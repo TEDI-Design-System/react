@@ -12,7 +12,7 @@ const meta: Meta<typeof VerticalStepper> = {
   parameters: {
     docs: {
       description: {
-        component: 'Vertical Stepper with StepItem and SubItem. Currently supports desktop only. ',
+        component: 'Verttical Stepper with StepItem and SubItem. Currently supports desktop only. ',
       },
     },
   },
