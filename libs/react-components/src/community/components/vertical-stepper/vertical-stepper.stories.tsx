@@ -1,6 +1,6 @@
 import { Meta, StoryFn } from '@storybook/react';
 
-import { Button, StatusBadge, Text, VerticalSpacing } from '../../../tedi';
+import { StatusBadge, Text, VerticalSpacing } from '../../../tedi';
 import Separator from '../../../tedi/components/misc/separator/separator';
 import { StepItem, VerticalStepper } from '.';
 import { SubItem } from './sub-item/sub-item';
@@ -24,8 +24,7 @@ const Template: StoryFn<typeof VerticalStepper> = ({ isCompact = false }) => (
   <div style={{ width: 350 }}>
     <VerticalSpacing size={4}>
       <VerticalStepper isCompact={isCompact}>
-        <StepItem title="Suhtlemine" isSelected hasIcon>
-          <Button size="small">Button</Button>
+        <StepItem title="Suhtlemine" isSelected>
           <SubItem title="Sotsiaalsed suhted" state="completed" as="button">
             <StatusBadge color="warning" variant="filled">
               Mõõdukas probleem
@@ -43,21 +42,28 @@ const Template: StoryFn<typeof VerticalStepper> = ({ isCompact = false }) => (
           <SubItem title="Riskivaldkonnad" state="disabled"></SubItem>
           <SubItem title="Tervise eest hoolitsemine" state="informative"></SubItem>
         </StepItem>
-        <StepItem title="Vaimne tervis" state="completed" hasIcon>
-          <StatusBadge color="warning" variant="filled">
-            Mõõdukas probleem
-          </StatusBadge>
+        <StepItem
+          title="Vaimne tervis"
+          state="completed"
+          hasIcon
+          info={
+            <StatusBadge color="warning" variant="filled">
+              Mõõdukas probleem
+            </StatusBadge>
+          }
+        >
+          <SubItem title="Sobiva eluaseme leidmine"></SubItem>
 
           <SubItem title="Riskivaldkonnad"></SubItem>
         </StepItem>
-        <Separator spacing={1} />
+        <Separator className="stepper-separator" spacing={1} />
         <StepItem title="Elukeskkond" state="completed">
           <SubItem title="Sobiva eluaseme leidmine"></SubItem>
         </StepItem>
         <StepItem title="Hõivatus" state="error" hasIcon>
           <SubItem title="Rakenduse leidmine ja säiilitamine"></SubItem>
         </StepItem>
-        <StepItem title="Vaba aeg ja huvitegevus" state="default"></StepItem>
+        <StepItem title="Vaba aeg ja huvitegevus ja peresisesed suhted" state="default"></StepItem>
         <StepItem title="Igapäevaelu toimingud" state="disabled"></StepItem>
         <StepItem title="Mitteametlik abi">
           <SubItem title="Abi perekonnalt" state="completed"></SubItem>
@@ -69,6 +75,16 @@ const Template: StoryFn<typeof VerticalStepper> = ({ isCompact = false }) => (
           <SubItem title="Muu abi" state="informative"></SubItem>
           <SubItem title="Muu abi 2"></SubItem>
         </StepItem>
+        <StepItem
+          title="Vaba aeg ja huvitegevus"
+          state="default"
+          info={
+            <StatusBadge color="warning" variant="filled">
+              Mõõdukas probleem
+            </StatusBadge>
+          }
+        ></StepItem>
+        {/* <StepItem title="Vaba aeg ja huvitegevus ja peresisesed suhted" state="default"></StepItem> */}
       </VerticalStepper>
     </VerticalSpacing>
   </div>
