@@ -145,4 +145,36 @@ describe('Separator Component', () => {
     expect(separator).toHaveClass(styles['tedi-separator--dotted']);
     expect(separator).not.toHaveClass(styles['tedi-separator--dot-only-medium']);
   });
+
+  it('should be aria-hidden by default when using div', () => {
+    const { getByTestId } = renderComponent({});
+    expect(getByTestId('separator')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('should have role separator when element is hr', () => {
+    const { getByTestId } = renderComponent({ element: 'hr' });
+    expect(getByTestId('separator')).toHaveAttribute('role', 'separator');
+    expect(getByTestId('separator')).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('should allow forcing semantic mode with isSemantic=true', () => {
+    const { getByTestId } = renderComponent({ isSemantic: true });
+    const separator = getByTestId('separator');
+    expect(separator).toHaveAttribute('role', 'separator');
+    expect(separator).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('should apply aria-label when isSemantic=true and ariaLabel is provided', () => {
+    const { getByTestId } = renderComponent({ isSemantic: true, ariaLabel: 'Section divider' });
+    const separator = getByTestId('separator');
+    expect(separator).toHaveAttribute('role', 'separator');
+    expect(separator).toHaveAttribute('aria-label', 'Section divider');
+  });
+
+  it('should ignore ariaLabel when isSemantic=false', () => {
+    const { getByTestId } = renderComponent({ ariaLabel: 'Ignored label' });
+    const separator = getByTestId('separator');
+    expect(separator).toHaveAttribute('aria-hidden', 'true');
+    expect(separator).not.toHaveAttribute('aria-label');
+  });
 });
