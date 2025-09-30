@@ -68,6 +68,20 @@ export interface AlertProps extends BreakpointSupport<AlertBreakpointProps> {
    * @default alert
    */
   role?: 'alert' | 'status' | 'none';
+  /**
+   * Semantic heading level for alert titles to ensure WCAG compliance.
+   *
+   * @example
+   * // For critical alerts that are main content
+   * titleElement="h2"
+   *
+   * @example
+   * // For secondary notifications
+   * titleElement="h4"
+   *
+   * @default 'h3'
+   */
+  titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
 export const Alert = (props: AlertProps): JSX.Element | null => {
@@ -82,6 +96,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     onClose,
     isGlobal = false,
     noSideBorders = false,
+    titleElement = 'h3',
     ...rest
   } = getCurrentBreakpointProps<AlertProps>(props);
 
@@ -106,13 +121,15 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
   };
 
   const ariaLive = role === 'alert' ? 'assertive' : role === 'status' ? 'polite' : 'off';
+  const headingId = React.useId();
 
   return isMounted ? (
     <div
       role={role}
       data-name="alert"
+      aria-label={`${type} alert`}
       aria-live={ariaLive}
-      aria-label={title ? `${type} alert: ${title}` : `${type} alert`}
+      aria-labelledby={title ? headingId : undefined}
       {...rest}
       className={alertBEM}
     >
@@ -121,12 +138,18 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           <Col grow={1} className={styles['tedi-alert__content']}>
             {icon && getIcon(icon)}
             <div className="tedi-alert__content-wrapper">
-              {title ? <Heading element="h5">{title}</Heading> : children}
+              {title ? (
+                <Heading element={titleElement} id={headingId} modifiers={['h5']}>
+                  {title}
+                </Heading>
+              ) : (
+                children
+              )}
             </div>
           </Col>
           {onClose && (
             <Col width="auto">
-              <ClosingButton onClick={onClose} aria-label="Close alert" />
+              <ClosingButton onClick={onClose} />
             </Col>
           )}
         </Row>

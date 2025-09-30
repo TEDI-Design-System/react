@@ -38,7 +38,6 @@ describe('Alert component', () => {
 
     expect(title).toBeInTheDocument();
     expect(content).toBeInTheDocument();
-    expect(title.tagName).toBe('H5');
   });
 
   it('renders an icon when provided', () => {
@@ -78,7 +77,7 @@ describe('Alert component', () => {
   it('does not render close button when onClose is not provided', () => {
     render(<Alert>No Close Button</Alert>);
 
-    const closeButton = screen.queryByRole('button', { name: /close alert/i });
+    const closeButton = screen.queryByRole('button', { name: /close/i });
     expect(closeButton).not.toBeInTheDocument();
   });
 
@@ -101,5 +100,45 @@ describe('Alert component', () => {
 
     const content = screen.getByText('Alert without Title');
     expect(content).toBeInTheDocument();
+  });
+
+  it('renders title with default h3 when titleElement is not provided', () => {
+    render(<Alert title="Alert Title">Alert Content</Alert>);
+
+    const title = screen.getByText('Alert Title');
+    expect(title.tagName).toBe('H3');
+  });
+
+  it('renders title with custom heading level when titleElement is provided', () => {
+    render(
+      <Alert title="Alert Title" titleElement="h2">
+        Alert Content
+      </Alert>
+    );
+
+    const title = screen.getByText('Alert Title');
+    expect(title.tagName).toBe('H2');
+  });
+
+  it('renders title with h1 when titleElement is h1', () => {
+    render(
+      <Alert title="Important Alert" titleElement="h1">
+        Critical content
+      </Alert>
+    );
+
+    const title = screen.getByText('Important Alert');
+    expect(title.tagName).toBe('H1');
+  });
+
+  it('renders title with h6 when titleElement is h6', () => {
+    render(
+      <Alert title="Minor Alert" titleElement="h6">
+        Less important content
+      </Alert>
+    );
+
+    const title = screen.getByText('Minor Alert');
+    expect(title.tagName).toBe('H6');
   });
 });
