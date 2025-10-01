@@ -1,3 +1,15 @@
+# [@tehik-ee/tedi-angular-v2.5.0-rc.2](https://github.com/TEHIK-EE/tedi-design-system/compare/angular-2.5.0-rc.1...angular-2.5.0-rc.2) (2025-10-01)
+
+
+### Bug Fixes
+
+* **file-dropzone:** better error message [#860](https://github.com/TEHIK-EE/tedi-design-system/issues/860) ([90638d8](https://github.com/TEHIK-EE/tedi-design-system/commit/90638d8177485e52a0f8b0a1f61e9f53ab52fb12))
+
+
+### Features
+
+* **file-dropzone:** add toggle for SI and IEC standards of showing filesize fix filesize [#860](https://github.com/TEHIK-EE/tedi-design-system/issues/860) ([162cae1](https://github.com/TEHIK-EE/tedi-design-system/commit/162cae130dabd4c9967165331d46c3fe36512a84))
+
 # [@tehik-ee/tedi-angular-v2.5.0-rc.1](https://github.com/TEHIK-EE/tedi-design-system/compare/angular-2.4.0...angular-2.5.0-rc.1) (2025-09-29)
 
 
