@@ -84,7 +84,7 @@ const Template: StoryFn<typeof VerticalStepper> = ({ isCompact = false }) => (
             </StatusBadge>
           }
         ></StepItem>
-        {/* <StepItem title="Vaba aeg ja huvitegevus ja peresisesed suhted" state="default"></StepItem> */}
+        <StepItem title="Vaba aeg ja huvitegevus ja peresisesed suhted" state="default"></StepItem>
       </VerticalStepper>
     </VerticalSpacing>
   </div>

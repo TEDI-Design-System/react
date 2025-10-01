@@ -42,6 +42,7 @@ export const StepItem = ({
   state = 'default',
   info,
 }: StepItemProps): JSX.Element => {
+  const [open, selected] = React.useState(false);
   const stepItemClassName = cn(
     styles['stepper-item'],
     {
@@ -49,6 +50,7 @@ export const StepItem = ({
       [styles['selected']]: isSelected,
       [styles['has-info']]: info && !children,
       [styles['info-with-children']]: info && children,
+      [styles['stepper-collapse-open']]: open,
     },
     className
   );
@@ -59,6 +61,8 @@ export const StepItem = ({
       <div className={styles['stepper-content']}>
         {children ? (
           <Collapse
+            onToggle={(isOpen) => selected(isOpen)}
+            open={open}
             hideCollapseText
             id="vertical-stepper-collapse"
             className={styles['stepper-item-collapse']}

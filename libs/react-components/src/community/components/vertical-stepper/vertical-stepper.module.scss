@@ -41,7 +41,7 @@
 
   &:last-child {
     &::before {
-      height: calc(100% - 20px);
+      height: calc(100% - 25px);
     }
   }
 
@@ -51,15 +51,15 @@
     }
   }
 
-  &.has-info {
+  &.info-with-children {
     &::before {
-      height: 1px;
+      height: calc(100% - 25px);
     }
   }
 
-  &.info-with-children {
+  &.stepper-collapse-open:not(:has(+ .stepper-item)) {
     &::before {
-      height: calc(100% - 24px);
+      height: calc(100% - 20px);
     }
   }
 
@@ -420,13 +420,25 @@
     }
   }
 
-  &.has-info {
+  &.has-info:not(:has(+ .stepper-item)) {
     &::before {
       height: 1px;
     }
   }
 
   &.info-with-children {
+    &::before {
+      height: calc(100% - 20px);
+    }
+  }
+
+  &:not(:has(+ .stepper-item)) {
+    &::before {
+      height: 0;
+    }
+  }
+
+  &.stepper-collapse-open:not(:has(+ .stepper-item)) {
     &::before {
       height: calc(100% - 20px);
     }
