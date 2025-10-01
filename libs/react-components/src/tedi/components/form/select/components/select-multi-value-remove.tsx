@@ -6,7 +6,7 @@ import Separator from '../../../misc/separator/separator';
 import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
 
-export const SelectMultiValueRemove = ({ innerProps }: MultiValueRemoveProps<ISelectOption>): JSX.Element => {
+export const SelectMultiValueRemove = ({ innerProps, data }: MultiValueRemoveProps<ISelectOption>): JSX.Element => {
   const { getLabel } = useLabels();
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -28,7 +28,7 @@ export const SelectMultiValueRemove = ({ innerProps }: MultiValueRemoveProps<ISe
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={styles['tedi-select__multi-value-clear']}
-        title={getLabel('clear')}
+        title={`${getLabel('clear')} ${data.label}`}
       />
       <Separator color="primary" axis="vertical" className={styles['tedi-select__separator']} />
     </>
