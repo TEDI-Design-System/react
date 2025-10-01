@@ -1,3 +1,10 @@
+# [@tehik-ee/tedi-react-v13.1.0-rc.17](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.16...react-13.1.0-rc.17) (2025-10-01)
+
+
+### Features
+
+* **vertical-stepper:** design changes and additional slot for info components [#512](https://github.com/TEHIK-EE/tedi-design-system/issues/512) ([#1131](https://github.com/TEHIK-EE/tedi-design-system/issues/1131)) ([1d4f0da](https://github.com/TEHIK-EE/tedi-design-system/commit/1d4f0da901e5810de64c4acaa4e566a445d4af18))
+
 # [@tehik-ee/tedi-react-v13.1.0-rc.16](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.15...react-13.1.0-rc.16) (2025-09-25)
 
 
