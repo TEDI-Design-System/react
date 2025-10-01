@@ -27,16 +27,6 @@
     }
   }
 
-  &:has(+ .tedi-separator) {
-    &::before {
-      height: 0;
-    }
-
-    &::after {
-      display: none;
-    }
-  }
-
   // ===== VERTICAL LINE =====
   &::before {
     position: absolute;
@@ -50,6 +40,24 @@
   }
 
   &:last-child {
+    &::before {
+      height: calc(100% - 25px);
+    }
+  }
+
+  &:has(+ .stepper-separator) {
+    &::before {
+      height: 0;
+    }
+  }
+
+  &.info-with-children {
+    &::before {
+      height: calc(100% - 25px);
+    }
+  }
+
+  &.stepper-collapse-open:not(:has(+ .stepper-item)) {
     &::before {
       height: calc(100% - 20px);
     }
@@ -187,6 +195,13 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+
+  .stepper-item-collapse {
+    button span {
+      align-items: flex-start !important;
+      color: var(--color-text-default);
+    }
+  }
 }
 
 .stepper-counter {
@@ -260,7 +275,7 @@
 
   .sub-item-dot-container {
     position: relative;
-    left: -16.5px;
+    left: -17px;
     width: 10px;
     height: 10px;
     border: 1px solid var(--color-white);
@@ -269,8 +284,8 @@
 
   .sub-item-dot {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 9px;
+    height: 9px;
     background-color: var(--color-white);
     border: 1px solid var(--general-border-secondary);
     border-radius: 50%;
@@ -294,6 +309,7 @@
 
   .sub-item-text button {
     padding: 0;
+    text-align: left;
     background: none;
     border: none;
   }
@@ -397,8 +413,39 @@
 // ==================
 .stepper--compact .stepper-item {
   grid-template-columns: [counter-column] 16px [text-column] auto;
+
+  &:last-child {
+    &::before {
+      height: calc(100% - 20px);
+    }
+  }
+
+  &.has-info:not(:has(+ .stepper-item)) {
+    &::before {
+      height: 1px;
+    }
+  }
+
+  &.info-with-children {
+    &::before {
+      height: calc(100% - 20px);
+    }
+  }
+
+  &:not(:has(+ .stepper-item)) {
+    &::before {
+      height: 0;
+    }
+  }
+
+  &.stepper-collapse-open:not(:has(+ .stepper-item)) {
+    &::before {
+      height: calc(100% - 20px);
+    }
+  }
 }
 
+/* ===== CHECKMARK ===== */
 .stepper--compact .stepper-item.completed .stepper-counter::before {
   top: 2px;
   left: 5.5px;
@@ -411,8 +458,10 @@
   transform: rotate(45deg);
 }
 
+/* ===== EXCLAMATION ICON ===== */
 .stepper--compact .stepper-item.error .stepper-counter::before {
   font-size: 12px;
+  font-weight: bold;
   content: '!';
 }
 
@@ -453,14 +502,14 @@
 }
 
 .stepper--compact .stepper-item .sub-item .sub-item-dot-container {
-  left: -8.5px;
+  left: -9px;
   width: 10px;
   height: 10px;
 }
 
 .stepper--compact .stepper-item .sub-item .sub-item-dot {
-  width: 100%;
-  height: 100%;
+  width: 9px;
+  height: 9px;
 
   &:hover {
     border-color: var(--color-primary-main);
