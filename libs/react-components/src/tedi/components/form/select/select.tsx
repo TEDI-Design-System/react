@@ -230,8 +230,6 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           id={id}
           aria-describedby={helperId}
           autoFocus={autoFocus}
-          aria-labelledby={!hideLabel ? `${id}-label` : undefined}
-          aria-label={hideLabel && placeholder ? placeholder : undefined}
           ref={element}
           instanceId={id}
           className="tedi-select__wrapper"
@@ -260,7 +258,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           tabSelectsValue={tabSelectsValue}
           onMenuClose={onMenuClose}
           onMenuOpen={onMenuOpen}
-          placeholder={placeholder}
+          placeholder={placeholder || ''}
           isClearable={isClearable}
           backspaceRemovesValue={isTagRemovable}
           menuShouldScrollIntoView={true}
@@ -317,7 +315,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       <div data-name="select" className={SelectBEM}>
         <div className={styles['tedi-select__inner']}>
           <FormLabel
-            id={`${id}-label`}
+            id={`${id}-input`}
             label={label}
             required={required}
             hideLabel={hideLabel}
