@@ -1,3 +1,10 @@
+# [@tehik-ee/tedi-react-v13.1.0-rc.18](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.17...react-13.1.0-rc.18) (2025-10-08)
+
+
+### Bug Fixes
+
+* **select:** fix label and placeholder accessibility [#1014](https://github.com/TEHIK-EE/tedi-design-system/issues/1014) ([#1130](https://github.com/TEHIK-EE/tedi-design-system/issues/1130)) ([649b52b](https://github.com/TEHIK-EE/tedi-design-system/commit/649b52b8b221293c7a9d5ad26695b4777e1bb94e))
+
 # [@tehik-ee/tedi-react-v13.1.0-rc.17](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.16...react-13.1.0-rc.17) (2025-10-01)
 
 
