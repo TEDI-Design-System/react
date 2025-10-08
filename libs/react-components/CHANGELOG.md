@@ -1,3 +1,10 @@
+# [@tehik-ee/tedi-react-v13.1.0-rc.19](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.18...react-13.1.0-rc.19) (2025-10-08)
+
+
+### Bug Fixes
+
+* **separator:** fix stories for 9.1.4.10 criteria [#1007](https://github.com/TEHIK-EE/tedi-design-system/issues/1007) ([#1125](https://github.com/TEHIK-EE/tedi-design-system/issues/1125)) ([80d9ac8](https://github.com/TEHIK-EE/tedi-design-system/commit/80d9ac82ebb75418e1f2debd236b3ad5cedbf1d6))
+
 # [@tehik-ee/tedi-react-v13.1.0-rc.18](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.17...react-13.1.0-rc.18) (2025-10-08)
 
 
