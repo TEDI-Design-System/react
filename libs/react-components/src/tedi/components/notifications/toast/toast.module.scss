@@ -1,0 +1,19 @@
+.tedi-toast__progress {
+  background: var(--toast-progress-color) !important;
+}
+
+.tedi-toast__progress--success {
+  --toast-progress-color: var(--alert-default-border-success);
+}
+
+.tedi-toast__progress--info {
+  --toast-progress-color: var(--alert-default-border-info);
+}
+
+.tedi-toast__progress--danger {
+  --toast-progress-color: var(--alert-default-border-danger);
+}
+
+.tedi-toast__progress--warning {
+  --toast-progress-color: var(--alert-default-border-warning);
+}

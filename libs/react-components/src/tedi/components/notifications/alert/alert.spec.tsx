@@ -38,7 +38,6 @@ describe('Alert component', () => {
 
     expect(title).toBeInTheDocument();
     expect(content).toBeInTheDocument();
-    expect(title.tagName).toBe('H5');
   });
 
   it('renders an icon when provided', () => {
@@ -78,7 +77,7 @@ describe('Alert component', () => {
   it('does not render close button when onClose is not provided', () => {
     render(<Alert>No Close Button</Alert>);
 
-    const closeButton = screen.queryByRole('button', { name: /close alert/i });
+    const closeButton = screen.queryByRole('button', { name: /close/i });
     expect(closeButton).not.toBeInTheDocument();
   });
 
@@ -98,8 +97,25 @@ describe('Alert component', () => {
 
   it('renders children without a title', () => {
     render(<Alert>Alert without Title</Alert>);
+    expect(screen.getByText('Alert without Title')).toBeInTheDocument();
+  });
 
-    const content = screen.getByText('Alert without Title');
-    expect(content).toBeInTheDocument();
+  it('renders title with default h3 when titleElement is not provided', () => {
+    render(<Alert title="Alert Title">Alert Content</Alert>);
+    const title = screen.getByText('Alert Title');
+    expect(title.tagName).toBe('H3');
+  });
+
+  const headingLevels: Array<'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'> = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+  it.each(headingLevels)('renders title with %s when titleElement is %s', (level) => {
+    const text = `Alert with ${level.toUpperCase()}`;
+    render(
+      <Alert title={text} titleElement={level}>
+        Alert Content
+      </Alert>
+    );
+    const title = screen.getByText(text);
+    expect(title.tagName).toBe(level.toUpperCase());
   });
 });
