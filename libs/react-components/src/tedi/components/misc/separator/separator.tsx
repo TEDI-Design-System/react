@@ -88,6 +88,7 @@ export type SeparatorBreakpointProps = {
    * Height values based on breakpoints (for vertical separators).
    */
   height?: Omit<SeparatorVerticalProps['height'], 'axis'>;
+  axis?: 'horizontal' | 'vertical';
 };
 
 export type SeparatorProps = BreakpointSupport<
