@@ -1,3 +1,10 @@
+# [@tehik-ee/tedi-react-v13.1.0-rc.20](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.19...react-13.1.0-rc.20) (2025-10-08)
+
+
+### Bug Fixes
+
+* **alert,toast:** enhance accessibility, add titleElement prop to override default heading element, better Toast stories, add documentation [#1009](https://github.com/TEHIK-EE/tedi-design-system/issues/1009) ([#1126](https://github.com/TEHIK-EE/tedi-design-system/issues/1126)) ([f922907](https://github.com/TEHIK-EE/tedi-design-system/commit/f92290772259b8b3ff19a2cc5a1f1d9e9b24d610))
+
 # [@tehik-ee/tedi-react-v13.1.0-rc.19](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.18...react-13.1.0-rc.19) (2025-10-08)
 
 
