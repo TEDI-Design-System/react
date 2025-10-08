@@ -1,0 +1,125 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="TEDI-Ready/Components/Notifications/Toast/Documentation" />
+
+# Toast
+
+The **Toast** component provides an easy way to display notifications using the same appearance as the `Alert` component.
+
+---
+
+## `sendNotification`
+
+The `sendNotification` function is the main entry point for triggering toast notifications.
+
+```tsx
+sendNotification(alertProps, toastOptions?)
+```
+
+### Parameters
+
+```tsx
+| Name            | Type                                                                 | Description                                                                     |
+| --------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `alertProps`    | [`AlertProps`](../alert)                                             | Accepts the same properties as the `Alert` component.                           |
+| `toastOptions?` | [`ToastOptions`](https://fkhadra.github.io/react-toastify/api/toast) | (Optional) Custom React-Toastify options for overriding the default behavior.   |
+```
+
+### Example
+
+```tsx
+<VerticalSpacing>
+  <Row>
+    <Col>
+      <Button
+        onClick={() =>
+          sendNotification({
+            type: 'success',
+            title: 'Notice',
+            children: 'Something was successful!',
+          })
+        }
+      >
+        Show success toast
+      </Button>
+    </Col>
+    <Col>
+      <Button
+        onClick={() =>
+          sendNotification({
+            type: 'warning',
+            title: 'Notice',
+            icon: 'warning',
+            children: 'Warning!',
+          })
+        }
+      >
+        Show warning toast
+      </Button>
+    </Col>
+  </Row>
+
+  <Row>
+    <Col>
+      <Button
+        onClick={() =>
+          sendNotification({
+            type: 'danger',
+            title: 'Notice',
+            icon: 'error',
+            children: 'Something went wrong!',
+          })
+        }
+      >
+        Show danger toast
+      </Button>
+    </Col>
+    <Col>
+      <Button
+        onClick={() =>
+          sendNotification({
+            type: 'info',
+            title: 'Notice',
+            icon: 'info',
+            children: 'Some info text that can usually be very long!',
+          })
+        }
+      >
+        Show info toast
+      </Button>
+    </Col>
+  </Row>
+</VerticalSpacing>
+```
+
+This will display the alert in the **bottom-left corner** of the page.
+
+---
+
+## `ToastContainer`
+
+The `ToastContainer` component is required for rendering toast notifications.  
+It should be added once, near the **root** of your application (for example, in your `index.tsx` or `App.tsx` file).
+
+### Example
+
+```tsx
+import { ToastContainer } from '@/components/Toasti';
+
+function App() {
+  return (
+    <>
+      <YourAppRoutes />
+      <ToastContainer />
+    </>
+  );
+}
+```
+
+---
+
+## Summary
+
+- `sendNotification` displays an `Alert`-styled toast in the bottom-left corner.
+- You can customize its behavior using the optional React-Toastify options parameter.
+- Remember to include `ToastContainer` at the application root.

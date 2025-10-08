@@ -10,6 +10,7 @@ import { sendNotification, ToastContainer } from './toast';
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4281-58105&m=dev" target="_blank">Figma ↗</a><br/>
  * <a href="https://tedi.tehik.ee/1ee8444b7/p/35370f-toast" target="_blank">Zeroheight ↗</a><br/>
+ * <a href="?path=/docs/tedi-ready-components-notifications-toast-documentation--docs">Documentation ↗</a> <br/>
  * <a href="https://fkhadra.github.io/react-toastify/introduction" target="_blank">React-Toastify ↗</a>
  */
 

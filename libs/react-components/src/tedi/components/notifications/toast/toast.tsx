@@ -1,6 +1,7 @@
 import { Slide, toast, ToastContainer, ToastOptions } from 'react-toastify';
 
 import { Alert, AlertProps } from '../alert/alert';
+import styles from './toast.module.scss';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,7 +19,12 @@ const toastDefaultOptions: ToastOptions = {
 };
 
 export const sendNotification = (props: AlertProps, toastOptions?: ToastOptions) => {
-  const mergedToastOptions = { ...toastDefaultOptions, ...toastOptions };
+  const mergedToastOptions: ToastOptions = {
+    ...toastDefaultOptions,
+    ...toastOptions,
+    progressClassName: `${styles['tedi-toast__progress']} ${styles[`tedi-toast__progress--${props.type}`]}`,
+  };
+
   const id = toast(
     () => (
       <Alert

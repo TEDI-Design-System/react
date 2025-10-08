@@ -97,48 +97,25 @@ describe('Alert component', () => {
 
   it('renders children without a title', () => {
     render(<Alert>Alert without Title</Alert>);
-
-    const content = screen.getByText('Alert without Title');
-    expect(content).toBeInTheDocument();
+    expect(screen.getByText('Alert without Title')).toBeInTheDocument();
   });
 
   it('renders title with default h3 when titleElement is not provided', () => {
     render(<Alert title="Alert Title">Alert Content</Alert>);
-
     const title = screen.getByText('Alert Title');
     expect(title.tagName).toBe('H3');
   });
 
-  it('renders title with custom heading level when titleElement is provided', () => {
+  const headingLevels: Array<'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'> = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+  it.each(headingLevels)('renders title with %s when titleElement is %s', (level) => {
+    const text = `Alert with ${level.toUpperCase()}`;
     render(
-      <Alert title="Alert Title" titleElement="h2">
+      <Alert title={text} titleElement={level}>
         Alert Content
       </Alert>
     );
-
-    const title = screen.getByText('Alert Title');
-    expect(title.tagName).toBe('H2');
-  });
-
-  it('renders title with h1 when titleElement is h1', () => {
-    render(
-      <Alert title="Important Alert" titleElement="h1">
-        Critical content
-      </Alert>
-    );
-
-    const title = screen.getByText('Important Alert');
-    expect(title.tagName).toBe('H1');
-  });
-
-  it('renders title with h6 when titleElement is h6', () => {
-    render(
-      <Alert title="Minor Alert" titleElement="h6">
-        Less important content
-      </Alert>
-    );
-
-    const title = screen.getByText('Minor Alert');
-    expect(title.tagName).toBe('H6');
+    const title = screen.getByText(text);
+    expect(title.tagName).toBe(level.toUpperCase());
   });
 });
