@@ -45,15 +45,6 @@ export interface SeparatorSharedProps {
    * - For vertical axis, spacing is applied to left and right of the separator.
    */
   spacing?: SeparatorSpacing;
-  /**
-   * Force accessibility visibility of the separator.
-   * By default: div/span → hidden, hr → visible.
-   */
-  isSemantic?: boolean;
-  /**
-   * Optional accessible label when isSemantic is true.
-   */
-  ariaLabel?: string;
 }
 
 export interface SeparatorVerticalProps extends SeparatorSharedProps {
@@ -97,17 +88,24 @@ export type SeparatorBreakpointProps = {
    * Height values based on breakpoints (for vertical separators).
    */
   height?: Omit<SeparatorVerticalProps['height'], 'axis'>;
+  axis?: 'horizontal' | 'vertical';
 };
 
 export type SeparatorProps = BreakpointSupport<
-  | (SeparatorHorizontalProps & {
-      variant?: 'dotted' | 'dotted-small' | 'dot-only';
-      dotSize?: 'large' | 'medium' | 'small' | 'extra-small';
-    })
-  | (SeparatorVerticalProps & {
-      variant?: 'dotted' | 'dotted-small' | 'dot-only';
-      dotSize?: 'large' | 'medium' | 'small' | 'extra-small';
-    })
+  | (
+      | SeparatorHorizontalProps
+      | (SeparatorVerticalProps & {
+          variant?: 'dotted' | 'dotted-small';
+          dotSize?: undefined;
+        })
+    )
+  | (
+      | SeparatorHorizontalProps
+      | (SeparatorVerticalProps & {
+          variant: 'dot-only';
+          dotSize: 'large' | 'medium' | 'small' | 'extra-small';
+        })
+    )
 > &
   SeparatorBreakpointProps;
 
@@ -121,18 +119,18 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
     topSpacing,
     bottomSpacing,
     axis = 'horizontal',
-    color = 'primary',
+    color = 'default',
     variant,
     thickness = 1,
     height,
     dotSize,
     display = 'block',
-    isSemantic = false,
     ...rest
   } = getCurrentBreakpointProps<SeparatorProps>(props);
 
   const SeparatorBEM = cn(
     styles['tedi-separator'],
+    className,
     { [styles[`tedi-separator--${color}`]]: color },
     { [styles[`tedi-separator--${axis}`]]: axis },
     { [styles[`tedi-separator--${variant}`]]: variant },
@@ -142,14 +140,8 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
     { [styles['tedi-separator--is-stretched']]: isStretched },
     { [styles[`tedi-separator--spacing-${spacing}`.replace('.', '-')]]: spacing },
     { [styles[`tedi-separator--top-${topSpacing}`.replace('.', '-')]]: !spacing && topSpacing },
-    { [styles[`tedi-separator--bottom-${bottomSpacing}`.replace('.', '-')]]: !spacing && bottomSpacing },
-    className
+    { [styles[`tedi-separator--bottom-${bottomSpacing}`.replace('.', '-')]]: !spacing && bottomSpacing }
   );
-
-  const accessibilityProps =
-    isSemantic || Element === 'hr'
-      ? { role: 'separator', 'aria-label': rest.ariaLabel ?? undefined }
-      : { 'aria-hidden': true };
 
   const getCssVars = () => {
     const cssvars: CSSProperties = {};
@@ -159,9 +151,7 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
     return cssvars;
   };
 
-  return (
-    <Element data-name="separator" {...rest} style={getCssVars()} className={SeparatorBEM} {...accessibilityProps} />
-  );
+  return <Element data-name="separator" {...rest} style={getCssVars()} className={SeparatorBEM} />;
 };
 
 export default Separator;

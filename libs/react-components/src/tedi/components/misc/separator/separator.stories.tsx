@@ -121,7 +121,7 @@ const TemplateVertical: StoryFn<SeparatorProps> = (args) => (
         <Col xs="auto" md={2}>
           <p className="text-right">12.12.2012</p>
         </Col>
-        <Col width="auto">
+        <Col width={12} lg="auto">
           <Separator {...args} />
         </Col>
         <Col>
@@ -139,17 +139,40 @@ const TemplateVertical: StoryFn<SeparatorProps> = (args) => (
 
 export const VerticalThick: Story = {
   render: TemplateVertical,
-  args: { axis: 'vertical', thickness: 2, isStretched: true },
+  args: {
+    axis: 'horizontal',
+    thickness: 1,
+    isStretched: true,
+    topSpacing: 1,
+    bottomSpacing: 1,
+    md: { axis: 'vertical', thickness: 1 },
+  },
 };
 
 export const VerticalDotted: Story = {
   render: TemplateVertical,
-  args: { axis: 'vertical', variant: 'dotted', color: 'accent', isStretched: true },
+  args: {
+    axis: 'horizontal',
+    variant: 'dotted',
+    color: 'accent',
+    topSpacing: 1,
+    bottomSpacing: 1,
+    isStretched: true,
+    md: { axis: 'vertical' },
+  },
 };
 
 export const VerticalDottedSmall: Story = {
   render: TemplateVertical,
-  args: { axis: 'vertical', variant: 'dotted-small', color: 'accent', isStretched: true },
+  args: {
+    axis: 'horizontal',
+    topSpacing: 1,
+    bottomSpacing: 1,
+    variant: 'dotted-small',
+    color: 'accent',
+    isStretched: true,
+    md: { axis: 'vertical' },
+  },
 };
 
 export const HorizontalDottedSeparator: Story = {
