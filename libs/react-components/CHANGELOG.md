@@ -1,3 +1,10 @@
+# [@tehik-ee/tedi-react-v13.1.0-rc.21](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.20...react-13.1.0-rc.21) (2025-10-09)
+
+
+### Bug Fixes
+
+* **textfield:** fix input param passing [#1132](https://github.com/TEHIK-EE/tedi-design-system/issues/1132) ([#1166](https://github.com/TEHIK-EE/tedi-design-system/issues/1166)) ([6380a9a](https://github.com/TEHIK-EE/tedi-design-system/commit/6380a9a82637ea360c4d0622799cc7591ef3486d))
+
 # [@tehik-ee/tedi-react-v13.1.0-rc.20](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.19...react-13.1.0-rc.20) (2025-10-08)
 
 
