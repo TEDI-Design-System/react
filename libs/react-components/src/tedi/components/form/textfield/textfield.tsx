@@ -279,6 +279,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   const renderInputElement = React.useMemo((): JSX.Element | null => {
     const sharedProps = {
+      ...input,
       id,
       name,
       ...(hideLabel ? { 'aria-label': label } : {}),
@@ -308,25 +309,26 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
     return null;
   }, [
-    disabled,
-    helperId,
-    id,
     input,
-    inputClassName,
-    isArrowsHidden,
-    isInputRef,
-    isInvalid,
-    isTextAreaRef,
+    id,
     name,
-    onBlur,
-    onChangeHandler,
-    onFocus,
-    placeholder,
-    readOnly,
-    required,
-    value,
     hideLabel,
     label,
+    helperId,
+    disabled,
+    inputClassName,
+    isArrowsHidden,
+    required,
+    isInvalid,
+    placeholder,
+    readOnly,
+    onChangeHandler,
+    value,
+    onBlur,
+    onFocus,
+    isTextAreaRef,
+    props,
+    isInputRef,
   ]);
 
   const renderClearButton = React.useMemo(() => {
@@ -340,7 +342,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     };
 
     return <ClosingButton {...clearButtonProps} />;
-  }, [clearInput, getLabel, label, size]);
+  }, [clearInput, disabled, getLabel, size]);
 
   const renderRightArea = React.useMemo(() => {
     return (
