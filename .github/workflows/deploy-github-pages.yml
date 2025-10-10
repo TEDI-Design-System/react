@@ -53,7 +53,7 @@ jobs:
           npm ci
           npm run build:sb
           mkdir -p compiled-storybook
-          mv dist/storybook-static compiled-storybook/
+          mv dist/storybook-static/* compiled-storybook/
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ strategy.job-index }}
@@ -78,13 +78,13 @@ jobs:
         name: "Download artifacts"
         with:
           path: branches/
-      - name: Create public folder
+      - name: Create gpages folder
         shell: bash
         run: |
           ls -la branches
-          mkdir public
-          mv .github/workflows/index.html ./public/index.html
-          cd public
+          mkdir gpages
+          mv .github/workflows/index.html ./gpages/index.html
+          cd gpages
           branches=$(echo '${{ needs.build_matrix.outputs.json_branches }}' | jq -r '.[]')
           valid_branches=""
           i=-1
@@ -108,7 +108,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public/
+          path: ./gpages/
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
