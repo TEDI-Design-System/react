@@ -2,19 +2,16 @@ name: Continuous Deployment
 
 on:
   workflow_dispatch:
-
   push:
     branches:
       - "**"
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
   actions: read
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -37,8 +34,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Build
-    needs:
-      - build_matrix
+    needs: build_matrix
     strategy:
       fail-fast: false
       matrix:
@@ -52,19 +48,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Build
+      - name: Install and Build Storybook
         run: |
           npm ci
-          cd libs/angular-components
-          npm ci
           npm run build:sb
-          cd ../react-components
-          npm ci
-          npm run build:sb
-          cd ../..
-          mkdir compiled-storybook
-          mv libs/angular-components/dist/storybook-static compiled-storybook/angular
-          mv libs/react-components/dist/storybook/react-components compiled-storybook/react
+          mkdir -p compiled-storybook
+          mv dist/storybook-static compiled-storybook/
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ strategy.job-index }}

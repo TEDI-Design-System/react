@@ -3,16 +3,15 @@ let mainBranchRoot = document.getElementById("main-branches");
 let featureBranchRoot = document.getElementById("feature-branches");
 
 branches.forEach(branch => {
-let li = document.createElement("li");
+  let li = document.createElement("li");
+  li.className = "py-2";
+  li.innerHTML = `${branch} - <a href="./${branch}/">View</a>`;
 
-li.className = "py-2";
-li.innerHTML = `${branch} - <a href="./${branch}/react">React</a> | <a href="./${branch}/angular">Angular</a>`;
-
-if (mainBranches.indexOf(branch) !== -1) {
-mainBranchRoot.appendChild(li);
-} else {
-featureBranchRoot.appendChild(li);
-}
+  if (mainBranches.indexOf(branch) !== -1) {
+    mainBranchRoot.appendChild(li);
+  } else {
+    featureBranchRoot.appendChild(li);
+  }
 });
 });
 </script>
