@@ -5,8 +5,6 @@ on:
     branches:
       - rc
       - main
-    paths-ignore:
-      - "libs/angular-components/**"
 
 jobs:
   lint:
@@ -23,8 +21,6 @@ jobs:
       - name: Lint
         run: |
           npm ci --cache .npm --prefer-offline
-          cd libs/react-components
-          npm ci --cache .npm --prefer-offline
           npm run lint
 
   test:
@@ -38,8 +34,6 @@ jobs:
           node-version: "lts/*"
       - name: Test
         run: |
-          npm ci --cache .npm --prefer-offline
-          cd libs/react-components
           npm ci --cache .npm --prefer-offline
           npm run test
 
@@ -59,16 +53,12 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --cache .npm --prefer-offline
-          cd libs/react-components
-          npm ci --cache .npm --prefer-offline
       - name: Build Storybook
         run: |
-          cd libs/react-components
           npm run build:sb
       - name: Publish to Chromatic
         run: |
-          cd libs/react-components
-          CHROMATIC_PROJECT_TOKEN=${{ secrets.CHROMATIC_TOKEN_REACT }} npm run chromatic
+          CHROMATIC_PROJECT_TOKEN=${{ secrets.CHROMATIC_TOKEN }} npm run chromatic
 
   build-and-deploy:
     needs: [lint, test]
@@ -87,8 +77,6 @@ jobs:
       - name: Build and publish npm package
         run: |
           HUSKY=0
-          npm ci
-          cd libs/react-components
           npm ci
           npm run build
           ls -la dist

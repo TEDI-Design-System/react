@@ -1,0 +1,8 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-heading-with-icon {
+  display: flex;
+  align-items: center;
+
+  @include mixins.responsive-styles(gap, content-heading-inner-spacing-x);
+}

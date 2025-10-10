@@ -1,0 +1,7 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-skeleton {
+  pointer-events: none;
+
+  @include mixins.responsive-styles(border-radius, loader-skeleton-radius);
+}
