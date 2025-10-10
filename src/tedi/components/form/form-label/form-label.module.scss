@@ -1,0 +1,11 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-form-label {
+  &--hidden {
+    @include mixins.visually-hidden;
+  }
+
+  &--hidden-keep-space {
+    visibility: hidden;
+  }
+}

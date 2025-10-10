@@ -1,68 +1,46 @@
-# TEDI Design System
+# TEDI Design System for React
 
 [![codecov](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)](https://codecov.io/gh/TEHIK-EE/tedi-design-system)
 [![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
-The TEDI Design System provides reusable UI components for multiple frameworks.
+`@tedi-design-system/react` is a library of React components implementing the TEDI Design System.  
+It provides reusable, accessible, and consistent UI components to streamline building React applications.
 
-Usage instructions can be found in the [wiki](https://github.com/TEHIK-EE/tedi-design-system/wiki).
+Usage instructions and detailed documentation can be found in the [TEDI Design System wiki](https://github.com/TEDI-Design-System/general).
+
+---
+
+## Installation
+
+Install the dependencies for your React library:
+
+```
+npm run i
+```
 
 ---
 
 ## Development Guide
 
-### Setting Up the Project
+### Running Storybook
 
-Components are separated into packages by framework. Each package is managed separately.
-
-#### 1. Installing dependencies.
-
-Run the following command at the root to install shared dependencies:
+To view and develop components in isolation, start Storybook for React:
 
 ```
-npm install
-```
-
-Then, install dependencies for the specific library you are working on:
-
-For **React components**:
-
-```
-npm run install:react
-```
-
-For **Angular components**:
-
-```
-npm run install:angular
-```
-
-Alternatively, you can install everything from root `package.json`:
-
-```
-  npm run install:all
-```
-
-#### 2. Running Storybook
-
-Run your desired Storybook from root:
-
-```
-npm run start:react
-npm run start:angular
+npm run start
 ```
 
 ---
 
-### **Additional Resources**
+## Contributing
 
-Check the [wiki](https://github.com/TEHIK-EE/tedi-design-system/wiki) for detailed documentation.  
-Report issues or contribute via [GitHub Issues](https://github.com/TEHIK-EE/tedi-design-system/issues).
+Check the [wiki](https://github.com/TEDI-Design-System/general) for component guidelines and coding standards.  
+Report issues or contribute via [GitHub Issues](https://github.com/TEDI-Design-System/react/issues).
 
 ---
 
-### Thanks
+## Visual Testing
 
 <a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
 
-Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.
+We use [Chromatic](https://www.chromatic.com/) for visual testing, reviewing UI changes, and preventing visual regressions.
