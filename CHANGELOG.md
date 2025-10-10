@@ -1,3 +1,32 @@
+# [14.0.0](https://github.com/TEDI-Design-System/react/compare/react-13.1.0...react-14.0.0) (2025-10-10)
+
+
+### Bug Fixes
+
+* **alert,toast:** enhance accessibility, add titleElement prop to override default heading element, better Toast stories, add documentation [#1009](https://github.com/TEDI-Design-System/react/issues/1009) ([#1126](https://github.com/TEDI-Design-System/react/issues/1126)) ([f922907](https://github.com/TEDI-Design-System/react/commit/f92290772259b8b3ff19a2cc5a1f1d9e9b24d610))
+* **file-dropzone:** better error message [#860](https://github.com/TEDI-Design-System/react/issues/860) ([90638d8](https://github.com/TEDI-Design-System/react/commit/90638d8177485e52a0f8b0a1f61e9f53ab52fb12))
+* **select:** fix label and placeholder accessibility [#1014](https://github.com/TEDI-Design-System/react/issues/1014) ([#1130](https://github.com/TEDI-Design-System/react/issues/1130)) ([649b52b](https://github.com/TEDI-Design-System/react/commit/649b52b8b221293c7a9d5ad26695b4777e1bb94e))
+* **separator:** fix stories for 9.1.4.10 criteria [#1007](https://github.com/TEDI-Design-System/react/issues/1007) ([#1125](https://github.com/TEDI-Design-System/react/issues/1125)) ([80d9ac8](https://github.com/TEDI-Design-System/react/commit/80d9ac82ebb75418e1f2debd236b3ad5cedbf1d6))
+* **textfield:** fix input param passing [#1132](https://github.com/TEDI-Design-System/react/issues/1132) ([#1166](https://github.com/TEDI-Design-System/react/issues/1166)) ([6380a9a](https://github.com/TEDI-Design-System/react/commit/6380a9a82637ea360c4d0622799cc7591ef3486d))
+
+
+### Code Refactoring
+
+* **react:** move React to standalone repo [#355](https://github.com/TEDI-Design-System/react/issues/355) ([bc880e5](https://github.com/TEDI-Design-System/react/commit/bc880e5f30d78769eb9e3b0dd1eae94a33b8c354))
+
+
+### Features
+
+* **file-dropzone:** add toggle for SI and IEC standards of showing filesize fix filesize [#860](https://github.com/TEDI-Design-System/react/issues/860) ([162cae1](https://github.com/TEDI-Design-System/react/commit/162cae130dabd4c9967165331d46c3fe36512a84))
+* **timeline:** TEDI-Ready component [#1094](https://github.com/TEDI-Design-System/react/issues/1094) ([#1122](https://github.com/TEDI-Design-System/react/issues/1122)) ([c6e9fb4](https://github.com/TEDI-Design-System/react/commit/c6e9fb44653b04dee705a9ffd2718045bc3d22ec))
+* **vertical-stepper:** design changes and additional slot for info components [#512](https://github.com/TEDI-Design-System/react/issues/512) ([#1131](https://github.com/TEDI-Design-System/react/issues/1131)) ([1d4f0da](https://github.com/TEDI-Design-System/react/commit/1d4f0da901e5810de64c4acaa4e566a445d4af18))
+
+
+### BREAKING CHANGES
+
+* **react:** the package name has changed.
+Update all imports and dependencies to use the new package name.
+
 # [14.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-13.1.0-rc.21...react-14.0.0-rc.1) (2025-10-10)
 
 
