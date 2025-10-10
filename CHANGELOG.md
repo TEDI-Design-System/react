@@ -1,3 +1,16 @@
+# [14.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-13.1.0-rc.21...react-14.0.0-rc.1) (2025-10-10)
+
+
+### Code Refactoring
+
+* **react:** move React to standalone repo [#355](https://github.com/TEDI-Design-System/react/issues/355) ([bc880e5](https://github.com/TEDI-Design-System/react/commit/bc880e5f30d78769eb9e3b0dd1eae94a33b8c354))
+
+
+### BREAKING CHANGES
+
+* **react:** the package name has changed.
+Update all imports and dependencies to use the new package name.
+
 # [@tehik-ee/tedi-react-v13.1.0-rc.21](https://github.com/TEHIK-EE/tedi-design-system/compare/react-13.1.0-rc.20...react-13.1.0-rc.21) (2025-10-09)
 
 
