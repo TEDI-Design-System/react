@@ -31,12 +31,11 @@ export default meta;
 type Story = StoryObj<SearchProps>;
 
 const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'];
+const sizeArray: SearchProps['size'][] = ['small', 'default', 'large'];
 
 interface TemplateStateProps extends SearchProps {
   array: typeof stateArray;
 }
-
-const sizeArray: SearchProps['size'][] = ['small', 'default', 'large'];
 
 interface TemplateMultipleProps<Type = SearchProps['size']> extends SearchProps {
   array: Type[];
@@ -56,10 +55,14 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
           <Col>
             <VerticalSpacing>
               <Search {...textFieldProps} {...{ [property]: value }} />
-              <Search {...textFieldProps} button={{ icon: 'search', size: value }} {...{ [property]: value }} />
               <Search
                 {...textFieldProps}
-                button={{ iconLeft: 'search', children: 'Otsi', size: value }}
+                button={{ icon: 'search', size: value, 'aria-label': 'Search' }}
+                {...{ [property]: value }}
+              />
+              <Search
+                {...textFieldProps}
+                button={{ iconLeft: 'search', children: 'Search', size: value }}
                 {...{ [property]: value }}
               />
             </VerticalSpacing>
@@ -85,50 +88,40 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           </Col>
         </Row>
       ))}
+
       <Row className="padding-14-16">
         <Col width={2} className="display-flex align-items-center">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col className="display-flex align-items-center">
-          <Search
-            {...textFieldProps}
-            id="success-search"
-            helper={{
-              text: 'Feedback text',
-              type: 'valid',
-            }}
-          />
+          <Search {...textFieldProps} id="success-search" helper={{ text: 'Feedback text', type: 'valid' }} />
         </Col>
       </Row>
+
       <Row className="padding-14-16">
         <Col width={2} className="display-flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col className="display-flex align-items-center">
-          <Search
-            {...textFieldProps}
-            id="error-search"
-            helper={{
-              text: 'Feedback text',
-              type: 'error',
-            }}
-          />
+          <Search {...textFieldProps} id="error-search" helper={{ text: 'Feedback text', type: 'error' }} />
         </Col>
       </Row>
     </div>
   );
 };
 
+/* ---------- Stories ---------- */
+
 export const Default: Story = {
   args: {
     id: 'example-1',
     label: 'Search',
+    placeholder: 'Search by name or keyword',
   },
 };
 
 export const Sizes: StoryObj<TemplateMultipleProps> = {
   render: TemplateColumn,
-
   args: {
     id: 'example-1',
     label: 'Search',
@@ -156,7 +149,7 @@ export const Placeholder: Story = {
   args: {
     id: 'example-1',
     label: 'Search',
-    placeholder: 'Name',
+    placeholder: 'Type something...',
   },
 };
 
@@ -175,7 +168,7 @@ export const ClearableButton: Story = {
     label: 'Search',
     isClearable: true,
     value: 'Lorem ipsum',
-    button: { iconLeft: 'search', children: 'Otsi' },
+    button: { iconLeft: 'search', children: 'Search' },
   },
 };
 
@@ -184,5 +177,14 @@ export const WithHint: Story = {
     id: 'example-1',
     label: 'Search',
     helper: { text: 'Hint text' },
+  },
+};
+
+export const Estonian: Story = {
+  args: {
+    id: 'example-et',
+    label: 'Otsi',
+    placeholder: 'Sisesta otsingusõna...',
+    button: { iconLeft: 'search', children: 'Otsi' },
   },
 };
