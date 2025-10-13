@@ -110,8 +110,6 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
   );
 };
 
-/* ---------- Stories ---------- */
-
 export const Default: Story = {
   args: {
     id: 'example-1',
