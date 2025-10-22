@@ -1,3 +1,10 @@
+## [14.0.1](https://github.com/TEDI-Design-System/react/compare/react-14.0.0...react-14.0.1) (2025-10-22)
+
+
+### Bug Fixes
+
+* **common:** move dayjs to peerDependencies fix [#367](https://github.com/TEDI-Design-System/react/issues/367) ([01be1e9](https://github.com/TEDI-Design-System/react/commit/01be1e9ce1e57b656acb87beac0528fd211eb138))
+
 # [14.0.0](https://github.com/TEDI-Design-System/react/compare/react-13.1.0...react-14.0.0) (2025-10-10)
 
 
