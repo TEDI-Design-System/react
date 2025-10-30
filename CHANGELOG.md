@@ -1,3 +1,10 @@
+# [14.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0-rc.1) (2025-10-27)
+
+
+### Features
+
+* **general:** react 19 support [#365](https://github.com/TEDI-Design-System/react/issues/365) ([#366](https://github.com/TEDI-Design-System/react/issues/366)) ([0d1d8d8](https://github.com/TEDI-Design-System/react/commit/0d1d8d8df09873edd9a9ff142d8665b777e4f223))
+
 ## [14.0.1](https://github.com/TEDI-Design-System/react/compare/react-14.0.0...react-14.0.1) (2025-10-22)
 
 
