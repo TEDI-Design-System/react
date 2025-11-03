@@ -1,3 +1,10 @@
+# [14.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.1.0...react-14.2.0-rc.1) (2025-11-03)
+
+
+### Features
+
+* **vertical-stepper:** make collapse controllable from outside and reposition checkmark [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c86a868](https://github.com/TEDI-Design-System/react/commit/c86a8682138c0b3c10732da2e3cc09700d5b2957))
+
 # [14.1.0](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0) (2025-10-30)
 
 
