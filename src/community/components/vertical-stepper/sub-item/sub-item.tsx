@@ -52,7 +52,7 @@ export const SubItem = ({
         </span>
 
         <span className={styles['sub-item-text']}>
-          <Element href={href} onClick={onClick} className={styles['sub-item-link']}>
+          <Element href={href} onClick={onClick}>
             <Text>
               {title}
               {hasIcon && state === 'error' && (
