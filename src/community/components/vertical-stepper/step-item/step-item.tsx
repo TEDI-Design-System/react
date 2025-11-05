@@ -83,8 +83,8 @@ export const StepItem = ({
             title={
               <>
                 <Row alignItems="start">
-                  <Col className={styles['stepper-link']}>
-                    <Text>
+                  <Col>
+                    <Text className={styles['stepper-link']}>
                       {title}
                       {hasIcon && state === 'error' && (
                         <Icon
