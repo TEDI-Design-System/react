@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
-import { Col, Row } from '../../../../tedi';
+import { Col, Row, Text } from '../../../../tedi';
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import Collapse from '../../../../tedi/components/buttons/collapse/collapse';
 import styles from '../vertical-stepper.module.scss';
@@ -29,6 +29,10 @@ export interface StepItemProps {
    * Additional info components like StatusBadge, Button, Link or Text.
    */
   info?: React.ReactNode;
+  /** Controls the collapse externally if provided */
+  isOpen?: boolean;
+  /** Called when collapse is toggled */
+  onToggle?: (isOpen: boolean) => void;
 }
 
 export const StepItem = ({
@@ -41,8 +45,18 @@ export const StepItem = ({
   onClick,
   state = 'default',
   info,
+  isOpen,
+  onToggle,
 }: StepItemProps): JSX.Element => {
-  const [open, selected] = React.useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(false);
+
+  const open = isOpen ?? internalOpen;
+
+  const handleToggle = (newState: boolean) => {
+    if (onToggle) onToggle(newState);
+    if (isOpen === undefined) setInternalOpen(newState);
+  };
+
   const stepItemClassName = cn(
     styles['stepper-item'],
     {
@@ -61,7 +75,7 @@ export const StepItem = ({
       <div className={styles['stepper-content']}>
         {children ? (
           <Collapse
-            onToggle={(isOpen) => selected(isOpen)}
+            onToggle={handleToggle}
             open={open}
             hideCollapseText
             id="vertical-stepper-collapse"
@@ -69,26 +83,28 @@ export const StepItem = ({
             title={
               <>
                 <Row alignItems="start">
-                  <Col className={styles['stepper-link']}>
-                    {title}
-                    {hasIcon && state === 'error' && (
-                      <Icon
-                        name="error"
-                        color="danger"
-                        size={16}
-                        display="inline"
-                        className={styles['radio__tooltip-icon']}
-                      />
-                    )}
-                    {hasIcon && state === 'completed' && (
-                      <Icon
-                        name="check"
-                        color="success"
-                        size={16}
-                        display="inline"
-                        className={styles['radio__tooltip-icon']}
-                      />
-                    )}
+                  <Col>
+                    <Text className={styles['stepper-link']}>
+                      {title}
+                      {hasIcon && state === 'error' && (
+                        <Icon
+                          name="error"
+                          color="danger"
+                          size={16}
+                          display="inline"
+                          className={styles['radio__tooltip-icon']}
+                        />
+                      )}
+                      {hasIcon && state === 'completed' && (
+                        <Icon
+                          name="check"
+                          color="success"
+                          size={16}
+                          display="inline"
+                          className={styles['radio__tooltip-icon']}
+                        />
+                      )}
+                    </Text>
                   </Col>
                 </Row>
                 <Row>
@@ -112,12 +128,16 @@ export const StepItem = ({
                 }}
                 className={styles['stepper-link']}
               >
-                {title}
+                <Text>
+                  {title}
+                  <span className={styles['stepper-link-icon']}>
+                    {hasIcon && state === 'error' && <Icon name="error" color="danger" size={16} display="inline" />}
+                    {hasIcon && state === 'completed' && (
+                      <Icon name="check" color="success" size={16} display="inline" />
+                    )}
+                  </span>
+                </Text>
               </a>
-              <span className={styles['stepper-link-icon']}>
-                {hasIcon && state === 'error' && <Icon name="error" color="danger" size={16} display="inline" />}
-                {hasIcon && state === 'completed' && <Icon name="check" color="success" size={16} display="inline" />}
-              </span>
             </div>
             <Row>
               <Col>{info}</Col>

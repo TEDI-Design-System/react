@@ -53,7 +53,7 @@
 
   &.info-with-children {
     &::before {
-      height: calc(100% - 25px);
+      height: 0;
     }
   }
 
@@ -300,7 +300,7 @@
     }
   }
 
-  .sub-item-text a,
+  .sub-item-text a p,
   .sub-item-text button {
     font-size: 16px;
     color: var(--color-text-default);
@@ -319,7 +319,7 @@
       border-color: var(--color-primary-active);
     }
 
-    .sub-item-text a,
+    .sub-item-text a p,
     .sub-item-text button {
       color: var(--color-primary-active);
       text-decoration: underline;
@@ -353,25 +353,6 @@
     }
   }
 
-  &.disabled {
-    .sub-item-dot {
-      color: var(--color-text-disabled);
-      background-color: var(--color-bg-disabled);
-      border-color: var(--general-border-secondary);
-    }
-
-    .sub-item-text a,
-    .sub-item-text button {
-      color: var(--color-text-disabled);
-      cursor: default;
-    }
-
-    &:hover .sub-item-text a,
-    .sub-item-text button {
-      text-decoration: none;
-    }
-  }
-
   &.default {
     .sub-item-dot {
       color: var(--color-text-muted);
@@ -391,7 +372,7 @@
       border: 2px solid var(--color-primary-active);
     }
 
-    .sub-item-text a,
+    .sub-item-text a p,
     .sub-item-text button {
       font-weight: bold;
       color: var(--color-primary-active);
@@ -401,9 +382,28 @@
       border-color: var(--blue-800);
     }
 
-    &:hover .sub-item-text a,
+    &:hover .sub-item-text a p,
     .sub-item-text button {
       color: var(--blue-800);
+    }
+  }
+
+  &.disabled {
+    .sub-item-dot {
+      color: var(--color-text-disabled);
+      background-color: var(--color-bg-disabled);
+      border-color: var(--general-border-secondary);
+    }
+
+    .sub-item-text a p,
+    .sub-item-text button {
+      color: var(--color-text-disabled);
+      cursor: default;
+    }
+
+    &:hover .sub-item-text a p,
+    .sub-item-text button {
+      text-decoration: none;
     }
   }
 }
@@ -468,7 +468,7 @@
 .stepper--compact .stepper-item.selected .stepper-counter {
   color: var(--color-primary-active);
   background-color: var(--color-white);
-  border: 2px solid var(--color-primary-active);
+  border: 4px solid var(--color-primary-active);
 }
 
 .stepper--compact .stepper-item .stepper-counter {
@@ -554,17 +554,6 @@
   border: 1px solid var(--general-border-secondary);
 }
 
-.stepper--compact .stepper-item .sub-item.disabled .sub-item-text a,
-.stepper--compact .stepper-item .sub-item.disabled .sub-item-text button {
-  color: var(--color-text-disabled);
-  cursor: default;
-}
-
-.stepper--compact .stepper-item .sub-item.disabled:hover .sub-item-text a,
-.stepper--compact .stepper-item .sub-item.disabled:hover .sub-item-text button {
-  text-decoration: none;
-}
-
 .stepper--compact .stepper-item .sub-item.default .sub-item-dot {
   color: var(--color-text-muted);
   background-color: var(--color-white);
@@ -589,6 +578,17 @@
 .stepper--compact .stepper-item .sub-item.selected .sub-item-text button {
   font-weight: bold;
   color: var(--color-primary-active);
+}
+
+.stepper--compact .stepper-item .sub-item.disabled .sub-item-text a,
+.stepper--compact .stepper-item .sub-item.disabled .sub-item-text button {
+  color: var(--color-text-disabled);
+  cursor: default;
+}
+
+.stepper--compact .stepper-item .sub-item.disabled:hover .sub-item-text a,
+.stepper--compact .stepper-item .sub-item.disabled:hover .sub-item-text button {
+  text-decoration: none;
 }
 
 .stepper--compact .stepper-item .sub-item.selected:hover .sub-item-dot {

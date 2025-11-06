@@ -1,5 +1,6 @@
 import cn from 'classnames';
 
+import { Text } from '../../../../tedi';
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import styles from '../vertical-stepper.module.scss';
 
@@ -51,17 +52,30 @@ export const SubItem = ({
         </span>
 
         <span className={styles['sub-item-text']}>
-          <Element href={href} onClick={onClick} className={styles['sub-item-link']}>
-            {title}
+          <Element href={href} onClick={onClick}>
+            <Text>
+              {title}
+              {hasIcon && state === 'error' && (
+                <Icon
+                  name="error"
+                  color="danger"
+                  size={16}
+                  display="inline"
+                  className={styles['radio__tooltip-icon']}
+                />
+              )}
+
+              {hasIcon && state === 'completed' && (
+                <Icon
+                  name="check"
+                  color="success"
+                  size={16}
+                  display="inline"
+                  className={styles['radio__tooltip-icon']}
+                />
+              )}
+            </Text>
           </Element>
-
-          {hasIcon && state === 'error' && (
-            <Icon name="error" color="danger" size={16} display="inline" className={styles['radio__tooltip-icon']} />
-          )}
-
-          {hasIcon && state === 'completed' && (
-            <Icon name="check" color="success" size={16} display="inline" className={styles['radio__tooltip-icon']} />
-          )}
         </span>
       </li>
       <div>{children}</div>

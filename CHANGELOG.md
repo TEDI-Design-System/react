@@ -1,3 +1,18 @@
+# [14.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.1...react-14.2.0-rc.2) (2025-11-05)
+
+
+### Features
+
+* **vertical-stepper:** update compact selected state counter border width [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c76d7aa](https://github.com/TEDI-Design-System/react/commit/c76d7aac8bc2eb46ff0f50591948dd53f78cf301))
+* **vertical-stepper:** update state styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([6be35eb](https://github.com/TEDI-Design-System/react/commit/6be35ebb9e9b1fdc31b601663f89a8ea1c4dec22))
+
+# [14.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.1.0...react-14.2.0-rc.1) (2025-11-03)
+
+
+### Features
+
+* **vertical-stepper:** make collapse controllable from outside and reposition checkmark [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c86a868](https://github.com/TEDI-Design-System/react/commit/c86a8682138c0b3c10732da2e3cc09700d5b2957))
+
 # [14.1.0](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0) (2025-10-30)
 
 
