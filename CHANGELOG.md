@@ -1,3 +1,12 @@
+# [14.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.2...react-14.2.0-rc.3) (2025-11-07)
+
+
+### Features
+
+* **vertical-stepper:** modify styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([78f5755](https://github.com/TEDI-Design-System/react/commit/78f5755ea6d277feee56626e4dbaecd048cedade))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([11a4f73](https://github.com/TEDI-Design-System/react/commit/11a4f73897ef5a745d4d7e8e71b7efee33a9e47f))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([01150d5](https://github.com/TEDI-Design-System/react/commit/01150d535f23d6bd9e4b59e007c468dad87e19b2))
+
 # [14.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.1...react-14.2.0-rc.2) (2025-11-05)
 
 
