@@ -53,26 +53,14 @@ export const SubItem = ({
 
         <span className={styles['sub-item-text']}>
           <Element href={href} onClick={onClick} className={styles['sub-item-link']}>
-            <Text className={styles['sub-item-title']}>
+            <Text element="span" className={styles['sub-item-title']}>
               {title}
               {hasIcon && state === 'error' && (
-                <Icon
-                  name="error"
-                  color="danger"
-                  size={16}
-                  display="inline"
-                  className={styles['radio__tooltip-icon']}
-                />
+                <Icon name="error" color="danger" size={16} display="inline" className={styles['stepper-icon']} />
               )}
 
               {hasIcon && state === 'completed' && (
-                <Icon
-                  name="check"
-                  color="success"
-                  size={16}
-                  display="inline"
-                  className={styles['radio__tooltip-icon']}
-                />
+                <Icon name="check" color="success" size={16} display="inline" className={styles['stepper-icon']} />
               )}
             </Text>
           </Element>

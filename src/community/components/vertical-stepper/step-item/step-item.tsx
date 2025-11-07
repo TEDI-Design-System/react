@@ -84,7 +84,7 @@ export const StepItem = ({
               <>
                 <Row alignItems="start">
                   <Col>
-                    <Text className={styles['stepper-link']}>
+                    <Text element="span" className={styles['stepper-link']}>
                       {title}
                       {hasIcon && state === 'error' && (
                         <Icon
@@ -92,7 +92,7 @@ export const StepItem = ({
                           color="danger"
                           size={16}
                           display="inline"
-                          className={styles['radio__tooltip-icon']}
+                          className={styles['stepper-icon']}
                         />
                       )}
                       {hasIcon && state === 'completed' && (
@@ -101,7 +101,7 @@ export const StepItem = ({
                           color="success"
                           size={16}
                           display="inline"
-                          className={styles['radio__tooltip-icon']}
+                          className={styles['stepper-icon']}
                         />
                       )}
                     </Text>
@@ -126,16 +126,15 @@ export const StepItem = ({
                     onClick();
                   }
                 }}
-                className={styles['stepper-link']}
               >
-                <Text>
+                <Text element="span" className={styles['stepper-link']}>
                   {title}
-                  <span className={styles['stepper-link-icon']}>
-                    {hasIcon && state === 'error' && <Icon name="error" color="danger" size={16} display="inline" />}
-                    {hasIcon && state === 'completed' && (
-                      <Icon name="check" color="success" size={16} display="inline" />
-                    )}
-                  </span>
+                  {hasIcon && state === 'error' && (
+                    <Icon name="error" color="danger" size={16} display="inline" className={styles['stepper-icon']} />
+                  )}
+                  {hasIcon && state === 'completed' && (
+                    <Icon name="check" color="success" size={16} display="inline" className={styles['stepper-icon']} />
+                  )}
                 </Text>
               </a>
             </div>
