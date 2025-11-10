@@ -1,0 +1,80 @@
+import { Meta, Title, Canvas, Controls, Stories } from '@storybook/blocks';
+import * as ThemeProviderStories from './theme-provider.stories.tsx';
+import { ThemeProvider } from './theme-provider.tsx';
+
+<Meta of={ThemeProviderStories} />
+
+<Title />
+The **ThemeProvider** component enables theme management across your application by providing theme context and applying
+the correct theme class (`.tedi-theme--*`) to the document root.
+
+It supports switching between predefined themes such as **Default**, **Dark** and can be extended with additional themes in the future.
+
+---
+
+## Usage
+
+### Provider
+
+Wrap the provider around your app and specify an initial theme:
+
+```jsx
+<ThemeProvider theme="default">
+  <YourApp />
+</ThemeProvider>
+```
+
+The **theme** prop accepts one of the registered theme names:
+
+- `default`
+- `dark`
+
+The provider automatically adds the corresponding class to the `<html>` element (e.g. `.tedi-theme--default`), which activates the theme's CSS variables defined in **@tedi-design-system/core**.
+
+---
+
+### Consumer Hook
+
+Use the `useTheme` hook to access or update the current theme within any component:
+
+```jsx
+import { useTheme } from '@tedi-design-system/react';
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <button onClick={() => setTheme(theme === 'default' ? 'default' : 'dark')}>
+      Switch to {theme === 'default' ? 'default' : 'dark'} theme
+    </button>
+  );
+}
+```
+
+---
+
+### Behavior
+
+- The provider toggles classes on the `<html>` element:
+  - `.tedi-theme--default`
+  - `.tedi-theme--dark`
+- The corresponding CSS variables are applied globally.
+- When the theme changes, styles update in real time without a page reload.
+
+---
+
+### Example
+
+```jsx
+<ThemeProvider theme="default">
+  <Button>Default Button</Button>
+</ThemeProvider>
+```
+
+You can interactively switch themes in Storybook using the toolbar at the top right (🖌️ **Theme** selector).
+
+---
+
+<Controls />
+
+<Stories />
