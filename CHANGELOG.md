@@ -1,3 +1,34 @@
+# [14.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.2...react-14.2.0-rc.3) (2025-11-07)
+
+
+### Features
+
+* **vertical-stepper:** modify styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([78f5755](https://github.com/TEDI-Design-System/react/commit/78f5755ea6d277feee56626e4dbaecd048cedade))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([11a4f73](https://github.com/TEDI-Design-System/react/commit/11a4f73897ef5a745d4d7e8e71b7efee33a9e47f))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([01150d5](https://github.com/TEDI-Design-System/react/commit/01150d535f23d6bd9e4b59e007c468dad87e19b2))
+
+# [14.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.1...react-14.2.0-rc.2) (2025-11-05)
+
+
+### Features
+
+* **vertical-stepper:** update compact selected state counter border width [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c76d7aa](https://github.com/TEDI-Design-System/react/commit/c76d7aac8bc2eb46ff0f50591948dd53f78cf301))
+* **vertical-stepper:** update state styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([6be35eb](https://github.com/TEDI-Design-System/react/commit/6be35ebb9e9b1fdc31b601663f89a8ea1c4dec22))
+
+# [14.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.1.0...react-14.2.0-rc.1) (2025-11-03)
+
+
+### Features
+
+* **vertical-stepper:** make collapse controllable from outside and reposition checkmark [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c86a868](https://github.com/TEDI-Design-System/react/commit/c86a8682138c0b3c10732da2e3cc09700d5b2957))
+
+# [14.1.0](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0) (2025-10-30)
+
+
+### Features
+
+* **general:** react 19 support [#365](https://github.com/TEDI-Design-System/react/issues/365) ([#366](https://github.com/TEDI-Design-System/react/issues/366)) ([0d1d8d8](https://github.com/TEDI-Design-System/react/commit/0d1d8d8df09873edd9a9ff142d8665b777e4f223))
+
 # [14.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0-rc.1) (2025-10-27)
 
 
