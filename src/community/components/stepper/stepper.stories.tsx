@@ -11,10 +11,11 @@ import Stepper, { StepperProps } from './stepper';
 interface TemplateProps extends StepperProps {
   controlled?: boolean;
   showNavigation?: boolean;
+  stepsWithCompletedIcon?: number[];
 }
 
 const Template = (args: TemplateProps) => {
-  const { controlled, showNavigation, ...rest } = args;
+  const { controlled, showNavigation, stepsWithCompletedIcon, ...rest } = args;
   const [currentStep, setCurrentStep] = React.useState(args.defaultActiveStep || 0);
   const [completedSteps, setCompletedSteps] = React.useState<number[]>(args.defaultActiveStep ? [0] : []);
 
@@ -49,20 +50,35 @@ const Template = (args: TemplateProps) => {
 
   return (
     <Stepper activeStep={controlled ? currentStep : undefined} onActiveStepChange={handleActiveStepChange} {...rest}>
-      <Step id="step-1" label="Childs needs" completed={getIsCompleted(0)}>
+      <Step
+        id="step-1"
+        label="Childs needs"
+        completed={getIsCompleted(0)}
+        showCompletedIcon={stepsWithCompletedIcon?.includes(0)}
+      >
         <VerticalSpacing>
           <Heading element="h2">Triin Kass</Heading>
           <p>Content 1</p>
           {showNavigation && <StepperNavigation />}
         </VerticalSpacing>
       </Step>
-      <Step id="step-2" label="Parent ability" completed={getIsCompleted(1)}>
+      <Step
+        id="step-2"
+        label="Parent ability"
+        completed={getIsCompleted(1)}
+        showCompletedIcon={stepsWithCompletedIcon?.includes(1)}
+      >
         <VerticalSpacing>
           <p>Content 2 </p>
           {showNavigation && <StepperNavigation />}
         </VerticalSpacing>
       </Step>
-      <Step id="step-3" label="Family and environment" completed={getIsCompleted(2)}>
+      <Step
+        id="step-3"
+        label="Family and environment"
+        completed={getIsCompleted(2)}
+        showCompletedIcon={stepsWithCompletedIcon?.includes(2)}
+      >
         <VerticalSpacing>
           <p>Content 3 </p>
           {showNavigation && <StepperNavigation />}
@@ -154,5 +170,11 @@ export const StateHandledOutsideCompletedOrNext: Story = {
     allowStepLabelClick: 'completed-or-next',
     controlled: true,
     showNavigation: true,
+  },
+};
+
+export const WithCompletedIcons: Story = {
+  args: {
+    stepsWithCompletedIcon: [0, 1],
   },
 };
