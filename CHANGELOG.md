@@ -1,3 +1,10 @@
+# [14.2.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.4...react-14.2.0-rc.5) (2025-11-13)
+
+
+### Features
+
+* **theme-provider:** new ThemeProvider functionality [#371](https://github.com/TEDI-Design-System/react/issues/371) ([#386](https://github.com/TEDI-Design-System/react/issues/386)) ([b073bd8](https://github.com/TEDI-Design-System/react/commit/b073bd807bf9d4ec2ec0add2cdf24155bac5abb1))
+
 # [14.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.3...react-14.2.0-rc.4) (2025-11-13)
 
 
