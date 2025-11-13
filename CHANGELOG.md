@@ -1,3 +1,10 @@
+# [14.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.3...react-14.2.0-rc.4) (2025-11-13)
+
+
+### Features
+
+* **stepper:** Add showCompletedIcon prop to Step ([#388](https://github.com/TEDI-Design-System/react/issues/388)) ([459f799](https://github.com/TEDI-Design-System/react/commit/459f799b49b004a0a2e366a441a67672819c8e2c)), closes [#387](https://github.com/TEDI-Design-System/react/issues/387)
+
 # [14.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.2...react-14.2.0-rc.3) (2025-11-07)
 
 
