@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
 export type Theme = 'default' | 'dark' | 'rit';
 
@@ -21,41 +21,36 @@ const ThemeContext = createContext<ThemeContextValue>({
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({
-  theme: serverTheme = 'default',
+  theme: initialTheme = 'default',
   children,
 }: {
   theme?: Theme;
   children: React.ReactNode;
 }) => {
-  const [theme, setThemeState] = useState<Theme>(serverTheme);
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof document !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, initialTheme);
+      document.cookie = `${STORAGE_KEY}=${initialTheme};path=/;max-age=31536000`;
+    }
+
+    return initialTheme;
+  });
 
   const setTheme = useCallback((newTheme: Theme) => {
     if (!AVAILABLE_THEMES.includes(newTheme)) return;
-
     setThemeState(newTheme);
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, newTheme);
-    }
+    if (typeof document === 'undefined') return;
 
+    localStorage.setItem(STORAGE_KEY, newTheme);
     document.cookie = `${STORAGE_KEY}=${newTheme};path=/;max-age=31536000`;
 
-    AVAILABLE_THEMES.forEach((t) => document.documentElement.classList.remove(`${THEME_CLASS_PREFIX}${t}`));
-    document.documentElement.classList.add(`${THEME_CLASS_PREFIX}${newTheme}`);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    if (stored && stored !== theme) {
-      setTheme(stored);
-      return;
+    const root = document.documentElement;
+    for (const t of AVAILABLE_THEMES) {
+      root.classList.remove(`${THEME_CLASS_PREFIX}${t}`);
     }
-
-    AVAILABLE_THEMES.forEach((t) => document.documentElement.classList.remove(`${THEME_CLASS_PREFIX}${t}`));
-    document.documentElement.classList.add(`${THEME_CLASS_PREFIX}${theme}`);
-  }, [theme, setTheme]);
+    root.classList.add(`${THEME_CLASS_PREFIX}${newTheme}`);
+  }, []);
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

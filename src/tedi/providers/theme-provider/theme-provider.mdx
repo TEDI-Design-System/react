@@ -75,6 +75,52 @@ You can interactively switch themes in Storybook using the toolbar at the top ri
 
 ---
 
+## Using ThemeProvider with Next.js (SSR)
+
+When using Next.js App Router with Server Components, you need to initialize the theme on the server to avoid a mismatch or flash during hydration.
+
+This setup ensures the `<html>` class and the ThemeProvider both start with the same value — so your UI loads with the correct theme immediately.
+
+### 1. Define a default theme
+
+```ts
+export const INITIAL_THEME = 'default';
+```
+
+### 2. Read the theme cookie and apply it in your RootLayout
+
+Here's a minimal but complete example of a properly SSR-aware RootLayout.
+It reads the theme from cookies on the server, applies the class to `<html>`, and passes the same value to the ThemeProvider for hydration consistency.
+
+```tsx
+// app/layout.tsx
+import { cookies } from 'next/headers';
+import { ThemeProvider, Theme } from '@tedi-design-system/react';
+import { INITIAL_THEME } from '@/lib/constants';
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const theme = (cookieStore.get('tedi-theme')?.value ?? INITIAL_THEME) as Theme;
+
+  return (
+    <html lang="et" className={`tedi-theme--${theme}`}>
+      <body>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### 3. Why this matters
+
+Next.js pre-renders pages on the server.
+If the client-side theme doesn't match the one used to render HTML, React will warn about a hydration mismatch, and users may briefly see the wrong theme before hydration finishes.
+
+Setting the `<html>` class and initial provider theme on the server keeps both sides in sync.
+
+---
+
 <Controls />
 
 <Stories />
