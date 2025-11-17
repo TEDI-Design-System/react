@@ -1,3 +1,10 @@
+# [14.2.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.5...react-14.2.0-rc.6) (2025-11-17)
+
+
+### Bug Fixes
+
+* **collapse:** nested collapse arrow not rotating fix [#391](https://github.com/TEDI-Design-System/react/issues/391) ([#392](https://github.com/TEDI-Design-System/react/issues/392)) ([bfcfb5d](https://github.com/TEDI-Design-System/react/commit/bfcfb5da1df94f3ee24e9e880fb05b55865a1cf3))
+
 # [14.2.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.4...react-14.2.0-rc.5) (2025-11-13)
 
 
