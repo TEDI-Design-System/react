@@ -514,7 +514,7 @@ $btn-width-large: 3.72rem;
   }
 
   .tedi-btn--link:not(.tedi-btn--is-loading) & {
-    display: inline;
+    display: inline-flex;
   }
 }
 

@@ -381,3 +381,31 @@ export const LongTextButtonThatWrapsIntoMultipleLines: Story = {
     </VerticalSpacing>
   ),
 };
+
+/**
+ * First/second example: default behaviour <br/>
+ * Third example: `iconStandAlone` prop set true
+ */
+export const IconAlignmentForLinkStyleButtons: Story = {
+  render: (args) => (
+    <VerticalSpacing>
+      <Row>
+        <Col md={3} width={12}>
+          <Button iconLeft="edit" visualType="link">
+            One liner text
+          </Button>
+        </Col>
+        <Col md={4} width={12}>
+          <Button iconLeft="edit" visualType="link">
+            Icon appears vertically centered next to the button text, even with very long text.
+          </Button>
+        </Col>
+        <Col md={4} width={12}>
+          <Button iconLeft="edit" visualType="link" iconStandalone>
+            Icon remains aligned with the first line of text, even when the label wraps to multiple lines.
+          </Button>
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
+};

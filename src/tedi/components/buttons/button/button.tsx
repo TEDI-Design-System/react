@@ -1,9 +1,11 @@
+import classNames from 'classnames';
 import React, { forwardRef } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { PolymorphicRef } from '../../../helpers/polymorphic/types';
 import { UnknownType } from '../../../types/commonTypes';
 import ButtonContent, { ButtonContentProps } from '../button-content/button-content';
+import styles from '../button-content/button-content.module.scss';
 
 export type ButtonType = 'primary' | 'secondary' | 'neutral' | 'link';
 export type ButtonColor = 'default' | 'danger' | 'success' | 'inverted' | 'text';
@@ -19,6 +21,10 @@ interface IInternalButtonProps {
    * @default true when type="submit"
    */
   formNoValidate?: boolean;
+  /**
+   * If true, the icon will be placed in a separate column
+   */
+  iconStandalone?: boolean;
 }
 
 type AllowedTags = 'button';
@@ -36,6 +42,7 @@ const ButtonComponent = forwardRef(
       as,
       type = 'button',
       formNoValidate = type === 'submit' ? true : undefined,
+      iconStandalone,
       ...rest
     } = getCurrentBreakpointProps<ButtonProps<C>>(props);
 
@@ -49,6 +56,7 @@ const ButtonComponent = forwardRef(
         formNoValidate={formNoValidate}
         ref={ref}
         as={ComponentAs}
+        className={classNames(rest.className, { [styles['tedi-btn__icon-standalone--link']]: iconStandalone })}
       >
         {children}
       </ButtonContent>
