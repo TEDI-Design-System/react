@@ -63,10 +63,9 @@
   &.direction-right {
     top: 0;
     right: 0;
+    width: var(--drag-indicator-vertical-width);
     height: 100%;
     cursor: col-resize;
-
-    @include mixins.responsive-styles(width, drag-indicator-vertical-width);
 
     .tedi-resize__drag-handle {
       top: 50%;
@@ -79,18 +78,16 @@
 
     .tedi-resize__drag-indicator {
       top: calc(50% - 12px);
-
-      @include mixins.responsive-styles(left, drag-indicator-vertical-width);
+      left: var(--drag-indicator-vertical-width);
     }
   }
 
   &.direction-left {
     top: 0;
     left: 0;
+    width: var(--drag-indicator-vertical-width);
     height: 100%;
     cursor: col-resize;
-
-    @include mixins.responsive-styles(width, drag-indicator-vertical-width);
 
     .tedi-resize__drag-handle {
       top: 50%;
@@ -106,8 +103,6 @@
       top: calc(50% - 12px);
       left: -14px;
       transform: rotate(180deg);
-
-      @include mixins.responsive-styles(--dragger-width, drag-indicator-vertical-width);
     }
   }
 
@@ -115,9 +110,8 @@
     top: 0;
     left: 0;
     width: 100%;
+    height: var(--drag-indicator-vertical-width);
     cursor: row-resize;
-
-    @include mixins.responsive-styles(height, drag-indicator-vertical-width);
 
     .tedi-resize__drag-handle {
       top: calc((var(--handle-button-size) / 2) * -1);
@@ -129,8 +123,6 @@
       top: -18px;
       left: calc(50% - 6px);
       transform: rotate(-90deg);
-
-      @include mixins.responsive-styles(--dragger-width, drag-indicator-vertical-width);
     }
   }
 
@@ -139,8 +131,6 @@
     left: 0;
     width: 100%;
     cursor: row-resize;
-
-    @include mixins.responsive-styles(height, drag-indicator-vertical-width);
 
     .tedi-resize__drag-handle {
       top: calc((var(--handle-button-size) / 2) * -1);
@@ -152,8 +142,6 @@
       bottom: -18px;
       left: calc(50% - 8px);
       transform: rotate(90deg);
-
-      @include mixins.responsive-styles(--dragger-width, drag-indicator-vertical-width);
     }
   }
 
@@ -171,15 +159,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: calc((var(--handle-button-size) / 2) * -1);
+  width: var(--button-sm-icon-size);
+  height: var(--button-sm-icon-size);
+  margin-right: calc((var(--button-sm-icon-size) / 2) * -1);
   background-color: var(--button-floating-secondary-background-default);
+  border-radius: var(--button-radius-default);
   box-shadow: 0 4px 10px 0 var(--alpha-14);
   transform: translate(-50%, -50%);
-
-  @include mixins.responsive-styles(--handle-button-size, button-sm-icon-size);
-  @include mixins.responsive-styles(width, button-sm-icon-size);
-  @include mixins.responsive-styles(height, button-sm-icon-size);
-  @include mixins.responsive-styles(border-radius, button-radius-default);
 
   > span {
     width: 100%;

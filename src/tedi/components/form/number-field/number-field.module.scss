@@ -108,15 +108,14 @@ $border-width: 1px;
 .tedi-number-field__input-wrapper {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: var(--form-field-inner-spacing-sm);
   align-items: stretch;
   width: 5rem;
   height: $input-height;
+  padding-right: var(--form-field-padding-y-3-default);
+  padding-left: var(--form-field-padding-y-3-default);
   background-color: var(--form-input-background-default);
   border: $border-width solid var(--form-input-border-default);
-
-  @include mixins.responsive-styles(padding-left, form-field-padding-y-3-default);
-  @include mixins.responsive-styles(padding-right, form-field-padding-y-3-default);
-  @include mixins.responsive-styles(gap, form-field-inner-spacing-sm);
 
   &:focus-within {
     z-index: 1;
@@ -160,13 +159,12 @@ $border-width: 1px;
   grid-column: span 2;
   width: 100%;
   min-width: 2rem;
+  font-size: var(--heading-h6-size);
   text-align: center;
   background-color: var(--form-input-background-default);
   border: 0;
   border-radius: 0;
   outline: none;
-
-  @include mixins.responsive-styles(font-size, heading-h6-size);
 
   //  /* Chrome, Safari, Edge, Opera */
   &::-webkit-outer-spin-button,

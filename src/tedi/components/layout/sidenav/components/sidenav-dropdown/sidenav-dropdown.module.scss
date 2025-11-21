@@ -10,15 +10,12 @@
 }
 
 .tedi-sidenav-dropdown__heading {
+  padding: var(--layout-grid-gutters-02) var(--dropdown-group-label-padding-x) var(--layout-grid-gutters-04)
+    var(--dropdown-group-label-padding-x);
   font-size: var(--size-01);
   font-weight: 600;
   color: var(--general-text-tertiary);
   text-transform: uppercase;
-
-  @include mixins.responsive-styles(padding-top, layout-grid-gutters-02);
-  @include mixins.responsive-styles(padding-bottom, layout-grid-gutters-04);
-  @include mixins.responsive-styles(padding-left, dropdown-group-label-padding-x);
-  @include mixins.responsive-styles(padding-right, dropdown-group-label-padding-x);
 }
 
 .tedi-sidenav-dropdown__list {
@@ -34,14 +31,10 @@
 .tedi-sidenav-dropdown__link {
   display: block;
   justify-content: flex-start;
+  padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
   color: var(--dropdown-item-default-text);
   cursor: pointer;
   border-radius: 0;
-
-  @include mixins.responsive-styles(padding-top, dropdown-item-padding-y);
-  @include mixins.responsive-styles(padding-bottom, dropdown-item-padding-y);
-  @include mixins.responsive-styles(padding-left, dropdown-item-padding-x);
-  @include mixins.responsive-styles(padding-right, dropdown-item-padding-x);
 
   &:hover {
     color: var(--dropdown-item-hover-text);
@@ -64,7 +57,7 @@
         left: calc(var(--dropdown-item-padding) * 1.5);
         width: var(--tree-trunk-width);
         content: '';
-        background-color: var(--side-navigation-tree-neutral-default);
+        background-color: var(--navigation-vertical-tree-neutral-default);
         border-radius: 0;
       }
 
@@ -72,16 +65,13 @@
         position: absolute;
         top: 20px;
         bottom: 0;
-        left: calc(var(--dropdown-item-padding) * 1.5);
+        left: calc(var(--dropdown-item-padding-x) * 1.5);
         width: var(--tree-branch-width);
         height: var(--tree-trunk-width);
         content: '';
-        background-color: var(--side-navigation-tree-neutral-default);
-        border-radius: 0 var(--button-radius) var(--button-radius) 0;
+        background-color: var(--navigation-vertical-tree-neutral-default);
+        border-radius: 0 var(--button-radius-sm) var(--button-radius-sm) 0;
       }
-
-      @include mixins.responsive-styles(--button-radius, button-radius-sm);
-      @include mixins.responsive-styles(--dropdown-item-padding, dropdown-item-padding-x);
     }
 
     &:last-child {

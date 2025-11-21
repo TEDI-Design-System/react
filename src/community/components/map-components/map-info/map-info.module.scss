@@ -2,15 +2,14 @@
 
 .tedi-map-info__wrapper {
   display: inline-flex;
+  gap: var(--layout-grid-gutters-04);
   align-items: flex-start;
+  padding: var(--card-padding-xxs);
   font-size: var(--size-00);
   line-height: var(--size-00);
   color: var(--button-map-info-text-default);
   background: var(--button-map-info-background-default);
   border-radius: var(--borders-04);
-
-  @include mixins.responsive-styles(padding, card-padding-xxs);
-  @include mixins.responsive-styles(gap, layout-grid-gutters-04);
 
   &:hover {
     color: var(--button-map-info-text-open);

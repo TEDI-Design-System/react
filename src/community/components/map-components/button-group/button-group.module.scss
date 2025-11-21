@@ -11,8 +11,8 @@
 
     .tedi-button-group__item {
       &:first-child {
-        @include mixins.responsive-styles(border-top-left-radius, button-radius-sm);
-        @include mixins.responsive-styles(border-bottom-left-radius, button-radius-sm);
+        border-top-left-radius: var(--button-radius-sm);
+        border-bottom-left-radius: var(--button-radius-sm);
       }
 
       &:not(:last-child) {
@@ -25,21 +25,20 @@
       }
 
       &:last-child {
-        @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
-        @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
+        border-top-right-radius: var(--button-radius-sm);
+        border-bottom-right-radius: var(--button-radius-sm);
       }
     }
 
     .tedi-button-group__suffix {
-      @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
-      @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
+      border-top-right-radius: var(--button-radius-sm);
+      border-bottom-right-radius: var(--button-radius-sm);
     }
 
     .tedi-button-group__prefix {
       border-right: 0;
-
-      @include mixins.responsive-styles(border-bottom-left-radius, button-radius-sm);
-      @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
+      border-bottom-right-radius: var(--button-radius-sm);
+      border-bottom-left-radius: var(--button-radius-sm);
     }
   }
 
@@ -48,8 +47,8 @@
 
     .tedi-button-group__item {
       &:first-child {
-        @include mixins.responsive-styles(border-top-left-radius, button-radius-sm);
-        @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
+        border-top-left-radius: var(--button-radius-sm);
+        border-top-right-radius: var(--button-radius-sm);
       }
 
       &:not(:last-child) {
@@ -62,8 +61,8 @@
       }
 
       &:last-child {
-        @include mixins.responsive-styles(border-bottom-left-radius, button-radius-sm);
-        @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
+        border-bottom-right-radius: var(--button-radius-sm);
+        border-bottom-left-radius: var(--button-radius-sm);
       }
     }
 
@@ -79,15 +78,14 @@
     }
 
     .tedi-button-group__suffix {
-      @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
-      @include mixins.responsive-styles(border-bottom-left-radius, button-radius-sm);
+      border-bottom-right-radius: var(--button-radius-sm);
+      border-bottom-left-radius: var(--button-radius-sm);
     }
 
     .tedi-button-group__prefix {
       border-bottom: 0;
-
-      @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
-      @include mixins.responsive-styles(border-top-left-radius, button-radius-sm);
+      border-top-left-radius: var(--button-radius-sm);
+      border-top-right-radius: var(--button-radius-sm);
     }
   }
 
@@ -95,16 +93,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: calc(var(--padding-top) - 1px);
-    padding-bottom: calc(var(--padding-bottom) - 1px);
+    padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
     text-align: center;
     cursor: pointer;
     border-radius: 0;
-
-    @include mixins.responsive-styles(--padding-top, button-md-padding-y);
-    @include mixins.responsive-styles(--padding-bottom, button-md-padding-y);
-    @include mixins.responsive-styles(padding-left, button-md-padding-x);
-    @include mixins.responsive-styles(padding-right, button-md-padding-x);
 
     @include breakpoints.media-breakpoint-down(md) {
       flex: 1;

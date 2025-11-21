@@ -5,14 +5,13 @@
   flex-flow: column;
   align-items: center;
   justify-content: center;
+  padding: var(--button-md-icon-padding);
   font-size: var(--size-00);
   font-weight: 700;
   color: var(--button-primary-text-default);
   background-color: var(--button-primary-background-default);
   border: 1px solid var(--button-primary-border-default);
-
-  @include mixins.responsive-styles(padding, button-md-icon-padding);
-  @include mixins.responsive-styles(border-radius, button-radius-sm);
+  border-radius: var(--button-radius-sm);
 
   &:hover {
     cursor: pointer;

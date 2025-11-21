@@ -7,13 +7,9 @@
     display: flex;
     align-items: center;
     min-height: 2.5rem;
+    padding: var(--form-checkbox-radio-card-checkbox-padding-y) var(--form-checkbox-radio-card-checkbox-padding-x);
     margin-top: 0;
-
-    @include mixins.responsive-styles(border-radius, form-checkbox-radio-card-radius);
-    @include mixins.responsive-styles(padding-left, form-checkbox-radio-card-checkbox-padding-x);
-    @include mixins.responsive-styles(padding-right, form-checkbox-radio-card-checkbox-padding-x);
-    @include mixins.responsive-styles(padding-top, form-checkbox-radio-card-checkbox-padding-y);
-    @include mixins.responsive-styles(padding-bottom, form-checkbox-radio-card-checkbox-padding-y);
+    border-radius: var(--form-checkbox-radio-card-radius);
 
     &:hover {
       cursor: pointer;

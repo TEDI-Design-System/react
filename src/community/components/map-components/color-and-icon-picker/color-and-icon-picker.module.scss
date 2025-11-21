@@ -8,12 +8,11 @@
 .tedi-color-and-icon-picker {
   display: flex;
   align-items: center;
+  height: var(--form-field-height);
+  padding: var(--form-field-padding-y-md-default);
   background: var(--form-input-background-default);
   border: 1px solid var(--form-input-border-default);
-
-  @include mixins.responsive-styles(border-radius, form-field-radius);
-  @include mixins.responsive-styles(height, form-field-height);
-  @include mixins.responsive-styles(padding, form-field-padding-y-md-default);
+  border-radius: var(--form-field-radius);
 
   & [data-name='icon'] {
     color: var(--general-icon-secondary);
@@ -25,13 +24,9 @@
 
   &__wrapper {
     flex-wrap: wrap;
+    gap: var(--form-field-inner-spacing);
     max-width: 220px;
-
-    @include mixins.responsive-styles(gap, form-field-inner-spacing);
-    @include mixins.responsive-styles(padding-top, dropdown-body-padding-y);
-    @include mixins.responsive-styles(padding-bottom, dropdown-body-padding-y);
-    @include mixins.responsive-styles(padding-left, dropdown-body-padding-x);
-    @include mixins.responsive-styles(padding-right, dropdown-body-padding-x);
+    padding: var(--dropdown-body-padding-y) var(--dropdown-body-padding-x);
 
     > button {
       padding: 0;
@@ -69,11 +64,10 @@
 }
 
 .tedi-color-and-icon-picker__visual {
+  width: var(--form-radio-selection-size);
+  height: var(--form-radio-selection-size);
   line-height: 1;
-
-  @include mixins.responsive-styles(border-radius, card-radius-rounded);
-  @include mixins.responsive-styles(width, form-radio-selection-size);
-  @include mixins.responsive-styles(height, form-radio-selection-size);
+  border-radius: var(--card-radius-rounded);
 
   &--icon {
     line-height: 0.5;

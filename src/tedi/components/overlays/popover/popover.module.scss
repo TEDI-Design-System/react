@@ -10,14 +10,13 @@ $popover-width: (
   z-index: var(--z-index-tooltip);
   display: flex;
   flex-direction: column;
+  gap: var(--layout-grid-gutters-08);
+  padding: var(--popover-padding-sm);
   color: var(--popover-text);
   background: var(--popover-background);
   border: 1px solid var(--popover-border);
+  border-radius: var(--popover-radius-rounded);
   box-shadow: 0 1px 5px 0 var(--alpha-20);
-
-  @include mixins.responsive-styles(gap, layout-grid-gutters-08);
-  @include mixins.responsive-styles(padding, popover-padding-sm);
-  @include mixins.responsive-styles(border-radius, popover-radius-rounded);
 
   @each $name, $width in $popover-width {
     &--#{$name} {
@@ -34,9 +33,8 @@ $popover-width: (
 
   &__header {
     display: flex;
+    gap: var(--layout-grid-gutters-08);
     justify-content: space-between;
-
-    @include mixins.responsive-styles(gap, layout-grid-gutters-08);
 
     &--no-title {
       justify-content: flex-end;

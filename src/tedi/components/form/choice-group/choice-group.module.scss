@@ -13,11 +13,9 @@
 }
 
 .tedi-choice-group__inner--indented {
-  padding-left: calc(var(--_padding-left) - 5px);
-
-  @include mixins.responsive-styles(--_padding-left, form-checkbox-radio-subitem-padding-left);
+  padding-left: calc(var(--form-checkbox-radio-subitem-padding-left) - 5px);
 
   @include breakpoints.media-breakpoint-down(md) {
-    @include mixins.responsive-styles(padding-left, form-checkbox-radio-subitem-padding-left);
+    padding-left: var(--form-checkbox-radio-subitem-padding-left);
   }
 }

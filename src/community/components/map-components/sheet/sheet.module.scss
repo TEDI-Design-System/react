@@ -22,10 +22,9 @@
 
   &--bottom {
     align-self: flex-end;
+    border-top-left-radius: var(--sheet-header-radius);
+    border-top-right-radius: var(--sheet-header-radius);
     transform: translateY(100%);
-
-    @include mixins.responsive-styles(border-top-left-radius, sheet-header-radius);
-    @include mixins.responsive-styles(border-top-right-radius, sheet-header-radius);
 
     &.is-visible {
       transform: translateY(0);
@@ -34,10 +33,9 @@
 
   &--top {
     align-self: flex-start;
+    border-bottom-right-radius: var(--sheet-header-radiu);
+    border-bottom-left-radius: var(--sheet-header-radiu);
     transform: translateY(-100%);
-
-    @include mixins.responsive-styles(border-bottom-left-radius, sheet-header-radius);
-    @include mixins.responsive-styles(border-bottom-right-radius, sheet-header-radius);
 
     &.is-visible {
       transform: translateY(0);
@@ -48,14 +46,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: var(--sheet-header-padding-y) var(--sheet-header-padding-x);
     background-color: var(--sheet-header-background-default);
-
-    @include mixins.responsive-styles(padding-left, sheet-header-padding-x);
-    @include mixins.responsive-styles(padding-right, sheet-header-padding-x);
-    @include mixins.responsive-styles(padding-top, sheet-header-padding-y);
-    @include mixins.responsive-styles(padding-bottom, sheet-header-padding-y);
-    @include mixins.responsive-styles(border-top-left-radius, sheet-header-radius);
-    @include mixins.responsive-styles(border-top-right-radius, sheet-header-radius);
+    border-top-left-radius: var(--sheet-header-radius);
+    border-top-right-radius: var(--sheet-header-radius);
 
     &-content {
       display: flex;
@@ -75,8 +69,7 @@
       height: 4px;
       margin: 0.25rem auto 0;
       background-color: var(--drag-indicator-light);
-
-      @include mixins.responsive-styles(border-radius, drag-indicator-radius);
+      border-radius: var(--drag-indicator-radius);
     }
 
     &--active {
@@ -98,10 +91,7 @@
   }
 
   &__footer {
-    @include mixins.responsive-styles(padding-left, sheet-footer-padding-x);
-    @include mixins.responsive-styles(padding-right, sheet-footer-padding-x);
-    @include mixins.responsive-styles(padding-top, sheet-footer-padding-y);
-    @include mixins.responsive-styles(padding-bottom, sheet-footer-padding-y);
+    padding: var(--sheet-footer-padding-y) var(--sheet-footer-padding-x);
   }
 }
 
@@ -125,7 +115,6 @@
 
 .tedi-sheet__heading {
   display: flex;
+  gap: var(--layout-grid-gutters-04);
   align-items: center;
-
-  @include mixins.responsive-styles(gap, layout-grid-gutters-04);
 }

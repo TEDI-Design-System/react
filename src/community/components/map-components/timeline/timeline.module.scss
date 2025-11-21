@@ -9,22 +9,20 @@
 
   &__clock {
     display: flex;
-
-    @include mixins.responsive-styles(gap, layout-grid-gutters-08);
+    gap: var(--layout-grid-gutters-08);
   }
 
   &__clock-wrapper {
     display: flex;
     flex-shrink: 0;
+    gap: var(--layout-grid-gutters-12);
     width: auto;
     padding: 5px 12px;
     background-color: var(--general-surface-secondary);
-
-    @include mixins.responsive-styles(gap, layout-grid-gutters-12);
   }
 
   &__date {
-    @include mixins.responsive-styles(font-weight, body-bold-weight);
+    font-weight: var(--body-bold-weight);
   }
 
   &__main-track {
@@ -145,9 +143,8 @@
 .tedi-timeline--vertical .tedi-timeline__clock-wrapper {
   justify-content: center;
   width: 155px;
-
-  @include mixins.responsive-styles(border-bottom-right-radius, card-radius-rounded);
-  @include mixins.responsive-styles(border-top-right-radius, card-radius-rounded);
+  border-top-right-radius: var(--card-radius-rounded);
+  border-bottom-right-radius: var(--card-radius-rounded);
 }
 
 .tedi-timeline--vertical .tedi-timeline__main-track {
@@ -179,11 +176,10 @@
   left: 100%;
   width: auto;
   height: auto;
+  padding: var(--card-padding-xxs);
   margin-left: 0;
   background-color: var(--general-surface-primary);
-
-  @include mixins.responsive-styles(border-radius, card-radius-rounded);
-  @include mixins.responsive-styles(padding, card-padding-xxs);
+  border-radius: var(--card-radius-rounded);
 }
 
 .tedi-timeline--vertical .tedi-timeline__tick-group {

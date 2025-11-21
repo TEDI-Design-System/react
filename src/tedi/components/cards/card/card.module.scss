@@ -42,8 +42,7 @@ $card-colors: (
   display: flex;
   flex-direction: column;
   border: 1px solid var(--card-border-primary);
-
-  @include mixins.responsive-styles(border-radius, card-radius-rounded);
+  border-radius: var(--card-radius-rounded);
 
   @mixin card-color($name, $color-var) {
     &--background--#{$name} {
@@ -133,8 +132,8 @@ $card-colors: (
 
 .tedi-card__header:first-of-type,
 .tedi-card__content:first-of-type {
-  @include mixins.responsive-styles(border-start-start-radius, card-radius-rounded);
-  @include mixins.responsive-styles(border-start-end-radius, card-radius-rounded);
+  border-start-start-radius: var(--card-radius-rounded);
+  border-start-end-radius: var(--card-radius-rounded);
 
   .tedi-card--border-top & {
     border-start-start-radius: 0;
@@ -144,8 +143,8 @@ $card-colors: (
 
 .tedi-card__header:last-child,
 .tedi-card__content:last-child {
-  @include mixins.responsive-styles(border-end-start-radius, card-radius-rounded);
-  @include mixins.responsive-styles(border-end-end-radius, card-radius-rounded);
+  border-end-start-radius: var(--card-radius-rounded);
+  border-end-end-radius: var(--card-radius-rounded);
 }
 
 .tedi-card__header,

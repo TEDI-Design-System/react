@@ -21,12 +21,11 @@
   &__indicator {
     position: relative;
     display: block;
+    margin-left: var(--form-checkbox-radio-inner-spacing);
     background-color: var(--form-checkbox-radio-default-background-default);
     border: 1px solid var(--form-checkbox-radio-default-border-default);
+    border-radius: var(--form-checkbox-radio-indicator-radius-radio);
     transition: border-color 150ms ease;
-
-    @include mixins.responsive-styles(margin-right, form-checkbox-radio-inner-spacing);
-    @include mixins.responsive-styles(border-radius, form-checkbox-radio-indicator-radius-radio);
 
     &::after {
       position: absolute;
@@ -36,35 +35,28 @@
       background: var(--alpha-01);
       border: 1px solid var(--alpha-01);
       border-radius: 50%;
+      border-radius: var(--form-checkbox-radio-indicator-radius-radio);
       transition: background-color 150ms ease, border-color 150ms ease;
       transform: translate(-50%, -50%);
-
-      @include mixins.responsive-styles(border-radius, form-checkbox-radio-indicator-radius-radio);
     }
 
     &--size-default {
-      @include mixins.responsive-styles(width, form-checkbox-radio-size-responsive);
-      @include mixins.responsive-styles(height, form-checkbox-radio-size-responsive);
+      width: var(--form-checkbox-radio-size-responsive);
+      height: var(--form-checkbox-radio-size-responsive);
 
       &::after {
-        width: calc(var(--_width) * 0.67);
-        height: calc(var(--_height) * 0.67);
-
-        @include mixins.responsive-styles(--_width, form-checkbox-radio-size-responsive);
-        @include mixins.responsive-styles(--_height, form-checkbox-radio-size-responsive);
+        width: calc(var(--form-checkbox-radio-size-responsive) * 0.67);
+        height: calc(var(--form-checkbox-radio-size-responsive) * 0.67);
       }
     }
 
     &--size-large {
-      @include mixins.responsive-styles(width, form-checkbox-radio-size-large);
-      @include mixins.responsive-styles(height, form-checkbox-radio-size-large);
+      width: var(--form-checkbox-radio-size-large);
+      height: var(--form-checkbox-radio-size-large);
 
       &::after {
-        width: calc(var(--_width) * 0.67);
-        height: calc(var(--_height) * 0.67);
-
-        @include mixins.responsive-styles(--_width, form-checkbox-radio-size-large);
-        @include mixins.responsive-styles(--_height, form-checkbox-radio-size-large);
+        width: calc(var(--form-checkbox-radio-size-large) * 0.67);
+        height: calc(var(--form-checkbox-radio-size-large) * 0.67);
       }
     }
 
@@ -105,12 +97,11 @@
   &__outer-indicator-wrapper {
     display: flex;
     align-items: center;
-
-    @include mixins.responsive-styles(height, form-checkbox-radio-indicator-container-height);
+    height: var(--form-checkbox-radio-indicator-container-height);
   }
 
   &__helper {
-    @include mixins.responsive-styles(padding-left, form-checkbox-radio-size-responsive);
-    @include mixins.responsive-styles(margin-left, form-checkbox-radio-inner-spacing);
+    padding-left: var(--form-checkbox-radio-size-responsive);
+    margin-left: var(--form-checkbox-radio-inner-spacing);
   }
 }
