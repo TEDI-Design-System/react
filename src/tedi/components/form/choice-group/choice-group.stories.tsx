@@ -441,8 +441,8 @@ export const CustomItemHTMLLabels: Story = {
         label: (
           <div
             style={{
-              backgroundColor: 'var(--primary-600)',
-              color: 'var(--neutral-100)',
+              backgroundColor: 'var(--tedi-primary-600)',
+              color: 'var(--tedi-neutral-100)',
               padding: '0 8px',
               borderRadius: '5px',
             }}

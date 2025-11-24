@@ -16,7 +16,7 @@
       }
 
       &:not(:last-child) {
-        border-right-color: var(--alpha-01);
+        border-right-color: var(--tedi-alpha-01);
 
         &:active,
         &:hover {
@@ -52,7 +52,7 @@
       }
 
       &:not(:last-child) {
-        border-bottom-color: var(--alpha-01);
+        border-bottom-color: var(--tedi-alpha-01);
 
         &:active,
         &:hover {

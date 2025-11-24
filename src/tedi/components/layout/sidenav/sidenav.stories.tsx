@@ -276,6 +276,5 @@ export const SmallSideNavItems: Story = {
     navItems: exampleThirdLevelMenuItems,
     ariaLabel: 'Default open menu',
     sideNavItemSize: 'small',
-    showDividers: false,
   },
 };

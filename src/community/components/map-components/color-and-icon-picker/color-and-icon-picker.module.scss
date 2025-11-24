@@ -40,7 +40,7 @@
 
   &:focus-visible {
     border-color: var(--card-border-selected);
-    outline: var(--borders-02) solid var(--primary-500);
+    outline: var(--borders-02) solid var(--tedi-primary-500);
     outline-offset: 1px;
   }
 
@@ -71,7 +71,7 @@
 
   &--icon {
     line-height: 0.5;
-    border: 1px solid var(--alpha-white-20);
+    border: 1px solid var(--tedi-alpha-white-20);
   }
 
   &--color {
@@ -81,15 +81,15 @@
   &--selected {
     width: var(--selected-option-width);
     height: var(--selected-option-height);
-    border-color: var(--neutral-100);
+    border-color: var(--tedi-neutral-100);
     border-radius: 3px;
   }
 
   &--none {
     position: relative;
     overflow: hidden;
-    background: var(--neutral-100);
-    background-color: var(--alpha-01);
+    background: var(--tedi-neutral-100);
+    background-color: var(--tedi-alpha-01);
     border: 1px solid var(--form-input-border-default);
 
     &::before {

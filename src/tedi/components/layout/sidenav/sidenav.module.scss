@@ -6,6 +6,7 @@
   --small-sidenav-item-height: 2.25rem;
   --tree-trunk-width: 2px;
   --tree-branch-width: 12px;
+  --sidenav-tree-container: 24px;
   --tree-bullet-size: 8px;
   --collapsed-menu-toggle-arrow-top: 20px;
   --collapsed-menu-toggle-arrow-right: 10px;
@@ -36,7 +37,10 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      left: var(--button-xs-icon-size);
+      left: calc(
+        (var(--navigation-vertical-item-padding-right) / 2) + var(--navigation-vertical-item-padding-right) +
+          var(--tree-trunk-width)
+      );
       z-index: 1;
       width: var(--tree-trunk-width);
       content: '';
@@ -48,20 +52,15 @@
       position: absolute;
       top: 50%;
       bottom: 0;
-      left: var(--button-xs-icon-size);
+      left: calc(
+        (var(--navigation-vertical-item-padding-right) / 2) + var(--navigation-vertical-item-padding-right) +
+          var(--tree-trunk-width)
+      );
       width: var(--tree-branch-width);
       height: var(--tree-trunk-width);
       content: '';
       background-color: var(--navigation-vertical-tree-brand-default);
       border-radius: 0 var(--button-radius-sm) var(--button-radius-sm) 0;
-
-      @include breakpoints.media-breakpoint-down(lg) {
-        left: var(--button-xs-icon-size);
-      }
-
-      @include breakpoints.media-breakpoint-down(sm) {
-        left: var(--button-xs-icon-size);
-      }
     }
 
     &:last-child::before {
@@ -74,7 +73,7 @@
   }
 
   [data-name='collapse-trigger'] {
-    border: 1px solid var(--alpha-01);
+    border: 1px solid var(--tedi-alpha-01);
   }
 }
 
@@ -100,7 +99,7 @@
   gap: var(--navigation-vertical-item-inner-spacing-sm);
   justify-content: center;
   padding: var(--navigation-vertical-item-padding-y) var(--navigation-vertical-item-padding-x-sm);
-  font-size: var(--navigation-vertical-text-size-sm);
+  font-size: var(--navigation-side-text-size);
   text-align: center;
 }
 
@@ -120,7 +119,7 @@
 
 .tedi-sidenav__overlay {
   z-index: calc(var(--z-index-header) - 1);
-  background: var(--alpha-20);
+  background: var(--tedi-alpha-20);
 
   .tedi-sidenav__item--level-2 {
     @include breakpoints.media-breakpoint-down(lg) {
@@ -134,10 +133,6 @@
         .tedi-sidenav__bullet {
           display: none;
         }
-      }
-
-      .tedi-sidenav__item--level-3 .tedi-sidenav__bullet {
-        display: block;
       }
     }
   }
@@ -179,13 +174,13 @@
   }
 
   &:focus-visible {
-    border: 1px solid var(--neutral-100);
+    border: 1px solid var(--tedi-neutral-100);
     outline: 1px solid var(--navigation-vertical-item-background-focus);
   }
 }
 
 .tedi-sidenav__item [data-name='collapse-trigger'] .tedi-sidenav__link:hover {
-  background-color: var(--alpha-00);
+  background-color: var(--tedi-alpha-01);
 }
 
 .tedi-sidenav__item div[class^='tedi-collapse__content'] {
@@ -203,9 +198,14 @@
 }
 
 .tedi-sidenav__item.tedi-sidenav__sub-item .tedi-sidenav__link {
-  min-height: auto;
+  min-height: var(--navigation-vertical-item-min-height-medium);
   padding-top: var(--navigation-vertical-item-padding-y);
   padding-bottom: var(--navigation-vertical-item-padding-y);
+  /* stylelint-disable-next-line operator-no-newline-after */
+  padding-left: calc(
+    var(--navigation-vertical-item-padding-right) + var(--sidenav-tree-container) +
+      var(--navigation-vertical-item-inner-spacing)
+  );
 }
 
 .tedi-sidenav__item .tedi-sidenav__link--has-children-link {
@@ -213,6 +213,12 @@
 
   @include breakpoints.media-breakpoint-down(md) {
     margin-left: calc(var(--navigation-vertical-item-padding-right) + var(--button-xs-icon-size));
+  }
+}
+
+.tedi-sidenav__item.tedi-sidenav__sub-item .tedi-sidenav__link--has-children-link {
+  @include breakpoints.media-breakpoint-down(md) {
+    padding-left: var(--navigation-vertical-item-padding-right);
   }
 }
 
@@ -248,12 +254,15 @@
 
 .tedi-sidenav__item--medium {
   .tedi-sidenav__link {
-    min-height: auto;
+    min-height: var(--navigation-vertical-item-min-height-medium);
+    font-size: var(--navigation-vertical-text-size-sm);
   }
 
   .tedi-sidenav__sub-item .tedi-sidenav__link {
+    min-height: auto;
     padding-top: var(--navigation-vertical-item-padding-y);
     padding-bottom: var(--navigation-vertical-item-padding-y);
+    font-size: var(--navigation-vertical-text-size-sm);
   }
 
   .tedi-sidenav__sub-item .tedi-sidenav__title {
@@ -263,13 +272,24 @@
   .tedi-sidenav__icon {
     font-size: var(--size-05);
   }
+
+  .tedi-sidenav__item--has-children {
+    &::before {
+      margin-top: calc(var(--navigation-vertical-item-min-height-small) / 2);
+
+      @include breakpoints.media-breakpoint-down(lg) {
+        margin-top: calc(var(--navigation-vertical-item-min-height-small) / 2);
+      }
+    }
+  }
 }
 
 .tedi-sidenav__item--small {
   .tedi-sidenav__link {
-    min-height: auto;
+    min-height: var(--navigation-vertical-item-min-height-small);
     padding-top: var(--navigation-vertical-item-padding-y-sm);
     padding-bottom: var(--navigation-vertical-item-padding-y-sm);
+    font-size: var(--navigation-vertical-text-size-sm);
   }
 
   .tedi-sidenav__sub-item .tedi-sidenav__title {
@@ -277,12 +297,24 @@
   }
 
   .tedi-sidenav__sub-item .tedi-sidenav__link {
+    min-height: auto;
     padding-top: var(--navigation-vertical-item-padding-y-sm);
     padding-bottom: var(--navigation-vertical-item-padding-y-sm);
+    font-size: var(--navigation-vertical-text-size-sm);
   }
 
   .tedi-sidenav__icon {
     font-size: var(--size-03);
+  }
+
+  .tedi-sidenav__item--has-children {
+    &::before {
+      margin-top: calc(var(--navigation-vertical-item-min-height-small) / 2);
+
+      @include breakpoints.media-breakpoint-down(lg) {
+        margin-top: calc(var(--navigation-vertical-item-min-height-small) / 2);
+      }
+    }
   }
 }
 
@@ -303,13 +335,13 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
   flex-grow: 1;
   gap: var(--navigation-vertical-item-inner-spacing);
   align-items: center;
-  min-height: var(--navigation-vertical-item-min-height-medium);
+  min-height: var(--navigation-vertical-item-min-height-large);
   padding: var(--navigation-vertical-item-padding-y) var(--navigation-vertical-item-padding-right)
     var(--navigation-vertical-item-padding-y) var(--navigation-vertical-item-padding-left-level-1);
   font: inherit;
   color: var(--navigation-vertical-item-text);
   text-decoration: none;
-  border: 1px solid var(--alpha-01);
+  border: 1px solid var(--tedi-alpha-01);
   border-radius: 0;
   transition: 200ms ease;
   transition-property: background-color, color;
@@ -319,15 +351,9 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
   }
 
   &:focus-visible {
-    border: 1px solid var(--neutral-100);
+    border: 1px solid var(--tedi-neutral-100);
     outline: 1px solid var(--navigation-vertical-item-background-focus);
   }
-}
-
-.tedi-sidenav__item .tedi-sidenav__item .tedi-sidenav__link .tedi-sidenav__title:first-child {
-  margin-left: calc(
-    (var(--navigation-vertical-item-min-height-medium) / 3) + var(--navigation-vertical-item-padding-left-level-2)
-  );
 }
 
 .tedi-sidenav__subheading {
@@ -387,16 +413,10 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
 
 .tedi-sidenav__bullet {
   position: absolute;
-  top: 50%;
-  left: calc(var(--button-xs-icon-size) - (var(--tree-bullet-size) / 2));
-
-  @include breakpoints.media-breakpoint-down(lg) {
-    left: calc((var(--button-xs-icon-size) - (var(--tree-bullet-size) * 2)));
-  }
-
-  @include breakpoints.media-breakpoint-down(sm) {
-    left: calc(var(--button-xs-icon-size) - (var(--tree-bullet-size)));
-  }
+  left: calc(var(--navigation-vertical-item-padding-right) + var(--tree-bullet-size) - 2px);
+  display: flex;
+  align-items: center;
+  height: 100%;
 
   &::before {
     position: absolute;

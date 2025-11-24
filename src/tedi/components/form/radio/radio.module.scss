@@ -21,7 +21,7 @@
   &__indicator {
     position: relative;
     display: block;
-    margin-left: var(--form-checkbox-radio-inner-spacing);
+    margin-right: var(--form-checkbox-radio-inner-spacing);
     background-color: var(--form-checkbox-radio-default-background-default);
     border: 1px solid var(--form-checkbox-radio-default-border-default);
     border-radius: var(--form-checkbox-radio-indicator-radius-radio);
@@ -32,8 +32,8 @@
       top: 50%;
       left: 50%;
       content: '';
-      background: var(--alpha-01);
-      border: 1px solid var(--alpha-01);
+      background: var(--tedi-alpha-01);
+      border: 1px solid var(--tedi-alpha-01);
       border-radius: 50%;
       border-radius: var(--form-checkbox-radio-indicator-radius-radio);
       transition: background-color 150ms ease, border-color 150ms ease;

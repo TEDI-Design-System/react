@@ -35,12 +35,12 @@
 .tedi-resize__handle-wrapper {
   position: absolute;
   z-index: 100;
-  background-color: var(--alpha-01);
+  background-color: var(--tedi-alpha-01);
 
   .tedi-resize__drag-handle {
     position: absolute;
     display: none;
-    box-shadow: 0 4px 10px 0 var(--alpha-14);
+    box-shadow: 0 4px 10px 0 var(--tedi-alpha-14);
   }
 
   &[data-show-indicator='true'] {
@@ -69,7 +69,7 @@
 
     .tedi-resize__drag-handle {
       top: 50%;
-      right: calc((var(--handle-button-size) / 2) * -1);
+      right: calc((var(--button-sm-icon-size) / 2) * -1);
 
       > span {
         transform: rotate(90deg);
@@ -91,7 +91,7 @@
 
     .tedi-resize__drag-handle {
       top: 50%;
-      left: calc((var(--handle-button-size) / 2) * -1);
+      left: calc((var(--button-sm-icon-size) / 2) * -1);
       transform: translateY(-50%);
 
       > span {
@@ -114,7 +114,7 @@
     cursor: row-resize;
 
     .tedi-resize__drag-handle {
-      top: calc((var(--handle-button-size) / 2) * -1);
+      top: calc((var(--button-sm-icon-size) / 2) * -1);
       left: 50%;
       transform: translateX(-50%);
     }
@@ -133,7 +133,7 @@
     cursor: row-resize;
 
     .tedi-resize__drag-handle {
-      top: calc((var(--handle-button-size) / 2) * -1);
+      top: calc((var(--button-sm-icon-size) / 2) * -1);
       left: 50%;
       transform: translateX(-50%);
     }
@@ -164,7 +164,7 @@
   margin-right: calc((var(--button-sm-icon-size) / 2) * -1);
   background-color: var(--button-floating-secondary-background-default);
   border-radius: var(--button-radius-default);
-  box-shadow: 0 4px 10px 0 var(--alpha-14);
+  box-shadow: 0 4px 10px 0 var(--tedi-alpha-14);
   transform: translate(-50%, -50%);
 
   > span {

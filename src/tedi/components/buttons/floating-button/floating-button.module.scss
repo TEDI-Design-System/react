@@ -9,7 +9,7 @@ $btn-height-large: 3rem;
 .tedi-floating-button {
   box-sizing: border-box;
   text-wrap: wrap;
-  box-shadow: 0 4px 10px 0 var(--alpha-14);
+  box-shadow: 0 4px 10px 0 var(--tedi-alpha-14);
 
   &--horizontal {
     border-radius: var(--button-radius-default);

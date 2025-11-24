@@ -13,7 +13,7 @@
   background-color: var(--general-surface-primary);
   border: 1px solid var(--button-main-neutral-border-default);
   border-radius: var(--card-radius-rounded);
-  box-shadow: 0 1px 5px 0 var(--alpha-20);
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
   @include breakpoints.media-breakpoint-down(xl) {
     display: inline-block;

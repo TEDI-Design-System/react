@@ -46,7 +46,7 @@
     bottom: 0;
     left: 0;
     width: 1px;
-    height: 8px;
+    height: var(--timeline-line-small-height);
     background-color: var(--timeline-line-small);
   }
 

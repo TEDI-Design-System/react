@@ -55,6 +55,6 @@
 
 @media print {
   .tedi-alert {
-    @include alert-variant(var(--neutral-100), var(--neutral-350));
+    @include alert-variant(var(--tedi-neutral-100), var(--tedi-neutral-350));
   }
 }

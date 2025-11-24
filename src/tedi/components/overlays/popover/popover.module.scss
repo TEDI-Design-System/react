@@ -16,7 +16,7 @@ $popover-width: (
   background: var(--popover-background);
   border: 1px solid var(--popover-border);
   border-radius: var(--popover-radius-rounded);
-  box-shadow: 0 1px 5px 0 var(--alpha-20);
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
   @each $name, $width in $popover-width {
     &--#{$name} {
@@ -27,7 +27,7 @@ $popover-width: (
   &__arrow {
     z-index: 1;
     clip-path: inset(0 -5px -5px -5px);
-    filter: drop-shadow(0 0 5px var(--alpha-20));
+    filter: drop-shadow(0 0 5px var(--tedi-alpha-20));
     fill: var(--popover-background);
   }
 
