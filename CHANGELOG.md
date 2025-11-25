@@ -1,3 +1,10 @@
+# [14.2.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.6...react-14.2.0-rc.7) (2025-11-25)
+
+
+### Bug Fixes
+
+* **layout:** fix useInteractions having conditional values ([#394](https://github.com/TEDI-Design-System/react/issues/394)) ([#396](https://github.com/TEDI-Design-System/react/issues/396)) ([a452cde](https://github.com/TEDI-Design-System/react/commit/a452cde387e2a2b903deca5832556e40ed6ad441))
+
 # [14.2.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.5...react-14.2.0-rc.6) (2025-11-17)
 
 
