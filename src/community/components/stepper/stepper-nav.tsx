@@ -24,6 +24,12 @@ export interface StepperNavItem {
    * The position of the step
    */
   index: number;
+  /**
+   * Show completed icon next to the step label
+   * When true, a checkmark icon is displayed next to the step label even when the step is not marked as completed.
+   * @default false
+   */
+  showCompletedIcon?: boolean;
 }
 
 export interface StepperNavProps {
@@ -92,7 +98,7 @@ export const StepperNav = (props: StepperNavProps): JSX.Element => {
   };
 
   const StepperNavItem = (stepperItem: StepperNavItem): JSX.Element => {
-    const { label, completed, index, id } = stepperItem;
+    const { label, completed, index, id, showCompletedIcon } = stepperItem;
     const isCurrent = index === activeStep;
     const isActive = index <= activeStep;
     const isDisabled = isStepperNavItemDisabled(stepperItem);
@@ -119,8 +125,8 @@ export const StepperNav = (props: StepperNavProps): JSX.Element => {
           disabled={isDisabled}
         >
           <span className={styles['stepper__nav-item-counter']}>
-            {completed && <Icon name="done" size={18} />}
-            {!completed && index + 1}
+            {(completed || showCompletedIcon) && <Icon name="done" size={18} />}
+            {!completed && !showCompletedIcon && index + 1}
           </span>
           <span className={StepperNavItemLabelBEM}>{label}</span>
           {completed && <span className="visually-hidden">{completedLabel}</span>}

@@ -27,10 +27,10 @@
   &__icon {
     color: var(--button-main-neutral-text-default);
     transition: transform 300ms ease;
+  }
 
-    .tedi-collapse--is-open & {
-      transform: rotate(180deg);
-    }
+  &--is-open > .tedi-collapse__title .tedi-collapse__icon {
+    transform: rotate(180deg);
   }
 
   &__content {

@@ -30,6 +30,12 @@ export interface StepProps {
    * Mark the step as completed
    */
   completed?: boolean;
+  /**
+   * Show completed icon next to the step label
+   * When true, a checkmark icon is displayed next to the step label even when the step is not marked as completed.
+   * @default false
+   */
+  showCompletedIcon?: boolean;
 }
 
 export const Step = (props: StepProps): JSX.Element | null => {

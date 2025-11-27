@@ -126,8 +126,8 @@ export const Stepper = (props: StepperProps): JSX.Element => {
         return React.isValidElement(child) && child.type === Step;
       })
       .map((item: React.ReactElement<StepProps>, index) => {
-        const { label, completed, id } = item.props;
-        return { label, completed: !!completed, index, id };
+        const { label, completed, id, showCompletedIcon } = item.props;
+        return { label, completed: !!completed, index, id, showCompletedIcon };
       });
   };
 
