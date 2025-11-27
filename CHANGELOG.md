@@ -1,3 +1,10 @@
+# [14.2.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.7...react-14.2.0-rc.8) (2025-11-27)
+
+
+### Features
+
+* **feedback-text:** allow content to be either string or reactNode [#399](https://github.com/TEDI-Design-System/react/issues/399) ([#400](https://github.com/TEDI-Design-System/react/issues/400)) ([a3b1f56](https://github.com/TEDI-Design-System/react/commit/a3b1f5653c33c0abe77a1ac4fcd56e3808afb83c))
+
 # [14.2.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.6...react-14.2.0-rc.7) (2025-11-25)
 
 
