@@ -1,3 +1,10 @@
+## [14.2.1](https://github.com/TEDI-Design-System/react/compare/react-14.2.0...react-14.2.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* **variables:** update core version [#402](https://github.com/TEDI-Design-System/react/issues/402) ([c58063f](https://github.com/TEDI-Design-System/react/commit/c58063f60b18db7491b5705e65e89221dbe89ecc))
+
 # [14.2.0](https://github.com/TEDI-Design-System/react/compare/react-14.1.0...react-14.2.0) (2025-11-27)
 
 
