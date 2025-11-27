@@ -10,7 +10,7 @@ export interface FeedbackTextProps {
   /**
    * Helper text
    */
-  text: string | React.ReactNode | React.ReactNode[];
+  text: React.ReactNode | React.ReactNode[];
   /**
    * ID to reference the helper from aria-describedby attributes.
    * If omitted, then the id might be set through a parent component.
