@@ -130,6 +130,16 @@ const TemplateBodyText: StoryFn = () => (
     <TextRow
       desktopText={<Text modifiers={['small', 'italic']}>Small italic</Text>}
       mobileText={<Text modifiers={['small', 'italic']}>Small italic</Text>}
+      className="border-bottom"
+    />
+    <TextRow
+      desktopText={<Text modifiers={['extra-small']}>Extra small</Text>}
+      mobileText={<Text modifiers={['extra-small']}>Extra small</Text>}
+      className="border-bottom"
+    />
+    <TextRow
+      desktopText={<Text modifiers={['extra-small', 'bold']}>Small bold</Text>}
+      mobileText={<Text modifiers={['extra-small', 'bold']}>Small bold</Text>}
     />
   </div>
 );
