@@ -6,6 +6,7 @@ import { Text } from '../../base/typography/text/text';
 import { Col, ColProps, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
+import TextField from '../textfield/textfield';
 import ChoiceGroup from './choice-group';
 import { ChoiceGroupValue } from './choice-group.types';
 import { ExtendedChoiceGroupItemProps } from './components/choice-group-item/choice-group-item';
@@ -314,7 +315,18 @@ export const WithExtraContent: Story = {
         id: 'extra-content-3',
         label: 'Enterprise plan',
         value: 'enterprise',
-        helper: { text: 'Includes unlimited storage and 24/7 support' },
+        helper: {
+          text: (
+            <Row>
+              <Col width={4}>
+                <VerticalSpacing size={0.5}>
+                  <TextField id="success-textfield-1" label="Field 1" />
+                  <TextField id="success-textfield-2" label="Field 2" />
+                </VerticalSpacing>
+              </Col>
+            </Row>
+          ),
+        },
       },
     ],
   },

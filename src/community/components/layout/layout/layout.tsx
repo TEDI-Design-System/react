@@ -101,21 +101,19 @@ export const Layout = <
   const [menuOpen, setMenuOpen] = React.useState(false);
   const prevMenuOpenRef = React.useRef<boolean>(menuOpen);
   const { hasSidenav } = useSidenavRendered(headerType, sideNav);
-  const useFloatingInteractions = Boolean(sideNav?.navItems?.length);
+  const areFloatingInteractionsEnabled = Boolean(sideNav?.navItems?.length);
   const { y, refs, context } = useFloating({
     placement: 'bottom-start',
     open: menuOpen,
-    onOpenChange: useFloatingInteractions ? setMenuOpen : undefined,
+    onOpenChange: areFloatingInteractionsEnabled ? setMenuOpen : undefined,
     whileElementsMounted: (...args) => autoUpdate(...args, { ancestorScroll: false }),
   });
   const headerBottomSize = useElementSize(headerBottomElement);
 
-  const click = useClick(context);
-  const role = useRole(context, { role: 'dialog' });
-  const dismiss = useDismiss(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions(
-    useFloatingInteractions ? [click, role, dismiss] : []
-  );
+  const click = useClick(context, { enabled: areFloatingInteractionsEnabled });
+  const role = useRole(context, { role: 'dialog', enabled: areFloatingInteractionsEnabled });
+  const dismiss = useDismiss(context, { enabled: areFloatingInteractionsEnabled });
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, role, dismiss]);
 
   const mainBem = cn(styles['main'], {
     [styles['main--with-sidenav']]: hasSidenav,
