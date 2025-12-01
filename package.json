@@ -41,7 +41,7 @@
     "@emotion/styled": "^11.11.0",
     "@floating-ui/react": "^0.26.9",
     "@mui/material": "^5.15.13",
-    "@mui/x-date-pickers": "^5.0.20",
+    "@mui/x-date-pickers": "^8.19.0",
     "@tanstack/react-table": "^8.13.2",
     "@tedi-design-system/core": "2.5.0",
     "classnames": "^2.5.1",
