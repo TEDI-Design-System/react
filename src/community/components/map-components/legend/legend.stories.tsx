@@ -23,7 +23,7 @@ export const Default: Story = {
 
 export const Color: Story = {
   args: {
-    label: <div style={{ backgroundColor: 'var(--primary-600)', width: '40px', height: '26px' }}></div>,
+    label: <div style={{ backgroundColor: 'var(--tedi-primary-600)', width: '40px', height: '26px' }}></div>,
     description: 'Lorem ipsum',
   },
 };

@@ -5,25 +5,19 @@ $input-height: 2.5rem;
 $input-height-small: 2rem;
 
 div.tedi-select__control {
-  padding-top: calc(var(--_padding-y) - 1px);
-  padding-bottom: calc(var(--_padding-y) - 1px);
+  padding: calc(var(--form-field-padding-y-md-default) - 1px) var(--form-field-padding-x-md-default);
   border: 1px solid var(--form-input-border-default);
 
   @include mixins.print-grayscale;
-  @include mixins.responsive-styles(padding-left, form-field-padding-x-md-default);
-  @include mixins.responsive-styles(padding-right, form-field-padding-x-md-default);
-  @include mixins.responsive-styles(--_padding-y, form-field-padding-y-md-default);
 
   .tedi-select__value-container {
+    gap: var(--form-field-inner-spacing);
     padding: 0;
-
-    @include mixins.responsive-styles(gap, form-field-inner-spacing);
   }
 
   .tedi-select__indicators-container {
+    gap: var(--layout-grid-gutters-04);
     align-items: flex-start;
-
-    @include mixins.responsive-styles(gap, layout-grid-gutters-04);
   }
 
   .tedi-select__input {
@@ -66,9 +60,8 @@ div.tedi-select__control {
 
 .tedi-select__loading-indicator {
   display: flex;
+  gap: var(--layout-grid-gutters-12);
   align-items: center;
-
-  @include mixins.responsive-styles(gap, layout-grid-gutters-12);
 }
 
 .tedi-select--disabled .tedi-select__control {
@@ -82,8 +75,8 @@ div.tedi-select__menu-portal {
 div .tedi-select__menu {
   margin: 1px 0 0;
   overflow: hidden;
+  border-radius: var(--form-field-radius);
 
-  @include mixins.responsive-styles(border-radius, form-field-radius);
   @include mixins.print-grayscale;
 }
 
@@ -145,23 +138,14 @@ div .tedi-select__menu {
 .tedi-select--small {
   .tedi-select__control {
     min-height: $input-height-small;
-    padding-top: calc(var(--_padding-top) - 1px);
-    padding-bottom: calc(var(--_padding-bottom) - 1px);
-
-    @include mixins.responsive-styles(font-size, body-small-regular-size);
-    @include mixins.responsive-styles(padding-left, form-field-padding-x-md-default);
-    @include mixins.responsive-styles(padding-right, form-field-padding-x-md-default);
-    @include mixins.responsive-styles(--_padding-top, form-field-padding-y-sm);
-    @include mixins.responsive-styles(--_padding-bottom, form-field-padding-y-sm);
+    padding: calc(var(--form-field-padding-y-sm) - 1px) var(--form-field-padding-x-md-default);
+    font-size: var(--body-small-regular-size);
 
     @include breakpoints.media-breakpoint-down(md) {
       min-height: $input-height;
-      padding-top: calc(var(--_padding-top) - 1px);
-      padding-bottom: calc(var(--_padding-bottom) - 1px);
-
-      @include mixins.responsive-styles(font-size, body-regular-size);
-      @include mixins.responsive-styles(--_padding-top, form-field-padding-y-md-default);
-      @include mixins.responsive-styles(--_padding-bottom, form-field-padding-y-md-default);
+      padding-top: calc(var(--form-field-padding-y-md-default-top) - 1px);
+      padding-bottom: calc(var(--form-field-padding-y-md-default-bottom) - 1px);
+      font-size: var(--body-regular-size);
     }
   }
 
@@ -205,9 +189,8 @@ div.tedi-select__multi-value-item {
 
 :global {
   .tedi-select__value-container {
+    gap: var(--form-field-inner-spacing);
     padding: 0 !important;
-
-    @include mixins.responsive-styles(gap, form-field-inner-spacing);
 
     .tedi-select__placeholder {
       color: var(--form-input-text-placeholder);
@@ -224,7 +207,7 @@ div.tedi-select__multi-value-item {
       inset: 0;
       pointer-events: none;
       content: '';
-      box-shadow: inset 0.5rem 0 0.25rem -0.25rem var(--alpha-100);
+      box-shadow: inset 0.5rem 0 0.25rem -0.25rem var(--tedi-alpha-100);
     }
   }
 

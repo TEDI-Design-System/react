@@ -1,7 +1,5 @@
-@use '@tedi-design-system/core/mixins';
-
 .tedi-text-group {
-  margin-bottom: var(--dimensions-03-rem);
+  margin-bottom: var(--dimensions-03);
 
   &--horizontal {
     display: flex;
@@ -17,8 +15,7 @@
 
   &__value {
     display: flex;
+    gap: var(--text-group-value-inner-spacing);
     align-items: center;
-
-    @include mixins.responsive-styles(gap, text-group-value-inner-spacing);
   }
 }

@@ -121,28 +121,21 @@ $btn-width-large: 3.72rem;
   justify-content: center;
   max-width: 100%;
   min-height: $btn-height;
-  padding-top: calc(var(--_padding-top) - 1px);
-  padding-bottom: calc(var(--_padding-bottom) - 1px);
+  padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
   margin: 0;
+  font-family: var(--family-default);
+  font-size: var(--button-text-size-default);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   background-image: none;
   border-style: solid;
   border-width: 1px;
+  border-radius: var(--button-radius-default);
   transition: 150ms ease;
   transition-property: background-color, border-color;
 
   @include mixins.print-grayscale;
-  @include mixins.responsive-styles(font-family, family-primary, $exclude: tablet);
-  @include mixins.responsive-styles(font-size, button-text-size-default);
-
-  // subtract border height
-  @include mixins.responsive-styles(--_padding-top, button-md-padding-y);
-  @include mixins.responsive-styles(--_padding-bottom, button-md-padding-y);
-  @include mixins.responsive-styles(padding-left, button-md-padding-x);
-  @include mixins.responsive-styles(padding-right, button-md-padding-x);
-  @include mixins.responsive-styles(border-radius, button-radius-default);
 }
 
 .tedi-btn:disabled,
@@ -152,14 +145,9 @@ $btn-width-large: 3.72rem;
 
 .tedi-btn--small {
   min-height: $btn-height-small;
-  padding-top: calc(var(--_padding-top) - 1px);
-  padding-bottom: calc(var(--_padding-bottom) - 1px);
-
-  @include mixins.responsive-styles(font-size, button-text-size-sm);
-  @include mixins.responsive-styles(--_padding-top, button-sm-padding-y);
-  @include mixins.responsive-styles(--_padding-bottom, button-sm-padding-y);
-  @include mixins.responsive-styles(padding-left, button-sm-padding-x);
-  @include mixins.responsive-styles(padding-right, button-sm-padding-x);
+  padding: calc(var(--button-sm-padding-y) - 1px) var(--button-sm-padding-x) calc(var(--button-sm-padding-y) - 1px)
+    var(--button-sm-padding-x);
+  font-size: var(--button-text-size-sm);
 
   @include breakpoints.media-breakpoint-down(md) {
     height: $btn-height;
@@ -176,13 +164,8 @@ $btn-width-large: 3.72rem;
 
 .tedi-btn--large {
   height: $btn-height-large;
-  padding-top: calc(var(--_padding-top) - 1px);
-  padding-bottom: calc(var(--_padding-bottom) - 1px);
-
-  @include mixins.responsive-styles(--_padding-top, button-md-padding-y);
-  @include mixins.responsive-styles(--_padding-bottom, button-md-padding-y);
-  @include mixins.responsive-styles(padding-left, button-md-padding-x);
-  @include mixins.responsive-styles(padding-right, button-md-padding-x);
+  padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x) calc(var(--button-md-padding-y) - 1px)
+    var(--button-md-padding-x);
 
   &.tedi-btn--icon-only {
     width: $btn-width-large;
@@ -191,12 +174,9 @@ $btn-width-large: 3.72rem;
 
 .tedi-btn--neutral {
   padding: 0;
-  padding-top: calc(var(--_padding-top) - 1px);
-  padding-bottom: calc(var(--_padding-bottom) - 1px);
+  padding-top: calc(var(--button-md-neutral-padding-y) - 1px);
+  padding-bottom: calc(var(--button-md-neutral-padding-y) - 1px);
   background-clip: padding-box;
-
-  @include mixins.responsive-styles(--_padding-top, button-md-neutral-padding-y);
-  @include mixins.responsive-styles(--_padding-bottom, button-md-neutral-padding-y);
 
   &.tedi-btn--default.tedi-btn--icon-only {
     &:hover:not(:disabled) {
@@ -432,17 +412,17 @@ $btn-width-large: 3.72rem;
   );
 
   .tedi-btn__icon--left {
-    @include mixins.responsive-styles(margin-right, button-sm-inner-spacing);
+    margin-right: var(--button-sm-inner-spacing);
   }
 
   .tedi-btn__icon--right {
-    @include mixins.responsive-styles(margin-left, button-sm-inner-spacing);
+    margin-left: var(--button-sm-inner-spacing);
   }
 }
 
 .tedi-btn__text {
-  @include mixins.responsive-styles(padding-left, button-md-inner-spacing);
-  @include mixins.responsive-styles(padding-right, button-md-inner-spacing);
+  padding-right: var(--button-md-inner-spacing);
+  padding-left: var(--button-md-inner-spacing);
 
   .tedi-btn--link.tedi-btn--is-hovered:not(:disabled) &,
   .tedi-btn--link.tedi-btn--is-active:not(:disabled) &,
@@ -452,12 +432,12 @@ $btn-width-large: 3.72rem;
   }
 
   .tedi-btn--is-loading:not(.tedi-btn--icon) & {
-    color: var(--alpha-01);
+    color: var(--tedi-alpha-01);
   }
 
   .tedi-btn--small & {
-    @include mixins.responsive-styles(padding-left, button-sm-inner-spacing);
-    @include mixins.responsive-styles(padding-right, button-sm-inner-spacing);
+    padding-right: var(--button-sm-inner-spacing);
+    padding-left: var(--button-sm-inner-spacing);
   }
 
   .tedi-btn--link & {
@@ -509,7 +489,7 @@ $btn-width-large: 3.72rem;
     align-items: flex-start;
 
     .tedi-btn__icon {
-      @include mixins.responsive-styles(line-height, body-regular-line-height);
+      line-height: var(--body-regular-line-height);
     }
   }
 

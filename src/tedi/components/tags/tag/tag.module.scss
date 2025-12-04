@@ -12,17 +12,16 @@ $tag-colors: (
   --general-icon-primary: var(--button-close-text-default);
 
   display: inline-flex;
+  gap: var(--tag-default-padding-x);
   align-items: flex-start;
   justify-content: center;
+  padding-right: var(--tag-default-padding-x);
+  padding-left: var(--tag-default-padding-x);
+  font-size: var(--body-small-regular-size);
+  font-weight: var(--body-small-regular-weight);
+  line-height: var(--body-small-regular-line-height);
   color: var(--general-text-primary);
-
-  @include mixins.responsive-styles(gap, tag-default-padding-x);
-  @include mixins.responsive-styles(border-radius, tag-default-radius);
-  @include mixins.responsive-styles(padding-left, tag-default-padding-x);
-  @include mixins.responsive-styles(padding-right, tag-default-padding-x);
-  @include mixins.responsive-styles(font-size, body-small-regular-size);
-  @include mixins.responsive-styles(font-weight, body-small-regular-weight);
-  @include mixins.responsive-styles(line-height, body-small-regular-line-height);
+  border-radius: var(--tag-default-radius);
 
   @each $color, $var in $tag-colors {
     &--color-#{$color} {
@@ -34,42 +33,36 @@ $tag-colors: (
   &__content {
     display: flex;
     align-items: center;
-
-    @include mixins.responsive-styles(min-height, button-xs-icon-size);
+    min-height: var(--button-xs-icon-size);
   }
 
   &__icon-wrapper {
     display: flex;
     align-items: center;
-
-    @include mixins.responsive-styles(min-height, button-xs-icon-size);
+    min-height: var(--button-xs-icon-size);
   }
 
   &__loader {
-    @include mixins.responsive-styles(width, icon-01);
-    @include mixins.responsive-styles(height, icon-01);
+    width: var(--icon-01);
+    height: var(--icon-01);
   }
 
   &__close {
-    --button-radius-default-desktop: 0;
-    --button-radius-default-tablet: 0;
-    --button-radius-default-mobile: 0;
+    --button-radius-default: 0;
 
     padding: 0;
+    padding-left: var(--tag-default-padding-x);
     overflow: hidden;
-
-    @include mixins.responsive-styles(padding-left, tag-default-padding-x);
 
     > button {
       flex-shrink: 0;
-
-      @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
-      @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
+      border-top-right-radius: var(--button-radius-sm);
+      border-bottom-right-radius: var(--button-radius-sm);
     }
   }
 
   @include breakpoints.media-breakpoint-down(md) {
-    @include mixins.responsive-styles(min-height, button-xs-icon-size);
+    min-height: var(--button-xs-icon-size);
   }
 
   @include mixins.print-grayscale;

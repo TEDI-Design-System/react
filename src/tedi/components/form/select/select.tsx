@@ -285,9 +285,9 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
             ...theme,
             colors: {
               ...theme.colors,
-              primary: 'var(--blue-600)',
-              danger: 'var(--red-600)',
-              dangerLight: 'var(--red-200)',
+              primary: 'var(--tedi-blue-600)',
+              danger: 'var(--tedi-red-600)',
+              dangerLight: 'var(--tedi-red-200)',
             },
           })}
           styles={{

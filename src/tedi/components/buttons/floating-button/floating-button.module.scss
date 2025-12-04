@@ -1,4 +1,3 @@
-@use '@tedi-design-system/core/mixins';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 @use '../button-content/button-content.module';
 
@@ -9,21 +8,20 @@ $btn-height-large: 3rem;
 .tedi-floating-button {
   box-sizing: border-box;
   text-wrap: wrap;
-  box-shadow: 0 4px 10px 0 var(--alpha-14);
+  box-shadow: 0 4px 10px 0 var(--tedi-alpha-14);
 
   &--horizontal {
-    @include mixins.responsive-styles(border-radius, button-radius-default);
+    border-radius: var(--button-radius-default);
   }
 
   &--vertical {
     min-width: max-content;
     white-space: nowrap;
     border-radius: 0;
+    border-top-left-radius: var(--button-radius-sm);
+    border-top-right-radius: var(--button-radius-sm);
     transform: rotate(-90deg);
     transform-origin: center;
-
-    @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
-    @include mixins.responsive-styles(border-top-left-radius, button-radius-sm);
   }
 
   &.tedi-floating-button--primary {
@@ -61,35 +59,33 @@ $btn-height-large: 3rem;
   &--medium {
     height: auto;
     min-height: $btn-height;
+    padding: var(--button-md-padding-y) var(--button-md-padding-x);
 
     @include breakpoints.media-breakpoint-up(md) {
       min-height: $btn-height-small;
     }
 
-    @include mixins.responsive-styles(padding, button-md-padding-y button-md-padding-x);
-
     &.tedi-floating-button--icon-only {
-      @include mixins.responsive-styles(width, button-md-icon-size);
-      @include mixins.responsive-styles(height, button-md-icon-size);
-      @include mixins.responsive-styles(padding, button-md-icon-padding);
+      width: var(--button-md-icon-size);
+      height: var(--button-md-icon-size);
+      padding: var(--button-md-icon-padding);
     }
   }
 
   &--large {
     height: auto;
     min-height: $btn-height-large;
-
-    @include mixins.responsive-styles(padding, button-xl-padding-y button-xl-padding-x);
+    padding: var(--button-lg-padding-y) var(--button-lg-padding-x);
 
     &.tedi-floating-button--icon-only {
-      @include mixins.responsive-styles(width, button-xl-icon-size);
-      @include mixins.responsive-styles(height, button-xl-icon-size);
-      @include mixins.responsive-styles(padding, button-xl-icon-padding);
+      width: var(--button-xl-icon-size);
+      height: var(--button-xl-icon-size);
+      padding: var(--button-xl-icon-padding);
     }
   }
 
   &:not(&--icon-only) {
-    @include mixins.responsive-styles(min-width, button-width-min);
-    @include mixins.responsive-styles(max-width, button-width-max);
+    min-width: var(--button-width-min);
+    max-width: var(--button-width-max);
   }
 }

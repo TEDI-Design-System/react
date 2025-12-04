@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-
 $popover-width: (
   'small': 15rem,
   'medium': 30rem,
@@ -10,14 +8,13 @@ $popover-width: (
   z-index: var(--z-index-tooltip);
   display: flex;
   flex-direction: column;
+  gap: var(--layout-grid-gutters-08);
+  padding: var(--popover-padding-sm);
   color: var(--popover-text);
   background: var(--popover-background);
   border: 1px solid var(--popover-border);
-  box-shadow: 0 1px 5px 0 var(--alpha-20);
-
-  @include mixins.responsive-styles(gap, layout-grid-gutters-08);
-  @include mixins.responsive-styles(padding, popover-padding-sm);
-  @include mixins.responsive-styles(border-radius, popover-radius-rounded);
+  border-radius: var(--popover-radius-rounded);
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
   @each $name, $width in $popover-width {
     &--#{$name} {
@@ -28,15 +25,14 @@ $popover-width: (
   &__arrow {
     z-index: 1;
     clip-path: inset(0 -5px -5px -5px);
-    filter: drop-shadow(0 0 5px var(--alpha-20));
+    filter: drop-shadow(0 0 5px var(--tedi-alpha-20));
     fill: var(--popover-background);
   }
 
   &__header {
     display: flex;
+    gap: var(--layout-grid-gutters-08);
     justify-content: space-between;
-
-    @include mixins.responsive-styles(gap, layout-grid-gutters-08);
 
     &--no-title {
       justify-content: flex-end;

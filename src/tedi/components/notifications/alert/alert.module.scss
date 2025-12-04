@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-
 @mixin alert-variant($background, $border) {
   color: var(--general-text-primary);
   background-color: $background;
@@ -7,22 +5,21 @@
 }
 
 .tedi-alert {
+  padding: var(--alert-default-padding-y) var(--alert-default-padding-x);
+  font-size: var(--body-regular-size);
   border: 1px solid;
+  border-radius: var(--alert-radius);
 
   @include alert-variant(var(--alert-default-background-info), var(--alert-default-border-info));
-  @include mixins.responsive-styles(font-size, body-regular-size);
-  @include mixins.responsive-styles(border-radius, alert-radius);
-  @include mixins.responsive-styles(padding, alert-default-padding-y alert-default-padding-x);
 
   &__content {
     display: flex;
+    gap: var(--layout-grid-gutters-08);
     align-items: flex-start;
 
     .tedi-alert__icon {
-      @include mixins.responsive-styles(line-height, body-regular-line-height);
+      line-height: var(--body-regular-line-height);
     }
-
-    @include mixins.responsive-styles(gap, alert-default-inner-spacing-x);
   }
 
   &--info {
@@ -56,6 +53,6 @@
 
 @media print {
   .tedi-alert {
-    @include alert-variant(var(--neutral-100), var(--neutral-350));
+    @include alert-variant(var(--tedi-neutral-100), var(--tedi-neutral-350));
   }
 }
