@@ -1,3 +1,10 @@
+# [14.3.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.1...react-14.3.0-rc.2) (2025-12-04)
+
+
+### Bug Fixes
+
+* **variables:** remove responsive-styles, replace with variables, sidenav variables update [#395](https://github.com/TEDI-Design-System/react/issues/395) ([#405](https://github.com/TEDI-Design-System/react/issues/405)) ([199bc4e](https://github.com/TEDI-Design-System/react/commit/199bc4e7b61ab28571d2707df5740868afbdabc1))
+
 # [14.3.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.2.1...react-14.3.0-rc.1) (2025-12-04)
 
 
