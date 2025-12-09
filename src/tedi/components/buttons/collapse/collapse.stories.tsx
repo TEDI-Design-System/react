@@ -1,9 +1,10 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
+import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import Collapse from './collapse';
+import Collapse, { CollapseProps } from './collapse';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.0.4-(work-in-progress)?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -31,19 +32,105 @@ export default meta;
 type Story = StoryObj<typeof Collapse>;
 
 export const Default: Story = {};
+const buttonStateArray = ['Default', 'Hover', 'Active', 'Focus'];
+type TemplateMultipleProps<Type = typeof buttonStateArray> = CollapseProps & {
+  array: Type;
+  hideSizes?: boolean;
+};
 
-export const IconNeutralButton = {
+const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array, hideSizes, ...collapseProps } = args;
+
+  return (
+    <>
+      <VerticalSpacing size={0}>
+        <Row>
+          <Col md={1}></Col>
+          <Col>
+            <Text modifiers="bold">Default</Text>
+          </Col>
+          {!hideSizes && (
+            <Col className="text-bold">
+              <Text modifiers="bold">Small</Text>
+            </Col>
+          )}
+        </Row>
+        <p>&nbsp;</p>
+        {array.map((value, key) => (
+          <Row key={key}>
+            <Col md={1} className="display-flex align-items-start">
+              <Text modifiers="bold">{value}</Text>
+            </Col>
+            <Col className="display-flex align-items-start gap-3">
+              <Collapse {...collapseProps} id={value}>
+                <>&nbsp;</>
+              </Collapse>
+              <Collapse {...collapseProps} id={value} open>
+                <>&nbsp;</>
+              </Collapse>
+            </Col>
+            {!hideSizes && (
+              <Col className="display-flex align-items-start gap-3">
+                <Collapse {...collapseProps} id={value} size="small">
+                  <>&nbsp;</>
+                </Collapse>
+                <Collapse {...collapseProps} id={value} open size="small">
+                  <>&nbsp;</>
+                </Collapse>
+              </Col>
+            )}
+          </Row>
+        ))}
+      </VerticalSpacing>
+    </>
+  );
+};
+
+export const WithText = {
+  render: TemplateColumn,
   args: {
-    ...Default.args,
-    hideCollapseText: true,
+    array: buttonStateArray,
+    visualType: 'primary',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover__trigger',
+      active: '#Active__trigger',
+      focusVisible: '#Focus__trigger',
+    },
   },
 };
 
-export const IconSecondaryButton = {
+export const IconOnly = {
+  render: TemplateColumn,
   args: {
-    ...Default.args,
+    array: buttonStateArray,
+    visualType: 'primary',
+    hideCollapseText: true,
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover__trigger',
+      active: '#Active__trigger',
+      focusVisible: '#Focus__trigger',
+    },
+  },
+};
+
+export const SecondaryButton = {
+  render: TemplateColumn,
+  args: {
+    array: buttonStateArray,
     arrowType: 'secondary',
     hideCollapseText: true,
+    hideSizes: true,
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover__trigger',
+      active: '#Active__trigger',
+      focusVisible: '#Focus__trigger',
+    },
   },
 };
 
