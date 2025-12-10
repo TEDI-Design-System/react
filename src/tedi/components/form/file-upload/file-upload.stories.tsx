@@ -10,7 +10,7 @@ import FileUpload, { FileUploadProps } from './file-upload';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4536-78765&m=dev" target="_BLANK">Figma ↗</a><br />
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/90c693-number-field" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/012bbe-file-upload" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof FileUpload> = {

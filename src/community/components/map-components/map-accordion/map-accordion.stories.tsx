@@ -7,8 +7,8 @@ import MapAccordionItemContent, { MapAccordionItemContentProps } from './map-acc
 import MapAccordionItemHeader, { MapAccordionItemHeaderProps } from './map-accordion-item-header';
 
 /**
- * <a href="?path=/docs/community-map-components-rightpanel--docs" target="_BLANK">Part of RightPanel component</a><br/>
- * <a href="?path=/docs/community-map-components-leftpanel--docs" target="_BLANK">Part of LeftPanel component</a><br/>
+ * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Map-Design-System?node-id=135-19015&t=cXoKuMFdKn2jXSEw-4" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/688da9-map-accordion" target="_BLANK">ZeroHeight ↗</a>
  */
 
 const meta: Meta<typeof MapAccordion> = {

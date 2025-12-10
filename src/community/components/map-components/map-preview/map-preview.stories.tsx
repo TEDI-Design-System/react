@@ -4,6 +4,7 @@ import MapPreview from './map-preview';
 
 /**
  * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Veera-Map-Design-System?node-id=179-24889&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/12449a-map-preview" target="_BLANK">ZeroHeight ↗</a>
  */
 
 const meta: Meta<typeof MapPreview> = {

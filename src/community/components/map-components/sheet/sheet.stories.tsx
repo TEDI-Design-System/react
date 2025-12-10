@@ -6,6 +6,7 @@ import { Sheet } from './sheet';
 
 /**
  * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Map-Design-System?node-id=251-42756&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/502b36-sheet" target="_BLANK">ZeroHeight ↗</a><br/>
  * NB! Use individual stories to test this component. This component is mobile-only, that means desktop variables don't apply to this component
  */
 

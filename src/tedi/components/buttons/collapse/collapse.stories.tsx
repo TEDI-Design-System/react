@@ -7,7 +7,7 @@ import Collapse from './collapse';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.0.4-(work-in-progress)?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/546461-floating-button" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/9469bf-collapse" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Collapse> = {

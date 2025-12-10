@@ -5,7 +5,7 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Print, PrintProps } from './print';
 
 /**
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/161c42-print" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/161c42-print" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Print> = {
