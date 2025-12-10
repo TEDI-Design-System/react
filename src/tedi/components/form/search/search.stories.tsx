@@ -7,7 +7,7 @@ import { Search, SearchProps } from './search';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4620-82860&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/4013b4-search" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/4013b4-search" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<SearchProps> = {

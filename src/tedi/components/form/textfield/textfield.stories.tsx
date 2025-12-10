@@ -6,7 +6,7 @@ import TextField, { TextFieldProps } from './textfield';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=3486-37649&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://zeroheight.com/1ee8444b7/p/328d11-text-field" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/328d11-text-field" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof TextField> = {

@@ -5,7 +5,7 @@ import { Tag, TagProps } from './tag';
 
 /**
  * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2405-49832&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/6524c4-tag" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/6524c4-tag" target="_BLANK">Zeroheight ↗</a>
  */
 
 export default {

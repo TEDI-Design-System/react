@@ -7,6 +7,7 @@ import { Directions } from './directions';
 
 /**
  * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Map-Design-System?node-id=868-96921&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/588d45-directions" target="_BLANK">ZeroHeight ↗</a>
  */
 
 const meta: Meta<typeof Directions> = {
