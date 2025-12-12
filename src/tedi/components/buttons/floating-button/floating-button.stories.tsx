@@ -107,7 +107,7 @@ export const PrimaryHorizontal: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -124,7 +124,7 @@ export const PrimaryVertical: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -141,7 +141,7 @@ export const SecondaryHorizontal: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -158,7 +158,7 @@ export const SecondaryVertical: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
