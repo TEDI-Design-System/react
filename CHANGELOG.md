@@ -1,3 +1,10 @@
+# [14.3.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.4...react-14.3.0-rc.5) (2025-12-12)
+
+
+### Features
+
+* **theme-provider:** muis theme, update core [#413](https://github.com/TEDI-Design-System/react/issues/413) ([#415](https://github.com/TEDI-Design-System/react/issues/415)) ([357d943](https://github.com/TEDI-Design-System/react/commit/357d9435c37b640a3d657359c13984d0b5581535))
+
 # [14.3.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.3...react-14.3.0-rc.4) (2025-12-12)
 
 
