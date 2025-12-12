@@ -1,3 +1,10 @@
+# [14.3.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.2...react-14.3.0-rc.3) (2025-12-12)
+
+
+### Bug Fixes
+
+* **header:** fix header-language list indent [#411](https://github.com/TEDI-Design-System/react/issues/411) ([#412](https://github.com/TEDI-Design-System/react/issues/412)) ([d028080](https://github.com/TEDI-Design-System/react/commit/d02808028dbfd4df1008a3f5a326f55c1236e6de))
+
 # [14.3.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.1...react-14.3.0-rc.2) (2025-12-04)
 
 
