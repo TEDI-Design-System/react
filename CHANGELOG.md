@@ -1,3 +1,10 @@
+# [14.3.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.3...react-14.3.0-rc.4) (2025-12-12)
+
+
+### Bug Fixes
+
+* **floating-button:** dark theme variable changes, fix focus style in storybook [#8](https://github.com/TEDI-Design-System/react/issues/8) ([#414](https://github.com/TEDI-Design-System/react/issues/414)) ([271f262](https://github.com/TEDI-Design-System/react/commit/271f262d801cbeb99d09bc811f325f862dd99a55))
+
 # [14.3.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.2...react-14.3.0-rc.3) (2025-12-12)
 
 
