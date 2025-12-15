@@ -226,6 +226,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },
+  'file-dropzone.no-file': {
+    description: 'No file selected label for FileUpload or FileDropzone',
+    components: ['FileDropzone', 'FileUpload'],
+    et: 'Ühtegi faili pole valitud',
+    en: 'No file has been chosen',
+    ru: 'Файлы не выбраны',
+  },
+  'file-dropzone.selected-files': {
+    description: 'Selected files label for FileUpload or FileDropzone',
+    components: ['FileDropzone', 'FileUpload'],
+    et: 'Valitud failid',
+    en: 'Uploaded files',
+    ru: 'Загруженные файлы',
+  },
+  'file-dropzone.files-selected': {
+    description: 'Label for selected file count',
+    components: ['FileDropzone', 'FileUpload'],
+    et: (files: number) => `${files} faili valitud`,
+    en: (files: number) => `${files} files selected`,
+    ru: (files: number) => `${files} выбранных файлов`,
+  },
   'modal.close': {
     description: 'Label for modals close button',
     components: ['Modal'],

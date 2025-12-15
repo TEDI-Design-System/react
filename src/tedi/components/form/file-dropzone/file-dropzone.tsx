@@ -7,8 +7,8 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import ClosingButton from '../../buttons/closing-button/closing-button';
 import { Card, CardContent } from '../../cards/card';
+import { List } from '../../content/list';
 import { Col, Row } from '../../layout/grid';
-import { VerticalSpacing } from '../../layout/vertical-spacing';
 import FeedbackText, { FeedbackTextProps } from '../feedback-text/feedback-text';
 import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './file-dropzone.module.scss';
@@ -42,10 +42,12 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
   const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove } = useFileUpload(props);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    disabled,
     accept: props.accept ? { 'application/*': [props.accept] } : undefined,
     multiple: props.multiple,
     maxSize: props.maxSize ? props.maxSize * 1024 ** 2 : undefined,
     onDrop: (acceptedFiles) => {
+      if (disabled) return;
       const event = {
         target: { files: acceptedFiles },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -65,8 +67,15 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
 
   return (
     <>
-      <div {...getRootProps()} className={fileDropzoneBEM}>
-        <input {...getInputProps()} />
+      <div
+        {...getRootProps({
+          tabIndex: disabled ? -1 : 0,
+          'aria-disabled': disabled,
+          'aria-describedby': helperId,
+        })}
+        className={fileDropzoneBEM}
+      >
+        <input {...getInputProps()} disabled={disabled} />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <Icon color={disabled ? 'tertiary' : 'secondary'} size={24} name="attach_file" />
           <FormLabel id={id} label={label} className={styles['tedi-file-dropzone__label']} />
@@ -78,36 +87,46 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         <FeedbackText {...uploadErrorHelper} id={helperId} />
       ) : null}
       {!!innerFiles.length && (
-        <VerticalSpacing size={0.5} className={styles['tedi-file-dropzone__file-list']}>
+        <List
+          className={styles['tedi-file-dropzone__file-list']}
+          style="none"
+          aria-label={getLabel('file-dropzone.selected-files')}
+        >
           {innerFiles.map((file: FileUploadFile) => (
-            <Card
-              background={file.isValid === false ? 'danger-primary' : 'tertiary'}
-              borderless
-              className={styles['tedi-file-dropzone__file-item']}
-              key={file.id || file.name}
-            >
-              <CardContent
-                padding={{
-                  bottom: 0.5,
-                  left: 0.5,
-                  right: 0.5,
-                  top: 0.5,
-                }}
+            <List.Item key={file.id || file.name} className={styles['tedi-file-dropzone__file-list-item']}>
+              <Card
+                background={file.isValid === false ? 'danger-primary' : 'tertiary'}
+                borderless
+                className={styles['tedi-file-dropzone__file-item']}
               >
-                <Row alignItems="center">
-                  <Col className={styles['tedi-file-dropzone__file-name']}>
-                    {file.name}{' '}
-                    {file.isValid === false && <Icon name="info" color="danger" display="inline" size={18} />}
-                  </Col>
-                  <Col width="auto">
-                    <ClosingButton title={getLabel('clear')} onClick={() => onFileRemove(file)} />
-                  </Col>
-                </Row>
-              </CardContent>
-            </Card>
+                <CardContent
+                  padding={{
+                    bottom: 0.5,
+                    left: 0.5,
+                    right: 0.5,
+                    top: 0.5,
+                  }}
+                >
+                  <Row alignItems="center">
+                    <Col className={styles['tedi-file-dropzone__file-name']}>
+                      {file.name}{' '}
+                      {file.isValid === false && <Icon name="info" color="danger" display="inline" size={18} />}
+                    </Col>
+                    <Col width="auto">
+                      <ClosingButton title={getLabel('remove') + ' ' + file.name} onClick={() => onFileRemove(file)} />
+                    </Col>
+                  </Row>
+                </CardContent>
+              </Card>
+            </List.Item>
           ))}
-        </VerticalSpacing>
+        </List>
       )}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {innerFiles.length === 0
+          ? getLabel('file-dropzone.no-file')
+          : getLabel('file-dropzone.files-selected', innerFiles.length)}
+      </div>
     </>
   );
 };
