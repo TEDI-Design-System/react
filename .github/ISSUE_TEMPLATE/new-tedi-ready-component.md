@@ -9,7 +9,7 @@ assignees: airikej
 
 Design:
 
-## Code & Development
+## DoD
 - [ ] The component is developed using best practices, conventions, and modern frontend trends
 - [ ] The component follows **BEM naming conventions** (if applicable)
 - [ ] The component implementation **matches the Figma design**, including all defined states and interactions
