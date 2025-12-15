@@ -67,11 +67,10 @@
   width: 100%;
   padding-left: 0;
   margin-top: var(--layout-grid-gutters-04);
-  list-style: none;
+}
 
-  .tedi-file-dropzone__file-list-item {
-    padding-left: 0 !important;
-  }
+.tedi-file-dropzone__file-list .tedi-file-dropzone__file-list-item {
+  padding-left: 0;
 }
 
 .tedi-file-dropzone__file-name {
