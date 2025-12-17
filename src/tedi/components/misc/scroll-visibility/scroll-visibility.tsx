@@ -1,3 +1,5 @@
+'use client';
+
 import cn from 'classnames';
 import { cloneElement, isValidElement, ReactNode, useEffect, useRef, useState } from 'react';
 
@@ -66,41 +68,60 @@ export const ScrollVisibility = (props: ScrollVisibilityProps) => {
     scrollContainer,
     animationDirection = 'center',
   } = props;
-  const { scrollTop, scrollHeight, clientHeight } = useScroll(scrollContainer);
-  const [isHidden, setIsHidden] = useState(() => {
-    if (!enabled) return false;
-    const currentScrollDistance = scrollDirection === 'down' ? scrollTop : scrollHeight - clientHeight - scrollTop;
-
-    if (visibility === 'hide') {
-      return currentScrollDistance > scrollDistance;
-    } else {
-      return currentScrollDistance <= scrollDistance;
-    }
-  });
-  const lastScrollTop = useRef(scrollDirection === 'down' ? scrollTop : scrollHeight - clientHeight - scrollTop);
+  const [isMounted, setIsMounted] = useState(false);
+  const { scrollTop = 0, scrollHeight = 0, clientHeight = 0 } = useScroll(scrollContainer) ?? {};
+  const [isHidden, setIsHidden] = useState(false);
+  const lastScrollTop = useRef<number>(0);
 
   useEffect(() => {
+    setIsMounted(true);
+
     if (!enabled) return;
+
+    const currentScrollDistance = scrollDirection === 'down' ? scrollTop : scrollHeight - clientHeight - scrollTop;
+
+    const shouldHide =
+      visibility === 'hide' ? currentScrollDistance > scrollDistance : currentScrollDistance <= scrollDistance;
+
+    setIsHidden(shouldHide);
+    lastScrollTop.current = currentScrollDistance;
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !enabled) return;
 
     const shouldShow = visibility === 'show';
     const currentScrollDistance = scrollDirection === 'down' ? scrollTop : scrollHeight - clientHeight - scrollTop;
 
+    let newHidden: boolean;
+
     if (toggleVisibility && currentScrollDistance < lastScrollTop.current) {
-      setIsHidden(shouldShow);
+      newHidden = shouldShow;
     } else if (currentScrollDistance > scrollDistance) {
-      setIsHidden(!shouldShow);
+      newHidden = !shouldShow;
     } else {
-      setIsHidden(shouldShow);
+      newHidden = shouldShow;
     }
 
+    setIsHidden(newHidden);
     lastScrollTop.current = currentScrollDistance;
-  }, [visibility, toggleVisibility, scrollDistance, scrollTop, enabled, scrollDirection, scrollHeight, clientHeight]);
+  }, [
+    isMounted,
+    enabled,
+    visibility,
+    toggleVisibility,
+    scrollDistance,
+    scrollTop,
+    scrollDirection,
+    scrollHeight,
+    clientHeight,
+  ]);
 
   const BEM = cn(
     styles['tedi-scroll-visibility'],
     styles[`tedi-scroll-visibility--${animationDirection}`],
     {
-      [styles['tedi-scroll-visibility--hidden']]: enabled && isHidden,
+      [styles['tedi-scroll-visibility--hidden']]: isMounted && enabled && isHidden,
     },
     className
   );

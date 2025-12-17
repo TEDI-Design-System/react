@@ -1,31 +1,43 @@
 import throttle from 'lodash-es/throttle';
 import { useEffect, useState } from 'react';
 
+type ScrollState = {
+  scrollTop: number;
+  scrollHeight: number;
+  clientHeight: number;
+};
+
+const INITIAL_SCROLL: ScrollState = {
+  scrollTop: 0,
+  scrollHeight: 0,
+  clientHeight: 0,
+};
+
 export const useScroll = (element?: HTMLElement) => {
-  const scrollableElement = element ?? document.documentElement;
-  const [scroll, setScroll] = useState({
-    scrollTop: scrollableElement.scrollTop,
-    scrollHeight: scrollableElement.scrollHeight,
-    clientHeight: scrollableElement.clientHeight,
-  });
+  const [scroll, setScroll] = useState<ScrollState>(INITIAL_SCROLL);
 
   useEffect(() => {
-    const listenToScroll = throttle(() => {
-      setScroll({
-        scrollTop: scrollableElement.scrollTop,
-        scrollHeight: scrollableElement.scrollHeight,
-        clientHeight: scrollableElement.clientHeight,
-      });
-    }, 50);
+    const target = element ?? document.documentElement;
+    const eventTarget = element ?? window;
 
-    (element ?? window).addEventListener('scroll', listenToScroll);
-    listenToScroll();
+    const updateScroll = () => {
+      setScroll({
+        scrollTop: target.scrollTop,
+        scrollHeight: target.scrollHeight,
+        clientHeight: target.clientHeight,
+      });
+    };
+
+    const listenToScroll = throttle(updateScroll, 50);
+
+    eventTarget.addEventListener('scroll', listenToScroll);
+    updateScroll();
 
     return () => {
-      (element ?? window).removeEventListener('scroll', listenToScroll);
+      eventTarget.removeEventListener('scroll', listenToScroll);
       listenToScroll.cancel();
     };
-  }, [scrollableElement, element]);
+  }, [element]);
 
   return scroll;
 };
