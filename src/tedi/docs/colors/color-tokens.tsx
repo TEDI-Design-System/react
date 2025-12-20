@@ -19,7 +19,7 @@ interface ColorStoryProps {
 const ColorStory: React.FC<ColorStoryProps> = ({ data }) => {
   const groupedColors: GroupedColors = data.reduce((acc: GroupedColors, item) => {
     item.color.forEach((color: Color) => {
-      const baseName = color.name.split('-')[0];
+      const baseName = color.name.replace(/^tedi-/, '').split('-')[0];
       if (!acc[baseName]) {
         acc[baseName] = [];
       }
@@ -40,7 +40,7 @@ const ColorStory: React.FC<ColorStoryProps> = ({ data }) => {
           <Row alignItems="start">
             {colors.map((color, index) => (
               <Col md="auto" key={`${groupName}-${index}`}>
-                <div className="color-card" style={{ backgroundColor: color.value }}></div>
+                <div className="color-card" style={{ backgroundColor: color.value, margin: 'auto' }}></div>
                 <p style={{ marginBottom: 0 }}>
                   <strong>--{color.name}</strong>
                 </p>
