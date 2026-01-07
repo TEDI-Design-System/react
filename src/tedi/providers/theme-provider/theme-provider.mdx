@@ -1,0 +1,126 @@
+import { Meta, Title, Canvas, Controls, Stories } from '@storybook/blocks';
+import * as ThemeProviderStories from './theme-provider.stories.tsx';
+import { ThemeProvider } from './theme-provider.tsx';
+
+<Meta of={ThemeProviderStories} />
+
+<Title />
+The **ThemeProvider** component enables theme management across your application by providing theme context and applying
+the correct theme class (`.tedi-theme--*`) to the document root.
+
+It supports switching between predefined themes such as **Default**, **Dark** and can be extended with additional themes in the future.
+
+---
+
+## Usage
+
+### Provider
+
+Wrap the provider around your app and specify an initial theme:
+
+```jsx
+<ThemeProvider theme="default">
+  <YourApp />
+</ThemeProvider>
+```
+
+The **theme** prop accepts one of the registered theme names:
+
+- `default`
+- `dark`
+
+The provider automatically adds the corresponding class to the `<html>` element (e.g. `.tedi-theme--default`), which activates the theme's CSS variables defined in **@tedi-design-system/core**.
+
+---
+
+### Consumer Hook
+
+Use the `useTheme` hook to access or update the current theme within any component:
+
+```jsx
+import { useTheme } from '@tedi-design-system/react';
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <button onClick={() => setTheme(theme === 'default' ? 'default' : 'dark')}>
+      Switch to {theme === 'default' ? 'default' : 'dark'} theme
+    </button>
+  );
+}
+```
+
+---
+
+### Behavior
+
+- The provider toggles classes on the `<html>` element:
+  - `.tedi-theme--default`
+  - `.tedi-theme--dark`
+- The corresponding CSS variables are applied globally.
+- When the theme changes, styles update in real time without a page reload.
+
+---
+
+### Example
+
+```jsx
+<ThemeProvider theme="default">
+  <Button>Default Button</Button>
+</ThemeProvider>
+```
+
+You can interactively switch themes in Storybook using the toolbar at the top right (🖌️ **Theme** selector).
+
+---
+
+## Using ThemeProvider with Next.js (SSR)
+
+When using Next.js App Router with Server Components, you need to initialize the theme on the server to avoid a mismatch or flash during hydration.
+
+This setup ensures the `<html>` class and the ThemeProvider both start with the same value — so your UI loads with the correct theme immediately.
+
+### 1. Define a default theme
+
+```ts
+export const INITIAL_THEME = 'default';
+```
+
+### 2. Read the theme cookie and apply it in your RootLayout
+
+Here's a minimal but complete example of a properly SSR-aware RootLayout.
+It reads the theme from cookies on the server, applies the class to `<html>`, and passes the same value to the ThemeProvider for hydration consistency.
+
+```tsx
+// app/layout.tsx
+import { cookies } from 'next/headers';
+import { ThemeProvider, Theme } from '@tedi-design-system/react';
+import { INITIAL_THEME } from '@/lib/constants';
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const theme = (cookieStore.get('tedi-theme')?.value ?? INITIAL_THEME) as Theme;
+
+  return (
+    <html lang="et" className={`tedi-theme--${theme}`}>
+      <body>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### 3. Why this matters
+
+Next.js pre-renders pages on the server.
+If the client-side theme doesn't match the one used to render HTML, React will warn about a hydration mismatch, and users may briefly see the wrong theme before hydration finishes.
+
+Setting the `<html>` class and initial provider theme on the server keeps both sides in sync.
+
+---
+
+<Controls />
+
+<Stories />

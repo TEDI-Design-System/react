@@ -1,4 +1,3 @@
-@use '@tedi-design-system/core/mixins';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 .tedi-sidenav-toggle {
@@ -13,18 +12,15 @@
 
   &.tedi-sidenav-toggle--collapse {
     position: absolute;
-    top: calc(var(--sidenav-toggle-top) / 5.5);
-    right: calc(var(--sidenav-toggle-right) / 2 * -1);
+    top: calc(var(--navigation-vertical-item-min-height-medium) / 5.5);
+    right: calc(var(--button-sm-icon-size) / 2 * -1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: var(--button-sm-icon-size);
+    height: var(--button-sm-icon-size);
+    min-height: var(--button-sm-icon-size);
     border-radius: var(--radius-08);
-
-    @include mixins.responsive-styles(--sidenav-toggle-right, button-sm-icon-size);
-    @include mixins.responsive-styles(--sidenav-toggle-top, side-navigation-item-min-height);
-    @include mixins.responsive-styles(min-height, button-sm-icon-size);
-    @include mixins.responsive-styles(height, button-sm-icon-size);
-    @include mixins.responsive-styles(width, button-sm-icon-size);
 
     @include breakpoints.media-breakpoint-down(md) {
       display: none;

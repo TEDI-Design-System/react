@@ -3,7 +3,7 @@ import { create } from '@storybook/theming';
 export default create({
   base: 'dark',
   brandTitle: 'Tehik react components',
-  brandUrl: 'https://tehik-ee.github.io/tedi-design-system/',
+  brandUrl: 'https://storybook.tedi.ee/react',
   brandImage: 'TEHIK_logo2.svg',
   brandTarget: '_self',
 

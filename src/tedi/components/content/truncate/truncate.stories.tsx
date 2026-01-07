@@ -5,7 +5,7 @@ import { Truncate } from './truncate';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=2427-40830&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://zeroheight.com/1ee8444b7/p/020483-truncate-dev" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/020483-truncate" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Truncate> = {

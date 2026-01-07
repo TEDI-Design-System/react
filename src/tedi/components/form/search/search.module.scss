@@ -1,5 +1,4 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
-@use '@tedi-design-system/core/mixins';
 
 $input-height-large: 3.75rem;
 $input-height-mobile: 2.75rem;
@@ -26,11 +25,7 @@ $input-height-mobile: 2.75rem;
     flex: 0 auto;
     min-width: fit-content;
     white-space: nowrap;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-
-    @include mixins.responsive-styles(border-bottom-right-radius, button-radius-sm);
-    @include mixins.responsive-styles(border-top-right-radius, button-radius-sm);
+    border-radius: 0 var(--button-radius-sm) var(--button-radius-sm) 0;
 
     @include breakpoints.media-breakpoint-down(md) {
       min-width: $input-height-mobile;

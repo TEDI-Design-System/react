@@ -1,30 +1,26 @@
-@use '@tedi-design-system/core/mixins';
-
 .tedi-label {
   display: inline;
   align-items: center;
+  font-family: var(--family-default);
+  font-size: var(--body-regular-size);
   font-style: normal;
+  font-weight: var(--body-regular-weight);
   font-feature-settings: 'clig' off, 'liga' off;
+  line-height: var(--body-regular-line-height);
   color: var(--general-text-secondary);
 
-  @include mixins.responsive-styles(font-family, family-primary);
-  @include mixins.responsive-styles(font-size, body-regular-size);
-  @include mixins.responsive-styles(font-weight, body-regular-weight);
-  @include mixins.responsive-styles(line-height, body-regular-line-height);
-
   &--small {
-    @include mixins.responsive-styles(font-size, body-small-regular-size, $exclude: tablet);
-    @include mixins.responsive-styles(font-weight, body-small-regular-weight, $exclude: tablet);
+    font-size: var(--body-small-regular-size);
+    font-weight: var(--body-small-regular-weight);
   }
 
   &--bold {
-    @include mixins.responsive-styles(font-weight, body-bold-weight);
-    @include mixins.responsive-styles(line-height, body-bold-line-height);
+    font-weight: var(--body-bold-weight);
+    line-height: var(--body-bold-line-height);
   }
 
   &__required {
+    margin-left: var(--content-label-inner-spacing-x);
     color: var(--form-general-feedback-error-border);
-
-    @include mixins.responsive-styles(margin-left, content-label-inner-spacing-x);
   }
 }

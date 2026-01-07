@@ -12,7 +12,7 @@ import Select, { IGroupedOptions, ISelectOption } from './select';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4589-107311&m=dev" target="_BLANK">Figma ↗</a><br />
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/97a0a6-select" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/97a0a6-select" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Select> = {

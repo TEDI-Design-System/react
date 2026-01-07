@@ -347,7 +347,7 @@ $btn-height-small: 2.25rem;
     align-items: flex-start;
 
     .btn__icon {
-      @include mixins.responsive-styles(line-height, body-regular-line-height);
+      line-height: var(--body-regular-line-height);
     }
 
     .btn__text {

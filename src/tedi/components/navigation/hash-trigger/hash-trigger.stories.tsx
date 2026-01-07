@@ -8,7 +8,7 @@ import Link from '../link/link';
 import { HashTrigger, HashTriggerProps } from './hash-trigger';
 
 /**
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/84a3d9-hashtrigger" target="_BLANK">Zeroheight ↗</a><br />
+ * <a href="https://www.tedi.ee/1ee8444b7/p/84a3d9-hashtrigger" target="_BLANK">Zeroheight ↗</a><br />
  */
 const meta: Meta<typeof HashTrigger> = {
   component: HashTrigger,

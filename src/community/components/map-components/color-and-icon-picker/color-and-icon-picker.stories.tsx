@@ -5,6 +5,7 @@ import ColorAndIconPicker from './color-and-icon-picker';
 
 /**
  * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Veera-Map-Design-System?node-id=109-25209&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/2720d8-color--and-iconpicker" target="_BLANK">ZeroHeight ↗</a>
  */
 
 const meta: Meta<typeof ColorAndIconPicker> = {

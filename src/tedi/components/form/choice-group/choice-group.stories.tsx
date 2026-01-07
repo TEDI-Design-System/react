@@ -6,15 +6,16 @@ import { Text } from '../../base/typography/text/text';
 import { Col, ColProps, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
+import TextField from '../textfield/textfield';
 import ChoiceGroup from './choice-group';
 import { ChoiceGroupValue } from './choice-group.types';
 import { ExtendedChoiceGroupItemProps } from './components/choice-group-item/choice-group-item';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4598-78103&m=dev" target="_BLANK">Radio Figma ↗</a><br />
- * <a href="https://zeroheight.com/1ee8444b7/p/93e423-radio" target="_BLANK">Radio Zeroheight ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Radio Zeroheight ↗</a><br/>
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4228-72934&m=dev" target="_BLANK">Checkbox Figma ↗</a><br />
- * <a href="https://zeroheight.com/1ee8444b7/p/796203-checkbox" target="_BLANK">Checkbox Zeroheight ↗</a><br/><hr/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Checkbox Zeroheight ↗</a><br/><hr/>
  * The `ChoiceGroup` component manages the state of input elements with either the radio or checkbox role. <br/>
  * It provides flexibility to show or hide the `FormLabel` for the fieldset and supports displaying a `FormHelper` to provide additional context or guidance for the entire group.
  */
@@ -314,7 +315,18 @@ export const WithExtraContent: Story = {
         id: 'extra-content-3',
         label: 'Enterprise plan',
         value: 'enterprise',
-        helper: { text: 'Includes unlimited storage and 24/7 support' },
+        helper: {
+          text: (
+            <Row>
+              <Col width={4}>
+                <VerticalSpacing size={0.5}>
+                  <TextField id="success-textfield-1" label="Field 1" />
+                  <TextField id="success-textfield-2" label="Field 2" />
+                </VerticalSpacing>
+              </Col>
+            </Row>
+          ),
+        },
       },
     ],
   },
@@ -441,8 +453,8 @@ export const CustomItemHTMLLabels: Story = {
         label: (
           <div
             style={{
-              backgroundColor: 'var(--primary-600)',
-              color: 'var(--neutral-100)',
+              backgroundColor: 'var(--tedi-primary-600)',
+              color: 'var(--tedi-neutral-100)',
               padding: '0 8px',
               borderRadius: '5px',
             }}

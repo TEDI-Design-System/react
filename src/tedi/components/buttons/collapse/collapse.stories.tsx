@@ -7,7 +7,7 @@ import Collapse from './collapse';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.0.4-(work-in-progress)?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/546461-floating-button" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/9469bf-collapse" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Collapse> = {
@@ -71,6 +71,51 @@ export const TitleRow = {
           <Text color="secondary">Kannatanu seos vägivaldsega</Text>
           <p>tütar</p>
         </div>
+      </VerticalSpacing>
+    ),
+  },
+};
+
+export const NestedCollapses: Story = {
+  args: {
+    id: 'parent-collapse',
+    title: (
+      <Heading element="h5" color="secondary">
+        Parent Collapse
+      </Heading>
+    ),
+    children: (
+      <VerticalSpacing>
+        <Text>Parent content above child collapse.</Text>
+        <Collapse
+          id="child-collapse"
+          title={
+            <Heading element="h6" color="secondary">
+              Child Collapse
+            </Heading>
+          }
+        >
+          <VerticalSpacing>
+            <Text>Child content above grandchild collapse.</Text>
+            <Collapse
+              id="grandchild-collapse"
+              title={
+                <Heading element="h6" color="brand">
+                  Grandchild Collapse
+                </Heading>
+              }
+            >
+              <VerticalSpacing>
+                <Text>This is nested inside the grandchild collapse.</Text>
+                <p>Open and close me to compare with parent and child states.</p>
+              </VerticalSpacing>
+            </Collapse>
+
+            <Text>Child content below grandchild collapse.</Text>
+          </VerticalSpacing>
+        </Collapse>
+
+        <Text>Parent content below child collapse.</Text>
       </VerticalSpacing>
     ),
   },

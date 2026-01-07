@@ -1,18 +1,14 @@
 @use '@tedi-design-system/core/mixins';
 
 .tedi-file-dropzone {
+  padding: var(--file-dropzone-padding-y) var(--file-dropzone-padding-x);
+  margin-bottom: var(--layout-grid-gutters-04);
   text-align: center;
   cursor: pointer;
   background-color: var(--file-dropzone-background-default);
   border: 2px dotted var(--file-dropzone-border-default);
+  border-radius: var(--form-field-radius);
   transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-
-  @include mixins.responsive-styles(border-radius, form-field-radius);
-  @include mixins.responsive-styles(padding-left, file-dropzone-padding-x);
-  @include mixins.responsive-styles(padding-right, file-dropzone-padding-x);
-  @include mixins.responsive-styles(padding-top, file-dropzone-padding-y);
-  @include mixins.responsive-styles(padding-bottom, file-dropzone-padding-y);
-  @include mixins.responsive-styles(margin-bottom, layout-grid-gutters-04);
 
   &:hover {
     background-color: var(--file-dropzone-background-hover);
@@ -69,9 +65,8 @@
 
 .tedi-file-dropzone__file-list {
   width: 100%;
+  margin-top: var(--layout-grid-gutters-04);
   list-style: none;
-
-  @include mixins.responsive-styles(margin-top, layout-grid-gutters-04);
 }
 
 .tedi-file-dropzone__file-name {

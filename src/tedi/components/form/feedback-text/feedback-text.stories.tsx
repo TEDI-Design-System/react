@@ -3,7 +3,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import { FeedbackText } from './feedback-text';
 
 /**
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/67d4de-formhelper" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/67d4de-feedbacktext" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof FeedbackText> = {

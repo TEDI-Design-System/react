@@ -8,18 +8,69 @@ import '../src/community/styles/index.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
 import '../src/community/styles/storybook.scss';
 
+import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
+import { useEffect } from 'react';
+
+export const globalTypes = {
+  theme: {
+    name: 'Theme',
+    description: 'TEDI theme',
+    defaultValue: 'default',
+    toolbar: {
+      icon: 'paintbrush',
+      items: [
+        { value: 'default', title: 'Default' },
+        { value: 'dark', title: 'Dark' },
+      ],
+      showName: true,
+    },
+  },
+};
+
 export const decorators: Preview['decorators'] = [
   (Story: React.ComponentType, context: StoryContext) => {
-    // prevent LabelProvider for label story, because it sets its own provider
-    return context.componentId === 'components-labelprovider' ? (
-      <Story />
-    ) : (
-      <StorybookDecorator>
-        <Story />
-      </StorybookDecorator>
+    const theme = (context.globals.theme || 'default') as 'default' | 'dark';
+
+    useEffect(() => {
+      document.documentElement.classList.remove('tedi-theme--default', 'tedi-theme--dark');
+      document.documentElement.classList.add(`tedi-theme--${theme}`);
+      
+      updateAllCanvasBackgrounds(theme);
+    }, [theme]);
+
+    const updateAllCanvasBackgrounds = (currentTheme: string) => {
+      const backgroundColor = getBackgroundColor(currentTheme);
+      const canvases = document.querySelectorAll('.sb-show-main, .docs-story > div');
+      
+      canvases.forEach((canvas) => {
+        const element = canvas as HTMLElement;
+        element.style.backgroundColor = backgroundColor;
+        element.style.transition = 'background-color 0.3s ease';
+      });
+
+      const storyPreviews = document.querySelectorAll('[data-story="true"], .sbdocs-preview');
+      storyPreviews.forEach((preview) => {
+        const element = preview as HTMLElement;
+        element.style.backgroundColor = backgroundColor;
+      });
+    };
+
+    const getBackgroundColor = (currentTheme: string): string =>  currentTheme === 'dark' ? 'var(--color-bg-inverted)' : '';
+
+    return (
+      <ThemeProvider theme={theme}>
+        {context.componentId === 'components-labelprovider' ? (
+          <Story />
+        ) : (
+          <StorybookDecorator>
+            <Story />
+          </StorybookDecorator>
+        )}
+      </ThemeProvider>
     );
   },
 ];
+
 
 const preview: Preview = {
   parameters: {
@@ -34,7 +85,7 @@ const preview: Preview = {
         { name: 'black', value: 'var(--color-black)' },
         { name: 'inverted', value: 'var(--color-bg-inverted)' },
         { name: 'inverted-contrast', value: 'var(--color-bg-inverted-contrast)' },
-        { name: 'brand', value: 'var(--primary-600)' },
+        { name: 'brand', value: 'var(--tedi-primary-600)' },
       ],
     },
     docs: {

@@ -4,7 +4,7 @@ import Popover from '../../overlays/popover/popover';
 import Ellipsis, { EllipsisProps } from './ellipsis';
 
 /**
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/87ef9b-ellipsis" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/87ef9b-ellipsis" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Ellipsis> = {

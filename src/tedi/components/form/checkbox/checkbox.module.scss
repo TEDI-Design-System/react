@@ -22,13 +22,12 @@
   &__outer-indicator-wrapper {
     display: flex;
     align-items: center;
-
-    @include mixins.responsive-styles(height, form-checkbox-radio-indicator-container-height);
+    height: var(--form-checkbox-radio-indicator-container-height);
   }
 
   &__helper {
-    @include mixins.responsive-styles(padding-left, form-checkbox-radio-size-responsive);
-    @include mixins.responsive-styles(margin-left, form-checkbox-radio-inner-spacing);
+    padding-left: var(--form-checkbox-radio-size-responsive);
+    margin-left: var(--form-checkbox-radio-inner-spacing);
   }
 
   &__icon {
@@ -44,7 +43,7 @@
   }
 
   &__tooltip-icon {
-    @include mixins.responsive-styles(margin-left, form-checkbox-radio-inner-spacing);
+    margin-left: var(--form-checkbox-radio-inner-spacing);
   }
 }
 
@@ -53,21 +52,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: var(--form-checkbox-radio-inner-spacing);
   background-color: var(--form-checkbox-radio-default-background-default);
   border: 1px solid var(--form-checkbox-radio-default-border-default);
+  border-radius: var(--form-checkbox-radio-indicator-radius-checkbox);
   transition: border-color 150ms ease;
 
-  @include mixins.responsive-styles(margin-right, form-checkbox-radio-inner-spacing);
-  @include mixins.responsive-styles(border-radius, form-checkbox-radio-indicator-radius-checkbox);
-
   &--size-default {
-    @include mixins.responsive-styles(width, form-checkbox-radio-size-responsive);
-    @include mixins.responsive-styles(height, form-checkbox-radio-size-responsive);
+    width: var(--form-checkbox-radio-size-responsive);
+    height: var(--form-checkbox-radio-size-responsive);
   }
 
   &--size-large {
-    @include mixins.responsive-styles(width, form-checkbox-radio-size-large);
-    @include mixins.responsive-styles(height, form-checkbox-radio-size-large);
+    width: var(--form-checkbox-radio-size-large);
+    height: var(--form-checkbox-radio-size-large);
   }
 
   &--invalid {

@@ -10,6 +10,7 @@ import { Heading } from '../../../../typography/heading/heading';
 import Text from '../../../../typography/text/text';
 import HeaderDropdown from '../header-dropdown/header-dropdown';
 import HeaderModal from '../header-modal/header-modal';
+import styles from './header-language.module.scss';
 
 export interface Language {
   label: string;
@@ -67,8 +68,12 @@ export const HeaderLanguage: React.FC<HeaderLanguageProps> = (props) => {
         tooltipProps={{ cardProps: { padding: 1 } }}
         triggerProps={triggerProps}
       >
-        <List verticalSpacing={{ size: 0.75 }} element="ul">
-          {languages?.map((language) => <ListItem key={language.label}>{getLanguageButton(language)}</ListItem>) || []}
+        <List verticalSpacing={{ size: 0.75 }} element="ul" className={styles['header-language__list']}>
+          {languages?.map((language) => (
+            <ListItem key={language.label} className={styles['header-language__list-item']}>
+              {getLanguageButton(language)}
+            </ListItem>
+          )) || []}
         </List>
       </HeaderDropdown>
     </div>

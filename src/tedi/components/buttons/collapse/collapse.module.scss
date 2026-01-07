@@ -17,20 +17,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: var(--button-sm-icon-size);
+    height: var(--button-sm-icon-size);
     border: var(--borders-01) solid var(--button-main-secondary-border-default);
     border-radius: 100%;
-
-    @include mixins.responsive-styles(width, button-sm-icon-size);
-    @include mixins.responsive-styles(height, button-sm-icon-size);
   }
 
   &__icon {
     color: var(--button-main-neutral-text-default);
     transition: transform 300ms ease;
+  }
 
-    .tedi-collapse--is-open & {
-      transform: rotate(180deg);
-    }
+  &--is-open > .tedi-collapse__title .tedi-collapse__icon {
+    transform: rotate(180deg);
   }
 
   &__content {

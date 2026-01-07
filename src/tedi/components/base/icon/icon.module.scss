@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-
 $icon-colors: (
   'primary': 'general-icon-primary',
   'secondary': 'general-icon-secondary',
@@ -56,11 +54,8 @@ $icon-sizes: (
 
     @each $size, $vars in $icon-sizes {
       &.tedi-icon__wrapper--size-#{$size} {
-        width: calc(var(--_width) * 2);
-        height: calc(var(--_height) * 2);
-
-        @include mixins.responsive-styles(--_width, $vars);
-        @include mixins.responsive-styles(--_height, $vars);
+        width: calc(var(--#{$vars}) * 2);
+        height: calc(var(--#{$vars}) * 2);
       }
     }
   }
@@ -89,7 +84,7 @@ $icon-sizes: (
 
   @each $size, $vars in $icon-sizes {
     &--size-#{$size} {
-      @include mixins.responsive-styles(font-size, $vars);
+      font-size: var(--#{$vars});
     }
   }
 

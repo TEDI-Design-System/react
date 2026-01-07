@@ -1,3 +1,146 @@
+# [14.3.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.4...react-14.3.0-rc.5) (2025-12-12)
+
+
+### Features
+
+* **theme-provider:** muis theme, update core [#413](https://github.com/TEDI-Design-System/react/issues/413) ([#415](https://github.com/TEDI-Design-System/react/issues/415)) ([357d943](https://github.com/TEDI-Design-System/react/commit/357d9435c37b640a3d657359c13984d0b5581535))
+
+# [14.3.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.3...react-14.3.0-rc.4) (2025-12-12)
+
+
+### Bug Fixes
+
+* **floating-button:** dark theme variable changes, fix focus style in storybook [#8](https://github.com/TEDI-Design-System/react/issues/8) ([#414](https://github.com/TEDI-Design-System/react/issues/414)) ([271f262](https://github.com/TEDI-Design-System/react/commit/271f262d801cbeb99d09bc811f325f862dd99a55))
+
+# [14.3.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.2...react-14.3.0-rc.3) (2025-12-12)
+
+
+### Bug Fixes
+
+* **header:** fix header-language list indent [#411](https://github.com/TEDI-Design-System/react/issues/411) ([#412](https://github.com/TEDI-Design-System/react/issues/412)) ([d028080](https://github.com/TEDI-Design-System/react/commit/d02808028dbfd4df1008a3f5a326f55c1236e6de))
+
+# [14.3.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.1...react-14.3.0-rc.2) (2025-12-04)
+
+
+### Bug Fixes
+
+* **variables:** remove responsive-styles, replace with variables, sidenav variables update [#395](https://github.com/TEDI-Design-System/react/issues/395) ([#405](https://github.com/TEDI-Design-System/react/issues/405)) ([199bc4e](https://github.com/TEDI-Design-System/react/commit/199bc4e7b61ab28571d2707df5740868afbdabc1))
+
+# [14.3.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.2.1...react-14.3.0-rc.1) (2025-12-04)
+
+
+### Features
+
+* **typography:** add extra small font [#397](https://github.com/TEDI-Design-System/react/issues/397) ([#404](https://github.com/TEDI-Design-System/react/issues/404)) ([9bf56c7](https://github.com/TEDI-Design-System/react/commit/9bf56c72683075c975b9eeee4d3cad758b95bd45))
+
+## [14.2.1](https://github.com/TEDI-Design-System/react/compare/react-14.2.0...react-14.2.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* **variables:** update core version [#402](https://github.com/TEDI-Design-System/react/issues/402) ([c58063f](https://github.com/TEDI-Design-System/react/commit/c58063f60b18db7491b5705e65e89221dbe89ecc))
+
+# [14.2.0](https://github.com/TEDI-Design-System/react/compare/react-14.1.0...react-14.2.0) (2025-11-27)
+
+
+### Bug Fixes
+
+* **collapse:** nested collapse arrow not rotating fix [#391](https://github.com/TEDI-Design-System/react/issues/391) ([#392](https://github.com/TEDI-Design-System/react/issues/392)) ([bfcfb5d](https://github.com/TEDI-Design-System/react/commit/bfcfb5da1df94f3ee24e9e880fb05b55865a1cf3))
+* **layout:** fix useInteractions having conditional values ([#394](https://github.com/TEDI-Design-System/react/issues/394)) ([#396](https://github.com/TEDI-Design-System/react/issues/396)) ([a452cde](https://github.com/TEDI-Design-System/react/commit/a452cde387e2a2b903deca5832556e40ed6ad441))
+
+
+### Features
+
+* **feedback-text:** allow content to be either string or reactNode [#399](https://github.com/TEDI-Design-System/react/issues/399) ([#400](https://github.com/TEDI-Design-System/react/issues/400)) ([a3b1f56](https://github.com/TEDI-Design-System/react/commit/a3b1f5653c33c0abe77a1ac4fcd56e3808afb83c))
+* **stepper:** Add showCompletedIcon prop to Step ([#388](https://github.com/TEDI-Design-System/react/issues/388)) ([459f799](https://github.com/TEDI-Design-System/react/commit/459f799b49b004a0a2e366a441a67672819c8e2c)), closes [#387](https://github.com/TEDI-Design-System/react/issues/387)
+* **theme-provider:** new ThemeProvider functionality [#371](https://github.com/TEDI-Design-System/react/issues/371) ([#386](https://github.com/TEDI-Design-System/react/issues/386)) ([b073bd8](https://github.com/TEDI-Design-System/react/commit/b073bd807bf9d4ec2ec0add2cdf24155bac5abb1))
+* **vertical-stepper:** make collapse controllable from outside and reposition checkmark [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c86a868](https://github.com/TEDI-Design-System/react/commit/c86a8682138c0b3c10732da2e3cc09700d5b2957))
+* **vertical-stepper:** modify styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([78f5755](https://github.com/TEDI-Design-System/react/commit/78f5755ea6d277feee56626e4dbaecd048cedade))
+* **vertical-stepper:** update compact selected state counter border width [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c76d7aa](https://github.com/TEDI-Design-System/react/commit/c76d7aac8bc2eb46ff0f50591948dd53f78cf301))
+* **vertical-stepper:** update state styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([6be35eb](https://github.com/TEDI-Design-System/react/commit/6be35ebb9e9b1fdc31b601663f89a8ea1c4dec22))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([11a4f73](https://github.com/TEDI-Design-System/react/commit/11a4f73897ef5a745d4d7e8e71b7efee33a9e47f))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([01150d5](https://github.com/TEDI-Design-System/react/commit/01150d535f23d6bd9e4b59e007c468dad87e19b2))
+
+# [14.2.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.7...react-14.2.0-rc.8) (2025-11-27)
+
+
+### Features
+
+* **feedback-text:** allow content to be either string or reactNode [#399](https://github.com/TEDI-Design-System/react/issues/399) ([#400](https://github.com/TEDI-Design-System/react/issues/400)) ([a3b1f56](https://github.com/TEDI-Design-System/react/commit/a3b1f5653c33c0abe77a1ac4fcd56e3808afb83c))
+
+# [14.2.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.6...react-14.2.0-rc.7) (2025-11-25)
+
+
+### Bug Fixes
+
+* **layout:** fix useInteractions having conditional values ([#394](https://github.com/TEDI-Design-System/react/issues/394)) ([#396](https://github.com/TEDI-Design-System/react/issues/396)) ([a452cde](https://github.com/TEDI-Design-System/react/commit/a452cde387e2a2b903deca5832556e40ed6ad441))
+
+# [14.2.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.5...react-14.2.0-rc.6) (2025-11-17)
+
+
+### Bug Fixes
+
+* **collapse:** nested collapse arrow not rotating fix [#391](https://github.com/TEDI-Design-System/react/issues/391) ([#392](https://github.com/TEDI-Design-System/react/issues/392)) ([bfcfb5d](https://github.com/TEDI-Design-System/react/commit/bfcfb5da1df94f3ee24e9e880fb05b55865a1cf3))
+
+# [14.2.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.4...react-14.2.0-rc.5) (2025-11-13)
+
+
+### Features
+
+* **theme-provider:** new ThemeProvider functionality [#371](https://github.com/TEDI-Design-System/react/issues/371) ([#386](https://github.com/TEDI-Design-System/react/issues/386)) ([b073bd8](https://github.com/TEDI-Design-System/react/commit/b073bd807bf9d4ec2ec0add2cdf24155bac5abb1))
+
+# [14.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.3...react-14.2.0-rc.4) (2025-11-13)
+
+
+### Features
+
+* **stepper:** Add showCompletedIcon prop to Step ([#388](https://github.com/TEDI-Design-System/react/issues/388)) ([459f799](https://github.com/TEDI-Design-System/react/commit/459f799b49b004a0a2e366a441a67672819c8e2c)), closes [#387](https://github.com/TEDI-Design-System/react/issues/387)
+
+# [14.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.2...react-14.2.0-rc.3) (2025-11-07)
+
+
+### Features
+
+* **vertical-stepper:** modify styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([78f5755](https://github.com/TEDI-Design-System/react/commit/78f5755ea6d277feee56626e4dbaecd048cedade))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([11a4f73](https://github.com/TEDI-Design-System/react/commit/11a4f73897ef5a745d4d7e8e71b7efee33a9e47f))
+* **vertical-stepper:** update step-item and sub-item styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([01150d5](https://github.com/TEDI-Design-System/react/commit/01150d535f23d6bd9e4b59e007c468dad87e19b2))
+
+# [14.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.2.0-rc.1...react-14.2.0-rc.2) (2025-11-05)
+
+
+### Features
+
+* **vertical-stepper:** update compact selected state counter border width [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c76d7aa](https://github.com/TEDI-Design-System/react/commit/c76d7aac8bc2eb46ff0f50591948dd53f78cf301))
+* **vertical-stepper:** update state styles [#172](https://github.com/TEDI-Design-System/react/issues/172) ([6be35eb](https://github.com/TEDI-Design-System/react/commit/6be35ebb9e9b1fdc31b601663f89a8ea1c4dec22))
+
+# [14.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.1.0...react-14.2.0-rc.1) (2025-11-03)
+
+
+### Features
+
+* **vertical-stepper:** make collapse controllable from outside and reposition checkmark [#172](https://github.com/TEDI-Design-System/react/issues/172) ([c86a868](https://github.com/TEDI-Design-System/react/commit/c86a8682138c0b3c10732da2e3cc09700d5b2957))
+
+# [14.1.0](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0) (2025-10-30)
+
+
+### Features
+
+* **general:** react 19 support [#365](https://github.com/TEDI-Design-System/react/issues/365) ([#366](https://github.com/TEDI-Design-System/react/issues/366)) ([0d1d8d8](https://github.com/TEDI-Design-System/react/commit/0d1d8d8df09873edd9a9ff142d8665b777e4f223))
+
+# [14.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.0.1...react-14.1.0-rc.1) (2025-10-27)
+
+
+### Features
+
+* **general:** react 19 support [#365](https://github.com/TEDI-Design-System/react/issues/365) ([#366](https://github.com/TEDI-Design-System/react/issues/366)) ([0d1d8d8](https://github.com/TEDI-Design-System/react/commit/0d1d8d8df09873edd9a9ff142d8665b777e4f223))
+
+## [14.0.1](https://github.com/TEDI-Design-System/react/compare/react-14.0.0...react-14.0.1) (2025-10-22)
+
+
+### Bug Fixes
+
+* **common:** move dayjs to peerDependencies fix [#367](https://github.com/TEDI-Design-System/react/issues/367) ([01be1e9](https://github.com/TEDI-Design-System/react/commit/01be1e9ce1e57b656acb87beac0528fd211eb138))
+
 # [14.0.0](https://github.com/TEDI-Design-System/react/compare/react-13.1.0...react-14.0.0) (2025-10-10)
 
 
