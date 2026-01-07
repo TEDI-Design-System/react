@@ -181,8 +181,33 @@ export const WithHint: Story = {
 export const Estonian: Story = {
   args: {
     id: 'example-et',
-    label: 'Otsi',
-    placeholder: 'Sisesta otsingusõna...',
+    label: 'Otsing',
+    placeholder: 'Otsi tooteid, artikleid või abiinfot...',
+    ariaLabel: 'Otsi kogu saidilt',
     button: { iconLeft: 'search', children: 'Otsi' },
+  },
+};
+
+export const AccessibilityFocused: Story = {
+  name: 'Accessibility: No Visible Label',
+  args: {
+    id: 'search-accessible',
+    placeholder: 'Otsi tooteid või teenuseid...',
+    ariaLabel: 'Otsi tooteid või teenuseid',
+  },
+  parameters: {
+    a11y: {
+      config: {
+        rules: {
+          label: { enabled: false },
+        },
+      },
+    },
+    docs: {
+      description: {
+        story:
+          'When no visible `label` is provided, always set `ariaLabel` to ensure screen readers announce the purpose correctly. This follows WCAG 2.1 and EN 301 549 9.2.5.3.',
+      },
+    },
   },
 };

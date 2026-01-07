@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
+import { useLabels } from '../../../providers/label-provider';
 import { IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Button, ButtonProps } from '../../buttons/button/button';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
@@ -19,14 +20,20 @@ export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' 
    * Optional button properties.
    */
   button?: Partial<ButtonProps>;
+  /**
+   * For accessibility: search field name (accessible name). Recommended to always set.
+   * E.g., "Search products" or "Search site".
+   */
+  ariaLabel?: string;
 }
 
 export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
   (
-    { placeholder, isClearable = true, searchIcon = 'search', onSearch, onChange, button, ...rest },
+    { placeholder, isClearable = true, searchIcon = 'search', onSearch, onChange, button, ariaLabel, ...rest },
     ref
   ): JSX.Element => {
-    const handleKeyPress: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    const { getLabel } = useLabels();
+    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
       if (e.key === 'Enter') {
         onSearch?.(rest.value as string);
       }
@@ -42,21 +49,25 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       inputClassName: cn(styles['tedi-search__input'], button && styles['tedi-search__input--has-button']),
       placeholder,
       isClearable,
-      onKeyPress: handleKeyPress,
+      onKeyDown: handleKeyDown,
       onChange,
       ...(button ? {} : { icon: searchIcon }),
     };
 
+    const defaultAriaLabel = placeholder || getLabel('search');
+    const searchAriaLabel = ariaLabel ?? defaultAriaLabel;
+
     return (
-      <div className={cn(styles['tedi-search__wrapper'], rest.className)}>
+      <div className={cn(styles['tedi-search__wrapper'], rest.className)} role="search" aria-label={searchAriaLabel}>
         <TextField {...textFieldProps} />
         {button && (
           <Button
             {...button}
             onClick={handleButtonClick}
             className={cn(styles['tedi-search__button'], button.className)}
+            aria-label={button.children ? undefined : getLabel('search')}
           >
-            {button.children}
+            {button.children ?? getLabel('search')}
           </Button>
         )}
       </div>
