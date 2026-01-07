@@ -109,6 +109,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     getDefaultHelpers({ accept, maxSize }, getLabel)
   );
 
+  const [announcement, setAnnouncement] = React.useState<string>('');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const validFileType = (file: File) => {
@@ -182,13 +183,24 @@ export const useFileUpload = (props: UseFileUploadProps) => {
           setInnerFiles(newFiles);
         }
         onChange?.(newFiles);
+
+        if (rejectedFiles.length === 0) {
+          const count = newFiles.length - actualFiles.length;
+          setAnnouncement(
+            getLabel('file-upload.success-added', count.toString()) || `${count} file(s) added successfully`
+          );
+        }
       }
 
       if (rejectedFiles.length) {
+        const failedNames = rejectedFiles.map((r) => r.file.name).join(', ');
+        setAnnouncement(getLabel('file-upload.failed-some', failedNames) || `Upload failed for: ${failedNames}`);
         setUploadErrorHelper({ type: 'error', text: getUploadErrorHelperText(rejectedFiles) });
       } else {
         setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
       }
+
+      setTimeout(() => setAnnouncement(''), 5000);
 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -238,5 +250,6 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onFileRemove,
     handleClear,
     fileInputRef,
+    announcement,
   };
 };
