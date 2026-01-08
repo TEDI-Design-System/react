@@ -1,20 +1,13 @@
 ---
-name: React TEDI-READY component issue
-about: Use this template if the issue is on the React TEDI-READY side, bug, enhancement
-  etc
+name: New TEDI-READY component
+about: This template is for new TEDI-Ready component creation and development
 title: "[Component_name]:"
 labels: tedi-ready
 assignees: airikej
 
 ---
 
-## Problem
-
-## Solution
-
-## Examples and information
-
-## Project
+Design:
 
 ## DoD
 - [ ] The component is developed using best practices, conventions, and modern frontend trends

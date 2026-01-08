@@ -18,7 +18,7 @@ import { Card, CardContentProps, CardNotificationProps, CardProps } from './inde
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=163-19532&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/35d515-card" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/35d515-card" target="_BLANK">Zeroheight ↗</a>
  */
 
 export default {

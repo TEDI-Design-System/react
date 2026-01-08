@@ -3,7 +3,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import Affix from './affix';
 
 /**
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/38ad96-affix" target="_BLANK">Zeroheight ↗</a><br />
+ * <a href="https://www.tedi.ee/1ee8444b7/p/38ad96-affix" target="_BLANK">Zeroheight ↗</a><br />
  */
 
 const meta: Meta<typeof Affix> = {

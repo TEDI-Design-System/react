@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-
 :root {
   --alert-default-padding-x-sm: 8px;
 }
@@ -16,8 +14,7 @@
 
   &__alert {
     padding: var(--alert-default-padding-x-sm);
-
-    @include mixins.responsive-styles(margin-bottom, sidepanel-header-padding-y);
+    margin-bottom: var(--sidepanel-header-padding-y);
   }
 }
 
@@ -26,17 +23,13 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
+  padding: var(--sidepanel-header-padding-y) var(--sidepanel-item-padding-x);
   color: var(--button-main-neutral-inverted-text-default);
   background-color: var(--sidepanel-header-background-default);
-
-  @include mixins.responsive-styles(padding-top, sidepanel-header-padding-y);
-  @include mixins.responsive-styles(padding-bottom, sidepanel-header-padding-y);
-  @include mixins.responsive-styles(padding-left, sidepanel-item-padding-x);
-  @include mixins.responsive-styles(padding-right, sidepanel-item-padding-x);
 }
 
 .tedi-left-panel__content {
-  @include mixins.responsive-styles(padding, sidepanel-item-padding-x);
+  padding: var(--sidepanel-item-padding-x);
 }
 
 .tedi-left-panel__footer {
@@ -47,13 +40,12 @@
   align-items: flex-start;
   align-self: stretch;
   justify-content: center;
+  padding: var(--sidepanel-item-padding-x);
+  font-size: var(--body-small-regular-size);
+  line-height: var(--body-small-regular-line-height);
   word-break: break-all;
   background: var(--sidepanel-footer-background);
   border-top: 1px solid var(--general-border-primary);
-
-  @include mixins.responsive-styles(padding, sidepanel-item-padding-x);
-  @include mixins.responsive-styles(font-size, body-small-regular-size);
-  @include mixins.responsive-styles(line-height, body-small-regular-line-height);
 
   &__theme-switch {
     width: 100%;
@@ -63,17 +55,16 @@
 
 .tedi-left-panel__header-controls {
   display: flex;
+  gap: var(--layout-grid-gutters-08);
   align-items: center;
   justify-content: space-between;
+  padding-right: var(--sidepanel-item-padding-x);
+  padding-bottom: var(--layout-grid-gutters-04);
+  padding-left: var(--sidepanel-item-padding-x);
   color: var(--button-main-neutral-inverted-text-default);
   background-color: var(--sidepanel-header-background-default);
-
-  @include mixins.responsive-styles(padding-left, sidepanel-item-padding-x);
-  @include mixins.responsive-styles(padding-right, sidepanel-item-padding-x);
-  @include mixins.responsive-styles(padding-bottom, layout-grid-gutters-04);
-  @include mixins.responsive-styles(border-bottom-left-radius, sidepanel-header-radius-bottom);
-  @include mixins.responsive-styles(border-bottom-right-radius, sidepanel-header-radius-bottom);
-  @include mixins.responsive-styles(gap, layout-grid-gutters-08);
+  border-bottom-right-radius: var(--sidepanel-header-radius-bottom);
+  border-bottom-left-radius: var(--sidepanel-header-radius-bottom);
 }
 
 .tedi-accordion {

@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-
 $headings: (h1, h2, h3, h4, h5, h6);
 
 .tedi-skeleton-block {
@@ -7,23 +5,22 @@ $headings: (h1, h2, h3, h4, h5, h6);
   width: 100%;
   background: linear-gradient(
     to right,
-    color-mix(in srgb, var(--loader-skeleton-color) 70%, var(--neutral-100)) 8%,
-    color-mix(in srgb, var(--loader-skeleton-color) 100%, var(--neutral-100)) 18%,
-    color-mix(in srgb, var(--loader-skeleton-color) 70%, var(--neutral-100)) 33%
+    color-mix(in srgb, var(--loader-skeleton-color) 70%, var(--tedi-neutral-100)) 8%,
+    color-mix(in srgb, var(--loader-skeleton-color) 100%, var(--tedi-neutral-100)) 18%,
+    color-mix(in srgb, var(--loader-skeleton-color) 70%, var(--tedi-neutral-100)) 33%
   );
   background-size: 1000px 100px;
+  border-radius: var(--loader-skeleton-radius);
   animation: wave-lines 2s infinite ease-in-out;
-
-  @include mixins.responsive-styles(border-radius, loader-skeleton-radius);
 
   @each $heading in $headings {
     &.tedi-skeleton-block--#{$heading} {
-      @include mixins.responsive-styles(height, heading-#{$heading}-line-height, $exclude: tablet);
+      height: var(--heading-#{$heading}-line-height);
     }
   }
 
   &.tedi-skeleton-block--p {
-    @include mixins.responsive-styles(height, body-regular-line-height, $exclude: tablet);
+    height: var(--body-regular-line-height);
   }
 }
 

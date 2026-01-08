@@ -6,7 +6,7 @@ import FloatingButton, { FloatingButtonProps } from './floating-button';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4514-73451&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/546461-floating-button" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/546461-floating-button" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof FloatingButton> = {
@@ -107,7 +107,7 @@ export const PrimaryHorizontal: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -124,7 +124,7 @@ export const PrimaryVertical: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -141,7 +141,7 @@ export const SecondaryHorizontal: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -158,7 +158,7 @@ export const SecondaryVertical: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };

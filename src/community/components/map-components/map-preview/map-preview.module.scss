@@ -35,7 +35,7 @@
   background: var(--general-surface-primary);
   border: 1px solid var(--general-border-primary);
   border-radius: 4px;
-  box-shadow: 0 1px 5px 0 var(--alpha-20);
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
   transition: ease-in-out 0.5 all;
 
   &[data-state='closed'] {

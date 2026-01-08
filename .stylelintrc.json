@@ -12,6 +12,7 @@
     "custom-property-pattern": null,
     "no-invalid-position-at-import-rule": null,
     "no-descending-specificity": null,
+    "scss/operator-no-newline-after": null,
     "selector-pseudo-class-no-unknown": [
       true,
       {

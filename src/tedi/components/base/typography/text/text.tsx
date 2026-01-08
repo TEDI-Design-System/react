@@ -9,6 +9,7 @@ export type TextModifiers =
   | HeadingModifiers
   | 'normal'
   | 'small'
+  | 'extra-small'
   | 'bold'
   | 'thin'
   | 'italic'

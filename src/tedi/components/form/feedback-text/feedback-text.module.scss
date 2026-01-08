@@ -1,9 +1,9 @@
 @use '@tedi-design-system/core/mixins';
 
 .tedi-feedback-text {
+  font-size: var(--body-small-regular-size);
   color: var(--general-text-tertiary);
 
-  @include mixins.responsive-styles(font-size, body-small-regular-size, $exclude: tablet);
   @include mixins.print-grayscale;
 
   &--valid {

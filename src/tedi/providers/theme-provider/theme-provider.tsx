@@ -2,9 +2,9 @@
 
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
-export type Theme = 'default' | 'dark' | 'rit';
+export type Theme = 'default' | 'dark' | 'rit' | 'muis';
 
-const AVAILABLE_THEMES: Theme[] = ['default', 'dark', 'rit'];
+const AVAILABLE_THEMES: Theme[] = ['default', 'dark', 'rit', 'muis'];
 const THEME_CLASS_PREFIX = 'tedi-theme--';
 const STORAGE_KEY = 'tedi-theme';
 

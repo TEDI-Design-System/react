@@ -92,7 +92,7 @@
 
     &:hover {
       .stepper-counter {
-        background-color: var(--green-800);
+        background-color: var(--tedi-green-800);
       }
 
       .stepper-link {
@@ -115,7 +115,7 @@
 
     &:hover {
       .stepper-counter {
-        background-color: var(--red-800);
+        background-color: var(--tedi-red-800);
       }
 
       .stepper-link {
@@ -177,7 +177,7 @@
 
     &:hover {
       .stepper-counter {
-        border-color: var(--blue-800);
+        border-color: var(--tedi-blue-800);
       }
 
       .stepper-link {
@@ -334,8 +334,8 @@
     }
 
     &:hover .sub-item-dot {
-      background-color: var(--green-800);
-      border-color: var(--green-800);
+      background-color: var(--tedi-green-800);
+      border-color: var(--tedi-green-800);
     }
   }
 
@@ -346,8 +346,8 @@
     }
 
     &:hover .sub-item-dot {
-      background-color: var(--red-800);
-      border-color: var(--red-800);
+      background-color: var(--tedi-red-800);
+      border-color: var(--tedi-red-800);
     }
   }
 
@@ -377,12 +377,12 @@
     }
 
     &:hover .sub-item-dot {
-      border-color: var(--blue-800);
+      border-color: var(--tedi-blue-800);
     }
 
     &:hover .sub-item-text a .sub-item-title,
     .sub-item-text button .sub-item-title {
-      color: var(--blue-800);
+      color: var(--tedi-blue-800);
     }
   }
 
@@ -530,8 +530,8 @@
 }
 
 .stepper--compact .stepper-item .sub-item.completed:hover .sub-item-dot {
-  background-color: var(--green-800);
-  border-color: var(--green-800);
+  background-color: var(--tedi-green-800);
+  border-color: var(--tedi-green-800);
 }
 
 .stepper--compact .stepper-item .sub-item.error .sub-item-dot {
@@ -540,8 +540,8 @@
 }
 
 .stepper--compact .stepper-item .sub-item.error:hover .sub-item-dot {
-  background-color: var(--red-800);
-  border-color: var(--red-800);
+  background-color: var(--tedi-red-800);
+  border-color: var(--tedi-red-800);
 }
 
 .stepper--compact .stepper-item .sub-item.disabled .sub-item-dot {

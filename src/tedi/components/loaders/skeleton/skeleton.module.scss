@@ -2,6 +2,5 @@
 
 .tedi-skeleton {
   pointer-events: none;
-
-  @include mixins.responsive-styles(border-radius, loader-skeleton-radius);
+  border-radius: var(--loader-skeleton-radius);
 }

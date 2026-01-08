@@ -1,3 +1,38 @@
+# [14.3.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.4...react-14.3.0-rc.5) (2025-12-12)
+
+
+### Features
+
+* **theme-provider:** muis theme, update core [#413](https://github.com/TEDI-Design-System/react/issues/413) ([#415](https://github.com/TEDI-Design-System/react/issues/415)) ([357d943](https://github.com/TEDI-Design-System/react/commit/357d9435c37b640a3d657359c13984d0b5581535))
+
+# [14.3.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.3...react-14.3.0-rc.4) (2025-12-12)
+
+
+### Bug Fixes
+
+* **floating-button:** dark theme variable changes, fix focus style in storybook [#8](https://github.com/TEDI-Design-System/react/issues/8) ([#414](https://github.com/TEDI-Design-System/react/issues/414)) ([271f262](https://github.com/TEDI-Design-System/react/commit/271f262d801cbeb99d09bc811f325f862dd99a55))
+
+# [14.3.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.2...react-14.3.0-rc.3) (2025-12-12)
+
+
+### Bug Fixes
+
+* **header:** fix header-language list indent [#411](https://github.com/TEDI-Design-System/react/issues/411) ([#412](https://github.com/TEDI-Design-System/react/issues/412)) ([d028080](https://github.com/TEDI-Design-System/react/commit/d02808028dbfd4df1008a3f5a326f55c1236e6de))
+
+# [14.3.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.1...react-14.3.0-rc.2) (2025-12-04)
+
+
+### Bug Fixes
+
+* **variables:** remove responsive-styles, replace with variables, sidenav variables update [#395](https://github.com/TEDI-Design-System/react/issues/395) ([#405](https://github.com/TEDI-Design-System/react/issues/405)) ([199bc4e](https://github.com/TEDI-Design-System/react/commit/199bc4e7b61ab28571d2707df5740868afbdabc1))
+
+# [14.3.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.2.1...react-14.3.0-rc.1) (2025-12-04)
+
+
+### Features
+
+* **typography:** add extra small font [#397](https://github.com/TEDI-Design-System/react/issues/397) ([#404](https://github.com/TEDI-Design-System/react/issues/404)) ([9bf56c7](https://github.com/TEDI-Design-System/react/commit/9bf56c72683075c975b9eeee4d3cad758b95bd45))
+
 ## [14.2.1](https://github.com/TEDI-Design-System/react/compare/react-14.2.0...react-14.2.1) (2025-11-27)
 
 
