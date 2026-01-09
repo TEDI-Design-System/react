@@ -2,12 +2,12 @@ import cn from 'classnames';
 import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row, RowProps } from '../../../tedi/components/layout/grid';
 import Print from '../../../tedi/components/misc/print/print';
 import { usePrint } from '../../../tedi/helpers';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import Icon from '../icon/icon';
-import { Text } from '../typography/text/text';
 import styles from './collapse.module.scss';
 
 export interface CollapseProps {
@@ -120,7 +120,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
                     'visually-hidden': hideCollapseText,
                   })}
                 >
-                  <Text element="span" color="primary">
+                  <Text element="span" color="brand">
                     {isOpen ? closeText : openText}
                   </Text>
                 </Col>

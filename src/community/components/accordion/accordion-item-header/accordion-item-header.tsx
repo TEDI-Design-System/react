@@ -1,11 +1,11 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Heading, HeadingProps } from '../../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { CardHeader, CardHeaderBackground, CardHeaderProps } from '../../card';
 import ToggleOpen from '../../toggle-open/toggle-open';
-import Heading, { HeadingProps } from '../../typography/heading/heading';
-import Text from '../../typography/text/text';
 import { AccordionContext } from '../accordion';
 import styles from '../accordion.module.scss';
 import { AccordionItemContext } from '../accordion-item/accordion-item';

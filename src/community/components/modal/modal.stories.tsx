@@ -1,11 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Button from '../button/button';
 import { CardContent, CardHeader } from '../card';
-import Heading from '../typography/heading/heading';
 import Modal, { ModalProps } from './modal';
 import ModalCloser from './modal-closer';
 import ModalProvider, { ModalProviderProps } from './modal-provider';

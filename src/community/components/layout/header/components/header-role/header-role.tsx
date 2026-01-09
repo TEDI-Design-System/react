@@ -1,11 +1,11 @@
 import React from 'react';
 
+import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import ScrollFade from '../../../../../../tedi/components/misc/scroll-fade/scroll-fade';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import { Card, CardContent } from '../../../../card';
 import Collapse from '../../../../collapse/collapse';
 import Tag from '../../../../tag/tag';
-import { Text } from '../../../../typography/text/text';
 import { HeaderDropdown } from '../header-dropdown/header-dropdown';
 import styles from './header-role.module.scss';
 
@@ -75,7 +75,7 @@ const HeaderRoleDropdown = (props: HeaderRoleComponentProps) => {
       );
     }
     return (
-      <Text color="muted" modifiers={['bold', 'small']}>
+      <Text color="secondary" modifiers={['bold', 'small']}>
         {label}
         {!!secondaryInfo && (
           <>
@@ -125,7 +125,7 @@ const HeaderRoleModal = (props: HeaderRoleComponentProps) => {
   const { children, open, onToggle, primaryInfo, secondaryInfo, label = getLabel('header.role-label') } = props;
 
   const title = (
-    <Text element="span" color="muted" modifiers="bold">
+    <Text element="span" color="secondary" modifiers="bold">
       {label} {primaryInfo}
       {secondaryInfo && (
         <Text element="span" modifiers="normal">

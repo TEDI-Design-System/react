@@ -1,9 +1,9 @@
 import { Meta, StoryFn } from '@storybook/react';
 import React from 'react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
-import Heading from '../typography/heading/heading';
-import Text from '../typography/text/text';
 import Collapse, { CollapseProps } from './collapse';
 
 export default {
@@ -45,22 +45,22 @@ export const Default = {
     openText: 'Näita rohkem',
     closeText: 'Näita vähem',
     title: (
-      <Heading element="h5" color="muted">
+      <Heading element="h5" color="secondary">
         Juhtumi üldandmed
       </Heading>
     ),
     children: (
       <VerticalSpacing>
         <div>
-          <Text color="muted">Laste osalus</Text>
+          <Text color="secondary">Laste osalus</Text>
           <p>peretüli lapse osaluseta</p>
         </div>
         <div>
-          <Text color="muted">Juhtumi liigid</Text>
+          <Text color="secondary">Juhtumi liigid</Text>
           <p>peretüli (lapsega)</p>
         </div>
         <div>
-          <Text color="muted">Kannatanu seos vägivaldsega</Text>
+          <Text color="secondary">Kannatanu seos vägivaldsega</Text>
           <p>tütar</p>
         </div>
       </VerticalSpacing>

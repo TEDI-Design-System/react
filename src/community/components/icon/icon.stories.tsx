@@ -1,10 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import useLayout from '../../helpers/hooks/use-layout';
-import Heading from '../typography/heading/heading';
-import Text from '../typography/text/text';
 import { Icon, IconProps } from './icon';
 
 const meta: Meta<typeof Icon> = {
@@ -22,14 +22,13 @@ type Story = StoryObj<TemplateMultipleProps>;
 
 const sizeArray: IconProps['size'][] = [12, 14, 16, 18, 24, 36, 48];
 const colorArray: IconProps['color'][] = [
-  'default',
   'primary',
-  'muted',
-  'subtle',
+  'secondary',
+  'tertiary',
   'disabled',
-  'inverted',
-  'positive',
-  'important',
+  'white',
+  'success',
+  'danger',
   'warning',
 ];
 const typeArray: IconProps['type'][] = ['outlined', 'rounded', 'sharp'];

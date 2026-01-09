@@ -1,10 +1,10 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Text } from '../../../../../tedi/components/base/typography/text/text';
 import Print from '../../../../../tedi/components/misc/print/print';
 import { Anchor, AnchorProps } from '../../../anchor/anchor';
 import Icon from '../../../icon/icon';
-import Text from '../../../typography/text/text';
 import styles from '../breadcrumbs.module.scss';
 
 export type CrumbProps<C extends React.ElementType = 'a'> = {
@@ -24,7 +24,7 @@ const Crumb = <C extends React.ElementType = 'a'>(props: CrumbProps<C> & { singl
     <li data-name="crumb" className={BEM}>
       <Print visibility="show">
         {isLast ? (
-          <Text color="muted">{children}</Text>
+          <Text color="secondary">{children}</Text>
         ) : (
           // TODO: Remove ts-ignore
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment

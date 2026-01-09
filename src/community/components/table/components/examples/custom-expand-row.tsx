@@ -2,13 +2,13 @@ import { faker } from '@faker-js/faker';
 import { StoryFn, StoryObj } from '@storybook/react';
 import { ColumnDef, createColumnHelper, Row as TSRow } from '@tanstack/react-table';
 
+import { Text } from '../../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../../tedi/components/layout/grid';
 import Print from '../../../../../tedi/components/misc/print/print';
 import { getBackgroundColorClass } from '../../../../helpers/background-colors/background-colors';
 import { IntentionalAny } from '../../../../types';
 import Tag from '../../../tag/tag';
 import ToggleOpen from '../../../toggle-open/toggle-open';
-import Text from '../../../typography/text/text';
 import Table from '../../table';
 import { DefaultTData, TableProps } from '../../table.types';
 
@@ -40,7 +40,7 @@ const CustomExpandRow = <TData extends DefaultTData<TData>>(row: TSRow<TData>): 
         <td colSpan={Math.floor(totalCells)}>
           <Row alignItems="center" justifyContent="end" gutterX={2}>
             <Col width="auto">
-              <Text modifiers="small" color="subtle">
+              <Text modifiers="small" color="tertiary">
                 {row.subRows.length} {row.original.countLabel(row.subRows.length)}
               </Text>
             </Col>
@@ -114,7 +114,7 @@ const columns: ColumnDef<ProceedingRow, any>[] = [
     cell: ({ row: { original } }) => (
       <div>
         <Text>{original.employee}</Text>
-        <Text color="subtle" modifiers="small">
+        <Text color="tertiary" modifiers="small">
           {original.authority}
         </Text>
       </div>

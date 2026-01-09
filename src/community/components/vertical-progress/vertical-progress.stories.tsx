@@ -3,10 +3,10 @@ import { Controls, Description, Primary, Stories, Title } from '@storybook/addon
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Button from '../button/button';
-import Heading from '../typography/heading/heading';
-import Text from '../typography/text/text';
 import { VerticalProgress, VerticalProgressItem, VerticalProgressItemProps, VerticalProgressProps } from '.';
 
 const meta: Meta<typeof VerticalProgress> = {

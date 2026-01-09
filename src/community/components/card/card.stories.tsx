@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Separator from '../../../tedi/components/misc/separator/separator';
@@ -7,7 +8,6 @@ import { StretchContent } from '../../../tedi/components/misc/stretch-content/st
 import { CardsExample } from '../../../tedi/components/misc/stretch-content/stretch-content.stories';
 import Collapse from '../collapse/collapse';
 import Icon from '../icon/icon';
-import Heading from '../typography/heading/heading';
 import { Card, CardProps } from './card';
 import CardContent, { CardContentPadding, CardContentProps } from './card-content/card-content';
 import CardHeader, { CardHeaderProps } from './card-header/card-header';

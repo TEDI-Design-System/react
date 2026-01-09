@@ -23,6 +23,7 @@ import ReactSelect, {
 import AsyncSelect from 'react-select/async';
 import { MenuPortalProps } from 'react-select/dist/declarations/src/components/Menu';
 
+import { Text, TextProps } from '../../../../tedi/components/base/typography/text/text';
 import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/form/feedback-text/feedback-text';
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
@@ -32,7 +33,6 @@ import Button from '../../button/button';
 import { TColorsBackground } from '../../commonTypes';
 import { Icon } from '../../icon/icon';
 import Tag from '../../tag/tag';
-import Text, { TextProps } from '../../typography/text/text';
 import Check from '../check/check';
 import styles from './select.module.scss';
 
@@ -347,7 +347,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       onMenuOpen,
       onBlur,
       inputIsHidden,
-      optionGroupHeadingText = { modifiers: 'small', color: 'subtle' },
+      optionGroupHeadingText = { modifiers: 'small', color: 'tertiary' },
       optionGroupBackgroundColor,
       cacheOptions = true,
       ...rest

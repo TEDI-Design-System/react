@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import Heading from '../typography/heading/heading';
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import Collapse, { CollapseProps } from './collapse';
 
 const getComponent = (props?: Partial<CollapseProps>) =>

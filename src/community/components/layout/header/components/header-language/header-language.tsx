@@ -1,13 +1,13 @@
 import React from 'react';
 
+import { Heading } from '../../../../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import { List, ListItem } from '../../../../../../tedi/components/content/list';
 import { Col, Row } from '../../../../../../tedi/components/layout/grid';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import { useLayout } from '../../../../../helpers/hooks/use-layout';
 import Button, { ButtonProps } from '../../../../button/button';
 import { Card, CardContent } from '../../../../card';
-import { Heading } from '../../../../typography/heading/heading';
-import Text from '../../../../typography/text/text';
 import HeaderDropdown from '../header-dropdown/header-dropdown';
 import HeaderModal from '../header-modal/header-modal';
 import styles from './header-language.module.scss';
@@ -58,7 +58,7 @@ export const HeaderLanguage: React.FC<HeaderLanguageProps> = (props) => {
 
   const dropdown = (
     <div>
-      <Text color="muted" modifiers="small">
+      <Text color="secondary" modifiers="small">
         {getLabel('header.select-lang')}
       </Text>
       <HeaderDropdown
