@@ -10,7 +10,9 @@
   }
 
   &__text {
-    text-decoration: underline;
+    &--underline {
+      text-decoration: underline;
+    }
   }
 
   &__icon-wrapper {

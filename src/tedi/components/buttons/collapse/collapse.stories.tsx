@@ -120,3 +120,10 @@ export const NestedCollapses: Story = {
     ),
   },
 };
+
+export const TitleWithoutUnderline = {
+  args: {
+    ...Default.args,
+    underline: false,
+  },
+};

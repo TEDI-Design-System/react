@@ -41,6 +41,11 @@ type CollapseBreakpointProps = {
    * Display toggle arrow as default or secondary button style
    */
   arrowType?: 'default' | 'secondary';
+  /*
+   * Display underline below the title
+   * @default true
+   */
+  underline?: boolean;
 };
 
 export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps> {
@@ -91,6 +96,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     open,
     onToggle,
     arrowType = 'neutral',
+    underline = true,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -149,7 +155,9 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
                   <Text
                     element="span"
                     color="brand"
-                    className={cn(styles['tedi-collapse__text'])}
+                    className={cn(styles['tedi-collapse__text'], {
+                      [styles['tedi-collapse__text--underline']]: underline,
+                    })}
                     id={`${id}-collapse-label`}
                   >
                     {isOpen ? closeText : openText}
