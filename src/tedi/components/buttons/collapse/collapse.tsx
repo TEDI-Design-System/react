@@ -159,7 +159,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
         <Row justifyContent="between" alignItems="center" wrap="nowrap" {...titleRowProps} element="span">
           {title && <Col aria-hidden="true">{title}</Col>}
           <Col width="auto">
-            <Row element="span" alignItems="center" gutter={0}>
+            <Row element="span" alignItems="center" gutter={0} wrap="nowrap">
               <Print visibility="hide">
                 <Col width="auto" className={cn({ 'visually-hidden': hideCollapseText })}>
                   <Text element="span" className={cn(styles['tedi-collapse__text'])} id={labelId}>
