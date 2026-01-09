@@ -1,3 +1,10 @@
+# [14.4.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.3.0...react-14.4.0-rc.1) (2026-01-09)
+
+
+### Features
+
+* **collapse:** make titles underline configurable [#7](https://github.com/TEDI-Design-System/react/issues/7) ([#439](https://github.com/TEDI-Design-System/react/issues/439)) ([e458004](https://github.com/TEDI-Design-System/react/commit/e458004507420859ae9b8cda55dab6c030e28f30))
+
 # [14.3.0](https://github.com/TEDI-Design-System/react/compare/react-14.2.1...react-14.3.0) (2026-01-08)
 
 
