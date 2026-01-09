@@ -5,7 +5,7 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Section } from './section';
 
 /**
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/369823-section" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/007622-section" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Section> = {

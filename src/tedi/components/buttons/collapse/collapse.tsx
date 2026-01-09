@@ -45,6 +45,11 @@ type CollapseBreakpointProps = {
    * @default default
    */
   size?: 'default' | 'small';
+  /*
+   * Display underline below the title
+   * @default true
+   */
+  underline?: boolean;
 };
 
 export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps> {
@@ -96,6 +101,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     onToggle,
     arrowType = 'default',
     size = 'default',
+    underline = true,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -162,7 +168,13 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
             <Row element="span" alignItems="center" gutter={0} wrap="nowrap">
               <Print visibility="hide">
                 <Col width="auto" className={cn({ 'visually-hidden': hideCollapseText })}>
-                  <Text element="span" className={cn(styles['tedi-collapse__text'])} id={labelId}>
+                  <Text
+                    element="span"
+                    className={cn(styles['tedi-collapse__text'], {
+                      [styles['tedi-collapse__text--underline']]: underline,
+                    })}
+                    id={labelId}
+                  >
                     {isOpen ? closeText : openText}
                   </Text>
                 </Col>

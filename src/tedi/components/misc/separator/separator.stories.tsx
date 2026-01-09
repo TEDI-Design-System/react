@@ -9,7 +9,7 @@ import Separator, { SeparatorProps } from './separator';
 
 /**
  * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=3518-32729&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/01debb-separator" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/01debb-separator" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Separator> = {

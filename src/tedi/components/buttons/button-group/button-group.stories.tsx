@@ -8,7 +8,7 @@ import ButtonGroup, { ButtonGroupProps } from './button-group';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=2215-38193&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://zeroheight.com/1ee8444b7/p/82e9cf-button-group" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/82e9cf-button-group" target="_BLANK">ZeroHeight ↗</a>
  */
 
 const meta: Meta<typeof ButtonGroup> = {

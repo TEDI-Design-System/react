@@ -12,6 +12,7 @@ import LeftPanel from './left-panel';
 
 /**
  * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Veera-Map-Design-System?node-id=427-91631&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/8053d6-left-panel" target="_BLANK">ZeroHeight ↗</a>
  */
 
 const meta: Meta<typeof LeftPanel> = {

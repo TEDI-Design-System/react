@@ -1,3 +1,46 @@
+# [14.4.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.3.0...react-14.4.0-rc.1) (2026-01-09)
+
+
+### Features
+
+* **collapse:** make titles underline configurable [#7](https://github.com/TEDI-Design-System/react/issues/7) ([#439](https://github.com/TEDI-Design-System/react/issues/439)) ([e458004](https://github.com/TEDI-Design-System/react/commit/e458004507420859ae9b8cda55dab6c030e28f30))
+
+# [14.3.0](https://github.com/TEDI-Design-System/react/compare/react-14.2.1...react-14.3.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* **floating-button:** dark theme variable changes, fix focus style in storybook [#8](https://github.com/TEDI-Design-System/react/issues/8) ([#414](https://github.com/TEDI-Design-System/react/issues/414)) ([271f262](https://github.com/TEDI-Design-System/react/commit/271f262d801cbeb99d09bc811f325f862dd99a55))
+* **header:** fix header-language list indent [#411](https://github.com/TEDI-Design-System/react/issues/411) ([#412](https://github.com/TEDI-Design-System/react/issues/412)) ([d028080](https://github.com/TEDI-Design-System/react/commit/d02808028dbfd4df1008a3f5a326f55c1236e6de))
+* **variables:** remove responsive-styles, replace with variables, sidenav variables update [#395](https://github.com/TEDI-Design-System/react/issues/395) ([#405](https://github.com/TEDI-Design-System/react/issues/405)) ([199bc4e](https://github.com/TEDI-Design-System/react/commit/199bc4e7b61ab28571d2707df5740868afbdabc1))
+
+
+### Features
+
+* **theme-provider:** muis theme, update core [#413](https://github.com/TEDI-Design-System/react/issues/413) ([#415](https://github.com/TEDI-Design-System/react/issues/415)) ([357d943](https://github.com/TEDI-Design-System/react/commit/357d9435c37b640a3d657359c13984d0b5581535))
+* **typography:** add extra small font [#397](https://github.com/TEDI-Design-System/react/issues/397) ([#404](https://github.com/TEDI-Design-System/react/issues/404)) ([9bf56c7](https://github.com/TEDI-Design-System/react/commit/9bf56c72683075c975b9eeee4d3cad758b95bd45))
+
+# [14.3.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.4...react-14.3.0-rc.5) (2025-12-12)
+
+
+### Features
+
+* **theme-provider:** muis theme, update core [#413](https://github.com/TEDI-Design-System/react/issues/413) ([#415](https://github.com/TEDI-Design-System/react/issues/415)) ([357d943](https://github.com/TEDI-Design-System/react/commit/357d9435c37b640a3d657359c13984d0b5581535))
+
+# [14.3.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.3...react-14.3.0-rc.4) (2025-12-12)
+
+
+### Bug Fixes
+
+* **floating-button:** dark theme variable changes, fix focus style in storybook [#8](https://github.com/TEDI-Design-System/react/issues/8) ([#414](https://github.com/TEDI-Design-System/react/issues/414)) ([271f262](https://github.com/TEDI-Design-System/react/commit/271f262d801cbeb99d09bc811f325f862dd99a55))
+
+# [14.3.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.2...react-14.3.0-rc.3) (2025-12-12)
+
+
+### Bug Fixes
+
+* **header:** fix header-language list indent [#411](https://github.com/TEDI-Design-System/react/issues/411) ([#412](https://github.com/TEDI-Design-System/react/issues/412)) ([d028080](https://github.com/TEDI-Design-System/react/commit/d02808028dbfd4df1008a3f5a326f55c1236e6de))
+
 # [14.3.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.3.0-rc.1...react-14.3.0-rc.2) (2025-12-04)
 
 

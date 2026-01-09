@@ -9,7 +9,7 @@ import { sendNotification, ToastContainer } from './toast';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4281-58105&m=dev" target="_blank">Figma ↗</a><br/>
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/35370f-toast" target="_blank">Zeroheight ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/35370f-toast" target="_blank">Zeroheight ↗</a><br/>
  * <a href="?path=/docs/tedi-ready-components-notifications-toast-documentation--docs">Documentation ↗</a> <br/>
  * <a href="https://fkhadra.github.io/react-toastify/introduction" target="_blank">React-Toastify ↗</a>
  */
@@ -217,7 +217,7 @@ export const HoverBehavior: Story = {
  * 2. Ensure focus is not stolen from user actions; toasts should not interrupt workflow.
  * 3. Ensure toasts can be dismissed or automatically close after a reasonable time.
  *
- * <a href="https://tedi.tehik.ee/1ee8444b7/p/35370f-toast/b/33c51e" target="_BLANK">Accessibility guidelines ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/35370f-toast/b/33c51e" target="_BLANK">Accessibility guidelines ↗</a>
  */
 
 export const WCAGCompliance: Story = {
