@@ -122,7 +122,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     styles['tedi-collapse'],
     size === 'small' && styles['tedi-collapse--small'],
     isOpen && styles['tedi-collapse--is-open'],
-    hideCollapseText && styles['tedi-collapse--iconOnly'],
+    hideCollapseText && styles['tedi-collapse--icon-only'],
     styles[`tedi-collapse--arrow-${arrowType}`],
     className
   );
