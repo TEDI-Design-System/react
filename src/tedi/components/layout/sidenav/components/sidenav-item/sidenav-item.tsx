@@ -224,6 +224,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 aria-controls={collapseId}
                 aria-current={isActive ? 'page' : undefined}
                 onKeyDown={handleTitleKeyDown}
+                aria-label={typeof children === 'string' ? children : undefined}
               >
                 {icon && getIcon(icon)}
                 <span className={styles['tedi-sidenav__title']}>{children}</span>
