@@ -1,3 +1,10 @@
+# [14.4.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.3...react-14.4.0-rc.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* **popover:** wcag improvements [#64](https://github.com/TEDI-Design-System/react/issues/64) ([#430](https://github.com/TEDI-Design-System/react/issues/430)) ([db79bcc](https://github.com/TEDI-Design-System/react/commit/db79bcc17a2bd523e993a7e654446a887f51515c))
+
 # [14.4.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.2...react-14.4.0-rc.3) (2026-01-12)
 
 
