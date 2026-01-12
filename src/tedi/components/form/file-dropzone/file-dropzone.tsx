@@ -99,14 +99,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
                 borderless
                 className={styles['tedi-file-dropzone__file-item']}
               >
-                <CardContent
-                  padding={{
-                    bottom: 0.5,
-                    left: 0.5,
-                    right: 0.5,
-                    top: 0.5,
-                  }}
-                >
+                <CardContent padding={0.5}>
                   <Row alignItems="center">
                     <Col className={styles['tedi-file-dropzone__file-name']}>
                       {file.name}{' '}
