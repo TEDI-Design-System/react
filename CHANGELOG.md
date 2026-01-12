@@ -1,3 +1,10 @@
+# [14.4.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.1...react-14.4.0-rc.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* **button:** nowrap to button texts [#44](https://github.com/TEDI-Design-System/react/issues/44) ([#437](https://github.com/TEDI-Design-System/react/issues/437)) ([bf8289c](https://github.com/TEDI-Design-System/react/commit/bf8289c69499525e7bbbe6921b9de3a0b4500a45))
+
 # [14.4.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.3.0...react-14.4.0-rc.1) (2026-01-09)
 
 
