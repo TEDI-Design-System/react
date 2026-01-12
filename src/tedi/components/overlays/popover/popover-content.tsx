@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { useContext } from 'react';
+import { useId } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
 import ClosingButton, { ClosingButtonProps } from '../../buttons/closing-button/closing-button';
@@ -47,6 +48,9 @@ export const PopoverContent = (props: PopoverContentProps) => {
     closeProps = { size: 'large' },
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
+  const titleId = useId();
+  const hasDescription = Boolean(children);
+  const descriptionId = useId();
 
   return (
     <OverlayContent
@@ -54,11 +58,13 @@ export const PopoverContent = (props: PopoverContentProps) => {
         content: cn(styles['tedi-popover'], { [styles[`tedi-popover--${width}`]]: width }, className),
         arrow: styles['tedi-popover__arrow'],
       }}
+      labelledBy={title ? titleId : undefined}
+      describedBy={hasDescription ? descriptionId : undefined}
     >
       {(title || close) && (
         <div className={cn(styles['tedi-popover__header'], { [styles['tedi-popover__header--no-title']]: !title })}>
           {title && (
-            <Text {...titleProps} className={cn('align-self-center', titleProps.className)}>
+            <Text {...titleProps} id={titleId} className={cn('align-self-center', titleProps.className)}>
               {title}
             </Text>
           )}
@@ -73,7 +79,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
           )}
         </div>
       )}
-      {children}
+      {hasDescription ? <div id={descriptionId}>{children}</div> : children}
     </OverlayContent>
   );
 };
