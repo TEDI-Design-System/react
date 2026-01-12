@@ -5,7 +5,6 @@ export * from './components/button/button';
 export * from './components/collapse/collapse';
 export * from './components/anchor/anchor';
 export * from './components/layout';
-export * from './components/ellipsis/ellipsis';
 export * from './components/dropdown/dropdown';
 export * from './components/stepper';
 export * from './components/card';
