@@ -220,7 +220,6 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                   isCollapsedInternal && styles['tedi-sidenav__link--active']
                 )}
                 role="menuitem"
-                tabIndex={0}
                 aria-expanded={isCollapsedInternal}
                 aria-controls={collapseId}
                 aria-current={isActive ? 'page' : undefined}

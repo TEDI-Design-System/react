@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { SideNavItemProps } from './components/sidenav-item/sidenav-item';
 
 export const exampleNavItems: SideNavItemProps[] = [
