@@ -31,6 +31,16 @@ describe('SideNavItem', () => {
       expect(defaultProps.onItemClick).toHaveBeenCalledTimes(1);
     });
 
+    test('does not call onItemClick when item has children', async () => {
+      const user = userEvent.setup();
+      const onItemClick = jest.fn();
+
+      render(<SideNavItem {...defaultProps} onItemClick={onItemClick} subItems={[{ children: 'Child' }]} />);
+
+      await user.click(screen.getByText('Test Item'));
+      expect(onItemClick).not.toHaveBeenCalled();
+    });
+
     test('applies active styles when isActive=true', () => {
       render(<SideNavItem {...defaultProps} isActive />);
       expect(screen.getByRole('menuitem').parentElement).toHaveClass('tedi-sidenav__item--current');
@@ -93,6 +103,17 @@ describe('SideNavItem', () => {
 
       expect(screen.getByText('Secret')).toBeInTheDocument();
     });
+
+    test('keyboard toggle works with Space key on non-linked parent', async () => {
+      const user = userEvent.setup();
+
+      render(<SideNavItem {...defaultProps} subItems={[{ children: 'Space Child' }]} />);
+
+      await user.tab();
+      await user.keyboard(' ');
+
+      expect(screen.getByText('Space Child')).toBeInTheDocument();
+    });
   });
 
   describe('level > 1 (nested)', () => {
@@ -144,5 +165,34 @@ describe('SideNavItem', () => {
     const nestedItem = screen.getByText('Deep Item').closest('li');
     const icon = nestedItem?.querySelector('span[data-name="icon"]');
     expect(icon).toBeInTheDocument();
+  });
+
+  test('does not toggle on unrelated keys', async () => {
+    const user = userEvent.setup();
+
+    render(<SideNavItem {...defaultProps} subItems={[{ children: 'Hidden Child' }]} isDefaultOpen />);
+    expect(screen.getByText('Hidden Child')).toBeInTheDocument();
+
+    await user.tab();
+    await user.keyboard('{Escape}');
+
+    expect(screen.getByText('Hidden Child')).toBeInTheDocument();
+  });
+
+  test('sets aria attributes for linked parent with children', () => {
+    render(<SideNavItem {...defaultProps} href="/parent" subItems={[{ children: 'Child' }]} />);
+
+    const link = screen.getByRole('menuitem', { name: /test item/i });
+    expect(link).toHaveAttribute('aria-haspopup', 'true');
+    expect(link).toHaveAttribute('aria-expanded');
+    expect(link).toHaveAttribute('aria-controls');
+  });
+
+  test('updates dropdown open state when SideNavDropdown opens', async () => {
+    const user = userEvent.setup();
+
+    render(<SideNavItem {...defaultProps} isCollapsed subItems={[{ children: 'Child' }]} />);
+
+    await user.click(screen.getByText('Test Item'));
   });
 });
