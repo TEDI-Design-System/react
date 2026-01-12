@@ -12,35 +12,39 @@ import styles from './collapse.module.scss';
 
 type CollapseBreakpointProps = {
   /**
-   * Whether the collapse should be initially open (uncontrolled mode).
-   * This is ignored when `open` and `onToggle` are provided.
+   * Whether the collapse should be initially open (uncontrolled mode)
+   * This is ignored when `open` and `onToggle` are provided
    * @default false
    */
   defaultOpen?: boolean;
-
   /**
-   * Controls the open/closed state of the collapse (controlled mode).
-   * Should be used together with `onToggle`.
+   * Controls the open/closed state of the collapse (controlled mode)
+   * Should be used together with `onToggle`
    */
   open?: boolean;
   /**
-   * Whether to visually hide the open/close text on the toggle button.
-   * Useful for icon-only toggles.
+   * Whether to visually hide the open/close text on the toggle button
+   * Useful for icon-only toggles
    * @default false
    */
   hideCollapseText?: boolean;
   /**
-   * Additional props to pass to the `Row` component used in the title area.
+   * Additional props to pass to the `Row` component used in the title area
    */
   titleRowProps?: RowProps;
   /**
-   * Custom class name for the root element.
+   * Custom class name for the root element
    */
   className?: string;
   /*
    * Display toggle arrow as default or secondary button style
    */
   arrowType?: 'default' | 'secondary';
+  /**
+   * Collapse text & icon size
+   * @default default
+   */
+  size?: 'default' | 'small';
   /*
    * Display underline below the title
    * @default true
@@ -95,10 +99,16 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     defaultOpen,
     open,
     onToggle,
-    arrowType = 'neutral',
+    arrowType = 'default',
+    size = 'default',
     underline = true,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
+
+  const triggerId = `${id}__trigger`;
+  const labelId = `${id}__label`;
+  const contentId = `${id}__content`;
+  const animateId = `${id}__animate`;
 
   const [isOpenState, setIsOpen] = React.useState(() => defaultOpen);
   const isPrint = usePrint();
@@ -108,12 +118,13 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     [isPrint, open, isOpenState]
   );
 
-  const CollapseBEM = React.useMemo(
-    () =>
-      cn(styles['tedi-collapse'], className, {
-        [styles['tedi-collapse--is-open']]: isOpen,
-      }),
-    [className, isOpen]
+  const CollapseBEM = cn(
+    styles['tedi-collapse'],
+    size === 'small' && styles['tedi-collapse--small'],
+    isOpen && styles['tedi-collapse--is-open'],
+    hideCollapseText && styles['tedi-collapse--icon-only'],
+    styles[`tedi-collapse--arrow-${arrowType}`],
+    className
   );
 
   const handleClick = () => {
@@ -130,57 +141,72 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
   };
 
   const renderContent = React.useMemo(
-    () => <div className={styles['tedi-collapse__content']}>{children}</div>,
-    [children]
+    () => (
+      <div id={contentId} className={styles['tedi-collapse__content']}>
+        {children}
+      </div>
+    ),
+    [children, contentId]
   );
 
   return (
     <div data-name="collapse" {...rest} className={CollapseBEM}>
       <button
+        id={triggerId}
         type="button"
         data-name="collapse-trigger"
         className={styles['tedi-collapse__title']}
-        aria-labelledby={`${id}-collapse-label`}
+        aria-labelledby={labelId}
         aria-expanded={isOpen}
-        aria-controls={id}
+        aria-controls={contentId}
         onKeyDown={handleKeyDown}
         onClick={handleClick}
       >
         <Row justifyContent="between" alignItems="center" wrap="nowrap" {...titleRowProps} element="span">
           {title && <Col aria-hidden="true">{title}</Col>}
           <Col width="auto">
-            <Row element="span" alignItems="center" gutter={1}>
+            <Row element="span" alignItems="center" gutter={0} wrap="nowrap">
               <Print visibility="hide">
                 <Col width="auto" className={cn({ 'visually-hidden': hideCollapseText })}>
                   <Text
                     element="span"
-                    color="brand"
                     className={cn(styles['tedi-collapse__text'], {
                       [styles['tedi-collapse__text--underline']]: underline,
                     })}
-                    id={`${id}-collapse-label`}
+                    id={labelId}
                   >
                     {isOpen ? closeText : openText}
                   </Text>
                 </Col>
               </Print>
               <Col width="auto">
-                {arrowType === 'secondary' ? (
-                  <div className={styles['tedi-collapse__icon-wrapper']}>
-                    <Icon className={cn(styles['tedi-collapse__icon'])} name="expand_more" />
-                  </div>
-                ) : (
-                  <Icon className={cn(styles['tedi-collapse__icon'])} name="expand_more" />
-                )}
+                <div
+                  className={cn(
+                    styles['tedi-collapse__icon-wrapper'],
+                    styles[`tedi-collapse__icon-wrapper--${arrowType}`],
+                    size === 'small' && styles['tedi-collapse__icon-wrapper--small']
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      styles['tedi-collapse__icon'],
+                      styles[`tedi-collapse__icon--${arrowType}`],
+                      size === 'small' && styles['tedi-collapse__icon--small']
+                    )}
+                    name="expand_more"
+                    size={size === 'small' || arrowType === 'secondary' ? 18 : 24}
+                  />
+                </div>
               </Col>
             </Row>
           </Col>
         </Row>
       </button>
+
       {isPrint ? (
         renderContent
       ) : (
-        <AnimateHeight duration={300} id={id} height={isOpen ? 'auto' : 0} data-testid="collapse-inner">
+        <AnimateHeight id={animateId} duration={300} height={isOpen ? 'auto' : 0} data-testid="collapse-inner">
           {renderContent}
         </AnimateHeight>
       )}
