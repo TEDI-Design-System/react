@@ -1,3 +1,10 @@
+# [14.4.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.2...react-14.4.0-rc.3) (2026-01-12)
+
+
+### Features
+
+* **collapse:** new size prop, improve stories with states [#390](https://github.com/TEDI-Design-System/react/issues/390) ([#438](https://github.com/TEDI-Design-System/react/issues/438)) ([0938bb7](https://github.com/TEDI-Design-System/react/commit/0938bb79bbcaed9d53aebc928e6f1ac858af5740))
+
 # [14.4.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.1...react-14.4.0-rc.2) (2026-01-12)
 
 
