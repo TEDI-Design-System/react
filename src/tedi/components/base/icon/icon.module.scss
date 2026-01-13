@@ -88,6 +88,10 @@ $icon-sizes: (
     }
   }
 
+  &--color-inherit {
+    color: inherit;
+  }
+
   &--filled {
     font-variation-settings: 'FILL' 1;
     font-optical-sizing: auto;

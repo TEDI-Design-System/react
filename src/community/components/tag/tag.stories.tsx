@@ -1,11 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Icon } from '../../../tedi/components/base/icon/icon';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Card from '../card/card';
 import CardContent from '../card/card-content/card-content';
-import Icon from '../icon/icon';
 import { Text, TextProps } from '../typography/text/text';
 import Tag, { TagColor, TagProps, TagSize, TagStatus, TagType } from './tag';
 
@@ -183,7 +183,7 @@ export const WithLongTextRounded: Story = {
 export const CustomTag: Story = {
   render: (args) => <Tag {...args} />,
   args: {
-    children: <Icon name="check" size={24} />,
+    children: <Icon name="check" size={24} color="white" />,
     size: 'large',
     isDisabled: true,
     rounded: true,

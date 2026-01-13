@@ -23,14 +23,14 @@ import ReactSelect, {
 import AsyncSelect from 'react-select/async';
 import { MenuPortalProps } from 'react-select/dist/declarations/src/components/Menu';
 
+import { Icon } from '../../../../tedi/components/base/icon/icon';
+import { Button } from '../../../../tedi/components/buttons/button/button';
 import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/form/feedback-text/feedback-text';
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
 import { getBackgroundColorClass } from '../../../helpers';
 import { IntentionalAny } from '../../../types';
-import Button from '../../button/button';
 import { TColorsBackground } from '../../commonTypes';
-import { Icon } from '../../icon/icon';
 import Tag from '../../tag/tag';
 import Text, { TextProps } from '../../typography/text/text';
 import Check from '../check/check';
@@ -372,7 +372,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     };
 
     const getDropDownIndicator = (): JSX.Element => (
-      <Icon name={iconName} size={24} className={styles['select__arrow']} />
+      <Icon name={iconName} size={24} className={styles['select__arrow']} color="inherit" />
     );
 
     const getPlaceholder = (props: PlaceholderProps<ISelectOption>): JSX.Element => (
@@ -481,7 +481,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const getMultiValueRemove = ({ data, innerProps }: MultiValueRemoveProps<ISelectOption>): JSX.Element => {
       return (
         <Button
-          icon={{ name: 'clear', color: 'muted' }}
+          icon={{ name: 'clear', color: 'secondary' }}
           className={styles['select__multi-value-clear']}
           visualType="link"
           tabIndex={-1}
@@ -497,7 +497,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const getClearIndicator = ({ innerProps: { ref, ...restInnerProps } }: ClearIndicatorProps<ISelectOption>) => {
       return isClearIndicatorVisible ? (
         <Button
-          icon={{ name: 'clear', color: 'muted' }}
+          icon={{ name: 'clear', color: 'secondary' }}
           visualType="link"
           tabIndex={-1}
           ref={ref as IntentionalAny}

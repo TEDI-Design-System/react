@@ -1,8 +1,9 @@
+import { Icon } from '../../../tedi/components/base/icon/icon';
 import { Col, ColProps, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import { Skeleton } from '../../../tedi/components/loaders/skeleton';
 import { Separator } from '../../../tedi/components/misc/separator/separator';
-import { Card, CardContent, CardProps, Heading, Icon, Tag, TagProps } from '../../index';
+import { Card, CardContent, CardProps, Heading, Tag, TagProps } from '../../index';
 
 const TagExamples = () => {
   return (

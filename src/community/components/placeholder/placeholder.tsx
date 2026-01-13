@@ -1,11 +1,11 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Icon, IconProps } from '../../../tedi/components/base/icon/icon';
 import { Col, Row, RowProps } from '../../../tedi/components/layout/grid';
 import Print from '../../../tedi/components/misc/print/print';
 import useLayout from '../../helpers/hooks/use-layout';
 import { Card, CardContent, CardProps } from '../card';
-import Icon, { IconProps } from '../icon/icon';
 import Text from '../typography/text/text';
 
 export interface PlaceholderProps {
@@ -53,16 +53,17 @@ export const Placeholder = (props: PlaceholderProps): JSX.Element => {
 
   const getIcon = (icon: string | IconProps | React.ReactNode) => {
     const iconBEM = cn('text-primary');
-    const defaultIconProps: Partial<IconProps> = { size: 36, className: iconBEM };
+    const defaultIconProps = { size: 36, className: iconBEM };
     const iconProps: IconProps | undefined =
       typeof icon === 'string'
-        ? { ...defaultIconProps, name: icon }
+        ? ({ ...defaultIconProps, name: icon, color: 'brand' } as IconProps)
         : typeof icon === 'object' && !React.isValidElement(icon)
-        ? {
+        ? ({
             ...defaultIconProps,
             ...(icon as IconProps),
+            color: 'brand',
             className: cn(defaultIconProps.className, (icon as IconProps)?.className),
-          }
+          } as IconProps)
         : undefined;
 
     return iconProps ? <Icon {...iconProps} /> : (icon as React.ReactNode);
