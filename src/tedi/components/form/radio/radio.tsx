@@ -28,6 +28,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
     invalid,
     ...rest
   } = props;
+
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
   const labelRef = React.useRef<HTMLLabelElement>(null);
 
@@ -43,6 +44,9 @@ export const Radio = (props: RadioProps): JSX.Element => {
   };
 
   const helperId = helper ? helper?.id ?? `${id}-helper` : undefined;
+  const tooltipId = tooltip ? `${id}-tooltip` : undefined;
+  const describedbyIds = [helperId, tooltipId].filter(Boolean).join(' ');
+
   const LabelBEM = cn(styles['tedi-radio'], { [styles['tedi-radio--disabled']]: disabled });
 
   return (
@@ -59,6 +63,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
               checked={getChecked}
               onChange={onChangeHandler}
               className={styles['tedi-radio__input']}
+              aria-describedby={describedbyIds || undefined}
             />
             <div
               aria-hidden="true"
