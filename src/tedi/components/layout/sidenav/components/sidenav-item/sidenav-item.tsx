@@ -200,6 +200,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 hideCollapseText
                 open={isCollapsedInternal}
                 onToggle={handleCollapseToggle}
+                toggleLabel={`Toggle ${children} submenu`}
                 className={styles['tedi-sidenav__collapse']}
               >
                 {renderChildren()}
@@ -213,18 +214,18 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
             open={isCollapsedInternal}
             onToggle={handleCollapseToggle}
             className={styles['tedi-sidenav__collapse']}
+            toggleLabel={`Toggle ${children} submenu`}
             title={
               <span
                 className={cn(
                   styles['tedi-sidenav__link'],
                   isCollapsedInternal && styles['tedi-sidenav__link--active']
                 )}
-                role="menuitem"
+                role="button"
                 aria-expanded={isCollapsedInternal}
                 aria-controls={collapseId}
                 aria-current={isActive ? 'page' : undefined}
                 onKeyDown={handleTitleKeyDown}
-                aria-label={typeof children === 'string' ? children : undefined}
               >
                 {icon && getIcon(icon)}
                 <span className={styles['tedi-sidenav__title']}>{children}</span>

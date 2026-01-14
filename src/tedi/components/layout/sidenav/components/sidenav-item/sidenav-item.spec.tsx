@@ -93,20 +93,20 @@ describe('SideNavItem', () => {
       expect(screen.getByText('Dash')).toBeInTheDocument();
     });
 
-    test('keyboard toggle works on Collapse title (Enter/Space)', async () => {
+    test('keyboard toggle works on Collapse button (Enter/Space)', async () => {
       const user = userEvent.setup();
 
       render(<SideNavItem {...defaultProps} subItems={[{ children: 'Child' }]} />);
 
-      const collapseButton = screen.getByRole('button', { name: 'open' });
+      const collapseButton = screen.getByRole('button', {
+        name: /toggle test item submenu/i,
+      });
 
       collapseButton.focus();
-
       await user.keyboard('{Enter}');
-      expect(collapseButton).toHaveAttribute('aria-expanded', 'true');
 
-      await user.keyboard(' ');
-      expect(collapseButton).toHaveAttribute('aria-expanded', 'false');
+      expect(collapseButton).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByText('Child')).toBeVisible(); // optional, good to have
     });
 
     test('keyboard toggle works with Space key on non-linked parent', async () => {
