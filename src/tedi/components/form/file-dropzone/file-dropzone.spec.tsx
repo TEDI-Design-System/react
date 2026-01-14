@@ -130,7 +130,7 @@ describe('FileDropzone', () => {
     });
 
     render(<FileDropzone id="test-file-dropzone" name="file" label="Upload File" />);
-    const removeButton = screen.getByRole('button', { name: /clear/i });
+    const removeButton = screen.getByRole('button', { name: /remove/i });
     fireEvent.click(removeButton);
 
     expect(onFileRemove).toHaveBeenCalledWith(file);
