@@ -226,6 +226,42 @@ export const labelsMap = validateDefaultLabels({
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },
+  'file-dropzone.no-file': {
+    description: 'No file selected label for FileUpload or FileDropzone',
+    components: ['FileDropzone', 'FileUpload'],
+    et: 'Ühtegi faili pole valitud',
+    en: 'No file has been chosen',
+    ru: 'Файлы не выбраны',
+  },
+  'file-dropzone.selected-files': {
+    description: 'Selected files label for FileUpload or FileDropzone',
+    components: ['FileDropzone', 'FileUpload'],
+    et: 'Valitud failid',
+    en: 'Uploaded files',
+    ru: 'Загруженные файлы',
+  },
+  'file-dropzone.files-selected': {
+    description: 'Label for selected file count',
+    components: ['FileDropzone', 'FileUpload'],
+    et: (files: number) => (files === 1 ? `${files} fail valitud` : `${files} faili valitud`),
+    en: (files: number) => (files === 1 ? `${files} file selected` : `${files} files selected`),
+    ru: (files: number) => {
+      const lastDigit = files % 10;
+      const lastTwoDigits = files % 100;
+      const isSingular = lastDigit === 1 && lastTwoDigits !== 11;
+      const isFew = lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
+
+      if (isSingular) {
+        return `${files} выбранный файл`;
+      }
+
+      if (isFew) {
+        return `${files} выбранных файла`;
+      }
+
+      return `${files} выбранных файлов`;
+    },
+  },
   'modal.close': {
     description: 'Label for modals close button',
     components: ['Modal'],

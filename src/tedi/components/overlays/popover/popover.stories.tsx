@@ -109,7 +109,7 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content>
             The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-            <Link underline={false} iconRight="north_east" className="align-self-end">
+            <Link href="#" underline={false} iconRight="north_east" className="align-self-end">
               Read more
             </Link>
           </Popover.Content>
@@ -434,6 +434,20 @@ export const NotDismissible: Story = {
   args: {
     dismissible: false,
   },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+          Accessibility warning
+
+          When \`dismissible=false\`:
+          - A visible close button MUST be present
+          - Keyboard users must have a clear exit path
+          - This pattern should only be used when content does not obscure critical information
+          `,
+      },
+    },
+  },
 };
 
 export const ScrollLocked: Story = {
@@ -483,15 +497,116 @@ export const FocusLocked: Story = {
     docs: {
       description: {
         story: `
-  This story demonstrates a Popover with a “locked” focus behavior, where keyboard navigation (Tab) is confined 
-  to the Popover content until the user clicks an action like "Cancel" or "Submit".
+          This story demonstrates a Popover with a “locked” focus behavior, where keyboard navigation (Tab) is confined 
+          to the Popover content until the user clicks an action like "Cancel" or "Submit".
 
-  Key points:
-  - Keyboard focus is restricted inside the Popover until it is closed.
-  - \`focusManager.modal\` ensures focus stays within the Popover content.
-  - \`initialFocus\` sets the first element to receive focus when opening.
-  - This setup covers mostly edge cases; the default focus trap is false.
-`,
+          Key points:
+          - Keyboard focus is restricted inside the Popover until it is closed.
+          - \`focusManager.modal\` ensures focus stays within the Popover content.
+          - \`initialFocus\` sets the first element to receive focus when opening.
+          - This setup covers mostly edge cases; the default focus trap is false.
+        `,
+      },
+    },
+  },
+};
+
+export const AccessibilityBaseline: Story = {
+  render: () => (
+    <Popover>
+      <Popover.Trigger>
+        <Button>Open popover</Button>
+      </Popover.Trigger>
+      <Popover.Content title="Popover title" close>
+        <p id="popover-description">
+          This popover contains text, a link, and buttons. Screen readers should announce roles correctly.
+        </p>
+
+        <Link href="#">Read more</Link>
+
+        <div className="display-flex gap-2">
+          <Button visualType="secondary">Cancel</Button>
+          <Button>Confirm</Button>
+        </div>
+      </Popover.Content>
+    </Popover>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `
+          Accessibility baseline test
+
+          Use this story to verify:
+          - Dialog role is announced
+          - Title is used as the accessible name
+          - Buttons and links announce their roles
+          - Focus moves into the popover on open
+          - Escape closes the popover
+          - Close button is reachable via keyboard
+          `,
+      },
+    },
+  },
+};
+
+export const NoTitleAccessibleName: Story = {
+  render: () => (
+    <Popover>
+      <Popover.Trigger>
+        <Button>Open popover</Button>
+      </Popover.Trigger>
+      <Popover.Content>
+        <p>This popover has no title. The accessible name will fall back to the trigger label.</p>
+        <Button>Action</Button>
+      </Popover.Content>
+    </Popover>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `
+          No-title popover
+
+          Expected behavior:
+          - Dialog is announced
+          - Accessible name is inherited from trigger
+          - Roles of buttons are still announced
+          `,
+      },
+    },
+  },
+};
+
+export const ReadAllStressTest: Story = {
+  render: () => (
+    <Popover>
+      <Popover.Trigger>
+        <Button>Read all test</Button>
+      </Popover.Trigger>
+      <Popover.Content title="Read all test" close>
+        <p>
+          Paragraph one with <strong>inline formatting</strong>.
+        </p>
+        <p>
+          Paragraph two with a <Link href="#">link</Link>.
+        </p>
+        <Button>Primary action</Button>
+      </Popover.Content>
+    </Popover>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `
+          Use VoiceOver "Read All" inside the popover.
+
+          Verify:
+          - Content is not flattened
+          - Buttons are announced as buttons
+          - Links are announced as links
+          - Content is not duplicated
+          `,
       },
     },
   },

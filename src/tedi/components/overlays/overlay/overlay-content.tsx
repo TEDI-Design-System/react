@@ -5,20 +5,49 @@ import { OverlayContext } from './overlay';
 
 export interface OverlayContentProps {
   /**
-   * Content.
+   * Overlay content.
+   * Can contain any valid React nodes (text, elements, components).
    */
   children: ReactNode | ReactNode[];
+
   /**
-   * Additional class names.
+   * Additional class names for styling overlay elements.
    */
   classNames?: {
+    /**
+     * Class name applied to the floating content container.
+     */
     content: string;
+
+    /**
+     * Class name applied to the overlay arrow element.
+     */
     arrow: string;
   };
+
+  /**
+   * ID of the element that labels the overlay content.
+   *
+   * This is used to set the `aria-labelledby` attribute on the overlay container,
+   * providing an accessible name for screen readers.
+   *
+   * Typically points to a heading element inside the overlay (e.g. a title).
+   */
+  labelledBy?: string;
+
+  /**
+   * ID of the element that describes the overlay content.
+   *
+   * This is used to set the `aria-describedby` attribute on the overlay container,
+   * allowing screen readers to announce additional descriptive text.
+   *
+   * Useful for longer explanations or supporting content that complements the title.
+   */
+  describedBy?: string;
 }
 
 export const OverlayContent = (props: OverlayContentProps) => {
-  const { children, classNames } = props;
+  const { children, classNames, labelledBy, describedBy } = props;
   const {
     open,
     x,
@@ -58,6 +87,9 @@ export const OverlayContent = (props: OverlayContentProps) => {
         <div
           {...getFloatingProps({
             ref: floating,
+            tabIndex: -1,
+            'aria-labelledby': labelledBy,
+            'aria-describedby': describedBy,
             style: {
               position: strategy,
               left: x,
