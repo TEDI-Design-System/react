@@ -1,3 +1,10 @@
+# [14.4.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.4...react-14.4.0-rc.5) (2026-01-14)
+
+
+### Bug Fixes
+
+* **file-dropzone:** wcag fixes [#54](https://github.com/TEDI-Design-System/react/issues/54) ([#422](https://github.com/TEDI-Design-System/react/issues/422)) ([f21635a](https://github.com/TEDI-Design-System/react/commit/f21635a6d520cc027ceac022395d9d85adff979a))
+
 # [14.4.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.3...react-14.4.0-rc.4) (2026-01-12)
 
 
