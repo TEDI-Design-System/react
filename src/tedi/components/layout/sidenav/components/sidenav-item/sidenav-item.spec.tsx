@@ -99,14 +99,14 @@ describe('SideNavItem', () => {
       render(<SideNavItem {...defaultProps} subItems={[{ children: 'Child' }]} />);
 
       const collapseButton = screen.getByRole('button', {
-        name: /toggle test item submenu/i,
+        name: 'sidenav.toggleSubmenuChildren',
       });
 
       collapseButton.focus();
       await user.keyboard('{Enter}');
 
       expect(collapseButton).toHaveAttribute('aria-expanded', 'true');
-      expect(screen.getByText('Child')).toBeVisible(); // optional, good to have
+      expect(screen.getByText('Child')).toBeVisible();
     });
 
     test('keyboard toggle works with Space key on non-linked parent', async () => {
