@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { useState } from 'react';
 
+import { useLabels } from '../../../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
 import Collapse from '../../../../buttons/collapse/collapse';
 import Link, { LinkProps } from '../../../../navigation/link/link';
@@ -65,6 +66,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     ...rest
   } = props;
 
+  const { getLabel } = useLabels();
   const [isCollapsedInternal, setIsCollapsedInternal] = useState(isDefaultOpen ?? false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const collapseId = React.useId();
@@ -200,7 +202,10 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 hideCollapseText
                 open={isCollapsedInternal}
                 onToggle={handleCollapseToggle}
-                toggleLabel={`Toggle ${children} submenu`}
+                toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
+                  isCollapsedInternal,
+                  children,
+                })}
                 className={styles['tedi-sidenav__collapse']}
               >
                 {renderChildren()}
@@ -214,7 +219,10 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
             open={isCollapsedInternal}
             onToggle={handleCollapseToggle}
             className={styles['tedi-sidenav__collapse']}
-            toggleLabel={`Toggle ${children} submenu`}
+            toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
+              isCollapsedInternal,
+              children,
+            })}
             title={
               <span
                 className={cn(

@@ -13,6 +13,7 @@ import {
 import classNames from 'classnames';
 import React, { useState } from 'react';
 
+import { useLabels } from '../../../../../providers/label-provider';
 import Link from '../../../../navigation/link/link';
 import { SideNavItemProps } from '../sidenav-item/sidenav-item';
 import styles from './sidenav-dropdown.module.scss';
@@ -33,6 +34,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
   groups,
   onOpenChange,
 }: SideNavDropdownProps<C>) => {
+  const { getLabel } = useLabels();
   const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -82,7 +84,12 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
         </Link>
 
         {hasChildren && (
-          <ul id={`${id}-submenu`} className={styles['tedi-sidenav-dropdown__list']} role="menu" aria-label="Submenu">
+          <ul
+            id={`${id}-submenu`}
+            className={styles['tedi-sidenav-dropdown__list']}
+            role="menu"
+            aria-label={getLabel('sidenav.submenu')}
+          >
             {(item.subItemGroups ?? (item.subItems ? [{ subItems: item.subItems }] : [])).map((group, idx) => (
               <React.Fragment key={idx}>
                 {group.subHeading && (
