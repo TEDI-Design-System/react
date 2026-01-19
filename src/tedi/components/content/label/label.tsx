@@ -2,6 +2,7 @@ import cn from 'classnames';
 import { ElementType, forwardRef, LabelHTMLAttributes } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import InfoButton from '../../buttons/info-button/info-button';
 import Tooltip from '../../overlays/tooltip/tooltip';
 import styles from './label.module.scss';
@@ -54,6 +55,7 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
     tooltip,
     ...rest
   } = getCurrentBreakpointProps<LabelProps>(props);
+  const { getLabel } = useLabels();
 
   const labelBEM = cn(
     styles['tedi-label'],
@@ -71,12 +73,14 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
         </span>
       )}
       {tooltip && (
-        <Tooltip>
-          <Tooltip.Trigger>
-            <InfoButton isSmall={isSmall}>{tooltip}</InfoButton>
-          </Tooltip.Trigger>
-          <Tooltip.Content>{tooltip}</Tooltip.Content>
-        </Tooltip>
+        <span aria-hidden="true">
+          <Tooltip>
+            <Tooltip.Trigger>
+              <InfoButton isSmall={isSmall} aria-label={getLabel('infoButton.moreInformation')} />
+            </Tooltip.Trigger>
+            <Tooltip.Content>{tooltip}</Tooltip.Content>
+          </Tooltip>
+        </span>
       )}
     </Element>
   );

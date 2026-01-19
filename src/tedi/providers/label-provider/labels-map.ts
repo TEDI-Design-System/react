@@ -794,6 +794,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'menu',
     ru: 'меню',
   },
+  'infoButton.moreInformation': {
+    description: 'More information button label',
+    components: ['InfoButton'],
+    et: 'Rohkem infot',
+    en: 'More information',
+    ru: 'Больше информации',
+  },
 });
 
 type DefaultLabels = typeof labelsMap;
