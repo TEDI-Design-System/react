@@ -1,3 +1,10 @@
+# [14.4.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.7...react-14.4.0-rc.8) (2026-01-19)
+
+
+### Bug Fixes
+
+* **select:** prevent dropdown jumping on multiselect [#446](https://github.com/TEDI-Design-System/react/issues/446) ([#454](https://github.com/TEDI-Design-System/react/issues/454)) ([9d0d980](https://github.com/TEDI-Design-System/react/commit/9d0d9807456ee8fa8dfcfbb2380a8e74ce66565a))
+
 # [14.4.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.6...react-14.4.0-rc.7) (2026-01-19)
 
 
