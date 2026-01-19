@@ -82,6 +82,11 @@ export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps
    * Defaults to the result of `getLabel('close')`.
    */
   closeText?: string;
+  /**
+   * Descriptive label for screen readers (e.g. "Toggle Products submenu")
+   * If provided, overrides the default open/close text for the accessible name.
+   */
+  toggleLabel?: string;
 }
 
 export const Collapse = (props: CollapseProps): JSX.Element => {
@@ -102,11 +107,11 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     arrowType = 'default',
     size = 'default',
     underline = true,
+    toggleLabel,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
   const triggerId = `${id}__trigger`;
-  const labelId = `${id}__label`;
   const contentId = `${id}__content`;
   const animateId = `${id}__animate`;
 
@@ -140,13 +145,15 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     }
   };
 
+  const accessibleName = toggleLabel ? toggleLabel : isOpen ? closeText : openText;
+
   const renderContent = React.useMemo(
     () => (
-      <div id={contentId} className={styles['tedi-collapse__content']}>
+      <div id={contentId} role="region" aria-labelledby={triggerId} className={styles['tedi-collapse__content']}>
         {children}
       </div>
     ),
-    [children, contentId]
+    [children, contentId, triggerId]
   );
 
   return (
@@ -156,7 +163,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
         type="button"
         data-name="collapse-trigger"
         className={styles['tedi-collapse__title']}
-        aria-labelledby={labelId}
+        aria-label={accessibleName}
         aria-expanded={isOpen}
         aria-controls={contentId}
         onKeyDown={handleKeyDown}
@@ -173,7 +180,6 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
                     className={cn(styles['tedi-collapse__text'], {
                       [styles['tedi-collapse__text--underline']]: underline,
                     })}
-                    id={labelId}
                   >
                     {isOpen ? closeText : openText}
                   </Text>

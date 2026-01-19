@@ -817,6 +817,23 @@ export const labelsMap = validateDefaultLabels({
     en: 'menu',
     ru: 'меню',
   },
+  'sidenav.toggleSubmenuChildren': {
+    description: 'Side navigation label for toggling submenu',
+    components: ['Sidenav'],
+    et: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
+      isCollapsedInternal ? `Sulge ${children} alammenüü` : `Ava ${children} alammenüü`,
+    en: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
+      isCollapsedInternal ? `Close ${children} submenu` : `Open ${children} submenu`,
+    ru: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
+      isCollapsedInternal ? `Закрыть подменю ${children}` : `Открыть подменю ${children}`,
+  },
+  'sidenav.submenu': {
+    description: 'Side navigation label for submenu',
+    components: ['Sidenav'],
+    et: 'Alammenüü',
+    en: 'Submenu',
+    ru: 'Подменю',
+  },
   'infoButton.moreInformation': {
     description: 'More information button label',
     components: ['InfoButton'],
