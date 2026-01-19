@@ -20,47 +20,40 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 export const useTheme = () => useContext(ThemeContext);
 
-export const ThemeProvider = ({
-  theme: initialTheme = 'default',
-  children,
-}: {
-  theme?: Theme;
-  children: React.ReactNode;
-}) => {
-  const [theme, setTheme] = useState<Theme>(initialTheme);
+export const ThemeProvider = ({ theme: initialTheme, children }: { theme?: Theme; children: React.ReactNode }) => {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (initialTheme !== undefined) {
+      return initialTheme;
+    }
+
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY) as Theme | null;
+      if (saved && AVAILABLE_THEMES.includes(saved)) {
+        return saved;
+      }
+    }
+
+    return 'default';
+  });
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
     const root = document.documentElement;
 
-    root.className = root.className
-      .replace(new RegExp(`${THEME_CLASS_PREFIX}\\w+`, 'g'), '')
-      .replace(/\s+/g, ' ')
-      .trim();
+    AVAILABLE_THEMES.forEach((t) => {
+      root.classList.toggle(`${THEME_CLASS_PREFIX}${t}`, t === theme);
+    });
 
-    root.classList.add(`${THEME_CLASS_PREFIX}${theme}`);
+    localStorage.setItem(STORAGE_KEY, theme);
+    document.cookie = `${STORAGE_KEY}=${theme};path=/;max-age=31536000`;
   }, [theme]);
 
-  const setThemeAndPersist = useCallback((newTheme: Theme) => {
-    if (!AVAILABLE_THEMES.includes(newTheme)) return;
-
-    setTheme(newTheme);
-
-    if (typeof document !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, newTheme);
-      document.cookie = `${STORAGE_KEY}=${newTheme};path=/;max-age=31536000`;
+  const setTheme = useCallback((newTheme: Theme) => {
+    if (AVAILABLE_THEMES.includes(newTheme)) {
+      setThemeState(newTheme);
     }
   }, []);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const saved = localStorage.getItem(STORAGE_KEY) as Theme | null;
-    if (saved && AVAILABLE_THEMES.includes(saved)) {
-      setTheme(saved);
-    }
-  }, []);
-
-  return <ThemeContext.Provider value={{ theme, setTheme: setThemeAndPersist }}>{children}</ThemeContext.Provider>;
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };
