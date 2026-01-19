@@ -1,3 +1,10 @@
+# [14.4.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.5...react-14.4.0-rc.6) (2026-01-19)
+
+
+### Bug Fixes
+
+* **theme-provider:** add theme class on initial render [#455](https://github.com/TEDI-Design-System/react/issues/455) ([#458](https://github.com/TEDI-Design-System/react/issues/458)) ([d8db713](https://github.com/TEDI-Design-System/react/commit/d8db713f7db6780705e956998af4eedc9bbc56a0))
+
 # [14.4.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.4...react-14.4.0-rc.5) (2026-01-14)
 
 
