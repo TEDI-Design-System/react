@@ -200,6 +200,13 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       }
     };
 
+    const SelectMenuListMemo = React.useCallback(
+      (menuProps: MenuListProps<ISelectOption, boolean>) => (
+        <SelectMenuList {...menuProps} renderMessageListFooter={renderMessageListFooter} />
+      ),
+      [renderMessageListFooter]
+    );
+
     const renderReactSelect = (): JSX.Element => {
       const customComponents: SelectComponentsConfig<ISelectOption, boolean, IGroupedOptions<ISelectOption>> = {
         ClearIndicator: (props) => SelectClearIndicator({ isClearIndicatorVisible, ...props }),
@@ -207,7 +214,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
         IndicatorSeparator: () => null,
         MenuPortal: SelectMenuPortal,
         Menu: SelectMenu,
-        MenuList: (props) => SelectMenuList({ renderMessageListFooter, ...props }),
+        MenuList: SelectMenuListMemo,
         Option: (props) => SelectOption({ renderOption, multiple, showRadioButtons, ...props }),
         Control: SelectControl,
         Input: SelectInput,

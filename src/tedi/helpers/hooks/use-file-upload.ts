@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { FeedbackTextProps } from '../../components/form/feedback-text/feedback-text';
 import { ILabelContext, useLabels } from '../../providers/label-provider';
@@ -68,6 +68,11 @@ export interface UseFileUploadProps {
    If not provided, the hook operates in uncontrolled mode, managing its own internal file state via `defaultFiles` and user interactions.
    */
   files?: FileUploadFile[];
+  /**
+   * How long (ms) the announcement message should be visible.
+   * @default 5000
+   */
+  announcementTimeout?: number;
 }
 
 const getDefaultHelpers = (
@@ -99,6 +104,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onChange,
     onDelete,
     files,
+    announcementTimeout = 5000,
   } = props;
 
   const isControlled = files !== undefined;
@@ -108,6 +114,15 @@ export const useFileUpload = (props: UseFileUploadProps) => {
   const [uploadErrorHelper, setUploadErrorHelper] = React.useState<FeedbackTextProps | undefined>(
     getDefaultHelpers({ accept, maxSize }, getLabel)
   );
+
+  const [announcement, setAnnouncement] = React.useState<string>('');
+  const isMounted = React.useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -182,13 +197,35 @@ export const useFileUpload = (props: UseFileUploadProps) => {
           setInnerFiles(newFiles);
         }
         onChange?.(newFiles);
+
+        if (rejectedFiles.length === 0) {
+          const count = newFiles.length - actualFiles.length;
+          const message =
+            getLabel('file-upload.success-added', count.toString()) || `${count} file(s) added successfully`;
+
+          if (isMounted.current) {
+            setAnnouncement(message);
+          }
+        }
       }
 
       if (rejectedFiles.length) {
+        const failedNames = rejectedFiles.map((r) => r.file.name).join(', ');
+        const errorMessage = getLabel('file-upload.failed-some', failedNames) || `Upload failed for: ${failedNames}`;
+
+        if (isMounted.current) {
+          setAnnouncement(errorMessage);
+        }
         setUploadErrorHelper({ type: 'error', text: getUploadErrorHelperText(rejectedFiles) });
       } else {
         setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
       }
+
+      setTimeout(() => {
+        if (isMounted.current) {
+          setAnnouncement('');
+        }
+      }, announcementTimeout);
 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -238,5 +275,6 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onFileRemove,
     handleClear,
     fileInputRef,
+    announcement,
   };
 };

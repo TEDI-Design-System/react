@@ -1,3 +1,45 @@
+# [14.4.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.9...react-14.4.0-rc.10) (2026-01-19)
+
+
+### Bug Fixes
+
+* **file-upload:** wcag improvements [#53](https://github.com/TEDI-Design-System/react/issues/53) ([#447](https://github.com/TEDI-Design-System/react/issues/447)) ([56f1aeb](https://github.com/TEDI-Design-System/react/commit/56f1aeb133f06df88c08b2b82938c0c6bcb9cdf5))
+
+# [14.4.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.8...react-14.4.0-rc.9) (2026-01-19)
+
+
+### Bug Fixes
+
+* **search:** wcag improvements [#57](https://github.com/TEDI-Design-System/react/issues/57) ([#431](https://github.com/TEDI-Design-System/react/issues/431)) ([f083824](https://github.com/TEDI-Design-System/react/commit/f0838240a42b80f90f08f0985382c1d5b195ad82))
+
+# [14.4.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.7...react-14.4.0-rc.8) (2026-01-19)
+
+
+### Bug Fixes
+
+* **select:** prevent dropdown jumping on multiselect [#446](https://github.com/TEDI-Design-System/react/issues/446) ([#454](https://github.com/TEDI-Design-System/react/issues/454)) ([9d0d980](https://github.com/TEDI-Design-System/react/commit/9d0d9807456ee8fa8dfcfbb2380a8e74ce66565a))
+
+# [14.4.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.6...react-14.4.0-rc.7) (2026-01-19)
+
+
+### Bug Fixes
+
+* **checkbox, info-button, label:** fix for 9.1.3.1 for Checkbox component [#55](https://github.com/TEDI-Design-System/react/issues/55) ([#457](https://github.com/TEDI-Design-System/react/issues/457)) ([22f22fe](https://github.com/TEDI-Design-System/react/commit/22f22fe968be018c6ae94b5af908a23de9783318))
+
+# [14.4.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.5...react-14.4.0-rc.6) (2026-01-19)
+
+
+### Bug Fixes
+
+* **theme-provider:** add theme class on initial render [#455](https://github.com/TEDI-Design-System/react/issues/455) ([#458](https://github.com/TEDI-Design-System/react/issues/458)) ([d8db713](https://github.com/TEDI-Design-System/react/commit/d8db713f7db6780705e956998af4eedc9bbc56a0))
+
+# [14.4.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.4...react-14.4.0-rc.5) (2026-01-14)
+
+
+### Bug Fixes
+
+* **file-dropzone:** wcag fixes [#54](https://github.com/TEDI-Design-System/react/issues/54) ([#422](https://github.com/TEDI-Design-System/react/issues/422)) ([f21635a](https://github.com/TEDI-Design-System/react/commit/f21635a6d520cc027ceac022395d9d85adff979a))
+
 # [14.4.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.3...react-14.4.0-rc.4) (2026-01-12)
 
 

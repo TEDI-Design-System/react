@@ -219,6 +219,29 @@ export const labelsMap = validateDefaultLabels({
     en: (files: string) => `File(s) ${files} have the wrong extension`,
     ru: (files: string) => `Файл(ы) ${files} имеют неправильное расширение`,
   },
+  'file-upload.failed': {
+    description: 'File upload failed label',
+    components: ['FileUpload'],
+    et: 'Faili üleslaadimine ebaõnnestus',
+    en: 'File upload failed',
+    ru: 'Загрузка файла не удалась',
+  },
+
+  'file-upload.success-added': {
+    description: 'How many files were added successfully',
+    components: ['FileUpload'],
+    et: (count: string) => `${count} faili lisati edukalt`,
+    en: (count: string) => `${count} files were added successfully`,
+    ru: (count: string) => `${count} файл(ы) успешно добавлены`,
+  },
+
+  'file-upload.failed-some': {
+    description: 'Error label for rejected files (wrong extension)',
+    components: ['FileUpload'],
+    et: (files: string) => `Fail(id) ${files} on vale laiendiga`,
+    en: (files: string) => `File(s) ${files} have the wrong extension`,
+    ru: (files: string) => `Файл(ы) ${files} имеют неправильное расширение`,
+  },
   'file-dropzone.label': {
     description: 'Default label for dropzone',
     components: ['FileDropzone'],
@@ -810,6 +833,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Alammenüü',
     en: 'Submenu',
     ru: 'Подменю',
+  },
+  'infoButton.moreInformation': {
+    description: 'More information button label',
+    components: ['InfoButton'],
+    et: 'Rohkem infot',
+    en: 'More information',
+    ru: 'Больше информации',
   },
 });
 
