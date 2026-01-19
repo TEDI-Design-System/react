@@ -1,3 +1,10 @@
+# [14.4.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.6...react-14.4.0-rc.7) (2026-01-19)
+
+
+### Bug Fixes
+
+* **checkbox, info-button, label:** fix for 9.1.3.1 for Checkbox component [#55](https://github.com/TEDI-Design-System/react/issues/55) ([#457](https://github.com/TEDI-Design-System/react/issues/457)) ([22f22fe](https://github.com/TEDI-Design-System/react/commit/22f22fe968be018c6ae94b5af908a23de9783318))
+
 # [14.4.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.5...react-14.4.0-rc.6) (2026-01-19)
 
 
