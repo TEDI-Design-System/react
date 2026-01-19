@@ -1,3 +1,10 @@
+# [14.4.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.11...react-14.4.0-rc.12) (2026-01-19)
+
+
+### Bug Fixes
+
+* **collapse:** fix icon states to only apply on icon not the whole title [#462](https://github.com/TEDI-Design-System/react/issues/462) ([#463](https://github.com/TEDI-Design-System/react/issues/463)) ([54897e3](https://github.com/TEDI-Design-System/react/commit/54897e31ca1ac7f3a5a8f48260f4a18ae13bf34d))
+
 # [14.4.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.10...react-14.4.0-rc.11) (2026-01-19)
 
 
