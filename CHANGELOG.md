@@ -1,3 +1,10 @@
+# [14.4.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.10...react-14.4.0-rc.11) (2026-01-19)
+
+
+### Bug Fixes
+
+* **sidenav:** wcag improvements [#73](https://github.com/TEDI-Design-System/react/issues/73) ([#432](https://github.com/TEDI-Design-System/react/issues/432)) ([8536ed5](https://github.com/TEDI-Design-System/react/commit/8536ed58ecfc4bbb301287581b63bc45891f4ffe))
+
 # [14.4.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.9...react-14.4.0-rc.10) (2026-01-19)
 
 
