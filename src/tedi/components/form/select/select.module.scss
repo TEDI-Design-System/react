@@ -111,6 +111,7 @@ div .tedi-select__menu {
 
     &:hover:not(:disabled) {
       color: var(--dropdown-item-hover-text);
+      background-color: var(--dropdown-item-hover-background);
     }
   }
 
