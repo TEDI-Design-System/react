@@ -207,13 +207,6 @@ export const AccessibilityFocused: Story = {
     ariaLabel: 'Otsi tooteid või teenuseid',
   },
   parameters: {
-    a11y: {
-      config: {
-        rules: {
-          label: { enabled: false },
-        },
-      },
-    },
     docs: {
       description: {
         story: `
