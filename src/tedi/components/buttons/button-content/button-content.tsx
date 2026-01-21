@@ -6,6 +6,7 @@ import { UnknownType } from '../../../types/commonTypes';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
 import { Print } from '../../misc/print/print';
+import { Tooltip } from '../../overlays/tooltip';
 import { ButtonColor, ButtonType } from '../button/button';
 import styles from './button-content.module.scss';
 
@@ -79,9 +80,14 @@ export type ButtonContentProps<
      */
     noStyle?: boolean;
     /**
-     *
+     * Internal use only
      */
     renderWrapperElement?: unknown;
+    /**
+     * Automatically show tooltip for icon-only buttons.
+     * @default true
+     */
+    showTooltip?: boolean;
   } & P
 >;
 
@@ -94,7 +100,7 @@ const InternalButtonContent = forwardRef(
     {
       children,
       as,
-      text,
+      _text,
       className,
       visualType = 'primary',
       color = 'default',
@@ -107,9 +113,10 @@ const InternalButtonContent = forwardRef(
       isActive,
       isLoading = false,
       noStyle,
-      renderWrapperElement,
+      _renderWrapperElement,
       fullWidth,
       onClick,
+      showTooltip = true,
       ...rest
     }: ButtonContentProps<C, P, A>,
     ref?: PolymorphicRef<C>
@@ -181,19 +188,44 @@ const InternalButtonContent = forwardRef(
       if (onClick && !isLoading) onClick(event);
     };
 
+    const isIconOnly = Boolean(icon);
+    const getButtonText = (children: React.ReactNode): string | undefined => {
+      if (typeof children === 'string') return children;
+      if (Array.isArray(children)) {
+        return children
+          .map((c) => (typeof c === 'string' ? c : ''))
+          .join('')
+          .trim();
+      }
+      return undefined;
+    };
+
+    const buttonText = getButtonText(children);
+    const buttonElement = (
+      <Component
+        data-name="button-content"
+        {...rest}
+        aria-disabled={isLoading || rest['aria-disabled']}
+        aria-busy={isLoading || undefined}
+        aria-label={isIconOnly ? buttonText : rest['aria-label']}
+        onClick={onClickHandler}
+        ref={ref}
+        className={BEM}
+      >
+        {!noStyle ? renderContent() : children}
+      </Component>
+    );
+
     return (
       <Print visibility="hide">
-        <Component
-          data-name="button-content"
-          {...rest}
-          aria-disabled={isLoading || rest['aria-disabled']}
-          aria-busy={isLoading || undefined}
-          onClick={onClickHandler}
-          ref={ref}
-          className={BEM}
-        >
-          {!noStyle ? renderContent() : children}
-        </Component>
+        {showTooltip && isIconOnly && buttonText ? (
+          <Tooltip>
+            <Tooltip.Trigger>{buttonElement}</Tooltip.Trigger>
+            <Tooltip.Content>{buttonText}</Tooltip.Content>
+          </Tooltip>
+        ) : (
+          buttonElement
+        )}
       </Print>
     );
   }
