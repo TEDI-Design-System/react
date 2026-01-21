@@ -1,3 +1,10 @@
+# [14.4.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.12...react-14.4.0-rc.13) (2026-01-21)
+
+
+### Bug Fixes
+
+* **radio:** wcag improvements [#56](https://github.com/TEDI-Design-System/react/issues/56) ([#459](https://github.com/TEDI-Design-System/react/issues/459)) ([4eba5cc](https://github.com/TEDI-Design-System/react/commit/4eba5cc6d8460819d05a675993088a9595a46776))
+
 # [14.4.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.11...react-14.4.0-rc.12) (2026-01-19)
 
 
