@@ -1,3 +1,10 @@
+# [15.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.2...react-15.0.0-rc.3) (2026-01-22)
+
+
+### Bug Fixes
+
+* **button:** visualType link icon alignment fix [#382](https://github.com/TEDI-Design-System/react/issues/382) ([#465](https://github.com/TEDI-Design-System/react/issues/465)) ([c144153](https://github.com/TEDI-Design-System/react/commit/c144153a9030115595f5796ac47ce29afd0c97a1))
+
 # [15.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.1...react-15.0.0-rc.2) (2026-01-22)
 
 
