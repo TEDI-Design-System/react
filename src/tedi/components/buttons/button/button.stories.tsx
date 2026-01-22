@@ -381,3 +381,25 @@ export const LongTextButtonThatWrapsIntoMultipleLines: Story = {
     </VerticalSpacing>
   ),
 };
+
+export const VisualTypeLink: StoryObj<TemplateMultipleProps> = {
+  render: () => (
+    <VerticalSpacing>
+      <Row gap={3}>
+        <Col width="auto">
+          <Button visualType="link">Add file</Button>
+        </Col>
+        <Col width="auto">
+          <Button visualType="link" iconLeft="add">
+            Add file
+          </Button>
+        </Col>
+        <Col width="auto">
+          <Button visualType="link" iconRight="add">
+            Add file
+          </Button>
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
+};

@@ -24,6 +24,7 @@ import AsyncSelect from 'react-select/async';
 import { MenuPortalProps } from 'react-select/dist/declarations/src/components/Menu';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
+import { Text, TextProps } from '../../../../tedi/components/base/typography/text/text';
 import { Button } from '../../../../tedi/components/buttons/button/button';
 import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/form/feedback-text/feedback-text';
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
@@ -32,7 +33,6 @@ import { getBackgroundColorClass } from '../../../helpers';
 import { IntentionalAny } from '../../../types';
 import { TColorsBackground } from '../../commonTypes';
 import Tag from '../../tag/tag';
-import Text, { TextProps } from '../../typography/text/text';
 import Check from '../check/check';
 import styles from './select.module.scss';
 
@@ -347,7 +347,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       onMenuOpen,
       onBlur,
       inputIsHidden,
-      optionGroupHeadingText = { modifiers: 'small', color: 'subtle' },
+      optionGroupHeadingText = { modifiers: 'small', color: 'tertiary' },
       optionGroupBackgroundColor,
       cacheOptions = true,
       ...rest

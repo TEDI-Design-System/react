@@ -1,9 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import Anchor from '../anchor/anchor';
 import { Card, CardContent } from '../card';
 import CardHeader from '../card/card-header/card-header';
-import Heading from '../typography/heading/heading';
 import Placeholder from './placeholder';
 
 const meta: Meta<typeof Placeholder> = {

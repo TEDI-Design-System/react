@@ -3,8 +3,8 @@ import dompurify from 'dompurify';
 import React from 'react';
 import * as showdown from 'showdown';
 
+import { Heading } from '../../../../tedi/components/base/typography/heading/heading';
 import { VerticalSpacing } from '../../../../tedi/components/layout/vertical-spacing';
-import Heading from '../../typography/heading/heading';
 import TextEditor, { TextEditorProps } from './text-editor';
 const converter = new showdown.Converter({ simpleLineBreaks: true });
 

@@ -219,12 +219,71 @@ export const labelsMap = validateDefaultLabels({
     en: (files: string) => `File(s) ${files} have the wrong extension`,
     ru: (files: string) => `Файл(ы) ${files} имеют неправильное расширение`,
   },
+  'file-upload.failed': {
+    description: 'File upload failed label',
+    components: ['FileUpload'],
+    et: 'Faili üleslaadimine ebaõnnestus',
+    en: 'File upload failed',
+    ru: 'Загрузка файла не удалась',
+  },
+
+  'file-upload.success-added': {
+    description: 'How many files were added successfully',
+    components: ['FileUpload'],
+    et: (count: string) => `${count} faili lisati edukalt`,
+    en: (count: string) => `${count} files were added successfully`,
+    ru: (count: string) => `${count} файл(ы) успешно добавлены`,
+  },
+
+  'file-upload.failed-some': {
+    description: 'Error label for rejected files (wrong extension)',
+    components: ['FileUpload'],
+    et: (files: string) => `Fail(id) ${files} on vale laiendiga`,
+    en: (files: string) => `File(s) ${files} have the wrong extension`,
+    ru: (files: string) => `Файл(ы) ${files} имеют неправильное расширение`,
+  },
   'file-dropzone.label': {
     description: 'Default label for dropzone',
     components: ['FileDropzone'],
     et: 'Lohista failid siia või klõpsa, et sirvida',
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
+  },
+  'file-dropzone.no-file': {
+    description: 'No file selected label for FileUpload or FileDropzone',
+    components: ['FileDropzone', 'FileUpload'],
+    et: 'Ühtegi faili pole valitud',
+    en: 'No file has been chosen',
+    ru: 'Файлы не выбраны',
+  },
+  'file-dropzone.selected-files': {
+    description: 'Selected files label for FileUpload or FileDropzone',
+    components: ['FileDropzone', 'FileUpload'],
+    et: 'Valitud failid',
+    en: 'Uploaded files',
+    ru: 'Загруженные файлы',
+  },
+  'file-dropzone.files-selected': {
+    description: 'Label for selected file count',
+    components: ['FileDropzone', 'FileUpload'],
+    et: (files: number) => (files === 1 ? `${files} fail valitud` : `${files} faili valitud`),
+    en: (files: number) => (files === 1 ? `${files} file selected` : `${files} files selected`),
+    ru: (files: number) => {
+      const lastDigit = files % 10;
+      const lastTwoDigits = files % 100;
+      const isSingular = lastDigit === 1 && lastTwoDigits !== 11;
+      const isFew = lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
+
+      if (isSingular) {
+        return `${files} выбранный файл`;
+      }
+
+      if (isFew) {
+        return `${files} выбранных файла`;
+      }
+
+      return `${files} выбранных файлов`;
+    },
   },
   'modal.close': {
     description: 'Label for modals close button',
@@ -757,6 +816,30 @@ export const labelsMap = validateDefaultLabels({
     et: 'menüüsse',
     en: 'menu',
     ru: 'меню',
+  },
+  'sidenav.toggleSubmenuChildren': {
+    description: 'Side navigation label for toggling submenu',
+    components: ['Sidenav'],
+    et: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
+      isCollapsedInternal ? `Sulge ${children} alammenüü` : `Ava ${children} alammenüü`,
+    en: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
+      isCollapsedInternal ? `Close ${children} submenu` : `Open ${children} submenu`,
+    ru: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
+      isCollapsedInternal ? `Закрыть подменю ${children}` : `Открыть подменю ${children}`,
+  },
+  'sidenav.submenu': {
+    description: 'Side navigation label for submenu',
+    components: ['Sidenav'],
+    et: 'Alammenüü',
+    en: 'Submenu',
+    ru: 'Подменю',
+  },
+  'infoButton.moreInformation': {
+    description: 'More information button label',
+    components: ['InfoButton'],
+    et: 'Rohkem infot',
+    en: 'More information',
+    ru: 'Больше информации',
   },
 });
 

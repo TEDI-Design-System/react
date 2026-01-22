@@ -2,11 +2,11 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon, IconProps } from '../../../tedi/components/base/icon/icon';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row, RowProps } from '../../../tedi/components/layout/grid';
 import Print from '../../../tedi/components/misc/print/print';
 import useLayout from '../../helpers/hooks/use-layout';
 import { Card, CardContent, CardProps } from '../card';
-import Text from '../typography/text/text';
 
 export interface PlaceholderProps {
   /**
@@ -84,7 +84,7 @@ export const Placeholder = (props: PlaceholderProps): JSX.Element => {
           <Row direction="column" alignItems="center" gutter={2} {...rowProps}>
             {icon && <Col width="auto">{getIcon(icon)}</Col>}
             <Col width="auto">
-              <Text color="muted" modifiers="center" element="div">
+              <Text color="secondary" modifiers="center" element="div">
                 {children}
               </Text>
             </Col>

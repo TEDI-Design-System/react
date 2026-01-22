@@ -1,11 +1,11 @@
 import React from 'react';
 import { flushSync } from 'react-dom';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import { useLayout } from '../../helpers';
 import { ModalContext } from '../modal';
-import Heading from '../typography/heading/heading';
 import { TableOfContentsProps } from './table-of-contents';
 import { TableOfContentsItem } from './table-of-contents-item';
 

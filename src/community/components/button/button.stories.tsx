@@ -1,12 +1,12 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
-import Text from '../typography/text/text';
 import { Button, ButtonProps } from './button';
 
 const meta: Meta<ButtonProps> = {
-  title: 'Community/Button',
+  title: 'Community/Buttons/Button',
   component: Button,
   parameters: {
     status: {
@@ -22,7 +22,7 @@ const Template: StoryFn<ButtonProps> = (args) => {
   const getRow = (name: string, rowProps?: Partial<ButtonProps>): JSX.Element => (
     <Row gutterX={5} alignItems="center">
       <Col width={1}>
-        <Text color={args.color === 'inverted' ? 'inverted' : undefined}>{name}</Text>
+        <Text color={args.color === 'inverted' ? 'white' : undefined}>{name}</Text>
       </Col>
       <Col width="auto">
         <Row>

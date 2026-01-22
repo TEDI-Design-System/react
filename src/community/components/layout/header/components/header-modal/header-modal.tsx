@@ -1,11 +1,11 @@
 import React from 'react';
 
+import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import { ClosingButton } from '../../../../../../tedi/components/buttons/closing-button/closing-button';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import Button, { ButtonProps } from '../../../../button/button';
 import { Card, CardContent } from '../../../../card';
 import { Modal, ModalCloser, ModalProvider, ModalTrigger } from '../../../../modal';
-import { Text } from '../../../../typography/text/text';
 import styles from '../../header/header.module.scss';
 
 export interface HeaderModalProps {

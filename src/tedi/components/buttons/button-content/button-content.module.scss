@@ -472,7 +472,7 @@ $btn-width-large: 3.72rem;
   justify-content: center;
 
   .tedi-btn--link & {
-    vertical-align: text-bottom;
+    line-height: inherit;
   }
 }
 

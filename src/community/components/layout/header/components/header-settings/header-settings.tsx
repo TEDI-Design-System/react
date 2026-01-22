@@ -1,12 +1,12 @@
 import React from 'react';
 
+import { Heading } from '../../../../../../tedi/components/base/typography/heading/heading';
 import { VerticalSpacing } from '../../../../../../tedi/components/layout/vertical-spacing';
 import Separator from '../../../../../../tedi/components/misc/separator/separator';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import { useLayout } from '../../../../../helpers/hooks/use-layout';
 import Button, { ButtonProps } from '../../../../button/button';
 import { Card, CardContent } from '../../../../card';
-import { Heading } from '../../../../typography/heading/heading';
 import { LayoutContext } from '../../../layout-context';
 import HeaderDropdown from '../header-dropdown/header-dropdown';
 import HeaderModal from '../header-modal/header-modal';

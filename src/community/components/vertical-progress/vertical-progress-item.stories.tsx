@@ -1,9 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Button from '../button/button';
-import { Heading } from '../typography/heading/heading';
-import { Text } from '../typography/text/text';
 import { VerticalProgress, VerticalProgressItem } from '.';
 
 const meta: Meta<typeof VerticalProgressItem> = {

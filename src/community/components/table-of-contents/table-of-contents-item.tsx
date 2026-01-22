@@ -2,10 +2,10 @@ import classNames from 'classnames';
 import { useContext } from 'react';
 
 import { Icon } from '../../../tedi/components/base/icon/icon';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import Separator from '../../../tedi/components/misc/separator/separator';
 import { IModalContext } from '../modal';
-import Text from '../typography/text/text';
 import { TableOfContentsContext } from './table-of-contents';
 import styles from './table-of-contents.module.scss';
 

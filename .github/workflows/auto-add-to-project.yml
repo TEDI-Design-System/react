@@ -1,0 +1,15 @@
+name: Auto Add to Project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    uses: TEDI-Design-System/general/.github/workflows/auto-add-to-project.yml@main
+    with:
+      project-url: https://github.com/orgs/TEDI-Design-System/projects/7
+    secrets:
+      PROJECT_AUTO_ADD_APP_ID: ${{ secrets.PROJECT_AUTO_ADD_APP_ID }}
+      PROJECT_AUTO_ADD_APP_KEY: ${{ secrets.PROJECT_AUTO_ADD_APP_KEY }}

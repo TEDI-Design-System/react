@@ -13,6 +13,7 @@ import {
 import classNames from 'classnames';
 import React, { useState } from 'react';
 
+import { useLabels } from '../../../../../providers/label-provider';
 import Link from '../../../../navigation/link/link';
 import { SideNavItemProps } from '../sidenav-item/sidenav-item';
 import styles from './sidenav-dropdown.module.scss';
@@ -33,6 +34,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
   groups,
   onOpenChange,
 }: SideNavDropdownProps<C>) => {
+  const { getLabel } = useLabels();
   const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -51,10 +53,11 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
 
   const renderDropdownItem = <C extends React.ElementType>(item: SideNavItemProps<C>) => {
     const hasChildren = item.subItemGroups || item.subItems;
+    const id = item.key || item.href || item.children?.toString();
 
     return (
       <li
-        key={item.key || item.href || item.children?.toString()}
+        key={id}
         role="none"
         className={classNames(
           styles['tedi-sidenav-dropdown__item'],
@@ -64,6 +67,9 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
         <Link
           {...item}
           role="menuitem"
+          aria-haspopup={hasChildren ? 'true' : undefined}
+          aria-expanded={hasChildren ? false : undefined}
+          aria-controls={hasChildren ? `${id}-submenu` : undefined}
           className={styles['tedi-sidenav-dropdown__link']}
           data-active={item.isActive}
           aria-current={item.isActive ? 'page' : undefined}
@@ -74,11 +80,16 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
           }}
         >
           {item.children}
-          {hasChildren && <span className={styles['tedi-sidenav__bullet']}></span>}
+          {hasChildren && <span className={styles['tedi-sidenav__bullet']} />}
         </Link>
 
         {hasChildren && (
-          <ul className={styles['tedi-sidenav-dropdown__list']} role="menu">
+          <ul
+            id={`${id}-submenu`}
+            className={styles['tedi-sidenav-dropdown__list']}
+            role="menu"
+            aria-label={getLabel('sidenav.submenu')}
+          >
             {(item.subItemGroups ?? (item.subItems ? [{ subItems: item.subItems }] : [])).map((group, idx) => (
               <React.Fragment key={idx}>
                 {group.subHeading && (
@@ -99,6 +110,11 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       setOpen((prev) => !prev);
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setOpen(false);
+      refs.setReference(null);
     }
   };
 
