@@ -1,3 +1,15 @@
+# [15.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.1...react-15.0.0-rc.2) (2026-01-22)
+
+
+### Bug Fixes
+
+* **ellipsis:** remove Community Ellipsis component and migrate to TEDI-Ready [#441](https://github.com/TEDI-Design-System/react/issues/441) ([#450](https://github.com/TEDI-Design-System/react/issues/450)) ([3e36bdd](https://github.com/TEDI-Design-System/react/commit/3e36bdd5e28e85bb889bc9f8ab347ae3e425c855))
+
+
+### BREAKING CHANGES
+
+* **ellipsis:** Community Ellipsis component has been removed, migrate to TEDI-Ready
+
 # [15.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.13...react-15.0.0-rc.1) (2026-01-22)
 
 
