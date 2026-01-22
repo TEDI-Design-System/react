@@ -1,3 +1,15 @@
+# [15.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.4...react-15.0.0-rc.5) (2026-01-22)
+
+
+### Bug Fixes
+
+* **icon:** remove deprecated Community Icon and adopt TEDI-Ready [#442](https://github.com/TEDI-Design-System/react/issues/442) ([#452](https://github.com/TEDI-Design-System/react/issues/452)) ([c80edb1](https://github.com/TEDI-Design-System/react/commit/c80edb12e806d08bbcc1ae05040104d7770fb067))
+
+
+### BREAKING CHANGES
+
+* **icon:** Community Icon removed, migrate to TEDI-Ready
+
 # [15.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.3...react-15.0.0-rc.4) (2026-01-22)
 
 
