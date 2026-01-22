@@ -1,40 +1,56 @@
 # TEDI Design System for React
 
-[![codecov](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)](https://codecov.io/gh/TEHIK-EE/tedi-design-system)
-[![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
-
-`@tedi-design-system/react` is a library of React components implementing the TEDI Design System.  
+`@tedi-design-system/react` is a library of React components implementing the TEDI Design System.
 It provides reusable, accessible, and consistent UI components to streamline building React applications.
 
-Usage instructions and detailed documentation can be found in the [TEDI Design System wiki](https://github.com/TEDI-Design-System/general).
+Usage instructions and detailed documentation for using the components in your application are available in [Storybook](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started).
+
+[![codecov](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)
+[![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
 ---
 
-## Installation
+## Getting Started (Using the package)
 
-Install the dependencies for your React library:
+If you are installing `@tedi-design-system/react` in your own project, follow the
+[Get Started guide in Storybook](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started)
 
-```
-npm run i
-```
+The Storybook documentation covers:
+
+- installation instructions
+- required styles and providers
+- component usage examples
+- accessibility notes
+- component APIs
 
 ---
 
-## Development Guide
+## Repository Development Guide (Contributors)
 
-### Running Storybook
+The following instructions apply only if you are working on this repository itself
+(e.g. developing, fixing, or adding components).
 
-To view and develop components in isolation, start Storybook for React:
+### Install dependencies
+
+```
+npm install
+```
+
+### Running Storybook locally
+
+To view and develop components in isolation, start Storybook:
 
 ```
 npm run start
 ```
 
+This will launch a local Storybook instance for component development.
+
 ---
 
 ## Contributing
 
-Check the [wiki](https://github.com/TEDI-Design-System/general) for component guidelines and coding standards.  
+Check the [wiki](https://github.com/TEDI-Design-System/general/wiki) for component guidelines and coding standards.  
 Report issues or contribute via [GitHub Issues](https://github.com/TEDI-Design-System/react/issues).
 
 ---

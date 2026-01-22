@@ -1,3 +1,118 @@
+# [15.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.1...react-15.0.0-rc.2) (2026-01-22)
+
+
+### Bug Fixes
+
+* **ellipsis:** remove Community Ellipsis component and migrate to TEDI-Ready [#441](https://github.com/TEDI-Design-System/react/issues/441) ([#450](https://github.com/TEDI-Design-System/react/issues/450)) ([3e36bdd](https://github.com/TEDI-Design-System/react/commit/3e36bdd5e28e85bb889bc9f8ab347ae3e425c855))
+
+
+### BREAKING CHANGES
+
+* **ellipsis:** Community Ellipsis component has been removed, migrate to TEDI-Ready
+
+# [15.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.13...react-15.0.0-rc.1) (2026-01-22)
+
+
+### Bug Fixes
+
+* **collapse:** remove deprecated Community Collapse and adopt TEDI-Ready [#445](https://github.com/TEDI-Design-System/react/issues/445) ([#449](https://github.com/TEDI-Design-System/react/issues/449)) ([28f3e06](https://github.com/TEDI-Design-System/react/commit/28f3e061f445314fde121a16ddf1fcf850ccbace))
+
+
+### BREAKING CHANGES
+
+* **collapse:** Community Collapse removed, migrate to TEDI-Ready
+
+# [14.4.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.12...react-14.4.0-rc.13) (2026-01-21)
+
+
+### Bug Fixes
+
+* **radio:** wcag improvements [#56](https://github.com/TEDI-Design-System/react/issues/56) ([#459](https://github.com/TEDI-Design-System/react/issues/459)) ([4eba5cc](https://github.com/TEDI-Design-System/react/commit/4eba5cc6d8460819d05a675993088a9595a46776))
+
+# [14.4.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.11...react-14.4.0-rc.12) (2026-01-19)
+
+
+### Bug Fixes
+
+* **collapse:** fix icon states to only apply on icon not the whole title [#462](https://github.com/TEDI-Design-System/react/issues/462) ([#463](https://github.com/TEDI-Design-System/react/issues/463)) ([54897e3](https://github.com/TEDI-Design-System/react/commit/54897e31ca1ac7f3a5a8f48260f4a18ae13bf34d))
+
+# [14.4.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.10...react-14.4.0-rc.11) (2026-01-19)
+
+
+### Bug Fixes
+
+* **sidenav:** wcag improvements [#73](https://github.com/TEDI-Design-System/react/issues/73) ([#432](https://github.com/TEDI-Design-System/react/issues/432)) ([8536ed5](https://github.com/TEDI-Design-System/react/commit/8536ed58ecfc4bbb301287581b63bc45891f4ffe))
+
+# [14.4.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.9...react-14.4.0-rc.10) (2026-01-19)
+
+
+### Bug Fixes
+
+* **file-upload:** wcag improvements [#53](https://github.com/TEDI-Design-System/react/issues/53) ([#447](https://github.com/TEDI-Design-System/react/issues/447)) ([56f1aeb](https://github.com/TEDI-Design-System/react/commit/56f1aeb133f06df88c08b2b82938c0c6bcb9cdf5))
+
+# [14.4.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.8...react-14.4.0-rc.9) (2026-01-19)
+
+
+### Bug Fixes
+
+* **search:** wcag improvements [#57](https://github.com/TEDI-Design-System/react/issues/57) ([#431](https://github.com/TEDI-Design-System/react/issues/431)) ([f083824](https://github.com/TEDI-Design-System/react/commit/f0838240a42b80f90f08f0985382c1d5b195ad82))
+
+# [14.4.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.7...react-14.4.0-rc.8) (2026-01-19)
+
+
+### Bug Fixes
+
+* **select:** prevent dropdown jumping on multiselect [#446](https://github.com/TEDI-Design-System/react/issues/446) ([#454](https://github.com/TEDI-Design-System/react/issues/454)) ([9d0d980](https://github.com/TEDI-Design-System/react/commit/9d0d9807456ee8fa8dfcfbb2380a8e74ce66565a))
+
+# [14.4.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.6...react-14.4.0-rc.7) (2026-01-19)
+
+
+### Bug Fixes
+
+* **checkbox, info-button, label:** fix for 9.1.3.1 for Checkbox component [#55](https://github.com/TEDI-Design-System/react/issues/55) ([#457](https://github.com/TEDI-Design-System/react/issues/457)) ([22f22fe](https://github.com/TEDI-Design-System/react/commit/22f22fe968be018c6ae94b5af908a23de9783318))
+
+# [14.4.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.5...react-14.4.0-rc.6) (2026-01-19)
+
+
+### Bug Fixes
+
+* **theme-provider:** add theme class on initial render [#455](https://github.com/TEDI-Design-System/react/issues/455) ([#458](https://github.com/TEDI-Design-System/react/issues/458)) ([d8db713](https://github.com/TEDI-Design-System/react/commit/d8db713f7db6780705e956998af4eedc9bbc56a0))
+
+# [14.4.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.4...react-14.4.0-rc.5) (2026-01-14)
+
+
+### Bug Fixes
+
+* **file-dropzone:** wcag fixes [#54](https://github.com/TEDI-Design-System/react/issues/54) ([#422](https://github.com/TEDI-Design-System/react/issues/422)) ([f21635a](https://github.com/TEDI-Design-System/react/commit/f21635a6d520cc027ceac022395d9d85adff979a))
+
+# [14.4.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.3...react-14.4.0-rc.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* **popover:** wcag improvements [#64](https://github.com/TEDI-Design-System/react/issues/64) ([#430](https://github.com/TEDI-Design-System/react/issues/430)) ([db79bcc](https://github.com/TEDI-Design-System/react/commit/db79bcc17a2bd523e993a7e654446a887f51515c))
+
+# [14.4.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.2...react-14.4.0-rc.3) (2026-01-12)
+
+
+### Features
+
+* **collapse:** new size prop, improve stories with states [#390](https://github.com/TEDI-Design-System/react/issues/390) ([#438](https://github.com/TEDI-Design-System/react/issues/438)) ([0938bb7](https://github.com/TEDI-Design-System/react/commit/0938bb79bbcaed9d53aebc928e6f1ac858af5740))
+
+# [14.4.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.1...react-14.4.0-rc.2) (2026-01-12)
+
+
+### Bug Fixes
+
+* **button:** nowrap to button texts [#44](https://github.com/TEDI-Design-System/react/issues/44) ([#437](https://github.com/TEDI-Design-System/react/issues/437)) ([bf8289c](https://github.com/TEDI-Design-System/react/commit/bf8289c69499525e7bbbe6921b9de3a0b4500a45))
+
+# [14.4.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.3.0...react-14.4.0-rc.1) (2026-01-09)
+
+
+### Features
+
+* **collapse:** make titles underline configurable [#7](https://github.com/TEDI-Design-System/react/issues/7) ([#439](https://github.com/TEDI-Design-System/react/issues/439)) ([e458004](https://github.com/TEDI-Design-System/react/commit/e458004507420859ae9b8cda55dab6c030e28f30))
+
 # [14.3.0](https://github.com/TEDI-Design-System/react/compare/react-14.2.1...react-14.3.0) (2026-01-08)
 
 

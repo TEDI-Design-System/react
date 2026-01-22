@@ -94,4 +94,10 @@ describe('Collapse component with breakpoint support', () => {
     const wrapper = container.querySelector('.tedi-collapse__icon-wrapper');
     expect(wrapper).toBeInTheDocument();
   });
+
+  it('hides underline when underline is false', () => {
+    const { container } = getComponent({ underline: false });
+    const text = container.querySelector('.tedi-collapse__text');
+    expect(text).not.toHaveClass('tedi-collapse__text--underline');
+  });
 });

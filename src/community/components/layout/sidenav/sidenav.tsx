@@ -2,12 +2,12 @@ import { FloatingFocusManager, FloatingOverlay } from '@floating-ui/react';
 import cn from 'classnames';
 import React from 'react';
 
+import { Collapse } from '../../../../tedi/components/buttons/collapse/collapse';
 import Print from '../../../../tedi/components/misc/print/print';
 import useLayout, { Layouts } from '../../../helpers/hooks/use-layout';
 import { AllowedHTMLTags } from '../../../helpers/polymorphic/types';
 import { IntentionalAny } from '../../../types';
 import Anchor, { AnchorProps } from '../../anchor/anchor';
-import Collapse from '../../collapse/collapse';
 import Icon, { IconProps } from '../../icon/icon';
 import { LayoutContext } from '../layout-context';
 import styles from './sidenav.module.scss';

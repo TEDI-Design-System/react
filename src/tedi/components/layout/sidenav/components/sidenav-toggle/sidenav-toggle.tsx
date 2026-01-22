@@ -2,7 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
-import { UnknownType } from '../../../../../../tedi/types/commonTypes';
+import { UnknownType } from '../../../../../types/commonTypes';
 import Button from '../../../../buttons/button/button';
 import FloatingButton from '../../../../buttons/floating-button/floating-button';
 import styles from './sidenav-toggle.module.scss';
@@ -50,6 +50,13 @@ export const SidenavToggle = ({
 
   const Element = variant === 'collapse' ? FloatingButton : Button;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMenu(!menuOpen);
+    }
+  };
+
   return (
     <Element
       {...getReferenceProps()}
@@ -62,7 +69,8 @@ export const SidenavToggle = ({
       }}
       visualType={variant === 'collapse' ? 'secondary' : 'primary'}
       className={BEM}
-      onClick={toggleMenu}
+      onClick={() => toggleMenu(!menuOpen)}
+      onKeyDown={handleKeyDown}
       position={variant === 'collapse' ? 'absolute' : 'static'}
       size={variant === 'collapse' ? 'small' : ''}
     >
