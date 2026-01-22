@@ -22,7 +22,7 @@
     "build": "rm -rf dist && vite build --config vite.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css --isRegex",
     "build:sb": "storybook build -c .storybook -o dist/storybook-static",
     "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
-    "lint:ci": "npx stylelint \"src/**/*.scss\" && eslint --quiet",
+    "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
     "test": "jest --config ./jest.config.ts --passWithNoTests",
     "test:coverage": "jest --config ./jest.config.ts --coverage",
     "release": "npx semantic-release",

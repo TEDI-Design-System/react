@@ -1,11 +1,11 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import preserveDirectives from 'rollup-plugin-preserve-directives';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, UserConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import preserveDirectives from 'rollup-plugin-preserve-directives';
 
 import packageJson from './package.json' assert { type: 'json' };
 
