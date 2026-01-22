@@ -1,3 +1,15 @@
+# [15.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.13...react-15.0.0-rc.1) (2026-01-22)
+
+
+### Bug Fixes
+
+* **collapse:** remove deprecated Community Collapse and adopt TEDI-Ready [#445](https://github.com/TEDI-Design-System/react/issues/445) ([#449](https://github.com/TEDI-Design-System/react/issues/449)) ([28f3e06](https://github.com/TEDI-Design-System/react/commit/28f3e061f445314fde121a16ddf1fcf850ccbace))
+
+
+### BREAKING CHANGES
+
+* **collapse:** Community Collapse removed, migrate to TEDI-Ready
+
 # [14.4.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-14.4.0-rc.12...react-14.4.0-rc.13) (2026-01-21)
 
 
