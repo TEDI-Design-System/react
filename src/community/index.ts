@@ -1,6 +1,4 @@
 export * from './components/commonTypes';
-export * from './components/typography/heading/heading';
-export * from './components/typography/text/text';
 export * from './components/button/button';
 export * from './components/anchor/anchor';
 export * from './components/layout';

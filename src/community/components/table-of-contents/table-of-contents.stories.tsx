@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Section } from '../../../tedi/components/content/section/section';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
@@ -11,8 +13,6 @@ import { Card, CardContent } from '../card';
 import Layout, { ILayoutProps } from '../layout/layout/layout';
 import { WithNotice as LayoutDefault } from '../layout/layout/layout.stories';
 import ToggleOpen from '../toggle-open/toggle-open';
-import Heading from '../typography/heading/heading';
-import Text from '../typography/text/text';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
 
 const meta: Meta<TableOfContentsProps> = {

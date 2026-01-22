@@ -1,6 +1,7 @@
 import { useFormik } from 'formik';
 import React from 'react';
 
+import { Heading } from '../../../../../../tedi/components/base/typography/heading/heading';
 import { Col, Row } from '../../../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../../../tedi/components/layout/vertical-spacing';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
@@ -8,7 +9,6 @@ import Button from '../../../../button/button';
 import Card from '../../../../card/card';
 import CardContent from '../../../../card/card-content/card-content';
 import { ChoiceGroup, ChoiceGroupItemProps, TChoiceGroupValue } from '../../../../form/choice-group';
-import Heading from '../../../../typography/heading/heading';
 import styles from '../../../table.module.scss';
 import { TableFilterContext } from '../table-filter-context';
 

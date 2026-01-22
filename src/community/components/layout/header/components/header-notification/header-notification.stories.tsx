@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 
-import Text from '../../../../typography/text/text';
+import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import HeaderNotification from './header-notification';
 
 /**

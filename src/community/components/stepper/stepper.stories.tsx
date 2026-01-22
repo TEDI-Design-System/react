@@ -1,10 +1,10 @@
 import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Button from '../button/button';
-import Heading from '../typography/heading/heading';
 import Step from './step';
 import Stepper, { StepperProps } from './stepper';
 

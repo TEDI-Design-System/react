@@ -1,11 +1,11 @@
 import { StoryFn } from '@storybook/react';
 import { MenuListProps, OptionProps } from 'react-select';
 
+import { Text } from '../../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../../tedi/components/layout/vertical-spacing';
 import Button from '../../../button/button';
 import Tag from '../../../tag/tag';
-import Text from '../../../typography/text/text';
 import Select, { ISelectOption } from '../select';
 
 interface AppealData {
@@ -105,7 +105,7 @@ const CustomOption = (props: OptionProps<ISelectOption, boolean>): JSX.Element =
         <p className="text-primary">
           <b>{name}</b> · {`${age}a`} · {personalCode}
         </p>
-        <Text color="muted" modifiers="small">
+        <Text color="secondary" modifiers="small">
           {aadress}
         </Text>
       </Col>
@@ -124,7 +124,7 @@ const CustomMessageListFooter = (props: MenuListProps<ISelectOption, boolean>): 
           <Button visualType="secondary">Puudub Eesti isikukood</Button>
         </Col>
       </Row>
-      <Text color="muted" modifiers="small">
+      <Text color="secondary" modifiers="small">
         Rahvastikuregistri andmete päringuks sisesta isikukood täismahus.
       </Text>
     </VerticalSpacing>

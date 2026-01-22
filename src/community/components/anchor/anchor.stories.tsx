@@ -2,9 +2,9 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import Link from 'next/link';
 import React, { ComponentProps, forwardRef } from 'react';
 
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
-import Text from '../typography/text/text';
 import { Anchor, AnchorProps } from './anchor';
 
 const meta: Meta<AnchorProps> = {
@@ -24,7 +24,7 @@ const Template: StoryFn<ComponentProps<typeof Anchor>> = (args) => {
   const getRow = (name: string, rowProps?: Partial<AnchorProps>): JSX.Element => (
     <Row gutterX={5} alignItems="center">
       <Col width={1}>
-        <Text color={args.color === 'inverted' ? 'inverted' : undefined}>{name}</Text>
+        <Text color={args.color === 'inverted' ? 'white' : undefined}>{name}</Text>
       </Col>
       <Col width="auto">
         <Row>

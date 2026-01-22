@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
-import { TextColor } from '../typography/text/text';
+import { TextColor } from '../../../tedi/components/base/typography/text/text';
 import styles from './icon.module.scss';
 
 export type IconSize = 12 | 14 | 16 | 18 | 24 | 36 | 48;

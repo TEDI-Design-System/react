@@ -1,9 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../tedi/components/layout/vertical-spacing';
-import Text from '../../typography/text/text';
 import Toggle, { ToggleProps } from './toggle';
 
 const meta: Meta<ToggleProps> = {
@@ -29,7 +29,7 @@ const ToggleRow = (props: ToggleTemplateProps) => {
         <Toggle defaultChecked {...rest} />
       </Col>
       <Col width="auto">
-        <Text color="muted">{name}</Text>
+        <Text color="secondary">{name}</Text>
       </Col>
     </Row>
   );
@@ -84,7 +84,7 @@ export const WithLabel: Story = {
   args: {
     label: <Text>Child in danger</Text>,
 
-    extraContent: <Text color="muted">Childs life or health is in danger or is putting others in danger.</Text>,
+    extraContent: <Text color="secondary">Childs life or health is in danger or is putting others in danger.</Text>,
   },
 };
 

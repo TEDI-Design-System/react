@@ -3,13 +3,13 @@ import { useFormik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
+import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../../../tedi/components/layout/vertical-spacing';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import { IntentionalAny } from '../../../../../types';
 import Button from '../../../../button/button';
 import { DatePicker, DatePickerProps } from '../../../../form/pickers';
-import Text from '../../../../typography/text/text';
 import { TableFilterContext } from '../table-filter-context';
 
 // DatePicker props that we allow to override through the column.meta

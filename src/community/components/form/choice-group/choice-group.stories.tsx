@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react';
 
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { ColProps } from '../../../../tedi/components/layout/grid/col';
-import Text from '../../typography/text/text';
 import ChoiceGroup from './choice-group';
 import { ChoiceGroupItemProps } from './choice-group.types';
 
@@ -47,7 +47,7 @@ const generateItems = (
     }`,
     value: `value-${index * 3 + 1}`,
     extraContent: extraContent ? (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>
