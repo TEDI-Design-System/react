@@ -15,7 +15,8 @@ export type IconColor =
   | 'warning'
   | 'warning-dark'
   | 'danger'
-  | 'white';
+  | 'white'
+  | 'inherit';
 export type IconBackgroundColor = 'primary' | 'secondary' | 'brand-primary' | 'brand-secondary';
 
 export interface IconSharedProps {

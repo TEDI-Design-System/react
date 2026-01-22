@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { useContext } from 'react';
 
+import { Icon } from '../../../tedi/components/base/icon/icon';
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
@@ -8,7 +9,6 @@ import { useLabels } from '../../../tedi/providers/label-provider';
 import Button from '../button/button';
 import ButtonContent from '../button-content/button-content';
 import { Card, CardContent, CardHeader } from '../card';
-import Icon from '../icon/icon';
 import { Modal, ModalProvider, ModalTrigger } from '../modal';
 import { TableOfContentsContext, TableOfContentsProps } from './table-of-contents';
 import styles from './table-of-contents.module.scss';

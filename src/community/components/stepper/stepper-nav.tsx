@@ -1,9 +1,9 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Icon } from '../../../tedi/components/base/icon/icon';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import { useLayout } from '../../helpers';
-import Icon from '../icon/icon';
 import styles from './stepper.module.scss';
 import { StepperContext } from './stepper-context';
 

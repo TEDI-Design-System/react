@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Icon, IconProps } from '../../../../tedi/components/base/icon/icon';
 import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../tedi/components/layout/vertical-spacing';
 import { Print } from '../../../../tedi/components/misc/print/print';
 import { StretchContent } from '../../../../tedi/components/misc/stretch-content/stretch-content';
 import { useLabels } from '../../../../tedi/providers/label-provider';
-import Icon, { IconProps } from '../../icon/icon';
 import styles from './footer.module.scss';
 
 export type FooterCategory = {
@@ -76,9 +76,11 @@ const FooterCategory = (props: FooterCategory): JSX.Element => {
   const { heading, icon, elements } = props;
 
   const getIcon = (icon: string | IconProps) => {
-    const defaultIconProps: Partial<IconProps> = { size: 16 };
+    const defaultIconProps: Partial<IconProps> = { size: 16, color: 'inherit', background: undefined };
     const iconProps: IconProps =
-      typeof icon === 'string' ? { ...defaultIconProps, name: icon } : { ...defaultIconProps, ...icon };
+      typeof icon === 'string'
+        ? { ...defaultIconProps, name: icon, background: undefined }
+        : { ...defaultIconProps, ...icon, background: undefined };
 
     return <Icon {...iconProps} />;
   };

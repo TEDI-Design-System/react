@@ -1,12 +1,12 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
+import { Icon, IconProps } from '../../../tedi/components/base/icon/icon';
 import { Spinner } from '../../../tedi/components/loaders/spinner/spinner';
 import Print from '../../../tedi/components/misc/print/print';
 import { AllowedHTMLTags, PolymorphicComponentPropWithRef, PolymorphicRef } from '../../helpers/polymorphic/types';
 import { IntentionalAny } from '../../types';
 import { ButtonColor, ButtonType } from '../button/button';
-import Icon, { IconProps } from '../icon/icon';
 import styles from './button-content.module.scss';
 
 export type ButtonContentProps<
@@ -141,8 +141,14 @@ const InternalButtonContent = forwardRef(
       const defaultIconProps: Partial<IconProps> = { size: 16, className: iconBEM };
       const iconProps: IconProps =
         typeof icon === 'string'
-          ? { ...defaultIconProps, name: icon }
-          : { ...defaultIconProps, ...icon, className: cn(defaultIconProps.className, icon?.className) };
+          ? { ...defaultIconProps, name: icon, color: 'inherit' }
+          : {
+              ...defaultIconProps,
+              ...icon,
+              color: 'inherit',
+              background: undefined,
+              className: cn(defaultIconProps.className, icon?.className),
+            };
 
       return isLoading ? <Spinner className={iconProps.className} /> : <Icon {...iconProps} />;
     };

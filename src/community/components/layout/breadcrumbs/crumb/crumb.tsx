@@ -1,10 +1,10 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Icon } from '../../../../../tedi/components/base/icon/icon';
 import { Text } from '../../../../../tedi/components/base/typography/text/text';
 import Print from '../../../../../tedi/components/misc/print/print';
 import { Anchor, AnchorProps } from '../../../anchor/anchor';
-import Icon from '../../../icon/icon';
 import styles from '../breadcrumbs.module.scss';
 
 export type CrumbProps<C extends React.ElementType = 'a'> = {

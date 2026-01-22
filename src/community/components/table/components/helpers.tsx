@@ -1,9 +1,9 @@
 import { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from '@tanstack/react-table';
 import React from 'react';
 
+import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { LabelContext } from '../../../../tedi/providers/label-provider';
 import Check from '../../form/check/check';
-import Icon from '../../icon/icon';
 import Tag from '../../tag/tag';
 import styles from '../table.module.scss';
 

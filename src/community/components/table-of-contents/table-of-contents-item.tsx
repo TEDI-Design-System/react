@@ -1,10 +1,10 @@
 import classNames from 'classnames';
 import { useContext } from 'react';
 
+import { Icon } from '../../../tedi/components/base/icon/icon';
 import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import Separator from '../../../tedi/components/misc/separator/separator';
-import Icon from '../icon/icon';
 import { IModalContext } from '../modal';
 import { TableOfContentsContext } from './table-of-contents';
 import styles from './table-of-contents.module.scss';
@@ -75,7 +75,7 @@ export function TableOfContentsItem(props: TableOfContentsItemProps & { handleCl
                 {isValid === false ? (
                   <Icon className={iconClass} name="warning" color="danger" />
                 ) : (
-                  <Icon className={iconClass} name="check" color={isValid === true ? 'success' : 'disabled'} />
+                  <Icon className={iconClass} name="check" color={isValid === true ? 'success' : 'tertiary'} />
                 )}
               </Col>
             </>

@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { DraftBlockType, DraftInlineStyleType } from 'draft-js';
 
-import Icon from '../../../icon/icon';
+import { Icon } from '../../../../../tedi/components/base/icon/icon';
 import styles from '../text-editor.module.scss';
 
 export interface StyleButtonProps {
@@ -22,7 +22,7 @@ export const StyleButton = (props: StyleButtonProps): JSX.Element => {
 
   return (
     <button type="button" className={BEM} onClick={onToggleHandler}>
-      <Icon name={label} size={24} />
+      <Icon name={label} size={24} color="secondary" />
     </button>
   );
 };

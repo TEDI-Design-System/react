@@ -1,8 +1,8 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { IconProps } from '../../../tedi/components/base/icon/icon';
 import Button, { ButtonProps } from '../button/button';
-import { IconProps } from '../icon/icon';
 import styles from './toggle-open.module.scss';
 
 export interface ToggleOpenProps extends Omit<ButtonProps, 'children' | 'iconRight'> {

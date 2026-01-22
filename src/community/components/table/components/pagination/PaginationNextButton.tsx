@@ -1,8 +1,8 @@
 import { Table as TableType } from '@tanstack/table-core';
 import React from 'react';
 
+import { Icon } from '../../../../../tedi/components/base/icon/icon';
 import { useLabels } from '../../../../../tedi/providers/label-provider';
-import Icon from '../../../icon/icon';
 import { TableContext } from '../../table-context';
 import styles from './pagination.module.scss';
 
