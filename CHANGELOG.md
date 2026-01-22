@@ -1,3 +1,15 @@
+# [15.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.3...react-15.0.0-rc.4) (2026-01-22)
+
+
+### Bug Fixes
+
+* **typography:** remove Community typography components and migrate to TEDI-Ready [#440](https://github.com/TEDI-Design-System/react/issues/440) ([#451](https://github.com/TEDI-Design-System/react/issues/451)) ([852cf65](https://github.com/TEDI-Design-System/react/commit/852cf65e80ff8177465167dc53ce9a880df15683))
+
+
+### BREAKING CHANGES
+
+* **typography:** Community Typography components have been removed, migrate to TEDI-Ready
+
 # [15.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.2...react-15.0.0-rc.3) (2026-01-22)
 
 
