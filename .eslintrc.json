@@ -72,5 +72,7 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "noInlineConfig": false,
+  "reportUnusedDisableDirectives": false
 }
