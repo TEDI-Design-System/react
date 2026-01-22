@@ -19,13 +19,15 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Disable ESLint problem matcher
-        run: echo "::remove-matcher owner=eslint::"
+      - name: Disable ESLint problem matchers
+        run: |
+          echo "::remove-matcher owner=eslint::"
+          echo "::remove-matcher owner=eslint-compact::"
 
       - name: Lint
         run: |
           npm ci --cache .npm --prefer-offline
-          npm run lint:ci > lint.log || true
+          npm run lint:ci
 
   build:
     runs-on: ubuntu-latest
