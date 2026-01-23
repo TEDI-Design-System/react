@@ -1,6 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
-import { TextRow } from '../../../../providers/storybook-provider/storybook-provider';
 import { Col, Row } from '../../../layout/grid';
 import { VerticalSpacing } from '../../../layout/vertical-spacing';
 import { Text } from './text';
@@ -18,6 +17,9 @@ const meta: Meta<typeof Text> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?node-id=115-11630&m=dev',
     },
+    status: {
+      type: 'mobileViewDifference',
+    },
   },
 };
 
@@ -26,121 +28,79 @@ type Story = StoryObj<typeof Text>;
 
 const TemplateSubtitles: StoryFn = () => (
   <div className="example-list w-100">
-    <Row className="border-bottom border-bottom--3x">
+    <Row className="border-bottom padding-14-16">
       <Col>
-        <Text color="primary" className="padding-14-16">
-          Desktop
-        </Text>
-      </Col>
-      <Col>
-        <Text color="primary" className="padding-14-16">
-          Mobile
+        <Text color="primary" modifiers="subtitle">
+          Subtitle
         </Text>
       </Col>
     </Row>
-    <TextRow
-      desktopText={
-        <Text color="primary" modifiers="subtitle">
-          Subtitle
-        </Text>
-      }
-      mobileText={
-        <Text color="primary" modifiers="subtitle">
-          Subtitle
-        </Text>
-      }
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={
+    <Row className="border-bottom padding-14-16">
+      <Col>
         <Text color="primary" modifiers={['subtitle', 'small']}>
           Subtitle Small
         </Text>
-      }
-      mobileText={
-        <Text color="primary" modifiers={['subtitle', 'small']}>
-          Subtitle Small
-        </Text>
-      }
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={
+      </Col>
+    </Row>
+    <Row className="border-bottom padding-14-16">
+      <Col>
         <Text color="secondary" element="label">
           Label
         </Text>
-      }
-      mobileText={
-        <Text color="secondary" element="label">
-          Label
-        </Text>
-      }
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={
+      </Col>
+    </Row>
+    <Row className="padding-14-16">
+      <Col>
         <Text element="label" modifiers="bold">
           Label bold
         </Text>
-      }
-      mobileText={
-        <Text element="label" modifiers="bold">
-          Label bold
-        </Text>
-      }
-    />
+      </Col>
+    </Row>
   </div>
 );
 
 const TemplateBodyText: StoryFn = () => (
   <div className="example-list w-100">
-    <Row className="border-bottom border-bottom--3x">
+    <Row className="border-bottom padding-14-16">
       <Col>
-        <Text color="primary" className="padding-14-16">
-          Desktop
-        </Text>
-      </Col>
-      <Col>
-        <Text color="primary" className="padding-14-16">
-          Mobile
-        </Text>
+        <Text>Body Regular</Text>
       </Col>
     </Row>
-    <TextRow desktopText="Body Regular" mobileText="Body Regular" className="border-bottom" />
-    <TextRow
-      desktopText={<Text modifiers="bold">Body bold</Text>}
-      mobileText={<Text modifiers="bold">Body bold</Text>}
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={<Text modifiers="italic">Body italic</Text>}
-      mobileText={<Text modifiers="italic">Body italic</Text>}
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={<Text modifiers="small">Small</Text>}
-      mobileText={<Text modifiers="small">Small</Text>}
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={<Text modifiers={['small', 'bold']}>Small bold</Text>}
-      mobileText={<Text modifiers={['small', 'bold']}>Small bold</Text>}
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={<Text modifiers={['small', 'italic']}>Small italic</Text>}
-      mobileText={<Text modifiers={['small', 'italic']}>Small italic</Text>}
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={<Text modifiers={['extra-small']}>Extra small</Text>}
-      mobileText={<Text modifiers={['extra-small']}>Extra small</Text>}
-      className="border-bottom"
-    />
-    <TextRow
-      desktopText={<Text modifiers={['extra-small', 'bold']}>Small bold</Text>}
-      mobileText={<Text modifiers={['extra-small', 'bold']}>Small bold</Text>}
-    />
+    <Row className="border-bottom padding-14-16">
+      <Col>
+        <Text modifiers="bold">Body bold</Text>
+      </Col>
+    </Row>
+    <Row className="border-bottom padding-14-16">
+      <Col>
+        <Text modifiers="italic">Body italic</Text>
+      </Col>
+    </Row>
+    <Row className="border-bottom padding-14-16">
+      <Col>
+        <Text modifiers="small">Small</Text>
+      </Col>
+    </Row>
+    <Row className="border-bottom padding-14-16">
+      <Col>
+        <Text modifiers={['small', 'bold']}>Small bold</Text>
+      </Col>
+    </Row>
+    <Row className="border-bottom padding-14-16">
+      <Col>
+        <Text modifiers={['small', 'italic']}>Small italic</Text>
+      </Col>
+    </Row>
+    <Row className="border-bottom padding-14-16">
+      <Col>
+        <Text modifiers={['extra-small']}>Extra small</Text>
+      </Col>
+    </Row>
+    <Row className="padding-14-16">
+      <Col>
+        <Text modifiers={['extra-small', 'bold']}>Small bold</Text>
+      </Col>
+    </Row>
   </div>
 );
 
