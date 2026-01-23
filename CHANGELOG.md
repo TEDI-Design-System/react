@@ -1,3 +1,10 @@
+# [15.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.5...react-15.0.0-rc.6) (2026-01-23)
+
+
+### Features
+
+* **collapse:** add iconOnly prop, fix community sidenav collapse margin [#471](https://github.com/TEDI-Design-System/react/issues/471) ([#472](https://github.com/TEDI-Design-System/react/issues/472)) ([c852ca8](https://github.com/TEDI-Design-System/react/commit/c852ca8d3024f1af5ab66bf264c0ade33a49a92f))
+
 # [15.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.4...react-15.0.0-rc.5) (2026-01-22)
 
 
