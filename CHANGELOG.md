@@ -1,3 +1,10 @@
+# [15.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.6...react-15.0.0-rc.7) (2026-01-23)
+
+
+### Bug Fixes
+
+* **scroll-visibility:** ssr support [#419](https://github.com/TEDI-Design-System/react/issues/419) ([#475](https://github.com/TEDI-Design-System/react/issues/475)) ([88953fd](https://github.com/TEDI-Design-System/react/commit/88953fd0d3730421e8c189d39f624f49e246908f))
+
 # [15.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.5...react-15.0.0-rc.6) (2026-01-23)
 
 
