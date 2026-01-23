@@ -16,8 +16,8 @@ In our Storybook, we use status badges to indicate key attributes of components 
         {
           <span
             style={{
-              color: '#fff',
-              backgroundColor: '#ff8000',
+              color: '#000',
+              backgroundColor: '#D2D3D8',
               padding: '4px 8px',
               borderRadius: '4px',
               fontSize: '14px',
@@ -146,6 +146,29 @@ In our Storybook, we use status badges to indicate key attributes of components 
       <Col>
         This badge indicates that the component lacks some TEDI-Ready functionality. For example, it may rely on another
         component that has not yet been developed.
+      </Col>
+    </Row>
+    <Row gutterX={0} align="start">
+      <Col lg={3} md={12} align="center">
+        {
+          <span
+            style={{
+              color: '#000',
+              backgroundColor: '#99BDDA',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+            }}
+          >
+            Mobile view difference
+          </span>
+        }
+      </Col>
+      <Col>
+        This component has a different layout on mobile. Use the mobile breakpoint or resize the browser window to
+        review the mobile design.
       </Col>
     </Row>
   </Card.Content>
