@@ -2,10 +2,10 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { CardContent, CardHeader } from '../../../tedi/components/cards/card';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Button from '../button/button';
-import { CardContent, CardHeader } from '../card';
 import Modal, { ModalProps } from './modal';
 import ModalCloser from './modal-closer';
 import ModalProvider, { ModalProviderProps } from './modal-provider';
@@ -52,7 +52,7 @@ const Template: StoryFn<TemplateProps> = (args): JSX.Element => {
       </ModalTrigger>
       <Modal {...modal} aria-labelledby="label">
         {renderHeader && (
-          <CardHeader background="white">
+          <CardHeader background="primary" hasSeparator>
             <Heading id="default-label">{heading}</Heading>
           </CardHeader>
         )}
@@ -132,7 +132,7 @@ export const ErrorTopModal: Story = {
   args: {
     heading: 'Error type modal',
     content: 'Use to display error notifications',
-    cardProps: { border: 'top-important-main' },
+    cardProps: { border: 'top-danger-secondary' },
     renderHeader: false,
     renderModalCloser: false,
   },
@@ -144,7 +144,7 @@ export const SuccessTopModal: Story = {
   args: {
     heading: 'Success type modal',
     content: 'Use to display success notifications',
-    cardProps: { border: 'top-positive-main' },
+    cardProps: { border: 'top-success-secondary' },
     renderHeader: false,
     renderModalCloser: false,
   },
@@ -156,7 +156,7 @@ export const WarningTopModal: Story = {
   args: {
     heading: 'Warning type modal',
     content: 'Use to display Warning notifications',
-    cardProps: { border: 'top-warning-main' },
+    cardProps: { border: 'top-warning-secondary' },
     renderHeader: false,
     renderModalCloser: false,
   },
@@ -189,7 +189,7 @@ export const Position: StoryFn<ModalProps> = () => {
         <Button className="text-capitalize">{position}</Button>
       </ModalTrigger>
       <Modal aria-labelledby="open-center" position={position}>
-        <CardHeader background="white">
+        <CardHeader background="primary" hasSeparator>
           <Heading>Modal with longer content to test out scrolling</Heading>
         </CardHeader>
         <CardContent>{content}</CardContent>

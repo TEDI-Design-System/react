@@ -1,11 +1,11 @@
 import { FloatingFocusManager, FloatingOverlay, FloatingPortal } from '@floating-ui/react';
 import cn from 'classnames';
 import React from 'react';
+import { UnknownType } from 'src/tedi/types/commonTypes';
 
 import { ClosingButton } from '../../../tedi/components/buttons/closing-button/closing-button';
+import { Card, CardProps } from '../../../tedi/components/cards/card'; // ← new import style
 import { useLabels } from '../../../tedi/providers/label-provider';
-import { IntentionalAny } from '../../types';
-import Card, { CardProps } from '../card/card';
 import styles from './modal.module.scss';
 import ModalCloser from './modal-closer';
 import { ModalContext } from './modal-provider';
@@ -73,7 +73,7 @@ export const Modal = (props: ModalProps): JSX.Element | null => {
   const {
     children,
     size = 6,
-    cardProps = {},
+    cardProps = { hasSeparator: true, className: undefined },
     hideCloseButton,
     position,
     lockScroll = true,
@@ -82,45 +82,57 @@ export const Modal = (props: ModalProps): JSX.Element | null => {
     overlay = undefined,
     visuallyHiddenDismiss = false,
   } = props;
+
   const { getLabel } = useLabels();
   const labelId = props['aria-labelledby'];
   const descriptionId = props['aria-describedby'];
   const { isOpen, floating, getFloatingProps, context, isDismissable } = React.useContext(ModalContext);
 
-  // add close button to the first CardHeader or CardContent
+  const isCardHeaderOrContent = (child: React.ReactNode): boolean => {
+    if (!React.isValidElement(child)) return false;
+
+    const type = child.type as UnknownType;
+
+    if (type === Card.Header || type === Card.Content) {
+      return true;
+    }
+
+    const displayName = type?.displayName || '';
+    return (
+      displayName === 'Card.Header' ||
+      displayName === 'Card.Content' ||
+      displayName.includes('Card.Header') ||
+      displayName.includes('Card.Content') ||
+      displayName.includes('Header') ||
+      displayName.includes('Content')
+    );
+  };
+
   const parsedChildren = React.useMemo(() => {
+    if (hideCloseButton) return children;
+
     let buttonRendered = false;
 
-    const getComponentDisplayName = (element: React.ReactElement<unknown, IntentionalAny>) => {
-      return element.type.displayName;
-    };
+    return React.Children.map(children, (child) => {
+      if (!buttonRendered && React.isValidElement(child) && isCardHeaderOrContent(child)) {
+        buttonRendered = true;
 
-    return !hideCloseButton
-      ? React.Children.map(children, (child, index) => {
-          if (
-            !buttonRendered &&
-            React.isValidElement(child) &&
-            (getComponentDisplayName(child) === 'CardHeader' || getComponentDisplayName(child) === 'CardContent')
-          ) {
-            buttonRendered = true;
+        return React.cloneElement(child as React.ReactElement, {
+          ...child.props,
+          children: (
+            <>
+              <ModalCloser>
+                <ClosingButton size="large" className={styles['close-button']} />
+              </ModalCloser>
+              {child.props.children}
+            </>
+          ),
+        });
+      }
 
-            return React.cloneElement(child, {
-              ...child.props,
-              children: (
-                <>
-                  <ModalCloser>
-                    <ClosingButton size="large" className={styles['close-button']} />
-                  </ModalCloser>
-                  {child.props.children}
-                </>
-              ),
-            });
-          }
-
-          return child;
-        })
-      : children;
-  }, [children, getLabel, hideCloseButton]);
+      return child;
+    });
+  }, [children, hideCloseButton]);
 
   return (
     <FloatingPortal data-name="modal">
