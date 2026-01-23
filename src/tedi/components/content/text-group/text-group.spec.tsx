@@ -50,4 +50,33 @@ describe('TextGroup component', () => {
 
     expect(textGroup).toHaveStyle('--label-width: 50%');
   });
+
+  it('applies right alignment class when labelAlign="right"', () => {
+    const { container } = render(<TextGroup label="Total" value="€ 124.50" labelAlign="right" />);
+
+    const labelElement = container.querySelector('dt.tedi-text-group__label');
+    expect(labelElement).toHaveClass('tedi-text-group--align-right');
+    expect(labelElement).not.toHaveClass('tedi-text-group--align-left');
+  });
+
+  it('applies right alignment in horizontal layout', () => {
+    const { container } = render(
+      <TextGroup label="Price" value="39.99 €" type="horizontal" labelAlign="right" labelWidth="180px" />
+    );
+
+    const textGroup = container.querySelector('.tedi-text-group');
+    expect(textGroup).toHaveClass('tedi-text-group--horizontal');
+    expect(textGroup).toHaveStyle('--label-width: 180px');
+
+    const labelElement = container.querySelector('dt');
+    expect(labelElement).toHaveClass('tedi-text-group--align-right');
+  });
+
+  it('still applies left alignment when explicitly set to "left"', () => {
+    const { container } = render(<TextGroup label="Status" value="Active" labelAlign="left" />);
+
+    const labelElement = container.querySelector('dt');
+    expect(labelElement).toHaveClass('tedi-text-group--align-left');
+    expect(labelElement).not.toHaveClass('tedi-text-group--align-right');
+  });
 });

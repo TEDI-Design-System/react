@@ -33,9 +33,10 @@ type Story = StoryObj<typeof TextGroup>;
 
 const TemplateWithLayouts: StoryFn<TextGroupProps> = (args) => {
   return (
-    <VerticalSpacing size={1}>
+    <VerticalSpacing size={1.5}>
       <TextGroup type="vertical" {...args} />
       <TextGroup type="horizontal" labelWidth="150px" {...args} />
+      <TextGroup type="horizontal" labelWidth="150px" labelAlign="right" {...args} />
     </VerticalSpacing>
   );
 };

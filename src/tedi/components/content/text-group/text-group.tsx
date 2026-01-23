@@ -6,6 +6,7 @@ import { Label } from '../label/label';
 import styles from './text-group.module.scss';
 
 type TextGroupType = 'vertical' | 'horizontal';
+type TextAlign = 'left' | 'right';
 
 type TextGroupBreakpointProps = {
   /**
@@ -17,6 +18,11 @@ type TextGroupBreakpointProps = {
    * @default 'auto'
    */
   labelWidth?: string | number;
+  /**
+   * Alignment for the label text
+   *  @default 'left'
+   */
+  labelAlign?: TextAlign;
 };
 
 export interface TextGroupProps extends BreakpointSupport<TextGroupBreakpointProps> {
@@ -42,6 +48,7 @@ export const TextGroup = (props: TextGroupProps): JSX.Element => {
     labelWidth = 'auto',
     className,
     type = 'vertical',
+    labelAlign = 'left',
   } = getCurrentBreakpointProps<TextGroupProps>(props);
 
   const textGroupBEM = cn(styles['tedi-text-group'], styles[`tedi-text-group--${type}`], className);
@@ -49,7 +56,7 @@ export const TextGroup = (props: TextGroupProps): JSX.Element => {
 
   return (
     <dl className={textGroupBEM} style={{ '--label-width': labelWidthStyle }}>
-      <dt className={cn(styles['tedi-text-group__label'])}>
+      <dt className={cn(styles['tedi-text-group__label'], styles[`tedi-text-group--align-${labelAlign}`])}>
         <Label>{label}</Label>
       </dt>
       <dd className={cn(styles['tedi-text-group__value'])}>{value}</dd>
