@@ -28,6 +28,7 @@ export const SelectMultiValueRemove = ({ innerProps, data }: MultiValueRemovePro
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={styles['tedi-select__multi-value-clear']}
+        iconSize={18}
         title={`${getLabel('clear')} ${data.label}`}
       />
       <Separator color="primary" axis="vertical" className={styles['tedi-select__separator']} />

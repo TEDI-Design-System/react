@@ -69,7 +69,7 @@ type DefaultCloseButtonProps = { id: string; isSingleItem: boolean; onClose: (id
 export const DefaultCloseButton = ({ id, isSingleItem, onClose }: DefaultCloseButtonProps): JSX.Element => (
   <ClosingButton
     className={styles['tedi-right-panel__closer']}
-    size={isSingleItem ? 'large' : 'medium'}
+    size={isSingleItem ? 'default' : 'small'}
     onClick={() => onClose(id)}
     title="Sulge aken"
   />

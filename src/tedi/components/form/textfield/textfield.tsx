@@ -333,7 +333,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   const renderClearButton = React.useMemo(() => {
     const clearButtonProps = {
-      size: (size === 'large' ? 'large' : 'medium') as 'medium' | 'large',
+      iconSize: size === 'large' ? (24 as const) : (18 as const),
       onClick: disabled ? () => {} : clearInput,
       disabled,
       'aria-disabled': disabled || undefined,

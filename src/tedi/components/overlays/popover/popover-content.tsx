@@ -45,7 +45,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
     title,
     titleProps = { element: 'h4' },
     close,
-    closeProps = { size: 'large' },
+    closeProps = { size: 'default' },
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
   const titleId = useId();
