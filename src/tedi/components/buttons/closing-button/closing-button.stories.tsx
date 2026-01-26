@@ -19,7 +19,8 @@ const meta: Meta<typeof ClosingButton> = {
   },
 };
 
-const sizeArray: ClosingButtonProps['size'][] = ['medium', 'large'];
+const sizeArray: ClosingButtonProps['size'][] = ['default', 'small'];
+const iconSizeArray: ClosingButtonProps['iconSize'][] = [24, 18];
 
 export default meta;
 type Story = StoryObj<typeof ClosingButton>;
@@ -58,15 +59,33 @@ const StatesTemplate: StoryFn = () => {
   );
 };
 
+const IconSizeTemplate: StoryFn = () => {
+  return (
+    <div className="example-list">
+      {iconSizeArray.map((iconSize, key) => (
+        <Row className={`${key === iconSizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col className="display-flex w-50">{`${iconSize}px`}</Col>
+          <Col className="display-flex">
+            <ClosingButton iconSize={iconSize} onClick={() => alert(`${iconSize}px icon clicked`)} />
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
+
 export const Default: Story = {
   args: {
     title: 'close',
-    size: 'medium',
   },
 };
 
 export const Size: Story = {
   render: SizeTemplate,
+};
+
+export const IconSizes: Story = {
+  render: IconSizeTemplate,
 };
 
 export const States: Story = {
