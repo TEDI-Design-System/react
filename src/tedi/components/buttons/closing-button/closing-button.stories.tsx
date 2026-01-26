@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import ClosingButton, { ClosingButtonProps } from './closing-button';
 
@@ -41,16 +42,18 @@ const SizeTemplate: StoryFn = () => {
 
 const stateArray = ['Default', 'Hover', 'Active', 'Focus'];
 
-const StatesTemplate: StoryFn = () => {
+const StatesTemplate: StoryFn = (args) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '200px' }}>
       {stateArray.map((state) => (
         <Row key={state}>
           <Col>
-            <b>{state}</b>
+            <Text color={args.color === 'white' ? 'white' : 'primary'} modifiers="bold">
+              {state}
+            </Text>
           </Col>
           <Col>
-            <ClosingButton id={state} />
+            <ClosingButton id={state} {...args} />
           </Col>
         </Row>
       ))}
@@ -77,5 +80,34 @@ export const States: Story = {
       active: '#Active',
       focusVisible: '#Focus',
     },
+  },
+};
+
+export const ColorBrand: Story = {
+  render: StatesTemplate,
+  args: {
+    color: 'brand',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      active: '#Active',
+      focusVisible: '#Focus',
+    },
+  },
+};
+
+export const ColorInverted: Story = {
+  render: StatesTemplate,
+  args: {
+    color: 'white',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      active: '#Active',
+      focusVisible: '#Focus',
+    },
+    backgrounds: { default: 'brand' },
   },
 };

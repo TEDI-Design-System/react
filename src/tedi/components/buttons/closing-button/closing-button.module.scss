@@ -1,28 +1,12 @@
 .tedi-closing-button {
-  --general-icon-primary: var(--button-close-text-default);
-
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   cursor: pointer;
-  background-color: var(--button-close-background-default);
-  border: 1px solid var(--button-close-background-default);
+  border: 0;
   border-radius: var(--button-radius-default);
-  transition: background 0.5s ease;
-
-  @each $state in hover, active {
-    &:#{ $state } {
-      --general-icon-primary: var(--button-close-text-#{$state});
-
-      background-color: var(--button-close-background-#{$state});
-    }
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--button-main-primary-border-focus);
-    outline-offset: -2px;
-  }
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
   &--medium {
     width: var(--button-xs-icon-size);
@@ -32,5 +16,62 @@
   &--large {
     width: var(--button-sm-icon-size);
     height: var(--button-sm-icon-size);
+  }
+
+  &--color-primary {
+    color: var(--button-close-text-default);
+    background-color: var(--button-close-background-default);
+
+    &:hover {
+      color: var(--button-close-text-hover);
+      background-color: var(--button-close-background-hover);
+    }
+
+    &:active {
+      color: var(--button-close-text-active);
+      background-color: var(--button-close-background-active);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--button-main-primary-border-focus);
+    }
+  }
+
+  &--color-brand {
+    color: var(--button-main-neutral-text-default);
+    background-color: var(--button-main-neutral-icon-only-background-default);
+
+    &:hover {
+      color: var(--button-main-neutral-text-hover);
+      background-color: var(--button-main-neutral-icon-only-background-hover);
+    }
+
+    &:active {
+      color: var(--button-main-neutral-text-active);
+      background-color: var(--button-main-neutral-icon-only-background-active);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--button-main-primary-border-focus);
+    }
+  }
+
+  &--color-white {
+    color: var(--button-neutral-inverted-text-default);
+    background-color: var(--button-neutral-inverted-icon-only-background-default);
+
+    &:hover {
+      color: var(--button-neutral-inverted-text-hover);
+      background-color: var(--button-main-neutral-inverted-icon-only-background-hover);
+    }
+
+    &:active {
+      color: var(--button-neutral-inverted-text-active);
+      background-color: var(--button-main-neutral-inverted-icon-only-background-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--button-main-neutral-inverted-text-focus);
+    }
   }
 }

@@ -7,6 +7,7 @@ import { Icon } from '../../base/icon/icon';
 import styles from './closing-button.module.scss';
 
 type ClosingButtonSize = 'medium' | 'large';
+type ClosingButtonColor = 'primary' | 'brand' | 'white';
 
 export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
@@ -27,16 +28,22 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
    * Used for accessibility and as a tooltip on hover. If not provided, the label provider's 'close' label will be used as a fallback.
    */
   title?: string;
+  /*
+   * Color variant of the ClosingButton
+   * @default 'default'
+   */
+  color?: ClosingButtonColor;
 }
 
 export const ClosingButton = (props: ClosingButtonProps): JSX.Element => {
   const { getLabel } = useLabels();
-  const { title = getLabel('close'), onClick, size = 'medium', className, ...rest } = props;
+  const { title = getLabel('close'), onClick, size = 'medium', className, color = 'primary', ...rest } = props;
 
   const buttonClass = cn(
     styles['tedi-closing-button'],
     {
       [styles[`tedi-closing-button--${size}`]]: size,
+      [styles[`tedi-closing-button--color-${color}`]]: color,
     },
     className
   );
@@ -53,7 +60,7 @@ export const ClosingButton = (props: ClosingButtonProps): JSX.Element => {
       title={title}
       aria-label={title}
     >
-      <Icon name="close" size={iconSize} />
+      <Icon name="close" size={iconSize} color={color} />
     </button>
   );
 };
