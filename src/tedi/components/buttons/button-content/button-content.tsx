@@ -116,7 +116,7 @@ const InternalButtonContent = forwardRef(
       _renderWrapperElement,
       fullWidth,
       onClick,
-      showTooltip = true,
+      showTooltip = false,
       ...rest
     }: ButtonContentProps<C, P, A>,
     ref?: PolymorphicRef<C>
@@ -207,7 +207,6 @@ const InternalButtonContent = forwardRef(
         {...rest}
         aria-disabled={isLoading || rest['aria-disabled']}
         aria-busy={isLoading || undefined}
-        aria-label={isIconOnly ? buttonText : rest['aria-label']}
         onClick={onClickHandler}
         ref={ref}
         className={BEM}

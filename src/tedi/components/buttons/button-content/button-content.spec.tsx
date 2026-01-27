@@ -103,7 +103,7 @@ describe('ButtonContent component', () => {
 
   it('does not show tooltip when autoTooltip is false', () => {
     render(
-      <ButtonContent icon="delete" autoTooltip={false}>
+      <ButtonContent icon="delete" showTooltip={false}>
         Delete
       </ButtonContent>
     );
