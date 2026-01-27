@@ -79,4 +79,58 @@ describe('TextGroup component', () => {
     expect(labelElement).toHaveClass('tedi-text-group--align-left');
     expect(labelElement).not.toHaveClass('tedi-text-group--align-right');
   });
+
+  it('renders plain string label through <Label> component', () => {
+    const { container } = render(<TextGroup label="Status" value="Active" />);
+
+    const dt = container.querySelector('dt');
+    const labelWrapper = dt?.querySelector('.tedi-label');
+
+    expect(labelWrapper).toBeInTheDocument();
+    expect(dt).toHaveTextContent('Status');
+    expect(dt?.children).toHaveLength(1);
+    expect(dt?.firstChild?.nodeName.toLowerCase()).toBe('label');
+  });
+
+  it('renders complex JSX label without extra <Label> wrapper', () => {
+    const { container } = render(
+      <TextGroup
+        label={
+          <>
+            <strong>Authorisations</strong>
+            <button type="button">Info</button>
+          </>
+        }
+        value="Visible to doctor"
+      />
+    );
+
+    const dt = container.querySelector('dt');
+
+    expect(dt).toBeInTheDocument();
+    expect(dt).toHaveTextContent('Authorisations');
+
+    const nestedLabels = dt?.querySelectorAll('label, .tedi-label');
+    expect(nestedLabels?.length).toBe(0);
+    expect(dt?.querySelector('strong')).toBeInTheDocument();
+    expect(dt?.querySelector('button')).toBeInTheDocument();
+  });
+
+  it('handles null/undefined label gracefully (renders empty)', () => {
+    const { container } = render(<TextGroup label={null} value="—" />);
+    const dt = container.querySelector('dt');
+
+    expect(dt).toBeInTheDocument();
+    expect(dt).toHaveTextContent('');
+    expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
+  });
+
+  it('renders label as array of nodes without wrapper', () => {
+    const { container } = render(<TextGroup label={['Role: ', <em key="em">Admin</em>]} value="System" />);
+
+    const dt = container.querySelector('dt');
+    expect(dt).toHaveTextContent('Role: Admin');
+    expect(dt?.querySelector('em')).toBeInTheDocument();
+    expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
+  });
 });
