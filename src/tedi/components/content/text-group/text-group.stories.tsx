@@ -26,6 +26,20 @@ const meta: Meta<typeof TextGroup> = {
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=45-30752&mode=dev',
     },
   },
+  argTypes: {
+    labelAlign: {
+      control: 'radio',
+      options: ['left', 'right'],
+      if: { arg: 'type', neq: 'vertical' },
+      table: {
+        disable: false,
+      },
+    },
+    type: {
+      control: 'radio',
+      options: ['vertical', 'horizontal'],
+    },
+  },
 };
 
 export default meta;
@@ -34,9 +48,9 @@ type Story = StoryObj<typeof TextGroup>;
 const TemplateWithLayouts: StoryFn<TextGroupProps> = (args) => {
   return (
     <VerticalSpacing size={1.5}>
-      <TextGroup type="vertical" {...args} />
-      <TextGroup type="horizontal" labelWidth="150px" {...args} />
-      <TextGroup type="horizontal" labelWidth="150px" labelAlign="right" {...args} />
+      <TextGroup {...args} type="vertical" labelAlign="left" />
+      <TextGroup {...args} type="horizontal" labelWidth="150px" />
+      <TextGroup {...args} type="horizontal" labelWidth="150px" labelAlign="right" />
     </VerticalSpacing>
   );
 };
@@ -118,10 +132,11 @@ const TemplateWithTypes: StoryFn<TextGroupProps> = (args) => {
     <Row>
       <Col>
         <VerticalSpacing size={1}>
-          <TextGroup type="vertical" {...args} />
+          <TextGroup {...args} type="vertical" labelAlign="left" />
           <TextGroup
             {...args}
             type="vertical"
+            labelAlign="left"
             value={
               <>
                 <Icon name="lock" size={16} color="tertiary" />
@@ -132,6 +147,7 @@ const TemplateWithTypes: StoryFn<TextGroupProps> = (args) => {
           <TextGroup
             {...args}
             type="vertical"
+            labelAlign="left"
             value={<Text modifiers="bold">Visible to doctor and representative</Text>}
           />
           <TextGroup

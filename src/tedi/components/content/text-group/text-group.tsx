@@ -5,27 +5,43 @@ import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Label } from '../label/label';
 import styles from './text-group.module.scss';
 
-type TextGroupType = 'vertical' | 'horizontal';
 type TextAlign = 'left' | 'right';
 
-type TextGroupBreakpointProps = {
-  /**
-   * Type of text group layout
-   */
-  type?: TextGroupType;
-  /**
-   * Width for the label (e.g., '200px', '30%', etc.)
-   * @default 'auto'
-   */
-  labelWidth?: string | number;
-  /**
-   * Alignment for the label text
-   *  @default 'left'
-   */
-  labelAlign?: TextAlign;
-};
+type TextGroupBreakpointProps =
+  | {
+      /**
+       * Type of text group layout
+       */
+      type?: 'horizontal';
+      /**
+       * Alignment for the label text
+       *  @default 'left'
+       */
+      labelAlign?: TextAlign;
+      /**
+       * Width for the label (e.g., '200px', '30%', etc.)
+       * @default 'auto'
+       */
+      labelWidth?: string | number;
+    }
+  | {
+      /**
+       * Type of text group layout
+       */
+      type: 'vertical';
+      /**
+       * Alignment for the label text
+       *  @default 'left'
+       */
+      labelAlign?: 'left';
+      /**
+       * Width for the label (e.g., '200px', '30%', etc.)
+       * @default 'auto'
+       */
+      labelWidth?: string | number;
+    };
 
-export interface TextGroupProps extends BreakpointSupport<TextGroupBreakpointProps> {
+export type TextGroupProps = BreakpointSupport<TextGroupBreakpointProps> & {
   /**
    * Label for the text group
    */
@@ -38,7 +54,7 @@ export interface TextGroupProps extends BreakpointSupport<TextGroupBreakpointPro
    * Additional class name(s) to apply to the element
    */
   className?: string;
-}
+};
 
 export const TextGroup = (props: TextGroupProps): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
