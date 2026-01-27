@@ -1,3 +1,10 @@
+# [15.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.11...react-15.0.0-rc.12) (2026-01-27)
+
+
+### Bug Fixes
+
+* **button:** show tooltip for icon-only buttons, add showTooltip prop [#389](https://github.com/TEDI-Design-System/react/issues/389) ([#476](https://github.com/TEDI-Design-System/react/issues/476)) ([6fd074d](https://github.com/TEDI-Design-System/react/commit/6fd074d1f1be1c6040ae3a3c2d0f450e1e0a0e77))
+
 # [15.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.10...react-15.0.0-rc.11) (2026-01-27)
 
 
