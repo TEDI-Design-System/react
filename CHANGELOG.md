@@ -1,3 +1,10 @@
+# [15.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.9...react-15.0.0-rc.10) (2026-01-27)
+
+
+### Bug Fixes
+
+* **select:** selected item hover text + background fix [#3](https://github.com/TEDI-Design-System/react/issues/3) ([#479](https://github.com/TEDI-Design-System/react/issues/479)) ([15cfe2d](https://github.com/TEDI-Design-System/react/commit/15cfe2d38f9483f4bd6db69dbdf64c4dd355d8ea))
+
 # [15.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.8...react-15.0.0-rc.9) (2026-01-27)
 
 
