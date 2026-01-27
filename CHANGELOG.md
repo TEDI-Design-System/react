@@ -1,3 +1,10 @@
+# [15.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.12...react-15.0.0-rc.13) (2026-01-27)
+
+
+### Features
+
+* **text-group:** new labelAlign prop [#4](https://github.com/TEDI-Design-System/react/issues/4) ([#482](https://github.com/TEDI-Design-System/react/issues/482)) ([e3a3c60](https://github.com/TEDI-Design-System/react/commit/e3a3c6044ea78263e9d5c04d5cb29a442d891a41))
+
 # [15.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.11...react-15.0.0-rc.12) (2026-01-27)
 
 
