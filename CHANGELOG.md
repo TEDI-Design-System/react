@@ -1,3 +1,10 @@
+# [15.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.10...react-15.0.0-rc.11) (2026-01-27)
+
+
+### Bug Fixes
+
+* **sidenav:** update mobile menu when navItems prop changes [#86](https://github.com/TEDI-Design-System/react/issues/86) ([#477](https://github.com/TEDI-Design-System/react/issues/477)) ([b91ffde](https://github.com/TEDI-Design-System/react/commit/b91ffde36ba5209e5270f6d8abc3f2b7322a125c))
+
 # [15.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.9...react-15.0.0-rc.10) (2026-01-27)
 
 
