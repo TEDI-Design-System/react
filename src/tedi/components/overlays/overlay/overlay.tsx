@@ -117,6 +117,7 @@ export interface OverlayContextType {
   placement: Placement;
   context: FloatingContext<ReferenceType>;
   scrollLock?: boolean;
+  role?: UseRoleProps['role'];
 }
 
 export const OverlayContext = createContext<OverlayContextType>({

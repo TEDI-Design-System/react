@@ -1,5 +1,5 @@
 import { FloatingArrow, FloatingFocusManager, FloatingPortal } from '@floating-ui/react';
-import { ReactNode, useContext, useEffect } from 'react';
+import { ReactNode, useContext, useEffect, useId } from 'react';
 
 import { OverlayContext } from './overlay';
 
@@ -48,6 +48,7 @@ export interface OverlayContentProps {
 
 export const OverlayContent = (props: OverlayContentProps) => {
   const { children, classNames, labelledBy, describedBy } = props;
+  const contentId = useId();
   const {
     open,
     x,
@@ -88,6 +89,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
           {...getFloatingProps({
             ref: floating,
             tabIndex: -1,
+            id: contentId,
             'aria-labelledby': labelledBy,
             'aria-describedby': describedBy,
             style: {
