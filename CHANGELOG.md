@@ -1,3 +1,10 @@
+# [15.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.7...react-15.0.0-rc.8) (2026-01-27)
+
+
+### Bug Fixes
+
+* **select:** select option focus style fix [#393](https://github.com/TEDI-Design-System/react/issues/393) ([#478](https://github.com/TEDI-Design-System/react/issues/478)) ([3830e08](https://github.com/TEDI-Design-System/react/commit/3830e0884cb828d1aa7d1b8ea97ec28ea44eb944))
+
 # [15.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.6...react-15.0.0-rc.7) (2026-01-23)
 
 
