@@ -1,3 +1,10 @@
+# [15.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.8...react-15.0.0-rc.9) (2026-01-27)
+
+
+### Bug Fixes
+
+* **textfield:** prevent text overlap when both icon and clearing button are visible [#373](https://github.com/TEDI-Design-System/react/issues/373) ([#480](https://github.com/TEDI-Design-System/react/issues/480)) ([546e1ea](https://github.com/TEDI-Design-System/react/commit/546e1ea83267148da2f80689637762aa19af9e47))
+
 # [15.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.7...react-15.0.0-rc.8) (2026-01-27)
 
 
