@@ -1,3 +1,10 @@
+# [15.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.13...react-15.0.0-rc.14) (2026-01-28)
+
+
+### Features
+
+* **text-group:** label prop type to ReactNode, add more examples [#48](https://github.com/TEDI-Design-System/react/issues/48) ([#483](https://github.com/TEDI-Design-System/react/issues/483)) ([e142689](https://github.com/TEDI-Design-System/react/commit/e142689edb55be71b94a71dc65cc0d9178fe44e8))
+
 # [15.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-15.0.0-rc.12...react-15.0.0-rc.13) (2026-01-27)
 
 
