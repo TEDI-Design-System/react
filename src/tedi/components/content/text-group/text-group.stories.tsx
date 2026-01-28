@@ -2,8 +2,10 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
+import InfoButton from '../../buttons/info-button/info-button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { TextGroup, TextGroupProps } from './text-group';
 
 /**
@@ -211,4 +213,39 @@ export const LongTextValues: Story = {
       </Text>
     ),
   },
+};
+
+export const ResponsiveLayoutChange: Story = {
+  args: {
+    label: 'Accessibility',
+    value: <Text>Visible to doctor and representative</Text>,
+    md: { type: 'vertical' },
+    lg: { type: 'horizontal' },
+  },
+
+  render: (args) => <TextGroup {...args} />,
+};
+
+export const CustomLabel: Story = {
+  render: () => (
+    <VerticalSpacing>
+      <TextGroup
+        label={
+          <Text modifiers="bold" color="secondary">
+            Authorisations <InfoButton>More information</InfoButton>
+          </Text>
+        }
+        value={<Text>Visible to doctor and representative</Text>}
+      />
+      <TextGroup
+        label={
+          <Text modifiers="bold" color="secondary">
+            Status <StatusBadge color="success">Active</StatusBadge>
+          </Text>
+        }
+        value={<Text>Some text regarding to status</Text>}
+        type="horizontal"
+      />
+    </VerticalSpacing>
+  ),
 };

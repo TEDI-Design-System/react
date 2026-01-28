@@ -45,7 +45,7 @@ export type TextGroupProps = BreakpointSupport<TextGroupBreakpointProps> & {
   /**
    * Label for the text group
    */
-  label: string;
+  label: React.ReactNode;
   /**
    * Value displayed alongside the label
    */
@@ -73,7 +73,7 @@ export const TextGroup = (props: TextGroupProps): JSX.Element => {
   return (
     <dl className={textGroupBEM} style={{ '--label-width': labelWidthStyle }}>
       <dt className={cn(styles['tedi-text-group__label'], styles[`tedi-text-group--align-${labelAlign}`])}>
-        <Label>{label}</Label>
+        {typeof label === 'string' ? <Label>{label}</Label> : label}
       </dt>
       <dd className={cn(styles['tedi-text-group__value'])}>{value}</dd>
     </dl>
