@@ -10,6 +10,11 @@ import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text'
 import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './textfield.module.scss';
 
+const iconSizes = {
+  large: 24,
+  default: 18,
+} as const;
+
 type TextFieldBreakpointProps = {
   /**
    * Input field size
@@ -333,7 +338,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   const renderClearButton = React.useMemo(() => {
     const clearButtonProps = {
-      iconSize: size === 'large' ? (24 as const) : (18 as const),
+      iconSize: iconSizes[size === 'large' ? 'large' : 'default'],
       onClick: disabled ? () => {} : clearInput,
       disabled,
       'aria-disabled': disabled || undefined,
