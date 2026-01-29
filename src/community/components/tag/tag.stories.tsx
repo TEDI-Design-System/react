@@ -1,12 +1,12 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Icon } from '../../../tedi/components/base/icon/icon';
+import { Text, TextProps } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Card from '../card/card';
 import CardContent from '../card/card-content/card-content';
-import Icon from '../icon/icon';
-import { Text, TextProps } from '../typography/text/text';
 import Tag, { TagColor, TagProps, TagSize, TagStatus, TagType } from './tag';
 
 type TagTemplateProps<Type = string | boolean> = React.ComponentProps<typeof Tag> & {
@@ -20,7 +20,7 @@ const TagStatuses: TagStatus[] = ['error', 'inactive', 'success'];
 const TagSizes: TagSize[] = ['default', 'large'];
 
 const Capitalize = ({ children, ...rest }: TextProps) => (
-  <Text element="span" modifiers={['small', 'capitalize']} color="muted" {...rest}>
+  <Text element="span" modifiers={['small', 'capitalize']} color="secondary" {...rest}>
     {children}
   </Text>
 );
@@ -43,7 +43,7 @@ const Template: StoryFn<TagTemplateProps> = (args) => {
           <CardContent>
             <Row>
               <Col>
-                <Capitalize color={type === 'borderless' ? 'inverted' : undefined}>{type}</Capitalize>
+                <Capitalize color={type === 'borderless' ? 'white' : undefined}>{type}</Capitalize>
               </Col>
               {TagColors.map((color, index) => (
                 <Col key={`${color}-${index}`}>
@@ -183,7 +183,7 @@ export const WithLongTextRounded: Story = {
 export const CustomTag: Story = {
   render: (args) => <Tag {...args} />,
   args: {
-    children: <Icon name="check" size={24} />,
+    children: <Icon name="check" size={24} color="white" />,
     size: 'large',
     isDisabled: true,
     rounded: true,

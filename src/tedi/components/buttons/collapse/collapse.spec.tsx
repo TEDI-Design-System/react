@@ -94,4 +94,53 @@ describe('Collapse component with breakpoint support', () => {
     const wrapper = container.querySelector('.tedi-collapse__icon-wrapper');
     expect(wrapper).toBeInTheDocument();
   });
+
+  it('hides underline when underline is false', () => {
+    const { container } = getComponent({ underline: false });
+    const text = container.querySelector('.tedi-collapse__text');
+    expect(text).not.toHaveClass('tedi-collapse__text--underline');
+  });
+
+  it('applies icon-only styles when iconOnly is true and no title is provided', () => {
+    const { container } = render(
+      <Collapse id="collapse-icon-only" iconOnly>
+        Content
+      </Collapse>
+    );
+
+    const root = container.querySelector('[data-name="collapse"]');
+    expect(root).toHaveClass('tedi-collapse--icon-only');
+  });
+
+  it('does NOT apply icon-only styles when iconOnly is true but title is provided', () => {
+    const { container } = render(
+      <Collapse id="collapse-with-title" iconOnly title={<Heading>Title</Heading>}>
+        Content
+      </Collapse>
+    );
+
+    const root = container.querySelector('[data-name="collapse"]');
+    expect(root).not.toHaveClass('tedi-collapse--icon-only');
+  });
+
+  it('does NOT apply icon-only styles when hideCollapseText is true', () => {
+    const { container } = render(
+      <Collapse id="collapse-hide-text" hideCollapseText title={<Heading>Toggle</Heading>}>
+        Content
+      </Collapse>
+    );
+
+    const root = container.querySelector('[data-name="collapse"]');
+    expect(root).not.toHaveClass('tedi-collapse--icon-only');
+  });
+
+  it('uses accessible name even in icon-only mode', () => {
+    render(
+      <Collapse id="collapse-a11y" iconOnly toggleLabel="Toggle section">
+        Content
+      </Collapse>
+    );
+
+    expect(screen.getByRole('button', { name: 'Toggle section' })).toBeInTheDocument();
+  });
 });

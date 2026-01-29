@@ -1,9 +1,9 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
+import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Spinner } from '../../../../tedi/components/loaders/spinner/spinner';
 import Button, { ButtonProps } from '../../button/button';
-import Icon from '../../icon/icon';
 import styles from './toggle.module.scss';
 
 export interface ToggleProps {

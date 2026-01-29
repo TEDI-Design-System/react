@@ -18,10 +18,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
+
+      - name: Disable ESLint problem matcher
+        run: echo "::remove-matcher owner=eslint::"
+
       - name: Lint
         run: |
           npm ci --cache .npm --prefer-offline
-          npm run lint
+          npm run lint:ci
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Build library
+        run: |
+          npm ci --cache .npm --prefer-offline
+          npm run build
 
   test:
     runs-on: ubuntu-latest

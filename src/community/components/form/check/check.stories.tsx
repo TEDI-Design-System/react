@@ -1,8 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
-import Text from '../../typography/text/text';
 import Check, { CheckProps } from './check';
 
 /**
@@ -81,7 +81,7 @@ export const WithExtraContent: Story = {
     id: 'extra-content-check',
     name: 'extra-content-check',
     extraContent: (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>
@@ -116,7 +116,7 @@ export const WithTooltipAndExtraContent: Story = {
     id: 'tooltip-extra-content-check',
     name: 'tooltip-extra-content-check',
     extraContent: (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>
@@ -131,7 +131,7 @@ export const WithTooltipAndLongTitleAndExtraContent: Story = {
     name: 'tooltip-long-title-extra-content-check',
     label: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. word word word word word',
     extraContent: (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>

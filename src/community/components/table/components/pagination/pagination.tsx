@@ -2,9 +2,9 @@ import { Table as TableType } from '@tanstack/table-core';
 import cn from 'classnames';
 import React from 'react';
 
+import { Text } from '../../../../../tedi/components/base/typography/text/text';
 import { useLabels } from '../../../../../tedi/providers/label-provider';
 import Select, { ISelectOption, TSelectValue } from '../../../form/select/select';
-import Text from '../../../typography/text/text';
 import { DefaultTData } from '../../table.types';
 import { TableContext } from '../../table-context';
 import styles from './pagination.module.scss';
@@ -66,7 +66,7 @@ const Pagination = <TData extends DefaultTData<TData>>(props: PaginationProps): 
 
   return (
     <div className={styles['pagination__wrapper']}>
-      <Text color="muted" modifiers="small">
+      <Text color="secondary" modifiers="small">
         {props.totalRows} {resultsLabel}
       </Text>
       {getPageCount() > 1 && (

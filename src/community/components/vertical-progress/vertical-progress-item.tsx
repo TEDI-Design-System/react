@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { Icon, IconProps } from '../../../tedi/components/base/icon/icon';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import Button from '../button/button';
 import { Card, CardContent } from '../card';
-import Icon, { IconProps } from '../icon/icon';
 import Tag, { TagProps } from '../tag/tag';
 import { VerticalProgressContext } from './vertical-progress';
 
@@ -114,7 +114,7 @@ const VerticalProgressItemHeader = () => {
         <Row gutterX={3} gutterY={0} alignItems="center" wrap="nowrap">
           <Col width="auto">
             <Tag iconOnly rounded color={getTagColor()} type={getTagType()}>
-              <Icon name={getIcon()} size={16} />
+              <Icon name={getIcon()} size={16} color="inherit" />
             </Tag>
           </Col>
           <Col width="auto">{title}</Col>

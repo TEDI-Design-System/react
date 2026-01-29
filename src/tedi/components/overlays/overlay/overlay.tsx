@@ -163,7 +163,8 @@ export const Overlay = (props: OverlayProps) => {
     scrollLock,
   } = props;
 
-  const { order = ['reference', 'content'], initialFocus = -1, ...restFocusManager } = focusManager ?? {};
+  const { order = ['reference', 'content'], initialFocus, modal, ...restFocusManager } = focusManager ?? {};
+  const resolvedInitialFocus = initialFocus !== undefined ? initialFocus : modal ? 0 : undefined;
 
   const [open, setOpen] = useState(defaultOpen);
   const arrowRef = useRef<SVGSVGElement | null>(null);
@@ -229,11 +230,14 @@ export const Overlay = (props: OverlayProps) => {
         reference: refs.setReference,
         floating: refs.setFloating,
         arrowRef,
-        focusManager: {
-          order,
-          initialFocus,
-          ...restFocusManager,
-        },
+        focusManager: focusManager
+          ? {
+              order,
+              modal,
+              initialFocus: resolvedInitialFocus,
+              ...restFocusManager,
+            }
+          : undefined,
         x,
         y,
         strategy,

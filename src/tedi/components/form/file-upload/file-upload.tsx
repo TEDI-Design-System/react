@@ -113,7 +113,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     ...rest
   } = props;
 
-  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, handleClear } = useFileUpload({
+  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, handleClear, announcement } = useFileUpload({
     accept,
     maxSize,
     multiple,
@@ -134,12 +134,15 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   }, [files, innerFiles, onChange]);
 
   const getFileElement = (file: FileUploadFile, index: number) => {
+    const fileLabel = file.isValid === false ? `${file.name} (${getLabel('file-upload.failed')})` : file.name;
+
     return (
       <li key={index}>
         <Tag
           color={file.isValid === false ? 'danger' : 'primary'}
           onClose={!file.isLoading && !disabled && !readOnly ? () => onFileRemove(file) : undefined}
           isLoading={file.isLoading}
+          aria-label={fileLabel}
         >
           {file.name}
         </Tag>
@@ -150,12 +153,23 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const showFiles = () => {
     if (getFiles.length > 1) {
       return (
-        <ul className={styles['tedi-file-upload__items']}>
+        <ul className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__truncate-list'])}>
           {getFiles.map((file, index) => getFileElement(file, index))}
         </ul>
       );
     } else if (getFiles.length === 1) {
-      return <Text className={styles['tedi-file-upload__items']}>{getFiles[0].name}</Text>;
+      const singleFile = getFiles[0];
+      const singleLabel =
+        singleFile.isValid === false ? `${singleFile.name} (${getLabel('file-upload.failed')})` : singleFile.name;
+
+      return (
+        <Text
+          aria-label={singleLabel}
+          className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__truncate'])}
+        >
+          {singleFile.name}
+        </Text>
+      );
     }
     return null;
   };
@@ -171,6 +185,11 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
           size={size}
         />
       </div>
+
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {announcement}
+      </div>
+
       {readOnly ? (
         showFiles()
       ) : (
@@ -198,7 +217,8 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     onChange={onFileChange}
                     multiple={multiple}
                     disabled={disabled}
-                    aria-invalid={!!uploadErrorHelper}
+                    aria-invalid={!!uploadErrorHelper && uploadErrorHelper.type === 'error'}
+                    aria-describedby={helperId}
                   />
                   {hasClearButton && getFiles.length > 0 && !disabled && (
                     <>
@@ -206,7 +226,6 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                         <Button
                           visualType="neutral"
                           iconLeft="close"
-                          aria-describedby={helperId}
                           disabled={disabled}
                           onClick={handleClear}
                           className={styles['tedi-file-upload__button']}
@@ -222,7 +241,6 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                   <Button
                     visualType="neutral"
                     iconLeft="file_upload"
-                    aria-describedby={helperId}
                     disabled={disabled}
                     onClick={() => document.getElementById(id)?.click()}
                     className={styles['tedi-file-upload__button']}

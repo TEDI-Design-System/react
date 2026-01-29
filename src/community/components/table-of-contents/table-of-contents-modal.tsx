@@ -1,15 +1,15 @@
 import cn from 'classnames';
 import React, { useContext } from 'react';
 
+import { Icon } from '../../../tedi/components/base/icon/icon';
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import Button from '../button/button';
 import ButtonContent from '../button-content/button-content';
 import { Card, CardContent, CardHeader } from '../card';
-import Icon from '../icon/icon';
 import { Modal, ModalProvider, ModalTrigger } from '../modal';
-import Heading from '../typography/heading/heading';
-import { Text } from '../typography/text/text';
 import { TableOfContentsContext, TableOfContentsProps } from './table-of-contents';
 import styles from './table-of-contents.module.scss';
 import { TableOfContentsItems } from './table-of-contents-items';
@@ -42,7 +42,7 @@ export const TableOfContentsModal = (props: TableOfContentsProps) => {
       {showIcons && invalidItems === 0 ? (
         <Row gutter={1}>
           <Col width="auto">
-            <Icon name="check" color="positive" />
+            <Icon name="check" color="success" />
           </Col>
           <Col width="auto">
             <Text element="span" aria-hidden={true}>
@@ -58,7 +58,7 @@ export const TableOfContentsModal = (props: TableOfContentsProps) => {
           <Col width="auto">
             <Row gutter={1}>
               <Col width="auto">
-                <Icon name="check" color="positive" />
+                <Icon name="check" color="success" />
               </Col>
               <Col width="auto">
                 <Text element="span" aria-hidden={true}>
@@ -73,7 +73,7 @@ export const TableOfContentsModal = (props: TableOfContentsProps) => {
           <Col width="auto">
             <Row gutter={1}>
               <Col width="auto">
-                <Icon name="warning" color="important" />
+                <Icon name="warning" color="danger" />
               </Col>
               <Col width="auto">
                 <Text element="span" aria-hidden={true}>

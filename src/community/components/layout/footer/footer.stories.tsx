@@ -1,9 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import useLayout from '../../../helpers/hooks/use-layout';
 import Anchor from '../../anchor/anchor';
-import Icon from '../../icon/icon';
 import Footer, { FooterProps } from './footer';
 
 const meta: Meta<typeof Footer> = {

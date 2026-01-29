@@ -1,8 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
-import Text from '../../typography/text/text';
 import Radio, { RadioProps } from './radio';
 
 /**
@@ -60,7 +60,7 @@ export const WithExtraContent: Story = {
     id: 'extra-content-radio',
     name: 'extra-content-radio',
     extraContent: (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>
@@ -95,7 +95,7 @@ export const WithTooltipAndExtraContent: Story = {
     id: 'tooltip-extra-content-radio',
     name: 'tooltip-extra-content-radio',
     extraContent: (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>
@@ -111,7 +111,7 @@ export const WithLongTitleAndTooltipAndExtraContent: Story = {
     label:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius, sem blandit sodales tincidunt, orci elit ornare ex, eu ultrices diam turpis id nisl. Sed sollicitudin auctor nunc. Aliquam a arcu in sem bibendum laoreet non eu nunc.',
     extraContent: (
-      <Text color="muted" element="span">
+      <Text color="secondary" element="span">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis scelerisque quis augue sit amet semper. Donec
         porttitor mauris neque, quis feugiat erat malesuada ac. Cras vel mauris a est pretium egestas.
       </Text>

@@ -31,12 +31,11 @@ export default meta;
 type Story = StoryObj<SearchProps>;
 
 const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'];
+const sizeArray: SearchProps['size'][] = ['small', 'default', 'large'];
 
 interface TemplateStateProps extends SearchProps {
   array: typeof stateArray;
 }
-
-const sizeArray: SearchProps['size'][] = ['small', 'default', 'large'];
 
 interface TemplateMultipleProps<Type = SearchProps['size']> extends SearchProps {
   array: Type[];
@@ -44,75 +43,77 @@ interface TemplateMultipleProps<Type = SearchProps['size']> extends SearchProps 
 }
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, property, ...textFieldProps } = args;
+  const { array, property, id = 'search', ...textFieldProps } = args;
 
   return (
     <div className="example-list">
-      {array.map((value, key) => (
-        <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col width={2}>
-            <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
-          </Col>
-          <Col>
-            <VerticalSpacing>
-              <Search {...textFieldProps} {...{ [property]: value }} />
-              <Search {...textFieldProps} button={{ icon: 'search', size: value }} {...{ [property]: value }} />
-              <Search
-                {...textFieldProps}
-                button={{ iconLeft: 'search', children: 'Otsi', size: value }}
-                {...{ [property]: value }}
-              />
-            </VerticalSpacing>
-          </Col>
-        </Row>
-      ))}
+      {array.map((value, key) => {
+        const baseId = `${id}-${property}-${value}`;
+
+        return (
+          <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+            <Col width={2}>
+              <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+            </Col>
+            <Col>
+              <VerticalSpacing>
+                <Search {...textFieldProps} {...{ [property]: value }} id={`${baseId}-plain`} />
+                <Search
+                  {...textFieldProps}
+                  {...{ [property]: value }}
+                  id={`${baseId}-icon`}
+                  button={{ icon: 'search', size: value, 'aria-label': 'Search' }}
+                />
+                <Search
+                  {...textFieldProps}
+                  {...{ [property]: value }}
+                  id={`${baseId}-button`}
+                  button={{ iconLeft: 'search', children: 'Search', size: value }}
+                />
+              </VerticalSpacing>
+            </Col>
+          </Row>
+        );
+      })}
     </div>
   );
 };
 
 const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
-  const { array, ...textFieldProps } = args;
+  const { array, id = 'search', ...textFieldProps } = args;
 
   return (
     <div className="state-example">
-      {array.map((state, index) => (
-        <Row key={index} className="padding-14-16">
-          <Col lg={2} md={12} className="display-flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
-          </Col>
-          <Col lg={10} md={12} className="display-flex align-items-center">
-            <Search disabled={state === 'Disabled'} {...textFieldProps} id={state} />
-          </Col>
-        </Row>
-      ))}
+      {array.map((state, index) => {
+        const stateId = `${id}-${state.toLowerCase()}`;
+
+        return (
+          <Row key={index} className="padding-14-16">
+            <Col lg={2} md={12} className="display-flex align-items-center">
+              <Text modifiers="bold">{state}</Text>
+            </Col>
+            <Col lg={10} md={12} className="display-flex align-items-center">
+              <Search {...textFieldProps} id={stateId} disabled={state === 'Disabled'} />
+            </Col>
+          </Row>
+        );
+      })}
+
       <Row className="padding-14-16">
         <Col width={2} className="display-flex align-items-center">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col className="display-flex align-items-center">
-          <Search
-            {...textFieldProps}
-            id="success-search"
-            helper={{
-              text: 'Feedback text',
-              type: 'valid',
-            }}
-          />
+          <Search {...textFieldProps} id={`${id}-success`} helper={{ text: 'Feedback text', type: 'valid' }} />
         </Col>
       </Row>
+
       <Row className="padding-14-16">
         <Col width={2} className="display-flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col className="display-flex align-items-center">
-          <Search
-            {...textFieldProps}
-            id="error-search"
-            helper={{
-              text: 'Feedback text',
-              type: 'error',
-            }}
-          />
+          <Search {...textFieldProps} id={`${id}-error`} helper={{ text: 'Feedback text', type: 'error' }} />
         </Col>
       </Row>
     </div>
@@ -121,16 +122,16 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 
 export const Default: Story = {
   args: {
-    id: 'example-1',
+    id: 'search-default',
     label: 'Search',
+    placeholder: 'Search by name or keyword',
   },
 };
 
 export const Sizes: StoryObj<TemplateMultipleProps> = {
   render: TemplateColumn,
-
   args: {
-    id: 'example-1',
+    id: 'search-sizes',
     label: 'Search',
     property: 'size',
     array: sizeArray,
@@ -142,6 +143,7 @@ export const States: StoryObj<TemplateStateProps> = {
   args: {
     array: stateArray,
     label: 'Search',
+    id: 'search-states',
   },
   parameters: {
     pseudo: {
@@ -154,15 +156,15 @@ export const States: StoryObj<TemplateStateProps> = {
 
 export const Placeholder: Story = {
   args: {
-    id: 'example-1',
+    id: 'search-placeholder',
     label: 'Search',
-    placeholder: 'Name',
+    placeholder: 'Type something...',
   },
 };
 
 export const Clearable: Story = {
   args: {
-    id: 'example-1',
+    id: 'search-clearable',
     label: 'Search',
     isClearable: true,
     value: 'Lorem ipsum',
@@ -171,18 +173,48 @@ export const Clearable: Story = {
 
 export const ClearableButton: Story = {
   args: {
-    id: 'example-1',
+    id: 'search-clearable-button',
     label: 'Search',
     isClearable: true,
     value: 'Lorem ipsum',
-    button: { iconLeft: 'search', children: 'Otsi' },
+    button: { iconLeft: 'search', children: 'Search' },
   },
 };
 
 export const WithHint: Story = {
   args: {
-    id: 'example-1',
+    id: 'search-with-hint',
     label: 'Search',
     helper: { text: 'Hint text' },
+  },
+};
+
+export const Estonian: Story = {
+  args: {
+    id: 'search-et',
+    label: 'Otsing',
+    placeholder: 'Otsi tooteid, artikleid või abiinfot...',
+    ariaLabel: 'Otsi kogu saidilt',
+    button: { iconLeft: 'search', children: 'Otsi' },
+  },
+};
+
+export const AccessibilityFocused: Story = {
+  name: 'Accessibility: No Visible Label',
+  args: {
+    id: 'search-accessible',
+    placeholder: 'Otsi tooteid või teenuseid...',
+    ariaLabel: 'Otsi tooteid või teenuseid',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Always prefer a native \`<label>\` element for form controls.
+If the label must not be visible in the UI, hide it visually using an \`sr-only\` (or equivalent) class rather than removing it. This preserves correct semantics and provides the most reliable experience for screen reader users.
+Use \`ariaLabel\` only as a fallback when a real \`<label>\` cannot be rendered. This follows WCAG 2.1 and EN 301 549 9.2.5.3.
+          `,
+      },
+    },
   },
 };

@@ -1,5 +1,6 @@
 import { Meta, StoryFn } from '@storybook/react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Section } from '../../../tedi/components/content/section/section';
 import { TextArea } from '../../../tedi/components/form/textarea/textarea';
 import TextField from '../../../tedi/components/form/textfield/textfield';
@@ -8,7 +9,6 @@ import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacin
 import Button from '../button/button';
 import { CardContent, CardHeader } from '../card';
 import { Default as LayoutDefault } from '../layout/layout/layout.stories';
-import Heading from '../typography/heading/heading';
 import Feedback, { FeedbackProps } from './feedback';
 
 /**

@@ -30,6 +30,7 @@ export const Popover = (props: PopoverProps) => {
         height: ARROW_HEIGHT,
       }}
       openWith={openWith}
+      role="dialog"
       {...rest}
     />
   );

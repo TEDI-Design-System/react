@@ -109,6 +109,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 icon="arrow_right_alt"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
+                showTooltip
               >
                 Icon Only
               </Button>
@@ -150,6 +151,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 icon="arrow_right_alt"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
+                showTooltip
               >
                 Icon Only
               </Button>
@@ -376,6 +378,28 @@ export const LongTextButtonThatWrapsIntoMultipleLines: Story = {
         </Col>
         <Col md={3} width={12}>
           <Button>{args.children}</Button>
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
+};
+
+export const VisualTypeLink: StoryObj<TemplateMultipleProps> = {
+  render: () => (
+    <VerticalSpacing>
+      <Row gap={3}>
+        <Col width="auto">
+          <Button visualType="link">Add file</Button>
+        </Col>
+        <Col width="auto">
+          <Button visualType="link" iconLeft="add">
+            Add file
+          </Button>
+        </Col>
+        <Col width="auto">
+          <Button visualType="link" iconRight="add">
+            Add file
+          </Button>
         </Col>
       </Row>
     </VerticalSpacing>

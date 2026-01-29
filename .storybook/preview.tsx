@@ -104,8 +104,8 @@ const preview: Preview = {
     status: {
       statuses: {
         devComponent: {
-          background: '#ff8000',
-          color: '#ffffff',
+          background: '#D2D3D8',
+          color: '#000',
           description: 'This component is dev only and not found in Figma',
         },
         breakpointSupport: {
@@ -128,6 +128,12 @@ const preview: Preview = {
           color: '#fff',
           description:
             'This component lacks some TEDI-Ready functionality, e.g it may rely on another component that has not yet been developed',
+        },
+        mobileViewDifference: {
+          background: '#99BDDA',
+          color: '#000',
+          description:
+            'This component has a different layout on mobile. Use the mobile breakpoint or resize the browser window to review the mobile design.',
         },
       },
     },

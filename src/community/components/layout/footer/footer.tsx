@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { Icon, IconProps } from '../../../../tedi/components/base/icon/icon';
+import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../../tedi/components/layout/vertical-spacing';
 import { Print } from '../../../../tedi/components/misc/print/print';
 import { StretchContent } from '../../../../tedi/components/misc/stretch-content/stretch-content';
 import { useLabels } from '../../../../tedi/providers/label-provider';
-import Icon, { IconProps } from '../../icon/icon';
-import Text from '../../typography/text/text';
 import styles from './footer.module.scss';
 
 export type FooterCategory = {
@@ -63,7 +63,7 @@ export const Footer = (props: FooterProps): JSX.Element => {
           {logo && <img className={styles['footer__logo']} src={logo.src} alt={logo.alt} style={logo.style} />}
         </div>
         {bottomElement && (
-          <Text color="inverted" element="div" className={styles['footer__bottom']}>
+          <Text color="white" element="div" className={styles['footer__bottom']}>
             {bottomElement}
           </Text>
         )}
@@ -76,9 +76,11 @@ const FooterCategory = (props: FooterCategory): JSX.Element => {
   const { heading, icon, elements } = props;
 
   const getIcon = (icon: string | IconProps) => {
-    const defaultIconProps: Partial<IconProps> = { size: 16 };
+    const defaultIconProps: Partial<IconProps> = { size: 16, color: 'inherit', background: undefined };
     const iconProps: IconProps =
-      typeof icon === 'string' ? { ...defaultIconProps, name: icon } : { ...defaultIconProps, ...icon };
+      typeof icon === 'string'
+        ? { ...defaultIconProps, name: icon, background: undefined }
+        : { ...defaultIconProps, ...icon, background: undefined };
 
     return <Icon {...iconProps} />;
   };
@@ -92,13 +94,13 @@ const FooterCategory = (props: FooterCategory): JSX.Element => {
       )}
       <Col width="auto">
         <VerticalSpacing className={cn('text-small', styles['footer__category'])} size={0.5}>
-          <Text color="inverted" modifiers={['bold', 'normal']} element="h3">
+          <Text color="white" modifiers={['bold', 'normal']} element="h3">
             {heading}
           </Text>
           <VerticalSpacing element="ul" size={0.5} className={cn(styles['footer__category-list'])}>
             {elements?.map((item, index) => (
               <li key={index}>
-                <Text color="inverted" element="span" modifiers="break-all">
+                <Text color="white" element="span" modifiers="break-all">
                   {item}
                 </Text>
               </li>

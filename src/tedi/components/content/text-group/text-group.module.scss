@@ -18,4 +18,12 @@
     gap: var(--text-group-value-inner-spacing);
     align-items: center;
   }
+
+  &--align-left {
+    justify-content: flex-start;
+  }
+
+  &--align-right {
+    justify-content: flex-end;
+  }
 }

@@ -1,7 +1,9 @@
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
+import { Text } from '../../../tedi/components/base/typography/text/text';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import { Separator } from '../../../tedi/components/misc/separator/separator';
-import { Button, Card, CardContent, Heading, Text } from '../../index';
+import { Button, Card, CardContent } from '../../index';
 
 const ButtonGroups = () => (
   <VerticalSpacing>
@@ -55,7 +57,7 @@ const Horizontal = () => (
           <VerticalSpacing size={2}>
             <Row direction="row-reverse" alignItems="center" gutterX={1} gap={2}>
               <Col width="auto">
-                <Text color="subtle">1</Text>
+                <Text color="tertiary">1</Text>
               </Col>
               <Col width="auto">
                 <Button>Primary</Button>
@@ -69,7 +71,7 @@ const Horizontal = () => (
             </Row>
             <Row direction="row-reverse" alignItems="center" gutterX={1} gap={2}>
               <Col width="auto">
-                <Text color="subtle">2</Text>
+                <Text color="tertiary">2</Text>
               </Col>
               <Col width="auto">
                 <Button>Primary</Button>
@@ -80,7 +82,7 @@ const Horizontal = () => (
             </Row>
             <Row direction="row-reverse" alignItems="center" gutterX={1} gap={2}>
               <Col width="auto">
-                <Text color="subtle">3</Text>
+                <Text color="tertiary">3</Text>
               </Col>
               <Col width="auto">
                 <Button visualType="secondary">Secondary</Button>
@@ -114,7 +116,7 @@ const Vertical = () => (
             <Col width="auto">
               <Row direction="column" alignItems="center" gutterX={1} gap={2}>
                 <Col width="auto">
-                  <Text color="subtle">1</Text>
+                  <Text color="tertiary">1</Text>
                 </Col>
                 <Col width="auto">
                   <Button>Primary</Button>
@@ -130,7 +132,7 @@ const Vertical = () => (
             <Col width="auto">
               <Row direction="column" alignItems="center" gutterX={1} gap={2}>
                 <Col width="auto">
-                  <Text color="subtle">2</Text>
+                  <Text color="tertiary">2</Text>
                 </Col>
                 <Col width="auto">
                   <Button>Primary</Button>
@@ -143,7 +145,7 @@ const Vertical = () => (
             <Col width="auto">
               <Row direction="column" alignItems="center" gutterX={1} gap={2}>
                 <Col width="auto">
-                  <Text color="subtle">3</Text>
+                  <Text color="tertiary">3</Text>
                 </Col>
                 <Col width="auto">
                   <Button visualType="secondary">Secondary</Button>

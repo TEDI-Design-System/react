@@ -12,6 +12,7 @@ import {
 import dayjs from 'dayjs';
 import React from 'react';
 
+import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import { getBackgroundColorClass } from '../../helpers/background-colors/background-colors';
 import { IntentionalAny } from '../../types';
@@ -20,7 +21,6 @@ import { Card, CardContent } from '../card';
 import Check from '../form/check/check';
 import Status from '../status/status';
 import Tag from '../tag/tag';
-import Heading from '../typography/heading/heading';
 import { CustomExpandRowExample } from './components/examples/custom-expand-row';
 import {
   CustomizeTableCell,
