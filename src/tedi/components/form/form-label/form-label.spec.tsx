@@ -61,4 +61,21 @@ describe('FormLabel component', () => {
 
     expect(getByText('Form Label Text')).toBeInTheDocument();
   });
+
+  it('renders a ReactNode label correctly', () => {
+    const { getByTestId } = render(
+      <FormLabel
+        id="test-id"
+        label={
+          <span data-testid="custom-label">
+            Custom <strong>Node</strong>
+          </span>
+        }
+      />
+    );
+
+    const customLabel = getByTestId('custom-label');
+    expect(customLabel).toBeInTheDocument();
+    expect(customLabel).toHaveTextContent('Custom Node');
+  });
 });
