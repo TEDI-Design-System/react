@@ -13,6 +13,11 @@
     height: var(--button-sm-icon-size);
   }
 
+  &--small {
+    width: var(--button-xs-icon-size);
+    height: var(--button-xs-icon-size);
+  }
+
   &--color-primary {
     color: var(--button-close-text-default);
     background-color: var(--button-close-background-default);
@@ -28,6 +33,7 @@
     }
 
     &:focus-visible {
+      color: var(--button-close-text-focus);
       outline: 2px solid var(--button-main-primary-border-focus);
     }
   }
@@ -67,11 +73,6 @@
 
     &:focus-visible {
       outline: 2px solid var(--button-main-neutral-inverted-text-focus);
-    }
-
-    &--small {
-      width: var(--button-xs-icon-size);
-      height: var(--button-xs-icon-size);
     }
   }
 }

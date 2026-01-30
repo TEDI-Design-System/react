@@ -14,18 +14,18 @@ describe('ClosingButton component', () => {
 
     const button = screen.getByRole('button', { name: /close/i });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveClass('tedi-closing-button tedi-closing-button--medium tedi-closing-button--color-primary');
+    expect(button).toHaveClass('tedi-closing-button tedi-closing-button--default tedi-closing-button--color-primary');
 
     const icon = button.querySelector('span[data-name="icon"]');
     expect(icon).toBeInTheDocument();
-    expect(icon).toHaveClass('tedi-icon--size-18');
+    expect(icon).toHaveClass('tedi-icon--size-24');
   });
 
-  it('renders with the correct large size class and icon size', () => {
-    render(<ClosingButton size="default" />);
+  it('renders with the correct small size class and icon size', () => {
+    render(<ClosingButton size="small" />);
 
     const button = screen.getByRole('button', { name: /close/i });
-    expect(button).toHaveClass('tedi-closing-button tedi-closing-button--large tedi-closing-button--color-primary');
+    expect(button).toHaveClass('tedi-closing-button tedi-closing-button--small tedi-closing-button--color-primary');
     render(
       <ClosingButton
         onClick={() => {
@@ -34,24 +34,11 @@ describe('ClosingButton component', () => {
       />
     );
 
-    const button = screen.getByRole('button', { name: /close/i });
     expect(button).toBeInTheDocument();
     expect(button).toHaveClass('tedi-closing-button');
-    expect(button).toHaveClass('tedi-closing-button--default');
-
-    const icon = button.querySelector('span[data-name="icon"]');
-    expect(icon).toHaveClass('tedi-icon--size-24');
-  });
-
-  it('renders with small size when size="small"', () => {
-    render(<ClosingButton size="small" />);
-
-    const button = screen.getByRole('button', { name: /close/i });
     expect(button).toHaveClass('tedi-closing-button--small');
 
     const icon = button.querySelector('span[data-name="icon"]');
-    expect(icon).toBeInTheDocument();
-    // Small button still uses default icon size
     expect(icon).toHaveClass('tedi-icon--size-24');
   });
 
@@ -71,12 +58,12 @@ describe('ClosingButton component', () => {
 
     const button = screen.getByRole('button', { name: /close/i });
     expect(button).toHaveClass(
-      'tedi-closing-button tedi-closing-button--medium tedi-closing-button--color-primary custom-class'
+      'tedi-closing-button tedi-closing-button--default tedi-closing-button--color-primary custom-class'
     );
-    const button = screen.getByRole('button', { name: /Close/i });
-    expect(button).toHaveClass('tedi-closing-button');
-    expect(button).toHaveClass('tedi-closing-button--default');
-    expect(button).toHaveClass('custom-class');
+    const customButton = screen.getByRole('button', { name: /Close/i });
+    expect(customButton).toHaveClass('tedi-closing-button');
+    expect(customButton).toHaveClass('tedi-closing-button--default');
+    expect(customButton).toHaveClass('custom-class');
   });
 
   it('triggers onClick handler when clicked', () => {

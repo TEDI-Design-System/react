@@ -77,7 +77,7 @@ export const ClosingButton = (props: ClosingButtonProps): JSX.Element => {
       title={title}
       aria-label={title}
     >
-      <Icon name="close" size={resolvedIconSize} color={color} />
+      <Icon name="close" size={resolvedIconSize} color="inherit" />
     </button>
   );
 };
