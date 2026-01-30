@@ -24,13 +24,13 @@
     outline-offset: -2px;
   }
 
-  &--medium {
-    width: var(--button-xs-icon-size);
-    height: var(--button-xs-icon-size);
-  }
-
-  &--large {
+  &--default {
     width: var(--button-sm-icon-size);
     height: var(--button-sm-icon-size);
+  }
+
+  &--small {
+    width: var(--button-xs-icon-size);
+    height: var(--button-xs-icon-size);
   }
 }

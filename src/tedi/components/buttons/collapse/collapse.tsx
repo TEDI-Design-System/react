@@ -50,6 +50,12 @@ type CollapseBreakpointProps = {
    * @default true
    */
   underline?: boolean;
+  /**
+   * Render collapse as icon-only toggle.
+   * Icon-only styles are applied ONLY when no title is provided.
+   * @default false
+   */
+  iconOnly?: boolean;
 };
 
 export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps> {
@@ -108,6 +114,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     size = 'default',
     underline = true,
     toggleLabel,
+    iconOnly = false,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -123,11 +130,13 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     [isPrint, open, isOpenState]
   );
 
+  const isIconOnly = iconOnly === true && !title;
+
   const CollapseBEM = cn(
     styles['tedi-collapse'],
     size === 'small' && styles['tedi-collapse--small'],
     isOpen && styles['tedi-collapse--is-open'],
-    hideCollapseText && styles['tedi-collapse--icon-only'],
+    isIconOnly && styles['tedi-collapse--icon-only'],
     styles[`tedi-collapse--arrow-${arrowType}`],
     className
   );

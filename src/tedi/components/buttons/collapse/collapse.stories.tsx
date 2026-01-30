@@ -106,7 +106,7 @@ export const IconOnly = {
   args: {
     array: buttonStateArray,
     visualType: 'primary',
-    hideCollapseText: true,
+    iconOnly: true,
   },
   parameters: {
     pseudo: {
@@ -122,7 +122,7 @@ export const SecondaryButton = {
   args: {
     array: buttonStateArray,
     arrowType: 'secondary',
-    hideCollapseText: true,
+    iconOnly: true,
     hideSizes: true,
   },
   parameters: {

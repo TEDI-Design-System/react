@@ -1,6 +1,6 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
@@ -37,6 +37,10 @@ export const SideNavMobile = <C extends React.ElementType = 'a'>({
 }: SideNavMobileProps<C>) => {
   const { getLabel } = useLabels();
   const [navigationStack, setNavigationStack] = useState<NavigationLevel<C>[]>([{ items: navItems }]);
+
+  useEffect(() => {
+    setNavigationStack([{ items: navItems }]);
+  }, [navItems]);
 
   const currentLevel = navigationStack[navigationStack.length - 1];
   const isRootLevel = navigationStack.length === 1;

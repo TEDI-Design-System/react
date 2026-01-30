@@ -1,10 +1,7 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 @use '@tedi-design-system/core/mixins';
 
-$input-height: 2.5rem;
-$input-height-small: 2rem;
 $input-height-large: 3.5rem;
-$input-height-mobile: 2.75rem;
 
 @mixin textfield-focus($border-color: null) {
   @if $border-color {
@@ -37,7 +34,7 @@ $input-height-mobile: 2.75rem;
 .tedi-textfield__input {
   display: block;
   width: 100%;
-  height: $input-height;
+  height: var(--form-field-height);
   padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
   font-family: inherit;
   font-size: var(--body-regular-size);
@@ -77,17 +74,13 @@ $input-height-mobile: 2.75rem;
     padding-right: 2rem;
   }
 
-  .tedi-textfield--clearable.textfield--with-icon & {
+  .tedi-textfield--clearable.tedi-textfield--with-icon & {
     padding-right: 4rem;
   }
 
   &::placeholder {
     color: var(--form-input-text-placeholder);
     opacity: 1;
-  }
-
-  @include breakpoints.media-breakpoint-down(md) {
-    height: $input-height-mobile;
   }
 }
 
@@ -160,21 +153,17 @@ div.tedi-textfield__icon-wrapper {
 /* Small */
 .tedi-textfield--small {
   .tedi-textfield__input {
-    height: $input-height-small;
+    height: var(--form-field-height-sm);
     padding: var(--form-field-padding-y-sm) var(--form-field-padding-x-md-default);
     font-size: var(--body-small-regular-size);
-
-    @include breakpoints.media-breakpoint-down(md) {
-      height: $input-height-mobile;
-    }
   }
 
-  &.tedi-textfield--clearable .tedi-textfield__input,
-  &.tedi-textfield--with-icon .tedi-textfield__input {
+  &.tedi-textfield--clearable &,
+  &.tedi-textfield--with-icon & {
     padding-right: 2rem;
   }
 
-  &.tedi-textfield--clearable.tedi-textfield--with-icon .tedi-textfield__input {
+  &.tedi-textfield--clearable.tedi-textfield--with-icon & {
     padding-right: 4rem;
   }
 }
@@ -186,7 +175,7 @@ div.tedi-textfield__icon-wrapper {
     padding: 1rem;
 
     @include breakpoints.media-breakpoint-down(md) {
-      height: $input-height-mobile;
+      height: var(--form-field-height);
     }
   }
 

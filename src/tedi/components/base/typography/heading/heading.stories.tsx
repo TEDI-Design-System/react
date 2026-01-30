@@ -1,6 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
-import { TextRow } from '../../../../providers/storybook-provider/storybook-provider';
 import { Col, Row } from '../../../layout/grid';
 import { HeadingModifiers, Text } from '../text/text';
 import { Heading } from './heading';
@@ -18,6 +17,9 @@ const meta: Meta<typeof Heading> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?node-id=115-11630&m=dev',
     },
+    status: {
+      type: 'mobileViewDifference',
+    },
   },
 };
 
@@ -28,34 +30,20 @@ const headings: HeadingModifiers[] = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 
 const TemplateHeadings: StoryFn = () => (
   <div className="example-list w-100">
-    <Row className="border-bottom border-bottom--3x">
+    <Row>
       <Col>
-        <Text color="primary" className="padding-14-16">
-          Desktop
-        </Text>
-      </Col>
-      <Col>
-        <Text color="primary" className="padding-14-16">
-          Mobile
-        </Text>
+        {headings.map((heading, index) => (
+          <Text
+            key={heading}
+            element={heading}
+            modifiers={heading}
+            className={`padding-14-16 ${index !== headings.length - 1 ? 'border-bottom' : ''}`}
+          >
+            Heading {heading.toUpperCase()}
+          </Text>
+        ))}
       </Col>
     </Row>
-    {headings.map((heading, key) => (
-      <TextRow
-        key={heading}
-        desktopText={
-          <Text element={heading} modifiers={heading}>
-            Heading {heading.toUpperCase()}
-          </Text>
-        }
-        mobileText={
-          <Text element={heading} modifiers={heading}>
-            Heading {heading.toUpperCase()}
-          </Text>
-        }
-        className={key !== headings.length - 1 ? 'border-bottom' : ''}
-      />
-    ))}
   </div>
 );
 
