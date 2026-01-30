@@ -13,7 +13,7 @@ export interface FormLabelProps {
   /**
    * The text content of the label that describes the input field.
    */
-  label: string;
+  label: React.ReactNode;
   /**
    * Controls the visibility of the label.
    * Use `true` to hide the label visually while maintaining its space in the layout,
