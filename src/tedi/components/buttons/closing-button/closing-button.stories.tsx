@@ -20,7 +20,8 @@ const meta: Meta<typeof ClosingButton> = {
   },
 };
 
-const sizeArray: ClosingButtonProps['size'][] = ['medium', 'large'];
+const sizeArray: ClosingButtonProps['size'][] = ['default', 'small'];
+const iconSizeArray: ClosingButtonProps['iconSize'][] = [18, 24];
 
 export default meta;
 type Story = StoryObj<typeof ClosingButton>;
@@ -61,15 +62,51 @@ const StatesTemplate: StoryFn = (args) => {
   );
 };
 
+const IconSizeTemplate: StoryFn = () => {
+  return (
+    <div className="example-list">
+      {iconSizeArray.map((iconSize, key) => (
+        <Row className={`${key === iconSizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col className="display-flex w-50">{`${iconSize}px`}</Col>
+          <Col className="display-flex">
+            <ClosingButton iconSize={iconSize} onClick={() => alert(`${iconSize}px icon clicked`)} className="hover" />
+            {iconSize === 24 && (
+              <div style={{ marginLeft: '16px' }}>
+                <ClosingButton
+                  iconSize={iconSize}
+                  size="small"
+                  onClick={() => alert(`${iconSize}px icon clicked`)}
+                  className="hover"
+                />
+              </div>
+            )}
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
+
 export const Default: Story = {
   args: {
     title: 'close',
-    size: 'medium',
   },
 };
 
 export const Size: Story = {
   render: SizeTemplate,
+};
+
+/**
+ * Hover state is shown on all buttons for size preview.
+ */
+export const IconSizes: Story = {
+  render: IconSizeTemplate,
+  parameters: {
+    pseudo: {
+      hover: '.hover',
+    },
+  },
 };
 
 export const States: Story = {

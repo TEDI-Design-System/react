@@ -22,13 +22,48 @@ describe('ClosingButton component', () => {
   });
 
   it('renders with the correct large size class and icon size', () => {
-    render(<ClosingButton size="large" />);
+    render(<ClosingButton size="default" />);
 
     const button = screen.getByRole('button', { name: /close/i });
     expect(button).toHaveClass('tedi-closing-button tedi-closing-button--large tedi-closing-button--color-primary');
+    render(
+      <ClosingButton
+        onClick={() => {
+          console.log('Button pressed');
+        }}
+      />
+    );
+
+    const button = screen.getByRole('button', { name: /close/i });
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveClass('tedi-closing-button');
+    expect(button).toHaveClass('tedi-closing-button--default');
 
     const icon = button.querySelector('span[data-name="icon"]');
     expect(icon).toHaveClass('tedi-icon--size-24');
+  });
+
+  it('renders with small size when size="small"', () => {
+    render(<ClosingButton size="small" />);
+
+    const button = screen.getByRole('button', { name: /close/i });
+    expect(button).toHaveClass('tedi-closing-button--small');
+
+    const icon = button.querySelector('span[data-name="icon"]');
+    expect(icon).toBeInTheDocument();
+    // Small button still uses default icon size
+    expect(icon).toHaveClass('tedi-icon--size-24');
+  });
+
+  it('forces small size when iconSize is 18', () => {
+    render(<ClosingButton iconSize={18} />);
+
+    const button = screen.getByRole('button', { name: /close/i });
+    expect(button).toHaveClass('tedi-closing-button--small');
+
+    const icon = button.querySelector('span[data-name="icon"]');
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveClass('tedi-icon--size-18');
   });
 
   it('applies custom class names', () => {
@@ -38,6 +73,10 @@ describe('ClosingButton component', () => {
     expect(button).toHaveClass(
       'tedi-closing-button tedi-closing-button--medium tedi-closing-button--color-primary custom-class'
     );
+    const button = screen.getByRole('button', { name: /Close/i });
+    expect(button).toHaveClass('tedi-closing-button');
+    expect(button).toHaveClass('tedi-closing-button--default');
+    expect(button).toHaveClass('custom-class');
   });
 
   it('triggers onClick handler when clicked', () => {

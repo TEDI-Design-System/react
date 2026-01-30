@@ -50,4 +50,87 @@ describe('TextGroup component', () => {
 
     expect(textGroup).toHaveStyle('--label-width: 50%');
   });
+
+  it('applies right alignment class when labelAlign="right"', () => {
+    const { container } = render(<TextGroup label="Total" value="€ 124.50" labelAlign="right" />);
+
+    const labelElement = container.querySelector('dt.tedi-text-group__label');
+    expect(labelElement).toHaveClass('tedi-text-group--align-right');
+    expect(labelElement).not.toHaveClass('tedi-text-group--align-left');
+  });
+
+  it('applies right alignment in horizontal layout', () => {
+    const { container } = render(
+      <TextGroup label="Price" value="39.99 €" type="horizontal" labelAlign="right" labelWidth="180px" />
+    );
+
+    const textGroup = container.querySelector('.tedi-text-group');
+    expect(textGroup).toHaveClass('tedi-text-group--horizontal');
+    expect(textGroup).toHaveStyle('--label-width: 180px');
+
+    const labelElement = container.querySelector('dt');
+    expect(labelElement).toHaveClass('tedi-text-group--align-right');
+  });
+
+  it('still applies left alignment when explicitly set to "left"', () => {
+    const { container } = render(<TextGroup label="Status" value="Active" labelAlign="left" />);
+
+    const labelElement = container.querySelector('dt');
+    expect(labelElement).toHaveClass('tedi-text-group--align-left');
+    expect(labelElement).not.toHaveClass('tedi-text-group--align-right');
+  });
+
+  it('renders plain string label through <Label> component', () => {
+    const { container } = render(<TextGroup label="Status" value="Active" />);
+
+    const dt = container.querySelector('dt');
+    const labelWrapper = dt?.querySelector('.tedi-label');
+
+    expect(labelWrapper).toBeInTheDocument();
+    expect(dt).toHaveTextContent('Status');
+    expect(dt?.children).toHaveLength(1);
+    expect(dt?.firstChild?.nodeName.toLowerCase()).toBe('label');
+  });
+
+  it('renders complex JSX label without extra <Label> wrapper', () => {
+    const { container } = render(
+      <TextGroup
+        label={
+          <>
+            <strong>Authorisations</strong>
+            <button type="button">Info</button>
+          </>
+        }
+        value="Visible to doctor"
+      />
+    );
+
+    const dt = container.querySelector('dt');
+
+    expect(dt).toBeInTheDocument();
+    expect(dt).toHaveTextContent('Authorisations');
+
+    const nestedLabels = dt?.querySelectorAll('label, .tedi-label');
+    expect(nestedLabels?.length).toBe(0);
+    expect(dt?.querySelector('strong')).toBeInTheDocument();
+    expect(dt?.querySelector('button')).toBeInTheDocument();
+  });
+
+  it('handles null/undefined label gracefully (renders empty)', () => {
+    const { container } = render(<TextGroup label={null} value="—" />);
+    const dt = container.querySelector('dt');
+
+    expect(dt).toBeInTheDocument();
+    expect(dt).toHaveTextContent('');
+    expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
+  });
+
+  it('renders label as array of nodes without wrapper', () => {
+    const { container } = render(<TextGroup label={['Role: ', <em key="em">Admin</em>]} value="System" />);
+
+    const dt = container.querySelector('dt');
+    expect(dt).toHaveTextContent('Role: Admin');
+    expect(dt?.querySelector('em')).toBeInTheDocument();
+    expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
+  });
 });
