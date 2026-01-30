@@ -210,4 +210,10 @@ describe('Checkbox component', () => {
 
     expect(label.click).toHaveBeenCalled();
   });
+
+  it('renders required indicator when required prop is true', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" required />);
+
+    expect(screen.getByText('*')).toBeInTheDocument();
+  });
 });

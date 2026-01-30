@@ -161,6 +161,14 @@ export const States = () => {
               />
             </Col>
           </Row>
+          <Row>
+            <Col md={3}>
+              <Text modifiers="bold">Required</Text>
+            </Col>
+            <Col>
+              <Checkbox id="check-required" label="Text" name="check-required" value="check" required />
+            </Col>
+          </Row>
         </VerticalSpacing>
       </Col>
     </Row>
