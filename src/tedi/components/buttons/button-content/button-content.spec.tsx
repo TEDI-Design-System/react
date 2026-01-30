@@ -78,4 +78,38 @@ describe('ButtonContent component', () => {
     fireEvent.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('shows tooltip automatically when button is icon-only', async () => {
+    render(<ButtonContent icon="search">Search</ButtonContent>);
+    const tooltipContent = await screen.findByText('Search');
+    expect(tooltipContent).toBeVisible();
+  });
+
+  it('uses children text as tooltip content for icon-only button', async () => {
+    render(<ButtonContent icon="edit">Edit item</ButtonContent>);
+    const button = screen.getByRole('button');
+    fireEvent.mouseOver(button);
+    const tooltip = await screen.findByText('Edit item');
+    expect(tooltip).toBeInTheDocument();
+  });
+
+  it('uses children text as tooltip content for icon-only button', async () => {
+    render(<ButtonContent icon="edit">Edit item</ButtonContent>);
+    const button = screen.getByRole('button');
+    fireEvent.pointerEnter(button);
+    await screen.findByText('Edit item');
+    expect(screen.getByText('Edit item')).toBeVisible();
+  });
+
+  it('does not show tooltip when autoTooltip is false', () => {
+    render(
+      <ButtonContent icon="delete" showTooltip={false}>
+        Delete
+      </ButtonContent>
+    );
+
+    const button = screen.getByRole('button');
+    fireEvent.mouseEnter(button);
+    expect(document.querySelector('.tedi-overlay__content')).not.toBeInTheDocument();
+  });
 });

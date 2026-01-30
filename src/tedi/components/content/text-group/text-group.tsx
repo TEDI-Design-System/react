@@ -5,25 +5,47 @@ import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Label } from '../label/label';
 import styles from './text-group.module.scss';
 
-type TextGroupType = 'vertical' | 'horizontal';
+type TextAlign = 'left' | 'right';
 
-type TextGroupBreakpointProps = {
-  /**
-   * Type of text group layout
-   */
-  type?: TextGroupType;
-  /**
-   * Width for the label (e.g., '200px', '30%', etc.)
-   * @default 'auto'
-   */
-  labelWidth?: string | number;
-};
+type TextGroupBreakpointProps =
+  | {
+      /**
+       * Type of text group layout
+       */
+      type?: 'horizontal';
+      /**
+       * Alignment for the label text
+       *  @default 'left'
+       */
+      labelAlign?: TextAlign;
+      /**
+       * Width for the label (e.g., '200px', '30%', etc.)
+       * @default 'auto'
+       */
+      labelWidth?: string | number;
+    }
+  | {
+      /**
+       * Type of text group layout
+       */
+      type: 'vertical';
+      /**
+       * Alignment for the label text
+       *  @default 'left'
+       */
+      labelAlign?: 'left';
+      /**
+       * Width for the label (e.g., '200px', '30%', etc.)
+       * @default 'auto'
+       */
+      labelWidth?: string | number;
+    };
 
-export interface TextGroupProps extends BreakpointSupport<TextGroupBreakpointProps> {
+export type TextGroupProps = BreakpointSupport<TextGroupBreakpointProps> & {
   /**
    * Label for the text group
    */
-  label: string;
+  label: React.ReactNode;
   /**
    * Value displayed alongside the label
    */
@@ -32,7 +54,7 @@ export interface TextGroupProps extends BreakpointSupport<TextGroupBreakpointPro
    * Additional class name(s) to apply to the element
    */
   className?: string;
-}
+};
 
 export const TextGroup = (props: TextGroupProps): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
@@ -42,6 +64,7 @@ export const TextGroup = (props: TextGroupProps): JSX.Element => {
     labelWidth = 'auto',
     className,
     type = 'vertical',
+    labelAlign = 'left',
   } = getCurrentBreakpointProps<TextGroupProps>(props);
 
   const textGroupBEM = cn(styles['tedi-text-group'], styles[`tedi-text-group--${type}`], className);
@@ -49,8 +72,8 @@ export const TextGroup = (props: TextGroupProps): JSX.Element => {
 
   return (
     <dl className={textGroupBEM} style={{ '--label-width': labelWidthStyle }}>
-      <dt className={cn(styles['tedi-text-group__label'])}>
-        <Label>{label}</Label>
+      <dt className={cn(styles['tedi-text-group__label'], styles[`tedi-text-group--align-${labelAlign}`])}>
+        {typeof label === 'string' ? <Label>{label}</Label> : label}
       </dt>
       <dd className={cn(styles['tedi-text-group__value'])}>{value}</dd>
     </dl>

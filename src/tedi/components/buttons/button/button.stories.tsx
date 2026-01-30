@@ -109,6 +109,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 icon="arrow_right_alt"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
+                showTooltip
               >
                 Icon Only
               </Button>
@@ -150,6 +151,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 icon="arrow_right_alt"
                 disabled={value === 'Disabled'}
                 isLoading={value === 'Loading'}
+                showTooltip
               >
                 Icon Only
               </Button>
