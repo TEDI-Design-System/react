@@ -1,3 +1,15 @@
+# [16.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-15.0.0...react-16.0.0-rc.1) (2026-01-30)
+
+
+### Features
+
+* **closing-button:** align size and icon behavior with the design [#43](https://github.com/TEDI-Design-System/react/issues/43) ([#481](https://github.com/TEDI-Design-System/react/issues/481)) ([cdd92a8](https://github.com/TEDI-Design-System/react/commit/cdd92a88115f9ba5b6a5265bf495640178f02b9c))
+
+
+### BREAKING CHANGES
+
+* **closing-button:** size, iconSize changes, new default values
+
 # [15.0.0](https://github.com/TEDI-Design-System/react/compare/react-14.3.0...react-15.0.0) (2026-01-29)
 
 
