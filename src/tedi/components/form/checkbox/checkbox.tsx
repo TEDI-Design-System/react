@@ -34,6 +34,7 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
     tooltip,
     invalid,
     size = 'default',
+    required,
     ...rest
   } = props;
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
@@ -53,7 +54,7 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
   const helperId = helper ? helper.id ?? `${id}-helper` : undefined;
   const tooltipId = tooltip ? `${id}-tooltip` : undefined;
 
-  const LabelBEM = cn(styles['tedi-checkbox'], { [styles['tedi-checkbox--disabled']]: disabled });
+  const LabelBEM = cn(styles['tedi-checkbox__label'], { [styles['tedi-checkbox--disabled']]: disabled });
 
   return (
     <div data-name="check" {...rest}>
@@ -100,8 +101,8 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
             </div>
           </div>
         </Col>
-        <Col>
-          {label && typeof label === 'string' ? (
+        {label && (
+          <Col>
             <FormLabel
               ref={labelRef}
               className={LabelBEM}
@@ -110,13 +111,10 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
               hideLabel={hideLabel}
               label={label}
               tooltip={tooltip}
+              required={required}
             />
-          ) : (
-            <label ref={labelRef} htmlFor={id} className={LabelBEM} data-testid="checkbox-label">
-              {label}
-            </label>
-          )}
-        </Col>
+          </Col>
+        )}
       </Row>
       {helper && (
         <FeedbackText id={helperId} {...helper} className={cn(styles['tedi-checkbox__helper'], helper.className)} />

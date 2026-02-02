@@ -26,6 +26,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
     tooltip,
     size = 'default',
     invalid,
+    required,
     ...rest
   } = props;
 
@@ -46,7 +47,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
   const helperId = helper ? helper.id ?? `${id}-helper` : undefined;
   const tooltipId = tooltip ? `${id}-tooltip` : undefined;
 
-  const LabelBEM = cn(styles['tedi-radio'], { [styles['tedi-radio--disabled']]: disabled });
+  const LabelBEM = cn(styles['tedi-radio__label'], { [styles['tedi-radio--disabled']]: disabled });
 
   return (
     <div data-name="radio" {...rest}>
@@ -78,8 +79,8 @@ export const Radio = (props: RadioProps): JSX.Element => {
             />
           </div>
         </Col>
-        <Col>
-          {label && typeof label === 'string' ? (
+        {label && (
+          <Col>
             <FormLabel
               ref={labelRef}
               className={LabelBEM}
@@ -88,13 +89,10 @@ export const Radio = (props: RadioProps): JSX.Element => {
               hideLabel={hideLabel}
               label={label}
               tooltip={tooltip}
+              required={required}
             />
-          ) : (
-            <label ref={labelRef} htmlFor={id} className={LabelBEM} data-testid="radio-label">
-              {label}
-            </label>
-          )}
-        </Col>
+          </Col>
+        )}
       </Row>
 
       {helper && (
