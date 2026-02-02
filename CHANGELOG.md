@@ -1,3 +1,10 @@
+# [16.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.2...react-16.0.0-rc.3) (2026-02-02)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** pass required prop to label [#115](https://github.com/TEDI-Design-System/react/issues/115) ([#498](https://github.com/TEDI-Design-System/react/issues/498)) ([a569636](https://github.com/TEDI-Design-System/react/commit/a569636453c865b142ec53761949b97afd436546)), closes [#486](https://github.com/TEDI-Design-System/react/issues/486)
+
 # [16.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.1...react-16.0.0-rc.2) (2026-02-02)
 
 
