@@ -1,3 +1,10 @@
+# [16.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.1...react-16.0.0-rc.2) (2026-02-02)
+
+
+### Features
+
+* **form-label:** update label prop type to ReactNode [#486](https://github.com/TEDI-Design-System/react/issues/486) ([#490](https://github.com/TEDI-Design-System/react/issues/490)) ([2c1152a](https://github.com/TEDI-Design-System/react/commit/2c1152a549aef92cb3225f092b0519c13440b756))
+
 # [16.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-15.0.0...react-16.0.0-rc.1) (2026-01-30)
 
 
