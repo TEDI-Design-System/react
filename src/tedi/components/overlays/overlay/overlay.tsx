@@ -20,7 +20,7 @@ import {
   useRole,
   UseRoleProps,
 } from '@floating-ui/react';
-import { ComponentProps, createContext, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { ComponentProps, createContext, ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import { useIsMounted, useIsTouchDevice } from '../../../helpers';
 import { OverlayContent } from './overlay-content';
@@ -118,6 +118,7 @@ export interface OverlayContextType {
   context: FloatingContext<ReferenceType>;
   scrollLock?: boolean;
   role?: UseRoleProps['role'];
+  contentId: string;
 }
 
 export const OverlayContext = createContext<OverlayContextType>({
@@ -144,6 +145,7 @@ export const OverlayContext = createContext<OverlayContextType>({
   placement: 'top',
   context: {} as FloatingContext,
   scrollLock: undefined,
+  contentId: '',
 });
 
 export const Overlay = (props: OverlayProps) => {
@@ -221,6 +223,8 @@ export const Overlay = (props: OverlayProps) => {
     }),
   ]);
 
+  const contentId = useId();
+
   return (
     <OverlayContext.Provider
       value={{
@@ -252,6 +256,7 @@ export const Overlay = (props: OverlayProps) => {
         context,
         placement,
         scrollLock,
+        contentId,
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 import { FloatingArrow, FloatingFocusManager, FloatingPortal } from '@floating-ui/react';
-import { ReactNode, useContext, useEffect, useId } from 'react';
+import { ReactNode, useContext, useEffect } from 'react';
 
 import { OverlayContext } from './overlay';
 
@@ -48,7 +48,6 @@ export interface OverlayContentProps {
 
 export const OverlayContent = (props: OverlayContentProps) => {
   const { children, classNames, labelledBy, describedBy } = props;
-  const contentId = useId();
   const {
     open,
     x,
@@ -62,6 +61,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
     context,
     arrow,
     scrollLock,
+    contentId,
   } = useContext(OverlayContext);
 
   useEffect(() => {
