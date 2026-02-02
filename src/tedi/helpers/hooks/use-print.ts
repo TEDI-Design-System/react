@@ -1,6 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+/**
+ * @deprecated Use the context-based version instead: import { usePrint } from './printing-provider'
+ *             and wrap your app with <PrintingProvider>.
+ *             The standalone hook adds duplicate event listeners per usage and can cause
+ *             inconsistent state in nested components.
+ *             Will be removed in the next major version.
+ */
 export const usePrint = (): boolean => {
   const isServerSide = typeof window === 'undefined';
   const [isPrinting, setIsPrinting] = React.useState(isServerSide ? false : window.matchMedia('print').matches);

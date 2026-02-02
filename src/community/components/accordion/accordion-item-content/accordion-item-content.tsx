@@ -2,7 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
-import { usePrint } from '../../../../tedi/helpers';
+import { usePrint } from '../../../../tedi/providers/printing-provider/printing-provider';
 import { CardContent, CardContentProps } from '../../card';
 import { AccordionContext } from '../accordion';
 import styles from '../accordion.module.scss';
