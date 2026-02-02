@@ -224,44 +224,69 @@ export const Overlay = (props: OverlayProps) => {
   ]);
 
   const contentId = useId();
-
-  return (
-    <OverlayContext.Provider
-      value={{
-        open: isOpen,
-        onOpenChange,
-        isMounted,
-        openWith,
-        reference: refs.setReference,
-        floating: refs.setFloating,
-        arrowRef,
-        focusManager: focusManager
-          ? {
-              order,
-              modal,
-              initialFocus: resolvedInitialFocus,
-              ...restFocusManager,
-            }
-          : undefined,
-        x,
-        y,
-        strategy,
-        getReferenceProps,
-        getFloatingProps,
-        arrow: {
-          width: arrowDimensions?.width,
-          height: arrowDimensions?.height,
-          ...middlewareData.arrow,
-        },
-        context,
-        placement,
-        scrollLock,
-        contentId,
-      }}
-    >
-      {children}
-    </OverlayContext.Provider>
+  const contextValue = useMemo<OverlayContextType>(
+    () => ({
+      open: isOpen,
+      onOpenChange,
+      isMounted,
+      openWith,
+      focusManager: focusManager
+        ? {
+            order,
+            modal,
+            initialFocus: resolvedInitialFocus,
+            ...restFocusManager,
+          }
+        : undefined,
+      reference: refs.setReference,
+      floating: refs.setFloating,
+      arrowRef,
+      x,
+      y,
+      strategy,
+      getReferenceProps,
+      getFloatingProps,
+      arrow: {
+        width: arrowDimensions?.width,
+        height: arrowDimensions?.height,
+        ...middlewareData.arrow,
+      },
+      context,
+      placement,
+      scrollLock,
+      role,
+      contentId,
+    }),
+    [
+      isOpen,
+      onOpenChange,
+      isMounted,
+      openWith,
+      focusManager,
+      refs.setReference,
+      refs.setFloating,
+      arrowRef,
+      x,
+      y,
+      strategy,
+      getReferenceProps,
+      getFloatingProps,
+      arrowDimensions?.width,
+      arrowDimensions?.height,
+      middlewareData.arrow,
+      context,
+      placement,
+      scrollLock,
+      role,
+      contentId,
+      modal,
+      order,
+      resolvedInitialFocus,
+      restFocusManager,
+    ]
   );
+
+  return <OverlayContext.Provider value={contextValue}>{children}</OverlayContext.Provider>;
 };
 
 Overlay.Trigger = OverlayTrigger;

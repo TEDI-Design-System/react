@@ -97,4 +97,30 @@ describe('Overlay.Trigger', () => {
     const trigger = screen.getByTestId('trigger-dialog');
     expect(trigger).not.toHaveAttribute('aria-describedby');
   });
+
+  it.each([
+    { role: 'tooltip' as const, open: true, expectDescribedBy: true },
+    { role: 'tooltip' as const, open: false, expectDescribedBy: false },
+    { role: 'dialog' as const, open: true, expectDescribedBy: false },
+  ])('aria-describedby behavior - role=$role open=$open → $expectDescribedBy', ({ role, open, expectDescribedBy }) => {
+    const onToggle = jest.fn();
+
+    render(
+      <Overlay role={role} open={open} onToggle={onToggle}>
+        <OverlayTrigger>
+          <div data-testid="trigger">Trigger</div>
+        </OverlayTrigger>
+        <Overlay.Content data-testid="overlay-content">Content</Overlay.Content>
+      </Overlay>
+    );
+
+    const trigger = screen.getByTestId('trigger');
+
+    if (expectDescribedBy) {
+      const content = screen.getByTestId('overlay-content');
+      expect(trigger).toHaveAttribute('aria-describedby', content.id);
+    } else {
+      expect(trigger).not.toHaveAttribute('aria-describedby');
+    }
+  });
 });
