@@ -411,12 +411,18 @@ $btn-width-large: 3.72rem;
     var(--link-primary-focus)
   );
 
-  .tedi-btn__icon--left {
-    margin-right: var(--button-sm-inner-spacing);
-  }
+  .tedi-btn__inner {
+    .tedi-btn__icon--left {
+      display: inline;
+      margin-right: var(--button-sm-inner-spacing);
+      vertical-align: middle;
+    }
 
-  .tedi-btn__icon--right {
-    margin-left: var(--button-sm-inner-spacing);
+    .tedi-btn__icon--right {
+      display: inline;
+      margin-left: var(--button-sm-inner-spacing);
+      vertical-align: middle;
+    }
   }
 }
 
