@@ -5,8 +5,6 @@
 }
 
 .tedi-alert {
-  padding: var(--alert-default-padding-y) var(--alert-default-padding-x);
-  font-size: var(--body-regular-size);
   border: 1px solid;
   border-radius: var(--alert-radius);
 
@@ -14,11 +12,29 @@
 
   &__content {
     display: flex;
-    gap: var(--layout-grid-gutters-08);
     align-items: flex-start;
 
     .tedi-alert__icon {
       line-height: var(--body-regular-line-height);
+    }
+  }
+
+  &--size-default {
+    padding: var(--alert-default-padding-y) var(--alert-default-padding-x);
+    font-size: var(--body-regular-size);
+
+    .tedi-alert__content {
+      gap: var(--layout-grid-gutters-08);
+    }
+  }
+
+  &--size-small {
+    padding: var(--alert-default-padding-y-sm) var(--alert-default-padding-x-sm);
+    font-size: var(--body-small-size);
+    line-height: var(--body-small-line-height);
+
+    .tedi-alert__content {
+      gap: var(--layout-grid-gutters-04);
     }
   }
 
