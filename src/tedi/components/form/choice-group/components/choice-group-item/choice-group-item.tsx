@@ -124,7 +124,10 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
               disabled={disabled}
               checked={isChecked}
               defaultChecked={currentValue === undefined ? props.defaultChecked : undefined}
-              onChange={(e) => onChangeHandler(value, e.target.checked)}
+              onChange={(e) => {
+                e.stopPropagation();
+                onChangeHandler(value, e.target.checked);
+              }}
               className={styles['tedi-choice-group-item__input']}
               role={type === 'radio' ? 'radio' : undefined}
               aria-checked={isChecked}
