@@ -12,7 +12,7 @@
 
   &__content {
     display: flex;
-    align-items: flex-start;
+    align-self: center;
 
     .tedi-alert__icon {
       line-height: var(--body-regular-line-height);
@@ -30,8 +30,8 @@
 
   &--size-small {
     padding: var(--alert-default-padding-y-sm) var(--alert-default-padding-x-sm);
-    font-size: var(--body-small-size);
-    line-height: var(--body-small-line-height);
+    font-size: var(--body-small-regular-size);
+    line-height: var(--body-small-regular-line-height);
 
     .tedi-alert__content {
       gap: var(--layout-grid-gutters-04);
