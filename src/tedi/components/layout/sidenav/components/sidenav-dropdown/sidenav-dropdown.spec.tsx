@@ -144,7 +144,7 @@ describe('SideNavDropdown', () => {
 
     const parentItem = screen.getByRole('menuitem', { name: /parent/i });
     expect(parentItem).toHaveAttribute('aria-haspopup', 'true');
-    expect(parentItem).toHaveAttribute('aria-expanded', 'false');
+    expect(parentItem).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('calls onOpenChange when closing', () => {

@@ -70,7 +70,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
           {...item}
           role="menuitem"
           aria-haspopup={hasChildren ? 'true' : undefined}
-          aria-expanded={open}
+          aria-expanded={hasChildren ? open : undefined}
           aria-controls={hasChildren ? `${id}-submenu` : undefined}
           className={styles['tedi-sidenav-dropdown__link']}
           data-active={item.isActive}
