@@ -49,11 +49,11 @@ interface GenerateItemsArgs {
   variant?: 'primary' | 'secondary';
   withHelper?: boolean;
   withIndicator?: boolean;
-  extraLongTitle?: boolean;
   tooltip?: boolean;
   colProps?: ColProps;
   layout?: 'separated' | 'segmented';
   justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
+  withIcons?: boolean;
 }
 
 const generateItems = ({
@@ -66,36 +66,44 @@ const generateItems = ({
   colProps,
   layout,
   justifyContent,
-}: GenerateItemsArgs): ExtendedChoiceGroupItemProps[] => [
-  {
-    id: `${inputType}-${variant}-value-${index * 10 + 1}-${withHelper}-${withIndicator}-${layout}`,
-    label: 'Text',
-    value: `${inputType}-${variant}-value-${index * 10 + 1}-${withHelper}-${withIndicator}-${layout}`,
-    ...(withHelper && { helper: { text: 'Description' } }),
-    colProps,
-    tooltip: tooltip ? 'Tooltip' : undefined,
-    justifyContent,
-  },
-  {
-    id: `${inputType}-${variant}-value-${index * 10 + 2}-${withHelper}-${withIndicator}-${layout}`,
-    label: 'Text',
-    value: `${inputType}-${variant}-value-${index * 10 + 2}-${withHelper}-${withIndicator}-${layout}`,
-    ...(withHelper && { helper: { text: 'Description' } }),
-    colProps,
-    tooltip: tooltip ? 'Tooltip' : undefined,
-    justifyContent,
-  },
-  {
-    id: `${inputType}-${variant}-value-${index * 10 + 3}-${withHelper}-${withIndicator}-${layout}`,
-    label: 'Text',
-    value: `${inputType}-${variant}-value-${index * 10 + 3}-${withHelper}-${withIndicator}-${layout}`,
-    ...(withHelper && { helper: { text: 'Description', type: 'error' } }),
-    disabled: true,
-    colProps,
-    tooltip: tooltip ? 'Tooltip' : undefined,
-    justifyContent,
-  },
-];
+  withIcons = false,
+}: GenerateItemsArgs): ExtendedChoiceGroupItemProps[] => {
+  const baseId = withIcons ? `icon-${inputType}-${variant}` : `${inputType}-${variant}`;
+  const icons = withIcons ? ['train', 'directions_walk', 'directions_car'] : [];
+
+  return [1, 2, 3].map((i) => {
+    const itemIndex = index * 10 + i;
+    const suffix = `${withHelper}-${withIndicator}-${layout ?? 'default'}`;
+
+    let label: React.ReactNode = 'Text';
+
+    if (withIcons) {
+      label = (
+        <Text>
+          <Icon name={icons[i - 1]} color="inherit" display="inline" />
+          {' Text'}
+        </Text>
+      );
+    }
+
+    return {
+      id: `${baseId}-value-${itemIndex}-${suffix}`,
+      label,
+      value: `${baseId}-value-${itemIndex}`,
+      ...(withHelper && {
+        helper: {
+          text: 'Description',
+          ...(i === 3 && { type: 'error' }),
+        },
+      }),
+      disabled: i === 3,
+      colProps,
+      tooltip: tooltip ? 'Tooltip' : undefined,
+      justifyContent,
+      ...(withIcons && i === 1 && { defaultChecked: true }),
+    };
+  });
+};
 
 const renderGroup = (
   inputType: 'radio' | 'checkbox',
@@ -104,13 +112,14 @@ const renderGroup = (
   withIndicator: boolean,
   layout: 'segmented' | 'separated',
   index: number,
-  justifyContent: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'
+  justifyContent: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly' = 'start',
+  withIcons = false
 ) => (
-  <Row key={`${inputType}-${variant}-${layout}-${index}`}>
+  <Row key={`${withIcons ? 'icon-' : ''}${inputType}-${variant}-${layout}-${index}`}>
     <Col lg={6} md={12}>
       <ChoiceGroup
         color="primary"
-        id={`${inputType}-${variant}-${layout}-no-helper-${index}`}
+        id={`${withIcons ? 'icon-' : ''}${inputType}-${variant}-${layout}-no-helper-${index}`}
         inputType={inputType}
         items={generateItems({
           index,
@@ -120,10 +129,11 @@ const renderGroup = (
           withIndicator,
           layout,
           justifyContent,
+          withIcons,
         })}
         label="Filter"
         hideLabel
-        name={`${inputType}-${variant}-${layout}-no-helper-${index}`}
+        name={`${withIcons ? 'icon-' : ''}${inputType}-${variant}-${layout}-no-helper-${index}`}
         showIndicator={withIndicator}
         variant="card"
         layout={layout}
@@ -132,7 +142,7 @@ const renderGroup = (
     <Col lg={6} md={12}>
       <ChoiceGroup
         color="secondary"
-        id={`${inputType}-${variant}-${layout}-with-helper-${index}`}
+        id={`${withIcons ? 'icon-' : ''}${inputType}-${variant}-${layout}-with-helper-${index}`}
         inputType={inputType}
         items={generateItems({
           index: index + 1,
@@ -142,10 +152,11 @@ const renderGroup = (
           withIndicator,
           layout,
           justifyContent,
+          withIcons,
         })}
         label="Filter"
         hideLabel
-        name={`${inputType}-${variant}-${layout}-with-helper-${index}`}
+        name={`${withIcons ? 'icon-' : ''}${inputType}-${variant}-${layout}-with-helper-${index}`}
         showIndicator={withIndicator}
         variant="card"
         layout={layout}
@@ -154,7 +165,7 @@ const renderGroup = (
   </Row>
 );
 
-const renderChoiceGroups = (inputType: 'radio' | 'checkbox', layout: 'segmented' | 'separated') => (
+const renderChoiceGroups = (inputType: 'radio' | 'checkbox', layout: 'segmented' | 'separated', withIcons = false) => (
   <VerticalSpacing>
     <Row>
       <Col lg={6} md={12}>
@@ -164,12 +175,12 @@ const renderChoiceGroups = (inputType: 'radio' | 'checkbox', layout: 'segmented'
         <Text modifiers="bold">Secondary</Text>
       </Col>
     </Row>
-    {renderGroup(inputType, 'primary', false, true, layout, 1, 'start')}
-    {renderGroup(inputType, 'primary', true, true, layout, 2, 'start')}
+    {renderGroup(inputType, 'primary', false, true, layout, 1, 'start', withIcons)}
+    {renderGroup(inputType, 'primary', true, true, layout, 2, 'start', withIcons)}
     {inputType !== 'radio' ||
-      (layout !== 'separated' && renderGroup(inputType, 'primary', false, false, layout, 3, 'start'))}
+      (layout !== 'separated' && renderGroup(inputType, 'primary', false, false, layout, 3, 'start', withIcons))}
     {inputType !== 'radio' ||
-      (layout !== 'separated' && renderGroup(inputType, 'primary', true, false, layout, 4, 'start'))}
+      (layout !== 'separated' && renderGroup(inputType, 'primary', true, false, layout, 4, 'start', withIcons))}
   </VerticalSpacing>
 );
 
@@ -222,6 +233,40 @@ export const CheckboxRow: Story = {
 export const RadioCardSegmented = () => <VerticalSpacing>{renderChoiceGroups('radio', 'segmented')}</VerticalSpacing>;
 export const RadioCardSeparated = () => <VerticalSpacing>{renderChoiceGroups('radio', 'separated')}</VerticalSpacing>;
 export const CheckboxCard = () => <VerticalSpacing>{renderChoiceGroups('checkbox', 'separated')}</VerticalSpacing>;
+
+export const RadioCardWithIcon: Story = {
+  render: () => (
+    <VerticalSpacing>
+      <Row>
+        <Col lg={6} md={12}>
+          <Text modifiers="bold">Primary</Text>
+        </Col>
+        <Col lg={6} md={12}>
+          <Text modifiers="bold">Secondary</Text>
+        </Col>
+      </Row>
+      {renderGroup('radio', 'primary', false, true, 'segmented', 1, 'start', true)}
+      {renderGroup('radio', 'secondary', true, true, 'segmented', 2, 'start', true)}
+    </VerticalSpacing>
+  ),
+};
+
+export const CheckboxCardWithIcon: Story = {
+  render: () => (
+    <VerticalSpacing>
+      <Row>
+        <Col lg={6} md={12}>
+          <Text modifiers="bold">Primary</Text>
+        </Col>
+        <Col lg={6} md={12}>
+          <Text modifiers="bold">Secondary</Text>
+        </Col>
+      </Row>
+      {renderGroup('checkbox', 'primary', false, true, 'separated', 5, 'start', true)}
+      {renderGroup('checkbox', 'secondary', true, true, 'separated', 6, 'start', true)}
+    </VerticalSpacing>
+  ),
+};
 
 export const WithError: Story = {
   render: function Render(args) {
