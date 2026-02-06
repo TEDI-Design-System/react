@@ -102,4 +102,27 @@ describe('ChoiceGroupItem', () => {
     fireEvent.click(card);
     expect(onChange).toHaveBeenCalled();
   });
+
+  it('programmatically clicks the input when card background is clicked', () => {
+    renderWithContext({ variant: 'card' });
+
+    const input = screen.getByLabelText('Test Label') as HTMLInputElement;
+    const clickSpy = jest.spyOn(input, 'click');
+    const card = input.closest('.tedi-choice-group-item') as HTMLElement;
+    fireEvent.click(card);
+
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    clickSpy.mockRestore();
+  });
+
+  it('does NOT programmatically click input when clicking the native input directly', () => {
+    const mockInputClick = jest.fn();
+    const mockInput = { click: mockInputClick } as unknown as HTMLInputElement;
+
+    jest.spyOn(document, 'getElementById').mockReturnValue(mockInput);
+    renderWithContext({ variant: 'card' });
+    const input = screen.getByLabelText('Test Label');
+    fireEvent.click(input);
+    expect(mockInputClick).not.toHaveBeenCalled();
+  });
 });
