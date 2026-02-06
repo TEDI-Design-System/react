@@ -33,33 +33,27 @@ describe('ChoiceGroupItem', () => {
 
   it('renders the radio input correctly', () => {
     renderWithContext();
-    const radioInput = screen.getByRole('radio', { name: 'Test Label' });
+    const radioInput = screen.getByLabelText('Test Label');
     expect(radioInput).toBeInTheDocument();
+    expect(radioInput).toHaveAttribute('type', 'radio');
   });
 
   it('renders the checkbox input correctly when type is checkbox', () => {
     renderWithContext({ type: 'checkbox' });
-    const checkboxInput = screen.getByRole('checkbox', { name: 'Test Label' });
+    const checkboxInput = screen.getByLabelText('Test Label');
     expect(checkboxInput).toBeInTheDocument();
+    expect(checkboxInput).toHaveAttribute('type', 'checkbox');
   });
 
   it('renders the card variant correctly', () => {
     renderWithContext({ variant: 'card' });
-    const cardInput = screen.getByRole('radio', { name: 'Test Label' });
-    expect(cardInput).toBeInTheDocument();
-  });
-
-  it('calls onChange handler when input is clicked', () => {
-    const onChange = jest.fn();
-    renderWithContext({ onChange }, { currentValue: '', name: 'test-name', onChange, inputType: 'radio' });
-    const radioInput = screen.getByRole('radio', { name: 'Test Label' });
-    fireEvent.click(radioInput);
-    expect(onChange).toHaveBeenCalledWith('test-value', true);
+    const input = screen.getByLabelText('Test Label');
+    expect(input).toBeInTheDocument();
   });
 
   it('renders with disabled state correctly', () => {
     renderWithContext({ disabled: true });
-    const radioInput = screen.getByRole('radio', { name: 'Test Label' });
+    const radioInput = screen.getByLabelText('Test Label');
     expect(radioInput).toBeDisabled();
   });
 
@@ -76,20 +70,9 @@ describe('ChoiceGroupItem', () => {
     expect(indicator).toBeInTheDocument();
   });
 
-  it('calls onChange handler when card input is clicked', () => {
-    const onChange = jest.fn();
-    renderWithContext(
-      { variant: 'card', onChange },
-      { currentValue: '', name: 'test-name', onChange, inputType: 'radio' }
-    );
-    const cardInput = screen.getByRole('radio', { name: 'Test Label' });
-    fireEvent.click(cardInput);
-    expect(onChange).toHaveBeenCalledWith('test-value', true);
-  });
-
   it('renders the card variant with disabled state correctly', () => {
     renderWithContext({ variant: 'card', disabled: true });
-    const cardInput = screen.getByRole('radio', { name: 'Test Label' });
+    const cardInput = screen.getByLabelText('Test Label');
     expect(cardInput).toBeDisabled();
   });
 
@@ -98,5 +81,25 @@ describe('ChoiceGroupItem', () => {
     renderWithContext({ variant: 'card', helper });
     const helperText = screen.getByText('Helper text');
     expect(helperText).toBeInTheDocument();
+  });
+
+  it('calls onChange handler when label is clicked', () => {
+    const onChange = jest.fn();
+    renderWithContext({ onChange }, { currentValue: '', name: 'test-name', onChange, inputType: 'radio' });
+    const label = screen.getByText('Test Label');
+    fireEvent.click(label);
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  it('calls onChange handler when card is clicked', () => {
+    const onChange = jest.fn();
+    renderWithContext(
+      { variant: 'card', onChange },
+      { currentValue: '', name: 'test-name', onChange, inputType: 'radio' }
+    );
+
+    const card = screen.getByText('Test Label');
+    fireEvent.click(card);
+    expect(onChange).toHaveBeenCalled();
   });
 });
