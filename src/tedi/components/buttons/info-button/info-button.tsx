@@ -6,16 +6,16 @@ import styles from './info-button.module.scss';
 
 export interface InfoButtonProps extends Omit<ButtonProps, 'size' | 'children' | 'color'> {
   /**
-   * If true, applies a small size to the InfoButton.
+   * If true, applies a small size to the InfoButton
    * @default false
    */
   isSmall?: boolean;
   /**
-   * Children elements to be rendered inside the InfoButton.
+   * Children elements to be rendered inside the InfoButton
    */
   children?: React.ReactNode;
   /*
-   * Color variant of the InfoButton.
+   * Color variant of the InfoButton
    * @default 'default'
    */
   color?: 'default' | 'inverted';
