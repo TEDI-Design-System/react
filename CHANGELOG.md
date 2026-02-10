@@ -1,3 +1,11 @@
+# [16.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.3...react-16.0.0-rc.4) (2026-02-10)
+
+
+### Bug Fixes
+
+* **choice-group:** prevent calling onchange twice on card variant [#484](https://github.com/TEDI-Design-System/react/issues/484) ([#502](https://github.com/TEDI-Design-System/react/issues/502)) ([27799cc](https://github.com/TEDI-Design-System/react/commit/27799cc2c4db6381f911ada2697e1bd0b53d2a4d))
+* **choice-group:** prevent double change events and unify card click behavior [#504](https://github.com/TEDI-Design-System/react/issues/504) ([#505](https://github.com/TEDI-Design-System/react/issues/505)) ([7ea1fed](https://github.com/TEDI-Design-System/react/commit/7ea1fedf754e4828df7b508f8cd9ab4428ad3fe6))
+
 # [16.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.2...react-16.0.0-rc.3) (2026-02-02)
 
 
