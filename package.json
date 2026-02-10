@@ -16,10 +16,14 @@
     },
     "./index.css": "./index.css"
   },
+  "bin": {
+    "import-figma-theme": "./scripts/import-figma-theme.cjs"
+  },
   "scripts": {
     "prepare": "husky",
     "start": "storybook dev -p 4400 -c .storybook",
-    "build": "rm -rf dist && vite build --config vite.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css --isRegex",
+    "build": "rm -rf dist && vite build --config vite.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css --isRegex && npm run build:cli",
+    "build:cli": "tsx src/tedi/scripts/build-cli.ts",
     "build:sb": "storybook build -c .storybook -o dist/storybook-static",
     "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
     "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
@@ -45,6 +49,7 @@
     "@tanstack/react-table": "^8.13.2",
     "@tedi-design-system/core": "3.0.1",
     "classnames": "^2.5.1",
+    "commander": "^14.0.3",
     "draft-js": "^0.11.7",
     "draftjs-md-converter": "^1.5.2",
     "formik": "^2.4.5",
@@ -145,6 +150,7 @@
     "ts-jest": "29.1.2",
     "ts-node": "^10.9.2",
     "tslib": "^2.3.0",
+    "tsx": "^4.21.0",
     "typescript": "5.9.2",
     "typescript-plugin-css-modules": "^5.1.0",
     "vite": "^5.4.11",
