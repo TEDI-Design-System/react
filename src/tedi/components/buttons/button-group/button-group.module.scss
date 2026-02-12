@@ -11,8 +11,6 @@
       align-items: center;
       justify-content: center;
       height: auto;
-      min-height: 2.5rem;
-      padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
       text-align: center;
       cursor: pointer;
       border-radius: 0;
@@ -37,6 +35,17 @@
 
       @include breakpoints.media-breakpoint-down(md) {
         flex: 1;
+      }
+
+      &.tedi-button-group__item--size-default {
+        min-height: var(--button-md-height);
+        padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
+      }
+
+      &.tedi-button-group__item--size-small {
+        min-height: var(--button-sm-height);
+        padding: calc(var(--button-sm-padding-y) - 1px) var(--button-sm-padding-x);
+        font-size: var(--button-text-size-sm);
       }
     }
   }
@@ -65,6 +74,12 @@
         background-color: var(--button-group-primary-selected-background);
         border-color: var(--button-group-primary-selected-border);
       }
+
+      &:focus-visible:not(:disabled, .tedi-button-group__item--active) {
+        color: var(--button-group-primary-inactive-text);
+        background-color: var(--button-group-primary-inactive-background);
+        border: 1px solid var(--button-group-primary-inactive-border);
+      }
     }
   }
 
@@ -92,6 +107,12 @@
         background-color: var(--button-group-secondary-selected-background);
         outline: 2px solid var(--button-group-secondary-selected-border);
         outline-offset: -2px;
+      }
+
+      &:focus-visible:not(:disabled, .tedi-button-group__item--active) {
+        color: var(--button-group-secondary-inactive-text);
+        background-color: var(--button-group-secondary-inactive-background);
+        border: 1px solid var(--button-group-secondary-inactive-border);
       }
     }
   }
