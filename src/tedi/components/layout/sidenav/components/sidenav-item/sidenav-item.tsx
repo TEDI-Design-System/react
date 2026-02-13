@@ -186,6 +186,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
               </span>
             </Tooltip.Trigger>
           }
+          as={as}
           groups={groupsToRender}
           onOpenChange={setIsDropdownOpen}
         />
@@ -264,7 +265,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
   );
 
   return level === 1 && isCollapsed ? (
-    <Tooltip placement="right" focusManager={{ order: ['content'] }}>
+    <Tooltip placement="right" focusManager={undefined}>
       <Tooltip.Content maxWidth="medium">{children}</Tooltip.Content>
       {content}
     </Tooltip>
