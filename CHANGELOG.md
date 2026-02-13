@@ -1,3 +1,10 @@
+# [16.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.6...react-16.0.0-rc.7) (2026-02-13)
+
+
+### Bug Fixes
+
+* **choice-group:** selected disabled choice-group item fixes [#27](https://github.com/TEDI-Design-System/react/issues/27) ([#510](https://github.com/TEDI-Design-System/react/issues/510)) ([be8884e](https://github.com/TEDI-Design-System/react/commit/be8884e83e0fb26925b155e13143061ba485aa82))
+
 # [16.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.5...react-16.0.0-rc.6) (2026-02-13)
 
 
