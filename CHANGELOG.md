@@ -1,3 +1,10 @@
+# [16.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.4...react-16.0.0-rc.5) (2026-02-13)
+
+
+### Features
+
+* **info-button:** added inverted variant and new color prop [#420](https://github.com/TEDI-Design-System/react/issues/420) ([#508](https://github.com/TEDI-Design-System/react/issues/508)) ([6ca2d7f](https://github.com/TEDI-Design-System/react/commit/6ca2d7fb3b5f609f3f51b884db074ee30fae457a))
+
 # [16.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.3...react-16.0.0-rc.4) (2026-02-10)
 
 
