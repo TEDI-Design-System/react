@@ -1,3 +1,10 @@
+# [16.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.5...react-16.0.0-rc.6) (2026-02-13)
+
+
+### Bug Fixes
+
+* **sidenav:** apply linkAs for flyout items [#40](https://github.com/TEDI-Design-System/react/issues/40) ([#501](https://github.com/TEDI-Design-System/react/issues/501)) ([6007ede](https://github.com/TEDI-Design-System/react/commit/6007ede51b75c6382db9ee3caf689f2a51a04bc3))
+
 # [16.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.4...react-16.0.0-rc.5) (2026-02-13)
 
 
