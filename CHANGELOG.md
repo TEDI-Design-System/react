@@ -1,3 +1,10 @@
+# [16.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.7...react-16.0.0-rc.8) (2026-02-16)
+
+
+### Bug Fixes
+
+* **tooltip,overlay:** wcag improvements [#468](https://github.com/TEDI-Design-System/react/issues/468) ([#491](https://github.com/TEDI-Design-System/react/issues/491)) ([fa60e46](https://github.com/TEDI-Design-System/react/commit/fa60e46c2492734c29d3af2ac3d7cb4df9779c69))
+
 # [16.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.6...react-16.0.0-rc.7) (2026-02-13)
 
 
