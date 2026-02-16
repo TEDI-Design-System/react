@@ -26,7 +26,7 @@ type SideNavDropdownProps<C extends React.ElementType = 'a'> = {
 };
 
 type Group<C extends React.ElementType> = {
-  subHeading?: string;
+  subHeading?: React.ReactNode;
   subItems: SideNavItemProps<C>[];
 };
 
