@@ -20,7 +20,7 @@ import {
   useRole,
   UseRoleProps,
 } from '@floating-ui/react';
-import { ComponentProps, createContext, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { ComponentProps, createContext, ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import { useIsMounted, useIsTouchDevice } from '../../../helpers';
 import { OverlayContent } from './overlay-content';
@@ -117,6 +117,8 @@ export interface OverlayContextType {
   placement: Placement;
   context: FloatingContext<ReferenceType>;
   scrollLock?: boolean;
+  role?: UseRoleProps['role'];
+  contentId: string;
 }
 
 export const OverlayContext = createContext<OverlayContextType>({
@@ -143,6 +145,7 @@ export const OverlayContext = createContext<OverlayContextType>({
   placement: 'top',
   context: {} as FloatingContext,
   scrollLock: undefined,
+  contentId: '',
 });
 
 export const Overlay = (props: OverlayProps) => {
@@ -220,42 +223,70 @@ export const Overlay = (props: OverlayProps) => {
     }),
   ]);
 
-  return (
-    <OverlayContext.Provider
-      value={{
-        open: isOpen,
-        onOpenChange,
-        isMounted,
-        openWith,
-        reference: refs.setReference,
-        floating: refs.setFloating,
-        arrowRef,
-        focusManager: focusManager
-          ? {
-              order,
-              modal,
-              initialFocus: resolvedInitialFocus,
-              ...restFocusManager,
-            }
-          : undefined,
-        x,
-        y,
-        strategy,
-        getReferenceProps,
-        getFloatingProps,
-        arrow: {
-          width: arrowDimensions?.width,
-          height: arrowDimensions?.height,
-          ...middlewareData.arrow,
-        },
-        context,
-        placement,
-        scrollLock,
-      }}
-    >
-      {children}
-    </OverlayContext.Provider>
+  const contentId = useId();
+  const contextValue = useMemo<OverlayContextType>(
+    () => ({
+      open: isOpen,
+      onOpenChange,
+      isMounted,
+      openWith,
+      focusManager: focusManager
+        ? {
+            order,
+            modal,
+            initialFocus: resolvedInitialFocus,
+            ...restFocusManager,
+          }
+        : undefined,
+      reference: refs.setReference,
+      floating: refs.setFloating,
+      arrowRef,
+      x,
+      y,
+      strategy,
+      getReferenceProps,
+      getFloatingProps,
+      arrow: {
+        width: arrowDimensions?.width,
+        height: arrowDimensions?.height,
+        ...middlewareData.arrow,
+      },
+      context,
+      placement,
+      scrollLock,
+      role,
+      contentId,
+    }),
+    [
+      isOpen,
+      onOpenChange,
+      isMounted,
+      openWith,
+      focusManager,
+      refs.setReference,
+      refs.setFloating,
+      arrowRef,
+      x,
+      y,
+      strategy,
+      getReferenceProps,
+      getFloatingProps,
+      arrowDimensions?.width,
+      arrowDimensions?.height,
+      middlewareData.arrow,
+      context,
+      placement,
+      scrollLock,
+      role,
+      contentId,
+      modal,
+      order,
+      resolvedInitialFocus,
+      restFocusManager,
+    ]
   );
+
+  return <OverlayContext.Provider value={contextValue}>{children}</OverlayContext.Provider>;
 };
 
 Overlay.Trigger = OverlayTrigger;

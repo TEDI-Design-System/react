@@ -207,4 +207,49 @@ describe('Overlay component', () => {
       expect(document.body.style.overflow).toBe('');
     });
   });
+
+  it('does NOT add aria-label when child is valid element but NOT an Icon (cloneElement path)', () => {
+    const { getLabel } = useLabels();
+
+    render(
+      <Overlay>
+        <Overlay.Trigger>
+          <span data-testid="span-child">Hover me</span>
+        </Overlay.Trigger>
+        <Overlay.Content>Content</Overlay.Content>
+      </Overlay>
+    );
+
+    const span = screen.getByTestId('span-child');
+
+    expect(span).toHaveAttribute('tabindex', '0');
+    expect(span).not.toHaveAttribute('aria-label');
+    expect(span).not.toHaveAttribute('aria-label', getLabel('tooltip.icon-trigger'));
+  });
+
+  it('removes aria-describedby when tooltip is closed', async () => {
+    render(
+      <Overlay role="tooltip">
+        <Overlay.Trigger>
+          <div data-testid="div-trigger">Trigger div</div>
+        </Overlay.Trigger>
+        <Overlay.Content>Hidden tooltip</Overlay.Content>
+      </Overlay>
+    );
+
+    const trigger = screen.getByTestId('div-trigger');
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+
+    await act(async () => {
+      fireEvent.mouseEnter(trigger);
+    });
+
+    expect(trigger).toHaveAttribute('aria-describedby');
+
+    await act(async () => {
+      fireEvent.mouseLeave(trigger);
+    });
+
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
 });

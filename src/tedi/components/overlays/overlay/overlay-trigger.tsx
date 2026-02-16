@@ -21,9 +21,15 @@ export interface OverlayTriggerProps {
 export const OverlayTrigger = (props: OverlayTriggerProps) => {
   const { children, className } = props;
   const { getLabel } = useLabels();
-  const { getReferenceProps, reference, openWith } = useContext(OverlayContext);
+  const { getReferenceProps, reference, openWith, open, role, contentId } = useContext(OverlayContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const refs = useMergeRefs([reference, (children as React.ComponentPropsWithRef<any>).ref]);
+  const extraProps =
+    role === 'tooltip'
+      ? {
+          'aria-describedby': open ? contentId : undefined,
+        }
+      : {};
 
   if (isValidElement(children)) {
     return cloneElement(
@@ -31,6 +37,7 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
       getReferenceProps({
         ref: refs,
         tabIndex: 0,
+        ...extraProps,
         label: children.type === Icon ? getLabel('tooltip.icon-trigger') : undefined,
         ...children.props,
       })
@@ -50,6 +57,7 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
           },
           className
         ),
+        ...extraProps,
       })}
     >
       {children}
