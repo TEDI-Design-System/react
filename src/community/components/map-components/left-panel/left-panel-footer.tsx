@@ -7,7 +7,7 @@ const LeftPanelFooter = () => {
     <div className={styles['tedi-left-panel__footer']}>
       <div className={styles['tedi-left-panel__footer__theme-switch']}>
         <Toggle ariaLabel="Toggle dark mode" label={<Text>Tume režiim</Text>} />
-        <Separator color="primary" topSpacing={1} />
+        <Separator color="primary" spacing={1} />
       </div>
       <Row>
         <Col width="auto">
