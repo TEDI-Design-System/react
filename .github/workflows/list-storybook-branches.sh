@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Number of days to check
-DAYS=10
+DAYS=30
 
 # Get the current date in seconds since epoch
 CURRENT_DATE=$(date +%s)
