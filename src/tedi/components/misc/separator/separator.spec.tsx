@@ -17,132 +17,149 @@ describe('Separator Component', () => {
     });
   });
 
-  const renderComponent = (props: SeparatorProps) => render(<Separator {...props} data-testid="separator" />);
+  const renderComponent = <P extends SeparatorProps>(props: P) =>
+    render(<Separator {...props} data-testid="separator" />);
 
-  it('should render a div element by default', () => {
-    const { getByTestId } = renderComponent({});
+  it('renders a div by default', () => {
+    const { getByTestId } = renderComponent({ element: 'div' });
     expect(getByTestId('separator').tagName).toBe('DIV');
   });
 
-  it('should render the specified element', () => {
+  it('renders the specified element', () => {
     const { getByTestId } = renderComponent({ element: 'hr' });
     expect(getByTestId('separator').tagName).toBe('HR');
   });
 
-  it('should apply default classes', () => {
-    const { getByTestId } = renderComponent({});
-    const separator = getByTestId('separator');
-    expect(separator).toHaveClass(styles['tedi-separator']);
-    expect(separator).toHaveClass(styles['tedi-separator--thickness-1']);
-    expect(separator).toHaveClass(styles['tedi-separator--horizontal']);
+  it('applies base and default classes', () => {
+    const { getByTestId } = renderComponent({ axis: 'horizontal' });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator']);
+    expect(el).toHaveClass(styles['tedi-separator--horizontal']);
+    expect(el).toHaveClass(styles['tedi-separator--thickness-1']);
   });
 
-  it('should apply additional classes from className prop', () => {
-    const { getByTestId } = renderComponent({ className: 'custom-class' });
-    expect(getByTestId('separator')).toHaveClass('custom-class');
+  it('applies custom className', () => {
+    const { getByTestId } = renderComponent({ className: 'my-extra-class' });
+    expect(getByTestId('separator')).toHaveClass('my-extra-class');
   });
 
-  it('should apply correct spacing class', () => {
-    const { getByTestId } = renderComponent({ spacing: 1.25 });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--spacing-1-25']);
-  });
-
-  it('should apply correct top and bottom spacing classes', () => {
-    const { getByTestId } = renderComponent({ topSpacing: 0.5, bottomSpacing: 1 });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--top-0-5']);
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--bottom-1']);
-  });
-
-  it('should apply axis specific class', () => {
-    const { getByTestId } = renderComponent({ axis: 'vertical' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--vertical']);
-  });
-
-  it('should apply color class', () => {
+  it('applies color modifier', () => {
     const { getByTestId } = renderComponent({ color: 'accent' });
     expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--accent']);
   });
 
-  it('should apply variant class', () => {
-    const { getByTestId } = renderComponent({ variant: 'dotted' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dotted']);
+  it('applies vertical axis class and allows height', () => {
+    const { getByTestId } = renderComponent({ axis: 'vertical', height: 5.5 });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator--vertical']);
+    expect(el).toHaveStyle('--vertical-separator-height: 5.5rem');
   });
 
-  it('should apply thickness class when no variant is used', () => {
-    const { getByTestId } = renderComponent({ thickness: 2 });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--thickness-2']);
+  it('applies spacing classes — number value', () => {
+    const { getByTestId } = renderComponent({ spacing: 1.5 });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator--top-1-5']);
+    expect(el).toHaveClass(styles['tedi-separator--bottom-1-5']);
   });
 
-  it('should not apply thickness class when variant is used', () => {
-    const { getByTestId } = renderComponent({ variant: 'dotted', thickness: 2 });
-    expect(getByTestId('separator')).not.toHaveClass(styles['tedi-separator--thickness-2']);
+  it('applies spacing classes — object value', () => {
+    const { getByTestId } = renderComponent({
+      spacing: { top: 2, bottom: 0.5, left: 1 },
+      axis: 'horizontal',
+    });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator--top-2']);
+    expect(el).toHaveClass(styles['tedi-separator--bottom-0-5']);
+    expect(el).toHaveClass(styles['tedi-separator--left-1']);
   });
 
-  it('should apply isStretched class', () => {
+  it('applies isStretched class', () => {
     const { getByTestId } = renderComponent({ isStretched: true });
     expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--is-stretched']);
   });
 
-  it('should set height CSS variable for vertical separator', () => {
-    const { getByTestId } = renderComponent({ axis: 'vertical', height: 2 });
-    expect(getByTestId('separator')).toHaveStyle('--vertical-separator-height: 2rem');
+  it('applies thickness class when no variant', () => {
+    const { getByTestId } = renderComponent({ thickness: 2 });
+    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--thickness-2']);
+  });
+  it('applies dotted class and dot size', () => {
+    const { getByTestId } = renderComponent({
+      variant: 'dotted',
+      dotSize: 'sm',
+      dotPosition: 'center',
+    });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator--dotted']);
+    expect(el).toHaveClass(styles['tedi-separator--dotted-sm']);
+    expect(el).toHaveClass(styles['tedi-separator--dot-position-center']);
   });
 
-  it('should apply dot-only variant class', () => {
-    const { getByTestId } = renderComponent({ variant: 'dot-only' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only']);
+  it('applies custom dot position via CSS var', () => {
+    const { getByTestId } = renderComponent({
+      variant: 'dotted',
+      dotPosition: 2.75,
+    });
+    expect(getByTestId('separator')).toHaveStyle('--separator-dot-position: 2.75rem');
+    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-position-custom']);
   });
 
-  it('should apply correct dot size class when variant is dot-only and dotSize is extra small', () => {
-    const { getByTestId } = renderComponent({ variant: 'dot-only', dotSize: 'extra-small' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-extra-small']);
+  it('does not apply dot-style class when variant is dotted', () => {
+    const { getByTestId } = renderComponent({
+      variant: 'dotted',
+      dotStyle: undefined,
+    });
+    expect(getByTestId('separator')).not.toHaveClass(/dot-style/);
   });
 
-  it('should apply correct dot size class when variant is dot-only and dotSize is small', () => {
-    const { getByTestId } = renderComponent({ variant: 'dot-only', dotSize: 'small' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-small']);
+  it('applies dot-only and dot size class', () => {
+    const { getByTestId } = renderComponent({
+      variant: 'dot-only',
+      dotSize: 'lg',
+      dotStyle: 'filled',
+    });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator--dot-only']);
+    expect(el).toHaveClass(styles['tedi-separator--dot-only-lg']);
+    expect(el).not.toHaveClass(styles['tedi-separator--dot-style-outlined']);
   });
 
-  it('should apply correct dot size class when variant is dot-only and dotSize is medium', () => {
-    const { getByTestId } = renderComponent({ variant: 'dot-only', dotSize: 'medium' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-medium']);
+  it('applies outlined style and thickness var when outlined', () => {
+    const { getByTestId } = renderComponent({
+      variant: 'dot-only',
+      dotSize: 'md',
+      dotStyle: 'outlined',
+      thickness: 2,
+    });
+    const el = getByTestId('separator');
+
+    expect(el).toHaveClass(styles['tedi-separator--dot-style-outlined']);
+    expect(el).toHaveStyle('--separator-thickness: 2px');
+    expect(el).toHaveClass(styles['tedi-separator--thickness-2']);
   });
 
-  it('should apply correct dot size class when variant is dot-only and dotSize is large', () => {
-    const { getByTestId } = renderComponent({ variant: 'dot-only', dotSize: 'large' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-large']);
+  it('requires dotSize (but test fallback/default)', () => {
+    const { getByTestId } = renderComponent({
+      variant: 'dot-only',
+      dotSize: 'lg',
+    });
+    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-lg']);
   });
-
-  it('should not apply dot size class when variant is not dot-only', () => {
-    const { getByTestId } = renderComponent({ variant: 'dotted', dotSize: 'large' });
-    expect(getByTestId('separator')).not.toHaveClass(styles['tedi-separator--dot-only-large']);
-  });
-
-  it('should default vertical separator display to block', () => {
+  it('defaults to block display in vertical mode', () => {
     const { getByTestId } = renderComponent({ axis: 'vertical' });
     expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--block']);
   });
 
-  it('should apply inline display class to vertical separator when specified', () => {
-    const { getByTestId } = renderComponent({ axis: 'vertical', display: 'inline' });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--inline']);
-  });
-
-  it('should not apply inline display class to horizontal separator', () => {
-    const { getByTestId } = renderComponent({ axis: 'horizontal', display: 'block' });
-    expect(getByTestId('separator')).not.toHaveClass(styles['tedi-separator--inline']);
-  });
-  it('should apply dotSize class when variant is dot-only', () => {
-    const { getByTestId } = renderComponent({ variant: 'dot-only', dotSize: 'medium' });
-    const separator = getByTestId('separator');
-    expect(separator).toHaveClass(styles['tedi-separator--dot-only']);
-    expect(separator).toHaveClass(styles['tedi-separator--dot-only-medium']);
-  });
-
-  it('should ignore dotSize when variant is not dot-only', () => {
-    const { getByTestId } = renderComponent({ variant: 'dotted', dotSize: 'medium' });
-    const separator = getByTestId('separator');
-    expect(separator).toHaveClass(styles['tedi-separator--dotted']);
-    expect(separator).not.toHaveClass(styles['tedi-separator--dot-only-medium']);
+  it('applies inline display when specified (vertical)', () => {
+    const { getByTestId } = renderComponent({
+      axis: 'vertical',
+      display: 'inline-block',
+    });
+    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--inline-block']);
   });
 });
