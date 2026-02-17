@@ -71,7 +71,7 @@ export const Tag = (props: TagProps): JSX.Element => {
           <Spinner className={styles['tedi-tag__loader']} />
         </div>
       )}
-      {!isLoading && onClose && <ClosingButton onClick={onClose} />}
+      {!isLoading && onClose && <ClosingButton iconSize={18} onClick={onClose} />}
     </div>
   );
 };

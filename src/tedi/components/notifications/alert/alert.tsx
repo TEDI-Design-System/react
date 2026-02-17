@@ -149,7 +149,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           </Col>
           {onClose && (
             <Col width="auto">
-              <ClosingButton onClick={onClose} />
+              <ClosingButton onClick={onClose} iconSize={18} />
             </Col>
           )}
         </Row>

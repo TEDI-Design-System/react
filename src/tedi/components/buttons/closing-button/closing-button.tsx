@@ -6,7 +6,8 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import styles from './closing-button.module.scss';
 
-type ClosingButtonSize = 'medium' | 'large';
+export type ClosingButtonSize = 'default' | 'small';
+export type ClosingButtonIconSize = 18 | 24;
 
 export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
@@ -15,7 +16,7 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
   className?: string;
   /**
    * Size of the ClosingButton
-   * @default 'medium'
+   * @default 'default'
    */
   size?: ClosingButtonSize;
   /**
@@ -27,21 +28,29 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
    * Used for accessibility and as a tooltip on hover. If not provided, the label provider's 'close' label will be used as a fallback.
    */
   title?: string;
+  /*
+   * Size of the icon inside the button
+   * @default 24
+   * If iconSize is set to 18, the button size will automatically adjust to 'small'.
+   */
+  iconSize?: ClosingButtonIconSize;
 }
 
 export const ClosingButton = (props: ClosingButtonProps): JSX.Element => {
   const { getLabel } = useLabels();
-  const { title = getLabel('close'), onClick, size = 'medium', className, ...rest } = props;
+  const { title = getLabel('close'), onClick, size = 'default', iconSize = 24, className, ...rest } = props;
+
+  const resolvedSize: ClosingButtonSize = iconSize === 18 ? 'small' : size;
 
   const buttonClass = cn(
     styles['tedi-closing-button'],
     {
-      [styles[`tedi-closing-button--${size}`]]: size,
+      [styles[`tedi-closing-button--${resolvedSize}`]]: resolvedSize,
     },
     className
   );
 
-  const iconSize = size === 'large' ? 24 : 18;
+  const resolvedIconSize: ClosingButtonIconSize = iconSize ?? 24;
 
   return (
     <button
@@ -53,7 +62,7 @@ export const ClosingButton = (props: ClosingButtonProps): JSX.Element => {
       title={title}
       aria-label={title}
     >
-      <Icon name="close" size={iconSize} />
+      <Icon name="close" size={resolvedIconSize} />
     </button>
   );
 };

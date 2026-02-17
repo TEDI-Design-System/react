@@ -55,7 +55,7 @@ export const HeaderModal = (props: HeaderModalProps) => {
                 <ModalCloser>
                   <ClosingButton
                     title={getLabel('modal.close')}
-                    size="large"
+                    size="default"
                     className={styles['header-modal__close']}
                   />
                 </ModalCloser>

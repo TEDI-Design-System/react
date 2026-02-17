@@ -17,7 +17,7 @@ export const SelectClearIndicator = ({
 
   return isClearIndicatorVisible ? (
     <>
-      <ClosingButton tabIndex={0} ref={ref} {...(restInnerProps as UnknownType)}>
+      <ClosingButton tabIndex={0} ref={ref} iconSize={18} {...(restInnerProps as UnknownType)}>
         {getLabel('clear')}
       </ClosingButton>
       <Separator color="primary" axis="vertical" className={styles['tedi-select__separator']} />

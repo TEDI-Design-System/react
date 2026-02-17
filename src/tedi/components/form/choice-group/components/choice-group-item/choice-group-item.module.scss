@@ -75,20 +75,31 @@
       border-color: var(--form-checkbox-radio-default-border-inverted);
     }
 
-    [type='radio']:checked + .tedi-choice-group-item__indicator {
+    [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
       background-color: var(--form-checkbox-radio-card-primary-selected-background);
       border-color: var(--form-checkbox-radio-default-border-inverted);
     }
 
-    [type='radio']:checked + .tedi-choice-group-item__indicator::after {
+    [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator::after {
       background-color: var(--form-checkbox-radio-default-background-selected-inverted);
       border-color: var(--form-checkbox-radio-default-background-inverted);
+    }
+
+    [type='radio']:checked:disabled + .tedi-choice-group-item__indicator::after {
+      background-color: var(--form-checkbox-radio-default-background-selected-disabled);
+      border-color: var(--form-checkbox-radio-card-default-disabled-selected-background);
     }
 
     label,
     .tedi-choice-group-item__label,
     .tedi-choice-group-item__feedback-text {
       color: var(--form-checkbox-radio-card-primary-selected-text);
+    }
+
+    &.tedi-choice-group-item--disabled {
+      color: var(--form-checkbox-radio-card-primary-disabled-selected-text);
+      background-color: var(--form-checkbox-radio-default-background-selected-disabled);
+      border-color: var(--form-checkbox-radio-default-background-selected-disabled);
     }
   }
 }
@@ -105,14 +116,29 @@
       border-right: 2px solid var(--form-checkbox-radio-card-secondary-active-border);
     }
 
-    [type='radio']:checked + .tedi-choice-group-item__indicator {
+    [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
       border-color: var(--form-checkbox-radio-default-border-selected);
+    }
+
+    [type='radio']:checked:disabled + .tedi-choice-group-item__indicator {
+      border-color: var(--form-checkbox-radio-default-border-selected-disabled);
     }
 
     label,
     .tedi-choice-group-item__label,
     .tedi-choice-group-item__feedback-text {
       color: var(--form-checkbox-radio-card-secondary-selected-text);
+    }
+
+    &.tedi-choice-group-item--disabled {
+      background-color: var(--form-checkbox-radio-card-secondary-disabled-selected-background);
+      outline-color: var(--form-checkbox-radio-card-secondary-disabled-selected-border);
+    }
+
+    &.tedi-choice-group-item--disabled label,
+    &.tedi-choice-group-item--disabled .tedi-choice-group-item__label,
+    &.tedi-choice-group-item--disabled .tedi-choice-group-item__feedback-text {
+      color: var(--form-checkbox-radio-card-secondary-disabled-selected-text);
     }
   }
 

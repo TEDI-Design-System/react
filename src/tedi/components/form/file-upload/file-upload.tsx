@@ -233,7 +233,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                           {getLabel('clear')}
                         </Button>
                       ) : (
-                        <ClosingButton onClick={handleClear} size="medium" title={getLabel('clear')} />
+                        <ClosingButton onClick={handleClear} iconSize={18} title={getLabel('clear')} />
                       )}
                       <Separator axis="vertical" height={1.5} spacing={0.5} color="primary" />
                     </>

@@ -109,7 +109,7 @@ export const Modal = (props: ModalProps): JSX.Element | null => {
               children: (
                 <>
                   <ModalCloser>
-                    <ClosingButton size="large" className={styles['close-button']} />
+                    <ClosingButton size="default" className={styles['close-button']} />
                   </ModalCloser>
                   {child.props.children}
                 </>

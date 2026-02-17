@@ -106,7 +106,11 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
                       {file.isValid === false && <Icon name="info" color="danger" display="inline" size={18} />}
                     </Col>
                     <Col width="auto">
-                      <ClosingButton title={getLabel('remove') + ' ' + file.name} onClick={() => onFileRemove(file)} />
+                      <ClosingButton
+                        iconSize={18}
+                        title={getLabel('remove') + ' ' + file.name}
+                        onClick={() => onFileRemove(file)}
+                      />
                     </Col>
                   </Row>
                 </CardContent>
