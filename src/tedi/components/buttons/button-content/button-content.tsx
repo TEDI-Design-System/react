@@ -144,6 +144,7 @@ const InternalButtonContent = forwardRef(
     const getIcon = (location: string, icon: string | IconWithoutBackgroundProps): JSX.Element => {
       const iconBEM = cn(styles['tedi-btn__icon'], styles[`tedi-btn__icon--${location}`], {
         [styles['tedi-btn__spinner']]: isLoading,
+        [styles['tedi-btn__icon-responsive']]: Component === 'a' && size === 'small',
       });
 
       const defaultIconProps: Partial<IconWithoutBackgroundProps> = {
