@@ -2,6 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
 import { Icon } from '../../base/icon/icon';
+import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import Checkbox from '../../form/checkbox/checkbox';
 import Radio from '../../form/radio/radio';
@@ -257,19 +258,19 @@ export const WithIcon: Story = {
 
       <Dropdown.Content>
         <Dropdown.Item index={0}>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <Icon name="download" color="inherit" /> Download
-          </span>
+          <Text>
+            <Icon name="download" color="inherit" display="inline" /> Download
+          </Text>
         </Dropdown.Item>
         <Dropdown.Item index={1}>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <Icon name="add" color="inherit" /> Add
-          </span>
+          <Text>
+            <Icon name="add" color="inherit" display="inline" /> Add
+          </Text>
         </Dropdown.Item>
         <Dropdown.Item index={2}>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <Icon name="delete" color="inherit" /> Delete
-          </span>
+          <Text>
+            <Icon name="delete" color="inherit" display="inline" /> Delete
+          </Text>
         </Dropdown.Item>
       </Dropdown.Content>
     </Dropdown>
