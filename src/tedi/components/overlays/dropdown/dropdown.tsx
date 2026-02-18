@@ -20,6 +20,7 @@ import styles from './dropdown.module.scss';
 import { DropdownContent } from './dropdown-content/dropdown-content';
 import { DropdownContext, DropdownContextValue } from './dropdown-context';
 import { DropdownItem } from './dropdown-item/dropdown-item';
+import { DropdownSeparator } from './dropdown-separator/dropdown-separator';
 import { DropdownTrigger } from './dropdown-trigger/dropdown-trigger';
 
 export type DropdownProps = {
@@ -36,9 +37,10 @@ export type DropdownProps = {
    * @default false
    */
   modal?: boolean;
+  divided?: boolean;
 };
 
-export const Dropdown = ({ children, modal = false }: DropdownProps) => {
+export const Dropdown = ({ children, modal = false, divided = false }: DropdownProps) => {
   const { getLabel } = useLabels();
   const nodeId = useFloatingNodeId();
 
@@ -80,6 +82,7 @@ export const Dropdown = ({ children, modal = false }: DropdownProps) => {
     placement,
     content,
     setContent,
+    divided,
     ...interactions,
   };
 
@@ -124,3 +127,4 @@ export const Dropdown = ({ children, modal = false }: DropdownProps) => {
 Dropdown.Trigger = DropdownTrigger;
 Dropdown.Content = DropdownContent;
 Dropdown.Item = DropdownItem;
+Dropdown.Separator = DropdownSeparator;

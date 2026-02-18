@@ -20,6 +20,7 @@ export default {
     'Dropdown.Trigger': Dropdown.Trigger,
     'Dropdown.Content': Dropdown.Content,
     'Dropdown.Item': Dropdown.Item,
+    'Dropdown.Separator': Dropdown.Separator,
   } as never,
 } as Meta;
 
@@ -270,6 +271,60 @@ export const WithIcon: Story = {
         <Dropdown.Item index={2}>
           <Text>
             <Icon name="delete" color="inherit" display="inline" /> Delete
+          </Text>
+        </Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown>
+  ),
+};
+
+export const Divided: Story = {
+  render: () => (
+    <Dropdown divided>
+      <Dropdown.Trigger>
+        <Button visualType="secondary" iconRight="keyboard_arrow_down">
+          Account
+        </Button>
+      </Dropdown.Trigger>
+
+      <Dropdown.Content>
+        <Dropdown.Item index={0}>Profile</Dropdown.Item>
+        <Dropdown.Item index={1}>Security</Dropdown.Item>
+        <Dropdown.Item index={2}>Billing</Dropdown.Item>
+        <Dropdown.Item index={3}>Log out</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown>
+  ),
+};
+
+export const WithSeparator: Story = {
+  render: () => (
+    <Dropdown>
+      <Dropdown.Trigger>
+        <Button visualType="secondary" iconRight="keyboard_arrow_down">
+          More actions
+        </Button>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item index={0}>
+          <Text>
+            <Icon name="edit" display="inline" /> Edit
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={1}>
+          <Text>
+            <Icon name="content_copy" display="inline" /> Duplicate
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Separator />
+        <Dropdown.Item index={2}>
+          <Text>
+            <Icon name="archive" display="inline" /> Archive
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={3}>
+          <Text>
+            <Icon name="delete" display="inline" /> Delete
           </Text>
         </Dropdown.Item>
       </Dropdown.Content>

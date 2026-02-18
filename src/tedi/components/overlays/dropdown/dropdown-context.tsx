@@ -14,6 +14,7 @@ export type DropdownContextValue = {
   placement?: string;
   content: React.ReactNode;
   setContent: (content: React.ReactNode) => void;
+  divided?: boolean;
 };
 
 export const DropdownContext = React.createContext<DropdownContextValue | null>(null);

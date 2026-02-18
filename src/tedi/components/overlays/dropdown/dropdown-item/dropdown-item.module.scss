@@ -20,6 +20,14 @@
     background-color: var(--color-bg-disabled);
   }
 
+  &--divided {
+    border-bottom: 1px solid var(--general-border-primary);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
   &:hover {
     color: var(--dropdown-item-hover-text);
     cursor: pointer;

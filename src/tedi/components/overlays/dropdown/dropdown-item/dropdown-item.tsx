@@ -72,7 +72,7 @@ export const DropdownItem = ({
   asChild = false,
   closeOnSelect = true,
 }: DropdownItemProps) => {
-  const { getItemProps, listItemsRef, setOpen, activeIndex } = useDropdownContext();
+  const { getItemProps, listItemsRef, setOpen, activeIndex, divided } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
 
@@ -90,6 +90,7 @@ export const DropdownItem = ({
         className: cn(styles['tedi-dropdown__item'], {
           [styles['tedi-dropdown__item--active']]: active,
           [styles['tedi-dropdown__item--disabled']]: disabled,
+          [styles['tedi-dropdown__item--divided']]: divided,
         }),
         onClick(e) {
           if (asChild || disabled) return;
