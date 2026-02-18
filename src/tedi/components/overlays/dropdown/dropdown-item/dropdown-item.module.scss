@@ -1,0 +1,37 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-dropdown__item {
+  @include mixins.button-reset;
+
+  padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+  padding-left: var(--dropdown-indent, var(--dropdown-item-padding-x));
+  color: var(--dropdown-item-default-text);
+  text-align: left;
+  border-radius: 0;
+
+  &--active {
+    color: var(--dropdown-item-active-text);
+    background-color: var(--dropdown-item-active-background);
+  }
+
+  &--disabled {
+    color: var(--color-text-disabled);
+    pointer-events: none;
+    background-color: var(--color-bg-disabled);
+  }
+
+  &:hover {
+    color: var(--dropdown-item-hover-text);
+    cursor: pointer;
+    background-color: var(--dropdown-item-hover-background);
+    outline: 0;
+  }
+
+  &:focus-visible {
+    &:not(.tedi-dropdown__item--disabled) {
+      cursor: pointer;
+      outline: 0;
+      box-shadow: 0 0 0 1px var(--dropdown-item-default-background), 0 0 0 3px var(--general-surface-selected);
+    }
+  }
+}

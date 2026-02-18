@@ -1,0 +1,20 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-dropdown {
+  z-index: var(--z-index-dropdown);
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+  pointer-events: none;
+  background-color: var(--dropdown-item-default-background);
+  border: 1px solid var(--card-border-primary);
+  border-radius: var(--form-select-area-radius);
+  transition: opacity 120ms ease, transform 120ms ease;
+  transform: translateY(-4px) scale(0.98);
+
+  &[data-state='open'] {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

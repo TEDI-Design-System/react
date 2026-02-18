@@ -37,6 +37,7 @@ export * from './components/form/select/select';
 export * from './components/form/checkbox/checkbox';
 export * from './components/overlays/tooltip';
 export * from './components/overlays/popover';
+export * from './components/overlays/dropdown';
 export * from './components/misc/separator/separator';
 export * from './components/misc/print/print';
 export * from './components/misc/stretch-content/stretch-content';
