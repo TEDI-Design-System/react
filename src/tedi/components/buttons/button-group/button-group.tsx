@@ -36,10 +36,22 @@ export type ButtonGroupProps = {
    * Additional custom CSS classes to apply to the ButtonGroup container
    */
   className?: string;
+  /**
+   * Size of the buttons in ButtonGroup
+   */
+  size?: 'default' | 'small';
 };
 
 export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
-  const { children, className, type = 'primary', onSelectionChange, stretch = false, ariaLabel } = props;
+  const {
+    children,
+    className,
+    type = 'primary',
+    onSelectionChange,
+    stretch = false,
+    ariaLabel,
+    size = 'default',
+  } = props;
 
   return (
     <div
@@ -60,8 +72,9 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
             className: cn(styles['tedi-button-group__item'], {
               [styles['tedi-button-group__item--active']]: child.props.isActive,
               [styles['tedi-button-group__item--disabled']]: child.props.disabled,
+              [styles[`tedi-button-group__item--size-${size}`]]: size,
             }),
-            noStyle: true,
+            size: size,
             onClick: () => {
               if (!child.props.disabled) {
                 child.props.onClick?.();

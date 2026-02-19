@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Button } from '../button/button';
@@ -24,7 +25,8 @@ const meta: Meta<typeof ButtonGroup> = {
 export default meta;
 type Story = StoryObj<typeof ButtonGroup>;
 
-const buttonStates = ['Default', 'Hover', 'Active', 'Disabled'];
+const buttonStates = ['Default', 'Hover', 'Active', 'Focus', 'Disabled'];
+const sizeArray: ButtonGroupProps['size'][] = ['default', 'small'];
 
 const Template: StoryFn<ButtonGroupProps> = (args) => (
   <ButtonGroup {...args} ariaLabel="Button group example">
@@ -35,6 +37,40 @@ const Template: StoryFn<ButtonGroupProps> = (args) => (
     <Button id="3">Text</Button>
   </ButtonGroup>
 );
+
+interface TemplateMultipleProps<Type = ButtonGroupProps['size']> extends ButtonGroupProps {
+  array: Type[];
+  property: keyof ButtonGroupProps;
+}
+
+const TemplateSizes: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array, property, ...buttonGroupProps } = args;
+
+  return (
+    <div className="example-list">
+      {array.map((value, key) => {
+        return (
+          <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+            <Col width={2}>
+              <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+            </Col>
+            <Col>
+              <VerticalSpacing>
+                <ButtonGroup type="primary" {...buttonGroupProps} {...{ [property]: value }}>
+                  <Button id="01">Text</Button>
+                  <Button id="02" isActive>
+                    Text
+                  </Button>
+                  <Button id="03">Text</Button>
+                </ButtonGroup>
+              </VerticalSpacing>
+            </Col>
+          </Row>
+        );
+      })}
+    </div>
+  );
+};
 
 const TemplateTypes: StoryFn<typeof Button> = (args) => {
   return (
@@ -70,6 +106,14 @@ export const Default: Story = {
   args: {
     type: 'primary',
     stretch: false,
+  },
+};
+
+export const Sizes: StoryObj<TemplateMultipleProps> = {
+  render: TemplateSizes,
+  args: {
+    property: 'size',
+    array: sizeArray,
   },
 };
 
@@ -130,7 +174,7 @@ export const Primary: StoryObj<{ states: string[] }> = {
     pseudo: {
       hover: ['#Hover-primary'],
       active: ['#Active-primary'],
-      focus: ['#Focus-primary'],
+      focusVisible: ['#Focus-primary'],
     },
   },
 };
@@ -144,7 +188,7 @@ export const Secondary: StoryObj<{ states: string[] }> = {
     pseudo: {
       hover: ['#Hover-secondary'],
       active: ['#Active-secondary'],
-      focus: ['#Focus-secondary'],
+      focusVisible: ['#Focus-secondary'],
     },
   },
 };
