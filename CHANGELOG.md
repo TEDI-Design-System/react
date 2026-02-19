@@ -1,3 +1,10 @@
+# [16.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.10...react-16.0.0-rc.11) (2026-02-19)
+
+
+### Bug Fixes
+
+* **link:** fix link icon sizes in relation to figma design [#46](https://github.com/TEDI-Design-System/react/issues/46) ([#520](https://github.com/TEDI-Design-System/react/issues/520)) ([f32bd83](https://github.com/TEDI-Design-System/react/commit/f32bd83b549b195ecb70b4f9191dd8ef9f6b0a42))
+
 # [16.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.9...react-16.0.0-rc.10) (2026-02-19)
 
 
