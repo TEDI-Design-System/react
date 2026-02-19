@@ -1,3 +1,10 @@
+# [16.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.14...react-16.0.0-rc.15) (2026-02-19)
+
+
+### Bug Fixes
+
+* **choice-group:** segmented item borders and focus behaviour [#101](https://github.com/TEDI-Design-System/react/issues/101) ([#513](https://github.com/TEDI-Design-System/react/issues/513)) ([455c491](https://github.com/TEDI-Design-System/react/commit/455c491a753dbfc35d7c996fb94aa15639bbdc51))
+
 # [16.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.13...react-16.0.0-rc.14) (2026-02-19)
 
 
