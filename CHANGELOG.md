@@ -1,3 +1,10 @@
+# [16.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.13...react-16.0.0-rc.14) (2026-02-19)
+
+
+### Features
+
+* **closing-button:** add brand and inverted color [#6](https://github.com/TEDI-Design-System/react/issues/6) ([#519](https://github.com/TEDI-Design-System/react/issues/519)) ([cfeb5f2](https://github.com/TEDI-Design-System/react/commit/cfeb5f206b9137041b581c610c577e8e600b4fd7))
+
 # [16.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.12...react-16.0.0-rc.13) (2026-02-19)
 
 
