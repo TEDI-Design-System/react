@@ -1,5 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Text } from '../../base/typography/text/text';
+import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Link from '../../navigation/link/link';
 import Alert, { AlertProps } from '../alert/alert';
@@ -36,6 +38,8 @@ const alertTypes: { type: AlertProps['type']; icon: string }[] = [
   { type: 'danger', icon: 'error' },
 ];
 
+const sizeArray: AlertProps['size'][] = ['default', 'small'];
+
 const TypesTemplate: StoryFn<AlertProps> = (args) => (
   <VerticalSpacing size={1}>
     {alertTypes.map(({ type, icon }) => (
@@ -45,6 +49,31 @@ const TypesTemplate: StoryFn<AlertProps> = (args) => (
     ))}
   </VerticalSpacing>
 );
+
+interface TemplateMultipleProps<Type = AlertProps['size']> extends AlertProps {
+  array: Type[];
+}
+
+const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array, ...alertProps } = args;
+
+  return (
+    <div className="example-list">
+      {array.map((value, key) => (
+        <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col width={2}>
+            <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+          </Col>
+          <Col className="d-flex">
+            <Alert key={alertProps.type} {...alertProps} size={array[key]}>
+              Content description
+            </Alert>
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
 
 const Template: StoryFn<AlertProps> = (args) => <Alert {...args} />;
 export const Default: Story = {
@@ -69,6 +98,15 @@ const WithAndWithoutHeading: StoryFn<AlertProps> = (args) => {
   );
 };
 
+export const Sizes: StoryObj<TemplateMultipleProps> = {
+  render: TemplateColumn,
+  args: {
+    array: sizeArray,
+    type: 'info',
+    children: 'Content description',
+    onClose: () => null,
+  },
+};
 export const Headless: Story = {
   render: Template,
   args: {
