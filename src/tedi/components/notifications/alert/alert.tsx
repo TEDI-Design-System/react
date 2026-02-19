@@ -33,7 +33,7 @@ type AlertBreakpointProps = {
    * Alert size variant.
    * - 'default': Standard alert size with padding and border radius.
    * - 'small': More compact alert size with reduced padding.
-   * @default 'default'
+   * @default default
    */
   size?: 'default' | 'small';
 };
@@ -86,7 +86,7 @@ export interface AlertProps extends BreakpointSupport<AlertBreakpointProps> {
    * // For secondary notifications
    * titleElement="h4"
    *
-   * @default 'h3'
+   * @default h3
    */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
@@ -107,8 +107,6 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     size = 'default',
     ...rest
   } = getCurrentBreakpointProps<AlertProps>(props);
-
-  console.log(size);
 
   const alertBEM = cn(
     styles['tedi-alert'],
