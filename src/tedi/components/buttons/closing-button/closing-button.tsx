@@ -17,7 +17,7 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
   className?: string;
   /**
    * Size of the ClosingButton
-   * @default 'default'
+   * @default default
    */
   size?: ClosingButtonSize;
   /**
@@ -31,7 +31,7 @@ export interface ClosingButtonProps extends ButtonHTMLAttributes<HTMLButtonEleme
   title?: string;
   /*
    * Color variant of the ClosingButton
-   * @default 'default'
+   * @default default
    */
   color?: ClosingButtonColor;
   /* Size of the icon inside the button
