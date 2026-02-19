@@ -1,3 +1,10 @@
+# [16.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.8...react-16.0.0-rc.9) (2026-02-19)
+
+
+### Features
+
+* **alert:** new size prop with default and small values [#11](https://github.com/TEDI-Design-System/react/issues/11) ([#509](https://github.com/TEDI-Design-System/react/issues/509)) ([35c4962](https://github.com/TEDI-Design-System/react/commit/35c4962ec56612c5e5b727a27f813eb96fd7fb1e))
+
 # [16.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.7...react-16.0.0-rc.8) (2026-02-16)
 
 
