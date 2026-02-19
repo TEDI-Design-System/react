@@ -37,12 +37,12 @@
         flex: 1;
       }
 
-      &.tedi-button-group__item--size-default {
+      &--size-default {
         min-height: var(--button-md-height);
         padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
       }
 
-      &.tedi-button-group__item--size-small {
+      &--size-small {
         min-height: var(--button-sm-height);
         padding: calc(var(--button-sm-padding-y) - 1px) var(--button-sm-padding-x);
         font-size: var(--button-text-size-sm);
