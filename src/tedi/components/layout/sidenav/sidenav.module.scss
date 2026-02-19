@@ -238,7 +238,7 @@
   + .tedi-sidenav__link-collapse-wrapper
   [data-name='collapse-trigger'] {
   position: absolute;
-  top: calc(var(--navigation-vertical-item-min-height-medium) / 3);
+  top: calc((var(--navigation-vertical-item-min-height-large) - var(--button-xs-icon-size)) / 2);
   right: var(--navigation-vertical-item-padding-right);
   display: flex;
   align-items: center;
