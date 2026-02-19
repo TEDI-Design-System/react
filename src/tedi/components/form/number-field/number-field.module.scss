@@ -11,7 +11,9 @@
   }
 
   .tedi-number-field__button {
-    width: var(--form-field-height);
+    width: var(--button-md-icon-size);
+    height: var(--button-md-icon-size);
+    min-height: var(--button-md-height);
     border: 1px solid var(--form-input-border-default);
 
     &__disabled,
@@ -79,7 +81,8 @@
   &--small {
     .tedi-number-field__input-wrapper,
     .tedi-number-field__button {
-      height: var(--form-field-height-sm);
+      height: var(--button-sm-height);
+      min-height: var(--form-field-height-sm);
     }
 
     @include breakpoints.media-breakpoint-down(md) {
@@ -130,6 +133,10 @@
       text-align: left;
       user-select: none;
     }
+  }
+
+  &__feedback {
+    margin-top: var(--form-field-outer-spacing);
   }
 
   @include breakpoints.media-breakpoint-down(md) {
