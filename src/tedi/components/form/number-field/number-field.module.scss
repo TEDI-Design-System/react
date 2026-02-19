@@ -14,7 +14,7 @@
     width: var(--button-md-icon-size);
     height: var(--button-md-icon-size);
     min-height: var(--button-md-height);
-    border: 1px solid var(--form-input-border-default);
+    border: 1px solid var(--button-main-secondary-border-default);
 
     &__disabled,
     &:disabled {
