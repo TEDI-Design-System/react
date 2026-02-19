@@ -93,7 +93,13 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
   };
   return (
     <Col {...colProps} className={ColumnBEM}>
-      <div className={ChoiceGroupItemBEM} onClick={handleClick} role={type} aria-checked={isChecked}>
+      <div
+        className={ChoiceGroupItemBEM}
+        tabIndex={disabled ? -1 : 0}
+        onClick={handleClick}
+        role={type}
+        aria-checked={isChecked}
+      >
         {variant === 'default' || showIndicator ? (
           <InputComponent
             id={id}
@@ -128,9 +134,10 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
               onChange={(e) => {
                 onChangeHandler(value, e.target.checked);
               }}
-              className={styles['tedi-choice-group-item__input']}
+              className="visually-hidden"
               role={type === 'radio' ? 'radio' : undefined}
               aria-checked={isChecked}
+              tabIndex={-1}
             />
             <label htmlFor={id} className={styles['tedi-choice-group-item__label']}>
               {label}
