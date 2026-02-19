@@ -1,3 +1,10 @@
+# [16.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.12...react-16.0.0-rc.13) (2026-02-19)
+
+
+### Bug Fixes
+
+* **feedback-text:** fix error/success text color variables [#517](https://github.com/TEDI-Design-System/react/issues/517) ([#521](https://github.com/TEDI-Design-System/react/issues/521)) ([c019e79](https://github.com/TEDI-Design-System/react/commit/c019e793c5126baba67c516255f3ad3ecfcb2fd7))
+
 # [16.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.11...react-16.0.0-rc.12) (2026-02-19)
 
 
