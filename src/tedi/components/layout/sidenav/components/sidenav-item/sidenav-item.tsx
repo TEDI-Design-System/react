@@ -23,7 +23,7 @@ export type SideNavItemProps<C extends React.ElementType = 'a'> = LinkProps<C> &
    * Grouped submenu items (preferred for headings)
    */
   subItemGroups?: {
-    subHeading?: string;
+    subHeading?: React.ReactNode;
     subItems: SideNavItemProps<C>[];
   }[];
   /**
@@ -73,6 +73,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
 
   const groupsToRender = subItemGroups ?? (subItems ? [{ subItems }] : null);
   const hasChildren = !!groupsToRender;
+  const hasTreeIndicator = level > 1 && hasChildren;
 
   const SideNavItemBEM = cn(
     styles['tedi-sidenav__item'],
@@ -81,6 +82,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
       [styles[`tedi-sidenav__item--level-${level}`]]: level > 1,
       [styles['tedi-sidenav__item--current']]: isActive,
       [styles['tedi-sidenav__item--has-children']]: hasChildren,
+      [styles['tedi-sidenav__item--with-tree']]: hasTreeIndicator,
     },
     className
   );
