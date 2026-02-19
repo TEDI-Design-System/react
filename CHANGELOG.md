@@ -1,3 +1,10 @@
+# [16.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.9...react-16.0.0-rc.10) (2026-02-19)
+
+
+### Features
+
+* **button-group:** add size prop, add small example, fix examples on storybook [#14](https://github.com/TEDI-Design-System/react/issues/14) ([#511](https://github.com/TEDI-Design-System/react/issues/511)) ([73cd4f1](https://github.com/TEDI-Design-System/react/commit/73cd4f11348e4cccc9dfbfd84b7a333ce59f2023))
+
 # [16.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.8...react-16.0.0-rc.9) (2026-02-19)
 
 
