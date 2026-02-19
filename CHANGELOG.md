@@ -1,3 +1,10 @@
+# [16.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.11...react-16.0.0-rc.12) (2026-02-19)
+
+
+### Features
+
+* **sidenav:** subheading as ReactNode, fix mobile sidenav items padding [#421](https://github.com/TEDI-Design-System/react/issues/421) ([#512](https://github.com/TEDI-Design-System/react/issues/512)) ([bb7fbe8](https://github.com/TEDI-Design-System/react/commit/bb7fbe8637895adfd5f331bbdbca5e3853d807ef))
+
 # [16.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.10...react-16.0.0-rc.11) (2026-02-19)
 
 
