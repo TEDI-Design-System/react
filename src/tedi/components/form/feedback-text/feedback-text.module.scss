@@ -7,11 +7,11 @@
   @include mixins.print-grayscale;
 
   &--valid {
-    color: var(--general-status-success-text);
+    color: var(--form-general-feedback-success-text);
   }
 
   &--error {
-    color: var(--general-status-danger-text);
+    color: var(--form-general-feedback-error-text);
   }
 
   &--left {
