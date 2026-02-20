@@ -15,7 +15,6 @@ export type DropdownItemProps = {
   onClick?: (e: React.MouseEvent | React.KeyboardEvent) => void;
   /**
    * Disables the item — prevents interaction and applies disabled styling.
-   *
    * @default false
    */
   disabled?: boolean;
@@ -29,13 +28,11 @@ export type DropdownItemProps = {
   /**
    * Required when using keyboard navigation (ArrowUp/ArrowDown).
    * Must be a unique, sequential number (0, 1, 2, ...) for each item in the list.
-   *
    * When omitted, the item won't be keyboard-focusable.
    */
   index?: number;
   /**
    * Indentation level (in rem units). Useful for nested / hierarchical menus.
-   *
    * Example: `indent={1}` → adds ~1rem left padding
    *
    * @default 0
@@ -44,7 +41,6 @@ export type DropdownItemProps = {
   /**
    * When `true`, renders a plain `<div>` instead of a `<button>`.
    * Useful when wrapping form controls like `<Checkbox>` or `<Radio>` that already handle their own events.
-   *
    * **Warning:** When `asChild={true}`, the item is no longer focusable via keyboard navigation
    * unless the child element itself is focusable.
    *
@@ -53,13 +49,24 @@ export type DropdownItemProps = {
   asChild?: boolean;
   /**
    * Controls whether the dropdown should close after this item is selected.
-   *
    * - Set to `false` for multi-select menus, toggles, or when selection should persist
    * - Set to `true` for action menus (delete, download, navigate, etc.)
    *
    * @default true
    */
   closeOnSelect?: boolean;
+  /**
+   * Marks this item as a tree parent node when the Dropdown is in `variant="tree"` mode.
+   * - Renders a visual parent indicator (bullet) aligned to the tree trunk
+   * - Starts the tree trunk at the vertical center of this item
+   * - Does **not** apply tree indentation — parent items remain aligned with normal items
+   *
+   * This prop is **purely visual** and does not affect behavior or hierarchy.
+   * Child items must still use `indent` to participate in the tree.
+   * Ignored when `variant !== 'tree'`.
+   * @default false
+   */
+  isParent?: boolean;
 };
 
 export const DropdownItem = ({
@@ -71,10 +78,22 @@ export const DropdownItem = ({
   indent,
   asChild = false,
   closeOnSelect = true,
+  isParent = false,
 }: DropdownItemProps) => {
-  const { getItemProps, listItemsRef, setOpen, activeIndex, divided } = useDropdownContext();
+  const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
+
+  const getCssVars = (indent?: number): React.CSSProperties => {
+    const cssVars: React.CSSProperties = {};
+
+    if (typeof indent === 'number') {
+      cssVars['--dropdown-indent-level'] = indent;
+      cssVars['--dropdown-indent'] = `${indent}rem`;
+    }
+
+    return cssVars;
+  };
 
   return (
     <Component
@@ -91,6 +110,9 @@ export const DropdownItem = ({
           [styles['tedi-dropdown__item--active']]: active,
           [styles['tedi-dropdown__item--disabled']]: disabled,
           [styles['tedi-dropdown__item--divided']]: divided,
+          [styles['tedi-dropdown__item--indent']]: indent,
+          [styles['tedi-dropdown__item--tree-item']]: variant === 'tree' && indent,
+          [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
         }),
         onClick(e) {
           if (asChild || disabled) return;
@@ -105,7 +127,7 @@ export const DropdownItem = ({
           }
         },
         style: {
-          paddingLeft: `calc(0.75rem + ${indent} * 1rem)`,
+          ...getCssVars(indent),
         },
       })}
     >

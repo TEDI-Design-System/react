@@ -15,6 +15,7 @@ export type DropdownContextValue = {
   content: React.ReactNode;
   setContent: (content: React.ReactNode) => void;
   divided?: boolean;
+  variant?: 'default' | 'tree';
 };
 
 export const DropdownContext = React.createContext<DropdownContextValue | null>(null);

@@ -3,6 +3,7 @@ import {
   flip,
   FloatingFocusManager,
   FloatingPortal,
+  Placement,
   shift,
   useClick,
   useDismiss,
@@ -15,6 +16,7 @@ import {
 import cn from 'classnames';
 import React from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import styles from './dropdown.module.scss';
 import { DropdownContent } from './dropdown-content/dropdown-content';
@@ -23,7 +25,44 @@ import { DropdownItem } from './dropdown-item/dropdown-item';
 import { DropdownSeparator } from './dropdown-separator/dropdown-separator';
 import { DropdownTrigger } from './dropdown-trigger/dropdown-trigger';
 
-export type DropdownProps = {
+type DropdownWidth = 'auto' | 'trigger' | 'full' | number | string;
+
+type DropdownBreakpointProps = {
+  /**
+   * When `true` there is a border between the dropdown items
+   *  @default false
+   */
+  divided?: boolean;
+  /**
+   * Controls the width of the dropdown menu.
+   * - `'auto'` – width is determined by content (default)
+   * - `'trigger'` – matches the width of the trigger element
+   * - `'full'` – spans the full width of the containing block
+   * - `number` – fixed width in pixels
+   * - `string` – any valid CSS width value (e.g. `'16rem'`, `'100%'`)
+   * @default auto
+   */
+  width?: DropdownWidth;
+  /**
+   * Controls where the dropdown is positioned relative to its trigger.
+   * Accepts any Floating UI placement value, such as:
+   * `'bottom-start'`, `'bottom-end'`, `'top-start'`, `'right-end'`, etc.
+   *
+   * @default bottom-start
+   */
+  placement?: Placement;
+  /**
+   * Controls the visual and structural variant of the dropdown.
+   * - `'default'` – standard flat list of items
+   * - `'tree'` – hierarchical (tree-style) list with indented items and connector lines
+   * Tree visuals are only applied when this prop is set to `'tree'`.
+   * Ignored by default.
+   * @default 'default'
+   */
+  variant?: 'default' | 'tree';
+};
+
+export interface DropdownProps extends BreakpointSupport<DropdownBreakpointProps> {
   /**
    * Child elements — must include exactly one `Dropdown.Trigger` and one `Dropdown.Content`
    */
@@ -37,28 +76,63 @@ export type DropdownProps = {
    * @default false
    */
   modal?: boolean;
-  divided?: boolean;
-};
+  /**
+   * Controlled open state
+   */
+  open?: boolean;
+  /**
+   * Uncontrolled default state
+   */
+  defaultOpen?: boolean;
+  /**
+   * Change handler (fires for both modes)
+   */
+  onOpenChange?: (open: boolean) => void;
+}
 
-export const Dropdown = ({ children, modal = false, divided = false }: DropdownProps) => {
+export const Dropdown = (props: DropdownProps) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const {
+    children,
+    modal = false,
+    divided = false,
+    width = 'auto',
+    variant = 'default',
+    open: controlledOpen,
+    defaultOpen = false,
+    onOpenChange,
+    placement = 'bottom-start',
+  } = getCurrentBreakpointProps<DropdownProps>(props);
   const { getLabel } = useLabels();
   const nodeId = useFloatingNodeId();
 
   const listItemsRef = React.useRef<Array<HTMLButtonElement | null>>([]);
-  const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
   const [content, setContent] = React.useState<React.ReactNode>(null);
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+
+  const open = controlledOpen ?? uncontrolledOpen;
+
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      if (controlledOpen === undefined) {
+        setUncontrolledOpen(next);
+      }
+      onOpenChange?.(next);
+    },
+    [controlledOpen, onOpenChange]
+  );
 
   const floating = useFloating({
-    placement: 'bottom-start',
     nodeId,
     open,
+    placement,
     onOpenChange: setOpen,
     middleware: [flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
 
-  const { context, refs, x, y, strategy, placement } = floating;
+  const { context, refs, x, y, strategy } = floating;
 
   const interactions = useInteractions([
     useClick(context),
@@ -83,8 +157,11 @@ export const Dropdown = ({ children, modal = false, divided = false }: DropdownP
     content,
     setContent,
     divided,
+    variant,
     ...interactions,
   };
+
+  const triggerWidth = refs.reference.current?.getBoundingClientRect().width;
 
   return (
     <DropdownContext.Provider value={value}>
@@ -100,11 +177,19 @@ export const Dropdown = ({ children, modal = false, divided = false }: DropdownP
             <div
               {...interactions.getFloatingProps({
                 ref: refs.setFloating,
-                className: cn(styles['tedi-dropdown']),
+                className: cn(styles['tedi-dropdown'], { [styles[`tedi-dropdown--${variant}`]]: variant === 'tree' }),
                 style: {
                   position: strategy,
                   left: x ?? 0,
                   top: y ?? 0,
+                  minWidth:
+                    width === 'trigger'
+                      ? triggerWidth
+                      : typeof width === 'number'
+                      ? `${width}px`
+                      : width === 'auto'
+                      ? undefined
+                      : width,
                 },
                 onKeyDown(event) {
                   if (event.key === 'Tab') {

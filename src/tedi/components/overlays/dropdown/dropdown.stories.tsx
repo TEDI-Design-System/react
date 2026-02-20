@@ -6,6 +6,7 @@ import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import Checkbox from '../../form/checkbox/checkbox';
 import Radio from '../../form/radio/radio';
+import { Col, Row } from '../../layout/grid';
 import { Dropdown } from './dropdown';
 
 /**
@@ -22,6 +23,18 @@ export default {
     'Dropdown.Item': Dropdown.Item,
     'Dropdown.Separator': Dropdown.Separator,
   } as never,
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.35.54?node-id=12185-156201&t=xqukY4r7lJRpWTby-4',
+    },
+  },
 } as Meta;
 
 type Story = StoryObj;
@@ -83,7 +96,9 @@ export const WithCheckbox: Story = {
     return (
       <Dropdown>
         <Dropdown.Trigger>
-          <Button visualType="secondary">Locations ({cities.length})</Button>
+          <Button visualType="primary" iconRight="keyboard_arrow_down">
+            Locations ({cities.length})
+          </Button>
         </Dropdown.Trigger>
 
         <Dropdown.Content>
@@ -147,7 +162,9 @@ export const WithIndentedItems: Story = {
     return (
       <Dropdown>
         <Dropdown.Trigger>
-          <Button visualType="secondary">Locations ({selected.length})</Button>
+          <Button color="success" iconRight="keyboard_arrow_down">
+            Locations ({selected.length})
+          </Button>
         </Dropdown.Trigger>
 
         <Dropdown.Content>
@@ -208,7 +225,9 @@ export const WithRadio: Story = {
     return (
       <Dropdown>
         <Dropdown.Trigger>
-          <Button visualType="secondary">Choose city: {city}</Button>
+          <Button visualType="link" iconRight="keyboard_arrow_down">
+            Choose city: {city}
+          </Button>
         </Dropdown.Trigger>
 
         <Dropdown.Content>
@@ -250,31 +269,155 @@ export const WithRadio: Story = {
   },
 };
 
-export const WithIcon: Story = {
+export const WithIconAndCustomDropdownWidth: Story = {
   render: () => (
-    <Dropdown>
-      <Dropdown.Trigger>
-        <Button visualType="secondary">Actions</Button>
-      </Dropdown.Trigger>
+    <Row>
+      <Col width="auto">
+        <Dropdown width={300}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Actions
+            </Button>
+          </Dropdown.Trigger>
 
-      <Dropdown.Content>
-        <Dropdown.Item index={0}>
-          <Text>
-            <Icon name="download" color="inherit" display="inline" /> Download
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={1}>
-          <Text>
-            <Icon name="add" color="inherit" display="inline" /> Add
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={2}>
-          <Text>
-            <Icon name="delete" color="inherit" display="inline" /> Delete
-          </Text>
-        </Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown>
+          <Dropdown.Content>
+            <Dropdown.Item index={0} active>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Access to health data</Text>
+                <Icon name="arrow_forward" color="inherit" size={16} />
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={1}>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Declaration of intent</Text>
+                <Icon name="arrow_forward" color="inherit" size={16} />
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={2}>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Contacts</Text>
+                <Icon name="arrow_forward" color="inherit" size={16} />
+              </div>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col>
+        <Dropdown>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Actions
+            </Button>
+          </Dropdown.Trigger>
+
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>
+              <Text>
+                <Icon name="download" color="inherit" display="inline" /> Download
+              </Text>
+            </Dropdown.Item>
+            <Dropdown.Item index={1}>
+              <Text>
+                <Icon name="add" color="inherit" display="inline" /> Add
+              </Text>
+            </Dropdown.Item>
+            <Dropdown.Item index={2}>
+              <Text>
+                <Icon name="delete" color="inherit" display="inline" /> Delete
+              </Text>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
+  ),
+};
+
+export const WithDescription: Story = {
+  render: () => (
+    <Row>
+      <Col width="auto">
+        <Dropdown width={400}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Actions
+            </Button>
+          </Dropdown.Trigger>
+
+          <Dropdown.Content>
+            <Dropdown.Item index={0} active>
+              <div className="flex flex-column">
+                <Text>Access to health data</Text>
+                <Text color="tertiary" modifiers="small">
+                  Doctors will be able to see your health data
+                </Text>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={1}>
+              <div className="flex flex-column">
+                <Text>Access to medications and health data</Text>
+                <Text color="tertiary" modifiers="small">
+                  Doctors will be able to see your medications and health data
+                </Text>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={2}>
+              <div className="flex flex-column">
+                <Text>Access to all</Text>
+                <Text color="tertiary" modifiers="small">
+                  Doctors will be able to see all your information, including declaration of health and other medical
+                  info
+                </Text>
+              </div>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col>
+        <Dropdown width={300}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Actions
+            </Button>
+          </Dropdown.Trigger>
+
+          <Dropdown.Content>
+            <Dropdown.Item index={0} active>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Tallinn</Text>
+                <Text color="tertiary" modifiers="small">
+                  3 timeslots available
+                </Text>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={1}>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Tartu</Text>
+                <Text color="tertiary" modifiers="small">
+                  4 timeslots available
+                </Text>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={2}>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Elva</Text>
+                <Text color="tertiary" modifiers="small">
+                  7 timeslots available
+                </Text>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={3}>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Rakvere</Text>
+                <Text color="tertiary" modifiers="small">
+                  3 timeslots available
+                </Text>
+              </div>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
   ),
 };
 
@@ -297,9 +440,9 @@ export const Divided: Story = {
   ),
 };
 
-export const WithSeparator: Story = {
+export const WithSeparatorAndOpensRight: Story = {
   render: () => (
-    <Dropdown>
+    <Dropdown placement="right-start">
       <Dropdown.Trigger>
         <Button visualType="secondary" iconRight="keyboard_arrow_down">
           More actions
@@ -308,26 +451,61 @@ export const WithSeparator: Story = {
       <Dropdown.Content>
         <Dropdown.Item index={0}>
           <Text>
-            <Icon name="edit" display="inline" /> Edit
+            <Icon name="edit" display="inline" color="inherit" /> Edit
           </Text>
         </Dropdown.Item>
         <Dropdown.Item index={1}>
           <Text>
-            <Icon name="content_copy" display="inline" /> Duplicate
+            <Icon name="content_copy" display="inline" color="inherit" /> Duplicate
           </Text>
         </Dropdown.Item>
         <Dropdown.Separator />
         <Dropdown.Item index={2}>
           <Text>
-            <Icon name="archive" display="inline" /> Archive
+            <Icon name="archive" display="inline" color="inherit" /> Archive
           </Text>
         </Dropdown.Item>
         <Dropdown.Item index={3}>
           <Text>
-            <Icon name="delete" display="inline" /> Delete
+            <Icon name="delete" display="inline" color="inherit" /> Delete
           </Text>
         </Dropdown.Item>
       </Dropdown.Content>
     </Dropdown>
+  ),
+};
+
+export const Tree: Story = {
+  render: () => (
+    <Row>
+      <Col width="auto">
+        <Dropdown variant="tree">
+          <Dropdown.Trigger>
+            <Button iconRight="keyboard_arrow_down">Open Tree Dropdown</Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item asChild>Parent</Dropdown.Item>
+            <Dropdown.Item indent={1}>Child 1</Dropdown.Item>
+            <Dropdown.Item indent={1}>Child 2</Dropdown.Item>
+            <Dropdown.Item indent={1}>Child 3</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col width="auto">
+        <Dropdown variant="tree">
+          <Dropdown.Trigger>
+            <Button iconRight="keyboard_arrow_down">Open Tree Dropdown</Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item asChild indent={1} isParent>
+              Parent
+            </Dropdown.Item>
+            <Dropdown.Item indent={1}>Child 1</Dropdown.Item>
+            <Dropdown.Item indent={1}>Child 2</Dropdown.Item>
+            <Dropdown.Item indent={1}>Child 3</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
   ),
 };
