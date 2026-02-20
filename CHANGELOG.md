@@ -1,3 +1,10 @@
+# [16.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.15...react-16.0.0-rc.16) (2026-02-20)
+
+
+### Bug Fixes
+
+* **number-field:** fix variables [#516](https://github.com/TEDI-Design-System/react/issues/516) ([#522](https://github.com/TEDI-Design-System/react/issues/522)) ([dcf6240](https://github.com/TEDI-Design-System/react/commit/dcf62404afa9543c13277623a9aaa6daed1b93df))
+
 # [16.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.14...react-16.0.0-rc.15) (2026-02-19)
 
 
