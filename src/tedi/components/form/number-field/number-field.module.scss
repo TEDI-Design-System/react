@@ -1,11 +1,5 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-$input-height: 2.5rem;
-$small-input-height: 2rem;
-$input-height-mobile: 2.75rem;
-$border-radius: 0.25rem;
-$border-width: 1px;
-
 .tedi-number-field {
   display: flex;
 
@@ -17,30 +11,30 @@ $border-width: 1px;
   }
 
   .tedi-number-field__button {
-    width: $input-height;
-    border: $border-width solid var(--form-input-border-default);
+    width: var(--button-md-icon-size);
+    height: var(--button-md-icon-size);
+    min-height: var(--button-md-height);
+    border: 1px solid var(--button-main-secondary-border-default);
 
     &__disabled,
     &:disabled {
       background-color: var(--form-input-background-disabled);
-      border: $border-width solid var(--form-input-border-disabled);
+      border: 1px solid var(--form-input-border-disabled);
       opacity: 0.5;
     }
 
     &--decrement {
-      margin-right: -$border-width;
-      border-radius: $border-radius 0 0 $border-radius;
+      margin-right: -1px;
+      border-radius: var(--button-radius-sm) 0 0 var(--button-radius-sm);
     }
 
     &--increment {
-      margin-left: -$border-width;
-      border-radius: 0 $border-radius $border-radius 0;
+      margin-left: -1px;
+      border-radius: 0 var(--button-radius-sm) var(--button-radius-sm) 0;
     }
 
     @include breakpoints.media-breakpoint-down(md) {
       flex: none;
-      width: $input-height-mobile;
-      height: $input-height-mobile;
     }
   }
 
@@ -63,10 +57,6 @@ $border-width: 1px;
         border-radius: 0;
         outline: none;
       }
-    }
-
-    @include breakpoints.media-breakpoint-down(md) {
-      height: $input-height-mobile;
     }
   }
 
@@ -91,11 +81,8 @@ $border-width: 1px;
   &--small {
     .tedi-number-field__input-wrapper,
     .tedi-number-field__button {
-      height: $small-input-height;
-
-      @include breakpoints.media-breakpoint-down(md) {
-        height: $input-height-mobile;
-      }
+      height: var(--button-sm-height);
+      min-height: var(--form-field-height-sm);
     }
 
     @include breakpoints.media-breakpoint-down(md) {
@@ -110,18 +97,18 @@ $border-width: 1px;
   gap: var(--form-field-inner-spacing-sm);
   align-items: stretch;
   width: 5rem;
-  height: $input-height;
+  height: var(--form-field-height);
   padding-right: var(--form-field-padding-y-3-default);
   padding-left: var(--form-field-padding-y-3-default);
   background-color: var(--form-input-background-default);
-  border: $border-width solid var(--form-input-border-default);
+  border: 1px solid var(--form-input-border-default);
 
   &:focus-within {
     z-index: 1;
     border-color: var(--form-input-border-active);
-    border-radius: $border-radius;
-    outline: calc(2 * $border-width) solid var(--form-input-border-active);
-    outline-offset: -$border-width;
+    border-radius: var(--button-radius-sm);
+    outline: calc(2 * 1px) solid var(--form-input-border-active);
+    outline-offset: -1px;
   }
 
   &:active {
@@ -148,9 +135,12 @@ $border-width: 1px;
     }
   }
 
+  &__feedback {
+    margin-top: var(--form-field-outer-spacing);
+  }
+
   @include breakpoints.media-breakpoint-down(md) {
     width: 100%;
-    height: $input-height-mobile;
   }
 }
 
@@ -159,6 +149,7 @@ $border-width: 1px;
   width: 100%;
   min-width: 2rem;
   font-size: var(--heading-h6-size);
+  color: var(--form-input-text-filled);
   text-align: center;
   background-color: var(--form-input-background-default);
   border: 0;
