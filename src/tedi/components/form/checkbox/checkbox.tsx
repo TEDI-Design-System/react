@@ -57,7 +57,11 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
   const LabelBEM = cn(styles['tedi-checkbox__label'], { [styles['tedi-checkbox--disabled']]: disabled });
 
   return (
-    <div data-name="check" {...rest}>
+    <div
+      className={cn(styles['tedi-checkbox'], { [styles['tedi-checkbox--disabled']]: disabled })}
+      data-name="check"
+      {...rest}
+    >
       <Row gutter={0}>
         <Col width="auto">
           <div className={styles['tedi-checkbox__outer-indicator-wrapper']}>

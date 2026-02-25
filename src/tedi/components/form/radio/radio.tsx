@@ -50,7 +50,11 @@ export const Radio = (props: RadioProps): JSX.Element => {
   const LabelBEM = cn(styles['tedi-radio__label'], { [styles['tedi-radio--disabled']]: disabled });
 
   return (
-    <div data-name="radio" {...rest}>
+    <div
+      className={cn(styles['tedi-radio'], { [styles['tedi-radio--disabled']]: disabled })}
+      data-name="radio"
+      {...rest}
+    >
       <Row gutter={0}>
         <Col width="auto">
           <div className={styles['tedi-radio__outer-indicator-wrapper']}>
