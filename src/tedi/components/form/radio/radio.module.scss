@@ -6,12 +6,13 @@
 
   @include mixins.print-grayscale;
 
-  &:hover:not(.tedi-radio--disabled) {
+  &:hover:not(.tedi-radio--disabled) label {
     cursor: pointer;
   }
 
   &--disabled {
     color: var(--general-text-disabled);
+    cursor: not-allowed;
   }
 
   &__input {
