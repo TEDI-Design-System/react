@@ -1,3 +1,15 @@
+# [16.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.17...react-16.0.0-rc.18) (2026-02-25)
+
+
+### Features
+
+* **separator:** redesign with new spacing API, dotPosition and dotStyle support [#30](https://github.com/TEDI-Design-System/react/issues/30) ([#525](https://github.com/TEDI-Design-System/react/issues/525)) ([93e9e11](https://github.com/TEDI-Design-System/react/commit/93e9e118aab73d40347029089c5370851a7b551c))
+
+
+### BREAKING CHANGES
+
+* **separator:** legacy spacing props removed, dotSize enum changed, variant values simplified
+
 # [16.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.16...react-16.0.0-rc.17) (2026-02-25)
 
 
