@@ -120,7 +120,6 @@ $dot-colors: (
     }
 
     &.tedi-separator--dot-style-outlined:not(.tedi-separator--dot-only)::before {
-      background-color: var(--tedi-neutral-100);
       border-color: $color;
     }
   }
@@ -225,7 +224,7 @@ $dot-colors: (
 
 .tedi-separator--dot-style-outlined {
   &::before {
-    background-color: var(--tedi-neutral-100);
+    background-color: var(--general-surface-primary);
     border-style: solid;
     border-width: var(--separator-thickness, 1px);
   }
