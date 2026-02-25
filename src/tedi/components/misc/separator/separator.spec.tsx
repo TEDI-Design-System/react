@@ -89,13 +89,13 @@ describe('Separator Component', () => {
   it('applies dotted class and dot size', () => {
     const { getByTestId } = renderComponent({
       variant: 'dotted',
-      dotSize: 'sm',
+      dotSize: 'small',
       dotPosition: 'center',
     });
     const el = getByTestId('separator');
 
     expect(el).toHaveClass(styles['tedi-separator--dotted']);
-    expect(el).toHaveClass(styles['tedi-separator--dotted-sm']);
+    expect(el).toHaveClass(styles['tedi-separator--dotted-small']);
     expect(el).toHaveClass(styles['tedi-separator--dot-position-center']);
   });
 
@@ -108,31 +108,23 @@ describe('Separator Component', () => {
     expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-position-custom']);
   });
 
-  it('does not apply dot-style class when variant is dotted', () => {
-    const { getByTestId } = renderComponent({
-      variant: 'dotted',
-      dotStyle: undefined,
-    });
-    expect(getByTestId('separator')).not.toHaveClass(/dot-style/);
-  });
-
   it('applies dot-only and dot size class', () => {
     const { getByTestId } = renderComponent({
       variant: 'dot-only',
-      dotSize: 'lg',
+      dotSize: 'large',
       dotStyle: 'filled',
     });
     const el = getByTestId('separator');
 
     expect(el).toHaveClass(styles['tedi-separator--dot-only']);
-    expect(el).toHaveClass(styles['tedi-separator--dot-only-lg']);
+    expect(el).toHaveClass(styles['tedi-separator--dot-only-large']);
     expect(el).not.toHaveClass(styles['tedi-separator--dot-style-outlined']);
   });
 
   it('applies outlined style and thickness var when outlined', () => {
     const { getByTestId } = renderComponent({
       variant: 'dot-only',
-      dotSize: 'md',
+      dotSize: 'medium',
       dotStyle: 'outlined',
       thickness: 2,
     });
@@ -146,9 +138,9 @@ describe('Separator Component', () => {
   it('requires dotSize (but test fallback/default)', () => {
     const { getByTestId } = renderComponent({
       variant: 'dot-only',
-      dotSize: 'lg',
+      dotSize: 'large',
     });
-    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-lg']);
+    expect(getByTestId('separator')).toHaveClass(styles['tedi-separator--dot-only-large']);
   });
   it('defaults to block display in vertical mode', () => {
     const { getByTestId } = renderComponent({ axis: 'vertical' });

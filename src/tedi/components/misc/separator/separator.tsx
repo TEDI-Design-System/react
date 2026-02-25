@@ -5,7 +5,7 @@ import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import styles from './separator.module.scss';
 
 export type SeparatorVariant = 'dotted' | 'dot-only';
-export type DotSize = 'lg' | 'md' | 'sm' | 'xs';
+export type DotSize = 'large' | 'medium' | 'small' | 'extra-small';
 export type DotStyle = 'filled' | 'outlined';
 export type DotPosition = 'start' | 'center' | 'end' | number;
 
@@ -89,7 +89,7 @@ export interface SeparatorHorizontalProps extends SeparatorSharedProps {
 type DottedSeparatorProps = {
   variant?: 'dotted';
   dotSize?: DotSize;
-  dotStyle?: never;
+  dotStyle?: DotStyle;
   /**
    * Position of the single dot
    * @example
@@ -130,7 +130,7 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
     variant,
     thickness = 1,
     height,
-    dotSize = 'lg',
+    dotSize = 'large',
     dotStyle = 'filled',
     dotPosition,
     display = 'block',
@@ -168,13 +168,12 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
     { [styles[`tedi-separator--${variant}`]]: variant },
     { [styles[`tedi-separator--${display}`]]: display },
     { [styles[`tedi-separator--${variant}-${dotSize}`]]: variant === 'dot-only' && dotSize },
-    { [styles[`tedi-separator--dot-style-${dotStyle}`]]: variant === 'dot-only' && dotStyle },
+    { [styles[`tedi-separator--dot-style-${dotStyle}`]]: variant && dotStyle },
     { [styles[`tedi-separator--dotted-${dotSize}`]]: variant === 'dotted' && dotSize },
     { [styles[`tedi-separator--dot-position-${resolvedDotPosition}`]]: resolvedDotPosition && variant !== 'dot-only' },
     { [styles['tedi-separator--dot-position-custom']]: isNumericDotPosition },
     {
-      [styles[`tedi-separator--thickness-${thickness}`]]:
-        thickness && (!variant || (variant === 'dot-only' && dotStyle === 'outlined')),
+      [styles[`tedi-separator--thickness-${thickness}`]]: thickness || dotStyle === 'outlined' ? thickness : undefined,
     },
     { [styles['tedi-separator--is-stretched']]: isStretched },
     { [styles[`tedi-separator--top-${top}`.replace('.', '-')]]: top },
@@ -186,12 +185,15 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
   const getCssVars = () => {
     const cssvars: CSSProperties = {};
     if (height) cssvars['--vertical-separator-height'] = `${height}rem`;
-    if (variant === 'dot-only' && dotStyle === 'outlined' && thickness) {
+
+    if (thickness) {
       cssvars['--separator-thickness'] = `${thickness}px`;
     }
+
     if (variant === 'dotted' && isNumericDotPosition) {
       cssvars['--separator-dot-position'] = `${dotPosition}rem`;
     }
+
     return cssvars;
   };
 

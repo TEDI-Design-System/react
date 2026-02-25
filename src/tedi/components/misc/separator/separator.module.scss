@@ -37,80 +37,10 @@ $dot-colors: (
     height: var(--vertical-separator-height);
     border-top: 0;
     border-left: 1px solid var(--general-border-primary);
-
-    &.tedi-separator--dot-position-start::before {
-      top: 0;
-      bottom: auto;
-    }
-
-    &.tedi-separator--dot-position-center::before {
-      top: 0;
-      bottom: 0;
-      margin: auto 0;
-    }
-
-    &.tedi-separator--dot-position-end::before {
-      top: auto;
-      bottom: 0;
-    }
-
-    &.tedi-separator--dotted-xs::before {
-      left: calc(var(--separator-dot-size-xs) / 2 * -1);
-    }
-
-    &.tedi-separator--dotted-sm::before {
-      left: calc(var(--separator-dot-size-sm) / 2 * -1);
-    }
-
-    &.tedi-separator--dotted-md::before {
-      left: calc(var(--separator-dot-size-md) / 2 * -1);
-    }
-
-    &.tedi-separator--dotted-lg::before {
-      left: calc(var(--separator-dot-size-lg) / 2 * -1);
-    }
   }
 
   &--horizontal {
-    &.tedi-separator--dotted-xs::before {
-      top: calc(var(--separator-dot-size-xs) / 2 * -1);
-    }
-
-    &.tedi-separator--dotted-sm::before {
-      top: calc(var(--separator-dot-size-sm) / 2 * -1);
-    }
-
-    &.tedi-separator--dotted-md::before {
-      top: calc(var(--separator-dot-size-md) / 2 * -1);
-    }
-
-    &.tedi-separator--dotted-lg::before {
-      top: calc(var(--separator-dot-size-lg) / 2 * -1);
-    }
-
-    &.tedi-separator--dot-position-start::before {
-      right: auto;
-      left: 0;
-    }
-
-    &.tedi-separator--dot-position-center::before {
-      right: 0;
-      left: 0;
-      margin: auto;
-    }
-
-    &.tedi-separator--dot-position-end::before {
-      right: 0;
-      left: auto;
-    }
-  }
-
-  &--secondary {
-    border-color: var(--general-border-secondary);
-  }
-
-  &--accent {
-    border-color: var(--general-border-accent);
+    display: block;
   }
 
   &--block {
@@ -119,6 +49,14 @@ $dot-colors: (
 
   &--inline {
     display: inline;
+  }
+
+  &--secondary {
+    border-color: var(--general-border-secondary);
+  }
+
+  &--accent {
+    border-color: var(--general-border-accent);
   }
 
   &--is-stretched {
@@ -137,7 +75,7 @@ $dot-colors: (
     position: absolute;
     content: '';
     background-color: var(--general-border-primary);
-    border-radius: 100%;
+    border-radius: 50%;
 
     @include mixins.print-grayscale;
   }
@@ -149,54 +87,6 @@ $dot-colors: (
 
 .tedi-separator--dotted {
   @extend %separator-dotted-base;
-
-  @each $name, $color in $dot-colors {
-    &.tedi-separator--#{$name}::before {
-      background-color: $color;
-    }
-  }
-}
-
-@each $size, $value in $sizes {
-  .tedi-separator--spacing-#{$size}:not(.tedi-separator--dot-only) {
-    margin: #{$value} 0 #{$value} 0;
-  }
-
-  .tedi-separator--dot-only.tedi-separator--spacing-#{$size} {
-    &.tedi-separator--horizontal {
-      margin-right: #{$value};
-      margin-left: #{$value};
-    }
-
-    &.tedi-separator--vertical {
-      margin-top: #{$value};
-      margin-bottom: #{$value};
-    }
-  }
-
-  @each $side in (top, bottom, left, right) {
-    .tedi-separator--#{$side}-#{$size} {
-      @if $side == top {
-        margin-top: #{$value};
-      } @else if $side == bottom {
-        margin-bottom: #{$value};
-      } @else if $side == left {
-        margin-left: #{$value};
-      } @else if $side == right {
-        margin-right: #{$value};
-      }
-    }
-  }
-}
-
-@each $thickness, $value in $thicknesses {
-  .tedi-separator.tedi-separator--thickness-#{$thickness} {
-    border-top-width: #{$value};
-  }
-
-  .tedi-separator--vertical.tedi-separator--thickness-#{$thickness} {
-    border-left-width: #{$value};
-  }
 }
 
 .tedi-separator--dot-only {
@@ -211,54 +101,70 @@ $dot-colors: (
     width: var(--separator-dotted-dot-sm);
     height: var(--separator-dotted-dot-sm);
     content: '';
-    border-radius: 100%;
+    border-radius: 50%;
 
     @include mixins.print-grayscale;
   }
 
-  @each $name, $color in $dot-colors {
-    &.tedi-separator--#{$name}::before {
+  &.tedi-separator--dot-style-outlined::before {
+    background: transparent;
+  }
+}
+
+@each $name, $color in $dot-colors {
+  .tedi-separator--#{$name} {
+    border-color: $color;
+
+    &::before {
       background-color: $color;
     }
-  }
 
-  &.tedi-separator--dot-style-outlined {
-    &::before {
-      background: transparent;
-      border-style: solid;
-      border-width: var(--separator-thickness, 1px);
+    &.tedi-separator--dot-style-outlined:not(.tedi-separator--dot-only)::before {
+      background-color: var(--tedi-neutral-100);
+      border-color: $color;
     }
+  }
+}
 
-    @each $name, $color in $dot-colors {
-      &.tedi-separator--#{$name}::before {
-        border-color: $color;
+@each $size, $var in (extra-small: xs, small: sm, medium: md, large: lg) {
+  .tedi-separator--dot-only-#{$size}::before,
+  .tedi-separator--dotted-#{$size}::before,
+  .tedi-separator--dot-style-outlined.tedi-separator--dotted-#{$size}::before {
+    width: var(--separator-dot-size-#{$var});
+    height: var(--separator-dot-size-#{$var});
+  }
+}
+
+@each $axis in (horizontal, vertical) {
+  @each $pos in (start, center, end) {
+    .tedi-separator--#{$axis}.tedi-separator--dot-position-#{$pos}::before {
+      @if $axis == horizontal {
+        @if $pos == start {
+          right: auto;
+          left: 0;
+        } @else if $pos == center {
+          right: 0;
+          left: 0;
+          margin: auto;
+        } @else if $pos == end {
+          right: 0;
+          left: auto;
+        }
+      } @else {
+        @if $pos == start {
+          top: 0;
+          bottom: auto;
+        } @else if $pos == center {
+          top: 0;
+          bottom: 0;
+          margin: auto 0;
+        } @else if $pos == end {
+          top: auto;
+          bottom: 0;
+        }
       }
     }
   }
-}
-
-.tedi-separator--dot-only-xs::before,
-.tedi-separator--dotted-xs::before {
-  width: var(--separator-dot-size-xs);
-  height: var(--separator-dot-size-xs);
-}
-
-.tedi-separator--dot-only-sm::before,
-.tedi-separator--dotted-sm::before {
-  width: var(--separator-dot-size-sm);
-  height: var(--separator-dot-size-sm);
-}
-
-.tedi-separator--dot-only-md::before,
-.tedi-separator--dotted-md::before {
-  width: var(--separator-dot-size-md);
-  height: var(--separator-dot-size-md);
-}
-
-.tedi-separator--dot-only-lg::before,
-.tedi-separator--dotted-lg::before {
-  width: var(--separator-dot-size-lg);
-  height: var(--separator-dot-size-lg);
 }
 
 .tedi-separator--horizontal.tedi-separator--dot-position-custom::before {
@@ -269,4 +175,70 @@ $dot-colors: (
 .tedi-separator--vertical.tedi-separator--dot-position-custom::before {
   top: var(--separator-dot-position);
   bottom: auto;
+}
+
+@each $size, $value in $sizes {
+  .tedi-separator--spacing-#{$size}:not(.tedi-separator--dot-only) {
+    margin: #{$value} 0;
+  }
+
+  .tedi-separator--dot-only.tedi-separator--spacing-#{$size} {
+    &.tedi-separator--horizontal {
+      margin-right: $value;
+      margin-left: $value;
+    }
+
+    &.tedi-separator--vertical {
+      margin-top: $value;
+      margin-bottom: $value;
+    }
+  }
+
+  @each $side in (top, bottom, left, right) {
+    .tedi-separator--#{$side}-#{$size} {
+      margin-#{$side}: $value;
+    }
+  }
+}
+
+@each $thickness, $value in $thicknesses {
+  .tedi-separator--thickness-#{$thickness} {
+    border-top-width: $value;
+  }
+  .tedi-separator--vertical.tedi-separator--thickness-#{$thickness} {
+    border-left-width: $value;
+  }
+}
+
+@each $axis in (horizontal, vertical) {
+  @each $size, $var in (extra-small: xs, small: sm, medium: md, large: lg) {
+    .tedi-separator--#{$axis}.tedi-separator--dotted-#{$size}::before,
+    .tedi-separator--#{$axis}.tedi-separator--dot-style-outlined.tedi-separator--dotted-#{$size}::before {
+      @if $axis == horizontal {
+        top: calc((var(--separator-dot-size-#{$var}) / 2 + var(--separator-thickness)) * -1);
+      } @else {
+        left: calc((var(--separator-dot-size-#{$var}) / 2 + var(--separator-thickness) / 2) * -1);
+      }
+    }
+  }
+}
+
+.tedi-separator--dot-style-outlined {
+  &::before {
+    background-color: var(--tedi-neutral-100);
+    border-style: solid;
+    border-width: var(--separator-thickness, 1px);
+  }
+
+  @each $name, $color in $dot-colors {
+    &.tedi-separator--#{$name}::before {
+      z-index: 10;
+      border-color: $color;
+    }
+
+    &.tedi-separator--dotted-#{$name}::before {
+      z-index: 10;
+      border-color: $color;
+    }
+  }
 }
