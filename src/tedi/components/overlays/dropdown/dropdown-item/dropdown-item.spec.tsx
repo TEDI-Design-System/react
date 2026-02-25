@@ -61,7 +61,7 @@ describe('DropdownItem', () => {
       </DropdownItem>
     );
 
-    fireEvent.keyDown(getByText('Item'), { key: 'Enter' });
+    fireEvent.click(getByText('Item'));
     expect(mockOnClick).toHaveBeenCalled();
     expect(mockSetOpen).toHaveBeenCalledWith(false);
   });

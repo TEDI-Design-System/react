@@ -42,7 +42,7 @@ type DropdownBreakpointProps = {
    * - `string` – any valid CSS width value (e.g. `'16rem'`, `'100%'`)
    * @default auto
    */
-  width?: DropdownWidth;
+  width?: 'auto' | 'trigger' | 'full' | number | string;
   /**
    * Controls where the dropdown is positioned relative to its trigger.
    * Accepts any Floating UI placement value, such as:
@@ -162,6 +162,15 @@ export const Dropdown = (props: DropdownProps) => {
   };
 
   const triggerWidth = refs.reference.current?.getBoundingClientRect().width;
+  const containerWidth = React.useMemo(() => {
+    const ref = refs.reference.current as HTMLElement | null;
+    if (!ref) return undefined;
+
+    const container = ref.offsetParent as HTMLElement | null;
+    if (!container) return undefined;
+
+    return container.getBoundingClientRect().width;
+  }, [refs.reference.current]);
 
   return (
     <DropdownContext.Provider value={value}>
@@ -182,8 +191,10 @@ export const Dropdown = (props: DropdownProps) => {
                   position: strategy,
                   left: x ?? 0,
                   top: y ?? 0,
-                  minWidth:
-                    width === 'trigger'
+                  width:
+                    width === 'full'
+                      ? containerWidth
+                      : width === 'trigger'
                       ? triggerWidth
                       : typeof width === 'number'
                       ? `${width}px`

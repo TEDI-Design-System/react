@@ -6,6 +6,7 @@ import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import Checkbox from '../../form/checkbox/checkbox';
 import Radio from '../../form/radio/radio';
+import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
 import { Dropdown } from './dropdown';
 
@@ -40,11 +41,11 @@ export default {
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => (
-    <Dropdown>
+  render: (args) => (
+    <Dropdown {...args}>
       <Dropdown.Trigger>
         <Button visualType="secondary" iconRight="keyboard_arrow_down">
-          Open dropdown
+          Create
         </Button>
       </Dropdown.Trigger>
 
@@ -83,6 +84,58 @@ export const WithActiveItem: Story = {
       </Dropdown>
     );
   },
+};
+
+export const WithAction: Story = {
+  render: () => (
+    <Dropdown>
+      <Dropdown.Trigger>
+        <Button visualType="secondary" icon="add">
+          Add
+        </Button>
+      </Dropdown.Trigger>
+
+      <Dropdown.Content>
+        <Dropdown.Item index={0} onClick={() => console.log('Lisa pöördumine')}>
+          Create contact
+        </Dropdown.Item>
+        <Dropdown.Item index={1} onClick={() => console.log('Lisa toetus')}>
+          Create application
+        </Dropdown.Item>
+        <Dropdown.Item index={2}>Create invoice</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown>
+  ),
+};
+
+export const WithIcon: Story = {
+  render: () => (
+    <Dropdown>
+      <Dropdown.Trigger>
+        <Button visualType="secondary" iconLeft="more_vert">
+          More
+        </Button>
+      </Dropdown.Trigger>
+
+      <Dropdown.Content>
+        <Dropdown.Item index={0}>
+          <Text>
+            <Icon name="download" color="inherit" display="inline" /> Download
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={1}>
+          <Text>
+            <Icon name="add" color="inherit" display="inline" /> Add
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={2}>
+          <Text>
+            <Icon name="delete" color="inherit" display="inline" /> Delete
+          </Text>
+        </Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown>
+  ),
 };
 
 export const WithCheckbox: Story = {
@@ -162,7 +215,7 @@ export const WithIndentedItems: Story = {
     return (
       <Dropdown>
         <Dropdown.Trigger>
-          <Button color="success" iconRight="keyboard_arrow_down">
+          <Button visualType="secondary" iconRight="keyboard_arrow_down">
             Locations ({selected.length})
           </Button>
         </Dropdown.Trigger>
@@ -226,7 +279,7 @@ export const WithRadio: Story = {
       <Dropdown>
         <Dropdown.Trigger>
           <Button visualType="link" iconRight="keyboard_arrow_down">
-            Choose city: {city}
+            City: {city}
           </Button>
         </Dropdown.Trigger>
 
@@ -269,10 +322,10 @@ export const WithRadio: Story = {
   },
 };
 
-export const WithIconAndCustomDropdownWidth: Story = {
+export const CustomWidth: Story = {
   render: () => (
     <Row>
-      <Col width="auto">
+      <Col width={12}>
         <Dropdown width={300}>
           <Dropdown.Trigger>
             <Button visualType="secondary" iconRight="keyboard_arrow_down">
@@ -302,33 +355,6 @@ export const WithIconAndCustomDropdownWidth: Story = {
           </Dropdown.Content>
         </Dropdown>
       </Col>
-      <Col>
-        <Dropdown>
-          <Dropdown.Trigger>
-            <Button visualType="secondary" iconRight="keyboard_arrow_down">
-              Actions
-            </Button>
-          </Dropdown.Trigger>
-
-          <Dropdown.Content>
-            <Dropdown.Item index={0}>
-              <Text>
-                <Icon name="download" color="inherit" display="inline" /> Download
-              </Text>
-            </Dropdown.Item>
-            <Dropdown.Item index={1}>
-              <Text>
-                <Icon name="add" color="inherit" display="inline" /> Add
-              </Text>
-            </Dropdown.Item>
-            <Dropdown.Item index={2}>
-              <Text>
-                <Icon name="delete" color="inherit" display="inline" /> Delete
-              </Text>
-            </Dropdown.Item>
-          </Dropdown.Content>
-        </Dropdown>
-      </Col>
     </Row>
   ),
 };
@@ -339,8 +365,8 @@ export const WithDescription: Story = {
       <Col width="auto">
         <Dropdown width={400}>
           <Dropdown.Trigger>
-            <Button visualType="secondary" iconRight="keyboard_arrow_down">
-              Actions
+            <Button visualType="secondary" iconLeft="share" iconRight="keyboard_arrow_down">
+              Share access
             </Button>
           </Dropdown.Trigger>
 
@@ -377,7 +403,7 @@ export const WithDescription: Story = {
         <Dropdown width={300}>
           <Dropdown.Trigger>
             <Button visualType="secondary" iconRight="keyboard_arrow_down">
-              Actions
+              Choose location
             </Button>
           </Dropdown.Trigger>
 
@@ -425,7 +451,7 @@ export const Divided: Story = {
   render: () => (
     <Dropdown divided>
       <Dropdown.Trigger>
-        <Button visualType="secondary" iconRight="keyboard_arrow_down">
+        <Button visualType="secondary" iconLeft="account_circle" iconRight="keyboard_arrow_down">
           Account
         </Button>
       </Dropdown.Trigger>
@@ -434,7 +460,11 @@ export const Divided: Story = {
         <Dropdown.Item index={0}>Profile</Dropdown.Item>
         <Dropdown.Item index={1}>Security</Dropdown.Item>
         <Dropdown.Item index={2}>Billing</Dropdown.Item>
-        <Dropdown.Item index={3}>Log out</Dropdown.Item>
+        <Dropdown.Item index={3}>
+          <Text>
+            <Icon name="logout" color="inherit" display="inline" /> Log out
+          </Text>
+        </Dropdown.Item>
       </Dropdown.Content>
     </Dropdown>
   ),
@@ -470,6 +500,33 @@ export const WithSeparatorAndOpensRight: Story = {
             <Icon name="delete" display="inline" color="inherit" /> Delete
           </Text>
         </Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown>
+  ),
+};
+
+export const CustomContent: Story = {
+  render: () => (
+    <Dropdown width={300}>
+      <Dropdown.Trigger>
+        <Button visualType="link" iconRight="keyboard_arrow_down">
+          Choose representative
+        </Button>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item index={0} closeOnSelect={false} asChild>
+          <Search id="Dropdown search" label="Otsi" />
+        </Dropdown.Item>
+        <Dropdown.Item index={1}>
+          <Text>Lauri Lepp 49504080254</Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={2}>
+          <Text>Mart Mardivere 39504080254</Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={3}>Madis Mets 39504080254</Dropdown.Item>
+        <Dropdown.Item index={4}>Kalle Kaasik 39504080254</Dropdown.Item>
+        <Dropdown.Item index={5}>Pille Porgand 49504080254</Dropdown.Item>
+        <Dropdown.Item index={6}>Kert Kasemets 39504080254</Dropdown.Item>
       </Dropdown.Content>
     </Dropdown>
   ),

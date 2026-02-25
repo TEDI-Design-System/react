@@ -83,6 +83,7 @@ export const DropdownItem = ({
   const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
+  const isInteractive = asChild && closeOnSelect === false;
 
   const getCssVars = (indent?: number): React.CSSProperties => {
     const cssVars: React.CSSProperties = {};
@@ -95,9 +96,14 @@ export const DropdownItem = ({
     return cssVars;
   };
 
-  return (
-    <Component
-      {...getItemProps({
+  const itemProps = isInteractive
+    ? {
+        className: cn(styles['tedi-dropdown__item'], {
+          [styles['tedi-dropdown__item--indent']]: indent,
+        }),
+        style: getCssVars(indent),
+      }
+    : getItemProps({
         ref(node: HTMLElement) {
           if (!asChild && typeof index === 'number') {
             listItemsRef.current[index] = node as HTMLButtonElement;
@@ -115,23 +121,37 @@ export const DropdownItem = ({
           [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
         }),
         onClick(e) {
-          if (asChild || disabled) return;
-          onClick?.(e);
-          if (closeOnSelect) setOpen(false);
-        },
-        onKeyDown(e) {
-          if (asChild || disabled) return;
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (disabled) return;
+
+          const input = (e.currentTarget as HTMLElement).querySelector(
+            'input[type="checkbox"], input[type="radio"]'
+          ) as HTMLInputElement | null;
+
+          if (input) {
+            input.click();
+            return;
+          }
+
+          if (!asChild) {
             onClick?.(e);
             if (closeOnSelect) setOpen(false);
           }
         },
-        style: {
-          ...getCssVars(indent),
+        onKeyDown(e) {
+          if (disabled) return;
+
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+
+            const input = (e.currentTarget as HTMLElement).querySelector(
+              'input[type="checkbox"], input[type="radio"]'
+            ) as HTMLInputElement | null;
+
+            input?.click();
+          }
         },
-      })}
-    >
-      {children}
-    </Component>
-  );
+        style: getCssVars(indent),
+      });
+
+  return <Component {...itemProps}>{children}</Component>;
 };
