@@ -38,7 +38,7 @@ export interface SeparatorSharedProps {
   isStretched?: boolean;
   /**
    * Semantic color token
-   * @default 'primary'
+   * @default primary
    */
   color?: 'primary' | 'secondary' | 'accent';
   /**

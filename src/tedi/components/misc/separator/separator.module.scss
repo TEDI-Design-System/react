@@ -70,7 +70,7 @@ $dot-colors: (
   }
 }
 
-%separator-dotted-base {
+.tedi-separator--dotted {
   &::before {
     position: absolute;
     content: '';
@@ -83,10 +83,6 @@ $dot-colors: (
   &.tedi-separator--vertical {
     min-height: 3rem;
   }
-}
-
-.tedi-separator--dotted {
-  @extend %separator-dotted-base;
 }
 
 .tedi-separator--dot-only {
@@ -145,7 +141,7 @@ $dot-colors: (
           right: 0;
           left: 0;
           margin: auto;
-        } @else if $pos == end {
+        } @else {
           right: 0;
           left: auto;
         }
@@ -157,7 +153,7 @@ $dot-colors: (
           top: 0;
           bottom: 0;
           margin: auto 0;
-        } @else if $pos == end {
+        } @else {
           top: auto;
           bottom: 0;
         }
@@ -226,15 +222,11 @@ $dot-colors: (
   &::before {
     background-color: var(--general-surface-primary);
     border-style: solid;
-    border-width: var(--separator-thickness, 1px);
+    border-width: var(--separator-thickness);
   }
 
   @each $name, $color in $dot-colors {
-    &.tedi-separator--#{$name}::before {
-      z-index: 10;
-      border-color: $color;
-    }
-
+    &.tedi-separator--#{$name}::before,
     &.tedi-separator--dotted-#{$name}::before {
       z-index: 10;
       border-color: $color;
