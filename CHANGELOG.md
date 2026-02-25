@@ -1,3 +1,10 @@
+# [16.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.18...react-16.0.0-rc.19) (2026-02-25)
+
+
+### Bug Fixes
+
+* **text-field:** fix small textfield right area padding, fix small textfield font size [#527](https://github.com/TEDI-Design-System/react/issues/527) ([#528](https://github.com/TEDI-Design-System/react/issues/528)) ([bd8bd16](https://github.com/TEDI-Design-System/react/commit/bd8bd1640c40be40199d881efead665ce45bd0a3))
+
 # [16.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.17...react-16.0.0-rc.18) (2026-02-25)
 
 
