@@ -1,3 +1,10 @@
+# [16.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.16...react-16.0.0-rc.17) (2026-02-25)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** show pointer on label hover [#532](https://github.com/TEDI-Design-System/react/issues/532) ([#533](https://github.com/TEDI-Design-System/react/issues/533)) ([097627d](https://github.com/TEDI-Design-System/react/commit/097627db68e23afaa27dd288319b34ccba3e5888))
+
 # [16.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.15...react-16.0.0-rc.16) (2026-02-20)
 
 
