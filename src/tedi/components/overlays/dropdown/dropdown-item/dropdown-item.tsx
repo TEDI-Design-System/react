@@ -67,6 +67,11 @@ export type DropdownItemProps = {
    * @default false
    */
   isParent?: boolean;
+  /*
+   * Additional class name(s) to apply to the dropdown item
+   * @default undefined
+   */
+  className?: string;
 };
 
 export const DropdownItem = ({
@@ -79,6 +84,7 @@ export const DropdownItem = ({
   asChild = false,
   closeOnSelect = true,
   isParent = false,
+  className,
 }: DropdownItemProps) => {
   const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
 
@@ -119,6 +125,7 @@ export const DropdownItem = ({
           [styles['tedi-dropdown__item--indent']]: indent,
           [styles['tedi-dropdown__item--tree-item']]: variant === 'tree' && indent,
           [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
+          className,
         }),
         onClick(e) {
           if (disabled) return;
