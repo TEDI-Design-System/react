@@ -8,6 +8,7 @@ import Checkbox from '../../form/checkbox/checkbox';
 import Radio from '../../form/radio/radio';
 import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
+import Separator from '../../misc/separator/separator';
 import { Dropdown } from './dropdown';
 
 /**
@@ -65,23 +66,45 @@ export const Default: Story = {
 export const WithActiveItem: Story = {
   render: () => {
     const [lang, setLang] = React.useState('ENG');
+    const [filter, setFilter] = React.useState('Newest first');
 
     return (
-      <Dropdown>
-        <Dropdown.Trigger>
-          <Button visualType="link" iconRight="expand_more">
-            {lang}
-          </Button>
-        </Dropdown.Trigger>
+      <Row>
+        <Col width={2}>
+          <Dropdown>
+            <Dropdown.Trigger>
+              <Button visualType="link" iconRight="expand_more">
+                {lang}
+              </Button>
+            </Dropdown.Trigger>
 
-        <Dropdown.Content>
-          {['EST', 'ENG', 'RUS'].map((l, i) => (
-            <Dropdown.Item key={l} index={i} active={lang === l} onClick={() => setLang(l)}>
-              {l}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Content>
-      </Dropdown>
+            <Dropdown.Content>
+              {['EST', 'ENG', 'RUS'].map((l, i) => (
+                <Dropdown.Item key={l} index={i} active={lang === l} onClick={() => setLang(l)}>
+                  {l}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Content>
+          </Dropdown>
+        </Col>
+        <Col width={3}>
+          <Dropdown width={200}>
+            <Dropdown.Trigger>
+              <Button visualType="link" iconRight="expand_more">
+                Sort: {filter}
+              </Button>
+            </Dropdown.Trigger>
+
+            <Dropdown.Content>
+              {['Newest first', 'Oldest first', 'Application name A–Z', 'Application name Z–A'].map((f, i) => (
+                <Dropdown.Item key={f} index={i} active={filter === f} onClick={() => setFilter(f)}>
+                  {f}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Content>
+          </Dropdown>
+        </Col>
+      </Row>
     );
   },
 };
@@ -518,15 +541,95 @@ export const CustomContent: Story = {
           <Search id="Dropdown search" label="Otsi" />
         </Dropdown.Item>
         <Dropdown.Item index={1}>
-          <Text>Lauri Lepp 49504080254</Text>
+          <Text>
+            <strong>Lauri Lepp</strong>
+            <Separator
+              axis="vertical"
+              color="secondary"
+              display="inline"
+              dotSize="small"
+              element="span"
+              spacing={0.5}
+              variant="dot-only"
+            />
+            49504080254
+          </Text>
         </Dropdown.Item>
         <Dropdown.Item index={2}>
-          <Text>Mart Mardivere 39504080254</Text>
+          <Text>
+            <strong>Mart Mardivere</strong>
+            <Separator
+              axis="vertical"
+              color="secondary"
+              display="inline"
+              dotSize="small"
+              element="span"
+              spacing={0.5}
+              variant="dot-only"
+            />
+            39504080254
+          </Text>
         </Dropdown.Item>
-        <Dropdown.Item index={3}>Madis Mets 39504080254</Dropdown.Item>
-        <Dropdown.Item index={4}>Kalle Kaasik 39504080254</Dropdown.Item>
-        <Dropdown.Item index={5}>Pille Porgand 49504080254</Dropdown.Item>
-        <Dropdown.Item index={6}>Kert Kasemets 39504080254</Dropdown.Item>
+        <Dropdown.Item index={3}>
+          <Text>
+            <strong>Madis Mets</strong>
+            <Separator
+              axis="vertical"
+              color="secondary"
+              display="inline"
+              dotSize="small"
+              element="span"
+              spacing={0.5}
+              variant="dot-only"
+            />
+            39504080254
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={4}>
+          <Text>
+            <strong>Kalle Kaasik</strong>
+            <Separator
+              axis="vertical"
+              color="secondary"
+              display="inline"
+              dotSize="small"
+              element="span"
+              spacing={0.5}
+              variant="dot-only"
+            />
+            39504080254
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={5}>
+          <Text>
+            <strong>Pille Porgand</strong>
+            <Separator
+              axis="vertical"
+              color="secondary"
+              display="inline"
+              dotSize="small"
+              element="span"
+              spacing={0.5}
+              variant="dot-only"
+            />
+            49504080254
+          </Text>
+        </Dropdown.Item>
+        <Dropdown.Item index={6}>
+          <Text>
+            <strong>Kert Kasemets</strong>
+            <Separator
+              axis="vertical"
+              color="secondary"
+              display="inline"
+              dotSize="small"
+              element="span"
+              spacing={0.5}
+              variant="dot-only"
+            />
+            39504080254
+          </Text>
+        </Dropdown.Item>
       </Dropdown.Content>
     </Dropdown>
   ),
