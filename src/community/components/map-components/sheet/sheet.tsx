@@ -229,7 +229,7 @@ export const Sheet = (props: SheetProps): JSX.Element | null => {
               <div className={styles['tedi-sheet__header-actions']}>
                 {actions}
                 <ClosingButton
-                  size="large"
+                  size="default"
                   onClick={onClose}
                   className={classNames({ [styles['tedi-sheet__closer--active']]: hasActiveActions })}
                 />

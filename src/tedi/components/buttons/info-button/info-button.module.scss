@@ -3,4 +3,12 @@
   height: var(--button-xs-icon-size);
   min-height: var(--button-xs-icon-size);
   vertical-align: bottom;
+
+  &[data-variant='inverted']:hover:not(:disabled) {
+    background-color: var(--button-main-neutral-inverted-icon-only-background-hover);
+  }
+
+  &[data-variant='inverted']:active:not(:disabled) {
+    background-color: var(--button-main-neutral-inverted-icon-only-background-active);
+  }
 }

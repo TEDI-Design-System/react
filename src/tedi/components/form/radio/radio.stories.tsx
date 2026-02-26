@@ -131,6 +131,14 @@ export const States = () => {
               />
             </Col>
           </Row>
+          <Row>
+            <Col md={3}>
+              <Text modifiers="bold">Required</Text>
+            </Col>
+            <Col>
+              <Radio id="radio-required" label="Text" name="radio-required" value="radio" required />
+            </Col>
+          </Row>
         </VerticalSpacing>
       </Col>
     </Row>

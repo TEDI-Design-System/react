@@ -222,4 +222,10 @@ describe('Radio component', () => {
 
     expect(label.click).toHaveBeenCalled();
   });
+
+  it('renders required indicator when required prop is true', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" required />);
+
+    expect(screen.getByText('*')).toBeInTheDocument();
+  });
 });

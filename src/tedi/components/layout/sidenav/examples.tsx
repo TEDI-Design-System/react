@@ -1,4 +1,6 @@
 /* istanbul ignore file */
+import { Text } from '../../base/typography/text/text';
+import { InfoButton } from '../../buttons/info-button/info-button';
 import { SideNavItemProps } from './components/sidenav-item/sidenav-item';
 
 export const exampleNavItems: SideNavItemProps[] = [
@@ -235,6 +237,66 @@ export const exampleThirdLevelMenuItemsLinks: SideNavItemProps[] = [
         ],
       },
     ],
+  },
+  {
+    href: '#',
+    children: 'Administration',
+    icon: 'admin_panel_settings',
+    subItems: [
+      { href: '#', children: 'Staff Management' },
+      { href: '#', children: 'Scheduling' },
+    ],
+  },
+  { href: '#', children: 'Inventory Management', icon: 'inventory' },
+  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+];
+
+export const exampleThirdLevelMenuItemsLinksWithSubTitles: SideNavItemProps[] = [
+  { href: '#', children: 'Dashboard', icon: 'dashboard' },
+  { href: '#', children: 'Patient Records', icon: 'people' },
+  {
+    children: 'Clinical Management',
+    icon: 'medical_services',
+    subItemGroups: [
+      {
+        subHeading: (
+          <Text>
+            Minu tervise ajalugu <InfoButton color="inverted">Lorem ipsum</InfoButton>
+          </Text>
+        ),
+        subItems: [
+          { href: '#', children: 'Active Treatments' },
+          { href: '#', children: 'Treatment History' },
+          { href: '#', children: 'Treatment Plans' },
+          { href: '#', children: 'Clinical Protocols' },
+        ],
+      },
+    ],
+    subItems: [
+      { href: '#', children: 'Vital Signs' },
+      { href: '#', children: 'Assessments' },
+      {
+        href: '#',
+        children: 'Treatments',
+        subItems: [
+          { href: '#', children: 'Active Treatments' },
+          { href: '#', children: 'Treatment History' },
+          { href: '#', children: 'Treatment Plans' },
+          { href: '#', children: 'Clinical Protocols' },
+        ],
+      },
+      {
+        href: '#',
+        children: 'Documentation',
+        subItems: [
+          { href: '#', children: 'Clinical Notes' },
+          { href: '#', children: 'Medical Forms' },
+          { href: '#', children: 'Consent Forms' },
+          { href: '#', children: 'Reports' },
+        ],
+      },
+    ],
+    isDefaultOpen: true,
   },
   {
     href: '#',

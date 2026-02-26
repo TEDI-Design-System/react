@@ -29,6 +29,13 @@ type AlertBreakpointProps = {
    * @default false
    */
   noSideBorders?: boolean;
+  /**
+   * Alert size variant.
+   * - 'default': Standard alert size with padding and border radius.
+   * - 'small': More compact alert size with reduced padding.
+   * @default default
+   */
+  size?: 'default' | 'small';
 };
 
 export interface AlertProps extends BreakpointSupport<AlertBreakpointProps> {
@@ -79,7 +86,7 @@ export interface AlertProps extends BreakpointSupport<AlertBreakpointProps> {
    * // For secondary notifications
    * titleElement="h4"
    *
-   * @default 'h3'
+   * @default h3
    */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
@@ -97,12 +104,14 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     isGlobal = false,
     noSideBorders = false,
     titleElement = 'h3',
+    size = 'default',
     ...rest
   } = getCurrentBreakpointProps<AlertProps>(props);
 
   const alertBEM = cn(
     styles['tedi-alert'],
     styles[`tedi-alert--${type}`],
+    styles[`tedi-alert--size-${size}`],
     {
       [styles['tedi-alert--global']]: isGlobal,
       [styles['tedi-alert--no-side-borders']]: noSideBorders,
@@ -149,7 +158,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           </Col>
           {onClose && (
             <Col width="auto">
-              <ClosingButton onClick={onClose} />
+              <ClosingButton onClick={onClose} iconSize={18} />
             </Col>
           )}
         </Row>

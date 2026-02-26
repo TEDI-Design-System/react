@@ -244,7 +244,7 @@ export const NumberField = (props: NumberFieldProps) => {
         {renderInputElement()}
         {renderButton('increment')}
       </div>
-      {helper && <FeedbackText {...helper} id={helperId} />}
+      {helper && <FeedbackText className={styles['tedi-number-field__feedback']} {...helper} id={helperId} />}
       {inputUpdated && (
         <div aria-live="polite" className="sr-only">
           {inputUpdated}

@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import ClosingButton, { ClosingButtonProps } from './closing-button';
 
@@ -19,7 +20,8 @@ const meta: Meta<typeof ClosingButton> = {
   },
 };
 
-const sizeArray: ClosingButtonProps['size'][] = ['medium', 'large'];
+const sizeArray: ClosingButtonProps['size'][] = ['default', 'small'];
+const iconSizeArray: ClosingButtonProps['iconSize'][] = [18, 24];
 
 export default meta;
 type Story = StoryObj<typeof ClosingButton>;
@@ -41,16 +43,43 @@ const SizeTemplate: StoryFn = () => {
 
 const stateArray = ['Default', 'Hover', 'Active', 'Focus'];
 
-const StatesTemplate: StoryFn = () => {
+const StatesTemplate: StoryFn = (args) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '200px' }}>
       {stateArray.map((state) => (
         <Row key={state}>
           <Col>
-            <b>{state}</b>
+            <Text color={args.color === 'white' ? 'white' : 'primary'} modifiers="bold">
+              {state}
+            </Text>
           </Col>
           <Col>
-            <ClosingButton id={state} />
+            <ClosingButton id={state} {...args} />
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
+
+const IconSizeTemplate: StoryFn = () => {
+  return (
+    <div className="example-list">
+      {iconSizeArray.map((iconSize, key) => (
+        <Row className={`${key === iconSizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col className="display-flex w-50">{`${iconSize}px`}</Col>
+          <Col className="display-flex">
+            <ClosingButton iconSize={iconSize} onClick={() => alert(`${iconSize}px icon clicked`)} className="hover" />
+            {iconSize === 24 && (
+              <div style={{ marginLeft: '16px' }}>
+                <ClosingButton
+                  iconSize={iconSize}
+                  size="small"
+                  onClick={() => alert(`${iconSize}px icon clicked`)}
+                  className="hover"
+                />
+              </div>
+            )}
           </Col>
         </Row>
       ))}
@@ -61,12 +90,23 @@ const StatesTemplate: StoryFn = () => {
 export const Default: Story = {
   args: {
     title: 'close',
-    size: 'medium',
   },
 };
 
 export const Size: Story = {
   render: SizeTemplate,
+};
+
+/**
+ * Hover state is shown on all buttons for size preview.
+ */
+export const IconSizes: Story = {
+  render: IconSizeTemplate,
+  parameters: {
+    pseudo: {
+      hover: '.hover',
+    },
+  },
 };
 
 export const States: Story = {
@@ -77,5 +117,34 @@ export const States: Story = {
       active: '#Active',
       focusVisible: '#Focus',
     },
+  },
+};
+
+export const ColorBrand: Story = {
+  render: StatesTemplate,
+  args: {
+    color: 'brand',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      active: '#Active',
+      focusVisible: '#Focus',
+    },
+  },
+};
+
+export const ColorInverted: Story = {
+  render: StatesTemplate,
+  args: {
+    color: 'white',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      active: '#Active',
+      focusVisible: '#Focus',
+    },
+    backgrounds: { default: 'brand' },
   },
 };

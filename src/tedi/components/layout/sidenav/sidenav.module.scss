@@ -197,7 +197,8 @@
   }
 }
 
-.tedi-sidenav__item.tedi-sidenav__sub-item .tedi-sidenav__link {
+.tedi-sidenav__item--with-tree .tedi-sidenav__item.tedi-sidenav__sub-item .tedi-sidenav__link,
+.tedi-sidenav__item--level-2 .tedi-sidenav__link {
   min-height: var(--navigation-vertical-item-min-height-medium);
   padding-top: var(--navigation-vertical-item-padding-y);
   padding-bottom: var(--navigation-vertical-item-padding-y);
@@ -208,11 +209,21 @@
   );
 }
 
+.tedi-sidenav__item:not(.tedi-sidenav__item--with-tree) .tedi-sidenav__sub-item.tedi-sidenav__item .tedi-sidenav__link,
+.tedi-sidenav__item--level-2 .tedi-sidenav__link,
+.tedi-sidenav__item--with-tree.tedi-sidenav__item--level-2 .tedi-sidenav__link.tedi-sidenav__link--has-children-link {
+  @include breakpoints.media-breakpoint-down(md) {
+    padding-left: var(--navigation-vertical-item-padding-right);
+  }
+}
+
 .tedi-sidenav__item .tedi-sidenav__link--has-children-link {
   padding-right: calc(var(--navigation-vertical-item-padding-right) + var(--button-xs-icon-size));
 
   @include breakpoints.media-breakpoint-down(md) {
+    z-index: 1;
     margin-left: calc(var(--navigation-vertical-item-padding-right) + var(--button-xs-icon-size));
+    background-color: var(--navigation-vertical-item-background-default);
   }
 }
 
@@ -227,7 +238,7 @@
   + .tedi-sidenav__link-collapse-wrapper
   [data-name='collapse-trigger'] {
   position: absolute;
-  top: calc(var(--navigation-vertical-item-min-height-medium) / 3);
+  top: calc((var(--navigation-vertical-item-min-height-large) - var(--button-xs-icon-size)) / 2);
   right: var(--navigation-vertical-item-padding-right);
   display: flex;
   align-items: center;
@@ -359,7 +370,7 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
 .tedi-sidenav__subheading {
   padding: var(--layout-grid-gutters-02) var(--navigation-vertical-item-padding-left-level-1)
     var(--layout-grid-gutters-04) var(--navigation-vertical-item-padding-right);
-  font-size: var(--size-00);
+  font-size: var(--body-extra-small-bold-size);
   color: var(--navigation-vertical-group-title-text);
   text-transform: uppercase;
 

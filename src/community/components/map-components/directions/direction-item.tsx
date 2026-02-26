@@ -61,6 +61,7 @@ export const DirectionItem = (props: DirectionItemProps): JSX.Element => {
           className={styles['tedi-directions__remove']}
           onClick={onDelete}
           aria-label={getLabel('remove')}
+          iconSize={18}
         />
       )}
     </div>

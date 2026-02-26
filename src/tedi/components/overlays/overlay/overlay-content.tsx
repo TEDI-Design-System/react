@@ -61,6 +61,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
     context,
     arrow,
     scrollLock,
+    contentId,
   } = useContext(OverlayContext);
 
   useEffect(() => {
@@ -88,6 +89,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
           {...getFloatingProps({
             ref: floating,
             tabIndex: -1,
+            id: contentId,
             'aria-labelledby': labelledBy,
             'aria-describedby': describedBy,
             style: {

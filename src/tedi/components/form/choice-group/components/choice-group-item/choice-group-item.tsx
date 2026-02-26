@@ -83,16 +83,23 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
 
   const InputComponent = type === 'radio' ? Radio : Checkbox;
 
-  const handleClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).tagName === 'LABEL') return;
-    if (!disabled && variant === 'card') {
-      onChangeHandler(value, !isChecked);
-    }
-  };
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled || variant !== 'card') return;
 
+    const target = e.target as HTMLElement;
+    if (target.closest('input, label')) return;
+
+    document.getElementById(id)?.click();
+  };
   return (
     <Col {...colProps} className={ColumnBEM}>
-      <div className={ChoiceGroupItemBEM} onClick={handleClick}>
+      <div
+        className={ChoiceGroupItemBEM}
+        tabIndex={disabled ? -1 : 0}
+        onClick={handleClick}
+        role={type}
+        aria-checked={isChecked}
+      >
         {variant === 'default' || showIndicator ? (
           <InputComponent
             id={id}
@@ -124,10 +131,13 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
               disabled={disabled}
               checked={isChecked}
               defaultChecked={currentValue === undefined ? props.defaultChecked : undefined}
-              onChange={(e) => onChangeHandler(value, e.target.checked)}
-              className={styles['tedi-choice-group-item__input']}
+              onChange={(e) => {
+                onChangeHandler(value, e.target.checked);
+              }}
+              className="visually-hidden"
               role={type === 'radio' ? 'radio' : undefined}
               aria-checked={isChecked}
+              tabIndex={-1}
             />
             <label htmlFor={id} className={styles['tedi-choice-group-item__label']}>
               {label}
