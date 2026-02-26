@@ -14,8 +14,8 @@ $dot-colors: (
   --vertical-separator-height: 100%;
 
   position: relative;
-  margin: var(--separator-margin-top, 0) var(--separator-margin-right, 0) var(--separator-margin-bottom, 0)
-    var(--separator-margin-left, 0);
+  margin: var(--separator-margin-top) var(--separator-margin-right) var(--separator-margin-bottom)
+    var(--separator-margin-left);
   border: 0;
   border-top: 1px solid var(--general-border-primary);
 
