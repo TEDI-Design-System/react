@@ -57,24 +57,31 @@ describe('Separator Component', () => {
     expect(el).toHaveStyle('--vertical-separator-height: 5.5rem');
   });
 
-  it('applies spacing classes — number value', () => {
+  it('applies spacing — number value', () => {
     const { getByTestId } = renderComponent({ spacing: 1.5 });
     const el = getByTestId('separator');
 
-    expect(el).toHaveClass(styles['tedi-separator--top-1-5']);
-    expect(el).toHaveClass(styles['tedi-separator--bottom-1-5']);
+    expect(el).toHaveStyle({
+      '--separator-margin-top': '1.5rem',
+      '--separator-margin-bottom': '1.5rem',
+      '--separator-margin-left': '0rem',
+      '--separator-margin-right': '0rem',
+    });
   });
 
-  it('applies spacing classes — object value', () => {
+  it('applies spacing — object value', () => {
     const { getByTestId } = renderComponent({
       spacing: { top: 2, bottom: 0.5, left: 1 },
       axis: 'horizontal',
     });
     const el = getByTestId('separator');
 
-    expect(el).toHaveClass(styles['tedi-separator--top-2']);
-    expect(el).toHaveClass(styles['tedi-separator--bottom-0-5']);
-    expect(el).toHaveClass(styles['tedi-separator--left-1']);
+    expect(el).toHaveStyle({
+      '--separator-margin-top': '2rem',
+      '--separator-margin-bottom': '0.5rem',
+      '--separator-margin-left': '1rem',
+      '--separator-margin-right': '0rem',
+    });
   });
 
   it('applies isStretched class', () => {
