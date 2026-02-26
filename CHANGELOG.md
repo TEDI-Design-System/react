@@ -1,3 +1,85 @@
+# [16.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.18...react-16.0.0-rc.19) (2026-02-25)
+
+
+### Bug Fixes
+
+* **text-field:** fix small textfield right area padding, fix small textfield font size [#527](https://github.com/TEDI-Design-System/react/issues/527) ([#528](https://github.com/TEDI-Design-System/react/issues/528)) ([bd8bd16](https://github.com/TEDI-Design-System/react/commit/bd8bd1640c40be40199d881efead665ce45bd0a3))
+
+# [16.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.17...react-16.0.0-rc.18) (2026-02-25)
+
+
+### Features
+
+* **separator:** redesign with new spacing API, dotPosition and dotStyle support [#30](https://github.com/TEDI-Design-System/react/issues/30) ([#525](https://github.com/TEDI-Design-System/react/issues/525)) ([93e9e11](https://github.com/TEDI-Design-System/react/commit/93e9e118aab73d40347029089c5370851a7b551c))
+
+
+### BREAKING CHANGES
+
+* **separator:** legacy spacing props removed, dotSize enum changed, variant values simplified
+
+# [16.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.16...react-16.0.0-rc.17) (2026-02-25)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** show pointer on label hover [#532](https://github.com/TEDI-Design-System/react/issues/532) ([#533](https://github.com/TEDI-Design-System/react/issues/533)) ([097627d](https://github.com/TEDI-Design-System/react/commit/097627db68e23afaa27dd288319b34ccba3e5888))
+
+# [16.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.15...react-16.0.0-rc.16) (2026-02-20)
+
+
+### Bug Fixes
+
+* **number-field:** fix variables [#516](https://github.com/TEDI-Design-System/react/issues/516) ([#522](https://github.com/TEDI-Design-System/react/issues/522)) ([dcf6240](https://github.com/TEDI-Design-System/react/commit/dcf62404afa9543c13277623a9aaa6daed1b93df))
+
+# [16.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.14...react-16.0.0-rc.15) (2026-02-19)
+
+
+### Bug Fixes
+
+* **choice-group:** segmented item borders and focus behaviour [#101](https://github.com/TEDI-Design-System/react/issues/101) ([#513](https://github.com/TEDI-Design-System/react/issues/513)) ([455c491](https://github.com/TEDI-Design-System/react/commit/455c491a753dbfc35d7c996fb94aa15639bbdc51))
+
+# [16.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.13...react-16.0.0-rc.14) (2026-02-19)
+
+
+### Features
+
+* **closing-button:** add brand and inverted color [#6](https://github.com/TEDI-Design-System/react/issues/6) ([#519](https://github.com/TEDI-Design-System/react/issues/519)) ([cfeb5f2](https://github.com/TEDI-Design-System/react/commit/cfeb5f206b9137041b581c610c577e8e600b4fd7))
+
+# [16.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.12...react-16.0.0-rc.13) (2026-02-19)
+
+
+### Bug Fixes
+
+* **feedback-text:** fix error/success text color variables [#517](https://github.com/TEDI-Design-System/react/issues/517) ([#521](https://github.com/TEDI-Design-System/react/issues/521)) ([c019e79](https://github.com/TEDI-Design-System/react/commit/c019e793c5126baba67c516255f3ad3ecfcb2fd7))
+
+# [16.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.11...react-16.0.0-rc.12) (2026-02-19)
+
+
+### Features
+
+* **sidenav:** subheading as ReactNode, fix mobile sidenav items padding [#421](https://github.com/TEDI-Design-System/react/issues/421) ([#512](https://github.com/TEDI-Design-System/react/issues/512)) ([bb7fbe8](https://github.com/TEDI-Design-System/react/commit/bb7fbe8637895adfd5f331bbdbca5e3853d807ef))
+
+# [16.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.10...react-16.0.0-rc.11) (2026-02-19)
+
+
+### Bug Fixes
+
+* **link:** fix link icon sizes in relation to figma design [#46](https://github.com/TEDI-Design-System/react/issues/46) ([#520](https://github.com/TEDI-Design-System/react/issues/520)) ([f32bd83](https://github.com/TEDI-Design-System/react/commit/f32bd83b549b195ecb70b4f9191dd8ef9f6b0a42))
+
+# [16.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.9...react-16.0.0-rc.10) (2026-02-19)
+
+
+### Features
+
+* **button-group:** add size prop, add small example, fix examples on storybook [#14](https://github.com/TEDI-Design-System/react/issues/14) ([#511](https://github.com/TEDI-Design-System/react/issues/511)) ([73cd4f1](https://github.com/TEDI-Design-System/react/commit/73cd4f11348e4cccc9dfbfd84b7a333ce59f2023))
+
+# [16.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.8...react-16.0.0-rc.9) (2026-02-19)
+
+
+### Features
+
+* **alert:** new size prop with default and small values [#11](https://github.com/TEDI-Design-System/react/issues/11) ([#509](https://github.com/TEDI-Design-System/react/issues/509)) ([35c4962](https://github.com/TEDI-Design-System/react/commit/35c4962ec56612c5e5b727a27f813eb96fd7fb1e))
+
 # [16.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.7...react-16.0.0-rc.8) (2026-02-16)
 
 

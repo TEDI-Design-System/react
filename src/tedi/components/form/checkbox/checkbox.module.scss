@@ -6,7 +6,7 @@
 
   @include mixins.print-grayscale;
 
-  &:hover:not(.checkbox--disabled) {
+  &:hover:not(.tedi-checkbox--disabled) label {
     cursor: pointer;
   }
 

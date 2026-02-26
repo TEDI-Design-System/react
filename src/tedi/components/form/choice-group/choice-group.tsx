@@ -67,7 +67,7 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
     indeterminateCheck,
     indeterminateCheckProps = {},
     color,
-    layout,
+    layout = 'separated',
     showIndicator,
     ...rest
   } = getCurrentBreakpointProps(props);
@@ -188,8 +188,8 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
                 )}
                 <Row
                   direction={direction}
-                  gutterX={direction === 'row' && layout === 'segmented' ? 0 : 2}
-                  gutterY={direction === 'row' && layout === 'segmented' ? 0 : 1}
+                  gutterX={layout === 'segmented' ? 0 : 2}
+                  gutterY={layout === 'segmented' ? 0 : 1}
                   gap={
                     variant === 'default'
                       ? isBreakpointBelow(currentBreakpoint, 'md')

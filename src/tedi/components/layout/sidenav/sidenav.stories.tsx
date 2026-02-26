@@ -11,6 +11,7 @@ import {
   exampleNavItems,
   exampleThirdLevelMenuItems,
   exampleThirdLevelMenuItemsLinks,
+  exampleThirdLevelMenuItemsLinksWithSubTitles,
 } from './examples';
 import { SideNav } from './sidenav';
 
@@ -276,5 +277,12 @@ export const SmallSideNavItems: Story = {
     navItems: exampleThirdLevelMenuItems,
     ariaLabel: 'Default open menu',
     sideNavItemSize: 'small',
+  },
+};
+
+export const SubTitles: Story = {
+  render: Template,
+  args: {
+    navItems: exampleThirdLevelMenuItemsLinksWithSubTitles,
   },
 };

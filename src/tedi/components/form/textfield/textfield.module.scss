@@ -1,7 +1,32 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 @use '@tedi-design-system/core/mixins';
+@use 'sass:map';
 
 $input-height-large: 3.5rem;
+$input-padding-right-map: (
+  default: (
+    normal: 2rem,
+    both: 4rem,
+  ),
+  small: (
+    normal: 2rem,
+    both: 4rem,
+  ),
+  large: (
+    normal: 3.5rem,
+    both: 6rem,
+  ),
+);
+
+@function get-padding-right($size, $clearable, $icon) {
+  @if $clearable and $icon {
+    @return map.get(map.get($input-padding-right-map, $size), both);
+  } @else if $clearable or $icon {
+    @return map.get(map.get($input-padding-right-map, $size), normal);
+  } @else {
+    @return null;
+  }
+}
 
 @mixin textfield-focus($border-color: null) {
   @if $border-color {
@@ -69,29 +94,45 @@ $input-height-large: 3.5rem;
     @include textfield-focus(var(--form-general-feedback-success-border));
   }
 
-  .tedi-textfield--clearable &,
-  .tedi-textfield--with-icon & {
-    padding-right: 2rem;
-  }
-
-  .tedi-textfield--clearable.tedi-textfield--with-icon & {
-    padding-right: 4rem;
-  }
-
   &::placeholder {
     color: var(--form-input-text-placeholder);
     opacity: 1;
   }
 }
 
-// hide arrows on number inputs
-.tedi-textfield__input--hidden-arrows[type='number'] {
-  appearance: textfield; // for Firefox
+@each $size in default, small, large {
+  $selector: if($size == default, '.tedi-textfield', '.tedi-textfield--#{$size}');
+  #{$selector} {
+    $padding: get-padding-right($size, true, false);
 
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    margin: 0;
-    appearance: none;
+    &.tedi-textfield--clearable .tedi-textfield__input {
+      padding-right: get-padding-right($size, true, false);
+    }
+
+    &.tedi-textfield--with-icon .tedi-textfield__input {
+      padding-right: get-padding-right($size, false, true);
+    }
+
+    &.tedi-textfield--clearable.tedi-textfield--with-icon .tedi-textfield__input {
+      padding-right: get-padding-right($size, true, true);
+    }
+
+    @if $size == small {
+      .tedi-textfield__input {
+        height: var(--form-field-height-sm);
+        padding: var(--form-field-padding-y-sm) var(--form-field-padding-x-md-default);
+        font-size: var(--body-regular-size);
+      }
+    } @else if $size == large {
+      .tedi-textfield__input {
+        height: $input-height-large;
+        padding: var(--form-field-padding-y-lg) var(--form-field-padding-x-lg);
+
+        @include breakpoints.media-breakpoint-down(md) {
+          height: var(--form-field-height);
+        }
+      }
+    }
   }
 }
 
@@ -100,26 +141,24 @@ $input-height-large: 3.5rem;
   top: 0;
   right: 0;
   display: flex;
+  gap: var(--layout-grid-gutters-04);
   align-items: center;
   height: 100%;
-  padding: 0.75rem 0.5rem;
+  padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
 
   .tedi-textfield--small & {
-    padding: 0.25rem 0.5rem;
+    padding: var(--form-field-padding-y-sm) var(--form-field-padding-x-md-default);
   }
 
   .tedi-textfield--large & {
-    padding: 1rem;
+    padding: var(--form-field-padding-y-lg) var(--form-field-padding-x-lg);
   }
-}
-
-.tedi-textfield__separator {
-  margin-right: 0.5rem;
-  margin-left: 0.25rem;
 }
 
 .tedi-textfield__icon-wrapper {
   display: flex;
+  justify-content: center;
+  width: var(--icon-04);
   color: var(--form-input-text-filled);
   transition: color 0.2s ease;
 
@@ -148,50 +187,6 @@ div.tedi-textfield__icon-wrapper {
 
 .tedi-textfield__icon {
   vertical-align: text-top;
-}
-
-/* Small */
-.tedi-textfield--small {
-  .tedi-textfield__input {
-    height: var(--form-field-height-sm);
-    padding: var(--form-field-padding-y-sm) var(--form-field-padding-x-md-default);
-    font-size: var(--body-small-regular-size);
-  }
-
-  &.tedi-textfield--clearable &,
-  &.tedi-textfield--with-icon & {
-    padding-right: 2rem;
-  }
-
-  &.tedi-textfield--clearable.tedi-textfield--with-icon & {
-    padding-right: 4rem;
-  }
-}
-
-/* Large */
-.tedi-textfield--large {
-  .tedi-textfield__input {
-    height: $input-height-large;
-    padding: 1rem;
-
-    @include breakpoints.media-breakpoint-down(md) {
-      height: var(--form-field-height);
-    }
-  }
-
-  .tedi-textfield__separator {
-    margin-right: 0.5rem;
-    margin-left: 0.5rem;
-  }
-
-  &.tedi-textfield--clearable .tedi-textfield__input,
-  &.tedi-textfield--with-icon .tedi-textfield__input {
-    padding-right: 3.5rem;
-  }
-
-  &.tedi-textfield--clearable.tedi-textfield--with-icon .tedi-textfield__input {
-    padding-right: 6rem;
-  }
 }
 
 .tedi-textfield__feedback-wrapper {
