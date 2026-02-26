@@ -1,3 +1,10 @@
+# [16.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.19...react-16.0.0-rc.20) (2026-02-26)
+
+
+### Bug Fixes
+
+* **separator:** fix custom size application [#535](https://github.com/TEDI-Design-System/react/issues/535) ([#536](https://github.com/TEDI-Design-System/react/issues/536)) ([130edcd](https://github.com/TEDI-Design-System/react/commit/130edcd158944b90c62788e76fc97e015f1f228c))
+
 # [16.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.18...react-16.0.0-rc.19) (2026-02-25)
 
 
