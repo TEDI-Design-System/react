@@ -1,11 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
-import { Fragment } from 'react/jsx-runtime';
 
 import { Text } from '../../base/typography/text/text';
 import { Card, CardContent } from '../../cards/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import Separator, { SeparatorProps } from './separator';
+import Separator, { DotSize, SeparatorProps } from './separator';
 
 /**
  * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=3518-32729&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -32,60 +31,75 @@ const meta: Meta<typeof Separator> = {
 export default meta;
 type Story = StoryObj<typeof Separator>;
 
-const colorArray: SeparatorProps['color'][] = ['primary', 'secondary', 'accent'];
+const spacingArray: SeparatorProps['spacing'][] = [0, 0.5, 1, 1.5, 2, 2.5];
+const sizeArray: SeparatorProps['dotSize'][] = ['large', 'medium'];
+type TemplateMultipleProps<Type = SeparatorProps['dotSize']> = SeparatorProps & {
+  array: Type[];
+  property: keyof SeparatorProps;
+};
+const Template: StoryFn<SeparatorProps> = (args) => <Separator {...args} />;
 
-const Template: StoryFn<SeparatorProps> = (args) => (
-  <>
-    <Text color="secondary">Some content</Text>
-    <Separator {...args} />
-    <Text color="secondary">Other content</Text>
-  </>
-);
+const SizesTemplate: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array } = args;
+
+  return (
+    <div className="example-list">
+      {array.map((value, key) => (
+        <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col width={2}>
+            <Text modifiers="bold">{value === 'large' ? 'Large' : 'Medium'}</Text>
+          </Col>
+          <Col className="d-flex" width="auto">
+            <Separator
+              variant="dotted"
+              axis="vertical"
+              color="accent"
+              dotPosition="center"
+              dotSize={value}
+              dotStyle={undefined}
+            />
+          </Col>
+          <Col className="d-flex" align="center">
+            <Separator
+              variant="dotted"
+              axis="horizontal"
+              color="accent"
+              dotPosition="center"
+              dotSize={value as DotSize}
+            />
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
 
 const ColorsAndThickness: StoryFn<SeparatorProps> = (args) => (
-  <>
-    {colorArray.map((color) => (
-      <Fragment key={color}>
-        <Row>
-          <Col>
-            <Separator color={color} thickness={1} {...args} />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Separator color={color} thickness={2} {...args} />
-          </Col>
-        </Row>
-      </Fragment>
-    ))}
-  </>
-);
-
-const VerticalColorTemplate: StoryFn<SeparatorProps> = (args) => (
   <Row>
-    {colorArray.map((color) => (
-      <Col width="auto" key={color}>
-        <Row>
-          <Col width="auto">
-            <Separator {...args} color={color} />
-          </Col>
-          <Col width="auto">
-            <Separator {...args} thickness={2} color={color} />
-          </Col>
-        </Row>
-      </Col>
-    ))}
+    <Col>
+      <Separator spacing={1} thickness={1} {...args} />
+      <Separator spacing={1} thickness={2} {...args} />
+    </Col>
   </Row>
 );
 
-const DotOnlyTemplate: StoryFn<SeparatorProps> = (args) => (
+const SpacingHorizontal: StoryFn<SeparatorProps> = (args) => (
   <Row>
     <Col>
-      <Separator {...args} variant="dot-only" color="secondary" dotSize="extra-small" />
-      <Separator {...args} variant="dot-only" color="secondary" dotSize="small" />
-      <Separator {...args} variant="dot-only" color="secondary" dotSize="medium" />
-      <Separator {...args} variant="dot-only" color="secondary" dotSize="large" />
+      {spacingArray.map((spacing, index) => (
+        <Separator key={index} spacing={spacing} {...args} />
+      ))}
     </Col>
+  </Row>
+);
+
+const SpacingVertical: StoryFn<SeparatorProps> = (args) => (
+  <Row>
+    {spacingArray.map((spacing, index) => (
+      <Col width="auto" key={index}>
+        <Separator spacing={spacing} {...args} />
+      </Col>
+    ))}
   </Row>
 );
 
@@ -94,24 +108,177 @@ export const Default: Story = {
   args: { spacing: 1 },
 };
 
-export const HorizontalColors: Story = {
+export const HorizontalSpacings: Story = {
+  render: SpacingHorizontal,
+  args: {
+    axis: 'horizontal',
+  },
+};
+
+export const HorizontalThickness: Story = {
   render: ColorsAndThickness,
-  args: { spacing: 1 },
 };
 
-export const VerticalColors: Story = {
-  render: VerticalColorTemplate,
-  args: { axis: 'vertical', height: 5 },
-};
-
-export const PaddedEven: Story = {
+export const Vertical: Story = {
   render: Template,
-  args: { spacing: 1 },
+  args: { axis: 'vertical', height: 3 },
 };
 
-export const PaddedUneven: Story = {
+export const VerticalSpacings: Story = {
+  render: SpacingVertical,
+  args: {
+    axis: 'vertical',
+    height: 3,
+    display: 'inline-block',
+  },
+};
+
+export const VerticalThickness: Story = {
+  render: ColorsAndThickness,
+  args: { axis: 'vertical', height: 3, display: 'inline' },
+};
+
+export const DottedLineHorizontal: Story = {
   render: Template,
-  args: { topSpacing: 2.5, bottomSpacing: 0.5 },
+  args: { axis: 'horizontal', variant: 'dotted', color: 'accent', dotPosition: 'center' },
+};
+
+export const DottedLineVertical: Story = {
+  render: Template,
+  args: { axis: 'vertical', variant: 'dotted', color: 'accent', height: 5, dotPosition: 'center' },
+};
+
+export const Sizes: StoryObj<TemplateMultipleProps> = {
+  render: SizesTemplate,
+
+  args: {
+    property: 'dotSize',
+    array: sizeArray,
+  },
+};
+
+export const SpacingTopDefault: Story = {
+  render: () => {
+    return (
+      <Row>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition="center" color="accent" dotSize="large" />
+        </Col>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition="center" color="accent" dotSize="medium" />
+        </Col>
+      </Row>
+    );
+  },
+};
+
+export const SpacingTopSmall: Story = {
+  render: () => {
+    return (
+      <Row>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition={0.5} color="accent" dotSize="large" />
+        </Col>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition={0.75} color="accent" dotSize="medium" />
+        </Col>
+      </Row>
+    );
+  },
+};
+
+export const Position: Story = {
+  render: () => {
+    return (
+      <>
+        <Row>
+          <Col width="auto">
+            <VerticalSpacing>
+              <Text>Start</Text>
+              <Row className="text-center">
+                <Col width="auto">
+                  <div>
+                    <Separator
+                      axis="vertical"
+                      variant="dotted"
+                      height={2}
+                      dotPosition="start"
+                      color="accent"
+                      dotSize="large"
+                    />
+                  </div>
+                </Col>
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={2}
+                    dotPosition="start"
+                    color="accent"
+                    dotSize="medium"
+                  />
+                </Col>
+              </Row>
+            </VerticalSpacing>
+          </Col>
+          <Col width="auto">
+            <VerticalSpacing>
+              <Text>Center</Text>
+              <Row className="text-center">
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={1}
+                    dotPosition="center"
+                    color="accent"
+                    dotSize="large"
+                  />
+                </Col>
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={1}
+                    dotPosition="center"
+                    color="accent"
+                    dotSize="medium"
+                  />
+                </Col>
+              </Row>
+            </VerticalSpacing>
+          </Col>
+          <Col width="auto">
+            <VerticalSpacing>
+              <Text>End</Text>
+              <Row className="text-center">
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={1}
+                    dotPosition="end"
+                    color="accent"
+                    dotSize="large"
+                  />
+                </Col>
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={1}
+                    dotPosition="end"
+                    color="accent"
+                    dotSize="medium"
+                  />
+                </Col>
+              </Row>
+            </VerticalSpacing>
+          </Col>
+        </Row>
+      </>
+    );
+  },
 };
 
 const TemplateVertical: StoryFn<SeparatorProps> = (args) => (
@@ -137,88 +304,132 @@ const TemplateVertical: StoryFn<SeparatorProps> = (args) => (
   </Card>
 );
 
-export const VerticalThick: Story = {
-  render: TemplateVertical,
-  args: {
-    axis: 'horizontal',
-    thickness: 1,
-    isStretched: true,
-    topSpacing: 1,
-    bottomSpacing: 1,
-    md: { axis: 'vertical', thickness: 1 },
+export const DotFilled: Story = {
+  render: () => {
+    return (
+      <>
+        <Separator axis="horizontal" variant="dot-only" dotSize="large" dotStyle="filled" color="secondary" />
+      </>
+    );
   },
 };
 
-export const VerticalDotted: Story = {
+export const DotOutlined: Story = {
+  render: () => {
+    return (
+      <>
+        <Separator axis="horizontal" variant="dot-only" dotSize="large" dotStyle="outlined" color="secondary" />
+      </>
+    );
+  },
+};
+
+const dotSizeToPxMap: Record<string, string> = {
+  xs: '2px',
+  sm: '4px',
+  md: '8px',
+  lg: '15px',
+};
+
+const DottedSizesTemplate: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array } = args;
+
+  return (
+    <div className="example-list">
+      {array.map((value, key) => (
+        <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col width={2}>
+            <Text>{value !== undefined ? dotSizeToPxMap[value] || value : '—'}</Text>
+          </Col>
+          <Col className="d-flex" width="auto">
+            <Separator
+              dotSize={value as DotSize}
+              variant="dot-only"
+              axis="horizontal"
+              color="secondary"
+              dotStyle="filled"
+            />
+          </Col>
+          <Col className="d-flex" align="center">
+            <Separator
+              dotSize={value as DotSize}
+              variant="dot-only"
+              axis="horizontal"
+              color="secondary"
+              dotStyle="outlined"
+            />
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
+
+export const DottedSizes: StoryObj<TemplateMultipleProps> = {
+  render: DottedSizesTemplate,
+  args: {
+    property: 'dotSize',
+    array: ['extra-small', 'small', 'medium', 'large'],
+  },
+};
+
+const InlineSeparatorTemplate: StoryFn<SeparatorProps> = (args) => {
+  const { dotPosition, ...safeArgs } = args;
+
+  return (
+    <>
+      <Text>
+        Lorem ipsum dolor sit, amet
+        <Separator {...safeArgs} element="span" color="primary" spacing={0.5} />
+        consectetur adipisicing elit.
+      </Text>
+      <Text>
+        Lorem ipsum dolor sit, amet
+        <Separator {...safeArgs} element="span" color="secondary" spacing={1} />
+        consectetur adipisicing elit.
+      </Text>
+      <Text>
+        Lorem ipsum dolor sit, amet
+        <Separator {...safeArgs} element="span" color="accent" spacing={1.5} />
+        consectetur adipisicing elit.
+      </Text>
+      <Text>
+        Lorem ipsum dolor sit, amet
+        <Separator {...safeArgs} element="span" color="secondary" spacing={0.5} variant="dot-only" dotSize="small" />
+        consectetur adipisicing elit.
+      </Text>
+    </>
+  );
+};
+
+export const InlineSeparatorUsage: Story = {
+  render: InlineSeparatorTemplate,
+  args: { axis: 'vertical', display: 'inline' },
+};
+
+export const VerticalDottedCardExample: Story = {
   render: TemplateVertical,
   args: {
     axis: 'horizontal',
     variant: 'dotted',
     color: 'accent',
-    topSpacing: 1,
-    bottomSpacing: 1,
+    spacing: 1,
     isStretched: true,
+    dotPosition: 1.25,
     md: { axis: 'vertical' },
   },
 };
 
-export const VerticalDottedSmall: Story = {
+export const VerticalDottedSmallCardExample: Story = {
   render: TemplateVertical,
   args: {
     axis: 'horizontal',
-    topSpacing: 1,
-    bottomSpacing: 1,
-    variant: 'dotted-small',
+    spacing: 1,
+    variant: 'dotted',
+    dotSize: 'medium',
     color: 'accent',
     isStretched: true,
+    dotPosition: 1.25,
     md: { axis: 'vertical' },
   },
-};
-
-export const HorizontalDottedSeparator: Story = {
-  render: () => (
-    <Row>
-      <Col lg={3} md={6} sm={12}>
-        <VerticalSpacing size={2}>
-          <Separator axis="horizontal" variant="dotted" color="accent" />
-          <Separator axis="horizontal" variant="dotted-small" color="accent" />
-        </VerticalSpacing>
-      </Col>
-    </Row>
-  ),
-};
-
-export const DotOnly: Story = {
-  render: DotOnlyTemplate,
-  args: { spacing: 0.5 },
-};
-
-const InlineSeparatorTemplate: StoryFn<SeparatorProps> = (args) => (
-  <VerticalSpacing>
-    <Text>
-      Lorem ipsum dolor sit, amet
-      <Separator {...args} element="span" color="primary" spacing={0.5} />
-      consectetur adipisicing elit.
-    </Text>
-    <Text>
-      Lorem ipsum dolor sit, amet
-      <Separator {...args} element="span" color="secondary" spacing={1} />
-      consectetur adipisicing elit.
-    </Text>
-    <Text>
-      Lorem ipsum dolor sit, amet
-      <Separator {...args} element="span" color="accent" spacing={1.5} />
-      consectetur adipisicing elit.
-    </Text>
-    <Text>
-      Lorem ipsum dolor sit, amet
-      <Separator {...args} element="span" color="secondary" spacing={0.5} variant="dot-only" dotSize="small" />
-      consectetur adipisicing elit.
-    </Text>
-  </VerticalSpacing>
-);
-
-export const InlineSeparatorUsedInText: Story = {
-  render: InlineSeparatorTemplate,
-  args: { axis: 'vertical', display: 'inline' },
 };

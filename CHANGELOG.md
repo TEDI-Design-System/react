@@ -1,3 +1,29 @@
+# [16.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.18...react-16.0.0-rc.19) (2026-02-25)
+
+
+### Bug Fixes
+
+* **text-field:** fix small textfield right area padding, fix small textfield font size [#527](https://github.com/TEDI-Design-System/react/issues/527) ([#528](https://github.com/TEDI-Design-System/react/issues/528)) ([bd8bd16](https://github.com/TEDI-Design-System/react/commit/bd8bd1640c40be40199d881efead665ce45bd0a3))
+
+# [16.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.17...react-16.0.0-rc.18) (2026-02-25)
+
+
+### Features
+
+* **separator:** redesign with new spacing API, dotPosition and dotStyle support [#30](https://github.com/TEDI-Design-System/react/issues/30) ([#525](https://github.com/TEDI-Design-System/react/issues/525)) ([93e9e11](https://github.com/TEDI-Design-System/react/commit/93e9e118aab73d40347029089c5370851a7b551c))
+
+
+### BREAKING CHANGES
+
+* **separator:** legacy spacing props removed, dotSize enum changed, variant values simplified
+
+# [16.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.16...react-16.0.0-rc.17) (2026-02-25)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** show pointer on label hover [#532](https://github.com/TEDI-Design-System/react/issues/532) ([#533](https://github.com/TEDI-Design-System/react/issues/533)) ([097627d](https://github.com/TEDI-Design-System/react/commit/097627db68e23afaa27dd288319b34ccba3e5888))
+
 # [16.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.15...react-16.0.0-rc.16) (2026-02-20)
 
 

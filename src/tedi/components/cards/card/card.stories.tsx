@@ -283,7 +283,7 @@ const Timeline: StoryFn<CardProps> = (args) => (
           <p>Card content</p>
         </Col>
         <Col width="auto">
-          <Separator axis="vertical" color="accent" variant="dotted-small" isStretched />
+          <Separator axis="vertical" color="accent" variant="dotted" dotPosition="center" isStretched />
         </Col>
         <Col>
           <p>Card content</p>

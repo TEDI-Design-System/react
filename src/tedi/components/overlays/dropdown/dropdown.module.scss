@@ -1,0 +1,51 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-dropdown {
+  z-index: var(--z-index-dropdown);
+  display: flex;
+  flex-direction: column;
+  width: var(--dropdown-min-width, 10rem);
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--dropdown-item-default-background);
+  border: 1px solid var(--card-border-primary);
+  border-radius: var(--form-select-area-radius);
+  transition: opacity 120ms ease, transform 120ms ease;
+  transform: translateY(-4px) scale(0.98);
+
+  &[data-state='open'] {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  &--tree {
+    .tedi-dropdown__item {
+      position: relative;
+    }
+
+    .tedi-dropdown__item[data-indent='1']::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0.75rem;
+      width: 2px;
+      content: '';
+      background-color: var(--general-border-primary);
+    }
+
+    .tedi-dropdown__item[data-indent='1']::after {
+      position: absolute;
+      top: 50%;
+      left: 0.75rem;
+      width: 0.75rem;
+      height: 2px;
+      content: '';
+      background-color: var(--general-border-primary);
+    }
+
+    .tedi-dropdown__item[data-indent='1'][data-last]::before {
+      bottom: 50%;
+    }
+  }
+}
