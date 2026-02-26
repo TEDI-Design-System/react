@@ -11,7 +11,7 @@ import { VerticalSpacing, VerticalSpacingProps } from './vertical-spacing';
 
 const meta: Meta<typeof VerticalSpacing> = {
   component: VerticalSpacing,
-  title: 'Tedi-Ready/Components/Helpers/VerticalSpacing',
+  title: 'Tedi-Ready/Layout/VerticalSpacing',
   subcomponents: {
     'VerticalSpacing.Item': VerticalSpacing.Item,
   } as never,
