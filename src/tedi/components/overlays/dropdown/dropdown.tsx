@@ -25,8 +25,6 @@ import { DropdownItem } from './dropdown-item/dropdown-item';
 import { DropdownSeparator } from './dropdown-separator/dropdown-separator';
 import { DropdownTrigger } from './dropdown-trigger/dropdown-trigger';
 
-type DropdownWidth = 'auto' | 'trigger' | 'full' | number | string;
-
 type DropdownBreakpointProps = {
   /**
    * When `true` there is a border between the dropdown items
@@ -88,6 +86,11 @@ export interface DropdownProps extends BreakpointSupport<DropdownBreakpointProps
    * Change handler (fires for both modes)
    */
   onOpenChange?: (open: boolean) => void;
+  /*
+   * Additional class name(s) to apply to the dropdown container
+   * @default undefined
+   */
+  className?: string;
 }
 
 export const Dropdown = (props: DropdownProps) => {
@@ -102,6 +105,7 @@ export const Dropdown = (props: DropdownProps) => {
     defaultOpen = false,
     onOpenChange,
     placement = 'bottom-start',
+    className,
   } = getCurrentBreakpointProps<DropdownProps>(props);
   const { getLabel } = useLabels();
   const nodeId = useFloatingNodeId();
@@ -186,7 +190,11 @@ export const Dropdown = (props: DropdownProps) => {
             <div
               {...interactions.getFloatingProps({
                 ref: refs.setFloating,
-                className: cn(styles['tedi-dropdown'], { [styles[`tedi-dropdown--${variant}`]]: variant === 'tree' }),
+                className: cn(
+                  styles['tedi-dropdown'],
+                  { [styles[`tedi-dropdown--${variant}`]]: variant === 'tree' },
+                  className
+                ),
                 style: {
                   position: strategy,
                   left: x ?? 0,
