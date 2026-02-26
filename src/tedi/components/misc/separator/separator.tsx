@@ -140,64 +140,65 @@ export const Separator = (props: SeparatorProps): JSX.Element => {
   const isNumericDotPosition = typeof dotPosition === 'number';
   const resolvedDotPosition = variant !== 'dot-only' && !isNumericDotPosition ? dotPosition : undefined;
 
-  let top: number | undefined;
-  let bottom: number | undefined;
-  let left: number | undefined;
-  let right: number | undefined;
+  let top = 0;
+  let bottom = 0;
+  let left = 0;
+  let right = 0;
 
   if (typeof spacing === 'number') {
     if (axis === 'horizontal') {
       top = bottom = spacing;
-      left = right = 0;
     } else {
       left = right = spacing;
-      top = bottom = 0;
     }
-  } else if (typeof spacing === 'object' && spacing !== null) {
-    top = spacing.top ?? (axis === 'horizontal' ? spacing.top ?? spacing.bottom ?? 0 : 0);
-    bottom = spacing.bottom ?? (axis === 'horizontal' ? spacing.top ?? spacing.bottom ?? 0 : 0);
-    left = spacing.left ?? (axis === 'vertical' ? spacing.left ?? spacing.right ?? 0 : 0);
-    right = spacing.right ?? (axis === 'vertical' ? spacing.left ?? spacing.right ?? 0 : 0);
+  }
+
+  if (typeof spacing === 'object' && spacing !== null) {
+    top = spacing.top ?? top;
+    bottom = spacing.bottom ?? bottom;
+    left = spacing.left ?? left;
+    right = spacing.right ?? right;
   }
 
   const SeparatorBEM = cn(
     styles['tedi-separator'],
     className,
-    { [styles[`tedi-separator--${color}`]]: color },
-    { [styles[`tedi-separator--${axis}`]]: axis },
-    { [styles[`tedi-separator--${variant}`]]: variant },
-    { [styles[`tedi-separator--${display}`]]: display },
-    { [styles[`tedi-separator--${variant}-${dotSize}`]]: variant === 'dot-only' && dotSize },
-    { [styles[`tedi-separator--dot-style-${dotStyle}`]]: variant && dotStyle },
-    { [styles[`tedi-separator--dotted-${dotSize}`]]: variant === 'dotted' && dotSize },
-    { [styles[`tedi-separator--dot-position-${resolvedDotPosition}`]]: resolvedDotPosition && variant !== 'dot-only' },
-    { [styles['tedi-separator--dot-position-custom']]: isNumericDotPosition },
+    styles[`tedi-separator--${axis}`],
+    styles[`tedi-separator--${color}`],
     {
+      [styles[`tedi-separator--${variant}`]]: variant,
+      [styles[`tedi-separator--${display}`]]: display,
+      [styles[`tedi-separator--dotted-${dotSize}`]]: variant === 'dotted',
+      [styles[`tedi-separator--dot-only-${dotSize}`]]: variant === 'dot-only',
+      [styles[`tedi-separator--dot-style-${dotStyle}`]]: variant,
+      [styles[`tedi-separator--dot-position-${resolvedDotPosition}`]]:
+        typeof resolvedDotPosition === 'string' && variant !== 'dot-only',
+      [styles['tedi-separator--dot-position-custom']]: isNumericDotPosition,
+      [styles['tedi-separator--is-stretched']]: isStretched,
       [styles[`tedi-separator--thickness-${thickness}`]]: thickness || dotStyle === 'outlined' ? thickness : undefined,
-    },
-    { [styles['tedi-separator--is-stretched']]: isStretched },
-    { [styles[`tedi-separator--top-${top}`.replace('.', '-')]]: top },
-    { [styles[`tedi-separator--bottom-${bottom}`.replace('.', '-')]]: bottom },
-    { [styles[`tedi-separator--left-${left}`.replace('.', '-')]]: left },
-    { [styles[`tedi-separator--right-${right}`.replace('.', '-')]]: right }
+    }
   );
 
-  const getCssVars = () => {
-    const cssvars: CSSProperties = {};
-    if (height) cssvars['--vertical-separator-height'] = `${height}rem`;
+  const cssVars: CSSProperties = {
+    '--separator-margin-top': `${top}rem`,
+    '--separator-margin-bottom': `${bottom}rem`,
+    '--separator-margin-left': `${left}rem`,
+    '--separator-margin-right': `${right}rem`,
+  } as CSSProperties;
 
-    if (thickness) {
-      cssvars['--separator-thickness'] = `${thickness}px`;
-    }
+  if (height) {
+    cssVars['--vertical-separator-height'] = `${height}rem`;
+  }
 
-    if (variant === 'dotted' && isNumericDotPosition) {
-      cssvars['--separator-dot-position'] = `${dotPosition}rem`;
-    }
+  if (thickness) {
+    cssVars['--separator-thickness'] = `${thickness}px`;
+  }
 
-    return cssvars;
-  };
+  if (variant === 'dotted' && isNumericDotPosition) {
+    cssVars['--separator-dot-position'] = `${dotPosition}rem`;
+  }
 
-  return <Element data-name="separator" {...rest} style={getCssVars()} className={SeparatorBEM} />;
+  return <Element data-name="separator" {...rest} style={cssVars} className={SeparatorBEM} />;
 };
 
 export default Separator;

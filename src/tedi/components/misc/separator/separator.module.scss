@@ -1,18 +1,5 @@
 @use '@tedi-design-system/core/mixins';
 
-$sizes: (
-  '0': 0,
-  '0-25': 0.25rem,
-  '0-5': 0.5rem,
-  '0-75': 0.75rem,
-  '1': 1rem,
-  '1-25': 1.25rem,
-  '1-5': 1.5rem,
-  '1-75': 1.75rem,
-  '2': 2rem,
-  '2-5': 2.5rem,
-  '5': 5rem,
-);
 $thicknesses: (
   '1': 1px,
   '2': 2px,
@@ -27,7 +14,8 @@ $dot-colors: (
   --vertical-separator-height: 100%;
 
   position: relative;
-  margin: 0;
+  margin: var(--separator-margin-top, 0) var(--separator-margin-right, 0) var(--separator-margin-bottom, 0)
+    var(--separator-margin-left, 0);
   border: 0;
   border-top: 1px solid var(--general-border-primary);
 
@@ -170,30 +158,6 @@ $dot-colors: (
 .tedi-separator--vertical.tedi-separator--dot-position-custom::before {
   top: var(--separator-dot-position);
   bottom: auto;
-}
-
-@each $size, $value in $sizes {
-  .tedi-separator--spacing-#{$size}:not(.tedi-separator--dot-only) {
-    margin: #{$value} 0;
-  }
-
-  .tedi-separator--dot-only.tedi-separator--spacing-#{$size} {
-    &.tedi-separator--horizontal {
-      margin-right: $value;
-      margin-left: $value;
-    }
-
-    &.tedi-separator--vertical {
-      margin-top: $value;
-      margin-bottom: $value;
-    }
-  }
-
-  @each $side in (top, bottom, left, right) {
-    .tedi-separator--#{$side}-#{$size} {
-      margin-#{$side}: $value;
-    }
-  }
 }
 
 @each $thickness, $value in $thicknesses {
