@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
@@ -10,18 +9,13 @@ import { DateField, DateFieldProps } from './date-field';
 /**
  * React DayPicker based reusable DatePicker component <br/>
  * <a href="https://daypicker.dev/" target="_BLANK">React DayPicker ↗</a><br />
- * <a href="#" target="_BLANK">Figma ↗</a><br />
- * <a href="# target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.37.57?node-id=4620-82915&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.tedi.ee/1ee8444b7/p/15bd6e-date-field" target="_BLANK">Zeroheight ↗</a>
  */
 
 export default {
   title: 'Tedi-Ready/Components/Form/DateField',
   component: DateField,
-  parameters: {
-    controls: {
-      exclude: [],
-    },
-  },
 } as Meta<DateFieldProps>;
 
 type Story = StoryObj<DateFieldProps>;
@@ -191,25 +185,25 @@ export const AvailableDays: Story = {
   },
 };
 
-// const ManualTypingTemplate: StoryFn<DateFieldProps> = (args) => {
-//   const [value, setValue] = useState<Date | undefined>();
+export const ManualTypingTemplate: StoryFn<DateFieldProps> = (args) => {
+  const [value, setValue] = useState<Date | undefined>();
 
-//   const parseEstonianDate = (value: string): Date | undefined => {
-//     const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-//     if (!match) return undefined;
+  const parseEstonianDate = (value: string): Date | undefined => {
+    const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (!match) return undefined;
 
-//     const [, dd, mm, yyyy] = match;
-//     const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    const [, dd, mm, yyyy] = match;
+    const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
 
-//     return isNaN(date.getTime()) ? undefined : date;
-//   };
+    return isNaN(date.getTime()) ? undefined : date;
+  };
 
-//   return <DateField {...args} selected={value} parseDate={parseEstonianDate} />;
-// };
-
-// export const ManualTyping: Story = {
-//   render: ManualTypingTemplate,
-//   args: {
-//     label: 'DD.MM.YYYY',
-//   },
-// };
+  return (
+    <DateField
+      {...args}
+      selected={value}
+      onSelect={(date) => setValue(date as Date | undefined)}
+      parseDate={parseEstonianDate}
+    />
+  );
+};

@@ -150,37 +150,29 @@
   }
 }
 
-.tedi-date-field__input-wrapper {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
+.tedi-date-field__textfield {
+  button:not([data-name='closing-button']):last-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--button-xs-icon-size);
+    min-height: var(--form-field-button-height-sm);
+    max-height: var(--form-field-button-height-sm);
+    border-radius: var(--button-radius-sm);
 
-.tedi-date-field__tags {
-  position: absolute;
-  left: 8px;
-  z-index: 10;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+    &:hover {
+      background-color: var(--form-datepicker-date-hover);
+    }
 
-.tedi-date-field__textfield button:not([data-name='closing-button']):last-child {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--button-xs-icon-size);
-  min-height: var(--form-field-button-height-sm);
-  max-height: var(--form-field-button-height-sm);
-  border-radius: var(--button-radius-sm);
-
-  &:hover {
-    background-color: var(--form-datepicker-date-hover);
+    > span {
+      color: var(--button-main-neutral-text-default);
+    }
   }
 
-  span {
-    color: var(--button-main-neutral-text-default);
+  &[aria-expanded='true'] {
+    button:not([data-name='closing-button']):last-child {
+      background-color: var(--form-datepicker-date-hover);
+    }
   }
 }
 

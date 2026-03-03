@@ -222,6 +222,7 @@ export const DateField: React.FC<DateFieldProps> = ({
 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<CalendarView>(calendarView);
+  const [inputValue, setInputValue] = useState('');
 
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
@@ -297,15 +298,15 @@ export const DateField: React.FC<DateFieldProps> = ({
       : [];
 
   const handleInputChange = (val: string) => {
+    setInputValue(val);
+
     if (!parseDate) return;
 
     const parsed = parseDate(val);
+    if (!parsed) return;
+
     if (!isControlled) setInternalValue(parsed);
-    if (mode === 'single' && parsed instanceof Date) {
-      onSelect?.(parsed, parsed, {}, {} as UnknownType);
-    } else {
-      onSelect?.(parsed as Date[] | DateRange, parsed as unknown as Date, {}, {} as UnknownType);
-    }
+    onSelect?.(parsed, parsed as Date, {}, {} as UnknownType);
 
     if (parsed instanceof Date) setCurrentMonth(parsed);
     if (shouldCloseOnSelect) setOpen(false);
@@ -363,8 +364,8 @@ export const DateField: React.FC<DateFieldProps> = ({
             {...(inputProps as TextFieldProps)}
             id="datepicker-input"
             label={label}
-            readOnly={readOnly}
-            value={formatDate ? formatDate(value) : defaultFormatter(value)}
+            readOnly={readOnly ?? !parseDate}
+            value={inputValue || (formatDate ? formatDate(value) : defaultFormatter(value))}
             placeholder={placeholder}
             icon="calendar_today"
             isClearable
@@ -415,13 +416,7 @@ export const DateField: React.FC<DateFieldProps> = ({
                 <DayPicker
                   {...dayPickerProps}
                   mode={mode}
-                  selected={
-                    mode === 'single'
-                      ? (value as Date | undefined)
-                      : mode === 'multiple'
-                      ? (value as Date[])
-                      : (value as DateRange | undefined)
-                  }
+                  selected={value as UnknownType}
                   locale={locale}
                   month={currentMonth}
                   onMonthChange={setCurrentMonth}
@@ -477,3 +472,5 @@ export const DateField: React.FC<DateFieldProps> = ({
     </>
   );
 };
+
+export { DateField as DatePicker };
