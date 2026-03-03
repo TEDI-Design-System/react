@@ -59,7 +59,7 @@ $input-padding-right-map: (
 .tedi-textfield__input {
   display: block;
   width: 100%;
-  height: var(--form-field-height);
+  min-height: var(--form-field-height);
   padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
   font-family: inherit;
   font-size: var(--body-regular-size);
@@ -191,4 +191,8 @@ div.tedi-textfield__icon-wrapper {
 
 .tedi-textfield__feedback-wrapper {
   display: flex;
+}
+
+.tedi-textfield__separator {
+  max-height: 1.5rem;
 }

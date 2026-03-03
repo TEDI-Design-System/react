@@ -1,0 +1,23 @@
+.tedi-multi-value-field > div {
+  min-height: var(--form-field-height);
+  padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
+  background-color: var(--form-input-background-default);
+  border: 1px solid var(--form-input-border-default);
+  border-radius: var(--form-field-radius);
+}
+
+.tedi-multi-value-field__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--layout-grid-gutters-04);
+}
+
+.tedi-multi-value-field__input {
+  display: none;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+}

@@ -1,15 +1,12 @@
 .tedi-date-field {
   &__container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    position: relative;
   }
 
   &__calendar {
     position: relative;
     z-index: var(--z-index-dropdown);
     min-width: 315px;
-    padding: var(--card-padding-md-default);
     font-family: var(--family-default);
     background: var(--card-background-primary);
     border: 1px solid var(--card-border-primary);
@@ -19,56 +16,32 @@
     table {
       width: 100%;
       border-spacing: 0;
+      border-collapse: separate;
     }
   }
 
-  &__day {
-    button {
-      width: var(--form-calendar-date-width);
-      height: var(--form-calendar-date-width);
-      font-size: var(--body-regular-size);
-      color: var(--general-text-primary);
-      background: transparent;
-      border: 0;
-      border-radius: 9999px;
-      transition: all 0.15s ease;
-
-      &:hover:not(:disabled) {
-        cursor: pointer;
-        border: 1px solid var(--form-datepicker-today-border);
-      }
-
-      &:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px var(--form-datepicker-today-border);
-      }
-    }
-
-    &--selected button {
-      color: var(--form-datepicker-date-text-selected);
-      background-color: var(--form-datepicker-date-selected);
-      border-radius: var(--button-radius-sm);
-    }
+  &__months-container {
+    display: flex;
+    gap: 8px;
   }
 
-  &__day > button {
-    color: var(--general-text-primary);
-    background: transparent;
-    border: 0;
+  &__month {
+    padding: var(--card-padding-md-default);
   }
 
-  &__head tr th {
-    border-bottom: 1px solid var(--card-border-primary);
+  &__footer {
+    padding-top: var(--layout-grid-gutters-08);
+    margin: 0 var(--card-padding-md-default) var(--card-padding-xs) var(--card-padding-md-default);
+    border-top: 1px solid var(--general-border-primary);
   }
 
   &__caption {
-    padding: 8px 0;
     font-weight: 600;
     color: var(--general-text-primary);
   }
 
-  &__row {
-    margin-bottom: 4px;
+  &__head tr th {
+    border-bottom: 1px solid var(--card-border-primary);
   }
 
   &__weekday {
@@ -79,7 +52,182 @@
     border-bottom: 1px solid var(--card-border-primary);
   }
 
-  &__outside-days button {
-    color: var(--form-datepicker-date-text-muted);
+  &__day {
+    width: var(--form-calendar-date-width);
+    height: var(--form-calendar-date-width);
+    text-align: center;
+    border-radius: var(--button-radius-sm);
+    transition: background 0.15s ease;
+
+    button {
+      all: unset;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      font-size: var(--body-regular-size);
+      color: var(--general-text-primary);
+      cursor: pointer;
+      border-radius: inherit;
+    }
+
+    &:hover:not(.tedi-date-field__disabled) {
+      color: var(--general-text-primary);
+      cursor: pointer;
+      background-color: var(--form-datepicker-date-hover);
+    }
   }
+
+  &__today {
+    border: 1px solid var(--form-datepicker-today-border);
+    border-radius: 50%;
+
+    &.tedi-date-field__available-day {
+      color: var(--form-datepicker-date-text-available);
+      background: var(--form-datepicker-date-available);
+    }
+  }
+
+  &__available-day {
+    color: var(--form-datepicker-date-text-available);
+    background: var(--form-datepicker-date-available);
+
+    button {
+      color: inherit;
+    }
+  }
+
+  &__day--selected {
+    color: var(--form-datepicker-date-text-selected);
+    background-color: var(--form-datepicker-date-selected);
+
+    button {
+      color: inherit;
+    }
+  }
+
+  &__range-middle {
+    background-color: var(--form-datepicker-date-active);
+    border-radius: 0;
+
+    button {
+      color: var(--general-text-primary);
+    }
+  }
+
+  &__range-start {
+    background-color: var(--form-datepicker-date-selected);
+    border-radius: var(--button-radius-sm) 0 0 var(--button-radius-sm);
+  }
+
+  &__range-end {
+    background-color: var(--form-datepicker-date-selected);
+    border-radius: 0 var(--button-radius-sm) var(--button-radius-sm) 0;
+  }
+
+  &__outside-days {
+    button {
+      color: var(--form-datepicker-date-text-muted);
+    }
+  }
+
+  &__disabled {
+    opacity: 0.6;
+
+    button {
+      color: var(--general-text-disabled);
+      cursor: not-allowed;
+    }
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  &__day:has(button:focus-visible) {
+    outline: 2px solid var(--form-datepicker-today-border);
+    outline-offset: 2px;
+  }
+}
+
+.tedi-date-field__input-wrapper {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tedi-date-field__tags {
+  position: absolute;
+  left: 8px;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tedi-date-field__textfield button:not([data-name='closing-button']):last-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-xs-icon-size);
+  min-height: var(--form-field-button-height-sm);
+  max-height: var(--form-field-button-height-sm);
+  border-radius: var(--button-radius-sm);
+
+  &:hover {
+    background-color: var(--form-datepicker-date-hover);
+  }
+
+  span {
+    color: var(--button-main-neutral-text-default);
+  }
+}
+
+.tedi-date-field__multivalue div:last-child {
+  align-items: start;
+}
+
+.tedi-date-field__picker-grid-container {
+  position: relative;
+  z-index: var(--z-index-dropdown);
+  max-width: 315px;
+  font-family: var(--family-default);
+  background: var(--card-background-primary);
+  border: 1px solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
+}
+
+.tedi-date-field__picker-grid-header {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--card-padding-md-default);
+  padding-bottom: 0;
+}
+
+.tedi-date-field__picker-grid {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  padding: var(--card-padding-md-default);
+}
+
+.tedi-date-field__grid-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
+  margin: 0;
+  font-family: var(--family-default);
+  font-size: var(--button-text-size-default);
+  color: var(--form-checkbox-radio-card-primary-default-text);
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid var(--form-checkbox-radio-card-secondary-default-border);
+  border-radius: var(--form-checkbox-radio-card-radius);
 }

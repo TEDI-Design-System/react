@@ -129,6 +129,8 @@ export interface TextFieldProps extends BreakpointSupport<TextFieldBreakpointPro
    * Additional attributes for the input element.
    */
   input?: React.InputHTMLAttributes<HTMLInputElement> | React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+  startSlot?: React.ReactNode;
+  endSlot?: React.ReactNode;
 }
 
 export interface TextFieldForwardRef {
@@ -169,6 +171,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     input,
     name,
     isTextArea,
+    startSlot,
+    endSlot,
     ...rest
   } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
   const { getLabel } = useLabels();
@@ -398,7 +402,9 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         tabIndex={disabled ? -1 : 0}
         ref={innerRef}
       >
+        {startSlot}
         {renderInputElement}
+        {endSlot}
         {isClearable || icon ? renderRightArea : null}
       </div>
       {renderFeedbackWrapper()}

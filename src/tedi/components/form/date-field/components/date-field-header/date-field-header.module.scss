@@ -1,0 +1,35 @@
+.tedi-date-field__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.tedi-date-field__month-year-dropdown {
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.tedi-date-field__month-year-selector {
+  display: flex;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+  padding-left: var(--layout-grid-gutters-04);
+  font-weight: 500;
+  text-transform: capitalize;
+  border-radius: var(--button-radius-sm);
+
+  &:hover,
+  &[aria-expanded='true'] {
+    color: var(--button-main-neutral-text-active);
+    background: var(--button-main-neutral-icon-only-background-active);
+
+    .tedi-date-field__month-year-caret {
+      color: var(--button-main-neutral-text-active);
+    }
+  }
+}
+
+.tedi-date-field__month-year-caret {
+  font-size: var(--tedi-size-09);
+}
