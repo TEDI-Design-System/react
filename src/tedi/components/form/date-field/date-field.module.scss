@@ -70,7 +70,6 @@
       display: block;
       width: 100%;
       height: 100%;
-      margin-left: -1px;
       overflow: hidden;
       font-size: var(--body-regular-size);
       font-weight: 400;
@@ -92,6 +91,7 @@
 
   &__today {
     button {
+      margin-left: -1px;
       border: 1px solid var(--form-datepicker-today-border);
       border-radius: 50%;
     }
