@@ -110,7 +110,7 @@
     &:not(.tedi-dropdown__item--disabled) {
       cursor: pointer;
       outline: 0;
-      box-shadow: 0 0 0 1px var(--TEDI-neutral-100), 0 0 0 3px var(--general-surface-selected);
+      box-shadow: 0 0 0 1px var(--tedi-neutral-100), 0 0 0 3px var(--general-surface-selected);
     }
   }
 

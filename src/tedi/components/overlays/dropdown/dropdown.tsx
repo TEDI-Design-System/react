@@ -221,8 +221,13 @@ export const Dropdown = (props: DropdownProps) => {
                       : width,
                 },
                 onKeyDown(event) {
-                  if (!modal && event.key === 'Tab') {
-                    setOpen(false);
+                  if (event.key === 'Tab') {
+                    const floatingEl = refs.floating.current;
+                    const relatedTarget = (event as unknown as KeyboardEvent & { relatedTarget: EventTarget | null })
+                      .relatedTarget;
+                    if (floatingEl && relatedTarget && !floatingEl.contains(relatedTarget as Node)) {
+                      setOpen(false);
+                    }
                   }
                 },
                 role: 'menu',
