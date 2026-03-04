@@ -7,16 +7,22 @@ export interface YearGridProps {
    */
   currentMonth: Date;
   /*
-   * Callback when a year is selected from the grid. Receives a Date object with the selected year and current month.
+   * Callback fired when a year is selected from the grid.
+   * Receives a Date object representing the selected year.
+   * The month and day values may be normalized by the parent component
+   * depending on the active calendar view (e.g. January 1st in year-only mode).
    */
-  onYearChange: (date: Date) => void;
+  onSelectYear: (date: Date) => void;
   /*
-   * Callback for navigating to a different year range in the grid. Receives a Date object with the target year and current month.
+   * Callback fired when navigating between year ranges in the grid
+   * (e.g. when clicking the previous or next buttons).
+   * Receives a Date object representing the first year of the
+   * newly displayed range.
    */
-  onBackToMonths: () => void;
+  onNavigate: (date: Date) => void;
 }
 
-export const YearGrid = ({ currentMonth, onYearChange, onBackToMonths }: YearGridProps) => {
+export const YearGrid = ({ currentMonth, onSelectYear, onNavigate }: YearGridProps) => {
   const { getLabel } = useLabels();
   const currentYear = currentMonth.getFullYear();
   const startYear = Math.floor(currentYear / 12) * 12;
@@ -37,12 +43,11 @@ export const YearGrid = ({ currentMonth, onYearChange, onBackToMonths }: YearGri
       headerLabel={`${startYear} – ${startYear + 11}`}
       prevAriaLabel={getLabel('pickers.previousYear')}
       nextAriaLabel={getLabel('pickers.nextYear')}
-      onPrev={() => onYearChange(new Date(startYear - 12, 0))}
-      onNext={() => onYearChange(new Date(startYear + 12, 0))}
+      onPrev={() => onNavigate(new Date(startYear - 12, 0))}
+      onNext={() => onNavigate(new Date(startYear + 12, 0))}
       items={years}
       onSelect={(year) => {
-        onYearChange(new Date(year, currentMonth.getMonth()));
-        onBackToMonths();
+        onSelectYear(new Date(year, currentMonth.getMonth(), 1));
       }}
     />
   );

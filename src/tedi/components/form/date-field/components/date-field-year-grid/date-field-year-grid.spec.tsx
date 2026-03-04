@@ -18,14 +18,14 @@ jest.mock('../../../../../providers/label-provider', () => ({
 }));
 
 describe('YearGrid component', () => {
-  const mockOnYearChange = jest.fn();
-  const mockOnBackToMonths = jest.fn();
+  const mockOnSelectYear = jest.fn();
+  const mockOnNavigate = jest.fn();
   const currentMonth = new Date(2025, 6, 15);
 
   const defaultProps = {
     currentMonth,
-    onYearChange: mockOnYearChange,
-    onBackToMonths: mockOnBackToMonths,
+    onSelectYear: mockOnSelectYear,
+    onNavigate: mockOnNavigate,
   };
 
   beforeEach(() => {
@@ -56,7 +56,7 @@ describe('YearGrid component', () => {
     render(<YearGrid {...defaultProps} />);
     const prevBtn = screen.getByRole('button', { name: 'Eelmine periood' });
     await user.click(prevBtn);
-    expect(mockOnYearChange).toHaveBeenCalledWith(new Date(2004, 0));
+    expect(mockOnNavigate).toHaveBeenCalledWith(new Date(2004, 0));
   });
 
   it('calls onYearChange with next 12-year range when next clicked', async () => {
@@ -64,17 +64,18 @@ describe('YearGrid component', () => {
     render(<YearGrid {...defaultProps} />);
     const nextBtn = screen.getByRole('button', { name: 'Järgmine periood' });
     await user.click(nextBtn);
-    expect(mockOnYearChange).toHaveBeenCalledWith(new Date(2028, 0));
+    expect(mockOnNavigate).toHaveBeenCalledWith(new Date(2028, 0));
   });
 
-  it('calls onYearChange and onBackToMonths when year selected', async () => {
+  it('calls onSelectYear when a year is selected', async () => {
     const user = userEvent.setup();
     render(<YearGrid {...defaultProps} />);
 
     const year2023 = screen.getByRole('button', { name: '2023' });
     await user.click(year2023);
 
-    expect(mockOnYearChange).toHaveBeenCalledWith(new Date(2023, currentMonth.getMonth()));
-    expect(mockOnBackToMonths).toHaveBeenCalled();
+    expect(mockOnSelectYear).toHaveBeenCalledWith(new Date(2023, currentMonth.getMonth(), 1));
+
+    expect(mockOnNavigate).not.toHaveBeenCalled();
   });
 });

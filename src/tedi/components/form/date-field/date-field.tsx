@@ -252,15 +252,26 @@ export const DateField: React.FC<DateFieldProps> = ({
     }
   }, [selected, isControlled]);
 
-  const dateFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat(localeCode, {
-        day: '2-digit',
+  const dateFormatter = useMemo(() => {
+    if (calendarView === 'years') {
+      return new Intl.DateTimeFormat(localeCode, {
+        year: 'numeric',
+      });
+    }
+
+    if (calendarView === 'months') {
+      return new Intl.DateTimeFormat(localeCode, {
         month: '2-digit',
         year: 'numeric',
-      }),
-    [localeCode]
-  );
+      });
+    }
+
+    return new Intl.DateTimeFormat(localeCode, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }, [localeCode, calendarView]);
 
   const floating = useFloating({
     open,
@@ -297,6 +308,12 @@ export const DateField: React.FC<DateFieldProps> = ({
     }
 
     return '';
+  };
+
+  const applyValue = (date: Date) => {
+    if (!isControlled) setInternalValue(date);
+    onSelect?.(date, date as UnknownType, {}, {} as UnknownType);
+    if (shouldCloseOnSelect) setOpen(false);
   };
 
   const formattedDates =
@@ -403,21 +420,35 @@ export const DateField: React.FC<DateFieldProps> = ({
                 {view === 'months' && getLabel('pickers.monthSelection')}
               </div>
 
-              {view === 'years' && (
+              {(view === 'years' || calendarView === 'years') && (
                 <YearGrid
                   currentMonth={currentMonth}
-                  onYearChange={setCurrentMonth}
-                  onBackToMonths={() => setView('months')}
+                  onNavigate={setCurrentMonth}
+                  onSelectYear={(date) => {
+                    setCurrentMonth(date);
+
+                    if (calendarView === 'years') {
+                      const normalized = new Date(date.getFullYear(), 0, 1);
+                      applyValue(normalized);
+                    } else {
+                      setView('months');
+                    }
+                  }}
                 />
               )}
 
-              {view === 'months' && (
+              {(view === 'months' || calendarView === 'months') && (
                 <MonthGrid
                   currentMonth={currentMonth}
                   onNavigate={setCurrentMonth}
                   onSelectMonth={(date) => {
                     setCurrentMonth(date);
-                    setView('days');
+
+                    if (calendarView === 'months') {
+                      applyValue(date);
+                    } else {
+                      setView('days');
+                    }
                   }}
                 />
               )}
