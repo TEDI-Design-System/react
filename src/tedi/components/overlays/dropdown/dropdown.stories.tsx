@@ -165,8 +165,8 @@ export const WithCheckbox: Story = {
   render: () => {
     const [cities, setCities] = React.useState<string[]>([]);
 
-    const toggle = (value: string, checked?: boolean) => {
-      setCities((prev) => (checked ? [...prev, value] : prev.filter((v) => v !== value)));
+    const toggle = (value: string) => (_value: string, checked: boolean) => {
+      setCities((prev) => (checked ? [...prev.filter((v) => v !== value), value] : prev.filter((v) => v !== value)));
     };
 
     return (
@@ -184,7 +184,7 @@ export const WithCheckbox: Story = {
               label="Pärnu"
               value="parnu"
               checked={cities.includes('parnu')}
-              onChange={toggle}
+              onChange={toggle('parnu')}
               name=""
             />
           </Dropdown.Item>
@@ -195,7 +195,7 @@ export const WithCheckbox: Story = {
               label="Tartu"
               value="tartu"
               checked={cities.includes('tartu')}
-              onChange={toggle}
+              onChange={toggle('tartu')}
               name=""
             />
           </Dropdown.Item>
@@ -206,7 +206,7 @@ export const WithCheckbox: Story = {
               label="Tallinn"
               value="tallinn"
               checked={cities.includes('tallinn')}
-              onChange={toggle}
+              onChange={toggle('tallinn')}
               name=""
             />
           </Dropdown.Item>
@@ -227,12 +227,12 @@ export const WithIndentedItems: Story = {
     const noneChecked = selected.length === 0;
     const indeterminate = !allChecked && !noneChecked;
 
-    const toggleAll = (_: string, checked?: boolean) => {
+    const toggleAll = (_: string, checked: boolean) => {
       setSelected(checked ? allCities : []);
     };
 
-    const toggleOne = (value: string, checked?: boolean) => {
-      setSelected((prev) => (checked ? [...prev, value as City] : prev.filter((v) => v !== value)));
+    const toggleOne = (value: City) => (_: string, checked: boolean) => {
+      setSelected((prev) => (checked ? [...prev.filter((v) => v !== value), value] : prev.filter((v) => v !== value)));
     };
 
     return (
@@ -262,7 +262,7 @@ export const WithIndentedItems: Story = {
               label="Tallinn"
               value="tallinn"
               checked={selected.includes('tallinn')}
-              onChange={toggleOne}
+              onChange={toggleOne('tallinn')}
               name=""
             />
           </Dropdown.Item>
@@ -273,7 +273,7 @@ export const WithIndentedItems: Story = {
               label="Tartu"
               value="tartu"
               checked={selected.includes('tartu')}
-              onChange={toggleOne}
+              onChange={toggleOne('tartu')}
               name=""
             />
           </Dropdown.Item>
@@ -284,7 +284,7 @@ export const WithIndentedItems: Story = {
               label="Pärnu"
               value="parnu"
               checked={selected.includes('parnu')}
-              onChange={toggleOne}
+              onChange={toggleOne('parnu')}
               name=""
             />
           </Dropdown.Item>

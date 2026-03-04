@@ -149,12 +149,13 @@ export const DropdownItem = ({
 
           if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
-
             const input = (e.currentTarget as HTMLElement).querySelector(
               'input[type="checkbox"], input[type="radio"]'
             ) as HTMLInputElement | null;
 
-            input?.click();
+            if (input) input.click();
+            else onClick?.(e);
+            if (!asChild && closeOnSelect) setOpen(false);
           }
         },
         style: getCssVars(indent),

@@ -211,10 +211,13 @@ export const Dropdown = (props: DropdownProps) => {
                       : width,
                 },
                 onKeyDown(event) {
-                  if (event.key === 'Tab') {
+                  if (!modal && event.key === 'Tab') {
                     setOpen(false);
                   }
                 },
+                role: 'menu',
+                'aria-orientation': 'vertical',
+                'aria-activedescendant': activeIndex !== null ? `dropdown-item-${activeIndex}` : undefined,
               })}
               data-placement={placement}
               data-state={open ? 'open' : 'closed'}
