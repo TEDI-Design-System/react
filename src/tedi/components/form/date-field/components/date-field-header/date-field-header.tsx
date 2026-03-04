@@ -7,7 +7,7 @@ import Button from '../../../../buttons/button/button';
 import { Dropdown } from '../../../../overlays/dropdown';
 import styles from './date-field-header.module.scss';
 
-export interface CalendarHeaderProps extends MonthCaptionProps {
+export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMonth'> {
   /**
    * Show month/year selection as grid instead of dropdowns.
    * Default is `false` (dropdowns).

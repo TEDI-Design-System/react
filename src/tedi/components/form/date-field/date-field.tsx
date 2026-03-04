@@ -15,9 +15,9 @@ import cn from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
 import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
-import { UnknownType } from 'src/tedi/types/commonTypes';
 
 import { useLabels } from '../../../providers/label-provider';
+import { UnknownType } from '../../../types/commonTypes';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldProps } from '../textfield/textfield';
 import { CalendarHeader } from './components/date-field-header/date-field-header';
@@ -383,6 +383,7 @@ export const DateField: React.FC<DateFieldProps> = ({
           <FloatingFocusManager context={context} modal={false}>
             <div
               ref={refs.setFloating}
+              role="dialog"
               aria-labelledby="datepicker-input"
               {...interactions.getFloatingProps({
                 style: { position: strategy, top: y ?? 0, left: x ?? 0 },
@@ -452,6 +453,7 @@ export const DateField: React.FC<DateFieldProps> = ({
                     month: styles['tedi-date-field__month'],
                     months: styles['tedi-date-field__months-container'],
                     footer: styles['tedi-date-field__footer'],
+                    week_number: styles['tedi-date-field__week-number'],
                   }}
                   modifiers={{
                     available:

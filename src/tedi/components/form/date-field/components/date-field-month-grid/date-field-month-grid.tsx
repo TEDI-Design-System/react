@@ -1,10 +1,6 @@
-import classNames from 'classnames';
-
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
-import Button from '../../../../buttons/button/button';
-import { Col, Row } from '../../../../layout/grid';
-import styles from '../../date-field.module.scss';
+import { PickerGrid } from '../../date-field-grid';
 
 export interface MonthGridProps {
   /*
@@ -25,52 +21,30 @@ export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate }: MonthGrid
   const { getLabel } = useLabels();
   const year = currentMonth.getFullYear();
 
-  const months = Array.from({ length: 12 }, (_, i) => new Date(year, i, 1));
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date(year, i, 1);
+
+    return {
+      key: i,
+      value: date,
+      label: <Text modifiers="capitalize-first">{date.toLocaleString('et-EE', { month: 'short' })}</Text>,
+      isSelected: i === currentMonth.getMonth(),
+    };
+  });
 
   return (
-    <div className={classNames(styles['tedi-date-field__picker-grid-container'])}>
-      <div className={classNames(styles['tedi-date-field__picker-grid-header'])}>
-        <Button
-          type="button"
-          onClick={() => onNavigate(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-          aria-label={getLabel('pickers.previousMonth')}
-          icon="arrow_back"
-          visualType="neutral"
-        >
-          <Text modifiers="capitalize-first">{getLabel('pickers.previousMonth')}</Text>
-        </Button>
-
-        <Text modifiers="capitalize-first">
+    <PickerGrid
+      headerLabel={
+        <>
           {currentMonth.toLocaleString('et-EE', { month: 'short' })} {year}
-        </Text>
-
-        <Button
-          type="button"
-          onClick={() => onNavigate(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-          aria-label={getLabel('pickers.nextMonth')}
-          icon="arrow_forward"
-          visualType="neutral"
-        >
-          {getLabel('pickers.nextMonth')}
-        </Button>
-      </div>
-
-      <div className={classNames(styles['tedi-date-field__picker-grid'])}>
-        <Row gutter={2}>
-          {months.map((date) => (
-            <Col key={date.getMonth()} width={4}>
-              <Button
-                noStyle
-                onClick={() => onSelectMonth(date)}
-                className={classNames(styles['tedi-date-field__grid-button'])}
-                aria-current="true"
-              >
-                <Text modifiers="capitalize-first">{date.toLocaleString('et-EE', { month: 'short' })}</Text>
-              </Button>
-            </Col>
-          ))}
-        </Row>
-      </div>
-    </div>
+        </>
+      }
+      prevAriaLabel={getLabel('pickers.previousMonth')}
+      nextAriaLabel={getLabel('pickers.nextMonth')}
+      onPrev={() => onNavigate(new Date(year, currentMonth.getMonth() - 1))}
+      onNext={() => onNavigate(new Date(year, currentMonth.getMonth() + 1))}
+      items={months}
+      onSelect={onSelectMonth}
+    />
   );
 };

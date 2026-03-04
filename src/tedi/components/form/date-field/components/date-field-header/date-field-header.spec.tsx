@@ -5,7 +5,6 @@ import { CalendarHeader } from './date-field-header';
 
 import '@testing-library/jest-dom';
 
-// Mock external dependencies
 jest.mock('../../../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string) => {
@@ -36,8 +35,10 @@ describe('CalendarHeader', () => {
     calendarMonth: {
       date: new Date(2025, 6, 15),
       displayMonth: new Date(2025, 6, 1),
+      weeks: [],
     },
     monthYearSelectGrid: false,
+    displayIndex: 0,
   };
 
   beforeEach(() => {
@@ -79,14 +80,9 @@ describe('CalendarHeader', () => {
   it('renders month and year as plain text + dropdown triggers when monthYearSelectGrid = false', () => {
     render(<CalendarHeader {...defaultProps} />);
 
-    // Should show July 2025 with dropdown carets
     expect(screen.getByText('juuli')).toBeInTheDocument();
     expect(screen.getByText('2025')).toBeInTheDocument();
-
-    // Two caret icons
-    expect(screen.getAllByTestId('icon-arrow_drop_down')).toHaveLength(2); // assuming Icon has data-testid or recognizable role
-
-    // Dropdowns should exist (but content hidden until open)
+    expect(screen.getAllByText('arrow_drop_down')).toHaveLength(2);
     expect(screen.getAllByRole('button', { name: /juuli/i })).toHaveLength(1);
     expect(screen.getAllByRole('button', { name: '2025' })).toHaveLength(1);
   });
@@ -106,8 +102,6 @@ describe('CalendarHeader', () => {
 
     expect(monthBtn).toBeInTheDocument();
     expect(yearBtn).toBeInTheDocument();
-
-    // No Dropdown components should be rendered
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
@@ -154,8 +148,8 @@ describe('CalendarHeader', () => {
       <CalendarHeader
         {...defaultProps}
         calendarMonth={{
-          date: new Date(2025, 11, 10), // December 2025
-          displayMonth: new Date(2025, 11, 1),
+          date: new Date(2025, 11, 10),
+          weeks: [],
         }}
       />
     );

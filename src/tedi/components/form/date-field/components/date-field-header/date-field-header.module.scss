@@ -16,10 +16,19 @@
   align-items: center;
   padding-left: var(--layout-grid-gutters-04);
   font-weight: 500;
+  color: var(--general-text-primary);
   text-transform: capitalize;
   border-radius: var(--button-radius-sm);
 
-  &:hover,
+  &:hover {
+    color: var(--button-main-neutral-text-hover);
+    background: var(--button-main-neutral-icon-only-background-hover);
+
+    .tedi-date-field__month-year-caret {
+      color: var(--button-main-neutral-text-hover);
+    }
+  }
+
   &[aria-expanded='true'] {
     color: var(--button-main-neutral-text-active);
     background: var(--button-main-neutral-icon-only-background-active);

@@ -98,6 +98,15 @@ export const DisabledWeekends: Story = {
   },
 };
 
+export const ShowWeekCount: Story = {
+  render: Template,
+  args: {
+    mode: 'single',
+    label: 'Weekdays only',
+    showWeekNumber: true,
+  },
+};
+
 export const MultipleMonthsShown: Story = {
   render: () => {
     return <DateField label="Visible months" numberOfMonths={2} mode="range" />;
@@ -154,7 +163,7 @@ export const CalendarFooter: Story = {
   },
 };
 
-export const DefaultValueExample: Story = {
+export const DefaultValue: Story = {
   render: Template,
   args: {
     mode: 'single',
@@ -185,7 +194,7 @@ export const AvailableDays: Story = {
   },
 };
 
-export const ManualTypingTemplate: StoryFn<DateFieldProps> = (args) => {
+export const ManualTyping: StoryFn<DateFieldProps> = (args) => {
   const [value, setValue] = useState<Date | undefined>();
 
   const parseEstonianDate = (value: string): Date | undefined => {
@@ -204,6 +213,9 @@ export const ManualTypingTemplate: StoryFn<DateFieldProps> = (args) => {
       selected={value}
       onSelect={(date) => setValue(date as Date | undefined)}
       parseDate={parseEstonianDate}
+      placeholder="pp.kk.aaaa"
+      label="Kuupäev"
+      required
     />
   );
 };

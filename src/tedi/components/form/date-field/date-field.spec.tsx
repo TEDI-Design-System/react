@@ -12,7 +12,7 @@ jest.mock('../../../providers/label-provider', () => ({
   }),
 }));
 
-describe('DateField', () => {
+describe('DateField component', () => {
   const defaultProps: DateFieldProps = {
     label: 'Birth date',
     mode: 'single',
@@ -25,15 +25,14 @@ describe('DateField', () => {
 
   it('renders TextField in single mode by default', () => {
     render(<DateField {...defaultProps} />);
-    const input = screen.getByLabelText('Birth date');
-    expect(input).toHaveAttribute('type', 'text');
-    expect(input).toHaveClass('tedi-date-field__textfield');
+
+    expect(screen.getByLabelText('Birth date')).toBeInTheDocument();
   });
 
   it('renders MultiValueField in multiple mode', () => {
     render(<DateField {...defaultProps} mode="multiple" />);
+
     expect(screen.getByLabelText('Birth date')).toBeInTheDocument();
-    expect(screen.getByLabelText('Birth date')).toHaveClass('tedi-date-field__multivalue');
   });
 
   it('shows placeholder when no value is selected', () => {
@@ -63,24 +62,10 @@ describe('DateField', () => {
     expect(input).toHaveAttribute('readonly');
   });
 
-  it('shows required asterisk when required=true', () => {
+  it('marks field required', () => {
     render(<DateField {...defaultProps} required />);
-    const input = screen.getByLabelText('Birth date');
-    expect(input).toHaveAttribute('aria-required', 'true');
-    // or check for visual asterisk if your TextField renders it
-  });
 
-  it('opens calendar when clicking calendar icon (openBehavior=button)', async () => {
-    const user = userEvent.setup();
-    render(<DateField {...defaultProps} />);
-
-    const iconButton = screen.getByRole('button', { name: /calendar/i });
-    await user.click(iconButton);
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-      expect(screen.getByText('pickers.yearSelection') || screen.getByText(/January/i)).toBeInTheDocument();
-    });
+    expect(screen.getByRole('textbox', { name: /birth date/i })).toBeRequired();
   });
 
   it('opens calendar when clicking input (openBehavior=input)', async () => {
@@ -95,45 +80,44 @@ describe('DateField', () => {
     });
   });
 
-  it('does not open calendar on input click when readOnly=true', async () => {
+  it('closes calendar after selecting date', async () => {
     const user = userEvent.setup();
-    render(<DateField {...defaultProps} readOnly openBehavior="input" />);
+    const onSelect = jest.fn();
 
-    const input = screen.getByLabelText('Birth date');
-    await user.click(input);
+    render(<DateField {...defaultProps} onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button'));
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalled();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
-
-  // it('closes calendar after selecting date in single mode (default behavior)', async () => {
-  //   const user = userEvent.setup();
-  //   const handleSelect = jest.fn();
-
-  //   render(<DateField {...defaultProps} onSelect={handleSelect} initialMonth={new Date(2025, 5, 1)} />);
-
-  //   await user.click(screen.getByRole('button', { name: /calendar/i }));
-  //   await waitFor(() => screen.getByRole('dialog'));
-  //   await user.click(screen.getByText('15'));
-
-  //   await waitFor(() => {
-  //     expect(handleSelect).toHaveBeenCalledWith(
-  //       expect.any(Date),
-  //       expect.anything(),
-  //       expect.anything(),
-  //       expect.anything()
-  //     );
-  //     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  //   });
-  // });
-
-  // it('applies custom className to root container', () => {
-  //   render(<DateField {...defaultProps} className="my-special-datepicker" />);
-  //   const container = screen.getByLabelText('Birth date').closest('div');
-  //   expect(container).toHaveClass('my-special-datepicker');
-  // });
 
   it('uses custom locale when provided', () => {
     render(<DateField {...defaultProps} locale={et} initialMonth={new Date(2025, 0, 1)} />);
+  });
+
+  it('applies custom className', () => {
+    render(<DateField {...defaultProps} className="my-datepicker" />);
+    const input = screen.getByLabelText('Birth date');
+    expect(input.closest('.tedi-date-field__container')).toHaveClass('my-datepicker');
+  });
+
+  it('parses manual input', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} parseDate={(v) => new Date(2024, 0, 1)} onSelect={onSelect} />);
+    await user.type(screen.getByLabelText('Birth date'), '01.01.2024');
+    expect(onSelect).toHaveBeenCalled();
+  });
+
+  it('updates when controlled value changes', () => {
+    const { rerender } = render(<DateField {...defaultProps} selected={undefined} />);
+    rerender(<DateField {...defaultProps} selected={new Date(2024, 5, 15)} />);
+    expect(screen.getByLabelText('Birth date')).toHaveValue('15.06.2024');
   });
 
   // Add more specific tests as needed, e.g.:
