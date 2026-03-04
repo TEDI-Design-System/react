@@ -16,6 +16,7 @@ describe('DateField component', () => {
   const defaultProps: DateFieldProps = {
     label: 'Birth date',
     mode: 'single',
+    id: 'date-field',
   };
 
   it('renders without crashing and shows label', () => {
@@ -119,11 +120,4 @@ describe('DateField component', () => {
     rerender(<DateField {...defaultProps} selected={new Date(2024, 5, 15)} />);
     expect(screen.getByLabelText('Birth date')).toHaveValue('15.06.2024');
   });
-
-  // Add more specific tests as needed, e.g.:
-  // - multiple mode chip removal
-  // - range selection (start → end)
-  // - disabled dates rendering
-  // - custom formatDate / parseDate
-  // - month/year grid view switching
 });

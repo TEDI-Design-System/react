@@ -28,8 +28,14 @@ import styles from './date-field.module.scss';
 export type DateFieldMode = 'single' | 'multiple' | 'range';
 export type CalendarView = 'days' | 'months' | 'years';
 export type DateFieldOpenBehavior = 'input' | 'button';
+type DateTextFieldProps = Omit<TextFieldProps, 'label' | 'id'>;
+type DateMultiValueFieldProps = Omit<MultiValueFieldProps, 'label' | 'id'>;
 
 export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
+  /**
+   * Unique identifier for the date field.
+   */
+  id: string;
   /**
    * Field label. Required for accessibility.
    */
@@ -182,10 +188,11 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
   /*
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
-  inputProps?: TextFieldProps | MultiValueFieldProps;
+  inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
+  id,
   mode = 'single',
   label,
   selected,
@@ -341,7 +348,7 @@ export const DateField: React.FC<DateFieldProps> = ({
         {mode === 'multiple' ? (
           <MultiValueField
             {...(inputProps as MultiValueFieldProps)}
-            id="datepicker-multivalue-input"
+            id={id}
             label={label}
             values={formattedDates}
             placeholder={placeholder}
@@ -362,7 +369,7 @@ export const DateField: React.FC<DateFieldProps> = ({
         ) : (
           <TextField
             {...(inputProps as TextFieldProps)}
-            id="datepicker-input"
+            id={id}
             label={label}
             readOnly={readOnly ?? !parseDate}
             value={inputValue || (formatDate ? formatDate(value) : defaultFormatter(value))}
@@ -373,7 +380,9 @@ export const DateField: React.FC<DateFieldProps> = ({
             aria-expanded={open}
             onChange={(val) => handleInputChange(val)}
             required={required}
-            className={styles['tedi-date-field__textfield']}
+            className={cn(styles['tedi-date-field__textfield'], {
+              [styles['tedi-date-field__textfield--disabled']]: inputProps?.disabled,
+            })}
           />
         )}
       </div>

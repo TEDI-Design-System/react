@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
+import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { DateField, DateFieldProps } from './date-field';
@@ -24,12 +25,86 @@ const Template: StoryFn<DateFieldProps> = (args) => {
   return <DateField {...args} />;
 };
 
+const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'];
+
+interface TemplateStateProps extends DateFieldProps {
+  array: typeof stateArray;
+}
+
+const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
+  const { array, ...dateFieldProps } = args;
+
+  return (
+    <div className="state-example">
+      {array.map((state, index) => (
+        <Row key={index} className="padding-14-16">
+          <Col width={2} className="display-flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          <Col className="display-flex align-items-center" width={10}>
+            <DateField
+              {...dateFieldProps}
+              id={state}
+              inputProps={{
+                ...(state === 'Disabled' && { disabled: true }),
+              }}
+            />
+          </Col>
+        </Row>
+      ))}
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Success</Text>
+        </Col>
+        <Col className="display-flex align-items-center" width={10}>
+          <DateField
+            {...dateFieldProps}
+            id="error-success-field"
+            inputProps={{
+              helper: { text: 'Feedback text', type: 'valid' },
+            }}
+          />
+        </Col>
+      </Row>
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Error</Text>
+        </Col>
+        <Col className="display-flex align-items-center" width={10}>
+          <DateField
+            {...dateFieldProps}
+            id="error-date-field"
+            inputProps={{
+              helper: { text: 'Feedback text', type: 'error' },
+            }}
+          />
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
 export const Single: Story = {
   render: Template,
   args: {
     mode: 'single',
     label: 'Date',
     required: true,
+  },
+};
+
+export const States: StoryObj<TemplateStateProps> = {
+  render: TemplateColumnWithStates,
+  args: {
+    array: stateArray,
+    label: 'Label',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
   },
 };
 
@@ -109,13 +184,13 @@ export const ShowWeekCount: Story = {
 
 export const MultipleMonthsShown: Story = {
   render: () => {
-    return <DateField label="Visible months" numberOfMonths={2} mode="range" />;
+    return <DateField label="Visible months" numberOfMonths={2} mode="range" id="multiple-shown" />;
   },
 };
 
 export const MonthYearSelectGrid: Story = {
   render: () => {
-    return <DateField label="Date" monthYearSelectGrid />;
+    return <DateField label="Date" monthYearSelectGrid id="month-year-grid" />;
   },
 };
 
@@ -125,7 +200,22 @@ export const CalendarFooter: Story = {
       <Row>
         <Col>
           <DateField
+            label="Select time"
+            id="calendar-with-footer"
+            openBehavior="input"
+            footer={
+              <Row>
+                <Col width={12} className="text-center">
+                  <Button visualType="secondary">Cancel selection</Button>
+                </Col>
+              </Row>
+            }
+          />
+        </Col>
+        <Col>
+          <DateField
             label="Action buttons"
+            id="calendar-with-footer-2"
             openBehavior="input"
             footer={
               <Row>
@@ -137,21 +227,6 @@ export const CalendarFooter: Story = {
                 <Col width={6}>
                   <Button visualType="primary" fullWidth>
                     Save
-                  </Button>
-                </Col>
-              </Row>
-            }
-          />
-        </Col>
-        <Col>
-          <DateField
-            label="Select time"
-            openBehavior="input"
-            footer={
-              <Row>
-                <Col width={12}>
-                  <Button visualType="link" fullWidth iconLeft="schedule">
-                    Select time
                   </Button>
                 </Col>
               </Row>
@@ -175,6 +250,7 @@ export const DefaultValue: Story = {
 export const AvailableDays: Story = {
   render: () => {
     const availableDays = [
+      new Date(),
       new Date(new Date().setDate(new Date().getDate() + 4)),
       new Date(new Date().setDate(new Date().getDate() + 5)),
       new Date(new Date().setDate(new Date().getDate() + 6)),
@@ -189,6 +265,7 @@ export const AvailableDays: Story = {
         selected={selected}
         onSelect={(date) => setSelected(date as Date)}
         availableDays={availableDays}
+        id="available-days-shown"
       />
     );
   },
@@ -213,8 +290,8 @@ export const ManualTyping: StoryFn<DateFieldProps> = (args) => {
       selected={value}
       onSelect={(date) => setValue(date as Date | undefined)}
       parseDate={parseEstonianDate}
-      placeholder="pp.kk.aaaa"
-      label="Kuupäev"
+      placeholder="dd.mm.yyyy"
+      label="Date"
       required
     />
   );
