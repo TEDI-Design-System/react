@@ -14,7 +14,7 @@ import {
   useRole,
 } from '@floating-ui/react';
 import cn from 'classnames';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -176,16 +176,6 @@ export const Dropdown = (props: DropdownProps) => {
     return container.getBoundingClientRect().width;
   }, [refs.reference.current]);
 
-  useEffect(() => {
-    if (open && listItemsRef.current.length > 0) {
-      const firstEnabledIndex = listItemsRef.current.findIndex((el) => el && !el.disabled);
-      if (firstEnabledIndex >= 0) {
-        setActiveIndex(firstEnabledIndex);
-        listItemsRef.current[firstEnabledIndex]?.focus();
-      }
-    }
-  }, [open]);
-
   return (
     <DropdownContext.Provider value={value}>
       {children}
@@ -221,13 +211,8 @@ export const Dropdown = (props: DropdownProps) => {
                       : width,
                 },
                 onKeyDown(event) {
-                  if (event.key === 'Tab') {
-                    const floatingEl = refs.floating.current;
-                    const relatedTarget = (event as unknown as KeyboardEvent & { relatedTarget: EventTarget | null })
-                      .relatedTarget;
-                    if (floatingEl && relatedTarget && !floatingEl.contains(relatedTarget as Node)) {
-                      setOpen(false);
-                    }
+                  if (!modal && event.key === 'Tab') {
+                    setOpen(false);
                   }
                 },
                 role: 'menu',
