@@ -1,3 +1,10 @@
+## [16.0.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.0.1-rc.1...react-16.0.1-rc.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* **file-dropzone:** pass formlabel props to FormLabel [#537](https://github.com/TEDI-Design-System/react/issues/537) ([#548](https://github.com/TEDI-Design-System/react/issues/548)) ([0aaf2e6](https://github.com/TEDI-Design-System/react/commit/0aaf2e62a075df95610e5727ebd348737db6f595))
+
 ## [16.0.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.0.0...react-16.0.1-rc.1) (2026-03-05)
 
 
