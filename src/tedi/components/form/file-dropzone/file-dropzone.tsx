@@ -38,7 +38,7 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
 
 export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
   const { getLabel } = useLabels();
-  const { label = getLabel('file-dropzone.label'), className, disabled = false, helper, id } = props;
+  const { label = getLabel('file-dropzone.label'), className, disabled = false, helper, id, ...rest } = props;
   const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove } = useFileUpload(props);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -78,7 +78,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         <input {...getInputProps()} disabled={disabled} />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <Icon color={disabled ? 'tertiary' : 'secondary'} size={24} name="attach_file" />
-          <FormLabel id={id} label={label} className={styles['tedi-file-dropzone__label']} />
+          <FormLabel {...rest} id={id} label={label} className={styles['tedi-file-dropzone__label']} />
         </div>
       </div>
       {helper ? (
