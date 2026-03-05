@@ -19,6 +19,14 @@
   border-radius: 0;
   transition: all 0.2s ease;
 
+  &:first-child {
+    border-radius: var(--form-select-area-radius) var(--form-select-area-radius) 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 var(--form-select-area-radius) var(--form-select-area-radius);
+  }
+
   &--active {
     color: var(--dropdown-item-active-text);
     background-color: var(--dropdown-item-active-background);

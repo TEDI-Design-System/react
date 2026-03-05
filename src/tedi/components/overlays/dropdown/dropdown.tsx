@@ -3,6 +3,7 @@ import {
   flip,
   FloatingFocusManager,
   FloatingPortal,
+  offset,
   Placement,
   shift,
   useClick,
@@ -132,7 +133,7 @@ export const Dropdown = (props: DropdownProps) => {
     open,
     placement,
     onOpenChange: setOpen,
-    middleware: [flip(), shift()],
+    middleware: [offset(4), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
 

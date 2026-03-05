@@ -296,13 +296,19 @@ export const WithIndentedItems: Story = {
 
 export const WithRadio: Story = {
   render: () => {
-    const [city, setCity] = React.useState<string>('tallinn');
+    const [city, setCity] = React.useState<'tallinn' | 'tartu' | 'parnu'>('tallinn');
+
+    const cities = {
+      tallinn: 'Tallinn',
+      tartu: 'Tartu',
+      parnu: 'Pärnu',
+    };
 
     return (
       <Dropdown>
         <Dropdown.Trigger>
           <Button visualType="link" iconRight="keyboard_arrow_down">
-            City: {city}
+            City: {cities[city]}
           </Button>
         </Dropdown.Trigger>
 
@@ -314,7 +320,7 @@ export const WithRadio: Story = {
               value="tallinn"
               label="Tallinn"
               checked={city === 'tallinn'}
-              onChange={(value) => setCity(value)}
+              onChange={(value) => setCity(value as City)}
             />
           </Dropdown.Item>
 
@@ -325,7 +331,7 @@ export const WithRadio: Story = {
               value="tartu"
               label="Tartu"
               checked={city === 'tartu'}
-              onChange={(value) => setCity(value)}
+              onChange={(value) => setCity(value as City)}
             />
           </Dropdown.Item>
 
@@ -336,7 +342,7 @@ export const WithRadio: Story = {
               value="parnu"
               label="Pärnu"
               checked={city === 'parnu'}
-              onChange={(value) => setCity(value)}
+              onChange={(value) => setCity(value as City)}
             />
           </Dropdown.Item>
         </Dropdown.Content>
@@ -529,110 +535,63 @@ export const WithSeparatorAndOpensRight: Story = {
 };
 
 export const CustomContent: Story = {
-  render: () => (
-    <Dropdown width={300}>
-      <Dropdown.Trigger>
-        <Button visualType="link" iconRight="keyboard_arrow_down">
-          Choose representative
-        </Button>
-      </Dropdown.Trigger>
-      <Dropdown.Content>
-        <Dropdown.Item index={0} closeOnSelect={false} asChild>
-          <Search id="Dropdown search" label="Otsi" />
-        </Dropdown.Item>
-        <Dropdown.Item index={1}>
-          <Text>
-            <strong>Lauri Lepp</strong>
-            <Separator
-              axis="vertical"
-              color="secondary"
-              display="inline"
-              dotSize="small"
-              element="span"
-              spacing={0.5}
-              variant="dot-only"
-            />
-            49504080254
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={2}>
-          <Text>
-            <strong>Mart Mardivere</strong>
-            <Separator
-              axis="vertical"
-              color="secondary"
-              display="inline"
-              dotSize="small"
-              element="span"
-              spacing={0.5}
-              variant="dot-only"
-            />
-            39504080254
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={3}>
-          <Text>
-            <strong>Madis Mets</strong>
-            <Separator
-              axis="vertical"
-              color="secondary"
-              display="inline"
-              dotSize="small"
-              element="span"
-              spacing={0.5}
-              variant="dot-only"
-            />
-            39504080254
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={4}>
-          <Text>
-            <strong>Kalle Kaasik</strong>
-            <Separator
-              axis="vertical"
-              color="secondary"
-              display="inline"
-              dotSize="small"
-              element="span"
-              spacing={0.5}
-              variant="dot-only"
-            />
-            39504080254
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={5}>
-          <Text>
-            <strong>Pille Porgand</strong>
-            <Separator
-              axis="vertical"
-              color="secondary"
-              display="inline"
-              dotSize="small"
-              element="span"
-              spacing={0.5}
-              variant="dot-only"
-            />
-            49504080254
-          </Text>
-        </Dropdown.Item>
-        <Dropdown.Item index={6}>
-          <Text>
-            <strong>Kert Kasemets</strong>
-            <Separator
-              axis="vertical"
-              color="secondary"
-              display="inline"
-              dotSize="small"
-              element="span"
-              spacing={0.5}
-              variant="dot-only"
-            />
-            39504080254
-          </Text>
-        </Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown>
-  ),
+  render: () => {
+    const [query, setQuery] = React.useState('');
+
+    const representatives = [
+      { name: 'Lauri Lepp', code: '49504080254' },
+      { name: 'Mart Mardivere', code: '39504080254' },
+      { name: 'Madis Mets', code: '39504080254' },
+      { name: 'Kalle Kaasik', code: '39504080254' },
+      { name: 'Pille Porgand', code: '49504080254' },
+      { name: 'Kert Kasemets', code: '39504080254' },
+    ];
+
+    const filtered =
+      query.trim() === ''
+        ? representatives
+        : representatives.filter(
+            (rep) => rep.name.toLowerCase().includes(query.toLowerCase()) || rep.code.includes(query)
+          );
+
+    return (
+      <Dropdown width={300}>
+        <Dropdown.Trigger>
+          <Button visualType="link" iconRight="keyboard_arrow_down">
+            Choose representative
+          </Button>
+        </Dropdown.Trigger>
+
+        <Dropdown.Content>
+          <Dropdown.Item index={0} closeOnSelect={false} asChild>
+            <Search id="dropdown-search" label="Otsi" value={query} onChange={(value) => setQuery(value)} />
+          </Dropdown.Item>
+
+          {filtered.map((rep, i) => {
+            const index = i + 1;
+
+            return (
+              <Dropdown.Item key={rep.name} index={index}>
+                <Text>
+                  <strong>{rep.name}</strong>
+                  <Separator
+                    axis="vertical"
+                    color="secondary"
+                    display="inline"
+                    dotSize="small"
+                    element="span"
+                    spacing={0.5}
+                    variant="dot-only"
+                  />
+                  {rep.code}
+                </Text>
+              </Dropdown.Item>
+            );
+          })}
+        </Dropdown.Content>
+      </Dropdown>
+    );
+  },
 };
 
 export const Tree: Story = {
