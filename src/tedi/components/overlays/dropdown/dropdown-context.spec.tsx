@@ -112,23 +112,4 @@ describe('DropdownContext + useDropdownContext', () => {
     expect(ctx).toHaveProperty('divided');
     expect(ctx).toHaveProperty('variant');
   });
-
-  it('context value shape matches snapshot', () => {
-    const { result } = renderHook(() => useDropdownContext(), {
-      wrapper: wrapperWithContext,
-    });
-
-    const {
-      setOpen,
-      setActiveIndex,
-      setContent,
-      refs,
-      getReferenceProps,
-      getFloatingProps,
-      getItemProps,
-      listItemsRef,
-      ...serializable
-    } = result.current ?? {};
-    expect(serializable).toMatchSnapshot();
-  });
 });

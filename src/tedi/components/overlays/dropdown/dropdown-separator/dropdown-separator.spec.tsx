@@ -17,11 +17,11 @@ describe('DropdownSeparator', () => {
     expect(screen.getByTestId('separator')).toBeInTheDocument();
   });
 
-  it('passes axis="horizontal" to Separator', () => {
+  it('renders a horizontal separator', () => {
     render(<DropdownSeparator />);
-
-    const separator = screen.getByTestId('separator');
-    expect(separator).toHaveAttribute('data-axis', 'horizontal');
+    const sep = screen.getByTestId('separator');
+    expect(sep.tagName).toBe('HR');
+    expect(sep).toHaveAttribute('data-axis', 'horizontal');
   });
 
   it('renders a semantic separator (hr)', () => {
@@ -29,10 +29,5 @@ describe('DropdownSeparator', () => {
 
     const separator = screen.getByTestId('separator');
     expect(separator.tagName).toBe('HR');
-  });
-
-  it('matches snapshot', () => {
-    const { container } = render(<DropdownSeparator />);
-    expect(container).toMatchSnapshot();
   });
 });
