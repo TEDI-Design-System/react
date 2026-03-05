@@ -12,7 +12,8 @@ import Separator from '../../misc/separator/separator';
 import { Dropdown } from './dropdown';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.34.53?node-id=2319-64439&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.58?node-id=40253-113444&m=dev" target="_BLANK">Dropdown Figma ↗</a><br/>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.58?node-id=2319-64439&m=dev" target="_BLANK">DropdownItem Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/0930a9-dropdown-item" target="_BLANK">Zeroheight ↗</a>
  */
 
