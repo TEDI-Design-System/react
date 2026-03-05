@@ -211,11 +211,6 @@ export const Dropdown = (props: DropdownProps) => {
                       ? undefined
                       : width,
                 },
-                onKeyDown(event) {
-                  if (!modal && event.key === 'Tab') {
-                    setOpen(false);
-                  }
-                },
                 role: 'menu',
                 'aria-orientation': 'vertical',
                 'aria-activedescendant': activeIndex !== null ? `dropdown-item-${activeIndex}` : undefined,

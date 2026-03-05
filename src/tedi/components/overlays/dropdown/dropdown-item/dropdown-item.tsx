@@ -104,6 +104,12 @@ export const DropdownItem = ({
 
   const itemProps = isInteractive
     ? {
+        ref(node: HTMLElement | null) {
+          if (typeof index === 'number') {
+            listItemsRef.current[index] = node as HTMLButtonElement | null;
+          }
+        },
+        tabIndex: activeIndex === index ? 0 : -1, // ← crucial
         className: cn(styles['tedi-dropdown__item'], {
           [styles['tedi-dropdown__item--indent']]: indent,
         }),
@@ -111,7 +117,7 @@ export const DropdownItem = ({
       }
     : getItemProps({
         ref(node: HTMLElement) {
-          if (!asChild && typeof index === 'number') {
+          if (typeof index === 'number') {
             listItemsRef.current[index] = node as HTMLButtonElement;
           }
         },

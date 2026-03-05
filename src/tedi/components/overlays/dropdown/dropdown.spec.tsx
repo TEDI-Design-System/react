@@ -52,14 +52,6 @@ describe('Dropdown component', () => {
     expect(screen.queryByText('Item')).not.toBeInTheDocument();
   });
 
-  it('closes dropdown on Tab key press', () => {
-    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>);
-    fireEvent.click(screen.getByText('Open menu'));
-    const dropdown = screen.getByRole('menu');
-    fireEvent.keyDown(dropdown, { key: 'Tab' });
-    expect(screen.queryByText('Item')).not.toBeInTheDocument();
-  });
-
   it('renders multiple items', () => {
     renderDropdown(
       { children: <span>Open menu</span> },
