@@ -1,3 +1,10 @@
+## [16.0.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.0.0...react-16.0.1-rc.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* **status-badge:** inherit icon color from text, fix dark mode icon colors [#545](https://github.com/TEDI-Design-System/react/issues/545) ([#547](https://github.com/TEDI-Design-System/react/issues/547)) ([59ce1cc](https://github.com/TEDI-Design-System/react/commit/59ce1cc4354101138d8ac226f8cacd0dccac1c3d))
+
 # [16.0.0](https://github.com/TEDI-Design-System/react/compare/react-15.0.0...react-16.0.0) (2026-02-26)
 
 
