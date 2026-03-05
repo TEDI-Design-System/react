@@ -1,7 +1,10 @@
+import * as FloatingUI from '@floating-ui/react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { ComponentProps } from 'react';
+import React, { ComponentProps } from 'react';
 
+import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown, DropdownProps } from './dropdown';
+import styles from './dropdown.module.scss';
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
@@ -52,14 +55,6 @@ describe('Dropdown component', () => {
     expect(screen.queryByText('Item')).not.toBeInTheDocument();
   });
 
-  it('closes dropdown on Tab key press', () => {
-    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>);
-    fireEvent.click(screen.getByText('Open menu'));
-    const dropdown = screen.getByRole('menu');
-    fireEvent.keyDown(dropdown, { key: 'Tab' });
-    expect(screen.queryByText('Item')).not.toBeInTheDocument();
-  });
-
   it('renders multiple items', () => {
     renderDropdown(
       { children: <span>Open menu</span> },
@@ -99,5 +94,151 @@ describe('Dropdown component', () => {
     const item = screen.getByText('Item');
     item.focus();
     expect(document.activeElement).toBe(item);
+  });
+
+  it('respects controlled open prop', () => {
+    const { rerender } = renderDropdown(
+      { children: <span>Trigger</span> },
+      <Dropdown.Item index={0}>Item</Dropdown.Item>,
+      { open: false }
+    );
+
+    expect(screen.queryByText('Item')).not.toBeInTheDocument();
+
+    rerender(
+      <Dropdown open={true}>
+        <Dropdown.Trigger>
+          <p>Trigger</p>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item index={0}>Item</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown>
+    );
+
+    expect(screen.getByText('Item')).toBeInTheDocument();
+  });
+
+  it('calls onOpenChange in controlled mode but does not change internal state', () => {
+    const onOpenChange = jest.fn();
+
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      open: false,
+      onOpenChange,
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(screen.queryByText('Item')).not.toBeInTheDocument();
+  });
+
+  it('does not set a valid width when reference is not available yet', () => {
+    jest.spyOn(FloatingUI, 'useFloating').mockReturnValue({
+      refs: {
+        reference: { current: null },
+        floating: { current: null },
+        setReference: jest.fn(),
+        setFloating: jest.fn(),
+      },
+      x: 0,
+      y: 0,
+      strategy: 'absolute',
+      placement: 'bottom-start',
+      middlewareData: {},
+    } as UnknownType);
+
+    renderDropdown({ children: <button>Trigger</button> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 'trigger',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+    const dropdown = screen.getByRole('menu');
+    expect(dropdown).toHaveStyle({ width: '0px' });
+    expect(dropdown.style.width).toBe('0px');
+    expect(parseFloat(getComputedStyle(dropdown).width)).toBe(0);
+  });
+
+  it('applies tree variant class when variant="tree"', () => {
+    renderDropdown({ children: <span>Menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, { variant: 'tree' });
+
+    fireEvent.click(screen.getByText('Menu'));
+    const dropdownContainer = screen.getByRole('menu');
+    expect(dropdownContainer).toHaveClass(styles['tedi-dropdown--tree']);
+  });
+
+  it('sets aria-activedescendant when activeIndex is set', () => {
+    renderDropdown(
+      { children: <span>Trigger</span> },
+      <>
+        <Dropdown.Item index={0}>First</Dropdown.Item>
+        <Dropdown.Item index={1}>Second</Dropdown.Item>
+      </>,
+      {}
+    );
+
+    fireEvent.click(screen.getByText('Trigger'));
+    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-0');
+  });
+
+  it('applies pixel width when width is a number', () => {
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 300,
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('menu')).toHaveStyle({ width: '300px' });
+  });
+
+  it('applies custom string width', () => {
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: '16rem',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('menu')).toHaveStyle({ width: '16rem' });
+  });
+
+  it('does not apply width when width="auto"', () => {
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 'auto',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    const dropdown = screen.getByRole('menu');
+    expect(dropdown.style.width).toBe('');
+  });
+
+  it('uses container width when width="full"', () => {
+    const container = document.createElement('div');
+
+    jest.spyOn(container, 'getBoundingClientRect').mockReturnValue({
+      width: 500,
+      height: 0,
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+
+    Object.defineProperty(HTMLElement.prototype, 'offsetParent', {
+      configurable: true,
+      get() {
+        return container;
+      },
+    });
+
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 'full',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('menu')).toHaveStyle({ width: '500px' });
   });
 });
