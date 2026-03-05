@@ -1,10 +1,30 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
+import { useBreakpoint } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import Button from '../button/button';
 import { ButtonGroup } from './button-group';
 
+jest.mock('../../../helpers', () => {
+  const original = jest.requireActual('../../../helpers');
+  return {
+    ...original,
+    useBreakpoint: jest.fn(),
+    isBreakpointBelow: (bp: string, threshold: string) => bp === 'sm' && threshold === 'md',
+  };
+});
+
+jest.mock('../../../providers/label-provider', () => ({
+  useLabels: jest.fn(),
+}));
+
 describe('ButtonGroup Component', () => {
+  beforeEach(() => {
+    (useBreakpoint as jest.Mock).mockReturnValue('lg');
+    (useLabels as jest.Mock).mockReturnValue({ getLabel: (key: string) => 'sidenav.submenu' });
+  });
+
   it('renders child buttons correctly', () => {
     render(
       <ButtonGroup>
@@ -16,6 +36,71 @@ describe('ButtonGroup Component', () => {
     expect(buttons).toHaveLength(2);
     expect(buttons[0]).toHaveTextContent('Button 1');
     expect(buttons[1]).toHaveTextContent('Button 2');
+  });
+
+  it('renders dropdown trigger with dropdownLabel on mobile', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    render(
+      <ButtonGroup dropdownLabel="Custom Dropdown">
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Custom Dropdown/i });
+    expect(triggerButton).toBeInTheDocument();
+  });
+
+  it('falls back to useLabels value if dropdownLabel is not provided on mobile', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    render(
+      <ButtonGroup>
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /sidenav.submenu/i });
+    expect(triggerButton).toBeInTheDocument();
+  });
+
+  it('triggers onSelectionChange when a dropdown item is clicked', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    const onSelectionChange = jest.fn();
+
+    render(
+      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu">
+        <Button id="button1">Button 1</Button>
+        <Button id="button2">Button 2</Button>
+      </ButtonGroup>
+    );
+
+    // Open the dropdown
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    fireEvent.click(triggerButton);
+
+    // Query the dropdown item after opening
+    const dropdownItem = screen.getByText('Button 1');
+    fireEvent.click(dropdownItem);
+
+    expect(onSelectionChange).toHaveBeenCalledWith('button1');
+  });
+
+  it('does not trigger onSelectionChange for a disabled dropdown item', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    const onSelectionChange = jest.fn();
+
+    render(
+      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu">
+        <Button id="button1" disabled>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    fireEvent.click(triggerButton);
+    const dropdownItem = screen.getByText('Button 1');
+    fireEvent.click(dropdownItem);
+    expect(onSelectionChange).not.toHaveBeenCalled();
   });
 
   it('applies the stretch class when the stretch prop is true', () => {

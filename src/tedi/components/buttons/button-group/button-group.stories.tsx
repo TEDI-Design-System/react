@@ -15,11 +15,6 @@ import ButtonGroup, { ButtonGroupProps } from './button-group';
 const meta: Meta<typeof ButtonGroup> = {
   title: 'TEDI-Ready/Components/Buttons/ButtonGroup',
   component: ButtonGroup,
-  parameters: {
-    status: {
-      type: 'partiallyTediReady',
-    },
-  },
 };
 
 export default meta;
@@ -106,6 +101,7 @@ export const Default: Story = {
   args: {
     type: 'primary',
     stretch: false,
+    dropdownLabel: 'Text',
   },
 };
 
@@ -114,6 +110,7 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
   args: {
     property: 'size',
     array: sizeArray,
+    dropdownLabel: 'Text',
   },
 };
 
