@@ -179,4 +179,66 @@ describe('Dropdown component', () => {
     fireEvent.click(screen.getByText('Trigger'));
     expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-0');
   });
+
+  it('applies pixel width when width is a number', () => {
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 300,
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('menu')).toHaveStyle({ width: '300px' });
+  });
+
+  it('applies custom string width', () => {
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: '16rem',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('menu')).toHaveStyle({ width: '16rem' });
+  });
+
+  it('does not apply width when width="auto"', () => {
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 'auto',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    const dropdown = screen.getByRole('menu');
+    expect(dropdown.style.width).toBe('');
+  });
+
+  it('uses container width when width="full"', () => {
+    const container = document.createElement('div');
+
+    jest.spyOn(container, 'getBoundingClientRect').mockReturnValue({
+      width: 500,
+      height: 0,
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+
+    Object.defineProperty(HTMLElement.prototype, 'offsetParent', {
+      configurable: true,
+      get() {
+        return container;
+      },
+    });
+
+    renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      width: 'full',
+    });
+
+    fireEvent.click(screen.getByText('Trigger'));
+
+    expect(screen.getByRole('menu')).toHaveStyle({ width: '500px' });
+  });
 });

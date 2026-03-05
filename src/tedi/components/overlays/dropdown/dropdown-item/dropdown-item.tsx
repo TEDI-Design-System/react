@@ -89,83 +89,84 @@ export const DropdownItem = ({
   const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
-  const isInteractive = asChild && closeOnSelect === false;
 
   const getCssVars = (indent?: number): React.CSSProperties => {
-    const cssVars: React.CSSProperties = {};
-
-    if (typeof indent === 'number') {
-      cssVars['--dropdown-indent-level'] = indent;
-      cssVars['--dropdown-indent'] = `${indent}rem`;
-    }
-
-    return cssVars;
+    if (typeof indent !== 'number') return {};
+    return {
+      '--dropdown-indent-level': indent,
+      '--dropdown-indent': `${indent}rem`,
+    } as React.CSSProperties;
   };
 
-  const itemProps = isInteractive
-    ? {
-        ref(node: HTMLElement | null) {
-          if (typeof index === 'number') {
-            listItemsRef.current[index] = node as HTMLButtonElement | null;
-          }
-        },
-        tabIndex: activeIndex === index ? 0 : -1, // ← crucial
-        className: cn(styles['tedi-dropdown__item'], {
-          [styles['tedi-dropdown__item--indent']]: indent,
-        }),
-        style: getCssVars(indent),
+  const handleClick = (e: React.MouseEvent) => {
+    if (disabled) return; // stop everything
+
+    // only trigger inner inputs if not disabled
+    const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
+      'input[type="checkbox"], input[type="radio"]'
+    );
+    if (input) {
+      input.click();
+      return;
+    }
+
+    if (!asChild) {
+      onClick?.(e);
+      if (closeOnSelect) setOpen(false);
+    } else {
+      onClick?.(e);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+
+      const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
+        'input[type="checkbox"], input[type="radio"]'
+      );
+
+      if (input) {
+        input.click();
+      } else {
+        onClick?.(e);
       }
-    : getItemProps({
-        ref(node: HTMLElement) {
-          if (typeof index === 'number') {
-            listItemsRef.current[index] = node as HTMLButtonElement;
-          }
-        },
-        role: 'menuitem',
-        disabled: !asChild ? disabled : undefined,
-        tabIndex: activeIndex === index ? 0 : -1,
-        className: cn(styles['tedi-dropdown__item'], {
-          [styles['tedi-dropdown__item--active']]: active,
-          [styles['tedi-dropdown__item--disabled']]: disabled,
-          [styles['tedi-dropdown__item--divided']]: divided,
-          [styles['tedi-dropdown__item--indent']]: indent,
-          [styles['tedi-dropdown__item--tree-item']]: variant === 'tree' && indent,
-          [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
-          className,
-        }),
-        onClick(e) {
-          if (disabled) return;
 
-          const input = (e.currentTarget as HTMLElement).querySelector(
-            'input[type="checkbox"], input[type="radio"]'
-          ) as HTMLInputElement | null;
+      if (!asChild && closeOnSelect) setOpen(false);
+    }
+  };
 
-          if (input) {
-            input.click();
-            return;
-          }
+  const baseProps = {
+    ref(node: HTMLElement | null) {
+      if (typeof index === 'number') {
+        listItemsRef.current[index] = node as HTMLButtonElement | null;
+      }
+    },
+    tabIndex: activeIndex === index ? 0 : -1,
+    className: cn(styles['tedi-dropdown__item'], {
+      [styles['tedi-dropdown__item--active']]: active,
+      [styles['tedi-dropdown__item--disabled']]: disabled,
+      [styles['tedi-dropdown__item--divided']]: divided,
+      [styles['tedi-dropdown__item--indent']]: indent,
+      [styles['tedi-dropdown__item--tree-item']]: variant === 'tree' && indent,
+      [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
+      className,
+    }),
+    style: getCssVars(indent),
+    onClick: handleClick,
+    onKeyDown: handleKeyDown,
+  };
 
-          if (!asChild) {
-            onClick?.(e);
-            if (closeOnSelect) setOpen(false);
-          }
-        },
-        onKeyDown(e) {
-          if (disabled) return;
-
-          if (e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
-            const input = (e.currentTarget as HTMLElement).querySelector(
-              'input[type="checkbox"], input[type="radio"]'
-            ) as HTMLInputElement | null;
-
-            if (input) input.click();
-            else onClick?.(e);
-            if (!asChild && closeOnSelect) setOpen(false);
-          }
-        },
-        style: getCssVars(indent),
-      });
+  const itemProps =
+    asChild && closeOnSelect === false
+      ? baseProps
+      : getItemProps({
+          role: 'menuitem',
+          disabled: !asChild ? disabled : undefined,
+          ...baseProps,
+        });
 
   return <Component {...itemProps}>{children}</Component>;
 };
