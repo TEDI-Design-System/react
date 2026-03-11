@@ -1,3 +1,10 @@
+# [16.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.1...react-16.1.0-rc.2) (2026-03-11)
+
+
+### Bug Fixes
+
+* **list:** fix mobile padding [#552](https://github.com/TEDI-Design-System/react/issues/552) ([#553](https://github.com/TEDI-Design-System/react/issues/553)) ([2e93804](https://github.com/TEDI-Design-System/react/commit/2e93804f5b1bf7662eef9ce3517c36fa637f61e9))
+
 # [16.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.0.1-rc.2...react-16.1.0-rc.1) (2026-03-10)
 
 
