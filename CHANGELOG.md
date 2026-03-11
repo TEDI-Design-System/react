@@ -1,3 +1,10 @@
+# [16.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.2...react-16.1.0-rc.3) (2026-03-11)
+
+
+### Features
+
+* **dropdown:** TEDI-Ready Dropdown component [#94](https://github.com/TEDI-Design-System/react/issues/94) ([#549](https://github.com/TEDI-Design-System/react/issues/549)) ([836039f](https://github.com/TEDI-Design-System/react/commit/836039ff317b32fed2dc0c47a8b495ddcffe6e91))
+
 # [16.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.1...react-16.1.0-rc.2) (2026-03-11)
 
 
