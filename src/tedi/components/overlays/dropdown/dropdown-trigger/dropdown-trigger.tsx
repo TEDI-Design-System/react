@@ -16,6 +16,7 @@ export const DropdownTrigger = ({ children }: DropdownTriggerProps) => {
     children,
     getReferenceProps({
       ref: refs.setReference,
+      ...children.props,
     })
   );
 };

@@ -2,6 +2,7 @@ import cn from 'classnames';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
+import { StatusIndicator } from '../status-indicator/status-indicator';
 import styles from './status-badge.module.scss';
 
 export type StatusBadgeColor = 'neutral' | 'brand' | 'accent' | 'success' | 'danger' | 'warning' | 'transparent';
@@ -82,8 +83,6 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
     styles['tedi-status-badge'],
     styles[`tedi-status-badge--variant-${variant}`],
     styles[`tedi-status-badge--color-${color}`],
-    status && styles['tedi-status-badge--status'],
-    status && styles[`tedi-status-badge--status-${status}`],
     size === 'large' && styles['tedi-status-badge--large'],
     icon && !children && styles['tedi-status-badge__icon-only'],
     className
@@ -100,6 +99,7 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
       aria-live={role ? ariaLive : undefined}
       {...rest}
     >
+      {status && <StatusIndicator type={status} size={size === 'large' ? 'lg' : 'sm'} hasBorder position="top-right" />}
       {icon && <Icon name={icon} color="inherit" size={16} className={styles[`tedi-status-badge__icon-${color}`]} />}
       {children && <span className={styles['tedi-status-badge__inner-text']}>{children}</span>}
     </BadgeElement>
