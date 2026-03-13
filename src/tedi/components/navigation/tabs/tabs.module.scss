@@ -37,8 +37,8 @@
     display: flex;
     overflow-x: auto;
     background: var(--tab-background);
-    border-top-left-radius: var(--tab-top-radius, 4px);
-    border-top-right-radius: var(--tab-top-radius, 4px);
+    border-top-left-radius: var(--tab-top-radius);
+    border-top-right-radius: var(--tab-top-radius);
 
     @include breakpoints.media-breakpoint-down(md) {
       overflow-x: visible;
@@ -84,7 +84,7 @@
   }
 
   &__content {
-    padding: var(--tab-content-padding, 1.5rem 2rem 2rem);
+    padding: var(--tab-content-padding);
     background: var(--tab-item-selected-background);
   }
 

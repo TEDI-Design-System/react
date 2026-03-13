@@ -16,20 +16,6 @@ const meta: Meta<typeof StatusIndicator> = {
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=2405-53326&m=dev',
     },
   },
-  argTypes: {
-    type: {
-      control: 'select',
-      options: ['success', 'danger', 'warning', 'inactive'],
-    },
-    size: {
-      control: 'select',
-      options: ['sm', 'lg'],
-    },
-    position: {
-      control: 'select',
-      options: ['default', 'top-right'],
-    },
-  },
 };
 
 export default meta;
