@@ -1,16 +1,16 @@
-.tedi-date-field__header {
+.tedi-date-calendar__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-align: center;
 }
 
-.tedi-date-field__month-year-dropdown {
+.tedi-date-calendar__month-year-dropdown {
   max-height: 15rem;
   overflow-y: auto;
 }
 
-.tedi-date-field__month-year-selector {
+.tedi-date-calendar__month-year-selector {
   display: flex;
   gap: var(--layout-grid-gutters-04);
   align-items: center;
@@ -24,7 +24,7 @@
     color: var(--button-main-neutral-text-hover);
     background: var(--button-main-neutral-icon-only-background-hover);
 
-    .tedi-date-field__month-year-caret {
+    .tedi-date-calendar__month-year-caret {
       color: var(--button-main-neutral-text-hover);
     }
   }
@@ -33,12 +33,12 @@
     color: var(--button-main-neutral-text-active);
     background: var(--button-main-neutral-icon-only-background-active);
 
-    .tedi-date-field__month-year-caret {
+    .tedi-date-calendar__month-year-caret {
       color: var(--button-main-neutral-text-active);
     }
   }
 }
 
-.tedi-date-field__month-year-caret {
+.tedi-date-calendar__month-year-caret {
   font-size: var(--tedi-size-09);
 }

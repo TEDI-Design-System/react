@@ -1,6 +1,6 @@
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
-import { PickerGrid } from '../../date-field-grid';
+import { PickerGrid } from '../../date-calendar-grid';
 
 export interface MonthGridProps {
   /*

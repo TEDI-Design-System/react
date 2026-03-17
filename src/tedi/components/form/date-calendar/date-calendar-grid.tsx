@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
-import styles from './date-field.module.scss';
+import styles from './date-calendar.module.scss';
 
 interface PickerGridItem<T> {
   key: React.Key;

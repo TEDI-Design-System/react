@@ -8,7 +8,6 @@ import { Col, Row } from '../../layout/grid';
 import { DateField, DateFieldProps } from './date-field';
 
 /**
- * React DayPicker based reusable DatePicker component <br/>
  * <a href="https://daypicker.dev/" target="_BLANK">React DayPicker ↗</a><br />
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.37.57?node-id=4620-82915&m=dev" target="_BLANK">Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/15bd6e-date-field" target="_BLANK">Zeroheight ↗</a>

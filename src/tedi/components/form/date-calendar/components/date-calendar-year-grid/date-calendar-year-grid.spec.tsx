@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { YearGrid } from './date-field-year-grid';
+import { YearGrid } from './date-calendar-year-grid';
 
 import '@testing-library/jest-dom';
 

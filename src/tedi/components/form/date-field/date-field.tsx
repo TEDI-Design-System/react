@@ -13,16 +13,14 @@ import {
 } from '@floating-ui/react';
 import cn from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
 import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
+import { DateCalendar } from '../date-calendar/date-calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldProps } from '../textfield/textfield';
-import { CalendarHeader } from './components/date-field-header/date-field-header';
-import { MonthGrid } from './components/date-field-month-grid/date-field-month-grid';
-import { YearGrid } from './components/date-field-year-grid/date-field-year-grid';
 import styles from './date-field.module.scss';
 
 export type DateFieldMode = 'single' | 'multiple' | 'range';
@@ -189,6 +187,7 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
+  enableCalendar?: boolean;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
@@ -222,6 +221,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   readOnly,
   availableDays,
   inputProps,
+  enableCalendar = true,
   ...dayPickerProps
 }) => {
   const { getLabel } = useLabels();
@@ -284,7 +284,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   const { refs, context, x, y, strategy } = floating;
   const click = useClick(context);
   const interactions = useInteractions([
-    ...(openBehavior === 'input' ? [click] : []),
+    ...(enableCalendar && openBehavior === 'input' ? [click] : []),
     useDismiss(context),
     useRole(context, { role: 'dialog' }),
   ]);
@@ -370,7 +370,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             values={formattedDates}
             placeholder={placeholder}
             icon="calendar_today"
-            onIconClick={() => setOpen(true)}
+            onIconClick={() => enableCalendar && setOpen(true)}
             isClearable
             required={required}
             onChange={(newValues) => {
@@ -404,113 +404,45 @@ export const DateField: React.FC<DateFieldProps> = ({
         )}
       </div>
 
-      <FloatingPortal>
-        {open && (
-          <FloatingFocusManager context={context} modal={false}>
-            <div
-              ref={refs.setFloating}
-              role="dialog"
-              aria-labelledby="datepicker-input"
-              {...interactions.getFloatingProps({
-                style: { position: strategy, top: y ?? 0, left: x ?? 0 },
-              })}
-            >
-              <div aria-live="polite" className="sr-only">
-                {view === 'years' && getLabel('pickers.yearSelection')}
-                {view === 'months' && getLabel('pickers.monthSelection')}
-              </div>
-
-              {(view === 'years' || calendarView === 'years') && (
-                <YearGrid
-                  currentMonth={currentMonth}
-                  onNavigate={setCurrentMonth}
-                  onSelectYear={(date) => {
-                    setCurrentMonth(date);
-
-                    if (calendarView === 'years') {
-                      const normalized = new Date(date.getFullYear(), 0, 1);
-                      applyValue(normalized);
-                    } else {
-                      setView('months');
-                    }
-                  }}
-                />
-              )}
-
-              {(view === 'months' || calendarView === 'months') && (
-                <MonthGrid
-                  currentMonth={currentMonth}
-                  onNavigate={setCurrentMonth}
-                  onSelectMonth={(date) => {
-                    setCurrentMonth(date);
-
-                    if (calendarView === 'months') {
-                      applyValue(date);
-                    } else {
-                      setView('days');
-                    }
-                  }}
-                />
-              )}
-
-              {view === 'days' && (
-                <DayPicker
+      {enableCalendar && (
+        <FloatingPortal>
+          {open && (
+            <FloatingFocusManager context={context} modal={false}>
+              <div
+                ref={refs.setFloating}
+                {...interactions.getFloatingProps({
+                  style: {
+                    position: strategy,
+                    top: y ?? 0,
+                    left: x ?? 0,
+                  },
+                })}
+              >
+                <DateCalendar
                   {...dayPickerProps}
+                  view={view}
+                  calendarView={calendarView}
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  setView={setView}
                   mode={mode}
-                  selected={value as UnknownType}
+                  value={value}
                   locale={locale}
-                  month={currentMonth}
-                  onMonthChange={setCurrentMonth}
                   showOutsideDays={showOutsideDays}
-                  disabled={disabledMatchers.length > 0 ? disabledMatchers : undefined}
+                  disabledMatchers={disabledMatchers}
                   required={required}
-                  components={{
-                    MonthCaption: (props) => (
-                      <CalendarHeader
-                        {...props}
-                        monthYearSelectGrid={monthYearSelectGrid}
-                        onOpenMonthGrid={() => setView('months')}
-                        onOpenYearGrid={() => setView('years')}
-                      />
-                    ),
-                    Nav: () => <></>,
-                  }}
+                  availableDays={availableDays}
                   footer={footer}
-                  classNames={{
-                    root: styles['tedi-date-field__calendar'],
-                    month_caption: styles['tedi-date-field__caption'],
-                    head: styles['tedi-date-field__head'],
-                    row: styles['tedi-date-field__row'],
-                    day: styles['tedi-date-field__day'],
-                    selected: styles['tedi-date-field__day--selected'],
-                    weekday: styles['tedi-date-field__weekday'],
-                    outside: styles['tedi-date-field__outside-days'],
-                    range_start: styles['tedi-date-field__range-start'],
-                    range_middle: styles['tedi-date-field__range-middle'],
-                    range_end: styles['tedi-date-field__range-end'],
-                    today: styles['tedi-date-field__today'],
-                    disabled: styles['tedi-date-field__disabled'],
-                    month: styles['tedi-date-field__month'],
-                    months: styles['tedi-date-field__months-container'],
-                    footer: styles['tedi-date-field__footer'],
-                    week_number: styles['tedi-date-field__week-number'],
-                  }}
-                  modifiers={{
-                    available:
-                      availableDays instanceof Function
-                        ? availableDays
-                        : (d) => availableDays?.some((day) => day.toDateString() === d.toDateString()) ?? false,
-                  }}
-                  modifiersClassNames={{
-                    available: styles['tedi-date-field__available-day'],
-                  }}
-                  onSelect={handleSelect}
+                  monthYearSelectGrid={monthYearSelectGrid}
+                  handleSelect={handleSelect}
+                  applyValue={applyValue}
+                  className={styles['tedi-date-field__calendar']}
                 />
-              )}
-            </div>
-          </FloatingFocusManager>
-        )}
-      </FloatingPortal>
+              </div>
+            </FloatingFocusManager>
+          )}
+        </FloatingPortal>
+      )}
     </>
   );
 };
