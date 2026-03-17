@@ -22,9 +22,12 @@ import { useLabels } from '../../../providers/label-provider';
 import styles from './dropdown.module.scss';
 import { DropdownContent } from './dropdown-content/dropdown-content';
 import { DropdownContext, DropdownContextValue } from './dropdown-context';
+import { resolveDropdownWidth } from './dropdown-helpers';
 import { DropdownItem } from './dropdown-item/dropdown-item';
 import { DropdownSeparator } from './dropdown-separator/dropdown-separator';
 import { DropdownTrigger } from './dropdown-trigger/dropdown-trigger';
+
+const DROPDOWN_OFFSET = 4;
 
 type DropdownBreakpointProps = {
   /**
@@ -133,7 +136,7 @@ export const Dropdown = (props: DropdownProps) => {
     open,
     placement,
     onOpenChange: setOpen,
-    middleware: [offset(4), flip(), shift()],
+    middleware: [offset(DROPDOWN_OFFSET), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
 
@@ -200,16 +203,7 @@ export const Dropdown = (props: DropdownProps) => {
                   position: strategy,
                   left: x ?? 0,
                   top: y ?? 0,
-                  width:
-                    width === 'full'
-                      ? containerWidth
-                      : width === 'trigger'
-                      ? triggerWidth
-                      : typeof width === 'number'
-                      ? `${width}px`
-                      : width === 'auto'
-                      ? undefined
-                      : width,
+                  width: resolveDropdownWidth(width, triggerWidth, containerWidth),
                 },
                 role: 'menu',
                 'aria-orientation': 'vertical',

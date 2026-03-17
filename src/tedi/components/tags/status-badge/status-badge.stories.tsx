@@ -31,14 +31,14 @@ export default meta;
 
 type Story = StoryObj<typeof StatusBadge>;
 
-const colors: StatusBadgeColor[] = ['neutral', 'brand', 'accent', 'success', 'danger', 'warning'];
+const colors: StatusBadgeColor[] = ['neutral', 'brand', 'accent', 'warning', 'danger', 'success'];
 const variants: StatusBadgeProps['variant'][] = ['filled', 'filled-bordered', 'bordered'];
 const statuses: StatusBadgeStatus[] = ['inactive', 'success', 'warning', 'danger'];
 const colorToIconMap: Record<StatusBadgeColor, string> = {
   neutral: 'edit',
   brand: 'send',
   accent: 'sync',
-  success: 'check_circle',
+  success: 'check',
   danger: 'error',
   warning: 'warning',
   transparent: 'edit',
