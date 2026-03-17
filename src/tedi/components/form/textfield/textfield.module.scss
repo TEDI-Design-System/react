@@ -54,6 +54,10 @@ $input-padding-right-map: (
 
 .tedi-textfield__inner {
   position: relative;
+
+  &:focus-within {
+    @include mixins.focus-element;
+  }
 }
 
 .tedi-textfield__input {
