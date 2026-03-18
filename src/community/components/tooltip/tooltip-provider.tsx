@@ -10,6 +10,7 @@ import {
   ReferenceType,
   safePolygon,
   shift,
+  ShiftOptions,
   Strategy,
   useClick,
   useDismiss,
@@ -77,6 +78,11 @@ export interface TooltipProviderProps {
    * @default GAP + ARROW_HEIGHT (3px + 7px)
    */
   offset?: OffsetOptions;
+  /**
+   * Optional Floating UI shift configuration.
+   * Use this to keep tooltip content inside a specific visible area (for example by setting `boundary`).
+   */
+  shift?: ShiftOptions;
 }
 
 export interface ITooltipContext {
@@ -135,6 +141,7 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     onToggle,
     role = 'tooltip',
     offset: offsetOptions = DEFAULT_TOOLTIP_OFFSET,
+    shift: shiftOptions,
   } = props;
   const {
     order = ['reference', 'content'],
@@ -164,7 +171,7 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     middleware: [
       offset(offsetOptions),
       flip(),
-      shift({ padding: 8 }),
+      shift(shiftOptions),
       arrow({
         element: arrowRef,
         padding: 4,
@@ -184,6 +191,7 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     }),
     useRole(context, { role }),
     useDismiss(context, {
+      ancestorScroll: true,
       outsidePressEvent: openWith === 'click' ? 'mousedown' : 'pointerdown', // https://floating-ui.com/docs/dialog#interaction-hooks
     }),
   ]);

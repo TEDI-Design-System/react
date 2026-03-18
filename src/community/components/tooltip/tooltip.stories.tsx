@@ -1,4 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 
 import { Heading } from '../../../tedi/components/base//typography/heading/heading';
 import { Icon } from '../../../tedi/components/base/icon/icon';
@@ -249,6 +250,35 @@ export const TooltipPosition: StoryFn = () => {
           </TooltipTrigger>
           <Tooltip>{tooltiptext}</Tooltip>
         </TooltipProvider>
+      </Col>
+    </Row>
+  );
+};
+
+export const ScrollableRowInCard: StoryFn = () => {
+  const [tooltipBoundary, setTooltipBoundary] = useState<HTMLElement | null>();
+  const shiftOptions: TooltipProviderProps['shift'] = tooltipBoundary ? { boundary: tooltipBoundary } : undefined;
+
+  return (
+    <Row justifyContent="center">
+      <Col width="auto" style={{ width: '100%' }}>
+        <div ref={setTooltipBoundary} style={{ width: '100%', overflowX: 'scroll' }}>
+          <div style={{ minWidth: '100rem' }}>
+            <TooltipProvider shift={shiftOptions}>
+              <TooltipTrigger>
+                <span
+                  style={{
+                    display: 'block',
+                    width: 'fit-content',
+                  }}
+                >
+                  Lorem ipsum dolor sit amet
+                </span>
+              </TooltipTrigger>
+              <Tooltip>Lorem ipsum dolor sit amet</Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
       </Col>
     </Row>
   );
