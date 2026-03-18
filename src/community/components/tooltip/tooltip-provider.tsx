@@ -77,10 +77,6 @@ export interface TooltipProviderProps {
    * @default GAP + ARROW_HEIGHT (3px + 7px)
    */
   offset?: OffsetOptions;
-  /**
-   * Optional Floating UI shift configuration.
-   * Use this to keep tooltip content inside a specific visible area (for example by setting `boundary`).
-   */
 }
 
 export interface ITooltipContext {
