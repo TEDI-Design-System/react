@@ -10,7 +10,6 @@ import {
   ReferenceType,
   safePolygon,
   shift,
-  ShiftOptions,
   Strategy,
   useClick,
   useDismiss,
@@ -82,7 +81,6 @@ export interface TooltipProviderProps {
    * Optional Floating UI shift configuration.
    * Use this to keep tooltip content inside a specific visible area (for example by setting `boundary`).
    */
-  shift?: ShiftOptions;
 }
 
 export interface ITooltipContext {
@@ -141,7 +139,6 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     onToggle,
     role = 'tooltip',
     offset: offsetOptions = DEFAULT_TOOLTIP_OFFSET,
-    shift: shiftOptions,
   } = props;
   const {
     order = ['reference', 'content'],
@@ -171,7 +168,10 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     middleware: [
       offset(offsetOptions),
       flip(),
-      shift(shiftOptions),
+      shift({
+        altBoundary: true,
+        padding: 8,
+      }),
       arrow({
         element: arrowRef,
         padding: 4,
