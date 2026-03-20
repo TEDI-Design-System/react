@@ -1,3 +1,10 @@
+# [16.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.3...react-16.1.0-rc.4) (2026-03-20)
+
+
+### Features
+
+* **docs:** added css-utilities documentation [#570](https://github.com/TEDI-Design-System/react/issues/570) ([#571](https://github.com/TEDI-Design-System/react/issues/571)) ([84bfbd7](https://github.com/TEDI-Design-System/react/commit/84bfbd710b63021d974c7abe86d4810a1ddf5b72))
+
 # [16.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.2...react-16.1.0-rc.3) (2026-03-11)
 
 
