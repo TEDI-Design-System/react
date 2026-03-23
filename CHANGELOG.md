@@ -1,3 +1,10 @@
+# [16.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.5...react-16.1.0-rc.6) (2026-03-23)
+
+
+### Bug Fixes
+
+* **status-badge:** add missing forwardRef, update stories [#546](https://github.com/TEDI-Design-System/react/issues/546) ([#572](https://github.com/TEDI-Design-System/react/issues/572)) ([cb86a50](https://github.com/TEDI-Design-System/react/commit/cb86a50e406236b6c4b4c70643ed3617f572d796))
+
 # [16.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.4...react-16.1.0-rc.5) (2026-03-23)
 
 
