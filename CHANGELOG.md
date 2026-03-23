@@ -1,3 +1,10 @@
+# [16.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.4...react-16.1.0-rc.5) (2026-03-23)
+
+
+### Bug Fixes
+
+* **textfield:** Move tabIndex attribute to input element https://github.com/TEDI-Design-System/react/issues/564 ([#565](https://github.com/TEDI-Design-System/react/issues/565)) ([11dcb5b](https://github.com/TEDI-Design-System/react/commit/11dcb5b2537fddf16410a01da04c0e81319222db))
+
 # [16.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.3...react-16.1.0-rc.4) (2026-03-20)
 
 
