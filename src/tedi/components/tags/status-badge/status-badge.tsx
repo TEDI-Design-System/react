@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { forwardRef } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
@@ -60,7 +61,7 @@ export interface StatusBadgeProps extends BreakpointSupport<StatusBadgePropsBrea
   role?: React.AriaRole;
 }
 
-export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
+export const StatusBadge = forwardRef<HTMLDivElement, StatusBadgeProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     color = 'neutral',
@@ -93,6 +94,7 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
 
   return (
     <BadgeElement
+      ref={ref}
       className={badgeClass}
       id={id}
       title={title}
@@ -104,4 +106,6 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
       {children && <span className={styles['tedi-status-badge__inner-text']}>{children}</span>}
     </BadgeElement>
   );
-};
+});
+
+StatusBadge.displayName = 'StatusBadge';
