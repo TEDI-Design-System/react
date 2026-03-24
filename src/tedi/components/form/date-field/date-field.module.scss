@@ -43,4 +43,18 @@
       }
     }
   }
+
+  &.tedi-date-field__icon--disabled {
+    button:not([data-name='closing-button']):last-child {
+      &:hover,
+      &:focus {
+        cursor: auto;
+        background: none;
+      }
+    }
+  }
+}
+
+.tedi-date-field__container {
+  width: 100%;
 }

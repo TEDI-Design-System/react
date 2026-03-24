@@ -1,8 +1,8 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { Tag } from '../../tags/tag/tag';
-import TextField, { TextFieldProps } from '../textfield/textfield';
+import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './multi-value-field.module.scss';
 
 export interface MultiValueFieldProps extends Omit<TextFieldProps, 'value' | 'onChange'> {
@@ -12,15 +12,8 @@ export interface MultiValueFieldProps extends Omit<TextFieldProps, 'value' | 'on
   tagColor?: 'primary' | 'secondary' | 'danger';
 }
 
-export const MultiValueField: React.FC<MultiValueFieldProps> = ({
-  values: externalValues,
-  onChange,
-  maxValues,
-  tagColor = 'primary',
-  disabled,
-  className,
-  ...rest
-}) => {
+export const MultiValueField = forwardRef<TextFieldForwardRef, MultiValueFieldProps>((props, ref): JSX.Element => {
+  const { values: externalValues, onChange, maxValues, tagColor = 'primary', disabled, className, ...rest } = props;
   const [internalValues, setInternalValues] = React.useState<string[]>(externalValues ?? []);
   const [inputValue, setInputValue] = React.useState('');
 
@@ -60,6 +53,7 @@ export const MultiValueField: React.FC<MultiValueFieldProps> = ({
   return (
     <TextField
       {...rest}
+      ref={ref}
       disabled={disabled}
       value={values.join(', ')}
       onChange={setInputValue}
@@ -81,6 +75,8 @@ export const MultiValueField: React.FC<MultiValueFieldProps> = ({
       }
     />
   );
-};
+});
+
+MultiValueField.displayName = 'MultiValueField';
 
 export default MultiValueField;

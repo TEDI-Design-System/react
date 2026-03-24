@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
-import styles from './date-calendar.module.scss';
+import styles from './calendar.module.scss';
 
 interface PickerGridItem<T> {
   key: React.Key;
@@ -32,8 +32,8 @@ export const PickerGrid = <T,>({
   onSelect,
 }: PickerGridProps<T>) => {
   return (
-    <div className={classNames(styles['tedi-date-field__picker-grid-container'])}>
-      <div className={classNames(styles['tedi-date-field__picker-grid-header'])}>
+    <div className={classNames(styles['tedi-date-calendar__picker-grid-container'])}>
+      <div className={classNames(styles['tedi-date-calendar__picker-grid-header'])}>
         <Button type="button" onClick={onPrev} aria-label={prevAriaLabel} icon="arrow_back" visualType="neutral">
           <Text modifiers="capitalize-first">{prevAriaLabel}</Text>
         </Button>
@@ -45,15 +45,15 @@ export const PickerGrid = <T,>({
         </Button>
       </div>
 
-      <div className={classNames(styles['tedi-date-field__picker-grid'])}>
+      <div className={classNames(styles['tedi-date-calendar__picker-grid'])}>
         <Row gutter={2}>
           {items.map((item) => (
             <Col key={item.key} width={4}>
               <Button
                 noStyle
                 onClick={() => onSelect(item.value)}
-                className={classNames(styles['tedi-date-field__grid-button'], {
-                  [styles['tedi-date-field__grid-button--selected']]: item.isSelected,
+                className={classNames(styles['tedi-date-calendar__grid-button'], {
+                  [styles['tedi-date-calendar__grid-button--selected']]: item.isSelected,
                 })}
                 aria-pressed={item.isSelected}
               >

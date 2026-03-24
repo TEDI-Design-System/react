@@ -5,7 +5,7 @@ import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
 import { Dropdown } from '../../../../overlays/dropdown';
-import styles from './date-calendar-header.module.scss';
+import styles from './calendar-header.module.scss';
 
 export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMonth'> {
   /**

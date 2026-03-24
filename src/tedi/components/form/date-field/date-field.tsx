@@ -4,7 +4,6 @@ import {
   FloatingFocusManager,
   FloatingPortal,
   offset,
-  shift,
   useClick,
   useDismiss,
   useFloating,
@@ -16,16 +15,17 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
-import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
-import { DateCalendar } from '../date-calendar/date-calendar';
+import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
-import TextField, { TextFieldProps } from '../textfield/textfield';
+import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
+
+const CALENDAR_OFFSET = 4;
 
 export type DateFieldMode = 'single' | 'multiple' | 'range';
 export type CalendarView = 'days' | 'months' | 'years';
-export type DateFieldOpenBehavior = 'input' | 'button';
+export type DateFieldCalendarTrigger = 'input' | 'button';
 type DateTextFieldProps = Omit<TextFieldProps, 'label' | 'id'>;
 type DateMultiValueFieldProps = Omit<MultiValueFieldProps, 'label' | 'id'>;
 
@@ -91,7 +91,7 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    *
    * @default button
    */
-  openBehavior?: DateFieldOpenBehavior;
+  calendarTrigger?: DateFieldCalendarTrigger;
   /*
    * Custom date parsing function for user input. Receives the input string and should return a `Date`, an array of `Date`s, a `DateRange`, or `undefined` if the input is invalid or cleared.
    * If not provided, the component will not allow manual input and will rely solely on the calendar picker for date selection.
@@ -187,6 +187,14 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
+  /*
+   * Enables or disables the calendar popover for the date field.
+   *
+   * - When `true` (default), the calendar is active, allowing the user to select dates from the calendar.
+   * - When `false`, the calendar is hidden and only manual input is possible.
+   *
+   * @default true
+   */
   enableCalendar?: boolean;
 }
 
@@ -201,7 +209,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   className,
   formatDate,
   required,
-  openBehavior = 'button',
+  calendarTrigger = 'button',
   showOutsideDays = true,
   parseDate,
   monthYearSelectGrid,
@@ -224,7 +232,6 @@ export const DateField: React.FC<DateFieldProps> = ({
   enableCalendar = true,
   ...dayPickerProps
 }) => {
-  const { getLabel } = useLabels();
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
   const [open, setOpen] = useState(false);
@@ -276,15 +283,15 @@ export const DateField: React.FC<DateFieldProps> = ({
   const floating = useFloating({
     open,
     onOpenChange: setOpen,
-    placement: 'bottom-end',
-    middleware: [offset(4), flip(), shift({ padding: 8 })],
+    placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
+    middleware: [offset(CALENDAR_OFFSET), flip()],
     whileElementsMounted: autoUpdate,
   });
 
   const { refs, context, x, y, strategy } = floating;
   const click = useClick(context);
   const interactions = useInteractions([
-    ...(enableCalendar && openBehavior === 'input' ? [click] : []),
+    ...(enableCalendar && calendarTrigger === 'input' ? [click] : []),
     useDismiss(context),
     useRole(context, { role: 'dialog' }),
   ]);
@@ -294,6 +301,14 @@ export const DateField: React.FC<DateFieldProps> = ({
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
     if (!isControlled) setInternalValue(date);
     onSelect?.(date, selectedDay, modifiers, e);
+
+    if (date) {
+      const formatted = formatDate ? formatDate(date) : defaultFormatter(date);
+      setInputValue(formatted);
+    } else {
+      setInputValue('');
+    }
+
     if (shouldCloseOnSelect) setOpen(false);
   };
 
@@ -313,6 +328,10 @@ export const DateField: React.FC<DateFieldProps> = ({
   const applyValue = (date: Date) => {
     if (!isControlled) setInternalValue(date);
     onSelect?.(date, date as UnknownType, {}, {} as UnknownType);
+
+    const formatted = formatDate ? formatDate(date) : defaultFormatter(date);
+    setInputValue(formatted);
+
     if (shouldCloseOnSelect) setOpen(false);
   };
 
@@ -336,6 +355,20 @@ export const DateField: React.FC<DateFieldProps> = ({
     if (shouldCloseOnSelect) setOpen(false);
   };
 
+  useEffect(() => {
+    if (isControlled) {
+      const formatted = formatDate ? formatDate(value) : defaultFormatter(value);
+      setInputValue(formatted);
+    }
+  }, [value, isControlled, formatDate, defaultFormatter]);
+
+  useEffect(() => {
+    if (!isControlled && defaultValue) {
+      const formatted = formatDate ? formatDate(defaultValue) : defaultFormatter(defaultValue);
+      setInputValue(formatted);
+    }
+  }, []);
+
   const disabledMatchers: Matcher[] = [];
 
   if (disabled) {
@@ -354,10 +387,17 @@ export const DateField: React.FC<DateFieldProps> = ({
   if (shouldDisableMonth) disabledMatchers.push((date: Date) => shouldDisableMonth(date));
   if (shouldDisableYear) disabledMatchers.push((date: Date) => shouldDisableYear(date));
 
+  const textFieldRef = React.useRef<TextFieldForwardRef>(null);
+
+  useEffect(() => {
+    if (textFieldRef.current?.input) {
+      refs.setReference(textFieldRef.current.input);
+    }
+  }, [refs]);
+
   return (
     <>
       <div
-        ref={refs.setReference}
         className={cn(styles['tedi-date-field__container'], className)}
         {...interactions.getReferenceProps()}
         aria-haspopup="dialog"
@@ -365,6 +405,7 @@ export const DateField: React.FC<DateFieldProps> = ({
         {mode === 'multiple' ? (
           <MultiValueField
             {...(inputProps as MultiValueFieldProps)}
+            ref={textFieldRef}
             id={id}
             label={label}
             values={formattedDates}
@@ -381,11 +422,14 @@ export const DateField: React.FC<DateFieldProps> = ({
               if (!isControlled) setInternalValue(newDates);
               onSelect?.(newDates, {} as UnknownType, {}, {} as UnknownType);
             }}
-            className={cn(styles['tedi-date-field__textfield'], styles['tedi-date-field__multivalue'])}
+            className={cn(styles['tedi-date-field__textfield'], styles['tedi-date-field__multivalue'], {
+              [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,
+            })}
           />
         ) : (
           <TextField
             {...(inputProps as TextFieldProps)}
+            ref={textFieldRef}
             id={id}
             label={label}
             readOnly={readOnly ?? !parseDate}
@@ -399,6 +443,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             required={required}
             className={cn(styles['tedi-date-field__textfield'], {
               [styles['tedi-date-field__textfield--disabled']]: inputProps?.disabled,
+              [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,
             })}
           />
         )}
@@ -418,7 +463,7 @@ export const DateField: React.FC<DateFieldProps> = ({
                   },
                 })}
               >
-                <DateCalendar
+                <Calendar
                   {...dayPickerProps}
                   view={view}
                   calendarView={calendarView}
@@ -446,5 +491,3 @@ export const DateField: React.FC<DateFieldProps> = ({
     </>
   );
 };
-
-export { DateField as DatePicker };

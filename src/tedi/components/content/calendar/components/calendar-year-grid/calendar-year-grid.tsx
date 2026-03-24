@@ -1,5 +1,5 @@
 import { useLabels } from '../../../../../providers/label-provider';
-import { PickerGrid } from '../../date-calendar-grid';
+import { PickerGrid } from '../../calendar-grid';
 
 export interface YearGridProps {
   /*

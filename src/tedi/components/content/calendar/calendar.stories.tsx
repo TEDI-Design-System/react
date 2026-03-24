@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { et } from 'react-day-picker/locale';
 
-import { CalendarView } from '../date-field/date-field';
-import { DateCalendar } from './date-calendar';
+import { CalendarView } from '../../form/date-field/date-field';
+import { Calendar } from './calendar';
 
 /**
  * React DayPicker based reusable date picker component <br/>
@@ -12,14 +12,14 @@ import { DateCalendar } from './date-calendar';
  * <a href="https://www.tedi.ee/1ee8444b7/p/15bd6e-date-field" target="_BLANK">Zeroheight ↗</a>
  */
 
-const meta: Meta<typeof DateCalendar> = {
-  title: 'TEDI-Ready/Components/Form/DateCalendar',
-  component: DateCalendar,
+const meta: Meta<typeof Calendar> = {
+  title: 'TEDI-Ready/Content/Calendar',
+  component: Calendar,
 };
 
 export default meta;
 
-type Story = StoryObj<typeof DateCalendar>;
+type Story = StoryObj<typeof Calendar>;
 
 export const Default = () => {
   const [view, setView] = useState<CalendarView>('days');
@@ -28,7 +28,7 @@ export const Default = () => {
   const [value, setValue] = useState<Date>();
 
   return (
-    <DateCalendar
+    <Calendar
       view={view}
       calendarView="days"
       currentMonth={currentMonth}
@@ -61,7 +61,7 @@ export const Multiple: Story = {
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
     return (
-      <DateCalendar
+      <Calendar
         view={view}
         calendarView="days"
         currentMonth={currentMonth}
@@ -93,7 +93,7 @@ export const Range: Story = {
     const [currentMonth, setCurrentMonth] = useState(today);
 
     return (
-      <DateCalendar
+      <Calendar
         view={view}
         calendarView="days"
         currentMonth={currentMonth}

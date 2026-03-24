@@ -81,6 +81,11 @@
       cursor: pointer;
       background-color: var(--form-datepicker-date-hover);
     }
+
+    &[data-outside='true']:not(.tedi-date-calendar__day--selected) {
+      cursor: auto;
+      background: unset;
+    }
   }
 
   &__today {

@@ -107,6 +107,33 @@ export const States: StoryObj<TemplateStateProps> = {
   },
 };
 
+export const DefaultValue: Story = {
+  render: Template,
+  args: {
+    mode: 'single',
+    label: 'Default selected date',
+    defaultValue: new Date(),
+  },
+};
+
+export const InputOnly: Story = {
+  render: Template,
+  args: {
+    mode: 'single',
+    label: 'Date',
+    required: true,
+    placeholder: 'dd.mm.yyyy',
+    enableCalendar: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'enableCalendar props allows you to show/hide calendar',
+      },
+    },
+  },
+};
+
 export const Multiple: Story = {
   render: (args) => {
     const [value, setValue] = useState<Date[] | undefined>([]);
@@ -155,11 +182,87 @@ export const Multiple: Story = {
   },
 };
 
+export const AvailableDays: Story = {
+  render: () => {
+    const availableDays = [
+      new Date(),
+      new Date(new Date().setDate(new Date().getDate() + 4)),
+      new Date(new Date().setDate(new Date().getDate() + 5)),
+      new Date(new Date().setDate(new Date().getDate() + 6)),
+    ];
+
+    const [selected, setSelected] = useState<Date | undefined>();
+
+    return (
+      <DateField
+        mode="single"
+        label="Pick from available days"
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+        availableDays={availableDays}
+        id="available-days-shown"
+      />
+    );
+  },
+};
+
 export const Range: Story = {
-  render: Template,
-  args: {
-    mode: 'range',
-    label: 'Select date range',
+  render: () => {
+    const [defaultRange, setDefaultRange] = useState<DateRange | undefined>();
+    const [rangeWithLimits, setRangeWithLimits] = useState<DateRange | undefined>();
+    const [startOnly, setStartOnly] = useState<DateRange | undefined>({ from: new Date(), to: undefined });
+    const [disablePastRange, setDisablePastRange] = useState<DateRange | undefined>();
+
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    const maxDate = new Date();
+
+    return (
+      <Row gutterY={3}>
+        <Col width={6}>
+          <DateField
+            mode="range"
+            label="Default Range"
+            selected={defaultRange}
+            onSelect={(range) => setDefaultRange(range as DateRange)}
+            id="range-default"
+          />
+        </Col>
+
+        <Col width={6}>
+          <DateField
+            mode="range"
+            label="Range with disabled future"
+            selected={rangeWithLimits}
+            onSelect={(range) => setRangeWithLimits(range as DateRange)}
+            minDate={twoMonthsAgo}
+            maxDate={maxDate}
+            id="range-with-limits"
+          />
+        </Col>
+
+        <Col width={6}>
+          <DateField
+            mode="range"
+            label="Start date only"
+            selected={startOnly}
+            onSelect={(range) => setStartOnly(range as DateRange)}
+            id="range-with-start-only"
+          />
+        </Col>
+
+        <Col width={6}>
+          <DateField
+            mode="range"
+            label="Range with disabled past"
+            selected={disablePastRange}
+            onSelect={(range) => setDisablePastRange(range as DateRange)}
+            disablePast
+            id="range-with-disabled-past"
+          />
+        </Col>
+      </Row>
+    );
   },
 };
 
@@ -183,7 +286,7 @@ export const ShowWeekCount: Story = {
 
 export const MultipleMonthsShown: Story = {
   render: () => {
-    return <DateField label="Visible months" numberOfMonths={2} mode="range" id="multiple-shown" />;
+    return <DateField label="Date" numberOfMonths={2} mode="range" id="multiple-shown" />;
   },
 };
 
@@ -201,11 +304,12 @@ export const CalendarFooter: Story = {
           <DateField
             label="Select time"
             id="calendar-with-footer"
-            openBehavior="input"
             footer={
               <Row>
                 <Col width={12} className="text-center">
-                  <Button visualType="secondary">Cancel selection</Button>
+                  <Button visualType="secondary" size="small">
+                    Cancel selection
+                  </Button>
                 </Col>
               </Row>
             }
@@ -215,18 +319,17 @@ export const CalendarFooter: Story = {
           <DateField
             label="Action buttons"
             id="calendar-with-footer-2"
-            openBehavior="input"
             footer={
               <Row>
-                <Col width={6}>
-                  <Button visualType="secondary" fullWidth>
-                    Cancel
-                  </Button>
-                </Col>
-                <Col width={6}>
-                  <Button visualType="primary" fullWidth>
-                    Save
-                  </Button>
+                <Col width={12}>
+                  <div className="flex gap-3">
+                    <Button visualType="secondary" fullWidth size="small">
+                      Cancel
+                    </Button>
+                    <Button visualType="primary" fullWidth size="small">
+                      Save
+                    </Button>
+                  </div>
                 </Col>
               </Row>
             }
@@ -237,36 +340,25 @@ export const CalendarFooter: Story = {
   },
 };
 
-export const DefaultValue: Story = {
-  render: Template,
-  args: {
-    mode: 'single',
-    label: 'Default selected date',
-    defaultValue: new Date(),
-  },
-};
-
-export const AvailableDays: Story = {
+export const CalendarTrigger: Story = {
   render: () => {
-    const availableDays = [
-      new Date(),
-      new Date(new Date().setDate(new Date().getDate() + 4)),
-      new Date(new Date().setDate(new Date().getDate() + 5)),
-      new Date(new Date().setDate(new Date().getDate() + 6)),
-    ];
-
-    const [selected, setSelected] = useState<Date | undefined>();
-
     return (
-      <DateField
-        mode="single"
-        label="Pick from available days"
-        selected={selected}
-        onSelect={(date) => setSelected(date as Date)}
-        availableDays={availableDays}
-        id="available-days-shown"
-      />
+      <Row>
+        <Col>
+          <DateField label="Calendar icon trigger" id="calendar-button-trigger" calendarTrigger="button" />
+        </Col>
+        <Col>
+          <DateField label="Input trigger" id="calendar-input-trigger" calendarTrigger="input" />
+        </Col>
+      </Row>
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'calendarTrigger prop allows you to open calendar either on input click or calendar icon',
+      },
+    },
   },
 };
 

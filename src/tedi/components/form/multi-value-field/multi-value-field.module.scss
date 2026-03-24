@@ -1,15 +1,20 @@
 .tedi-multi-value-field > div {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
   min-height: var(--form-field-height);
   padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
   background-color: var(--form-input-background-default);
-  border: 1px solid var(--form-input-border-default);
   border-radius: var(--form-field-radius);
+  outline: 1px solid var(--form-input-border-default);
+  outline-offset: -1px;
 }
 
 .tedi-multi-value-field__tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--layout-grid-gutters-04);
+  padding-right: 4rem;
 }
 
 .tedi-multi-value-field__input {

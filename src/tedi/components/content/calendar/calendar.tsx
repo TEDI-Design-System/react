@@ -3,13 +3,13 @@ import React from 'react';
 import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { UnknownType } from 'src/tedi/types/commonTypes';
 
-import { CalendarView, DateFieldMode } from '../date-field/date-field';
-import { CalendarHeader } from './components/date-calendar-header/date-calendar-header';
-import { MonthGrid } from './components/date-calendar-month-grid/date-calendar-month-grid';
-import { YearGrid } from './components/date-calendar-year-grid/date-calendar-year-grid';
-import styles from './date-calendar.module.scss';
+import { CalendarView, DateFieldMode } from '../../form/date-field/date-field';
+import styles from './calendar.module.scss';
+import { CalendarHeader } from './components/calendar-header/calendar-header';
+import { MonthGrid } from './components/calendar-month-grid/calendar-month-grid';
+import { YearGrid } from './components/calendar-year-grid/calendar-year-grid';
 
-export interface DateCalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
+export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
   /**
    * Current view of the calendar. Can be `'days'`, `'months'`, or `'years'`.
    * Controls which calendar grid is displayed.
@@ -86,7 +86,7 @@ export interface DateCalendarProps extends Omit<DayPickerProps, 'mode' | 'select
   className?: string;
 }
 
-export const DateCalendar = ({
+export const Calendar = ({
   view,
   calendarView,
   currentMonth,
@@ -105,7 +105,34 @@ export const DateCalendar = ({
   applyValue,
   className,
   ...dayPickerProps
-}: DateCalendarProps) => {
+}: CalendarProps) => {
+  const computedDisabled: Matcher[] = [...(disabledMatchers ?? [])];
+
+  if (availableDays) {
+    computedDisabled.push((date: Date) => !isAvailable(date));
+  }
+
+  if (availableDays) {
+    const isAvailable = (date: Date) => {
+      if (Array.isArray(availableDays)) {
+        return availableDays.some((d) => d.toDateString() === date.toDateString());
+      }
+      return availableDays(date);
+    };
+
+    computedDisabled.push((date: Date) => !isAvailable(date));
+  }
+
+  const isAvailable = (date: Date) => {
+    if (!availableDays) return true;
+
+    if (Array.isArray(availableDays)) {
+      return availableDays.some((d) => d.toDateString() === date.toDateString());
+    }
+
+    return availableDays(date);
+  };
+
   return (
     <div className={styles['tedi-date-calendar']}>
       {(view === 'years' || calendarView === 'years') && (
@@ -147,7 +174,7 @@ export const DateCalendar = ({
           month={currentMonth}
           onMonthChange={setCurrentMonth}
           showOutsideDays={showOutsideDays}
-          disabled={disabledMatchers?.length ? disabledMatchers : undefined}
+          disabled={computedDisabled.length ? computedDisabled : undefined}
           required={required}
           components={{
             MonthCaption: (props) => (
@@ -181,12 +208,11 @@ export const DateCalendar = ({
             week_number: styles['tedi-date-calendar__week-number'],
           }}
           modifiers={{
-            available:
-              availableDays instanceof Function
-                ? availableDays
-                : (d) => availableDays?.some((day) => day.toDateString() === d.toDateString()) ?? false,
+            available: (date) => (availableDays ? isAvailable(date) : false),
           }}
-          modifiersClassNames={{ available: styles['tedi-date-calendar__available-day'] }}
+          modifiersClassNames={{
+            available: styles['tedi-date-calendar__available-day'],
+          }}
           onSelect={handleSelect}
         />
       )}
