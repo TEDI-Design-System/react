@@ -4,6 +4,7 @@ import {
   FloatingFocusManager,
   FloatingPortal,
   offset,
+  shift,
   useClick,
   useDismiss,
   useFloating,
@@ -18,7 +19,7 @@ import { et } from 'react-day-picker/locale';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
-import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
+import TextField, { TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
 
 const CALENDAR_OFFSET = 4;
@@ -284,7 +285,7 @@ export const DateField: React.FC<DateFieldProps> = ({
     open,
     onOpenChange: setOpen,
     placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
-    middleware: [offset(CALENDAR_OFFSET), flip()],
+    middleware: [offset(CALENDAR_OFFSET), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
 
@@ -387,25 +388,17 @@ export const DateField: React.FC<DateFieldProps> = ({
   if (shouldDisableMonth) disabledMatchers.push((date: Date) => shouldDisableMonth(date));
   if (shouldDisableYear) disabledMatchers.push((date: Date) => shouldDisableYear(date));
 
-  const textFieldRef = React.useRef<TextFieldForwardRef>(null);
-
-  useEffect(() => {
-    if (textFieldRef.current?.input) {
-      refs.setReference(textFieldRef.current.input);
-    }
-  }, [refs]);
-
   return (
     <>
       <div
         className={cn(styles['tedi-date-field__container'], className)}
         {...interactions.getReferenceProps()}
         aria-haspopup="dialog"
+        ref={refs.setReference}
       >
         {mode === 'multiple' ? (
           <MultiValueField
             {...(inputProps as MultiValueFieldProps)}
-            ref={textFieldRef}
             id={id}
             label={label}
             readOnly={readOnly ?? (parseDate ? false : enableCalendar)}
@@ -430,7 +423,6 @@ export const DateField: React.FC<DateFieldProps> = ({
         ) : (
           <TextField
             {...(inputProps as TextFieldProps)}
-            ref={textFieldRef}
             id={id}
             label={label}
             readOnly={readOnly ?? (parseDate ? false : enableCalendar)}
