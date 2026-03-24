@@ -119,13 +119,13 @@ $input-padding-right-map: (
 
     @if $size == small {
       .tedi-textfield__input {
-        height: var(--form-field-height-sm);
+        min-height: var(--form-field-height-sm);
         padding: var(--form-field-padding-y-sm) var(--form-field-padding-x-md-default);
         font-size: var(--body-regular-size);
       }
     } @else if $size == large {
       .tedi-textfield__input {
-        height: $input-height-large;
+        min-height: $input-height-large;
         padding: var(--form-field-padding-y-lg) var(--form-field-padding-x-lg);
 
         @include breakpoints.media-breakpoint-down(md) {
@@ -157,8 +157,10 @@ $input-padding-right-map: (
 
 .tedi-textfield__icon-wrapper {
   display: flex;
+  align-items: center;
   justify-content: center;
   width: var(--icon-04);
+  height: var(--icon-04);
   color: var(--form-input-text-filled);
   transition: color 0.2s ease;
 

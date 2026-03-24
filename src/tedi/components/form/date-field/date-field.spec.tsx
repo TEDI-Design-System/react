@@ -71,7 +71,7 @@ describe('DateField component', () => {
 
   it('opens calendar when clicking input (openBehavior=input)', async () => {
     const user = userEvent.setup();
-    render(<DateField {...defaultProps} openBehavior="input" />);
+    render(<DateField {...defaultProps} calendarTrigger="input" />);
 
     const input = screen.getByLabelText('Birth date');
     await user.click(input);

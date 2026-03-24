@@ -5,6 +5,8 @@ import { DateRange } from 'react-day-picker';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { TextFieldProps } from '../textfield/textfield';
 import { DateField, DateFieldProps } from './date-field';
 
 /**
@@ -30,57 +32,180 @@ interface TemplateStateProps extends DateFieldProps {
   array: typeof stateArray;
 }
 
-const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
-  const { array, ...dateFieldProps } = args;
+const sizeArray: TextFieldProps['size'][] = ['default', 'small'];
+interface TemplateMultipleProps<Type = TextFieldProps['size']> extends TextFieldProps {
+  array: Type[];
+  property: keyof TextFieldProps;
+}
+
+const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array, property, ...textFieldProps } = args;
 
   return (
-    <div className="state-example">
-      {array.map((state, index) => (
-        <Row key={index} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
+    <div className="example-list">
+      {array.map((value, key) => (
+        <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col width={2}>
+            <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="display-flex align-items-center" width={10}>
+          <Col className="d-flex">
             <DateField
-              {...dateFieldProps}
-              id={state}
+              label="Date"
+              id={`${textFieldProps.id}-${key}-1`}
               inputProps={{
-                ...(state === 'Disabled' && { disabled: true }),
+                [property]: value,
               }}
             />
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
-          <Text modifiers="bold">Success</Text>
-        </Col>
-        <Col className="display-flex align-items-center" width={10}>
-          <DateField
-            {...dateFieldProps}
-            id="error-success-field"
-            inputProps={{
-              helper: { text: 'Feedback text', type: 'valid' },
-            }}
-          />
-        </Col>
-      </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
-          <Text modifiers="bold">Error</Text>
-        </Col>
-        <Col className="display-flex align-items-center" width={10}>
-          <DateField
-            {...dateFieldProps}
-            id="error-date-field"
-            inputProps={{
-              helper: { text: 'Feedback text', type: 'error' },
-            }}
-          />
-        </Col>
-      </Row>
     </div>
   );
+};
+
+export const Default: Story = {
+  render: Template,
+  args: {
+    mode: 'single',
+    label: 'Date',
+    required: true,
+  },
+};
+
+export const Size: StoryObj<TemplateMultipleProps> = {
+  render: TemplateColumn,
+  args: {
+    property: 'size',
+    array: sizeArray,
+  },
+};
+
+export const FieldOptions: StoryFn = () => {
+  const [shortcutValue, setShortcutValue] = useState<Date | undefined>(undefined);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  return (
+    <Row>
+      <Col width={6}>
+        <div className="flex gap-4 flex-column">
+          <DateField id="date-default" label="Date field default" enableCalendar={false} mode="single" />
+
+          <DateField
+            id="date-with-hint"
+            label="Date field with hint"
+            enableCalendar={false}
+            placeholder="pp.kk.aaaa"
+            mode="single"
+            inputProps={{ helper: { text: 'kk.pp.aaaa' } }}
+          />
+
+          <div>
+            <DateField
+              key={shortcutValue?.toISOString() ?? 'empty'}
+              id="date-with-shortcuts"
+              label="Date field with shortcuts"
+              enableCalendar={false}
+              mode="single"
+              defaultValue={shortcutValue}
+              parseDate={(val) => {
+                const parts = val.split('.');
+                if (parts.length !== 3) return undefined;
+                const [day, month, year] = parts.map(Number);
+                const d = new Date(year, month - 1, day);
+                return isNaN(d.getTime()) ? undefined : d;
+              }}
+              onSelect={(d) => setShortcutValue(d instanceof Date ? d : undefined)}
+            />
+            <div className="flex gap-3" style={{ marginTop: '8px' }}>
+              <Button visualType="link" size="small" onClick={() => setShortcutValue(today)}>
+                Täna
+              </Button>
+              <Button visualType="link" size="small" onClick={() => setShortcutValue(tomorrow)}>
+                Homme
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Col>
+    </Row>
+  );
+};
+
+export const ValueType: StoryFn = () => {
+  return (
+    <Row>
+      <Col width={6}>
+        <div className="flex gap-3 flex-column">
+          <DateField id="date-default" label="Date" enableCalendar={false} />
+
+          <DateField id="date-with-placeholder" label="Date" enableCalendar={false} placeholder="pp.kk.aaaa" />
+
+          <DateField
+            id="date-with-placeholder"
+            label="Date"
+            enableCalendar={false}
+            placeholder="pp.kk.aaaa"
+            defaultValue={new Date()}
+          />
+
+          <DateField
+            id="date-with-multiple-dates"
+            label="Date"
+            enableCalendar={false}
+            placeholder="pp.kk.aaaa"
+            defaultValue={[new Date(2026, 2, 24), new Date(2026, 2, 26)]}
+            mode="multiple"
+          />
+
+          <DateField
+            id="date-with-range"
+            label="Date"
+            enableCalendar={false}
+            placeholder="pp.kk.aaaa – pp.kk.aaaa"
+            mode="range"
+            defaultValue={{
+              from: new Date(2026, 2, 24),
+              to: new Date(2026, 2, 27),
+            }}
+          />
+        </div>
+      </Col>
+    </Row>
+  );
+};
+
+export const OnClickType: Story = {
+  render: () => {
+    return (
+      <Row>
+        <Col>
+          <VerticalSpacing>
+            <Text>Calendar button is clickable</Text>
+            <DateField label="Date" id="calendar-button-trigger" calendarTrigger="button" />
+          </VerticalSpacing>
+        </Col>
+        <Col>
+          <VerticalSpacing>
+            <Text>Input is clickable</Text>
+            <DateField label="Date" id="calendar-input-trigger" calendarTrigger="input" />
+          </VerticalSpacing>
+        </Col>
+      </Row>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'calendarTrigger prop allows you to open calendar either on input click or calendar icon',
+      },
+    },
+  },
 };
 
 export const Single: Story = {
@@ -92,49 +217,7 @@ export const Single: Story = {
   },
 };
 
-export const States: StoryObj<TemplateStateProps> = {
-  render: TemplateColumnWithStates,
-  args: {
-    array: stateArray,
-    label: 'Label',
-  },
-  parameters: {
-    pseudo: {
-      hover: '#Hover',
-      focus: '#Focus',
-      active: '#Active',
-    },
-  },
-};
-
-export const DefaultValue: Story = {
-  render: Template,
-  args: {
-    mode: 'single',
-    label: 'Default selected date',
-    defaultValue: new Date(),
-  },
-};
-
-export const InputOnly: Story = {
-  render: Template,
-  args: {
-    mode: 'single',
-    label: 'Date',
-    required: true,
-    placeholder: 'dd.mm.yyyy',
-    enableCalendar: false,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'enableCalendar props allows you to show/hide calendar',
-      },
-    },
-  },
-};
-
-export const Multiple: Story = {
+export const MultipleValues: Story = {
   render: (args) => {
     const [value, setValue] = useState<Date[] | undefined>([]);
 
@@ -179,30 +262,6 @@ export const Multiple: Story = {
   args: {
     mode: 'multiple',
     label: 'Dates',
-  },
-};
-
-export const AvailableDays: Story = {
-  render: () => {
-    const availableDays = [
-      new Date(),
-      new Date(new Date().setDate(new Date().getDate() + 4)),
-      new Date(new Date().setDate(new Date().getDate() + 5)),
-      new Date(new Date().setDate(new Date().getDate() + 6)),
-    ];
-
-    const [selected, setSelected] = useState<Date | undefined>();
-
-    return (
-      <DateField
-        mode="single"
-        label="Pick from available days"
-        selected={selected}
-        onSelect={(date) => setSelected(date as Date)}
-        availableDays={availableDays}
-        id="available-days-shown"
-      />
-    );
   },
 };
 
@@ -261,6 +320,16 @@ export const Range: Story = {
             id="range-with-disabled-past"
           />
         </Col>
+        <Col width={12}>
+          <DateField
+            mode="range"
+            label="Range with multiple months"
+            selected={defaultRange}
+            onSelect={(range) => setDefaultRange(range as DateRange)}
+            id="range-with-multiple-months"
+            numberOfMonths={2}
+          />
+        </Col>
       </Row>
     );
   },
@@ -271,7 +340,7 @@ export const DisabledWeekends: Story = {
   args: {
     mode: 'single',
     disabled: { dayOfWeek: [0, 6] },
-    label: 'Weekdays only',
+    label: 'Date',
   },
 };
 
@@ -279,14 +348,14 @@ export const ShowWeekCount: Story = {
   render: Template,
   args: {
     mode: 'single',
-    label: 'Weekdays only',
+    label: 'Date',
     showWeekNumber: true,
   },
 };
 
 export const MultipleMonthsShown: Story = {
   render: () => {
-    return <DateField label="Date" numberOfMonths={2} mode="range" id="multiple-shown" />;
+    return <DateField label="Date" numberOfMonths={2} mode="single" id="multiple-shown-single" />;
   },
 };
 
@@ -302,13 +371,13 @@ export const CalendarFooter: Story = {
       <Row>
         <Col>
           <DateField
-            label="Select time"
+            label="Time"
             id="calendar-with-footer"
             footer={
               <Row>
                 <Col width={12} className="text-center">
-                  <Button visualType="secondary" size="small">
-                    Cancel selection
+                  <Button visualType="link" size="small" iconRight="schedule">
+                    Select time
                   </Button>
                 </Col>
               </Row>
@@ -317,7 +386,7 @@ export const CalendarFooter: Story = {
         </Col>
         <Col>
           <DateField
-            label="Action buttons"
+            label="Date"
             id="calendar-with-footer-2"
             footer={
               <Row>
@@ -340,25 +409,27 @@ export const CalendarFooter: Story = {
   },
 };
 
-export const CalendarTrigger: Story = {
+export const AvailableDays: Story = {
   render: () => {
+    const availableDays = [
+      new Date(new Date().setDate(new Date().getDate() - 1)),
+      new Date(new Date().setDate(new Date().getDate() + 4)),
+      new Date(new Date().setDate(new Date().getDate() + 5)),
+      new Date(new Date().setDate(new Date().getDate() + 6)),
+    ];
+
+    const [selected, setSelected] = useState<Date | undefined>();
+
     return (
-      <Row>
-        <Col>
-          <DateField label="Calendar icon trigger" id="calendar-button-trigger" calendarTrigger="button" />
-        </Col>
-        <Col>
-          <DateField label="Input trigger" id="calendar-input-trigger" calendarTrigger="input" />
-        </Col>
-      </Row>
+      <DateField
+        mode="single"
+        label="Date"
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+        availableDays={availableDays}
+        id="available-days-shown"
+      />
     );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'calendarTrigger prop allows you to open calendar either on input click or calendar icon',
-      },
-    },
   },
 };
 
