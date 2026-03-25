@@ -1,7 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
+import { CardContent } from '../../cards/card/card-content/card-content';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
@@ -22,8 +23,6 @@ const meta: Meta<typeof Tabs> = {
     'Tabs.List': Tabs.List,
     'Tabs.Trigger': Tabs.Trigger,
     'Tabs.Content': Tabs.Content,
-    'Tabs.Dropdown': Tabs.Dropdown,
-    'Tabs.Dropdown.Item': Tabs.Dropdown.Item,
   } as never,
   parameters: {
     design: {
@@ -35,6 +34,9 @@ const meta: Meta<typeof Tabs> = {
 
 export default meta;
 type Story = StoryObj<typeof Tabs>;
+
+const contentText =
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas turpis odio, iaculis quis sodales at, placerat vitae risus. Integer hendrerit ex eget nisl euismod pharetra.';
 
 const stateArray = ['Default', 'Hover', 'Active', 'Focus', 'Selected'];
 
@@ -61,7 +63,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
             <Col className="display-flex align-items-center">
               <TabsContext.Provider value={{ currentTab, setCurrentTab: noop }}>
                 <div role="tablist">
-                  <TabsTrigger id={triggerId}>Toimingud</TabsTrigger>
+                  <TabsTrigger id={triggerId}>Health timeline</TabsTrigger>
                 </div>
               </TabsContext.Provider>
             </Col>
@@ -75,23 +77,25 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 export const Default: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Toimingud tabs">
-        <Tabs.Trigger id="tab-1">Toimingud</Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">Dokumendid</Tabs.Trigger>
-        <Tabs.Trigger id="tab-3">Esindusõigused</Tabs.Trigger>
-        <Tabs.Trigger id="tab-4">Kontaktisikud</Tabs.Trigger>
+      <Tabs.List aria-label="Health tabs">
+        <Tabs.Trigger id="tab-1">Health timeline</Tabs.Trigger>
+        <Tabs.Trigger id="tab-2">Course of diseases</Tabs.Trigger>
+        <Tabs.Trigger id="tab-3">Medication history</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
-        <p>Toimingud content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
-        <p>Dokumendid content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-3">
-        <p>Esindusõigused content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-4">
-        <p>Kontaktisikud content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
     </Tabs>
   ),
@@ -101,30 +105,22 @@ export const WithIcons: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
       <Tabs.List aria-label="Tabs with icons">
-        <Tabs.Trigger id="tab-1" icon="person">
-          Minu andmed
+        <Tabs.Trigger id="tab-1" icon="table_chart">
+          Table
         </Tabs.Trigger>
-        <Tabs.Trigger id="tab-2" icon="description">
-          Dokumendid
-        </Tabs.Trigger>
-        <Tabs.Trigger id="tab-3" icon="lock">
-          Ligipääs
-        </Tabs.Trigger>
-        <Tabs.Trigger id="tab-4" icon="settings">
-          Seaded
+        <Tabs.Trigger id="tab-2" icon="grid_on">
+          Grid
         </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
-        <p>Minu andmed content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
-        <p>Dokumendid content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-3">
-        <p>Ligipääs content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-4">
-        <p>Seaded content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
     </Tabs>
   ),
@@ -135,24 +131,30 @@ export const WithStatusBadge: Story = {
     <Tabs defaultValue="tab-1">
       <Tabs.List aria-label="Tabs with status badge">
         <Tabs.Trigger id="tab-1">
-          Toimingud <StatusBadge color="brand">Esitatud</StatusBadge>
+          Health timeline <StatusBadge color="brand">Submitted</StatusBadge>
         </Tabs.Trigger>
         <Tabs.Trigger id="tab-2">
           <span style={{ position: 'relative' }}>
-            Lugemata teated&nbsp;
+            Unread messages&nbsp;
             <StatusIndicator type="danger" position="top-right" />
           </span>
         </Tabs.Trigger>
-        <Tabs.Trigger id="tab-3">Esindusõigused</Tabs.Trigger>
+        <Tabs.Trigger id="tab-3">Medication history</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
-        <p>Toimingud content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
-        <p>Lugemata teated content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-3">
-        <p>Esindusõigused content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
     </Tabs>
   ),
@@ -183,18 +185,18 @@ export const Controlled: Story = {
         </p>
         <Tabs value={currentTab} onChange={setCurrentTab}>
           <Tabs.List aria-label="Controlled tabs">
-            <Tabs.Trigger id="tab-1">Toimingud</Tabs.Trigger>
-            <Tabs.Trigger id="tab-2">Dokumendid</Tabs.Trigger>
-            <Tabs.Trigger id="tab-3">Esindusõigused</Tabs.Trigger>
+            <Tabs.Trigger id="tab-1">Health timeline</Tabs.Trigger>
+            <Tabs.Trigger id="tab-2">Course of diseases</Tabs.Trigger>
+            <Tabs.Trigger id="tab-3">Medication history</Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content id="tab-1">
-            <p>Toimingud content</p>
+            <Text>{contentText}</Text>
           </Tabs.Content>
           <Tabs.Content id="tab-2">
-            <p>Dokumendid content</p>
+            <Text>{contentText}</Text>
           </Tabs.Content>
           <Tabs.Content id="tab-3">
-            <p>Esindusõigused content</p>
+            <Text>{contentText}</Text>
           </Tabs.Content>
         </Tabs>
       </VerticalSpacing>
@@ -202,56 +204,100 @@ export const Controlled: Story = {
   },
 };
 
-export const WithDropdown: Story = {
+export const WithDisabledTab: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tabs with dropdown">
-        <Tabs.Trigger id="tab-1">Toimingud</Tabs.Trigger>
-        <Tabs.Dropdown label="Esindusõigused">
-          <Tabs.Dropdown.Item id="tab-3">Volitused</Tabs.Dropdown.Item>
-          <Tabs.Dropdown.Item id="tab-4">Õigused</Tabs.Dropdown.Item>
-          <Tabs.Dropdown.Item id="tab-5">Pääsud</Tabs.Dropdown.Item>
-        </Tabs.Dropdown>
-        <Tabs.Trigger id="tab-2">Dokumendid</Tabs.Trigger>
+      <Tabs.List aria-label="Tabs with disabled">
+        <Tabs.Trigger id="tab-1">Health timeline</Tabs.Trigger>
+        <Tabs.Trigger id="tab-2">Course of diseases</Tabs.Trigger>
+        <Tabs.Trigger id="tab-3" disabled>
+          Medication history
+        </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
-        <p>Toimingud content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
-        <p>Dokumendid content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-3">
-        <p>Volitused content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-4">
-        <p>Õigused content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-5">
-        <p>Pääsud content</p>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{contentText}</Text>
+        </CardContent>
       </Tabs.Content>
     </Tabs>
   ),
 };
 
-export const WithDisabledTab: Story = {
+export const OverflowBehavior: Story = {
   render: () => (
-    <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tabs with disabled">
-        <Tabs.Trigger id="tab-1">Toimingud</Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">Dokumendid</Tabs.Trigger>
-        <Tabs.Trigger id="tab-3" disabled>
-          Esindusõigused
-        </Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content id="tab-1">
-        <p>Toimingud content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-2">
-        <p>Dokumendid content</p>
-      </Tabs.Content>
-      <Tabs.Content id="tab-3">
-        <p>Esindusõigused content</p>
-      </Tabs.Content>
-    </Tabs>
+    <VerticalSpacing size={2}>
+      <Text modifiers="bold">Dropdown (default)</Text>
+      <div style={{ maxWidth: 400 }}>
+        <Tabs defaultValue="more-1">
+          <Tabs.List aria-label="Overflow tabs with dropdown">
+            <Tabs.Trigger id="more-1">Health timeline</Tabs.Trigger>
+            <Tabs.Trigger id="more-2">Course of diseases</Tabs.Trigger>
+            <Tabs.Trigger id="more-3">Medication history</Tabs.Trigger>
+            <Tabs.Trigger id="more-4">Declarations of intent</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="more-1">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="more-2">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="more-3">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="more-4">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </div>
+      <Text modifiers="bold">Horizontal scroll</Text>
+      <div style={{ maxWidth: 400 }}>
+        <Tabs defaultValue="scroll-1">
+          <Tabs.List aria-label="Overflow tabs with scroll" overflowMode="scroll">
+            <Tabs.Trigger id="scroll-1">Health timeline</Tabs.Trigger>
+            <Tabs.Trigger id="scroll-2">Course of diseases</Tabs.Trigger>
+            <Tabs.Trigger id="scroll-3">Medication history</Tabs.Trigger>
+            <Tabs.Trigger id="scroll-4">Declarations of intent</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="scroll-1">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="scroll-2">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="scroll-3">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="scroll-4">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{contentText}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </div>
+    </VerticalSpacing>
   ),
 };

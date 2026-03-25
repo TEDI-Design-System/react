@@ -12,6 +12,20 @@ jest.mock('../../../providers/label-provider', () => ({
   })),
 }));
 
+let resizeCallback: (() => void) | null = null;
+
+beforeAll(() => {
+  global.ResizeObserver = jest.fn().mockImplementation((cb: ResizeObserverCallback) => ({
+    observe: jest.fn(() => {
+      resizeCallback = () => cb([], {} as ResizeObserver);
+    }),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(() => {
+      resizeCallback = null;
+    }),
+  }));
+});
+
 const renderTabs = (props?: Partial<TabsProps>) => {
   return render(
     <Tabs defaultValue="tab-1" {...props}>
@@ -29,37 +43,33 @@ const renderTabs = (props?: Partial<TabsProps>) => {
   );
 };
 
-const setupMobileMode = () => {
-  (window.matchMedia as jest.Mock).mockImplementation((query: string) => ({
-    matches: false, // No min-width queries match → breakpoint is 'xs'
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
+const simulateOverflow = () => {
+  const listEl = screen.getByRole('tablist');
+  Object.defineProperty(listEl, 'scrollWidth', { value: 500, configurable: true });
+  Object.defineProperty(listEl, 'clientWidth', { value: 300, configurable: true });
+
+  const wrapper = listEl.parentElement!;
+  Object.defineProperty(wrapper, 'clientWidth', { value: 300, configurable: true });
+
+  act(() => {
+    resizeCallback?.();
+  });
 };
 
-const setupDesktopMode = () => {
-  (window.matchMedia as jest.Mock).mockImplementation((query: string) => ({
-    matches: ['(min-width: 576px)', '(min-width: 768px)', '(min-width: 992px)'].includes(query),
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
+const simulateNoOverflow = () => {
+  const listEl = screen.getByRole('tablist');
+  Object.defineProperty(listEl, 'scrollWidth', { value: 300, configurable: true });
+  Object.defineProperty(listEl, 'clientWidth', { value: 600, configurable: true });
+
+  const wrapper = listEl.parentElement!;
+  Object.defineProperty(wrapper, 'clientWidth', { value: 600, configurable: true });
+
+  act(() => {
+    resizeCallback?.();
+  });
 };
 
 describe('Tabs component', () => {
-  beforeEach(() => {
-    setupDesktopMode();
-  });
-
   it('renders the tablist with correct role', () => {
     renderTabs();
     expect(screen.getByRole('tablist')).toBeInTheDocument();
@@ -175,7 +185,7 @@ describe('Tabs component', () => {
 
   it('renders with custom className', () => {
     renderTabs({ className: 'custom-class' });
-    const container = screen.getByRole('tablist').parentElement;
+    const container = screen.getByRole('tablist').closest('[data-name="tabs"]');
     expect(container).toHaveClass('custom-class');
   });
 
@@ -195,23 +205,16 @@ describe('Tabs component', () => {
     expect(screen.getByRole('tabpanel')).not.toHaveAttribute('tabIndex');
   });
 
-  it('does not render "More" button on desktop', () => {
+  it('does not render "More" button when tabs do not overflow', () => {
     renderTabs();
     expect(screen.queryByText('More')).not.toBeInTheDocument();
   });
 });
 
-describe('Tabs mobile overflow', () => {
-  beforeEach(() => {
-    setupMobileMode();
-  });
-
-  afterEach(() => {
-    setupDesktopMode();
-  });
-
-  it('renders "More" button on mobile when there are multiple tabs', () => {
+describe('Tabs overflow (more mode)', () => {
+  it('renders "More" button when tabs overflow', () => {
     renderTabs();
+    simulateOverflow();
     expect(screen.getByText('More')).toBeInTheDocument();
   });
 
@@ -224,11 +227,22 @@ describe('Tabs mobile overflow', () => {
         <Tabs.Content id="tab-1">Content</Tabs.Content>
       </Tabs>
     );
+
+    const listEl = screen.getByRole('tablist');
+    Object.defineProperty(listEl, 'scrollWidth', { value: 500, configurable: true });
+    Object.defineProperty(listEl, 'clientWidth', { value: 300, configurable: true });
+    const wrapper = listEl.parentElement!;
+    Object.defineProperty(wrapper, 'clientWidth', { value: 300, configurable: true });
+    act(() => {
+      resizeCallback?.();
+    });
+
     expect(screen.queryByText('More')).not.toBeInTheDocument();
   });
 
   it('opens dropdown with non-selected tabs', () => {
     renderTabs();
+    simulateOverflow();
     fireEvent.click(screen.getByText('More'));
 
     const menu = screen.getByRole('menu');
@@ -238,6 +252,7 @@ describe('Tabs mobile overflow', () => {
 
   it('closes dropdown on toggle', () => {
     renderTabs();
+    simulateOverflow();
     const moreBtn = screen.getByText('More');
 
     fireEvent.click(moreBtn);
@@ -249,6 +264,7 @@ describe('Tabs mobile overflow', () => {
 
   it('selects a tab from dropdown and closes it', () => {
     renderTabs();
+    simulateOverflow();
     fireEvent.click(screen.getByText('More'));
 
     const menuItems = screen.getAllByRole('menuitem');
@@ -261,6 +277,7 @@ describe('Tabs mobile overflow', () => {
 
   it('closes dropdown on Escape key', () => {
     renderTabs();
+    simulateOverflow();
     fireEvent.click(screen.getByText('More'));
     expect(screen.getByRole('menu')).toBeInTheDocument();
 
@@ -270,146 +287,36 @@ describe('Tabs mobile overflow', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
-  it('flattens TabsDropdown items into mobile More menu', () => {
-    render(
-      <Tabs defaultValue="tab-1">
-        <Tabs.List aria-label="Dropdown tabs">
-          <Tabs.Trigger id="tab-1">Tab 1</Tabs.Trigger>
-          <Tabs.Dropdown label="Group">
-            <Tabs.Dropdown.Item id="tab-2">Sub 1</Tabs.Dropdown.Item>
-            <Tabs.Dropdown.Item id="tab-3">Sub 2</Tabs.Dropdown.Item>
-          </Tabs.Dropdown>
-        </Tabs.List>
-        <Tabs.Content id="tab-1">Content 1</Tabs.Content>
-        <Tabs.Content id="tab-2">Content 2</Tabs.Content>
-        <Tabs.Content id="tab-3">Content 3</Tabs.Content>
-      </Tabs>
-    );
+  it('removes overflow when container grows', () => {
+    renderTabs();
+    simulateOverflow();
+    expect(screen.getByText('More')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('More'));
-    const menuItems = screen.getAllByRole('menuitem');
-    expect(menuItems).toHaveLength(2);
-    expect(menuItems[0]).toHaveTextContent('Sub 1');
-    expect(menuItems[1]).toHaveTextContent('Sub 2');
+    simulateNoOverflow();
+    expect(screen.queryByText('More')).not.toBeInTheDocument();
   });
 });
 
-describe('TabsDropdown', () => {
-  beforeEach(() => {
-    setupDesktopMode();
-  });
-
-  const renderWithDropdown = () => {
-    return render(
-      <Tabs defaultValue="tab-1">
-        <Tabs.List aria-label="Dropdown tabs">
-          <Tabs.Trigger id="tab-1">Tab 1</Tabs.Trigger>
-          <Tabs.Dropdown label="Group">
-            <Tabs.Dropdown.Item id="tab-2">Sub 1</Tabs.Dropdown.Item>
-            <Tabs.Dropdown.Item id="tab-3">Sub 2</Tabs.Dropdown.Item>
-          </Tabs.Dropdown>
-          <Tabs.Trigger id="tab-4">Tab 4</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content id="tab-1">Content 1</Tabs.Content>
-        <Tabs.Content id="tab-2">Content 2</Tabs.Content>
-        <Tabs.Content id="tab-3">Content 3</Tabs.Content>
-        <Tabs.Content id="tab-4">Content 4</Tabs.Content>
-      </Tabs>
-    );
-  };
-
-  it('renders dropdown trigger with tab role', () => {
-    renderWithDropdown();
-    const dropdown = screen.getByText('Group').closest('[role="tab"]');
-    expect(dropdown).toBeInTheDocument();
-    expect(dropdown).toHaveAttribute('aria-selected', 'false');
-    expect(dropdown).toHaveAttribute('tabIndex', '-1');
-  });
-
-  it('sets aria-selected and aria-controls when a dropdown item is active', () => {
-    renderWithDropdown();
-    const dropdown = screen.getByText('Group').closest('[role="tab"]')!;
-
-    fireEvent.click(dropdown);
-    const menuItems = screen.getAllByRole('menuitem');
-    fireEvent.click(menuItems[0]);
-
-    expect(dropdown).toHaveAttribute('aria-selected', 'true');
-    expect(dropdown).toHaveAttribute('aria-controls', 'tab-2-panel');
-  });
-
-  it('shows selected item label on trigger', () => {
-    renderWithDropdown();
-    const dropdown = screen.getByText('Group').closest('[role="tab"]')!;
-
-    fireEvent.click(dropdown);
-    fireEvent.click(screen.getAllByRole('menuitem')[0]);
-
-    expect(dropdown).toHaveTextContent('Sub 1');
-  });
-
-  it('opens dropdown menu on click', () => {
-    renderWithDropdown();
-    const dropdown = screen.getByText('Group').closest('[role="tab"]')!;
-
-    fireEvent.click(dropdown);
-    expect(screen.getByRole('menu')).toBeInTheDocument();
-  });
-
-  it('selects item and closes dropdown', () => {
-    renderWithDropdown();
-    const dropdown = screen.getByText('Group').closest('[role="tab"]')!;
-
-    fireEvent.click(dropdown);
-    fireEvent.click(screen.getAllByRole('menuitem')[1]);
-
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-    expect(screen.getByText('Content 3')).toBeInTheDocument();
-  });
-
-  it('navigates to sibling tabs with arrow keys', () => {
-    renderWithDropdown();
-    const tab1 = screen.getByText('Tab 1');
-
-    fireEvent.keyDown(tab1, { key: 'ArrowRight' });
-    const dropdown = screen.getByText('Group').closest('[role="tab"]')!;
-    expect(dropdown).toHaveFocus();
-
-    fireEvent.keyDown(dropdown, { key: 'ArrowRight' });
-    expect(screen.getByText('Tab 4')).toHaveFocus();
-  });
-
-  it('displays disabled item in dropdown', () => {
+describe('Tabs overflow (scroll mode)', () => {
+  it('renders with scroll mode', () => {
     render(
       <Tabs defaultValue="tab-1">
-        <Tabs.List aria-label="Dropdown tabs">
+        <Tabs.List aria-label="Scroll tabs" overflowMode="scroll">
           <Tabs.Trigger id="tab-1">Tab 1</Tabs.Trigger>
-          <Tabs.Dropdown label="Group">
-            <Tabs.Dropdown.Item id="tab-2">Sub 1</Tabs.Dropdown.Item>
-            <Tabs.Dropdown.Item id="tab-3" disabled>
-              Sub 2
-            </Tabs.Dropdown.Item>
-          </Tabs.Dropdown>
+          <Tabs.Trigger id="tab-2">Tab 2</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content id="tab-1">Content 1</Tabs.Content>
         <Tabs.Content id="tab-2">Content 2</Tabs.Content>
-        <Tabs.Content id="tab-3">Content 3</Tabs.Content>
       </Tabs>
     );
 
-    const dropdown = screen.getByText('Group').closest('[role="tab"]')!;
-    fireEvent.click(dropdown);
-
-    const menuItems = screen.getAllByRole('menuitem');
-    expect(menuItems[1]).toHaveAttribute('disabled');
+    const tablist = screen.getByRole('tablist');
+    expect(tablist).toBeInTheDocument();
+    expect(screen.queryByText('More')).not.toBeInTheDocument();
   });
 });
 
 describe('TabsContent without id', () => {
-  beforeEach(() => {
-    setupDesktopMode();
-  });
-
   it('always renders when id is omitted', () => {
     render(
       <Tabs defaultValue="tab-1">

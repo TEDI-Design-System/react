@@ -67,7 +67,7 @@ export const TabsTrigger = (props: TabsTriggerProps) => {
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      {icon && <Icon name={icon} size={16} color="inherit" />}
+      {icon && <Icon name={icon} size={18} color="inherit" />}
       {children}
     </button>
   );

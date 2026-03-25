@@ -7,3 +7,4 @@ export * from './hooks/use-scroll';
 export * from './hooks/use-is-touch-device';
 export * from './hooks/use-file-upload';
 export * from './hooks/use-what-input';
+export * from './hooks/use-scroll-fade';

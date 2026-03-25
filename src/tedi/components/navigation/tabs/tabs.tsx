@@ -4,7 +4,6 @@ import React from 'react';
 import styles from './tabs.module.scss';
 import { TabsContent } from './tabs-content/tabs-content';
 import { TabsContext } from './tabs-context';
-import { TabsDropdown } from './tabs-dropdown/tabs-dropdown';
 import { TabsList } from './tabs-list/tabs-list';
 import { TabsTrigger } from './tabs-trigger/tabs-trigger';
 
@@ -61,6 +60,5 @@ Tabs.displayName = 'Tabs';
 Tabs.List = TabsList;
 Tabs.Trigger = TabsTrigger;
 Tabs.Content = TabsContent;
-Tabs.Dropdown = TabsDropdown;
 
 export default Tabs;

@@ -34,6 +34,7 @@ export const navigateTablist = (e: React.KeyboardEvent<HTMLButtonElement>): HTML
   if (newIndex !== -1) {
     e.preventDefault();
     tabs[newIndex].focus();
+    tabs[newIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
     return tabs[newIndex];
   }
 
