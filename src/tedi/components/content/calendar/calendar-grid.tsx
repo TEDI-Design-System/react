@@ -20,6 +20,7 @@ interface PickerGridProps<T> {
   onNext: () => void;
   items: PickerGridItem<T>[];
   onSelect: (value: T) => void;
+  showNavigation?: boolean;
 }
 
 export const PickerGrid = <T,>({
@@ -30,19 +31,28 @@ export const PickerGrid = <T,>({
   onNext,
   items,
   onSelect,
+  showNavigation,
 }: PickerGridProps<T>) => {
   return (
     <div className={classNames(styles['tedi-date-calendar__picker-grid-container'])}>
-      <div className={classNames(styles['tedi-date-calendar__picker-grid-header'])}>
-        <Button type="button" onClick={onPrev} aria-label={prevAriaLabel} icon="arrow_back" visualType="neutral">
-          <Text modifiers="capitalize-first">{prevAriaLabel}</Text>
-        </Button>
+      <div
+        className={classNames(styles['tedi-date-calendar__picker-grid-header'], {
+          [styles['tedi-date-calendar__picker--no-navigation']]: !showNavigation,
+        })}
+      >
+        {showNavigation && (
+          <Button type="button" onClick={onPrev} aria-label={prevAriaLabel} icon="arrow_back" visualType="neutral">
+            <Text modifiers="capitalize-first">{prevAriaLabel}</Text>
+          </Button>
+        )}
 
         <Text modifiers="capitalize-first">{headerLabel}</Text>
 
-        <Button type="button" onClick={onNext} aria-label={nextAriaLabel} icon="arrow_forward" visualType="neutral">
-          {nextAriaLabel}
-        </Button>
+        {showNavigation && (
+          <Button type="button" onClick={onNext} aria-label={nextAriaLabel} icon="arrow_forward" visualType="neutral">
+            {nextAriaLabel}
+          </Button>
+        )}
       </div>
 
       <div className={classNames(styles['tedi-date-calendar__picker-grid'])}>
@@ -50,12 +60,12 @@ export const PickerGrid = <T,>({
           {items.map((item) => (
             <Col key={item.key} width={4}>
               <Button
-                noStyle
                 onClick={() => onSelect(item.value)}
                 className={classNames(styles['tedi-date-calendar__grid-button'], {
                   [styles['tedi-date-calendar__grid-button--selected']]: item.isSelected,
                 })}
                 aria-pressed={item.isSelected}
+                noStyle
               >
                 {item.label}
               </Button>

@@ -3,6 +3,10 @@
   align-items: center;
   justify-content: space-between;
   text-align: center;
+
+  &.tedi-date-calendar__no-navigation {
+    justify-content: center;
+  }
 }
 
 .tedi-date-calendar__month-year-dropdown {

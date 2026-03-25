@@ -15,9 +15,14 @@ export interface MonthGridProps {
    * Callback for navigating to a different month in the grid. Receives a Date object with the target month and current year.
    */
   onNavigate: (date: Date) => void;
+  /**
+   * Show or hide previous/next navigation buttons in calendar header.
+   * Default is `true`.
+   */
+  showNavigation?: boolean;
 }
 
-export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate }: MonthGridProps) => {
+export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigation }: MonthGridProps) => {
   const { getLabel } = useLabels();
   const year = currentMonth.getFullYear();
 
@@ -45,6 +50,7 @@ export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate }: MonthGrid
       onNext={() => onNavigate(new Date(year, currentMonth.getMonth() + 1))}
       items={months}
       onSelect={onSelectMonth}
+      showNavigation={showNavigation}
     />
   );
 };

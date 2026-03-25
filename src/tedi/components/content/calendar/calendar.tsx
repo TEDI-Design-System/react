@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import { et } from 'react-day-picker/locale';
 import { UnknownType } from 'src/tedi/types/commonTypes';
 
 import { CalendarView, DateFieldMode } from '../../form/date-field/date-field';
@@ -14,11 +15,11 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Current view of the calendar. Can be `'days'`, `'months'`, or `'years'`.
    * Controls which calendar grid is displayed.
    */
-  view: CalendarView;
+  view?: CalendarView;
   /**
    * The intended calendar view mode. Determines if the calendar initially opens in `'days'`, `'months'`, or `'years'` view.
    */
-  calendarView: CalendarView;
+  calendarView?: CalendarView;
   /**
    * The month currently displayed in the calendar. Used to render the correct month grid.
    */
@@ -30,11 +31,11 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
   /**
    * Callback to update the current `view` (days, months, years) when the user switches calendar levels.
    */
-  setView: (view: CalendarView) => void;
+  setView?: (view: CalendarView) => void;
   /**
    * Selection mode of the calendar. Can be `'single'`, `'multiple'`, or `'range'`.
    */
-  mode: DateFieldMode;
+  mode?: DateFieldMode;
   /**
    * The currently selected value(s).
    * - Single mode: `Date | undefined`
@@ -45,12 +46,12 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
   /**
    * Locale object for formatting and translating calendar labels (from `react-day-picker`).
    */
-  locale: Locale;
+  locale?: Locale;
   /**
    * Whether to display days from the previous and next months in the current month grid.
    * Default is `true`.
    */
-  showOutsideDays: boolean;
+  showOutsideDays?: boolean;
   /**
    * Array of `Matcher`s or functions to disable specific dates. Used to prevent selection of certain days.
    */
@@ -64,6 +65,11 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Highlights selectable days without disabling other days.
    */
   availableDays?: Date[] | ((date: Date) => boolean);
+  /**
+   * Array of unavailable dates or a function to dynamically mark dates as unavailable.
+   * Used for styling and optionally disabling specific days.
+   */
+  unavailableDays?: Date[] | ((date: Date) => boolean);
   /**
    * Optional footer element to render below the calendar grid, e.g., for action buttons.
    */
@@ -81,48 +87,38 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    */
   applyValue: (date: Date) => void;
   /**
+   * Show or hide previous/next navigation buttons in calendar header.
+   * Default is `true`.
+   */
+  showNavigation?: boolean;
+  /**
    * Optional additional CSS class for the calendar container.
    */
   className?: string;
 }
 
 export const Calendar = ({
-  view,
-  calendarView,
+  view = 'days',
+  calendarView = 'days',
   currentMonth,
   setCurrentMonth,
-  setView,
+  setView = () => 'days',
   mode = 'single',
   value,
-  locale,
-  showOutsideDays,
+  locale = et,
+  showOutsideDays = true,
   disabledMatchers,
   required,
   availableDays,
+  unavailableDays,
   footer,
   monthYearSelectGrid,
   handleSelect,
   applyValue,
+  showNavigation = true,
   className,
   ...dayPickerProps
 }: CalendarProps) => {
-  const computedDisabled: Matcher[] = [...(disabledMatchers ?? [])];
-
-  if (availableDays) {
-    computedDisabled.push((date: Date) => !isAvailable(date));
-  }
-
-  if (availableDays) {
-    const isAvailable = (date: Date) => {
-      if (Array.isArray(availableDays)) {
-        return availableDays.some((d) => d.toDateString() === date.toDateString());
-      }
-      return availableDays(date);
-    };
-
-    computedDisabled.push((date: Date) => !isAvailable(date));
-  }
-
   const isAvailable = (date: Date) => {
     if (!availableDays) return true;
 
@@ -133,14 +129,32 @@ export const Calendar = ({
     return availableDays(date);
   };
 
+  const isUnavailable = (date: Date) => {
+    if (!unavailableDays) return false;
+
+    if (Array.isArray(unavailableDays)) {
+      return unavailableDays.some((d) => d.toDateString() === date.toDateString());
+    }
+
+    return unavailableDays(date);
+  };
+
+  const computedDisabled: Matcher[] = [
+    ...(disabledMatchers ?? []),
+    ...(availableDays ? [(date: Date) => !isAvailable(date)] : []),
+    ...(unavailableDays ? [(date: Date) => isUnavailable(date)] : []),
+  ];
+
   return (
-    <div className={styles['tedi-date-calendar']}>
+    <div className={styles['tedi-date-calendar__wrapper']}>
       {(view === 'years' || calendarView === 'years') && (
         <YearGrid
           currentMonth={currentMonth}
           onNavigate={setCurrentMonth}
+          showNavigation={showNavigation}
           onSelectYear={(date) => {
             setCurrentMonth(date);
+
             if (calendarView === 'years') {
               applyValue(new Date(date.getFullYear(), 0, 1));
             } else {
@@ -154,8 +168,10 @@ export const Calendar = ({
         <MonthGrid
           currentMonth={currentMonth}
           onNavigate={setCurrentMonth}
+          showNavigation={showNavigation}
           onSelectMonth={(date) => {
             setCurrentMonth(date);
+
             if (calendarView === 'months') {
               applyValue(date);
             } else {
@@ -183,6 +199,7 @@ export const Calendar = ({
                 monthYearSelectGrid={monthYearSelectGrid}
                 onOpenMonthGrid={() => setView('months')}
                 onOpenYearGrid={() => setView('years')}
+                showNavigation={showNavigation}
               />
             ),
             Nav: () => <></>,
@@ -209,9 +226,11 @@ export const Calendar = ({
           }}
           modifiers={{
             available: (date) => (availableDays ? isAvailable(date) : false),
+            unavailable: (date) => (unavailableDays ? isUnavailable(date) : false),
           }}
           modifiersClassNames={{
             available: styles['tedi-date-calendar__available-day'],
+            unavailable: styles['tedi-date-calendar__unavailable-day'],
           }}
           onSelect={handleSelect}
         />

@@ -20,9 +20,14 @@ export interface YearGridProps {
    * newly displayed range.
    */
   onNavigate: (date: Date) => void;
+  /**
+   * Show or hide previous/next navigation buttons in calendar header.
+   * Default is `true`.
+   */
+  showNavigation?: boolean;
 }
 
-export const YearGrid = ({ currentMonth, onSelectYear, onNavigate }: YearGridProps) => {
+export const YearGrid = ({ currentMonth, onSelectYear, onNavigate, showNavigation }: YearGridProps) => {
   const { getLabel } = useLabels();
   const currentYear = currentMonth.getFullYear();
   const startYear = Math.floor(currentYear / 12) * 12;
@@ -40,7 +45,7 @@ export const YearGrid = ({ currentMonth, onSelectYear, onNavigate }: YearGridPro
 
   return (
     <PickerGrid
-      headerLabel={`${startYear} – ${startYear + 11}`}
+      headerLabel={currentYear}
       prevAriaLabel={getLabel('pickers.previousYear')}
       nextAriaLabel={getLabel('pickers.nextYear')}
       onPrev={() => onNavigate(new Date(startYear - 12, 0))}
@@ -49,6 +54,7 @@ export const YearGrid = ({ currentMonth, onSelectYear, onNavigate }: YearGridPro
       onSelect={(year) => {
         onSelectYear(new Date(year, currentMonth.getMonth(), 1));
       }}
+      showNavigation={showNavigation}
     />
   );
 };

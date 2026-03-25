@@ -21,6 +21,11 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    * Callback for opening year selection grid. Only used if `monthYearSelectGrid` is `true`.
    */
   onOpenYearGrid?: () => void;
+  /**
+   * Show or hide previous/next navigation buttons in calendar header.
+   * Default is `true`.
+   */
+  showNavigation?: boolean;
 }
 
 export function CalendarHeader({
@@ -28,6 +33,7 @@ export function CalendarHeader({
   monthYearSelectGrid,
   onOpenMonthGrid,
   onOpenYearGrid,
+  showNavigation,
 }: CalendarHeaderProps) {
   const { getLabel } = useLabels();
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
@@ -37,16 +43,22 @@ export function CalendarHeader({
   const years = Array.from({ length: 10 }, (_, i) => 2021 + i);
 
   return (
-    <div className={styles['tedi-date-calendar__header']}>
-      <Button
-        type="button"
-        onClick={() => previousMonth && goToMonth(previousMonth)}
-        aria-label={getLabel('pickers.previousMonth')}
-        icon="arrow_back"
-        visualType="neutral"
-      >
-        {getLabel('pickers.previousMonth')}
-      </Button>
+    <div
+      className={classNames(styles['tedi-date-calendar__header'], {
+        [styles['tedi-date-calendar__no-navigation']]: !showNavigation,
+      })}
+    >
+      {showNavigation && (
+        <Button
+          type="button"
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+          aria-label={getLabel('pickers.previousMonth')}
+          icon="arrow_back"
+          visualType="neutral"
+        >
+          {getLabel('pickers.previousMonth')}
+        </Button>
+      )}
 
       {monthYearSelectGrid ? (
         <>
@@ -124,15 +136,17 @@ export function CalendarHeader({
         </>
       )}
 
-      <Button
-        type="button"
-        onClick={() => nextMonth && goToMonth(nextMonth)}
-        visualType="neutral"
-        aria-label={getLabel('pickers.nextMonth')}
-        icon="arrow_forward"
-      >
-        {getLabel('pickers.nextMonth')}
-      </Button>
+      {showNavigation && (
+        <Button
+          type="button"
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+          visualType="neutral"
+          aria-label={getLabel('pickers.nextMonth')}
+          icon="arrow_forward"
+        >
+          {getLabel('pickers.nextMonth')}
+        </Button>
+      )}
     </div>
   );
 }
