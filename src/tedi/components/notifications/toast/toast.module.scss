@@ -1,19 +1,29 @@
-.tedi-toast__progress {
-  background: var(--toast-progress-color) !important;
+:root,
+.Toastify__toast-theme--light {
+  --toastify-color-progress-light: transparent !important;
 }
 
-.tedi-toast__progress--success {
-  --toast-progress-color: var(--alert-default-border-success);
-}
+.tedi-toast {
+  display: block;
+  width: 100%;
 
-.tedi-toast__progress--info {
-  --toast-progress-color: var(--alert-default-border-info);
-}
+  &__progress {
+    background: var(--toast-progress-color) !important;
 
-.tedi-toast__progress--danger {
-  --toast-progress-color: var(--alert-default-border-danger);
-}
+    &--success {
+      --toast-progress-color: var(--alert-default-border-success);
+    }
 
-.tedi-toast__progress--warning {
-  --toast-progress-color: var(--alert-default-border-warning);
+    &--info {
+      --toast-progress-color: var(--alert-default-border-info);
+    }
+
+    &--danger {
+      --toast-progress-color: var(--alert-default-border-danger);
+    }
+
+    &--warning {
+      --toast-progress-color: var(--alert-default-border-warning);
+    }
+  }
 }

@@ -47,7 +47,7 @@ jobs:
           ref: ${{ matrix.branch }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "lts/*"
       - name: Install and Build Storybook
         run: |
           npm ci

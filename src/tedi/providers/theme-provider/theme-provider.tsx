@@ -1,10 +1,10 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-export type Theme = 'default' | 'dark' | 'rit' | 'muis';
+type TEDITheme = 'default' | 'dark';
+export type Theme = TEDITheme | string;
 
-const AVAILABLE_THEMES: Theme[] = ['default', 'dark', 'rit', 'muis'];
 const THEME_CLASS_PREFIX = 'tedi-theme--';
 const STORAGE_KEY = 'tedi-theme';
 
@@ -20,40 +20,44 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+function getInitialTheme(initialTheme?: Theme): Theme {
+  if (typeof window === 'undefined') {
+    return initialTheme ?? 'default';
+  }
+
+  const fromStorage = localStorage.getItem(STORAGE_KEY);
+  if (fromStorage) return fromStorage;
+
+  const cookieMatch = document.cookie
+    .split('; ')
+    .find((c) => c.startsWith(`${STORAGE_KEY}=`))
+    ?.split('=')[1];
+
+  if (cookieMatch) return cookieMatch;
+
+  return initialTheme ?? 'default';
+}
+
 export const ThemeProvider = ({ theme: initialTheme, children }: { theme?: Theme; children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (initialTheme !== undefined) {
-      return initialTheme;
-    }
-
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY) as Theme | null;
-      if (saved && AVAILABLE_THEMES.includes(saved)) {
-        return saved;
-      }
-    }
-
-    return 'default';
-  });
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme(initialTheme));
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
     const root = document.documentElement;
 
-    AVAILABLE_THEMES.forEach((t) => {
-      root.classList.toggle(`${THEME_CLASS_PREFIX}${t}`, t === theme);
-    });
+    for (let i = root.classList.length - 1; i >= 0; i--) {
+      const cls = root.classList.item(i);
+      if (cls?.startsWith(THEME_CLASS_PREFIX)) {
+        root.classList.remove(cls);
+      }
+    }
+
+    root.classList.add(`${THEME_CLASS_PREFIX}${theme}`);
 
     localStorage.setItem(STORAGE_KEY, theme);
-    document.cookie = `${STORAGE_KEY}=${theme};path=/;max-age=31536000`;
+    document.cookie = `${STORAGE_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`;
   }, [theme]);
-
-  const setTheme = useCallback((newTheme: Theme) => {
-    if (AVAILABLE_THEMES.includes(newTheme)) {
-      setThemeState(newTheme);
-    }
-  }, []);
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };
