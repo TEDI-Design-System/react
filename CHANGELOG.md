@@ -1,3 +1,15 @@
+# [16.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.6...react-16.1.0-rc.7) (2026-03-26)
+
+
+### Bug Fixes
+
+* **sidenav-toggle:** fix button size, add className prop [#562](https://github.com/TEDI-Design-System/react/issues/562) ([#573](https://github.com/TEDI-Design-System/react/issues/573)) ([5c961d3](https://github.com/TEDI-Design-System/react/commit/5c961d3845ef80f9f4f6eacdb888fee34474708e))
+
+
+### Features
+
+* **tooltip:** Add shift altBoundary: true to tooltip-provider.tsx https://github.com/TEDI-Design-System/react/issues/566 ([#567](https://github.com/TEDI-Design-System/react/issues/567)) ([4ac0af6](https://github.com/TEDI-Design-System/react/commit/4ac0af6eacf120f8ee797e440a710a428a5ad5af))
+
 # [16.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.5...react-16.1.0-rc.6) (2026-03-23)
 
 
