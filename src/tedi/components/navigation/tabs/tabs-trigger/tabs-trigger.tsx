@@ -8,7 +8,8 @@ import { navigateTablist } from '../tabs-helpers';
 
 export interface TabsTriggerProps {
   /**
-   * Unique identifier for this tab. Must match the corresponding TabsContent id.
+   * Unique identifier for this tab. Used as the element id and to link to the
+   * corresponding TabsContent panel (aria-controls="{id}-panel").
    */
   id: string;
   /**

@@ -31,7 +31,7 @@ describe('DropdownTrigger', () => {
     expect(mockGetReferenceProps).toHaveBeenCalled();
   });
 
-  it('passes ref to setReference', () => {
+  it('passes merged ref that calls setReference', () => {
     render(
       <DropdownTrigger>
         <button>Open</button>
@@ -39,6 +39,8 @@ describe('DropdownTrigger', () => {
     );
 
     const refCall = mockGetReferenceProps.mock.calls[0][0];
-    expect(refCall.ref).toBe(mockSetReference);
+    const mockNode = document.createElement('div');
+    refCall.ref(mockNode);
+    expect(mockSetReference).toHaveBeenCalledWith(mockNode);
   });
 });

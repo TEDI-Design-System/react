@@ -182,7 +182,6 @@ export const TabsList = (props: TabsListProps) => {
                   <Dropdown.Item
                     key={item.id}
                     index={index}
-                    active={currentTab === item.id}
                     disabled={item.disabled}
                     onClick={() => handleMoreSelect(item.id)}
                   >

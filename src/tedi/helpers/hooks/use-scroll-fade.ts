@@ -45,6 +45,8 @@ export const useScrollFade = (options: UseScrollFadeOptions = {}): UseScrollFade
   const observerRef = useRef<ResizeObserver | null>(null);
   const onScrollToStartRef = useRef(onScrollToStart);
   const onScrollToEndRef = useRef(onScrollToEnd);
+  const wasAtStartRef = useRef(false);
+  const wasAtEndRef = useRef(false);
 
   onScrollToStartRef.current = onScrollToStart;
   onScrollToEndRef.current = onScrollToEnd;
@@ -71,8 +73,11 @@ export const useScrollFade = (options: UseScrollFadeOptions = {}): UseScrollFade
       setCanScrollStart(!atStart);
       setCanScrollEnd(!atEnd);
 
-      if (atStart) onScrollToStartRef.current?.();
-      if (atEnd) onScrollToEndRef.current?.();
+      if (atStart && !wasAtStartRef.current) onScrollToStartRef.current?.();
+      if (atEnd && !wasAtEndRef.current) onScrollToEndRef.current?.();
+
+      wasAtStartRef.current = atStart;
+      wasAtEndRef.current = atEnd;
     },
     [direction]
   );

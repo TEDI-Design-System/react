@@ -14,6 +14,7 @@ export const navigateTablist = (e: React.KeyboardEvent<HTMLButtonElement>): HTML
     (tab) => getComputedStyle(tab).display !== 'none'
   );
   const currentIndex = tabs.indexOf(e.currentTarget);
+  if (tabs.length === 0 || currentIndex === -1) return null;
   let newIndex = -1;
 
   switch (e.key) {
