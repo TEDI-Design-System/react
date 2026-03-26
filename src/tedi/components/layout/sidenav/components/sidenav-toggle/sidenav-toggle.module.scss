@@ -1,9 +1,12 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
+$toggle-button-height: 3.5rem;
+$toggle-button-width: 3.5rem;
+
 .tedi-sidenav-toggle {
   z-index: var(--z-index-sidenav);
-  width: var(--button-sm-height);
-  height: var(--button-sm-height);
+  width: $toggle-button-width;
+  height: $toggle-button-height;
   margin: 0;
   border-radius: 0;
 

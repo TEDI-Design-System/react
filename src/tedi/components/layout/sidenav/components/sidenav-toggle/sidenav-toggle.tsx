@@ -30,6 +30,10 @@ export type SidenavToggleProps = {
    * Variant of toggle (mobile overlay or collapse control)
    */
   variant?: SidenavToggleVariant;
+  /**
+   * Add custom class to override styles
+   */
+  className?: string;
 };
 
 export const SidenavToggle = ({
@@ -38,15 +42,20 @@ export const SidenavToggle = ({
   referenceRef,
   getReferenceProps = () => ({}),
   variant = 'mobile',
+  className,
 }: SidenavToggleProps) => {
   const { getLabel } = useLabels();
 
   const toggleLabel = getLabel('header.toggle', menuOpen);
 
-  const BEM = cn(styles['tedi-sidenav-toggle'], {
-    [styles['tedi-sidenav-toggle--open']]: menuOpen,
-    [styles[`tedi-sidenav-toggle--${variant}`]]: true,
-  });
+  const BEM = cn(
+    styles['tedi-sidenav-toggle'],
+    {
+      [styles['tedi-sidenav-toggle--open']]: menuOpen,
+      [styles[`tedi-sidenav-toggle--${variant}`]]: true,
+    },
+    className
+  );
 
   const Element = variant === 'collapse' ? FloatingButton : Button;
 
