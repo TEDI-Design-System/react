@@ -196,6 +196,7 @@ div.tedi-select__multi-value-item {
 
     .tedi-select__placeholder {
       color: var(--form-input-text-placeholder);
+      pointer-events: none;
     }
   }
 }
