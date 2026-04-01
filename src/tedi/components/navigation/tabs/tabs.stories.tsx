@@ -1,7 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
+import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
+import { ButtonGroup } from '../../buttons/button-group/button-group';
 import { CardContent } from '../../cards/card/card-content/card-content';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -300,4 +303,65 @@ export const OverflowBehavior: Story = {
       </div>
     </VerticalSpacing>
   ),
+};
+
+export const WithSubTabs: Story = {
+  render: () => {
+    const [activeSubTab, setActiveSubTab] = useState('work-accidents');
+
+    const subTabContent: Record<string, string> = {
+      'work-accidents': 'Displaying work accident cases and their review statuses.',
+      'occupational-diseases': 'Displaying occupational disease records and diagnoses.',
+      'work-related-illnesses': 'Displaying work-related illness reports and outcomes.',
+    };
+
+    return (
+      <Tabs defaultValue="tab-3">
+        <Tabs.List aria-label="Health and safety tabs">
+          <Tabs.Trigger id="tab-1">Procedures in Progress</Tabs.Trigger>
+          <Tabs.Trigger id="tab-2">Procedures in Planning</Tabs.Trigger>
+          <Tabs.Trigger id="tab-3">Accidents and Illnesses</Tabs.Trigger>
+          <Tabs.Trigger id="tab-4">Calendar</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content id="tab-1">
+          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+            <Text>{contentText}</Text>
+          </CardContent>
+        </Tabs.Content>
+        <Tabs.Content id="tab-2">
+          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+            <Text>{contentText}</Text>
+          </CardContent>
+        </Tabs.Content>
+        <Tabs.Content id="tab-3">
+          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+            <VerticalSpacing size={1.5}>
+              <ButtonGroup
+                type="secondary"
+                ariaLabel="Accidents and illnesses sub-navigation"
+                onSelectionChange={setActiveSubTab}
+              >
+                <Button id="work-accidents" isActive={activeSubTab === 'work-accidents'}>
+                  Work Accidents
+                </Button>
+                <Button id="occupational-diseases" isActive={activeSubTab === 'occupational-diseases'}>
+                  Occupational Diseases
+                </Button>
+                <Button id="work-related-illnesses" isActive={activeSubTab === 'work-related-illnesses'}>
+                  Work-related Illnesses
+                </Button>
+              </ButtonGroup>
+              <Heading element="h2">{activeSubTab.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</Heading>
+              <Text>{subTabContent[activeSubTab]}</Text>
+            </VerticalSpacing>
+          </CardContent>
+        </Tabs.Content>
+        <Tabs.Content id="tab-4">
+          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+            <Text>{contentText}</Text>
+          </CardContent>
+        </Tabs.Content>
+      </Tabs>
+    );
+  },
 };
