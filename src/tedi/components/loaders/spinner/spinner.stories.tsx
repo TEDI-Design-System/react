@@ -19,6 +19,7 @@ const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) 
     elements.forEach((el) => {
       const element = el as HTMLElement;
       element.style.backgroundColor = bg;
+      element.style.color = 'var(--color-text-inverted)';
       element.style.transition = 'background-color 0.2s ease';
     });
 
