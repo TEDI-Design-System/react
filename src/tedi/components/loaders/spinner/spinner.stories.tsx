@@ -28,7 +28,7 @@ const meta: Meta<typeof Spinner> = {
 export default meta;
 type Story = StoryObj<typeof Spinner>;
 
-const sizeArray: SpinnerProps['size'][] = [10, 16, 48];
+const sizeArray: SpinnerProps['size'][] = [10, 16, 36, 48];
 
 interface TemplateMultipleProps<Type = SpinnerProps['size'] | SpinnerProps['color'] | SpinnerProps['position']>
   extends SpinnerProps {
