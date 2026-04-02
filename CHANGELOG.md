@@ -1,3 +1,10 @@
+## [16.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.0...react-16.1.1-rc.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* **select:** select placeholder no longer blocks context menu interactions [#584](https://github.com/TEDI-Design-System/react/issues/584) ([#585](https://github.com/TEDI-Design-System/react/issues/585)) ([e8d86ab](https://github.com/TEDI-Design-System/react/commit/e8d86ab9632be40906a1d706991fbfe87ff31656))
+
 # [16.1.0](https://github.com/TEDI-Design-System/react/compare/react-16.0.0...react-16.1.0) (2026-03-26)
 
 
