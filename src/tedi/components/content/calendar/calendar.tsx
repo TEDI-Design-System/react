@@ -146,7 +146,7 @@ export const Calendar = ({
   ];
 
   return (
-    <div className={styles['tedi-date-calendar__wrapper']}>
+    <div className={styles['tedi-calendar__wrapper']}>
       {(view === 'years' || calendarView === 'years') && (
         <YearGrid
           currentMonth={currentMonth}
@@ -206,31 +206,31 @@ export const Calendar = ({
           }}
           footer={footer}
           classNames={{
-            root: classNames(styles['tedi-date-calendar'], className),
-            month_caption: styles['tedi-date-calendar__caption'],
-            head: styles['tedi-date-calendar__head'],
-            row: styles['tedi-date-calendar__row'],
-            day: styles['tedi-date-calendar__day'],
-            selected: styles['tedi-date-calendar__day--selected'],
-            weekday: styles['tedi-date-calendar__weekday'],
-            outside: styles['tedi-date-calendar__outside-days'],
-            range_start: styles['tedi-date-calendar__range-start'],
-            range_middle: styles['tedi-date-calendar__range-middle'],
-            range_end: styles['tedi-date-calendar__range-end'],
-            today: styles['tedi-date-calendar__today'],
-            disabled: styles['tedi-date-calendar__disabled'],
-            month: styles['tedi-date-calendar__month'],
-            months: styles['tedi-date-calendar__months-container'],
-            footer: styles['tedi-date-calendar__footer'],
-            week_number: styles['tedi-date-calendar__week-number'],
+            root: classNames(styles['tedi-calendar'], className),
+            month_caption: styles['tedi-calendar__caption'],
+            head: styles['tedi-calendar__head'],
+            row: styles['tedi-calendar__row'],
+            day: styles['tedi-calendar__day'],
+            selected: styles['tedi-calendar__day--selected'],
+            weekday: styles['tedi-calendar__weekday'],
+            outside: styles['tedi-calendar__outside-days'],
+            range_start: styles['tedi-calendar__range-start'],
+            range_middle: styles['tedi-calendar__range-middle'],
+            range_end: styles['tedi-calendar__range-end'],
+            today: styles['tedi-calendar__today'],
+            disabled: styles['tedi-calendar__disabled'],
+            month: styles['tedi-calendar__month'],
+            months: styles['tedi-calendar__months-container'],
+            footer: styles['tedi-calendar__footer'],
+            week_number: styles['tedi-calendar__week-number'],
           }}
           modifiers={{
             available: (date) => (availableDays ? isAvailable(date) : false),
             unavailable: (date) => (unavailableDays ? isUnavailable(date) : false),
           }}
           modifiersClassNames={{
-            available: styles['tedi-date-calendar__available-day'],
-            unavailable: styles['tedi-date-calendar__unavailable-day'],
+            available: styles['tedi-calendar__available-day'],
+            unavailable: styles['tedi-calendar__unavailable-day'],
           }}
           onSelect={handleSelect}
         />

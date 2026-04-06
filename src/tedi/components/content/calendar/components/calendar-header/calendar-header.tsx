@@ -44,8 +44,8 @@ export function CalendarHeader({
 
   return (
     <div
-      className={classNames(styles['tedi-date-calendar__header'], {
-        [styles['tedi-date-calendar__no-navigation']]: !showNavigation,
+      className={classNames(styles['tedi-calendar__header'], {
+        [styles['tedi-calendar__no-navigation']]: !showNavigation,
       })}
     >
       {showNavigation && (
@@ -62,32 +62,28 @@ export function CalendarHeader({
 
       {monthYearSelectGrid ? (
         <>
-          <Button noStyle className={styles['tedi-date-calendar__month-year-selector']} onClick={onOpenMonthGrid}>
+          <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenMonthGrid}>
             {displayMonth.toLocaleString('et-EE', { month: 'long' })}
-            <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-date-calendar__month-year-caret']} />
+            <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>
-          <Button noStyle className={styles['tedi-date-calendar__month-year-selector']} onClick={onOpenYearGrid}>
+          <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenYearGrid}>
             {displayMonth.getFullYear()}
-            <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-date-calendar__month-year-caret']} />
+            <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>
         </>
       ) : (
         <>
           <Dropdown
             className={classNames(
-              styles['tedi-date-calendar__month-year-dropdown'],
-              monthYearSelectGrid ? styles['tedi-date-calendar__picker-grid-dropdown'] : undefined
+              styles['tedi-calendar__month-year-dropdown'],
+              monthYearSelectGrid ? styles['tedi-calendar__picker-grid-dropdown'] : undefined
             )}
             width="auto"
           >
             <Dropdown.Trigger>
-              <Button noStyle className={styles['tedi-date-calendar__month-year-selector']}>
+              <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
                 {displayMonth.toLocaleString('et-EE', { month: 'long' })}{' '}
-                <Icon
-                  name="arrow_drop_down"
-                  color="tertiary"
-                  className={styles['tedi-date-calendar__month-year-caret']}
-                />
+                <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
               </Button>
             </Dropdown.Trigger>
             <Dropdown.Content>
@@ -106,19 +102,15 @@ export function CalendarHeader({
 
           <Dropdown
             className={classNames(
-              styles['tedi-date-calendar__month-year-dropdown'],
-              monthYearSelectGrid ? styles['tedi-date-calendar__picker-grid-dropdown'] : undefined
+              styles['tedi-calendar__month-year-dropdown'],
+              monthYearSelectGrid ? styles['tedi-calendar__picker-grid-dropdown'] : undefined
             )}
             width="auto"
           >
             <Dropdown.Trigger>
-              <Button noStyle className={styles['tedi-date-calendar__month-year-selector']}>
+              <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
                 {displayMonth.getFullYear()}{' '}
-                <Icon
-                  name="arrow_drop_down"
-                  color="tertiary"
-                  className={styles['tedi-date-calendar__month-year-caret']}
-                />
+                <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
               </Button>
             </Dropdown.Trigger>
             <Dropdown.Content>

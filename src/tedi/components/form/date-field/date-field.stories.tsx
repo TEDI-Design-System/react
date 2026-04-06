@@ -5,7 +5,6 @@ import { DateRange } from 'react-day-picker';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
-import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { TextFieldProps } from '../textfield/textfield';
 import { DateField, DateFieldProps } from './date-field';
 
@@ -185,16 +184,12 @@ export const OnClickType: Story = {
     return (
       <Row>
         <Col>
-          <VerticalSpacing>
-            <Text>Calendar button is clickable</Text>
-            <DateField label="Date" id="calendar-button-trigger" calendarTrigger="button" />
-          </VerticalSpacing>
+          <p style={{ marginBottom: '16px', display: 'block' }}>Calendar button is clickable</p>
+          <DateField label="Date" id="calendar-button-trigger" calendarTrigger="button" />
         </Col>
         <Col>
-          <VerticalSpacing>
-            <Text>Input is clickable</Text>
-            <DateField label="Date" id="calendar-input-trigger" calendarTrigger="input" />
-          </VerticalSpacing>
+          <p style={{ marginBottom: '16px', display: 'block' }}>Input is clickable</p>
+          <DateField label="Date" id="calendar-input-trigger" calendarTrigger="input" />
         </Col>
       </Row>
     );

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { CalendarHeader } from './date-calendar-header';
+import { CalendarHeader } from './calendar-header';
 
 import '@testing-library/jest-dom';
 
@@ -159,6 +159,6 @@ describe('CalendarHeader', () => {
 
   it('applies correct container class', () => {
     const { container } = render(<CalendarHeader {...defaultProps} />);
-    expect(container.firstChild).toHaveClass('tedi-date-calendar__header');
+    expect(container.firstChild).toHaveClass('tedi-calendar__header');
   });
 });

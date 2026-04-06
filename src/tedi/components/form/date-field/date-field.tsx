@@ -401,7 +401,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             {...(inputProps as MultiValueFieldProps)}
             id={id}
             label={label}
-            readOnly={readOnly ?? (parseDate ? false : enableCalendar)}
+            readOnly={readOnly ?? !enableCalendar}
             values={formattedDates}
             placeholder={placeholder}
             icon="calendar_today"
@@ -425,7 +425,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             {...(inputProps as TextFieldProps)}
             id={id}
             label={label}
-            readOnly={readOnly ?? (parseDate ? false : enableCalendar)}
+            readOnly={readOnly ?? !enableCalendar}
             value={inputValue || (formatDate ? formatDate(value) : defaultFormatter(value))}
             placeholder={placeholder}
             icon="calendar_today"

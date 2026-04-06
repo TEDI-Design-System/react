@@ -34,10 +34,10 @@ export const PickerGrid = <T,>({
   showNavigation,
 }: PickerGridProps<T>) => {
   return (
-    <div className={classNames(styles['tedi-date-calendar__picker-grid-container'])}>
+    <div className={classNames(styles['tedi-calendar__picker-grid-container'])}>
       <div
-        className={classNames(styles['tedi-date-calendar__picker-grid-header'], {
-          [styles['tedi-date-calendar__picker--no-navigation']]: !showNavigation,
+        className={classNames(styles['tedi-calendar__picker-grid-header'], {
+          [styles['tedi-calendar__picker--no-navigation']]: !showNavigation,
         })}
       >
         {showNavigation && (
@@ -55,14 +55,14 @@ export const PickerGrid = <T,>({
         )}
       </div>
 
-      <div className={classNames(styles['tedi-date-calendar__picker-grid'])}>
+      <div className={classNames(styles['tedi-calendar__picker-grid'])}>
         <Row gutter={2}>
           {items.map((item) => (
             <Col key={item.key} width={4}>
               <Button
                 onClick={() => onSelect(item.value)}
-                className={classNames(styles['tedi-date-calendar__grid-button'], {
-                  [styles['tedi-date-calendar__grid-button--selected']]: item.isSelected,
+                className={classNames(styles['tedi-calendar__grid-button'], {
+                  [styles['tedi-calendar__grid-button--selected']]: item.isSelected,
                 })}
                 aria-pressed={item.isSelected}
                 noStyle
