@@ -144,6 +144,46 @@ export const MultipleSelectedDates: Story = {
   },
 };
 
+export const WithLegend: Story = {
+  render: () => (
+    <VerticalSpacing>
+      <Row>
+        <Col width="auto">
+          <CalendarTemplate
+            footer={
+              <Row>
+                <Col width="auto" className="flex align-items-center gap-2">
+                  <div
+                    style={{
+                      backgroundColor: 'var(--form-datepicker-date-selected)',
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '4px',
+                    }}
+                  ></div>{' '}
+                  Selected
+                </Col>
+                <Col width="auto" className="flex align-items-center gap-2">
+                  <div
+                    style={{
+                      backgroundColor: 'var(--form-datepicker-date-available)',
+                      border: '1px solid var(--green-200)',
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '4px',
+                    }}
+                  ></div>{' '}
+                  Available
+                </Col>
+              </Row>
+            }
+          />
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
+};
+
 export const Availability: Story = {
   render: () => {
     const today = new Date();
@@ -230,10 +270,10 @@ export const WithWeeksCount: Story = {
   ),
 };
 
-export const YearView: Story = {
-  render: () => <CalendarTemplate calendarView="years" view="years" />,
-};
-
 export const MonthView: Story = {
   render: () => <CalendarTemplate calendarView="months" view="months" showNavigation={false} />,
+};
+
+export const YearView: Story = {
+  render: () => <CalendarTemplate calendarView="years" view="years" />,
 };

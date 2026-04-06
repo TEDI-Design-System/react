@@ -197,6 +197,7 @@
   @extend %tedi-calendar-surface;
 
   max-width: 315px;
+  border-radius: 4px;
 }
 
 .tedi-calendar__picker-grid-header {
@@ -234,10 +235,11 @@
 
   &--selected {
     color: var(--form-checkbox-radio-card-secondary-selected-text);
-    border: var(--general-selected-border-width) solid var(--form-checkbox-radio-card-secondary-selected-border);
+    border-color: var(--form-checkbox-radio-card-secondary-selected-border);
+    box-shadow: 0 0 0 1px var(--form-checkbox-radio-card-secondary-selected-border);
 
     &:hover {
-      border-width: 2px;
+      box-shadow: 0 0 0 1px var(--form-checkbox-radio-card-secondary-selected-border);
     }
   }
 }
