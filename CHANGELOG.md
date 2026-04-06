@@ -1,3 +1,10 @@
+# [16.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.1-rc.1...react-16.2.0-rc.1) (2026-04-06)
+
+
+### Features
+
+* **spinner:** add new sizes [#586](https://github.com/TEDI-Design-System/react/issues/586) ([#589](https://github.com/TEDI-Design-System/react/issues/589)) ([fbea0c3](https://github.com/TEDI-Design-System/react/commit/fbea0c3e684feac8a1de3895c17d6c10b9a6e07e))
+
 ## [16.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.0...react-16.1.1-rc.1) (2026-04-02)
 
 
