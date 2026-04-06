@@ -41,7 +41,7 @@ describe('ButtonGroup Component', () => {
   it('renders dropdown trigger with dropdownLabel on mobile', () => {
     (useBreakpoint as jest.Mock).mockReturnValue('sm');
     render(
-      <ButtonGroup dropdownLabel="Custom Dropdown">
+      <ButtonGroup dropdownLabel="Custom Dropdown" enableMobileDropdown>
         <Button id="button1">Button 1</Button>
       </ButtonGroup>
     );
@@ -53,7 +53,7 @@ describe('ButtonGroup Component', () => {
   it('falls back to useLabels value if dropdownLabel is not provided on mobile', () => {
     (useBreakpoint as jest.Mock).mockReturnValue('sm');
     render(
-      <ButtonGroup>
+      <ButtonGroup enableMobileDropdown>
         <Button id="button1">Button 1</Button>
       </ButtonGroup>
     );
@@ -67,7 +67,7 @@ describe('ButtonGroup Component', () => {
     const onSelectionChange = jest.fn();
 
     render(
-      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu">
+      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1">Button 1</Button>
         <Button id="button2">Button 2</Button>
       </ButtonGroup>
@@ -89,7 +89,7 @@ describe('ButtonGroup Component', () => {
     const onSelectionChange = jest.fn();
 
     render(
-      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu">
+      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" disabled>
           Button 1
         </Button>

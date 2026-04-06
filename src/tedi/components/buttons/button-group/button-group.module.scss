@@ -152,4 +152,10 @@
       }
     }
   }
+
+  &__dropdown-item {
+    display: flex;
+    gap: var(--button-md-inner-spacing);
+    align-items: center;
+  }
 }

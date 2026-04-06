@@ -46,6 +46,11 @@ export type ButtonGroupProps = {
    */
   size?: 'default' | 'small';
   /**
+   * Whether the button group should collapse into a dropdown on mobile
+   * @default true
+   */
+  enableMobileDropdown?: boolean;
+  /**
    * Breakpoint at which to switch to dropdown
    * @default 'md'
    */
@@ -67,6 +72,7 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
     stretch = false,
     ariaLabel,
     size = 'default',
+    enableMobileDropdown = false,
     mobileBreakpoint = 'md',
     dropdownLabel = getLabel('sidenav.submenu'),
   } = props;
@@ -78,7 +84,13 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
     (child) => isValidElement(child) && child.type === Button
   ) as React.ReactElement<ButtonProps>[];
 
-  if (isMobileView) {
+  const activeButton = buttonsArray.find((btn) => btn.props.isActive);
+  const activeLabel = activeButton?.props.children || dropdownLabel;
+
+  const activeIconLeft = activeButton?.props.iconLeft || 'menu';
+  const activeIcon = activeButton?.props.icon;
+
+  if (isMobileView && enableMobileDropdown) {
     return (
       <Dropdown width="trigger">
         <Dropdown.Trigger>
@@ -92,8 +104,15 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
             noStyle
             fullWidth
           >
-            <Icon name="menu" color="inherit" />
-            {dropdownLabel}
+            {activeIconLeft && (
+              <Icon name={typeof activeIconLeft === 'string' ? activeIconLeft : activeIconLeft.name} color="inherit" />
+            )}
+
+            {!activeIconLeft && activeIcon && (
+              <Icon name={typeof activeIcon === 'string' ? activeIcon : activeIcon.name} color="inherit" />
+            )}
+
+            {activeLabel}
           </Button>
         </Dropdown.Trigger>
 
@@ -105,13 +124,29 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
               active={btn?.props.isActive}
               disabled={btn?.props.disabled}
               onClick={(event) => {
+                if (btn.props.disabled) return;
+
                 btn.props.onClick?.(event as UnknownType);
+
                 if (btn.props.id) {
                   onSelectionChange?.(btn.props.id);
                 }
               }}
+              className={styles['tedi-button-group__dropdown-item']}
             >
+              {btn.props.iconLeft && (
+                <Icon
+                  name={typeof btn.props.iconLeft === 'string' ? btn.props.iconLeft : btn.props.iconLeft.name}
+                  color="inherit"
+                />
+              )}
               {btn.props.children}
+              {btn.props.iconRight && (
+                <Icon
+                  name={typeof btn.props.iconRight === 'string' ? btn.props.iconRight : btn.props.iconRight.name}
+                  color="inherit"
+                />
+              )}
             </Dropdown.Item>
           ))}
         </Dropdown.Content>
