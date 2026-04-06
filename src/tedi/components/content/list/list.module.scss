@@ -23,12 +23,12 @@ $bullet-colors: (
 }
 
 .tedi-list--unordered {
-  padding-left: var(--list-padding-left-level-1);
+  padding-left: calc(var(--list-inner-spacing-x) + var(--list-icon-size));
   list-style: none;
 
   .tedi-list__item {
     position: relative;
-    padding-left: var(--list-padding-left-level-1);
+    padding-left: calc(var(--list-inner-spacing-x) + var(--list-icon-size));
 
     &::before {
       position: absolute;
@@ -67,7 +67,7 @@ $bullet-colors: (
 }
 
 .tedi-list--ordered {
-  padding-left: var(--list-padding-left-level-1);
+  padding-left: calc(var(--list-inner-spacing-x) + var(--list-icon-size));
   list-style: none;
   counter-reset: item;
 

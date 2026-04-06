@@ -1,9 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { Fragment } from 'react/jsx-runtime';
 
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import { StatusBadge, StatusBadgeColor, StatusBadgeProps, StatusBadgeStatus } from './status-badge';
+import { Tooltip } from '../../overlays/tooltip';
+import { StatusBadge, StatusBadgeColor, StatusBadgeProps, StatusBadgeSize, StatusBadgeStatus } from './status-badge';
 
 /**
  * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2385-24154&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -31,9 +33,14 @@ export default meta;
 
 type Story = StoryObj<typeof StatusBadge>;
 
+interface TemplateMultipleProps<Type = StatusBadgeProps['size']> extends StatusBadgeProps {
+  array: Type[];
+}
+
 const colors: StatusBadgeColor[] = ['neutral', 'brand', 'accent', 'warning', 'danger', 'success'];
 const variants: StatusBadgeProps['variant'][] = ['filled', 'filled-bordered', 'bordered'];
 const statuses: StatusBadgeStatus[] = ['inactive', 'success', 'warning', 'danger'];
+const sizeArray: StatusBadgeSize[] = ['default', 'large'];
 const colorToIconMap: Record<StatusBadgeColor, string> = {
   neutral: 'edit',
   brand: 'send',
@@ -43,6 +50,7 @@ const colorToIconMap: Record<StatusBadgeColor, string> = {
   warning: 'warning',
   transparent: 'edit',
 };
+
 const statusToIconMap: Record<StatusBadgeStatus, string> = {
   inactive: 'edit',
   success: 'send',
@@ -139,6 +147,35 @@ const TemplateStatusGrid: StoryFn<StatusBadgeProps> = (args) => {
   );
 };
 
+const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
+  const { array } = args;
+
+  return (
+    <div className="example-list">
+      {array.map((value, key) => (
+        <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col width={6}>
+            <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+          </Col>
+          <Col className="display-flex gap-2">
+            <StatusBadge {...args} color="neutral" size={array[key]} />
+            <StatusBadge {...args} color="neutral" size={array[key]} status="success" />
+          </Col>
+        </Row>
+      ))}
+    </div>
+  );
+};
+
+export const Sizes: StoryObj<TemplateMultipleProps> = {
+  render: TemplateColumn,
+  args: {
+    array: sizeArray,
+    children: 'Draft',
+    color: 'neutral',
+  },
+};
+
 export const Colors: Story = {
   render: TemplateAllCombos,
 };
@@ -150,22 +187,15 @@ export const StatusIndicator: Story = {
   },
 };
 
-const TemplateLarge: StoryFn<StatusBadgeProps> = (args) => (
-  <Row>
-    <Col width="auto">
-      <StatusBadge {...args} />
-    </Col>
-    <Col width="auto">
-      <StatusBadge {...args} status="success" />
-    </Col>
-  </Row>
-);
-
-export const Large: Story = {
-  render: TemplateLarge,
-  args: {
-    color: 'neutral',
-    size: 'large',
-    children: 'Draft',
-  },
+export const WithTooltip: StoryFn<StatusBadgeProps> = () => {
+  return (
+    <Tooltip placement="top">
+      <Tooltip.Trigger>
+        <StatusBadge color="warning" icon="warning" />
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        Icon-only badges should always have a tooltip to provide context and ensure accessibility.
+      </Tooltip.Content>
+    </Tooltip>
+  );
 };
