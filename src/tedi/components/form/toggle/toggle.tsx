@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { forwardRef, useId } from 'react';
+import React, { forwardRef, useId, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
@@ -121,13 +121,20 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
   const id = propId || `toggle-${generatedId}`;
   const helperId = helper ? `${id}-helper` : undefined;
 
+  const [internalChecked, setInternalChecked] = useState(defaultChecked ?? false);
+
   const isControlled = typeof checked !== 'undefined';
-  const isChecked = isControlled ? checked : defaultChecked ?? false;
+  const isChecked = isControlled ? checked : internalChecked;
 
   const size = propSize || (icon ? 'large' : 'default');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isLoading) return;
+
+    if (!isControlled) {
+      setInternalChecked(e.target.checked);
+    }
+
     onChange?.(e.target.checked);
   };
 
@@ -177,7 +184,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
             {isLoading ? (
               <Spinner size={size === 'large' ? 16 : 10} className={styles['tedi-toggle__icon']} />
             ) : icon ? (
-              <Icon name={isChecked ? 'lock_open_right' : 'lock'} size={16} color="inherit" />
+              <Icon name={isChecked ? 'lock_open' : 'lock'} size={16} color="inherit" />
             ) : null}
           </span>
         </div>
