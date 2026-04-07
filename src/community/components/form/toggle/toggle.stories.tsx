@@ -9,6 +9,11 @@ import Toggle, { ToggleProps } from './toggle';
 const meta: Meta<ToggleProps> = {
   component: Toggle,
   title: 'Community/Form/Toggle',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -27,6 +27,7 @@ export * from './components/navigation/link/link';
 export * from './components/form/textfield/textfield';
 export * from './components/form/textarea/textarea';
 export * from './components/form/number-field/number-field';
+export * from './components/form/toggle/toggle';
 export * from './components/form/feedback-text/feedback-text';
 export * from './components/form/search/search';
 export * from './components/form/radio/radio';
