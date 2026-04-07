@@ -1,0 +1,157 @@
+import { Meta, Title } from '@storybook/blocks';
+import { Link } from '../../components/navigation/link/link.tsx';
+
+<Meta name="Labels" title="TEDI-Ready/Providers/ThemeProvider/Custom theming" />
+
+# Custom theming
+
+ThemeProvider supports built-in themes like **Default** and **Dark**, as well as fully **custom themes generated from design tokens** (e.g. via Figma). That assumes project designer has created overrides for TEDI variables in your project.
+
+---
+
+## Usage
+
+### Provider
+
+Wrap your application with the provider and define an initial theme:
+
+```tsx
+<ThemeProvider theme="default">
+  <YourApp />
+</ThemeProvider>
+```
+
+The **theme** prop accepts:
+
+- Built-in themes:
+  - `default`
+  - `dark`
+- Custom themes:
+  - Any string (e.g. `"custom-theme"`)
+
+---
+
+### Custom Themes (Figma Integration)
+
+You can create and use custom themes by exporting variables from Figma using the <Link href="https://www.figma.com/community/plugin/1612732083806730958">TEDI Figma Variable Exporter plugin ↗</Link>.
+
+#### Steps:
+
+1. Define your theme in Figma (e.g. `custom-theme`)
+2. Export variables using the plugin
+3. Ensure the generated CSS variables are included in your project
+4. Apply the theme via the provider:
+
+```tsx
+<ThemeProvider theme="custom-theme">
+  <YourApp />
+</ThemeProvider>
+```
+
+This will apply the class:
+
+```tsx
+<html class="tedi-theme--custom-theme">
+```
+
+Your exported CSS variables should be scoped to this class.
+
+---
+
+### Consumer Hook
+
+Use the `useTheme` hook to read or update the theme dynamically:
+
+```tsx
+import { useTheme } from '@tedi-design-system/react';
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+
+  return <button onClick={() => setTheme(theme === 'default' ? 'dark' : 'default')}>Switch theme</button>;
+}
+```
+
+You can also switch to a custom theme:
+
+```tsx
+setTheme('custom-theme');
+```
+
+---
+
+### Behavior
+
+- The provider:
+  - Removes any existing `.tedi-theme--*` classes from `<html>`
+  - Applies the active theme class: `.tedi-theme--{theme}`
+- Theme is persisted in:
+  - `localStorage` (`tedi-theme`)
+  - `document.cookie`
+- On reload:
+  - Theme is restored from storage or cookies
+- Updates happen instantly without page reload
+
+---
+
+### Example
+
+```tsx
+<ThemeProvider theme="custom-theme">
+  <Button>Styled with custom theme</Button>
+</ThemeProvider>
+```
+
+---
+
+## Using ThemeProvider with Next.js (SSR)
+
+To avoid hydration mismatches or theme flickering, initialize the theme on the server.
+
+---
+
+### 1. Define a default theme
+
+```tsx
+export const INITIAL_THEME = 'default';
+```
+
+---
+
+### 2. Apply theme from cookies in RootLayout
+
+```tsx
+// app/layout.tsx
+import { cookies } from 'next/headers';
+import { ThemeProvider, Theme } from '@tedi-design-system/react';
+import { INITIAL_THEME } from '@/lib/constants';
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const theme = (cookieStore.get('tedi-theme')?.value ?? INITIAL_THEME) as Theme;
+
+  return (
+    <html lang="en" className={`tedi-theme--${theme}`}>
+      <body>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+---
+
+### 3. Why this matters
+
+- Prevents hydration mismatch warnings
+- Avoids flashing incorrect theme on load
+- Ensures server and client render the same UI
+
+---
+
+## Notes
+
+- Custom themes must define CSS variables under `.tedi-theme--{theme-name}`
+- Theme names are not restricted — consistency with your design system is recommended
+- Multiple themes can coexist as long as their variables are scoped correctly
