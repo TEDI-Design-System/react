@@ -21,6 +21,7 @@ interface PickerGridProps<T> {
   items: PickerGridItem<T>[];
   onSelect: (value: T) => void;
   showNavigation?: boolean;
+  className?: string;
 }
 
 export const PickerGrid = <T,>({
@@ -32,9 +33,10 @@ export const PickerGrid = <T,>({
   items,
   onSelect,
   showNavigation,
+  className,
 }: PickerGridProps<T>) => {
   return (
-    <div className={classNames(styles['tedi-calendar__picker-grid-container'])}>
+    <div className={classNames(styles['tedi-calendar__picker-grid-container'], className)}>
       <div
         className={classNames(styles['tedi-calendar__picker-grid-header'], {
           [styles['tedi-calendar__picker--no-navigation']]: !showNavigation,

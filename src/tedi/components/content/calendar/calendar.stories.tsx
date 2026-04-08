@@ -66,7 +66,7 @@ export const Default: Story = {
 export const WithFooter: Story = {
   render: () => (
     <VerticalSpacing>
-      <Row>
+      <Row gutterY={3}>
         <Col width="auto">
           <CalendarTemplate
             footer={
@@ -92,7 +92,7 @@ export const WithFooter: Story = {
           />
         </Col>
       </Row>
-      <Row>
+      <Row gutterY={3}>
         <Col width="auto">
           <CalendarTemplate
             footer={

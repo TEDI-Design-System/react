@@ -161,6 +161,7 @@ export const Calendar = ({
               setView('months');
             }
           }}
+          className={className}
         />
       )}
 
@@ -178,6 +179,7 @@ export const Calendar = ({
               setView('days');
             }
           }}
+          className={className}
         />
       )}
 

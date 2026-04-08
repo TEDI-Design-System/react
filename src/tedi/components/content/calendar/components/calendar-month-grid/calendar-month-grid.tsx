@@ -20,9 +20,10 @@ export interface MonthGridProps {
    * Default is `true`.
    */
   showNavigation?: boolean;
+  className?: string;
 }
 
-export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigation }: MonthGridProps) => {
+export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigation, className }: MonthGridProps) => {
   const { getLabel } = useLabels();
   const year = currentMonth.getFullYear();
 
@@ -51,6 +52,7 @@ export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigat
       items={months}
       onSelect={onSelectMonth}
       showNavigation={showNavigation}
+      className={className}
     />
   );
 };

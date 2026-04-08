@@ -25,9 +25,10 @@ export interface YearGridProps {
    * Default is `true`.
    */
   showNavigation?: boolean;
+  className?: string;
 }
 
-export const YearGrid = ({ currentMonth, onSelectYear, onNavigate, showNavigation }: YearGridProps) => {
+export const YearGrid = ({ currentMonth, onSelectYear, onNavigate, showNavigation, className }: YearGridProps) => {
   const { getLabel } = useLabels();
   const currentYear = currentMonth.getFullYear();
   const startYear = Math.floor(currentYear / 12) * 12;
@@ -55,6 +56,7 @@ export const YearGrid = ({ currentMonth, onSelectYear, onNavigate, showNavigatio
         onSelectYear(new Date(year, currentMonth.getMonth(), 1));
       }}
       showNavigation={showNavigation}
+      className={className}
     />
   );
 };

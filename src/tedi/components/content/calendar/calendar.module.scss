@@ -3,7 +3,6 @@
   z-index: var(--z-index-dropdown);
   font-family: var(--family-default);
   background: var(--card-background-primary);
-  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 }
 
 %tedi-calendar-cell-size {
@@ -197,6 +196,7 @@
   @extend %tedi-calendar-surface;
 
   max-width: 315px;
+  border: 1px solid var(--card-border-primary);
   border-radius: 4px;
 }
 
