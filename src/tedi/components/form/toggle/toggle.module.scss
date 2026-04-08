@@ -150,18 +150,18 @@
       cursor: not-allowed;
     }
   }
-}
 
-.tedi-toggle__control {
-  display: flex;
-  gap: var(--layout-grid-gutters-08);
-  align-items: center;
+  &__control {
+    display: flex;
+    gap: var(--layout-grid-gutters-08);
+    align-items: center;
 
-  &--label-left {
-    flex-direction: row;
-  }
+    &--label-left {
+      flex-direction: row;
+    }
 
-  &--label-right {
-    flex-direction: row;
+    &--label-right {
+      flex-direction: row-reverse;
+    }
   }
 }

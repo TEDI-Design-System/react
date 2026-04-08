@@ -103,14 +103,14 @@ describe('Toggle component', () => {
   it('renders label on the right when labelPosition="right"', () => {
     render(<Toggle {...defaultProps} labelPosition="right" />);
 
-    const control = screen.getByRole('switch').closest('label');
+    const control = screen.getByRole('switch').closest('.tedi-toggle__control');
     expect(control).toHaveClass('tedi-toggle__control--label-right');
   });
 
   it('renders label on the left by default', () => {
     render(<Toggle {...defaultProps} />);
 
-    const control = screen.getByRole('switch').closest('label');
+    const control = screen.getByRole('switch').closest('.tedi-toggle__control');
     expect(control).toHaveClass('tedi-toggle__control--label-left');
   });
 
@@ -139,8 +139,7 @@ describe('Toggle component', () => {
   });
 
   it('applies active class when checked', () => {
-    render(<Toggle {...defaultProps} checked />);
-
+    render(<Toggle {...defaultProps} checked onChange={jest.fn()} />);
     const toggleContainer = screen.getByRole('switch').closest('.tedi-toggle');
     expect(toggleContainer).toHaveClass('tedi-toggle--active');
   });

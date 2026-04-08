@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { forwardRef, useId, useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
@@ -98,7 +98,7 @@ export interface ToggleProps {
 
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => {
   const {
-    id: propId,
+    id,
     label,
     hideLabel = false,
     labelPosition = 'left',
@@ -116,9 +116,6 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
     tooltip,
     ...rest
   } = props;
-
-  const generatedId = useId();
-  const id = propId || `toggle-${generatedId}`;
   const helperId = helper ? `${id}-helper` : undefined;
 
   const [internalChecked, setInternalChecked] = useState(defaultChecked ?? false);
@@ -152,53 +149,41 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
   const controlClass = cn(styles['tedi-toggle__control'], styles[`tedi-toggle__control--label-${labelPosition}`]);
 
   return (
-    <div className={styles['tedi-toggle-wrapper']}>
-      <label htmlFor={id} className={controlClass}>
-        {label && labelPosition === 'left' && (
-          <FormLabel
-            id={id}
-            className={styles['tedi-toggle__label']}
-            hideLabel={hideLabel}
-            label={label}
-            tooltip={tooltip}
-          />
-        )}
+    <div className={controlClass}>
+      {label && (
+        <FormLabel
+          id={id}
+          className={styles['tedi-toggle__label']}
+          hideLabel={hideLabel}
+          label={label}
+          tooltip={tooltip}
+        />
+      )}
 
-        <div className={toggleClass}>
-          <input
-            {...rest}
-            ref={ref}
-            id={id}
-            type="checkbox"
-            role="switch"
-            aria-label={typeof label === 'string' ? label : undefined}
-            aria-describedby={helperId}
-            className={styles['tedi-toggle__input']}
-            checked={isControlled ? isChecked : undefined}
-            defaultChecked={!isControlled ? defaultChecked : undefined}
-            disabled={disabled || isLoading}
-            onChange={handleChange}
-          />
+      <div className={toggleClass}>
+        <input
+          {...rest}
+          ref={ref}
+          id={id}
+          type="checkbox"
+          role="switch"
+          aria-label={typeof label === 'string' ? label : undefined}
+          aria-describedby={helperId}
+          className={styles['tedi-toggle__input']}
+          checked={isControlled ? isChecked : undefined}
+          defaultChecked={!isControlled ? defaultChecked : undefined}
+          disabled={disabled || isLoading}
+          onChange={handleChange}
+        />
 
-          <span className={styles['tedi-toggle__slider']}>
-            {isLoading ? (
-              <Spinner size={size === 'large' ? 16 : 10} className={styles['tedi-toggle__icon']} />
-            ) : icon ? (
-              <Icon name={isChecked ? 'lock_open' : 'lock'} size={16} color="inherit" />
-            ) : null}
-          </span>
-        </div>
-
-        {label && labelPosition === 'right' && (
-          <FormLabel
-            id={id}
-            className={styles['tedi-toggle__label']}
-            hideLabel={hideLabel}
-            label={label}
-            tooltip={tooltip}
-          />
-        )}
-      </label>
+        <span className={styles['tedi-toggle__slider']}>
+          {isLoading ? (
+            <Spinner size={size === 'large' ? 16 : 10} className={styles['tedi-toggle__icon']} />
+          ) : icon ? (
+            <Icon name={isChecked ? 'lock_open' : 'lock'} size={16} color="inherit" />
+          ) : null}
+        </span>
+      </div>
 
       {helper && (
         <FeedbackText id={helperId} {...helper} className={cn(styles['tedi-toggle__helper'], helper.className)} />
