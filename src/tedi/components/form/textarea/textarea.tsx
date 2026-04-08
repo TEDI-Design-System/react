@@ -81,7 +81,14 @@ export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, r
     textarea.style.overflow = 'hidden';
 
     const computedStyle = window.getComputedStyle(textarea);
-    const lineHeight = parseFloat(computedStyle.lineHeight);
+
+    let lineHeight = parseFloat(computedStyle.lineHeight);
+
+    if (isNaN(lineHeight)) {
+      // Fallback: estimate from font-size (common ratio ~1.5)
+      const fontSize = parseFloat(computedStyle.fontSize) || 16;
+      lineHeight = fontSize * 1.5;
+    }
 
     const paddingTop = parseFloat(computedStyle.paddingTop);
     const paddingBottom = parseFloat(computedStyle.paddingBottom);
@@ -96,7 +103,6 @@ export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, r
     const calculatedHeight = rowCount * lineHeight + paddingTop + paddingBottom;
 
     textarea.style.height = `${calculatedHeight}px`;
-
     textarea.style.overflow = originalOverflow;
 
     if (rowCount >= maxRows) {
@@ -153,7 +159,6 @@ export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, r
       };
     } else {
       return {
-        rows: minRows,
         style: {
           height: height,
           ...(maxHeight ? { maxHeight } : {}),

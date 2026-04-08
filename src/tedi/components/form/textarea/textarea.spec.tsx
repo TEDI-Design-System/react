@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useBreakpointProps } from '../../../helpers';
+import { UnknownType } from '../../../types/commonTypes';
 import TextArea, { TextAreaProps } from './textarea';
 
 import '@testing-library/jest-dom';
@@ -93,6 +94,10 @@ describe('TextArea component', () => {
       paddingBottom: '8px',
     }));
 
+    const originalScrollHeightDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLTextAreaElement.prototype,
+      'scrollHeight'
+    );
     Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
       configurable: true,
       get() {
@@ -101,9 +106,7 @@ describe('TextArea component', () => {
     });
 
     render(<TextArea {...defaultProps} autoGrow minRows={3} maxRows={10} />);
-
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-
     expect(textarea).toHaveAttribute('rows', '3');
 
     await act(async () => {
@@ -115,8 +118,13 @@ describe('TextArea component', () => {
     });
 
     expect(parseFloat(textarea.style.height || '0')).toBeGreaterThan(120);
-
     window.getComputedStyle = originalGetComputedStyle;
+
+    if (originalScrollHeightDescriptor) {
+      Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', originalScrollHeightDescriptor);
+    } else {
+      delete (HTMLTextAreaElement.prototype as UnknownType).scrollHeight;
+    }
   });
 
   it('respects maxRows and enables scroll when exceeded with autoGrow', async () => {
