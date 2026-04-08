@@ -93,12 +93,11 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col width={6}>
         <div className="flex gap-4 flex-column">
-          <DateField id="date-default" label="Date field default" enableCalendar={false} mode="single" />
+          <DateField id="date-default" label="Date field default" mode="single" />
 
           <DateField
             id="date-with-hint"
             label="Date field with hint"
-            enableCalendar={false}
             placeholder="pp.kk.aaaa"
             mode="single"
             inputProps={{ helper: { text: 'kk.pp.aaaa' } }}
@@ -109,7 +108,6 @@ export const FieldOptions: StoryFn = () => {
               key={shortcutValue?.toISOString() ?? 'empty'}
               id="date-with-shortcuts"
               label="Date field with shortcuts"
-              enableCalendar={false}
               mode="single"
               defaultValue={shortcutValue}
               parseDate={(val) => {
@@ -141,22 +139,15 @@ export const ValueType: StoryFn = () => {
     <Row>
       <Col width={6}>
         <div className="flex gap-3 flex-column">
-          <DateField id="date-default" label="Date" enableCalendar={false} />
+          <DateField id="date-default" label="Date" />
 
-          <DateField id="date-with-placeholder" label="Date" enableCalendar={false} placeholder="pp.kk.aaaa" />
+          <DateField id="date-with-placeholder" label="Date" placeholder="pp.kk.aaaa" />
 
-          <DateField
-            id="date-with-placeholder"
-            label="Date"
-            enableCalendar={false}
-            placeholder="pp.kk.aaaa"
-            defaultValue={new Date()}
-          />
+          <DateField id="date-with-placeholder" label="Date" placeholder="pp.kk.aaaa" defaultValue={new Date()} />
 
           <DateField
             id="date-with-multiple-dates"
             label="Date"
-            enableCalendar={false}
             placeholder="pp.kk.aaaa"
             defaultValue={[new Date(2026, 2, 24), new Date(2026, 2, 26)]}
             mode="multiple"
@@ -165,7 +156,6 @@ export const ValueType: StoryFn = () => {
           <DateField
             id="date-with-range"
             label="Date"
-            enableCalendar={false}
             placeholder="pp.kk.aaaa – pp.kk.aaaa"
             mode="range"
             defaultValue={{
@@ -200,15 +190,6 @@ export const OnClickType: Story = {
         story: 'calendarTrigger prop allows you to open calendar either on input click or calendar icon',
       },
     },
-  },
-};
-
-export const Single: Story = {
-  render: Template,
-  args: {
-    mode: 'single',
-    label: 'Date',
-    required: true,
   },
 };
 
@@ -348,19 +329,19 @@ export const ShowWeekCount: Story = {
   },
 };
 
-export const MultipleMonthsShown: Story = {
+export const MultipleMonths: Story = {
   render: () => {
     return <DateField label="Date" numberOfMonths={2} mode="single" id="multiple-shown-single" />;
   },
 };
 
-export const MonthYearSelectGrid: Story = {
+export const YearGrid: Story = {
   render: () => {
-    return <DateField label="Date" monthYearSelectGrid id="month-year-grid" />;
+    return <DateField label="Date" monthYearSelectGrid id="month-year-grid" calendarView="years" />;
   },
 };
 
-export const CalendarFooter: Story = {
+export const WithFooter: Story = {
   render: () => {
     return (
       <Row>
@@ -426,30 +407,4 @@ export const AvailableDays: Story = {
       />
     );
   },
-};
-
-export const ManualTyping: StoryFn<DateFieldProps> = (args) => {
-  const [value, setValue] = useState<Date | undefined>();
-
-  const parseEstonianDate = (value: string): Date | undefined => {
-    const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-    if (!match) return undefined;
-
-    const [, dd, mm, yyyy] = match;
-    const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
-
-    return isNaN(date.getTime()) ? undefined : date;
-  };
-
-  return (
-    <DateField
-      {...args}
-      selected={value}
-      onSelect={(date) => setValue(date as Date | undefined)}
-      parseDate={parseEstonianDate}
-      placeholder="dd.mm.yyyy"
-      label="Date"
-      required
-    />
-  );
 };

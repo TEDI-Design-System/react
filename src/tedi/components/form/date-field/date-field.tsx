@@ -341,18 +341,29 @@ export const DateField: React.FC<DateFieldProps> = ({
       ? value.map((d) => (formatDate ? formatDate(d) : defaultFormatter(d)))
       : [];
 
+  const defaultParseDate = (value: string): Date | undefined => {
+    const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (!match) return undefined;
+
+    const [, dd, mm, yyyy] = match;
+    const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+
+    return isNaN(date.getTime()) ? undefined : date;
+  };
+
   const handleInputChange = (val: string) => {
     setInputValue(val);
 
-    if (!parseDate) return;
+    const parser = parseDate ?? defaultParseDate;
+    const parsed = parser(val);
 
-    const parsed = parseDate(val);
     if (!parsed) return;
 
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as Date, {}, {} as UnknownType);
 
     if (parsed instanceof Date) setCurrentMonth(parsed);
+
     if (shouldCloseOnSelect) setOpen(false);
   };
 

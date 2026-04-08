@@ -6,9 +6,23 @@ import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/tex
 import styles from './multi-value-field.module.scss';
 
 export interface MultiValueFieldProps extends Omit<TextFieldProps, 'value' | 'onChange'> {
+  /*
+   * Array of string values to display as tags. Can be controlled or uncontrolled.
+   */
   values?: string[];
+  /**
+   * Callback fired when the values change (e.g. tag added or removed).
+   * Provides the updated array of values.
+   */
   onChange?: (values: string[]) => void;
+  /*
+   * Maximum number of values allowed. If set, prevents adding more tags than this limit.
+   */
   maxValues?: number;
+  /*
+   * Color of the tags. Can be 'primary', 'secondary', or 'danger'.
+   * Defaults to 'primary'.
+   */
   tagColor?: 'primary' | 'secondary' | 'danger';
 }
 
