@@ -144,7 +144,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
     styles[`tedi-toggle--${color}-${type}`],
     {
       [styles['tedi-toggle--active']]: isChecked,
-      [styles['tedi-toggle--disabled']]: disabled,
+      [styles['tedi-toggle--disabled']]: disabled || isLoading,
     },
     className
   );
@@ -176,7 +176,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
             className={styles['tedi-toggle__input']}
             checked={isControlled ? isChecked : undefined}
             defaultChecked={!isControlled ? defaultChecked : undefined}
-            disabled={disabled}
+            disabled={disabled || isLoading}
             onChange={handleChange}
           />
 

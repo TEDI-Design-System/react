@@ -81,12 +81,12 @@
     border-radius: var(--form-toggl-radius);
     transition: background 0.15s ease, border-color 0.15s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: var(--toggle-bg-hover);
       border-color: var(--toggle-border-hover);
     }
 
-    &:active {
+    &:active:not(:disabled) {
       background: var(--toggle-bg-active);
       border-color: var(--toggle-border-active);
     }
@@ -95,12 +95,12 @@
       background: var(--toggle-bg-checked);
       border-color: var(--toggle-border-checked);
 
-      &:hover {
+      &:hover:not(:disabled) {
         background: var(--toggle-bg-checked-hover);
         border-color: var(--toggle-border-checked-hover);
       }
 
-      &:active {
+      &:active:not(:disabled) {
         background: var(--toggle-bg-checked-active);
         border-color: var(--toggle-border-checked-active);
       }

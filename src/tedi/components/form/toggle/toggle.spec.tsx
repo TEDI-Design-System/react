@@ -100,18 +100,18 @@ describe('Toggle component', () => {
     expect(icon).toBeInTheDocument();
   });
 
-  it('renders label on the left when labelPosition="left"', () => {
-    render(<Toggle {...defaultProps} labelPosition="left" />);
-
-    const control = screen.getByRole('switch').closest('label');
-    expect(control).toHaveClass('tedi-toggle__control--label-left');
-  });
-
-  it('renders label on the right by default', () => {
-    render(<Toggle {...defaultProps} />);
+  it('renders label on the right when labelPosition="right"', () => {
+    render(<Toggle {...defaultProps} labelPosition="right" />);
 
     const control = screen.getByRole('switch').closest('label');
     expect(control).toHaveClass('tedi-toggle__control--label-right');
+  });
+
+  it('renders label on the left by default', () => {
+    render(<Toggle {...defaultProps} />);
+
+    const control = screen.getByRole('switch').closest('label');
+    expect(control).toHaveClass('tedi-toggle__control--label-left');
   });
 
   it('renders helper text when provided', () => {
