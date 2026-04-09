@@ -253,3 +253,29 @@ export const TooltipPosition: StoryFn = () => {
     </Row>
   );
 };
+
+export const ScrollableRowInCard: StoryFn = () => {
+  return (
+    <Row justifyContent="center">
+      <Col width="auto" style={{ width: '100%' }}>
+        <div style={{ width: '100%', overflowX: 'scroll' }}>
+          <div style={{ minWidth: '100rem' }}>
+            <TooltipProvider>
+              <TooltipTrigger>
+                <span
+                  style={{
+                    display: 'block',
+                    width: 'fit-content',
+                  }}
+                >
+                  Lorem ipsum dolor sit amet
+                </span>
+              </TooltipTrigger>
+              <Tooltip>Lorem ipsum dolor sit amet</Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+      </Col>
+    </Row>
+  );
+};

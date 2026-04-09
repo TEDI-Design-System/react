@@ -164,7 +164,10 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     middleware: [
       offset(offsetOptions),
       flip(),
-      shift({ padding: 8 }),
+      shift({
+        altBoundary: true,
+        padding: 8,
+      }),
       arrow({
         element: arrowRef,
         padding: 4,
@@ -184,6 +187,7 @@ export const TooltipProvider = (props: TooltipProviderProps): JSX.Element => {
     }),
     useRole(context, { role }),
     useDismiss(context, {
+      ancestorScroll: true,
       outsidePressEvent: openWith === 'click' ? 'mousedown' : 'pointerdown', // https://floating-ui.com/docs/dialog#interaction-hooks
     }),
   ]);

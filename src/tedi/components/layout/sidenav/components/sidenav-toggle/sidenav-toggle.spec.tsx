@@ -107,4 +107,19 @@ describe('SidenavToggle', () => {
     const button = screen.getByRole('button');
     expect(button.className).toContain('tedi-sidenav-toggle--open');
   });
+
+  test('applies custom className prop', () => {
+    const customClass = 'my-special-toggle extra-class';
+
+    render(<SidenavToggle {...defaultProps} className={customClass} />);
+
+    const button = screen.getByRole('button');
+
+    expect(button).toHaveClass('my-special-toggle');
+    expect(button).toHaveClass('extra-class');
+
+    expect(button).toHaveClass('tedi-sidenav-toggle');
+    expect(button).toHaveClass('tedi-sidenav-toggle--mobile');
+    expect(button).not.toHaveClass('tedi-sidenav-toggle--open');
+  });
 });
