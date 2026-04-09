@@ -22,7 +22,9 @@ $card-colors: (
 @mixin reset-corner($corner) {
   border-#{$corner}-radius: 0;
 
+  > .tedi-card__header:first-of-type,
   > .tedi-card__content:first-of-type,
+  > .tedi-card__header:last-child,
   > .tedi-card__content:last-child {
     border-#{$corner}-radius: 0;
   }
