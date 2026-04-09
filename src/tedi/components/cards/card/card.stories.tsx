@@ -158,10 +158,6 @@ export const Backgrounds: Story = {
   render: BackgroundColorsTemplate,
 };
 
-export const BorderColors: Story = {
-  render: GeneralTemplate,
-};
-
 export const MultipleContent: Story = {
   render: GeneralTemplate,
 
@@ -220,15 +216,64 @@ export const Borderless: Story = {
   },
 };
 
-export const WithoutBorderRadius: Story = {
-  render: GeneralTemplate,
+export const BorderRadius = () => {
+  return (
+    <>
+      <Row>
+        <Col>
+          <Card>
+            <Card.Content>Default radius</Card.Content>
+          </Card>
+        </Col>
 
-  args: {
-    ...Default.args,
-    card: {
-      borderRadius: false,
-    },
-  },
+        <Col>
+          <Card borderRadius={false}>
+            <Card.Content>No radius</Card.Content>
+          </Card>
+        </Col>
+
+        <Col>
+          <Card borderRadius={{ top: false }}>
+            <Card.Content>No top radius</Card.Content>
+          </Card>
+        </Col>
+
+        <Col>
+          <Card borderRadius={{ bottom: false }}>
+            <Card.Content>No bottom radius</Card.Content>
+          </Card>
+        </Col>
+      </Row>
+
+      <Separator spacing={1.5} />
+
+      <Row>
+        <Col>
+          <Card borderRadius={{ left: false }}>
+            <Card.Content>No left radius</Card.Content>
+          </Card>
+        </Col>
+
+        <Col>
+          <Card borderRadius={{ right: false }}>
+            <Card.Content>No right radius</Card.Content>
+          </Card>
+        </Col>
+
+        <Col>
+          <Card borderRadius={{ topLeft: false }}>
+            <Card.Content>No top-left</Card.Content>
+          </Card>
+        </Col>
+
+        <Col>
+          <Card borderRadius={{ bottomRight: false }}>
+            <Card.Content>No bottom-right</Card.Content>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  );
 };
 
 export const BreakpointProps: Story = {

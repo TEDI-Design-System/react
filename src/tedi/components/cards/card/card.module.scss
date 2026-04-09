@@ -19,14 +19,12 @@ $card-colors: (
   'warning-secondary': '--general-status-warning-background-dark',
 );
 
-@mixin border-radius-reset($sides...) {
-  @each $side in $sides {
-    border-#{$side}-radius: 0;
+@mixin reset-corner($corner) {
+  border-#{$corner}-radius: 0;
 
-    > .tedi-card__content:first-of-type,
-    > .tedi-card__content:last-child {
-      border-#{$side}-radius: 0;
-    }
+  > .tedi-card__content:first-of-type,
+  > .tedi-card__content:last-child {
+    border-#{$corner}-radius: 0;
   }
 }
 
@@ -76,20 +74,20 @@ $card-colors: (
     border: none;
   }
 
-  &--no-border-radius-top {
-    @include border-radius-reset(top-left, top-right);
+  &--no-radius-tl {
+    @include reset-corner(top-left);
   }
 
-  &--no-border-radius-right {
-    @include border-radius-reset(top-right, bottom-right);
+  &--no-radius-tr {
+    @include reset-corner(top-right);
   }
 
-  &--no-border-radius-bottom {
-    @include border-radius-reset(bottom-right, bottom-left);
+  &--no-radius-br {
+    @include reset-corner(bottom-right);
   }
 
-  &--no-border-radius-left {
-    @include border-radius-reset(bottom-left, top-left);
+  &--no-radius-bl {
+    @include reset-corner(bottom-left);
   }
 
   &--border-left,
