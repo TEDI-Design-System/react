@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { Tag } from '../../tags/tag/tag';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
@@ -16,10 +16,6 @@ export interface MultiValueFieldProps extends Omit<TextFieldProps, 'value' | 'on
    */
   onChange?: (values: string[]) => void;
   /*
-   * Maximum number of values allowed. If set, prevents adding more tags than this limit.
-   */
-  maxValues?: number;
-  /*
    * Color of the tags. Can be 'primary', 'secondary', or 'danger'.
    * Defaults to 'primary'.
    */
@@ -27,11 +23,13 @@ export interface MultiValueFieldProps extends Omit<TextFieldProps, 'value' | 'on
 }
 
 export const MultiValueField = forwardRef<TextFieldForwardRef, MultiValueFieldProps>((props, ref): JSX.Element => {
-  const { values: externalValues, onChange, maxValues, tagColor = 'primary', disabled, className, ...rest } = props;
+  const { values: externalValues, onChange, tagColor = 'primary', className, ...rest } = props;
   const [internalValues, setInternalValues] = React.useState<string[]>(externalValues ?? []);
   const [inputValue, setInputValue] = React.useState('');
 
   const values = externalValues ?? internalValues;
+  const tagsRef = useRef<HTMLDivElement>(null);
+  const [tagsHeight, setTagsHeight] = useState(0);
 
   const updateValues = (newValues: string[]) => {
     setInternalValues(newValues);
@@ -42,7 +40,6 @@ export const MultiValueField = forwardRef<TextFieldForwardRef, MultiValueFieldPr
     const trimmed = value.trim();
     if (!trimmed) return;
     if (values.includes(trimmed)) return;
-    if (maxValues && values.length >= maxValues) return;
 
     updateValues([...values, trimmed]);
     setInputValue('');
@@ -64,30 +61,53 @@ export const MultiValueField = forwardRef<TextFieldForwardRef, MultiValueFieldPr
     }
   };
 
+  useLayoutEffect(() => {
+    if (tagsRef.current) {
+      const height = tagsRef.current.offsetHeight;
+      setTagsHeight(height);
+    }
+  }, [values]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (tagsRef.current) setTagsHeight(tagsRef.current.offsetHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const wrapperStyle: React.CSSProperties = {
+    '--tags-height': `${tagsHeight}px`,
+  } as React.CSSProperties;
+
   return (
-    <TextField
-      {...rest}
-      ref={ref}
-      disabled={disabled}
-      value={values.join(', ')}
-      onChange={setInputValue}
-      onKeyDown={handleKeyDown}
-      className={classNames(styles['tedi-multi-value-field'], className)}
-      inputClassName={styles['tedi-multi-value-field__input']}
-      isClearable
-      onClear={() => updateValues([])}
-      startSlot={
-        values.length > 0 && (
-          <div className={styles['tedi-multi-value-field__tags']}>
-            {values.map((value, index) => (
-              <Tag key={`${value}-${index}`} color={tagColor} onClose={disabled ? undefined : () => removeValue(index)}>
-                {value}
-              </Tag>
-            ))}
-          </div>
-        )
-      }
-    />
+    <div style={wrapperStyle} className={styles['tedi-multi-value-field__wrapper']}>
+      <TextField
+        {...rest}
+        ref={ref}
+        value={values.join(', ')}
+        onChange={setInputValue}
+        onKeyDown={handleKeyDown}
+        className={classNames(styles['tedi-multi-value-field'], className)}
+        inputClassName={styles['tedi-multi-value-field__input']}
+        onClear={() => updateValues([])}
+        startSlot={
+          values.length > 0 && (
+            <div ref={tagsRef} className={styles['tedi-multi-value-field__tags']}>
+              {values.map((value, index) => (
+                <Tag
+                  key={`${value}-${index}`}
+                  color={tagColor}
+                  onClose={rest.disabled ? undefined : () => removeValue(index)}
+                >
+                  {value}
+                </Tag>
+              ))}
+            </div>
+          )
+        }
+      />
+    </div>
   );
 });
 

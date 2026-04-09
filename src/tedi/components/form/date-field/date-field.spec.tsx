@@ -120,4 +120,145 @@ describe('DateField component', () => {
     rerender(<DateField {...defaultProps} selected={new Date(2024, 5, 15)} />);
     expect(screen.getByLabelText('Birth date')).toHaveValue('15.06.2024');
   });
+
+  it('removes value from MultiValueField in multiple mode', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(
+      <DateField
+        {...defaultProps}
+        mode="multiple"
+        selected={[new Date(2025, 5, 15), new Date(2025, 6, 20)]}
+        onSelect={onSelect}
+      />
+    );
+
+    const removeButtons = screen.getAllByRole('button', { name: 'close' });
+    await user.click(removeButtons[0]);
+
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.any(Date)]),
+      expect.anything(),
+      expect.anything(),
+      expect.anything()
+    );
+  });
+
+  it('respects readOnly prop', () => {
+    render(<DateField {...defaultProps} readOnly />);
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toHaveAttribute('readonly');
+  });
+
+  it('uses defaultValue for uncontrolled component', () => {
+    const defaultVal = new Date(2025, 0, 15);
+    render(<DateField {...defaultProps} defaultValue={defaultVal} />);
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toHaveValue('15.01.2025');
+  });
+
+  it('handles manual input parsing with parseDate prop', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    const customParse = jest.fn((val: string) => {
+      if (val === 'today') return new Date(2025, 5, 15);
+      return undefined;
+    });
+
+    render(<DateField {...defaultProps} parseDate={customParse} onSelect={onSelect} />);
+
+    const input = screen.getByLabelText('Birth date');
+    await user.type(input, 'today');
+    await user.keyboard('{Enter}'); // or fireEvent.keyDown if preferred
+
+    expect(customParse).toHaveBeenCalledWith('today');
+    expect(onSelect).toHaveBeenCalled();
+  });
+
+  it('applies inputProps correctly', () => {
+    render(<DateField {...defaultProps} inputProps={{ disabled: true, size: 'small' }} />);
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toBeDisabled();
+  });
+
+  it('calls onSelect and formats value when selecting a date', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(<DateField {...defaultProps} onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+    await user.click(screen.getByRole('button'));
+
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    expect(onSelect).toHaveBeenCalled();
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toHaveValue('15.06.2025');
+  });
+
+  it('does not close calendar when closeOnSelect is false', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} closeOnSelect={false} initialMonth={new Date(2025, 5, 1)} />);
+
+    await user.click(screen.getByRole('button'));
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('does not call onSelect when input is invalid', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(<DateField {...defaultProps} onSelect={onSelect} />);
+
+    const input = screen.getByLabelText('Birth date');
+    await user.clear(input);
+    await user.type(input, 'invalid-date');
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('uses custom formatDate when provided', async () => {
+    const user = userEvent.setup();
+    const formatDate = jest.fn(() => 'CUSTOM FORMAT');
+
+    render(<DateField {...defaultProps} formatDate={formatDate} selected={new Date(2025, 5, 15)} />);
+
+    expect(screen.getByLabelText('Birth date')).toHaveValue('CUSTOM FORMAT');
+  });
+
+  it('updates selected values in multiple mode', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(<DateField {...defaultProps} mode="multiple" selected={[new Date(2025, 5, 15)]} onSelect={onSelect} />);
+
+    const removeButtons = screen.getAllByRole('button', { name: 'close' });
+    await user.click(removeButtons[0]);
+
+    expect(onSelect).toHaveBeenCalled();
+  });
+
+  it('renders with minDate and maxDate without crashing', () => {
+    render(<DateField {...defaultProps} minDate={new Date(2025, 0, 1)} maxDate={new Date(2025, 11, 31)} />);
+
+    expect(screen.getByLabelText('Birth date')).toBeInTheDocument();
+  });
+
+  it('updates internal state when controlled value changes', () => {
+    const { rerender } = render(<DateField {...defaultProps} selected={new Date(2025, 0, 1)} />);
+
+    rerender(<DateField {...defaultProps} selected={new Date(2025, 1, 1)} />);
+
+    expect(screen.getByLabelText('Birth date')).toHaveValue('01.02.2025');
+  });
 });

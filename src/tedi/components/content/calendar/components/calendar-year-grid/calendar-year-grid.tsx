@@ -25,6 +25,9 @@ export interface YearGridProps {
    * Default is `true`.
    */
   showNavigation?: boolean;
+  /*
+   * Additional class name(s) to apply to the year grid container.
+   */
   className?: string;
 }
 

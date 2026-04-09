@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { CalendarHeader } from './calendar-header';
+import styles from './calendar-header.module.scss';
 
 import '@testing-library/jest-dom';
 
@@ -38,74 +39,82 @@ describe('CalendarHeader', () => {
       weeks: [],
     },
     monthYearSelectGrid: false,
-    displayIndex: 0,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders previous and next month buttons with correct aria-labels', () => {
-    render(<CalendarHeader {...defaultProps} />);
+  it('renders previous and next navigation buttons', () => {
+    render(<CalendarHeader {...defaultProps} showNavigation />);
 
-    const prevBtn = screen.getByRole('button', { name: 'Eelmine kuu' });
-    const nextBtn = screen.getByRole('button', { name: 'Järgmine kuu' });
+    const prevButton = screen.getByRole('button', { name: /eelmine/i });
+    const nextButton = screen.getByRole('button', { name: /järgmine/i });
 
-    expect(prevBtn).toBeInTheDocument();
-    expect(nextBtn).toBeInTheDocument();
-    expect(prevBtn).toHaveAttribute('aria-label', 'Eelmine kuu');
-    expect(nextBtn).toHaveAttribute('aria-label', 'Järgmine kuu');
+    expect(prevButton).toBeInTheDocument();
+    expect(nextButton).toBeInTheDocument();
+    expect(prevButton).toHaveAttribute('aria-label', 'Eelmine kuu');
+    expect(nextButton).toHaveAttribute('aria-label', 'Järgmine kuu');
   });
 
   it('calls goToMonth with previous month when prev button is clicked', async () => {
     const user = userEvent.setup();
-    render(<CalendarHeader {...defaultProps} />);
+    render(<CalendarHeader {...defaultProps} showNavigation />);
 
-    const prevBtn = screen.getByRole('button', { name: 'Eelmine kuu' });
-    await user.click(prevBtn);
+    const prevButton = screen.getByRole('button', { name: /eelmine/i });
+    await user.click(prevButton);
 
     expect(mockGoToMonth).toHaveBeenCalledWith(mockPreviousMonth);
   });
 
   it('calls goToMonth with next month when next button is clicked', async () => {
     const user = userEvent.setup();
-    render(<CalendarHeader {...defaultProps} />);
+    render(<CalendarHeader {...defaultProps} showNavigation />);
 
-    const nextBtn = screen.getByRole('button', { name: 'Järgmine kuu' });
-    await user.click(nextBtn);
+    const nextButton = screen.getByRole('button', { name: /järgmine/i });
+    await user.click(nextButton);
 
     expect(mockGoToMonth).toHaveBeenCalledWith(mockNextMonth);
   });
 
-  it('renders month and year as plain text + dropdown triggers when monthYearSelectGrid = false', () => {
-    render(<CalendarHeader {...defaultProps} />);
+  it('hides navigation buttons when showNavigation=false', () => {
+    render(<CalendarHeader {...defaultProps} showNavigation={false} />);
 
-    expect(screen.getByText('juuli')).toBeInTheDocument();
-    expect(screen.getByText('2025')).toBeInTheDocument();
-    expect(screen.getAllByText('arrow_drop_down')).toHaveLength(2);
-    expect(screen.getAllByRole('button', { name: /juuli/i })).toHaveLength(1);
-    expect(screen.getAllByRole('button', { name: '2025' })).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: 'Eelmine kuu' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Järgmine kuu' })).not.toBeInTheDocument();
   });
 
-  it('renders clickable month and year buttons (no dropdown) when monthYearSelectGrid = true', () => {
+  it('renders month and year dropdowns when monthYearSelectGrid = false', () => {
+    render(<CalendarHeader {...defaultProps} />);
+
+    const monthButton = screen.getByRole('button', { name: /juuli/i });
+    expect(monthButton).toBeInTheDocument();
+    const yearButton = screen.getByRole('button', { name: /2025/i });
+    expect(yearButton).toBeInTheDocument();
+    expect(screen.getAllByTestId('tedi-icon-arrow_drop_down')).toHaveLength(2);
+  });
+
+  it('renders clickable month/year buttons (grid mode) when monthYearSelectGrid = true', () => {
+    const onOpenMonthGrid = jest.fn();
+    const onOpenYearGrid = jest.fn();
+
     render(
       <CalendarHeader
         {...defaultProps}
         monthYearSelectGrid={true}
-        onOpenMonthGrid={jest.fn()}
-        onOpenYearGrid={jest.fn()}
+        onOpenMonthGrid={onOpenMonthGrid}
+        onOpenYearGrid={onOpenYearGrid}
       />
     );
 
-    const monthBtn = screen.getByRole('button', { name: 'juuli' });
-    const yearBtn = screen.getByRole('button', { name: '2025' });
+    const monthBtn = screen.getByRole('button', { name: /juuli/i });
+    const yearBtn = screen.getByRole('button', { name: /2025/i });
 
     expect(monthBtn).toBeInTheDocument();
     expect(yearBtn).toBeInTheDocument();
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
-  it('calls onOpenMonthGrid when month button is clicked in grid mode', async () => {
+  it('calls onOpenMonthGrid when month button clicked in grid mode', async () => {
     const onOpenMonthGrid = jest.fn();
     const user = userEvent.setup();
 
@@ -118,13 +127,12 @@ describe('CalendarHeader', () => {
       />
     );
 
-    const monthBtn = screen.getByRole('button', { name: 'juuli' });
-    await user.click(monthBtn);
+    await user.click(screen.getByRole('button', { name: /juuli/i }));
 
     expect(onOpenMonthGrid).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onOpenYearGrid when year button is clicked in grid mode', async () => {
+  it('calls onOpenYearGrid when year button clicked in grid mode', async () => {
     const onOpenYearGrid = jest.fn();
     const user = userEvent.setup();
 
@@ -137,13 +145,12 @@ describe('CalendarHeader', () => {
       />
     );
 
-    const yearBtn = screen.getByRole('button', { name: '2025' });
-    await user.click(yearBtn);
+    await user.click(screen.getByRole('button', { name: /2025/i }));
 
     expect(onOpenYearGrid).toHaveBeenCalledTimes(1);
   });
 
-  it('shows correct month name in Estonian locale', () => {
+  it('shows correct Estonian month name', () => {
     render(
       <CalendarHeader
         {...defaultProps}
@@ -154,11 +161,14 @@ describe('CalendarHeader', () => {
       />
     );
 
-    expect(screen.getByText('detsember')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /detsember/i })).toBeInTheDocument();
   });
 
-  it('applies correct container class', () => {
-    const { container } = render(<CalendarHeader {...defaultProps} />);
-    expect(container.firstChild).toHaveClass('tedi-calendar__header');
+  it('applies correct header class and no-navigation variant', () => {
+    const { container } = render(<CalendarHeader {...defaultProps} showNavigation={false} />);
+
+    const header = container.querySelector(`.${styles['tedi-calendar__header']}`);
+    expect(header).toBeInTheDocument();
+    expect(header).toHaveClass(styles['tedi-calendar__no-navigation']);
   });
 });

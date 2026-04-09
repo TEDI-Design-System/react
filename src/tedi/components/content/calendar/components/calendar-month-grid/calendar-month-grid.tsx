@@ -20,6 +20,9 @@ export interface MonthGridProps {
    * Default is `true`.
    */
   showNavigation?: boolean;
+  /*
+   * Additional class name(s) to apply to the month grid container.
+   */
   className?: string;
 }
 

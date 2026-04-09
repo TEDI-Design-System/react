@@ -1,29 +1,16 @@
-.tedi-multi-value-field > div {
-  position: relative;
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  min-height: var(--form-field-height);
-  padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
-  background-color: var(--form-input-background-default);
-  border-radius: var(--form-field-radius);
-  outline: 1px solid var(--form-input-border-default);
-  outline-offset: -1px;
-}
-
 .tedi-multi-value-field__tags {
+  position: absolute;
+  top: 0;
+  right: 4rem;
+  left: 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--layout-grid-gutters-04);
-  padding-right: 4rem;
+  padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
 }
 
 .tedi-multi-value-field__input {
-  display: none;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  outline: none;
+  box-sizing: border-box;
+  min-height: var(--tags-height, var(--form-field-height));
+  color: var(--tedi-alpha-01);
 }

@@ -129,7 +129,13 @@ export interface TextFieldProps extends BreakpointSupport<TextFieldBreakpointPro
    * Additional attributes for the input element.
    */
   input?: React.InputHTMLAttributes<HTMLInputElement> | React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+  /*
+   * Optional start slot element to render inside the input container, before the input field.
+   */
   startSlot?: React.ReactNode;
+  /**
+   * Optional end slot element to render inside the input container, after the input field.
+   */
   endSlot?: React.ReactNode;
 }
 

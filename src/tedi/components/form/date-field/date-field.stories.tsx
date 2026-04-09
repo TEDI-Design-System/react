@@ -25,12 +25,6 @@ const Template: StoryFn<DateFieldProps> = (args) => {
   return <DateField {...args} />;
 };
 
-const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'];
-
-interface TemplateStateProps extends DateFieldProps {
-  array: typeof stateArray;
-}
-
 const sizeArray: TextFieldProps['size'][] = ['default', 'small'];
 interface TemplateMultipleProps<Type = TextFieldProps['size']> extends TextFieldProps {
   array: Type[];
@@ -232,6 +226,7 @@ export const MultipleValues: Story = {
           }
         }}
         formatDate={formatDate}
+        calendarTrigger="input"
       />
     );
   },

@@ -83,7 +83,12 @@ export function CalendarHeader({
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
                 {displayMonth.toLocaleString('et-EE', { month: 'long' })}{' '}
-                <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
+                <Icon
+                  name="arrow_drop_down"
+                  color="tertiary"
+                  className={styles['tedi-calendar__month-year-caret']}
+                  data-testid="tedi-icon-arrow_drop_down"
+                />
               </Button>
             </Dropdown.Trigger>
             <Dropdown.Content>
@@ -110,7 +115,12 @@ export function CalendarHeader({
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
                 {displayMonth.getFullYear()}{' '}
-                <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
+                <Icon
+                  name="arrow_drop_down"
+                  color="tertiary"
+                  className={styles['tedi-calendar__month-year-caret']}
+                  data-testid="tedi-icon-arrow_drop_down"
+                />
               </Button>
             </Dropdown.Trigger>
             <Dropdown.Content>

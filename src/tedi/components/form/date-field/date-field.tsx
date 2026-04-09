@@ -427,7 +427,7 @@ export const DateField: React.FC<DateFieldProps> = ({
               if (!isControlled) setInternalValue(newDates);
               onSelect?.(newDates, {} as UnknownType, {}, {} as UnknownType);
             }}
-            className={cn(styles['tedi-date-field__textfield'], styles['tedi-date-field__multivalue'], {
+            className={cn(styles['tedi-date-field__textfield'], {
               [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,
             })}
           />
