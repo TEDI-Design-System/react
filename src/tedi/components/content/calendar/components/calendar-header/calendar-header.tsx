@@ -26,6 +26,10 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    * Default is `true`.
    */
   showNavigation?: boolean;
+  /**
+   * Locale object for formatting and translating calendar labels (from `react-day-picker`).
+   */
+  localeCode?: string;
 }
 
 export function CalendarHeader({
@@ -34,13 +38,17 @@ export function CalendarHeader({
   onOpenMonthGrid,
   onOpenYearGrid,
   showNavigation,
+  localeCode,
 }: CalendarHeaderProps) {
   const { getLabel } = useLabels();
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
 
   const displayMonth = calendarMonth.date;
-  const months = Array.from({ length: 12 }, (_, i) => new Date(2025, i, 1).toLocaleString('et-EE', { month: 'long' }));
-  const years = Array.from({ length: 10 }, (_, i) => 2021 + i);
+  const months = Array.from({ length: 12 }, (_, i) =>
+    new Date(2025, i, 1).toLocaleString(localeCode, { month: 'long' })
+  );
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
   return (
     <div
@@ -63,7 +71,7 @@ export function CalendarHeader({
       {monthYearSelectGrid ? (
         <>
           <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenMonthGrid}>
-            {displayMonth.toLocaleString('et-EE', { month: 'long' })}
+            {displayMonth.toLocaleString(localeCode, { month: 'long' })}
             <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>
           <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenYearGrid}>
@@ -82,7 +90,7 @@ export function CalendarHeader({
           >
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
-                {displayMonth.toLocaleString('et-EE', { month: 'long' })}{' '}
+                {displayMonth.toLocaleString(localeCode, { month: 'long' })}{' '}
                 <Icon
                   name="arrow_drop_down"
                   color="tertiary"

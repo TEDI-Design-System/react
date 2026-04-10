@@ -260,26 +260,15 @@ export const DateField: React.FC<DateFieldProps> = ({
     }
   }, [selected, isControlled]);
 
-  const dateFormatter = useMemo(() => {
-    if (calendarView === 'years') {
-      return new Intl.DateTimeFormat(localeCode, {
-        year: 'numeric',
-      });
-    }
-
-    if (calendarView === 'months') {
-      return new Intl.DateTimeFormat(localeCode, {
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(localeCode, {
+        day: '2-digit',
         month: '2-digit',
         year: 'numeric',
-      });
-    }
-
-    return new Intl.DateTimeFormat(localeCode, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  }, [localeCode, calendarView]);
+      }),
+    [localeCode]
+  );
 
   const floating = useFloating({
     open,
@@ -346,18 +335,30 @@ export const DateField: React.FC<DateFieldProps> = ({
     if (!match) return undefined;
 
     const [, dd, mm, yyyy] = match;
-    const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    const day = Number(dd);
+    const month = Number(mm) - 1;
+    const year = Number(yyyy);
+    const date = new Date(year, month, day);
 
-    return isNaN(date.getTime()) ? undefined : date;
+    if (isNaN(date.getTime()) || date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
+      return undefined;
+    }
+
+    return date;
   };
 
   const handleInputChange = (val: string) => {
     setInputValue(val);
 
-    const parser = parseDate ?? defaultParseDate;
+    const parser = parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined);
     const parsed = parser(val);
 
-    if (!parsed) return;
+    const isValidForMode =
+      (mode === 'single' && parsed instanceof Date) ||
+      (mode === 'multiple' && Array.isArray(parsed)) ||
+      (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
+
+    if (!isValidForMode) return;
 
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as Date, {}, {} as UnknownType);
@@ -437,7 +438,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             id={id}
             label={label}
             readOnly={readOnly ?? !enableCalendar}
-            value={inputValue || (formatDate ? formatDate(value) : defaultFormatter(value))}
+            value={inputValue}
             placeholder={placeholder}
             icon="calendar_today"
             isClearable

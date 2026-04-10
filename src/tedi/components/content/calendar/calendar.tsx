@@ -2,8 +2,8 @@ import classNames from 'classnames';
 import React from 'react';
 import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
-import { UnknownType } from 'src/tedi/types/commonTypes';
 
+import { UnknownType } from '../../../types/commonTypes';
 import { CalendarView, DateFieldMode } from '../../form/date-field/date-field';
 import styles from './calendar.module.scss';
 import { CalendarHeader } from './components/calendar-header/calendar-header';
@@ -47,6 +47,10 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Locale object for formatting and translating calendar labels (from `react-day-picker`).
    */
   locale?: Locale;
+  /*
+   * The locale code string used for date formatting. Defaults to 'et-EE'.
+   */
+  localeCode?: string;
   /**
    * Whether to display days from the previous and next months in the current month grid.
    * Default is `true`.
@@ -106,6 +110,7 @@ export const Calendar = ({
   mode = 'single',
   value,
   locale = et,
+  localeCode = 'et-EE',
   showOutsideDays = true,
   disabledMatchers,
   required,
@@ -147,7 +152,7 @@ export const Calendar = ({
 
   return (
     <div className={styles['tedi-calendar__wrapper']}>
-      {(view === 'years' || calendarView === 'years') && (
+      {view === 'years' && (
         <YearGrid
           currentMonth={currentMonth}
           onNavigate={setCurrentMonth}
@@ -165,11 +170,12 @@ export const Calendar = ({
         />
       )}
 
-      {(view === 'months' || calendarView === 'months') && (
+      {view === 'months' && (
         <MonthGrid
           currentMonth={currentMonth}
           onNavigate={setCurrentMonth}
           showNavigation={showNavigation}
+          localeCode={localeCode}
           onSelectMonth={(date) => {
             setCurrentMonth(date);
 
@@ -202,6 +208,7 @@ export const Calendar = ({
                 onOpenMonthGrid={() => setView('months')}
                 onOpenYearGrid={() => setView('years')}
                 showNavigation={showNavigation}
+                localeCode={localeCode}
               />
             ),
             Nav: () => <></>,

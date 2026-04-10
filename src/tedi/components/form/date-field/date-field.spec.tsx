@@ -97,8 +97,11 @@ describe('DateField component', () => {
     });
   });
 
-  it('uses custom locale when provided', () => {
+  it('uses custom locale when provided', async () => {
+    const user = userEvent.setup();
     render(<DateField {...defaultProps} locale={et} initialMonth={new Date(2025, 0, 1)} />);
+    await user.click(screen.getByRole('button'));
+    expect(screen.getByText(/jaanuar/i)).toBeInTheDocument();
   });
 
   it('applies custom className', () => {

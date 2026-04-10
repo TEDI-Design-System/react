@@ -20,13 +20,24 @@ export interface MonthGridProps {
    * Default is `true`.
    */
   showNavigation?: boolean;
+  /**
+   * Locale object for formatting and translating calendar labels (from `react-day-picker`).
+   */
+  localeCode?: string;
   /*
    * Additional class name(s) to apply to the month grid container.
    */
   className?: string;
 }
 
-export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigation, className }: MonthGridProps) => {
+export const MonthGrid = ({
+  currentMonth,
+  onSelectMonth,
+  onNavigate,
+  showNavigation,
+  localeCode,
+  className,
+}: MonthGridProps) => {
   const { getLabel } = useLabels();
   const year = currentMonth.getFullYear();
 
@@ -36,7 +47,7 @@ export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigat
     return {
       key: i,
       value: date,
-      label: <Text modifiers="capitalize-first">{date.toLocaleString('et-EE', { month: 'short' })}</Text>,
+      label: <Text modifiers="capitalize-first">{date.toLocaleString(localeCode, { month: 'short' })}</Text>,
       isSelected: i === currentMonth.getMonth(),
     };
   });
@@ -45,7 +56,7 @@ export const MonthGrid = ({ currentMonth, onSelectMonth, onNavigate, showNavigat
     <PickerGrid
       headerLabel={
         <>
-          {currentMonth.toLocaleString('et-EE', { month: 'short' })} {year}
+          {currentMonth.toLocaleString(localeCode, { month: 'short' })} {year}
         </>
       }
       prevAriaLabel={getLabel('pickers.previousMonth')}

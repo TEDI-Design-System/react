@@ -13,7 +13,7 @@ jest.mock('react-day-picker', () => ({
       <div data-testid="day-picker" className={props.classNames?.root}>
         {MonthCaption && <MonthCaption {...props} />}
 
-        <button onClick={() => props.onSelect?.('selected-date')}>select</button>
+        <button onClick={() => props.onSelect?.(new Date(2025, 0, 15))}>select</button>
         <button onClick={() => props.onMonthChange?.(new Date(2025, 1))}>change-month</button>
         {props.footer}
       </div>
@@ -80,7 +80,7 @@ describe('Calendar', () => {
 
     fireEvent.click(screen.getByText('select'));
 
-    expect(handleSelect).toHaveBeenCalledWith('selected-date');
+    expect(handleSelect).toHaveBeenCalledWith(new Date(2025, 0, 15));
   });
 
   it('calls setCurrentMonth when month changes', () => {

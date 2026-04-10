@@ -137,7 +137,12 @@ export const ValueType: StoryFn = () => {
 
           <DateField id="date-with-placeholder" label="Date" placeholder="pp.kk.aaaa" />
 
-          <DateField id="date-with-placeholder" label="Date" placeholder="pp.kk.aaaa" defaultValue={new Date()} />
+          <DateField
+            id="date-with-placeholder-and-default-value"
+            label="Date"
+            placeholder="pp.kk.aaaa"
+            defaultValue={new Date()}
+          />
 
           <DateField
             id="date-with-multiple-dates"
