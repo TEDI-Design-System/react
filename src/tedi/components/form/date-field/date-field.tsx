@@ -413,9 +413,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             {...(inputProps as MultiValueFieldProps)}
             id={id}
             label={label}
-            readOnly={readOnly ?? !enableCalendar}
             values={formattedDates}
-            placeholder={placeholder}
             icon="calendar_today"
             onIconClick={() => enableCalendar && setOpen(true)}
             isClearable

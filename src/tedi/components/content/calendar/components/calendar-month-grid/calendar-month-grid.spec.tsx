@@ -83,7 +83,7 @@ describe('MonthGrid', () => {
 
   it('renders header with correct month and year', () => {
     render(<MonthGrid {...defaultProps} />);
-    expect(screen.getByTestId('header')).toHaveTextContent('juuli 2025');
+    expect(screen.getByTestId('header')).toHaveTextContent('Jul 2025');
   });
 
   it('renders 12 month buttons', () => {

@@ -85,7 +85,7 @@ describe('CalendarHeader', () => {
   });
 
   it('renders month and year dropdowns when monthYearSelectGrid = false', () => {
-    render(<CalendarHeader {...defaultProps} />);
+    render(<CalendarHeader {...defaultProps} localeCode="et" />);
 
     const monthButton = screen.getByRole('button', { name: /juuli/i });
     expect(monthButton).toBeInTheDocument();
@@ -104,6 +104,7 @@ describe('CalendarHeader', () => {
         monthYearSelectGrid={true}
         onOpenMonthGrid={onOpenMonthGrid}
         onOpenYearGrid={onOpenYearGrid}
+        localeCode="et"
       />
     );
 
@@ -124,6 +125,7 @@ describe('CalendarHeader', () => {
         monthYearSelectGrid={true}
         onOpenMonthGrid={onOpenMonthGrid}
         onOpenYearGrid={jest.fn()}
+        localeCode="et"
       />
     );
 
@@ -142,6 +144,7 @@ describe('CalendarHeader', () => {
         monthYearSelectGrid={true}
         onOpenMonthGrid={jest.fn()}
         onOpenYearGrid={onOpenYearGrid}
+        localeCode="et"
       />
     );
 
@@ -158,6 +161,7 @@ describe('CalendarHeader', () => {
           date: new Date(2025, 11, 10),
           weeks: [],
         }}
+        localeCode="et"
       />
     );
 

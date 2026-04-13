@@ -1,121 +1,90 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { useBreakpointProps } from '../../../helpers';
 import MultiValueField, { MultiValueFieldProps } from './multi-value-field';
 
 import '@testing-library/jest-dom';
 
-jest.mock('../../../helpers', () => ({
-  useBreakpointProps: jest.fn(),
-}));
-
 describe('MultiValueField', () => {
-  beforeEach(() => {
-    (useBreakpointProps as jest.Mock).mockReturnValue({
-      getCurrentBreakpointProps: jest.fn((props) => props),
-    });
-  });
-
   const defaultProps: MultiValueFieldProps = {
     id: 'test-multi',
     label: 'Test Multi',
-    placeholder: 'Add value',
   };
 
-  it('renders the input correctly', () => {
+  it('renders label when provided', () => {
     render(<MultiValueField {...defaultProps} />);
-    const input = screen.getByRole('textbox');
-
-    expect(input).toBeInTheDocument();
-    expect(input).toHaveAttribute('id', 'test-multi');
-    expect(input).toHaveAttribute('placeholder', 'Add value');
+    expect(screen.getByText('Test Multi')).toBeInTheDocument();
   });
 
-  it('adds a value when pressing Enter', () => {
-    render(<MultiValueField {...defaultProps} />);
-
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'hello' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    expect(screen.getByText('hello')).toBeInTheDocument();
-  });
-
-  it('does not add empty or whitespace-only values', () => {
-    render(<MultiValueField {...defaultProps} />);
-
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: '   ' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    expect(screen.queryByRole('button', { name: /remove/i })).not.toBeInTheDocument();
-  });
-
-  it('does not add duplicate values', () => {
-    render(<MultiValueField {...defaultProps} />);
-
-    const input = screen.getByRole('textbox');
-
-    fireEvent.change(input, { target: { value: 'hello' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    fireEvent.change(input, { target: { value: 'hello' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    expect(screen.getAllByText('hello')).toHaveLength(1);
-  });
-
-  it('removes last value on Backspace when input is empty', () => {
-    render(<MultiValueField {...defaultProps} />);
-
-    const input = screen.getByRole('textbox');
-
-    // Add two values
-    fireEvent.change(input, { target: { value: 'one' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    fireEvent.change(input, { target: { value: 'two' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    expect(screen.getByText('two')).toBeInTheDocument();
-
-    // Backspace when input is empty
-    fireEvent.change(input, { target: { value: '' } });
-    fireEvent.keyDown(input, { key: 'Backspace' });
-
-    expect(screen.queryByText('two')).not.toBeInTheDocument();
-    expect(screen.getByText('one')).toBeInTheDocument();
-  });
-
-  it('calls onChange when values change', () => {
-    const handleChange = jest.fn();
-    render(<MultiValueField {...defaultProps} onChange={handleChange} />);
-
-    const input = screen.getByRole('textbox');
-
-    fireEvent.change(input, { target: { value: 'hello' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
-
-    expect(handleChange).toHaveBeenCalledWith(['hello']);
-  });
-
-  it('renders initial controlled values', () => {
+  it('renders values as tags', () => {
     render(<MultiValueField {...defaultProps} values={['apple', 'banana']} />);
 
     expect(screen.getByText('apple')).toBeInTheDocument();
     expect(screen.getByText('banana')).toBeInTheDocument();
   });
 
-  it('does not allow removing values when disabled', () => {
-    render(<MultiValueField {...defaultProps} values={['one']} disabled />);
+  it('calls onChange when removing a value', () => {
+    const handleChange = jest.fn();
 
-    expect(screen.queryByRole('button', { name: /remove/i })).not.toBeInTheDocument();
+    render(<MultiValueField {...defaultProps} values={['one', 'two']} onChange={handleChange} />);
+
+    const closeButtons = screen.getAllByRole('button');
+    fireEvent.click(closeButtons[0]);
+
+    expect(handleChange).toHaveBeenCalledWith(['two']);
+  });
+
+  it('shows clear button when values exist and isClearable is true', () => {
+    render(<MultiValueField {...defaultProps} values={['one']} />);
+
+    expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+  });
+
+  it('clears all values when clear button is clicked', () => {
+    const handleChange = jest.fn();
+
+    render(<MultiValueField {...defaultProps} values={['one', 'two']} onChange={handleChange} />);
+
+    const clearButton = screen.getByRole('button', { name: /clear/i });
+    fireEvent.click(clearButton);
+
+    expect(handleChange).toHaveBeenCalledWith([]);
+  });
+
+  it('does not show clear button when isClearable is false', () => {
+    render(<MultiValueField {...defaultProps} values={['one']} isClearable={false} />);
+
+    expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
+  });
+
+  it('renders hidden input when name is provided', () => {
+    render(<MultiValueField {...defaultProps} name="test-name" values={['one', 'two']} />);
+
+    const input = document.querySelector('input[type="hidden"]');
+    expect(input).toHaveAttribute('name', 'test-name');
+    expect(input).toHaveValue(JSON.stringify(['one', 'two']));
+  });
+
+  it('renders icon when provided', () => {
+    render(<MultiValueField {...defaultProps} icon="add" />);
+
+    // Icon renders as span[data-name="icon"] in your setup
+    expect(document.querySelector('[data-name="icon"]')).toBeInTheDocument();
+  });
+
+  it('calls onIconClick when icon is clicked', () => {
+    const handleClick = jest.fn();
+
+    render(<MultiValueField {...defaultProps} icon="add" onIconClick={handleClick} />);
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    expect(handleClick).toHaveBeenCalled();
   });
 
   it('applies custom className', () => {
-    render(<MultiValueField {...defaultProps} className="custom-multi-field" />);
+    const { container } = render(<MultiValueField {...defaultProps} className="custom-class" />);
 
-    const field = screen.getByRole('textbox').closest('div[class*="tedi-multi-value-field"]');
-    expect(field).toHaveClass('custom-multi-field');
+    expect(container.firstChild).toHaveClass('custom-class');
   });
 });

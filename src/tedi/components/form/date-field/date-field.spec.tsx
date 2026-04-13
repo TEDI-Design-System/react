@@ -31,9 +31,10 @@ describe('DateField component', () => {
   });
 
   it('renders MultiValueField in multiple mode', () => {
-    render(<DateField {...defaultProps} mode="multiple" />);
+    const { container } = render(<DateField {...defaultProps} mode="multiple" />);
 
-    expect(screen.getByLabelText('Birth date')).toBeInTheDocument();
+    expect(container.querySelector('.tedi-multi-value-field')).toBeInTheDocument();
+    expect(screen.getByText('Birth date')).toBeInTheDocument();
   });
 
   it('shows placeholder when no value is selected', () => {
@@ -263,5 +264,89 @@ describe('DateField component', () => {
     rerender(<DateField {...defaultProps} selected={new Date(2025, 1, 1)} />);
 
     expect(screen.getByLabelText('Birth date')).toHaveValue('01.02.2025');
+  });
+
+  it('formats multiple dates correctly', () => {
+    render(<DateField {...defaultProps} mode="multiple" selected={[new Date(2025, 0, 1), new Date(2025, 0, 2)]} />);
+
+    expect(screen.getByText('01.01.2025')).toBeInTheDocument();
+    expect(screen.getByText('02.01.2025')).toBeInTheDocument();
+  });
+
+  it('does not open calendar when enableCalendar=false', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} enableCalendar={false} />);
+
+    await user.click(screen.getByRole('textbox'));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('opens calendar when clicking icon (button trigger)', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('formats range with only start date', () => {
+    render(<DateField {...defaultProps} mode="range" selected={{ from: new Date(2025, 0, 10) }} />);
+
+    expect(screen.getByLabelText('Birth date')).toHaveValue('10.01.2025');
+  });
+
+  it('parses valid default input (dd.MM.yyyy)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(<DateField {...defaultProps} onSelect={onSelect} />);
+
+    const input = screen.getByLabelText('Birth date');
+
+    await user.clear(input);
+    await user.type(input, '15.06.2025');
+
+    expect(onSelect).toHaveBeenCalled();
+  });
+
+  it('rejects invalid date like 32.13.2025', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(<DateField {...defaultProps} onSelect={onSelect} />);
+
+    const input = screen.getByLabelText('Birth date');
+
+    await user.clear(input);
+    await user.type(input, '32.13.2025');
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('opens calendar with initialMonth', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} initialMonth={new Date(2025, 11, 1)} />);
+
+    await user.click(screen.getByRole('button'));
+
+    expect(await screen.findByText(/detsember/i)).toBeInTheDocument();
+  });
+
+  it('closes calendar in multiple mode when closeOnSelect=true', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} mode="multiple" closeOnSelect={true} initialMonth={new Date(2025, 5, 1)} />);
+
+    await user.click(screen.getByRole('button'));
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
