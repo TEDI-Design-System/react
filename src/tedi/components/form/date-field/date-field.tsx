@@ -12,7 +12,7 @@ import {
   useRole,
 } from '@floating-ui/react';
 import cn from 'classnames';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
@@ -302,18 +302,21 @@ export const DateField: React.FC<DateFieldProps> = ({
     if (shouldCloseOnSelect) setOpen(false);
   };
 
-  const defaultFormatter = (date?: Date | Date[] | DateRange): string => {
-    if (!date) return '';
+  const defaultFormatter = useCallback(
+    (date?: Date | Date[] | DateRange): string => {
+      if (!date) return '';
 
-    if (date instanceof Date) return dateFormatter.format(date);
-    if (Array.isArray(date)) return date.map((d) => dateFormatter.format(d)).join(', ');
-    if (date.from) {
-      const from = dateFormatter.format(date.from);
-      return date.to ? `${from} – ${dateFormatter.format(date.to)}` : from;
-    }
+      if (date instanceof Date) return dateFormatter.format(date);
+      if (Array.isArray(date)) return date.map((d) => dateFormatter.format(d)).join(', ');
+      if (date.from) {
+        const from = dateFormatter.format(date.from);
+        return date.to ? `${from} – ${dateFormatter.format(date.to)}` : from;
+      }
 
-    return '';
-  };
+      return '';
+    },
+    [dateFormatter]
+  );
 
   const applyValue = (date: Date) => {
     if (!isControlled) setInternalValue(date);
