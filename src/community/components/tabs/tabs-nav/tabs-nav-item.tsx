@@ -8,8 +8,14 @@ import { TabsContext } from '../tabs-context';
 import { TabsItemProps } from '../tabs-item/tabs-item';
 import styles from './tabs-nav.module.scss';
 
+/**
+ * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
+ */
 export type TabsNavItemProps<C extends React.ElementType = 'a'> = AnchorProps<C> & Pick<TabsItemProps, 'id'>;
 
+/**
+ * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
+ */
 export const TabsNavItem = <C extends React.ElementType = 'a'>(props: TabsNavItemProps<C>): JSX.Element => {
   const { isActive, children, id, ...rest } = props;
   const TabsNavItemBEM = cn(styles['tabs__nav-item'], { [styles['tabs__nav-item--current']]: isActive });

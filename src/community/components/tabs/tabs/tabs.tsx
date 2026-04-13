@@ -9,6 +9,9 @@ import TabsNav from '../tabs-nav/tabs-nav';
 import { TabsNavItemProps } from '../tabs-nav/tabs-nav-item';
 import styles from './tabs.module.scss';
 
+/**
+ * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
+ */
 export interface TabsProps {
   /**
    * Tabs content. Children should be TabsItems
@@ -42,6 +45,9 @@ export interface TabsProps {
   hideNavOnPrint?: PrintProps['visibility'];
 }
 
+/**
+ * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
+ */
 export const Tabs = (props: TabsProps): JSX.Element => {
   const isPrinting = usePrint();
   const { defaultCurrentTab, onTabChange, className, children, hideNavOnPrint = 'show' } = props;
