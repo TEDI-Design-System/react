@@ -149,46 +149,47 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
   const controlClass = cn(styles['tedi-toggle__control'], styles[`tedi-toggle__control--label-${labelPosition}`]);
 
   return (
-    <div className={controlClass}>
-      {label && (
-        <FormLabel
-          id={id}
-          className={styles['tedi-toggle__label']}
-          hideLabel={hideLabel}
-          label={label}
-          tooltip={tooltip}
-        />
-      )}
+    <>
+      <div className={controlClass}>
+        {label && (
+          <FormLabel
+            id={id}
+            className={styles['tedi-toggle__label']}
+            hideLabel={hideLabel}
+            label={label}
+            tooltip={tooltip}
+          />
+        )}
 
-      <div className={toggleClass}>
-        <input
-          {...rest}
-          ref={ref}
-          id={id}
-          type="checkbox"
-          role="switch"
-          aria-label={typeof label === 'string' ? label : undefined}
-          aria-describedby={helperId}
-          className={styles['tedi-toggle__input']}
-          checked={isControlled ? isChecked : undefined}
-          defaultChecked={!isControlled ? defaultChecked : undefined}
-          disabled={disabled || isLoading}
-          onChange={handleChange}
-        />
+        <div className={toggleClass}>
+          <input
+            {...rest}
+            ref={ref}
+            id={id}
+            type="checkbox"
+            role="switch"
+            aria-label={typeof label === 'string' ? label : undefined}
+            aria-describedby={helperId}
+            className={styles['tedi-toggle__input']}
+            checked={isControlled ? isChecked : undefined}
+            defaultChecked={!isControlled ? defaultChecked : undefined}
+            disabled={disabled || isLoading}
+            onChange={handleChange}
+          />
 
-        <span className={styles['tedi-toggle__slider']}>
-          {isLoading ? (
-            <Spinner size={size === 'large' ? 16 : 10} className={styles['tedi-toggle__icon']} />
-          ) : icon ? (
-            <Icon name={isChecked ? 'lock_open' : 'lock'} size={16} color="inherit" />
-          ) : null}
-        </span>
+          <span className={styles['tedi-toggle__slider']}>
+            {isLoading ? (
+              <Spinner size={size === 'large' ? 16 : 10} className={styles['tedi-toggle__icon']} />
+            ) : icon ? (
+              <Icon name={isChecked ? 'lock_open' : 'lock'} size={16} color="inherit" />
+            ) : null}
+          </span>
+        </div>
       </div>
-
       {helper && (
         <FeedbackText id={helperId} {...helper} className={cn(styles['tedi-toggle__helper'], helper.className)} />
       )}
-    </div>
+    </>
   );
 });
 
