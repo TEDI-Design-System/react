@@ -5,6 +5,11 @@ import { Dropdown, DropdownItem, DropdownProps } from './dropdown';
 export default {
   component: Dropdown,
   title: 'Community/Dropdown',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 } as Meta;
 
 const items: DropdownItem[] = [

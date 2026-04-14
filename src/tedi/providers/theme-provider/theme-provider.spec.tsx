@@ -18,6 +18,7 @@ describe('ThemeProvider', () => {
 
   const TestComponent = () => {
     const { theme, setTheme } = useTheme();
+
     return (
       <div>
         <p data-testid="theme">{theme}</p>
@@ -53,7 +54,7 @@ describe('ThemeProvider', () => {
     expect(document.cookie).toContain('tedi-theme=default');
   });
 
-  it('ignores existing localStorage theme and uses provided prop theme instead', () => {
+  it('uses theme from localStorage over provided prop theme', () => {
     localStorage.setItem('tedi-theme', 'dark');
 
     render(
@@ -62,11 +63,10 @@ describe('ThemeProvider', () => {
       </ThemeProvider>
     );
 
-    // Provider should still use "default" because prop theme overrides storage
-    expect(screen.getByTestId('theme')).toHaveTextContent('default');
-    expect(document.documentElement).toHaveClass('tedi-theme--default');
-    expect(localStorage.getItem('tedi-theme')).toBe('default');
-    expect(document.cookie).toContain('tedi-theme=default');
+    expect(screen.getByTestId('theme')).toHaveTextContent('dark');
+    expect(document.documentElement).toHaveClass('tedi-theme--dark');
+    expect(localStorage.getItem('tedi-theme')).toBe('dark');
+    expect(document.cookie).toContain('tedi-theme=dark');
   });
 
   it('updates theme and document classes when setTheme is called', () => {
@@ -76,10 +76,8 @@ describe('ThemeProvider', () => {
       </ThemeProvider>
     );
 
-    const button = screen.getByText('Set Dark');
-
     act(() => {
-      button.click();
+      screen.getByText('Set Dark').click();
     });
 
     expect(screen.getByTestId('theme')).toHaveTextContent('dark');
@@ -133,29 +131,31 @@ describe('ThemeProvider', () => {
     expect(document.cookie).toContain('tedi-theme=rit');
   });
 
-  it('does not set theme if invalid theme is provided', () => {
-    const TestComponentWithInvalidTheme = () => {
+  it('allows custom theme values', () => {
+    const TestComponentWithCustomTheme = () => {
       const { theme, setTheme } = useTheme();
+
       return (
         <div>
           <p data-testid="theme">{theme}</p>
-          <button onClick={() => setTheme('invalid' as Theme)}>Set Invalid</button>
+          <button onClick={() => setTheme('invalid' as Theme)}>Set Custom</button>
         </div>
       );
     };
 
     render(
       <ThemeProvider theme="default">
-        <TestComponentWithInvalidTheme />
+        <TestComponentWithCustomTheme />
       </ThemeProvider>
     );
 
     act(() => {
-      screen.getByText('Set Invalid').click();
+      screen.getByText('Set Custom').click();
     });
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('default');
-    expect(document.documentElement).toHaveClass('tedi-theme--default');
-    expect(localStorage.getItem('tedi-theme')).toBe('default');
+    expect(screen.getByTestId('theme')).toHaveTextContent('invalid');
+    expect(document.documentElement).toHaveClass('tedi-theme--invalid');
+    expect(localStorage.getItem('tedi-theme')).toBe('invalid');
+    expect(document.cookie).toContain('tedi-theme=invalid');
   });
 });

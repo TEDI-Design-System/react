@@ -8,7 +8,7 @@ export interface ChoiceInputProps {
   /**
    * Label text
    */
-  label: string | React.ReactNode;
+  label: React.ReactNode;
   /**
    * Additional classes.
    */
@@ -61,4 +61,8 @@ export interface ChoiceInputProps {
    * Whether the input is marked as invalid.
    */
   invalid?: boolean;
+  /**
+   * Whether the input is marked as required.
+   */
+  required?: boolean;
 }

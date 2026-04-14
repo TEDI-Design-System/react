@@ -2,7 +2,7 @@ $spinner-colors: (
   'primary': 'loader-spinner-color-primary',
   'secondary': 'loader-spinner-color-secondary',
 );
-$spinner-sizes: (10, 16, 18, 48);
+$spinner-sizes: (8, 10, 12, 16, 18, 24, 36, 48);
 
 .tedi-spinner {
   display: flex;

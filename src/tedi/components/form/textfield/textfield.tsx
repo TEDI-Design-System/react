@@ -305,11 +305,23 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     };
 
     if (isTextAreaRef(props, inputRef)) {
-      return <textarea {...(sharedProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)} ref={inputRef} />;
+      return (
+        <textarea
+          {...(sharedProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+          ref={inputRef}
+          tabIndex={disabled ? -1 : 0}
+        />
+      );
     }
 
     if (isInputRef(props, inputRef)) {
-      return <input {...(sharedProps as React.InputHTMLAttributes<HTMLInputElement>)} ref={inputRef} />;
+      return (
+        <input
+          {...(sharedProps as React.InputHTMLAttributes<HTMLInputElement>)}
+          ref={inputRef}
+          tabIndex={disabled ? -1 : 0}
+        />
+      );
     }
 
     return null;
@@ -395,7 +407,6 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         onClick={onClick}
-        tabIndex={disabled ? -1 : 0}
         ref={innerRef}
       >
         {renderInputElement}

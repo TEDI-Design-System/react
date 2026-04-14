@@ -66,4 +66,30 @@ describe('InfoButton Component', () => {
     expect(button).toHaveAttribute('title', 'Info button');
     expect(button).toHaveAttribute('id', 'info-button-id');
   });
+
+  it('applies default color variant correctly', () => {
+    render(<InfoButton>Info</InfoButton>);
+    const button = screen.getByRole('button');
+    expect(button).not.toHaveAttribute('data-variant');
+  });
+
+  it('applies inverted color variant correctly', () => {
+    render(<InfoButton color="inverted">Info</InfoButton>);
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('data-variant', 'inverted');
+  });
+
+  it('applies the inverted variant and still renders children', () => {
+    render(
+      <InfoButton color="inverted">
+        <span data-testid="child">Child content</span>
+      </InfoButton>
+    );
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('data-variant', 'inverted');
+
+    const child = screen.getByTestId('child');
+    expect(child).toBeInTheDocument();
+    expect(child).toHaveTextContent('Child content');
+  });
 });

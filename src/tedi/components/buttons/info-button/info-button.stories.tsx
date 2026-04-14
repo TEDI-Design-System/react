@@ -28,20 +28,29 @@ const buttonStateArray = ['Default', 'Hover', 'Active', 'Focus'];
 
 type TemplateMultipleProps = {
   array: typeof buttonStateArray;
+  color?: 'default' | 'inverted';
 };
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, ...buttonProps } = args;
+  const { array, color = 'default', ...buttonProps } = args;
 
   return (
     <VerticalSpacing>
       {array.map((state, index) => (
         <Row key={index}>
           <Col width={1} className="display-flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
+            <Text modifiers="bold" color={color === 'inverted' ? 'white' : 'primary'}>
+              {state}
+            </Text>
           </Col>
           <Col width={1} className="text-center">
-            <InfoButton title={`Info button ${state}`} {...buttonProps} aria-label={`Info button ${state}`} id={state}>
+            <InfoButton
+              title={`Info button ${state}`}
+              color={color}
+              {...buttonProps}
+              aria-label={`Info button ${state}`}
+              id={state}
+            >
               Info button
             </InfoButton>
           </Col>
@@ -57,7 +66,7 @@ export const Default: Story = {
   },
 };
 
-export const InfoButtonStates: StoryObj<TemplateMultipleProps> = {
+export const States: StoryObj<TemplateMultipleProps> = {
   render: TemplateColumn,
   args: {
     array: buttonStateArray,
@@ -68,5 +77,21 @@ export const InfoButtonStates: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focusVisible: '#Focus',
     },
+  },
+};
+
+export const Inverted: StoryObj<TemplateMultipleProps> = {
+  render: TemplateColumn,
+  args: {
+    array: buttonStateArray,
+    color: 'inverted',
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      active: '#Active',
+      focusVisible: '#Focus',
+    },
+    backgrounds: { default: 'brand' },
   },
 };

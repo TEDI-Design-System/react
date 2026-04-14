@@ -4,154 +4,201 @@ import { CSSProperties } from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import styles from './separator.module.scss';
 
-export type SeparatorSpacing = 0 | 0.25 | 0.5 | 0.75 | 1 | 1.25 | 1.5 | 1.75 | 2 | 2.5 | 5;
+export type SeparatorVariant = 'dotted' | 'dot-only';
+export type DotSize = 'large' | 'medium' | 'small' | 'extra-small';
+export type DotStyle = 'filled' | 'outlined';
+export type DotPosition = 'start' | 'center' | 'end' | number;
+
+/**
+ * Margin/padding-like spacing around the separator
+ * - number → uniform spacing on main axis
+ * - object → fine-grained control (top/bottom/left/right)
+ */
+export type SeparatorSpacing =
+  | number
+  | {
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    };
 
 export interface SeparatorSharedProps {
   /**
-   * Additional class.
+   * Additional class names
    */
   className?: string;
   /**
-   * Rendered HTML element.
-   * @default div
+   * HTML element to render — most common are 'hr', 'div', 'span'
    */
   element?: 'hr' | 'div' | 'span';
   /**
-   * Whether the separator should stretch to fill the full spacing inside cardContent.
+   * When true, the separator stretches to fill available space (100%)
    */
   isStretched?: boolean;
-  /*
-   * Color of separator
-   * @default default
+  /**
+   * Semantic color token
+   * @default primary
    */
   color?: 'primary' | 'secondary' | 'accent';
-  /*
-   * Separator style variant.
+  /**
+   * Visual style — line with dots vs standalone centered dot(s)
    */
-  variant?: 'dotted' | 'dotted-small' | 'dot-only';
-  /*
-   * Dot size.
-   * Only used when variant="dot-only"
-   */
-  dotSize?: 'large' | 'medium' | 'small' | 'extra-small';
-  /*
-   * Thickness in pixels (ignored if variant is used).
-   * @default 1
+  variant?: SeparatorVariant;
+  /**
+   * Line thickness in pixels (1 or 2) — affects outlined & solid lines
    */
   thickness?: 1 | 2;
   /**
-   * Spacing applied based on the axis:
-   * - For horizontal axis, spacing is applied to top and bottom of the separator.
-   * - For vertical axis, spacing is applied to left and right of the separator.
+   * Spacing (margin) around the separator
+   * @example
+   * spacing={16}        // 16px top & bottom (horizontal) or left & right (vertical)
+   * spacing={{ top: 24, bottom: 8 }}
    */
   spacing?: SeparatorSpacing;
 }
-
 export interface SeparatorVerticalProps extends SeparatorSharedProps {
   /**
-   * Height of separator. Use with vertical axis, when full-width separator is not needed.
-   * Height can be number in rem units. It's customizable to allow for more flexibility around X components.
+   * Must be set to 'vertical'
+   */
+  axis: 'vertical';
+  /**
+   * Height of the vertical separator in rem units
    */
   height?: number;
   /**
-   * Axis of separator, vertical and horizontal separators support different props
+   * CSS display value — usually 'block' or 'inline-block'
    */
-  axis: 'vertical';
-  topSpacing?: undefined;
-  bottomSpacing?: undefined;
-  display?: 'block' | 'inline';
+  display?: 'block' | 'inline' | 'inline-block';
 }
-
 export interface SeparatorHorizontalProps extends SeparatorSharedProps {
   /**
-   * Spacing on top of separator. Ignored when spacing is also used. Only for horizontal axis.
-   */
-  topSpacing?: SeparatorSpacing;
-  /**
-   * Spacing on bottom of separator. Ignored when spacing is also used. Only for horizontal axis.
-   */
-  bottomSpacing?: SeparatorSpacing;
-  /**
-   * Axis of separator, vertical and horizontal separators support different props
+   * Must be set to 'horizontal' or left undefined (defaults to horizontal)
    */
   axis?: 'horizontal';
+  /**
+  Vertical height is not used in horizontal mode
+  */
   height?: undefined;
+  /**
+   * Display is forced to 'block' in horizontal mode
+   */
   display?: 'block';
 }
 
+type DottedSeparatorProps = {
+  variant?: 'dotted';
+  dotSize?: DotSize;
+  dotStyle?: DotStyle;
+  /**
+   * Position of the single dot
+   * @example
+   * 'center' | 'start' | 'end' | 2.5  // 2.5rem from start
+   */
+  dotPosition?: DotPosition;
+};
+
+type DotOnlySeparatorProps = {
+  variant: 'dot-only';
+  dotSize: DotSize;
+  dotStyle?: DotStyle;
+  dotPosition?: never;
+};
+
 export type SeparatorBreakpointProps = {
-  /**
-   * Spacing values based on breakpoints.
-   */
-  spacing?: Omit<SeparatorHorizontalProps['spacing'], 'axis'>;
-  /**
-   * Height values based on breakpoints (for vertical separators).
-   */
-  height?: Omit<SeparatorVerticalProps['height'], 'axis'>;
+  spacing?: SeparatorSpacing;
+  height?: number;
   axis?: 'horizontal' | 'vertical';
 };
 
 export type SeparatorProps = BreakpointSupport<
-  | (
-      | SeparatorHorizontalProps
-      | (SeparatorVerticalProps & {
-          variant?: 'dotted' | 'dotted-small';
-          dotSize?: undefined;
-        })
-    )
-  | (
-      | SeparatorHorizontalProps
-      | (SeparatorVerticalProps & {
-          variant: 'dot-only';
-          dotSize: 'large' | 'medium' | 'small' | 'extra-small';
-        })
-    )
+  | (SeparatorHorizontalProps & (DottedSeparatorProps | DotOnlySeparatorProps))
+  | (SeparatorVerticalProps & (DottedSeparatorProps | DotOnlySeparatorProps))
 > &
   SeparatorBreakpointProps;
 
 export const Separator = (props: SeparatorProps): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+
   const {
     className,
     element: Element = 'div',
     isStretched,
     spacing,
-    topSpacing,
-    bottomSpacing,
     axis = 'horizontal',
-    color = 'default',
+    color = 'primary',
     variant,
     thickness = 1,
     height,
-    dotSize,
+    dotSize = 'large',
+    dotStyle = 'filled',
+    dotPosition,
     display = 'block',
     ...rest
   } = getCurrentBreakpointProps<SeparatorProps>(props);
 
+  const isNumericDotPosition = typeof dotPosition === 'number';
+  const resolvedDotPosition = variant !== 'dot-only' && !isNumericDotPosition ? dotPosition : undefined;
+
+  let top = 0;
+  let bottom = 0;
+  let left = 0;
+  let right = 0;
+
+  if (typeof spacing === 'number') {
+    if (axis === 'horizontal') {
+      top = bottom = spacing;
+    } else {
+      left = right = spacing;
+    }
+  }
+
+  if (typeof spacing === 'object' && spacing !== null) {
+    top = spacing.top ?? top;
+    bottom = spacing.bottom ?? bottom;
+    left = spacing.left ?? left;
+    right = spacing.right ?? right;
+  }
+
   const SeparatorBEM = cn(
     styles['tedi-separator'],
     className,
-    { [styles[`tedi-separator--${color}`]]: color },
-    { [styles[`tedi-separator--${axis}`]]: axis },
-    { [styles[`tedi-separator--${variant}`]]: variant },
-    { [styles[`tedi-separator--${display}`]]: display },
-    { [styles[`tedi-separator--${variant}-${dotSize}`]]: variant && dotSize },
-    { [styles[`tedi-separator--thickness-${thickness}`]]: thickness && !variant },
-    { [styles['tedi-separator--is-stretched']]: isStretched },
-    { [styles[`tedi-separator--spacing-${spacing}`.replace('.', '-')]]: spacing },
-    { [styles[`tedi-separator--top-${topSpacing}`.replace('.', '-')]]: !spacing && topSpacing },
-    { [styles[`tedi-separator--bottom-${bottomSpacing}`.replace('.', '-')]]: !spacing && bottomSpacing }
+    styles[`tedi-separator--${axis}`],
+    styles[`tedi-separator--${color}`],
+    {
+      [styles[`tedi-separator--${variant}`]]: variant,
+      [styles[`tedi-separator--${display}`]]: display,
+      [styles[`tedi-separator--dotted-${dotSize}`]]: variant === 'dotted',
+      [styles[`tedi-separator--dot-only-${dotSize}`]]: variant === 'dot-only',
+      [styles[`tedi-separator--dot-style-${dotStyle}`]]: variant,
+      [styles[`tedi-separator--dot-position-${resolvedDotPosition}`]]:
+        typeof resolvedDotPosition === 'string' && variant !== 'dot-only',
+      [styles['tedi-separator--dot-position-custom']]: isNumericDotPosition,
+      [styles['tedi-separator--is-stretched']]: isStretched,
+      [styles[`tedi-separator--thickness-${thickness}`]]: thickness || dotStyle === 'outlined' ? thickness : undefined,
+    }
   );
 
-  const getCssVars = () => {
-    const cssvars: CSSProperties = {};
+  const cssVars: CSSProperties = {
+    '--separator-margin-top': `${top}rem`,
+    '--separator-margin-bottom': `${bottom}rem`,
+    '--separator-margin-left': `${left}rem`,
+    '--separator-margin-right': `${right}rem`,
+  } as CSSProperties;
 
-    if (height) cssvars['--vertical-separator-height'] = `${height}rem`;
+  if (height) {
+    cssVars['--vertical-separator-height'] = `${height}rem`;
+  }
 
-    return cssvars;
-  };
+  if (thickness) {
+    cssVars['--separator-thickness'] = `${thickness}px`;
+  }
 
-  return <Element data-name="separator" {...rest} style={getCssVars()} className={SeparatorBEM} />;
+  if (variant === 'dotted' && isNumericDotPosition) {
+    cssVars['--separator-dot-position'] = `${dotPosition}rem`;
+  }
+
+  return <Element data-name="separator" {...rest} style={cssVars} className={SeparatorBEM} />;
 };
 
 export default Separator;

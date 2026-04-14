@@ -118,4 +118,23 @@ describe('Alert component', () => {
     const title = screen.getByText(text);
     expect(title.tagName).toBe(level.toUpperCase());
   });
+
+  it('renders with small size and applies correct size class', () => {
+    render(<Alert size="small">Small Alert</Alert>);
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveClass('tedi-alert--size-small');
+  });
+
+  it('renders danger alert with small size', () => {
+    render(
+      <Alert type="danger" size="small">
+        Danger Small Alert
+      </Alert>
+    );
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveClass('tedi-alert--danger');
+    expect(alert).toHaveClass('tedi-alert--size-small');
+  });
 });

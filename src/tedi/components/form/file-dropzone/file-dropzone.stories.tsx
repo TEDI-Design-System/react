@@ -120,3 +120,13 @@ export const MultipleWithIndividualValidation: Story = {
     </Row>
   ),
 };
+
+export const HasTooltip: Story = {
+  render: Template,
+  args: {
+    id: 'file-dropzone-tooltip',
+    name: 'file-tooltip',
+    label: 'Drop files here',
+    tooltip: 'Lorem ipsum',
+  },
+};

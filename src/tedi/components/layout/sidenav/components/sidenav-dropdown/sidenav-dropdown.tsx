@@ -22,10 +22,11 @@ type SideNavDropdownProps<C extends React.ElementType = 'a'> = {
   trigger: React.ReactNode;
   groups: Group<C>[];
   onOpenChange?: (isOpen: boolean) => void;
+  as?: C;
 };
 
 type Group<C extends React.ElementType> = {
-  subHeading?: string;
+  subHeading?: React.ReactNode;
   subItems: SideNavItemProps<C>[];
 };
 
@@ -33,6 +34,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
   trigger,
   groups,
   onOpenChange,
+  as,
 }: SideNavDropdownProps<C>) => {
   const { getLabel } = useLabels();
   const [open, setOpen] = useState(false);
@@ -68,7 +70,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
           {...item}
           role="menuitem"
           aria-haspopup={hasChildren ? 'true' : undefined}
-          aria-expanded={hasChildren ? false : undefined}
+          aria-expanded={hasChildren ? open : undefined}
           aria-controls={hasChildren ? `${id}-submenu` : undefined}
           className={styles['tedi-sidenav-dropdown__link']}
           data-active={item.isActive}
@@ -78,6 +80,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
             item.onClick?.(e);
             setOpen(false);
           }}
+          as={item.as ?? as}
         >
           {item.children}
           {hasChildren && <span className={styles['tedi-sidenav__bullet']} />}

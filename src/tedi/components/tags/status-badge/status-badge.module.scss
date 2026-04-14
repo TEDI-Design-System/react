@@ -88,13 +88,5 @@ $badge-status-colors: ('inactive', 'success', 'danger', 'warning');
     line-height: var(--body-small-regular-line-height);
   }
 
-  &__icon-primary {
-    color: var(--status-badge-icon-primary);
-  }
-
-  &__icon-accent {
-    color: var(--status-badge-icon-secondary);
-  }
-
   @include mixins.print-grayscale;
 }

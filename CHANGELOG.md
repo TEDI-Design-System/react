@@ -1,3 +1,281 @@
+# [16.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.1-rc.1...react-16.2.0-rc.1) (2026-04-06)
+
+
+### Features
+
+* **spinner:** add new sizes [#586](https://github.com/TEDI-Design-System/react/issues/586) ([#589](https://github.com/TEDI-Design-System/react/issues/589)) ([fbea0c3](https://github.com/TEDI-Design-System/react/commit/fbea0c3e684feac8a1de3895c17d6c10b9a6e07e))
+
+## [16.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.0...react-16.1.1-rc.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* **select:** select placeholder no longer blocks context menu interactions [#584](https://github.com/TEDI-Design-System/react/issues/584) ([#585](https://github.com/TEDI-Design-System/react/issues/585)) ([e8d86ab](https://github.com/TEDI-Design-System/react/commit/e8d86ab9632be40906a1d706991fbfe87ff31656))
+
+# [16.1.0](https://github.com/TEDI-Design-System/react/compare/react-16.0.0...react-16.1.0) (2026-03-26)
+
+
+### Bug Fixes
+
+* **file-dropzone:** pass formlabel props to FormLabel [#537](https://github.com/TEDI-Design-System/react/issues/537) ([#548](https://github.com/TEDI-Design-System/react/issues/548)) ([0aaf2e6](https://github.com/TEDI-Design-System/react/commit/0aaf2e62a075df95610e5727ebd348737db6f595))
+* **list:** fix mobile padding [#552](https://github.com/TEDI-Design-System/react/issues/552) ([#553](https://github.com/TEDI-Design-System/react/issues/553)) ([2e93804](https://github.com/TEDI-Design-System/react/commit/2e93804f5b1bf7662eef9ce3517c36fa637f61e9))
+* **sidenav-toggle:** fix button size, add className prop [#562](https://github.com/TEDI-Design-System/react/issues/562) ([#573](https://github.com/TEDI-Design-System/react/issues/573)) ([5c961d3](https://github.com/TEDI-Design-System/react/commit/5c961d3845ef80f9f4f6eacdb888fee34474708e))
+* **status-badge:** add missing forwardRef, update stories [#546](https://github.com/TEDI-Design-System/react/issues/546) ([#572](https://github.com/TEDI-Design-System/react/issues/572)) ([cb86a50](https://github.com/TEDI-Design-System/react/commit/cb86a50e406236b6c4b4c70643ed3617f572d796))
+* **status-badge:** inherit icon color from text, fix dark mode icon colors [#545](https://github.com/TEDI-Design-System/react/issues/545) ([#547](https://github.com/TEDI-Design-System/react/issues/547)) ([59ce1cc](https://github.com/TEDI-Design-System/react/commit/59ce1cc4354101138d8ac226f8cacd0dccac1c3d))
+* **textfield:** Move tabIndex attribute to input element https://github.com/TEDI-Design-System/react/issues/564 ([#565](https://github.com/TEDI-Design-System/react/issues/565)) ([11dcb5b](https://github.com/TEDI-Design-System/react/commit/11dcb5b2537fddf16410a01da04c0e81319222db))
+
+
+### Features
+
+* **docs:** added css-utilities documentation [#570](https://github.com/TEDI-Design-System/react/issues/570) ([#571](https://github.com/TEDI-Design-System/react/issues/571)) ([84bfbd7](https://github.com/TEDI-Design-System/react/commit/84bfbd710b63021d974c7abe86d4810a1ddf5b72))
+* **dropdown:** TEDI-Ready Dropdown component [#94](https://github.com/TEDI-Design-System/react/issues/94) ([#549](https://github.com/TEDI-Design-System/react/issues/549)) ([836039f](https://github.com/TEDI-Design-System/react/commit/836039ff317b32fed2dc0c47a8b495ddcffe6e91))
+* **theme-provider:** theme provider changes [#499](https://github.com/TEDI-Design-System/react/issues/499) ([#550](https://github.com/TEDI-Design-System/react/issues/550)) ([07fa36c](https://github.com/TEDI-Design-System/react/commit/07fa36c1a26d5f9b20b6cada92b1ab92e098f587))
+* **tooltip:** Add shift altBoundary: true to tooltip-provider.tsx https://github.com/TEDI-Design-System/react/issues/566 ([#567](https://github.com/TEDI-Design-System/react/issues/567)) ([4ac0af6](https://github.com/TEDI-Design-System/react/commit/4ac0af6eacf120f8ee797e440a710a428a5ad5af))
+
+# [16.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.6...react-16.1.0-rc.7) (2026-03-26)
+
+
+### Bug Fixes
+
+* **sidenav-toggle:** fix button size, add className prop [#562](https://github.com/TEDI-Design-System/react/issues/562) ([#573](https://github.com/TEDI-Design-System/react/issues/573)) ([5c961d3](https://github.com/TEDI-Design-System/react/commit/5c961d3845ef80f9f4f6eacdb888fee34474708e))
+
+
+### Features
+
+* **tooltip:** Add shift altBoundary: true to tooltip-provider.tsx https://github.com/TEDI-Design-System/react/issues/566 ([#567](https://github.com/TEDI-Design-System/react/issues/567)) ([4ac0af6](https://github.com/TEDI-Design-System/react/commit/4ac0af6eacf120f8ee797e440a710a428a5ad5af))
+
+# [16.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.5...react-16.1.0-rc.6) (2026-03-23)
+
+
+### Bug Fixes
+
+* **status-badge:** add missing forwardRef, update stories [#546](https://github.com/TEDI-Design-System/react/issues/546) ([#572](https://github.com/TEDI-Design-System/react/issues/572)) ([cb86a50](https://github.com/TEDI-Design-System/react/commit/cb86a50e406236b6c4b4c70643ed3617f572d796))
+
+# [16.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.4...react-16.1.0-rc.5) (2026-03-23)
+
+
+### Bug Fixes
+
+* **textfield:** Move tabIndex attribute to input element https://github.com/TEDI-Design-System/react/issues/564 ([#565](https://github.com/TEDI-Design-System/react/issues/565)) ([11dcb5b](https://github.com/TEDI-Design-System/react/commit/11dcb5b2537fddf16410a01da04c0e81319222db))
+
+# [16.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.3...react-16.1.0-rc.4) (2026-03-20)
+
+
+### Features
+
+* **docs:** added css-utilities documentation [#570](https://github.com/TEDI-Design-System/react/issues/570) ([#571](https://github.com/TEDI-Design-System/react/issues/571)) ([84bfbd7](https://github.com/TEDI-Design-System/react/commit/84bfbd710b63021d974c7abe86d4810a1ddf5b72))
+
+# [16.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.2...react-16.1.0-rc.3) (2026-03-11)
+
+
+### Features
+
+* **dropdown:** TEDI-Ready Dropdown component [#94](https://github.com/TEDI-Design-System/react/issues/94) ([#549](https://github.com/TEDI-Design-System/react/issues/549)) ([836039f](https://github.com/TEDI-Design-System/react/commit/836039ff317b32fed2dc0c47a8b495ddcffe6e91))
+
+# [16.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.1.0-rc.1...react-16.1.0-rc.2) (2026-03-11)
+
+
+### Bug Fixes
+
+* **list:** fix mobile padding [#552](https://github.com/TEDI-Design-System/react/issues/552) ([#553](https://github.com/TEDI-Design-System/react/issues/553)) ([2e93804](https://github.com/TEDI-Design-System/react/commit/2e93804f5b1bf7662eef9ce3517c36fa637f61e9))
+
+# [16.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.0.1-rc.2...react-16.1.0-rc.1) (2026-03-10)
+
+
+### Features
+
+* **theme-provider:** theme provider changes [#499](https://github.com/TEDI-Design-System/react/issues/499) ([#550](https://github.com/TEDI-Design-System/react/issues/550)) ([07fa36c](https://github.com/TEDI-Design-System/react/commit/07fa36c1a26d5f9b20b6cada92b1ab92e098f587))
+
+## [16.0.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.0.1-rc.1...react-16.0.1-rc.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* **file-dropzone:** pass formlabel props to FormLabel [#537](https://github.com/TEDI-Design-System/react/issues/537) ([#548](https://github.com/TEDI-Design-System/react/issues/548)) ([0aaf2e6](https://github.com/TEDI-Design-System/react/commit/0aaf2e62a075df95610e5727ebd348737db6f595))
+
+## [16.0.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.0.0...react-16.0.1-rc.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* **status-badge:** inherit icon color from text, fix dark mode icon colors [#545](https://github.com/TEDI-Design-System/react/issues/545) ([#547](https://github.com/TEDI-Design-System/react/issues/547)) ([59ce1cc](https://github.com/TEDI-Design-System/react/commit/59ce1cc4354101138d8ac226f8cacd0dccac1c3d))
+
+# [16.0.0](https://github.com/TEDI-Design-System/react/compare/react-15.0.0...react-16.0.0) (2026-02-26)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** pass required prop to label [#115](https://github.com/TEDI-Design-System/react/issues/115) ([#498](https://github.com/TEDI-Design-System/react/issues/498)) ([a569636](https://github.com/TEDI-Design-System/react/commit/a569636453c865b142ec53761949b97afd436546)), closes [#486](https://github.com/TEDI-Design-System/react/issues/486)
+* **checkbox,radio:** show pointer on label hover [#532](https://github.com/TEDI-Design-System/react/issues/532) ([#533](https://github.com/TEDI-Design-System/react/issues/533)) ([097627d](https://github.com/TEDI-Design-System/react/commit/097627db68e23afaa27dd288319b34ccba3e5888))
+* **choice-group:** prevent calling onchange twice on card variant [#484](https://github.com/TEDI-Design-System/react/issues/484) ([#502](https://github.com/TEDI-Design-System/react/issues/502)) ([27799cc](https://github.com/TEDI-Design-System/react/commit/27799cc2c4db6381f911ada2697e1bd0b53d2a4d))
+* **choice-group:** prevent double change events and unify card click behavior [#504](https://github.com/TEDI-Design-System/react/issues/504) ([#505](https://github.com/TEDI-Design-System/react/issues/505)) ([7ea1fed](https://github.com/TEDI-Design-System/react/commit/7ea1fedf754e4828df7b508f8cd9ab4428ad3fe6))
+* **choice-group:** segmented item borders and focus behaviour [#101](https://github.com/TEDI-Design-System/react/issues/101) ([#513](https://github.com/TEDI-Design-System/react/issues/513)) ([455c491](https://github.com/TEDI-Design-System/react/commit/455c491a753dbfc35d7c996fb94aa15639bbdc51))
+* **choice-group:** selected disabled choice-group item fixes [#27](https://github.com/TEDI-Design-System/react/issues/27) ([#510](https://github.com/TEDI-Design-System/react/issues/510)) ([be8884e](https://github.com/TEDI-Design-System/react/commit/be8884e83e0fb26925b155e13143061ba485aa82))
+* **feedback-text:** fix error/success text color variables [#517](https://github.com/TEDI-Design-System/react/issues/517) ([#521](https://github.com/TEDI-Design-System/react/issues/521)) ([c019e79](https://github.com/TEDI-Design-System/react/commit/c019e793c5126baba67c516255f3ad3ecfcb2fd7))
+* **link:** fix link icon sizes in relation to figma design [#46](https://github.com/TEDI-Design-System/react/issues/46) ([#520](https://github.com/TEDI-Design-System/react/issues/520)) ([f32bd83](https://github.com/TEDI-Design-System/react/commit/f32bd83b549b195ecb70b4f9191dd8ef9f6b0a42))
+* **number-field:** fix variables [#516](https://github.com/TEDI-Design-System/react/issues/516) ([#522](https://github.com/TEDI-Design-System/react/issues/522)) ([dcf6240](https://github.com/TEDI-Design-System/react/commit/dcf62404afa9543c13277623a9aaa6daed1b93df))
+* **separator:** fix custom size application [#535](https://github.com/TEDI-Design-System/react/issues/535) ([#536](https://github.com/TEDI-Design-System/react/issues/536)) ([130edcd](https://github.com/TEDI-Design-System/react/commit/130edcd158944b90c62788e76fc97e015f1f228c))
+* **sidenav:** apply linkAs for flyout items [#40](https://github.com/TEDI-Design-System/react/issues/40) ([#501](https://github.com/TEDI-Design-System/react/issues/501)) ([6007ede](https://github.com/TEDI-Design-System/react/commit/6007ede51b75c6382db9ee3caf689f2a51a04bc3))
+* **text-field:** fix small textfield right area padding, fix small textfield font size [#527](https://github.com/TEDI-Design-System/react/issues/527) ([#528](https://github.com/TEDI-Design-System/react/issues/528)) ([bd8bd16](https://github.com/TEDI-Design-System/react/commit/bd8bd1640c40be40199d881efead665ce45bd0a3))
+* **tooltip,overlay:** wcag improvements [#468](https://github.com/TEDI-Design-System/react/issues/468) ([#491](https://github.com/TEDI-Design-System/react/issues/491)) ([fa60e46](https://github.com/TEDI-Design-System/react/commit/fa60e46c2492734c29d3af2ac3d7cb4df9779c69))
+
+
+### Features
+
+* **alert:** new size prop with default and small values [#11](https://github.com/TEDI-Design-System/react/issues/11) ([#509](https://github.com/TEDI-Design-System/react/issues/509)) ([35c4962](https://github.com/TEDI-Design-System/react/commit/35c4962ec56612c5e5b727a27f813eb96fd7fb1e))
+* **button-group:** add size prop, add small example, fix examples on storybook [#14](https://github.com/TEDI-Design-System/react/issues/14) ([#511](https://github.com/TEDI-Design-System/react/issues/511)) ([73cd4f1](https://github.com/TEDI-Design-System/react/commit/73cd4f11348e4cccc9dfbfd84b7a333ce59f2023))
+* **closing-button:** add brand and inverted color [#6](https://github.com/TEDI-Design-System/react/issues/6) ([#519](https://github.com/TEDI-Design-System/react/issues/519)) ([cfeb5f2](https://github.com/TEDI-Design-System/react/commit/cfeb5f206b9137041b581c610c577e8e600b4fd7))
+* **closing-button:** align size and icon behavior with the design [#43](https://github.com/TEDI-Design-System/react/issues/43) ([#481](https://github.com/TEDI-Design-System/react/issues/481)) ([cdd92a8](https://github.com/TEDI-Design-System/react/commit/cdd92a88115f9ba5b6a5265bf495640178f02b9c))
+* **form-label:** update label prop type to ReactNode [#486](https://github.com/TEDI-Design-System/react/issues/486) ([#490](https://github.com/TEDI-Design-System/react/issues/490)) ([2c1152a](https://github.com/TEDI-Design-System/react/commit/2c1152a549aef92cb3225f092b0519c13440b756))
+* **info-button:** added inverted variant and new color prop [#420](https://github.com/TEDI-Design-System/react/issues/420) ([#508](https://github.com/TEDI-Design-System/react/issues/508)) ([6ca2d7f](https://github.com/TEDI-Design-System/react/commit/6ca2d7fb3b5f609f3f51b884db074ee30fae457a))
+* **separator:** redesign with new spacing API, dotPosition and dotStyle support [#30](https://github.com/TEDI-Design-System/react/issues/30) ([#525](https://github.com/TEDI-Design-System/react/issues/525)) ([93e9e11](https://github.com/TEDI-Design-System/react/commit/93e9e118aab73d40347029089c5370851a7b551c))
+* **sidenav:** subheading as ReactNode, fix mobile sidenav items padding [#421](https://github.com/TEDI-Design-System/react/issues/421) ([#512](https://github.com/TEDI-Design-System/react/issues/512)) ([bb7fbe8](https://github.com/TEDI-Design-System/react/commit/bb7fbe8637895adfd5f331bbdbca5e3853d807ef))
+
+
+### BREAKING CHANGES
+
+* **separator:** legacy spacing props removed, dotSize enum changed, variant values simplified
+* **closing-button:** size, iconSize changes, new default values
+
+# [16.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.19...react-16.0.0-rc.20) (2026-02-26)
+
+
+### Bug Fixes
+
+* **separator:** fix custom size application [#535](https://github.com/TEDI-Design-System/react/issues/535) ([#536](https://github.com/TEDI-Design-System/react/issues/536)) ([130edcd](https://github.com/TEDI-Design-System/react/commit/130edcd158944b90c62788e76fc97e015f1f228c))
+
+# [16.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.18...react-16.0.0-rc.19) (2026-02-25)
+
+
+### Bug Fixes
+
+* **text-field:** fix small textfield right area padding, fix small textfield font size [#527](https://github.com/TEDI-Design-System/react/issues/527) ([#528](https://github.com/TEDI-Design-System/react/issues/528)) ([bd8bd16](https://github.com/TEDI-Design-System/react/commit/bd8bd1640c40be40199d881efead665ce45bd0a3))
+
+# [16.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.17...react-16.0.0-rc.18) (2026-02-25)
+
+
+### Features
+
+* **separator:** redesign with new spacing API, dotPosition and dotStyle support [#30](https://github.com/TEDI-Design-System/react/issues/30) ([#525](https://github.com/TEDI-Design-System/react/issues/525)) ([93e9e11](https://github.com/TEDI-Design-System/react/commit/93e9e118aab73d40347029089c5370851a7b551c))
+
+
+### BREAKING CHANGES
+
+* **separator:** legacy spacing props removed, dotSize enum changed, variant values simplified
+
+# [16.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.16...react-16.0.0-rc.17) (2026-02-25)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** show pointer on label hover [#532](https://github.com/TEDI-Design-System/react/issues/532) ([#533](https://github.com/TEDI-Design-System/react/issues/533)) ([097627d](https://github.com/TEDI-Design-System/react/commit/097627db68e23afaa27dd288319b34ccba3e5888))
+
+# [16.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.15...react-16.0.0-rc.16) (2026-02-20)
+
+
+### Bug Fixes
+
+* **number-field:** fix variables [#516](https://github.com/TEDI-Design-System/react/issues/516) ([#522](https://github.com/TEDI-Design-System/react/issues/522)) ([dcf6240](https://github.com/TEDI-Design-System/react/commit/dcf62404afa9543c13277623a9aaa6daed1b93df))
+
+# [16.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.14...react-16.0.0-rc.15) (2026-02-19)
+
+
+### Bug Fixes
+
+* **choice-group:** segmented item borders and focus behaviour [#101](https://github.com/TEDI-Design-System/react/issues/101) ([#513](https://github.com/TEDI-Design-System/react/issues/513)) ([455c491](https://github.com/TEDI-Design-System/react/commit/455c491a753dbfc35d7c996fb94aa15639bbdc51))
+
+# [16.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.13...react-16.0.0-rc.14) (2026-02-19)
+
+
+### Features
+
+* **closing-button:** add brand and inverted color [#6](https://github.com/TEDI-Design-System/react/issues/6) ([#519](https://github.com/TEDI-Design-System/react/issues/519)) ([cfeb5f2](https://github.com/TEDI-Design-System/react/commit/cfeb5f206b9137041b581c610c577e8e600b4fd7))
+
+# [16.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.12...react-16.0.0-rc.13) (2026-02-19)
+
+
+### Bug Fixes
+
+* **feedback-text:** fix error/success text color variables [#517](https://github.com/TEDI-Design-System/react/issues/517) ([#521](https://github.com/TEDI-Design-System/react/issues/521)) ([c019e79](https://github.com/TEDI-Design-System/react/commit/c019e793c5126baba67c516255f3ad3ecfcb2fd7))
+
+# [16.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.11...react-16.0.0-rc.12) (2026-02-19)
+
+
+### Features
+
+* **sidenav:** subheading as ReactNode, fix mobile sidenav items padding [#421](https://github.com/TEDI-Design-System/react/issues/421) ([#512](https://github.com/TEDI-Design-System/react/issues/512)) ([bb7fbe8](https://github.com/TEDI-Design-System/react/commit/bb7fbe8637895adfd5f331bbdbca5e3853d807ef))
+
+# [16.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.10...react-16.0.0-rc.11) (2026-02-19)
+
+
+### Bug Fixes
+
+* **link:** fix link icon sizes in relation to figma design [#46](https://github.com/TEDI-Design-System/react/issues/46) ([#520](https://github.com/TEDI-Design-System/react/issues/520)) ([f32bd83](https://github.com/TEDI-Design-System/react/commit/f32bd83b549b195ecb70b4f9191dd8ef9f6b0a42))
+
+# [16.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.9...react-16.0.0-rc.10) (2026-02-19)
+
+
+### Features
+
+* **button-group:** add size prop, add small example, fix examples on storybook [#14](https://github.com/TEDI-Design-System/react/issues/14) ([#511](https://github.com/TEDI-Design-System/react/issues/511)) ([73cd4f1](https://github.com/TEDI-Design-System/react/commit/73cd4f11348e4cccc9dfbfd84b7a333ce59f2023))
+
+# [16.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.8...react-16.0.0-rc.9) (2026-02-19)
+
+
+### Features
+
+* **alert:** new size prop with default and small values [#11](https://github.com/TEDI-Design-System/react/issues/11) ([#509](https://github.com/TEDI-Design-System/react/issues/509)) ([35c4962](https://github.com/TEDI-Design-System/react/commit/35c4962ec56612c5e5b727a27f813eb96fd7fb1e))
+
+# [16.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.7...react-16.0.0-rc.8) (2026-02-16)
+
+
+### Bug Fixes
+
+* **tooltip,overlay:** wcag improvements [#468](https://github.com/TEDI-Design-System/react/issues/468) ([#491](https://github.com/TEDI-Design-System/react/issues/491)) ([fa60e46](https://github.com/TEDI-Design-System/react/commit/fa60e46c2492734c29d3af2ac3d7cb4df9779c69))
+
+# [16.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.6...react-16.0.0-rc.7) (2026-02-13)
+
+
+### Bug Fixes
+
+* **choice-group:** selected disabled choice-group item fixes [#27](https://github.com/TEDI-Design-System/react/issues/27) ([#510](https://github.com/TEDI-Design-System/react/issues/510)) ([be8884e](https://github.com/TEDI-Design-System/react/commit/be8884e83e0fb26925b155e13143061ba485aa82))
+
+# [16.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.5...react-16.0.0-rc.6) (2026-02-13)
+
+
+### Bug Fixes
+
+* **sidenav:** apply linkAs for flyout items [#40](https://github.com/TEDI-Design-System/react/issues/40) ([#501](https://github.com/TEDI-Design-System/react/issues/501)) ([6007ede](https://github.com/TEDI-Design-System/react/commit/6007ede51b75c6382db9ee3caf689f2a51a04bc3))
+
+# [16.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.4...react-16.0.0-rc.5) (2026-02-13)
+
+
+### Features
+
+* **info-button:** added inverted variant and new color prop [#420](https://github.com/TEDI-Design-System/react/issues/420) ([#508](https://github.com/TEDI-Design-System/react/issues/508)) ([6ca2d7f](https://github.com/TEDI-Design-System/react/commit/6ca2d7fb3b5f609f3f51b884db074ee30fae457a))
+
+# [16.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.3...react-16.0.0-rc.4) (2026-02-10)
+
+
+### Bug Fixes
+
+* **choice-group:** prevent calling onchange twice on card variant [#484](https://github.com/TEDI-Design-System/react/issues/484) ([#502](https://github.com/TEDI-Design-System/react/issues/502)) ([27799cc](https://github.com/TEDI-Design-System/react/commit/27799cc2c4db6381f911ada2697e1bd0b53d2a4d))
+* **choice-group:** prevent double change events and unify card click behavior [#504](https://github.com/TEDI-Design-System/react/issues/504) ([#505](https://github.com/TEDI-Design-System/react/issues/505)) ([7ea1fed](https://github.com/TEDI-Design-System/react/commit/7ea1fedf754e4828df7b508f8cd9ab4428ad3fe6))
+
+# [16.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.2...react-16.0.0-rc.3) (2026-02-02)
+
+
+### Bug Fixes
+
+* **checkbox,radio:** pass required prop to label [#115](https://github.com/TEDI-Design-System/react/issues/115) ([#498](https://github.com/TEDI-Design-System/react/issues/498)) ([a569636](https://github.com/TEDI-Design-System/react/commit/a569636453c865b142ec53761949b97afd436546)), closes [#486](https://github.com/TEDI-Design-System/react/issues/486)
+
+# [16.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-16.0.0-rc.1...react-16.0.0-rc.2) (2026-02-02)
+
+
+### Features
+
+* **form-label:** update label prop type to ReactNode [#486](https://github.com/TEDI-Design-System/react/issues/486) ([#490](https://github.com/TEDI-Design-System/react/issues/490)) ([2c1152a](https://github.com/TEDI-Design-System/react/commit/2c1152a549aef92cb3225f092b0519c13440b756))
+
 # [16.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-15.0.0...react-16.0.0-rc.1) (2026-01-30)
 
 
