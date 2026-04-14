@@ -1,28 +1,28 @@
 @mixin toggle-variant($color, $type) {
   @if $type == filled {
-    --toggle-bg-default: var(--form-toggl-#{$color}-inactive-default);
-    --toggle-bg-hover: var(--form-toggl-#{$color}-inactive-hover);
-    --toggle-bg-active: var(--form-toggl-#{$color}-inactive-active);
-    --toggle-bg-checked: var(--form-toggl-#{$color}-active-default);
-    --toggle-bg-checked-hover: var(--form-toggl-#{$color}-active-hover);
-    --toggle-bg-checked-active: var(--form-toggl-#{$color}-active-active);
-    --toggle-indicator-default: var(--form-toggl-#{$color}-inactive-indicator);
-    --toggle-indicator-checked: var(--form-toggl-#{$color}-active-indicator);
-    --toggle-icon-default: var(--form-toggl-#{$color}-inactive-icon);
-    --toggle-icon-checked: var(--form-toggl-#{$color}-active-icon);
+    --toggle-bg-default: var(--form-toggle-#{$color}-inactive-default);
+    --toggle-bg-hover: var(--form-toggle-#{$color}-inactive-hover);
+    --toggle-bg-active: var(--form-toggle-#{$color}-inactive-active);
+    --toggle-bg-checked: var(--form-toggle-#{$color}-active-default);
+    --toggle-bg-checked-hover: var(--form-toggle-#{$color}-active-hover);
+    --toggle-bg-checked-active: var(--form-toggle-#{$color}-active-active);
+    --toggle-indicator-default: var(--form-toggle-#{$color}-inactive-indicator);
+    --toggle-indicator-checked: var(--form-toggle-#{$color}-active-indicator);
+    --toggle-icon-default: var(--form-toggle-#{$color}-inactive-icon);
+    --toggle-icon-checked: var(--form-toggle-#{$color}-active-icon);
   }
 
   @if $type == outlined {
-    --toggle-border-default: var(--form-toggl-#{$color}-inactive-default);
-    --toggle-border-hover: var(--form-toggl-#{$color}-inactive-hover);
-    --toggle-border-active: var(--form-toggl-#{$color}-inactive-active);
-    --toggle-border-checked: var(--form-toggl-#{$color}-active-default);
-    --toggle-border-checked-hover: var(--form-toggl-#{$color}-active-hover);
-    --toggle-border-checked-active: var(--form-toggl-#{$color}-active-active);
-    --toggle-indicator-default: var(--form-toggl-#{$color}-inactive-default);
-    --toggle-indicator-checked: var(--form-toggl-#{$color}-active-default);
-    --toggle-icon-default: var(--form-toggl-#{$color}-inactive-icon-outlined);
-    --toggle-icon-checked: var(--form-toggl-#{$color}-active-icon-outlined);
+    --toggle-border-default: var(--form-toggle-#{$color}-inactive-default);
+    --toggle-border-hover: var(--form-toggle-#{$color}-inactive-hover);
+    --toggle-border-active: var(--form-toggle-#{$color}-inactive-active);
+    --toggle-border-checked: var(--form-toggle-#{$color}-active-default);
+    --toggle-border-checked-hover: var(--form-toggle-#{$color}-active-hover);
+    --toggle-border-checked-active: var(--form-toggle-#{$color}-active-active);
+    --toggle-indicator-default: var(--form-toggle-#{$color}-inactive-default);
+    --toggle-indicator-checked: var(--form-toggle-#{$color}-active-default);
+    --toggle-icon-default: var(--form-toggle-#{$color}-inactive-icon-outlined);
+    --toggle-icon-checked: var(--form-toggle-#{$color}-active-icon-outlined);
   }
 }
 
@@ -31,26 +31,26 @@
   display: block;
 
   &--default {
-    --toggle-indicator: var(--form-toggl-default-indicator);
+    --toggle-indicator: var(--form-toggle-default-indicator);
 
-    width: var(--form-toggl-default-width);
-    height: var(--form-toggl-default-height);
+    width: var(--form-toggle-default-width);
+    height: var(--form-toggle-default-height);
 
     .tedi-toggle__slider {
-      width: var(--form-toggl-default-indicator);
-      height: var(--form-toggl-default-indicator);
+      width: var(--form-toggle-default-indicator);
+      height: var(--form-toggle-default-indicator);
     }
   }
 
   &--large {
-    --toggle-indicator: var(--form-toggl-large-indicator);
+    --toggle-indicator: var(--form-toggle-large-indicator);
 
-    width: var(--form-toggl-large-width);
-    height: var(--form-toggl-large-height);
+    width: var(--form-toggle-large-width);
+    height: var(--form-toggle-large-height);
 
     .tedi-toggle__slider {
-      width: var(--form-toggl-large-indicator);
-      height: var(--form-toggl-large-indicator);
+      width: var(--form-toggle-large-indicator);
+      height: var(--form-toggle-large-indicator);
     }
   }
 
@@ -77,8 +77,8 @@
     appearance: none;
     cursor: pointer;
     background: var(--toggle-bg-default);
-    border: var(--borders-01) solid var(--toggle-border-default);
-    border-radius: var(--form-toggl-radius);
+    border: var(--tedi-borders-01) solid var(--toggle-border-default);
+    border-radius: var(--form-toggle-radius);
     transition: background 0.15s ease, border-color 0.15s ease;
 
     &:hover:not(:disabled) {
@@ -107,12 +107,12 @@
     }
 
     &:focus-visible {
-      outline: calc(2 * var(--borders-01)) solid var(--form-toggl-primary-active-default);
+      outline: calc(2 * var(--borders-01)) solid var(--form-toggle-primary-active-default);
       outline-offset: var(--borders-01);
     }
 
     &:checked + .tedi-toggle__slider {
-      left: calc(100% - var(--toggle-indicator) - var(--form-toggl-padding));
+      left: calc(100% - var(--toggle-indicator) - var(--form-toggle-padding));
       color: var(--toggle-icon-checked);
       background-color: var(--toggle-indicator-checked);
       transform: translateY(-50%);
@@ -126,7 +126,7 @@
   &__slider {
     position: absolute;
     top: 50%;
-    left: var(--form-toggl-padding);
+    left: var(--form-toggle-padding);
     display: flex;
     align-items: center;
     justify-content: center;

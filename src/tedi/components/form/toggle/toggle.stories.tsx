@@ -60,7 +60,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
       <VerticalSpacing size={1}>
         {array.map((value, key) => (
           <Row key={key}>
-            <Col md={1} className="display-flex align-items-center">
+            <Col lg={1} md={2} className="display-flex align-items-center">
               <Text color={titleColor} modifiers="bold">
                 {value}
               </Text>
@@ -132,7 +132,6 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
 export const Default: Story = {
   args: {
     label: 'Toggle',
-    hideLabel: true,
   },
 };
 
