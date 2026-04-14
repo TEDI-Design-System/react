@@ -1,3 +1,16 @@
+# [17.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.2.0-rc.1...react-17.0.0-rc.1) (2026-04-14)
+
+
+### Features
+
+* **print:** introduce PrintingProvider + context-based usePrint [#99](https://github.com/TEDI-Design-System/react/issues/99) ([#497](https://github.com/TEDI-Design-System/react/issues/497)) ([a58cb70](https://github.com/TEDI-Design-System/react/commit/a58cb70b49e715c9a24e37fe761d5b7ab4df3fa5))
+
+
+### BREAKING CHANGES
+
+* **print:** usePrint hook removed.
+Replace with usePrint from the new PrintingProvider context.
+
 # [16.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.1-rc.1...react-16.2.0-rc.1) (2026-04-06)
 
 
