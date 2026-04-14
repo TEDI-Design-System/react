@@ -1,3 +1,10 @@
+# [17.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.2...react-17.0.0-rc.3) (2026-04-14)
+
+
+### Features
+
+* **card:** add more control to borderRadius usage, add examples [#444](https://github.com/TEDI-Design-System/react/issues/444) ([#597](https://github.com/TEDI-Design-System/react/issues/597)) ([deac9db](https://github.com/TEDI-Design-System/react/commit/deac9db6a10b8e1fe7dbd8f46ec74c8a46245496))
+
 # [17.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.1...react-17.0.0-rc.2) (2026-04-14)
 
 
