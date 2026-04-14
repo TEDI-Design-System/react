@@ -1,3 +1,10 @@
+# [17.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.3...react-17.0.0-rc.4) (2026-04-14)
+
+
+### Features
+
+* **toggle:** new TEDI-Ready component [#305](https://github.com/TEDI-Design-System/react/issues/305) ([#594](https://github.com/TEDI-Design-System/react/issues/594)) ([6f28045](https://github.com/TEDI-Design-System/react/commit/6f280457f48898d79b72467dd0bac1c2b01fc779))
+
 # [17.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.2...react-17.0.0-rc.3) (2026-04-14)
 
 
