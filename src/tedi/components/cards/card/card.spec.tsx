@@ -79,7 +79,7 @@ describe('Card Component', () => {
     expect(card).toHaveClass('tedi-card--borderless');
   });
 
-  it('applies custom border-radius styles', () => {
+  it('applies custom border-radius styles (top & left)', () => {
     render(
       <Card borderRadius={{ top: false, left: true }}>
         <CardHeader />
@@ -87,8 +87,22 @@ describe('Card Component', () => {
     );
 
     const card = screen.getByTestId('tedi-card');
-    expect(card).toHaveClass('tedi-card--no-border-radius-top');
-    expect(card).not.toHaveClass('tedi-card--no-border-radius-left');
+    expect(card).toHaveClass('tedi-card--no-radius-tl');
+    expect(card).toHaveClass('tedi-card--no-radius-tr');
+    expect(card).not.toHaveClass('tedi-card--no-radius-bl');
+    expect(card).not.toHaveClass('tedi-card--no-radius-br');
+  });
+
+  it('applies specific corner overrides correctly', () => {
+    render(
+      <Card borderRadius={{ bottom: false, bottomRight: true }}>
+        <CardHeader />
+      </Card>
+    );
+
+    const card = screen.getByTestId('tedi-card');
+    expect(card).toHaveClass('tedi-card--no-radius-bl');
+    expect(card).not.toHaveClass('tedi-card--no-radius-br');
   });
 
   it('combines custom `className` with default styles', () => {

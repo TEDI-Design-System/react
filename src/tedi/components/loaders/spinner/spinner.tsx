@@ -2,16 +2,17 @@ import cn from 'classnames';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { IconSize } from '../../base/icon/icon';
 import styles from './spinner.module.scss';
 
-export type SpinnerSize = 10 | 16 | 18 | 48;
+export type SpinnerSize = IconSize | 10;
 export type SpinnerColor = 'primary' | 'secondary';
 export type SpinnerPosition = 'absolute';
 
 type SpinnerBreakpointProps = {
   /**
    * Defines the size of the spinner.
-   * Accepted values: 10 (small), 16 (default), 48 (large).
+   * Accepted values: 8, 10 (small), 12, 16 (default), 18, 24, 36, 48 (large).
    *
    * @default 16
    */
