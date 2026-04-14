@@ -8,6 +8,7 @@ import '../src/community/styles/index.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
 import '../src/community/styles/storybook.scss';
 
+import { PrintingProvider } from '../src/tedi/providers/printing-provider';
 import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
 import { useEffect } from 'react';
 
@@ -59,6 +60,7 @@ export const decorators: Preview['decorators'] = [
 
     return (
       <ThemeProvider theme={theme}>
+        <PrintingProvider>
         {context.componentId === 'components-labelprovider' ? (
           <Story />
         ) : (
@@ -66,6 +68,7 @@ export const decorators: Preview['decorators'] = [
             <Story />
           </StorybookDecorator>
         )}
+        </PrintingProvider>
       </ThemeProvider>
     );
   },
