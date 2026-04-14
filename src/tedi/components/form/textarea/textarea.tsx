@@ -33,7 +33,10 @@ export interface TextAreaProps extends TextFieldProps {
    */
   height?: string | number;
   /**
-   * Maximum height when autoGrow is enabled.
+   * Maximum height of the textarea.
+   *
+   * - When `autoGrow` is enabled, this limits how tall the textarea can grow.
+   * - When `autoGrow` is disabled, this limits the fixed height.
    */
   maxHeight?: string | number;
 }
@@ -100,16 +103,12 @@ export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, r
 
     rowCount = Math.min(Math.max(rowCount, minRows), maxRows);
 
-    const calculatedHeight = rowCount * lineHeight + paddingTop + paddingBottom;
+    const nextHeight = `${rowCount * lineHeight + paddingTop + paddingBottom}px`;
+    textarea.style.height = nextHeight;
+    setTextareaHeight(nextHeight);
 
-    textarea.style.height = `${calculatedHeight}px`;
     textarea.style.overflow = originalOverflow;
-
-    if (rowCount >= maxRows) {
-      textarea.style.overflowY = 'auto';
-    } else {
-      textarea.style.overflowY = 'hidden';
-    }
+    textarea.style.overflowY = textarea.scrollHeight > textarea.clientHeight ? 'auto' : 'hidden';
   }, [autoGrow, minRows, maxRows]);
 
   useEffect(() => {
@@ -167,17 +166,6 @@ export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, r
       };
     }
   }, [autoGrow, minRows, maxHeight, height, textareaHeight]);
-
-  useEffect(() => {
-    if (autoGrow && textareaRef.current) {
-      const updateHeight = () => {
-        if (textareaRef.current) {
-          setTextareaHeight(textareaRef.current.style.height);
-        }
-      };
-      updateHeight();
-    }
-  }, [autoGrow, value]);
 
   const charCount = value.length;
   const charCountHelper = characterLimit ? `${charCount}/${characterLimit}` : '';
