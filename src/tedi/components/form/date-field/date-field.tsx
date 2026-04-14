@@ -383,6 +383,7 @@ export const DateField: React.FC<DateFieldProps> = ({
       const formatted = formatDate ? formatDate(defaultValue) : defaultFormatter(defaultValue);
       setInputValue(formatted);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only effect
   }, []);
 
   const disabledMatchers: Matcher[] = [];
@@ -438,7 +439,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             {...(inputProps as TextFieldProps)}
             id={id}
             label={label}
-            readOnly={readOnly ?? !enableCalendar}
+            readOnly={readOnly}
             value={inputValue}
             placeholder={placeholder}
             icon="calendar_today"

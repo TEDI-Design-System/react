@@ -58,7 +58,7 @@ export interface MultiValueFieldProps {
   isClearable?: boolean;
   /**
    * Marks the field as required.
-   * Adds required indicator to label and hidden input.
+   * Adds required indicator to label and applies native required validation to the hidden input.
    */
   required?: boolean;
   /**
@@ -85,6 +85,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
     onIconClick,
     isClearable = true,
     required,
+    disabled,
   } = props;
 
   const [internalValues, setInternalValues] = useState<string[]>(externalValues ?? []);
@@ -101,7 +102,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
     updateValues(newVals);
   };
 
-  const showClear = isClearable && values.length > 0;
+  const showClear = !disabled && isClearable && values.length > 0;
 
   const clearAll = () => {
     updateValues([]);
@@ -132,7 +133,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
         {values.length > 0 && (
           <div className={styles['tedi-multi-value-field__tags']}>
             {values.map((value, index) => (
-              <Tag key={`${value}-${index}`} color={tagColor} onClose={() => removeValue(index)}>
+              <Tag key={`${value}-${index}`} color={tagColor} onClose={disabled ? undefined : () => removeValue(index)}>
                 {value}
               </Tag>
             ))}
@@ -155,7 +156,15 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
         )}
       </div>
 
-      {name && <input type="hidden" name={name} value={JSON.stringify(values)} required={required} />}
+      {name && (
+        <input
+          type="hidden"
+          name={name}
+          value={values.length ? JSON.stringify(values) : ''}
+          required={required}
+          disabled={disabled}
+        />
+      )}
     </div>
   );
 });
