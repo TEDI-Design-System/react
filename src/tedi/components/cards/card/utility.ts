@@ -76,3 +76,57 @@ export const getPaddingCssVariables = (padding: CardContentProps['padding']) => 
     '--card-content-padding-left': `${left}rem`,
   };
 };
+
+export type BorderRadius =
+  | false
+  | {
+      top?: boolean;
+      right?: boolean;
+      bottom?: boolean;
+      left?: boolean;
+      topLeft?: boolean;
+      topRight?: boolean;
+      bottomRight?: boolean;
+      bottomLeft?: boolean;
+    };
+
+export type ResolvedCorners = {
+  topLeft: boolean;
+  topRight: boolean;
+  bottomRight: boolean;
+  bottomLeft: boolean;
+};
+
+export const resolveBorderRadius = (config?: BorderRadius): ResolvedCorners => {
+  if (config === false) {
+    return {
+      topLeft: false,
+      topRight: false,
+      bottomRight: false,
+      bottomLeft: false,
+    };
+  }
+
+  const { top, right, bottom, left, topLeft, topRight, bottomRight, bottomLeft } = config ?? {};
+
+  // default = true unless explicitly disabled
+  const sideTop = top !== false;
+  const sideRight = right !== false;
+  const sideBottom = bottom !== false;
+  const sideLeft = left !== false;
+
+  const resolved = {
+    topLeft: sideTop && sideLeft,
+    topRight: sideTop && sideRight,
+    bottomRight: sideBottom && sideRight,
+    bottomLeft: sideBottom && sideLeft,
+  };
+
+  // corner overrides have highest priority
+  return {
+    topLeft: topLeft ?? resolved.topLeft,
+    topRight: topRight ?? resolved.topRight,
+    bottomRight: bottomRight ?? resolved.bottomRight,
+    bottomLeft: bottomLeft ?? resolved.bottomLeft,
+  };
+};
