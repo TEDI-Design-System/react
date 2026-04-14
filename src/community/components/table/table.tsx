@@ -19,7 +19,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { useLabels } from '../../../tedi/providers/label-provider';
-import { usePrint } from '../../../tedi/providers/printing-provider/printing-provider';
+import { usePrint } from '../../../tedi/providers/printing-provider';
 import { IntentionalAny } from '../../types';
 import { Card, CardContent } from '../card';
 import { PlaceholderProps } from '../placeholder/placeholder';
