@@ -24,7 +24,7 @@ $toggle-button-width: 3.5rem;
     width: var(--button-sm-icon-size);
     height: var(--button-sm-icon-size);
     min-height: var(--button-sm-icon-size);
-    border-radius: var(--radius-08);
+    border-radius: var(--tedi-radius-08);
 
     @include breakpoints.media-breakpoint-down(md) {
       display: none;
