@@ -2,37 +2,108 @@ import { Meta, Title, Subtitle, Unstyled } from '@storybook/blocks';
 
 <Meta name="Printing" title="TEDI-Ready/Components/Helpers/Print/Documentation" />
 
-# Printing
+# Printing in TEDI-Ready
 
-## Components have built-in styles for printing
+Components and layouts include built-in optimizations for print media (via `@media print` styles). This ensures clean, readable output when users trigger print preview or print to PDF.
 
-- Text colors and some components are converted to grayscale.
-- Most background colors are set to white.
-- The base font size is 14px, with other font sizes and spacing adjusted accordingly.
-- Some components are hidden by default, including Buttons, Anchors, Header, Footer, Breadcrumbs, and Sidenav.
-- Expandable components are open by default, such as Accordion, Collapse, and Table subRow/subComponent.
-- Page breaks are prevented in certain components (e.g., Placeholder, Table rows). Other page break locations should be defined in the application using the `<Print>` component.  
-  _Note: Page breaks do not work in Firefox. See the following issues for more details:_  
-  [Bug 1](https://bugzilla.mozilla.org/show_bug.cgi?id=1807406), [Bug 2](https://bugzilla.mozilla.org/show_bug.cgi?id=1695475), [Bug 3](https://bugzilla.mozilla.org/show_bug.cgi?id=939897)
-- Tables are printed by default, but each table should be reviewed on a case-by-case basis. If a table does not fit horizontally, it will include a scrollbar. Tables with many columns may not fit well in the print view.
+## Global Print Behaviors (Applied Automatically)
 
-**The UI can be adjusted using the following methods:**
+- Text colors and many components are converted to grayscale for better ink economy and readability.
+- Most background colors are forced to white (or transparent) to reduce ink usage.
+- Base font size is set to **14px**, with proportional scaling for headings, spacing, and line heights.
+- Interactive or non-essential elements are **hidden by default** in print:
+  - Buttons
+  - Links/Anchors (unless overridden)
+  - Header, Footer
+  - Breadcrumbs
+  - Sidenav / Navigation
+- Expandable components are **expanded by default**:
+  - Accordion
+  - Collapse
+  - Table sub-rows / sub-components
+- Tables are printed by default, but:
+  - Very wide tables may show horizontal scrollbars if content overflows.
+  - Review large or multi-column tables individually — consider hiding columns or switching to a simplified print layout when needed.
+- Some components prevent page breaks internally (e.g. `break-inside: avoid` on table rows, Placeholder content), but most page-break decisions should be made explicitly using the tools below.
 
-### `<Print>` component
+**Firefox & Page Breaks Note**  
+Firefox has supported the modern `break-before`, `break-after`, and `break-inside` properties since version **65** (January 2019). Legacy `page-break-*` properties are aliased for compatibility.  
+Many fragmentation issues — especially with flex containers and `avoid` values — were resolved around Firefox 122 (late 2023). Complex flexbox layouts may still encounter minor pagination quirks in edge cases.  
+Always test in Firefox print preview. Relevant historical bugs (mostly fixed):
 
-Preferred method. [More info here](/docs/tedi-ready-components-helpers-print--docs).
+- [Meta: Flex fragmentation/print issues](https://bugzilla.mozilla.org/show_bug.cgi?id=939897)
+- Related fixes: [1744363](https://bugzilla.mozilla.org/show_bug.cgi?id=1744363), [1695475](https://bugzilla.mozilla.org/show_bug.cgi?id=1695475), [1807406](https://bugzilla.mozilla.org/show_bug.cgi?id=1807406)
 
-### Hooks
+## How to Control Print Output
 
-- `const isPrinting = usePrint()` - This hook checks if `window.matchMedia('print')` matches. It is useful for conditionally re-rendering the UI during printing.
+Use these tools — in recommended order:
 
-### Utility classes
+### 1. Preferred: `<Print>` Component
 
-**Note:** Use utility classes only when the `<Print>` component cannot be used.
+Wrap content to apply print-specific visibility or page-break behavior via cloned `className`.
 
-- `no-print` - Hides a component from the print view.
-- `show-print` - Shows components in the print view that are hidden by default.
-- Determines where page breaks occur during printing. Accepted values include `auto`, `avoid`, `avoid-column`, `avoid-page`, `avoid-region`
-  - `break-before-{value}` - Controls how page, column, or region breaks behave **before** a generated box.
-  - `break-after-{value}` - Controls how page, column, or region breaks behave **after** a generated box.
-  - `break-inside-{value}` - Controls how page, column, or region breaks behave **inside** a generated box.
+```tsx
+import { Print } from '@tedi-design-system/react/tedi';
+
+// Hide during print
+<Print visibility="hide">
+  This toolbar / interactive section disappears when printing
+</Print>
+
+// Show only during print
+<Print visibility="show">
+  This message or simplified content is only visible in print preview / on paper
+</Print>
+
+// Control page breaks
+<Print
+  breakBefore="avoid-page"
+  breakAfter="auto"
+  breakInside="avoid"
+>
+  <MyImportantSection />
+</Print>
+```
+
+- `visibility`: `'show'` or `'hide'` → adds `show-print` or `no-print`
+- `breakBefore` / `breakAfter` / `breakInside`: `'auto'`, `'avoid'`, `'avoid-page'`, `'avoid-column'`, `'avoid-region'`
+- Full props & stories → [Print component docs](/docs/tedi-ready-components-helpers-print--docs)
+
+### 2. Conditional Rendering: `usePrint()` Hook + `PrintingProvider`
+
+For completely different markup, structure, or logic during print (e.g. no charts, simplified tables, no filters).
+
+```tsx
+import { usePrint } from '@tedi-design-system/react/tedi';
+
+function ReportPage({ data }) {
+  const isPrinting = usePrint();
+
+  return isPrinting ? (
+    // Lightweight, print-friendly version
+    <PrintOptimizedTable data={data} />
+  ) : (
+    // Rich screen version
+    <>
+      <InteractiveChart data={data} />
+      <FiltersPanel />
+      <ExportToolbar />
+    </>
+  );
+}
+```
+
+**Setup (already handled globally):**
+
+```tsx
+// In your App.tsx
+import { PrintingProvider } from '@tedi-design-system/react/tedi';
+
+<PrintingProvider>
+  <YourAppOrLayout />
+</PrintingProvider>;
+```
+
+- Returns `true` during browser print preview / printing
+- Consistent value across all nested components (no race conditions)
+- Uses `beforeprint` / `afterprint` events (more reliable than `matchMedia('print')` alone)

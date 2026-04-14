@@ -1,7 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { PrintingProvider, usePrint } from '../../../../../providers/printing-provider/printing-provider';
 import { SideNavItem } from './sidenav-item';
+
+jest.mock('../../../../../providers/printing-provider/printing-provider', () => ({
+  PrintingProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  usePrint: jest.fn(),
+}));
+
+const renderWithProviders = (ui: React.ReactElement) => render(<PrintingProvider>{ui}</PrintingProvider>);
 
 describe('SideNavItem', () => {
   const defaultProps = {
@@ -15,11 +23,12 @@ describe('SideNavItem', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (usePrint as jest.Mock).mockReturnValue(false);
   });
 
   describe('basic item (no children)', () => {
     test('renders correctly', () => {
-      render(<SideNavItem {...defaultProps} />);
+      renderWithProviders(<SideNavItem {...defaultProps} />);
       expect(screen.getByText('Test Item')).toBeInTheDocument();
       expect(screen.getByRole('menuitem')).toBeInTheDocument();
     });
@@ -35,26 +44,28 @@ describe('SideNavItem', () => {
       const user = userEvent.setup();
       const onItemClick = jest.fn();
 
-      render(<SideNavItem {...defaultProps} onItemClick={onItemClick} subItems={[{ children: 'Child' }]} />);
+      renderWithProviders(
+        <SideNavItem {...defaultProps} onItemClick={onItemClick} subItems={[{ children: 'Child' }]} />
+      );
 
       await user.click(screen.getByText('Test Item'));
       expect(onItemClick).not.toHaveBeenCalled();
     });
 
     test('applies active styles when isActive=true', () => {
-      render(<SideNavItem {...defaultProps} isActive />);
+      renderWithProviders(<SideNavItem {...defaultProps} isActive />);
       expect(screen.getByRole('menuitem').parentElement).toHaveClass('tedi-sidenav__item--current');
     });
   });
 
   describe('collapsed mode (isCollapsed = true)', () => {
     test('uses aria-label when collapsed', () => {
-      render(<SideNavItem {...defaultProps} isCollapsed />);
+      renderWithProviders(<SideNavItem {...defaultProps} isCollapsed />);
       expect(screen.getByRole('menuitem')).toHaveAttribute('aria-label', 'Test Item');
     });
 
     test('renders SideNavDropdown when has children & collapsed', () => {
-      render(<SideNavItem {...defaultProps} isCollapsed subItems={[{ children: 'Sub' }]} />);
+      renderWithProviders(<SideNavItem {...defaultProps} isCollapsed subItems={[{ children: 'Sub' }]} />);
       expect(screen.getByText('Test Item')).toBeInTheDocument();
       expect(screen.getByText(/expand_more/i)).toBeInTheDocument();
     });
@@ -62,13 +73,13 @@ describe('SideNavItem', () => {
 
   describe('items with children', () => {
     test('opens subitems when isDefaultOpen=true', () => {
-      render(<SideNavItem {...defaultProps} subItems={[{ children: 'Visible Child' }]} isDefaultOpen />);
+      renderWithProviders(<SideNavItem {...defaultProps} subItems={[{ children: 'Visible Child' }]} isDefaultOpen />);
 
       expect(screen.getByText('Visible Child')).toBeInTheDocument();
     });
 
     test('renders subItemGroups with heading', () => {
-      render(
+      renderWithProviders(
         <SideNavItem
           {...defaultProps}
           isDefaultOpen
@@ -86,7 +97,9 @@ describe('SideNavItem', () => {
     });
 
     test('uses clickable Link + separate Collapse when href exists (level 1)', () => {
-      render(<SideNavItem {...defaultProps} href="/dashboard" subItems={[{ children: 'Dash' }]} isDefaultOpen />);
+      renderWithProviders(
+        <SideNavItem {...defaultProps} href="/dashboard" subItems={[{ children: 'Dash' }]} isDefaultOpen />
+      );
 
       const link = screen.getByRole('menuitem', { name: /Test Item/ });
       expect(link).toHaveAttribute('href', '/dashboard');
@@ -96,7 +109,7 @@ describe('SideNavItem', () => {
     test('keyboard toggle works on Collapse button (Enter/Space)', async () => {
       const user = userEvent.setup();
 
-      render(<SideNavItem {...defaultProps} subItems={[{ children: 'Child' }]} />);
+      renderWithProviders(<SideNavItem {...defaultProps} subItems={[{ children: 'Child' }]} />);
 
       const collapseButton = screen.getByRole('button', {
         name: 'sidenav.toggleSubmenuChildren',
@@ -112,7 +125,7 @@ describe('SideNavItem', () => {
     test('keyboard toggle works with Space key on non-linked parent', async () => {
       const user = userEvent.setup();
 
-      render(<SideNavItem {...defaultProps} subItems={[{ children: 'Space Child' }]} />);
+      renderWithProviders(<SideNavItem {...defaultProps} subItems={[{ children: 'Space Child' }]} />);
 
       await user.tab();
       await user.keyboard(' ');
@@ -123,7 +136,7 @@ describe('SideNavItem', () => {
 
   describe('level > 1 (nested)', () => {
     test('renders bullet instead of chevron on nested parents', () => {
-      render(
+      renderWithProviders(
         <SideNavItem {...defaultProps} level={1} isDefaultOpen>
           <SideNavItem subItems={[{ children: 'Deep' }]}>Nested Parent</SideNavItem>
         </SideNavItem>
@@ -134,7 +147,7 @@ describe('SideNavItem', () => {
   });
 
   test('handles accessibility attributes', () => {
-    render(
+    renderWithProviders(
       <SideNavItem {...defaultProps} isActive={true} isCollapsed={true}>
         Active Item
       </SideNavItem>
@@ -146,7 +159,7 @@ describe('SideNavItem', () => {
   });
 
   test('handles accessibility attributes', () => {
-    render(
+    renderWithProviders(
       <SideNavItem {...defaultProps} isActive={true} isCollapsed={true}>
         Active Item
       </SideNavItem>
@@ -165,7 +178,7 @@ describe('SideNavItem', () => {
         subItems: [{ children: 'Deep Item', icon: 'deep-icon' }],
       },
     ];
-    render(<SideNavItem {...defaultProps} subItems={subItems} isDefaultOpen={true} />);
+    renderWithProviders(<SideNavItem {...defaultProps} subItems={subItems} isDefaultOpen={true} />);
     expect(screen.getByText('Deep Item')).toBeInTheDocument();
     const nestedItem = screen.getByText('Deep Item').closest('li');
     const icon = nestedItem?.querySelector('span[data-name="icon"]');
@@ -175,7 +188,7 @@ describe('SideNavItem', () => {
   test('does not toggle on unrelated keys', async () => {
     const user = userEvent.setup();
 
-    render(<SideNavItem {...defaultProps} subItems={[{ children: 'Hidden Child' }]} isDefaultOpen />);
+    renderWithProviders(<SideNavItem {...defaultProps} subItems={[{ children: 'Hidden Child' }]} isDefaultOpen />);
     expect(screen.getByText('Hidden Child')).toBeInTheDocument();
 
     await user.tab();
@@ -185,7 +198,7 @@ describe('SideNavItem', () => {
   });
 
   test('sets aria attributes for linked parent with children', () => {
-    render(<SideNavItem {...defaultProps} href="/parent" subItems={[{ children: 'Child' }]} />);
+    renderWithProviders(<SideNavItem {...defaultProps} href="/parent" subItems={[{ children: 'Child' }]} />);
 
     const link = screen.getByRole('menuitem', { name: /test item/i });
     expect(link).toHaveAttribute('aria-haspopup', 'true');
@@ -196,7 +209,7 @@ describe('SideNavItem', () => {
   test('updates dropdown open state when SideNavDropdown opens', async () => {
     const user = userEvent.setup();
 
-    render(<SideNavItem {...defaultProps} isCollapsed subItems={[{ children: 'Child' }]} />);
+    renderWithProviders(<SideNavItem {...defaultProps} isCollapsed subItems={[{ children: 'Child' }]} />);
 
     await user.click(screen.getByText('Test Item'));
   });
