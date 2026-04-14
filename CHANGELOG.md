@@ -1,3 +1,10 @@
+# [17.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.1...react-17.0.0-rc.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* **variables:** update core version, update variable names [#592](https://github.com/TEDI-Design-System/react/issues/592) ([#598](https://github.com/TEDI-Design-System/react/issues/598)) ([1f15b36](https://github.com/TEDI-Design-System/react/commit/1f15b361dd3e953822c7fd490d772f4531363e0e))
+
 # [17.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.2.0-rc.1...react-17.0.0-rc.1) (2026-04-14)
 
 
