@@ -52,7 +52,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
+      <Row>
         <Col width={2} className="display-flex align-items-center">
           <Text modifiers="bold">Success</Text>
         </Col>
@@ -67,7 +67,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           />
         </Col>
       </Row>
-      <Row className="padding-14-16">
+      <Row>
         <Col width={2} className="display-flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
@@ -188,5 +188,103 @@ export const DefaultValue: Story = {
     id: 'example-1',
     label: 'Label',
     defaultValue: 'Text value',
+  },
+};
+
+const TemplateHeights: StoryFn<TextAreaProps> = (args) => {
+  return (
+    <VerticalSpacing>
+      <Row>
+        <Col>
+          <Text modifiers="bold">Fixed Height (7.5rem default)</Text>
+        </Col>
+        <Col>
+          <TextArea
+            {...args}
+            id="fixed-height-default"
+            label="Label"
+            placeholder="This textarea has a fixed height of 7.5rem"
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          <Text modifiers="bold">Custom Fixed Height</Text>
+        </Col>
+        <Col>
+          <TextArea
+            {...args}
+            id="custom-height"
+            label="Label"
+            height="4rem"
+            placeholder="This textarea has a fixed height of 4rem"
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          <Text modifiers="bold">Auto Grow (minRows: 3, maxRows: 12)</Text>
+        </Col>
+        <Col>
+          <TextArea
+            {...args}
+            id="auto-grow"
+            label="Label"
+            autoGrow={true}
+            minRows={3}
+            maxRows={12}
+            placeholder="Type multiple lines to see it grow automatically"
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          <Text modifiers="bold">Auto Grow with Custom Rows</Text>
+        </Col>
+        <Col>
+          <TextArea
+            {...args}
+            id="auto-grow-custom"
+            label="Label"
+            autoGrow={true}
+            minRows={5}
+            maxRows={8}
+            placeholder="This will grow from 5 to 8 rows maximum"
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          <Text modifiers="bold">Auto Grow with Max Height</Text>
+        </Col>
+        <Col>
+          <TextArea
+            {...args}
+            id="auto-grow-max-height"
+            label="Label"
+            autoGrow={true}
+            maxHeight="200px"
+            minRows={3}
+            maxRows={12}
+            placeholder="This will grow but max height is limited to 200px"
+          />
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  );
+};
+
+export const HeightExamples: Story = {
+  render: TemplateHeights,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Examples showing different height configurations for TextArea',
+      },
+    },
   },
 };
