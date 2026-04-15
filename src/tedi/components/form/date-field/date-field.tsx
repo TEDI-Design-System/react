@@ -242,11 +242,26 @@ export const DateField: React.FC<DateFieldProps> = ({
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
 
-  const [currentMonth, setCurrentMonth] = useState<Date>(() => {
-    if (value instanceof Date) return value;
-    if (initialMonth) return initialMonth;
-    return new Date();
-  });
+  const getInitialMonth = useCallback((val: Date | Date[] | DateRange | undefined, fallback?: Date): Date => {
+    if (val instanceof Date) return val;
+
+    if (Array.isArray(val) && val.length > 0) {
+      return [...val].sort((a, b) => a.getTime() - b.getTime())[0];
+    }
+
+    if (val && typeof val === 'object' && 'from' in val && val.from instanceof Date) return val.from;
+    if (val && typeof val === 'object' && 'to' in val && val.to instanceof Date) return val.to;
+
+    return fallback ?? new Date();
+  }, []);
+
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => getInitialMonth(value, initialMonth));
+
+  useEffect(() => {
+    if (!open) {
+      setCurrentMonth(getInitialMonth(value, initialMonth));
+    }
+  }, [value, initialMonth, open, getInitialMonth]);
 
   useEffect(() => {
     if (open) {
@@ -270,23 +285,53 @@ export const DateField: React.FC<DateFieldProps> = ({
     [localeCode]
   );
 
-  const floating = useFloating({
-    open,
-    onOpenChange: setOpen,
-    placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
-    middleware: [offset(CALENDAR_OFFSET), flip(), shift()],
-    whileElementsMounted: autoUpdate,
-  });
-
-  const { refs, context, x, y, strategy } = floating;
-  const click = useClick(context);
-  const interactions = useInteractions([
-    ...(enableCalendar && calendarTrigger === 'input' ? [click] : []),
-    useDismiss(context),
-    useRole(context, { role: 'dialog' }),
-  ]);
+  const defaultFormatter = useCallback(
+    (date?: Date | Date[] | DateRange): string => {
+      if (!date) return '';
+      if (date instanceof Date) return dateFormatter.format(date);
+      if (Array.isArray(date)) return date.map((d) => dateFormatter.format(d)).join(', ');
+      if (date.from) {
+        const from = dateFormatter.format(date.from);
+        return date.to ? `${from} – ${dateFormatter.format(date.to)}` : from;
+      }
+      return '';
+    },
+    [dateFormatter]
+  );
 
   const shouldCloseOnSelect = closeOnSelect ?? mode === 'single';
+
+  const formattedDatesWithIds =
+    mode === 'multiple' && Array.isArray(value)
+      ? value.map((d, index) => ({
+          id: index,
+          label: formatDate ? formatDate(d) : defaultFormatter(d),
+          date: d,
+        }))
+      : [];
+
+  const isDateDisabled = useCallback(
+    (date: Date): boolean => {
+      let disabledList: Matcher[] = [];
+
+      if (disabled) {
+        disabledList = Array.isArray(disabled) ? disabled : [disabled];
+      }
+      if (minDate) disabledList.push({ before: minDate });
+      if (maxDate) disabledList.push({ after: maxDate });
+      if (disablePast) disabledList.push({ before: new Date() });
+      if (disableFuture) disabledList.push({ after: new Date() });
+      if (shouldDisableMonth) disabledList.push((d: Date) => shouldDisableMonth(d));
+      if (shouldDisableYear) disabledList.push((d: Date) => shouldDisableYear(d));
+
+      return disabledList.some((matcher) => {
+        if (typeof matcher === 'function') return matcher(date);
+        if (matcher instanceof Date) return matcher.getTime() === date.getTime();
+        return false;
+      });
+    },
+    [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]
+  );
 
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
     if (!isControlled) setInternalValue(date);
@@ -302,23 +347,9 @@ export const DateField: React.FC<DateFieldProps> = ({
     if (shouldCloseOnSelect) setOpen(false);
   };
 
-  const defaultFormatter = useCallback(
-    (date?: Date | Date[] | DateRange): string => {
-      if (!date) return '';
-
-      if (date instanceof Date) return dateFormatter.format(date);
-      if (Array.isArray(date)) return date.map((d) => dateFormatter.format(d)).join(', ');
-      if (date.from) {
-        const from = dateFormatter.format(date.from);
-        return date.to ? `${from} – ${dateFormatter.format(date.to)}` : from;
-      }
-
-      return '';
-    },
-    [dateFormatter]
-  );
-
   const applyValue = (date: Date) => {
+    if (isDateDisabled(date)) return;
+
     if (!isControlled) setInternalValue(date);
     onSelect?.(date, date as UnknownType, {}, {} as UnknownType);
 
@@ -327,11 +358,6 @@ export const DateField: React.FC<DateFieldProps> = ({
 
     if (shouldCloseOnSelect) setOpen(false);
   };
-
-  const formattedDates =
-    mode === 'multiple' && Array.isArray(value)
-      ? value.map((d) => (formatDate ? formatDate(d) : defaultFormatter(d)))
-      : [];
 
   const defaultParseDate = (value: string): Date | undefined => {
     const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
@@ -346,7 +372,6 @@ export const DateField: React.FC<DateFieldProps> = ({
     if (isNaN(date.getTime()) || date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
       return undefined;
     }
-
     return date;
   };
 
@@ -362,6 +387,10 @@ export const DateField: React.FC<DateFieldProps> = ({
       (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
 
     if (!isValidForMode) return;
+
+    if (parsed instanceof Date && isDateDisabled(parsed)) {
+      return;
+    }
 
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as Date, {}, {} as UnknownType);
@@ -383,8 +412,24 @@ export const DateField: React.FC<DateFieldProps> = ({
       const formatted = formatDate ? formatDate(defaultValue) : defaultFormatter(defaultValue);
       setInputValue(formatted);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const floating = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
+    middleware: [offset(CALENDAR_OFFSET), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const { refs, context, x, y, strategy } = floating;
+  const click = useClick(context);
+  const interactions = useInteractions([
+    ...(enableCalendar && calendarTrigger === 'input' ? [click] : []),
+    useDismiss(context),
+    useRole(context, { role: 'dialog' }),
+  ]);
 
   const disabledMatchers: Matcher[] = [];
 
@@ -417,16 +462,19 @@ export const DateField: React.FC<DateFieldProps> = ({
             {...(inputProps as MultiValueFieldProps)}
             id={id}
             label={label}
-            values={formattedDates}
+            values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
             onIconClick={() => enableCalendar && setOpen(true)}
+            aria-expanded={enableCalendar ? open : undefined}
             isClearable
             required={required}
-            onChange={(newValues) => {
+            onChange={(newLabels) => {
               if (!Array.isArray(value)) return;
-              const newDates = value.filter((d) =>
-                newValues.includes(formatDate ? formatDate(d) : defaultFormatter(d))
-              );
+
+              const newDates = formattedDatesWithIds
+                .filter((item) => newLabels.includes(item.label))
+                .map((item) => item.date);
+
               if (!isControlled) setInternalValue(newDates);
               onSelect?.(newDates, {} as UnknownType, {}, {} as UnknownType);
             }}
@@ -444,8 +492,8 @@ export const DateField: React.FC<DateFieldProps> = ({
             placeholder={placeholder}
             icon="calendar_today"
             isClearable
-            onIconClick={() => setOpen(true)}
-            aria-expanded={open}
+            onIconClick={() => enableCalendar && setOpen(true)}
+            aria-expanded={enableCalendar ? open : undefined}
             onChange={(val) => handleInputChange(val)}
             required={required}
             className={cn(styles['tedi-date-field__textfield'], {

@@ -231,7 +231,6 @@ export const MultipleValues: Story = {
           }
         }}
         formatDate={formatDate}
-        calendarTrigger="input"
       />
     );
   },

@@ -36,4 +36,8 @@
 .tedi-multi-value-field__icon-wrapper {
   background: transparent;
   border: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
