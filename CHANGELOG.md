@@ -1,3 +1,10 @@
+# [17.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.5...react-17.0.0-rc.6) (2026-04-15)
+
+
+### Features
+
+* **tabs:** new tedi-ready component [#555](https://github.com/TEDI-Design-System/react/issues/555) ([#557](https://github.com/TEDI-Design-System/react/issues/557)) ([9c06c51](https://github.com/TEDI-Design-System/react/commit/9c06c51d2b7073494d2faa77bbf212ccae2921af))
+
 # [17.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.4...react-17.0.0-rc.5) (2026-04-15)
 
 
