@@ -1,3 +1,10 @@
+# [17.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.4...react-17.0.0-rc.5) (2026-04-15)
+
+
+### Features
+
+* **textarea:** add autoGrow, height and maxHeight props [#588](https://github.com/TEDI-Design-System/react/issues/588) ([#593](https://github.com/TEDI-Design-System/react/issues/593)) ([2c86740](https://github.com/TEDI-Design-System/react/commit/2c867409a9102bb024c94f8e6bc9c27791a59bd9))
+
 # [17.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.3...react-17.0.0-rc.4) (2026-04-14)
 
 
