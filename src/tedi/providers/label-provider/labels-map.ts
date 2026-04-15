@@ -72,9 +72,16 @@ const muiTranslationsUrl =
  * et, en and ru values must be of same type
  */
 export const labelsMap = validateDefaultLabels({
+  'tabs.more': {
+    description: 'Label for the mobile overflow button in Tabs',
+    components: ['Tabs'],
+    et: 'Veel',
+    en: 'More',
+    ru: 'Ещё',
+  },
   close: {
     description: 'Used for closing',
-    components: ['CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip'],
+    components: ['CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
     et: 'Sulge',
     en: 'Close',
     ru: 'Закрыть',
