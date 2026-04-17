@@ -35,7 +35,7 @@ export type ButtonContentProps<
      */
     fullWidth?: boolean;
     /**
-     * Color schema for button. PS text-color works only with link type links.
+     * Color schema for button. PS 'text' works only with link type links.
      * @default default
      */
     color?: ButtonColor;

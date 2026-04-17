@@ -1,0 +1,94 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
+.tedi-header {
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20, rgb(0 0 0 / 20%));
+
+  &__main {
+    position: relative;
+    display: flex;
+    flex: 1 0 0;
+    min-height: var(--layout-header-height);
+    background: var(--header-background);
+
+    &--content {
+      display: flex;
+      gap: var(--layout-header-items-right-gutter-x);
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: var(--layout-header-height);
+      padding: var(--layout-header-padding-y) var(--layout-header-padding-right) var(--layout-header-padding-y)
+        var(--layout-header-padding-left);
+    }
+  }
+
+  &__center {
+    display: flex;
+    flex: 1 0 0;
+    gap: var(--layout-header-items-center-gutter-x);
+    align-items: center;
+    align-self: stretch;
+    color: var(--header-link-default);
+
+    &--flex-start {
+      justify-content: flex-start;
+    }
+
+    &--center {
+      justify-content: center;
+    }
+
+    &--space-between {
+      justify-content: space-between;
+    }
+
+    > * {
+      display: flex;
+      gap: var(--layout-header-items-center-gutter-x);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--layout-header-items-right-gutter-x);
+    align-items: center;
+    height: 100%;
+
+    > [data-name='separator'] {
+      padding: var(--layout-header-separator-padding-y) 0;
+    }
+
+    @include breakpoints.media-breakpoint-down(lg) {
+      max-height: 2.75rem;
+    }
+
+    @include breakpoints.media-breakpoint-down(md) {
+      max-height: unset;
+    }
+  }
+
+  &__logo {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+
+    img,
+    svg {
+      display: block;
+      width: auto;
+      height: var(--layout-header-logo-size);
+      max-height: 100%;
+    }
+  }
+
+  &__icon--text {
+    color: inherit;
+  }
+
+  &__bottom {
+    padding: var(--layout-grid-gutters-12) var(--layout-page-spacing-x);
+    background: var(--general-surface-primary);
+    border-top: 1px solid var(--general-border-primary);
+    border-bottom: 1px solid var(--general-border-primary);
+  }
+}
