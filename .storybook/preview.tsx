@@ -60,14 +60,14 @@ export const decorators: Preview['decorators'] = [
 
     return (
       <ThemeProvider theme={theme}>
-        <PrintingProvider>
-        {context.componentId === 'components-labelprovider' ? (
-          <Story />
-        ) : (
-          <StorybookDecorator>
+        <PrintingProvider> 
+          {context.componentId === 'components-labelprovider' ? (
             <Story />
-          </StorybookDecorator>
-        )}
+          ) : (
+            <StorybookDecorator>
+              <Story />
+            </StorybookDecorator>
+          )}
         </PrintingProvider>
       </ThemeProvider>
     );

@@ -1,3 +1,31 @@
+# [17.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.5...react-17.0.0-rc.6) (2026-04-15)
+
+
+### Features
+
+* **tabs:** new tedi-ready component [#555](https://github.com/TEDI-Design-System/react/issues/555) ([#557](https://github.com/TEDI-Design-System/react/issues/557)) ([9c06c51](https://github.com/TEDI-Design-System/react/commit/9c06c51d2b7073494d2faa77bbf212ccae2921af))
+
+# [17.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.4...react-17.0.0-rc.5) (2026-04-15)
+
+
+### Features
+
+* **textarea:** add autoGrow, height and maxHeight props [#588](https://github.com/TEDI-Design-System/react/issues/588) ([#593](https://github.com/TEDI-Design-System/react/issues/593)) ([2c86740](https://github.com/TEDI-Design-System/react/commit/2c867409a9102bb024c94f8e6bc9c27791a59bd9))
+
+# [17.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.3...react-17.0.0-rc.4) (2026-04-14)
+
+
+### Features
+
+* **toggle:** new TEDI-Ready component [#305](https://github.com/TEDI-Design-System/react/issues/305) ([#594](https://github.com/TEDI-Design-System/react/issues/594)) ([6f28045](https://github.com/TEDI-Design-System/react/commit/6f280457f48898d79b72467dd0bac1c2b01fc779))
+
+# [17.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.2...react-17.0.0-rc.3) (2026-04-14)
+
+
+### Features
+
+* **card:** add more control to borderRadius usage, add examples [#444](https://github.com/TEDI-Design-System/react/issues/444) ([#597](https://github.com/TEDI-Design-System/react/issues/597)) ([deac9db](https://github.com/TEDI-Design-System/react/commit/deac9db6a10b8e1fe7dbd8f46ec74c8a46245496))
+
 # [17.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.1...react-17.0.0-rc.2) (2026-04-14)
 
 

@@ -48,9 +48,9 @@ describe('StatusBadge component', () => {
         Warning Badge
       </StatusBadge>
     );
-    const badge = container.querySelector('.tedi-status-badge');
-    expect(badge).toHaveClass('tedi-status-badge--status');
-    expect(badge).toHaveClass('tedi-status-badge--status-warning');
+    const indicator = container.querySelector('[data-name="status-indicator"]');
+    expect(indicator).toBeInTheDocument();
+    expect(indicator).toHaveClass('tedi-status-indicator--warning');
   });
 
   it('renders with icon only', () => {
@@ -112,8 +112,10 @@ describe('StatusBadge component', () => {
     const { container } = render(<StatusBadge {...props}>All Props Badge</StatusBadge>);
     const badge = container.querySelector('.tedi-status-badge');
     expect(badge).toHaveClass('tedi-status-badge--variant-filled-bordered');
-    expect(badge).toHaveClass('tedi-status-badge--status-success');
     expect(badge).toHaveClass('tedi-status-badge--large');
+    const indicator = container.querySelector('[data-name="status-indicator"]');
+    expect(indicator).toBeInTheDocument();
+    expect(indicator).toHaveClass('tedi-status-indicator--success');
     expect(badge).toHaveClass('custom-class');
     expect(badge).toHaveTextContent('All Props Badge');
     expect(badge).toHaveAttribute('title', 'Success Badge');
