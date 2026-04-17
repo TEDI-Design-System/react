@@ -1,6 +1,9 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
+import { Text } from '../../base/typography/text/text';
+import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { NumberField } from '../number-field/number-field';
 import { Slider, SliderProps } from './slider';
 
@@ -78,30 +81,6 @@ export const CurrentValue: Story = {
   },
 };
 
-const InputGroupTemplate = (args: SliderProps) => {
-  const [value, setValue] = useState<number>(20);
-  return (
-    <Slider
-      {...args}
-      value={value}
-      onChange={setValue}
-      addonRight={
-        <NumberField
-          id="slider-input-group-number"
-          label="Value"
-          hideLabel
-          suffix="%"
-          min={args.min}
-          max={args.max}
-          step={args.step}
-          value={value}
-          onChange={setValue}
-        />
-      }
-    />
-  );
-};
-
 const NumberFieldTemplate = (args: SliderProps) => {
   const [value, setValue] = useState<number>(4);
   return (
@@ -174,5 +153,117 @@ export const Invalid: Story = {
     minLabel: '0%',
     maxLabel: '100%',
     helper: { id: 'slider-error-text', text: 'Value is out of range', type: 'error' },
+  },
+};
+
+const StatesInputGroupTemplate = () => {
+  const [value, setValue] = useState<number>(50);
+  return (
+    <Slider
+      id="slider-states-input-group"
+      label="Label"
+      min={0}
+      max={100}
+      step={1}
+      minLabel="0%"
+      maxLabel="100%"
+      value={value}
+      onChange={setValue}
+      addonRight={
+        <NumberField
+          id="slider-states-input-group-number"
+          label="Value"
+          hideLabel
+          suffix="%"
+          min={0}
+          max={100}
+          step={1}
+          value={value}
+          onChange={setValue}
+        />
+      }
+    />
+  );
+};
+
+/**
+ * Showcases the full set of interactive states via Storybook's pseudo-states addon.
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=17283-87458&m=dev" target="_BLANK">Figma ↗</a>
+ */
+export const States: Story = {
+  parameters: {
+    pseudo: {
+      hover: '#slider-states-hover',
+      active: '#slider-states-active',
+      focus: '#slider-states-focus',
+    },
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=17283-87458&m=dev',
+    },
+  },
+  render: () => {
+    const sharedArgs: SliderProps = {
+      min: 0,
+      max: 100,
+      step: 1,
+      defaultValue: 50,
+      minLabel: '0%',
+      maxLabel: '100%',
+      valueFormatter: (value) => `${value}%`,
+    };
+
+    return (
+      <VerticalSpacing size={2}>
+        <Row>
+          <Col lg={2} md={12} className="display-flex align-items-center">
+            <Text modifiers="bold">Default</Text>
+          </Col>
+          <Col>
+            <Slider {...sharedArgs} id="slider-states-default" />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} md={12} className="display-flex align-items-center">
+            <Text modifiers="bold">Hover</Text>
+          </Col>
+          <Col>
+            <Slider {...sharedArgs} id="slider-states-hover" />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} md={12} className="display-flex align-items-center">
+            <Text modifiers="bold">Active</Text>
+          </Col>
+          <Col>
+            <Slider {...sharedArgs} id="slider-states-active" />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} md={12} className="display-flex align-items-center">
+            <Text modifiers="bold">Disabled</Text>
+          </Col>
+          <Col>
+            <Slider {...sharedArgs} id="slider-states-disabled" disabled />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} md={12} className="display-flex align-items-center">
+            <Text modifiers="bold">Focus</Text>
+          </Col>
+          <Col>
+            <Slider {...sharedArgs} id="slider-states-focus" />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} md={12} className="display-flex align-items-center">
+            <Text modifiers="bold">With input</Text>
+          </Col>
+          <Col>
+            <StatesInputGroupTemplate />
+          </Col>
+        </Row>
+      </VerticalSpacing>
+    );
   },
 };
