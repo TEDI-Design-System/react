@@ -7,7 +7,7 @@ import { Button, ButtonProps } from '../../buttons/button/button';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './search.module.scss';
 
-export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' | 'onKeyPress'> {
+export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' | 'onKeyPress' | 'className'> {
   /**
    * Callback triggered when the search is executed (Enter key pressed or button clicked).
    */
@@ -25,11 +25,22 @@ export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' 
    * E.g., "Search products" or "Search site".
    */
   ariaLabel?: string;
+  className?: string;
 }
 
 export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
   (
-    { placeholder, isClearable = true, searchIcon = 'search', onSearch, onChange, button, ariaLabel, ...rest },
+    {
+      placeholder,
+      isClearable = true,
+      searchIcon = 'search',
+      onSearch,
+      onChange,
+      button,
+      ariaLabel,
+      className,
+      ...rest
+    },
     ref
   ): JSX.Element => {
     const { getLabel } = useLabels();
@@ -46,7 +57,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
     const textFieldProps = {
       ...rest,
       ref,
-      inputClassName: cn(styles['tedi-search__input'], button && styles['tedi-search__input--has-button']),
+      inputClassName: cn(styles['tedi-search__input'], button && styles['tedi-search__input--has-button'], className),
       placeholder,
       isClearable,
       onKeyDown: handleKeyDown,
@@ -58,7 +69,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
     const searchAriaLabel = ariaLabel ?? defaultAriaLabel;
 
     return (
-      <div className={cn(styles['tedi-search__wrapper'], rest.className)} role="search" aria-label={searchAriaLabel}>
+      <div className={cn(styles['tedi-search__wrapper'])} role="search" aria-label={searchAriaLabel}>
         <TextField {...textFieldProps} />
         {button && (
           <Button

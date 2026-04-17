@@ -19,6 +19,10 @@ export interface FileUploadProps extends FormLabelProps {
    * Additional class names for styling the component.
    */
   className?: string;
+  /**
+   * Additional class names for styling the component.
+   */
+  wrapperClassName?: string;
 
   /**
    * The name of the file input field, used for form submission and accessibility.
@@ -100,6 +104,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     multiple,
     onChange,
     className,
+    wrapperClassName,
     defaultFiles,
     onDelete,
     hasClearButton = true,
@@ -201,7 +206,8 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
               [styles['tedi-file-upload--error']]: (uploadErrorHelper?.type || helper?.type) === 'error',
               [styles['tedi-file-upload--valid']]: (uploadErrorHelper?.type || helper?.type) === 'valid',
             },
-            { [styles[`tedi-file-upload__container--${size}`]]: size }
+            { [styles[`tedi-file-upload__container--${size}`]]: size },
+            wrapperClassName
           )}
         >
           <div className={styles['tedi-file-upload__content']}>

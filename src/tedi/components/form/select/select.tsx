@@ -216,7 +216,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
         Menu: SelectMenu,
         MenuList: SelectMenuListMemo,
         Option: (props) => SelectOption({ renderOption, multiple, showRadioButtons, ...props }),
-        Control: SelectControl,
+        Control: (props) => SelectControl({ ...props, className: className }),
         Input: SelectInput,
         MultiValue: (props) => SelectMultiValue({ isTagRemovable, ...props }),
         MultiValueRemove: SelectMultiValueRemove,
