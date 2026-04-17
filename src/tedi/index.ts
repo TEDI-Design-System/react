@@ -38,6 +38,7 @@ export * from './components/form/file-upload/file-upload';
 export * from './components/form/file-dropzone/file-dropzone';
 export * from './components/form/select/select';
 export * from './components/form/checkbox/checkbox';
+export * from './components/form/slider/slider';
 export * from './components/overlays/tooltip';
 export * from './components/overlays/popover';
 export * from './components/overlays/dropdown';
