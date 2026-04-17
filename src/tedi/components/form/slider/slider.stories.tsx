@@ -186,22 +186,7 @@ const StatesInputGroupTemplate = () => {
   );
 };
 
-/**
- * Showcases the full set of interactive states via Storybook's pseudo-states addon.
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=17283-87458&m=dev" target="_BLANK">Figma ↗</a>
- */
 export const States: Story = {
-  parameters: {
-    pseudo: {
-      hover: '#slider-states-hover',
-      active: '#slider-states-active',
-      focus: '#slider-states-focus',
-    },
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=17283-87458&m=dev',
-    },
-  },
   render: () => {
     const sharedArgs: SliderProps = {
       min: 0,
