@@ -52,7 +52,7 @@ const config: StorybookConfig = {
       },
       publicDir: join(__dirname, '../public'),
       plugins: await withoutVitePlugins(
-        [config.plugins],
+        config.plugins ?? [],
         ['vite:dts']
       ),
     };
