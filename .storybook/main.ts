@@ -22,6 +22,7 @@ const config: StorybookConfig = {
     '@storybook/addon-designs',
     '@avalane/storybook-addon-status',
     'storybook-addon-pseudo-states',
+    '@chromatic-com/storybook',
   ],
   core: {
     builder: '@storybook/builder-vite',
