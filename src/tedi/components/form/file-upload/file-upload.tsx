@@ -12,9 +12,12 @@ import { Col, Row } from '../../layout/grid';
 import Separator from '../../misc/separator/separator';
 import { Tag } from '../../tags/tag/tag';
 import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text';
+import { useOptionalInputGroup } from '../input-group/input-group';
 import styles from './file-upload.module.scss';
 
-export interface FileUploadProps extends FormLabelProps {
+export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
+  id?: string;
+  label?: string;
   /**
    * Additional class names for styling the component.
    */
@@ -100,6 +103,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const {
     id,
     name,
+    label,
     accept,
     multiple,
     onChange,
@@ -130,9 +134,15 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   });
 
   const currentBreakpoint = useBreakpoint();
+  const generatedId = React.useId();
+  const inputGroup = useOptionalInputGroup?.();
+  const shouldHideLabel = inputGroup?.hasExternalLabel;
+  const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const fileUploadBEM = cn(styles['tedi-file-upload'], { [styles['tedi-file-upload--disabled']]: disabled }, className);
-  const helperId = helper ? helper?.id ?? `${id}-helper` : undefined;
+  const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
 
   const getFiles = React.useMemo(() => {
     return !!files && !!onChange ? files : innerFiles;
@@ -182,13 +192,16 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   return (
     <>
       <div className={styles['tedi-file-upload__label-wrapper']}>
-        <FormLabel
-          id={id}
-          {...rest}
-          renderWithoutLabel={readOnly}
-          className={styles['tedi-file-upload__label']}
-          size={size}
-        />
+        {!shouldHideLabel && label && (
+          <FormLabel
+            id={resolvedId}
+            label={label ?? ''}
+            {...rest}
+            renderWithoutLabel={readOnly}
+            className={styles['tedi-file-upload__label']}
+            size={size}
+          />
+        )}
       </div>
 
       <div aria-live="polite" aria-atomic="true" className="sr-only">
@@ -216,7 +229,8 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
               <Col xs={12} md="auto">
                 <div className={fileUploadBEM}>
                   <input
-                    id={id}
+                    ref={inputRef}
+                    id={resolvedId}
                     type="file"
                     name={name}
                     accept={accept}
@@ -248,7 +262,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     visualType="neutral"
                     iconLeft="file_upload"
                     disabled={disabled}
-                    onClick={() => document.getElementById(id)?.click()}
+                    onClick={() => inputRef.current?.click()}
                     className={styles['tedi-file-upload__button']}
                     size={size}
                   >

@@ -18,3 +18,6 @@ export const Suffix = ({ children, className, ...props }: { children: ReactNode;
     </div>
   );
 };
+
+Suffix.displayName = 'InputGroup.Suffix';
+Suffix.displayName = 'Suffix';

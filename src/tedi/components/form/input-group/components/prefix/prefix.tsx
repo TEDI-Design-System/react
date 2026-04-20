@@ -18,3 +18,6 @@ export const Prefix = ({ children, className, ...props }: { children: ReactNode;
     </div>
   );
 };
+
+Prefix.displayName = 'InputGroup.Prefix';
+Prefix.displayName = 'Prefix';

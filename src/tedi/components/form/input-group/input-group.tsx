@@ -8,7 +8,7 @@ import { Prefix } from './components/prefix/prefix';
 import { Suffix } from './components/suffix/suffix';
 import styles from './input-group.module.scss';
 
-export interface InputGroupProps extends Omit<FormLabelProps, 'size'> {
+export interface InputGroupProps extends FormLabelProps {
   /**
    * Additional class name(s) applied to the root element of the InputGroup.
    * Useful for custom styling or layout overrides.
@@ -16,7 +16,7 @@ export interface InputGroupProps extends Omit<FormLabelProps, 'size'> {
   className?: string;
   /**
    * Enables merged styling between input and its prefix/suffix elements.
-   * When `true`, borders and radii are visually combined into a single control.
+   * When `true`, borders and radius are visually combined into a single control.
    * Disable this when using non-standard addons (e.g. buttons) that should not visually merge.
    *
    * @default true
@@ -79,6 +79,19 @@ export type InputGroupContextValue = {
    * behavior and styling.
    */
   disabled?: boolean;
+  /*
+   * Indicates if the InputGroup has an external label (i.e. FormLabel rendered by InputGroup).
+   * This is used by child components to determine if they should render their own label or not.
+   * E.g., if `hasExternalLabel` is true, an Input component inside the group might choose to hide its own label to avoid redundancy.
+   * This is particularly important for accessibility, ensuring that screen readers do not announce duplicate labels.
+   */
+  hasExternalLabel?: boolean;
+  /*
+   * The ID to be applied to the input element within the group.
+   * This allows the FormLabel rendered by InputGroup to correctly reference the input for accessibility.
+   * If not provided, InputGroup will generate a unique ID internally.
+   */
+  inputId?: string;
 };
 
 const InputGroupContext = createContext<InputGroupContextValue | null>(null);
@@ -89,9 +102,16 @@ export const useInputGroup = () => {
   return ctx;
 };
 
-const InputGroup = forwardRef<InputGroupForwardRef, InputGroupProps>(
-  ({ className, addons = true, helper, label, children, disabled, ...labelProps }, ref) => {
+export const useOptionalInputGroup = () => {
+  return useContext(InputGroupContext);
+};
+
+const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
+  ({ className, addons = true, helper, label, children, disabled, id, ...labelProps }, ref) => {
     const rootRef = React.useRef<HTMLDivElement>(null);
+    const generatedId = React.useId();
+
+    const inputId = id ?? generatedId;
 
     const [hasPrefix, setHasPrefix] = useState(false);
     const [hasSuffix, setHasSuffix] = useState(false);
@@ -107,12 +127,14 @@ const InputGroup = forwardRef<InputGroupForwardRef, InputGroupProps>(
         hasPrefix,
         hasSuffix,
         disabled,
+        hasExternalLabel: !!label,
+        inputId,
         registerPrefix: () => setHasPrefix(true),
         unregisterPrefix: () => setHasPrefix(false),
         registerSuffix: () => setHasSuffix(true),
         unregisterSuffix: () => setHasSuffix(false),
       }),
-      [hasPrefix, hasSuffix, disabled]
+      [inputId, hasPrefix, hasSuffix, disabled]
     );
 
     const groupClassName = cn(
@@ -142,7 +164,7 @@ const InputGroup = forwardRef<InputGroupForwardRef, InputGroupProps>(
 
     return (
       <InputGroupContext.Provider value={ctxValue}>
-        {label && <FormLabel {...labelProps} label={label} />}
+        {label && <FormLabel {...labelProps} label={label} id={inputId} />}
 
         <div ref={rootRef} className={groupClassName} data-name="tedi-input-group" aria-disabled={disabled}>
           {children}
@@ -152,16 +174,14 @@ const InputGroup = forwardRef<InputGroupForwardRef, InputGroupProps>(
       </InputGroupContext.Provider>
     );
   }
-) as React.ForwardRefExoticComponent<InputGroupProps & React.RefAttributes<InputGroupForwardRef>> & {
-  Prefix: typeof Prefix;
-  Suffix: typeof Suffix;
-  Input: typeof Input;
-};
+);
 
-InputGroup.displayName = 'InputGroup';
+InputGroupBase.displayName = 'InputGroup';
 
-InputGroup.Prefix = Prefix;
-InputGroup.Suffix = Suffix;
-InputGroup.Input = Input;
+const InputGroup = Object.assign(InputGroupBase, {
+  Prefix,
+  Suffix,
+  Input,
+});
 
 export default InputGroup;

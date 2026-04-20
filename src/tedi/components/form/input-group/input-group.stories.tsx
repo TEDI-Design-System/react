@@ -15,17 +15,24 @@ import InputGroup, { InputGroupProps } from './input-group';
 
 /**
  * <p>InputGroup is a flexible wrapper that allows composing form controls with prefixes and suffixes.
- * It supports any form elements e.g Field, Select, FileUpload, etc.</p>
+ * It supports form elements e.g Field, Select, FileUpload, etc.</p>
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.68?node-id=4968-94396&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/18b6b5-input-group" target="_BLANK">Zeroheight ↗</a>
  */
 
-const meta: Meta<typeof InputGroup> = {
-  component: InputGroup,
+const meta: Meta<InputGroupProps> = {
   title: 'TEDI-Ready/Components/Form/InputGroup',
+  component: InputGroup,
+  // subcomponents: {
+  //   'InputGroup.Prefix': InputGroup.Prefix,
+  //   'InputGroup.Input': InputGroup.Input,
+  //   'InputGroup.Suffix': InputGroup.Suffix,
+  // },
+  // tags: ['autodocs'],
 };
 
 export default meta;
+
 type Story = StoryObj<InputGroupProps>;
 
 export const StartStatic: Story = {
@@ -79,7 +86,7 @@ export const StartDynamic: Story = {
                 </Dropdown>
               </InputGroup.Prefix>
               <InputGroup.Input>
-                <Field id="input-group-tel-example-1" type="tel" />
+                <Field type="tel" />
               </InputGroup.Input>
             </InputGroup>
           </Col>
@@ -105,9 +112,6 @@ export const StartDynamic: Story = {
               </InputGroup.Prefix>
               <InputGroup.Input>
                 <Select
-                  id="select-example-1"
-                  label="lorem ipsum"
-                  hideLabel
                   isClearIndicatorVisible
                   options={[
                     { label: 'lorem', value: 'lorem' },
@@ -137,7 +141,7 @@ export const StartDynamic: Story = {
                 </Dropdown>
               </InputGroup.Prefix>
               <InputGroup.Input>
-                <FileUpload hideLabel label="File upload" name="file-upload" id="file-upload" />
+                <FileUpload name="file-upload" />
               </InputGroup.Input>
             </InputGroup>
           </Col>
@@ -160,7 +164,7 @@ export const StartDynamic: Story = {
                 </Dropdown>
               </InputGroup.Prefix>
               <InputGroup.Input>
-                <Search hideLabel label="Search" name="search" id="seach-prefix" />
+                <Search name="search" />
               </InputGroup.Input>
             </InputGroup>
           </Col>
@@ -198,7 +202,7 @@ export const EndDynamic: Story = {
           <Col width={4}>
             <InputGroup label="Cost" id="cost-with-selection">
               <InputGroup.Input>
-                <Field id="input-group-tel-example-1" type="tel" />
+                <Field type="tel" />
               </InputGroup.Input>
               <InputGroup.Suffix>
                 <Dropdown>
@@ -224,9 +228,6 @@ export const EndDynamic: Story = {
             <InputGroup label="Label" id="prefix-select">
               <InputGroup.Input>
                 <Select
-                  id="select-example-1"
-                  label="lorem ipsum"
-                  hideLabel
                   isClearIndicatorVisible
                   options={[
                     { label: 'lorem', value: 'lorem' },
@@ -256,7 +257,7 @@ export const EndDynamic: Story = {
           <Col>
             <InputGroup label="File" id="prefix-select">
               <InputGroup.Input>
-                <FileUpload hideLabel label="File upload" name="file-upload" id="file-upload" />
+                <FileUpload name="file-upload" />
               </InputGroup.Input>
               <InputGroup.Suffix>
                 <Dropdown>
@@ -279,7 +280,7 @@ export const EndDynamic: Story = {
           <Col>
             <InputGroup label="Search" id="prefix-search">
               <InputGroup.Input>
-                <Search hideLabel label="Search" name="search" id="seach-prefix" />
+                <Search name="search" />
               </InputGroup.Input>
               <InputGroup.Suffix>
                 <Dropdown>
@@ -351,14 +352,14 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
               <Text>Street</Text>
             </InputGroup.Prefix>
             <InputGroup.Input>
-              <Field id="Error" invalid />
+              <Field invalid />
             </InputGroup.Input>
           </InputGroup>
         </Col>
         <Col>
           <InputGroup label="Label" id="state-example" helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Input>
-              <Field id="Error" invalid />
+              <Field invalid />
             </InputGroup.Input>
             <InputGroup.Suffix>
               <Text>EUR</Text>
@@ -384,19 +385,21 @@ export const States: StoryObj<TemplateStateProps> = {
   },
 };
 
-export const WithButtonSuffix: Story = {
+export const WithButtonAddons: Story = {
   args: {
     label: 'Promo code',
     addons: false,
   },
   render: (args) => (
-    <InputGroup {...args}>
-      <InputGroup.Input>
-        <Field id="input-group-button" placeholder="Enter promo code" />
-      </InputGroup.Input>
-      <InputGroup.Suffix>
-        <Button>Apply</Button>
-      </InputGroup.Suffix>
-    </InputGroup>
+    <VerticalSpacing>
+      <InputGroup {...args} id="input-group-button">
+        <InputGroup.Input>
+          <Field placeholder="Enter promo code" />
+        </InputGroup.Input>
+        <InputGroup.Suffix>
+          <Button>Apply</Button>
+        </InputGroup.Suffix>
+      </InputGroup>
+    </VerticalSpacing>
   ),
 };

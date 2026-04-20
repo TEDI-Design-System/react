@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
+import { useOptionalInputGroup } from '../input-group/input-group';
 import styles from './field.module.scss';
 
 export type FieldElement = HTMLInputElement | HTMLTextAreaElement;
@@ -9,7 +10,7 @@ export interface FieldProps {
   /**
    * Unique identifier for the field element.
    */
-  id: string;
+  id?: string;
   /**
    * Name attribute used in forms and form submissions.
    */
@@ -129,11 +130,15 @@ export const Field = forwardRef<FieldElement, FieldProps>((props, ref) => {
     onChangeEvent?.(e);
   };
 
+  const inputGroup = useOptionalInputGroup?.();
+  const generatedId = React.useId();
+  const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+
   const finalClassName = cn(styles['tedi-field'], userClassName);
 
   const sharedProps = {
     ...rest,
-    id,
+    id: resolvedId,
     name,
     value,
     placeholder,

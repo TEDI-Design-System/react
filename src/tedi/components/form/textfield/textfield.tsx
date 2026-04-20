@@ -10,6 +10,7 @@ import Separator from '../../misc/separator/separator';
 import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text';
 import { Field, FieldElement } from '../field/field';
 import FormLabel, { FormLabelProps } from '../form-label/form-label';
+import { useOptionalInputGroup } from '../input-group/input-group';
 import styles from './textfield.module.scss';
 
 const iconSizes = {
@@ -71,14 +72,17 @@ type TextFieldBreakpointProps = {
   className?: string;
 };
 
-export interface TextFieldProps extends BreakpointSupport<TextFieldBreakpointProps>, Omit<FormLabelProps, 'size'> {
+export interface TextFieldProps
+  extends BreakpointSupport<TextFieldBreakpointProps>,
+    Omit<FormLabelProps, 'size' | 'id' | 'label'> {
   /**
    * Unique identifier for the text field.
    *
    * Required for accessibility (associates label, helper text, and input).
    * Also used to generate `aria-describedby` and helper IDs automatically.
    */
-  id: string;
+  id?: string;
+  label?: string;
   /**
    * Name attribute for the underlying input/textarea element.
    *
@@ -265,6 +269,11 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   const value = externalValue ?? innerValue;
   const showClearButton = Boolean(isClearable && value);
 
+  const inputGroup = useOptionalInputGroup?.();
+  const generatedId = React.useId();
+  const shouldHideLabel = inputGroup?.hasExternalLabel;
+  const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+
   React.useImperativeHandle(ref, () => ({
     get input() {
       return fieldRef.current;
@@ -379,7 +388,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         {Array.isArray(helper) ? (
           helper.map((item, index) => <FeedbackText key={index} {...item} id={`${id}-helper-${index}`} />)
         ) : (
-          <FeedbackText {...helper} id={`${id}-helper`} />
+          <FeedbackText {...helper} id={`${resolvedId}-helper`} />
         )}
       </div>
     );
@@ -387,7 +396,9 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   return (
     <div data-name="textfield" {...rest} className={TextFieldBEM}>
-      <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} size={labelSize} />
+      {!shouldHideLabel && (
+        <FormLabel id={resolvedId} label={label} required={required} hideLabel={hideLabel} size={labelSize} />
+      )}
 
       <div
         className={styles['tedi-textfield__inner']}
@@ -399,7 +410,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       >
         <Field
           {...input}
-          id={id}
+          id={resolvedId}
           name={name}
           value={value}
           defaultValue={defaultValue}
