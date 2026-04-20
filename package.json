@@ -20,7 +20,7 @@
     "prepare": "husky",
     "start": "storybook dev -p 4400 -c .storybook",
     "build": "rm -rf dist && vite build --config vite.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css --isRegex",
-    "build:sb": "storybook build -c .storybook -o dist/storybook-static",
+    "build:sb": "storybook build -c .storybook -o dist/storybook-static --stats-json",
     "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
     "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
     "test": "jest --config ./jest.config.ts --passWithNoTests",
