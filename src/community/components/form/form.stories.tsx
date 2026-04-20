@@ -4,7 +4,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import { TextField } from '../../../tedi/components/form/textfield/textfield';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
-import { Button } from '../../index';
+import { Button } from '../button/button';
 
 const EmptyComponent = () => <p>Empty component</p>;
 
