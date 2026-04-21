@@ -35,10 +35,6 @@ export interface TimePickerProps {
    * @example ["09:00", "09:30", "10:00", "14:00", "15:30"]
    */
   availableTimes?: string[];
-  /**
-   * Defines how available times are displayed
-   */
-  availableTimesView?: 'grid' | 'dropdown';
   /*
    * Variant of the grid when availableTimesView is set to 'grid':
    * - 'buttons' – buttons grid
@@ -94,3 +90,5 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     />
   );
 };
+
+TimePicker.displayName = 'TimePicker';

@@ -131,7 +131,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   } = getCurrentBreakpointProps<TimeFieldBreakpointProps>(props);
 
   const isControlled = value !== undefined;
-  const [internalValue, setInternalValue] = useState(value ?? defaultValue ?? availableTimes?.[0] ?? '');
+  const [internalValue, setInternalValue] = useState(value ?? defaultValue ?? '');
 
   const currentValue = isControlled ? value : internalValue;
   const [open, setOpen] = useState(false);
@@ -298,3 +298,5 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     </>
   );
 };
+
+TimeField.displayName = 'TimeField';

@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { useId } from 'react';
 
 import Button from '../../../../buttons/button/button';
 import { Col, ColSize, Row } from '../../../../layout/grid';
@@ -40,14 +41,16 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   colWidth = 4,
   variant = 'buttons',
 }) => {
+  const reactId = useId();
+
   if (variant === 'radio') {
     return (
       <div className={cn(styles['tedi-time-picker__grid'], className)}>
         <ChoiceGroup
-          id="time-picker-group"
+          id={`time-picker-group-${reactId}`}
           label="Pick time"
           inputType="radio"
-          name="time-grid"
+          name={`time-grid-${reactId}`}
           value={value}
           onChange={(val) => onSelect(val as string)}
           items={times.map((time) => ({

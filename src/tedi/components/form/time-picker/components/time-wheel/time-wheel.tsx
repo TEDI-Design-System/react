@@ -53,6 +53,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   onChange,
   className,
 }) => {
+  const uid = React.useId();
   const hourRef = useRef<HTMLDivElement>(null);
   const minuteRef = useRef<HTMLDivElement>(null);
 
@@ -135,7 +136,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
       if (retryTimeoutHour.current) clearTimeout(retryTimeoutHour.current);
       if (retryTimeoutMinute.current) clearTimeout(retryTimeoutMinute.current);
     };
-  }, []);
+  }, [hours, minutes, selectedHour, selectedMinute]);
 
   const handleHourScroll = () => {
     if (!hourRef.current || isProgrammaticScrollHour.current) return;
@@ -281,7 +282,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
         role="listbox"
         aria-label="Hours"
         tabIndex={0}
-        aria-activedescendant={`hour-${selectedHour}`}
+        aria-activedescendant={`${uid}-hour-${hours.indexOf(selectedHour)}`}
         className={styles['tedi-time-picker__wheel-column']}
         onScroll={handleHourScroll}
         onKeyDown={handleColumnKeyDown('hour', hours, selectedHour, (h) => onChange(h, selectedMinute))}
@@ -293,7 +294,9 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
               [styles['tedi-time-picker__wheel-item--selected']]: h === selectedHour,
             })}
             onClick={() => handleHourClick(idx)}
-            id={`hour-${idx}`}
+            id={`${uid}-hour-${idx}`}
+            role="option"
+            aria-selected={h === selectedHour}
           >
             {h}
           </div>
@@ -307,7 +310,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
         onScroll={handleMinuteScroll}
         aria-label="Minutes"
         tabIndex={0}
-        aria-activedescendant={`minute-${selectedMinute}`}
+        aria-activedescendant={`${uid}-minute-${minutes.indexOf(selectedMinute)}`}
         onKeyDown={handleColumnKeyDown('minute', minutes, selectedMinute, (m) => onChange(selectedHour, m))}
       >
         {minutes.map((m, idx) => (
@@ -317,7 +320,9 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
               [styles['tedi-time-picker__wheel-item--selected']]: m === selectedMinute,
             })}
             onClick={() => handleMinuteClick(idx)}
-            id={`minute-${idx}`}
+            id={`${uid}-minute-${idx}`}
+            role="option"
+            aria-selected={m === selectedMinute}
           >
             {m}
           </div>

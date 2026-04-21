@@ -35,8 +35,8 @@ jest.mock('./components/time-wheel/time-wheel', () => ({
 }));
 
 jest.mock('./components/time-grid/time-grid', () => ({
-  TimeGrid: ({ times, value, onSelect }: any) => (
-    <div data-testid="time-grid">
+  TimeGrid: ({ times, value, onSelect, variant, className }: any) => (
+    <div data-testid="time-grid" data-variant={variant} data-classname={className}>
       <div data-testid="value">{value}</div>
       {times.map((t: string) => (
         <button key={t} onClick={() => onSelect(t)}>
@@ -107,12 +107,12 @@ describe('TimePicker', () => {
   it('applies className to TimeGrid', () => {
     render(<TimePicker availableTimes={['09:00']} className="custom-class" />);
 
-    expect(screen.getByTestId('time-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('time-grid')).toHaveAttribute('data-classname', 'custom-class');
   });
 
   it('passes gridVariant to TimeGrid', () => {
     render(<TimePicker availableTimes={['09:00']} gridVariant="radio" />);
 
-    expect(screen.getByTestId('time-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('time-grid')).toHaveAttribute('data-variant', 'radio');
   });
 });
