@@ -82,7 +82,12 @@ export interface TextFieldProps
    * Also used to generate `aria-describedby` and helper IDs automatically.
    */
   id?: string;
-  label?: string;
+  /*
+   * The text or React node that serves as the label for the text field.
+   * If `hideLabel` is `true`, the label will be visually hidden but still accessible to screen readers.
+   * If `hideLabel` is `'keep-space'`, the label will be hidden but the space it occupies will be preserved.
+   */
+  label?: React.ReactNode;
   /**
    * Name attribute for the underlying input/textarea element.
    *
