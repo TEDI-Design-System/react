@@ -3,7 +3,6 @@ import { Children, cloneElement, isValidElement, ReactNode } from 'react';
 
 import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
-import { UnknownType } from '../../../types/commonTypes';
 import { Icon } from '../../base/icon/icon';
 import { Dropdown } from '../../overlays/dropdown';
 import Button, { ButtonProps } from '../button/button';
@@ -96,7 +95,7 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
   const activeButton = buttonsArray.find((btn) => btn.props.isActive);
   const activeLabel = dropdownLabelMode === 'static' ? dropdownLabel : activeButton?.props.children ?? dropdownLabel;
 
-  const activeIconLeft = activeButton?.props.iconLeft || 'menu';
+  const activeIconLeft = activeButton?.props.iconLeft;
   const activeIcon = activeButton?.props.icon;
 
   if (isMobileView && enableMobileDropdown) {
@@ -113,12 +112,12 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
             noStyle
             fullWidth
           >
-            {activeIconLeft && (
+            {activeIconLeft ? (
               <Icon name={typeof activeIconLeft === 'string' ? activeIconLeft : activeIconLeft.name} color="inherit" />
-            )}
-
-            {!activeIconLeft && activeIcon && (
+            ) : activeIcon ? (
               <Icon name={typeof activeIcon === 'string' ? activeIcon : activeIcon.name} color="inherit" />
+            ) : (
+              <Icon name="menu" color="inherit" />
             )}
 
             {activeLabel}
@@ -132,10 +131,12 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
               index={index}
               active={btn?.props.isActive}
               disabled={btn?.props.disabled}
-              onClick={(event) => {
+              onClick={(event: React.MouseEvent | React.KeyboardEvent) => {
                 if (btn.props.disabled) return;
 
-                btn.props.onClick?.(event as UnknownType);
+                if (event.type === 'click') {
+                  btn.props.onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+                }
 
                 if (btn.props.id) {
                   onSelectionChange?.(btn.props.id);

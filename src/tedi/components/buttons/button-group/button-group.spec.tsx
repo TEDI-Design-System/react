@@ -276,4 +276,196 @@ describe('ButtonGroup Component', () => {
     const triggerButton = screen.getByRole('button', { name: /sidenav.submenu/i });
     expect(triggerButton).toBeInTheDocument();
   });
+
+  it('renders the default menu icon on the dropdown trigger when the active button has no icon', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" isActive>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    expect(triggerButton.textContent).toContain('menu');
+  });
+
+  it('renders the active button iconLeft as string on the dropdown trigger', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" iconLeft="home" isActive>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    expect(triggerButton.textContent).toContain('home');
+  });
+
+  it('renders the active button iconLeft as object on the dropdown trigger', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" iconLeft={{ name: 'star' }} isActive>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    expect(triggerButton.textContent).toContain('star');
+  });
+
+  it('falls back to the active button icon (string) when no iconLeft is set', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" icon="settings" isActive>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    expect(triggerButton.textContent).toContain('settings');
+  });
+
+  it('falls back to the active button icon (object) when no iconLeft is set', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" icon={{ name: 'search' }} isActive>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Menu/i });
+    expect(triggerButton.textContent).toContain('search');
+  });
+
+  it('renders string iconLeft + iconRight inside each dropdown item', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" iconLeft="home" iconRight="arrow_forward">
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
+    const item = screen.getByRole('menuitem');
+    expect(item.textContent).toContain('home');
+    expect(item.textContent).toContain('arrow_forward');
+  });
+
+  it('renders object iconLeft + iconRight inside each dropdown item', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" iconLeft={{ name: 'star' }} iconRight={{ name: 'check' }}>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
+    const item = screen.getByRole('menuitem');
+    expect(item.textContent).toContain('star');
+    expect(item.textContent).toContain('check');
+  });
+
+  it('uses the index as the dropdown item key when the button has no id', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    const onSelectionChange = jest.fn();
+
+    render(
+      <ButtonGroup onSelectionChange={onSelectionChange} dropdownLabel="Menu" enableMobileDropdown>
+        <Button>Button without id</Button>
+      </ButtonGroup>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
+    fireEvent.click(screen.getByText('Button without id'));
+
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it('forwards the button onClick when a dropdown item is clicked', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    const onButtonClick = jest.fn();
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1" onClick={onButtonClick}>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
+    fireEvent.click(screen.getByText('Button 1'));
+
+    expect(onButtonClick).toHaveBeenCalled();
+  });
+
+  it('skips the button onClick when the dropdown item is activated via keyboard (Enter)', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    const onButtonClick = jest.fn();
+    const onSelectionChange = jest.fn();
+
+    render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown onSelectionChange={onSelectionChange}>
+        <Button id="button1" onClick={onButtonClick}>
+          Button 1
+        </Button>
+      </ButtonGroup>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
+    const item = screen.getByRole('menuitem');
+    fireEvent.keyDown(item, { key: 'Enter' });
+
+    expect(onButtonClick).not.toHaveBeenCalled();
+    expect(onSelectionChange).toHaveBeenCalledWith('button1');
+  });
+
+  it('does not call onSelectionChange in desktop view when the clicked button has no id', () => {
+    const onSelectionChange = jest.fn();
+
+    render(
+      <ButtonGroup onSelectionChange={onSelectionChange}>
+        <Button>Button without id</Button>
+      </ButtonGroup>
+    );
+
+    fireEvent.click(screen.getByText('Button without id'));
+
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it('filters out non-Button children', () => {
+    render(
+      <ButtonGroup>
+        <Button id="button1">Button 1</Button>
+        <div>Non-button child</div>
+        <Button id="button2">Button 2</Button>
+      </ButtonGroup>
+    );
+
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(2);
+    expect(screen.queryByText('Non-button child')).not.toBeInTheDocument();
+  });
 });

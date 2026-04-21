@@ -158,6 +158,7 @@ export const WithIcon: Story = {
   args: {
     type: 'primary',
     enableMobileDropdown: true,
+    dropdownLabelMode: 'active',
   },
 };
 
