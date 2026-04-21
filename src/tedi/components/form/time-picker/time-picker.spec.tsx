@@ -115,4 +115,32 @@ describe('TimePicker', () => {
 
     expect(screen.getByTestId('time-grid')).toHaveAttribute('data-variant', 'radio');
   });
+
+  it('updates the grid selection in uncontrolled mode and forwards onChange', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+
+    render(<TimePicker availableTimes={['09:00', '10:00']} defaultValue="09:00" onChange={onChange} />);
+
+    expect(screen.getByTestId('value')).toHaveTextContent('09:00');
+
+    await user.click(screen.getByText('10:00'));
+
+    expect(onChange).toHaveBeenCalledWith('10:00');
+    expect(screen.getByTestId('value')).toHaveTextContent('10:00');
+  });
+
+  it('updates the wheel selection in uncontrolled mode and forwards onChange', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+
+    render(<TimePicker defaultValue="00:00" stepMinutes={5} onChange={onChange} />);
+
+    expect(screen.getByTestId('selected')).toHaveTextContent('00:00');
+
+    await user.click(screen.getByText('select-time'));
+
+    expect(onChange).toHaveBeenCalledWith('01:10');
+    expect(screen.getByTestId('selected')).toHaveTextContent('01:10');
+  });
 });

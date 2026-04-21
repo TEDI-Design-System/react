@@ -12,6 +12,12 @@ export interface TimePickerProps {
    * @default ""
    */
   value?: string;
+  /*
+   * Initial time value for uncontrolled mode. Should be in "HH:mm" format.
+   * @example "09:00"
+   * @default ""
+   */
+  defaultValue?: string;
   /**
    * Callback fired when the user selects a new time.
    * Returns the selected time in "HH:mm" format.
@@ -36,7 +42,7 @@ export interface TimePickerProps {
    */
   availableTimes?: string[];
   /*
-   * Variant of the grid when availableTimesView is set to 'grid':
+   * Variant of the grid rendered when `availableTimes` is provided:
    * - 'buttons' – buttons grid
    * - 'radio' – radio buttons grid
    * @default 'buttons'
@@ -50,17 +56,26 @@ export interface TimePickerProps {
 }
 
 export const TimePicker: React.FC<TimePickerProps> = ({
-  value = '',
+  value,
+  defaultValue = '',
   onChange,
   stepMinutes = 1,
   availableTimes,
   gridVariant = 'buttons',
   className,
 }) => {
+  const [internal, setInternal] = React.useState(defaultValue);
+  const isControlled = value !== undefined;
+  const current = isControlled ? value : internal;
+  const handleChange = (next: string) => {
+    if (!isControlled) setInternal(next);
+    onChange?.(next);
+  };
+
   const hours = useMemo(generateHours, []);
   const minutes = useMemo(() => generateMinutes(stepMinutes), [stepMinutes]);
 
-  const { hour, minute } = parseTime(value || '12:00');
+  const { hour, minute } = parseTime(current || '12:00');
 
   const selectedHour = hours.includes(hour) ? hour : '00';
   const selectedMinute = findClosestMinute(minute, minutes);
@@ -69,9 +84,9 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     return (
       <TimeGrid
         times={availableTimes}
-        value={value}
+        value={current}
         variant={gridVariant}
-        onSelect={(time) => onChange?.(time)}
+        onSelect={handleChange}
         className={className}
       />
     );
@@ -83,9 +98,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
       minutes={minutes}
       selectedHour={selectedHour}
       selectedMinute={selectedMinute}
-      onChange={(hour, minute) => {
-        onChange?.(`${hour}:${minute}`);
-      }}
+      onChange={(hour, minute) => handleChange(`${hour}:${minute}`)}
       className={className}
     />
   );

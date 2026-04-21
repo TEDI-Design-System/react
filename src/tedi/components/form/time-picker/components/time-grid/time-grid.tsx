@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { useId } from 'react';
 
+import { useLabels } from '../../../../../providers/label-provider';
 import Button from '../../../../buttons/button/button';
 import { Col, ColSize, Row } from '../../../../layout/grid';
 import ChoiceGroup from '../../../choice-group/choice-group';
@@ -42,19 +43,20 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   variant = 'buttons',
 }) => {
   const reactId = useId();
+  const { getLabel } = useLabels();
 
   if (variant === 'radio') {
     return (
       <div className={cn(styles['tedi-time-picker__grid'], className)}>
         <ChoiceGroup
           id={`time-picker-group-${reactId}`}
-          label="Pick time"
+          label={getLabel('timePicker.pickTime')}
           inputType="radio"
           name={`time-grid-${reactId}`}
           value={value}
           onChange={(val) => onSelect(val as string)}
           items={times.map((time) => ({
-            id: `time-${time}`,
+            id: `time-${reactId}-${time}`,
             label: time,
             value: time,
             colProps: { width: colWidth },
@@ -89,3 +91,5 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
     </div>
   );
 };
+
+TimeGrid.displayName = 'TimeGrid';

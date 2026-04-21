@@ -261,7 +261,9 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
 
       event.preventDefault();
 
-      const el = document.getElementById(`${type}-${nextIndex}`);
+      const container = type === 'hour' ? hourRef.current : minuteRef.current;
+      const el = container?.querySelector<HTMLElement>(`#${CSS.escape(`${uid}-${type}-${nextIndex}`)}`);
+
       el?.focus();
       el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     };
@@ -331,3 +333,5 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     </div>
   );
 };
+
+TimeWheel.displayName = 'TimeWheel';
