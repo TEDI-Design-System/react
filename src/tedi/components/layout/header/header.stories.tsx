@@ -6,19 +6,15 @@ import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
+import { Text } from '../../base/typography/text/text';
 import { Search } from '../../form/search/search';
 import Link from '../../navigation/link/link';
+import { Tag } from '../../tags/tag/tag';
 import { HideAt } from '../hide-at';
 import { ShowAt } from '../show-at';
 import { SideNav } from '../sidenav';
-import HeaderLanguage from './components/header-language/header-language';
-import HeaderLogin from './components/header-login/header-login';
-import HeaderLogout from './components/header-logout/header-logout';
-import HeaderProfile from './components/header-profile/header-profile';
-import HeaderRole from './components/header-role/header-role';
 import { Representative } from './components/header-role/header-role-representatives';
-import HeaderSearch from './components/header-search/header-search';
-import Header, { HeaderLogoProps } from './header';
+import { Header, HeaderActions, HeaderCenter, HeaderLogo, HeaderLogoProps } from './header';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.68?m=dev&node-id=6380-53060" target="_BLANK">Figma ↗</a><br/>
@@ -27,14 +23,20 @@ import Header, { HeaderLogoProps } from './header';
 
 const STORAGE_KEY = 'tedi-theme';
 
-export default {
+const meta: Meta<typeof Header> = {
   title: 'TEDI-Ready/Layout/Header',
   component: Header,
   subcomponents: {
-    'Header.Logo': Header.Logo,
-    'Header.Center': Header.Center,
-    'Header.Actions': Header.Actions,
-  },
+    'Header.Logo': HeaderLogo,
+    'Header.Center': HeaderCenter,
+    'Header.Actions': HeaderActions,
+    'Header.Language': Header.Language,
+    'Header.Login': Header.Login,
+    'Header.Logout': Header.Logout,
+    'Header.Profile': Header.Profile,
+    'Header.Role': Header.Role,
+    'Header.Search': Header.Search,
+  } as never,
   decorators: [
     (Story) => {
       const [globals, updateGlobals] = useGlobals();
@@ -70,8 +72,13 @@ export default {
   ],
   parameters: {
     layout: 'fullscreen',
+    status: {
+      type: ['breakpointSupport'],
+    },
   },
-} as Meta<typeof Header>;
+};
+
+export default meta;
 
 type Story = StoryObj<typeof Header>;
 
@@ -208,7 +215,7 @@ const ProfileExample = () => {
       <ShowAt lg>
         <Separator axis="horizontal" />
       </ShowAt>
-      <HeaderLogout size="default" href="#" />
+      <Header.Logout size="default" href="#" />
     </>
   );
 };
@@ -273,9 +280,9 @@ export const Default: Story = {
               </ShowAt>
             </Header.Center>
             <Header.Actions>
-              <HeaderLanguage languages={languages} currentLanguage={languages[0].label} />
+              <Header.Language languages={languages} currentLanguage={languages[0].label} />
               <Separator axis="vertical" />
-              <HeaderLogin href="#" />
+              <Header.Login href="#" />
             </Header.Actions>
           </Header>
 
@@ -337,9 +344,9 @@ export const LoggedOut: Story = {
                 </Header.Center>
 
                 <Header.Actions>
-                  <HeaderLanguage languages={languages} currentLanguage={languages[0].label} />
+                  <Header.Language languages={languages} currentLanguage={languages[0].label} />
                   <Separator axis="vertical" />
-                  <HeaderLogin href="#" />
+                  <Header.Login href="#" />
                 </Header.Actions>
               </Header>
 
@@ -399,24 +406,24 @@ export const LoggedOut: Story = {
                       Kontakt
                     </Link>
                   </div>
-                  <HeaderSearch>
+                  <Header.Search>
                     <div style={{ width: '100%', maxWidth: '22.5rem' }}>
-                      <Search placeholder="" label="" id="search-2" />
+                      <Search label="search-1" hideLabel id="search-1" />
                     </div>
-                  </HeaderSearch>
+                  </Header.Search>
                 </ShowAt>
               </Header.Center>
 
               <Header.Actions>
                 <HideAt lg>
-                  <HeaderSearch>
-                    <Search placeholder="" label="" id="search-2" />
-                  </HeaderSearch>
+                  <Header.Search>
+                    <Search label="search-1" hideLabel id="search-1" />
+                  </Header.Search>
                   <Separator axis="vertical" />
                 </HideAt>
-                <HeaderLanguage languages={languages} />
+                <Header.Language languages={languages} />
                 <Separator axis="vertical" />
-                <HeaderLogin href="#" />
+                <Header.Login href="#" />
               </Header.Actions>
             </Header>
 
@@ -462,18 +469,32 @@ export const LoggedIn: Story = {
             <ShowAt lg>
               {accessibilityLink}
               <Separator axis="vertical" />
-              <HeaderRole title="Roll:" representatives={representatives} />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Roll:
+                  </Text>
+                }
+                representatives={representatives}
+              />
               <Separator axis="vertical" />
             </ShowAt>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
-            <HeaderProfile>
+            <Header.Profile>
               <HideAt lg>
-                <HeaderRole title="Roll:" representatives={representatives} />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Roll:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
                 {accessibilityLink}
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
           </Header.Actions>
         </Header>
       </div>
@@ -484,18 +505,18 @@ export const LoggedIn: Story = {
           <ShowAt lg>
             {accessibilityLink}
             <Separator axis="vertical" />
-            <HeaderRole title="Esindatav" withStatusBadge={true} representatives={representatives} />
+            <Header.Role label={<Tag>Esindatav</Tag>} showDescription={false} representatives={representatives} />
             <Separator axis="vertical" />
           </ShowAt>
-          <HeaderLanguage languages={languages} />
+          <Header.Language languages={languages} />
           <Separator axis="vertical" />
-          <HeaderProfile>
+          <Header.Profile>
             <HideAt lg>
-              <HeaderRole title="Esindatav:" withStatusBadge={true} representatives={representatives} />
+              <Header.Role label={<Tag>Esindatav:</Tag>} showDescription={false} representatives={representatives} />
               {accessibilityLink}
             </HideAt>
             <ProfileExample />
-          </HeaderProfile>
+          </Header.Profile>
         </Header.Actions>
       </Header>
     </>
@@ -512,21 +533,51 @@ export const WithOrganizationSelection: Story = {
             <ShowAt lg>
               {accessibilityLink}
               <Separator axis="vertical" />
-              <HeaderRole title="Asutus" representatives={organizations} isOrganization />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Asutus
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
               <Separator axis="vertical" />
-              <HeaderRole title="Roll:" representatives={representatives} />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Roll:
+                  </Text>
+                }
+                representatives={representatives}
+              />
               <Separator axis="vertical" />
             </ShowAt>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
-            <HeaderProfile>
+            <Header.Profile>
               <HideAt lg>
-                <HeaderRole title="Asutus:" representatives={organizations} isOrganization />
-                <HeaderRole title="Roll:" representatives={representatives} />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Asutus:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Roll:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
                 {accessibilityLink}
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
           </Header.Actions>
         </Header>
       </div>
@@ -537,18 +588,33 @@ export const WithOrganizationSelection: Story = {
           <ShowAt lg>
             {accessibilityLink}
             <Separator axis="vertical" />
-            <HeaderRole title="Asutus" representatives={organizations2} />
+            <Header.Role
+              label={
+                <Text modifiers={['small', 'bold']} color="secondary">
+                  Asutus
+                </Text>
+              }
+              representatives={organizations2}
+            />
             <Separator axis="vertical" />
           </ShowAt>
-          <HeaderLanguage languages={languages} />
+          <Header.Language languages={languages} />
           <Separator axis="vertical" />
-          <HeaderProfile>
+          <Header.Profile>
             <HideAt lg>
-              <HeaderRole title="Asutus:" representatives={organizations2} isOrganization />
+              <Header.Role
+                label={
+                  <Text modifiers="bold" color="secondary">
+                    Asutus:
+                  </Text>
+                }
+                representatives={organizations2}
+                isOrganization
+              />
               {accessibilityLink}
             </HideAt>
             <ProfileExample />
-          </HeaderProfile>
+          </Header.Profile>
         </Header.Actions>
       </Header>
     </>
@@ -565,21 +631,51 @@ export const AlternativeProfileAndLogoutButton: Story = {
             <ShowAt lg>
               {accessibilityLink}
               <Separator axis="vertical" />
-              <HeaderRole title="Asutus" representatives={organizations} isOrganization />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Asutus
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
               <Separator axis="vertical" />
-              <HeaderRole title="Isikukood:" representatives={representatives} />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Isikukood:
+                  </Text>
+                }
+                representatives={representatives}
+              />
               <Separator axis="vertical" />
             </ShowAt>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
-            <HeaderProfile showLabel>
+            <Header.Profile showLabel>
               <HideAt lg>
-                <HeaderRole title="Asutus:" representatives={organizations} isOrganization />
-                <HeaderRole title="Isikukood:" representatives={representatives} />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Asutus:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Isikukood:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
                 {accessibilityLink}
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
           </Header.Actions>
         </Header>
       </div>
@@ -591,18 +687,32 @@ export const AlternativeProfileAndLogoutButton: Story = {
             <ShowAt lg>
               {accessibilityLink}
               <Separator axis="vertical" />
-              <HeaderRole title="Isikukood:" representatives={representatives} />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Isikukood:
+                  </Text>
+                }
+                representatives={representatives}
+              />
               <Separator axis="vertical" />
             </ShowAt>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
-            <HeaderProfile showLabel>
+            <Header.Profile showLabel>
               <HideAt lg>
-                <HeaderRole title="Isikukood:" representatives={representatives} />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Isikukood:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
                 {accessibilityLink}
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
           </Header.Actions>
         </Header>
       </div>
@@ -611,15 +721,15 @@ export const AlternativeProfileAndLogoutButton: Story = {
         <Header>
           <Header.Logo logoDark={logoDark} logo={logo} />
           <Header.Actions>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
 
-            <HeaderProfile showLabel label={representatives2[0].name}>
+            <Header.Profile showLabel md={{ label: representatives2[0].name }}>
               <HideAt lg>
-                <HeaderRole representatives={representatives2}></HeaderRole>
+                <Header.Role representatives={representatives2}></Header.Role>
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
           </Header.Actions>
         </Header>
       </div>
@@ -630,19 +740,35 @@ export const AlternativeProfileAndLogoutButton: Story = {
           <ShowAt lg>
             {accessibilityLink}
             <Separator axis="vertical" />
-            <HeaderRole title="Asutus" representatives={organizations} isOrganization />
+            <Header.Role
+              label={
+                <Text modifiers={['small', 'bold']} color="secondary">
+                  Asutus
+                </Text>
+              }
+              representatives={organizations}
+              isOrganization
+            />
             <Separator axis="vertical" />
           </ShowAt>
-          <HeaderLanguage languages={languages} />
+          <Header.Language languages={languages} />
           <Separator axis="vertical" />
           <HideAt lg>
-            <HeaderProfile>
-              <HeaderRole title="Asutus:" representatives={organizations} isOrganization />
+            <Header.Profile>
+              <Header.Role
+                label={
+                  <Text modifiers="bold" color="secondary">
+                    Asutus:
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
               {accessibilityLink}
-            </HeaderProfile>
+            </Header.Profile>
             <Separator axis="vertical" />
           </HideAt>
-          <HeaderLogout href="#" />
+          <Header.Logout href="#" />
         </Header.Actions>
       </Header>
     </>
@@ -656,55 +782,69 @@ export const WithSearch: Story = {
         <Header>
           <Header.Logo logoDark={logoDark} logo={logo} />
           <Header.Actions>
-            <HeaderSearch>
-              <Search placeholder="" label="" id="search-3" />
-            </HeaderSearch>
+            <Header.Search>
+              <Search label="search-3" hideLabel id="search-3" />
+            </Header.Search>
             <Separator axis="vertical" />
             <ShowAt lg>
-              <HeaderRole title="Roll:" representatives={representatives} />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    Roll:
+                  </Text>
+                }
+                representatives={representatives}
+              />
               <Separator axis="vertical" />
             </ShowAt>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
-            <HeaderProfile>
+            <Header.Profile>
               <HideAt lg>
-                <HeaderRole title="Roll:" representatives={representatives} />
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      Roll:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
           </Header.Actions>
         </Header>
       </div>
       <>
         <Header
           bottom={
-            <HeaderSearch mobileVariant="inline">
-              <Search placeholder="" label="" id="search-6" />
-            </HeaderSearch>
+            <Header.Search mobileVariant="inline">
+              <Search label="search-4" hideLabel id="search-4" />
+            </Header.Search>
           }
         >
           <Header.Logo logoDark={logoDark} logo={logo} />
           <Header.Actions>
             <ShowAt md>
-              <HeaderSearch>
-                <Search placeholder="" label="" id="search-4" />
-              </HeaderSearch>
+              <Header.Search>
+                <Search label="search-4" hideLabel id="search-4" />
+              </Header.Search>
             </ShowAt>
             <ShowAt lg>
               <Separator axis="vertical" />
-              <HeaderRole representatives={representatives2} />
+              <Header.Role representatives={representatives2} />
               <Separator axis="vertical" />
             </ShowAt>
-            <HeaderLanguage languages={languages} />
+            <Header.Language languages={languages} />
             <Separator axis="vertical" />
-            <HeaderProfile showLabel label={representatives2[0].name}>
+            <Header.Profile showLabel md={{ label: representatives2[0].name }}>
               <HideAt lg>
-                <HeaderRole representatives={representatives2} />
+                <Header.Role representatives={representatives2} />
               </HideAt>
               <ProfileExample />
-            </HeaderProfile>
+            </Header.Profile>
             <Separator axis="vertical" />
-            <HeaderLogout href="#" />
+            <Header.Logout href="#" />
           </Header.Actions>
         </Header>
       </>
@@ -723,18 +863,32 @@ export const LoggedInWithSidenav: Story = {
               <ShowAt lg>
                 {accessibilityLink}
                 <Separator axis="vertical" />
-                <HeaderRole title="Roll:" representatives={representatives} />
+                <Header.Role
+                  label={
+                    <Text modifiers={['small', 'bold']} color="secondary">
+                      Roll:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
                 <Separator axis="vertical" />
               </ShowAt>
-              <HeaderLanguage languages={languages} />
+              <Header.Language languages={languages} />
               <Separator axis="vertical" />
-              <HeaderProfile>
+              <Header.Profile>
                 <HideAt lg>
-                  <HeaderRole title="Roll:" representatives={representatives} />
+                  <Header.Role
+                    label={
+                      <Text modifiers="bold" color="secondary">
+                        Roll:
+                      </Text>
+                    }
+                    representatives={representatives}
+                  />
                   {accessibilityLink}
                 </HideAt>
                 <ProfileExample />
-              </HeaderProfile>
+              </Header.Profile>
             </Header.Actions>
           </Header>
 

@@ -17,7 +17,7 @@ interface HeaderMobileButtonProps {
    */
   icon: string | IconWithoutBackgroundProps;
   /** Label text displayed below the icon. */
-  text?: string;
+  label?: string;
   /** Whether the button is in a selected state. */
   selected?: boolean;
   /** Whether the button is disabled. */
@@ -25,7 +25,7 @@ interface HeaderMobileButtonProps {
 }
 
 const HeaderMobileButton = (props: HeaderMobileButtonProps) => {
-  const { onClick, href, icon, text, selected, disabled } = props;
+  const { onClick, href, icon, label, selected, disabled } = props;
 
   const getIcon = (icon: string | IconWithoutBackgroundProps) => {
     const iconProps: IconWithoutBackgroundProps =
@@ -38,7 +38,7 @@ const HeaderMobileButton = (props: HeaderMobileButtonProps) => {
     <div className={styles['tedi-header-mobile-button__inner']}>
       {getIcon(icon)}
       <Text modifiers="extra-small" className={styles['tedi-header-mobile-button__text']}>
-        {text}
+        {label}
       </Text>
     </div>
   );

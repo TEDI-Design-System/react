@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { useState } from 'react';
 
 import { Text } from '../../../../../components/base/typography/text/text';
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
+import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { TediLanguage, useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
@@ -29,29 +29,37 @@ export interface Language {
   'aria-label'?: string;
 }
 
-interface HeaderLanguageBreakpointProps {
-  /** Whether to hide the "Select language" label text. */
-  hideLabel?: boolean;
-}
-
-interface HeaderLanguageProps extends BreakpointSupport<HeaderLanguageBreakpointProps> {
-  /** List of available languages to display in the selector dropdown. */
+export interface HeaderLanguageProps {
+  /**
+   * List of available languages to display in the selector dropdown.
+   * Each language object accepts:
+   * - `label` — display text (e.g. 'EST', 'ENG')
+   * - `locale` — locale code passed to `setLocale` on selection (ignored when `onClick` is provided)
+   * - `onClick` — custom click handler that takes full control of selection behavior
+   * - `isSelected` — marks the language as currently active (`aria-current`)
+   * - `aria-label` — accessible label for screen readers (e.g. 'Estonian', 'English')
+   */
   languages: Language[];
   /** Initially displayed language label. Falls back to the label matching the current locale, or the first item. */
   currentLanguage?: string;
+  /** Label for the language selector.
+   * Falls back to the default i18n label when not provided.
+   **/
+  selectLabel?: string;
 }
 
-const HeaderLanguage = (props: HeaderLanguageProps) => {
+export const HeaderLanguage = (props: HeaderLanguageProps) => {
+  const { languages, currentLanguage, selectLabel } = props;
   const [languageSelectionOpen, setLanguageSelectionOpen] = useState(false);
   const { getLabel, setLocale, locale } = useLabels();
-  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getCurrentBreakpointProps } = useBreakpointProps();
   const breakpoint = useBreakpoint();
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
   const { hideLabel } = getCurrentBreakpointProps({
     hideLabel: true,
     lg: { hideLabel: false },
   });
-  const availableLanguages: Language[] = props.languages ?? [];
+  const availableLanguages: Language[] = languages ?? [];
 
   const initialLabel = (() => {
     if (locale) {
@@ -59,7 +67,7 @@ const HeaderLanguage = (props: HeaderLanguageProps) => {
       if (found) return found.label;
     }
 
-    if (props.currentLanguage) return props.currentLanguage;
+    if (currentLanguage) return currentLanguage;
     return availableLanguages[0]?.label ?? '';
   })();
 
@@ -86,11 +94,9 @@ const HeaderLanguage = (props: HeaderLanguageProps) => {
         [styles['tedi-header-language__mobile']]: isMobileView,
       })}
     >
-      {!hideLabel && (
-        <Text modifiers="small" color="secondary">
-          {getLabel('header.select-lang')}
-        </Text>
-      )}
+      <Text modifiers="small" color="secondary" className={cn({ 'visually-hidden': hideLabel })}>
+        {selectLabel ?? getLabel('header.select-lang')}
+      </Text>
 
       <Popover
         placement="bottom"
@@ -102,7 +108,7 @@ const HeaderLanguage = (props: HeaderLanguageProps) => {
           <Button
             visualType="link"
             underline={false}
-            aria-label={`${getLabel('header.select-lang')} ${language}`}
+            aria-label={`${selectLabel ?? getLabel('header.select-lang')}, ${language}`}
             aria-expanded={languageSelectionOpen}
           >
             <div className={styles['tedi-header-language__selected']}>

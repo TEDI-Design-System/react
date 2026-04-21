@@ -6,18 +6,27 @@ import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-login.module.scss';
 
 interface HeaderLoginBreakpointProps {
+  /**
+   * Controls the visual size of the login button.
+   * `'small'` renders a compact icon button (used on mobile), `'default'` renders a full-width link.
+   * Automatically falls back to `'small'` on mobile viewports when not specified.
+   */
   size?: 'default' | 'small';
+  /** Custom label text for the login button. Falls back to the `header.login` or `header.login-small` translation key. */
+  label?: string;
 }
 
-interface HeaderLoginProps extends BreakpointSupport<HeaderLoginBreakpointProps> {
+export interface HeaderLoginProps extends BreakpointSupport<HeaderLoginBreakpointProps> {
+  /** Click handler fired when the login button is activated. */
   onClick?: () => void;
+  /** URL to navigate to when the login button is clicked. */
   href?: string;
 }
 
-const HeaderLogin = (props: HeaderLoginProps) => {
+export const HeaderLogin = (props: HeaderLoginProps) => {
   const { onClick, href } = props;
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { size: sizeProp } = getCurrentBreakpointProps<HeaderLoginBreakpointProps>(props);
+  const { size: sizeProp, label } = getCurrentBreakpointProps<HeaderLoginBreakpointProps>(props);
   const { getLabel } = useLabels();
 
   const breakpoint = useBreakpoint();
@@ -26,6 +35,8 @@ const HeaderLogin = (props: HeaderLoginProps) => {
   const size = sizeProp ?? (isMobileView ? 'small' : 'default');
   const isSmall = size === 'small';
 
+  const resolvedLabel = label ?? (isSmall ? getLabel('header.login-small') : getLabel('header.login'));
+
   return (
     <>
       {isSmall ? (
@@ -33,7 +44,7 @@ const HeaderLogin = (props: HeaderLoginProps) => {
           onClick={onClick}
           href={href}
           icon={{ name: 'login', size: 24, color: 'inherit' }}
-          text={getLabel('header.login-small')}
+          label={resolvedLabel}
         />
       ) : (
         <Link
@@ -45,7 +56,7 @@ const HeaderLogin = (props: HeaderLoginProps) => {
         >
           <div className={styles['tedi-header-login__button--inner']}>
             <Text modifiers="normal" className={styles['tedi-header-login__button--text']}>
-              {getLabel('header.login')}
+              {resolvedLabel}
             </Text>
           </div>
         </Link>

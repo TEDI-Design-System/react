@@ -7,18 +7,28 @@ import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-logout.module.scss';
 
 interface HeaderLogoutBreakpointProps {
+  /**
+   * Controls the visual size of the logout button.
+   * `'small'` renders a compact icon button (used on mobile), `'default'` renders a full-width link with icon.
+   * Automatically falls back to `'small'` on mobile viewports when not specified.
+   */
   size?: 'default' | 'small';
+  /** Custom label text for the logout button. Falls back to the `header.logout` or `header.logout-small` translation key. */
+  label?: string;
 }
 
-interface HeaderLogoutProps extends BreakpointSupport<HeaderLogoutBreakpointProps> {
+export interface HeaderLogoutProps extends BreakpointSupport<HeaderLogoutBreakpointProps> {
+  /** Click handler fired when the logout button is activated. */
   onClick?: () => void;
+  /** URL to navigate to when the logout button is clicked. */
   href?: string;
 }
 
-const HeaderLogout = (props: HeaderLogoutProps) => {
-  const { getLabel } = useLabels();
+export const HeaderLogout = (props: HeaderLogoutProps) => {
+  const { onClick, href } = props;
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { size: sizeProp } = getCurrentBreakpointProps<HeaderLogoutBreakpointProps>(props);
+  const { size: sizeProp, label } = getCurrentBreakpointProps<HeaderLogoutBreakpointProps>(props);
+  const { getLabel } = useLabels();
 
   const breakpoint = useBreakpoint();
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
@@ -26,7 +36,7 @@ const HeaderLogout = (props: HeaderLogoutProps) => {
   const size = sizeProp ?? (isMobileView ? 'small' : 'default');
   const isSmall = size === 'small';
 
-  const { onClick, href } = props;
+  const resolvedLabel = label ?? (isSmall ? getLabel('header.logout-small') : getLabel('header.logout'));
 
   return (
     <>
@@ -35,14 +45,14 @@ const HeaderLogout = (props: HeaderLogoutProps) => {
           onClick={onClick}
           href={href}
           icon={{ name: 'logout', size: 24, color: 'inherit' }}
-          text={getLabel('header.logout-small')}
+          label={resolvedLabel}
         />
       ) : (
         <Link onClick={onClick} href={href} underline={false}>
           <div className={styles['tedi-header-logout']}>
             <Icon name="logout" size={18} color="inherit" />
             <Text modifiers="normal" className={styles['tedi-header-logout__text']}>
-              {getLabel('header.logout')}
+              {resolvedLabel}
             </Text>
           </div>
         </Link>

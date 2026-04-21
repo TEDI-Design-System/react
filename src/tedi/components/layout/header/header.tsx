@@ -3,13 +3,20 @@ import React from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
+import Print from '../../misc/print/print';
 import styles from '../header/header.module.scss';
+import HeaderLanguage from './components/header-language/header-language';
+import HeaderLogin from './components/header-login/header-login';
+import HeaderLogout from './components/header-logout/header-logout';
+import HeaderProfile from './components/header-profile/header-profile';
+import HeaderRole from './components/header-role/header-role';
+import HeaderSearch from './components/header-search/header-search';
 
 export interface HeaderProps {
   /**
    * Content rendered inside the header, typically Header.Logo, Header.Center, and Header.Actions subcomponents.
    */
-  children?: React.ReactNode;
+  children: React.ReactNode;
   /**
    * Toggle element for the mobile side navigation menu.
    * Typically a SideNav.Toggle component.
@@ -20,40 +27,30 @@ export interface HeaderProps {
    * Commonly used for a mobile-specific search bar or other compact navigation elements.
    */
   bottom?: React.ReactNode;
-}
-
-export interface HeaderContentProps {
-  /** Content rendered in the center area of the header, typically navigation links or a search bar. */
-  children?: React.ReactNode;
-  /**
-   * Controls the horizontal alignment of center content.
-   * @default center
-   */
-  alignment?: 'flex-start' | 'center' | 'space-between';
-  /** Additional CSS class name applied to the center content area. */
+  /** Additional CSS class name applied to the header wrapper. */
   className?: string;
 }
 
-export interface HeaderActionsProps {
-  /** Action elements rendered on the right side of the header (e.g. language selector, login, profile). */
-  children?: React.ReactNode;
-}
-
-const Header = ({ children, toggle, bottom }: HeaderProps) => {
+export const Header = (props: HeaderProps) => {
+  const { children, toggle, bottom, className } = props;
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, 'md');
 
   return (
-    <div className={cn(styles['tedi-header'])}>
-      <header className={cn(styles['tedi-header__main'])}>
-        {toggle && <>{toggle}</>}
-        <div className={styles['tedi-header__main--content']}>{children}</div>
-      </header>
+    <Print visibility="hide">
+      <div className={cn(styles['tedi-header'], className)}>
+        <header className={cn(styles['tedi-header__main'])}>
+          {toggle && <>{toggle}</>}
+          <div className={styles['tedi-header__main--content']}>{children}</div>
+        </header>
 
-      {bottom && isMobile && <div className={styles['tedi-header__bottom']}>{bottom}</div>}
-    </div>
+        {bottom && isMobile && <div className={styles['tedi-header__bottom']}>{bottom}</div>}
+      </div>
+    </Print>
   );
 };
+
+Header.displayName = 'Header';
 
 export interface HeaderLogoProps {
   /**
@@ -76,9 +73,12 @@ export interface HeaderLogoProps {
    * If provided, the logo will be wrapped in an anchor element.
    */
   href?: string;
+  /** Additional CSS class name applied to the logo wrapper. */
+  className?: string;
 }
 
-Header.Logo = function Logo({ logo, logoDark, href, showLogo = true }: HeaderLogoProps) {
+export const HeaderLogo = (props: HeaderLogoProps) => {
+  const { logo, logoDark, href, showLogo = true, className } = props;
   const { theme } = useTheme();
 
   const resolvedLogo = theme === 'dark' && logoDark ? logoDark : logo;
@@ -87,24 +87,57 @@ Header.Logo = function Logo({ logo, logoDark, href, showLogo = true }: HeaderLog
 
   const content = href ? <a href={href}>{resolvedLogo}</a> : resolvedLogo;
 
-  return <div className={styles['tedi-header__logo']}>{content}</div>;
+  return <div className={cn(styles['tedi-header__logo'], className)}>{content}</div>;
 };
 
-Header.Center = function Content(props: HeaderContentProps) {
-  const { children, className, alignment = 'center', ...rest } = props;
+HeaderLogo.displayName = 'Header.Logo';
 
-  const centerBEM = cn(styles['tedi-header__center'], styles[`tedi-header__center--${alignment}`], className);
+export interface HeaderCenterProps {
+  /** Content rendered in the center area of the header, typically navigation links or a search bar. */
+  children: React.ReactNode;
+  /**
+   * Controls the horizontal alignment of center content.
+   * @default center
+   */
+  alignment?: 'flex-start' | 'center' | 'space-between';
+  /** Additional CSS class name applied to the center content area. */
+  className?: string;
+}
+
+export const HeaderCenter = (props: HeaderCenterProps) => {
+  const { children, className, alignment = 'center' } = props;
 
   return (
-    <div className={centerBEM} {...rest}>
+    <div className={cn(styles['tedi-header__center'], styles[`tedi-header__center--${alignment}`], className)}>
       {children}
     </div>
   );
 };
 
-Header.Actions = function Actions(props: HeaderActionsProps) {
-  const { children } = props;
-  return <div className={styles['tedi-header__actions']}>{children}</div>;
+HeaderCenter.displayName = 'Header.Center';
+
+export interface HeaderActionsProps {
+  /** Action elements rendered on the right side of the header (e.g. language selector, login, profile). */
+  children: React.ReactNode;
+  /** Additional CSS class name applied to the actions wrapper. */
+  className?: string;
+}
+
+export const HeaderActions = (props: HeaderActionsProps) => {
+  const { children, className } = props;
+  return <div className={cn(styles['tedi-header__actions'], className)}>{children}</div>;
 };
+
+HeaderActions.displayName = 'Header.Actions';
+
+Header.Logo = HeaderLogo;
+Header.Center = HeaderCenter;
+Header.Actions = HeaderActions;
+Header.Language = HeaderLanguage;
+Header.Login = HeaderLogin;
+Header.Logout = HeaderLogout;
+Header.Profile = HeaderProfile;
+Header.Role = HeaderRole;
+Header.Search = HeaderSearch;
 
 export default Header;

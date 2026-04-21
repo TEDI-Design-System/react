@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React from 'react';
+import React, { useId } from 'react';
 
 import Separator from '../../../../../../tedi/components/misc/separator/separator';
 import { Text } from '../../../../../components/base/typography/text/text';
@@ -21,41 +21,78 @@ interface HeaderRoleRepresentativesProps {
   setInputValue: (value: string) => void;
   setRepresentative: (rep: Representative) => void;
   setIsRoleSelectionOpen: (open: boolean) => void;
+  /** Callback fired when the role selection is toggled. Handles both state update and external notification. */
+  onRoleSelectionToggle?: () => void;
   isRoleSelectionOpen: boolean;
   isOrganization?: boolean;
+  /**
+   * Label for the search input when selecting a representative.
+   * Falls back to i18n labels when not provided.
+   */
+  searchLabel?: string;
+  /**
+   * Label for the search input when selecting an organization representative.
+   * Overrides both the default and `searchLabel` when `isOrganization` is true.
+   */
+  organizationSearchLabel?: string;
+  /** Optional id for the search input. Falls back to a generated unique id. */
+  searchId?: string;
+  /** Whether to keep the role selection open after selecting a representative. */
+  keepOpenOnSelect?: boolean;
 }
 
-const HeaderRoleRepresentatives = ({
-  representatives,
-  inputValue,
-  setInputValue,
-  setRepresentative,
-  setIsRoleSelectionOpen,
-  isRoleSelectionOpen,
-  representative,
-  isOrganization,
-}: HeaderRoleRepresentativesProps) => {
+const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
+  const {
+    representatives,
+    inputValue,
+    setInputValue,
+    setRepresentative,
+    setIsRoleSelectionOpen,
+    onRoleSelectionToggle,
+    isRoleSelectionOpen,
+    representative,
+    isOrganization,
+    searchLabel,
+    organizationSearchLabel,
+    searchId,
+    keepOpenOnSelect,
+  } = props;
   const { getLabel } = useLabels();
 
-  const searchLabel = isOrganization
-    ? getLabel('header.role-selection.search-label-organization')
-    : getLabel('header.role-selection.search-label');
+  const resolvedSearchLabel = isOrganization
+    ? organizationSearchLabel ?? getLabel('header.role-selection.search.organizationLabel')
+    : searchLabel ?? getLabel('header.role-selection.search.label');
 
   const handleSelect = (rep: Representative) => {
     setRepresentative(rep);
     setInputValue('');
-    setIsRoleSelectionOpen(false);
+
+    if (!keepOpenOnSelect) {
+      if (isRoleSelectionOpen && onRoleSelectionToggle) {
+        onRoleSelectionToggle();
+      } else {
+        setIsRoleSelectionOpen(false);
+      }
+    }
   };
+
+  const generatedSearchId = useId();
 
   return (
     <div
       className={cn(styles['tedi-header-role__collapse'], {
         [styles['tedi-header-role__collapse--open']]: isRoleSelectionOpen,
       })}
+      {...(!isRoleSelectionOpen && { inert: '' })}
     >
       <div className={styles['tedi-header-role__collapse-inner']}>
         <div className={styles['tedi-header-role__list']}>
-          <Search id="header-role-search" value={inputValue} onChange={(e) => setInputValue(e)} label={searchLabel} />
+          <Search
+            id={searchId ?? generatedSearchId}
+            value={inputValue}
+            onChange={(e) => setInputValue(e)}
+            label={resolvedSearchLabel}
+          />
           {representatives.map((rep) => {
             const isSelected = representative.name === rep.name;
 
@@ -74,6 +111,7 @@ const HeaderRoleRepresentatives = ({
                     {rep.icon && <Icon name={rep.icon.name} size={rep.icon.size} color="inherit" />}
                     <div className={styles['tedi-header-role__item-text']}>
                       {rep.name}
+
                       <Text modifiers="small">{rep.description}</Text>
                     </div>
                   </div>

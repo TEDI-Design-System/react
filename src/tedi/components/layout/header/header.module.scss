@@ -19,6 +19,7 @@
       min-height: var(--layout-header-height);
       padding: var(--layout-header-padding-y) var(--layout-header-padding-right) var(--layout-header-padding-y)
         var(--layout-header-padding-left);
+      overflow: auto;
     }
   }
 

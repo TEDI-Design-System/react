@@ -16,29 +16,32 @@ import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-profile.module.scss';
 
 interface HeaderProfileBreakpointProps {
-  /** Breakpoint at which we show dropdown instead of modal */
+  /**
+   * Defines the breakpoint from which the profile menu is displayed as a dropdown.
+   * Below this breakpoint, it is rendered as a full-screen modal.
+   *
+   * @default lg
+   */
   showDropdown?: Breakpoint;
+  /** Custom label text for the profile button. Falls back to the `header.profile` translation key. */
+  label?: string;
 }
 
 export interface HeaderProfileProps extends BreakpointSupport<HeaderProfileBreakpointProps> {
   /** Content rendered inside the profile dropdown or modal (e.g. navigation links, logout button). */
-  children?: React.ReactNode;
+  children: React.ReactNode;
   /**
    * Whether to display a text label next to the profile icon on non-mobile viewports.
    * @default false
    */
   showLabel?: boolean;
-  /** Custom label text for the profile button. Falls back to the `header.profile` translation key. */
-  label?: string;
-  /** Custom label text for the mobile profile button. Falls back to the `header.profile.mobile` translation key. */
-  labelMobile?: string;
 }
 
-const HeaderProfile = (props: HeaderProfileProps) => {
-  const { children, showLabel = false, label, labelMobile } = props;
+export const HeaderProfile = (props: HeaderProfileProps) => {
+  const { children, showLabel = false } = props;
   const { getLabel } = useLabels();
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { showDropdown = 'lg' } = getCurrentBreakpointProps<HeaderProfileBreakpointProps>(props);
+  const { showDropdown = 'lg', label } = getCurrentBreakpointProps<HeaderProfileBreakpointProps>(props);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,16 +52,18 @@ const HeaderProfile = (props: HeaderProfileProps) => {
 
   const useDropdown = !isBreakpointBelow(breakpoint, showDropdown);
 
+  const resolvedLabel = label ?? (isMobileView ? getLabel('header.profile.mobile') : getLabel('header.profile'));
+
   const button = isMobileView ? (
     <HeaderMobileButton
       icon={{ name: modalOpen ? 'close' : 'account_circle', size: 24, color: 'inherit' }}
-      text={labelMobile ?? getLabel('header.profile.mobile')}
+      label={resolvedLabel}
       selected={modalOpen}
     />
   ) : showLabel ? (
     <Button visualType="secondary" iconLeft="account_circle">
       <div className={styles['tedi-header-profile__button']}>
-        {label ?? getLabel('header.profile')}
+        {resolvedLabel}
         <Icon
           name="expand_more"
           size={18}
@@ -69,7 +74,7 @@ const HeaderProfile = (props: HeaderProfileProps) => {
       </div>
     </Button>
   ) : (
-    <Button icon={{ name: 'account_circle', size: 36 }} visualType="neutral">
+    <Button icon={{ name: 'account_circle', size: 36 }} visualType="neutral" aria-label={resolvedLabel}>
       <></>
     </Button>
   );
