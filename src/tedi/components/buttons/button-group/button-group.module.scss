@@ -144,7 +144,7 @@
     &--secondary {
       color: var(--button-main-secondary-text-default);
       background: var(--button-main-secondary-background-default);
-      border: 2px solid var(--button-group-secondary-selected-border);
+      border: 2px solid var(--button-main-secondary-border-default);
 
       &[aria-expanded='true'] {
         background: var(--button-main-secondary-background-active);

@@ -47,7 +47,7 @@ export type ButtonGroupProps = {
   size?: 'default' | 'small';
   /**
    * Whether the button group should collapse into a dropdown on mobile
-   * @default true
+   * @default false
    */
   enableMobileDropdown?: boolean;
   /**
@@ -57,13 +57,13 @@ export type ButtonGroupProps = {
   mobileBreakpoint?: Breakpoint;
   /**
    * Label to display on the dropdown trigger button when the button group collapses on mobile.
-   * If not provided, `ariaLabel` will be used as fallback.
+   * If not provided, the label provider value for `sidenav.submenu` will be used as fallback.
    */
   dropdownLabel?: string;
   /*
    * Determines the source of the dropdown trigger button's label when the button group collapses on mobile.
-   * - `'active'` (default) – uses the label of the currently active button as the dropdown trigger label. If no button is active, falls back to `dropdownLabel` or `ariaLabel`.
-   * - `'static'` – always uses the `dropdownLabel` (or `ariaLabel` as fallback) as the dropdown trigger label, regardless of which button is active.
+   * - `'active'` – uses the label of the currently active button as the dropdown trigger label. If no button is active, falls back to `dropdownLabel`.
+   * - `'static'` (default) – always uses `dropdownLabel`, regardless of which button is active.
    *
    * @default static
    */
@@ -176,11 +176,15 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
     >
       {buttonsArray.map((child) =>
         cloneElement(child, {
-          className: cn(styles['tedi-button-group__item'], {
-            [styles['tedi-button-group__item--active']]: child.props.isActive,
-            [styles['tedi-button-group__item--disabled']]: child.props.disabled,
-            [styles[`tedi-button-group__item--size-${size}`]]: size,
-          }),
+          className: cn(
+            styles['tedi-button-group__item'],
+            {
+              [styles['tedi-button-group__item--active']]: child.props.isActive,
+              [styles['tedi-button-group__item--disabled']]: child.props.disabled,
+              [styles[`tedi-button-group__item--size-${size}`]]: size,
+            },
+            child.props.className
+          ),
           size,
           onClick: (event) => {
             child.props.onClick?.(event);
