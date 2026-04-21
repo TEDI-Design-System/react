@@ -60,6 +60,14 @@ export type ButtonGroupProps = {
    * If not provided, `ariaLabel` will be used as fallback.
    */
   dropdownLabel?: string;
+  /*
+   * Determines the source of the dropdown trigger button's label when the button group collapses on mobile.
+   * - `'active'` (default) – uses the label of the currently active button as the dropdown trigger label. If no button is active, falls back to `dropdownLabel` or `ariaLabel`.
+   * - `'static'` – always uses the `dropdownLabel` (or `ariaLabel` as fallback) as the dropdown trigger label, regardless of which button is active.
+   *
+   * @default static
+   */
+  dropdownLabelMode?: 'active' | 'static';
 };
 
 export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
@@ -75,6 +83,7 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
     enableMobileDropdown = false,
     mobileBreakpoint = 'md',
     dropdownLabel = getLabel('sidenav.submenu'),
+    dropdownLabelMode = 'static',
   } = props;
 
   const breakpoint = useBreakpoint();
@@ -85,7 +94,7 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
   ) as React.ReactElement<ButtonProps>[];
 
   const activeButton = buttonsArray.find((btn) => btn.props.isActive);
-  const activeLabel = activeButton?.props.children || dropdownLabel;
+  const activeLabel = dropdownLabelMode === 'static' ? dropdownLabel : activeButton?.props.children ?? dropdownLabel;
 
   const activeIconLeft = activeButton?.props.iconLeft || 'menu';
   const activeIcon = activeButton?.props.icon;

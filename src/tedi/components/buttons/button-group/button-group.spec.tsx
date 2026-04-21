@@ -220,4 +220,60 @@ describe('ButtonGroup Component', () => {
     expect(button2).toHaveClass('tedi-button-group__item--active');
     expect(button1).not.toHaveClass('tedi-button-group__item--active');
   });
+
+  it('uses dropdownLabel when dropdownLabelMode is static even if a button is active', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Static Label" enableMobileDropdown>
+        <Button id="button1" isActive>
+          Active Button
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Static Label/i });
+    expect(triggerButton).toBeInTheDocument();
+  });
+
+  it('uses active button label when dropdownLabelMode is active', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Static Label" dropdownLabelMode="active" enableMobileDropdown>
+        <Button id="button1" isActive>
+          Active Button
+        </Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Active Button/i });
+    expect(triggerButton).toBeInTheDocument();
+  });
+
+  it('falls back to dropdownLabel in active mode when no button is active', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabel="Fallback Label" dropdownLabelMode="active" enableMobileDropdown>
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /Fallback Label/i });
+    expect(triggerButton).toBeInTheDocument();
+  });
+
+  it('falls back to useLabels value in active mode when no active button and no dropdownLabel', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+
+    render(
+      <ButtonGroup dropdownLabelMode="active" enableMobileDropdown>
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    const triggerButton = screen.getByRole('button', { name: /sidenav.submenu/i });
+    expect(triggerButton).toBeInTheDocument();
+  });
 });
