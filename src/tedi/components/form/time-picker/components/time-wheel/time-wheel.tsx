@@ -56,6 +56,8 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   const uid = React.useId();
   const hourRef = useRef<HTMLDivElement>(null);
   const minuteRef = useRef<HTMLDivElement>(null);
+  const hourGen = useRef(0);
+  const minuteGen = useRef(0);
 
   const isProgrammaticScrollHour = useRef(false);
   const isProgrammaticScrollMinute = useRef(false);
@@ -71,34 +73,48 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
 
   const clampIndex = (index: number, length: number) => Math.max(0, Math.min(length - 1, index));
 
-  const forceScrollTo = (ref: React.RefObject<HTMLDivElement>, targetIndex: number, isHour: boolean, attempt = 0) => {
+  const forceScrollTo = (
+    ref: React.RefObject<HTMLDivElement>,
+    targetIndex: number,
+    isHour: boolean,
+    gen: number,
+    attempt = 0
+  ) => {
     const element = ref.current;
     if (!element || targetIndex < 0) return;
+
+    const isStale = () => (isHour ? gen !== hourGen.current : gen !== minuteGen.current);
+
+    if (isStale()) return;
 
     const target = getScrollTopForIndex(targetIndex);
     const maxAttempts = 12;
 
     const tryScroll = () => {
-      if (!element) return;
+      if (!element || isStale()) return;
 
-      isHour ? (isProgrammaticScrollHour.current = true) : (isProgrammaticScrollMinute.current = true);
+      if (isHour) isProgrammaticScrollHour.current = true;
+      else isProgrammaticScrollMinute.current = true;
 
       element.scrollTo({ top: target, behavior: 'instant' });
 
       requestAnimationFrame(() => {
-        if (!element) return;
+        if (!element || isStale()) return;
 
         const stillWrong = needsScrollCorrection(element.scrollTop, target, 3);
 
         if (stillWrong && attempt < maxAttempts) {
           const nextDelay = 16 + attempt * 20;
+
+          const schedule = () => {
+            if (isStale()) return;
+            forceScrollTo(ref, targetIndex, isHour, gen, attempt + 1);
+          };
+
           if (isHour) {
-            retryTimeoutHour.current = setTimeout(() => forceScrollTo(ref, targetIndex, true, attempt + 1), nextDelay);
+            retryTimeoutHour.current = setTimeout(schedule, nextDelay);
           } else {
-            retryTimeoutMinute.current = setTimeout(
-              () => forceScrollTo(ref, targetIndex, false, attempt + 1),
-              nextDelay
-            );
+            retryTimeoutMinute.current = setTimeout(schedule, nextDelay);
           }
         } else {
           if (isHour) isProgrammaticScrollHour.current = false;
@@ -111,6 +127,9 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   };
 
   useLayoutEffect(() => {
+    hourGen.current++;
+    minuteGen.current++;
+
     const hourIndex = hours.indexOf(selectedHour);
     const minuteIndex = minutes.indexOf(selectedMinute);
 
@@ -123,14 +142,15 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     isProgrammaticScrollHour.current = false;
     isProgrammaticScrollMinute.current = false;
 
+    const currentHourGen = hourGen.current;
+    const currentMinuteGen = minuteGen.current;
+
     const initializeScrollPosition = () => {
-      forceScrollTo(hourRef, hourIndex, true);
-      forceScrollTo(minuteRef, minuteIndex, false);
+      forceScrollTo(hourRef, hourIndex, true, currentHourGen);
+      forceScrollTo(minuteRef, minuteIndex, false, currentMinuteGen);
     };
 
-    requestAnimationFrame(() => {
-      initializeScrollPosition();
-    });
+    requestAnimationFrame(initializeScrollPosition);
 
     return () => {
       if (retryTimeoutHour.current) clearTimeout(retryTimeoutHour.current);
