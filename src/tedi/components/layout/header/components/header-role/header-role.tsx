@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 
 import { Text } from '../../../../../components/base/typography/text/text';
 import { isBreakpointBelow, useBreakpoint } from '../../../../../helpers';
@@ -59,11 +59,18 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     searchLabel,
     organizationSearchLabel,
     searchId,
+    onRoleSelectionToggle,
+    onRepresentativeChange,
   } = props;
   const { getLabel } = useLabels();
-  const [representative, setRepresentative] = useState<Representative>(representatives?.[0] ?? ({} as Representative));
+  const roleId = useId();
+  const [representative, setRepresentative] = useState<Representative | undefined>(representatives?.[0]);
   const [isRoleSelectionOpen, setIsRoleSelectionOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+
+  useEffect(() => {
+    setRepresentative(representatives?.[0]);
+  }, [representatives]);
 
   const breakpoint = useBreakpoint();
   const isTabletView = isBreakpointBelow(breakpoint, 'lg');
@@ -82,15 +89,20 @@ export const HeaderRole = (props: HeaderRoleProps) => {
   const handleToggle = () => {
     const next = !isRoleSelectionOpen;
     setIsRoleSelectionOpen(next);
-    props.onRoleSelectionToggle?.(next);
+    onRoleSelectionToggle?.(next);
   };
 
   const handleRepresentativeChange = (rep: Representative) => {
     setRepresentative(rep);
-    props.onRepresentativeChange?.(rep);
+    onRepresentativeChange?.(rep);
   };
 
+  const toggleId = `${roleId}-toggle`;
+  const panelId = `${roleId}-panel`;
+
   const representativesProps = {
+    id: panelId,
+    toggleId,
     representatives: filteredRepresentatives,
     representative,
     inputValue,
@@ -119,25 +131,32 @@ export const HeaderRole = (props: HeaderRoleProps) => {
           <div
             className={cn(styles['tedi-header-role__accordion--body'], {
               [styles['tedi-header-role__accordion--body-inline']]:
-                !hasMultipleRepresentatives && showDescription && representative.description,
+                !hasMultipleRepresentatives && showDescription && representative?.description,
             })}
           >
             <div className={styles['tedi-header-role__accordion--title']}>
               {label}
               <Text modifiers="bold" color="secondary">
-                {representative.name}
+                {representative?.name}
               </Text>
             </div>
-            {showDescription && representative.description && (
+            {showDescription && representative?.description && (
               <>
                 {!hasMultipleRepresentatives && <Separator axis="vertical" />}
-                <Text color="secondary">{representative.description}</Text>
+                <Text color="secondary">{representative?.description}</Text>
               </>
             )}
           </div>
 
           {hasMultipleRepresentatives && (
-            <Button visualType="link" underline={false} onClick={() => handleToggle()}>
+            <Button
+              id={toggleId}
+              visualType="link"
+              underline={false}
+              onClick={() => handleToggle()}
+              aria-expanded={isRoleSelectionOpen}
+              aria-controls={panelId}
+            >
               <div className={styles['tedi-header-role__accordion--toggle']}>
                 {isRoleSelectionOpen ? closeLabel : openLabel}
                 <Icon
@@ -161,9 +180,9 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     <div className={styles['tedi-header-role']}>
       <div className={styles['tedi-header-role__label']}>
         {label}
-        {showDescription && !isOrganization && (
+        {showDescription && !isOrganization && representative?.description && (
           <Text modifiers="small" color="secondary">
-            {representative.description}
+            {representative?.description}
           </Text>
         )}
       </div>
@@ -173,7 +192,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
           <Popover.Trigger>
             <Button visualType="link" underline={false}>
               <div className={styles['tedi-header-role__value']}>
-                {representative.name}
+                {representative?.name}
                 <Icon
                   name="expand_more"
                   size={16}
@@ -191,7 +210,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
         </Popover>
       ) : (
         <div className={styles['tedi-header-role__value']}>
-          <Text>{representative.name}</Text>
+          <Text>{representative?.name}</Text>
         </div>
       )}
     </div>

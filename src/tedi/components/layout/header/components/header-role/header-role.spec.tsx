@@ -146,6 +146,29 @@ describe('HeaderRole component', () => {
 
       expect(container.textContent).toContain('Personal representative');
     });
+
+    it('sets aria-expanded and aria-controls on the accordion toggle', () => {
+      render(<HeaderRole representatives={mockRepresentatives} />);
+
+      const toggle = screen.getByText('header.role-selection').closest('button')!;
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      expect(toggle).toHaveAttribute('aria-controls');
+
+      fireEvent.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('links toggle and panel via aria-controls and aria-labelledby', () => {
+      const { container } = render(<HeaderRole representatives={mockRepresentatives} />);
+
+      const toggle = screen.getByText('header.role-selection').closest('button')!;
+      const panelId = toggle.getAttribute('aria-controls');
+      const panel = container.querySelector(`#${CSS.escape(panelId!)}`);
+
+      expect(panel).toBeInTheDocument();
+      expect(panel).toHaveAttribute('role', 'region');
+      expect(panel).toHaveAttribute('aria-labelledby', toggle.id);
+    });
   });
 
   describe('Search functionality', () => {
@@ -377,6 +400,27 @@ describe('HeaderRoleRepresentatives component', () => {
 
     const collapse = container.querySelector('[class*="header-role__collapse"]');
     expect(collapse).not.toHaveAttribute('inert');
+  });
+
+  it('sets aria-current on the selected representative', () => {
+    render(
+      <HeaderRoleRepresentatives
+        representatives={mockRepresentatives}
+        representative={mockRepresentatives[0]}
+        inputValue=""
+        setInputValue={jest.fn()}
+        setRepresentative={jest.fn()}
+        setIsRoleSelectionOpen={jest.fn()}
+        isRoleSelectionOpen={true}
+        searchLabel="Search"
+      />
+    );
+
+    const selectedButton = screen.getByText('John Doe').closest('button')!;
+    const unselectedButton = screen.getByText('Jane Smith').closest('button')!;
+
+    expect(selectedButton).toHaveAttribute('aria-current', 'true');
+    expect(unselectedButton).not.toHaveAttribute('aria-current');
   });
 
   it('does not close when keepOpenOnSelect is true', () => {

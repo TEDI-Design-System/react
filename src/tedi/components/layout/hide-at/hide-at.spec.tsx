@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../helpers';
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { HideAt } from './hide-at';
 
 import '@testing-library/jest-dom';
 
-jest.mock('../../helpers', () => ({
-  ...jest.requireActual('../../helpers'),
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
   useBreakpoint: jest.fn(),
   isBreakpointBelow: jest.fn(),
 }));

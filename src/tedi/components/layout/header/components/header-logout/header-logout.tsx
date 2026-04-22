@@ -31,7 +31,7 @@ export const HeaderLogout = (props: HeaderLogoutProps) => {
   const { size: sizeProp, label } = getCurrentBreakpointProps<HeaderLogoutBreakpointProps>(props);
   const { getLabel } = useLabels();
 
-  const breakpoint = useBreakpoint();
+  const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
 
   const size = sizeProp ?? (isMobileView ? 'small' : 'default');

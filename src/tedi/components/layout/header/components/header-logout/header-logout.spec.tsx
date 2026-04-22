@@ -49,16 +49,16 @@ describe('HeaderLogout component', () => {
       getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => ({ ...props, label: 'Sign out' })),
     });
 
-    const { container } = render(<HeaderLogout />);
+    render(<HeaderLogout />);
 
-    expect(container.textContent).toContain('Sign out');
+    expect(screen.getByText('Sign out')).toBeInTheDocument();
   });
 
   it('renders with href', () => {
-    const { container } = render(<HeaderLogout href="/logout" />);
+    render(<HeaderLogout href="/logout" />);
 
-    const link = container.querySelector('a[href="/logout"]');
-    expect(link).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /header.logout/i });
+    expect(link).toHaveAttribute('href', '/logout');
   });
 
   it('handles onClick without href', () => {

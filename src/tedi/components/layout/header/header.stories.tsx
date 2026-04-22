@@ -1,6 +1,6 @@
 import { useGlobals } from '@storybook/preview-api';
 import { Meta, StoryObj } from '@storybook/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
@@ -10,19 +10,18 @@ import { Text } from '../../base/typography/text/text';
 import { Search } from '../../form/search/search';
 import Link from '../../navigation/link/link';
 import { Tag } from '../../tags/tag/tag';
-import { HideAt } from '../hide-at';
-import { ShowAt } from '../show-at';
+import { HideAt } from '../hide-at/hide-at';
+import { ShowAt } from '../show-at/show-at';
 import { SideNav } from '../sidenav';
 import { Representative } from './components/header-role/header-role-representatives';
 import { Header, HeaderActions, HeaderCenter, HeaderLogo, HeaderLogoProps } from './header';
 
-/**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.68?m=dev&node-id=6380-53060" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/68343d-header" target="_BLANK">Zeroheight ↗</a>
- */
-
 const STORAGE_KEY = 'tedi-theme';
 
+/**
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?m=dev&node-id=6380-53060" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/68343d-header" target="_BLANK">Zeroheight ↗</a>
+ */
 const meta: Meta<typeof Header> = {
   title: 'TEDI-Ready/Layout/Header',
   component: Header,
@@ -63,7 +62,11 @@ const meta: Meta<typeof Header> = {
   parameters: {
     layout: 'fullscreen',
     status: {
-      type: ['breakpointSupport'],
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?m=dev&node-id=6380-53060',
     },
   },
 };
@@ -172,6 +175,7 @@ const logoDark = <img src="header-logo-white.svg" alt="Logo (Dark Mode)" />;
 
 const ProfileExample = () => {
   const { theme, setTheme } = useTheme();
+  const id = useId();
 
   const handleToggle = () => {
     setTheme(theme === 'dark' ? 'default' : 'dark');
@@ -193,7 +197,7 @@ const ProfileExample = () => {
       </ShowAt>
 
       <div>
-        <Toggle id="theme-toggle" onChange={handleToggle} label="Tume režiim" checked={theme === 'dark'} />
+        <Toggle id={id} onChange={handleToggle} label="Tume režiim" checked={theme === 'dark'} />
       </div>
 
       <ShowAt lg>
@@ -278,7 +282,7 @@ export const Default: Story = {
 
           <HideAt lg>
             <SideNav
-              ariaLabel=""
+              ariaLabel="Main navigation"
               linkAs="a"
               isMobileOpen={isOpen}
               navItems={[
@@ -342,7 +346,7 @@ export const LoggedOut: Story = {
 
               <HideAt lg>
                 <SideNav
-                  ariaLabel=""
+                  ariaLabel="Main navigation"
                   linkAs="a"
                   isMobileOpen={isOpen}
                   navItems={[
@@ -419,7 +423,7 @@ export const LoggedOut: Story = {
 
             <HideAt lg>
               <SideNav
-                ariaLabel=""
+                ariaLabel="Main navigation"
                 linkAs="a"
                 isMobileOpen={isOpen}
                 navItems={[
@@ -657,7 +661,7 @@ export const AlternativeProfileAndLogoutButton: Story = {
                 <Header.Role
                   label={
                     <Text modifiers="bold" color="secondary">
-                      Isikukood:
+                      Roll:
                     </Text>
                   }
                   representatives={representatives}
@@ -694,7 +698,7 @@ export const AlternativeProfileAndLogoutButton: Story = {
                 <Header.Role
                   label={
                     <Text modifiers="bold" color="secondary">
-                      Isikukood:
+                      Roll:
                     </Text>
                   }
                   representatives={representatives}
@@ -882,7 +886,7 @@ export const LoggedInWithSidenav: Story = {
             </Header.Actions>
           </Header>
 
-          <SideNav ariaLabel="" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
+          <SideNav ariaLabel="Main navigation" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
         </>
       )}
     </StoryWrapper>

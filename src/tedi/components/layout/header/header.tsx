@@ -3,13 +3,13 @@ import React from 'react';
 
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import Print from '../../misc/print/print';
-import styles from '../header/header.module.scss';
 import HeaderLanguage from './components/header-language/header-language';
 import HeaderLogin from './components/header-login/header-login';
 import HeaderLogout from './components/header-logout/header-logout';
 import HeaderProfile from './components/header-profile/header-profile';
 import HeaderRole from './components/header-role/header-role';
 import HeaderSearch from './components/header-search/header-search';
+import styles from './header.module.scss';
 
 export interface HeaderProps {
   /**
@@ -37,7 +37,7 @@ export const Header = (props: HeaderProps) => {
     <Print visibility="hide">
       <div className={cn(styles['tedi-header'], className)}>
         <header className={cn(styles['tedi-header__main'])}>
-          {toggle && <>{toggle}</>}
+          {toggle}
           <div className={styles['tedi-header__main--content']}>{children}</div>
         </header>
 

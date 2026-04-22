@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../helpers';
+import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 
 type HideAtProps = {
   children: React.ReactNode;
@@ -19,3 +19,5 @@ export const HideAt = ({ children, ...breakpoints }: HideAtProps) => {
 
   return <>{children}</>;
 };
+
+HideAt.displayName = 'HideAt';

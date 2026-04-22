@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../helpers';
+import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 
 type ShowAtProps = {
   children: React.ReactNode;
@@ -18,3 +18,5 @@ export const ShowAt = ({ children, ...breakpoints }: ShowAtProps) => {
 
   return <>{children}</>;
 };
+
+ShowAt.displayName = 'ShowAt';

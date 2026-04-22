@@ -15,8 +15,12 @@ export interface Representative {
   icon?: IconProps;
 }
 interface HeaderRoleRepresentativesProps {
+  /** Unique id for the collapsible panel, used for aria-controls on the toggle. */
+  id?: string;
+  /** Id of the toggle button, used for aria-labelledby on the panel. */
+  toggleId?: string;
   representatives: Representative[];
-  representative: Representative;
+  representative?: Representative;
   inputValue: string;
   setInputValue: (value: string) => void;
   setRepresentative: (rep: Representative) => void;
@@ -43,6 +47,8 @@ interface HeaderRoleRepresentativesProps {
 
 const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
   const {
+    id,
+    toggleId,
     representatives,
     inputValue,
     setInputValue,
@@ -80,6 +86,9 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
 
   return (
     <div
+      id={id}
+      role="region"
+      aria-labelledby={toggleId}
       className={cn(styles['tedi-header-role__collapse'], {
         [styles['tedi-header-role__collapse--open']]: isRoleSelectionOpen,
       })}
@@ -94,7 +103,7 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
             label={resolvedSearchLabel}
           />
           {representatives.map((rep) => {
-            const isSelected = representative.name === rep.name;
+            const isSelected = representative?.name === rep.name;
 
             return (
               <React.Fragment key={rep.name}>
@@ -102,6 +111,7 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
                 <Button
                   onClick={() => handleSelect(rep)}
                   visualType={isSelected ? 'primary' : 'neutral'}
+                  aria-current={isSelected || undefined}
                   className={cn(styles['tedi-header-role__item'], {
                     [styles['tedi-header-role__item--selected']]: isSelected,
                   })}

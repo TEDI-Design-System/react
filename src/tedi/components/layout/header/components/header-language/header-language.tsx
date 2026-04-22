@@ -125,6 +125,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
               <Button
                 visualType="link"
                 aria-current={lang.isSelected}
+                aria-label={lang['aria-label']}
                 key={lang.label}
                 underline={false}
                 onClick={() => changeLanguage(lang)}
