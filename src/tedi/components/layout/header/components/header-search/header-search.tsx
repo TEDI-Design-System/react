@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint } from '../../../../../helpers';
+import { isBreakpointBelow, useBreakpoint } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import { Text } from '../../../../base/typography/text/text';
@@ -8,11 +8,9 @@ import { Button } from '../../../../buttons/button/button';
 import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-search.module.scss';
 
-interface HeaderSearchBreakpointProps {}
-
 type MobileSearchVariant = 'modal' | 'inline';
 
-export interface HeaderSearchProps extends BreakpointSupport<HeaderSearchBreakpointProps> {
+export interface HeaderSearchProps {
   /** Search input or form content rendered inside the search area. */
   children: React.ReactNode;
   /**
@@ -28,16 +26,28 @@ export interface HeaderSearchProps extends BreakpointSupport<HeaderSearchBreakpo
     /** Title displayed at the top of the mobile search modal. Falls back to the `header.search` translation key. */
     modalTitle?: string;
   };
+  /**
+   * Whether the mobile search button is disabled. Prevents opening the search modal.
+   * @default false
+   */
+  disabled?: boolean;
 }
 
 export const HeaderSearch = (props: HeaderSearchProps) => {
-  const { children, mobileVariant = 'modal', mobileLabels } = props;
+  const { children, mobileVariant = 'modal', mobileLabels, disabled = false } = props;
   const breakpoint = useBreakpoint();
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
   const { getLabel } = useLabels();
 
   const [modalOpen, setModalOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const showModal = isMobileView && mobileVariant === 'modal';
+
+  useEffect(() => {
+    if (!showModal) {
+      setModalOpen(false);
+    }
+  }, [showModal]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -56,7 +66,7 @@ export const HeaderSearch = (props: HeaderSearchProps) => {
 
   return (
     <>
-      {isMobileView && mobileVariant === 'modal' ? (
+      {showModal ? (
         <>
           <dialog
             ref={dialogRef}
@@ -70,6 +80,7 @@ export const HeaderSearch = (props: HeaderSearchProps) => {
               <Button
                 onClick={() => setModalOpen(false)}
                 className={styles['tedi-header-search__button-close']}
+                aria-label={getLabel('close')}
                 noStyle
               >
                 <Icon name="close" size={24} color="inherit" />
@@ -81,6 +92,7 @@ export const HeaderSearch = (props: HeaderSearchProps) => {
             onClick={() => setModalOpen((prev) => !prev)}
             icon={{ name: 'search', size: 24, color: 'inherit' }}
             label={mobileLabels?.button ?? getLabel('header.search')}
+            disabled={disabled}
           />
         </>
       ) : (
@@ -89,5 +101,7 @@ export const HeaderSearch = (props: HeaderSearchProps) => {
     </>
   );
 };
+
+HeaderSearch.displayName = 'HeaderSearch';
 
 export default HeaderSearch;

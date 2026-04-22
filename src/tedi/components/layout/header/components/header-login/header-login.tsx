@@ -1,6 +1,7 @@
 import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
+import { Button } from '../../../../buttons/button/button';
 import Link from '../../../../navigation/link/link';
 import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-login.module.scss';
@@ -46,7 +47,7 @@ export const HeaderLogin = (props: HeaderLoginProps) => {
           icon={{ name: 'login', size: 24, color: 'inherit' }}
           label={resolvedLabel}
         />
-      ) : (
+      ) : href ? (
         <Link
           onClick={onClick}
           href={href}
@@ -60,9 +61,19 @@ export const HeaderLogin = (props: HeaderLoginProps) => {
             </Text>
           </div>
         </Link>
+      ) : (
+        <Button onClick={onClick} visualType="primary" className={styles['tedi-header-login__button']}>
+          <div className={styles['tedi-header-login__button--inner']}>
+            <Text modifiers="normal" className={styles['tedi-header-login__button--text']}>
+              {resolvedLabel}
+            </Text>
+          </div>
+        </Button>
       )}
     </>
   );
 };
+
+HeaderLogin.displayName = 'Header.Login';
 
 export default HeaderLogin;

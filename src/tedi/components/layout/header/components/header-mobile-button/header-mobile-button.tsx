@@ -24,7 +24,7 @@ interface HeaderMobileButtonProps {
   disabled?: boolean;
 }
 
-const HeaderMobileButton = (props: HeaderMobileButtonProps) => {
+const HeaderMobileButton = (props: HeaderMobileButtonProps): JSX.Element => {
   const { onClick, href, icon, label, selected, disabled } = props;
 
   const getIcon = (icon: string | IconWithoutBackgroundProps) => {
@@ -62,5 +62,7 @@ const HeaderMobileButton = (props: HeaderMobileButtonProps) => {
     </Link>
   );
 };
+
+HeaderMobileButton.displayName = 'HeaderMobileButton';
 
 export default HeaderMobileButton;

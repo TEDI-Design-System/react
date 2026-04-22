@@ -13,12 +13,18 @@
   background: var(--modal-background);
   border: 0;
 
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
   &::backdrop {
     background: transparent;
   }
 
   &-heading {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
     padding: var(--modal-heading-padding-y) var(--modal-heading-padding-x);
@@ -26,8 +32,9 @@
   }
 
   &-body {
-    height: 100%;
+    flex: 1 1 0;
     padding: var(--modal-body-padding);
+    overflow-y: auto;
   }
 }
 

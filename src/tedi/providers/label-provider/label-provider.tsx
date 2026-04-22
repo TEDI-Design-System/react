@@ -88,6 +88,10 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
 
   const [currentLocale, setCurrentLocale] = React.useState<TediLanguage>(locale);
 
+  React.useEffect(() => {
+    setCurrentLocale(locale);
+  }, [locale]);
+
   const mergedLabels = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = {} as Record<string, string | LabelFunctionValue<any>>;

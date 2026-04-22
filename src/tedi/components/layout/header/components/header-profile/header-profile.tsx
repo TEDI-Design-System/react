@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import {
   Breakpoint,
@@ -35,16 +35,23 @@ export interface HeaderProfileProps extends BreakpointSupport<HeaderProfileBreak
    * @default false
    */
   showLabel?: boolean;
+  /**
+   * Whether the profile button is disabled. Prevents opening the dropdown or modal.
+   * @default false
+   */
+  disabled?: boolean;
 }
 
 export const HeaderProfile = (props: HeaderProfileProps) => {
-  const { children, showLabel = false } = props;
+  const { children, showLabel = false, disabled = false } = props;
   const { getLabel } = useLabels();
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const { showDropdown = 'lg', label } = getCurrentBreakpointProps<HeaderProfileBreakpointProps>(props);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const modalId = useId();
 
   const breakpoint = useBreakpoint();
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
@@ -54,27 +61,62 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
 
   const resolvedLabel = label ?? (isMobileView ? getLabel('header.profile.mobile') : getLabel('header.profile'));
 
+  useEffect(() => {
+    if (!modalOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setModalOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [modalOpen]);
+
+  const handleToggleModal = () => {
+    setModalOpen((prev) => !prev);
+  };
+
+  const isOpen = useDropdown ? dropdownOpen : modalOpen;
+
   const button = isMobileView ? (
     <HeaderMobileButton
-      icon={{ name: modalOpen ? 'close' : 'account_circle', size: 24, color: 'inherit' }}
+      onClick={handleToggleModal}
+      icon={{ name: isOpen ? 'close' : 'account_circle', size: 24, color: 'inherit' }}
       label={resolvedLabel}
-      selected={modalOpen}
+      selected={isOpen}
+      disabled={disabled}
     />
   ) : showLabel ? (
-    <Button visualType="secondary" iconLeft="account_circle">
+    <Button
+      visualType="secondary"
+      iconLeft="account_circle"
+      onClick={handleToggleModal}
+      ref={triggerRef}
+      disabled={disabled}
+    >
       <div className={styles['tedi-header-profile__button']}>
         {resolvedLabel}
         <Icon
           name="expand_more"
           size={18}
           className={cn(styles['tedi-header-profile__icon'], {
-            [styles['tedi-header-profile__icon--open']]: modalOpen || dropdownOpen,
+            [styles['tedi-header-profile__icon--open']]: isOpen,
           })}
         />
       </div>
     </Button>
   ) : (
-    <Button icon={{ name: 'account_circle', size: 36 }} visualType="neutral" aria-label={resolvedLabel}>
+    <Button
+      icon={{ name: 'account_circle', size: 36 }}
+      visualType="neutral"
+      aria-label={resolvedLabel}
+      onClick={handleToggleModal}
+      ref={triggerRef}
+      disabled={disabled}
+    >
       <></>
     </Button>
   );
@@ -95,12 +137,22 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
         </Popover>
       ) : (
         <>
-          <div onClick={() => setModalOpen(!modalOpen)}>{button}</div>
+          {button}
 
           {modalOpen && (
             <>
-              <div className={styles['tedi-header-profile__overlay']} onClick={() => setModalOpen(false)} />
-              <div className={styles['tedi-header-profile__modal']}>
+              <div
+                className={styles['tedi-header-profile__overlay']}
+                onClick={() => setModalOpen(false)}
+                aria-hidden="true"
+              />
+              <div
+                className={styles['tedi-header-profile__modal']}
+                role="dialog"
+                aria-modal="true"
+                aria-label={resolvedLabel}
+                id={modalId}
+              >
                 <div
                   className={cn(styles['tedi-header-profile__modal--content'], {
                     [styles['tedi-header-profile__modal--content-small']]: isTabletView,
@@ -116,5 +168,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
     </>
   );
 };
+
+HeaderProfile.displayName = 'Header.Profile';
 
 export default HeaderProfile;

@@ -91,8 +91,7 @@ describe('HeaderSearch component', () => {
     const dialog = document.querySelector('dialog')!;
     expect(dialog).toHaveAttribute('open');
 
-    const closeButton = dialog.querySelector('[class*="button-close"]') as HTMLElement;
-    fireEvent.click(closeButton);
+    fireEvent.click(screen.getByRole('button', { name: /close/i }));
 
     expect(dialog).not.toHaveAttribute('open');
   });
@@ -145,6 +144,23 @@ describe('HeaderSearch component', () => {
     );
 
     expect(mockGetLabel).toHaveBeenCalledWith('header.search');
+  });
+
+  it('does not open dialog when disabled on mobile', () => {
+    (isBreakpointBelow as jest.Mock).mockReturnValue(true);
+
+    render(
+      <HeaderSearch disabled>
+        <input placeholder="Search..." />
+      </HeaderSearch>
+    );
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    const dialog = document.querySelector('dialog');
+    expect(dialog).not.toHaveAttribute('open');
+    expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
   });
 
   describe('Accessibility', () => {

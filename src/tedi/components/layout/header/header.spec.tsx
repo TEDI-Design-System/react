@@ -64,9 +64,7 @@ describe('Header component', () => {
       expect(screen.queryByRole('button', { name: 'Toggle' })).not.toBeInTheDocument();
     });
 
-    it('renders bottom content on mobile viewport', () => {
-      (isBreakpointBelow as jest.Mock).mockReturnValue(true);
-
+    it('renders bottom content when bottom prop is provided', () => {
       render(
         <Header bottom={<div>Bottom bar</div>}>
           <span>Content</span>
@@ -76,21 +74,7 @@ describe('Header component', () => {
       expect(screen.getByText('Bottom bar')).toBeInTheDocument();
     });
 
-    it('does not render bottom content on desktop viewport', () => {
-      (isBreakpointBelow as jest.Mock).mockReturnValue(false);
-
-      render(
-        <Header bottom={<div>Bottom bar</div>}>
-          <span>Content</span>
-        </Header>
-      );
-
-      expect(screen.queryByText('Bottom bar')).not.toBeInTheDocument();
-    });
-
     it('does not render bottom section when bottom is not provided', () => {
-      (isBreakpointBelow as jest.Mock).mockReturnValue(true);
-
       const { container } = render(
         <Header>
           <span>Content</span>

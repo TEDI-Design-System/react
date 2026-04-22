@@ -68,12 +68,24 @@ describe('HideAt component', () => {
     expect(screen.queryByText('Hidden content')).not.toBeInTheDocument();
   });
 
-  it('renders children when all specified breakpoints are below current', () => {
+  it('hides children when all specified breakpoints are below the current breakpoint', () => {
     (useBreakpoint as jest.Mock).mockReturnValue('xxl');
-    (isBreakpointBelow as jest.Mock).mockReturnValue(true);
+    (isBreakpointBelow as jest.Mock).mockReturnValue(false);
 
     render(
       <HideAt sm md>
+        <span>Visible content</span>
+      </HideAt>
+    );
+
+    expect(screen.queryByText('Visible content')).not.toBeInTheDocument();
+  });
+
+  it('renders children when current breakpoint is null (SSR)', () => {
+    (useBreakpoint as jest.Mock).mockReturnValue(null);
+
+    render(
+      <HideAt md>
         <span>Visible content</span>
       </HideAt>
     );

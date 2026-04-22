@@ -1,7 +1,6 @@
 import cn from 'classnames';
 import React from 'react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import Print from '../../misc/print/print';
 import styles from '../header/header.module.scss';
@@ -33,8 +32,6 @@ export interface HeaderProps {
 
 export const Header = (props: HeaderProps) => {
   const { children, toggle, bottom, className } = props;
-  const breakpoint = useBreakpoint();
-  const isMobile = isBreakpointBelow(breakpoint, 'md');
 
   return (
     <Print visibility="hide">
@@ -44,7 +41,7 @@ export const Header = (props: HeaderProps) => {
           <div className={styles['tedi-header__main--content']}>{children}</div>
         </header>
 
-        {bottom && isMobile && <div className={styles['tedi-header__bottom']}>{bottom}</div>}
+        {bottom && <div className={styles['tedi-header__bottom']}>{bottom}</div>}
       </div>
     </Print>
   );

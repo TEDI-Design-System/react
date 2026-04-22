@@ -11,6 +11,7 @@ export const HideAt = ({ children, ...breakpoints }: HideAtProps) => {
 
   const shouldHide = Object.entries(breakpoints).some(([bp, value]) => {
     if (!value) return false;
+    if (!current) return false;
     return !isBreakpointBelow(current, bp as Breakpoint);
   });
 

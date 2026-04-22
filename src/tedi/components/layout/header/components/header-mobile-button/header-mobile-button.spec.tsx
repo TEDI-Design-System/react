@@ -13,34 +13,32 @@ describe('HeaderMobileButton component', () => {
   });
 
   it('renders as a Button when no href is provided', () => {
-    const { container } = render(<HeaderMobileButton icon="menu" label="Menu" />);
+    render(<HeaderMobileButton icon="menu" label="Menu" />);
 
-    expect(container.querySelector('button')).toBeInTheDocument();
-    expect(container.querySelector('a')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Menu/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('renders as a Link when href is provided and not disabled', () => {
-    const { container } = render(<HeaderMobileButton icon="menu" label="Menu" href="/page" />);
+    render(<HeaderMobileButton icon="menu" label="Menu" href="/page" />);
 
-    const link = container.querySelector('a');
-    expect(link).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Menu/i });
     expect(link).toHaveAttribute('href', '/page');
-    expect(container.querySelector('button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('renders as a Button when href is provided but disabled', () => {
-    const { container } = render(<HeaderMobileButton icon="menu" label="Menu" href="/page" disabled />);
+    render(<HeaderMobileButton icon="menu" label="Menu" href="/page" disabled />);
 
-    expect(container.querySelector('button')).toBeInTheDocument();
-    expect(container.querySelector('a')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Menu/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('calls onClick when Link is clicked', () => {
     const onClick = jest.fn();
-    const { container } = render(<HeaderMobileButton icon="menu" label="Menu" href="/page" onClick={onClick} />);
+    render(<HeaderMobileButton icon="menu" label="Menu" href="/page" onClick={onClick} />);
 
-    const link = container.querySelector('a')!;
-    fireEvent.click(link);
+    fireEvent.click(screen.getByRole('link', { name: /Menu/i }));
 
     expect(onClick).toHaveBeenCalled();
   });
@@ -49,21 +47,23 @@ describe('HeaderMobileButton component', () => {
     const onClick = jest.fn();
     render(<HeaderMobileButton icon="menu" label="Menu" onClick={onClick} />);
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
 
     expect(onClick).toHaveBeenCalled();
   });
 
   it('applies selected class when selected is true', () => {
-    const { container } = render(<HeaderMobileButton icon="menu" label="Menu" selected />);
+    render(<HeaderMobileButton icon="menu" label="Menu" selected />);
 
-    expect(container.querySelector('[class*="header-mobile-button--selected"]')).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: /Menu/i });
+    expect(button.className).toMatch(/header-mobile-button--selected/);
   });
 
   it('applies disabled class when disabled is true', () => {
-    const { container } = render(<HeaderMobileButton icon="menu" label="Menu" disabled />);
+    render(<HeaderMobileButton icon="menu" label="Menu" disabled />);
 
-    expect(container.querySelector('[class*="header-mobile-button--disabled"]')).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: /Menu/i });
+    expect(button.className).toMatch(/header-mobile-button--disabled/);
   });
 
   it('renders icon from IconWithoutBackgroundProps object', () => {
@@ -75,8 +75,8 @@ describe('HeaderMobileButton component', () => {
   });
 
   it('renders without label', () => {
-    const { container } = render(<HeaderMobileButton icon="menu" />);
+    render(<HeaderMobileButton icon="menu" />);
 
-    expect(container.querySelector('[class*="header-mobile-button__inner"]')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeInTheDocument();
   });
 });

@@ -125,4 +125,6 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
   );
 };
 
+HeaderRoleRepresentatives.displayName = 'HeaderRoleRepresentatives';
+
 export default HeaderRoleRepresentatives;

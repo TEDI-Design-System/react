@@ -1,7 +1,7 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 .tedi-header {
-  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20, rgb(0 0 0 / 20%));
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
   &__main {
     position: relative;
@@ -91,5 +91,9 @@
     background: var(--general-surface-primary);
     border-top: 1px solid var(--general-border-primary);
     border-bottom: 1px solid var(--general-border-primary);
+
+    @include breakpoints.media-breakpoint-up(md) {
+      display: none;
+    }
   }
 }

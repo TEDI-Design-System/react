@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Text } from '../../../../../components/base/typography/text/text';
 import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
@@ -59,9 +59,9 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
     hideLabel: true,
     lg: { hideLabel: false },
   });
-  const availableLanguages: Language[] = languages ?? [];
+  const availableLanguages = useMemo<Language[]>(() => languages ?? [], [languages]);
 
-  const initialLabel = (() => {
+  const displayedLanguage = useMemo(() => {
     if (locale) {
       const found = availableLanguages.find((l) => l.locale === locale);
       if (found) return found.label;
@@ -69,13 +69,9 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
 
     if (currentLanguage) return currentLanguage;
     return availableLanguages[0]?.label ?? '';
-  })();
-
-  const [language, setLanguage] = useState(initialLabel);
+  }, [availableLanguages, locale, currentLanguage]);
 
   const changeLanguage = (lang: Language) => {
-    setLanguage(lang.label);
-
     if (lang.onClick) {
       lang.onClick({ onToggle: setLanguageSelectionOpen });
       return;
@@ -108,11 +104,11 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
           <Button
             visualType="link"
             underline={false}
-            aria-label={`${selectLabel ?? getLabel('header.select-lang')}, ${language}`}
+            aria-label={`${selectLabel ?? getLabel('header.select-lang')}, ${displayedLanguage}`}
             aria-expanded={languageSelectionOpen}
           >
             <div className={styles['tedi-header-language__selected']}>
-              {language}
+              {displayedLanguage}
               <Icon
                 name="expand_more"
                 size={16}
@@ -142,5 +138,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
     </div>
   );
 };
+
+HeaderLanguage.displayName = 'HeaderLanguage';
 
 export default HeaderLanguage;

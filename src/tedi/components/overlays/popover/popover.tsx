@@ -10,7 +10,7 @@ const ARROW_HEIGHT = 17 as const;
 const ARROW_PADDING_BORDERED = 12 as const;
 const ARROW_PADDING_DEFAULT = 4 as const;
 
-export interface PopoverProps extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset'> {
+export interface PopoverProps extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset' | 'arrowPadding'> {
   /**
    * Adds correct event listeners that change the open state.
    * @default click
@@ -36,6 +36,7 @@ export const Popover = (props: PopoverProps) => {
   return (
     <PopoverContext.Provider value={{ withBorder }}>
       <Overlay
+        {...rest}
         arrowDimensions={{
           width: ARROW_WIDTH,
           height: ARROW_HEIGHT,
@@ -43,7 +44,6 @@ export const Popover = (props: PopoverProps) => {
         arrowPadding={withBorder ? ARROW_PADDING_BORDERED : ARROW_PADDING_DEFAULT}
         openWith={openWith}
         role="dialog"
-        {...rest}
       />
     </PopoverContext.Provider>
   );

@@ -62,7 +62,10 @@ export const PopoverContent = (props: PopoverContentProps) => {
       classNames={{
         content: cn(
           styles['tedi-popover'],
-          { [styles[`tedi-popover--${width}`]]: width, [styles['tedi-popover--border']]: withBorder },
+          {
+            [styles[`tedi-popover--${width}`]]: width && width !== 'none',
+            [styles['tedi-popover--border']]: withBorder,
+          },
           className
         ),
         arrow: cn(styles['tedi-popover__arrow'], { [styles['tedi-popover__arrow--border']]: withBorder }),
@@ -92,3 +95,5 @@ export const PopoverContent = (props: PopoverContentProps) => {
     </OverlayContent>
   );
 };
+
+PopoverContent.displayName = 'PopoverContent';

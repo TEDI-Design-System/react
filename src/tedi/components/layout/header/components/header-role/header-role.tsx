@@ -113,7 +113,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
       <div className={styles['tedi-header-role__accordion--container']}>
         <div
           className={cn(styles['tedi-header-role__accordion'], {
-            [styles['tedi-header-role__accordion---has-representatives']]: hasMultipleRepresentatives,
+            [styles['tedi-header-role__accordion--has-representatives']]: hasMultipleRepresentatives,
           })}
         >
           <div
@@ -152,7 +152,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
           )}
         </div>
 
-        <HeaderRoleRepresentatives {...representativesProps} keepOpenOnSelect />
+        {hasMultipleRepresentatives && <HeaderRoleRepresentatives {...representativesProps} keepOpenOnSelect />}
       </div>
     );
   }
@@ -197,5 +197,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     </div>
   );
 };
+
+HeaderRole.displayName = 'Header.Role';
 
 export default HeaderRole;

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
@@ -61,14 +61,29 @@ describe('HeaderLogin component', () => {
     expect(link).toBeInTheDocument();
   });
 
-  it('handles onClick', () => {
+  it('handles onClick without href', () => {
     const onClick = jest.fn();
-    const { container } = render(<HeaderLogin onClick={onClick} />);
+    render(<HeaderLogin onClick={onClick} />);
 
-    const link = container.querySelector('a');
-    link?.click();
+    fireEvent.click(screen.getByText('header.login'));
 
     expect(onClick).toHaveBeenCalled();
+  });
+
+  it('handles onClick with href', () => {
+    const onClick = jest.fn();
+    render(<HeaderLogin onClick={onClick} href="/login" />);
+
+    fireEvent.click(screen.getByRole('link', { name: /header.login/i }));
+
+    expect(onClick).toHaveBeenCalled();
+  });
+
+  it('renders a button when href is not provided', () => {
+    render(<HeaderLogin />);
+
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('renders small variant when size is explicitly small', () => {

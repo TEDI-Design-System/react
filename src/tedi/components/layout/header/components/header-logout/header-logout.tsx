@@ -2,6 +2,7 @@ import { Text } from '../../../../../../tedi/components/base/typography/text/tex
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
+import { Button } from '../../../../buttons/button/button';
 import Link from '../../../../navigation/link/link';
 import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-logout.module.scss';
@@ -47,7 +48,7 @@ export const HeaderLogout = (props: HeaderLogoutProps) => {
           icon={{ name: 'logout', size: 24, color: 'inherit' }}
           label={resolvedLabel}
         />
-      ) : (
+      ) : href ? (
         <Link onClick={onClick} href={href} underline={false}>
           <div className={styles['tedi-header-logout']}>
             <Icon name="logout" size={18} color="inherit" />
@@ -56,9 +57,20 @@ export const HeaderLogout = (props: HeaderLogoutProps) => {
             </Text>
           </div>
         </Link>
+      ) : (
+        <Button onClick={onClick} noStyle>
+          <div className={styles['tedi-header-logout']}>
+            <Icon name="logout" size={18} color="inherit" />
+            <Text modifiers="normal" className={styles['tedi-header-logout__text']}>
+              {resolvedLabel}
+            </Text>
+          </div>
+        </Button>
       )}
     </>
   );
 };
+
+HeaderLogout.displayName = 'HeaderLogout';
 
 export default HeaderLogout;

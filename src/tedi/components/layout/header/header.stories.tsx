@@ -1,5 +1,5 @@
 import { useGlobals } from '@storybook/preview-api';
-import { Meta, StoryObj } from '@storybook/react/*';
+import { Meta, StoryObj } from '@storybook/react';
 import { useEffect, useRef, useState } from 'react';
 
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
@@ -44,24 +44,14 @@ const meta: Meta<typeof Header> = {
 
       useEffect(() => {
         originalThemeRef.current = localStorage.getItem(STORAGE_KEY);
-        const storedTheme = originalThemeRef.current;
 
-        if (storedTheme && globals.theme !== storedTheme) {
-          updateGlobals({ theme: storedTheme });
+        if (originalThemeRef.current && globals.theme !== originalThemeRef.current) {
+          updateGlobals({ theme: originalThemeRef.current });
         }
 
-        const originalSetItem = localStorage.setItem.bind(localStorage);
-
-        localStorage.setItem = (key: string, value: string) => {
-          if (key === STORAGE_KEY) return;
-          originalSetItem(key, value);
-        };
-
         return () => {
-          localStorage.setItem = originalSetItem;
-
           if (originalThemeRef.current !== null) {
-            originalSetItem(STORAGE_KEY, originalThemeRef.current);
+            localStorage.setItem(STORAGE_KEY, originalThemeRef.current);
           }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps

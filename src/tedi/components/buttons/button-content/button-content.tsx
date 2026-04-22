@@ -35,7 +35,7 @@ export type ButtonContentProps<
      */
     fullWidth?: boolean;
     /**
-     * Color schema for button. PS 'text' works only with link type links.
+     * Color scheme of the button. The 'text' value is only supported when visualType is 'link'.
      * @default default
      */
     color?: ButtonColor;
