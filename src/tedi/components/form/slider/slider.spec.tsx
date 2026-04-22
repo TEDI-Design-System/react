@@ -167,4 +167,49 @@ describe('Slider component', () => {
     fireEvent.change(input, { target: { value: '75' } });
     expect(screen.getByRole('tooltip')).toHaveTextContent('75%');
   });
+
+  it('keeps the tooltip visible while dragging, even after the pointer leaves the track', () => {
+    render(<Slider {...defaultProps} defaultValue={40} valueFormatter={(value) => `${value}%`} />);
+    const input = screen.getByRole('slider');
+
+    fireEvent.mouseEnter(input);
+    fireEvent.pointerDown(input, { pointerId: 1 });
+    fireEvent.mouseLeave(input);
+
+    expect(screen.getByRole('tooltip')).toHaveTextContent('40%');
+
+    fireEvent.pointerUp(window, { pointerId: 1 });
+
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+
+  it('applies the dragging class while the pointer is down and removes it on pointerup', () => {
+    render(<Slider {...defaultProps} defaultValue={40} />);
+    const input = screen.getByRole('slider');
+
+    fireEvent.pointerDown(input, { pointerId: 1 });
+    expect(input.className).toMatch(/--dragging/);
+
+    fireEvent.pointerUp(window, { pointerId: 1 });
+    expect(input.className).not.toMatch(/--dragging/);
+  });
+
+  it('does not start dragging when the slider is disabled', () => {
+    render(<Slider {...defaultProps} defaultValue={40} disabled />);
+    const input = screen.getByRole('slider');
+
+    fireEvent.pointerDown(input, { pointerId: 1 });
+    expect(input.className).not.toMatch(/--dragging/);
+  });
+
+  it('ends dragging on pointercancel', () => {
+    render(<Slider {...defaultProps} defaultValue={40} />);
+    const input = screen.getByRole('slider');
+
+    fireEvent.pointerDown(input, { pointerId: 1 });
+    expect(input.className).toMatch(/--dragging/);
+
+    fireEvent.pointerCancel(window, { pointerId: 1 });
+    expect(input.className).not.toMatch(/--dragging/);
+  });
 });

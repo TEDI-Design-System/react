@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { forwardRef, useCallback, useId, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Tooltip } from '../../overlays/tooltip/tooltip';
@@ -159,17 +159,45 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
   const currentValue = value ?? uncontrolledValue;
   const clampedValue = Math.min(max, Math.max(min, currentValue));
 
-  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const canShowTooltip = Boolean(tooltip) && !disabled;
+  const isTooltipOpen = canShowTooltip && (isHovered || isFocused || isDragging);
 
-  const openTooltip = useCallback(() => {
-    if (canShowTooltip) setIsTooltipOpen(true);
-  }, [canShowTooltip]);
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+  const handleFocus = useCallback(() => setIsFocused(true), []);
+  const handleBlur = useCallback(() => setIsFocused(false), []);
 
-  const closeTooltip = useCallback(() => {
-    setIsTooltipOpen(false);
+  const dragPointerIdRef = useRef<number | null>(null);
+
+  const endDrag = useCallback(() => {
+    dragPointerIdRef.current = null;
+    setIsDragging(false);
   }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+
+    return () => {
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+    };
+  }, [isDragging, endDrag]);
+
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent<HTMLInputElement>) => {
+      if (disabled) return;
+      dragPointerIdRef.current = event.pointerId;
+      setIsDragging(true);
+    },
+    [disabled]
+  );
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,19 +255,17 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
               aria-labelledby={ariaLabelledBy}
               aria-valuetext={ariaValueText}
               onChange={handleChange}
-              onMouseEnter={openTooltip}
-              onMouseLeave={closeTooltip}
-              onFocus={openTooltip}
-              onBlur={closeTooltip}
-              className={styles['tedi-slider__input']}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onPointerDown={handlePointerDown}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              className={cn(styles['tedi-slider__input'], {
+                [styles['tedi-slider__input--dragging']]: isDragging,
+              })}
             />
             {canShowTooltip && (
-              <Tooltip
-                open={isTooltipOpen}
-                onToggle={setIsTooltipOpen}
-                focusManager={{ returnFocus: false }}
-                placement="top"
-              >
+              <Tooltip open={isTooltipOpen} onToggle={() => {}} focusManager={{ returnFocus: false }} placement="top">
                 <TooltipTrigger>
                   <span className={styles['tedi-slider__thumb-anchor']} aria-hidden="true" tabIndex={-1} />
                 </TooltipTrigger>

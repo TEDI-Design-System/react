@@ -205,7 +205,7 @@ export const States: Story = {
             <Text modifiers="bold">Default</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="slider-states-default" />
+            <Slider {...sharedArgs} id="Default" />
           </Col>
         </Row>
         <Row>
@@ -213,7 +213,7 @@ export const States: Story = {
             <Text modifiers="bold">Hover</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="slider-states-hover" />
+            <Slider {...sharedArgs} id="Hover" />
           </Col>
         </Row>
         <Row>
@@ -221,7 +221,7 @@ export const States: Story = {
             <Text modifiers="bold">Active</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="slider-states-active" />
+            <Slider {...sharedArgs} id="Active" />
           </Col>
         </Row>
         <Row>
@@ -237,7 +237,7 @@ export const States: Story = {
             <Text modifiers="bold">Focus</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="slider-states-focus" />
+            <Slider {...sharedArgs} id="Focus" />
           </Col>
         </Row>
         <Row>
@@ -250,5 +250,12 @@ export const States: Story = {
         </Row>
       </VerticalSpacing>
     );
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      focusVisible: '#Focus',
+      active: '#Active',
+    },
   },
 };
