@@ -30,6 +30,7 @@
 
 .tedi-slider__track {
   --tedi-slider-progress: 0%;
+  --tedi-slider-progress-ratio: 0;
 
   position: relative;
   flex: 1 0 0;
@@ -50,7 +51,7 @@
   position: absolute;
   top: 50%;
   left: calc(
-    var(--form-slider-thumb-size) / 2 + var(--tedi-slider-progress) * (100% - var(--form-slider-thumb-size)) / 100%
+    var(--form-slider-thumb-size) / 2 + var(--tedi-slider-progress-ratio) * (100% - var(--form-slider-thumb-size))
   );
   display: block;
   width: var(--form-slider-thumb-size);

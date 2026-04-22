@@ -153,7 +153,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
 
   const generatedId = useId();
   const id = providedId ?? `tedi-slider-${generatedId}`;
-  const helperId = helper ? `${id}-helper` : undefined;
+  const helperId = helper ? helper.id ?? `${id}-helper` : undefined;
 
   const [uncontrolledValue, setUncontrolledValue] = useState<number>(defaultValue ?? min);
   const currentValue = value ?? uncontrolledValue;
@@ -236,7 +236,12 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
           )}
           <div
             className={styles['tedi-slider__track']}
-            style={{ ['--tedi-slider-progress' as string]: `${progress}%` }}
+            style={
+              {
+                '--tedi-slider-progress': `${progress}%`,
+                '--tedi-slider-progress-ratio': `${progress / 100}`,
+              } as React.CSSProperties
+            }
           >
             <input
               ref={ref}
@@ -285,7 +290,9 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
         </div>
         {addonRight && <div className={styles['tedi-slider__addon']}>{addonRight}</div>}
       </div>
-      {helper && <FeedbackText className={styles['tedi-slider__feedback']} {...helper} id={helperId} />}
+      {helper && (
+        <FeedbackText {...helper} id={helperId} className={cn(styles['tedi-slider__feedback'], helper.className)} />
+      )}
     </div>
   );
 });

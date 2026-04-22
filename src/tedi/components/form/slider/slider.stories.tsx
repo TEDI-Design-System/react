@@ -66,6 +66,7 @@ export const MinAndMaxValues: Story = {
     defaultValue: 50,
     minLabel: '0%',
     maxLabel: '100%',
+    'aria-label': 'Label',
   },
 };
 
@@ -78,6 +79,7 @@ export const CurrentValue: Story = {
     defaultValue: 50,
     showCurrentValue: true,
     valueFormatter: (value) => `${value}%`,
+    'aria-label': 'Label',
   },
 };
 
