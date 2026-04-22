@@ -96,12 +96,23 @@ describe('Slider component', () => {
     expect(screen.getByRole('slider')).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('renders helper text and links it via aria-describedby', () => {
+  it('renders helper text and links it via aria-describedby using the helper id when provided', () => {
     render(<Slider {...defaultProps} helper={{ type: 'hint', text: 'Slide to adjust', id: 'hint-1' }} />);
     const input = screen.getByRole('slider');
-    const describedBy = input.getAttribute('aria-describedby');
-    expect(describedBy).toBe('test-slider-helper');
+    expect(input).toHaveAttribute('aria-describedby', 'hint-1');
     expect(screen.getByText(/slide to adjust/i)).toBeInTheDocument();
+  });
+
+  it('falls back to a generated helper id when the helper has no id', () => {
+    render(<Slider {...defaultProps} helper={{ type: 'hint', text: 'Slide to adjust' }} />);
+    const input = screen.getByRole('slider');
+    expect(input).toHaveAttribute('aria-describedby', 'test-slider-helper');
+  });
+
+  it('does not set aria-describedby when no helper is provided', () => {
+    render(<Slider {...defaultProps} />);
+    const input = screen.getByRole('slider');
+    expect(input).not.toHaveAttribute('aria-describedby');
   });
 
   it('clamps the displayed value when out of range', () => {
@@ -211,5 +222,33 @@ describe('Slider component', () => {
 
     fireEvent.pointerCancel(window, { pointerId: 1 });
     expect(input.className).not.toMatch(/--dragging/);
+  });
+
+  it('uses the default min/max/step when none are provided', () => {
+    render(<Slider label="Volume" />);
+    const input = screen.getByRole('slider') as HTMLInputElement;
+
+    expect(input).toHaveAttribute('min', '0');
+    expect(input).toHaveAttribute('max', '100');
+    expect(input).toHaveAttribute('step', '1');
+    expect(input.value).toBe('0');
+  });
+
+  it('generates an id when none is provided', () => {
+    render(<Slider label="Volume" />);
+    const input = screen.getByRole('slider');
+
+    expect(input.id).toMatch(/^tedi-slider-/);
+  });
+
+  it('avoids a divide-by-zero when min equals max', () => {
+    expect(() => render(<Slider label="Volume" min={5} max={5} value={5} />)).not.toThrow();
+    const input = screen.getByRole('slider') as HTMLInputElement;
+    expect(input.value).toBe('5');
+  });
+
+  it('marks the slider invalid when the helper has type="error"', () => {
+    render(<Slider {...defaultProps} helper={{ type: 'error', text: 'Oops' }} />);
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-invalid', 'true');
   });
 });
