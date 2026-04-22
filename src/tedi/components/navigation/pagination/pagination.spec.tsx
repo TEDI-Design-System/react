@@ -72,6 +72,36 @@ describe('usePagination', () => {
     expect(first[0]).toEqual(expect.objectContaining({ type: 'previous', disabled: true }));
     expect(last[last.length - 1]).toEqual(expect.objectContaining({ type: 'next', disabled: true }));
   });
+
+  it('produces the same number of slots for every page when pageCount exceeds the window', () => {
+    const pageCount = 30;
+    const counts = new Set(
+      Array.from({ length: pageCount }, (_, index) => usePagination({ page: index + 1, pageCount }).length)
+    );
+    expect(counts.size).toBe(1);
+  });
+
+  it('keeps the slot count constant with custom boundary + sibling counts', () => {
+    const counts = new Set(
+      Array.from(
+        { length: 25 },
+        (_, index) => usePagination({ page: index + 1, pageCount: 25, boundaryCount: 2, siblingCount: 2 }).length
+      )
+    );
+    expect(counts.size).toBe(1);
+  });
+
+  it('swaps the ellipsis for an extra page number when near the start boundary', () => {
+    const nearStart = usePagination({ page: 2, pageCount: 20 });
+    const middle = usePagination({ page: 10, pageCount: 20 });
+
+    const ellipsesAtStart = nearStart.filter((item) => item.type === 'ellipsis').length;
+    const ellipsesAtMiddle = middle.filter((item) => item.type === 'ellipsis').length;
+
+    expect(ellipsesAtStart).toBe(1);
+    expect(ellipsesAtMiddle).toBe(2);
+    expect(nearStart.length).toBe(middle.length);
+  });
 });
 
 describe('Pagination component', () => {

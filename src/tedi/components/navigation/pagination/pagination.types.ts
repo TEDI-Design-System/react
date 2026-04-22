@@ -94,7 +94,7 @@ export interface PaginationProps {
   siblingCount?: number;
   /**
    * Visual size of the buttons.
-   * @default 'medium'
+   * @default medium
    */
   size?: 'medium' | 'small';
   /**
