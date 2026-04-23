@@ -1,3 +1,10 @@
+# [17.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.6...react-17.0.0-rc.7) (2026-04-23)
+
+
+### Bug Fixes
+
+* **checkbox:** invalid indicator hover border fix [#605](https://github.com/TEDI-Design-System/react/issues/605) ([#609](https://github.com/TEDI-Design-System/react/issues/609)) ([f1d62c6](https://github.com/TEDI-Design-System/react/commit/f1d62c6f2c19b9bae25cc71e5a88ae0fb17415d0))
+
 # [17.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.5...react-17.0.0-rc.6) (2026-04-15)
 
 
