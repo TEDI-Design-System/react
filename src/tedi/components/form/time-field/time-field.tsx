@@ -231,8 +231,14 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   };
 
   if (availableTimes && availableTimesVariant === 'dropdown') {
+    // Land focus on the previously selected item when the dropdown opens; if
+    // nothing is selected yet, focus the first item. Lets the user Enter/Space
+    // to reconfirm or Arrow to move without a priming keystroke.
+    const selectedIndex = availableTimes.indexOf(currentValue);
+    const defaultActiveIndex = selectedIndex >= 0 ? selectedIndex : 0;
+
     return (
-      <Dropdown width="trigger">
+      <Dropdown width="trigger" defaultActiveIndex={defaultActiveIndex}>
         <Dropdown.Trigger>
           <div
             className={cn(styles['tedi-time-field__container'], className, {

@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import Button from '../../../../buttons/button/button';
@@ -44,10 +44,66 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
 }) => {
   const timeGridId = useId();
   const { getLabel } = useLabels();
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // When the grid mounts (i.e. the picker opens), land focus on the card that
+  // matches the current value. Lets keyboard users arrow-navigate from where
+  // they left off and mirrors the way native <select> opens pre-highlighted.
+  // Runs once per mount — TimeGrid remounts every time the picker reopens.
+  useEffect(() => {
+    if (!value) return;
+    const root = rootRef.current;
+    if (!root) return;
+    const target = root.querySelector<HTMLElement>(
+      `input[type="radio"][value="${value}"], button[data-time="${value}"]`
+    );
+    target?.focus({ preventScroll: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Listbox-style keyboard handling for the radio variant: arrow keys move
+  // focus between slots *without* triggering native same-name-radio
+  // auto-selection. Without this, Arrow-Down would also mark the next radio
+  // checked, fire onSelect/onChange, and (inside TimeField) close the picker.
+  // Space/Enter fall through to native radio activation — that still fires
+  // onChange and lets the picker close on explicit confirmation.
+  const handleRadioKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (variant !== 'radio') return;
+    const root = rootRef.current;
+    if (!root) return;
+
+    const radios = Array.from(root.querySelectorAll<HTMLInputElement>('input[type="radio"]:not([disabled])'));
+    if (radios.length === 0) return;
+
+    const currentIndex = radios.findIndex((r) => r === document.activeElement);
+    let nextIndex: number;
+
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        nextIndex = currentIndex < 0 || currentIndex === radios.length - 1 ? 0 : currentIndex + 1;
+        break;
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        nextIndex = currentIndex <= 0 ? radios.length - 1 : currentIndex - 1;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = radios.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    radios[nextIndex]?.focus();
+  };
 
   if (variant === 'radio') {
     return (
-      <div className={cn(styles['tedi-time-picker__grid'], className)}>
+      <div ref={rootRef} className={cn(styles['tedi-time-picker__grid'], className)} onKeyDown={handleRadioKeyDown}>
         <ChoiceGroup
           id={`time-picker-group-${timeGridId}`}
           label={getLabel('timePicker.pickTime')}
@@ -72,12 +128,13 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   }
 
   return (
-    <div className={cn(styles['tedi-time-picker__grid'], className)}>
+    <div ref={rootRef} className={cn(styles['tedi-time-picker__grid'], className)}>
       <Row gutter={2}>
         {times.map((time) => (
           <Col width={colWidth} key={time}>
             <Button
               noStyle
+              data-time={time}
               className={cn(styles['tedi-time-picker__grid-item'], {
                 [styles['tedi-time-picker__grid-item--selected']]: time === value,
               })}

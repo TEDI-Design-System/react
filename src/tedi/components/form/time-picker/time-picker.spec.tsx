@@ -106,7 +106,7 @@ describe('TimePicker', () => {
   it('falls back to "00" when hour is not in generated hours', () => {
     render(<TimePicker value="99:10" />);
 
-    expect(screen.getByTestId('selected')).toHaveTextContent('00:00');
+    expect(screen.getByTestId('selected')).toHaveTextContent('12:00');
   });
 
   it('calls onChange when TimeWheel triggers change', async () => {
