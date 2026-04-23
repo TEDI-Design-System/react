@@ -7,7 +7,7 @@ import { Button, ButtonProps } from '../../buttons/button/button';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './search.module.scss';
 
-export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' | 'onKeyPress' | 'className'> {
+export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' | 'onKeyPress'> {
   /**
    * Callback triggered when the search is executed (Enter key pressed or button clicked).
    */
@@ -25,7 +25,6 @@ export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' 
    * E.g., "Search products" or "Search site".
    */
   ariaLabel?: string;
-  className?: string;
 }
 
 export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
