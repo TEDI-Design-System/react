@@ -80,7 +80,14 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     if (isHour) isProgrammaticScrollHour.current = true;
     else isProgrammaticScrollMinute.current = true;
 
-    element.scrollTo({ top: target, behavior: 'auto' });
+    // 'instant' (not 'auto') so this jump is synchronous — the column's
+    // CSS `scroll-behavior: smooth` would otherwise turn this into a ~300ms
+    // animation, and the in-flight scroll events during that animation would
+    // get mis-classified as user scrolls (the rAF clears the programmatic
+    // flag after one frame, while the animation keeps firing for ~280ms more)
+    // and fire onChange with every intermediate index — which is how the
+    // wheel ended up snapping back to 00:00 on open.
+    element.scrollTo({ top: target, behavior: 'instant' });
 
     requestAnimationFrame(() => {
       if (isHour) isProgrammaticScrollHour.current = false;

@@ -466,7 +466,7 @@ describe('TimeWheel', () => {
       jest.advanceTimersByTime(20);
     });
 
-    expect(scrollToSpy).toHaveBeenCalledWith({ top: 80, behavior: 'auto' });
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 80, behavior: 'instant' });
   });
 
   it('skips initial scroll when the selected value is not in the list', () => {

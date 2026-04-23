@@ -77,7 +77,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
 
   const { hour, minute } = parseTime(current || '12:00');
 
-  const selectedHour = hours.includes(hour) ? hour : '00';
+  const selectedHour = hours.includes(hour) ? hour : '12';
   const selectedMinute = findClosestMinute(minute, minutes);
 
   if (Array.isArray(availableTimes) && availableTimes.length > 0) {
