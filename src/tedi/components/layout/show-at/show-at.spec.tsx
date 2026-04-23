@@ -57,7 +57,7 @@ describe('ShowAt component', () => {
 
   it('shows when any of multiple breakpoints match', () => {
     (useBreakpoint as jest.Mock).mockReturnValue('md');
-    (isBreakpointBelow as jest.Mock).mockReturnValueOnce(false);
+    (isBreakpointBelow as jest.Mock).mockReturnValueOnce(true).mockReturnValueOnce(false);
 
     render(
       <ShowAt sm lg>

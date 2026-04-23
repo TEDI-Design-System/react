@@ -18,12 +18,12 @@ jest.mock('../../../../../providers/label-provider', () => ({
 }));
 
 const mockRepresentatives: Representative[] = [
-  { name: 'John Doe', description: 'Personal representative' },
-  { name: 'Jane Smith', description: 'Organization representative' },
-  { name: 'Bob Wilson', description: 'Another representative' },
+  { id: '1', name: 'John Doe', description: 'Personal representative' },
+  { id: '2', name: 'Jane Smith', description: 'Organization representative' },
+  { id: '3', name: 'Bob Wilson', description: 'Another representative' },
 ];
 
-const singleRepresentative: Representative[] = [{ name: 'John Doe', description: 'Personal representative' }];
+const singleRepresentative: Representative[] = [{ id: '1', name: 'John Doe', description: 'Personal representative' }];
 
 describe('HeaderRole component', () => {
   const mockGetLabel = jest.fn((key: string) => key);

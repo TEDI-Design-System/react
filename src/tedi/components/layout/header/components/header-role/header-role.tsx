@@ -69,8 +69,17 @@ export const HeaderRole = (props: HeaderRoleProps) => {
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    setRepresentative(representatives?.[0]);
-  }, [representatives]);
+    if (!representatives?.length) {
+      setRepresentative(undefined);
+      return;
+    }
+
+    const currentStillExists = representative && representatives.some((r) => r.id === representative.id);
+
+    if (!currentStillExists) {
+      setRepresentative(representatives[0]);
+    }
+  }, [representatives]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const breakpoint = useBreakpoint();
   const isTabletView = isBreakpointBelow(breakpoint, 'lg');
@@ -157,7 +166,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
               aria-expanded={isRoleSelectionOpen}
               aria-controls={panelId}
             >
-              <div className={styles['tedi-header-role__accordion--toggle']}>
+              <span className={styles['tedi-header-role__accordion--toggle']}>
                 {isRoleSelectionOpen ? closeLabel : openLabel}
                 <Icon
                   name="expand_more"
@@ -166,7 +175,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
                     [styles['tedi-header-role__accordion--toggle-icon--open']]: isRoleSelectionOpen,
                   })}
                 />
-              </div>
+              </span>
             </Button>
           )}
         </div>
@@ -191,7 +200,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
         <Popover placement="bottom" open={isRoleSelectionOpen} onToggle={handleToggle} withBorder={true}>
           <Popover.Trigger>
             <Button visualType="link" underline={false}>
-              <div className={styles['tedi-header-role__value']}>
+              <span className={styles['tedi-header-role__value']}>
                 {representative?.name}
                 <Icon
                   name="expand_more"
@@ -201,7 +210,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
                     [styles['tedi-header-role__icon--open']]: isRoleSelectionOpen,
                   })}
                 />
-              </div>
+              </span>
             </Button>
           </Popover.Trigger>
           <Popover.Content>

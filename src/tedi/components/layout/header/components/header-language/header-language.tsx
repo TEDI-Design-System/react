@@ -59,17 +59,17 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
     hideLabel: true,
     lg: { hideLabel: false },
   });
-  const availableLanguages = useMemo<Language[]>(() => languages ?? [], [languages]);
+  const availableLanguages = languages ?? [];
 
   const displayedLanguage = useMemo(() => {
     if (locale) {
-      const found = availableLanguages.find((l) => l.locale === locale);
+      const found = languages?.find((l) => l.locale === locale);
       if (found) return found.label;
     }
 
     if (currentLanguage) return currentLanguage;
-    return availableLanguages[0]?.label ?? '';
-  }, [availableLanguages, locale, currentLanguage]);
+    return languages?.[0]?.label ?? '';
+  }, [languages, locale, currentLanguage]);
 
   const changeLanguage = (lang: Language) => {
     if (lang.onClick) {
@@ -104,7 +104,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
           <Button
             visualType="link"
             underline={false}
-            aria-label={`${selectLabel ?? getLabel('header.select-lang')}, ${displayedLanguage}`}
+            aria-label={`${selectLabel ?? getLabel('header.select-lang')} ${displayedLanguage}`}
             aria-expanded={languageSelectionOpen}
           >
             <div className={styles['tedi-header-language__selected']}>

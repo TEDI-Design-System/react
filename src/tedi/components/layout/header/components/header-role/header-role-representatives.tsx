@@ -10,8 +10,13 @@ import { Search } from '../../../../form/search/search';
 import styles from './header-role.module.scss';
 
 export interface Representative {
+  /** Unique identifier for the representative. */
+  id: string;
+  /** Display name shown in the header and selection list. */
   name: string;
+  /** Additional context shown below the name (e.g. role, organization, personal code). */
   description?: string;
+  /** Icon displayed next to the representative in the selection list. */
   icon?: IconProps;
 }
 interface HeaderRoleRepresentativesProps {
@@ -19,15 +24,23 @@ interface HeaderRoleRepresentativesProps {
   id?: string;
   /** Id of the toggle button, used for aria-labelledby on the panel. */
   toggleId?: string;
+  /** List of representatives to display in the selection list. */
   representatives: Representative[];
+  /** Currently selected representative. */
   representative?: Representative;
+  /** Current value of the search input. */
   inputValue: string;
+  /** Callback to update the search input value. */
   setInputValue: (value: string) => void;
+  /** Callback to update the selected representative. */
   setRepresentative: (rep: Representative) => void;
+  /** Callback to control the open/closed state of the role selection. */
   setIsRoleSelectionOpen: (open: boolean) => void;
   /** Callback fired when the role selection is toggled. Handles both state update and external notification. */
   onRoleSelectionToggle?: () => void;
+  /** Whether the role selection panel is currently open. */
   isRoleSelectionOpen: boolean;
+  /** Whether the representatives belong to an organization context. Affects the search input label. */
   isOrganization?: boolean;
   /**
    * Label for the search input when selecting a representative.
@@ -103,10 +116,10 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
             label={resolvedSearchLabel}
           />
           {representatives.map((rep) => {
-            const isSelected = representative?.name === rep.name;
+            const isSelected = representative?.id === rep.id;
 
             return (
-              <React.Fragment key={rep.name}>
+              <React.Fragment key={rep.id}>
                 <Separator />
                 <Button
                   onClick={() => handleSelect(rep)}

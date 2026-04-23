@@ -61,9 +61,6 @@ const meta: Meta<typeof Header> = {
   ],
   parameters: {
     layout: 'fullscreen',
-    status: {
-      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
-    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?m=dev&node-id=6380-53060',
@@ -94,10 +91,10 @@ const languages = [
 ];
 
 const representatives: Representative[] = [
-  { name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
-  { name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
+  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle', size: 24 } },
 ];
 
 const loggedInNavItems = [
@@ -165,10 +162,13 @@ const loggedInNavItems = [
   },
 ];
 
-const representatives2 = [{ name: 'Mari Maasikas', description: '49504080934' }];
+const representatives2 = [{ id: '1', name: 'Mari Maasikas', description: '49504080934' }];
 
-const organizations = [{ name: 'Pärnu linnavolikogu' }, { name: 'Tartu Linnavalitsus' }];
-const organizations2 = [{ name: 'Tartu Linnavalitsus' }];
+const organizations = [
+  { id: 'org-1', name: 'Pärnu linnavolikogu' },
+  { id: 'org-2', name: 'Tartu Linnavalitsus' },
+];
+const organizations2 = [{ id: 'org-2', name: 'Tartu Linnavalitsus' }];
 
 const logo = <img src="header-logo.svg" alt="Logo" />;
 const logoDark = <img src="header-logo-white.svg" alt="Logo (Dark Mode)" />;
