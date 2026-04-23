@@ -39,6 +39,7 @@
       color: var(--general-text-secondary);
       background-color: var(--form-general-background-action-background);
       border: 1px solid var(--form-input-border-default);
+      transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
 
       > * {
         min-width: 1.5rem;
@@ -59,6 +60,35 @@
     .tedi-input-group__suffix {
       border-left: 0;
       border-radius: 0 var(--form-field-radius) var(--form-field-radius) 0;
+    }
+
+    .tedi-input-group__prefix:has(button:not(:disabled):hover),
+    .tedi-input-group__suffix:has(button:not(:disabled):hover) {
+      background-color: var(--button-main-secondary-background-hover);
+      border-color: var(--button-main-secondary-border-hover);
+
+      > * {
+        color: var(--button-main-secondary-text-hover);
+      }
+    }
+
+    .tedi-input-group__prefix:has(button:not(:disabled):active),
+    .tedi-input-group__suffix:has(button:not(:disabled):active) {
+      background-color: var(--button-main-secondary-background-active);
+      border-color: var(--button-main-secondary-border-active);
+
+      > * {
+        color: var(--button-main-secondary-text-active);
+      }
+    }
+
+    .tedi-input-group__prefix:has(button:focus-visible),
+    .tedi-input-group__suffix:has(button:focus-visible) {
+      position: relative;
+      z-index: 2;
+      border-color: var(--button-main-secondary-border-focus);
+      box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
+        0 0 0 var(--tedi-borders-03) var(--button-main-primary-background-focus);
     }
   }
 

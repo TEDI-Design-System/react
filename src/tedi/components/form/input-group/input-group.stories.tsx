@@ -20,15 +20,14 @@ import InputGroup, { InputGroupProps } from './input-group';
  * <a href="https://www.tedi.ee/1ee8444b7/p/18b6b5-input-group" target="_BLANK">Zeroheight ↗</a>
  */
 
-const meta: Meta<InputGroupProps> = {
+const meta: Meta<typeof InputGroup> = {
   title: 'TEDI-Ready/Components/Form/InputGroup',
   component: InputGroup,
-  // subcomponents: {
-  //   'InputGroup.Prefix': InputGroup.Prefix,
-  //   'InputGroup.Input': InputGroup.Input,
-  //   'InputGroup.Suffix': InputGroup.Suffix,
-  // },
-  // tags: ['autodocs'],
+  subcomponents: {
+    'InputGroup.Prefix': InputGroup.Prefix,
+    'InputGroup.Input': InputGroup.Input,
+    'InputGroup.Suffix': InputGroup.Suffix,
+  } as never,
 };
 
 export default meta;
@@ -51,127 +50,163 @@ export const StartStatic: Story = {
   ),
 };
 
+const COUNTRIES = [
+  { code: 'EE', name: 'Estonia', dial: '372' },
+  { code: 'LV', name: 'Latvia', dial: '371' },
+  { code: 'LT', name: 'Lithuania', dial: '370' },
+  { code: 'FI', name: 'Finland', dial: '358' },
+];
+
+const CURRENCIES = [
+  { code: 'EUR', name: 'Euro' },
+  { code: 'USD', name: 'US Dollar' },
+  { code: 'GBP', name: 'British Pound' },
+  { code: 'SEK', name: 'Swedish Krona' },
+];
+
+const ACCOUNTS = [
+  { label: 'Checking · EE38 2200 2210 2014 5685', value: 'checking' },
+  { label: 'Savings · EE96 2200 2210 2014 7283', value: 'savings' },
+  { label: 'Investment · EE27 2200 2210 2014 8120', value: 'investment' },
+];
+
+const FILE_FORMATS = ['PDF', 'XLSX', 'DOCX', 'CSV', 'TXT'];
+
+const SEARCH_CATEGORIES = ['All', 'Articles', 'People', 'Files', 'Projects'];
+
+const PhonePrefixRow = () => {
+  const [country, setCountry] = useState(COUNTRIES[0]);
+  return (
+    <Row>
+      <Col width={4}>
+        <InputGroup label="Phone number" id="start-phone">
+          <InputGroup.Prefix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  +{country.dial} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {COUNTRIES.map((c) => (
+                  <Dropdown.Item key={c.code} active={c.code === country.code} onClick={() => setCountry(c)}>
+                    {c.name} (+{c.dial})
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Prefix>
+          <InputGroup.Input>
+            <Field type="tel" />
+          </InputGroup.Input>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const CurrencyPrefixSelectRow = () => {
+  const [currency, setCurrency] = useState(CURRENCIES[0]);
+  return (
+    <Row>
+      <Col width={4}>
+        <InputGroup label="Transfer from" id="start-transfer-from">
+          <InputGroup.Prefix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {currency.code} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {CURRENCIES.map((c) => (
+                  <Dropdown.Item key={c.code} active={c.code === currency.code} onClick={() => setCurrency(c)}>
+                    {c.name} ({c.code})
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Prefix>
+          <InputGroup.Input>
+            <Select isClearIndicatorVisible options={ACCOUNTS} />
+          </InputGroup.Input>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const FileFormatPrefixRow = () => {
+  const [format, setFormat] = useState(FILE_FORMATS[0]);
+  return (
+    <Row>
+      <Col>
+        <InputGroup label="Report" id="start-file-format">
+          <InputGroup.Prefix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {format} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {FILE_FORMATS.map((f) => (
+                  <Dropdown.Item key={f} active={f === format} onClick={() => setFormat(f)}>
+                    {f}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Prefix>
+          <InputGroup.Input>
+            <FileUpload name="start-file-upload" />
+          </InputGroup.Input>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const SearchCategoryPrefixRow = () => {
+  const [category, setCategory] = useState(SEARCH_CATEGORIES[0]);
+  return (
+    <Row>
+      <Col>
+        <InputGroup label="Search" id="start-search-category">
+          <InputGroup.Prefix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {category} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {SEARCH_CATEGORIES.map((c) => (
+                  <Dropdown.Item key={c} active={c === category} onClick={() => setCategory(c)}>
+                    {c}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Prefix>
+          <InputGroup.Input>
+            <Search name="start-search" />
+          </InputGroup.Input>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
 export const StartDynamic: Story = {
-  render: () => {
-    const [country, setCountry] = useState('EE');
-
-    const countries = [
-      { code: 'EE', name: 'Estonia' },
-      { code: 'LV', name: 'Latvia' },
-      { code: 'LT', name: 'Lithuania' },
-      { code: 'FI', name: 'Finland' },
-    ];
-
-    const current = countries.find((c) => c.code === country)!;
-
-    return (
-      <VerticalSpacing>
-        <Row>
-          <Col width={4}>
-            <InputGroup label="Phone number" id="phone-with-country">
-              <InputGroup.Prefix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      +{current.code === 'EE' ? '372' : '371'} <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    {countries.map((c) => (
-                      <Dropdown.Item key={c.code} active={c.code === country} onClick={() => setCountry(c.code)}>
-                        {c.name} (+{c.code === 'EE' ? '372' : '371'})
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Prefix>
-              <InputGroup.Input>
-                <Field type="tel" />
-              </InputGroup.Input>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col width={4}>
-            <InputGroup label="Label" id="prefix-select">
-              <InputGroup.Prefix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      Prefix <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    {countries.map((c) => (
-                      <Dropdown.Item key={c.code} active={c.code === country} onClick={() => setCountry(c.code)}>
-                        {c.name} (+{c.code === 'EE' ? '372' : '371'})
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Prefix>
-              <InputGroup.Input>
-                <Select
-                  isClearIndicatorVisible
-                  options={[
-                    { label: 'lorem', value: 'lorem' },
-                    { label: 'ipsum', value: 'ipsum' },
-                    { label: 'dolor', value: 'dolor' },
-                  ]}
-                />
-              </InputGroup.Input>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <InputGroup label="File" id="prefix-select">
-              <InputGroup.Prefix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      PDF <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    <Dropdown.Item>PDF</Dropdown.Item>
-                    <Dropdown.Item>XLS</Dropdown.Item>
-                    <Dropdown.Item>TXT</Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Prefix>
-              <InputGroup.Input>
-                <FileUpload name="file-upload" />
-              </InputGroup.Input>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <InputGroup label="Search" id="prefix-search">
-              <InputGroup.Prefix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      Category <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    <Dropdown.Item>Lorem</Dropdown.Item>
-                    <Dropdown.Item>Ipsum</Dropdown.Item>
-                    <Dropdown.Item>Dolor</Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Prefix>
-              <InputGroup.Input>
-                <Search name="search" />
-              </InputGroup.Input>
-            </InputGroup>
-          </Col>
-        </Row>
-      </VerticalSpacing>
-    );
-  },
+  render: () => (
+    <VerticalSpacing>
+      <PhonePrefixRow />
+      <CurrencyPrefixSelectRow />
+      <FileFormatPrefixRow />
+      <SearchCategoryPrefixRow />
+    </VerticalSpacing>
+  ),
 };
 
 export const EndStatic: Story = {
@@ -190,118 +225,152 @@ export const EndStatic: Story = {
   ),
 };
 
+const TIMEZONES = [
+  { code: 'UTC', label: 'UTC' },
+  { code: 'EET', label: 'EET (UTC+2)' },
+  { code: 'CET', label: 'CET (UTC+1)' },
+  { code: 'EST', label: 'EST (UTC−5)' },
+];
+
+const MEETINGS = [
+  { label: 'Weekly sync · Mon 09:00', value: 'weekly-sync' },
+  { label: 'Product review · Wed 14:00', value: 'product-review' },
+  { label: 'All-hands · Fri 11:00', value: 'all-hands' },
+];
+
+const CostUnitSuffixRow = () => {
+  const [currency, setCurrency] = useState(CURRENCIES[0]);
+  return (
+    <Row>
+      <Col width={4}>
+        <InputGroup label="Cost" id="end-cost-currency">
+          <InputGroup.Input>
+            <Field type="tel" />
+          </InputGroup.Input>
+          <InputGroup.Suffix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {currency.code} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {CURRENCIES.map((c) => (
+                  <Dropdown.Item key={c.code} active={c.code === currency.code} onClick={() => setCurrency(c)}>
+                    {c.name} ({c.code})
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Suffix>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const TimezoneSuffixSelectRow = () => {
+  const [timezone, setTimezone] = useState(TIMEZONES[0]);
+  return (
+    <Row>
+      <Col width={4}>
+        <InputGroup label="Schedule" id="end-schedule-timezone">
+          <InputGroup.Input>
+            <Select isClearIndicatorVisible options={MEETINGS} />
+          </InputGroup.Input>
+          <InputGroup.Suffix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {timezone.code} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {TIMEZONES.map((t) => (
+                  <Dropdown.Item key={t.code} active={t.code === timezone.code} onClick={() => setTimezone(t)}>
+                    {t.label}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Suffix>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const FileFormatSuffixRow = () => {
+  const [format, setFormat] = useState(FILE_FORMATS[0]);
+  return (
+    <Row>
+      <Col>
+        <InputGroup label="Report" id="end-file-format">
+          <InputGroup.Input>
+            <FileUpload name="end-file-upload" />
+          </InputGroup.Input>
+          <InputGroup.Suffix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {format} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {FILE_FORMATS.map((f) => (
+                  <Dropdown.Item key={f} active={f === format} onClick={() => setFormat(f)}>
+                    {f}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Suffix>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const SearchCategorySuffixRow = () => {
+  const [category, setCategory] = useState(SEARCH_CATEGORIES[0]);
+  return (
+    <Row>
+      <Col>
+        <InputGroup label="Search" id="end-search-category">
+          <InputGroup.Input>
+            <Search name="end-search" />
+          </InputGroup.Input>
+          <InputGroup.Suffix>
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button noStyle className="flex align-items-center">
+                  {category} <Icon name="arrow_drop_down" color="inherit" />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Content>
+                {SEARCH_CATEGORIES.map((c) => (
+                  <Dropdown.Item key={c} active={c === category} onClick={() => setCategory(c)}>
+                    {c}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </InputGroup.Suffix>
+        </InputGroup>
+      </Col>
+    </Row>
+  );
+};
+
 export const EndDynamic: Story = {
-  render: () => {
-    const [selectedUnit, setSelectedUnit] = useState('EUR');
-
-    const units = ['EUR', 'USD', 'GBP', 'SEK'];
-
-    return (
-      <VerticalSpacing>
-        <Row>
-          <Col width={4}>
-            <InputGroup label="Cost" id="cost-with-selection">
-              <InputGroup.Input>
-                <Field type="tel" />
-              </InputGroup.Input>
-              <InputGroup.Suffix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      {selectedUnit} <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    {units.map((unit) => (
-                      <Dropdown.Item key={unit} active={unit === selectedUnit} onClick={() => setSelectedUnit(unit)}>
-                        {unit}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Suffix>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col width={4}>
-            <InputGroup label="Label" id="prefix-select">
-              <InputGroup.Input>
-                <Select
-                  isClearIndicatorVisible
-                  options={[
-                    { label: 'lorem', value: 'lorem' },
-                    { label: 'ipsum', value: 'ipsum' },
-                    { label: 'dolor', value: 'dolor' },
-                  ]}
-                />
-              </InputGroup.Input>
-              <InputGroup.Suffix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      Prefix <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    <Dropdown.Item>Lorem</Dropdown.Item>
-                    <Dropdown.Item>Ipsum</Dropdown.Item>
-                    <Dropdown.Item>Dolor</Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Suffix>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <InputGroup label="File" id="prefix-select">
-              <InputGroup.Input>
-                <FileUpload name="file-upload" />
-              </InputGroup.Input>
-              <InputGroup.Suffix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      PDF <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    <Dropdown.Item>PDF</Dropdown.Item>
-                    <Dropdown.Item>XLS</Dropdown.Item>
-                    <Dropdown.Item>TXT</Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Suffix>
-            </InputGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <InputGroup label="Search" id="prefix-search">
-              <InputGroup.Input>
-                <Search name="search" />
-              </InputGroup.Input>
-              <InputGroup.Suffix>
-                <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button noStyle className="flex align-items-center">
-                      Category <Icon name="arrow_drop_down" color="inherit" />
-                    </Button>
-                  </Dropdown.Trigger>
-                  <Dropdown.Content>
-                    <Dropdown.Item>Lorem</Dropdown.Item>
-                    <Dropdown.Item>Ipsum</Dropdown.Item>
-                    <Dropdown.Item>Dolor</Dropdown.Item>
-                  </Dropdown.Content>
-                </Dropdown>
-              </InputGroup.Suffix>
-            </InputGroup>
-          </Col>
-        </Row>
-      </VerticalSpacing>
-    );
-  },
+  render: () => (
+    <VerticalSpacing>
+      <CostUnitSuffixRow />
+      <TimezoneSuffixSelectRow />
+      <FileFormatSuffixRow />
+      <SearchCategorySuffixRow />
+    </VerticalSpacing>
+  ),
 };
 
 const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'];

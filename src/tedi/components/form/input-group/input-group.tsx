@@ -106,7 +106,7 @@ export const useOptionalInputGroup = () => {
   return useContext(InputGroupContext);
 };
 
-const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
+export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
   ({ className, addons = true, helper, label, children, disabled, id, ...labelProps }, ref) => {
     const rootRef = React.useRef<HTMLDivElement>(null);
     const generatedId = React.useId();
@@ -178,10 +178,14 @@ const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
 
 InputGroupBase.displayName = 'InputGroup';
 
-const InputGroup = Object.assign(InputGroupBase, {
-  Prefix,
-  Suffix,
-  Input,
-});
+const InputGroup = InputGroupBase as typeof InputGroupBase & {
+  Prefix: typeof Prefix;
+  Suffix: typeof Suffix;
+  Input: typeof Input;
+};
+
+InputGroup.Prefix = Prefix;
+InputGroup.Suffix = Suffix;
+InputGroup.Input = Input;
 
 export default InputGroup;
