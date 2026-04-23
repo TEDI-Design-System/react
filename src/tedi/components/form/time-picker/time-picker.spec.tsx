@@ -62,6 +62,22 @@ describe('TimePicker', () => {
     expect(screen.queryByTestId('time-wheel')).not.toBeInTheDocument();
   });
 
+  it('falls back to TimeWheel when availableTimes is an empty array', () => {
+    render(<TimePicker availableTimes={[]} />);
+
+    expect(screen.getByTestId('time-wheel')).toBeInTheDocument();
+    expect(screen.queryByTestId('time-grid')).not.toBeInTheDocument();
+  });
+
+  it('falls back to TimeWheel when availableTimes is not an array (bad input)', () => {
+    // Simulates Storybook's "Set object" control producing `{}` when saved
+    // before the user replaces the placeholder with a real array.
+    render(<TimePicker availableTimes={{} as unknown as string[]} />);
+
+    expect(screen.getByTestId('time-wheel')).toBeInTheDocument();
+    expect(screen.queryByTestId('time-grid')).not.toBeInTheDocument();
+  });
+
   it('calls onChange when a grid time is selected', async () => {
     const user = userEvent.setup();
     const onChange = jest.fn();

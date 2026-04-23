@@ -33,7 +33,7 @@ type Story = StoryObj<TimeFieldProps>;
 
 const Template: StoryFn<TimeFieldProps> = (args) => (
   <Row>
-    <Col width={3}>
+    <Col lg={3} md={6}>
       <TimeField {...args} />
     </Col>
   </Row>
@@ -52,10 +52,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col width={2}>
+          <Col md={2} sm={6}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col width={3} className="d-flex">
+          <Col lg={3} md={6} className="d-flex">
             <TimeField label="Time" id={`time-field-size--${value}`} inputProps={{ [property]: value }} />
           </Col>
         </Row>
@@ -85,7 +85,7 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
 export const FieldOptions: StoryFn = () => {
   return (
     <Row>
-      <Col width={3}>
+      <Col lg={3} md={6}>
         <div className="flex gap-4 flex-column">
           <TimeField id="time-field-default" label="Default time field" />
 
@@ -103,7 +103,7 @@ export const FieldOptions: StoryFn = () => {
 export const ValueType: StoryFn = () => {
   return (
     <Row>
-      <Col width={3}>
+      <Col lg={3} md={6}>
         <div className="flex gap-3 flex-column">
           <TimeField id="time-default" label="Label" />
           <TimeField id="time-with-placeholder" label="Label" placeholder="hh:mm" />
@@ -119,13 +119,13 @@ export const OnClickType: Story = {
     return (
       <VerticalSpacing>
         <Row>
-          <Col width={3}>
+          <Col lg={3} md={6}>
             <Text>Clock button is clickable</Text>
             <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
-          <Col width={3}>
+          <Col lg={3} md={6}>
             <Text>Input is clickable</Text>
             <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="input" />
           </Col>
@@ -158,7 +158,7 @@ export const PredefinedTimeSlots: Story = {
     return (
       <VerticalSpacing>
         <Row>
-          <Col width={3}>
+          <Col lg={3} md={6}>
             <TimeField
               id="time-dropdown"
               label="Time"
@@ -172,7 +172,7 @@ export const PredefinedTimeSlots: Story = {
         </Row>
 
         <Row>
-          <Col width={3}>
+          <Col lg={3} md={6}>
             <TimeField
               id="time-grid"
               label="Time"
@@ -197,7 +197,7 @@ export const Dropdown: Story = {
 
     return (
       <Row>
-        <Col width={3}>
+        <Col lg={3} md={6}>
           <TimeField
             id="available-times-dropdown"
             label="Time"
@@ -244,7 +244,7 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
 
   return (
     <Row>
-      <Col width={3}>
+      <Col lg={3} md={6}>
         <TimeField
           {...args}
           value={time}

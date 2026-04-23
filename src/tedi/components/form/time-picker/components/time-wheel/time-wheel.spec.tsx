@@ -83,11 +83,17 @@ describe('TimeWheel', () => {
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
+    // Flush the initial rAF so the useLayoutEffect's programmatic-scroll flag clears.
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
     const col = screen.getAllByRole('listbox')[0];
 
     act(() => {
       Object.defineProperty(col, 'scrollTop', { value: 40, writable: true });
       col.dispatchEvent(new Event('scroll'));
+      jest.advanceTimersByTime(50);
     });
 
     expect(onChange).toHaveBeenCalled();
@@ -98,11 +104,16 @@ describe('TimeWheel', () => {
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
     const col = screen.getAllByRole('listbox')[1];
 
     act(() => {
       Object.defineProperty(col, 'scrollTop', { value: 40, writable: true });
       col.dispatchEvent(new Event('scroll'));
+      jest.advanceTimersByTime(50);
     });
 
     expect(onChange).toHaveBeenCalled();
@@ -122,6 +133,10 @@ describe('TimeWheel', () => {
         onChange={onChange}
       />
     );
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
 
     const col = screen.getAllByRole('listbox')[0];
 
@@ -207,6 +222,10 @@ describe('TimeWheel', () => {
         onChange={onChange}
       />
     );
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
 
     const col = screen.getAllByRole('listbox')[1];
 
@@ -447,7 +466,7 @@ describe('TimeWheel', () => {
       jest.advanceTimersByTime(20);
     });
 
-    expect(scrollToSpy).toHaveBeenCalledWith({ top: 80, behavior: 'instant' });
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 80, behavior: 'auto' });
   });
 
   it('skips initial scroll when the selected value is not in the list', () => {
@@ -469,34 +488,6 @@ describe('TimeWheel', () => {
     });
 
     expect(scrollToSpy).not.toHaveBeenCalled();
-  });
-
-  it('schedules a retry when the initial scroll does not land correctly', () => {
-    (needsScrollCorrection as jest.Mock).mockReturnValue(true);
-    const scrollToSpy = jest.fn();
-    Element.prototype.scrollTo = scrollToSpy;
-
-    render(
-      <TimeWheel
-        hours={['00', '01', '02']}
-        minutes={['00', '10']}
-        selectedHour="02"
-        selectedMinute="10"
-        onChange={jest.fn()}
-      />
-    );
-
-    act(() => {
-      jest.advanceTimersByTime(20);
-    });
-
-    const callsAfterFirstRaf = scrollToSpy.mock.calls.length;
-
-    act(() => {
-      jest.advanceTimersByTime(60);
-    });
-
-    expect(scrollToSpy.mock.calls.length).toBeGreaterThan(callsAfterFirstRaf);
   });
 
   it('stops retrying initial scroll once a re-render supersedes the pending attempt (stale gen)', () => {
@@ -542,6 +533,10 @@ describe('TimeWheel', () => {
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
     const col = screen.getAllByRole('listbox')[0];
 
     act(() => {
@@ -549,7 +544,7 @@ describe('TimeWheel', () => {
       col.dispatchEvent(new Event('scroll'));
     });
 
-    // Advance past both the 100ms correction trigger and the 50ms flag reset.
+    // Advance past the settle-timeout and the 50ms programmatic-flag reset.
     act(() => {
       jest.advanceTimersByTime(200);
     });

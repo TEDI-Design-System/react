@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { TimePicker, TimePickerProps } from './time-picker';
 
 /**
@@ -43,11 +44,25 @@ export const WithInitialValue: Story = {
 
 export const PredefinedSlots: Story = {
   render: () => {
-    const [time, setTime] = useState<string | undefined>();
+    const [timeButton, setTimeButton] = useState<string | undefined>();
+    const [timeRadio, setTimeRadio] = useState<string | undefined>();
 
     const availableTimes = ['08:00', '08:30', '09:00', '09:15', '09:30', '10:00', '10:30', '11:00', '12:00'];
 
-    return <TimePicker value={time} availableTimes={availableTimes} onChange={setTime} />;
+    return (
+      <VerticalSpacing>
+        <Row>
+          <Col width={5}>
+            <Text>gridVariant = button</Text>
+            <TimePicker value={timeButton} availableTimes={availableTimes} onChange={setTimeButton} />
+          </Col>
+          <Col width={5}>
+            <Text>gridVariant = radio</Text>
+            <TimePicker gridVariant="radio" value={timeRadio} availableTimes={availableTimes} onChange={setTimeRadio} />
+          </Col>
+        </Row>
+      </VerticalSpacing>
+    );
   },
 };
 

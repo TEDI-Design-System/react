@@ -287,7 +287,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
                     updateTime(time);
                     if (availableTimes) setOpen(false);
                   }}
-                  gridVariant={availableTimesVariant === 'grid-radio' ? 'radio' : 'buttons'}
+                  gridVariant={availableTimesVariant === 'grid-radio' ? 'radio' : 'button'}
                   className={styles['tedi-time-field__picker-wrapper']}
                 />
               </div>

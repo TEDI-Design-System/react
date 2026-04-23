@@ -56,8 +56,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   const uid = React.useId();
   const hourRef = useRef<HTMLDivElement>(null);
   const minuteRef = useRef<HTMLDivElement>(null);
-  const hourGen = useRef(0);
-  const minuteGen = useRef(0);
 
   const isProgrammaticScrollHour = useRef(false);
   const isProgrammaticScrollMinute = useRef(false);
@@ -65,145 +63,107 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   const scrollTimeoutHour = useRef<NodeJS.Timeout>();
   const scrollTimeoutMinute = useRef<NodeJS.Timeout>();
 
-  const retryTimeoutHour = useRef<NodeJS.Timeout>();
-  const retryTimeoutMinute = useRef<NodeJS.Timeout>();
-
   const lastHourIndex = useRef(-1);
   const lastMinuteIndex = useRef(-1);
 
+  const [activeHourIndex, setActiveHourIndex] = React.useState<number | null>(null);
+  const [activeMinuteIndex, setActiveMinuteIndex] = React.useState<number | null>(null);
+
   const clampIndex = (index: number, length: number) => Math.max(0, Math.min(length - 1, index));
 
-  const forceScrollTo = (
-    ref: React.RefObject<HTMLDivElement>,
-    targetIndex: number,
-    isHour: boolean,
-    gen: number,
-    attempt = 0
-  ) => {
+  const forceScrollTo = (ref: React.RefObject<HTMLDivElement>, targetIndex: number, isHour: boolean) => {
     const element = ref.current;
     if (!element || targetIndex < 0) return;
 
-    const isStale = () => (isHour ? gen !== hourGen.current : gen !== minuteGen.current);
-
-    if (isStale()) return;
-
     const target = getScrollTopForIndex(targetIndex);
-    const maxAttempts = 12;
 
-    const tryScroll = () => {
-      if (!element || isStale()) return;
+    if (isHour) isProgrammaticScrollHour.current = true;
+    else isProgrammaticScrollMinute.current = true;
 
-      if (isHour) isProgrammaticScrollHour.current = true;
-      else isProgrammaticScrollMinute.current = true;
+    element.scrollTo({ top: target, behavior: 'auto' });
 
-      element.scrollTo({ top: target, behavior: 'instant' });
-
-      requestAnimationFrame(() => {
-        if (!element || isStale()) return;
-
-        const stillWrong = needsScrollCorrection(element.scrollTop, target, 3);
-
-        if (stillWrong && attempt < maxAttempts) {
-          const nextDelay = 16 + attempt * 20;
-
-          const schedule = () => {
-            if (isStale()) return;
-            forceScrollTo(ref, targetIndex, isHour, gen, attempt + 1);
-          };
-
-          if (isHour) {
-            retryTimeoutHour.current = setTimeout(schedule, nextDelay);
-          } else {
-            retryTimeoutMinute.current = setTimeout(schedule, nextDelay);
-          }
-        } else {
-          if (isHour) isProgrammaticScrollHour.current = false;
-          else isProgrammaticScrollMinute.current = false;
-        }
-      });
-    };
-
-    tryScroll();
+    requestAnimationFrame(() => {
+      if (isHour) isProgrammaticScrollHour.current = false;
+      else isProgrammaticScrollMinute.current = false;
+    });
   };
 
   useLayoutEffect(() => {
-    hourGen.current++;
-    minuteGen.current++;
-
     const hourIndex = hours.indexOf(selectedHour);
     const minuteIndex = minutes.indexOf(selectedMinute);
 
-    lastHourIndex.current = hourIndex;
-    lastMinuteIndex.current = minuteIndex;
+    if (hourIndex !== lastHourIndex.current) {
+      lastHourIndex.current = hourIndex;
+      forceScrollTo(hourRef, hourIndex, true);
+    }
 
-    if (retryTimeoutHour.current) clearTimeout(retryTimeoutHour.current);
-    if (retryTimeoutMinute.current) clearTimeout(retryTimeoutMinute.current);
+    if (minuteIndex !== lastMinuteIndex.current) {
+      lastMinuteIndex.current = minuteIndex;
+      forceScrollTo(minuteRef, minuteIndex, false);
+    }
 
-    isProgrammaticScrollHour.current = false;
-    isProgrammaticScrollMinute.current = false;
-
-    const currentHourGen = hourGen.current;
-    const currentMinuteGen = minuteGen.current;
-
-    const initializeScrollPosition = () => {
-      forceScrollTo(hourRef, hourIndex, true, currentHourGen);
-      forceScrollTo(minuteRef, minuteIndex, false, currentMinuteGen);
-    };
-
-    requestAnimationFrame(initializeScrollPosition);
-
-    return () => {
-      if (retryTimeoutHour.current) clearTimeout(retryTimeoutHour.current);
-      if (retryTimeoutMinute.current) clearTimeout(retryTimeoutMinute.current);
-    };
+    setActiveHourIndex(hourIndex);
+    setActiveMinuteIndex(minuteIndex);
   }, [hours, minutes, selectedHour, selectedMinute]);
 
   const handleHourScroll = () => {
     if (!hourRef.current || isProgrammaticScrollHour.current) return;
 
-    const index = clampIndex(snapToNearestItem(hourRef.current.scrollTop, hours.length), hours.length);
-
-    if (index !== lastHourIndex.current) {
-      lastHourIndex.current = index;
-      onChange(hours[index]!, selectedMinute);
-    }
-
     clearScrollTimeout(scrollTimeoutHour.current);
+
     scrollTimeoutHour.current = setTimeout(() => {
       if (!hourRef.current) return;
+
+      const index = clampIndex(snapToNearestItem(hourRef.current.scrollTop, hours.length), hours.length);
+
+      setActiveHourIndex(index);
+
       const target = getScrollTopForIndex(index);
-      if (needsScrollCorrection(hourRef.current.scrollTop, target, 4)) {
+
+      if (needsScrollCorrection(hourRef.current.scrollTop, target, 8)) {
         isProgrammaticScrollHour.current = true;
         scrollToIndex(hourRef.current, index);
-        setTimeout(() => {
-          isProgrammaticScrollHour.current = false;
-        }, 50);
       }
-    }, 100);
+
+      if (index !== lastHourIndex.current) {
+        lastHourIndex.current = index;
+        onChange(hours[index]!, selectedMinute);
+      }
+
+      setTimeout(() => {
+        isProgrammaticScrollHour.current = false;
+      }, 50);
+    });
   };
 
   const handleMinuteScroll = () => {
     if (!minuteRef.current || isProgrammaticScrollMinute.current) return;
 
-    const index = clampIndex(snapToNearestItem(minuteRef.current.scrollTop, minutes.length), minutes.length);
-
-    if (index !== lastMinuteIndex.current) {
-      lastMinuteIndex.current = index;
-      onChange(selectedHour, minutes[index]!);
-    }
-
     clearScrollTimeout(scrollTimeoutMinute.current);
+
     scrollTimeoutMinute.current = setTimeout(() => {
       if (!minuteRef.current) return;
+
+      const index = clampIndex(snapToNearestItem(minuteRef.current.scrollTop, minutes.length), minutes.length);
+
+      setActiveMinuteIndex(index);
+
       const target = getScrollTopForIndex(index);
-      if (needsScrollCorrection(minuteRef.current.scrollTop, target, 4)) {
+
+      if (needsScrollCorrection(minuteRef.current.scrollTop, target, 8)) {
         isProgrammaticScrollMinute.current = true;
         scrollToIndex(minuteRef.current, index);
-        setTimeout(() => {
-          isProgrammaticScrollMinute.current = false;
-        }, 50);
       }
-    }, 100);
+
+      if (index !== lastMinuteIndex.current) {
+        lastMinuteIndex.current = index;
+        onChange(selectedHour, minutes[index]!);
+      }
+
+      setTimeout(() => {
+        isProgrammaticScrollMinute.current = false;
+      }, 50);
+    });
   };
 
   const handleHourClick = (index: number) => {
@@ -211,14 +171,17 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     if (!hour || !hourRef.current) return;
 
     clearScrollTimeout(scrollTimeoutHour.current);
-    onChange(hour, selectedMinute);
+
     lastHourIndex.current = index;
+    setActiveHourIndex(index);
+    onChange(hour, selectedMinute);
 
     isProgrammaticScrollHour.current = true;
     scrollToIndex(hourRef.current, index, 'smooth');
+
     setTimeout(() => {
       isProgrammaticScrollHour.current = false;
-    }, 350);
+    }, 300);
   };
 
   const handleMinuteClick = (index: number) => {
@@ -226,14 +189,17 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     if (!minute || !minuteRef.current) return;
 
     clearScrollTimeout(scrollTimeoutMinute.current);
-    onChange(selectedHour, minute);
+
     lastMinuteIndex.current = index;
+    setActiveMinuteIndex(index);
+    onChange(selectedHour, minute);
 
     isProgrammaticScrollMinute.current = true;
     scrollToIndex(minuteRef.current, index, 'smooth');
+
     setTimeout(() => {
       isProgrammaticScrollMinute.current = false;
-    }, 350);
+    }, 300);
   };
 
   const handleColumnKeyDown =
@@ -248,33 +214,26 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
         case 'ArrowDown':
           nextIndex = Math.min(currentIndex + 1, list.length - 1);
           break;
-
         case 'ArrowUp':
           nextIndex = Math.max(currentIndex - 1, 0);
           break;
-
         case 'Home':
           nextIndex = 0;
           break;
-
         case 'End':
           nextIndex = list.length - 1;
           break;
-
         case 'PageDown':
           nextIndex = Math.min(currentIndex + 5, list.length - 1);
           break;
-
         case 'PageUp':
           nextIndex = Math.max(currentIndex - 5, 0);
           break;
-
         case 'Enter':
         case ' ':
           event.preventDefault();
           onSelect(list[currentIndex]);
           return;
-
         default:
           return;
       }
@@ -292,8 +251,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     return () => {
       clearScrollTimeout(scrollTimeoutHour.current);
       clearScrollTimeout(scrollTimeoutMinute.current);
-      if (retryTimeoutHour.current) clearTimeout(retryTimeoutHour.current);
-      if (retryTimeoutMinute.current) clearTimeout(retryTimeoutMinute.current);
     };
   }, []);
 
@@ -313,7 +270,8 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
           <div
             key={h}
             className={cn(styles['tedi-time-picker__wheel-item'], {
-              [styles['tedi-time-picker__wheel-item--selected']]: h === selectedHour,
+              [styles['tedi-time-picker__wheel-item--selected']]:
+                idx === (activeHourIndex ?? hours.indexOf(selectedHour)),
             })}
             onClick={() => handleHourClick(idx)}
             id={`${uid}-hour-${idx}`}
@@ -339,7 +297,8 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
           <div
             key={m}
             className={cn(styles['tedi-time-picker__wheel-item'], {
-              [styles['tedi-time-picker__wheel-item--selected']]: m === selectedMinute,
+              [styles['tedi-time-picker__wheel-item--selected']]:
+                idx === (activeMinuteIndex ?? minutes.indexOf(selectedMinute)),
             })}
             onClick={() => handleMinuteClick(idx)}
             id={`${uid}-minute-${idx}`}

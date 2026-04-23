@@ -27,7 +27,7 @@ export interface TimeGridProps {
   /**
    * Display mode
    */
-  variant?: 'buttons' | 'radio';
+  variant?: 'button' | 'radio';
   /*
    * Additional CSS class name for custom styling
    */
@@ -40,23 +40,23 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   onSelect,
   className,
   colWidth = 4,
-  variant = 'buttons',
+  variant = 'button',
 }) => {
-  const reactId = useId();
+  const timeGridId = useId();
   const { getLabel } = useLabels();
 
   if (variant === 'radio') {
     return (
       <div className={cn(styles['tedi-time-picker__grid'], className)}>
         <ChoiceGroup
-          id={`time-picker-group-${reactId}`}
+          id={`time-picker-group-${timeGridId}`}
           label={getLabel('timePicker.pickTime')}
           inputType="radio"
-          name={`time-grid-${reactId}`}
+          name={`time-grid-${timeGridId}`}
           value={value}
           onChange={(val) => onSelect(val as string)}
           items={times.map((time) => ({
-            id: `time-${reactId}-${time}`,
+            id: `time-${timeGridId}-${time}`,
             label: time,
             value: time,
             colProps: { width: colWidth },
