@@ -82,13 +82,11 @@
       }
     }
 
-    .tedi-input-group__prefix:has(button:focus-visible),
-    .tedi-input-group__suffix:has(button:focus-visible) {
-      position: relative;
+    .tedi-input-group__prefix > button:focus-visible,
+    .tedi-input-group__suffix > button:focus-visible {
       z-index: 2;
-      border-color: var(--button-main-secondary-border-focus);
-      box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
-        0 0 0 var(--tedi-borders-03) var(--button-main-primary-background-focus);
+      outline: 2px solid var(--button-main-primary-background-focus);
+      outline-offset: 2px;
     }
   }
 
