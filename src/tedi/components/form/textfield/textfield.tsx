@@ -3,7 +3,6 @@ import React, { forwardRef, useCallback, useMemo } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
-import { UnknownType } from '../../../types/commonTypes';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import Separator from '../../misc/separator/separator';
@@ -391,7 +390,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     return (
       <div className={styles['tedi-textfield__feedback-wrapper']}>
         {Array.isArray(helper) ? (
-          helper.map((item, index) => <FeedbackText key={index} {...item} id={`${id}-helper-${index}`} />)
+          helper.map((item, index) => <FeedbackText key={index} {...item} id={`${resolvedId}-helper-${index}`} />)
         ) : (
           <FeedbackText {...helper} id={`${resolvedId}-helper`} />
         )}
@@ -430,12 +429,21 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
             [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
           })}
           onFocus={(e) => {
-            input?.onFocus?.(e as UnknownType);
+            (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
             onFocus?.(e);
           }}
-          onBlur={onBlur}
+          onBlur={(e) => {
+            (input?.onBlur as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+            onBlur?.(e);
+          }}
           isTextArea={isTextArea}
-          aria-describedby={helper ? `${id}-helper` : undefined}
+          aria-describedby={
+            !helper || (Array.isArray(helper) && helper.length === 0)
+              ? undefined
+              : Array.isArray(helper)
+              ? helper.map((_, index) => `${resolvedId}-helper-${index}`).join(' ')
+              : `${resolvedId}-helper`
+          }
           aria-label={hideLabel && typeof label === 'string' ? label : undefined}
           ref={fieldRef}
         />

@@ -11,7 +11,7 @@ export const Input = ({ children }: { children: ReactNode }) => {
   if (!React.isValidElement(children)) return children;
 
   const extraProps: UnknownType = {
-    disabled: disabled ?? children.props.disabled,
+    disabled: disabled || children.props.disabled,
     id: children.props.id ?? inputId,
     className: classNames(children.props.className, styles['tedi-input-group__input']),
     wrapperClassName: classNames(children.props.wrapperClassName, styles['tedi-input-group__input']),
@@ -21,4 +21,3 @@ export const Input = ({ children }: { children: ReactNode }) => {
 };
 
 Input.displayName = 'InputGroup.Input';
-Input.displayName = 'Input';

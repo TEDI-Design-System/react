@@ -154,10 +154,10 @@ export const Field = forwardRef<FieldElement, FieldProps>((props, ref) => {
   };
 
   if (isTextArea) {
-    return <textarea {...sharedProps} {...textareaProps} ref={innerRef as React.Ref<HTMLTextAreaElement>} />;
+    return <textarea {...textareaProps} {...sharedProps} ref={innerRef as React.Ref<HTMLTextAreaElement>} />;
   }
 
-  return <input {...sharedProps} type={type} {...inputProps} ref={innerRef as React.Ref<HTMLInputElement>} />;
+  return <input {...inputProps} {...sharedProps} type={type} ref={innerRef as React.Ref<HTMLInputElement>} />;
 });
 
 Field.displayName = 'Field';

@@ -134,7 +134,7 @@ export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
         registerSuffix: () => setHasSuffix(true),
         unregisterSuffix: () => setHasSuffix(false),
       }),
-      [inputId, hasPrefix, hasSuffix, disabled]
+      [inputId, hasPrefix, hasSuffix, disabled, label]
     );
 
     const groupClassName = cn(

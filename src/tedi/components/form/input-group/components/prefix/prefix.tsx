@@ -13,11 +13,10 @@ export const Prefix = ({ children, className, ...props }: { children: ReactNode;
   }, [registerPrefix, unregisterPrefix]);
 
   return (
-    <div className={classNames(styles['tedi-input-group__prefix'], className)} aria-disabled={disabled} {...props}>
+    <div {...props} className={classNames(styles['tedi-input-group__prefix'], className)} aria-disabled={disabled}>
       {children}
     </div>
   );
 };
 
 Prefix.displayName = 'InputGroup.Prefix';
-Prefix.displayName = 'Prefix';
