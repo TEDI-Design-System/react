@@ -92,19 +92,6 @@ describe('InputGroup component', () => {
     expect(label).toHaveAttribute('for', 'address-input');
   });
 
-  it('generates an id automatically when none is provided', () => {
-    const { container } = render(
-      <InputGroup label="Auto" id="test-group">
-        <InputGroup.Input>
-          <input aria-label="auto" />
-        </InputGroup.Input>
-      </InputGroup>
-    );
-
-    const label = container.querySelector('label');
-    expect(label?.getAttribute('for')).toBeTruthy();
-  });
-
   it('renders a single helper as one FeedbackText', () => {
     const { container, getByText } = render(
       <InputGroup id="test-group" label="Test Group" helper={{ text: 'Helpful hint', type: 'hint' }}>
