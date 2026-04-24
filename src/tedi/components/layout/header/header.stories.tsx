@@ -865,7 +865,7 @@ export const WithSearch2: Story = {
     <Header
       bottom={
         <Header.Search mobileVariant="inline">
-          <Search label="search-4" hideLabel id="search-4" />
+          <Search label="search-4" hideLabel id="search-4-mobile" />
         </Header.Search>
       }
     >
@@ -873,7 +873,7 @@ export const WithSearch2: Story = {
       <Header.Actions>
         <ShowAt md>
           <Header.Search>
-            <Search label="search-4" hideLabel id="search-4" />
+            <Search label="search-4" hideLabel id="search-4-desktop" />
           </Header.Search>
         </ShowAt>
         <ShowAt lg>

@@ -282,13 +282,23 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 **Header.Login:** bp — login button
 **Header.Logout:** bp — logout button
 **Header.Profile:** bp — user profile display
-**Header.Search:** search input for header
+**Header.Search:** wrapper that accepts a Search child (and optional `mobileVariant`). `children: ReactNode`, `mobileVariant?: 'modal' | 'inline'`, `mobileLabels?: { button?, modalTitle? }`, `disabled?: boolean`
 
 ```tsx
-<Header toggle={<SideNav.Toggle />} bottom={<Header.Search />}>
+<Header
+  toggle={<SideNav.Toggle />}
+  bottom={
+    <Header.Search mobileVariant="inline">
+      <Search label="Search" hideLabel id="header-search" />
+    </Header.Search>
+  }
+>
   <Header.Logo logo={<img src="/logo.svg" alt="Logo" />} href="/" />
   <Header.Center><Link href="/about">About</Link></Header.Center>
   <Header.Actions>
+    <Header.Search>
+      <Search label="Search" hideLabel id="header-search" />
+    </Header.Search>
     <Header.Language />
     <Header.Login />
   </Header.Actions>

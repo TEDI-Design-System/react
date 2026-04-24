@@ -59,16 +59,14 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
     hideLabel: true,
     lg: { hideLabel: false },
   });
-  const availableLanguages = languages ?? [];
-
   const displayedLanguage = useMemo(() => {
     if (locale) {
-      const found = languages?.find((l) => l.locale === locale);
+      const found = languages.find((l) => l.locale === locale);
       if (found) return found.label;
     }
 
     if (currentLanguage) return currentLanguage;
-    return languages?.[0]?.label ?? '';
+    return languages[0]?.label ?? '';
   }, [languages, locale, currentLanguage]);
 
   const changeLanguage = (lang: Language) => {
@@ -121,7 +119,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
         </Popover.Trigger>
         <Popover.Content width="none">
           <div className={styles['tedi-header-language__list']}>
-            {availableLanguages.map((lang) => (
+            {languages.map((lang) => (
               <Button
                 visualType="link"
                 aria-current={lang.isSelected}

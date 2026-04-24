@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import React from 'react';
 
 import { Text } from '../../../../../../tedi/components/base/typography/text/text';
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
@@ -24,7 +25,7 @@ interface HeaderMobileButtonProps {
   disabled?: boolean;
 }
 
-const HeaderMobileButton = (props: HeaderMobileButtonProps): JSX.Element => {
+const HeaderMobileButton = React.forwardRef<HTMLButtonElement, HeaderMobileButtonProps>((props, ref) => {
   const { onClick, href, icon, label, selected, disabled } = props;
 
   const getIcon = (icon: string | IconWithoutBackgroundProps) => {
@@ -50,7 +51,7 @@ const HeaderMobileButton = (props: HeaderMobileButtonProps): JSX.Element => {
 
   if (disabled || !href) {
     return (
-      <Button onClick={onClick} disabled={disabled} className={className} noStyle>
+      <Button onClick={onClick} disabled={disabled} className={className} ref={ref} noStyle>
         {innerContent}
       </Button>
     );
@@ -61,7 +62,7 @@ const HeaderMobileButton = (props: HeaderMobileButtonProps): JSX.Element => {
       {innerContent}
     </Link>
   );
-};
+});
 
 HeaderMobileButton.displayName = 'HeaderMobileButton';
 

@@ -1,12 +1,12 @@
 import cn from 'classnames';
 import React, { useId } from 'react';
 
-import Separator from '../../../../../../tedi/components/misc/separator/separator';
-import { Text } from '../../../../../components/base/typography/text/text';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon, IconProps } from '../../../../base/icon/icon';
+import { Text } from '../../../../base/typography/text/text';
 import { Button } from '../../../../buttons/button/button';
 import { Search } from '../../../../form/search/search';
+import Separator from '../../../../misc/separator/separator';
 import styles from './header-role.module.scss';
 
 export interface Representative {
@@ -113,7 +113,7 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
             <Search
               id={searchId ?? generatedSearchId}
               value={inputValue}
-              onChange={(e) => setInputValue(e)}
+              onChange={(value) => setInputValue(value)}
               label={resolvedSearchLabel}
             />
             {representatives.map((rep) => {

@@ -94,6 +94,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
       label={resolvedLabel}
       selected={isOpen}
       disabled={disabled}
+      ref={triggerRef}
     />
   ) : showLabel ? (
     <Button
@@ -149,7 +150,10 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
             <>
               <div
                 className={styles['tedi-header-profile__overlay']}
-                onClick={() => setModalOpen(false)}
+                onClick={() => {
+                  setModalOpen(false);
+                  triggerRef.current?.focus();
+                }}
                 aria-hidden="true"
               />
               <div
