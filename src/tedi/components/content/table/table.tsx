@@ -2,6 +2,7 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
   type ExpandedState,
+  type FilterFn,
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
@@ -31,6 +32,20 @@ import { useTablePersistence } from './use-table-persistence';
 
 const SELECT_COLUMN_ID = '__select__';
 const EXPAND_COLUMN_ID = '__expand__';
+
+// Satisfy the community-side `declare module '@tanstack/table-core'` FilterFns
+// augmentation so the typed `useReactTable` signature accepts our options. The
+// community Table uses richer implementations; the TEDI-Ready Table's stories
+// drive filtering via built-ins (`includesString`) or per-column `filterFn`
+// overrides, so these stubs are never invoked in practice.
+const passthroughFilter: FilterFn<unknown> = () => true;
+const DEFAULT_FILTER_FNS = {
+  text: passthroughFilter,
+  select: passthroughFilter,
+  'multi-select': passthroughFilter,
+  'date-range': passthroughFilter,
+  'date-range-period': passthroughFilter,
+} as const;
 
 function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const {
@@ -271,6 +286,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     onColumnFiltersChange: handleColumnFiltersChange,
     onSortingChange: handleSortingChange,
     onPaginationChange: paginationEnabled ? handlePaginationChange : undefined,
+    // Satisfies the globally-augmented FilterFns contract from community/Table.
+    // Per-column `filterFn` overrides take precedence when a story sets one.
+    filterFns: DEFAULT_FILTER_FNS,
     getCoreRowModel: coreRowModel,
     // Always-on: filtering runs whenever columnFilters has entries, regardless of
     // whether the built-in inline filter row is shown. Cheap when no filters set.
