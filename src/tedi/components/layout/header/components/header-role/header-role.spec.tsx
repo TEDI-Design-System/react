@@ -107,6 +107,52 @@ describe('HeaderRole component', () => {
     });
   });
 
+  describe('Representative sync on prop change', () => {
+    it('selects the first representative on initial render', () => {
+      render(<HeaderRole representatives={mockRepresentatives} />);
+
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+    });
+
+    it('falls back to the first representative when the current one is removed', () => {
+      const { rerender } = render(<HeaderRole representatives={mockRepresentatives} />);
+
+      const updatedReps = [mockRepresentatives[1], mockRepresentatives[2]];
+      rerender(<HeaderRole representatives={updatedReps} />);
+
+      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+    });
+
+    it('keeps the current representative when it still exists in the updated list', () => {
+      const onRepresentativeChange = jest.fn();
+      const { rerender } = render(
+        <HeaderRole representatives={mockRepresentatives} onRepresentativeChange={onRepresentativeChange} />
+      );
+
+      const trigger = screen.getByText('John Doe').closest('button');
+      if (trigger) fireEvent.click(trigger);
+      const janeButton = screen.getByText('Jane Smith').closest('button');
+      if (janeButton) fireEvent.click(janeButton);
+
+      onRepresentativeChange.mockClear();
+
+      const updatedReps = [mockRepresentatives[1], mockRepresentatives[2]];
+      rerender(<HeaderRole representatives={updatedReps} onRepresentativeChange={onRepresentativeChange} />);
+
+      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+      expect(onRepresentativeChange).not.toHaveBeenCalled();
+    });
+
+    it('clears the representative when the list becomes empty', () => {
+      const { rerender } = render(<HeaderRole representatives={mockRepresentatives} />);
+
+      rerender(<HeaderRole representatives={[]} />);
+
+      expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
+      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Tablet/Mobile view (accordion)', () => {
     beforeEach(() => {
       (isBreakpointBelow as jest.Mock).mockReturnValue(true);
@@ -380,7 +426,7 @@ describe('HeaderRoleRepresentatives component', () => {
       />
     );
 
-    const collapse = container.querySelector('[class*="header-role__collapse"]');
+    const collapse = container.querySelector('[class*="header-role__selection"]');
     expect(collapse).toHaveAttribute('inert');
   });
 
@@ -398,7 +444,7 @@ describe('HeaderRoleRepresentatives component', () => {
       />
     );
 
-    const collapse = container.querySelector('[class*="header-role__collapse"]');
+    const collapse = container.querySelector('[class*="header-role__selection"]');
     expect(collapse).not.toHaveAttribute('inert');
   });
 

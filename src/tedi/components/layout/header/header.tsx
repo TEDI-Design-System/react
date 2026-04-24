@@ -61,7 +61,9 @@ export interface HeaderLogoProps {
   logoDark?: React.ReactNode;
   /**
    * Controls visibility of the logo.
-   * Can be used together with responsive utilities (e.g. HideAt/ShowAt or media queries).
+   * Useful for conditionally hiding the logo based on application state, feature flags,
+   * or custom media queries that fall between standard breakpoints (e.g. 360px).
+   * For responsive hiding at standard breakpoints, prefer wrapping Header.Logo with HideAt/ShowAt.
    * @default true
    */
   showLogo?: boolean;

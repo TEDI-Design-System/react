@@ -173,9 +173,9 @@ export const labelsMap = validateDefaultLabels({
   'header.role-selection': {
     description: 'Label for Role selection on mobile',
     components: ['HeaderRole'],
-    et: 'Vaheta rolli',
-    en: 'Change role',
-    ru: 'Изменить роль',
+    et: 'Roll',
+    en: 'Role',
+    ru: 'Роль',
   },
   'header.role-selection.close': {
     description: 'Label for closing the Role selection on mobile when the selection view is expanded',

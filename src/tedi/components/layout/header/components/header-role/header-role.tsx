@@ -131,19 +131,20 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     const closeLabel = accordionLabels?.close ?? getLabel('header.role-selection.close');
 
     return (
-      <div className={styles['tedi-header-role__accordion--container']}>
+      <div className={styles['tedi-header-role__container']}>
         <div
-          className={cn(styles['tedi-header-role__accordion'], {
-            [styles['tedi-header-role__accordion--has-representatives']]: hasMultipleRepresentatives,
+          className={cn(styles['tedi-header-role__content'], {
+            [styles['tedi-header-role__content--open']]: isRoleSelectionOpen,
+            [styles['tedi-header-role__content--has-representatives']]: hasMultipleRepresentatives,
           })}
         >
           <div
-            className={cn(styles['tedi-header-role__accordion--body'], {
-              [styles['tedi-header-role__accordion--body-inline']]:
+            className={cn(styles['tedi-header-role__content--body'], {
+              [styles['tedi-header-role__content--body-inline']]:
                 !hasMultipleRepresentatives && showDescription && representative?.description,
             })}
           >
-            <div className={styles['tedi-header-role__accordion--title']}>
+            <div className={styles['tedi-header-role__content--title']}>
               {label}
               <Text modifiers="bold" color="secondary">
                 {representative?.name}
@@ -166,13 +167,13 @@ export const HeaderRole = (props: HeaderRoleProps) => {
               aria-expanded={isRoleSelectionOpen}
               aria-controls={panelId}
             >
-              <span className={styles['tedi-header-role__accordion--toggle']}>
+              <span className={styles['tedi-header-role__content--toggle']}>
                 {isRoleSelectionOpen ? closeLabel : openLabel}
                 <Icon
                   name="expand_more"
                   size={16}
-                  className={cn(styles['tedi-header-role__accordion--toggle-icon'], {
-                    [styles['tedi-header-role__accordion--toggle-icon--open']]: isRoleSelectionOpen,
+                  className={cn(styles['tedi-header-role__content--toggle-icon'], {
+                    [styles['tedi-header-role__content--toggle-icon--open']]: isRoleSelectionOpen,
                   })}
                 />
               </span>

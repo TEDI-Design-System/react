@@ -17,18 +17,18 @@ import styles from './header-profile.module.scss';
 
 interface HeaderProfileBreakpointProps {
   /**
-   * Defines the breakpoint from which the profile menu is displayed as a dropdown.
-   * Below this breakpoint, it is rendered as a full-screen modal.
+   * Defines the breakpoint from which the profile menu is displayed as a popover.
+   * Below this breakpoint, it is rendered as a modal.
    *
    * @default lg
    */
-  showDropdown?: Breakpoint;
+  showPopover?: Breakpoint;
   /** Custom label text for the profile button. Falls back to the `header.profile` translation key. */
   label?: string;
 }
 
 export interface HeaderProfileProps extends BreakpointSupport<HeaderProfileBreakpointProps> {
-  /** Content rendered inside the profile dropdown or modal (e.g. navigation links, logout button). */
+  /** Content rendered inside the profile popover or modal (e.g. navigation links, logout button). */
   children: React.ReactNode;
   /**
    * Whether to display a text label next to the profile icon on non-mobile viewports.
@@ -36,28 +36,34 @@ export interface HeaderProfileProps extends BreakpointSupport<HeaderProfileBreak
    */
   showLabel?: boolean;
   /**
-   * Whether the profile button is disabled. Prevents opening the dropdown or modal.
+   * Whether the profile button is disabled. Prevents opening the popover or modal.
    * @default false
    */
   disabled?: boolean;
+  /**
+   * Removes default item styles from the mobile modal content.
+   * When `true`, children are rendered without padding, borders, or background applied by the component.
+   * Use when the content requires custom item styling.
+   * @default false
+   */
+  noStyle?: boolean;
 }
 
 export const HeaderProfile = (props: HeaderProfileProps) => {
-  const { children, showLabel = false, disabled = false } = props;
+  const { children, showLabel = false, disabled = false, noStyle = false } = props;
   const { getLabel } = useLabels();
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { showDropdown = 'lg', label } = getCurrentBreakpointProps<HeaderProfileBreakpointProps>(props);
+  const { showPopover = 'lg', label } = getCurrentBreakpointProps<HeaderProfileBreakpointProps>(props);
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const modalId = useId();
 
   const breakpoint = useBreakpoint();
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
-  const isTabletView = isBreakpointBelow(breakpoint, 'lg');
 
-  const useDropdown = !isBreakpointBelow(breakpoint, showDropdown);
+  const usePopover = !isBreakpointBelow(breakpoint, showPopover);
 
   const resolvedLabel = label ?? (isMobileView ? getLabel('header.profile.mobile') : getLabel('header.profile'));
 
@@ -79,7 +85,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
     setModalOpen((prev) => !prev);
   };
 
-  const isOpen = useDropdown ? dropdownOpen : modalOpen;
+  const isOpen = usePopover ? popoverOpen : modalOpen;
 
   const button = isMobileView ? (
     <HeaderMobileButton
@@ -123,12 +129,12 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
 
   return (
     <>
-      {useDropdown ? (
+      {usePopover ? (
         <Popover
           placement="bottom-end"
           withBorder={true}
-          open={dropdownOpen}
-          onToggle={() => setDropdownOpen((prev) => !prev)}
+          open={popoverOpen}
+          onToggle={() => setPopoverOpen((prev) => !prev)}
         >
           <Popover.Trigger>{button}</Popover.Trigger>
           <Popover.Content>
@@ -155,7 +161,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
               >
                 <div
                   className={cn(styles['tedi-header-profile__modal--content'], {
-                    [styles['tedi-header-profile__modal--content-small']]: isTabletView,
+                    [styles['tedi-header-profile__modal--content-styled']]: !noStyle,
                   })}
                 >
                   {children}

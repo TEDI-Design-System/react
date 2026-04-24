@@ -5,7 +5,7 @@ import { HideAt } from './hide-at';
 
 const meta: Meta<typeof HideAt> = {
   component: HideAt,
-  title: 'Tedi-Ready/Layout/HideAt',
+  title: 'TEDI-Ready/Layout/HideAt',
   parameters: {
     status: {
       type: ['devComponent'],

@@ -5,7 +5,7 @@ import { ShowAt } from './show-at';
 
 const meta: Meta<typeof ShowAt> = {
   component: ShowAt,
-  title: 'Tedi-Ready/Layout/ShowAt',
+  title: 'TEDI-Ready/Layout/ShowAt',
   parameters: {
     status: {
       type: ['devComponent'],
