@@ -29,7 +29,7 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    */
   showNavigation?: boolean;
   /**
-   * Locale object for formatting and translating calendar labels (from `react-day-picker`).
+   * Locale code string used for date formatting (e.g., `'et-EE'`). Defaults to the runtime locale when omitted.
    */
   localeCode?: string;
 }
@@ -39,7 +39,7 @@ export function CalendarHeader({
   monthYearSelectType = 'dropdown',
   onOpenMonthGrid,
   onOpenYearGrid,
-  showNavigation,
+  showNavigation = true,
   localeCode,
 }: CalendarHeaderProps) {
   const isGridSelect = monthYearSelectType === 'grid';
