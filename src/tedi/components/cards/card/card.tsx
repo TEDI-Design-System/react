@@ -7,7 +7,14 @@ import { CardContent, CardContentProps } from './card-content/card-content';
 import { CardContext } from './card-context';
 import CardHeader from './card-header/card-header';
 import CardNotification from './card-notification/card-notification';
-import { CardBackground, CardBorderType, CardContentPaddingNumber, getCardBorderPlacementColor } from './utility';
+import {
+  BorderRadius,
+  CardBackground,
+  CardBorderType,
+  CardContentPaddingNumber,
+  getCardBorderPlacementColor,
+  resolveBorderRadius,
+} from './utility';
 
 export type CardContentPadding =
   | CardContentPaddingNumber
@@ -64,10 +71,20 @@ type CardBreakpointProps = {
    */
   className?: string;
   /**
-   * Follows the order in border-radius CSS property
-   * Top-left / Top-right / Bottom-right / Bottom-left
+   * Controls card border radius.
+   *
+   * Accepts `false` to remove all radius or an object to control sides or individual corners.
+   *
+   * Side values affect two corners while corner values take precedence.
+   *
+   * Examples:
+   * `false` → no radius
+   * `{ top:false }` → removes top corners
+   * `{ left:false }` → removes left corners
+   * `{ topLeft:false }` → removes one corner
+   * `{ bottom:false, bottomRight:true }` → corner override
    */
-  borderRadius?: false | { top?: boolean; right?: boolean; bottom?: boolean; left?: boolean };
+  borderRadius?: BorderRadius;
   /**
    * Remove border from card
    */
@@ -89,16 +106,19 @@ const CardComponent = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.El
 
   const [borderPlacement, borderColor] = getCardBorderPlacementColor(border);
 
+  const corners = resolveBorderRadius(borderRadius);
+
   const cardBEM = cn(
     styles['tedi-card'],
     {
       [styles[`tedi-card--border-${borderPlacement}`]]: borderPlacement,
       [styles[`tedi-card--border--${borderColor}`]]: borderColor,
       [styles['tedi-card--borderless']]: borderless,
-      [styles['tedi-card--no-border-radius-top']]: borderRadius === false || borderRadius?.top === false,
-      [styles['tedi-card--no-border-radius-right']]: borderRadius === false || borderRadius?.right === false,
-      [styles['tedi-card--no-border-radius-bottom']]: borderRadius === false || borderRadius?.bottom === false,
-      [styles['tedi-card--no-border-radius-left']]: borderRadius === false || borderRadius?.left === false,
+
+      [styles['tedi-card--no-radius-tl']]: !corners.topLeft,
+      [styles['tedi-card--no-radius-tr']]: !corners.topRight,
+      [styles['tedi-card--no-radius-br']]: !corners.bottomRight,
+      [styles['tedi-card--no-radius-bl']]: !corners.bottomLeft,
     },
     className
   );

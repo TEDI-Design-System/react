@@ -17,7 +17,7 @@
     }
 
     &:focus-visible {
-      outline: var(--borders-02) solid var(--general-border-brand);
+      outline: var(--tedi-borders-02) solid var(--general-border-brand);
       outline-offset: 1px;
 
       .tedi-collapse__text {
@@ -50,7 +50,7 @@
     width: var(--button-sm-icon-size);
     height: var(--button-sm-icon-size);
     background: var(--button-main-secondary-background-default);
-    border: var(--borders-01) solid var(--button-main-secondary-border-default);
+    border: var(--tedi-borders-01) solid var(--button-main-secondary-border-default);
   }
 
   &__icon--secondary {
@@ -89,7 +89,7 @@
 
   &__title:focus-visible .tedi-collapse__icon-wrapper--secondary {
     background: var(--button-main-secondary-background-focus);
-    outline: var(--borders-02) solid var(--general-border-brand);
+    outline: var(--tedi-borders-02) solid var(--general-border-brand);
     outline-offset: 2px;
   }
 
@@ -97,7 +97,7 @@
     width: var(--button-sm-icon-size);
     height: var(--button-sm-icon-size);
     background: transparent;
-    border: var(--borders-01) solid var(--button-main-neutral-border-default);
+    border: var(--tedi-borders-01) solid var(--button-main-neutral-border-default);
   }
 
   &__icon--default {
@@ -147,7 +147,7 @@
 
         .tedi-collapse__icon-wrapper {
           border-radius: 100%;
-          outline: var(--borders-02) solid var(--general-border-brand);
+          outline: var(--tedi-borders-02) solid var(--general-border-brand);
           outline-offset: 2px;
         }
 
@@ -160,7 +160,7 @@
 
   &__content {
     min-height: 0;
-    margin-top: var(--dimensions-05);
+    margin-top: var(--tedi-dimensions-05);
   }
 
   &--is-open > .tedi-collapse__title .tedi-collapse__icon {

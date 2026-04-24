@@ -6,6 +6,9 @@ import { TabsContext } from '../tabs-context';
 
 type TabsItemBreakpointProps = Pick<CardContentProps, 'padding' | 'background'>;
 
+/**
+ * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
+ */
 export interface TabsItemProps extends BreakpointSupport<TabsItemBreakpointProps> {
   /**
    * ID property.
@@ -25,6 +28,9 @@ export interface TabsItemProps extends BreakpointSupport<TabsItemBreakpointProps
   className?: string;
 }
 
+/**
+ * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
+ */
 export const TabsItem = (props: TabsItemProps) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const { className, padding, background, id, children } = getCurrentBreakpointProps<TabsItemProps>(props, {

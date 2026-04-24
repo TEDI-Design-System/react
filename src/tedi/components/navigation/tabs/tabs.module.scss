@@ -1,0 +1,124 @@
+@mixin tab-button-base {
+  --_tab-background: var(--tab-item-default-background);
+  --_tab-color: var(--tab-item-default-text);
+
+  display: inline-flex;
+  gap: var(--tab-inner-spacing);
+  align-items: center;
+  justify-content: center;
+  padding: var(--tab-spacing-y) var(--tab-spacing-x);
+  font-size: var(--body-regular-size);
+  color: var(--_tab-color);
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--_tab-background);
+  border: none;
+
+  &:hover {
+    --_tab-background: var(--tab-item-hover-background);
+    --_tab-color: var(--tab-item-hover-text);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 var(--borders-02) var(--general-border-brand);
+  }
+
+  &:active {
+    --_tab-background: var(--tab-item-active-background);
+    --_tab-color: var(--tab-item-active-text);
+  }
+}
+
+.tedi-tabs {
+  &__list-wrapper {
+    position: relative;
+    display: flex;
+    background: var(--tab-background);
+    border-top-left-radius: var(--tab-top-radius);
+    border-top-right-radius: var(--tab-top-radius);
+
+    &--scroll-fade-left::before,
+    &--scroll-fade-right::after {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 1;
+      width: 48px;
+      pointer-events: none;
+      content: '';
+    }
+
+    &--scroll-fade-left::before {
+      left: 0;
+      background: linear-gradient(to right, var(--tab-background) 10%, transparent 80%);
+    }
+
+    &--scroll-fade-right::after {
+      right: 0;
+      background: linear-gradient(to left, var(--tab-background) 10%, transparent 80%);
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+
+    &--overflow {
+      .tedi-tabs__trigger:not(.tedi-tabs__trigger--selected) {
+        display: none;
+      }
+
+      .tedi-tabs__trigger--selected {
+        flex-grow: 1;
+      }
+    }
+
+    &--scroll {
+      overflow-x: auto;
+    }
+  }
+
+  &__trigger {
+    @include tab-button-base;
+
+    position: relative;
+    text-decoration: none;
+
+    &--selected {
+      --_tab-background: var(--tab-item-selected-background);
+      --_tab-color: var(--tab-item-selected-text);
+
+      font-weight: var(--body-bold-weight);
+
+      &::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        content: '';
+        border-top: 3px solid var(--tab-item-selected-border);
+      }
+    }
+
+    &--disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  }
+
+  &__content {
+    background: var(--tab-item-selected-background);
+  }
+
+  &__more-wrapper {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  &__more-btn {
+    @include tab-button-base;
+  }
+}

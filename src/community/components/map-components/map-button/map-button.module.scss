@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--button-md-icon-padding);
-  font-size: var(--size-00);
+  font-size: var(--tedi-size-00);
   font-weight: 700;
   color: var(--button-primary-text-default);
   background-color: var(--button-primary-background-default);
@@ -29,7 +29,7 @@
 
   &:focus-visible {
     border-color: var(--button-primary-border-hover);
-    outline: var(--borders-02) solid var(--tedi-primary-500);
+    outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
     outline-offset: 1px;
   }
 
@@ -45,13 +45,13 @@
   }
 
   &--default {
-    width: var(--dimensions-19);
-    height: var(--dimensions-19);
+    width: var(--tedi-dimensions-19);
+    height: var(--tedi-dimensions-19);
   }
 
   &--small {
-    width: var(--dimensions-16);
-    height: var(--dimensions-16);
+    width: var(--tedi-dimensions-16);
+    height: var(--tedi-dimensions-16);
 
     .tedi-map-button__text {
       width: 2rem;

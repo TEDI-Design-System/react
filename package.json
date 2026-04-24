@@ -20,13 +20,13 @@
     "prepare": "husky",
     "start": "storybook dev -p 4400 -c .storybook",
     "build": "rm -rf dist && vite build --config vite.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css --isRegex",
-    "build:sb": "storybook build -c .storybook -o dist/storybook-static",
+    "build:sb": "storybook build -c .storybook -o dist/storybook-static --stats-json",
     "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
     "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
     "test": "jest --config ./jest.config.ts --passWithNoTests",
     "test:coverage": "jest --config ./jest.config.ts --coverage",
     "release": "npx semantic-release",
-    "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN --build-script-name=build:sb --baseline-branch=rc"
+    "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "@mui/material": "^5.15.13",
     "@mui/x-date-pickers": "^5.0.20",
     "@tanstack/react-table": "^8.13.2",
-    "@tedi-design-system/core": "3.3.0",
+    "@tedi-design-system/core": "6.0.0",
     "classnames": "^2.5.1",
     "draft-js": "^0.11.7",
     "draftjs-md-converter": "^1.5.2",
@@ -67,6 +67,7 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
+    "@chromatic-com/storybook": "^3.2.7",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@dnd-kit/core": "^6.3.1",

@@ -8,6 +8,11 @@ const meta: Meta<typeof Tabs> = {
   component: Tabs,
   title: 'Community/Tabs',
   subcomponents: { TabsItem } as never,
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

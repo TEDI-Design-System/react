@@ -1,6 +1,7 @@
 import cn from 'classnames';
-import { forwardRef, useCallback, useState } from 'react';
+import { forwardRef, useCallback } from 'react';
 
+import { useScrollFade } from '../../../helpers';
 import styles from './scroll-fade.module.scss';
 
 export interface ScrollFadeProps {
@@ -47,61 +48,32 @@ export const ScrollFade = forwardRef<HTMLDivElement, ScrollFadeProps>((props, re
     fadeSize = 20,
     fadePosition = 'both',
   } = props;
-  const [fade, setFade] = useState({ top: false, bottom: false });
 
-  const handleFade = useCallback(
-    (scrollTop: number, scrollHeight: number, clientHeight: number) => {
-      const atTop = scrollTop === 0;
-      const atBottom = Math.abs(scrollHeight - scrollTop - clientHeight) <= 1;
+  const { scrollRef, canScrollStart, canScrollEnd, handleScroll } = useScrollFade({
+    direction: 'vertical',
+    onScrollToStart: onScrollToTop,
+    onScrollToEnd: onScrollToBottom,
+  });
 
-      let fadeTop = true;
-      let fadeBottom = true;
-
-      if (atTop) {
-        fadeTop = false;
-        onScrollToTop?.();
-      }
-
-      if (atBottom) {
-        fadeBottom = false;
-        onScrollToBottom?.();
-      }
-
-      setFade({ top: fadeTop, bottom: fadeBottom });
-    },
-    [onScrollToTop, onScrollToBottom]
-  );
-
-  const onScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      const { scrollTop, scrollHeight, clientHeight } = e.target as HTMLDivElement;
-      handleFade(scrollTop, scrollHeight, clientHeight);
-    },
-    [handleFade]
-  );
-
-  const callbackRef = useCallback(
+  const mergedRef = useCallback(
     (node: HTMLDivElement | null) => {
+      scrollRef(node);
       if (typeof ref === 'function') {
         ref(node);
       } else if (ref) {
         ref.current = node;
       }
-
-      if (node) {
-        handleFade(node.scrollTop, node.scrollHeight, node.clientHeight);
-      }
     },
-    [handleFade, ref]
+    [scrollRef, ref]
   );
+
+  const showStartFade = canScrollStart && (fadePosition === 'both' || fadePosition === 'top');
+  const showEndFade = canScrollEnd && (fadePosition === 'both' || fadePosition === 'bottom');
 
   const ScrollFadeBEM = cn(
     styles['tedi-scroll-fade'],
-    { [styles[`tedi-scroll-fade--top-${fadeSize}`]]: fade.top && (fadePosition === 'both' || fadePosition === 'top') },
-    {
-      [styles[`tedi-scroll-fade--bottom-${fadeSize}`]]:
-        fade.bottom && (fadePosition === 'both' || fadePosition === 'bottom'),
-    },
+    { [styles[`tedi-scroll-fade--top-${fadeSize}`]]: showStartFade },
+    { [styles[`tedi-scroll-fade--bottom-${fadeSize}`]]: showEndFade },
     className
   );
 
@@ -111,7 +83,7 @@ export const ScrollFade = forwardRef<HTMLDivElement, ScrollFadeProps>((props, re
 
   return (
     <div data-name="scroll-fade" className={ScrollFadeBEM}>
-      <div ref={callbackRef} onScroll={onScroll} className={ScrollFadeInnerBEM} tabIndex={0}>
+      <div ref={mergedRef} onScroll={handleScroll} className={ScrollFadeInnerBEM} tabIndex={0}>
         {children}
       </div>
     </div>

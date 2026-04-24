@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { useBreakpointProps, usePrint } from '../../../helpers';
+import { useBreakpointProps } from '../../../helpers';
+import { PrintingProvider, usePrint } from '../../../providers/printing-provider/printing-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import Collapse, { CollapseProps } from './collapse';
 
@@ -8,20 +9,26 @@ import '@testing-library/jest-dom';
 
 jest.mock('../../../helpers', () => ({
   useBreakpointProps: jest.fn(),
+}));
+
+jest.mock('../../../providers/printing-provider/printing-provider', () => ({
+  PrintingProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   usePrint: jest.fn(),
 }));
 
 const getComponent = (props?: Partial<CollapseProps>) =>
   render(
-    <Collapse
-      id="collapse-1"
-      title={<Heading>Heading</Heading>}
-      openText="Näita rohkem"
-      closeText="Näita vähem"
-      {...props}
-    >
-      Collapse content
-    </Collapse>
+    <PrintingProvider>
+      <Collapse
+        id="collapse-1"
+        title={<Heading>Heading</Heading>}
+        openText="Näita rohkem"
+        closeText="Näita vähem"
+        {...props}
+      >
+        Collapse content
+      </Collapse>
+    </PrintingProvider>
   );
 
 describe('Collapse component with breakpoint support', () => {
