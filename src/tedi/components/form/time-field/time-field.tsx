@@ -150,12 +150,9 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
+  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !useNativePicker;
 
-  const interactions = useInteractions([
-    ...(showPicker && timePickerTrigger === 'input' && !readOnly ? [click] : []),
-    dismiss,
-    role,
-  ]);
+  const interactions = useInteractions([...(shouldUseCustomInputTrigger ? [click] : []), dismiss, role]);
 
   const updateTime = (time: string) => {
     const cleaned = time.trim();
@@ -212,7 +209,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     label,
     value: currentValue,
     placeholder,
-    readOnly: readOnly || isInputTrigger,
+    readOnly: readOnly || (!useNativePicker && isInputTrigger),
     icon: 'schedule',
     isClearable: true,
     required,
@@ -230,7 +227,10 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     },
   };
 
-  if (availableTimes && availableTimesVariant === 'dropdown') {
+  const shouldUseDropdownPicker =
+    !useNativePicker && showPicker && !readOnly && availableTimesVariant === 'dropdown' && !!availableTimes?.length;
+
+  if (shouldUseDropdownPicker) {
     // Land focus on the previously selected item when the dropdown opens; if
     // nothing is selected yet, focus the first item. Lets the user Enter/Space
     // to reconfirm or Arrow to move without a priming keystroke.
@@ -264,7 +264,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     <>
       <div
         className={cn(styles['tedi-time-field__container'], className)}
-        {...(readOnly || !showPicker ? {} : interactions.getReferenceProps())}
+        {...(shouldUseCustomInputTrigger ? interactions.getReferenceProps() : {})}
         aria-haspopup={showPicker ? 'listbox' : undefined}
         tabIndex={-1}
       >

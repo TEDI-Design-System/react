@@ -103,7 +103,7 @@ describe('TimePicker', () => {
     expect(screen.getByTestId('selected')).toHaveTextContent('01:00');
   });
 
-  it('falls back to "00" when hour is not in generated hours', () => {
+  it('falls back to the default "12:00" when the parsed hour is not in generated hours', () => {
     render(<TimePicker value="99:10" />);
 
     expect(screen.getByTestId('selected')).toHaveTextContent('12:00');
