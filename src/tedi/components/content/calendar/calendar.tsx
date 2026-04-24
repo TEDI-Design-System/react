@@ -3,7 +3,6 @@ import React from 'react';
 import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
-import { UnknownType } from '../../../types/commonTypes';
 import { CalendarView, DateFieldMode } from '../../form/date-field/date-field';
 import styles from './calendar.module.scss';
 import { CalendarHeader } from './components/calendar-header/calendar-header';
@@ -79,9 +78,13 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    */
   footer?: React.ReactNode;
   /**
-   * If `true`, the month/year selection in the calendar header will be displayed as a grid instead of a dropdown.
+   * How the month/year selector in the calendar header is rendered.
+   * Forwarded to the internal `CalendarHeader`.
+   * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
+   * - `'grid'` — each picker opens a full grid of options.
+   * @default 'dropdown'
    */
-  monthYearSelectGrid?: boolean;
+  monthYearSelectType?: 'dropdown' | 'grid';
   /**
    * Callback fired when a date or date range is selected. Receives the selected value, day, modifiers, and event.
    */
@@ -117,7 +120,7 @@ export const Calendar = ({
   availableDays,
   unavailableDays,
   footer,
-  monthYearSelectGrid,
+  monthYearSelectType,
   handleSelect,
   applyValue,
   showNavigation = true,
@@ -149,6 +152,26 @@ export const Calendar = ({
     ...(availableDays ? [(date: Date) => !isAvailable(date)] : []),
     ...(unavailableDays ? [(date: Date) => isUnavailable(date)] : []),
   ];
+
+  // DayPicker's `selected` is a discriminated union keyed off `mode`. Package
+  // the two props as a type-narrowed pair and spread them together so the
+  // correct overload is picked without a cast.
+  const selectionProps = (():
+    | { mode: 'single'; selected: Date | undefined }
+    | { mode: 'multiple'; selected: Date[] | undefined }
+    | { mode: 'range'; selected: DateRange | undefined } => {
+    switch (mode) {
+      case 'multiple':
+        return { mode: 'multiple', selected: Array.isArray(value) ? value : undefined };
+      case 'range':
+        return {
+          mode: 'range',
+          selected: value && !Array.isArray(value) && !(value instanceof Date) ? value : undefined,
+        };
+      default:
+        return { mode: 'single', selected: value instanceof Date ? value : undefined };
+    }
+  })();
 
   return (
     <div className={styles['tedi-calendar__wrapper']}>
@@ -192,8 +215,7 @@ export const Calendar = ({
       {view === 'days' && (
         <DayPicker
           {...dayPickerProps}
-          mode={mode}
-          selected={value as UnknownType}
+          {...selectionProps}
           locale={locale}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
@@ -204,7 +226,7 @@ export const Calendar = ({
             MonthCaption: (props) => (
               <CalendarHeader
                 {...props}
-                monthYearSelectGrid={monthYearSelectGrid}
+                monthYearSelectType={monthYearSelectType}
                 onOpenMonthGrid={() => setView('months')}
                 onOpenYearGrid={() => setView('years')}
                 showNavigation={showNavigation}

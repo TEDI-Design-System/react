@@ -12,7 +12,7 @@
 
 .tedi-calendar {
   width: fit-content;
-  min-width: 315px;
+  min-width: 20rem;
   max-width: none;
   border: 1px solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
@@ -30,7 +30,7 @@
 
   &__months-container {
     display: flex;
-    gap: 8px;
+    gap: var(--layout-grid-gutters-08);
   }
 
   &__month {

@@ -108,17 +108,19 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * @default false
    */
   required?: boolean;
-  /*
-   * When `true`, the month and year selection in the calendar header will be displayed as grids instead of dropdowns. Default is `false`.
-   *
-   * @default false
+  /**
+   * How the month/year selector in the calendar header is rendered.
+   * Forwarded to the internal `Calendar` / `CalendarHeader`.
+   * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
+   * - `'grid'` — each picker opens a full grid of options.
+   * @default dropdown
    */
-  monthYearSelectGrid?: boolean;
+  monthYearSelectType?: 'dropdown' | 'grid';
   /*
    * The initial view to show when the calendar is opened. Can be one of:
    * - `'days'` (default) – shows the calendar with days view
-   *  - `'months'` – shows the month selection grid (if `monthYearSelectGrid` is `true`) or dropdown
-   * - `'years'` – shows the year selection grid (if `monthYearSelectGrid` is `true`) or dropdown
+   *  - `'months'` – shows the month selection grid (if `monthYearSelectType` is `'grid'`) or dropdown
+   * - `'years'` – shows the year selection grid (if `monthYearSelectType` is `'grid'`) or dropdown
    * @default 'days'
    */
   calendarView?: CalendarView;
@@ -213,7 +215,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   calendarTrigger = 'button',
   showOutsideDays = true,
   parseDate,
-  monthYearSelectGrid,
+  monthYearSelectType,
   calendarView = 'days',
   locale = et,
   localeCode = 'et-EE',
@@ -533,7 +535,7 @@ export const DateField: React.FC<DateFieldProps> = ({
                   required={required}
                   availableDays={availableDays}
                   footer={footer}
-                  monthYearSelectGrid={monthYearSelectGrid}
+                  monthYearSelectType={monthYearSelectType}
                   handleSelect={handleSelect}
                   applyValue={applyValue}
                   className={styles['tedi-date-field__calendar']}

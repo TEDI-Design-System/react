@@ -38,7 +38,7 @@ describe('CalendarHeader', () => {
       displayMonth: new Date(2025, 6, 1),
       weeks: [],
     },
-    monthYearSelectGrid: false,
+    monthYearSelectType: 'dropdown' as const,
   };
 
   beforeEach(() => {
@@ -84,7 +84,7 @@ describe('CalendarHeader', () => {
     expect(screen.queryByRole('button', { name: 'Järgmine kuu' })).not.toBeInTheDocument();
   });
 
-  it('renders month and year dropdowns when monthYearSelectGrid = false', () => {
+  it('renders month and year dropdowns when monthYearSelectType = "dropdown"', () => {
     render(<CalendarHeader {...defaultProps} localeCode="et" />);
 
     const monthButton = screen.getByRole('button', { name: /juuli/i });
@@ -94,14 +94,14 @@ describe('CalendarHeader', () => {
     expect(screen.getAllByTestId('tedi-icon-arrow_drop_down')).toHaveLength(2);
   });
 
-  it('renders clickable month/year buttons (grid mode) when monthYearSelectGrid = true', () => {
+  it('renders clickable month/year buttons (grid mode) when monthYearSelectType = "grid"', () => {
     const onOpenMonthGrid = jest.fn();
     const onOpenYearGrid = jest.fn();
 
     render(
       <CalendarHeader
         {...defaultProps}
-        monthYearSelectGrid={true}
+        monthYearSelectType="grid"
         onOpenMonthGrid={onOpenMonthGrid}
         onOpenYearGrid={onOpenYearGrid}
         localeCode="et"
@@ -122,7 +122,7 @@ describe('CalendarHeader', () => {
     render(
       <CalendarHeader
         {...defaultProps}
-        monthYearSelectGrid={true}
+        monthYearSelectType="grid"
         onOpenMonthGrid={onOpenMonthGrid}
         onOpenYearGrid={jest.fn()}
         localeCode="et"
@@ -141,7 +141,7 @@ describe('CalendarHeader', () => {
     render(
       <CalendarHeader
         {...defaultProps}
-        monthYearSelectGrid={true}
+        monthYearSelectType="grid"
         onOpenMonthGrid={jest.fn()}
         onOpenYearGrid={onOpenYearGrid}
         localeCode="et"
@@ -174,5 +174,39 @@ describe('CalendarHeader', () => {
     const header = container.querySelector(`.${styles['tedi-calendar__header']}`);
     expect(header).toBeInTheDocument();
     expect(header).toHaveClass(styles['tedi-calendar__no-navigation']);
+  });
+
+  it('calls goToMonth with new month when a month dropdown item is selected', async () => {
+    const user = userEvent.setup();
+
+    render(<CalendarHeader {...defaultProps} localeCode="et" />);
+
+    await user.click(screen.getByRole('button', { name: /juuli/i }));
+
+    const januaryItem = await screen.findByRole('menuitem', { name: /jaanuar/i });
+    await user.click(januaryItem);
+
+    expect(mockGoToMonth).toHaveBeenCalledTimes(1);
+    const called = mockGoToMonth.mock.calls[0][0] as Date;
+    expect(called.getMonth()).toBe(0);
+    expect(called.getFullYear()).toBe(2025);
+  });
+
+  it('calls goToMonth with new year when a year dropdown item is selected', async () => {
+    const user = userEvent.setup();
+
+    render(<CalendarHeader {...defaultProps} localeCode="et" />);
+
+    await user.click(screen.getByRole('button', { name: /2025/i }));
+
+    const currentYear = new Date().getFullYear();
+    const targetYear = currentYear - 10;
+    const yearItem = await screen.findByRole('menuitem', { name: String(targetYear) });
+    await user.click(yearItem);
+
+    expect(mockGoToMonth).toHaveBeenCalledTimes(1);
+    const called = mockGoToMonth.mock.calls[0][0] as Date;
+    expect(called.getFullYear()).toBe(targetYear);
+    expect(called.getMonth()).toBe(defaultProps.calendarMonth.date.getMonth());
   });
 });

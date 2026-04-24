@@ -24,7 +24,7 @@
 .tedi-multi-value-field__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--layout-grid-gutters-04);
 }
 
 .tedi-multi-value-field__right-area {

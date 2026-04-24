@@ -9,16 +9,18 @@ import styles from './calendar-header.module.scss';
 
 export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMonth'> {
   /**
-   * Show month/year selection as grid instead of dropdowns.
-   * Default is `false` (dropdowns).
+   * How the month/year selector in the calendar header is rendered.
+   * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
+   * - `'grid'` — each picker opens a full grid of options.
+   * @default 'dropdown'
    */
-  monthYearSelectGrid?: boolean;
+  monthYearSelectType?: 'dropdown' | 'grid';
   /*
-   * Callback for opening month selection grid. Only used if `monthYearSelectGrid` is `true`.
+   * Callback for opening month selection grid. Only used if `monthYearSelectType` is `'grid'`.
    */
   onOpenMonthGrid?: () => void;
   /*
-   * Callback for opening year selection grid. Only used if `monthYearSelectGrid` is `true`.
+   * Callback for opening year selection grid. Only used if `monthYearSelectType` is `'grid'`.
    */
   onOpenYearGrid?: () => void;
   /**
@@ -34,12 +36,13 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
 
 export function CalendarHeader({
   calendarMonth,
-  monthYearSelectGrid,
+  monthYearSelectType = 'dropdown',
   onOpenMonthGrid,
   onOpenYearGrid,
   showNavigation,
   localeCode,
 }: CalendarHeaderProps) {
+  const isGridSelect = monthYearSelectType === 'grid';
   const { getLabel } = useLabels();
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
 
@@ -68,7 +71,7 @@ export function CalendarHeader({
         </Button>
       )}
 
-      {monthYearSelectGrid ? (
+      {isGridSelect ? (
         <>
           <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenMonthGrid}>
             {displayMonth.toLocaleString(localeCode, { month: 'long' })}
@@ -82,15 +85,14 @@ export function CalendarHeader({
       ) : (
         <>
           <Dropdown
-            className={classNames(
-              styles['tedi-calendar__month-year-dropdown'],
-              monthYearSelectGrid ? styles['tedi-calendar__picker-grid-dropdown'] : undefined
-            )}
+            className={classNames(styles['tedi-calendar__month-year-dropdown'], {
+              [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
+            })}
             width="auto"
           >
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
-                {displayMonth.toLocaleString(localeCode, { month: 'long' })}{' '}
+                {displayMonth.toLocaleString(localeCode, { month: 'long' })}
                 <Icon
                   name="arrow_drop_down"
                   color="tertiary"
@@ -114,15 +116,14 @@ export function CalendarHeader({
           </Dropdown>
 
           <Dropdown
-            className={classNames(
-              styles['tedi-calendar__month-year-dropdown'],
-              monthYearSelectGrid ? styles['tedi-calendar__picker-grid-dropdown'] : undefined
-            )}
+            className={classNames(styles['tedi-calendar__month-year-dropdown'], {
+              [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
+            })}
             width="auto"
           >
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
-                {displayMonth.getFullYear()}{' '}
+                {displayMonth.getFullYear()}
                 <Icon
                   name="arrow_drop_down"
                   color="tertiary"

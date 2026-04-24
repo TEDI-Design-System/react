@@ -349,4 +349,166 @@ describe('DateField component', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('returns an empty string when formatted range has no from date', () => {
+    render(<DateField {...defaultProps} mode="range" selected={{ from: undefined, to: undefined } as never} />);
+
+    expect(screen.getByLabelText('Birth date')).toHaveValue('');
+  });
+
+  it('accepts a single (non-array) disabled matcher', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    const target = new Date(2025, 5, 15);
+
+    render(
+      <DateField
+        {...defaultProps}
+        disabled={(date: Date) => date.getTime() === target.getTime()}
+        initialMonth={new Date(2025, 5, 1)}
+        onSelect={onSelect}
+      />
+    );
+
+    await user.click(screen.getByRole('button'));
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('skips onSelect when parsed input matches a disabled function matcher', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    const target = new Date(2025, 5, 15);
+
+    render(
+      <DateField
+        {...defaultProps}
+        disabled={(date: Date) => date.getTime() === target.getTime()}
+        parseDate={() => target}
+        onSelect={onSelect}
+      />
+    );
+
+    const input = screen.getByLabelText('Birth date');
+    await user.type(input, '15.06.2025');
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('skips onSelect when parsed input matches an exact Date matcher', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    const target = new Date(2025, 5, 15);
+
+    render(<DateField {...defaultProps} disabled={target} parseDate={() => target} onSelect={onSelect} />);
+
+    await user.type(screen.getByLabelText('Birth date'), '15.06.2025');
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('renders without crashing with disablePast + disableFuture flags', () => {
+    expect(() => render(<DateField {...defaultProps} disablePast disableFuture />)).not.toThrow();
+    expect(screen.getByLabelText('Birth date')).toBeInTheDocument();
+  });
+
+  it('applies value from month grid selection (applyValue path)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(
+      <DateField
+        {...defaultProps}
+        calendarView="months"
+        monthYearSelectType="grid"
+        onSelect={onSelect}
+        initialMonth={new Date(2025, 0, 1)}
+      />
+    );
+
+    await user.click(screen.getByRole('button'));
+
+    const monthCell = await screen.findByRole('button', { name: /juuni/i });
+    await user.click(monthCell);
+
+    expect(onSelect).toHaveBeenCalled();
+    const [firstArg] = onSelect.mock.calls[0];
+    expect(firstArg).toBeInstanceOf(Date);
+  });
+
+  it('applyValue short-circuits when the selected month is disabled', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(
+      <DateField
+        {...defaultProps}
+        calendarView="months"
+        monthYearSelectType="grid"
+        onSelect={onSelect}
+        initialMonth={new Date(2025, 0, 1)}
+        disabled={(date: Date) => date.getMonth() === 5}
+      />
+    );
+
+    await user.click(screen.getByRole('button'));
+
+    const juneCell = await screen.findByRole('button', { name: /juuni/i });
+    await user.click(juneCell);
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('clears input value when parsed input clears the selection', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+
+    render(
+      <DateField {...defaultProps} selected={new Date(2025, 5, 15)} parseDate={() => undefined} onSelect={onSelect} />
+    );
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toHaveValue('15.06.2025');
+
+    await user.clear(input);
+
+    expect(input).toHaveValue('');
+  });
+
+  it('passes shouldDisableMonth and shouldDisableYear through without crashing', async () => {
+    const user = userEvent.setup();
+    const shouldDisableMonth = jest.fn(() => false);
+    const shouldDisableYear = jest.fn(() => false);
+
+    render(
+      <DateField {...defaultProps} shouldDisableMonth={shouldDisableMonth} shouldDisableYear={shouldDisableYear} />
+    );
+
+    await user.click(screen.getByRole('button'));
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('accepts an array of disabled matchers via disabled prop', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    const target = new Date(2025, 5, 15);
+
+    render(
+      <DateField
+        {...defaultProps}
+        disabled={[(date: Date) => date.getTime() === target.getTime()]}
+        initialMonth={new Date(2025, 5, 1)}
+        onSelect={onSelect}
+      />
+    );
+
+    await user.click(screen.getByRole('button'));
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
 });
