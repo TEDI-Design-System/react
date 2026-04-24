@@ -70,6 +70,15 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   }, [paginationProp]);
   const paginationEnabled = paginationOptions !== null;
 
+  // Stable options array reference passed down to `<Pagination>`. Without this
+  // the array is recomputed from `paginationOptions` every render, which in
+  // the real browser can cascade through react-select inside the page-size
+  // picker and produce a feedback loop.
+  const paginationPageSizeOptions = useMemo<number[] | undefined>(() => {
+    const opts = paginationOptions?.pageSizeOptions;
+    return Array.isArray(opts) && opts.length > 0 ? opts : undefined;
+  }, [paginationOptions]);
+
   const [tableState, setTableState] = useTablePersistence({
     persist,
     controlled: state,
@@ -149,6 +158,18 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const hasExpansion = Boolean(renderSubComponent || getSubRows);
   const hasSelection = Boolean(enableRowSelection);
 
+  // Memoise row-model factories: TanStack compares these by reference, so a
+  // fresh function every render can (and occasionally does) look like a
+  // row-model swap and cascade through autoReset handlers in the real browser.
+  const coreRowModel = useMemo(() => getCoreRowModel(), []);
+  const filteredRowModel = useMemo(() => getFilteredRowModel(), []);
+  const sortedRowModel = useMemo(() => getSortedRowModel(), []);
+  const expandedRowModel = useMemo(() => (hasExpansion ? getExpandedRowModel() : undefined), [hasExpansion]);
+  const paginationRowModel = useMemo(
+    () => (paginationEnabled ? getPaginationRowModel() : undefined),
+    [paginationEnabled]
+  );
+
   const augmentedColumns = useMemo<ColumnDef<TData>[]>(() => {
     const leading: ColumnDef<TData>[] = [];
 
@@ -218,18 +239,27 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const memoColumns = useMemo(() => augmentedColumns, [augmentedColumns]);
 
+  // Stabilise fallback references so unset slices don't churn the state object
+  // every render (TanStack can treat new-but-equal refs as state changes).
+  const fallbackRowSelection = useMemo<RowSelectionState>(() => ({}), []);
+  const fallbackExpanded = useMemo<ExpandedState>(() => ({}), []);
+  const fallbackColumnFilters = useMemo<ColumnFiltersState>(() => [], []);
+  const fallbackSorting = useMemo<SortingState>(() => [], []);
+  const fallbackPagination = useMemo<PaginationState>(
+    () => ({ pageIndex: 0, pageSize: paginationOptions?.pageSize ?? 10 }),
+    [paginationOptions]
+  );
+
   const table = useReactTable<TData>({
     data,
     columns: memoColumns,
     state: {
       columnVisibility: tableState.columnVisibility,
-      rowSelection: tableState.rowSelection ?? {},
-      expanded: tableState.expanded ?? {},
-      columnFilters: tableState.columnFilters ?? [],
-      sorting: tableState.sorting ?? [],
-      pagination: paginationEnabled
-        ? tableState.pagination ?? { pageIndex: 0, pageSize: paginationOptions?.pageSize ?? 10 }
-        : undefined,
+      rowSelection: tableState.rowSelection ?? fallbackRowSelection,
+      expanded: tableState.expanded ?? fallbackExpanded,
+      columnFilters: tableState.columnFilters ?? fallbackColumnFilters,
+      sorting: tableState.sorting ?? fallbackSorting,
+      pagination: paginationEnabled ? tableState.pagination ?? fallbackPagination : undefined,
     },
     enableRowSelection,
     enableColumnFilters,
@@ -241,14 +271,23 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     onColumnFiltersChange: handleColumnFiltersChange,
     onSortingChange: handleSortingChange,
     onPaginationChange: paginationEnabled ? handlePaginationChange : undefined,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: enableColumnFilters ? getFilteredRowModel() : undefined,
-    getExpandedRowModel: hasExpansion ? getExpandedRowModel() : undefined,
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: paginationEnabled ? getPaginationRowModel() : undefined,
+    getCoreRowModel: coreRowModel,
+    // Always-on: filtering runs whenever columnFilters has entries, regardless of
+    // whether the built-in inline filter row is shown. Cheap when no filters set.
+    getFilteredRowModel: filteredRowModel,
+    getExpandedRowModel: expandedRowModel,
+    getSortedRowModel: sortedRowModel,
+    getPaginationRowModel: paginationRowModel,
   });
 
   const contextValue: TableContextValue<TData> = useMemo(() => ({ table, size, id }), [table, size, id]);
+
+  // Stable references for the Pagination controls — react-select reacts badly
+  // to a new callback identity on every render inside its controlled flow.
+  const handlePaginationPageChange = useCallback((nextPage: number) => table.setPageIndex(nextPage - 1), [table]);
+  const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
+
+  const hasGroupedHeaders = table.getHeaderGroups().length > 1;
 
   const rootClassName = cn(
     styles['tedi-table'],
@@ -260,6 +299,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick),
       [styles['tedi-table--has-pagination']]: paginationEnabled,
+      [styles['tedi-table--grouped-headers']]: hasGroupedHeaders,
     },
     className
   );
@@ -289,19 +329,36 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           <table id={id} className={styles['tedi-table__table']}>
             {caption && <caption className={styles['tedi-table__caption']}>{caption}</caption>}
             <thead className={styles['tedi-table__head']}>
-              {headerGroups.map((headerGroup) => (
+              {headerGroups.map((headerGroup, rowIndex) => (
                 <tr key={headerGroup.id} className={styles['tedi-table__row']}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className={styles['tedi-table__header-cell']}
-                      scope="col"
-                      style={header.column.getSize() ? { width: header.column.getSize() } : undefined}
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const isGroup = header.subHeaders.length > 0;
+                    const hasParentGroup = Boolean(header.column.parent);
+                    // Top-level leaf columns (no parent group) are represented by a
+                    // placeholder at row 0 that rowSpans down. Skip their real leaf
+                    // header in deeper rows to avoid a duplicate — matches Figma's
+                    // "Merged cells" where Kuupäev / Asukoht span both header rows.
+                    // Leaves that DO have a parent group (Kellaaeg / Kestus under
+                    // "Aeg") still render in their designated deep row.
+                    if (!header.isPlaceholder && !isGroup && !hasParentGroup && rowIndex > 0) {
+                      return null;
+                    }
+                    const rowSpanCount = header.isPlaceholder ? headerGroups.length - rowIndex : 1;
+                    return (
+                      <th
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        rowSpan={rowSpanCount > 1 ? rowSpanCount : undefined}
+                        className={cn(styles['tedi-table__header-cell'], {
+                          [styles['tedi-table__header-cell--group']]: isGroup,
+                        })}
+                        scope="col"
+                        style={header.column.getSize() ? { width: header.column.getSize() } : undefined}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
               {enableColumnFilters && (
@@ -403,15 +460,11 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
             <Pagination
               pageCount={Math.max(1, table.getPageCount())}
               page={table.getState().pagination.pageIndex + 1}
-              onPageChange={(nextPage) => table.setPageIndex(nextPage - 1)}
+              onPageChange={handlePaginationPageChange}
               totalItems={table.getFilteredRowModel().rows.length}
               pageSize={table.getState().pagination.pageSize}
-              pageSizeOptions={
-                paginationOptions?.pageSizeOptions && paginationOptions.pageSizeOptions.length > 0
-                  ? paginationOptions.pageSizeOptions
-                  : undefined
-              }
-              onPageSizeChange={(nextSize) => table.setPageSize(nextSize)}
+              pageSizeOptions={paginationPageSizeOptions}
+              onPageSizeChange={handlePaginationPageSizeChange}
             />
           </div>
         )}
