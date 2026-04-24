@@ -220,6 +220,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
     {
       [styles['tedi-slider--disabled']]: disabled,
       [styles['tedi-slider--invalid']]: isInvalid,
+      [styles['tedi-slider--dragging']]: isDragging && !disabled,
     },
     className
   );
@@ -270,7 +271,13 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
               })}
             />
             {canShowTooltip && (
-              <Tooltip open={isTooltipOpen} onToggle={() => {}} focusManager={{ returnFocus: false }} placement="top">
+              <Tooltip
+                open={isTooltipOpen}
+                onToggle={() => {}}
+                focusManager={{ returnFocus: false, initialFocus: -1 }}
+                placement="top"
+                trackReferencePosition
+              >
                 <TooltipTrigger>
                   <span className={styles['tedi-slider__thumb-anchor']} aria-hidden="true" tabIndex={-1} />
                 </TooltipTrigger>

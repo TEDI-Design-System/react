@@ -173,6 +173,17 @@
   );
 }
 
+.tedi-slider--dragging:not(.tedi-slider--disabled) .tedi-slider__track,
+.tedi-slider:active:not(.tedi-slider--disabled) .tedi-slider__track {
+  background: linear-gradient(
+    to right,
+    var(--form-slider-active-background-active) 0%,
+    var(--form-slider-active-background-active) var(--tedi-slider-progress),
+    var(--form-slider-passive-background-default) var(--tedi-slider-progress),
+    var(--form-slider-passive-background-default) 100%
+  );
+}
+
 .tedi-slider--disabled {
   .tedi-slider__track {
     background: linear-gradient(

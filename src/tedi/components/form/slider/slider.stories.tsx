@@ -145,19 +145,6 @@ export const WithHelper: Story = {
   },
 };
 
-export const Invalid: Story = {
-  args: {
-    id: 'slider-invalid',
-    label: 'Label',
-    min: 0,
-    max: 100,
-    defaultValue: 80,
-    minLabel: '0%',
-    maxLabel: '100%',
-    helper: { id: 'slider-error-text', text: 'Value is out of range', type: 'error' },
-  },
-};
-
 const StatesInputGroupTemplate = () => {
   const [value, setValue] = useState<number>(50);
   return (
@@ -215,7 +202,7 @@ export const States: Story = {
             <Text modifiers="bold">Hover</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="Hover" />
+            <Slider {...sharedArgs} id="Hover" className="slider-state-hover" />
           </Col>
         </Row>
         <Row>
@@ -223,7 +210,7 @@ export const States: Story = {
             <Text modifiers="bold">Active</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="Active" />
+            <Slider {...sharedArgs} id="Active" className="slider-state-active" />
           </Col>
         </Row>
         <Row>
@@ -239,7 +226,7 @@ export const States: Story = {
             <Text modifiers="bold">Focus</Text>
           </Col>
           <Col>
-            <Slider {...sharedArgs} id="Focus" />
+            <Slider {...sharedArgs} id="Focus" className="slider-state-focus" />
           </Col>
         </Row>
         <Row>
@@ -255,9 +242,9 @@ export const States: Story = {
   },
   parameters: {
     pseudo: {
-      hover: '#Hover',
-      focusVisible: '#Focus',
-      active: '#Active',
+      hover: ['#Hover', '.slider-state-hover'],
+      focusVisible: ['#Focus', '.slider-state-focus'],
+      active: ['#Active', '.slider-state-active'],
     },
   },
 };
