@@ -22,7 +22,6 @@ export const Pagination = (props: PaginationProps): JSX.Element => {
     onPageSizeChange,
     boundaryCount = 1,
     siblingCount = 1,
-    size = 'medium',
     labels,
     className,
   } = props;
@@ -83,7 +82,7 @@ export const Pagination = (props: PaginationProps): JSX.Element => {
     [onPageSizeChange]
   );
 
-  const rootClassName = cn(styles['tedi-pagination'], styles[`tedi-pagination--${size}`], className);
+  const rootClassName = cn(styles['tedi-pagination'], className);
 
   const showResults = totalItems !== undefined;
   const showPageSizeSelect = Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;

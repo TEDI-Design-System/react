@@ -241,12 +241,6 @@ describe('Pagination component', () => {
     expect(screen.getByText('3 results')).toBeInTheDocument();
   });
 
-  it('applies the medium size class when size="medium"', () => {
-    const { container } = render(<Pagination pageCount={3} defaultPage={1} size="medium" />);
-    const nav = container.querySelector('[data-name="tedi-pagination"]');
-    expect(nav?.className).toMatch(/--medium/);
-  });
-
   it('applies a custom className', () => {
     const { container } = render(<Pagination pageCount={3} defaultPage={1} className="my-pagination" />);
     expect(container.querySelector('[data-name="tedi-pagination"]')?.className).toContain('my-pagination');
