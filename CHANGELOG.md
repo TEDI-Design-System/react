@@ -1,3 +1,10 @@
+# [17.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.7...react-17.0.0-rc.8) (2026-04-27)
+
+
+### Features
+
+* **button-group:** add mobile variant [#448](https://github.com/TEDI-Design-System/react/issues/448) ([#606](https://github.com/TEDI-Design-System/react/issues/606)) ([54dee90](https://github.com/TEDI-Design-System/react/commit/54dee901855737c2f4255893b75dcc6ea966314c)), closes [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94)
+
 # [17.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.6...react-17.0.0-rc.7) (2026-04-23)
 
 
