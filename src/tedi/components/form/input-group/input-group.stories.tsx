@@ -76,7 +76,7 @@ const PhonePrefixRow = () => {
   const [country, setCountry] = useState(COUNTRIES[0]);
   return (
     <Row>
-      <Col width={4}>
+      <Col lg={4} md={12}>
         <InputGroup label="Phone number" id="start-phone">
           <InputGroup.Prefix>
             <Dropdown>
@@ -107,7 +107,7 @@ const CurrencyPrefixSelectRow = () => {
   const [currency, setCurrency] = useState(CURRENCIES[0]);
   return (
     <Row>
-      <Col width={4}>
+      <Col lg={4} md={12}>
         <InputGroup label="Transfer from" id="start-transfer-from">
           <InputGroup.Prefix>
             <Dropdown>
@@ -238,7 +238,7 @@ const CostUnitSuffixRow = () => {
   const [currency, setCurrency] = useState(CURRENCIES[0]);
   return (
     <Row>
-      <Col width={4}>
+      <Col lg={4} md={12}>
         <InputGroup label="Cost" id="end-cost-currency">
           <InputGroup.Input>
             <Field type="tel" />
@@ -269,7 +269,7 @@ const TimezoneSuffixSelectRow = () => {
   const [timezone, setTimezone] = useState(TIMEZONES[0]);
   return (
     <Row>
-      <Col width={4}>
+      <Col lg={4} md={12}>
         <InputGroup label="Schedule" id="end-schedule-timezone">
           <InputGroup.Input>
             <Select isClearIndicatorVisible options={MEETINGS} />
