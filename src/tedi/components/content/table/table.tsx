@@ -20,7 +20,7 @@ import {
 import cn from 'classnames';
 import { Fragment, type KeyboardEvent, useCallback, useMemo } from 'react';
 
-import { Icon } from '../../base/icon/icon';
+import { Collapse } from '../../buttons/collapse/collapse';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { Pagination } from '../../navigation/pagination';
@@ -233,18 +233,20 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         header: '',
         cell: ({ row }) =>
           row.getCanExpand() ? (
-            <button
-              type="button"
-              className={styles['tedi-table__expand-button']}
-              aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
-              aria-expanded={row.getIsExpanded()}
-              onClick={(event) => {
-                event.stopPropagation();
-                row.toggleExpanded();
-              }}
-            >
-              <Icon name={row.getIsExpanded() ? 'remove' : 'add'} size={16} color="inherit" />
-            </button>
+            <span onClick={(e) => e.stopPropagation()}>
+              <Collapse
+                id={`${id ?? 'tedi-table'}-expand-${row.id}`}
+                iconOnly
+                arrowType="secondary"
+                hideCollapseText
+                openText="Expand row"
+                closeText="Collapse row"
+                open={row.getIsExpanded()}
+                onToggle={() => row.toggleExpanded()}
+              >
+                {null}
+              </Collapse>
+            </span>
           ) : null,
       });
     }
@@ -298,7 +300,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     getPaginationRowModel: paginationRowModel,
   });
 
-  const contextValue: TableContextValue<TData> = useMemo(() => ({ table, size, id }), [table, size, id]);
+  // Not memoised: TanStack returns the same `table` reference every render
+  // (stored in a useState ref), so a useMemo here would never recompute and
+  // context consumers (e.g. TableColumnsMenu) would never see state changes.
+  const contextValue: TableContextValue<TData> = { table, size, id };
 
   // Stable references for the Pagination controls — react-select reacts badly
   // to a new callback identity on every render inside its controlled flow.
@@ -422,6 +427,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   const rowClassName = cn(styles['tedi-table__row'], {
                     [styles['tedi-table__row--selected']]: row.getIsSelected(),
                     [styles['tedi-table__row--clickable']]: clickable,
+                    [styles['tedi-table__row--sub-row']]: row.depth > 0,
                   });
                   return (
                     <Fragment key={row.id}>

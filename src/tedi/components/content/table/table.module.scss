@@ -114,25 +114,12 @@
   background: var(--table-striped);
 }
 
-.tedi-table__cell--sub-component {
-  padding: var(--table-data-padding-y) var(--table-data-padding-x);
+.tedi-table__row--sub-row {
+  background: var(--table-striped);
 }
 
-.tedi-table__expand-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  color: var(--general-text-primary);
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-
-  &:focus-visible {
-    border-radius: var(--tedi-radius-02-default);
-    outline: var(--tedi-borders-02) solid var(--general-border-focus);
-    outline-offset: var(--tedi-borders-01);
-  }
+.tedi-table__cell--sub-component {
+  padding: var(--table-data-padding-y) var(--table-data-padding-x);
 }
 
 .tedi-table__row--filter {

@@ -38,9 +38,9 @@ export const TableColumnsMenu = ({ triggerLabel = 'Columns', className }: TableC
   };
 
   return (
-    <Dropdown>
+    <Dropdown placement="bottom-end">
       <DropdownTrigger>
-        <Button type="button" visualType="secondary" iconLeft="view_column" className={className}>
+        <Button type="button" visualType="link" iconLeft="view_column" className={className}>
           {triggerLabel}
         </Button>
       </DropdownTrigger>
@@ -53,15 +53,17 @@ export const TableColumnsMenu = ({ triggerLabel = 'Columns', className }: TableC
 
           return (
             <DropdownItem key={column.id} asChild closeOnSelect={false}>
-              <Checkbox
-                id={checkboxId}
-                name={checkboxId}
-                label={headerLabel}
-                value={column.id}
-                checked={isVisible}
-                disabled={isLastVisible}
-                onChange={() => column.toggleVisibility()}
-              />
+              <div onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  id={checkboxId}
+                  name={checkboxId}
+                  label={headerLabel}
+                  value={column.id}
+                  checked={isVisible}
+                  disabled={isLastVisible}
+                  onChange={() => column.toggleVisibility()}
+                />
+              </div>
             </DropdownItem>
           );
         })}

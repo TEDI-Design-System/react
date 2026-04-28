@@ -11,9 +11,10 @@ import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { EmptyState } from '../../notifications/empty-state';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
+import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Tag } from '../../tags/tag/tag';
 import { Table } from './table';
-import type { TableProps, TableState } from './table.types';
+import type { TableProps } from './table.types';
 
 /**
  * <a href="https://tanstack.com/table" target="_BLANK">@tanstack/react-table ↗</a><br/>
@@ -108,7 +109,7 @@ const people: Person[] = Array.from({ length: 28 }, (_, index) => {
  * Default pagination options applied to most stories. Matches Figma examples
  * which show pagination on every table variant (default page size 10).
  */
-const DEFAULT_PAGINATION = { pageSize: 10, pageSizeOptions: [10, 25, 50] } as const;
+const DEFAULT_PAGINATION = { pageSize: 10, pageSizeOptions: [10, 25, 50] };
 
 const personColumns: ColumnDef<Person>[] = [
   { id: 'name', header: 'Name', accessorKey: 'name' },
@@ -412,8 +413,12 @@ const EditableTemplate = () => {
           if (row.original.id === editingId) {
             return (
               <span style={editActionsStyle}>
-                <Button visualType="neutral" size="small" icon="close" aria-label="Tühista" onClick={cancelEdit} />
-                <Button visualType="primary" size="small" icon="check" aria-label="Kinnita" onClick={commitEdit} />
+                <Button visualType="neutral" size="small" icon="close" onClick={cancelEdit}>
+                  Tühista
+                </Button>
+                <Button visualType="primary" size="small" icon="check" onClick={commitEdit}>
+                  Kinnita
+                </Button>
               </span>
             );
           }
@@ -508,6 +513,13 @@ export const Sortable: Story = { render: () => <SortableTemplate /> };
  * Both icons tint `brand` when their state is active; otherwise `tertiary`.
  */
 type CertStatus = 'Kehtiv' | 'Kehtetu' | 'Aegumas' | 'Aegunud';
+
+const certStatusColor: Record<CertStatus, StatusBadgeColor> = {
+  Kehtiv: 'success',
+  Aegumas: 'warning',
+  Kehtetu: 'danger',
+  Aegunud: 'neutral',
+};
 
 interface PersonRecord {
   id: string;
@@ -835,7 +847,7 @@ const FiltersTemplate = () => {
           </span>
         ),
         cell: ({ row }) => (
-          <Tag color={row.original.status === 'Kehtiv' ? 'primary' : 'secondary'}>{row.original.status}</Tag>
+          <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
         ),
       },
     ],
@@ -854,33 +866,63 @@ const FiltersTemplate = () => {
 
 export const Filters: Story = { render: () => <FiltersTemplate /> };
 
-/**
- * Collapsible rows using the TEDI `Collapse` component in icon-only secondary
- * mode. Each row gets a compact arrow trigger; supplementary content reveals
- * inline below it when expanded.
- */
+interface CollapsibleRecord {
+  id: string;
+  name: string;
+  age: number;
+  visits: number;
+  status: CertStatus;
+  subRows?: CollapsibleRecord[];
+}
+
+const collapsibleSeed: Omit<CollapsibleRecord, 'id' | 'subRows'>[] = [
+  { name: 'Mari Maasikas', age: 25, visits: 6, status: 'Kehtiv' },
+  { name: 'Kalle Kapsapea', age: 35, visits: 13, status: 'Kehtiv' },
+  { name: 'Mart Mägi', age: 43, visits: 26, status: 'Kehtiv' },
+  { name: 'Meelis Mets', age: 64, visits: 26, status: 'Kehtetu' },
+  { name: 'Kadri Kask', age: 32, visits: 4, status: 'Aegumas' },
+  { name: 'Liis Linn', age: 21, visits: 13, status: 'Aegunud' },
+];
+
+const collapsiblePeople: CollapsibleRecord[] = Array.from({ length: 28 }, (_, index) => {
+  const seed = collapsibleSeed[index % collapsibleSeed.length];
+  const round = Math.floor(index / collapsibleSeed.length);
+  const name = round === 0 ? seed.name : `${seed.name} ${round + 1}`;
+  const id = String(index + 1);
+  const subRows: CollapsibleRecord[] | undefined =
+    index % 2 === 0
+      ? [
+          { id: `${id}-1`, name, age: seed.age, visits: Math.floor(seed.visits / 2), status: 'Kehtiv' },
+          { id: `${id}-2`, name, age: seed.age, visits: seed.visits - Math.floor(seed.visits / 2), status: 'Kehtetu' },
+        ]
+      : undefined;
+  return { ...seed, id, name, ...(subRows ? { subRows } : {}) };
+});
+
 export const CollapsibleRows: Story = {
   render: () => {
-    const columns: ColumnDef<Person>[] = [
-      { id: 'name', header: 'Name', accessorKey: 'name' },
-      { id: 'role', header: 'Role', accessorKey: 'role' },
-      { id: 'location', header: 'Location', accessorKey: 'location' },
+    const columns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'name', header: 'Isik', accessorKey: 'name' },
+      { id: 'age', header: 'Vanus', accessorKey: 'age' },
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
       {
-        id: 'details',
-        header: '',
-        size: 40,
+        id: 'status',
+        header: 'Tõendi staatus',
+        accessorKey: 'status',
         cell: ({ row }) => (
-          <Collapse id={`row-${row.original.id}`} iconOnly arrowType="secondary" hideCollapseText>
-            <VerticalSpacing size={0.5}>
-              <Text modifiers="bold">Details for {row.original.name}</Text>
-              <Text>Monthly salary: €{row.original.salary.toLocaleString('et-EE')}</Text>
-              <Tag color={row.original.status === 'active' ? 'primary' : 'secondary'}>{row.original.status}</Tag>
-            </VerticalSpacing>
-          </Collapse>
+          <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
         ),
       },
     ];
-    return <Table<Person> id="tedi-table-collapse" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
+    return (
+      <Table<CollapsibleRecord>
+        id="tedi-table-collapse"
+        data={collapsiblePeople}
+        columns={columns}
+        getSubRows={(row) => row.subRows}
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
   },
 };
 
@@ -976,7 +1018,7 @@ export const StickyFirstColumn: Story = {
  * zero-data layout (icon + heading + description + actions) inside the table
  * body.
  */
-export const EmptyWithEmptyState: Story = {
+export const WithEmptyState: Story = {
   render: () => (
     <Table<Person>
       id="tedi-table-empty-state"
@@ -1026,54 +1068,3 @@ export const WithColumnsMenu: Story = {
     </Table>
   ),
 };
-
-/**
- * Combines tag rendering with selectable rows to preview a richer production-
- * style table.
- */
-export const StatusShowcase: Story = {
-  render: () => {
-    const columns: ColumnDef<Person>[] = [
-      { id: 'name', header: 'Name', accessorKey: 'name' },
-      { id: 'email', header: 'Email', accessorKey: 'email' },
-      {
-        id: 'status',
-        header: 'Status',
-        accessorKey: 'status',
-        cell: ({ row }) => (
-          <Tag color={row.original.status === 'active' ? 'primary' : 'secondary'}>{row.original.status}</Tag>
-        ),
-      },
-    ];
-    return (
-      <Table<Person>
-        id="tedi-table-status"
-        data={people}
-        columns={columns}
-        enableRowSelection
-        pagination={DEFAULT_PAGINATION}
-      />
-    );
-  },
-};
-
-const PersistedTemplate = () => {
-  const [state, setState] = useState<TableState>({});
-  return (
-    <Table<Person>
-      id="tedi-table-persisted"
-      data={people}
-      columns={personColumns}
-      state={state}
-      onStateChange={setState}
-      persist={{ key: 'tedi-table-persisted-story' }}
-      pagination={DEFAULT_PAGINATION}
-    >
-      <Table.Toolbar>
-        <Table.ColumnsMenu />
-      </Table.Toolbar>
-    </Table>
-  );
-};
-
-export const Persisted: Story = { render: () => <PersistedTemplate /> };

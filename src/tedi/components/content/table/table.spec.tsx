@@ -7,6 +7,11 @@ import type { TableState } from './table.types';
 
 import '@testing-library/jest-dom';
 
+jest.mock('../../../providers/printing-provider/printing-provider', () => ({
+  PrintingProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  usePrint: jest.fn().mockReturnValue(false),
+}));
+
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string, ...args: unknown[]) => {
