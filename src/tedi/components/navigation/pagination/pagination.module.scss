@@ -65,8 +65,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: var(--pagination-button-size);
+  width: var(--pagination-button-size);
   height: var(--pagination-button-size);
+  font-size: var(--body-small-regular-size);
   color: var(--general-text-secondary);
   cursor: pointer;
   background: var(--button-main-neutral-icon-only-background-default);
@@ -116,13 +117,6 @@
 
 .tedi-pagination__button--nav {
   padding: 0;
-}
-
-.tedi-pagination--medium {
-  .tedi-pagination__button {
-    min-width: var(--tedi-dimensions-14);
-    height: var(--tedi-dimensions-14);
-  }
 }
 
 .tedi-pagination__page-size {

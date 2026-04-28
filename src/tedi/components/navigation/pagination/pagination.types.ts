@@ -93,11 +93,6 @@ export interface PaginationProps {
    */
   siblingCount?: number;
   /**
-   * Visual size of the buttons.
-   * @default medium
-   */
-  size?: 'medium' | 'small';
-  /**
    * Override any of the default text labels / aria labels.
    */
   labels?: Partial<PaginationLabels>;

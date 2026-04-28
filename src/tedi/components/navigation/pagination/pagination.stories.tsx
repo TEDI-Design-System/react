@@ -125,14 +125,6 @@ export const ManyPagesEllipsis: Story = {
   },
 };
 
-export const SmallSize: Story = {
-  args: {
-    pageCount: 10,
-    defaultPage: 5,
-    size: 'small',
-  },
-};
-
 /**
  * Boundary and sibling tuning — keep more neighbours visible around the active
  * page. Useful for dense layouts where users rarely paginate one-at-a-time.
