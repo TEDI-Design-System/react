@@ -10,11 +10,15 @@ export const Input = ({ children }: { children: ReactNode }) => {
 
   if (!React.isValidElement(children)) return children;
 
+  const isIntrinsicChild = typeof children.type === 'string';
+
   const extraProps: UnknownType = {
     disabled: disabled || children.props.disabled,
     id: children.props.id ?? inputId,
     className: classNames(children.props.className, styles['tedi-input-group__input']),
-    wrapperClassName: classNames(children.props.wrapperClassName, styles['tedi-input-group__input']),
+    ...(!isIntrinsicChild && {
+      wrapperClassName: classNames(children.props.wrapperClassName, styles['tedi-input-group__input']),
+    }),
   };
 
   return React.cloneElement(children, extraProps);

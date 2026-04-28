@@ -303,20 +303,21 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   }, [invalid, helper]);
 
   const labelSize = size === 'large' ? 'default' : size;
+  const isControlled = externalValue !== undefined;
 
   const handleChange = useCallback(
     (newValue: string) => {
-      setInnerValue(newValue);
+      if (!isControlled) setInnerValue(newValue);
       onChange?.(newValue);
     },
-    [onChange]
+    [isControlled, onChange]
   );
 
   const clearInput = useCallback(() => {
-    setInnerValue('');
+    if (!isControlled) setInnerValue('');
     onChange?.('');
     onClear?.();
-  }, [onChange, onClear]);
+  }, [isControlled, onChange, onClear]);
 
   const renderIcon = useCallback(() => {
     if (!icon) return null;
@@ -331,18 +332,23 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         ? { ...defaultIconProps, name: icon }
         : { ...defaultIconProps, ...icon, className: cn(defaultIconProps.className, icon.className) };
 
-    const Wrapper = onIconClick ? 'button' : 'div';
+    if (onIconClick) {
+      return (
+        <button
+          type="button"
+          className={styles['tedi-textfield__icon-wrapper']}
+          onClick={disabled ? undefined : onIconClick}
+          disabled={disabled}
+        >
+          <Icon {...iconProps} />
+        </button>
+      );
+    }
 
     return (
-      <Wrapper
-        className={styles['tedi-textfield__icon-wrapper']}
-        type={onIconClick ? 'button' : undefined}
-        onClick={disabled ? undefined : onIconClick}
-        disabled={disabled}
-        tabIndex={disabled ? -1 : 0}
-      >
+      <div className={styles['tedi-textfield__icon-wrapper']} aria-hidden="true">
         <Icon {...iconProps} />
-      </Wrapper>
+      </div>
     );
   }, [icon, size, onIconClick, disabled]);
 
