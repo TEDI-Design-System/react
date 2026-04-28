@@ -46,7 +46,7 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Locale object for formatting and translating calendar labels (from `react-day-picker`).
    */
   locale?: Locale;
-  /*
+  /**
    * The locale code string used for date formatting. Defaults to 'et-EE'.
    */
   localeCode?: string;
