@@ -5,7 +5,25 @@ import { UnknownType } from '../../../../../types/commonTypes';
 import { useInputGroup } from '../../input-group';
 import styles from '../../input-group.module.scss';
 
-export const Input = ({ children }: { children: ReactNode }) => {
+export interface InputProps {
+  /**
+   * The form control rendered inside the input slot — must be a single React
+   * element (e.g. `TextField`, `Select`, native `<input>`). The element is
+   * cloned with extra props from the surrounding `InputGroup`:
+   * - `disabled` is OR-ed with the group's disabled state
+   * - `id` falls back to the group's `inputId` so an external `Label` can
+   *   target it via `htmlFor`
+   * - `className` (or `wrapperClassName` for non-intrinsic components) is
+   *   merged with `tedi-input-group__input` to align borders/radii with
+   *   adjacent prefix/suffix slots
+   *
+   * Non-element children (text, fragments, `null`) are returned as-is and
+   * receive none of these props.
+   */
+  children: ReactNode;
+}
+
+export const Input = ({ children }: InputProps) => {
   const { disabled, inputId } = useInputGroup();
 
   if (!React.isValidElement(children)) return children;
@@ -23,5 +41,3 @@ export const Input = ({ children }: { children: ReactNode }) => {
 
   return React.cloneElement(children, extraProps);
 };
-
-Input.displayName = 'InputGroup.Input';
