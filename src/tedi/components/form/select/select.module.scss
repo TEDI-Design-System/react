@@ -78,9 +78,16 @@ div .tedi-select__menu {
   border-radius: var(--form-field-radius);
 
   @include mixins.print-grayscale;
+
+  // In grid mode the menu shouldn't stretch to match the trigger — let it
+  // shrink to the grid's natural width.
+  &:has(.tedi-select__menu-list--grid) {
+    width: fit-content;
+    min-width: 0;
+  }
 }
 
-.tedi-select__menu .tedi-select__menu-list,
+.tedi-select__menu .tedi-select__menu-list:not(.tedi-select__menu-list--grid),
 .tedi-select__menu .tedi-select__menu-list-inner {
   padding: 0;
 }
@@ -99,10 +106,14 @@ div .tedi-select__menu {
     background-color: var(--dropdown-item-hover-background);
   }
 
+  // react-select's `isFocused` flag is set on both keyboard-arrow nav AND mouse
+  // hover (and on whichever option is auto-active when the menu first opens).
+  // Background tint is fine to share, but the focus ring must only appear during
+  // real keyboard navigation — that's gated by the `:has(:focus-visible)` rule
+  // below.
   &--focused {
     background-color: var(--form-input-background-default);
     border-radius: var(--dropdown-item-radius);
-    box-shadow: inset 0 0 0 2px var(--form-input-border-hover);
   }
 
   &:active:not(.tedi-select__option--disabled),
@@ -204,22 +215,100 @@ div.tedi-select__multi-value-item {
 .tedi-select--tags-row {
   :global .select__control > .select__value-container--is-multi {
     flex-wrap: nowrap;
+    overflow: hidden;
 
-    &::after {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      content: '';
-      box-shadow: inset 0.5rem 0 0.25rem -0.25rem var(--tedi-alpha-100);
+    > * {
+      flex-shrink: 0;
     }
-  }
 
-  &.tedi-select--searchable :global .tedi-select__control > .tedi-select__value-container--is-multi {
-    justify-content: flex-end;
+    /* Push react-select's input container to the very end so the
+       overflow `+N` Tag visually sits between the last visible tag
+       and the search input. */
+    :global .select__input-container {
+      order: 99;
+    }
   }
 
   :global .tedi-select__control--is-focused .tedi-select__input {
     min-width: 5rem !important; // no other way to override style
+  }
+}
+
+.tedi-select__overflow-tag {
+  flex-shrink: 0;
+}
+
+// Focus ring on the active option ONLY while the user is keyboard-driving
+// the menu. `--keyboard` is toggled by Select itself: arrow / Home / End /
+// PageUp / PageDown / Tab keydown turns it on; the next mousemove inside the
+// menu list turns it off. This avoids the limitation of `:focus-visible`,
+// which stays on after a Tab and would otherwise re-paint the ring on every
+// mouse hover.
+.tedi-select__menu-list--keyboard .tedi-select__option--focused {
+  box-shadow: inset 0 0 0 2px var(--form-input-border-hover);
+}
+
+.tedi-select__select-all {
+  padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--dropdown-item-hover-background);
+  }
+}
+
+.tedi-select__group-heading-toggle {
+  cursor: pointer;
+}
+
+// Grid layout for color/icon pickers (Angular `dropdownType="grid"`).
+// Each option becomes a fixed-size square; the menu auto-sizes to its
+// natural width up to `--tedi-swatch-columns` columns. Customise via the
+// three CSS variables on the menu list.
+.tedi-select__menu-list--grid {
+  --tedi-swatch-size: 24px;
+  --tedi-swatch-gap: 4px;
+  --tedi-swatch-columns: 11;
+  --tedi-swatch-grid-padding: 8px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, var(--tedi-swatch-size));
+  gap: var(--tedi-swatch-gap);
+  width: fit-content;
+  max-width: calc(
+    var(--tedi-swatch-columns) * (var(--tedi-swatch-size) + var(--tedi-swatch-gap)) +
+      (2 * var(--tedi-swatch-grid-padding))
+  );
+  padding: var(--tedi-swatch-grid-padding);
+
+  .tedi-select__option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tedi-swatch-size);
+    height: var(--tedi-swatch-size);
+    padding: 2px;
+    color: inherit;
+    background: transparent;
+    border-radius: var(--card-radius-rounded);
+
+    // Override the global `--selected` rule (white-on-blue), which would
+    // otherwise paint icon options invisible inside their transparent cell.
+    &--selected,
+    &[aria-selected='true'] {
+      color: inherit;
+      background: transparent;
+      border: 2px solid var(--card-border-selected);
+
+      p,
+      span {
+        color: inherit;
+      }
+    }
+
+    &:hover:not(.tedi-select__option--disabled) {
+      background: transparent;
+    }
   }
 }
 
