@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
+import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Collapse } from '../../buttons/collapse/collapse';
@@ -111,6 +112,13 @@ const people: Person[] = Array.from({ length: 28 }, (_, index) => {
  */
 const DEFAULT_PAGINATION = { pageSize: 10, pageSizeOptions: [10, 25, 50] };
 
+/**
+ * Used by `Sizes` and `Simple` stories — the Figma frames show 3-4 visible
+ * rows per page so the table comparison fits without scrolling.
+ */
+const SHOWCASE_PAGINATION_3 = { pageSize: 3, pageSizeOptions: [3, 10, 25, 50] };
+const SHOWCASE_PAGINATION_4 = { pageSize: 4, pageSizeOptions: [4, 10, 25, 50] };
+
 const personColumns: ColumnDef<Person>[] = [
   { id: 'name', header: 'Name', accessorKey: 'name' },
   { id: 'email', header: 'Email', accessorKey: 'email' },
@@ -120,21 +128,6 @@ const personColumns: ColumnDef<Person>[] = [
 
 type Story = StoryObj<TableProps<Person>>;
 
-/**
- * Baseline render: headers + rows + the default border/padding chrome.
- */
-export const Simple: Story = {
-  render: () => (
-    <Table<Person> id="tedi-table-simple" data={people} columns={personColumns} pagination={DEFAULT_PAGINATION} />
-  ),
-};
-
-/**
- * Merged header cells — matches Figma Example "Merged cells". The "Aeg" (time)
- * header group spans two sub-columns (Kellaaeg / Kestus); Kuupäev, Asukoht,
- * and the action column are single-column headers that span both header rows.
- * Sort indicator on Kuupäev.
- */
 interface Booking {
   id: string;
   dateRange: string;
@@ -150,6 +143,202 @@ const bookings: Booking[] = Array.from({ length: 28 }, (_, index) => ({
   duration: '6 min',
   location: 'Harjumaa',
 }));
+
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  experience: string;
+  location: string;
+}
+
+const doctorSeed: Omit<Doctor, 'id'>[] = [
+  { name: 'Kalle Kask', specialty: 'Dermatovenereoloog', experience: '4 a', location: 'Tallinn' },
+  { name: 'Mari Maasikas', specialty: 'Kopsuarst', experience: '4 a', location: 'Tallinn' },
+  { name: 'Vello Vaarikas', specialty: 'Kõrva-nina-kurguarst', experience: '4 a', location: 'Tallinn' },
+];
+
+const doctors: Doctor[] = Array.from({ length: 28 }, (_, index) => ({
+  ...doctorSeed[index % doctorSeed.length],
+  id: String(index + 1),
+}));
+
+const editLinkStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+  color: 'var(--link-primary-default)',
+  textDecoration: 'none',
+  fontWeight: 'var(--body-regular-weight)',
+};
+
+const nameLinkStyle: React.CSSProperties = {
+  color: 'var(--link-primary-default)',
+  textDecoration: 'none',
+  fontWeight: 'var(--body-regular-weight)',
+};
+
+/**
+ * Three "simple" table layouts side-by-side, mirroring the Figma "Simple"
+ * frame: a bookings list with an edit action, a people list with linked
+ * names + status badges, and a doctor list with a multi-line first cell.
+ * Same chrome (borders, pagination), different content patterns.
+ */
+const SimpleTemplate = () => {
+  const bookingColumns = useMemo<ColumnDef<Booking>[]>(
+    () => [
+      { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
+      { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
+      { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+      {
+        id: 'actions',
+        header: '',
+        cell: () => (
+          <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+            <Icon name="edit" color="brand" size={18} />
+            Muuda
+          </a>
+        ),
+      },
+    ],
+    []
+  );
+
+  const peopleColumns = useMemo<ColumnDef<PersonRecord>[]>(
+    () => [
+      {
+        id: 'name',
+        header: 'Isik',
+        accessorKey: 'name',
+        cell: ({ row }) => (
+          <a href="#" onClick={(event) => event.preventDefault()} style={nameLinkStyle}>
+            {row.original.name}
+          </a>
+        ),
+      },
+      { id: 'age', header: 'Vanus', accessorKey: 'age' },
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+      {
+        id: 'status',
+        header: 'Tõendi staatus',
+        accessorKey: 'status',
+        cell: ({ row }) => (
+          <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
+        ),
+      },
+    ],
+    []
+  );
+
+  const doctorColumns = useMemo<ColumnDef<Doctor>[]>(
+    () => [
+      {
+        id: 'name',
+        header: 'Arst',
+        cell: ({ row }) => (
+          <div>
+            <div>{row.original.name}</div>
+            <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+          </div>
+        ),
+      },
+      { id: 'experience', header: 'Tööstaaž', accessorKey: 'experience' },
+      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+      {
+        id: 'actions',
+        header: '',
+        cell: () => (
+          <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+            <Icon name="edit" color="brand" size={18} />
+            Muuda
+          </a>
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <VerticalSpacing size={1}>
+      <Table<Booking>
+        id="tedi-table-simple-bookings"
+        data={bookings}
+        columns={bookingColumns}
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+      <Table<PersonRecord>
+        id="tedi-table-simple-people"
+        data={filterablePeople}
+        columns={peopleColumns}
+        pagination={SHOWCASE_PAGINATION_4}
+      />
+      <Table<Doctor>
+        id="tedi-table-simple-doctors"
+        data={doctors}
+        columns={doctorColumns}
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+    </VerticalSpacing>
+  );
+};
+
+/**
+ * Both table sizes side-by-side, mirroring the Figma "Sizes" frame:
+ * a warning Alert, then `default` and `small` variants of the same booking
+ * columns so the difference in row/header padding is easy to compare.
+ */
+const SizesTemplate = () => {
+  const columns = useMemo<ColumnDef<Booking>[]>(
+    () => [
+      { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
+      { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
+      { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+      {
+        id: 'actions',
+        header: '',
+        cell: () => (
+          <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+            <Icon name="edit" color="brand" size={18} />
+            Muuda
+          </a>
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <VerticalSpacing size={1}>
+      <Heading element="h3">Default</Heading>
+      <Table<Booking>
+        id="tedi-table-sizes-default"
+        data={bookings}
+        columns={columns}
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+      <Heading element="h3">Small</Heading>
+      <Table<Booking>
+        id="tedi-table-sizes-small"
+        data={bookings}
+        columns={columns}
+        size="small"
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+    </VerticalSpacing>
+  );
+};
+
+export const Sizes: Story = { render: () => <SizesTemplate /> };
+export const Simple: Story = { render: () => <SimpleTemplate /> };
+
+/**
+ * Merged header cells — matches Figma Example "Merged cells". The "Aeg" (time)
+ * header group spans two sub-columns (Kellaaeg / Kestus); Kuupäev, Asukoht,
+ * and the action column are single-column headers that span both header rows.
+ * Sort indicator on Kuupäev.
+ */
 
 const MergedCellsTemplate = () => {
   const columns = useMemo<ColumnDef<Booking>[]>(
@@ -237,22 +426,6 @@ export const VerticalBorders: Story = {
       data={people}
       columns={personColumns}
       verticalBorders
-      pagination={DEFAULT_PAGINATION}
-    />
-  ),
-};
-
-/**
- * Compact variant: reduced row padding per Figma small-size tokens
- * (`table/header/padding-*-sm`, `table/data/padding-*-sm`).
- */
-export const Small: Story = {
-  render: () => (
-    <Table<Person>
-      id="tedi-table-small"
-      data={people}
-      columns={personColumns}
-      size="small"
       pagination={DEFAULT_PAGINATION}
     />
   ),
