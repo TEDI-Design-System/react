@@ -134,7 +134,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const fileUploadBEM = cn(styles['tedi-file-upload'], { [styles['tedi-file-upload--disabled']]: disabled }, className);
-  const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
+  const helperId = helper?.id ?? (helper || uploadErrorHelper ? `${resolvedId}-helper` : undefined);
 
   const getFiles = React.useMemo(() => {
     return !!files && !!onChange ? files : innerFiles;

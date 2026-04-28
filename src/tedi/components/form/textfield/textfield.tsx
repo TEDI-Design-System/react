@@ -271,7 +271,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   const [innerValue, setInnerValue] = React.useState(externalValue ?? defaultValue ?? '');
 
   const value = externalValue ?? innerValue;
-  const showClearButton = Boolean(isClearable && value);
+  const showClearButton = Boolean(isClearable && value && !readOnly);
 
   const inputGroup = useOptionalInputGroup?.();
   const generatedId = React.useId();
