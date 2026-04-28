@@ -40,9 +40,7 @@ export const StartStatic: Story = {
   },
   render: (args) => (
     <InputGroup {...args}>
-      <InputGroup.Prefix>
-        <Text>Street</Text>
-      </InputGroup.Prefix>
+      <InputGroup.Prefix>Street</InputGroup.Prefix>
       <InputGroup.Input>
         <Field id="start-static-1" />
       </InputGroup.Input>
@@ -218,9 +216,7 @@ export const EndStatic: Story = {
       <InputGroup.Input>
         <Field id="end-static-1" />
       </InputGroup.Input>
-      <InputGroup.Suffix>
-        <Text>EUR</Text>
-      </InputGroup.Suffix>
+      <InputGroup.Suffix>EUR</InputGroup.Suffix>
     </InputGroup>
   ),
 };
@@ -391,9 +387,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           </Col>
           <Col>
             <InputGroup label="Label" id="state-example" disabled={state === 'Disabled'}>
-              <InputGroup.Prefix>
-                <Text>Street</Text>
-              </InputGroup.Prefix>
+              <InputGroup.Prefix>Street</InputGroup.Prefix>
               <InputGroup.Input>
                 <Field id={state} />
               </InputGroup.Input>
@@ -404,9 +398,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
               <InputGroup.Input>
                 <Field id={state} />
               </InputGroup.Input>
-              <InputGroup.Suffix>
-                <Text>EUR</Text>
-              </InputGroup.Suffix>
+              <InputGroup.Suffix>EUR</InputGroup.Suffix>
             </InputGroup>
           </Col>
         </Row>
@@ -417,9 +409,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
         </Col>
         <Col>
           <InputGroup label="Label" id="state-example" helper={{ text: 'Feedback text', type: 'error' }}>
-            <InputGroup.Prefix>
-              <Text>Street</Text>
-            </InputGroup.Prefix>
+            <InputGroup.Prefix>Street</InputGroup.Prefix>
             <InputGroup.Input>
               <Field invalid />
             </InputGroup.Input>
@@ -430,9 +420,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
             <InputGroup.Input>
               <Field invalid />
             </InputGroup.Input>
-            <InputGroup.Suffix>
-              <Text>EUR</Text>
-            </InputGroup.Suffix>
+            <InputGroup.Suffix>EUR</InputGroup.Suffix>
           </InputGroup>
         </Col>
       </Row>

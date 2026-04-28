@@ -12,8 +12,18 @@ export const Prefix = ({ children, className, ...props }: { children: ReactNode;
     return () => unregisterPrefix();
   }, [registerPrefix, unregisterPrefix]);
 
+  const isText = typeof children === 'string' || typeof children === 'number';
+
   return (
-    <div {...props} className={classNames(styles['tedi-input-group__prefix'], className)} aria-disabled={disabled}>
+    <div
+      {...props}
+      className={classNames(
+        styles['tedi-input-group__prefix'],
+        { [styles['tedi-input-group__prefix--no-inner-div']]: isText },
+        className
+      )}
+      aria-disabled={disabled}
+    >
       {children}
     </div>
   );

@@ -12,8 +12,18 @@ export const Suffix = ({ children, className, ...props }: { children: ReactNode;
     return () => unregisterSuffix();
   }, [registerSuffix, unregisterSuffix]);
 
+  const isText = typeof children === 'string' || typeof children === 'number';
+
   return (
-    <div {...props} className={classNames(styles['tedi-input-group__suffix'], className)} aria-disabled={disabled}>
+    <div
+      {...props}
+      className={classNames(
+        styles['tedi-input-group__suffix'],
+        { [styles['tedi-input-group__suffix--no-inner-div']]: isText },
+        className
+      )}
+      aria-disabled={disabled}
+    >
       {children}
     </div>
   );

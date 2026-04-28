@@ -25,11 +25,14 @@
     gap: 10px;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
     padding: 0;
     white-space: nowrap;
     background: transparent;
     border: none;
+
+    &--no-inner-div {
+      padding: calc(var(--form-field-padding-y-md-default) - 2px) var(--form-field-padding-x-md-default);
+    }
   }
 
   &--addons {
@@ -141,6 +144,6 @@
   }
 
   &__feedback-wrapper {
-    margin-top: 4px;
+    margin-top: var(--form-field-outer-spacing);
   }
 }
