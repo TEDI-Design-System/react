@@ -1,0 +1,44 @@
+.tedi-table-header-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  color: var(--general-text-tertiary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--button-radius-sm);
+  transition: background-color 120ms ease, color 120ms ease, outline-color 120ms ease;
+
+  // Default → Hover: light tint, icon stays neutral.
+  &:hover:not(:disabled) {
+    background: var(--button-main-neutral-icon-only-background-hover);
+  }
+
+  // Active (mouse-down): slightly stronger tint, icon picks up brand colour.
+  &:active:not(:disabled) {
+    color: var(--button-main-primary-background-default);
+    background: var(--button-main-neutral-icon-only-background-active);
+  }
+
+  // Focus ring on keyboard focus, brand-coloured icon.
+  &:focus-visible {
+    color: var(--button-main-primary-background-default);
+    outline: var(--tedi-borders-02) solid var(--general-border-focus);
+    outline-offset: 0;
+  }
+
+  // Selected: paint the icon brand colour even at rest (e.g. active filter,
+  // currently-sorted column).
+  &--selected {
+    color: var(--button-main-primary-background-default);
+  }
+
+  &:disabled {
+    color: var(--general-text-disabled);
+    cursor: not-allowed;
+    background: transparent;
+  }
+}

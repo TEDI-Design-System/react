@@ -10,6 +10,7 @@ import { Collapse } from '../../buttons/collapse/collapse';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Alert } from '../../notifications/alert/alert';
 import { EmptyState } from '../../notifications/empty-state';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
@@ -283,26 +284,276 @@ const SimpleTemplate = () => {
   );
 };
 
+/** Shared columns for the Default and Sizes stories (Figma "Sizes" frame). */
+const bookingShowcaseColumns: ColumnDef<Booking>[] = [
+  { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
+  { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
+  { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+  {
+    id: 'actions',
+    header: '',
+    cell: () => (
+      <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+        <Icon name="edit" color="brand" size={18} />
+        Muuda
+      </a>
+    ),
+  },
+];
+
+/**
+ * Baseline render: a single default-size booking table — same content used in
+ * the `Sizes` showcase below, just on its own.
+ */
+export const Default: Story = {
+  render: () => (
+    <Table<Booking>
+      id="tedi-table-default"
+      data={bookings}
+      columns={bookingShowcaseColumns}
+      pagination={SHOWCASE_PAGINATION_3}
+    />
+  ),
+};
+
 /**
  * Both table sizes side-by-side, mirroring the Figma "Sizes" frame:
- * a warning Alert, then `default` and `small` variants of the same booking
- * columns so the difference in row/header padding is easy to compare.
+ * `default` and `small` variants of the same booking columns so the
+ * difference in row/header padding is easy to compare.
  */
-const SizesTemplate = () => {
-  const columns = useMemo<ColumnDef<Booking>[]>(
+const SizesTemplate = () => (
+  <VerticalSpacing size={1}>
+    <Heading element="h3">Default</Heading>
+    <Table<Booking>
+      id="tedi-table-sizes-default"
+      data={bookings}
+      columns={bookingShowcaseColumns}
+      pagination={SHOWCASE_PAGINATION_3}
+    />
+    <Heading element="h3">Small</Heading>
+    <Table<Booking>
+      id="tedi-table-sizes-small"
+      data={bookings}
+      columns={bookingShowcaseColumns}
+      size="small"
+      pagination={SHOWCASE_PAGINATION_3}
+    />
+  </VerticalSpacing>
+);
+
+export const Sizes: Story = { render: () => <SizesTemplate /> };
+export const Simple: Story = { render: () => <SimpleTemplate /> };
+
+/**
+ * Two long-text patterns from the Figma "Long texts" frame. Top table puts
+ * the "Show more" link on its own line under the truncated paragraph (with a
+ * chevron). Bottom table inlines the link at the end of the truncated text
+ * (underlined, no icon). Tip alert in the middle explains the trade-off.
+ */
+const LONG_DESCRIPTION =
+  'Pellentesque mattis augue at mi tristique dignissim. Aliquam lobortis hendrerit ' +
+  'augue, sit amet pellentesque nibh ultricies eu. Nullam ut nibh non lectus pulvinar ' +
+  'volutpat.';
+
+const truncate2LinesStyle: React.CSSProperties = {
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+};
+
+const inlineShowMoreLinkStyle: React.CSSProperties = {
+  color: 'var(--link-primary-default)',
+  textDecoration: 'underline',
+  fontWeight: 'var(--body-regular-weight)',
+  whiteSpace: 'nowrap',
+};
+
+const baseDoctorWithDescriptionColumns = (): ColumnDef<Doctor>[] => [
+  {
+    id: 'name',
+    header: 'Arst',
+    cell: ({ row }) => (
+      <div>
+        <div>{row.original.name}</div>
+        <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+      </div>
+    ),
+  },
+  // Description cell injected per variant.
+  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+  {
+    id: 'actions',
+    header: '',
+    cell: () => (
+      <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+        <Icon name="edit" color="brand" size={18} />
+        Muuda
+      </a>
+    ),
+  },
+];
+
+const LongTextsTemplate = () => {
+  const [expandedBlock, setExpandedBlock] = useState<Set<string>>(new Set());
+  const [expandedInline, setExpandedInline] = useState<Set<string>>(new Set());
+
+  const toggleIn = (set: Set<string>, id: string) => {
+    const next = new Set(set);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    return next;
+  };
+
+  const blockColumns = useMemo<ColumnDef<Doctor>[]>(() => {
+    const base = baseDoctorWithDescriptionColumns();
+    return [
+      base[0],
+      {
+        id: 'description',
+        header: 'Kirjeldus',
+        cell: ({ row }) => {
+          const isExpanded = expandedBlock.has(row.id);
+          return (
+            <div>
+              <div style={isExpanded ? undefined : truncate2LinesStyle}>{LONG_DESCRIPTION}</div>
+              <a
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setExpandedBlock((prev) => toggleIn(prev, row.id));
+                }}
+                style={{ ...editLinkStyle, marginTop: 4 }}
+              >
+                {isExpanded ? 'Show less' : 'Show more'}
+                <Icon name={isExpanded ? 'arrow_drop_up' : 'arrow_drop_down'} color="brand" size={18} />
+              </a>
+            </div>
+          );
+        },
+      },
+      base[1],
+      base[2],
+    ];
+  }, [expandedBlock]);
+
+  const inlineColumns = useMemo<ColumnDef<Doctor>[]>(() => {
+    const base = baseDoctorWithDescriptionColumns();
+    return [
+      base[0],
+      {
+        id: 'description',
+        header: 'Kirjeldus',
+        cell: ({ row }) => {
+          const isExpanded = expandedInline.has(row.id);
+          // Truncate at a fixed length so the inline "Show more" sits at the
+          // end of the text rather than on its own line. CSS line-clamp can't
+          // mix with an inline trailing link without complex layout tricks.
+          const truncated =
+            LONG_DESCRIPTION.length > 70 ? `${LONG_DESCRIPTION.slice(0, 70).trimEnd()}…` : LONG_DESCRIPTION;
+          return (
+            <span>
+              {isExpanded ? LONG_DESCRIPTION : truncated}{' '}
+              <a
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setExpandedInline((prev) => toggleIn(prev, row.id));
+                }}
+                style={inlineShowMoreLinkStyle}
+              >
+                {isExpanded ? 'Show less' : 'Show more'}
+              </a>
+            </span>
+          );
+        },
+      },
+      base[1],
+      base[2],
+    ];
+  }, [expandedInline]);
+
+  return (
+    <VerticalSpacing size={1}>
+      <Table<Doctor>
+        id="tedi-table-long-texts-block"
+        data={doctors}
+        columns={blockColumns}
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+      <Table<Doctor>
+        id="tedi-table-long-texts-inline"
+        data={doctors}
+        columns={inlineColumns}
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+    </VerticalSpacing>
+  );
+};
+
+/**
+ * Two row-action patterns from the Figma "Actions" frame. Top table puts
+ * separate edit + delete icon buttons on each row. Bottom table collapses
+ * the same affordances into a single kebab (`more_vert`) button — typical
+ * pattern when the row is dense or has many possible actions.
+ */
+const baseDoctorActionsColumns = (): ColumnDef<Doctor>[] => [
+  {
+    id: 'name',
+    header: 'Arst',
+    cell: ({ row }) => (
+      <div>
+        <div>{row.original.name}</div>
+        <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+      </div>
+    ),
+  },
+  { id: 'experience', header: 'Tööstaaž', accessorKey: 'experience' },
+  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+];
+
+const rowActionsCellStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  gap: 8,
+  justifyContent: 'flex-end',
+  width: '100%',
+};
+
+const ActionsTemplate = () => {
+  const editDeleteColumns = useMemo<ColumnDef<Doctor>[]>(
     () => [
-      { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
-      { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
-      { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
-      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+      ...baseDoctorActionsColumns(),
       {
         id: 'actions',
         header: '',
         cell: () => (
-          <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-            <Icon name="edit" color="brand" size={18} />
-            Muuda
-          </a>
+          <span style={rowActionsCellStyle}>
+            <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
+              <></>
+            </Button>
+            <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
+              <></>
+            </Button>
+          </span>
+        ),
+      },
+    ],
+    []
+  );
+
+  const kebabColumns = useMemo<ColumnDef<Doctor>[]>(
+    () => [
+      ...baseDoctorActionsColumns(),
+      {
+        id: 'actions',
+        header: '',
+        cell: () => (
+          <span style={rowActionsCellStyle}>
+            <Button visualType="secondary" icon="more_vert" aria-label="More actions" onClick={() => undefined}>
+              <></>
+            </Button>
+          </span>
         ),
       },
     ],
@@ -311,34 +562,145 @@ const SizesTemplate = () => {
 
   return (
     <VerticalSpacing size={1}>
-      <Heading element="h3">Default</Heading>
-      <Table<Booking>
-        id="tedi-table-sizes-default"
-        data={bookings}
-        columns={columns}
+      <Table<Doctor>
+        id="tedi-table-actions-edit-delete"
+        data={doctors}
+        columns={editDeleteColumns}
         pagination={SHOWCASE_PAGINATION_3}
       />
-      <Heading element="h3">Small</Heading>
-      <Table<Booking>
-        id="tedi-table-sizes-small"
-        data={bookings}
-        columns={columns}
-        size="small"
+      <Table<Doctor>
+        id="tedi-table-actions-kebab"
+        data={doctors}
+        columns={kebabColumns}
         pagination={SHOWCASE_PAGINATION_3}
       />
     </VerticalSpacing>
   );
 };
 
-export const Sizes: Story = { render: () => <SizesTemplate /> };
-export const Simple: Story = { render: () => <SimpleTemplate /> };
-
 /**
- * Merged header cells — matches Figma Example "Merged cells". The "Aeg" (time)
- * header group spans two sub-columns (Kellaaeg / Kestus); Kuupäev, Asukoht,
- * and the action column are single-column headers that span both header rows.
- * Sort indicator on Kuupäev.
+ * "Custom" Figma frame: a tip alert plus a table with custom-rendered cells —
+ * avatar circle next to the name, a status note column with coloured
+ * `StatusBadge`s, and the same edit/delete row actions from the Actions
+ * showcase. Demonstrates that any column can return arbitrary JSX.
  */
+type CustomNoteColor = 'warning' | 'danger' | undefined;
+
+interface CustomDoctor extends Doctor {
+  note?: string;
+  noteColor?: CustomNoteColor;
+}
+
+const customDoctorSeed: Omit<CustomDoctor, 'id'>[] = [
+  {
+    name: 'Kalle Kask',
+    specialty: 'Dermatovenereoloog',
+    experience: '4 a',
+    location: 'Tallinn',
+    note: 'Esineb maksehäireid',
+    noteColor: 'warning',
+  },
+  {
+    name: 'Mari Maasikas',
+    specialty: 'Kopsuarst',
+    experience: '4 a',
+    location: 'Tallinn',
+  },
+  {
+    name: 'Vello Vaarikas',
+    specialty: 'Kõrva-nina-kurguarst',
+    experience: '4 a',
+    location: 'Tallinn',
+    note: 'Arve tasumata',
+    noteColor: 'danger',
+  },
+];
+
+const customDoctors: CustomDoctor[] = Array.from({ length: 28 }, (_, index) => ({
+  ...customDoctorSeed[index % customDoctorSeed.length],
+  id: String(index + 1),
+}));
+
+const avatarStyle: React.CSSProperties = {
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  background: 'var(--general-surface-secondary)',
+  color: 'var(--general-text-secondary)',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontWeight: 'var(--heading-weight)',
+  fontSize: 'var(--body-small-regular-size)',
+  flexShrink: 0,
+};
+
+const initialsOf = (name: string) =>
+  name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('');
+
+const CustomTemplate = () => {
+  const columns = useMemo<ColumnDef<CustomDoctor>[]>(
+    () => [
+      {
+        id: 'name',
+        header: 'Arst',
+        cell: ({ row }) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span aria-hidden="true" style={avatarStyle}>
+              {initialsOf(row.original.name)}
+            </span>
+            <div>
+              <div>{row.original.name}</div>
+              <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: 'note',
+        header: '',
+        cell: ({ row }) =>
+          row.original.note && row.original.noteColor ? (
+            <Alert type={row.original.noteColor} size="small" role="status">
+              {row.original.note}
+            </Alert>
+          ) : null,
+      },
+      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+      {
+        id: 'actions',
+        header: '',
+        cell: () => (
+          <span style={rowActionsCellStyle}>
+            <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
+              <></>
+            </Button>
+            <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
+              <></>
+            </Button>
+          </span>
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <VerticalSpacing size={1}>
+      <Table<CustomDoctor>
+        id="tedi-table-custom"
+        data={customDoctors}
+        columns={columns}
+        pagination={SHOWCASE_PAGINATION_3}
+      />
+    </VerticalSpacing>
+  );
+};
 
 const MergedCellsTemplate = () => {
   const columns = useMemo<ColumnDef<Booking>[]>(
@@ -350,25 +712,15 @@ const MergedCellsTemplate = () => {
           const sorted = column.getIsSorted();
           const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
           return (
-            <button
-              type="button"
-              onClick={column.getToggleSortingHandler()}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'transparent',
-                border: 0,
-                padding: 0,
-                font: 'inherit',
-                color: 'inherit',
-                cursor: 'pointer',
-              }}
-              aria-label="Sort by Kuupäev"
-            >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               Kuupäev
-              <Icon name={iconName} color={sorted ? 'brand' : 'secondary'} />
-            </button>
+              <Table.HeaderButton
+                icon={iconName}
+                selected={!!sorted}
+                aria-label="Sort by Kuupäev"
+                onClick={column.getToggleSortingHandler()}
+              />
+            </span>
           );
         },
       },
@@ -642,25 +994,15 @@ const SortableTemplate = () => {
           const sorted = column.getIsSorted();
           const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
           return (
-            <button
-              type="button"
-              onClick={column.getToggleSortingHandler()}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'transparent',
-                border: 0,
-                padding: 0,
-                font: 'inherit',
-                color: 'inherit',
-                cursor: 'pointer',
-              }}
-              aria-label={`Sort by ${col.header}`}
-            >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               {col.header}
-              <Icon name={iconName} color={sorted ? 'brand' : 'secondary'} />
-            </button>
+              <Table.HeaderButton
+                icon={iconName}
+                selected={!!sorted}
+                aria-label={`Sort by ${col.header}`}
+                onClick={column.getToggleSortingHandler()}
+              />
+            </span>
           );
         },
       })),
@@ -669,8 +1011,6 @@ const SortableTemplate = () => {
 
   return <Table<Person> id="tedi-table-sortable" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
 };
-
-export const Sortable: Story = { render: () => <SortableTemplate /> };
 
 /**
  * Per-column filter popovers — matches Figma Example table 7/8 exactly
@@ -724,18 +1064,6 @@ const filterablePeople: PersonRecord[] = Array.from({ length: 28 }, (_, index) =
   };
 });
 
-const headerButtonStyle: React.CSSProperties = {
-  background: 'transparent',
-  border: 0,
-  padding: 0,
-  font: 'inherit',
-  color: 'inherit',
-  cursor: 'pointer',
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-};
-
 const SortLabel = ({
   column,
   children,
@@ -751,18 +1079,16 @@ const SortLabel = ({
   const sorted = column.getIsSorted();
   const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
   return (
-    <button type="button" onClick={column.getToggleSortingHandler()} style={headerButtonStyle} aria-label={ariaLabel}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
       {children}
-      <Icon name={iconName} color={sorted ? 'brand' : 'secondary'} />
-    </button>
+      <Table.HeaderButton
+        icon={iconName}
+        selected={!!sorted}
+        aria-label={ariaLabel}
+        onClick={column.getToggleSortingHandler()}
+      />
+    </span>
   );
-};
-
-const filterTriggerStyle: React.CSSProperties = {
-  background: 'transparent',
-  border: 0,
-  padding: 2,
-  cursor: 'pointer',
 };
 
 const TextFilterPopover = ({
@@ -778,9 +1104,7 @@ const TextFilterPopover = ({
   return (
     <Popover>
       <PopoverTrigger>
-        <button type="button" aria-label={`Filtreeri ${label}`} style={filterTriggerStyle}>
-          <Icon name="filter_alt" color={value ? 'brand' : 'secondary'} filled={value ? true : false} />
-        </button>
+        <Table.HeaderButton icon="filter_alt" selected={!!value} filled={!!value} aria-label={`Filtreeri ${label}`} />
       </PopoverTrigger>
       <PopoverContent>
         <VerticalSpacing size={0.5}>
@@ -830,9 +1154,7 @@ const DateRangeFilterPopover = ({
   return (
     <Popover>
       <PopoverTrigger>
-        <button type="button" aria-label={`Filtreeri ${label}`} style={filterTriggerStyle}>
-          <Icon name="filter_alt" color={active ? 'brand' : 'secondary'} filled={active ? true : false} />
-        </button>
+        <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
       </PopoverTrigger>
       <PopoverContent>
         <VerticalSpacing size={0.5}>
@@ -892,9 +1214,7 @@ const MultiSelectFilterPopover = ({
   return (
     <Popover>
       <PopoverTrigger>
-        <button type="button" aria-label={`Filtreeri ${label}`} style={filterTriggerStyle}>
-          <Icon name="filter_alt" color={active ? 'brand' : 'secondary'} filled={active ? true : false} />
-        </button>
+        <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
       </PopoverTrigger>
       <PopoverContent>
         <VerticalSpacing size={0.5}>
@@ -1099,36 +1419,6 @@ export const CollapsibleRows: Story = {
   },
 };
 
-/**
- * Alternative collapsible layout using the TEDI `Collapse` component inside a
- * regular cell. Use this when the disclosure should stay inline with its row
- * rather than push content into a separate full-width row.
- */
-export const CollapsibleInlineContent: Story = {
-  render: () => {
-    const columns: ColumnDef<Person>[] = [
-      { id: 'name', header: 'Name', accessorKey: 'name' },
-      { id: 'role', header: 'Role', accessorKey: 'role' },
-      {
-        id: 'details',
-        header: 'Details',
-        cell: ({ row }) => (
-          <Collapse id={`details-${row.original.id}`} title={<Text>View details</Text>} size="small">
-            <VerticalSpacing size={0.5}>
-              <Text>Location: {row.original.location}</Text>
-              <Text>Email: {row.original.email}</Text>
-              <Tag color={row.original.status === 'active' ? 'primary' : 'secondary'}>{row.original.status}</Tag>
-            </VerticalSpacing>
-          </Collapse>
-        ),
-      },
-    ];
-    return (
-      <Table<Person> id="tedi-table-collapse-inline" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />
-    );
-  },
-};
-
 export const SelectableRows: Story = {
   render: () => (
     <Table<Person>
@@ -1206,6 +1496,39 @@ export const WithEmptyState: Story = {
   ),
 };
 
+/**
+ * Two long-text patterns from the Figma "Long texts" frame. Top table puts
+ * the "Show more" link on its own line under the truncated paragraph (with a
+ * chevron). Bottom table inlines the link at the end of the truncated text
+ * (underlined, no icon). Tip alert in the middle explains the trade-off.
+ */
+export const LongTexts: Story = { render: () => <LongTextsTemplate /> };
+
+/**
+ * Two row-action patterns from the Figma "Actions" frame. Top table puts
+ * separate edit + delete icon buttons on each row. Bottom table collapses
+ * the same affordances into a single kebab (`more_vert`) button — typical
+ * pattern when the row is dense or has many possible actions.
+ */
+export const Actions: Story = { render: () => <ActionsTemplate /> };
+
+/**
+ * "Custom" Figma frame: a tip alert plus a table with custom-rendered cells —
+ * avatar circle next to the name, a status note column with coloured `Alert`
+ * tags, and the same edit/delete row actions from the Actions showcase.
+ * Demonstrates that any column can return arbitrary JSX.
+ */
+export const Custom: Story = { render: () => <CustomTemplate /> };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Stories not present in the Figma "Types" frame — kept after the Figma-driven
+// showcase so the story sidebar follows the design's documented order first.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Footer row showing per-column aggregates (e.g. salary total, headcount).
+ * Columns opt in by providing a `footer` value/function on `columnDef`.
+ */
 export const WithFooter: Story = {
   render: () => {
     const columns: ColumnDef<Person>[] = [
@@ -1240,4 +1563,41 @@ export const WithColumnsMenu: Story = {
       </Table.Toolbar>
     </Table>
   ),
+};
+
+/**
+ * Sortable columns — header shows a compact sort chevron that cycles through
+ * `unsorted → ascending → descending → unsorted` on click. Standalone
+ * showcase; a combined sort + filter version lives in `Filters`.
+ */
+export const Sortable: Story = { render: () => <SortableTemplate /> };
+
+/**
+ * Alternative collapsible layout using the TEDI `Collapse` component inside a
+ * regular cell. Use this when the disclosure should stay inline with its row
+ * rather than push content into a separate full-width row.
+ */
+export const CollapsibleInlineContent: Story = {
+  render: () => {
+    const columns: ColumnDef<Person>[] = [
+      { id: 'name', header: 'Name', accessorKey: 'name' },
+      { id: 'role', header: 'Role', accessorKey: 'role' },
+      {
+        id: 'details',
+        header: 'Details',
+        cell: ({ row }) => (
+          <Collapse id={`details-${row.original.id}`} title={<Text>View details</Text>} size="small">
+            <VerticalSpacing size={0.5}>
+              <Text>Location: {row.original.location}</Text>
+              <Text>Email: {row.original.email}</Text>
+              <Tag color={row.original.status === 'active' ? 'primary' : 'secondary'}>{row.original.status}</Tag>
+            </VerticalSpacing>
+          </Collapse>
+        ),
+      },
+    ];
+    return (
+      <Table<Person> id="tedi-table-collapse-inline" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />
+    );
+  },
 };

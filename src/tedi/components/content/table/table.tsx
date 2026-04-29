@@ -28,6 +28,7 @@ import styles from './table.module.scss';
 import type { TableContextValue, TableProps } from './table.types';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
+import { TableHeaderButton } from './table-header-button/table-header-button';
 import { useTablePersistence } from './use-table-persistence';
 
 const SELECT_COLUMN_ID = '__select__';
@@ -511,6 +512,7 @@ TableToolbar.displayName = 'Table.Toolbar';
 export const Table = Object.assign(TableBase, {
   Toolbar: TableToolbar,
   ColumnsMenu: TableColumnsMenu,
+  HeaderButton: TableHeaderButton,
 });
 
 export default Table;
