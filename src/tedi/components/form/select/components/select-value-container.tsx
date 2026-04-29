@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { components as ReactSelectComponents, ValueContainerProps } from 'react-select';
 
 import { Tag } from '../../../tags/tag/tag';
@@ -23,6 +23,10 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
   const totalCount = Array.isArray(selected) ? selected.length : 0;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Width seen by the most recent measurement pass. We compare against this
+  // inside the ResizeObserver so contents-only reflows (e.g. tags coming
+  // back when we reset to null) don't ping-pong us into a re-measure loop.
+  const lastMeasuredWidthRef = useRef<number>(0);
   const [visibleCount, setVisibleCount] = useState<number | null>(null);
 
   // Reset measurement whenever the selection count changes — that gives the
@@ -37,6 +41,30 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSingleRow, totalCount]);
 
+  // Re-measure when the container actually changes width (browser resize,
+  // parent layout shift, etc.). Without this the `+N` counter only matches
+  // the layout that existed at first paint — narrowing the window after
+  // load would leave overflow tags visibly clipping or push more rows in
+  // than fit. We compare the new contentRect width against the last value
+  // we measured at, so reflows triggered by our own setState don't loop.
+  useEffect(() => {
+    if (!isSingleRow) return;
+    const container = containerRef.current;
+    if (!container) return;
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver((entries) => {
+      const newWidth = entries[0]?.contentRect.width ?? 0;
+      if (newWidth > 0 && newWidth !== lastMeasuredWidthRef.current) {
+        // Triggers the measurement pass below via the visibleCount === null
+        // branch; that pass updates `lastMeasuredWidthRef`.
+        setVisibleCount(null);
+      }
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [isSingleRow]);
+
   // Measure rendered tags after the reset render and compute how many fit.
   useLayoutEffect(() => {
     if (!isSingleRow || visibleCount !== null) return;
@@ -48,6 +76,7 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
 
     const tags = container.querySelectorAll<HTMLElement>('[data-tedi-tag-index]');
     if (tags.length === 0) {
+      lastMeasuredWidthRef.current = containerWidth;
       setVisibleCount(0);
       return;
     }
@@ -71,6 +100,7 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
       }
     }
     if (visible === 0) visible = 1;
+    lastMeasuredWidthRef.current = containerWidth;
     setVisibleCount(visible);
   }, [isSingleRow, visibleCount, totalCount]);
 
