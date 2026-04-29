@@ -40,7 +40,7 @@ export const TableColumnsMenu = ({ triggerLabel = 'Columns', className }: TableC
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
-        <Button type="button" visualType="link" iconLeft="view_column" className={className}>
+        <Button type="button" visualType="neutral" iconLeft="view_column" className={className}>
           {triggerLabel}
         </Button>
       </DropdownTrigger>

@@ -450,4 +450,53 @@ describe('Table', () => {
       expect(screen.queryByRole('navigation', { name: /Pagination/i })).not.toBeInTheDocument();
     });
   });
+
+  describe('server-side mode', () => {
+    it('uses the supplied pageCount and rowCount instead of local row math', () => {
+      // Two rows on the current page, server says there are 50 total —
+      // local math would compute 1 page / 2 results, but the manual props
+      // override.
+      render(
+        <Table<Person>
+          id="t-manual"
+          data={data}
+          columns={columns}
+          pagination={{ pageSize: 10, pageSizeOptions: false }}
+          manualPagination
+          pageCount={5}
+          rowCount={50}
+        />
+      );
+
+      // The "results" total in the pagination footer should reflect the
+      // server-supplied rowCount (50), not the local 2-row count.
+      expect(screen.getByText(/50/)).toBeInTheDocument();
+    });
+
+    it('does not re-sort the rows locally when manualSorting is true', () => {
+      // Pass rows already in the order the "server" returned them (Charlie,
+      // Alice, Bob). With local sorting they would be re-ordered when sort
+      // state changes; with manualSorting they stay as-is.
+      const orderedData: Person[] = [
+        { id: '1', name: 'Charlie', role: 'Engineer' },
+        { id: '2', name: 'Alice', role: 'Engineer' },
+        { id: '3', name: 'Bob', role: 'Engineer' },
+      ];
+
+      render(
+        <Table<Person>
+          id="t-manual-sort"
+          data={orderedData}
+          columns={[{ id: 'name', header: 'Name', accessorKey: 'name' }]}
+          manualSorting
+          state={{ sorting: [{ id: 'name', desc: false }] }}
+        />
+      );
+
+      const cells = screen.getAllByRole('cell');
+      expect(cells[0]).toHaveTextContent('Charlie');
+      expect(cells[1]).toHaveTextContent('Alice');
+      expect(cells[2]).toHaveTextContent('Bob');
+    });
+  });
 });

@@ -184,12 +184,16 @@
 }
 
 .tedi-table--sticky-first-column {
+  // The `<table>` uses `border-collapse: collapse`, which drops `border-right`
+  // on `position: sticky` cells (the collapsed border is owned by the
+  // neighbouring cell, which scrolls away). Use an inset `box-shadow` instead
+  // so the divider is painted inside the sticky cell and travels with it.
   .tedi-table__row > .tedi-table__header-cell:first-child {
     position: sticky;
     left: 0;
     z-index: 2;
     background: var(--table-default);
-    border-right: 1px solid var(--table-border);
+    box-shadow: inset -1px 0 0 var(--table-border);
   }
 
   .tedi-table__row > .tedi-table__cell:first-child {
@@ -197,7 +201,7 @@
     left: 0;
     z-index: 1;
     background: var(--table-default);
-    border-right: 1px solid var(--table-border);
+    box-shadow: inset -1px 0 0 var(--table-border);
   }
 
   &.tedi-table--striped .tedi-table__body .tedi-table__row:nth-of-type(even) > .tedi-table__cell:first-child {

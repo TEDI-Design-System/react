@@ -144,6 +144,43 @@ export interface TableProps<TData> {
    */
   pagination?: boolean | TablePaginationOptions;
   /**
+   * Switches pagination to server-side mode. When `true`, Table stops slicing
+   * `data` locally — `data` is treated as the rows for the current page only.
+   * Pair with `pageCount` (or `rowCount`) and a controlled `state.pagination`
+   * + `onStateChange` to fetch the right page from the server on each change.
+   * @default false
+   */
+  manualPagination?: boolean;
+  /**
+   * Switches sorting to server-side mode. When `true`, Table no longer sorts
+   * `data` locally — sort state still updates and fires `onStateChange` so
+   * the parent can refetch in the new order, but the rows are rendered in
+   * the order they arrive in `data`.
+   * @default false
+   */
+  manualSorting?: boolean;
+  /**
+   * Switches filtering to server-side mode. When `true`, Table stops applying
+   * `columnFilters` locally; the parent is expected to translate filter state
+   * (visible via `onStateChange`) into a server query.
+   * @default false
+   */
+  manualFiltering?: boolean;
+  /**
+   * Total number of pages on the server. Required when `manualPagination` is
+   * `true` so the pagination footer can render the right page count — local
+   * row-count math is otherwise wrong, since `data` only holds the current
+   * page's rows.
+   */
+  pageCount?: number;
+  /**
+   * Total number of rows on the server (across all pages). Used as the
+   * "X tulemust" / "X results" counter in the pagination footer when
+   * `manualPagination` is on. Falls back to the locally filtered row count
+   * when omitted.
+   */
+  rowCount?: number;
+  /**
    * Controlled state. Pair with `onStateChange`. Any key left undefined falls
    * back to the corresponding default or internal state.
    */

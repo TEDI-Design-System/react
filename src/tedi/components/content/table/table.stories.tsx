@@ -6,15 +6,15 @@ import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
-import { Collapse } from '../../buttons/collapse/collapse';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import Separator from '../../misc/separator/separator';
 import { Alert } from '../../notifications/alert/alert';
 import { EmptyState } from '../../notifications/empty-state';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
-import { Tag } from '../../tags/tag/tag';
+import { Truncate } from '../truncate/truncate';
 import { Table } from './table';
 import type { TableProps } from './table.types';
 
@@ -356,19 +356,7 @@ const LONG_DESCRIPTION =
   'augue, sit amet pellentesque nibh ultricies eu. Nullam ut nibh non lectus pulvinar ' +
   'volutpat.';
 
-const truncate2LinesStyle: React.CSSProperties = {
-  display: '-webkit-box',
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: 'vertical',
-  overflow: 'hidden',
-};
-
-const inlineShowMoreLinkStyle: React.CSSProperties = {
-  color: 'var(--link-primary-default)',
-  textDecoration: 'underline',
-  fontWeight: 'var(--body-regular-weight)',
-  whiteSpace: 'nowrap',
-};
+const LONG_TEXT_MAX_LENGTH = 70;
 
 const baseDoctorWithDescriptionColumns = (): ColumnDef<Doctor>[] => [
   {
@@ -396,83 +384,42 @@ const baseDoctorWithDescriptionColumns = (): ColumnDef<Doctor>[] => [
 ];
 
 const LongTextsTemplate = () => {
-  const [expandedBlock, setExpandedBlock] = useState<Set<string>>(new Set());
-  const [expandedInline, setExpandedInline] = useState<Set<string>>(new Set());
-
-  const toggleIn = (set: Set<string>, id: string) => {
-    const next = new Set(set);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    return next;
-  };
-
-  const blockColumns = useMemo<ColumnDef<Doctor>[]>(() => {
-    const base = baseDoctorWithDescriptionColumns();
-    return [
-      base[0],
+  // Block variant: the "Show more" Button sits on its own line below the
+  // truncated paragraph (matches the top table in the Figma frame). Forced
+  // via `style: { display: 'block' }` on the underlying Button.
+  const blockColumns = useMemo<ColumnDef<Doctor>[]>(
+    () => [
+      baseDoctorWithDescriptionColumns()[0],
       {
         id: 'description',
         header: 'Kirjeldus',
-        cell: ({ row }) => {
-          const isExpanded = expandedBlock.has(row.id);
-          return (
-            <div>
-              <div style={isExpanded ? undefined : truncate2LinesStyle}>{LONG_DESCRIPTION}</div>
-              <a
-                href="#"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setExpandedBlock((prev) => toggleIn(prev, row.id));
-                }}
-                style={{ ...editLinkStyle, marginTop: 4 }}
-              >
-                {isExpanded ? 'Show less' : 'Show more'}
-                <Icon name={isExpanded ? 'arrow_drop_up' : 'arrow_drop_down'} color="brand" size={18} />
-              </a>
-            </div>
-          );
-        },
+        cell: () => (
+          <Truncate maxLength={LONG_TEXT_MAX_LENGTH} button={{ style: { display: 'block', padding: 0 } }}>
+            {LONG_DESCRIPTION}
+          </Truncate>
+        ),
       },
-      base[1],
-      base[2],
-    ];
-  }, [expandedBlock]);
+      baseDoctorWithDescriptionColumns()[1],
+      baseDoctorWithDescriptionColumns()[2],
+    ],
+    []
+  );
 
-  const inlineColumns = useMemo<ColumnDef<Doctor>[]>(() => {
-    const base = baseDoctorWithDescriptionColumns();
-    return [
-      base[0],
+  // Inline variant: default Truncate renders the toggle Button inline at the
+  // end of the truncated text (matches the bottom table in the Figma frame).
+  const inlineColumns = useMemo<ColumnDef<Doctor>[]>(
+    () => [
+      baseDoctorWithDescriptionColumns()[0],
       {
         id: 'description',
         header: 'Kirjeldus',
-        cell: ({ row }) => {
-          const isExpanded = expandedInline.has(row.id);
-          // Truncate at a fixed length so the inline "Show more" sits at the
-          // end of the text rather than on its own line. CSS line-clamp can't
-          // mix with an inline trailing link without complex layout tricks.
-          const truncated =
-            LONG_DESCRIPTION.length > 70 ? `${LONG_DESCRIPTION.slice(0, 70).trimEnd()}…` : LONG_DESCRIPTION;
-          return (
-            <span>
-              {isExpanded ? LONG_DESCRIPTION : truncated}{' '}
-              <a
-                href="#"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setExpandedInline((prev) => toggleIn(prev, row.id));
-                }}
-                style={inlineShowMoreLinkStyle}
-              >
-                {isExpanded ? 'Show less' : 'Show more'}
-              </a>
-            </span>
-          );
-        },
+        cell: () => <Truncate maxLength={LONG_TEXT_MAX_LENGTH}>{LONG_DESCRIPTION}</Truncate>,
       },
-      base[1],
-      base[2],
-    ];
-  }, [expandedInline]);
+      baseDoctorWithDescriptionColumns()[1],
+      baseDoctorWithDescriptionColumns()[2],
+    ],
+    []
+  );
 
   return (
     <VerticalSpacing size={1}>
@@ -1566,38 +1513,128 @@ export const WithColumnsMenu: Story = {
 };
 
 /**
- * Sortable columns — header shows a compact sort chevron that cycles through
- * `unsorted → ascending → descending → unsorted` on click. Standalone
- * showcase; a combined sort + filter version lives in `Filters`.
+ * Server-side pagination + sorting demo. `manualPagination` / `manualSorting`
+ * tell the Table not to slice or re-order `data` locally; the parent owns
+ * the current page slice and the sort, and re-derives them when state
+ * changes. In a real app the `onStateChange` callback would dispatch a
+ * fetch with the new page / sort and pass the response back as `data`.
+ *
+ * Key props:
+ * - `manualPagination` / `manualSorting` — disables in-memory work
+ * - `pageCount` / `rowCount` — server-known totals (the local row count is
+ *   wrong because `data` only holds the current page)
+ * - controlled `state` + `onStateChange` — observe page / sort changes and
+ *   refetch
  */
-export const Sortable: Story = { render: () => <SortableTemplate /> };
+const ServerSideTemplate = () => {
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+  const [sorting, setSorting] = useState<{ id: string; desc: boolean }[]>([]);
 
-/**
- * Alternative collapsible layout using the TEDI `Collapse` component inside a
- * regular cell. Use this when the disclosure should stay inline with its row
- * rather than push content into a separate full-width row.
- */
-export const CollapsibleInlineContent: Story = {
-  render: () => {
-    const columns: ColumnDef<Person>[] = [
-      { id: 'name', header: 'Name', accessorKey: 'name' },
-      { id: 'role', header: 'Role', accessorKey: 'role' },
-      {
-        id: 'details',
-        header: 'Details',
-        cell: ({ row }) => (
-          <Collapse id={`details-${row.original.id}`} title={<Text>View details</Text>} size="small">
-            <VerticalSpacing size={0.5}>
-              <Text>Location: {row.original.location}</Text>
-              <Text>Email: {row.original.email}</Text>
-              <Tag color={row.original.status === 'active' ? 'primary' : 'secondary'}>{row.original.status}</Tag>
-            </VerticalSpacing>
-          </Collapse>
-        ),
-      },
-    ];
-    return (
-      <Table<Person> id="tedi-table-collapse-inline" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />
-    );
-  },
+  const sortedData = useMemo(() => {
+    if (sorting.length === 0) return people;
+    const { id, desc } = sorting[0];
+    const direction = desc ? -1 : 1;
+    return [...people].sort((a, b) => {
+      const av = a[id as keyof Person];
+      const bv = b[id as keyof Person];
+      if (av === bv) return 0;
+      return av > bv ? direction : -direction;
+    });
+  }, [sorting]);
+
+  const pageRows = useMemo(
+    () =>
+      sortedData.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize),
+    [sortedData, pagination]
+  );
+
+  const sortableColumns = useMemo<ColumnDef<Person>[]>(
+    () =>
+      personColumns.map((col) => ({
+        ...col,
+        header: ({ column }) => {
+          const sorted = column.getIsSorted();
+          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+          return (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              {col.header as string}
+              <Table.HeaderButton
+                icon={iconName}
+                selected={!!sorted}
+                aria-label={`Sort by ${col.header as string}`}
+                onClick={column.getToggleSortingHandler()}
+              />
+            </span>
+          );
+        },
+      })) as ColumnDef<Person>[],
+    []
+  );
+
+  return (
+    <VerticalSpacing size={1}>
+      <Alert type="info" role="status" title="Server-side mode" icon="lightbulb">
+        <Text>
+          This story simulates a server-paginated, server-sorted table. The parent owns the current page slice and the
+          sort state; the Table is told <StatusBadge>manualPagination</StatusBadge> +{' '}
+          <StatusBadge>manualSorting</StatusBadge> so it does not re-slice or re-sort its{' '}
+          <StatusBadge>data</StatusBadge> locally.
+        </Text>
+        <Text modifiers="bold">Wiring it up in your app</Text>
+        <pre
+          style={{
+            margin: 0,
+            padding: 'var(--tedi-dimensions-12)',
+            background: 'var(--general-surface-secondary)',
+            borderRadius: 'var(--tedi-borders-radius-default, 4px)',
+            fontFamily: 'var(--family-mono, monospace)',
+            fontSize: 'var(--body-small-regular-size)',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {`const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+const [sorting, setSorting] = useState([]);
+
+// Refetch from the server whenever pagination / sort changes.
+const { data: page, total } = useServerQuery({ pagination, sorting });
+
+<Table
+  data={page.rows}                    // current page only
+  columns={columns}
+  manualPagination                    // disables in-memory pagination
+  manualSorting                       // disables in-memory sort
+  pageCount={Math.ceil(total / pagination.pageSize)}
+  rowCount={total}                    // shown in the "X results" footer
+  state={{ pagination, sorting }}     // controlled
+  onStateChange={(next) => {
+    if (next.pagination) setPagination(next.pagination);
+    if (next.sorting) setSorting(next.sorting);
+  }}
+  pagination
+/>`}
+        </pre>
+        <Separator axis="horizontal" spacing={1} color="secondary" />
+        <Text modifiers="small" color="secondary">
+          Tip: <StatusBadge>manualFiltering</StatusBadge> works the same way for column filters when you have them.
+        </Text>
+      </Alert>
+      <Table<Person>
+        id="tedi-table-server-side"
+        data={pageRows}
+        columns={sortableColumns}
+        manualPagination
+        manualSorting
+        pageCount={Math.ceil(people.length / pagination.pageSize)}
+        rowCount={people.length}
+        state={{ pagination, sorting }}
+        onStateChange={(next) => {
+          if (next.pagination) setPagination(next.pagination);
+          if (next.sorting !== undefined) setSorting(next.sorting);
+        }}
+        pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
+      />
+    </VerticalSpacing>
+  );
 };
+
+export const ServerSide: Story = { render: () => <ServerSideTemplate /> };

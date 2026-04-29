@@ -73,6 +73,11 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     getRowCanExpand,
     getSubRows,
     pagination: paginationProp,
+    manualPagination = false,
+    manualSorting = false,
+    manualFiltering = false,
+    pageCount,
+    rowCount,
   } = props;
 
   const paginationOptions = useMemo(() => {
@@ -178,12 +183,15 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   // fresh function every render can (and occasionally does) look like a
   // row-model swap and cascade through autoReset handlers in the real browser.
   const coreRowModel = useMemo(() => getCoreRowModel(), []);
-  const filteredRowModel = useMemo(() => getFilteredRowModel(), []);
-  const sortedRowModel = useMemo(() => getSortedRowModel(), []);
+  // Skip the local row models entirely when their corresponding manual flag is
+  // on — TanStack tolerates client-side row models in manual mode, but
+  // omitting them avoids redundant work and makes intent obvious.
+  const filteredRowModel = useMemo(() => (manualFiltering ? undefined : getFilteredRowModel()), [manualFiltering]);
+  const sortedRowModel = useMemo(() => (manualSorting ? undefined : getSortedRowModel()), [manualSorting]);
   const expandedRowModel = useMemo(() => (hasExpansion ? getExpandedRowModel() : undefined), [hasExpansion]);
   const paginationRowModel = useMemo(
-    () => (paginationEnabled ? getPaginationRowModel() : undefined),
-    [paginationEnabled]
+    () => (paginationEnabled && !manualPagination ? getPaginationRowModel() : undefined),
+    [paginationEnabled, manualPagination]
   );
 
   const augmentedColumns = useMemo<ColumnDef<TData>[]>(() => {
@@ -281,6 +289,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     },
     enableRowSelection,
     enableColumnFilters,
+    manualPagination,
+    manualSorting,
+    manualFiltering,
+    // `pageCount` only matters in manual mode; TanStack ignores it otherwise.
+    pageCount: manualPagination && pageCount !== undefined ? pageCount : undefined,
+    rowCount: manualPagination && rowCount !== undefined ? rowCount : undefined,
     getRowCanExpand: renderSubComponent ? getRowCanExpand ?? (() => true) : getRowCanExpand,
     getSubRows,
     onColumnVisibilityChange: handleVisibilityChange,
@@ -486,7 +500,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               pageCount={Math.max(1, table.getPageCount())}
               page={table.getState().pagination.pageIndex + 1}
               onPageChange={handlePaginationPageChange}
-              totalItems={table.getFilteredRowModel().rows.length}
+              // In manual-pagination mode the locally-filtered row count is
+              // wrong (`data` only holds the current page); fall back to the
+              // server-provided `rowCount` when available.
+              totalItems={rowCount ?? table.getFilteredRowModel().rows.length}
               pageSize={table.getState().pagination.pageSize}
               pageSizeOptions={paginationPageSizeOptions}
               onPageSizeChange={handlePaginationPageSizeChange}
