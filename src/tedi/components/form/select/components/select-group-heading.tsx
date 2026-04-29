@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactElement } from 'react';
+import { ReactElement, useId } from 'react';
 import { components as ReactSelectComponents, GroupHeadingProps } from 'react-select';
 
 import { Text, TextProps } from '../../../base/typography/text/text';
@@ -14,6 +14,7 @@ type GroupHeadingType = GroupHeadingProps<ISelectOption, boolean, IGroupedOption
 };
 
 export const SelectGroupHeading = ({ optionGroupHeadingText, ...props }: GroupHeadingType): ReactElement => {
+  const groupHeadingId = useId();
   const textSettings = props.data.text || optionGroupHeadingText;
 
   // Forwarded from <Select>; cast to read without polluting react-select types.
@@ -52,7 +53,7 @@ export const SelectGroupHeading = ({ optionGroupHeadingText, ...props }: GroupHe
         // mousedown that would otherwise close react-select's menu.
         <div className={styles['tedi-select__group-heading-toggle']} onMouseDown={(e) => e.preventDefault()}>
           <Checkbox
-            id={`${props.selectProps.instanceId ?? 'tedi-select'}-group-${props.data.label}`}
+            id={`${props.selectProps.instanceId ?? 'tedi-select'}-group-${groupHeadingId}`}
             name="tedi-select__group-toggle"
             value={`__group_${props.data.label}__`}
             label={<Text {...textSettings}>{props.data.label}</Text>}
