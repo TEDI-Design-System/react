@@ -333,12 +333,14 @@ describe('Table', () => {
         />
       );
 
-      const toggle = screen.getAllByRole('button', { name: /Expand row/i })[0];
+      // Without a `LabelProvider` wrapping the render, `getLabel` returns the
+      // i18n key verbatim, which is what the accessible name resolves to.
+      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
       fireEvent.click(toggle);
 
       expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
 
-      const collapse = screen.getByRole('button', { name: /Collapse row/i });
+      const collapse = screen.getByRole('button', { name: /table\.collapse-row/i });
       fireEvent.click(collapse);
       expect(screen.queryByText(/details for Anna/)).not.toBeInTheDocument();
     });

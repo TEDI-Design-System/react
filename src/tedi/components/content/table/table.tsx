@@ -20,6 +20,7 @@ import {
 import cn from 'classnames';
 import { Fragment, type KeyboardEvent, useCallback, useMemo } from 'react';
 
+import { useLabels } from '../../../providers/label-provider';
 import { Collapse } from '../../buttons/collapse/collapse';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
@@ -59,7 +60,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     defaultState,
     onStateChange,
     persist,
-    placeholder = 'No data',
+    placeholder,
     className,
     children,
     striped = false,
@@ -79,6 +80,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     pageCount,
     rowCount,
   } = props;
+
+  const { getLabel } = useLabels();
+  const resolvedPlaceholder = placeholder ?? getLabel('table.no-data');
 
   const paginationOptions = useMemo(() => {
     if (!paginationProp) return null;
@@ -208,7 +212,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           <Checkbox
             id={`${id ?? 'tedi-table'}-select-all`}
             name={`${id ?? 'tedi-table'}-select-all`}
-            label="Select all"
+            label={getLabel('table.select-all', table.getIsAllRowsSelected())}
             hideLabel
             value="all"
             checked={table.getIsAllRowsSelected()}
@@ -220,7 +224,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           <Checkbox
             id={`${id ?? 'tedi-table'}-select-${row.id}`}
             name={`${id ?? 'tedi-table'}-select-${row.id}`}
-            label="Select row"
+            label={getLabel('table.select-row', row.getIsSelected())}
             hideLabel
             value={row.id}
             checked={row.getIsSelected()}
@@ -248,8 +252,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 iconOnly
                 arrowType="secondary"
                 hideCollapseText
-                openText="Expand row"
-                closeText="Collapse row"
+                openText={getLabel('table.expand-row')}
+                closeText={getLabel('table.collapse-row')}
                 open={row.getIsExpanded()}
                 onToggle={() => row.toggleExpanded()}
               >
@@ -415,7 +419,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             label={`Filter ${headerLabel}`}
                             hideLabel
                             size="small"
-                            placeholder="Filter…"
+                            placeholder={getLabel('table.filter-placeholder')}
                             value={(column.getFilterValue() as string | undefined) ?? ''}
                             onChange={(next) => column.setFilterValue(next || undefined)}
                           />
@@ -433,7 +437,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     colSpan={Math.max(1, leafColumnCount)}
                     className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--placeholder'])}
                   >
-                    {placeholder}
+                    {resolvedPlaceholder}
                   </td>
                 </tr>
               ) : (

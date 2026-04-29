@@ -1,3 +1,4 @@
+import { useLabels } from '../../../../providers/label-provider';
 import { Button } from '../../../buttons/button/button';
 import { Checkbox } from '../../../form/checkbox/checkbox';
 import { Dropdown } from '../../../overlays/dropdown/dropdown';
@@ -8,8 +9,8 @@ import { useTableContext } from '../table-context';
 
 export interface TableColumnsMenuProps {
   /**
-   * Trigger label.
-   * @default "Columns"
+   * Trigger label. Falls back to the localised `table.columns` label from
+   * `LabelProvider` when not provided.
    */
   triggerLabel?: React.ReactNode;
   /**
@@ -26,8 +27,10 @@ export interface TableColumnsMenuProps {
  * Prevents hiding the last visible column — a table with zero columns has no
  * useful state to reach.
  */
-export const TableColumnsMenu = ({ triggerLabel = 'Columns', className }: TableColumnsMenuProps) => {
+export const TableColumnsMenu = ({ triggerLabel, className }: TableColumnsMenuProps) => {
   const { table, id } = useTableContext();
+  const { getLabel } = useLabels();
+  const resolvedTriggerLabel = triggerLabel ?? getLabel('table.columns');
 
   const hideableColumns = table.getAllLeafColumns().filter((column) => column.getCanHide());
   const visibleCount = hideableColumns.filter((column) => column.getIsVisible()).length;
@@ -41,7 +44,7 @@ export const TableColumnsMenu = ({ triggerLabel = 'Columns', className }: TableC
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
         <Button type="button" visualType="neutral" iconLeft="view_column" className={className}>
-          {triggerLabel}
+          {resolvedTriggerLabel}
         </Button>
       </DropdownTrigger>
       <DropdownContent>

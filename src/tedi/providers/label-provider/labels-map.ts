@@ -313,6 +313,44 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
+  'table.no-data': {
+    description: 'Default placeholder shown in the Table body when `data` is empty.',
+    components: ['Table'],
+    et: 'Andmed puuduvad',
+    en: 'No data',
+    ru: 'Нет данных',
+  },
+  // `table.select-all` / `table.select-row` already exist further down with a
+  // state-aware function signature shared with the community Table — we reuse
+  // them via `getLabel('table.select-all', isAllSelected)` etc.
+  'table.expand-row': {
+    description: 'Accessible label on the expand toggle in expandable rows.',
+    components: ['Table'],
+    et: 'Laienda rida',
+    en: 'Expand row',
+    ru: 'Развернуть строку',
+  },
+  'table.collapse-row': {
+    description: 'Accessible label on the collapse toggle in expandable rows.',
+    components: ['Table'],
+    et: 'Ahenda rida',
+    en: 'Collapse row',
+    ru: 'Свернуть строку',
+  },
+  'table.filter-placeholder': {
+    description: 'Placeholder for the per-column filter inputs rendered under the header.',
+    components: ['Table'],
+    et: 'Filtreeri…',
+    en: 'Filter…',
+    ru: 'Фильтр…',
+  },
+  'table.columns': {
+    description: 'Default label on the `Table.ColumnsMenu` trigger (column-visibility menu).',
+    components: ['TableColumnsMenu'],
+    et: 'Veerud',
+    en: 'Columns',
+    ru: 'Столбцы',
+  },
   'stepper.completed': {
     description: 'Label for screen-reader that this step is completed (visually hidden)',
     components: ['StepperNav'],
