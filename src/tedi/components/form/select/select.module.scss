@@ -128,14 +128,21 @@ div .tedi-select__menu {
   }
 
   &--selected {
+    // `.tedi-radio` sets `color` on its own root element, which would beat the
+    // inherited `--selected` color, so override it explicitly. `:global` is
+    // needed because the class lives in the radio module, not this one.
     p,
-    span {
+    span,
+    label,
+    :global(.tedi-radio) {
       color: var(--dropdown-item-active-text);
     }
 
     &:hover:not(:disabled) {
       p,
-      span {
+      span,
+      label,
+      :global(.tedi-radio) {
         color: var(--dropdown-item-hover-text);
       }
     }

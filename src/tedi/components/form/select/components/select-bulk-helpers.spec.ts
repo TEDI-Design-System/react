@@ -61,16 +61,41 @@ describe('select-bulk-helpers', () => {
   });
 
   describe('getGroupEnabledOptions', () => {
-    it('returns enabled options for the matching group label', () => {
-      expect(getGroupEnabledOptions(grouped, 'Numbers').map((o) => o.value)).toEqual(['1', '2']);
+    it('returns enabled options of the passed group', () => {
+      expect(getGroupEnabledOptions(grouped[1]).map((o) => o.value)).toEqual(['1', '2']);
     });
 
-    it('returns [] when group label is not found', () => {
-      expect(getGroupEnabledOptions(grouped, 'Missing')).toEqual([]);
+    it('filters out disabled options within the group', () => {
+      // grouped[0] = { label: 'Letters', options: [a, b (disabled)] }
+      expect(getGroupEnabledOptions(grouped[0]).map((o) => o.value)).toEqual(['a']);
     });
 
-    it('returns [] when called on flat options', () => {
-      expect(getGroupEnabledOptions(flat, 'whatever')).toEqual([]);
+    it('returns [] when group is null/undefined', () => {
+      expect(getGroupEnabledOptions(null)).toEqual([]);
+      expect(getGroupEnabledOptions(undefined)).toEqual([]);
+    });
+
+    it('returns [] when group has no options array', () => {
+      expect(getGroupEnabledOptions({ label: 'No options' } as never)).toEqual([]);
+    });
+
+    it('targets the correct group when two groups share the same label', () => {
+      // Regression: looking groups up by label would have always resolved to
+      // the first match, returning the wrong options for the second group.
+      const a: IGroupedOptions<ISelectOption> = {
+        label: 'Shared',
+        options: [{ value: 'a-1', label: 'A1' }],
+      };
+      const b: IGroupedOptions<ISelectOption> = {
+        label: 'Shared',
+        options: [
+          { value: 'b-1', label: 'B1' },
+          { value: 'b-2', label: 'B2' },
+        ],
+      };
+
+      expect(getGroupEnabledOptions(a).map((o) => o.value)).toEqual(['a-1']);
+      expect(getGroupEnabledOptions(b).map((o) => o.value)).toEqual(['b-1', 'b-2']);
     });
   });
 

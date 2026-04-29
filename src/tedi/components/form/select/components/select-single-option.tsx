@@ -40,6 +40,12 @@ export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }:
             value={props.data.value}
             checked={props.isSelected}
             disabled={props.isDisabled}
+            // Required: without an onChange, Radio falls back to its internal
+            // `innerChecked` state and ignores the controlled `checked` prop,
+            // so the radio dot would never visually update from react-select's
+            // selection. Click is handled at the option level — this is just
+            // a no-op marker so Radio respects the prop.
+            onChange={() => null}
           />
         </>
       ) : renderOption ? (

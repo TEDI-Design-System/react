@@ -26,13 +26,15 @@ export const getEnabledOptions = (
   return (options as ISelectOption[]).filter((o) => !o.isDisabled);
 };
 
-export const getGroupEnabledOptions = (
-  options: OptionsOrGroups<ISelectOption, GroupBase<ISelectOption>>,
-  groupLabel: string
-): ISelectOption[] => {
-  if (!isGroupedOptions(options)) return [];
-  const group = options.find((g) => g.label === groupLabel);
-  return group ? group.options.filter((o) => !o.isDisabled) : [];
+/**
+ * Returns the enabled options of a specific group. Pass the group object
+ * directly (e.g. `GroupHeadingProps.data` from react-select) — looking groups
+ * up by label is unsafe because duplicate labels would always resolve to the
+ * first match, mutating the wrong group.
+ */
+export const getGroupEnabledOptions = (group: GroupBase<ISelectOption> | null | undefined): ISelectOption[] => {
+  if (!group || !Array.isArray(group.options)) return [];
+  return group.options.filter((o) => !o.isDisabled);
 };
 
 /** True iff every enabled option is currently in the selection. */

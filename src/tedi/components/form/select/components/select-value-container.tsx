@@ -108,3 +108,5 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
     </SelectTagsContext.Provider>
   );
 };
+
+SelectValueContainer.displayName = 'SelectValueContainer';

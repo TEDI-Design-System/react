@@ -60,7 +60,6 @@ export const SelectMenuList = ({ renderMessageListFooter, ...props }: MenuListTy
               label={selectAllLabel ?? getLabel('select.select-all')}
               checked={allSelected}
               indeterminate={indeterminate}
-              onChange={handleSelectAll}
             />
           </div>
         )}
@@ -72,3 +71,5 @@ export const SelectMenuList = ({ renderMessageListFooter, ...props }: MenuListTy
     </div>
   );
 };
+
+SelectMenuList.displayName = 'SelectMenuList';
