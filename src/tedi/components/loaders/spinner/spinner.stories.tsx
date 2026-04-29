@@ -1,4 +1,5 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryContext, StoryFn, StoryObj } from '@storybook/react';
+import { useEffect } from 'react';
 
 import { Col, Row } from '../../layout/grid';
 import { Spinner, SpinnerProps } from './spinner';
@@ -7,6 +8,31 @@ import { Spinner, SpinnerProps } from './spinner';
  * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2768-42334&mode=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/13d6ac-spinner" target="_BLANK">Zeroheight ↗</a>
  */
+
+const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) => {
+  const { color } = context.args;
+
+  useEffect(() => {
+    const bg = color === 'secondary' ? 'var(--color-bg-inverted)' : 'var(--color-bg-default)';
+    const elements = document.querySelectorAll('.sb-show-main, .docs-story > div, .sbdocs-preview');
+
+    elements.forEach((el) => {
+      const element = el as HTMLElement;
+      element.style.backgroundColor = bg;
+      element.style.color = 'var(--color-text-inverted)';
+      element.style.transition = 'background-color 0.2s ease';
+    });
+
+    return () => {
+      elements.forEach((el) => {
+        const element = el as HTMLElement;
+        element.style.backgroundColor = '';
+      });
+    };
+  }, [color]);
+
+  return <Story />;
+};
 
 const meta: Meta<typeof Spinner> = {
   component: Spinner,
@@ -28,7 +54,7 @@ const meta: Meta<typeof Spinner> = {
 export default meta;
 type Story = StoryObj<typeof Spinner>;
 
-const sizeArray: SpinnerProps['size'][] = [10, 16, 48];
+const sizeArray: SpinnerProps['size'][] = [8, 10, 12, 16, 18, 24, 36, 48];
 
 interface TemplateMultipleProps<Type = SpinnerProps['size'] | SpinnerProps['color'] | SpinnerProps['position']>
   extends SpinnerProps {
@@ -88,6 +114,7 @@ export const Default: Story = {
     color: 'primary',
     label: 'Loading...',
   },
+  decorators: [withConditionalCanvasBackground],
 };
 
 export const Size: StoryObj<TemplateMultipleProps> = {

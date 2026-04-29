@@ -3,6 +3,7 @@ import linkifyStr from 'linkify-string';
 
 import { Table, Tooltip, TooltipProvider, TooltipTrigger } from '../../../community/index';
 import { IntentionalAny } from '../../../community/types';
+import { PrintingProvider } from '../printing-provider';
 import { LabelProvider, labelsMap } from '.';
 
 interface LabelRow {
@@ -77,17 +78,19 @@ const Labels = () => {
   ];
 
   return (
-    <LabelProvider>
-      <Table
-        id="labels-table"
-        className="sb-unstyled"
-        data={labels}
-        columns={columns}
-        defaultPagination={{ pageIndex: 0, pageSize: 20 }}
-        defaultSorting={[{ id: 'key', desc: false }]}
-        enableFilters
-      />
-    </LabelProvider>
+    <PrintingProvider>
+      <LabelProvider>
+        <Table
+          id="labels-table"
+          className="sb-unstyled"
+          data={labels}
+          columns={columns}
+          defaultPagination={{ pageIndex: 0, pageSize: 20 }}
+          defaultSorting={[{ id: 'key', desc: false }]}
+          enableFilters
+        />
+      </LabelProvider>
+    </PrintingProvider>
   );
 };
 

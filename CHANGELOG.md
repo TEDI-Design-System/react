@@ -1,3 +1,79 @@
+# [17.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.7...react-17.0.0-rc.8) (2026-04-27)
+
+
+### Features
+
+* **button-group:** add mobile variant [#448](https://github.com/TEDI-Design-System/react/issues/448) ([#606](https://github.com/TEDI-Design-System/react/issues/606)) ([54dee90](https://github.com/TEDI-Design-System/react/commit/54dee901855737c2f4255893b75dcc6ea966314c)), closes [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94)
+
+# [17.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.6...react-17.0.0-rc.7) (2026-04-23)
+
+
+### Bug Fixes
+
+* **checkbox:** invalid indicator hover border fix [#605](https://github.com/TEDI-Design-System/react/issues/605) ([#609](https://github.com/TEDI-Design-System/react/issues/609)) ([f1d62c6](https://github.com/TEDI-Design-System/react/commit/f1d62c6f2c19b9bae25cc71e5a88ae0fb17415d0))
+
+# [17.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.5...react-17.0.0-rc.6) (2026-04-15)
+
+
+### Features
+
+* **tabs:** new tedi-ready component [#555](https://github.com/TEDI-Design-System/react/issues/555) ([#557](https://github.com/TEDI-Design-System/react/issues/557)) ([9c06c51](https://github.com/TEDI-Design-System/react/commit/9c06c51d2b7073494d2faa77bbf212ccae2921af))
+
+# [17.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.4...react-17.0.0-rc.5) (2026-04-15)
+
+
+### Features
+
+* **textarea:** add autoGrow, height and maxHeight props [#588](https://github.com/TEDI-Design-System/react/issues/588) ([#593](https://github.com/TEDI-Design-System/react/issues/593)) ([2c86740](https://github.com/TEDI-Design-System/react/commit/2c867409a9102bb024c94f8e6bc9c27791a59bd9))
+
+# [17.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.3...react-17.0.0-rc.4) (2026-04-14)
+
+
+### Features
+
+* **toggle:** new TEDI-Ready component [#305](https://github.com/TEDI-Design-System/react/issues/305) ([#594](https://github.com/TEDI-Design-System/react/issues/594)) ([6f28045](https://github.com/TEDI-Design-System/react/commit/6f280457f48898d79b72467dd0bac1c2b01fc779))
+
+# [17.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.2...react-17.0.0-rc.3) (2026-04-14)
+
+
+### Features
+
+* **card:** add more control to borderRadius usage, add examples [#444](https://github.com/TEDI-Design-System/react/issues/444) ([#597](https://github.com/TEDI-Design-System/react/issues/597)) ([deac9db](https://github.com/TEDI-Design-System/react/commit/deac9db6a10b8e1fe7dbd8f46ec74c8a46245496))
+
+# [17.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-17.0.0-rc.1...react-17.0.0-rc.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* **variables:** update core version, update variable names [#592](https://github.com/TEDI-Design-System/react/issues/592) ([#598](https://github.com/TEDI-Design-System/react/issues/598)) ([1f15b36](https://github.com/TEDI-Design-System/react/commit/1f15b361dd3e953822c7fd490d772f4531363e0e))
+
+# [17.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.2.0-rc.1...react-17.0.0-rc.1) (2026-04-14)
+
+
+### Features
+
+* **print:** introduce PrintingProvider + context-based usePrint [#99](https://github.com/TEDI-Design-System/react/issues/99) ([#497](https://github.com/TEDI-Design-System/react/issues/497)) ([a58cb70](https://github.com/TEDI-Design-System/react/commit/a58cb70b49e715c9a24e37fe761d5b7ab4df3fa5))
+
+
+### BREAKING CHANGES
+
+* **print:** usePrint hook removed.
+Replace with usePrint from the new PrintingProvider context.
+
+# [16.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.1-rc.1...react-16.2.0-rc.1) (2026-04-06)
+
+
+### Features
+
+* **spinner:** add new sizes [#586](https://github.com/TEDI-Design-System/react/issues/586) ([#589](https://github.com/TEDI-Design-System/react/issues/589)) ([fbea0c3](https://github.com/TEDI-Design-System/react/commit/fbea0c3e684feac8a1de3895c17d6c10b9a6e07e))
+
+## [16.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-16.1.0...react-16.1.1-rc.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* **select:** select placeholder no longer blocks context menu interactions [#584](https://github.com/TEDI-Design-System/react/issues/584) ([#585](https://github.com/TEDI-Design-System/react/issues/585)) ([e8d86ab](https://github.com/TEDI-Design-System/react/commit/e8d86ab9632be40906a1d706991fbfe87ff31656))
+
 # [16.1.0](https://github.com/TEDI-Design-System/react/compare/react-16.0.0...react-16.1.0) (2026-03-26)
 
 

@@ -2,8 +2,9 @@ import cn from 'classnames';
 import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
-import { BreakpointSupport, useBreakpointProps, usePrint } from '../../../helpers';
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { usePrint } from '../../../providers/printing-provider/printing-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row, RowProps } from '../../layout/grid';

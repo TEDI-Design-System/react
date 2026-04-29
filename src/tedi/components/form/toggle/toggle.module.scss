@@ -1,0 +1,167 @@
+@mixin toggle-variant($color, $type) {
+  @if $type == filled {
+    --toggle-bg-default: var(--form-toggle-#{$color}-inactive-default);
+    --toggle-bg-hover: var(--form-toggle-#{$color}-inactive-hover);
+    --toggle-bg-active: var(--form-toggle-#{$color}-inactive-active);
+    --toggle-bg-checked: var(--form-toggle-#{$color}-active-default);
+    --toggle-bg-checked-hover: var(--form-toggle-#{$color}-active-hover);
+    --toggle-bg-checked-active: var(--form-toggle-#{$color}-active-active);
+    --toggle-indicator-default: var(--form-toggle-#{$color}-inactive-indicator);
+    --toggle-indicator-checked: var(--form-toggle-#{$color}-active-indicator);
+    --toggle-icon-default: var(--form-toggle-#{$color}-inactive-icon);
+    --toggle-icon-checked: var(--form-toggle-#{$color}-active-icon);
+  }
+
+  @if $type == outlined {
+    --toggle-border-default: var(--form-toggle-#{$color}-inactive-default);
+    --toggle-border-hover: var(--form-toggle-#{$color}-inactive-hover);
+    --toggle-border-active: var(--form-toggle-#{$color}-inactive-active);
+    --toggle-border-checked: var(--form-toggle-#{$color}-active-default);
+    --toggle-border-checked-hover: var(--form-toggle-#{$color}-active-hover);
+    --toggle-border-checked-active: var(--form-toggle-#{$color}-active-active);
+    --toggle-indicator-default: var(--form-toggle-#{$color}-inactive-default);
+    --toggle-indicator-checked: var(--form-toggle-#{$color}-active-default);
+    --toggle-icon-default: var(--form-toggle-#{$color}-inactive-icon-outlined);
+    --toggle-icon-checked: var(--form-toggle-#{$color}-active-icon-outlined);
+  }
+}
+
+.tedi-toggle {
+  position: relative;
+  display: block;
+
+  &--default {
+    --toggle-indicator: var(--form-toggle-default-indicator);
+
+    width: var(--form-toggle-default-width);
+    height: var(--form-toggle-default-height);
+
+    .tedi-toggle__slider {
+      width: var(--form-toggle-default-indicator);
+      height: var(--form-toggle-default-indicator);
+    }
+  }
+
+  &--large {
+    --toggle-indicator: var(--form-toggle-large-indicator);
+
+    width: var(--form-toggle-large-width);
+    height: var(--form-toggle-large-height);
+
+    .tedi-toggle__slider {
+      width: var(--form-toggle-large-indicator);
+      height: var(--form-toggle-large-indicator);
+    }
+  }
+
+  &--primary-filled {
+    @include toggle-variant(primary, filled);
+  }
+
+  &--primary-outlined {
+    @include toggle-variant(primary, outlined);
+  }
+
+  &--colored-filled {
+    @include toggle-variant(colored, filled);
+  }
+
+  &--colored-outlined {
+    @include toggle-variant(colored, outlined);
+  }
+
+  &__input {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    background: var(--toggle-bg-default);
+    border: var(--tedi-borders-01) solid var(--toggle-border-default);
+    border-radius: var(--form-toggle-radius);
+    transition: background 0.15s ease, border-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: var(--toggle-bg-hover);
+      border-color: var(--toggle-border-hover);
+    }
+
+    &:active:not(:disabled) {
+      background: var(--toggle-bg-active);
+      border-color: var(--toggle-border-active);
+    }
+
+    &:checked {
+      background: var(--toggle-bg-checked);
+      border-color: var(--toggle-border-checked);
+
+      &:hover:not(:disabled) {
+        background: var(--toggle-bg-checked-hover);
+        border-color: var(--toggle-border-checked-hover);
+      }
+
+      &:active:not(:disabled) {
+        background: var(--toggle-bg-checked-active);
+        border-color: var(--toggle-border-checked-active);
+      }
+    }
+
+    &:focus-visible {
+      outline: calc(2 * var(--borders-01)) solid var(--form-toggle-primary-active-default);
+      outline-offset: var(--borders-01);
+    }
+
+    &:checked + .tedi-toggle__slider {
+      left: calc(100% - var(--toggle-indicator) - var(--form-toggle-padding));
+      color: var(--toggle-icon-checked);
+      background-color: var(--toggle-indicator-checked);
+      transform: translateY(-50%);
+
+      .tedi-toggle__icon {
+        stroke: var(--toggle-icon-checked);
+      }
+    }
+  }
+
+  &__slider {
+    position: absolute;
+    top: 50%;
+    left: var(--form-toggle-padding);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--toggle-icon-default);
+    pointer-events: none;
+    background-color: var(--toggle-indicator-default);
+    border-radius: 50%;
+    transition: left 0.17s ease-out, background 0.15s ease;
+    transform: translateY(-50%);
+
+    .tedi-toggle__icon {
+      stroke: var(--toggle-icon-default);
+    }
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    .tedi-toggle__input {
+      cursor: not-allowed;
+    }
+  }
+
+  &__control {
+    display: flex;
+    gap: var(--layout-grid-gutters-08);
+    align-items: center;
+
+    &--label-left {
+      flex-direction: row;
+    }
+
+    &--label-right {
+      flex-direction: row-reverse;
+    }
+  }
+}

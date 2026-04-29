@@ -3,14 +3,14 @@
   min-width: 16.5rem;
   overflow: hidden;
   background: var(--dropdown-item-default-background);
-  border-radius: var(--radius-02-default);
+  border-radius: var(--tedi-radius-02-default);
   box-shadow: 0 1px 5px var(--tedi-alpha-20);
 }
 
 .tedi-sidenav-dropdown__heading {
   padding: var(--layout-grid-gutters-02) var(--dropdown-group-label-padding-x) var(--layout-grid-gutters-04)
     var(--dropdown-group-label-padding-x);
-  font-size: var(--size-01);
+  font-size: var(--tedi-size-01);
   font-weight: 600;
   color: var(--general-text-tertiary);
   text-transform: uppercase;

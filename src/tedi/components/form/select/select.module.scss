@@ -196,6 +196,7 @@ div.tedi-select__multi-value-item {
 
     .tedi-select__placeholder {
       color: var(--form-input-text-placeholder);
+      pointer-events: none;
     }
   }
 }
@@ -230,7 +231,7 @@ div.tedi-select__multi-value-item {
 }
 
 .tedi-select__separator {
-  height: var(--dimensions-13);
+  height: var(--tedi-dimensions-13);
 }
 
 .tedi-select--searchable {
