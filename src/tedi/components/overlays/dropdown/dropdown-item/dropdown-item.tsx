@@ -145,15 +145,18 @@ export const DropdownItem = ({
       }
     },
     tabIndex: activeIndex === index ? 0 : -1,
-    className: cn(styles['tedi-dropdown__item'], {
-      [styles['tedi-dropdown__item--active']]: active,
-      [styles['tedi-dropdown__item--disabled']]: disabled,
-      [styles['tedi-dropdown__item--divided']]: divided,
-      [styles['tedi-dropdown__item--indent']]: indent,
-      [styles['tedi-dropdown__item--tree-item']]: variant === 'tree' && indent,
-      [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
-      className,
-    }),
+    className: cn(
+      styles['tedi-dropdown__item'],
+      {
+        [styles['tedi-dropdown__item--active']]: active,
+        [styles['tedi-dropdown__item--disabled']]: disabled,
+        [styles['tedi-dropdown__item--divided']]: divided,
+        [styles['tedi-dropdown__item--indent']]: indent,
+        [styles['tedi-dropdown__item--tree-item']]: variant === 'tree' && indent,
+        [styles['tedi-dropdown__item--tree-parent']]: variant === 'tree' && isParent,
+      },
+      className
+    ),
     style: getCssVars(indent),
     onClick: handleClick,
     onKeyDown: handleKeyDown,
