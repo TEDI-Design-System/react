@@ -143,13 +143,13 @@
   &:focus-visible:not(:disabled)::-webkit-slider-thumb,
   &.tedi-slider__input--dragging:not(:disabled)::-webkit-slider-thumb {
     box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
-      0 0 0 calc(var(--tedi-borders-01) + var(--tedi-borders-03)) var(--form-slider-thumb-border-focus);
+      0 0 0 calc(var(--tedi-borders-01) + var(--tedi-borders-02)) var(--form-slider-thumb-border-focus);
   }
 
   &:focus-visible:not(:disabled)::-moz-range-thumb,
   &.tedi-slider__input--dragging:not(:disabled)::-moz-range-thumb {
     box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
-      0 0 0 calc(var(--tedi-borders-01) + var(--tedi-borders-03)) var(--form-slider-thumb-border-focus);
+      0 0 0 calc(var(--tedi-borders-01) + var(--tedi-borders-02)) var(--form-slider-thumb-border-focus);
   }
 }
 
