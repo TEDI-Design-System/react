@@ -44,7 +44,7 @@ const CalendarTemplate: React.FC<Partial<CalendarProps>> = (props) => {
   return (
     <Calendar
       view={view}
-      calendarView="days"
+      selectionLevel="days"
       currentMonth={currentMonth}
       setCurrentMonth={setCurrentMonth}
       setView={setView}
@@ -271,9 +271,9 @@ export const WithWeeksCount: Story = {
 };
 
 export const MonthView: Story = {
-  render: () => <CalendarTemplate calendarView="months" view="months" showNavigation={false} />,
+  render: () => <CalendarTemplate selectionLevel="months" view="months" showNavigation={false} />,
 };
 
 export const YearView: Story = {
-  render: () => <CalendarTemplate calendarView="years" view="years" />,
+  render: () => <CalendarTemplate selectionLevel="years" view="years" />,
 };

@@ -195,7 +195,7 @@
 .tedi-calendar__picker-grid-container {
   @extend %tedi-calendar-surface;
 
-  max-width: 315px;
+  max-width: 20rem;
   border: 1px solid var(--card-border-primary);
   border-radius: 4px;
 }

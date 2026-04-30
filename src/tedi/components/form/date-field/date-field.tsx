@@ -117,13 +117,22 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    */
   monthYearSelectType?: 'dropdown' | 'grid';
   /**
-   * The initial view to show when the calendar is opened. Can be one of:
-   * - `'days'` (default) – shows the calendar with days view
-   *  - `'months'` – shows the month selection grid (if `monthYearSelectType` is `'grid'`) or dropdown
-   * - `'years'` – shows the year selection grid (if `monthYearSelectType` is `'grid'`) or dropdown
+   * **Selection granularity** — controls the level at which a click finalises
+   * the date selection rather than drilling further into days. Use a coarser
+   * level when the consumer only needs to pick a year or a month.
+   * - `'years'` — clicking a year selects Jan 1 of that year and closes; the
+   *   calendar opens on the year grid.
+   * - `'months'` — clicking a month selects the first day of that month; the
+   *   calendar opens on the month grid.
+   * - `'days'` (default) — full day-level selection; the calendar opens on
+   *   the day grid as usual.
+   *
+   * Distinct from the *currently visible* grid — that's managed internally
+   * and flips as the user navigates between year / month / day. This prop
+   * is the lowest level the user can drill down to before a click commits.
    * @default 'days'
    */
-  calendarView?: CalendarView;
+  selectionLevel?: CalendarView;
   /**
    * The locale object for the calendar, used by React DayPicker. Defaults to Estonian locale.
    */
@@ -216,7 +225,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   showOutsideDays = true,
   parseDate,
   monthYearSelectType,
-  calendarView = 'days',
+  selectionLevel = 'days',
   locale = et,
   localeCode = 'et-EE',
   initialMonth,
@@ -238,7 +247,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<CalendarView>(calendarView);
+  const [view, setView] = useState<CalendarView>(selectionLevel);
   const [inputValue, setInputValue] = useState('');
 
   const isControlled = selected !== undefined;
@@ -267,9 +276,9 @@ export const DateField: React.FC<DateFieldProps> = ({
 
   useEffect(() => {
     if (open) {
-      setView(calendarView);
+      setView(selectionLevel);
     }
-  }, [open, calendarView]);
+  }, [open, selectionLevel]);
 
   useEffect(() => {
     if (isControlled) {
@@ -523,7 +532,7 @@ export const DateField: React.FC<DateFieldProps> = ({
                 <Calendar
                   {...dayPickerProps}
                   view={view}
-                  calendarView={calendarView}
+                  selectionLevel={selectionLevel}
                   currentMonth={currentMonth}
                   setCurrentMonth={setCurrentMonth}
                   setView={setView}

@@ -421,7 +421,7 @@ describe('DateField component', () => {
     render(
       <DateField
         {...defaultProps}
-        calendarView="months"
+        selectionLevel="months"
         monthYearSelectType="grid"
         onSelect={onSelect}
         initialMonth={new Date(2025, 0, 1)}
@@ -445,7 +445,7 @@ describe('DateField component', () => {
     render(
       <DateField
         {...defaultProps}
-        calendarView="months"
+        selectionLevel="months"
         monthYearSelectType="grid"
         onSelect={onSelect}
         initialMonth={new Date(2025, 0, 1)}

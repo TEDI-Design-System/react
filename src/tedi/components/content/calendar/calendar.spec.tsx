@@ -116,7 +116,7 @@ describe('Calendar', () => {
     expect(setView).toHaveBeenCalledWith('years');
   });
 
-  it('selecting month updates currentMonth and applies value if calendarView=months', () => {
+  it('selecting month updates currentMonth and applies value if selectionLevel=months', () => {
     const setCurrentMonth = jest.fn();
     const applyValue = jest.fn();
 
@@ -124,7 +124,7 @@ describe('Calendar', () => {
       <Calendar
         {...baseProps}
         view="months"
-        calendarView="months"
+        selectionLevel="months"
         setCurrentMonth={setCurrentMonth}
         applyValue={applyValue}
       />
@@ -136,17 +136,17 @@ describe('Calendar', () => {
     expect(applyValue).toHaveBeenCalled();
   });
 
-  it('selecting month switches to days if calendarView is not months', () => {
+  it('selecting month switches to days if selectionLevel is not months', () => {
     const setView = jest.fn();
 
-    render(<Calendar {...baseProps} view="months" calendarView="days" setView={setView} />);
+    render(<Calendar {...baseProps} view="months" selectionLevel="days" setView={setView} />);
 
     fireEvent.click(screen.getByText('select-month'));
 
     expect(setView).toHaveBeenCalledWith('days');
   });
 
-  it('selecting year updates currentMonth and applies value if calendarView=years', () => {
+  it('selecting year updates currentMonth and applies value if selectionLevel=years', () => {
     const setCurrentMonth = jest.fn();
     const applyValue = jest.fn();
 
@@ -154,7 +154,7 @@ describe('Calendar', () => {
       <Calendar
         {...baseProps}
         view="years"
-        calendarView="years"
+        selectionLevel="years"
         setCurrentMonth={setCurrentMonth}
         applyValue={applyValue}
       />
@@ -166,10 +166,10 @@ describe('Calendar', () => {
     expect(applyValue).toHaveBeenCalled();
   });
 
-  it('selecting year switches to months if calendarView is not years', () => {
+  it('selecting year switches to months if selectionLevel is not years', () => {
     const setView = jest.fn();
 
-    render(<Calendar {...baseProps} view="years" calendarView="days" setView={setView} />);
+    render(<Calendar {...baseProps} view="years" selectionLevel="days" setView={setView} />);
 
     fireEvent.click(screen.getByText('select-year'));
 
@@ -335,7 +335,7 @@ describe('Calendar', () => {
 
   it('falls back to default setView without crashing when prop is omitted', () => {
     // Omit setView; opening a month from the MonthGrid should invoke the default noop.
-    expect(() => render(<Calendar {...baseProps} view="months" calendarView="days" />)).not.toThrow();
+    expect(() => render(<Calendar {...baseProps} view="months" selectionLevel="days" />)).not.toThrow();
 
     fireEvent.click(screen.getByText('select-month'));
   });

@@ -16,9 +16,22 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    */
   view?: CalendarView;
   /**
-   * The intended calendar view mode. Determines if the calendar initially opens in `'days'`, `'months'`, or `'years'` view.
+   * **Selection granularity** — controls the level at which a click finalises
+   * the selection rather than drilling down to the next sub-grid:
+   * - `'years'` — clicking a year selects Jan 1 of that year and closes; the
+   *   calendar starts on the year grid.
+   * - `'months'` — clicking a month selects the first day of that month; the
+   *   calendar starts on the month grid.
+   * - `'days'` (default) — full day-level selection; the calendar starts on
+   *   the day grid.
+   *
+   * Distinct from `view` / `setView`, which control the *currently visible*
+   * grid — those flip as the user navigates between year / month / day.
+   * `selectionLevel` is the lowest level the user can drill down to before
+   * a click commits the selection.
+   * @default 'days'
    */
-  calendarView?: CalendarView;
+  selectionLevel?: CalendarView;
   /**
    * The month currently displayed in the calendar. Used to render the correct month grid.
    */
@@ -106,7 +119,7 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
 
 export const Calendar = ({
   view = 'days',
-  calendarView = 'days',
+  selectionLevel = 'days',
   currentMonth,
   setCurrentMonth,
   setView = () => 'days',
@@ -183,7 +196,7 @@ export const Calendar = ({
           onSelectYear={(date) => {
             setCurrentMonth(date);
 
-            if (calendarView === 'years') {
+            if (selectionLevel === 'years') {
               applyValue(new Date(date.getFullYear(), 0, 1));
             } else {
               setView('months');
@@ -202,7 +215,7 @@ export const Calendar = ({
           onSelectMonth={(date) => {
             setCurrentMonth(date);
 
-            if (calendarView === 'months') {
+            if (selectionLevel === 'months') {
               applyValue(date);
             } else {
               setView('days');

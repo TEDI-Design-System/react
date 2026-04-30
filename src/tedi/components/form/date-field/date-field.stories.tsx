@@ -336,7 +336,7 @@ export const MultipleMonths: Story = {
 
 export const YearGrid: Story = {
   render: () => {
-    return <DateField label="Date" monthYearSelectType="grid" id="month-year-grid" calendarView="years" />;
+    return <DateField label="Date" monthYearSelectType="grid" id="month-year-grid" selectionLevel="years" />;
   },
 };
 
