@@ -1,3 +1,10 @@
+# [17.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.0.0...react-17.1.0-rc.1) (2026-04-30)
+
+
+### Features
+
+* **input-group:** new TEDI-Ready component [#23](https://github.com/TEDI-Design-System/react/issues/23) ([#610](https://github.com/TEDI-Design-System/react/issues/610)) ([6e9c20c](https://github.com/TEDI-Design-System/react/commit/6e9c20c6c93d7741cd4933c71e2b0aaac32214ce))
+
 # [17.0.0](https://github.com/TEDI-Design-System/react/compare/react-16.1.0...react-17.0.0) (2026-04-29)
 
 
