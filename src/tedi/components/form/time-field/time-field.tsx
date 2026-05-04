@@ -191,7 +191,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     input.focus();
   };
 
-  const openCustomPicker = () => setOpen(true);
+  const openCustomPicker = () => setOpen((prev) => !prev);
 
   const handleIconClick = () => {
     if (readOnly || !showPicker) return;

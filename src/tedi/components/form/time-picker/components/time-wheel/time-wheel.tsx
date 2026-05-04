@@ -113,64 +113,111 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     setActiveMinuteIndex(minuteIndex);
   }, [hours, minutes, selectedHour, selectedMinute]);
 
-  const handleHourScroll = () => {
-    if (!hourRef.current || isProgrammaticScrollHour.current) return;
+  // Callback refs — updated every render so scrollend listeners always use fresh
+  // closure values without needing to re-register. This avoids the stale-closure
+  // problem that arises when event listeners are registered once in useEffect.
+  const processHourScrollEnd = useRef<() => void>(() => {});
+  processHourScrollEnd.current = () => {
+    const el = hourRef.current;
+    if (!el || isProgrammaticScrollHour.current) return;
 
     clearScrollTimeout(scrollTimeoutHour.current);
 
-    scrollTimeoutHour.current = setTimeout(() => {
-      if (!hourRef.current) return;
+    const index = clampIndex(snapToNearestItem(el.scrollTop, hours.length), hours.length);
+    setActiveHourIndex(index);
 
-      const index = clampIndex(snapToNearestItem(hourRef.current.scrollTop, hours.length), hours.length);
+    const target = getScrollTopForIndex(index);
 
-      setActiveHourIndex(index);
-
-      const target = getScrollTopForIndex(index);
-
-      if (needsScrollCorrection(hourRef.current.scrollTop, target, 8)) {
-        isProgrammaticScrollHour.current = true;
-        scrollToIndex(hourRef.current, index);
-      }
-
-      if (index !== lastHourIndex.current) {
-        lastHourIndex.current = index;
-        onChange(hours[index]!, selectedMinute);
-      }
-
-      setTimeout(() => {
+    // Use 'instant' here — 'auto' would trigger the CSS scroll-behavior:smooth
+    // animation (~300ms), causing it to outlast the 50ms programmatic flag and
+    // treat the remaining animation frames as user scrolls, re-triggering snaps.
+    if (needsScrollCorrection(el.scrollTop, target, 8)) {
+      isProgrammaticScrollHour.current = true;
+      scrollToIndex(el, index, 'instant');
+      requestAnimationFrame(() => {
         isProgrammaticScrollHour.current = false;
-      }, 50);
-    });
+      });
+    }
+
+    if (index !== lastHourIndex.current) {
+      lastHourIndex.current = index;
+      onChange(hours[index]!, selectedMinute);
+    }
+  };
+
+  const processMinuteScrollEnd = useRef<() => void>(() => {});
+  processMinuteScrollEnd.current = () => {
+    const el = minuteRef.current;
+    if (!el || isProgrammaticScrollMinute.current) return;
+
+    clearScrollTimeout(scrollTimeoutMinute.current);
+
+    const index = clampIndex(snapToNearestItem(el.scrollTop, minutes.length), minutes.length);
+    setActiveMinuteIndex(index);
+
+    const target = getScrollTopForIndex(index);
+
+    if (needsScrollCorrection(el.scrollTop, target, 8)) {
+      isProgrammaticScrollMinute.current = true;
+      scrollToIndex(el, index, 'instant');
+      requestAnimationFrame(() => {
+        isProgrammaticScrollMinute.current = false;
+      });
+    }
+
+    if (index !== lastMinuteIndex.current) {
+      lastMinuteIndex.current = index;
+      onChange(selectedHour, minutes[index]!);
+    }
+  };
+
+  // Primary path: scrollend fires once after the CSS snap animation completes,
+  // so scrollTop is always at a valid snap point when we read it. This prevents
+  // the flicker caused by the debounced scroll handler reading an intermediate
+  // scrollTop mid-snap-animation (most visible on high-refresh-rate trackpads).
+  useEffect(() => {
+    const hourEl = hourRef.current;
+    const minuteEl = minuteRef.current;
+    if (!hourEl || !minuteEl) return;
+
+    const onHourScrollEnd = () => processHourScrollEnd.current();
+    const onMinuteScrollEnd = () => processMinuteScrollEnd.current();
+
+    hourEl.addEventListener('scrollend', onHourScrollEnd);
+    minuteEl.addEventListener('scrollend', onMinuteScrollEnd);
+
+    return () => {
+      hourEl.removeEventListener('scrollend', onHourScrollEnd);
+      minuteEl.removeEventListener('scrollend', onMinuteScrollEnd);
+    };
+  }, []);
+
+  // Fallback for browsers without scrollend support: debounce at 150ms so the
+  // handler fires well after the CSS snap animation has finished emitting scroll
+  // events. processScrollEnd clears this timer when scrollend fires first.
+  //
+  // The active-index state is updated on every scroll event so the highlight
+  // follows the wheel in real time — this gives instant visual feedback without
+  // waiting for scrollend. onChange is intentionally NOT called here; it fires
+  // only in processHourScrollEnd once the scroll has fully settled.
+  const handleHourScroll = () => {
+    if (!hourRef.current || isProgrammaticScrollHour.current) return;
+
+    const index = clampIndex(snapToNearestItem(hourRef.current.scrollTop, hours.length), hours.length);
+    setActiveHourIndex(index);
+
+    clearScrollTimeout(scrollTimeoutHour.current);
+    scrollTimeoutHour.current = setTimeout(() => processHourScrollEnd.current(), 150);
   };
 
   const handleMinuteScroll = () => {
     if (!minuteRef.current || isProgrammaticScrollMinute.current) return;
 
+    const index = clampIndex(snapToNearestItem(minuteRef.current.scrollTop, minutes.length), minutes.length);
+    setActiveMinuteIndex(index);
+
     clearScrollTimeout(scrollTimeoutMinute.current);
-
-    scrollTimeoutMinute.current = setTimeout(() => {
-      if (!minuteRef.current) return;
-
-      const index = clampIndex(snapToNearestItem(minuteRef.current.scrollTop, minutes.length), minutes.length);
-
-      setActiveMinuteIndex(index);
-
-      const target = getScrollTopForIndex(index);
-
-      if (needsScrollCorrection(minuteRef.current.scrollTop, target, 8)) {
-        isProgrammaticScrollMinute.current = true;
-        scrollToIndex(minuteRef.current, index);
-      }
-
-      if (index !== lastMinuteIndex.current) {
-        lastMinuteIndex.current = index;
-        onChange(selectedHour, minutes[index]!);
-      }
-
-      setTimeout(() => {
-        isProgrammaticScrollMinute.current = false;
-      }, 50);
-    });
+    scrollTimeoutMinute.current = setTimeout(() => processMinuteScrollEnd.current(), 150);
   };
 
   const handleHourClick = (index: number) => {

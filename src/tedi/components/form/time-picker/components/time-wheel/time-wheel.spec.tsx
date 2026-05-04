@@ -93,7 +93,7 @@ describe('TimeWheel', () => {
     act(() => {
       Object.defineProperty(col, 'scrollTop', { value: 40, writable: true });
       col.dispatchEvent(new Event('scroll'));
-      jest.advanceTimersByTime(50);
+      jest.advanceTimersByTime(200);
     });
 
     expect(onChange).toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe('TimeWheel', () => {
     act(() => {
       Object.defineProperty(col, 'scrollTop', { value: 40, writable: true });
       col.dispatchEvent(new Event('scroll'));
-      jest.advanceTimersByTime(50);
+      jest.advanceTimersByTime(200);
     });
 
     expect(onChange).toHaveBeenCalled();

@@ -138,6 +138,18 @@ describe('TimeField', () => {
     expect(screen.getByTestId('timepicker')).toBeInTheDocument();
   });
 
+  it('closes custom picker when icon clicked again (button trigger)', async () => {
+    const user = userEvent.setup();
+
+    render(<TimeField id="t1" label="Time" defaultValue="10:00" />);
+
+    await user.click(screen.getByTestId('icon'));
+    expect(screen.getByTestId('timepicker')).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('icon'));
+    expect(screen.queryByTestId('timepicker')).not.toBeInTheDocument();
+  });
+
   it('does NOT open picker when readOnly', async () => {
     const user = userEvent.setup();
 
