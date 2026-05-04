@@ -343,6 +343,7 @@ const SizesTemplate = () => (
 );
 
 export const Sizes: Story = { render: () => <SizesTemplate /> };
+
 export const Simple: Story = { render: () => <SimpleTemplate /> };
 
 /**
@@ -716,8 +717,16 @@ const MergedCellsTemplate = () => {
   );
 };
 
+/**
+ * Two-level header using column groups. Nest column definitions under `columns` inside a parent
+ * `columnDef` — TanStack Table will render the parent as a merged header cell spanning its children.
+ */
 export const MergedCells: Story = { render: () => <MergedCellsTemplate /> };
 
+/**
+ * Column separator lines via `verticalBorders`. Combine with `borderless` if the outer border
+ * should be removed at the same time.
+ */
 export const VerticalBorders: Story = {
   render: () => (
     <Table<Person>
@@ -730,6 +739,10 @@ export const VerticalBorders: Story = {
   ),
 };
 
+/**
+ * Removes the outer table border with `borderless`. Useful when the table sits inside an
+ * already-bordered card or panel and a double border would look wrong.
+ */
 export const NoOutsideBorder: Story = {
   render: () => (
     <Table<Person>
@@ -918,6 +931,11 @@ const EditableTemplate = () => {
   );
 };
 
+/**
+ * Row-level inline editing: clicking "Muuda" replaces static cells with `TextField` inputs and
+ * swaps the action column for confirm/cancel buttons. Track `editingId` + a `draft` copy of the row
+ * in local state; commit or discard on button click. Only one row edits at a time.
+ */
 export const EditableValues: Story = { render: () => <EditableTemplate /> };
 
 /**
@@ -958,6 +976,13 @@ const SortableTemplate = () => {
 
   return <Table<Person> id="tedi-table-sortable" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
 };
+
+/**
+ * Client-side sorting via `Table.HeaderButton` in the header renderer. Each click cycles
+ * `unfold_more → arrow_upward → arrow_downward → unfold_more`. TanStack Table handles the
+ * sort state internally; no external state needed for client-side use.
+ */
+export const Sortable: Story = { render: () => <SortableTemplate /> };
 
 /**
  * Per-column filter popovers — matches Figma Example table 7/8 exactly
@@ -1304,6 +1329,11 @@ const FiltersTemplate = () => {
   );
 };
 
+/**
+ * Column filter popovers via `Table.HeaderButton` + `Popover`. Each column provides a `filterFn`
+ * and stores its filter value in TanStack Table's `columnFilters` state. Filter UI varies per column:
+ * text input for names, date-range fields for dates, and a checkbox list for enum values.
+ */
 export const Filters: Story = { render: () => <FiltersTemplate /> };
 
 interface CollapsibleRecord {
@@ -1339,6 +1369,11 @@ const collapsiblePeople: CollapsibleRecord[] = Array.from({ length: 28 }, (_, in
   return { ...seed, id, name, ...(subRows ? { subRows } : {}) };
 });
 
+/**
+ * Nested rows using TanStack Table's sub-rows feature. Pass `getSubRows={(row) => row.subRows}` and
+ * include a `subRows` array on any data item. Rows with children get an expand/collapse toggle
+ * automatically; child rows are indented by depth level.
+ */
 export const CollapsibleRows: Story = {
   render: () => {
     const columns: ColumnDef<CollapsibleRecord>[] = [
@@ -1366,6 +1401,10 @@ export const CollapsibleRows: Story = {
   },
 };
 
+/**
+ * Row checkboxes via `enableRowSelection`. A header checkbox selects/deselects all rows on the
+ * current page. Read selected rows with `table.getSelectedRowModel().rows` in `onStateChange`.
+ */
 export const SelectableRows: Story = {
   render: () => (
     <Table<Person>
@@ -1394,8 +1433,16 @@ const ClickableTemplate = () => {
   );
 };
 
+/**
+ * Whole-row click via `onRowClick={(row) => ...}`. The table adds pointer cursor and hover highlight
+ * automatically. Use instead of (or alongside) `enableRowSelection` when a click should navigate
+ * or open a detail panel rather than toggle a checkbox.
+ */
 export const ClickableRows: Story = { render: () => <ClickableTemplate /> };
 
+/**
+ * Alternating row background color via `striped`. Helps readability in wide or dense tables.
+ */
 export const Striped: Story = {
   render: () => (
     <Table<Person>
@@ -1408,6 +1455,11 @@ export const Striped: Story = {
   ),
 };
 
+/**
+ * First column stays fixed during horizontal scroll via `stickyFirstColumn`. Constrain the
+ * container width (e.g. `maxWidth: 520`) so there is something to scroll — the sticky effect
+ * is invisible when the table fits without overflow.
+ */
 export const StickyFirstColumn: Story = {
   render: () => (
     <div style={{ maxWidth: 520 }}>
@@ -1637,4 +1689,10 @@ const { data: page, total } = useServerQuery({ pagination, sorting });
   );
 };
 
+/**
+ * API-driven pagination and sorting. Pass `manualPagination` + `manualSorting` so TanStack Table
+ * skips in-memory work; supply `pageCount` / `rowCount` from the server response; control
+ * `state.pagination` and `state.sorting`; refetch in `onStateChange` when either changes.
+ * `manualFiltering` works the same way for column filters.
+ */
 export const ServerSide: Story = { render: () => <ServerSideTemplate /> };
