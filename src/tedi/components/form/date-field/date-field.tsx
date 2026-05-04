@@ -5,6 +5,7 @@ import {
   FloatingPortal,
   offset,
   shift,
+  size,
   useClick,
   useDismiss,
   useFloating,
@@ -12,7 +13,7 @@ import {
   useRole,
 } from '@floating-ui/react';
 import cn from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
@@ -23,6 +24,7 @@ import TextField, { TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
 
 const CALENDAR_OFFSET = 4;
+const CALENDAR_PADDING = 8;
 
 export type DateFieldMode = 'single' | 'multiple' | 'range';
 export type CalendarView = 'days' | 'months' | 'years';
@@ -248,6 +250,7 @@ export const DateField: React.FC<DateFieldProps> = ({
 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<CalendarView>(selectionLevel);
+  const naturalCalendarWidthRef = useRef<number | null>(null);
   const [inputValue, setInputValue] = useState('');
 
   const isControlled = selected !== undefined;
@@ -277,6 +280,8 @@ export const DateField: React.FC<DateFieldProps> = ({
   useEffect(() => {
     if (open) {
       setView(selectionLevel);
+    } else {
+      naturalCalendarWidthRef.current = null;
     }
   }, [open, selectionLevel]);
 
@@ -430,7 +435,32 @@ export const DateField: React.FC<DateFieldProps> = ({
     open,
     onOpenChange: setOpen,
     placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
-    middleware: [offset(CALENDAR_OFFSET), flip(), shift()],
+    middleware: [
+      offset(CALENDAR_OFFSET),
+      flip(),
+      shift({ padding: CALENDAR_PADDING }),
+      size({
+        padding: CALENDAR_PADDING,
+        apply({ availableWidth, elements }) {
+          const el = elements.floating;
+          // Capture the natural (unconstrained) width on the first positioning
+          // call after opening. Subsequent calls reuse this value so a
+          // min-content width set in a previous frame doesn't corrupt the check.
+          if (naturalCalendarWidthRef.current === null) {
+            naturalCalendarWidthRef.current = el.getBoundingClientRect().width;
+          }
+          if (naturalCalendarWidthRef.current > availableWidth) {
+            // Months won't fit side by side — snap to one-month width and cap
+            // at the available space so nothing overflows the viewport.
+            el.style.width = 'min-content';
+            el.style.maxWidth = `${availableWidth}px`;
+          } else {
+            el.style.width = '';
+            el.style.maxWidth = '';
+          }
+        },
+      }),
+    ],
     whileElementsMounted: autoUpdate,
   });
 
@@ -475,7 +505,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             label={label}
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
-            onIconClick={() => enableCalendar && setOpen(true)}
+            onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
             aria-expanded={enableCalendar ? open : undefined}
             isClearable
             required={required}
@@ -503,7 +533,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             placeholder={placeholder}
             icon="calendar_today"
             isClearable
-            onIconClick={() => enableCalendar && setOpen(true)}
+            onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
             aria-expanded={enableCalendar ? open : undefined}
             onChange={(val) => handleInputChange(val)}
             required={required}

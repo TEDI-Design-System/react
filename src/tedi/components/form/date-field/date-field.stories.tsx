@@ -38,10 +38,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col width={2}>
+          <Col lg={2} xs={12}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="d-flex">
+          <Col lg={10} xs={12} className="d-flex">
             <DateField
               label="Date"
               id={`${textFieldProps.id}-${key}-1`}
@@ -85,7 +85,7 @@ export const FieldOptions: StoryFn = () => {
 
   return (
     <Row>
-      <Col width={6}>
+      <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
           <DateField id="date-default" label="Date field default" mode="single" />
 
@@ -131,7 +131,7 @@ export const FieldOptions: StoryFn = () => {
 export const ValueType: StoryFn = () => {
   return (
     <Row>
-      <Col width={6}>
+      <Col lg={6} xs={12}>
         <div className="flex gap-3 flex-column">
           <DateField id="date-default" label="Date" />
 
@@ -171,12 +171,12 @@ export const ValueType: StoryFn = () => {
 export const OnClickType: Story = {
   render: () => {
     return (
-      <Row>
-        <Col>
+      <Row gutterY={2}>
+        <Col lg={6} xs={12}>
           <p style={{ marginBottom: '16px', display: 'block' }}>Calendar button is clickable</p>
           <DateField label="Date" id="calendar-button-trigger" calendarTrigger="button" />
         </Col>
-        <Col>
+        <Col lg={6} xs={12}>
           <p style={{ marginBottom: '16px', display: 'block' }}>Input is clickable</p>
           <DateField label="Date" id="calendar-input-trigger" calendarTrigger="input" />
         </Col>
@@ -253,7 +253,7 @@ export const Range: Story = {
 
     return (
       <Row gutterY={3}>
-        <Col width={6}>
+        <Col lg={6} xs={12}>
           <DateField
             mode="range"
             label="Default Range"
@@ -263,7 +263,7 @@ export const Range: Story = {
           />
         </Col>
 
-        <Col width={6}>
+        <Col lg={6} xs={12}>
           <DateField
             mode="range"
             label="Range with disabled future"
@@ -275,7 +275,7 @@ export const Range: Story = {
           />
         </Col>
 
-        <Col width={6}>
+        <Col lg={6} xs={12}>
           <DateField
             mode="range"
             label="Start date only"
@@ -285,7 +285,7 @@ export const Range: Story = {
           />
         </Col>
 
-        <Col width={6}>
+        <Col lg={6} xs={12}>
           <DateField
             mode="range"
             label="Range with disabled past"
@@ -343,8 +343,8 @@ export const YearGrid: Story = {
 export const WithFooter: Story = {
   render: () => {
     return (
-      <Row>
-        <Col>
+      <Row gutterY={3}>
+        <Col lg={6} xs={12}>
           <DateField
             label="Time"
             id="calendar-with-footer"
@@ -359,7 +359,7 @@ export const WithFooter: Story = {
             }
           />
         </Col>
-        <Col>
+        <Col lg={6} xs={12}>
           <DateField
             label="Date"
             id="calendar-with-footer-2"

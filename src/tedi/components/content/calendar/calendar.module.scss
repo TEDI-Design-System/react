@@ -30,6 +30,7 @@
 
   &__months-container {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--layout-grid-gutters-08);
   }
 

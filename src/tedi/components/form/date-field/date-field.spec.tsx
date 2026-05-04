@@ -294,6 +294,19 @@ describe('DateField component', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
+  it('closes calendar when clicking icon again (button trigger toggle)', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} />);
+
+    const button = screen.getByRole('button');
+    await user.click(button);
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+
+    await user.click(button);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('formats range with only start date', () => {
     render(<DateField {...defaultProps} mode="range" selected={{ from: new Date(2025, 0, 10) }} />);
 
