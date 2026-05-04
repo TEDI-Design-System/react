@@ -63,7 +63,7 @@ describe('NumberField component', () => {
     fireEvent.click(decrementButton);
 
     const input = screen.getByRole('spinbutton');
-    expect(input).toHaveValue(0);
+    expect(input).toHaveValue('0');
   });
 
   it('does not increment above the maximum value', () => {
@@ -72,7 +72,31 @@ describe('NumberField component', () => {
     fireEvent.click(incrementButton);
 
     const input = screen.getByRole('spinbutton');
-    expect(input).toHaveValue(10);
+    expect(input).toHaveValue('10');
+  });
+
+  it('parses a comma as a decimal separator', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={0} max={100} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '1,5' } });
+    expect(handleChange).toHaveBeenCalledWith(1.5);
+  });
+
+  it('does not fire onChange for partial entries like a lone minus sign', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={-100} max={100} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '-' } });
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('fires onChange with 0 when the input is cleared', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} defaultValue={5} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '' } });
+    expect(handleChange).toHaveBeenCalledWith(0);
   });
 
   it('renders helper text when provided', () => {

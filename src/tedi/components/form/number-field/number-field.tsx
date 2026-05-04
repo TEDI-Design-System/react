@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -104,14 +104,24 @@ export const NumberField = (props: NumberFieldProps) => {
   const { getLabel } = useLabels();
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const isFocusedRef = useRef(false);
 
   const [inputUpdated, setInputUpdated] = useState<string>('');
   const [inputInnerValue, setInputInnerValue] = useState<number>(defaultValue ?? 0);
+  const [displayValue, setDisplayValue] = useState<string>(() =>
+    value !== undefined ? String(value) : String(defaultValue ?? 0)
+  );
 
   const getCurrentValue = useMemo(
     (): number => (onChange && typeof value !== 'undefined' ? value : inputInnerValue),
     [onChange, value, inputInnerValue]
   );
+
+  useEffect(() => {
+    if (!isFocusedRef.current && typeof value !== 'undefined') {
+      setDisplayValue(String(value));
+    }
+  }, [value]);
 
   const helperId = helper ? `${id}-helper` : undefined;
 
@@ -157,11 +167,29 @@ export const NumberField = (props: NumberFieldProps) => {
     updateValueUpdatedLabel(returnValue);
     onChange?.(returnValue);
     setInputInnerValue(returnValue);
+    setDisplayValue(String(returnValue));
   };
 
-  const handleInputChange = ({ currentTarget: { value } }: ChangeEvent<HTMLInputElement>) => {
-    onChange?.(forceToLimits(+value));
-    setInputInnerValue(forceToLimits(+value));
+  const handleInputChange = ({ currentTarget: { value: rawValue } }: ChangeEvent<HTMLInputElement>) => {
+    setDisplayValue(rawValue);
+
+    const normalized = rawValue.replace(',', '.');
+    const parsed = rawValue === '' ? 0 : parseFloat(normalized);
+
+    if (!Number.isNaN(parsed)) {
+      const clamped = forceToLimits(parsed);
+      onChange?.(clamped);
+      setInputInnerValue(clamped);
+    }
+  };
+
+  const handleFocus = () => {
+    isFocusedRef.current = true;
+  };
+
+  const handleBlur = () => {
+    isFocusedRef.current = false;
+    setDisplayValue(String(getCurrentValue));
   };
 
   const renderButton = (direction: TDirection) => {
@@ -205,17 +233,20 @@ export const NumberField = (props: NumberFieldProps) => {
         <input
           ref={inputRef}
           id={id}
+          role="spinbutton"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={getCurrentValue}
           aria-describedby={helperId}
           aria-invalid={isInvalid(getCurrentValue) ? 'true' : 'false'}
-          type="number"
+          type="text"
           inputMode={inputMode}
-          value={getCurrentValue}
-          min={min}
-          max={max}
+          value={displayValue}
           required={required}
-          step={step}
           disabled={disabled}
           onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           className={InputBEM}
           {...input}
         />
