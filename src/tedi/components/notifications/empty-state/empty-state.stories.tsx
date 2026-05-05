@@ -17,6 +17,11 @@ import { EmptyState } from './empty-state';
 const meta: Meta<typeof EmptyState> = {
   component: EmptyState,
   title: 'TEDI-Ready/Components/Helpers/EmptyState',
+  argTypes: {
+    icon: { control: false },
+    heading: { control: false },
+    actions: { control: false },
+  },
   parameters: {
     design: {
       type: 'figma',
