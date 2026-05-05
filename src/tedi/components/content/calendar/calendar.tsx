@@ -282,3 +282,5 @@ export const Calendar = ({
     </div>
   );
 };
+
+Calendar.displayName = 'Calendar';

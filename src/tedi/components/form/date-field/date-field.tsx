@@ -569,6 +569,7 @@ export const DateField: React.FC<DateFieldProps> = ({
                   mode={mode}
                   value={value}
                   locale={locale}
+                  localeCode={localeCode}
                   showOutsideDays={showOutsideDays}
                   disabledMatchers={disabledMatchers}
                   required={required}
@@ -587,3 +588,5 @@ export const DateField: React.FC<DateFieldProps> = ({
     </>
   );
 };
+
+DateField.displayName = 'DateField';

@@ -99,11 +99,10 @@ export const FieldOptions: StoryFn = () => {
 
           <div>
             <DateField
-              key={shortcutValue?.toISOString() ?? 'empty'}
               id="date-with-shortcuts"
               label="Date field with shortcuts"
               mode="single"
-              defaultValue={shortcutValue}
+              selected={shortcutValue}
               parseDate={(val) => {
                 const parts = val.split('.');
                 if (parts.length !== 3) return undefined;
