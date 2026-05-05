@@ -13,6 +13,9 @@ import { Slider, SliderProps } from './slider';
 const meta: Meta<typeof Slider> = {
   component: Slider,
   title: 'TEDI-Ready/Components/Form/Slider',
+  argTypes: {
+    addonRight: { control: false },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
