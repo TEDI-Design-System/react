@@ -219,6 +219,14 @@ export interface TextFieldProps
    * Additional attributes for the input element.
    */
   input?: React.InputHTMLAttributes<HTMLInputElement> | React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+  /*
+   * Optional start slot element to render inside the input container, before the input field.
+   */
+  startSlot?: React.ReactNode;
+  /**
+   * Optional end slot element to render inside the input container, after the input field.
+   */
+  endSlot?: React.ReactNode;
 }
 
 export interface TextFieldForwardRef {
@@ -260,6 +268,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     input,
     name,
     isTextArea,
+    startSlot,
+    endSlot,
     ...rest
   } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
 
@@ -380,6 +390,44 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     );
   }, [showClearButton, icon, renderClearButton, renderIcon]);
 
+  const renderInputElement = (
+    <Field
+      {...input}
+      id={resolvedId}
+      name={name}
+      value={value}
+      defaultValue={defaultValue}
+      onChange={handleChange}
+      onChangeEvent={onChangeEvent}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      invalid={isInvalid}
+      placeholder={placeholder}
+      className={cn(styles['tedi-textfield__input'], inputClassName, {
+        [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
+      })}
+      onFocus={(e) => {
+        (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+        onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        (input?.onBlur as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+        onBlur?.(e);
+      }}
+      isTextArea={isTextArea}
+      aria-describedby={
+        !helper || (Array.isArray(helper) && helper.length === 0)
+          ? undefined
+          : Array.isArray(helper)
+          ? helper.map((_, index) => `${resolvedId}-helper-${index}`).join(' ')
+          : `${resolvedId}-helper`
+      }
+      aria-label={hideLabel && typeof label === 'string' ? label : undefined}
+      ref={fieldRef}
+    />
+  );
+
   const TextFieldBEM = cn(
     styles['tedi-textfield'],
     { [styles[`tedi-textfield--${size}`]]: size },
@@ -418,42 +466,9 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         onClick={onClick}
         ref={innerRef}
       >
-        <Field
-          {...input}
-          id={resolvedId}
-          name={name}
-          value={value}
-          defaultValue={defaultValue}
-          onChange={handleChange}
-          onChangeEvent={onChangeEvent}
-          disabled={disabled}
-          readOnly={readOnly}
-          required={required}
-          invalid={isInvalid}
-          placeholder={placeholder}
-          className={cn(styles['tedi-textfield__input'], inputClassName, {
-            [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
-          })}
-          onFocus={(e) => {
-            (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
-            onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            (input?.onBlur as React.FocusEventHandler<FieldElement> | undefined)?.(e);
-            onBlur?.(e);
-          }}
-          isTextArea={isTextArea}
-          aria-describedby={
-            !helper || (Array.isArray(helper) && helper.length === 0)
-              ? undefined
-              : Array.isArray(helper)
-              ? helper.map((_, index) => `${resolvedId}-helper-${index}`).join(' ')
-              : `${resolvedId}-helper`
-          }
-          aria-label={hideLabel && typeof label === 'string' ? label : undefined}
-          ref={fieldRef}
-        />
-
+        {startSlot}
+        {renderInputElement}
+        {endSlot}
         {(isClearable || icon) && renderRightArea}
       </div>
 

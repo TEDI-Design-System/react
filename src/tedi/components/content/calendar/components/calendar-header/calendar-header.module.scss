@@ -1,0 +1,48 @@
+.tedi-calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+
+  &.tedi-calendar__no-navigation {
+    justify-content: center;
+  }
+}
+
+.tedi-calendar__month-year-dropdown {
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.tedi-calendar__month-year-selector {
+  display: flex;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+  padding-left: var(--layout-grid-gutters-04);
+  font-weight: 500;
+  color: var(--general-text-primary);
+  text-transform: capitalize;
+  border-radius: var(--button-radius-sm);
+
+  &:hover {
+    color: var(--button-main-neutral-text-hover);
+    background: var(--button-main-neutral-icon-only-background-hover);
+
+    .tedi-calendar__month-year-caret {
+      color: var(--button-main-neutral-text-hover);
+    }
+  }
+
+  &[aria-expanded='true'] {
+    color: var(--button-main-neutral-text-active);
+    background: var(--button-main-neutral-icon-only-background-active);
+
+    .tedi-calendar__month-year-caret {
+      color: var(--button-main-neutral-text-active);
+    }
+  }
+}
+
+.tedi-calendar__month-year-caret {
+  font-size: var(--tedi-size-09);
+}

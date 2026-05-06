@@ -123,6 +123,7 @@
     "lint-staged": "^16.1.6",
     "next": "^16.2.2",
     "prettier": "^2.8.8",
+    "react-day-picker": "^9.13.2",
     "replace-in-file": "^8.4.0",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "rollup-plugin-visualizer": "^6.0.5",
