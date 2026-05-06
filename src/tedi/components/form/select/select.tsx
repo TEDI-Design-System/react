@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 import ReactSelect, {
+  ActionMeta,
   GroupBase,
   InputActionMeta,
   MenuListProps,
@@ -16,6 +17,7 @@ import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/for
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
 import { TextProps } from '../../base/typography/text/text';
+import { areAllSelected, getEnabledOptions, SELECT_ALL_VALUE } from './components/select-bulk-helpers';
 import { SelectClearIndicator } from './components/select-clear-indicator';
 import { SelectControl } from './components/select-control';
 import { SelectDropDownIndicator } from './components/select-dropdown-indicator';
@@ -441,13 +443,99 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
 
-    const onChangeHandler = (option: OnChangeValue<ISelectOption, boolean>) => {
-      onChange?.(option);
+    // "Select all" is injected into react-select's option list as a sentinel
+    // option so that keyboard navigation and default focus naturally include
+    // it (rather than rendering it as a sibling div outside react-select's
+    // option system, which left it unreachable via arrow keys).
+    //
+    // Toggling the sentinel is intercepted in onChangeHandler and translated
+    // into a bulk select / deselect of all enabled options. The sentinel is
+    // stripped from the value before it reaches the consumer's onChange — it
+    // never leaks outside this component.
+    const showSelectAllMode = !!showSelectAll && multiple;
+
+    // Internal value tracking is needed when showSelectAllMode is on because
+    // we need the latest selection in multiple places (filterOption, value
+    // injection) regardless of whether the consumer uses controlled or
+    // uncontrolled mode. For uncontrolled usage we track the value here so we
+    // can decide when to inject the sentinel into the value passed down.
+    const [internalValue, setInternalValue] = React.useState<TSelectValue>(defaultValue ?? null);
+    const isControlled = value !== undefined;
+    const currentValue = isControlled ? value : internalValue;
+    const currentValueArray: ReadonlyArray<ISelectOption> = React.useMemo(() => {
+      if (Array.isArray(currentValue)) return currentValue;
+      if (currentValue) return [currentValue as ISelectOption];
+      return [];
+    }, [currentValue]);
+
+    const selectAllSentinel = React.useMemo<ISelectOption>(
+      () => ({ value: SELECT_ALL_VALUE, label: getLabel('select.select-all') }),
+      [getLabel]
+    );
+
+    const optionsForReactSelect = React.useMemo(() => {
+      if (!showSelectAllMode || !options || options.length === 0) return options;
+      return [selectAllSentinel, ...options] as typeof options;
+    }, [options, showSelectAllMode, selectAllSentinel]);
+
+    const valueForReactSelect = React.useMemo(() => {
+      if (!showSelectAllMode) return currentValue;
+      const enabled = getEnabledOptions(options ?? []);
+      if (enabled.length > 0 && areAllSelected(currentValueArray, enabled)) {
+        return [...currentValueArray, selectAllSentinel];
+      }
+      return currentValue;
+    }, [currentValue, currentValueArray, options, showSelectAllMode, selectAllSentinel]);
+
+    const onChangeHandler = (option: OnChangeValue<ISelectOption, boolean>, actionMeta: ActionMeta<ISelectOption>) => {
+      let resolved: OnChangeValue<ISelectOption, boolean> = option;
+
+      if (showSelectAllMode) {
+        const enabled = getEnabledOptions(options ?? []);
+        const toggledOption = (actionMeta as { option?: ISelectOption }).option;
+        const toggledSentinel = toggledOption?.value === SELECT_ALL_VALUE;
+
+        if (toggledSentinel && actionMeta.action === 'select-option') {
+          // Sentinel was just selected → select every enabled option, but
+          // keep any disabled options that were already in the selection.
+          const previouslyDisabled = currentValueArray.filter(
+            (s) => s.value !== SELECT_ALL_VALUE && !enabled.some((e) => e.value === s.value)
+          );
+          resolved = [...previouslyDisabled, ...enabled];
+        } else if (toggledSentinel && actionMeta.action === 'deselect-option') {
+          // Sentinel was just deselected → drop every enabled option from
+          // the current selection while preserving disabled ones.
+          resolved = currentValueArray.filter(
+            (s) => s.value !== SELECT_ALL_VALUE && !enabled.some((e) => e.value === s.value)
+          );
+        } else if (Array.isArray(option)) {
+          // Strip the sentinel from any other action's payload so it never
+          // leaks outside this component.
+          resolved = (option as ISelectOption[]).filter((o) => o.value !== SELECT_ALL_VALUE);
+        }
+      }
+
+      if (!isControlled) {
+        setInternalValue(resolved as TSelectValue);
+      }
+
+      onChange?.(resolved);
 
       if (!blurInputOnSelect && element.current) {
         setTimeout(() => element.current?.inputRef?.focus(), 0);
       }
     };
+
+    // Keep the sentinel visible regardless of the search input — filtering
+    // it out would hide a meta-action while the user is narrowing the list.
+    const filterOption = React.useCallback(
+      (candidate: { value: string; label: string; data: ISelectOption }, input: string) => {
+        if (candidate.data.value === SELECT_ALL_VALUE) return true;
+        if (!input) return true;
+        return String(candidate.label).toLowerCase().includes(input.toLowerCase());
+      },
+      []
+    );
 
     // Keyboard-vs-mouse mode for the option focus ring. react-select's
     // `isFocused` flag is shared between hover and arrow-key nav, so we can't
@@ -524,12 +612,13 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           instanceId={id}
           className="tedi-select__wrapper"
           name={name}
-          options={options}
+          options={optionsForReactSelect}
           defaultOptions={defaultOptions}
-          value={value}
+          value={valueForReactSelect}
           defaultValue={defaultValue}
           cacheOptions={cacheOptions}
           onChange={onChangeHandler}
+          filterOption={showSelectAllMode ? filterOption : undefined}
           onInputChange={onInputChange}
           onBlur={onBlur}
           inputValue={inputValue}

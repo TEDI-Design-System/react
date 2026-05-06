@@ -3,6 +3,17 @@ import { GroupBase, OptionsOrGroups } from 'react-select';
 import { ISelectOption } from '../select';
 
 /**
+ * Sentinel value used by the "Select all" option when it is injected into
+ * react-select's option list. The sentinel is stripped from the value before
+ * it is exposed to consumers via onChange — it never leaks outside the
+ * component.
+ */
+export const SELECT_ALL_VALUE = '__tedi_select_all__';
+
+export const isSelectAllSentinel = (option: { value?: string } | null | undefined): boolean =>
+  !!option && option.value === SELECT_ALL_VALUE;
+
+/**
  * Returns true when `options` is a grouped tree (i.e. each top-level entry
  * has its own `options` array).
  */
@@ -15,15 +26,27 @@ export const isGroupedOptions = (
  * Flattens grouped/non-grouped options into a single list of enabled
  * `ISelectOption`s. Used by Select All and group toggles to decide which
  * options to flip on/off.
+ *
+ * Handles a mixed input where a flat option (e.g. the injected Select-all
+ * sentinel) sits alongside groups in the same top-level array, by checking
+ * each item individually rather than only inspecting `options[0]`.
  */
 export const getEnabledOptions = (
   options: OptionsOrGroups<ISelectOption, GroupBase<ISelectOption>>
 ): ISelectOption[] => {
   if (!options || options.length === 0) return [];
-  if (isGroupedOptions(options)) {
-    return options.flatMap((group) => group.options.filter((o) => !o.isDisabled));
+  const flat: ISelectOption[] = [];
+  for (const item of options) {
+    if (item && typeof item === 'object' && Array.isArray((item as GroupBase<ISelectOption>).options)) {
+      for (const opt of (item as GroupBase<ISelectOption>).options) {
+        if (!opt.isDisabled) flat.push(opt);
+      }
+    } else {
+      const opt = item as ISelectOption;
+      if (opt && !opt.isDisabled) flat.push(opt);
+    }
   }
-  return (options as ISelectOption[]).filter((o) => !o.isDisabled);
+  return flat;
 };
 
 /**

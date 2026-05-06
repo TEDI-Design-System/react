@@ -14,7 +14,7 @@ export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }:
   const OptionBEM = cn(
     styles['tedi-select__option'],
     { [styles['tedi-select__option--disabled']]: props.isDisabled },
-    { [styles['tedi-select__option--selected']]: props.isSelected },
+    { [styles['tedi-select__option--selected']]: props.isSelected && !showRadioButtons },
     { [styles['tedi-select__option--focused']]: props.isFocused }
   );
 
@@ -40,11 +40,6 @@ export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }:
             value={props.data.value}
             checked={props.isSelected}
             disabled={props.isDisabled}
-            // Required: without an onChange, Radio falls back to its internal
-            // `innerChecked` state and ignores the controlled `checked` prop,
-            // so the radio dot would never visually update from react-select's
-            // selection. Click is handled at the option level — this is just
-            // a no-op marker so Radio respects the prop.
             onChange={() => null}
           />
         </>

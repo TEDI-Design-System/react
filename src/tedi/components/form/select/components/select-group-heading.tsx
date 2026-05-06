@@ -45,7 +45,12 @@ export const SelectGroupHeading = ({ optionGroupHeadingText, ...props }: GroupHe
   };
 
   return (
-    <ReactSelectComponents.GroupHeading {...props} className={cn(styles['tedi-select__group-heading'])}>
+    <ReactSelectComponents.GroupHeading
+      {...props}
+      className={cn(styles['tedi-select__group-heading'], {
+        [styles['tedi-select__group-heading--selectable']]: interactive,
+      })}
+    >
       {interactive ? (
         // The Checkbox owns the toggle path through its own `onChange`;
         // attaching another handler to the wrapper would fire `handleToggle`

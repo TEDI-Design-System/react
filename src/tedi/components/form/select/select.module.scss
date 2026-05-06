@@ -203,6 +203,20 @@ div.tedi-select__multi-value-item {
   margin-bottom: 0;
 }
 
+// When the group heading itself is a selectable checkbox (selectableGroups
+// in multi-select), indent the options that follow it so the visual
+// hierarchy reads as "group toggle" → "child option toggles". Uses the same
+// padding values as ChoiceGroup's indented inner row (the design-system
+// reference for this pattern) so a child option's checkbox aligns under the
+// parent's label glyph instead of 5px too far right on desktop.
+.tedi-select__group-heading--selectable ~ .tedi-select__option {
+  padding-left: calc(var(--form-checkbox-radio-subitem-padding-left) - 5px);
+
+  @include breakpoints.media-breakpoint-down(md) {
+    padding-left: var(--form-checkbox-radio-subitem-padding-left);
+  }
+}
+
 .tedi-select__multi-value-clear {
   margin: -0.125rem -0.25rem -0.125rem 0;
 }

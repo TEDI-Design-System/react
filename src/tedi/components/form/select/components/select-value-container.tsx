@@ -18,6 +18,17 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
   const tagsDirection = props.selectProps.tagsDirection;
   const isMulti = props.isMulti;
   const isSingleRow = !!isMulti && tagsDirection === 'row';
+  // Re-measure whenever the focus state flips — react-select inflates the
+  // input's min-width from ~2px to 5rem on focus (see select.module.scss).
+  // Without this trigger the visibleCount calculated in the unfocused state
+  // would still be in effect after focus, causing the now-too-wide input to
+  // push the last visible tag and the +N counter past the container's right
+  // edge.
+  const isFocused = !!props.selectProps.menuIsOpen || !!(props.selectProps as { isFocused?: boolean }).isFocused;
+  // Re-measure when the typed input string changes — the input grows with
+  // content past its min-width, so a static measurement taken when the input
+  // was empty is no longer accurate once the user types.
+  const inputValue = props.selectProps.inputValue ?? '';
 
   const selected = (props.selectProps.value as ReadonlyArray<ISelectOption> | null) ?? [];
   const totalCount = Array.isArray(selected) ? selected.length : 0;
@@ -29,9 +40,11 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
   const lastMeasuredWidthRef = useRef<number>(0);
   const [visibleCount, setVisibleCount] = useState<number | null>(null);
 
-  // Reset measurement whenever the selection count changes — that gives the
-  // child MultiValues a render with `visibleCount = null`, which forces them
-  // all to render so we can read their widths.
+  // Reset measurement whenever inputs that affect available space change:
+  // selection count (more / fewer tags to lay out), focus state (input min
+  // jumps between ~2px and 5rem), or typed input string (input grows with
+  // content). Each of these can change the layout enough that a previously
+  // computed visibleCount no longer fits.
   useLayoutEffect(() => {
     if (!isSingleRow) {
       if (visibleCount !== null) setVisibleCount(null);
@@ -39,7 +52,7 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
     }
     setVisibleCount(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSingleRow, totalCount]);
+  }, [isSingleRow, totalCount, isFocused, inputValue]);
 
   // Re-measure when the container actually changes width (browser resize,
   // parent layout shift, etc.). Without this the `+N` counter only matches
@@ -81,9 +94,22 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
       return;
     }
 
+    // Reserve the input's actual rendered width (not just its min-width) so
+    // we account for content the user may have typed. Fall back to min-width
+    // when the input hasn't been laid out yet.
     const inputEl = container.querySelector<HTMLElement>('.select__input-container');
-    const inputMin = inputEl ? parseFloat(getComputedStyle(inputEl).minWidth) || 0 : 0;
-    const available = containerWidth - inputMin;
+    let inputReserve = 0;
+    if (inputEl) {
+      const rendered = inputEl.offsetWidth;
+      const minWidth = parseFloat(getComputedStyle(inputEl).minWidth) || 0;
+      inputReserve = Math.max(rendered, minWidth);
+    }
+    // Reserve the gap between the last-visible-tag-or-counter and the input
+    // too — without this we underestimate by TAG_GAP_PX, letting the layout
+    // overflow by exactly one gap (visible as the rightmost tag clipping
+    // into the input area, which from a user's vantage looks like the first
+    // tags being pushed under the input).
+    const available = containerWidth - inputReserve - TAG_GAP_PX;
 
     let usedWidth = 0;
     let visible = 0;

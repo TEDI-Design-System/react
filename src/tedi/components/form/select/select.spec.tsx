@@ -414,7 +414,9 @@ describe('Select component', () => {
       await userEvent.click(screen.getByRole('combobox'));
     });
 
-    expect(await screen.findByText(SELECT_ALL_KEY)).toBeInTheDocument();
+    // The select-all option renders the label twice (sr-only span + Checkbox
+    // label), so use findAllByText and assert at least one match.
+    expect((await screen.findAllByText(SELECT_ALL_KEY)).length).toBeGreaterThan(0);
   });
 
   it('does not render Select All toggle outside multi mode', async () => {
@@ -444,9 +446,13 @@ describe('Select component', () => {
       await userEvent.click(screen.getByRole('combobox'));
     });
 
-    const selectAll = await screen.findByText(SELECT_ALL_KEY);
+    // The select-all option renders the label twice; click the option element
+    // itself (matched by role) to trigger react-select's selection handler.
+    const selectAllOption = (await screen.findAllByRole('option')).find((el) =>
+      el.textContent?.includes(SELECT_ALL_KEY)
+    )!;
     await act(async () => {
-      await userEvent.click(selectAll);
+      await userEvent.click(selectAllOption);
     });
 
     expect(handleChange).toHaveBeenCalled();
@@ -462,9 +468,11 @@ describe('Select component', () => {
       await userEvent.click(screen.getByRole('combobox'));
     });
 
-    const selectAll = await screen.findByText(SELECT_ALL_KEY);
+    const selectAllOption = (await screen.findAllByRole('option')).find((el) =>
+      el.textContent?.includes(SELECT_ALL_KEY)
+    )!;
     await act(async () => {
-      await userEvent.click(selectAll);
+      await userEvent.click(selectAllOption);
     });
 
     expect(handleChange).toHaveBeenCalled();

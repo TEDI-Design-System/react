@@ -5,6 +5,7 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Checkbox } from '../checkbox/checkbox';
 import { AsyncSelectTemplate } from './examples/async';
 import { EditableSelectTemplate } from './examples/editable';
 import { MultipleHandledTemplate } from './examples/multiple-handled';
@@ -51,20 +52,20 @@ const groupedOptions: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOpti
 
 const TemplateSizes: StoryFn = (args) => (
   <Row>
-    <Col lg={12} md={12} className="example-list">
+    <Col lg={12} xs={12} className="example-list">
       <Row className="border-bottom padding-14-16">
-        <Col lg={2} md={12} className="display-flex align-items-center">
+        <Col lg={2} xs={12} className="display-flex align-items-center">
           <Text modifiers="bold">Default</Text>
         </Col>
-        <Col lg={10} md={12}>
+        <Col lg={10} xs={12}>
           <Select label={args.label} id="select-size-default" {...args} />
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col lg={2} md={12} className="display-flex align-items-center">
+        <Col lg={2} xs={12} className="display-flex align-items-center">
           <Text modifiers="bold">Small</Text>
         </Col>
-        <Col lg={10} md={12}>
+        <Col lg={10} xs={12}>
           <Select label={args.label} size="small" id="select-size-default" {...args} />
         </Col>
       </Row>
@@ -115,7 +116,7 @@ export const States: Story = {
   render: (args) => (
     <VerticalSpacing>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col>
@@ -123,7 +124,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Hover</Text>
         </Col>
         <Col>
@@ -137,7 +138,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Focus</Text>
         </Col>
         <Col>
@@ -151,7 +152,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Active</Text>
         </Col>
         <Col>
@@ -165,7 +166,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
@@ -173,7 +174,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
@@ -181,7 +182,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Disabled</Text>
         </Col>
         <Col>
@@ -485,6 +486,33 @@ const renderDescriptionOption = (props: OptionProps<ISelectOption, boolean>) => 
   );
 };
 
+const renderDescriptionOptionWithCheckbox = (props: OptionProps<ISelectOption, boolean>) => {
+  const { title, description } = props.data.customData as DescriptionData;
+  return (
+    <Row gutterY={2} gutterX={1} alignItems="start">
+      <Col width="auto">
+        <Checkbox
+          id={props.data.value}
+          label=""
+          aria-hidden
+          value={props.data.value}
+          name={props.data.value}
+          checked={props.isSelected}
+          onChange={() => null}
+          disabled={props.isDisabled}
+        />
+      </Col>
+      <Col width="auto">
+        <span className="sr-only">{props.label}</span>
+        <Text>{title}</Text>
+        <Text color="secondary" modifiers="small">
+          {description}
+        </Text>
+      </Col>
+    </Row>
+  );
+};
+
 const renderHorizontalMetaOption = (props: OptionProps<ISelectOption, boolean>) => {
   const { name, slots } = props.data.customData as MetaData;
   return (
@@ -611,7 +639,7 @@ export const Examples: Story = {
         label="Multiselect with custom templates"
         placeholder="Select permissions..."
         options={permissionOptions}
-        renderOption={renderDescriptionOption}
+        renderOption={renderDescriptionOptionWithCheckbox}
         multiple
         isClearable
         isTagRemovable
@@ -635,6 +663,18 @@ export const MultipleHandled: Story = {
   },
 };
 
+/**
+ * Demonstrates the `async` mode with a `loadOptions` callback that fetches
+ * matches on demand instead of receiving a static `options` array. Use this
+ * shape when the option list lives on the server, is too large to ship up
+ * front, or needs to be filtered by the backend (typeahead search, remote
+ * lookup, etc.).
+ *
+ * In this example `loadOptions` simulates a 1s network delay before resolving
+ * with locally filtered colour options, and the user's input is sanitised
+ * (non-word characters stripped) before it's used as the search term — the
+ * sanitised value is shown above the select.
+ */
 export const AsyncSelect: Story = {
   render: AsyncSelectTemplate,
   args: {
@@ -644,6 +684,18 @@ export const AsyncSelect: Story = {
   },
 };
 
+/**
+ * Demonstrates a fully controlled combobox where the parent owns both the
+ * selected `value` AND the visible `inputValue`. Use this shape when the
+ * input text needs to be edited freely (rather than only filter the menu)
+ * and stay in sync with the selected option — e.g. an editable autocomplete
+ * field.
+ *
+ * Selecting an option from the menu overwrites the input text with that
+ * option's label. Typing into the field updates `inputValue` only, leaving
+ * the previously selected value intact until a new option is picked. The
+ * underlying input is rendered visibly (`inputIsHidden={false}`).
+ */
 export const EditableSelect: Story = {
   render: EditableSelectTemplate,
   args: {
