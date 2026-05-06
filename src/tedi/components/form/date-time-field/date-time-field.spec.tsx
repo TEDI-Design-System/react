@@ -110,6 +110,7 @@ describe('DateTimeField component', () => {
         layout="multi-step"
         defaultValue={new Date(2025, 8, 1, 0, 0)}
         availableTimes={['09:30', '11:30', '15:30']}
+        selectTimeLabel="Select time"
         onChange={onChange}
       />
     );

@@ -17,6 +17,7 @@ import { DateRange, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Button } from '../../buttons/button/button';
 import { Calendar } from '../../content/calendar/calendar';
@@ -80,7 +81,7 @@ type DateTimeFieldBreakpointProps = {
   showOutsideDays?: boolean;
   /**
    * Heading rendered above the time picker in the side-by-side layout.
-   * @default 'Time'
+   * Falls back to the localised `dateTimeField.timeHeading` label.
    */
   timeHeading?: React.ReactNode;
 };
@@ -181,13 +182,15 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    */
   localeCode?: string;
   /**
-   * Label of the "Select time" footer button under the calendar.
-   * @default 'Select time'
+   * Label of the "Select time" footer button under the calendar in the
+   * multi-step layout. Falls back to the localised
+   * `dateTimeField.selectTime` label.
    */
   selectTimeLabel?: string;
   /**
-   * Label of the "Back" link shown above the time picker.
-   * @default 'Back'
+   * Label of the "Back" link shown above the time picker in the
+   * multi-step layout. Falls back to the localised `dateTimeField.back`
+   * label.
    */
   backLabel?: string;
   /**
@@ -235,6 +238,7 @@ const asSingle = (val: DateTimeFieldValue | undefined): Date | undefined => (isD
 
 export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getLabel } = useLabels();
   const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobile = isBreakpointBelow(breakpoint, 'md');
   const {
@@ -244,7 +248,7 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     timeGridVariant,
     showOutsideDays = true,
     availableTimes,
-    timeHeading = 'Time',
+    timeHeading = getLabel('dateTimeField.timeHeading'),
   } = getCurrentBreakpointProps<DateTimeFieldBreakpointProps>(props);
 
   const {
@@ -266,8 +270,8 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     initialMonth,
     locale = et,
     localeCode = 'et-EE',
-    selectTimeLabel = 'Select time',
-    backLabel = 'Back',
+    selectTimeLabel = getLabel('dateTimeField.selectTime'),
+    backLabel = getLabel('dateTimeField.back'),
     mode = 'single',
     inputProps,
   } = props;

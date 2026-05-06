@@ -76,8 +76,6 @@ export const MultiSteps: Story = {
     layout: 'multi-step',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'radio',
-    selectTimeLabel: 'Select time',
-    backLabel: 'Tagasi',
   },
 };
 
