@@ -193,7 +193,7 @@ export const States: Story = {
     return (
       <VerticalSpacing size={2}>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center">
             <Text modifiers="bold">Default</Text>
           </Col>
           <Col>
@@ -201,7 +201,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center">
             <Text modifiers="bold">Hover</Text>
           </Col>
           <Col>
@@ -209,7 +209,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center">
             <Text modifiers="bold">Active</Text>
           </Col>
           <Col>
@@ -217,7 +217,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center">
             <Text modifiers="bold">Disabled</Text>
           </Col>
           <Col>
@@ -225,7 +225,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center">
             <Text modifiers="bold">Focus</Text>
           </Col>
           <Col>
@@ -233,7 +233,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center">
             <Text modifiers="bold">With input</Text>
           </Col>
           <Col>

@@ -61,13 +61,15 @@
 }
 
 .tedi-slider__input {
+  --tedi-slider-hit-padding: 0.625rem;
+
   position: absolute;
-  inset: 0;
+  inset: calc(var(--tedi-slider-hit-padding) * -1) 0;
   width: 100%;
-  height: 100%;
   padding: 0;
   margin: 0;
   appearance: none;
+  cursor: pointer;
   background: transparent;
   border: 0;
   border-radius: inherit;
@@ -90,7 +92,7 @@
   &::-webkit-slider-thumb {
     width: var(--form-slider-thumb-size);
     height: var(--form-slider-thumb-size);
-    margin-top: calc((var(--form-slider-height) - var(--form-slider-thumb-size)) / 2);
+    margin-top: calc((var(--form-slider-height) - var(--form-slider-thumb-size)) / 2 + var(--tedi-slider-hit-padding));
     appearance: none;
     cursor: pointer;
     background: var(--form-slider-thumb-background-default);
