@@ -372,21 +372,54 @@ export const DateField: React.FC<DateFieldProps> = ({
     if (shouldCloseOnSelect) setOpen(false);
   };
 
-  const defaultParseDate = (value: string): Date | undefined => {
-    const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-    if (!match) return undefined;
+  const defaultParseDate = useMemo(() => {
+    const ref = new Date(2099, 11, 31);
+    const parts = dateFormatter.formatToParts(ref);
 
-    const [, dd, mm, yyyy] = match;
-    const day = Number(dd);
-    const month = Number(mm) - 1;
-    const year = Number(yyyy);
-    const date = new Date(year, month, day);
-
-    if (isNaN(date.getTime()) || date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
-      return undefined;
+    const fieldOrder: ('day' | 'month' | 'year')[] = [];
+    const separators: string[] = [];
+    for (const part of parts) {
+      if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
+        fieldOrder.push(part.type);
+      } else if (part.type === 'literal' && fieldOrder.length > 0 && separators.length < 2) {
+        separators.push(part.value);
+      }
     }
-    return date;
-  };
+
+    const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regexSource = fieldOrder
+      .map((field, i) => {
+        const digits = field === 'year' ? '\\d{4}' : '\\d{2}';
+        const sep = i > 0 ? escapeRegex(separators[i - 1] ?? '') : '';
+        return `${sep}(${digits})`;
+      })
+      .join('');
+    const regex = new RegExp(`^${regexSource}$`);
+
+    return (value: string): Date | undefined => {
+      const match = value.match(regex);
+      if (!match) return undefined;
+
+      const values: Partial<Record<'day' | 'month' | 'year', number>> = {};
+      fieldOrder.forEach((field, i) => {
+        values[field] = Number(match[i + 1]);
+      });
+
+      const { day, month, year } = values;
+      if (day === undefined || month === undefined || year === undefined) return undefined;
+
+      const date = new Date(year, month - 1, day);
+      if (
+        isNaN(date.getTime()) ||
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        return undefined;
+      }
+      return date;
+    };
+  }, [dateFormatter]);
 
   const handleInputChange = (val: string) => {
     setInputValue(val);
