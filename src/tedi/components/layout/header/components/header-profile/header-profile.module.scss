@@ -39,6 +39,10 @@
       align-items: flex-start;
       border-radius: 0;
 
+      [class*='tedi-header-role__selection-body'] {
+        padding: 0 var(--card-padding-md-default) var(--card-padding-md-default) var(--card-padding-md-default);
+      }
+
       &-styled > * {
         display: flex;
         flex-direction: column;

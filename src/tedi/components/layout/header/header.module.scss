@@ -59,12 +59,8 @@
       padding: var(--layout-header-separator-padding-y) 0;
     }
 
-    @include breakpoints.media-breakpoint-down(lg) {
+    @include breakpoints.media-breakpoint-only(md) {
       max-height: 2.75rem;
-    }
-
-    @include breakpoints.media-breakpoint-down(md) {
-      max-height: unset;
     }
   }
 

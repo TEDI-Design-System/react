@@ -240,7 +240,7 @@ const AccessibilityLink = () => {
     <Link underline={false} href="#">
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--link-inner-spacing-x)' }}>
         {label}
-        <Icon name="arrow_outward" size={16} />
+        <Icon name="north_east" size={16} />
       </div>
     </Link>
   );
