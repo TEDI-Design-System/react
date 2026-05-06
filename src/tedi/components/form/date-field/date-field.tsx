@@ -13,7 +13,7 @@ import {
   useRole,
 } from '@floating-ui/react';
 import cn from 'classnames';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
@@ -250,7 +250,6 @@ export const DateField: React.FC<DateFieldProps> = ({
 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<CalendarView>(selectionLevel);
-  const naturalCalendarWidthRef = useRef<number | null>(null);
   const [inputValue, setInputValue] = useState('');
 
   const isControlled = selected !== undefined;
@@ -280,8 +279,6 @@ export const DateField: React.FC<DateFieldProps> = ({
   useEffect(() => {
     if (open) {
       setView(selectionLevel);
-    } else {
-      naturalCalendarWidthRef.current = null;
     }
   }, [open, selectionLevel]);
 
@@ -443,15 +440,11 @@ export const DateField: React.FC<DateFieldProps> = ({
         padding: CALENDAR_PADDING,
         apply({ availableWidth, elements }) {
           const el = elements.floating;
-          // Capture the natural (unconstrained) width on the first positioning
-          // call after opening. Subsequent calls reuse this value so a
-          // min-content width set in a previous frame doesn't corrupt the check.
-          if (naturalCalendarWidthRef.current === null) {
-            naturalCalendarWidthRef.current = el.getBoundingClientRect().width;
-          }
-          if (naturalCalendarWidthRef.current > availableWidth) {
-            // Months won't fit side by side — snap to one-month width and cap
-            // at the available space so nothing overflows the viewport.
+          el.style.width = 'max-content';
+          el.style.maxWidth = '';
+          const naturalWidth = el.getBoundingClientRect().width;
+
+          if (naturalWidth > availableWidth) {
             el.style.width = 'min-content';
             el.style.maxWidth = `${availableWidth}px`;
           } else {
