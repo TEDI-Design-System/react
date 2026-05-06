@@ -15,11 +15,6 @@ import ButtonGroup, { ButtonGroupProps } from './button-group';
 const meta: Meta<typeof ButtonGroup> = {
   title: 'TEDI-Ready/Components/Buttons/ButtonGroup',
   component: ButtonGroup,
-  parameters: {
-    status: {
-      type: 'partiallyTediReady',
-    },
-  },
 };
 
 export default meta;
@@ -30,11 +25,11 @@ const sizeArray: ButtonGroupProps['size'][] = ['default', 'small'];
 
 const Template: StoryFn<ButtonGroupProps> = (args) => (
   <ButtonGroup {...args} ariaLabel="Button group example">
-    <Button id="1">Text</Button>
+    <Button id="1">Details</Button>
     <Button id="2" isActive>
-      Text
+      Updates
     </Button>
-    <Button id="3">Text</Button>
+    <Button id="3">Settings</Button>
   </ButtonGroup>
 );
 
@@ -55,15 +50,13 @@ const TemplateSizes: StoryFn<TemplateMultipleProps> = (args) => {
               <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
             </Col>
             <Col>
-              <VerticalSpacing>
-                <ButtonGroup type="primary" {...buttonGroupProps} {...{ [property]: value }}>
-                  <Button id="01">Text</Button>
-                  <Button id="02" isActive>
-                    Text
-                  </Button>
-                  <Button id="03">Text</Button>
-                </ButtonGroup>
-              </VerticalSpacing>
+              <ButtonGroup type="primary" {...buttonGroupProps} {...{ [property]: value }}>
+                <Button id="01">Tab 1</Button>
+                <Button id="02" isActive>
+                  Tab 2
+                </Button>
+                <Button id="03">Tab 3</Button>
+              </ButtonGroup>
             </Col>
           </Row>
         );
@@ -74,30 +67,66 @@ const TemplateSizes: StoryFn<TemplateMultipleProps> = (args) => {
 
 const TemplateTypes: StoryFn<typeof Button> = (args) => {
   return (
-    <VerticalSpacing>
-      <ButtonGroup type="primary" stretch={false} ariaLabel="Button group example">
-        <Button id="1" {...args}>
-          Text
-        </Button>
-        <Button id="2" isActive {...args}>
-          Text
-        </Button>
-        <Button id="3" {...args}>
-          Text
-        </Button>
-      </ButtonGroup>
-      <ButtonGroup type="secondary" stretch={false}>
-        <Button id="1" {...args}>
-          Text
-        </Button>
-        <Button id="2" isActive {...args}>
-          Text
-        </Button>
-        <Button id="3" {...args}>
-          Text
-        </Button>
-      </ButtonGroup>
-    </VerticalSpacing>
+    <Row gutterY={2}>
+      <Col md={12}>
+        <ButtonGroup type="primary" stretch={false} ariaLabel="Button group example">
+          <Button id="1" {...args}>
+            Tab 1
+          </Button>
+          <Button id="2" isActive {...args}>
+            Tab 2
+          </Button>
+          <Button id="3" {...args}>
+            Tab 3
+          </Button>
+        </ButtonGroup>
+      </Col>
+      <Col md={12}>
+        <ButtonGroup type="secondary" stretch={false}>
+          <Button id="1" {...args}>
+            Tab 1
+          </Button>
+          <Button id="2" isActive {...args}>
+            Tab 2
+          </Button>
+          <Button id="3" {...args}>
+            Tab 3
+          </Button>
+        </ButtonGroup>
+      </Col>
+    </Row>
+  );
+};
+
+const TemplateWithIcons: StoryFn<ButtonGroupProps> = (args) => {
+  return (
+    <ButtonGroup {...args} stretch={false}>
+      <Button id="1" iconLeft="table">
+        Tab 1
+      </Button>
+      <Button id="2" iconLeft="refresh" isActive>
+        Tab 2
+      </Button>
+      <Button id="3" iconLeft="settings">
+        Tab 3
+      </Button>
+    </ButtonGroup>
+  );
+};
+
+const TemplateIconOnly: StoryFn<ButtonGroupProps> = (args) => {
+  return (
+    <ButtonGroup {...args} stretch={false}>
+      <Button id="1" icon="table">
+        Tab 1
+      </Button>
+      <Button id="2" icon="refresh" isActive>
+        Tab 2
+      </Button>
+      <Button id="3" icon="settings">
+        Tab 3
+      </Button>
+    </ButtonGroup>
   );
 };
 
@@ -106,6 +135,7 @@ export const Default: Story = {
   args: {
     type: 'primary',
     stretch: false,
+    dropdownLabel: 'Text',
   },
 };
 
@@ -114,6 +144,8 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
   args: {
     property: 'size',
     array: sizeArray,
+    dropdownLabel: 'Text',
+    enableMobileDropdown: true,
   },
 };
 
@@ -121,14 +153,20 @@ export const Types: StoryObj<typeof Button> = {
   render: TemplateTypes,
 };
 
-export const WithIcon: StoryObj<typeof Button> = {
-  render: TemplateTypes,
-  args: { iconLeft: 'table' },
+export const WithIcon: Story = {
+  render: TemplateWithIcons,
+  args: {
+    type: 'primary',
+    enableMobileDropdown: true,
+    dropdownLabelMode: 'active',
+  },
 };
 
-export const IconOnly: StoryObj<typeof Button> = {
-  render: TemplateTypes,
-  args: { icon: 'table' },
+export const IconOnly: Story = {
+  render: TemplateIconOnly,
+  args: {
+    type: 'primary',
+  },
 };
 
 const TemplateColumn: StoryFn<{ states: string[]; type: 'primary' | 'secondary' }> = (args) => {
@@ -149,13 +187,13 @@ const TemplateColumn: StoryFn<{ states: string[]; type: 'primary' | 'secondary' 
                 onClick={() => setSelectedId(`${state}-1-${args.type}`)}
                 disabled={state === 'Disabled'}
               >
-                Text
+                Details
               </Button>
               <Button id={`${state}-2-${args.type}`} onClick={() => setSelectedId(`${state}-2-${args.type}`)}>
-                Text
+                Updates
               </Button>
               <Button id={`${state}-3-${args.type}`} onClick={() => setSelectedId(`${state}-3-${args.type}`)}>
-                Text
+                Settings
               </Button>
             </ButtonGroup>
           </Col>
@@ -200,7 +238,13 @@ export const DifferentWidthButtons: Story = {
     return (
       <Row>
         <Col md={12}>
-          <ButtonGroup {...args} stretch={false} onSelectionChange={setSelectedId} ariaLabel="Button group example">
+          <ButtonGroup
+            {...args}
+            stretch={false}
+            onSelectionChange={setSelectedId}
+            ariaLabel="Button group example"
+            enableMobileDropdown
+          >
             <Button id="1" isActive={selectedId === '1'} onClick={() => setSelectedId('1')}>
               Text
             </Button>

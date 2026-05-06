@@ -16,6 +16,7 @@ import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/for
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
 import { TextProps } from '../../base/typography/text/text';
+import { useOptionalInputGroup } from '../input-group/input-group';
 import { SelectClearIndicator } from './components/select-clear-indicator';
 import { SelectControl } from './components/select-control';
 import { SelectDropDownIndicator } from './components/select-dropdown-indicator';
@@ -39,8 +40,9 @@ declare module 'react-select/dist/declarations/src/Select' {
   }
 }
 
-export interface SelectProps extends FormLabelProps {
-  id: string;
+export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
+  id?: string;
+  label?: string;
   options?: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOption>>;
   defaultOptions?: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOption>> | boolean;
   placeholder?: string;
@@ -183,7 +185,12 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       tooltip,
       classNames,
     } = props;
-    const helperId = helper ? helper?.id ?? `${id}-helper` : undefined;
+    const inputGroup = useOptionalInputGroup?.();
+    const generatedId = React.useId();
+    const shouldHideLabel = inputGroup?.hasExternalLabel;
+    const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+
+    const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
     const { getLabel } = useLabels();
 
@@ -216,7 +223,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
         Menu: SelectMenu,
         MenuList: SelectMenuListMemo,
         Option: (props) => SelectOption({ renderOption, multiple, showRadioButtons, ...props }),
-        Control: SelectControl,
+        Control: (props) => SelectControl({ ...props, className: className }),
         Input: SelectInput,
         MultiValue: (props) => SelectMultiValue({ isTagRemovable, ...props }),
         MultiValueRemove: SelectMultiValueRemove,
@@ -234,7 +241,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
 
       return (
         <ReactSelectElement<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
-          id={id}
+          id={resolvedId}
           aria-describedby={helperId}
           autoFocus={autoFocus}
           ref={element}
@@ -321,15 +328,17 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     return (
       <div data-name="select" className={SelectBEM}>
         <div className={styles['tedi-select__inner']}>
-          <FormLabel
-            id={`${id}-input`}
-            label={label}
-            required={required}
-            hideLabel={hideLabel}
-            size={size}
-            renderWithoutLabel={renderWithoutLabel}
-            tooltip={tooltip}
-          />
+          {!shouldHideLabel && (
+            <FormLabel
+              id={`${resolvedId}-input`}
+              label={label}
+              required={required}
+              hideLabel={hideLabel}
+              size={size}
+              renderWithoutLabel={renderWithoutLabel}
+              tooltip={tooltip}
+            />
+          )}
           {renderReactSelect()}
         </div>
         {helper && <FeedbackText {...helper} id={helperId} />}

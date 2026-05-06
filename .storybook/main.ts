@@ -22,6 +22,7 @@ const config: StorybookConfig = {
     '@storybook/addon-designs',
     '@avalane/storybook-addon-status',
     'storybook-addon-pseudo-states',
+    '@chromatic-com/storybook',
   ],
   core: {
     builder: '@storybook/builder-vite',
@@ -51,7 +52,7 @@ const config: StorybookConfig = {
       },
       publicDir: join(__dirname, '../public'),
       plugins: await withoutVitePlugins(
-        [config.plugins],
+        config.plugins ?? [],
         ['vite:dts']
       ),
     };
