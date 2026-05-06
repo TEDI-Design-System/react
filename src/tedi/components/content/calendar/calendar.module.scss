@@ -59,7 +59,7 @@
   &__day {
     @extend %tedi-calendar-cell-size;
 
-    padding: 2px;
+    padding: 1px;
     text-align: center;
     border-radius: var(--button-radius-sm);
     transition: background 0.15s ease;
@@ -68,7 +68,9 @@
       all: unset;
       display: block;
       width: 100%;
+      width: var(--form-calendar-date-width);
       height: 100%;
+      height: var(--form-calendar-date-width);
       overflow: hidden;
       font-size: var(--body-regular-size);
       font-weight: 400;
@@ -95,7 +97,6 @@
 
   &__today {
     button {
-      margin-left: -1px;
       border: 1px solid var(--form-datepicker-today-border);
       border-radius: 50%;
     }

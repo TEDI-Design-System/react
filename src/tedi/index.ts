@@ -42,6 +42,7 @@ export * from './components/form/time-field/time-field';
 export * from './components/form/time-picker/time-picker';
 export * from './components/form/checkbox/checkbox';
 export * from './components/form/date-field/date-field';
+export * from './components/form/date-time-field/date-time-field';
 export * from './components/form/input-group';
 export * from './components/form/field/field';
 export * from './components/overlays/tooltip';
