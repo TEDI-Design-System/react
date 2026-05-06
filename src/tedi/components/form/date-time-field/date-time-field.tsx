@@ -21,22 +21,21 @@ import { UnknownType } from '../../../types/commonTypes';
 import { Button } from '../../buttons/button/button';
 import { Calendar } from '../../content/calendar/calendar';
 import { CalendarView } from '../date-field/date-field';
+import {
+  buildDateRegexSource,
+  buildDisabledMatchers,
+  CALENDAR_POPOVER_OFFSET,
+  CALENDAR_POPOVER_PADDING,
+  getLocaleDateParts,
+} from '../date-field/date-field-helpers';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import { TimePicker } from '../time-picker/time-picker';
 import styles from './date-time-field.module.scss';
-
-const POPUP_OFFSET = 4;
-const POPUP_PADDING = 8;
 
 export type DateTimeFieldStep = 'date' | 'time';
 export type DateTimeFieldLayout = 'side-by-side' | 'multi-step';
 export type DateTimeFieldMode = 'single' | 'range';
 
-/**
- * Range value shape for `mode='range'`. Each side carries both a date and
- * a time component — the `from` / `to` `Date` objects include the time
- * picked from the corresponding time picker in the popover.
- */
 export interface DateTimeRange {
   from?: Date;
   to?: Date;
@@ -44,25 +43,17 @@ export interface DateTimeRange {
 
 export type DateTimeFieldValue = Date | DateTimeRange;
 
-/**
- * Per-breakpoint overridable props. Each can be set on the component
- * directly (applies at all breakpoints) or via the `xs / sm / md / lg /
- * xl / xxl` keys to override at a specific breakpoint — typical use is
- * `useNativePicker` on mobile + custom popover on desktop, or
- * `layout='multi-step'` on mobile + `'side-by-side'` on desktop.
- */
 type DateTimeFieldBreakpointProps = {
   /**
    * When `true`, renders an `<input type="datetime-local">` and skips the
    * custom popover entirely — the browser's built-in date/time picker is
-   * shown when the calendar icon is clicked. Useful on mobile where the
-   * native picker is the platform-idiomatic UX. Has no effect when
+   * shown when the calendar icon is clicked. Has no effect when
    * `mode='range'` (native datetime-local has no range counterpart).
    * @default false
    */
   useNativePicker?: boolean;
   /**
-   * Layout of the date-and-time popover. See `DateTimeFieldLayout`.
+   * Layout of the date-and-time popover.
    * @default 'side-by-side'
    */
   layout?: DateTimeFieldLayout;
@@ -224,25 +215,17 @@ const combineDateTime = (date: Date, time: string): Date => {
 
 const isDate = (val: unknown): val is Date => val instanceof Date;
 
-// Format a Date as the value `<input type="datetime-local">` expects:
-// "YYYY-MM-DDTHH:mm" (local timezone, no seconds/offset).
 const formatNativeValue = (d: Date | undefined): string => {
   if (!d) return '';
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-// Parse the string a native datetime-local input emits. Browsers send
-// either "YYYY-MM-DDTHH:mm" or "YYYY-MM-DDTHH:mm:ss"; both round-trip
-// through the Date constructor in the user's local timezone.
 const parseNativeValue = (input: string): Date | undefined => {
   if (!input) return undefined;
   const date = new Date(input);
   return isNaN(date.getTime()) ? undefined : date;
 };
 
-// Coerce the loose `Date | DateTimeRange | undefined` value union into a
-// guaranteed `DateTimeRange` shape. When the consumer is using `single` mode
-// but happens to pass nothing / a Date, we fall back to `{}` here.
 const asRange = (val: DateTimeFieldValue | undefined): DateTimeRange => {
   if (!val || isDate(val)) return {};
   return val;
@@ -252,10 +235,6 @@ const asSingle = (val: DateTimeFieldValue | undefined): Date | undefined => (isD
 
 export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  // Mobile detection for range mode: a 2-month calendar (~640px wide)
-  // doesn't fit on most phones, so we collapse to a single visible month
-  // below the `md` breakpoint and let the user navigate between months
-  // with the calendar's existing < / > arrows.
   const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobile = isBreakpointBelow(breakpoint, 'md');
   const {
@@ -294,17 +273,8 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   } = props;
 
   const isRange = mode === 'range';
-  // Native datetime-local doesn't support ranges, so even if the consumer
-  // requests it for range mode we silently fall back to the custom popover
-  // (which does support ranges). Keep `useNative` separate so the rest of
-  // the component can branch on the resolved-and-validated value.
   const useNative = useNativePicker && !isRange;
-  // Range mode forces side-by-side layout regardless of `layout` — the
-  // multi-step affordance only makes sense for a single date+time.
   const effectiveLayout: DateTimeFieldLayout = isRange ? 'side-by-side' : layout;
-  // The grid variants in the Figma differ per layout: side-by-side uses
-  // plain buttons, multi-step uses radio cards. Keep the prop overridable
-  // but pick a sensible default per layout when the consumer doesn't care.
   const resolvedGridVariant: 'button' | 'radio' =
     timeGridVariant ?? (effectiveLayout === 'multi-step' ? 'radio' : 'button');
   const isControlled = value !== undefined;
@@ -314,13 +284,8 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   const singleValue = isRange ? undefined : asSingle(currentValue);
 
   const [open, setOpen] = useState(false);
-  // Multi-step popover: 'date' shows the calendar with a "Select time" footer;
-  // 'time' shows a back-link + TimePicker. Resets to 'date' on close so
-  // reopening always starts at the calendar.
   const [step, setStep] = useState<DateTimeFieldStep>('date');
   const [view, setView] = useState<CalendarView>('days');
-  // Pivot date that anchors the calendar's currently visible month — for
-  // range it follows the `from` date, for single it follows the value.
   const monthAnchor = isRange ? rangeValue.from : singleValue;
   const [currentMonth, setCurrentMonth] = useState<Date>(() => monthAnchor ?? initialMonth ?? new Date());
 
@@ -330,13 +295,9 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
       setView('days');
       setCurrentMonth(monthAnchor ?? initialMonth ?? new Date());
     }
-    // monthAnchor changes whenever currentValue changes; keep the deps
-    // explicit so this still re-fires on unrelated value updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, currentValue, initialMonth]);
 
-  // Pull controlled value updates into the internal mirror so the displayed
-  // input text re-formats whenever the parent changes the date.
   useEffect(() => {
     if (isControlled) setInternalValue(value);
   }, [isControlled, value]);
@@ -351,9 +312,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     [localeCode]
   );
 
-  // Short-year formatter for the multi-step time-step header — matches the
-  // Figma reference which shows "01.09.25" (2-digit year) next to the back
-  // link, not the full 4-digit year used in the input value.
   const shortDateFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat(localeCode, {
@@ -386,33 +344,10 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     [formatSingle]
   );
 
-  // Locale-aware parser: derive the date portion from the same Intl
-  // formatter used for display, then require " HH:mm" after it. This way the
-  // field round-trips correctly in any locale (et-EE: dd.MM.yyyy HH:mm,
-  // en-US: MM/dd/yyyy HH:mm, etc.).
   const parseDateTimeText = useMemo(() => {
-    const ref = new Date(2099, 11, 31);
-    const parts = dateFormatter.formatToParts(ref);
-
-    const fieldOrder: ('day' | 'month' | 'year')[] = [];
-    const separators: string[] = [];
-    for (const part of parts) {
-      if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
-        fieldOrder.push(part.type);
-      } else if (part.type === 'literal' && fieldOrder.length > 0 && separators.length < 2) {
-        separators.push(part.value);
-      }
-    }
-
-    const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const datePart = fieldOrder
-      .map((field, i) => {
-        const digits = field === 'year' ? '\\d{4}' : '\\d{2}';
-        const sep = i > 0 ? escapeRegex(separators[i - 1] ?? '') : '';
-        return `${sep}(${digits})`;
-      })
-      .join('');
-    const regex = new RegExp(`^${datePart}\\s+(\\d{2}):(\\d{2})$`);
+    const localeParts = getLocaleDateParts(dateFormatter);
+    const { fieldOrder } = localeParts;
+    const regex = new RegExp(`^${buildDateRegexSource(localeParts)}\\s+(\\d{2}):(\\d{2})$`);
 
     return (input: string): Date | undefined => {
       const match = input.trim().match(regex);
@@ -448,29 +383,16 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     setInputText(formatValue(currentValue));
   }, [currentValue, formatValue]);
 
-  // The TextField itself owns the helper / aria-describedby plumbing when
-  // a `helper` is forwarded via `inputProps`, so we don't need a parallel
-  // ID here.
-
-  // Floating UI — single popover whose content swaps based on `step`. We
-  // intentionally don't wire up `useClick` so clicking the trigger doesn't
-  // open the menu; opening is handled exclusively via the calendar icon
-  // (matching DateField's default behaviour).
   const floating = useFloating({
     open,
     onOpenChange: setOpen,
     placement: 'bottom-end',
     middleware: [
-      offset(POPUP_OFFSET),
+      offset(CALENDAR_POPOVER_OFFSET),
       flip(),
-      shift({ padding: POPUP_PADDING }),
-      // Cap the popover to the available viewport width so the
-      // side-by-side layout (calendar ~312px + time picker ~192px) doesn't
-      // overflow on small screens. Combined with the mobile-stacking SCSS
-      // below `md`, the calendar and time picker stack vertically when
-      // there isn't enough horizontal space.
+      shift({ padding: CALENDAR_POPOVER_PADDING }),
       size({
-        padding: POPUP_PADDING,
+        padding: CALENDAR_POPOVER_PADDING,
         apply({ availableWidth, elements }) {
           elements.floating.style.maxWidth = `${availableWidth}px`;
         },
@@ -495,12 +417,8 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     setInputText(formatValue(next));
   };
 
-  // Calendar-side select: commit the date portion immediately so the field
-  // updates in real time, but keep the popover open so the user can advance
-  // to the time step via the footer button.
   const handleCalendarSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (selected) => {
     if (isRange) {
-      // react-day-picker's `mode='range'` callback hands back a DateRange.
       const range = selected as DateRange | undefined;
       if (!range || (!range.from && !range.to)) {
         updateValue(undefined);
@@ -523,9 +441,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
 
   const handleApplyValue = (date: Date) => {
     if (isRange) {
-      // Month/year-grid taps in range mode update the `from` date and keep
-      // the existing time. Switching to a new from-month also clears `to`
-      // because the existing range may no longer be valid.
       updateValue({ from: combineDateTime(date, getTimeOf(rangeValue.from)) });
       return;
     }
@@ -535,9 +450,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   const handleTimeSelect = (time: string) => {
     const baseDate = singleValue ?? new Date();
     updateValue(combineDateTime(baseDate, time));
-    // Auto-close only in multi-step + discrete-slot mode where picking a
-    // time is the user's final action. In side-by-side they may still want
-    // to change the date afterwards, so the popover stays open.
     if (effectiveLayout === 'multi-step' && availableTimes) setOpen(false);
   };
 
@@ -554,8 +466,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
       return;
     }
 
-    // Native datetime-local emits ISO-local strings ("YYYY-MM-DDTHH:mm")
-    // — parse those directly and skip the locale-formatted parser.
     if (useNative) {
       const parsed = parseNativeValue(newText);
       if (!parsed) return;
@@ -564,9 +474,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
       return;
     }
 
-    // Range parsing isn't supported — the displayed value
-    // ("dd.MM.yyyy HH:mm – dd.MM.yyyy HH:mm") is intentionally
-    // picker-driven only. Skip the single-mode parser here.
     if (isRange) return;
 
     const parsed = parseDateTimeText(newText);
@@ -576,9 +483,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     setCurrentMonth(parsed);
   };
 
-  // Open the browser's native datetime-local picker (Chrome/Edge/Safari)
-  // via `showPicker()`, falling back to focusing the input on browsers
-  // without that API. Same pattern as TimeField's native trigger.
   const openNativePicker = () => {
     const input = textFieldRef.current?.input as HTMLInputElement | undefined;
     if (!input) return;
@@ -598,21 +502,13 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     setOpen((prev) => !prev);
   };
 
-  const disabledMatchers: Matcher[] = [];
-  if (minDate) disabledMatchers.push({ before: minDate });
-  if (maxDate) disabledMatchers.push({ after: maxDate });
-  if (disablePast) disabledMatchers.push({ before: new Date() });
-  if (disableFuture) disabledMatchers.push({ after: new Date() });
+  const disabledMatchers: Matcher[] = buildDisabledMatchers({
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+  });
 
-  // The "Select time" footer link belongs to the multi-step layout — it's
-  // the affordance that swaps the popover's content from calendar to time
-  // picker. In side-by-side the time picker is already visible alongside,
-  // so no footer link is needed.
-  //
-  // The wrapping div centers the button horizontally; the calendar's own
-  // `__footer` class already supplies the `border-top` separator and the
-  // surrounding padding (see `calendar.module.scss`), so we don't add
-  // another one here.
   const calendarFooter =
     effectiveLayout === 'multi-step' ? (
       <div className={styles['tedi-date-time-field__select-time-wrapper']}>
@@ -630,16 +526,7 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
       currentMonth={currentMonth}
       setCurrentMonth={setCurrentMonth}
       mode={isRange ? 'range' : 'single'}
-      // Cast: react-day-picker's `DateRange` requires `from`, but the
-      // user might land here mid-pick with neither side set yet — Calendar
-      // tolerates `{}` at runtime. Cast keeps the prop happy without
-      // forcing a synthetic `from: undefined as Date` upstream.
       value={isRange ? (rangeValue as DateRange) : singleValue}
-      // Range mode shows two months side-by-side natively in
-      // react-day-picker, matching the Figma "Range" frames. On mobile
-      // (below `md`) we collapse to a single visible month so the
-      // popover doesn't have to be wider than the device — the user
-      // navigates between months with the calendar's < / > arrows.
       numberOfMonths={isRange && !isMobile ? 2 : 1}
       locale={locale}
       localeCode={localeCode}
@@ -657,10 +544,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     />
   );
 
-  // Render mode is wheel when no `availableTimes` are provided (TimePicker
-  // falls back to TimeWheel internally) — used to apply a wheel-only
-  // stretch class so the wheel fills the popover in multi-step without
-  // also stretching the grid (which would blow up the radio-card slots).
   const isWheelMode = !availableTimes || availableTimes.length === 0;
 
   const timePickerElement = (
@@ -676,8 +559,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     />
   );
 
-  // For range mode we render two separate TimePicker instances bound to
-  // the `from` and `to` halves of the range. Factory keeps the markup DRY.
   const renderRangeTimePicker = (kind: 'from' | 'to') => (
     <TimePicker
       value={getTimeOf(rangeValue[kind])}
@@ -695,10 +576,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
     ...(inputProps as TextFieldProps),
     id,
     label,
-    // Native picker takes precedence: the input value must follow the
-    // datetime-local ISO format ("YYYY-MM-DDTHH:mm") for the browser's
-    // built-in picker to recognise it; the locale-formatted text is only
-    // used by the custom popover path.
     value: useNative ? formatNativeValue(singleValue) : inputText,
     placeholder,
     readOnly: readOnly || (!useNative && !!availableTimes && !!currentValue),
@@ -724,11 +601,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
         <TextField ref={textFieldRef} {...textFieldProps} />
       </div>
 
-      {/*
-        When useNativePicker is on, the browser's built-in datetime-local
-        picker is the entire UI — skip the custom popover so we don't
-        double-render two pickers stacked on top of each other.
-      */}
       {!useNative && (
         <FloatingPortal>
           {open && !disabled && (
@@ -745,9 +617,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
                 })}
               >
                 {isRange ? (
-                  // Range layout: 2-month calendar on top, two time pickers
-                  // (from / to) stacked below in a single popover card.
-                  // Matches the Figma "Range" frames (node 42943:146342).
                   <div className={styles['tedi-date-time-field__range']}>
                     {calendarElement}
                     <div className={styles['tedi-date-time-field__range-separator']} aria-hidden="true">
@@ -773,13 +642,6 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
                     </div>
                   </div>
                 ) : effectiveLayout === 'side-by-side' ? (
-                  // Calendar + TimePicker share a single card. The Calendar's
-                  // own border / radius / shadow are stripped via the
-                  // `--split` modifier so the unified popover surface is what
-                  // the user sees. The vertical separator is a 1px line with
-                  // top/bottom padding equal to the card padding (matching
-                  // the Figma "Separator vertical" frame), not a full-height
-                  // border-left, so the line ends short of the card edges.
                   <div className={styles['tedi-date-time-field__split']}>
                     {calendarElement}
                     <div className={styles['tedi-date-time-field__split-separator']} aria-hidden="true">
@@ -795,28 +657,11 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
                 ) : step === 'date' ? (
                   calendarElement
                 ) : (
-                  // Multi-step time popover: a single bordered card with two
-                  // sections — header (back link on the left, selected date on
-                  // the right) and body (the time picker). The inner
-                  // TimePicker's own border / padding / shadow are stripped
-                  // via the nested `__time-picker` rule in SCSS so the card
-                  // surface comes from `__time-step` alone (no double card).
                   <div className={styles['tedi-date-time-field__time-step']}>
                     <header className={styles['tedi-date-time-field__time-header']}>
                       <Button type="button" visualType="link" iconLeft="arrow_back" onClick={() => setStep('date')}>
                         {backLabel}
                       </Button>
-                      {/*
-                      Always show the date the time pick will be associated
-                      with. If the user hasn't explicitly picked a date,
-                      `handleTimeSelect` falls back to `new Date()` (today)
-                      when committing — so the header mirrors that fallback
-                      and shows today's date as the implied selection
-                      instead of being empty (previously it stayed blank
-                      until the user backed out, picked a date, and came
-                      back, even though the eventual commit would still use
-                      today).
-                    */}
                       <span className={styles['tedi-date-time-field__time-date']}>
                         {shortDateFormatter.format(singleValue ?? new Date())}
                       </span>

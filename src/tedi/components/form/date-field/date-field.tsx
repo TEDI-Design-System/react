@@ -22,9 +22,14 @@ import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
-
-const CALENDAR_OFFSET = 4;
-const CALENDAR_PADDING = 8;
+import {
+  buildDateRegexSource,
+  buildDisabledMatchers,
+  CALENDAR_POPOVER_OFFSET,
+  CALENDAR_POPOVER_PADDING,
+  getInitialMonth as getInitialMonthFromValue,
+  getLocaleDateParts,
+} from './date-field-helpers';
 
 export type DateFieldMode = 'single' | 'multiple' | 'range';
 export type CalendarView = 'days' | 'months' | 'years';
@@ -255,18 +260,10 @@ export const DateField: React.FC<DateFieldProps> = ({
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
 
-  const getInitialMonth = useCallback((val: Date | Date[] | DateRange | undefined, fallback?: Date): Date => {
-    if (val instanceof Date) return val;
-
-    if (Array.isArray(val) && val.length > 0) {
-      return [...val].sort((a, b) => a.getTime() - b.getTime())[0];
-    }
-
-    if (val && typeof val === 'object' && 'from' in val && val.from instanceof Date) return val.from;
-    if (val && typeof val === 'object' && 'to' in val && val.to instanceof Date) return val.to;
-
-    return fallback ?? new Date();
-  }, []);
+  const getInitialMonth = useCallback(
+    (val: Date | Date[] | DateRange | undefined, fallback?: Date) => getInitialMonthFromValue(val, fallback),
+    []
+  );
 
   const [currentMonth, setCurrentMonth] = useState<Date>(() => getInitialMonth(value, initialMonth));
 
@@ -373,28 +370,9 @@ export const DateField: React.FC<DateFieldProps> = ({
   };
 
   const defaultParseDate = useMemo(() => {
-    const ref = new Date(2099, 11, 31);
-    const parts = dateFormatter.formatToParts(ref);
-
-    const fieldOrder: ('day' | 'month' | 'year')[] = [];
-    const separators: string[] = [];
-    for (const part of parts) {
-      if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
-        fieldOrder.push(part.type);
-      } else if (part.type === 'literal' && fieldOrder.length > 0 && separators.length < 2) {
-        separators.push(part.value);
-      }
-    }
-
-    const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regexSource = fieldOrder
-      .map((field, i) => {
-        const digits = field === 'year' ? '\\d{4}' : '\\d{2}';
-        const sep = i > 0 ? escapeRegex(separators[i - 1] ?? '') : '';
-        return `${sep}(${digits})`;
-      })
-      .join('');
-    const regex = new RegExp(`^${regexSource}$`);
+    const localeParts = getLocaleDateParts(dateFormatter);
+    const regex = new RegExp(`^${buildDateRegexSource(localeParts)}$`);
+    const { fieldOrder } = localeParts;
 
     return (value: string): Date | undefined => {
       const match = value.match(regex);
@@ -466,11 +444,11 @@ export const DateField: React.FC<DateFieldProps> = ({
     onOpenChange: setOpen,
     placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
     middleware: [
-      offset(CALENDAR_OFFSET),
+      offset(CALENDAR_POPOVER_OFFSET),
       flip(),
-      shift({ padding: CALENDAR_PADDING }),
+      shift({ padding: CALENDAR_POPOVER_PADDING }),
       size({
-        padding: CALENDAR_PADDING,
+        padding: CALENDAR_POPOVER_PADDING,
         apply({ availableWidth, elements }) {
           const el = elements.floating;
           el.style.width = 'max-content';
@@ -498,23 +476,15 @@ export const DateField: React.FC<DateFieldProps> = ({
     useRole(context, { role: 'dialog' }),
   ]);
 
-  const disabledMatchers: Matcher[] = [];
-
-  if (disabled) {
-    if (Array.isArray(disabled)) {
-      disabledMatchers.push(...disabled);
-    } else {
-      disabledMatchers.push(disabled);
-    }
-  }
-
-  if (minDate) disabledMatchers.push({ before: minDate });
-  if (maxDate) disabledMatchers.push({ after: maxDate });
-  if (disablePast) disabledMatchers.push({ before: new Date() });
-  if (disableFuture) disabledMatchers.push({ after: new Date() });
-
-  if (shouldDisableMonth) disabledMatchers.push((date: Date) => shouldDisableMonth(date));
-  if (shouldDisableYear) disabledMatchers.push((date: Date) => shouldDisableYear(date));
+  const disabledMatchers: Matcher[] = buildDisabledMatchers({
+    disabled,
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+    shouldDisableMonth,
+    shouldDisableYear,
+  });
 
   return (
     <>
