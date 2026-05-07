@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
-import { Icon, type IconProps } from '../../base/icon/icon';
+import { Icon, type IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import styles from './empty-state.module.scss';
@@ -27,11 +27,11 @@ export interface EmptyStateProps {
   size?: EmptyStateSize;
   /**
    * Icon rendered above the text block. Pass a Material icon name, a full
-   * `IconProps` object, any React node (e.g. a custom SVG), or `null` to hide
-   * the icon.
+   * `IconWithoutBackgroundProps` object to configure the underlying `Icon`,
+   * or `null` to hide the icon.
    * @default spa
    */
-  icon?: string | IconProps | React.ReactNode | null;
+  icon?: string | IconWithoutBackgroundProps | null;
   /**
    * Optional heading rendered above the description — appears as an H3 in
    * brand-primary text color.
@@ -52,9 +52,6 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-const isIconPropsObject = (value: unknown): value is IconProps =>
-  typeof value === 'object' && value !== null && !React.isValidElement(value) && 'name' in (value as IconProps);
-
 export const EmptyState = ({
   type = 'separate',
   size = 'default',
@@ -72,14 +69,11 @@ export const EmptyState = ({
   );
 
   const renderedIcon = (() => {
-    if (icon === null || icon === undefined) return null;
+    if (icon === null) return null;
     if (typeof icon === 'string') {
       return <Icon name={icon} size={36} color="brand" />;
     }
-    if (isIconPropsObject(icon)) {
-      return <Icon size={36} color="brand" {...icon} />;
-    }
-    return icon;
+    return <Icon size={36} color="brand" {...icon} />;
   })();
 
   return (

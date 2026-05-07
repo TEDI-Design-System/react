@@ -29,21 +29,6 @@ describe('EmptyState', () => {
     expect(icon).toHaveTextContent('inbox');
   });
 
-  it('renders an arbitrary ReactNode icon', () => {
-    render(
-      <EmptyState
-        icon={
-          <svg aria-label="custom-illustration">
-            <circle cx="0" cy="0" r="1" />
-          </svg>
-        }
-      >
-        Empty
-      </EmptyState>
-    );
-    expect(screen.getByLabelText('custom-illustration')).toBeInTheDocument();
-  });
-
   it('hides the icon when icon is null', () => {
     const { container } = render(<EmptyState icon={null}>Empty</EmptyState>);
     expect(container.querySelector('[data-name="icon"]')).not.toBeInTheDocument();
