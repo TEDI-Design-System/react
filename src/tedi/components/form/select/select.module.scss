@@ -6,6 +6,7 @@ $input-height-small: 2rem;
 
 div.tedi-select__control {
   padding: calc(var(--form-field-padding-y-md-default) - 1px) var(--form-field-padding-x-md-default);
+  background-color: var(--form-input-background-default);
   border: 1px solid var(--form-input-border-default);
 
   @include mixins.print-grayscale;
