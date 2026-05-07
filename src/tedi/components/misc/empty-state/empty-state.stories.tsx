@@ -133,10 +133,6 @@ export const InsideComponent: Story = {
   ),
 };
 
-/**
- * Any ReactNode can be passed as `icon` — useful when you have a bespoke SVG
- * or illustration.
- */
 export const CustomIcon: Story = {
   args: {
     children: 'No products in your cart',
