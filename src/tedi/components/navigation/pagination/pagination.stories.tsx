@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
-import { Pagination } from './pagination';
-import type { PaginationProps } from './pagination.types';
+import { Pagination, PaginationProps } from './pagination';
 
 /**
  * Navigation between paginated sets of content. Renders a row of page buttons
@@ -38,55 +37,57 @@ export const Default: Story = {
 export const First: Story = {
   args: {
     pageCount: 10,
-    page: 1,
+    defaultPage: 1,
   },
 };
 
 export const Last: Story = {
   args: {
     pageCount: 10,
-    page: 10,
+    defaultPage: 10,
   },
 };
 
-const AllPropertiesTemplate = () => {
-  const [page, setPage] = useState(3);
-  const [pageSize, setPageSize] = useState(10);
-  return (
-    <Pagination
-      pageCount={Math.ceil(97 / pageSize)}
-      page={page}
-      onPageChange={setPage}
-      totalItems={97}
-      pageSize={pageSize}
-      pageSizeOptions={[10, 25, 50, 100]}
-      onPageSizeChange={(next) => {
-        setPageSize(next);
-        setPage(1);
-      }}
-    />
-  );
+export const AllPropertiesShown: Story = {
+  render: function AllPropertiesShown() {
+    const [page, setPage] = useState(3);
+    const [pageSize, setPageSize] = useState(10);
+    return (
+      <Pagination
+        pageCount={Math.ceil(97 / pageSize)}
+        page={page}
+        onPageChange={setPage}
+        totalItems={97}
+        pageSize={pageSize}
+        pageSizeOptions={[10, 25, 50, 100]}
+        onPageSizeChange={(next) => {
+          setPageSize(next);
+          setPage(1);
+        }}
+      />
+    );
+  },
 };
-export const AllPropertiesShown: Story = { render: () => <AllPropertiesTemplate /> };
 
-const WithoutResultsNumberTemplate = () => {
-  const [page, setPage] = useState(3);
-  const [pageSize, setPageSize] = useState(10);
-  return (
-    <Pagination
-      pageCount={Math.ceil(97 / pageSize)}
-      page={page}
-      onPageChange={setPage}
-      pageSize={pageSize}
-      pageSizeOptions={[10, 25, 50, 100]}
-      onPageSizeChange={(next) => {
-        setPageSize(next);
-        setPage(1);
-      }}
-    />
-  );
+export const WithoutResultsNumber: Story = {
+  render: function WithoutResultsNumber() {
+    const [page, setPage] = useState(3);
+    const [pageSize, setPageSize] = useState(10);
+    return (
+      <Pagination
+        pageCount={Math.ceil(97 / pageSize)}
+        page={page}
+        onPageChange={setPage}
+        pageSize={pageSize}
+        pageSizeOptions={[10, 25, 50, 100]}
+        onPageSizeChange={(next) => {
+          setPageSize(next);
+          setPage(1);
+        }}
+      />
+    );
+  },
 };
-export const WithoutResultsNumber: Story = { render: () => <WithoutResultsNumberTemplate /> };
 
 export const WithoutDropdown: Story = {
   args: {
@@ -99,11 +100,12 @@ export const WithoutDropdown: Story = {
 /**
  * Controlled mode — the consumer owns `page` state explicitly.
  */
-const ControlledTemplate = () => {
-  const [page, setPage] = useState(3);
-  return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
+export const ControlledPage: Story = {
+  render: function ControlledPage() {
+    const [page, setPage] = useState(3);
+    return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
+  },
 };
-export const ControlledPage: Story = { render: () => <ControlledTemplate /> };
 
 /**
  * Small page count — every page number is rendered (no ellipsis).
