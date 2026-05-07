@@ -142,4 +142,24 @@ describe('NumberField component', () => {
     const container = document.querySelector('.tedi-number-field');
     expect(container).toHaveClass('tedi-number-field--small');
   });
+
+  it('formats the displayed value with the configured decimal separator', () => {
+    render(<NumberField {...defaultProps} decimalSeparator="," defaultValue={1.5} min={-10} max={10} />);
+    const input = screen.getByRole('spinbutton');
+    expect(input).toHaveValue('1,5');
+  });
+
+  it('reformats the display to the configured decimal separator on blur', () => {
+    render(<NumberField {...defaultProps} decimalSeparator="," defaultValue={0} min={0} max={10} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '2.5' } });
+    fireEvent.blur(input);
+    expect(input).toHaveValue('2,5');
+  });
+
+  it('uses inputMode="decimal" when decimalSeparator is a comma', () => {
+    render(<NumberField {...defaultProps} decimalSeparator="," />);
+    const input = screen.getByRole('spinbutton');
+    expect(input).toHaveAttribute('inputmode', 'decimal');
+  });
 });

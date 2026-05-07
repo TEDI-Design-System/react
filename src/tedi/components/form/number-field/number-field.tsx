@@ -51,13 +51,20 @@ export interface NumberFieldProps extends BreakpointSupport<NumberFieldBreakpoin
   onChange?: (value: number) => void;
   /**
    * Specifies the input mode for the field (e.g., numeric or decimal).
-   * @default numeric
+   * Defaults to `'decimal'` when `decimalPlaces > 0` or `decimalSeparator === ','`,
+   * otherwise numeric.
    */
   inputMode?: 'numeric' | 'decimal';
   /**
    * Number of decimal places for rounding calculations.
    */
   decimalPlaces?: number;
+  /**
+   * Character used as the decimal separator when displaying the value.
+   * Both `.` and `,` are always accepted as input regardless of this setting.
+   * @default .
+   */
+  decimalSeparator?: '.' | ',';
   /**
    * Minimum allowed value. Disables decrementing below this value and restricts manual input.
    */
@@ -85,8 +92,9 @@ export const NumberField = (props: NumberFieldProps) => {
     required,
     className,
     size,
-    inputMode = 'numeric',
+    inputMode,
     decimalPlaces,
+    decimalSeparator = '.',
     min,
     max,
     step = 1,
@@ -101,6 +109,14 @@ export const NumberField = (props: NumberFieldProps) => {
     input,
   } = getCurrentBreakpointProps<NumberFieldProps>(props);
 
+  const resolvedInputMode =
+    inputMode ?? ((decimalPlaces && decimalPlaces > 0) || decimalSeparator === ',' ? 'decimal' : 'numeric');
+
+  const formatNumber = useCallback(
+    (num: number): string => (decimalSeparator === ',' ? String(num).replace('.', ',') : String(num)),
+    [decimalSeparator]
+  );
+
   const { getLabel } = useLabels();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -109,7 +125,7 @@ export const NumberField = (props: NumberFieldProps) => {
   const [inputUpdated, setInputUpdated] = useState<string>('');
   const [inputInnerValue, setInputInnerValue] = useState<number>(defaultValue ?? 0);
   const [displayValue, setDisplayValue] = useState<string>(() =>
-    value !== undefined ? String(value) : String(defaultValue ?? 0)
+    formatNumber(value !== undefined ? value : defaultValue ?? 0)
   );
 
   const getCurrentValue = useMemo(
@@ -119,9 +135,9 @@ export const NumberField = (props: NumberFieldProps) => {
 
   useEffect(() => {
     if (!isFocusedRef.current && typeof value !== 'undefined') {
-      setDisplayValue(String(value));
+      setDisplayValue(formatNumber(value));
     }
-  }, [value]);
+  }, [value, formatNumber]);
 
   const helperId = helper ? `${id}-helper` : undefined;
 
@@ -167,7 +183,7 @@ export const NumberField = (props: NumberFieldProps) => {
     updateValueUpdatedLabel(returnValue);
     onChange?.(returnValue);
     setInputInnerValue(returnValue);
-    setDisplayValue(String(returnValue));
+    setDisplayValue(formatNumber(returnValue));
   };
 
   const handleInputChange = ({ currentTarget: { value: rawValue } }: ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +205,7 @@ export const NumberField = (props: NumberFieldProps) => {
 
   const handleBlur = () => {
     isFocusedRef.current = false;
-    setDisplayValue(String(getCurrentValue));
+    setDisplayValue(formatNumber(getCurrentValue));
   };
 
   const renderButton = (direction: TDirection) => {
@@ -240,7 +256,7 @@ export const NumberField = (props: NumberFieldProps) => {
           aria-describedby={helperId}
           aria-invalid={isInvalid(getCurrentValue) ? 'true' : 'false'}
           type="text"
-          inputMode={inputMode}
+          inputMode={resolvedInputMode}
           value={displayValue}
           required={required}
           disabled={disabled}
