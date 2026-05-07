@@ -79,8 +79,6 @@ div .tedi-select__menu {
 
   @include mixins.print-grayscale;
 
-  // In grid mode the menu shouldn't stretch to match the trigger — let it
-  // shrink to the grid's natural width.
   &:has(.tedi-select__menu-list--grid) {
     width: fit-content;
     min-width: 0;
@@ -106,14 +104,8 @@ div .tedi-select__menu {
     background-color: var(--dropdown-item-hover-background);
   }
 
-  // react-select's `isFocused` flag is set on both keyboard-arrow nav AND mouse
-  // hover (and on whichever option is auto-active when the menu first opens).
-  // Background tint is fine to share, but the focus ring must only appear during
-  // real keyboard navigation — that's gated by the `:has(:focus-visible)` rule
-  // below.
   &--focused {
     background-color: var(--form-input-background-default);
-    border-radius: var(--dropdown-item-radius);
   }
 
   &:active:not(.tedi-select__option--disabled),
@@ -128,9 +120,6 @@ div .tedi-select__menu {
   }
 
   &--selected {
-    // `.tedi-radio` sets `color` on its own root element, which would beat the
-    // inherited `--selected` color, so override it explicitly. `:global` is
-    // needed because the class lives in the radio module, not this one.
     p,
     span,
     label,
@@ -203,12 +192,6 @@ div.tedi-select__multi-value-item {
   margin-bottom: 0;
 }
 
-// When the group heading itself is a selectable checkbox (selectableGroups
-// in multi-select), indent the options that follow it so the visual
-// hierarchy reads as "group toggle" → "child option toggles". Uses the same
-// padding values as ChoiceGroup's indented inner row (the design-system
-// reference for this pattern) so a child option's checkbox aligns under the
-// parent's label glyph instead of 5px too far right on desktop.
 .tedi-select__group-heading--selectable ~ .tedi-select__option {
   padding-left: calc(var(--form-checkbox-radio-subitem-padding-left) - 5px);
 
@@ -242,9 +225,6 @@ div.tedi-select__multi-value-item {
       flex-shrink: 0;
     }
 
-    /* Push react-select's input container to the very end so the
-       overflow `+N` Tag visually sits between the last visible tag
-       and the search input. */
     :global .select__input-container {
       order: 99;
     }
@@ -259,12 +239,6 @@ div.tedi-select__multi-value-item {
   flex-shrink: 0;
 }
 
-// Focus ring on the active option ONLY while the user is keyboard-driving
-// the menu. `--keyboard` is toggled by Select itself: arrow / Home / End /
-// PageUp / PageDown / Tab keydown turns it on; the next mousemove inside the
-// menu list turns it off. This avoids the limitation of `:focus-visible`,
-// which stays on after a Tab and would otherwise re-paint the ring on every
-// mouse hover.
 .tedi-select__menu-list--keyboard .tedi-select__option--focused {
   box-shadow: inset 0 0 0 2px var(--form-input-border-hover);
 }
@@ -282,10 +256,6 @@ div.tedi-select__multi-value-item {
   cursor: pointer;
 }
 
-// Grid layout for color/icon pickers (Angular `dropdownType="grid"`).
-// Each option becomes a fixed-size square; the menu auto-sizes to its
-// natural width up to `--tedi-swatch-columns` columns. Customise via the
-// three CSS variables on the menu list.
 .tedi-select__menu-list--grid {
   --tedi-swatch-size: 24px;
   --tedi-swatch-gap: 4px;
@@ -313,8 +283,6 @@ div.tedi-select__multi-value-item {
     background: transparent;
     border-radius: var(--card-radius-rounded);
 
-    // Override the global `--selected` rule (white-on-blue), which would
-    // otherwise paint icon options invisible inside their transparent cell.
     &--selected,
     &[aria-selected='true'] {
       color: inherit;

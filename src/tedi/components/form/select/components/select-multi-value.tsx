@@ -51,18 +51,11 @@ export const SelectMultiValue = ({
 
   const handleClose = createMultiValueCloseHandler(removeProps);
 
-  // Stop the click from bubbling to react-select's control (which would
-  // toggle the menu) before forwarding to the remove handler. The wrapping
-  // div's onMouseDown also stops propagation, but we keep the click guard on
-  // the button itself in case keyboard activation synthesises a click event.
   const handleCloseClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     event.stopPropagation();
     handleClose(event);
   };
 
-  // Enter/Space activate the close button. preventDefault keeps Space from
-  // scrolling the menu list, stopPropagation keeps the activation event from
-  // re-opening the menu after the tag is removed.
   const handleCloseKeyDown: React.KeyboardEventHandler<HTMLButtonElement> = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();

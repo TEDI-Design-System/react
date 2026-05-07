@@ -5,19 +5,16 @@ import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
 
 type MenuListType = MenuListProps<ISelectOption, boolean> & {
-  renderMessageListFooter?: (props: MenuListProps<ISelectOption, boolean>) => JSX.Element;
-};
-
-export const SelectMenuList = ({ renderMessageListFooter, ...props }: MenuListType) => {
-  // "Select all" is now rendered as a regular react-select option (injected
-  // by <Select>) so it participates in keyboard navigation and default focus.
-  // The menu list itself only handles keyboard / mouse mode tracking and the
-  // optional message list footer.
-  const { keyboardMode, exitKeyboardMode, dropdownType } = props.selectProps as unknown as {
+  selectProps: MenuListProps<ISelectOption, boolean>['selectProps'] & {
     keyboardMode?: boolean;
     exitKeyboardMode?: () => void;
     dropdownType?: 'menu' | 'grid';
   };
+  renderMessageListFooter?: (props: MenuListProps<ISelectOption, boolean>) => JSX.Element;
+};
+
+export const SelectMenuList = ({ renderMessageListFooter, ...props }: MenuListType) => {
+  const { keyboardMode, exitKeyboardMode, dropdownType } = props.selectProps;
 
   return (
     <div className={styles['tedi-select__menu-list-wrapper']} onMouseMove={keyboardMode ? exitKeyboardMode : undefined}>
