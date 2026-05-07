@@ -29,7 +29,17 @@ export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' 
 
 export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
   (
-    { placeholder, isClearable = true, searchIcon = 'search', onSearch, onChange, button, ariaLabel, ...rest },
+    {
+      placeholder,
+      isClearable = true,
+      searchIcon = 'search',
+      onSearch,
+      onChange,
+      button,
+      ariaLabel,
+      className,
+      ...rest
+    },
     ref
   ): JSX.Element => {
     const { getLabel } = useLabels();
@@ -46,7 +56,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
     const textFieldProps = {
       ...rest,
       ref,
-      inputClassName: cn(styles['tedi-search__input'], button && styles['tedi-search__input--has-button']),
+      inputClassName: cn(styles['tedi-search__input'], button && styles['tedi-search__input--has-button'], className),
       placeholder,
       isClearable,
       onKeyDown: handleKeyDown,
@@ -58,7 +68,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
     const searchAriaLabel = ariaLabel ?? defaultAriaLabel;
 
     return (
-      <div className={cn(styles['tedi-search__wrapper'], rest.className)} role="search" aria-label={searchAriaLabel}>
+      <div className={cn(styles['tedi-search__wrapper'])} role="search" aria-label={searchAriaLabel}>
         <TextField {...textFieldProps} />
         {button && (
           <Button

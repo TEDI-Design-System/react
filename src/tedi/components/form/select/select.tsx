@@ -16,7 +16,10 @@ import AsyncSelect from 'react-select/async';
 import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/form/feedback-text/feedback-text';
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
+import { UnknownType } from '../../../types/commonTypes';
 import { TextProps } from '../../base/typography/text/text';
+import { useOptionalInputGroup } from '../input-group/input-group';
+import inputGroupStyles from '../input-group/input-group.module.scss';
 import { areAllSelected, getEnabledOptions, SELECT_ALL_VALUE } from './components/select-bulk-helpers';
 import { SelectClearIndicator } from './components/select-clear-indicator';
 import { SelectControl } from './components/select-control';
@@ -42,9 +45,14 @@ declare module 'react-select/dist/declarations/src/Select' {
   }
 }
 
-export interface SelectProps extends FormLabelProps {
-  /** Unique HTML id for the input. Also used as react-select's `instanceId` for SSR-stable internal IDs. */
-  id: string;
+export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
+  /**
+   * Unique HTML id for the input. Also used as react-select's `instanceId` for SSR-stable internal IDs.
+   * When omitted, falls back to the surrounding `InputGroup`'s id or a generated `useId()`.
+   */
+  id?: string;
+  /** Visible label. May be omitted when the surrounding `InputGroup` provides its own label. */
+  label?: string;
   /**
    * The list of selectable options. Pass a flat `ISelectOption[]` for a simple
    * list, or an array of `IGroupedOptions` (each with its own `options` array)
@@ -434,7 +442,12 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       tooltip,
       classNames,
     } = props;
-    const helperId = helper ? helper?.id ?? `${id}-helper` : undefined;
+    const inputGroup = useOptionalInputGroup?.();
+    const generatedId = React.useId();
+    const shouldHideLabel = inputGroup?.hasExternalLabel;
+    const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+
+    const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
     const { getLabel } = useLabels();
 
@@ -443,22 +456,8 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
 
-    // "Select all" is injected into react-select's option list as a sentinel
-    // option so that keyboard navigation and default focus naturally include
-    // it (rather than rendering it as a sibling div outside react-select's
-    // option system, which left it unreachable via arrow keys).
-    //
-    // Toggling the sentinel is intercepted in onChangeHandler and translated
-    // into a bulk select / deselect of all enabled options. The sentinel is
-    // stripped from the value before it reaches the consumer's onChange — it
-    // never leaks outside this component.
     const showSelectAllMode = !!showSelectAll && multiple;
 
-    // Internal value tracking is needed when showSelectAllMode is on because
-    // we need the latest selection in multiple places (filterOption, value
-    // injection) regardless of whether the consumer uses controlled or
-    // uncontrolled mode. For uncontrolled usage we track the value here so we
-    // can decide when to inject the sentinel into the value passed down.
     const [internalValue, setInternalValue] = React.useState<TSelectValue>(defaultValue ?? null);
     const isControlled = value !== undefined;
     const currentValue = isControlled ? value : internalValue;
@@ -496,21 +495,15 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
         const toggledSentinel = toggledOption?.value === SELECT_ALL_VALUE;
 
         if (toggledSentinel && actionMeta.action === 'select-option') {
-          // Sentinel was just selected → select every enabled option, but
-          // keep any disabled options that were already in the selection.
           const previouslyDisabled = currentValueArray.filter(
             (s) => s.value !== SELECT_ALL_VALUE && !enabled.some((e) => e.value === s.value)
           );
           resolved = [...previouslyDisabled, ...enabled];
         } else if (toggledSentinel && actionMeta.action === 'deselect-option') {
-          // Sentinel was just deselected → drop every enabled option from
-          // the current selection while preserving disabled ones.
           resolved = currentValueArray.filter(
             (s) => s.value !== SELECT_ALL_VALUE && !enabled.some((e) => e.value === s.value)
           );
         } else if (Array.isArray(option)) {
-          // Strip the sentinel from any other action's payload so it never
-          // leaks outside this component.
           resolved = (option as ISelectOption[]).filter((o) => o.value !== SELECT_ALL_VALUE);
         }
       }
@@ -526,8 +519,6 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       }
     };
 
-    // Keep the sentinel visible regardless of the search input — filtering
-    // it out would hide a meta-action while the user is narrowing the list.
     const filterOption = React.useCallback(
       (candidate: { value: string; label: string; data: ISelectOption }, input: string) => {
         if (candidate.data.value === SELECT_ALL_VALUE) return true;
@@ -537,10 +528,6 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       []
     );
 
-    // Keyboard-vs-mouse mode for the option focus ring. react-select's
-    // `isFocused` flag is shared between hover and arrow-key nav, so we can't
-    // use it directly. Arrow / Home / End / PageUp / PageDown keys flip the
-    // mode on; the next mousemove inside the menu list flips it off again.
     const [keyboardMode, setKeyboardMode] = React.useState(false);
     const handleSelectKeyDown = (e: React.KeyboardEvent) => {
       if (
@@ -605,7 +592,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           keyboardMode={keyboardMode}
           exitKeyboardMode={exitKeyboardMode}
           onKeyDown={handleSelectKeyDown}
-          id={id}
+          id={resolvedId}
           aria-describedby={helperId}
           autoFocus={autoFocus}
           ref={element}
@@ -650,16 +637,20 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           required={required}
           menuPortalTarget={document.body}
           menuPosition="absolute"
-          classNames={
-            classNames
-              ? Object.fromEntries(
-                  Object.entries(classNames).map(([key, value]) => [
-                    key,
-                    typeof value === 'string' ? () => value : value,
-                  ])
-                )
-              : undefined
-          }
+          classNames={(() => {
+            const merged: Record<string, (state: UnknownType) => string> = {};
+            if (classNames) {
+              for (const [key, value] of Object.entries(classNames)) {
+                merged[key] = typeof value === 'string' ? () => value : (value as (state: UnknownType) => string);
+              }
+            }
+
+            if (inputGroup) {
+              const previousControl = merged.control;
+              merged.control = (state) => cn(previousControl?.(state), inputGroupStyles['tedi-input-group__input']);
+            }
+            return Object.keys(merged).length > 0 ? merged : undefined;
+          })()}
           theme={(theme) => ({
             ...theme,
             colors: {
@@ -693,15 +684,17 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     return (
       <div data-name="select" className={SelectBEM}>
         <div className={styles['tedi-select__inner']}>
-          <FormLabel
-            id={`${id}-input`}
-            label={label}
-            required={required}
-            hideLabel={hideLabel}
-            size={size}
-            renderWithoutLabel={renderWithoutLabel}
-            tooltip={tooltip}
-          />
+          {!shouldHideLabel && (
+            <FormLabel
+              id={`${resolvedId}-input`}
+              label={label}
+              required={required}
+              hideLabel={hideLabel}
+              size={size}
+              renderWithoutLabel={renderWithoutLabel}
+              tooltip={tooltip}
+            />
+          )}
           {renderReactSelect()}
         </div>
         {helper && <FeedbackText {...helper} id={helperId} />}

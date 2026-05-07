@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -7,7 +7,9 @@ import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import Separator from '../../misc/separator/separator';
 import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text';
+import { Field, FieldElement } from '../field/field';
 import FormLabel, { FormLabelProps } from '../form-label/form-label';
+import { useOptionalInputGroup } from '../input-group/input-group';
 import styles from './textfield.module.scss';
 
 const iconSizes = {
@@ -17,112 +19,200 @@ const iconSizes = {
 
 type TextFieldBreakpointProps = {
   /**
-   * Input field size
+   * Controls the visual size of the text field.
+   *
+   * - `'small'`  → Compact version (smaller height, padding, and font size)
+   * - `'default'` → Standard size (most commonly used)
+   * - `'large'`   → Larger touch target, bigger text and padding
+   *
    * @default 'default'
    */
   size?: 'default' | 'small' | 'large';
   /**
-   * Icon name or configuration for the input field.
+   * Icon displayed inside the text field on the right side.
+   *
+   * Accepts either:
+   * - A simple string (icon name) → e.g. `'search'`, `'user'`, `'calendar'`
+   * - A full `IconWithoutBackgroundProps` object for advanced configuration (size, color, className, etc.)
+   *
+   * When `onIconClick` is provided, the icon becomes a clickable button.
+   * Otherwise, it is rendered as a non-interactive decorative element.
    */
   icon?: string | IconWithoutBackgroundProps;
   /**
-   * Whether to render a textarea instead of an input.
+   * If `true`, renders a `<textarea>` instead of a regular `<input>`.
+   * Useful for multi-line text input (comments, descriptions, addresses, etc.).
+   *
+   * Note: When using `isTextArea`, the component still behaves like a text field
+   * (same styling, clear button, icon support, validation, etc.).
+   *
+   * @default false
    */
   isTextArea?: boolean;
   /**
-   * Placeholder text displayed inside the input.
+   * Placeholder text shown when the field is empty.
+   *
+   * Recommended to be short and descriptive. Avoid using placeholder as a label.
    */
   placeholder?: string;
   /**
-   * Whether the input includes a clear button.
+   * When `true`, displays a clear (×) button on the right side when the field has a value.
+   *
+   * Clicking the button clears the input and calls `onClear` (if provided).
+   *
+   * @default false
    */
   isClearable?: boolean;
   /**
-   * Custom CSS classes for the container.
+   * Additional CSS class name applied to the root container (`<div>`).
+   *
+   * Use this for layout adjustments, custom spacing, or theming the entire text field wrapper.
    */
   className?: string;
 };
 
-export interface TextFieldProps extends BreakpointSupport<TextFieldBreakpointProps>, Omit<FormLabelProps, 'size'> {
+export interface TextFieldProps
+  extends BreakpointSupport<TextFieldBreakpointProps>,
+    Omit<FormLabelProps, 'size' | 'id' | 'label'> {
   /**
-   * Unique identifier for the input field.
+   * Unique identifier for the text field.
+   *
+   * Required for accessibility (associates label, helper text, and input).
+   * Also used to generate `aria-describedby` and helper IDs automatically.
    */
-  id: string;
+  id?: string;
+  /*
+   * The text or React node that serves as the label for the text field.
+   * If `hideLabel` is `true`, the label will be visually hidden but still accessible to screen readers.
+   * If `hideLabel` is `'keep-space'`, the label will be hidden but the space it occupies will be preserved.
+   */
+  label?: React.ReactNode;
   /**
-   * Name attribute for the input element.
+   * Name attribute for the underlying input/textarea element.
+   *
+   * Important for form submission and integration with form libraries (React Hook Form, Formik, etc.).
    */
   name?: string;
   /**
-   * Custom CSS classes for the input element.
+   * Custom CSS class applied directly to the `<input>` or `<textarea>` element (via the internal `Field` component).
+   *
+   * Use this when you need to style the input itself (e.g. text alignment, font, custom focus styles).
+   *
+   * Note: The root container uses `className`.
    */
   inputClassName?: string;
   /**
-   * Callback triggered when the input value changes.
+   * Callback fired when the value changes. Receives the new value as a plain string.
+   *
+   * Preferred for most use cases (simpler than `onChangeEvent`).
+   *
+   * @param value - The current value of the field after change
    */
   onChange?: (value: string) => void;
   /**
-   * Callback triggered with the change event.
+   * Native `onChange` event handler.
+   *
+   * Gives you access to the full `ChangeEvent` object (useful if you need `event.target`, `event.preventDefault()`, etc.).
+   *
+   * Note: Both `onChange` and `onChangeEvent` are called when the value changes.
    */
-  onChangeEvent?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+  onChangeEvent?: React.ChangeEventHandler<FieldElement>;
   /**
-   * Callback for keypress events.
+   * Keyboard event handlers attached to the inner wrapper `<div>`.
+   *
+   * Useful for handling Enter key submission, arrow key navigation, or custom keyboard shortcuts.
+   *
+   * Note: These are **not** attached to the input/textarea directly, but to the surrounding container.
    */
   onKeyPress?: React.KeyboardEventHandler<HTMLDivElement>;
-  /**
-   * Callback for keydown events.
-   */
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
-  /**
-   * Callback for keyup events.
-   */
   onKeyUp?: React.KeyboardEventHandler<HTMLDivElement>;
   /**
-   * Initial default value of the input.
+   * Default value for **uncontrolled** usage.
+   *
+   * Use this when you don't want to manage state yourself.
+   * The component will manage its internal state.
    */
   defaultValue?: string;
   /**
-   * Controlled value of the input field.
+   * Controlled value of the text field.
+   *
+   * When provided, the component becomes **fully controlled**.
+   * You must update this value via `onChange` to reflect user input.
    */
   value?: string;
   /**
-   * Callback for clicking the icon.
+   * Called when the user clicks on the icon (only works if `icon` is provided).
+   *
+   * The icon is automatically wrapped in a `<button>` when this prop is present.
+   *
+   * @param event - Mouse event from the icon wrapper
    */
   onIconClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
   /**
-   * Callback for input container clicks.
+   * Click handler for the entire inner container (the area around the input).
+   *
+   * Can be used to focus the input when clicking anywhere in the field area,
+   * or to trigger custom behavior.
    */
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   /**
-   * Whether the input is disabled.
+   * Disables the entire text field.
+   *
+   * When `true`:
+   * - Input becomes non-editable and non-focusable
+   * - Clear button and icon are disabled
+   * - Visual disabled styles are applied
    */
   disabled?: boolean;
   /**
-   * Whether the input is marked as invalid.
+   * Marks the field as invalid and triggers error styling.
+   *
+   * Also affects `aria-invalid` attribute.
+   *
+   * Note: The `helper` prop can override this if it contains items with `type: 'error'`.
    */
   invalid?: boolean;
   /**
-   * Whether the input is read-only.
+   * Makes the field read-only.
+   *
+   * User can focus and select text, but cannot modify the value.
+   * Useful for pre-filled data that should not be changed.
    */
   readOnly?: boolean;
   /**
-   * Helper text or feedback messages.
+   * Helper text, success message, or error message displayed below the field.
+   *
+   * Accepts either:
+   * - A single `FeedbackTextProps` object
+   * - An array of `FeedbackTextProps` (useful for multiple messages or mixed error/success states)
+   *
+   * The component automatically detects error states from helper items.
    */
   helper?: FeedbackTextProps | FeedbackTextProps[];
   /**
-   * Callback for input focus events.
+   * Fired when the input/textarea receives focus.
    */
-  onFocus?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onFocus?: React.FocusEventHandler<FieldElement>;
   /**
-   * Callback for input blur events.
+   * Fired when the input/textarea loses focus.
    */
-  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onBlur?: React.FocusEventHandler<FieldElement>;
   /**
-   * Whether to hide arrows for number inputs.
+   * Hides the spinner/arrows for number inputs (`type="number"`).
+   *
+   * Only has effect when the underlying input has `type="number"`.
+   *
    * @default true
    */
   isArrowsHidden?: boolean;
   /**
-   * Callback triggered when the clear button is clicked.
+   * Callback fired when the clear button (×) is clicked.
+   *
+   * Useful if you need to perform additional actions besides clearing the value
+   * (e.g. analytics, resetting related fields, etc.).
+   *
+   * Note: The field value is automatically cleared regardless of this callback.
    */
   onClear?: () => void;
   /**
@@ -132,12 +222,13 @@ export interface TextFieldProps extends BreakpointSupport<TextFieldBreakpointPro
 }
 
 export interface TextFieldForwardRef {
-  input: HTMLInputElement | HTMLTextAreaElement | null;
+  input: FieldElement | null;
   inner: HTMLDivElement | null;
 }
 
-export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props, ref): JSX.Element => {
+export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+
   const {
     id,
     label,
@@ -150,7 +241,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     readOnly,
     icon,
     onIconClick,
-    size,
+    size = 'default',
     placeholder,
     isArrowsHidden = true,
     isClearable,
@@ -171,207 +262,123 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     isTextArea,
     ...rest
   } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
+
   const { getLabel } = useLabels();
-  const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
-  const innerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const innerRef = React.useRef<HTMLDivElement>(null);
+  const fieldRef = React.useRef<FieldElement>(null);
+
   const [innerValue, setInnerValue] = React.useState(externalValue ?? defaultValue ?? '');
-  const helperId = React.useMemo(() => {
-    if (!helper) return undefined;
 
-    if (Array.isArray(helper)) {
-      return helper[0]?.id ?? `${id}-helper`;
-    }
+  const value = externalValue ?? innerValue;
+  const showClearButton = Boolean(isClearable && value && !readOnly);
 
-    return helper.id ?? `${id}-helper`;
-  }, [helper, id]);
-
-  const value = React.useMemo(() => externalValue ?? innerValue, [externalValue, innerValue]);
-  const showClearButton = isClearable && value;
+  const inputGroup = useOptionalInputGroup?.();
+  const generatedId = React.useId();
+  const shouldHideLabel = inputGroup?.hasExternalLabel;
+  const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
 
   React.useImperativeHandle(ref, () => ({
     get input() {
-      return inputRef.current;
+      return fieldRef.current;
     },
     get inner() {
       return innerRef.current;
     },
   }));
 
-  const isInvalid = React.useMemo((): boolean => {
+  const isInvalid = useMemo((): boolean => {
     if (Array.isArray(helper)) {
       return invalid || helper.some((h) => h.type === 'error');
     }
     return invalid || helper?.type === 'error';
   }, [invalid, helper]);
 
-  const isValid = React.useMemo((): boolean => {
-    if (!helper || (Array.isArray(helper) && helper.length === 0)) {
-      return false;
-    }
-
+  const isValid = useMemo((): boolean => {
+    if (!helper || (Array.isArray(helper) && helper.length === 0)) return false;
     if (Array.isArray(helper)) {
       return !invalid && helper.every((h) => h.type === 'valid');
     }
-
     return !invalid && helper.type === 'valid';
   }, [invalid, helper]);
 
   const labelSize = size === 'large' ? 'default' : size;
+  const isControlled = externalValue !== undefined;
 
-  const getIcon = React.useCallback(
-    (icon: string | IconWithoutBackgroundProps): JSX.Element => {
-      const defaultIconProps: Partial<IconWithoutBackgroundProps> = {
-        size: size === 'large' ? 24 : size === 'small' ? 16 : 18,
-        className: cn(styles['tedi-textfield__icon']),
-      };
-      const iconProps: IconWithoutBackgroundProps =
-        typeof icon === 'string'
-          ? { ...defaultIconProps, name: icon }
-          : { ...defaultIconProps, ...icon, className: cn(defaultIconProps.className, icon?.className) };
-      const iconComponent = <Icon {...iconProps} />;
-      const WrapperElement = onIconClick ? 'button' : 'div';
-
-      return (
-        <WrapperElement
-          className={styles['tedi-textfield__icon-wrapper']}
-          type={onIconClick ? 'button' : undefined}
-          onClick={disabled ? undefined : onIconClick}
-          disabled={disabled}
-          tabIndex={disabled ? -1 : 0}
-        >
-          {iconComponent}
-        </WrapperElement>
-      );
-    },
-    [disabled, onIconClick, size]
-  );
-
-  const onChangeHandler: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = React.useCallback(
-    (event) => {
-      const newValue = event.currentTarget.value;
-      setInnerValue(newValue);
+  const handleChange = useCallback(
+    (newValue: string) => {
+      if (!isControlled) setInnerValue(newValue);
       onChange?.(newValue);
-      onChangeEvent?.(event);
     },
-    [onChange, onChangeEvent]
+    [isControlled, onChange]
   );
 
-  const clearInput = React.useCallback(() => {
-    setInnerValue('');
+  const clearInput = useCallback(() => {
+    if (!isControlled) setInnerValue('');
     onChange?.('');
     onClear?.();
-  }, [onChange, onClear]);
+  }, [isControlled, onChange, onClear]);
 
-  const isTextAreaRef = React.useCallback(
-    (
-      props: TextFieldProps,
-      ref: React.ForwardedRef<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
-    ): ref is React.ForwardedRef<HTMLTextAreaElement> => {
-      return !!isTextArea;
-    },
-    [isTextArea]
-  );
+  const renderIcon = useCallback(() => {
+    if (!icon) return null;
 
-  const isInputRef = React.useCallback(
-    (
-      props: TextFieldProps,
-      ref: React.ForwardedRef<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
-    ): ref is React.ForwardedRef<HTMLInputElement> => {
-      return !isTextArea;
-    },
-    [isTextArea]
-  );
-
-  const renderInputElement = React.useMemo((): JSX.Element | null => {
-    const sharedProps = {
-      ...input,
-      id,
-      name,
-      ...(hideLabel ? { 'aria-label': label } : {}),
-      'aria-describedby': helperId,
-      'aria-disabled': disabled || undefined,
-      className: cn(styles['tedi-textfield__input'], inputClassName, {
-        [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
-      }),
-      disabled,
-      required,
-      'aria-invalid': isInvalid || undefined,
-      placeholder,
-      readOnly,
-      onChange: onChangeHandler,
-      value,
-      onBlur,
-      onFocus,
+    const defaultIconProps: Partial<IconWithoutBackgroundProps> = {
+      size: size === 'large' ? 24 : size === 'small' ? 16 : 18,
+      className: styles['tedi-textfield__icon'],
     };
 
-    if (isTextAreaRef(props, inputRef)) {
+    const iconProps: IconWithoutBackgroundProps =
+      typeof icon === 'string'
+        ? { ...defaultIconProps, name: icon }
+        : { ...defaultIconProps, ...icon, className: cn(defaultIconProps.className, icon.className) };
+
+    if (onIconClick) {
       return (
-        <textarea
-          {...(sharedProps as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
-          ref={inputRef}
-          tabIndex={disabled ? -1 : 0}
-        />
+        <button
+          type="button"
+          className={styles['tedi-textfield__icon-wrapper']}
+          onClick={disabled ? undefined : onIconClick}
+          disabled={disabled}
+        >
+          <Icon {...iconProps} />
+        </button>
       );
     }
 
-    if (isInputRef(props, inputRef)) {
-      return (
-        <input
-          {...(sharedProps as React.InputHTMLAttributes<HTMLInputElement>)}
-          ref={inputRef}
-          tabIndex={disabled ? -1 : 0}
-        />
-      );
-    }
-
-    return null;
-  }, [
-    input,
-    id,
-    name,
-    hideLabel,
-    label,
-    helperId,
-    disabled,
-    inputClassName,
-    isArrowsHidden,
-    required,
-    isInvalid,
-    placeholder,
-    readOnly,
-    onChangeHandler,
-    value,
-    onBlur,
-    onFocus,
-    isTextAreaRef,
-    props,
-    isInputRef,
-  ]);
-
-  const renderClearButton = React.useMemo(() => {
-    const clearButtonProps = {
-      iconSize: iconSizes[size === 'large' ? 'large' : 'default'],
-      onClick: disabled ? () => {} : clearInput,
-      disabled,
-      'aria-disabled': disabled || undefined,
-      title: `${getLabel('clear')}`,
-      className: cn(styles['tedi-textfield__clear-button']),
-    };
-
-    return <ClosingButton {...clearButtonProps} />;
-  }, [clearInput, disabled, getLabel, size]);
-
-  const renderRightArea = React.useMemo(() => {
     return (
-      <div className={styles['tedi-textfield__right-area']}>
-        {showClearButton && renderClearButton}
-        {showClearButton && icon ? (
-          <Separator color="primary" axis="vertical" className={styles['tedi-textfield__separator']} />
-        ) : null}
-        {icon && getIcon(icon)}
+      <div className={styles['tedi-textfield__icon-wrapper']} aria-hidden="true">
+        <Icon {...iconProps} />
       </div>
     );
-  }, [getIcon, icon, renderClearButton, showClearButton]);
+  }, [icon, size, onIconClick, disabled]);
+
+  const renderClearButton = useMemo(() => {
+    if (!showClearButton) return null;
+
+    return (
+      <ClosingButton
+        iconSize={iconSizes[size === 'large' ? 'large' : 'default']}
+        onClick={disabled ? undefined : clearInput}
+        disabled={disabled}
+        title={getLabel('clear')}
+        className={styles['tedi-textfield__clear-button']}
+      />
+    );
+  }, [showClearButton, size, disabled, clearInput, getLabel]);
+
+  const renderRightArea = useMemo(() => {
+    if (!showClearButton && !icon) return null;
+
+    return (
+      <div className={styles['tedi-textfield__right-area']}>
+        {renderClearButton}
+        {showClearButton && icon && (
+          <Separator color="primary" axis="vertical" className={styles['tedi-textfield__separator']} />
+        )}
+        {icon && renderIcon()}
+      </div>
+    );
+  }, [showClearButton, icon, renderClearButton, renderIcon]);
 
   const TextFieldBEM = cn(
     styles['tedi-textfield'],
@@ -383,17 +390,15 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     className
   );
 
-  const renderFeedbackWrapper = () => {
-    if (!helper || (Array.isArray(helper) && helper.length === 0)) {
-      return null;
-    }
+  const renderFeedback = () => {
+    if (!helper || (Array.isArray(helper) && helper.length === 0)) return null;
 
     return (
       <div className={styles['tedi-textfield__feedback-wrapper']}>
         {Array.isArray(helper) ? (
-          helper.map((item, index) => <FeedbackText key={index} {...item} id={`${helperId}-${index}`} />)
+          helper.map((item, index) => <FeedbackText key={index} {...item} id={`${resolvedId}-helper-${index}`} />)
         ) : (
-          <FeedbackText {...helper} id={helperId} />
+          <FeedbackText {...helper} id={`${resolvedId}-helper`} />
         )}
       </div>
     );
@@ -401,18 +406,58 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   return (
     <div data-name="textfield" {...rest} className={TextFieldBEM}>
-      <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} size={labelSize} />
+      {!shouldHideLabel && (
+        <FormLabel id={resolvedId} label={label} required={required} hideLabel={hideLabel} size={labelSize} />
+      )}
+
       <div
         className={styles['tedi-textfield__inner']}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
+        onKeyPress={onKeyPress}
         onClick={onClick}
         ref={innerRef}
       >
-        {renderInputElement}
-        {isClearable || icon ? renderRightArea : null}
+        <Field
+          {...input}
+          id={resolvedId}
+          name={name}
+          value={value}
+          defaultValue={defaultValue}
+          onChange={handleChange}
+          onChangeEvent={onChangeEvent}
+          disabled={disabled}
+          readOnly={readOnly}
+          required={required}
+          invalid={isInvalid}
+          placeholder={placeholder}
+          className={cn(styles['tedi-textfield__input'], inputClassName, {
+            [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
+          })}
+          onFocus={(e) => {
+            (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            (input?.onBlur as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+            onBlur?.(e);
+          }}
+          isTextArea={isTextArea}
+          aria-describedby={
+            !helper || (Array.isArray(helper) && helper.length === 0)
+              ? undefined
+              : Array.isArray(helper)
+              ? helper.map((_, index) => `${resolvedId}-helper-${index}`).join(' ')
+              : `${resolvedId}-helper`
+          }
+          aria-label={hideLabel && typeof label === 'string' ? label : undefined}
+          ref={fieldRef}
+        />
+
+        {(isClearable || icon) && renderRightArea}
       </div>
-      {renderFeedbackWrapper()}
+
+      {renderFeedback()}
     </div>
   );
 });
