@@ -55,7 +55,7 @@ type DateTimeFieldBreakpointProps = {
   useNativePicker?: boolean;
   /**
    * Layout of the date-and-time popover.
-   * @default 'side-by-side'
+   * @default side-by-side
    */
   layout?: DateTimeFieldLayout;
   /**
@@ -71,7 +71,7 @@ type DateTimeFieldBreakpointProps = {
   timeGridVariant?: 'button' | 'radio';
   /**
    * How the month/year selector in the calendar header is rendered.
-   * @default 'dropdown'
+   * @default dropdown
    */
   monthYearSelectType?: 'dropdown' | 'grid';
   /**
@@ -109,7 +109,7 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    * - `'range'` — pair of `from` / `to` `Date` values, each carrying their
    *   own time. Renders a 2-month calendar and two time pickers (one for
    *   `from`, one for `to`) stacked underneath.
-   * @default 'single'
+   * @default single
    */
   mode?: DateTimeFieldMode;
   /**
@@ -178,7 +178,7 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
   locale?: Locale;
   /**
    * Locale code used for the displayed date format.
-   * @default 'et-EE'
+   * @default et-EE
    */
   localeCode?: string;
   /**

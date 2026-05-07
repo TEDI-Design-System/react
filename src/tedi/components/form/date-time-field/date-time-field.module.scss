@@ -27,20 +27,10 @@
     background-color: var(--form-datepicker-date-hover);
   }
 
-  // Native picker mode (`useNativePicker`) — hide the browser's built-in
-  // datetime-local picker indicator on the right of the input so only our
-  // calendar icon is shown. Without this Chrome / Safari render their own
-  // calendar/clock glyph that overlaps with the icon button. Same pattern
-  // TimeField uses for `input[type="time"]`.
   input[type='datetime-local']::-webkit-calendar-picker-indicator {
     display: none !important;
   }
 
-  // Native datetime-local inputs don't show the `placeholder` attribute
-  // when empty (the browser draws "yyyy-mm-dd hh:mm aa" placeholder text
-  // instead). Hide the browser-supplied edit text and overlay our own
-  // placeholder so the field reads consistently with the rest of the
-  // form.
   input[type='datetime-local'][value='']:not(:focus)::-webkit-datetime-edit {
     /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
     color: transparent;
@@ -85,18 +75,6 @@
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 }
 
-// Side-by-side layout: Calendar + TimePicker share a single popover card.
-// The Calendar's individual border / radius / shadow are stripped (via the
-// `--split` modifier nested below for specificity) so the surrounding
-// `__split` wrapper supplies the unified card surface. The vertical
-// separator is a thin 1px line with top/bottom padding (NOT a full-height
-// `border-left`) so it ends short of the card's top/bottom edges, matching
-// the Figma "Separator vertical" frame.
-//
-// Below the `md` breakpoint the side-by-side layout stacks vertically
-// (calendar on top, separator becomes horizontal, time picker on bottom)
-// so the popover fits in narrow viewports where the combined width would
-// otherwise overflow.
 .tedi-date-time-field__split {
   display: flex;
   align-items: stretch;
@@ -110,13 +88,6 @@
     flex-direction: column;
   }
 
-  // Nested selectors raise specificity to (0,2,0) so they win over
-  // calendar.module.scss's `.tedi-calendar` and time-picker.module.scss's
-  // `.tedi-time-picker__grid` / `.tedi-time-picker__wheel` (each 0,1,0)
-  // without `!important`. The inner pickers shouldn't carry their own
-  // border / radius / shadow / padding inside the unified popover —
-  // `__split-time-body` already provides the outer padding, and the
-  // popover frame already provides the card surface.
   .tedi-date-time-field__calendar--split {
     background: transparent;
     border: 0;
@@ -125,10 +96,6 @@
   }
 
   .tedi-date-time-field__time-picker {
-    // The grid's stock `max-width: 310px` renders three slots ~93px wide
-    // each via the 12-col Row/Col layout (colWidth=4) — much wider than
-    // the Figma reference (~60-65px). Cap it here so the time side stays
-    // compact in side-by-side. Wheel mode is 160px and unaffected.
     max-width: 12rem;
     padding: 0;
     background: transparent;
@@ -136,16 +103,15 @@
     border-radius: 0;
     box-shadow: none;
 
-    // On mobile (stacked layout) the time picker sits below the calendar
-    // and we want it to fill the available width — but never wider than
-    // the calendar above it. The calendar's `min-width: 20rem` is the
-    // ceiling, so cap the time picker to the same value. Without this,
-    // a popover that's wider than the calendar (e.g. landscape phone)
-    // would let the time picker stretch past the calendar's edge.
     @include breakpoints.media-breakpoint-down(md) {
       width: 100%;
       max-width: 20rem;
     }
+  }
+
+  .tedi-date-time-field__time-picker--wheel {
+    --tedi-time-wheel-height: 15.5rem;
+    --tedi-time-wheel-fade: 6.5rem;
   }
 }
 
@@ -153,15 +119,7 @@
   display: flex;
   flex-shrink: 0;
   align-items: stretch;
-  padding: var(--card-padding-md-default) var(--separator-spacing-x-01, 0.375rem);
-
-  // Flip orientation on mobile: padding now sits on the left/right so the
-  // line stretches horizontally between the stacked calendar and time
-  // picker, ending short of the card's left/right edges (mirroring the
-  // desktop "ends short of top/bottom" behaviour).
-  @include breakpoints.media-breakpoint-down(md) {
-    padding: var(--separator-spacing-x-01, 0.375rem) var(--card-padding-md-default);
-  }
+  padding: var(--card-padding-md-default) var(--separator-spacing-x-01);
 }
 
 .tedi-date-time-field__split-separator-line {
@@ -181,26 +139,17 @@
   flex-shrink: 0;
 }
 
-// Header padding mirrors the calendar header (`pt: card-padding-md-default;
-// pb: card-padding-xs; px: card-padding-md-default`) so the "Time" /
-// "Kellaaeg" label sits at the same vertical rhythm as "October 2025" on
-// the calendar side.
 .tedi-date-time-field__split-time-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--card-padding-md-default) var(--card-padding-md-default) var(--card-padding-xs);
+  padding: var(--card-padding-md-default) var(--card-padding-md-default) 0;
 }
 
-// 16px Roboto-Medium — same size and weight as the calendar's month/year
-// dropdown trigger (per Figma node 42944:124932). Using a span + tokens
-// avoids the larger default sizing of `<Text element="h3">`.
 .tedi-date-time-field__split-heading {
   font-size: var(--body-regular-size);
-  font-weight: 500;
   line-height: var(--body-regular-line-height);
   color: var(--general-text-primary);
-  letter-spacing: 0.15px;
 }
 
 .tedi-date-time-field__split-time-body {
@@ -211,10 +160,6 @@
   padding: var(--card-padding-md-default);
 }
 
-// Range layout: 2-month calendar on top, two time pickers (from / to)
-// stacked below. Single popover card with a horizontal separator between
-// the calendar and the time pickers, and a vertical separator between
-// the two time pickers. Matches the Figma "Range" frames.
 .tedi-date-time-field__range {
   display: flex;
   flex-direction: column;
@@ -224,9 +169,6 @@
   border-radius: var(--card-radius-rounded);
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
-  // Strip the inner Calendar / TimePicker card surfaces — the wrapper
-  // supplies the unified card. Specificity (0,2,0) wins over the inner
-  // module's (0,1,0) declarations without `!important`.
   .tedi-date-time-field__calendar--split {
     background: transparent;
     border: 0;
@@ -241,24 +183,22 @@
     border-radius: 0;
     box-shadow: none;
 
-    // On mobile the two time pickers stack under the (now single-month)
-    // calendar. Cap each picker to the calendar's `min-width` of 20rem
-    // so neither time picker can render visually wider than the
-    // calendar above them, matching the side-by-side mobile constraint.
     @include breakpoints.media-breakpoint-down(md) {
       width: 100%;
       max-width: 20rem;
     }
   }
+
+  .tedi-date-time-field__time-picker--wheel {
+    --tedi-time-wheel-height: 7.1875rem;
+    --tedi-time-wheel-fade: 2.313rem;
+  }
 }
 
-// Horizontal separator between the calendar and the time pickers.
-// Padding-left/right keeps the line short of the card's vertical edges.
 .tedi-date-time-field__range-separator {
   display: flex;
   flex-shrink: 0;
   align-items: stretch;
-  padding: var(--separator-spacing-x-01, 0.375rem) var(--card-padding-md-default);
 }
 
 .tedi-date-time-field__range-separator-line {
@@ -267,8 +207,6 @@
   background: var(--general-border-primary);
 }
 
-// Two time pickers side-by-side under the calendar. Each takes equal width
-// and is separated by a vertical 1px border-left on the second column.
 .tedi-date-time-field__range-times {
   display: flex;
   align-items: stretch;
@@ -285,8 +223,6 @@
   min-width: 0;
 
   & + & {
-    border-left: 1px solid var(--card-border-primary);
-
     @include breakpoints.media-breakpoint-down(md) {
       border-top: 1px solid var(--card-border-primary);
       border-left: 0;
@@ -294,19 +230,11 @@
   }
 }
 
-// Centers the "Select time" link horizontally inside the calendar's
-// `__footer` wrapper (which already supplies the border-top separator and
-// the surrounding padding via calendar.module.scss).
 .tedi-date-time-field__select-time-wrapper {
   display: flex;
   justify-content: center;
 }
 
-// Multi-step time popover: a single card with header + body sections.
-// The popover surface (border, bg, shadow, radius) lives on the wrapper;
-// the nested rule strips the inner TimePicker's own card so we don't end
-// up with a card-in-a-card. `overflow: hidden` clips the inner radio-card
-// borders against the wrapper's rounded corners.
 .tedi-date-time-field__time-step {
   display: flex;
   flex-direction: column;
@@ -317,9 +245,6 @@
   border-radius: var(--card-radius-rounded);
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
-  // Nested for specificity (0,2,0) so they win over time-picker.module.scss's
-  // `.tedi-time-picker__grid` / `.tedi-time-picker__wheel` (each 0,1,0)
-  // without `!important`.
   .tedi-date-time-field__time-picker {
     padding: 0;
     background: transparent;
@@ -328,30 +253,20 @@
     box-shadow: none;
   }
 
-  // Wheel-only stretch: the wheel's intrinsic 160px is too narrow inside
-  // a popover sized for the calendar above it, so let it fill the body.
-  // The grid keeps its natural fit-content width and stays centered —
-  // stretching the grid would inflate the 3 radio-card slots well past
-  // the Figma's compact ~60-65px.
   .tedi-date-time-field__time-picker--wheel {
     width: 100%;
     max-width: none;
   }
 }
 
-// Header padding matches the calendar header (`pt: card-padding-md-default;
-// pb: card-padding-xs; px: card-padding-md-default`). Back link sits on the
-// left, selected date on the right, both vertically centered.
 .tedi-date-time-field__time-header {
   display: flex;
   gap: var(--layout-grid-gutters-08);
   align-items: center;
   justify-content: space-between;
-  padding: var(--card-padding-md-default) var(--card-padding-md-default) var(--card-padding-xs);
+  padding: var(--card-padding-md-default) var(--card-padding-md-default) 0;
 }
 
-// 16px Roboto-Medium with 0.15px tracking — matches the calendar's month/
-// year header so the "01.09.25" date label sits at the same visual weight.
 .tedi-date-time-field__time-date {
   font-size: var(--body-regular-size);
   font-weight: 500;
@@ -364,13 +279,6 @@
   padding: var(--card-padding-md-default);
 }
 
-// Default behaviour for any context (side-by-side or multi-step): the
-// picker keeps its intrinsic width (no `width: 100%` — that would force
-// the wheel into whatever cramped flex space remains and squish both
-// columns) and won't shrink in flex containers. Layout-specific overrides
-// (max-width, padding-strip, border-strip) live inside the matching
-// layout block above so they only apply where the parent provides the
-// alternative surface.
 .tedi-date-time-field__time-picker {
   flex-shrink: 0;
 }
