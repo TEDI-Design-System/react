@@ -21,6 +21,7 @@ export * from './components/buttons/collapse/collapse';
 export * from './components/layout/vertical-spacing';
 export * from './components/layout/grid';
 export * from './components/notifications/alert/alert';
+export * from './components/misc/empty-state';
 export * from './components/notifications/toast/toast';
 export * from './components/cards/card';
 export * from './components/navigation/hash-trigger/hash-trigger';
