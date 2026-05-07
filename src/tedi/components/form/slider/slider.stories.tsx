@@ -138,7 +138,16 @@ const CustomValueTemplate = (args: SliderProps) => {
     <VerticalSpacing size={2}>
       <Row>
         <Col lg={6} xs={12}>
-          <Slider hideLabel defaultValue={50} minLabel="0%" maxLabel="100%" />
+          <Slider
+            id="slider-custom-value-basic"
+            label="Label"
+            hideLabel
+            min={0}
+            max={100}
+            defaultValue={50}
+            minLabel="0%"
+            maxLabel="100%"
+          />
         </Col>
       </Row>
       <Row>
@@ -154,7 +163,7 @@ const CustomValueTemplate = (args: SliderProps) => {
             label="Label"
             addonRight={
               <div style={{ width: '100px' }}>
-                <InputGroup id="slider-input-group-field" label="Value" hideLabel>
+                <InputGroup id="slider-custom-value-input-group" label="Value" hideLabel>
                   <InputGroup.Input>
                     <Field
                       type="number"
