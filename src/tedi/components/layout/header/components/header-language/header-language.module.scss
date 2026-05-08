@@ -31,7 +31,7 @@
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--layout-grid-gutters-08);
     align-items: flex-start;
   }
 }

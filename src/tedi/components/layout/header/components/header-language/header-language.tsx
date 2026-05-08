@@ -77,7 +77,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
 
     setLanguageSelectionOpen(false);
 
-    if (lang.locale && setLocale) {
+    if (lang.locale) {
       setLocale(lang.locale);
     }
   };
