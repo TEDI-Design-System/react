@@ -1,3 +1,10 @@
+# [17.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.3...react-17.1.0-rc.4) (2026-05-08)
+
+
+### Features
+
+* **pagination:** new TEDI-Ready component [#20](https://github.com/TEDI-Design-System/react/issues/20) ([#612](https://github.com/TEDI-Design-System/react/issues/612)) ([c564788](https://github.com/TEDI-Design-System/react/commit/c564788c89dc231506584702aa525a0aa53cf35a))
+
 # [17.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.2...react-17.1.0-rc.3) (2026-05-07)
 
 
