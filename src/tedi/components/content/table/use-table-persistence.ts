@@ -64,7 +64,11 @@ export function useTablePersistence(options: {
         const mergedPrev: TableState = { ...prev, ...controlled };
         const patch = typeof patchOrFn === 'function' ? patchOrFn(mergedPrev) : patchOrFn;
         const next: TableState = { ...prev, ...patch };
-        const merged: TableState = { ...next, ...controlled };
+        // `patch` must win over `controlled` so that the parent hears the new
+        // value when a controlled key (pagination, sorting, …) just changed.
+        // `controlled` then re-asserts ownership for keys the parent owns but
+        // didn't change in this update, while `next` provides internal-only keys.
+        const merged: TableState = { ...next, ...controlled, ...patch };
 
         const current = persistRef.current;
         const storage = getStorage(current);

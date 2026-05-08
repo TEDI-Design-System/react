@@ -9,9 +9,9 @@ import Button from '../../buttons/button/button';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { EmptyState } from '../../misc/empty-state';
 import Separator from '../../misc/separator/separator';
 import { Alert } from '../../notifications/alert/alert';
-import { EmptyState } from '../../notifications/empty-state';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Truncate } from '../truncate/truncate';
@@ -825,7 +825,6 @@ const EditableTemplate = () => {
               name="date"
               label="Kuupäev"
               hideLabel
-              size="small"
               icon="calendar_today"
               value={draft.dateRange}
               onChange={(next) => setDraft((prev) => (prev ? { ...prev, dateRange: next } : prev))}
@@ -845,7 +844,6 @@ const EditableTemplate = () => {
               name="hour"
               label="Kellaaeg"
               hideLabel
-              size="small"
               icon="schedule"
               value={draft.hour}
               onChange={(next) => setDraft((prev) => (prev ? { ...prev, hour: next } : prev))}
@@ -865,7 +863,6 @@ const EditableTemplate = () => {
               name="duration"
               label="Kestus"
               hideLabel
-              size="small"
               value={draft.duration}
               onChange={(next) => setDraft((prev) => (prev ? { ...prev, duration: next } : prev))}
             />
@@ -884,7 +881,6 @@ const EditableTemplate = () => {
               name="location"
               label="Asukoht"
               hideLabel
-              size="small"
               value={draft.location}
               onChange={(next) => setDraft((prev) => (prev ? { ...prev, location: next } : prev))}
             />

@@ -28,7 +28,7 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'pagination.results': {
           const [count] = args as [number];
-          return count === 1 ? 'result' : 'results';
+          return `${count} ${count === 1 ? 'result' : 'results'}`;
         }
         case 'pagination.page-size':
           return 'Page size';
@@ -194,6 +194,36 @@ describe('Table', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'reveal-role' }));
       expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+    });
+
+    it('reports the new pageIndex through onStateChange when pagination is controlled (server-side mode)', () => {
+      const ServerSideWrapper = () => {
+        const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 1 });
+        return (
+          <Table<Person>
+            id="t-server-side"
+            data={data.slice(pagination.pageIndex, pagination.pageIndex + pagination.pageSize)}
+            columns={columns}
+            manualPagination
+            pageCount={data.length}
+            rowCount={data.length}
+            state={{ pagination }}
+            onStateChange={(next) => {
+              if (next.pagination) setPagination(next.pagination);
+            }}
+            pagination={{ pageSize: 1, pageSizeOptions: [1, 2] }}
+          />
+        );
+      };
+
+      render(<ServerSideWrapper />);
+      expect(screen.getByRole('cell', { name: 'Anna' })).toBeInTheDocument();
+      expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+
+      expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
+      expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
     });
   });
 
@@ -391,8 +421,9 @@ describe('Table', () => {
 
       expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Current page, page 1/i })).toHaveAttribute('aria-current', 'page');
-      expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
-      expect(screen.getByRole('button', { name: /Next page/i })).toBeEnabled();
+      // Previous arrow is hidden on the first page (intentional — see Pagination).
+      expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
       expect(screen.getByText('7 results')).toBeInTheDocument();
     });
 
