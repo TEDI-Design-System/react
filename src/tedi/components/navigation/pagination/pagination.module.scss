@@ -71,9 +71,9 @@
   color: var(--general-text-secondary);
   cursor: pointer;
   background: var(--button-main-neutral-icon-only-background-default);
-  border: 1px solid transparent;
+  border: 1px solid var(--tedi-neutral-100);
   border-radius: 100%;
-  transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: all 250ms ease;
 
   &:hover:not(:disabled, .tedi-pagination__button--selected) {
     color: var(--button-main-neutral-text-hover);
@@ -90,7 +90,7 @@
     background: var(--button-main-neutral-icon-only-background-focus);
     outline: none;
     box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
-      0 0 0 calc(var(--tedi-borders-01) + var(--tedi-borders-03)) var(--button-main-primary-background-focus);
+      0 0 0 var(--tedi-borders-03) var(--tedi-primary-500);
   }
 
   &:disabled {
@@ -111,7 +111,7 @@
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
-      0 0 0 calc(var(--tedi-borders-01) + var(--tedi-borders-03)) var(--button-main-primary-background-focus);
+      0 0 0 var(--tedi-borders-03) var(--tedi-primary-500);
   }
 }
 

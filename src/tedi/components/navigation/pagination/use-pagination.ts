@@ -1,4 +1,4 @@
-import type { PaginationItem, PaginationItemType } from './pagination.types';
+import { PaginationItem, PaginationItemType } from './pagination';
 
 export interface UsePaginationArgs {
   /** 1-based current page. */

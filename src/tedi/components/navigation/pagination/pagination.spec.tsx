@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 
 import { Pagination } from './pagination';
 import { usePagination } from './use-pagination';
@@ -22,7 +22,7 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'pagination.results': {
           const [count] = args as [number];
-          return count === 1 ? 'result' : 'results';
+          return `${count} ${count === 1 ? 'result' : 'results'}`;
         }
         case 'pagination.page-size':
           return 'Page size';
@@ -151,14 +151,14 @@ describe('Pagination component', () => {
     expect(screen.getByRole('button', { name: /Current page, page 4/i })).toBeInTheDocument();
   });
 
-  it('disables Previous on the first page and Next on the last', () => {
+  it('hides Previous on the first page and Next on the last', () => {
     const { rerender } = render(<Pagination pageCount={3} page={1} />);
-    expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /Next page/i })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
 
     rerender(<Pagination pageCount={3} page={3} />);
-    expect(screen.getByRole('button', { name: /Previous page/i })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /Next page/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Next page/i })).not.toBeInTheDocument();
   });
 
   it('Previous / Next move the current page by one', () => {
@@ -187,7 +187,7 @@ describe('Pagination component', () => {
     render(
       <Pagination
         pageCount={5}
-        defaultPage={1}
+        defaultPage={3}
         totalItems={28}
         labels={{
           previous: 'Eelmine',
@@ -259,5 +259,12 @@ describe('Pagination component', () => {
     ellipses.forEach((el) => {
       expect(within(el as HTMLElement).queryByRole('button')).not.toBeInTheDocument();
     });
+  });
+
+  it('forwards ref to the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<Pagination ref={ref} pageCount={3} defaultPage={1} />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveAttribute('data-name', 'tedi-pagination');
   });
 });
