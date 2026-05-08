@@ -92,6 +92,18 @@ export interface OverlayProps {
    */
   offset?: OffsetOptions;
   /**
+   * Re-measure the floating element every animation frame while mounted.
+   *
+   * Enable this when the trigger/reference element's position can change without a
+   * DOM-observable event (e.g. position driven by an inherited CSS custom property on an
+   * ancestor). The default `autoUpdate` only reacts to scroll, resize, and element-size
+   * changes, so position-only movement goes unnoticed and the overlay lags behind.
+   *
+   * Opt-in because animation-frame tracking is more expensive than the default.
+   * @default false
+   */
+  trackReferencePosition?: boolean;
+  /**
    * Minimum distance (in px) between the arrow and the edges of the content.
    * Helps keep the arrow away from rounded corners, especially on `-start` and `-end` placements.
    * Use a larger value for bigger arrows or arrows with borders.
@@ -172,6 +184,7 @@ export const Overlay = (props: OverlayProps) => {
     focusManager,
     dismissible,
     scrollLock,
+    trackReferencePosition = false,
   } = props;
 
   const { order = ['reference', 'content'], initialFocus, modal, ...restFocusManager } = focusManager ?? {};
@@ -210,7 +223,9 @@ export const Overlay = (props: OverlayProps) => {
         padding: arrowPadding,
       }),
     ],
-    whileElementsMounted: autoUpdate,
+    whileElementsMounted: trackReferencePosition
+      ? (reference, floating, update) => autoUpdate(reference, floating, update, { animationFrame: true })
+      : autoUpdate,
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([

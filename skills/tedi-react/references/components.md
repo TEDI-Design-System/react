@@ -204,6 +204,26 @@ Sub-component: `List.Item`
 - `min?: number`, `max?: number`, `step?: number = 1`
 - `suffix?: string`
 
+### Slider
+**Props:** `SliderProps` extends `BreakpointSupport` | fRef (HTMLInputElement)
+- `id?: string`, `name?: string`
+- `label?: ReactNode`, `hideLabel?: boolean | 'keep-space'`, `required?: boolean`
+- `min?: number = 0`, `max?: number = 100`, `step?: number = 1`
+- `value?: number`, `defaultValue?: number`
+- `onChange?: (value: number) => void`
+- `minLabel?: ReactNode`, `maxLabel?: ReactNode`
+- `showCurrentValue?: boolean` — renders current value on the right instead of `maxLabel`
+- `valueFormatter?: (value: number) => ReactNode` — also used for the thumb tooltip
+- `tooltip?: boolean = true` — bubble above the thumb showing the current value
+- `addonRight?: ReactNode` — slot for a companion input (e.g. `NumberField`)
+- `disabled?: boolean`, `invalid?: boolean`
+- `helper?: FeedbackTextProps`
+- `'aria-label' | 'aria-labelledby' | 'aria-valuetext'?: string`
+
+```tsx
+<Slider id="volume" label="Volume" min={0} max={100} defaultValue={40} minLabel="0%" maxLabel="100%" />
+```
+
 ### Checkbox
 **Props:** `CheckboxProps` | form
 - `id: string` (required)
