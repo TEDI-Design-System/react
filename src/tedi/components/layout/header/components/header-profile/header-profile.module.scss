@@ -1,5 +1,11 @@
 .tedi-header-profile {
   &__button {
+    [class*='tedi-btn__text'] {
+      padding-right: 0;
+    }
+  }
+
+  &__button-inner {
     display: flex;
     gap: var(--button-md-inner-spacing);
     align-items: center;

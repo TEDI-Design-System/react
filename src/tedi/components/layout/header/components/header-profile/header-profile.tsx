@@ -103,8 +103,9 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
       onClick={handleToggleModal}
       ref={triggerRef}
       disabled={disabled}
+      className={styles['tedi-header-profile__button']}
     >
-      <div className={styles['tedi-header-profile__button']}>
+      <div className={styles['tedi-header-profile__button-inner']}>
         {resolvedLabel}
         <Icon
           name="expand_more"
