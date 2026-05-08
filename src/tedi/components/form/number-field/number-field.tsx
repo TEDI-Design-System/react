@@ -194,8 +194,9 @@ export const NumberField = (props: NumberFieldProps) => {
 
     if (!Number.isNaN(parsed)) {
       const clamped = forceToLimits(parsed);
-      onChange?.(clamped);
-      setInputInnerValue(clamped);
+      const rounded = roundValue(clamped);
+      onChange?.(rounded);
+      setInputInnerValue(rounded);
     }
   };
 
