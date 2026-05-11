@@ -14,7 +14,7 @@ import {
 import cn from 'classnames';
 import React, { useEffect, useState } from 'react';
 
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
@@ -24,8 +24,11 @@ import { TIMEPICKER_OFFSET } from './time-field-helpers';
 
 type TimeFieldBreakpointProps = {
   /**
-   * If `true`, uses the native time picker of the browser instead of a custom one.
-   * Note: When using the native picker, the `availableTimes` prop will not be applied.
+   * If `true`, the field swaps the custom time-picker popover for the
+   * browser's native time picker (`<input type="time">`). Works on both
+   * mobile and desktop — useful when the consumer wants to skip the custom
+   * UI entirely.
+   * Note: When using the native picker, the `availableTimes` prop is ignored.
    * @default false
    */
   useNativePicker?: boolean;
@@ -136,9 +139,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const currentValue = isControlled ? value : internalValue;
   const [open, setOpen] = useState(false);
   const isInputTrigger = timePickerTrigger === 'input';
-  const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
-  const isMobile = isBreakpointBelow(breakpoint, 'md');
-  const shouldUseNativePicker = useNativePicker && isMobile;
+  const shouldUseNativePicker = useNativePicker;
 
   const floating = useFloating({
     open,
