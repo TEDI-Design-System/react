@@ -32,6 +32,12 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'pagination.page-size':
           return 'Page size';
+        case 'table.filter-input': {
+          const [columnLabel] = args as [string | undefined];
+          return `Filter ${columnLabel ?? 'column'}`.trim();
+        }
+        case 'table.row-details':
+          return 'Row details';
         default:
           return key;
       }

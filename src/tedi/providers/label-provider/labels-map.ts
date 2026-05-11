@@ -344,6 +344,20 @@ export const labelsMap = validateDefaultLabels({
     en: 'Filter…',
     ru: 'Фильтр…',
   },
+  'table.filter-input': {
+    description: 'Accessible label for the per-column filter input. Receives the column label.',
+    components: ['Table'],
+    et: (columnLabel?: string) => `Filtreeri veergu ${columnLabel ?? ''}`.trim(),
+    en: (columnLabel?: string) => `Filter ${columnLabel ?? 'column'}`.trim(),
+    ru: (columnLabel?: string) => `Фильтр ${columnLabel ?? ''}`.trim(),
+  },
+  'table.row-details': {
+    description: 'Accessible label for the sub-component / disclosure panel of an expanded row.',
+    components: ['Table'],
+    et: 'Rea üksikasjad',
+    en: 'Row details',
+    ru: 'Сведения о строке',
+  },
   'table.columns': {
     description: 'Default label on the `Table.ColumnsMenu` trigger (column-visibility menu).',
     components: ['TableColumnsMenu'],

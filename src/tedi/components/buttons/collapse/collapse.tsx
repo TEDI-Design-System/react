@@ -94,6 +94,21 @@ export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps
    * If provided, overrides the default open/close text for the accessible name.
    */
   toggleLabel?: string;
+  /**
+   * Use Collapse purely as a toggle trigger for content rendered elsewhere.
+   *
+   * When set, the toggle button's `aria-controls` points at the supplied id
+   * instead of Collapse's internal content panel, and the internal panel is
+   * **not rendered**. Useful when the disclosed region must live outside
+   * Collapse's DOM subtree (e.g. a table row whose details live in a
+   * sibling `<tr>`). The consumer is responsible for rendering the target
+   * element with the matching `id` and an appropriate `role` (typically
+   * `region`).
+   *
+   * When omitted (default), Collapse renders its own `children` inside a
+   * built-in `role="region"` panel.
+   */
+  controlsId?: string;
 }
 
 export const Collapse = (props: CollapseProps): JSX.Element => {
@@ -116,8 +131,11 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     underline = true,
     toggleLabel,
     iconOnly = false,
+    controlsId,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
+
+  const isExternallyControlled = controlsId !== undefined;
 
   const triggerId = `${id}__trigger`;
   const contentId = `${id}__content`;
@@ -175,7 +193,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
         className={styles['tedi-collapse__title']}
         aria-label={accessibleName}
         aria-expanded={isOpen}
-        aria-controls={contentId}
+        aria-controls={isExternallyControlled ? controlsId : contentId}
         onKeyDown={handleKeyDown}
         onClick={handleClick}
       >
@@ -219,13 +237,17 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
         </Row>
       </button>
 
-      {isPrint ? (
-        renderContent
-      ) : (
-        <AnimateHeight id={animateId} duration={300} height={isOpen ? 'auto' : 0} data-testid="collapse-inner">
-          {renderContent}
-        </AnimateHeight>
-      )}
+      {/* In externally-controlled mode the disclosed region lives outside
+          Collapse's DOM — render nothing here so we don't emit an orphan
+          `role="region"` panel pointing back at the same trigger. */}
+      {!isExternallyControlled &&
+        (isPrint ? (
+          renderContent
+        ) : (
+          <AnimateHeight id={animateId} duration={300} height={isOpen ? 'auto' : 0} data-testid="collapse-inner">
+            {renderContent}
+          </AnimateHeight>
+        ))}
     </div>
   );
 };

@@ -4,7 +4,8 @@ import React, { forwardRef } from 'react';
 import { Icon, IconSize } from '../../../base/icon/icon';
 import styles from './table-header-button.module.scss';
 
-export interface TableHeaderButtonProps {
+export interface TableHeaderButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'aria-label'> {
   /**
    * Material icon name rendered inside the button (e.g. `unfold_more`,
    * `arrow_downward`, `filter_alt`).
@@ -24,27 +25,12 @@ export interface TableHeaderButtonProps {
    */
   selected?: boolean;
   /**
-   * Disables interaction and applies disabled styling.
-   * @default false
-   */
-  disabled?: boolean;
-  /**
    * Required accessible name — these are icon-only buttons, so screen readers
    * have nothing else to announce.
    */
   'aria-label': string;
   /** Size of the icon, in pixels. @default 18 */
   iconSize?: IconSize;
-  /** Click handler. */
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  /** Additional class on the root button element. */
-  className?: string;
-  /**
-   * Native `type` attribute. Defaults to `'button'` to avoid accidentally
-   * submitting an enclosing `<form>`.
-   * @default 'button'
-   */
-  type?: 'button' | 'submit' | 'reset';
 }
 
 /**

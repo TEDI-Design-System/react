@@ -247,8 +247,11 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableColumnFilter: false,
         size: 40,
         header: '',
-        cell: ({ row }) =>
-          row.getCanExpand() ? (
+        cell: ({ row }) => {
+          if (!row.getCanExpand()) return null;
+          const subRowId = `${resolvedId}-sub-${row.id}`;
+
+          return (
             <span
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => {
@@ -257,6 +260,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
             >
               <Collapse
                 id={`${resolvedId}-expand-${row.id}`}
+                controlsId={subRowId}
                 iconOnly
                 arrowType="secondary"
                 hideCollapseText
@@ -268,7 +272,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 {null}
               </Collapse>
             </span>
-          ) : null,
+          );
+        },
       });
     }
 
@@ -355,22 +360,43 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const handleRowKeyDown = (row: Row<TData>) => (event: KeyboardEvent<HTMLTableRowElement>) => {
     if (!onRowClick) return;
+    // Only activate the row when focus is on the row itself — without this
+    // gate a Space press inside an inner `<input>` would also fire onRowClick.
+    if (event.target !== event.currentTarget) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onRowClick(row);
     }
   };
 
+  // ARIA row indexing for paginated tables — lets SR users hear "row 47 of
+  // 200" instead of "row 7 of 10" on the current page. Includes header rows
+  // (each `<tr>` in `<thead>`) in the count per the ARIA spec.
+  const headerRowCount = headerGroups.length + (enableColumnFilters ? 1 : 0);
+  const paginationState = table.getState().pagination;
+  const rowIndexOffset = paginationEnabled ? paginationState.pageIndex * paginationState.pageSize : 0;
+  const totalDataRowCount = paginationEnabled ? rowCount ?? table.getFilteredRowModel().rows.length : rows.length;
+  const ariaRowCount = paginationEnabled ? headerRowCount + totalDataRowCount : undefined;
+
   return (
     <TableContext.Provider value={contextValue as TableContextValue}>
       <div className={rootClassName} data-name="tedi-table">
         {children}
         <div className={styles['tedi-table__scroll']}>
-          <table id={id} className={styles['tedi-table__table']}>
+          <table
+            id={id}
+            className={styles['tedi-table__table']}
+            aria-rowcount={ariaRowCount}
+            aria-colcount={leafColumnCount > 0 ? leafColumnCount : undefined}
+          >
             {caption && <caption className={styles['tedi-table__caption']}>{caption}</caption>}
             <thead className={styles['tedi-table__head']}>
               {headerGroups.map((headerGroup, rowIndex) => (
-                <tr key={headerGroup.id} className={styles['tedi-table__row']}>
+                <tr
+                  key={headerGroup.id}
+                  className={styles['tedi-table__row']}
+                  aria-rowindex={paginationEnabled ? rowIndex + 1 : undefined}
+                >
                   {headerGroup.headers.map((header) => {
                     const isGroup = header.subHeaders.length > 0;
                     const hasParentGroup = Boolean(header.column.parent);
@@ -378,6 +404,14 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       return null;
                     }
                     const rowSpanCount = header.isPlaceholder ? headerGroups.length - rowIndex : 1;
+                    const sortDirection = header.column.getIsSorted();
+                    const ariaSort: 'ascending' | 'descending' | 'none' | undefined = header.column.getCanSort()
+                      ? sortDirection === 'asc'
+                        ? 'ascending'
+                        : sortDirection === 'desc'
+                        ? 'descending'
+                        : 'none'
+                      : undefined;
                     return (
                       <th
                         key={header.id}
@@ -387,6 +421,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                           [styles['tedi-table__header-cell--group']]: isGroup,
                         })}
                         scope="col"
+                        aria-sort={ariaSort}
                         style={header.column.getSize() ? { width: header.column.getSize() } : undefined}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -396,10 +431,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 </tr>
               ))}
               {enableColumnFilters && (
-                <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--filter'])}>
+                <tr
+                  className={cn(styles['tedi-table__row'], styles['tedi-table__row--filter'])}
+                  aria-rowindex={paginationEnabled ? headerGroups.length + 1 : undefined}
+                >
                   {leafColumns.map((column) => {
+                    // Prefer the column's `meta.label` (consumer-supplied
+                    // friendly name) → string header → raw column id. Render-fn
+                    // headers fall through to meta/id so the filter input
+                    // doesn't read out a machine-id to SR users.
+                    const meta = column.columnDef.meta as { label?: string } | undefined;
                     const headerLabel =
-                      typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id;
+                      meta?.label ??
+                      (typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id);
                     const filterId = `${resolvedId}-filter-${column.id}`;
 
                     return (
@@ -408,7 +452,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                           <TextField
                             id={filterId}
                             name={filterId}
-                            label={`Filter ${headerLabel}`}
+                            label={getLabel('table.filter-input', headerLabel)}
                             hideLabel
                             size="small"
                             placeholder={getLabel('table.filter-placeholder')}
@@ -433,13 +477,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   </td>
                 </tr>
               ) : (
-                rows.map((row) => {
+                rows.map((row, visibleIndex) => {
                   const clickable = Boolean(onRowClick);
                   const rowClassName = cn(styles['tedi-table__row'], {
                     [styles['tedi-table__row--selected']]: row.getIsSelected(),
                     [styles['tedi-table__row--clickable']]: clickable,
                     [styles['tedi-table__row--sub-row']]: row.depth > 0,
                   });
+                  const ariaRowIndex = paginationEnabled
+                    ? headerRowCount + rowIndexOffset + visibleIndex + 1
+                    : undefined;
+                  const subRowId = `${resolvedId}-sub-${row.id}`;
                   return (
                     <Fragment key={row.id}>
                       <tr
@@ -448,7 +496,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         onKeyDown={clickable ? handleRowKeyDown(row) : undefined}
                         tabIndex={clickable ? 0 : undefined}
                         role={clickable ? 'button' : undefined}
-                        aria-selected={row.getIsSelected() || undefined}
+                        aria-rowindex={ariaRowIndex}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <td key={cell.id} className={styles['tedi-table__cell']}>
@@ -459,6 +507,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       {renderSubComponent && row.getIsExpanded() && (
                         <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--sub-component'])}>
                           <td
+                            id={subRowId}
+                            role="region"
+                            aria-label={getLabel('table.row-details')}
                             colSpan={Math.max(1, leafColumnCount)}
                             className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--sub-component'])}
                           >
