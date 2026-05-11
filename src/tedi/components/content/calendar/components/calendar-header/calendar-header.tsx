@@ -133,9 +133,10 @@ export function CalendarHeader({
               </Button>
             </Dropdown.Trigger>
             <Dropdown.Content>
-              {years.map((year) => (
+              {years.map((year, yearIndex) => (
                 <Dropdown.Item
                   key={year}
+                  index={yearIndex}
                   active={displayMonth.getFullYear() === year}
                   onClick={() => goToMonth(new Date(year, displayMonth.getMonth()))}
                 >
