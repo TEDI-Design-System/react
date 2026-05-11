@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -71,6 +71,7 @@ jest.mock('../textfield/textfield', () => {
           data-testid="textfield-input"
           value={props.value || ''}
           onChange={(e: any) => props.onChange?.(e.target.value)}
+          onBlur={props.onBlur}
         />
         <button data-testid="icon" onClick={props.onIconClick}>
           icon
@@ -228,5 +229,34 @@ describe('TimeField', () => {
     await user.click(screen.getByTestId('icon'));
 
     expect(showPicker).toHaveBeenCalled();
+  });
+
+  it('normalises a delimiter-less time on blur (e.g. "1155" -> "11:55")', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+    render(<TimeField id="t-norm" label="Time" onChange={onChange} />);
+
+    const input = screen.getByTestId('textfield-input');
+    await user.click(input);
+    await user.keyboard('1155');
+    await user.tab();
+
+    await waitFor(() => expect(input).toHaveValue('11:55'));
+    expect(onChange).toHaveBeenLastCalledWith('11:55');
+  });
+
+  it('leaves invalid input untouched on blur (no normalisation possible)', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+    render(<TimeField id="t-norm-bad" label="Time" onChange={onChange} />);
+
+    const input = screen.getByTestId('textfield-input');
+    await user.click(input);
+    await user.keyboard('9999');
+    onChange.mockClear();
+    await user.tab();
+
+    expect(input).toHaveValue('9999');
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

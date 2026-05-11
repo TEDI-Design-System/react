@@ -20,7 +20,7 @@ import { Dropdown } from '../../overlays/dropdown';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import { TimePicker } from '../time-picker/time-picker';
 import styles from './time-field.module.scss';
-import { TIMEPICKER_OFFSET } from './time-field-helpers';
+import { normalizeTime, TIMEPICKER_OFFSET } from './time-field-helpers';
 
 type TimeFieldBreakpointProps = {
   /**
@@ -168,6 +168,23 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     onChange?.(cleaned);
   };
 
+  // Normalise common typed shorthands on blur (e.g. "1155" → "11:55",
+  // "9:5" → "09:05"). Doesn't run while the user is still typing — we keep
+  // the raw value visible until they tab/click away so the field doesn't
+  // fight mid-keystroke. Invalid input is left as-is for the consumer's
+  // validation to flag.
+  const handleInputBlur: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
+    // Read off the target BEFORE running consumer's onBlur — React pools
+    // SyntheticEvents and `currentTarget` is nulled after the listener
+    // returns, so we must capture upfront.
+    const raw = (event.target as HTMLInputElement).value ?? '';
+    (inputProps?.onBlur as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined)?.(event);
+    const normalised = normalizeTime(raw);
+    if (normalised !== null && normalised !== raw) {
+      updateTime(normalised);
+    }
+  };
+
   useEffect(() => {
     if (value !== undefined) {
       setInternalValue(value);
@@ -219,6 +236,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     required,
     onIconClick: handleIconClick,
     onChange: updateTime,
+    onBlur: handleInputBlur,
     className: cn(
       styles['tedi-time-field__textfield'],
       { [styles['tedi-time-field__icon--disabled']]: !showPicker || readOnly },
