@@ -12,6 +12,11 @@ jest.mock('../../../helpers', () => ({
       ...props,
     }),
   }),
+  useBreakpoint: () => 'xs',
+  isBreakpointBelow: (current: string, target: string) => {
+    const order = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
+    return order.indexOf(current) < order.indexOf(target);
+  },
 }));
 
 jest.mock('@floating-ui/react', () => ({

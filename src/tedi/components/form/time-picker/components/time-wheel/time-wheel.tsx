@@ -43,6 +43,11 @@ export interface TimeWheelProps {
    * Additional CSS class name to apply to the root wheel container.
    */
   className?: string;
+  /**
+   * Whether to render the surrounding card chrome (border, background, radius).
+   * @default true
+   */
+  bordered?: boolean;
 }
 
 export const TimeWheel: React.FC<TimeWheelProps> = ({
@@ -52,6 +57,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   selectedMinute,
   onChange,
   className,
+  bordered = true,
 }) => {
   const uid = React.useId();
   const hourRef = useRef<HTMLDivElement>(null);
@@ -309,7 +315,13 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   }, []);
 
   return (
-    <div className={cn(styles['tedi-time-picker__wheel'], className)}>
+    <div
+      className={cn(
+        styles['tedi-time-picker__wheel'],
+        { [styles['tedi-time-picker__wheel--borderless']]: !bordered },
+        className
+      )}
+    >
       <div
         ref={hourRef}
         role="listbox"

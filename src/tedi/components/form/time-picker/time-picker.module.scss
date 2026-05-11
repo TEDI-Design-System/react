@@ -10,6 +10,12 @@
   border: 1px solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
 
+  &--borderless {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
   &::before {
     position: absolute;
     inset: 0;
@@ -108,6 +114,13 @@
   background: var(--card-background-primary);
   border: 1px solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
+
+  &--borderless {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
 
   .tedi-time-picker__grid-item {
     display: inline-flex;

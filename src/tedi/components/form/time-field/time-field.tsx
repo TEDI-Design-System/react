@@ -14,7 +14,7 @@ import {
 import cn from 'classnames';
 import React, { useEffect, useState } from 'react';
 
-import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
@@ -136,6 +136,9 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const currentValue = isControlled ? value : internalValue;
   const [open, setOpen] = useState(false);
   const isInputTrigger = timePickerTrigger === 'input';
+  const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+  const shouldUseNativePicker = useNativePicker && isMobile;
 
   const floating = useFloating({
     open,
@@ -150,7 +153,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
-  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !useNativePicker;
+  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !shouldUseNativePicker;
 
   const interactions = useInteractions([...(shouldUseCustomInputTrigger ? [click] : []), dismiss, role]);
 
@@ -196,7 +199,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const handleIconClick = () => {
     if (readOnly || !showPicker) return;
 
-    if (useNativePicker) {
+    if (shouldUseNativePicker) {
       openNativePicker();
     } else if (timePickerTrigger === 'button') {
       openCustomPicker();
@@ -209,7 +212,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     label,
     value: currentValue,
     placeholder,
-    readOnly: readOnly || (!useNativePicker && isInputTrigger),
+    readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
     icon: 'schedule',
     isClearable: true,
     required,
@@ -219,21 +222,22 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
       styles['tedi-time-field__textfield'],
       { [styles['tedi-time-field__icon--disabled']]: !showPicker || readOnly },
       { [styles['tedi-time-field__textfield--disabled']]: inputProps?.disabled },
-      { [styles['tedi-time-field--native']]: useNativePicker }
+      { [styles['tedi-time-field--native']]: shouldUseNativePicker }
     ),
     input: {
       ...(inputProps?.input as UnknownType),
-      type: 'time',
+      ...(shouldUseNativePicker && { type: 'time' }),
     },
   };
 
   const shouldUseDropdownPicker =
-    !useNativePicker && showPicker && !readOnly && availableTimesVariant === 'dropdown' && !!availableTimes?.length;
+    !shouldUseNativePicker &&
+    showPicker &&
+    !readOnly &&
+    availableTimesVariant === 'dropdown' &&
+    !!availableTimes?.length;
 
   if (shouldUseDropdownPicker) {
-    // Land focus on the previously selected item when the dropdown opens; if
-    // nothing is selected yet, focus the first item. Lets the user Enter/Space
-    // to reconfirm or Arrow to move without a priming keystroke.
     const selectedIndex = availableTimes.indexOf(currentValue);
     const defaultActiveIndex = selectedIndex >= 0 ? selectedIndex : 0;
 
@@ -242,7 +246,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         <Dropdown.Trigger>
           <div
             className={cn(styles['tedi-time-field__container'], className, {
-              [styles['tedi-time-field__container--native']]: useNativePicker,
+              [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
             })}
           >
             <TextField ref={textFieldRef} {...textFieldProps} />
@@ -271,7 +275,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         <TextField ref={textFieldRef} aria-expanded={showPicker ? open : undefined} {...textFieldProps} />
       </div>
 
-      {!useNativePicker && showPicker && (
+      {!shouldUseNativePicker && showPicker && (
         <FloatingPortal>
           {open && !readOnly && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
