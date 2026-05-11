@@ -93,6 +93,10 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
       }
     }
 
+    if (visible === 0 && tags.length > 0) {
+      visible = 1;
+    }
+
     lastMeasuredWidthRef.current = containerWidth;
     setVisibleCount(visible);
   }, [isSingleRow, visibleCount, totalCount]);

@@ -14,6 +14,17 @@ export const isSelectAllSentinel = (option: { value?: string } | null | undefine
   !!option && option.value === SELECT_ALL_VALUE;
 
 /**
+ * Prefix for group sentinel options. When `selectableGroups + multiple` is on,
+ * each group is flattened into the option list with a sentinel option at the
+ * top of its run; toggling the sentinel toggles every enabled child of that
+ * group. The label after the prefix is the original group's label.
+ */
+export const GROUP_OPTION_PREFIX = '__tedi_select_group__:';
+
+export const isGroupSentinel = (option: { value?: string } | null | undefined): boolean =>
+  !!option && typeof option.value === 'string' && option.value.startsWith(GROUP_OPTION_PREFIX);
+
+/**
  * Returns true when `options` is a grouped tree (i.e. each top-level entry
  * has its own `options` array).
  */

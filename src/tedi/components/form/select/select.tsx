@@ -20,7 +20,13 @@ import { UnknownType } from '../../../types/commonTypes';
 import { TextProps } from '../../base/typography/text/text';
 import { useOptionalInputGroup } from '../input-group/input-group';
 import inputGroupStyles from '../input-group/input-group.module.scss';
-import { areAllSelected, getEnabledOptions, SELECT_ALL_VALUE } from './components/select-bulk-helpers';
+import {
+  areAllSelected,
+  getEnabledOptions,
+  GROUP_OPTION_PREFIX,
+  isGroupSentinel,
+  SELECT_ALL_VALUE,
+} from './components/select-bulk-helpers';
 import { SelectClearIndicator } from './components/select-clear-indicator';
 import { SelectControl } from './components/select-control';
 import { SelectDropDownIndicator } from './components/select-dropdown-indicator';
@@ -173,10 +179,10 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
   multiple?: boolean;
   /**
    * Layout for selected tags in multi-select mode.
-   * - `"row"` (default) — tags stay on one row; overflow tags collapse into a
-   *   `+N` counter, just like the Angular `multiRow=false` mode.
-   * - `"stack"` — tags wrap onto multiple rows.
-   * @default 'row'
+   * - `"stack"` (default) — tags wrap onto multiple rows.
+   * - `"row"` — tags stay on one row; overflow tags collapse into a `+N`
+   *   counter, just like the Angular `multiRow=false` mode.
+   * @default 'stack'
    */
   tagsDirection?: 'stack' | 'row';
   /**
@@ -247,10 +253,11 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   autoFocus?: boolean;
   /**
-   * Whether the value can be cleared. With the current default, Backspace
-   * also clears — but the visible "×" button only appears if
-   * `isClearIndicatorVisible` is also `true` (that prop is now deprecated;
-   * see its docstring for migration plans).
+   * Whether the value can be cleared via the "×" indicator. The visible
+   * "×" button only appears if `isClearIndicatorVisible` is also `true`
+   * (that prop is now deprecated; see its docstring for migration plans).
+   * Backspace deletion is controlled separately by `backspaceRemovesValue`
+   * (default `false`).
    * @default true
    */
   isClearable?: boolean;
@@ -282,6 +289,15 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    * @default false
    */
   isTagRemovable?: boolean;
+  /**
+   * If `true`, pressing Backspace while the input is empty removes the
+   * last selected value (single-mode: clears it; multi-mode: pops the
+   * last tag). Disabled by default because react-select's upstream
+   * default (`true`) leads to accidental deletions, especially in
+   * multi-select with no visual cue for the affected tag.
+   * @default false
+   */
+  backspaceRemovesValue?: boolean;
   /**
    * Controlled menu open state. When set, the parent owns whether the menu
    * is showing — pair with `onMenuOpen` / `onMenuClose`.
@@ -396,7 +412,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       required,
       value,
       defaultValue,
-      tagsDirection = 'row',
+      tagsDirection = 'stack',
       onChange,
       onInputChange,
       inputValue,
@@ -435,6 +451,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       onBlur,
       inputIsHidden,
       isTagRemovable = false,
+      backspaceRemovesValue = false,
       optionGroupHeadingText = { modifiers: 'small', color: 'tertiary' },
       cacheOptions = true,
       showRadioButtons = false,
@@ -472,40 +489,113 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       [getLabel]
     );
 
+    const selectableGroupsMode = !!selectableGroups && !!multiple;
+
+    type GroupSentinelEntry = { enabled: ISelectOption[] };
+    const { groupFlattenedOptions, groupSentinelMap } = React.useMemo(() => {
+      const emptyMap = new Map<string, GroupSentinelEntry>();
+      if (!selectableGroupsMode || !options || options.length === 0) {
+        return { groupFlattenedOptions: null, groupSentinelMap: emptyMap };
+      }
+      const hasAnyGroup = options.some((it) => it && Array.isArray((it as IGroupedOptions<ISelectOption>).options));
+      if (!hasAnyGroup) return { groupFlattenedOptions: null, groupSentinelMap: emptyMap };
+
+      const flat: ISelectOption[] = [];
+      const sentinelMap = new Map<string, GroupSentinelEntry>();
+
+      for (const item of options) {
+        if (item && Array.isArray((item as IGroupedOptions<ISelectOption>).options)) {
+          const group = item as IGroupedOptions<ISelectOption>;
+          const sentinelValue = `${GROUP_OPTION_PREFIX}${group.label ?? ''}`;
+          const enabled = group.options.filter((o) => !o.isDisabled);
+          sentinelMap.set(sentinelValue, { enabled });
+
+          flat.push({ value: sentinelValue, label: group.label ?? '' });
+          for (const child of group.options) {
+            flat.push({
+              ...child,
+              customData: { ...((child.customData as object) ?? {}), __tediInGroup: true },
+            });
+          }
+        } else {
+          flat.push(item as ISelectOption);
+        }
+      }
+
+      return { groupFlattenedOptions: flat, groupSentinelMap: sentinelMap };
+    }, [options, selectableGroupsMode]);
+
     const optionsForReactSelect = React.useMemo(() => {
-      if (!showSelectAllMode || !options || options.length === 0) return options;
-      return [selectAllSentinel, ...options] as typeof options;
-    }, [options, showSelectAllMode, selectAllSentinel]);
+      let next = (groupFlattenedOptions ?? options) as typeof options | undefined;
+      if (showSelectAllMode && next && next.length > 0) {
+        next = [selectAllSentinel, ...next] as typeof options;
+      }
+      return next;
+    }, [options, groupFlattenedOptions, showSelectAllMode, selectAllSentinel]);
 
     const valueForReactSelect = React.useMemo(() => {
-      if (!showSelectAllMode) return currentValue;
-      const enabled = getEnabledOptions(options ?? []);
-      if (enabled.length > 0 && areAllSelected(currentValueArray, enabled)) {
-        return [...currentValueArray, selectAllSentinel];
-      }
-      return currentValue;
-    }, [currentValue, currentValueArray, options, showSelectAllMode, selectAllSentinel]);
+      const extras: ISelectOption[] = [];
 
-    const onChangeHandler = (option: OnChangeValue<ISelectOption, boolean>, actionMeta: ActionMeta<ISelectOption>) => {
-      let resolved: OnChangeValue<ISelectOption, boolean> = option;
+      if (selectableGroupsMode && groupSentinelMap.size > 0) {
+        for (const [sentinelValue, entry] of groupSentinelMap) {
+          if (entry.enabled.length > 0 && areAllSelected(currentValueArray, entry.enabled)) {
+            extras.push({ value: sentinelValue, label: '' });
+          }
+        }
+      }
 
       if (showSelectAllMode) {
         const enabled = getEnabledOptions(options ?? []);
-        const toggledOption = (actionMeta as { option?: ISelectOption }).option;
-        const toggledSentinel = toggledOption?.value === SELECT_ALL_VALUE;
+        if (enabled.length > 0 && areAllSelected(currentValueArray, enabled)) {
+          extras.push(selectAllSentinel);
+        }
+      }
 
-        if (toggledSentinel && actionMeta.action === 'select-option') {
+      if (extras.length === 0) return currentValue;
+      return [...currentValueArray, ...extras];
+    }, [
+      currentValue,
+      currentValueArray,
+      options,
+      selectableGroupsMode,
+      groupSentinelMap,
+      showSelectAllMode,
+      selectAllSentinel,
+    ]);
+
+    const onChangeHandler = (option: OnChangeValue<ISelectOption, boolean>, actionMeta: ActionMeta<ISelectOption>) => {
+      let resolved: OnChangeValue<ISelectOption, boolean> = option;
+      const toggledOption = (actionMeta as { option?: ISelectOption }).option;
+
+      if (selectableGroupsMode && toggledOption && groupSentinelMap.has(toggledOption.value)) {
+        const enabled = groupSentinelMap.get(toggledOption.value)!.enabled;
+        if (actionMeta.action === 'select-option') {
+          const next = [...currentValueArray];
+          for (const opt of enabled) {
+            if (!next.some((s) => s.value === opt.value)) next.push(opt);
+          }
+          resolved = next;
+        } else if (actionMeta.action === 'deselect-option') {
+          resolved = currentValueArray.filter((s) => !enabled.some((e) => e.value === s.value));
+        }
+      } else if (showSelectAllMode) {
+        const enabled = getEnabledOptions(options ?? []);
+        const toggledSelectAll = toggledOption?.value === SELECT_ALL_VALUE;
+
+        if (toggledSelectAll && actionMeta.action === 'select-option') {
           const previouslyDisabled = currentValueArray.filter(
             (s) => s.value !== SELECT_ALL_VALUE && !enabled.some((e) => e.value === s.value)
           );
           resolved = [...previouslyDisabled, ...enabled];
-        } else if (toggledSentinel && actionMeta.action === 'deselect-option') {
+        } else if (toggledSelectAll && actionMeta.action === 'deselect-option') {
           resolved = currentValueArray.filter(
             (s) => s.value !== SELECT_ALL_VALUE && !enabled.some((e) => e.value === s.value)
           );
-        } else if (Array.isArray(option)) {
-          resolved = (option as ISelectOption[]).filter((o) => o.value !== SELECT_ALL_VALUE);
         }
+      }
+
+      if (Array.isArray(resolved)) {
+        resolved = (resolved as ISelectOption[]).filter((o) => o.value !== SELECT_ALL_VALUE && !isGroupSentinel(o));
       }
 
       if (!isControlled) {
@@ -522,6 +612,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const filterOption = React.useCallback(
       (candidate: { value: string; label: string; data: ISelectOption }, input: string) => {
         if (candidate.data.value === SELECT_ALL_VALUE) return true;
+        if (isGroupSentinel(candidate.data)) return true;
         if (!input) return true;
         return String(candidate.label).toLowerCase().includes(input.toLowerCase());
       },
@@ -605,7 +696,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           defaultValue={defaultValue}
           cacheOptions={cacheOptions}
           onChange={onChangeHandler}
-          filterOption={showSelectAllMode ? filterOption : undefined}
+          filterOption={showSelectAllMode || selectableGroupsMode ? filterOption : undefined}
           onInputChange={onInputChange}
           onBlur={onBlur}
           inputValue={inputValue}
@@ -626,7 +717,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           onMenuOpen={onMenuOpen}
           placeholder={placeholder || ''}
           isClearable={isClearable}
-          backspaceRemovesValue={isTagRemovable}
+          backspaceRemovesValue={backspaceRemovesValue}
           menuShouldScrollIntoView={true}
           isMulti={multiple}
           hideSelectedOptions={false}

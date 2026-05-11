@@ -671,9 +671,9 @@ export const MultipleHandled: Story = {
  * lookup, etc.).
  *
  * In this example `loadOptions` simulates a 1s network delay before resolving
- * with locally filtered colour options, and the user's input is sanitised
- * (non-word characters stripped) before it's used as the search term — the
- * sanitised value is shown above the select.
+ * with a locally filtered list of labelled options, and the user's input is
+ * sanitised (non-word characters stripped) before it's used as the search
+ * term — the sanitised value is shown above the select.
  */
 export const AsyncSelect: Story = {
   render: AsyncSelectTemplate,

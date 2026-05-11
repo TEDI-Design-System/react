@@ -2,6 +2,7 @@ import { MultiValueProps } from 'react-select';
 
 import { Tag } from '../../../tags/tag/tag';
 import { ISelectOption } from '../select';
+import { isGroupSentinel, SELECT_ALL_VALUE } from './select-bulk-helpers';
 import { useSelectTagsContext } from './select-tags-context';
 
 type MultiValueType = MultiValueProps<ISelectOption> & { isTagRemovable?: boolean };
@@ -44,6 +45,10 @@ export const SelectMultiValue = ({
   ...props
 }: MultiValueType): JSX.Element | null => {
   const { isSingleRow, visibleCount } = useSelectTagsContext();
+
+  if (props.data.value === SELECT_ALL_VALUE || isGroupSentinel(props.data)) {
+    return null;
+  }
 
   const selected = (props.selectProps.value as ReadonlyArray<ISelectOption> | null) ?? [];
   const index = Array.isArray(selected) ? selected.findIndex((opt) => opt.value === props.data.value) : -1;
