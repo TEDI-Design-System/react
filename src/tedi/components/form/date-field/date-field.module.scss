@@ -54,12 +54,7 @@
     }
   }
 
-  // Strip browser-default UI on `<input type="date">` so the field looks
-  // identical to the custom variant — our own `calendar_today` icon stays
-  // as the visible trigger. iOS Safari ignores `display: none` on the
-  // calendar picker indicator, hence the belt-and-braces zeroing.
   input[type='date'] {
-    appearance: none;
     appearance: none;
 
     &::-webkit-calendar-picker-indicator {
@@ -69,7 +64,6 @@
       padding: 0;
       margin: 0;
       appearance: none;
-      appearance: none;
       pointer-events: none;
       opacity: 0;
     }
@@ -78,13 +72,9 @@
     &::-webkit-clear-button {
       display: none;
       appearance: none;
-      appearance: none;
     }
   }
 
-  // Hide the browser's "yyyy-mm-dd" format hint when the field is empty
-  // and unfocused, then surface the consumer-provided `placeholder` via
-  // ::before so it reads like an ordinary text field until typed in.
   input[type='date'][value='']:not(:focus)::-webkit-datetime-edit {
     /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
     color: transparent;
