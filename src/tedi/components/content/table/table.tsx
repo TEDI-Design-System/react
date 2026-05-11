@@ -18,7 +18,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table';
 import cn from 'classnames';
-import { Fragment, type KeyboardEvent, useCallback, useMemo } from 'react';
+import { Fragment, type KeyboardEvent, useCallback, useId, useMemo, useRef } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Collapse } from '../../buttons/collapse/collapse';
@@ -84,6 +84,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const { getLabel } = useLabels();
   const resolvedPlaceholder = placeholder ?? getLabel('table.no-data');
 
+  // `getLabel` from `useLabels` is meant to be stable, but tests (and some
+  // consumer setups) hand back a fresh reference each render. Reading it
+  // through a ref lets the header / cell closures pick up the latest locale
+  // without invalidating the `augmentedColumns` memo every render — which
+  // would otherwise hand TanStack a new columns array and reset row state.
+  const getLabelRef = useRef(getLabel);
+  getLabelRef.current = getLabel;
+
+  // Stable fallback id so two unidentified `<Table>`s on the same page don't
+  // collide on the synthetic checkbox / expand / filter input ids.
+  const generatedId = useId();
+  const resolvedId = id ?? generatedId;
+
   const paginationOptions = useMemo(() => {
     if (!paginationProp) return null;
     if (paginationProp === true) return { pageSize: 10, pageSizeOptions: [10, 25, 50] as number[] | false };
@@ -95,10 +108,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   }, [paginationProp]);
   const paginationEnabled = paginationOptions !== null;
 
-  // Stable options array reference passed down to `<Pagination>`. Without this
-  // the array is recomputed from `paginationOptions` every render, which in
-  // the real browser can cascade through react-select inside the page-size
-  // picker and produce a feedback loop.
   const paginationPageSizeOptions = useMemo<number[] | undefined>(() => {
     const opts = paginationOptions?.pageSizeOptions;
     return Array.isArray(opts) && opts.length > 0 ? opts : undefined;
@@ -183,13 +192,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const hasExpansion = Boolean(renderSubComponent || getSubRows);
   const hasSelection = Boolean(enableRowSelection);
 
-  // Memoise row-model factories: TanStack compares these by reference, so a
-  // fresh function every render can (and occasionally does) look like a
-  // row-model swap and cascade through autoReset handlers in the real browser.
   const coreRowModel = useMemo(() => getCoreRowModel(), []);
-  // Skip the local row models entirely when their corresponding manual flag is
-  // on — TanStack tolerates client-side row models in manual mode, but
-  // omitting them avoids redundant work and makes intent obvious.
   const filteredRowModel = useMemo(() => (manualFiltering ? undefined : getFilteredRowModel()), [manualFiltering]);
   const sortedRowModel = useMemo(() => (manualSorting ? undefined : getSortedRowModel()), [manualSorting]);
   const expandedRowModel = useMemo(() => (hasExpansion ? getExpandedRowModel() : undefined), [hasExpansion]);
@@ -210,9 +213,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         size: 40,
         header: ({ table }) => (
           <Checkbox
-            id={`${id ?? 'tedi-table'}-select-all`}
-            name={`${id ?? 'tedi-table'}-select-all`}
-            label={getLabel('table.select-all', table.getIsAllRowsSelected())}
+            id={`${resolvedId}-select-all`}
+            name={`${resolvedId}-select-all`}
+            label={getLabelRef.current('table.select-all', table.getIsAllRowsSelected())}
             hideLabel
             value="all"
             checked={table.getIsAllRowsSelected()}
@@ -222,9 +225,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         ),
         cell: ({ row }) => (
           <Checkbox
-            id={`${id ?? 'tedi-table'}-select-${row.id}`}
-            name={`${id ?? 'tedi-table'}-select-${row.id}`}
-            label={getLabel('table.select-row', row.getIsSelected())}
+            id={`${resolvedId}-select-${row.id}`}
+            name={`${resolvedId}-select-${row.id}`}
+            label={getLabelRef.current('table.select-row', row.getIsSelected())}
             hideLabel
             value={row.id}
             checked={row.getIsSelected()}
@@ -246,14 +249,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         header: '',
         cell: ({ row }) =>
           row.getCanExpand() ? (
-            <span onClick={(e) => e.stopPropagation()}>
+            <span
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+              }}
+            >
               <Collapse
-                id={`${id ?? 'tedi-table'}-expand-${row.id}`}
+                id={`${resolvedId}-expand-${row.id}`}
                 iconOnly
                 arrowType="secondary"
                 hideCollapseText
-                openText={getLabel('table.expand-row')}
-                closeText={getLabel('table.collapse-row')}
+                openText={getLabelRef.current('table.expand-row')}
+                closeText={getLabelRef.current('table.collapse-row')}
                 open={row.getIsExpanded()}
                 onToggle={() => row.toggleExpanded()}
               >
@@ -265,12 +273,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     }
 
     return [...leading, ...columns];
-  }, [columns, hasSelection, hasExpansion, id]);
+  }, [columns, hasSelection, hasExpansion, resolvedId]);
 
-  const memoColumns = useMemo(() => augmentedColumns, [augmentedColumns]);
-
-  // Stabilise fallback references so unset slices don't churn the state object
-  // every render (TanStack can treat new-but-equal refs as state changes).
   const fallbackRowSelection = useMemo<RowSelectionState>(() => ({}), []);
   const fallbackExpanded = useMemo<ExpandedState>(() => ({}), []);
   const fallbackColumnFilters = useMemo<ColumnFiltersState>(() => [], []);
@@ -282,7 +286,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const table = useReactTable<TData>({
     data,
-    columns: memoColumns,
+    columns: augmentedColumns,
     state: {
       columnVisibility: tableState.columnVisibility,
       rowSelection: tableState.rowSelection ?? fallbackRowSelection,
@@ -307,25 +311,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     onColumnFiltersChange: handleColumnFiltersChange,
     onSortingChange: handleSortingChange,
     onPaginationChange: paginationEnabled ? handlePaginationChange : undefined,
-    // Satisfies the globally-augmented FilterFns contract from community/Table.
-    // Per-column `filterFn` overrides take precedence when a story sets one.
     filterFns: DEFAULT_FILTER_FNS,
     getCoreRowModel: coreRowModel,
-    // Always-on: filtering runs whenever columnFilters has entries, regardless of
-    // whether the built-in inline filter row is shown. Cheap when no filters set.
     getFilteredRowModel: filteredRowModel,
     getExpandedRowModel: expandedRowModel,
     getSortedRowModel: sortedRowModel,
     getPaginationRowModel: paginationRowModel,
   });
 
-  // Not memoised: TanStack returns the same `table` reference every render
-  // (stored in a useState ref), so a useMemo here would never recompute and
-  // context consumers (e.g. TableColumnsMenu) would never see state changes.
-  const contextValue: TableContextValue<TData> = { table, size, id };
+  const contextValue = useMemo<TableContextValue<TData>>(
+    () => ({ table, size, id: resolvedId }),
+    [table, size, resolvedId]
+  );
 
-  // Stable references for the Pagination controls — react-select reacts badly
-  // to a new callback identity on every render inside its controlled flow.
   const handlePaginationPageChange = useCallback((nextPage: number) => table.setPageIndex(nextPage - 1), [table]);
   const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
 
@@ -376,12 +374,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   {headerGroup.headers.map((header) => {
                     const isGroup = header.subHeaders.length > 0;
                     const hasParentGroup = Boolean(header.column.parent);
-                    // Top-level leaf columns (no parent group) are represented by a
-                    // placeholder at row 0 that rowSpans down. Skip their real leaf
-                    // header in deeper rows to avoid a duplicate — matches Figma's
-                    // "Merged cells" where Kuupäev / Asukoht span both header rows.
-                    // Leaves that DO have a parent group (Kellaaeg / Kestus under
-                    // "Aeg") still render in their designated deep row.
                     if (!header.isPlaceholder && !isGroup && !hasParentGroup && rowIndex > 0) {
                       return null;
                     }
@@ -408,7 +400,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   {leafColumns.map((column) => {
                     const headerLabel =
                       typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id;
-                    const filterId = `${id ?? 'tedi-table'}-filter-${column.id}`;
+                    const filterId = `${resolvedId}-filter-${column.id}`;
 
                     return (
                       <th key={column.id} className={styles['tedi-table__header-cell']} scope="col">
@@ -504,9 +496,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               pageCount={Math.max(1, table.getPageCount())}
               page={table.getState().pagination.pageIndex + 1}
               onPageChange={handlePaginationPageChange}
-              // In manual-pagination mode the locally-filtered row count is
-              // wrong (`data` only holds the current page); fall back to the
-              // server-provided `rowCount` when available.
               totalItems={rowCount ?? table.getFilteredRowModel().rows.length}
               pageSize={table.getState().pagination.pageSize}
               pageSizeOptions={paginationPageSizeOptions}

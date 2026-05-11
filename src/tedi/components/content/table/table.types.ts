@@ -42,7 +42,11 @@ export interface TablePersistOptions {
    */
   storage?: Storage;
   /**
-   * Subset of state slices to persist. Defaults to all slices.
+   * Subset of state slices to persist. Defaults to user-preference slices
+   * only: `columnVisibility`, `columnOrder`, `rowOrder`, `columnSizing`.
+   * Task-scoped slices (`rowSelection`, `expanded`, `columnFilters`, `sorting`,
+   * `pagination`) are deliberately excluded by default — pass them explicitly
+   * via `include` if you want them to survive across sessions.
    */
   include?: (keyof TableState)[];
 }

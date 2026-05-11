@@ -51,7 +51,7 @@ export const TableColumnsMenu = ({ triggerLabel, className }: TableColumnsMenuPr
         {hideableColumns.map((column) => {
           const isVisible = column.getIsVisible();
           const isLastVisible = isVisible && visibleCount === 1;
-          const checkboxId = `${id ?? 'tedi-table'}-columns-menu-${column.id}`;
+          const checkboxId = `${id}-columns-menu-${column.id}`;
           const headerLabel = resolveHeader(column);
 
           return (
