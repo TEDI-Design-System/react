@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
@@ -33,7 +33,38 @@ export type DateFieldCalendarTrigger = 'input' | 'button';
 type DateTextFieldProps = Omit<TextFieldProps, 'label' | 'id'>;
 type DateMultiValueFieldProps = Omit<MultiValueFieldProps, 'label' | 'id'>;
 
-export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
+/**
+ * Subset of DateField props that can be overridden per breakpoint via the
+ * `BreakpointSupport` API (e.g. `<DateField useNativePicker md={{ useNativePicker: false }} />`).
+ */
+type DateFieldBreakpointProps = {
+  /**
+   * Whether the calendar popover is interactive.
+   * @default true
+   */
+  enableCalendar?: boolean;
+  /**
+   * What opens the calendar — only the icon (`'button'`) or anywhere in the input (`'input'`).
+   * @default 'button'
+   */
+  calendarTrigger?: DateFieldCalendarTrigger;
+  /**
+   * Swap the custom calendar for the browser's native `<input type="date">`.
+   * Only applies to `mode='single'`.
+   * @default false
+   */
+  useNativePicker?: boolean;
+  /**
+   * Number of months shown side-by-side. On mobile (`< md`) values > 1 are
+   * automatically clamped to 1 — the popover would otherwise be unscrollable
+   * on a phone viewport.
+   */
+  numberOfMonths?: number;
+};
+
+export interface DateFieldProps
+  extends BreakpointSupport<DateFieldBreakpointProps>,
+    Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect' | 'numberOfMonths'> {
   /**
    * Unique identifier for the date field.
    */
@@ -88,14 +119,6 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * @default true
    */
   showOutsideDays?: boolean;
-  /**
-   * Determines how the calendar popover is opened:
-   * - `'button'` (default): The calendar opens when the user clicks the calendar icon button.
-   * - `'input'`: The calendar opens when the user clicks anywhere on the input field, including the calendar icon.
-   *
-   * @default button
-   */
-  calendarTrigger?: DateFieldCalendarTrigger;
   /**
    * Custom date parsing function for user input. Receives the input string and should return a `Date`, an array of `Date`s, a `DateRange`, or `undefined` if the input is invalid or cleared.
    * If not provided, the component will not allow manual input and will rely solely on the calendar picker for date selection.
@@ -202,75 +225,72 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
-  /**
-   * Enables or disables the calendar popover for the date field.
-   *
-   * - When `true` (default), the calendar is active, allowing the user to select dates from the calendar.
-   * - When `false`, the calendar is hidden and only manual input is possible.
-   *
-   * @default true
-   */
-  enableCalendar?: boolean;
-  /**
-   * If `true`, the field swaps the custom calendar popover for the browser's
-   * native date picker (`<input type="date">`). Useful when the consumer
-   * wants to skip the custom UI entirely — works on both mobile and desktop.
-   * Only applies to `mode='single'`; `multiple` and `range` always use the
-   * custom calendar because `<input type="date">` can't express them.
-   * @default false
-   */
-  useNativePicker?: boolean;
 }
 
-export const DateField: React.FC<DateFieldProps> = ({
-  id,
-  mode = 'single',
-  label,
-  selected,
-  onSelect,
-  disabled,
-  placeholder,
-  className,
-  formatDate,
-  required,
-  calendarTrigger = 'button',
-  showOutsideDays = true,
-  parseDate,
-  monthYearSelectType,
-  selectionLevel = 'days',
-  locale = et,
-  localeCode = 'et-EE',
-  initialMonth,
-  closeOnSelect,
-  footer,
-  defaultValue,
-  minDate,
-  maxDate,
-  disablePast,
-  disableFuture,
-  shouldDisableMonth,
-  shouldDisableYear,
-  readOnly,
-  availableDays,
-  inputProps,
-  enableCalendar = true,
-  useNativePicker = false,
-  ...dayPickerProps
-}) => {
+export const DateField: React.FC<DateFieldProps> = (props) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const {
+    useNativePicker = false,
+    enableCalendar = true,
+    calendarTrigger = 'button',
+    numberOfMonths,
+  } = getCurrentBreakpointProps<DateFieldBreakpointProps>(props);
+
+  const {
+    id,
+    mode = 'single',
+    label,
+    selected,
+    onSelect,
+    disabled,
+    placeholder,
+    className,
+    formatDate,
+    required,
+    showOutsideDays = true,
+    parseDate,
+    monthYearSelectType,
+    selectionLevel = 'days',
+    locale = et,
+    localeCode = 'et-EE',
+    initialMonth,
+    closeOnSelect,
+    footer,
+    defaultValue,
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+    shouldDisableMonth,
+    shouldDisableYear,
+    readOnly,
+    availableDays,
+    inputProps,
+    useNativePicker: _useNativePicker,
+    enableCalendar: _enableCalendar,
+    calendarTrigger: _calendarTrigger,
+    numberOfMonths: _numberOfMonths,
+    defaultServerBreakpoint: _defaultServerBreakpoint,
+    sm: _sm,
+    md: _md,
+    lg: _lg,
+    xl: _xl,
+    xxl: _xxl,
+    ...dayPickerProps
+  } = props;
+
   // Native `<input type="date">` is only meaningful for a single Date — it
   // can't express ranges or multi-selection.
   const shouldUseNativePicker = useNativePicker && mode === 'single';
 
-  const breakpoint = useBreakpoint();
+  const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobile = isBreakpointBelow(breakpoint, 'md');
   // Multi-month calendars are unwieldy on phones — the popover gets tall,
   // wraps to a vertical stack, and any focus-into-view (react-day-picker
   // moving focus to a day on tap) yanks the scroll back to the top. Force
   // a single month below `md`; users navigate with the month nav buttons.
   const effectiveNumberOfMonths =
-    isMobile && typeof dayPickerProps.numberOfMonths === 'number' && dayPickerProps.numberOfMonths > 1
-      ? 1
-      : dayPickerProps.numberOfMonths;
+    isMobile && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 

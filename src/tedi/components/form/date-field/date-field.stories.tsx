@@ -17,6 +17,18 @@ import { DateField, DateFieldProps } from './date-field';
 export default {
   title: 'Tedi-Ready/Components/Form/DateField',
   component: DateField,
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.37.57?node-id=4620-82915&m=dev',
+    },
+  },
 } as Meta<DateFieldProps>;
 
 type Story = StoryObj<DateFieldProps>;
