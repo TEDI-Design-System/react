@@ -406,3 +406,27 @@ export const AvailableDays: Story = {
     );
   },
 };
+
+/**
+ * Swaps the custom calendar popover for the browser's native date picker
+ * (`<input type="date">`). Useful when the consumer wants to skip the custom
+ * UI entirely — works on both mobile (where the native control is usually
+ * the best UX) and desktop (where it's a compact, dependency-free fallback).
+ *
+ */
+export const NativePicker: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+
+    return (
+      <DateField
+        id="date-field-native-picker"
+        mode="single"
+        label="Date"
+        useNativePicker
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+      />
+    );
+  },
+};

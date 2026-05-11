@@ -17,10 +17,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
-import TextField, { TextFieldProps } from '../textfield/textfield';
+import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
 
 const CALENDAR_OFFSET = 4;
@@ -210,6 +211,15 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * @default true
    */
   enableCalendar?: boolean;
+  /**
+   * If `true`, the field swaps the custom calendar popover for the browser's
+   * native date picker (`<input type="date">`). Useful when the consumer
+   * wants to skip the custom UI entirely — works on both mobile and desktop.
+   * Only applies to `mode='single'`; `multiple` and `range` always use the
+   * custom calendar because `<input type="date">` can't express them.
+   * @default false
+   */
+  useNativePicker?: boolean;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
@@ -244,8 +254,24 @@ export const DateField: React.FC<DateFieldProps> = ({
   availableDays,
   inputProps,
   enableCalendar = true,
+  useNativePicker = false,
   ...dayPickerProps
 }) => {
+  // Native `<input type="date">` is only meaningful for a single Date — it
+  // can't express ranges or multi-selection.
+  const shouldUseNativePicker = useNativePicker && mode === 'single';
+
+  const breakpoint = useBreakpoint();
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+  // Multi-month calendars are unwieldy on phones — the popover gets tall,
+  // wraps to a vertical stack, and any focus-into-view (react-day-picker
+  // moving focus to a day on tap) yanks the scroll back to the top. Force
+  // a single month below `md`; users navigate with the month nav buttons.
+  const effectiveNumberOfMonths =
+    isMobile && typeof dayPickerProps.numberOfMonths === 'number' && dayPickerProps.numberOfMonths > 1
+      ? 1
+      : dayPickerProps.numberOfMonths;
+
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
   const [open, setOpen] = useState(false);
@@ -254,6 +280,20 @@ export const DateField: React.FC<DateFieldProps> = ({
 
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
+
+  const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
+
+  // ISO `yyyy-MM-dd` for `<input type="date">`. Native date inputs only
+  // accept this format regardless of locale.
+  const toIsoDate = (d?: Date): string => {
+    if (!d) return '';
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const nativeValue = shouldUseNativePicker && value instanceof Date ? toIsoDate(value) : '';
 
   const getInitialMonth = useCallback((val: Date | Date[] | DateRange | undefined, fallback?: Date): Date => {
     if (val instanceof Date) return val;
@@ -493,10 +533,39 @@ export const DateField: React.FC<DateFieldProps> = ({
   const { refs, context, x, y, strategy } = floating;
   const click = useClick(context);
   const interactions = useInteractions([
-    ...(enableCalendar && calendarTrigger === 'input' ? [click] : []),
+    ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' ? [click] : []),
     useDismiss(context),
     useRole(context, { role: 'dialog' }),
   ]);
+
+  const openNativePicker = () => {
+    const input = textFieldRef.current?.input as HTMLInputElement | undefined;
+    if (!input) return;
+    if (typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+        return;
+      } catch {
+        // showPicker() throws InvalidStateError on inputs whose type isn't
+        // date / time / etc. Fall through to focus.
+      }
+    }
+    input.focus();
+  };
+
+  const handleNativeInputChange = (val: string) => {
+    if (!val) {
+      if (!isControlled) setInternalValue(undefined);
+      onSelect?.(undefined as UnknownType, undefined as UnknownType, {}, {} as UnknownType);
+      return;
+    }
+    const [y, m, d] = val.split('-').map(Number);
+    if (!y || !m || !d) return;
+    const parsed = new Date(y, m - 1, d);
+    if (Number.isNaN(parsed.getTime())) return;
+    if (!isControlled) setInternalValue(parsed);
+    onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
+  };
 
   const disabledMatchers: Matcher[] = [];
 
@@ -552,29 +621,41 @@ export const DateField: React.FC<DateFieldProps> = ({
         ) : (
           <TextField
             {...(inputProps as TextFieldProps)}
+            ref={textFieldRef}
             id={id}
             label={label}
             readOnly={readOnly}
-            value={inputValue}
+            value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
             isClearable
-            onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
-            aria-expanded={enableCalendar ? open : undefined}
-            onChange={(val) => handleInputChange(val)}
+            onIconClick={() => {
+              if (!enableCalendar) return;
+              if (shouldUseNativePicker) {
+                openNativePicker();
+              } else {
+                setOpen((prev) => !prev);
+              }
+            }}
+            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
+            onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             required={required}
             className={cn(styles['tedi-date-field__textfield'], {
               [styles['tedi-date-field__textfield--disabled']]: inputProps?.disabled,
               [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,
             })}
+            input={{
+              ...((inputProps as TextFieldProps)?.input as UnknownType),
+              ...(shouldUseNativePicker && { type: 'date' }),
+            }}
           />
         )}
       </div>
 
-      {enableCalendar && (
+      {enableCalendar && !shouldUseNativePicker && (
         <FloatingPortal>
           {open && (
-            <FloatingFocusManager context={context} modal={false}>
+            <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
                 ref={refs.setFloating}
                 {...interactions.getFloatingProps({
@@ -587,6 +668,7 @@ export const DateField: React.FC<DateFieldProps> = ({
               >
                 <Calendar
                   {...dayPickerProps}
+                  numberOfMonths={effectiveNumberOfMonths}
                   view={view}
                   selectionLevel={selectionLevel}
                   currentMonth={currentMonth}
