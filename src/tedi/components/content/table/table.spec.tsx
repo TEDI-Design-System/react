@@ -472,7 +472,7 @@ describe('Table', () => {
     });
 
     it('hides the page-size selector when pageSizeOptions is false', () => {
-      render(
+      const { container } = render(
         <Table<Person>
           id="t-page-no-select"
           data={many}
@@ -481,7 +481,10 @@ describe('Table', () => {
         />
       );
 
-      expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+      // The page-jump Select (mobile collapse) is always in the DOM but
+      // hidden via CSS at desktop widths, so target the page-size select
+      // directly by its id prefix.
+      expect(container.querySelector('[id^="tedi-pagination-page-size-"]')).not.toBeInTheDocument();
     });
 
     it('omits the pagination bar when pagination is not enabled', () => {

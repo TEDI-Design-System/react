@@ -1,3 +1,5 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
 .tedi-pagination {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -6,6 +8,11 @@
   width: 100%;
   padding: var(--tedi-dimensions-07) var(--tedi-dimensions-09);
   border-top: 1px solid var(--general-border-secondary);
+
+  @include breakpoints.media-breakpoint-down(md) {
+    grid-template-columns: 1fr;
+    gap: var(--layout-grid-gutters-08);
+  }
 }
 
 .tedi-pagination__slot-start {
@@ -13,6 +20,11 @@
   align-items: center;
   justify-self: start;
   min-width: 0;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    justify-content: center;
+    justify-self: center;
+  }
 }
 
 .tedi-pagination__slot-center {
@@ -26,6 +38,10 @@
   align-items: center;
   justify-self: end;
   min-width: 0;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    display: none;
+  }
 }
 
 .tedi-pagination__results {
@@ -35,8 +51,15 @@
 
 .tedi-pagination__nav {
   display: flex;
+  gap: var(--layout-grid-gutters-08);
   align-items: center;
   justify-content: center;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--layout-grid-gutters-16);
+  }
 }
 
 .tedi-pagination__list {
@@ -47,6 +70,26 @@
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+.tedi-pagination__list--desktop {
+  @include breakpoints.media-breakpoint-down(md) {
+    display: none;
+  }
+}
+
+.tedi-pagination__page-jump {
+  display: none;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    display: inline-flex;
+    grid-column: 2;
+    justify-self: center;
+  }
+}
+
+.tedi-pagination__page-jump-select {
+  min-width: var(--tedi-dimensions-18);
 }
 
 .tedi-pagination__item {
@@ -117,6 +160,30 @@
 
 .tedi-pagination__button--nav {
   padding: 0;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    background: transparent;
+    border: 0;
+
+    &:hover:not(:disabled, .tedi-pagination__button--selected),
+    &:active:not(:disabled, .tedi-pagination__button--selected) {
+      background: transparent;
+    }
+  }
+}
+
+.tedi-pagination__button--nav-previous {
+  @include breakpoints.media-breakpoint-down(md) {
+    grid-column: 1;
+    justify-self: end;
+  }
+}
+
+.tedi-pagination__button--nav-next {
+  @include breakpoints.media-breakpoint-down(md) {
+    grid-column: 3;
+    justify-self: start;
+  }
 }
 
 .tedi-pagination__page-size {

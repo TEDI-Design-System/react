@@ -1679,8 +1679,24 @@ const DraggableRowsTemplate = () => {
  * Drag rows by the grip handle to reorder them. The story owns the data array
  * and applies `arrayMove` on drag end — Table itself doesn't need to know.
  *
- * For server-backed data, persist the new order ids in the `rowOrder` state
- * slice and re-derive `data` from the server response on next fetch.
+ * **Persistence (not applied in this story).** The order lives in the
+ * component's local `useState`, so refreshing the page resets it. TanStack
+ * has no native rowOrder, so Table can't auto-persist the visual order on
+ * your behalf — you have two options:
+ *
+ * 1. **Persist the data array yourself**: serialise the reordered `rows`
+ *    array (or just the ids) into `localStorage` on every drag-end and
+ *    hydrate the `useState` initial value from there on mount.
+ * 2. **Use Table's `rowOrder` state slice**: `state.rowOrder` is in Table's
+ *    `DEFAULT_PERSISTED_KEYS`, so passing `persist={{ key: '…' }}` writes
+ *    the list of ids to `localStorage` automatically. On mount, read it
+ *    back (via `defaultState.rowOrder`) and physically reorder your `data`
+ *    array before passing it to `<Table>`. Table itself only stores the
+ *    list — your component still owns the data shape.
+ *
+ * For server-backed data the same applies: persist the new order ids on the
+ * server (or in `rowOrder`) and re-derive `data` from the response on the
+ * next fetch.
  */
 export const DraggableRows: Story = { render: () => <DraggableRowsTemplate /> };
 
@@ -1761,6 +1777,21 @@ const DraggableColumnsTemplate = () => {
  * Drag a column header's grip to reorder columns. The story owns
  * `state.columnOrder`; Table forwards it to TanStack's `columnOrder` state so
  * cells reshuffle without re-creating the column definitions.
+ *
+ * **Persistence (not applied in this story).** The order lives in local
+ * `useState`, so refreshing the page resets it. To make column order survive
+ * a refresh, drop the local state + `state` / `onStateChange` wiring and add
+ * a single prop:
+ *
+ * ```tsx
+ * <Table id="…" data={…} columns={…} persist={{ key: 'my-table' }} />
+ * ```
+ *
+ * `columnOrder` is in Table's `DEFAULT_PERSISTED_KEYS`, so the persist
+ * adapter writes it to `localStorage` on every change and hydrates it on
+ * mount — no extra wiring needed. The same prop covers `columnVisibility`,
+ * `rowOrder` (ids only — see DraggableRows for the caveat), and
+ * `columnSizing`. Use `persist.include` to opt in / out of specific slices.
  */
 export const DraggableColumns: Story = { render: () => <DraggableColumnsTemplate /> };
 

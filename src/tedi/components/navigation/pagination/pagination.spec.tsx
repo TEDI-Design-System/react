@@ -230,8 +230,11 @@ describe('Pagination component', () => {
   });
 
   it('omits the page-size selector when pageSizeOptions is empty', () => {
-    render(<Pagination pageCount={5} defaultPage={1} pageSizeOptions={[]} />);
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} pageSizeOptions={[]} />);
+    // The page-jump Select (mobile collapse) is always in the DOM but hidden
+    // via CSS at desktop widths — so we target the page-size select directly
+    // by its id prefix rather than asserting "no combobox anywhere".
+    expect(container.querySelector('[id^="tedi-pagination-page-size-"]')).not.toBeInTheDocument();
   });
 
   it('does not render the nav when pageCount <= 1', () => {

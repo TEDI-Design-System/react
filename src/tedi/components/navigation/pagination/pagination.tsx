@@ -189,6 +189,55 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const showResults = totalItems !== undefined;
   const showPageSizeSelect = Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
 
+  const previousItem = items[0];
+  const nextItem = items[items.length - 1];
+  const pageItems = items.slice(1, -1);
+
+  const renderArrow = (item: PaginationItem) => {
+    if (item.disabled) return null;
+    const label = item.type === 'previous' ? mergedLabels.previous : mergedLabels.next;
+    const iconName = item.type === 'previous' ? 'arrow_back' : 'arrow_forward';
+    return (
+      <Button
+        type="button"
+        className={cn(
+          styles['tedi-pagination__button'],
+          styles['tedi-pagination__button--nav'],
+          styles[`tedi-pagination__button--nav-${item.type}`]
+        )}
+        aria-label={label}
+        onClick={() => item.page !== null && handlePageChange(item.page)}
+        noStyle
+      >
+        <Icon name={iconName} size={18} color="brand" />
+      </Button>
+    );
+  };
+
+  const pageJumpOptions = useMemo<ISelectOption[]>(
+    () =>
+      Array.from({ length: pageCount }, (_, idx) => {
+        const pageNumber = idx + 1;
+        return { value: String(pageNumber), label: `${pageNumber} / ${pageCount}` };
+      }),
+    [pageCount]
+  );
+
+  const currentPageJumpOption = useMemo<ISelectOption | null>(
+    () => pageJumpOptions.find((option) => option.value === String(currentPage)) ?? null,
+    [pageJumpOptions, currentPage]
+  );
+
+  const handlePageJumpChange = useCallback(
+    (value: TSelectValue) => {
+      const option = Array.isArray(value) ? value[0] : value;
+      if (option && 'value' in option) {
+        handlePageChange(Number(option.value));
+      }
+    },
+    [handlePageChange]
+  );
+
   return (
     <div ref={ref} className={rootClassName} data-name="tedi-pagination">
       <div className={styles['tedi-pagination__slot-start']}>
@@ -202,8 +251,10 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       <div className={styles['tedi-pagination__slot-center']}>
         {pageCount > 1 && (
           <nav aria-label={mergedLabels.ariaLabel} className={styles['tedi-pagination__nav']}>
-            <ul className={styles['tedi-pagination__list']}>
-              {items.map((item, index) => {
+            {renderArrow(previousItem)}
+
+            <ul className={cn(styles['tedi-pagination__list'], styles['tedi-pagination__list--desktop'])}>
+              {pageItems.map((item, index) => {
                 if (item.type === 'ellipsis') {
                   return (
                     <li
@@ -212,26 +263,6 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
                       aria-hidden="true"
                     >
                       …
-                    </li>
-                  );
-                }
-
-                if (item.type === 'previous' || item.type === 'next') {
-                  if (item.disabled) return null;
-
-                  const label = item.type === 'previous' ? mergedLabels.previous : mergedLabels.next;
-                  const iconName = item.type === 'previous' ? 'arrow_back' : 'arrow_forward';
-                  return (
-                    <li key={item.type} className={styles['tedi-pagination__item']}>
-                      <Button
-                        type="button"
-                        className={cn(styles['tedi-pagination__button'], styles['tedi-pagination__button--nav'])}
-                        aria-label={label}
-                        onClick={() => item.page !== null && handlePageChange(item.page)}
-                        noStyle
-                      >
-                        <Icon name={iconName} size={18} color="brand" />
-                      </Button>
                     </li>
                   );
                 }
@@ -259,6 +290,23 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
                 );
               })}
             </ul>
+
+            <div className={styles['tedi-pagination__page-jump']}>
+              <Select
+                id={`tedi-pagination-jump-${selectId}`}
+                className={styles['tedi-pagination__page-jump-select']}
+                label={mergedLabels.ariaLabel}
+                hideLabel
+                size="small"
+                options={pageJumpOptions}
+                value={currentPageJumpOption}
+                onChange={handlePageJumpChange}
+                isSearchable={false}
+                isClearable={false}
+              />
+            </div>
+
+            {renderArrow(nextItem)}
           </nav>
         )}
       </div>
