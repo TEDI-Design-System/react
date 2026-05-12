@@ -150,4 +150,34 @@ describe('Collapse component with breakpoint support', () => {
 
     expect(screen.getByRole('button', { name: 'Toggle section' })).toBeInTheDocument();
   });
+
+  it('toggles open state when Enter or Space is pressed on the trigger', () => {
+    const onToggle = jest.fn();
+    const { getByRole } = getComponent({ id: 'collapse-keyboard', onToggle });
+    const button = getByRole('button', { name: /näita rohkem/i });
+
+    fireEvent.keyDown(button, { key: 'Enter' });
+    expect(onToggle).toHaveBeenCalledWith(true);
+
+    fireEvent.keyDown(button, { key: ' ' });
+    expect(onToggle).toHaveBeenCalledWith(false);
+    expect(onToggle).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignores repeated key events (e.repeat is true)', () => {
+    const onToggle = jest.fn();
+    const { getByRole } = getComponent({ id: 'collapse-repeat', onToggle });
+    const button = getByRole('button', { name: /näita rohkem/i });
+    fireEvent.keyDown(button, { key: 'Enter', repeat: true });
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it('ignores keys other than Enter / Space', () => {
+    const onToggle = jest.fn();
+    const { getByRole } = getComponent({ id: 'collapse-other-key', onToggle });
+    const button = getByRole('button', { name: /näita rohkem/i });
+    fireEvent.keyDown(button, { key: 'a' });
+    fireEvent.keyDown(button, { key: 'Tab' });
+    expect(onToggle).not.toHaveBeenCalled();
+  });
 });

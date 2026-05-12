@@ -84,12 +84,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const { getLabel } = useLabels();
   const resolvedPlaceholder = placeholder ?? getLabel('table.no-data');
-
-  // `getLabel` from `useLabels` is meant to be stable, but tests (and some
-  // consumer setups) hand back a fresh reference each render. Reading it
-  // through a ref lets the header / cell closures pick up the latest locale
-  // without invalidating the `augmentedColumns` memo every render — which
-  // would otherwise hand TanStack a new columns array and reset row state.
   const getLabelRef = useRef(getLabel);
   getLabelRef.current = getLabel;
 
@@ -375,8 +369,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const handleRowKeyDown = (row: Row<TData>) => (event: KeyboardEvent<HTMLTableRowElement>) => {
     if (!onRowClick) return;
-    // Only activate the row when focus is on the row itself — without this
-    // gate a Space press inside an inner `<input>` would also fire onRowClick.
     if (event.target !== event.currentTarget) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -384,9 +376,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     }
   };
 
-  // ARIA row indexing for paginated tables — lets SR users hear "row 47 of
-  // 200" instead of "row 7 of 10" on the current page. Includes header rows
-  // (each `<tr>` in `<thead>`) in the count per the ARIA spec.
   const headerRowCount = headerGroups.length + (enableColumnFilters ? 1 : 0);
   const paginationState = table.getState().pagination;
   const rowIndexOffset = paginationEnabled ? paginationState.pageIndex * paginationState.pageSize : 0;
@@ -451,10 +440,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   aria-rowindex={paginationEnabled ? headerGroups.length + 1 : undefined}
                 >
                   {leafColumns.map((column) => {
-                    // Prefer the column's `meta.label` (consumer-supplied
-                    // friendly name) → string header → raw column id. Render-fn
-                    // headers fall through to meta/id so the filter input
-                    // doesn't read out a machine-id to SR users.
                     const meta = column.columnDef.meta as { label?: string } | undefined;
                     const headerLabel =
                       meta?.label ??

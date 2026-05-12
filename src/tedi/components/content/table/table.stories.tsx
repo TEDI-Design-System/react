@@ -197,111 +197,6 @@ const nameLinkStyle: React.CSSProperties = {
   fontWeight: 'var(--body-regular-weight)',
 };
 
-/**
- * Three "simple" table layouts side-by-side, mirroring the Figma "Simple"
- * frame: a bookings list with an edit action, a people list with linked
- * names + status badges, and a doctor list with a multi-line first cell.
- * Same chrome (borders, pagination), different content patterns.
- */
-const SimpleTemplate = () => {
-  const bookingColumns = useMemo<ColumnDef<Booking>[]>(
-    () => [
-      { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
-      { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
-      { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
-      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-            <Icon name="edit" color="brand" size={18} />
-            Muuda
-          </a>
-        ),
-      },
-    ],
-    []
-  );
-
-  const peopleColumns = useMemo<ColumnDef<PersonRecord>[]>(
-    () => [
-      {
-        id: 'name',
-        header: 'Isik',
-        accessorKey: 'name',
-        cell: ({ row }) => (
-          <a href="#" onClick={(event) => event.preventDefault()} style={nameLinkStyle}>
-            {row.original.name}
-          </a>
-        ),
-      },
-      { id: 'age', header: 'Vanus', accessorKey: 'age' },
-      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
-      {
-        id: 'status',
-        header: 'Tõendi staatus',
-        accessorKey: 'status',
-        cell: ({ row }) => (
-          <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
-        ),
-      },
-    ],
-    []
-  );
-
-  const doctorColumns = useMemo<ColumnDef<Doctor>[]>(
-    () => [
-      {
-        id: 'name',
-        header: 'Arst',
-        cell: ({ row }) => (
-          <div>
-            <div>{row.original.name}</div>
-            <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
-          </div>
-        ),
-      },
-      { id: 'experience', header: 'Tööstaaž', accessorKey: 'experience' },
-      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-            <Icon name="edit" color="brand" size={18} />
-            Muuda
-          </a>
-        ),
-      },
-    ],
-    []
-  );
-
-  return (
-    <VerticalSpacing size={1}>
-      <Table<Booking>
-        id="tedi-table-simple-bookings"
-        data={bookings}
-        columns={bookingColumns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-      <Table<PersonRecord>
-        id="tedi-table-simple-people"
-        data={filterablePeople}
-        columns={peopleColumns}
-        pagination={SHOWCASE_PAGINATION_4}
-      />
-      <Table<Doctor>
-        id="tedi-table-simple-doctors"
-        data={doctors}
-        columns={doctorColumns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-    </VerticalSpacing>
-  );
-};
-
 /** Shared columns for the Default and Sizes stories (Figma "Sizes" frame). */
 const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
@@ -340,29 +235,136 @@ export const Default: Story = {
  * `default` and `small` variants of the same booking columns so the
  * difference in row/header padding is easy to compare.
  */
-const SizesTemplate = () => (
-  <VerticalSpacing size={1}>
-    <Heading element="h3">Default</Heading>
-    <Table<Booking>
-      id="tedi-table-sizes-default"
-      data={bookings}
-      columns={bookingShowcaseColumns}
-      pagination={SHOWCASE_PAGINATION_3}
-    />
-    <Heading element="h3">Small</Heading>
-    <Table<Booking>
-      id="tedi-table-sizes-small"
-      data={bookings}
-      columns={bookingShowcaseColumns}
-      size="small"
-      pagination={SHOWCASE_PAGINATION_3}
-    />
-  </VerticalSpacing>
-);
+export const Sizes: Story = {
+  render: function Sizes() {
+    return (
+      <VerticalSpacing size={1}>
+        <Heading element="h3">Default</Heading>
+        <Table<Booking>
+          id="tedi-table-sizes-default"
+          data={bookings}
+          columns={bookingShowcaseColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+        <Heading element="h3">Small</Heading>
+        <Table<Booking>
+          id="tedi-table-sizes-small"
+          data={bookings}
+          columns={bookingShowcaseColumns}
+          size="small"
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </VerticalSpacing>
+    );
+  },
+};
 
-export const Sizes: Story = { render: () => <SizesTemplate /> };
+/**
+ * Three "simple" table layouts side-by-side, mirroring the Figma "Simple"
+ * frame: a bookings list with an edit action, a people list with linked
+ * names + status badges, and a doctor list with a multi-line first cell.
+ * Same chrome (borders, pagination), different content patterns.
+ */
+export const Simple: Story = {
+  render: function Simple() {
+    const bookingColumns = useMemo<ColumnDef<Booking>[]>(
+      () => [
+        { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
+        { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
+        { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+        {
+          id: 'actions',
+          header: '',
+          cell: () => (
+            <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+              <Icon name="edit" color="brand" size={18} />
+              Muuda
+            </a>
+          ),
+        },
+      ],
+      []
+    );
 
-export const Simple: Story = { render: () => <SimpleTemplate /> };
+    const peopleColumns = useMemo<ColumnDef<PersonRecord>[]>(
+      () => [
+        {
+          id: 'name',
+          header: 'Isik',
+          accessorKey: 'name',
+          cell: ({ row }) => (
+            <a href="#" onClick={(event) => event.preventDefault()} style={nameLinkStyle}>
+              {row.original.name}
+            </a>
+          ),
+        },
+        { id: 'age', header: 'Vanus', accessorKey: 'age' },
+        { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+        {
+          id: 'status',
+          header: 'Tõendi staatus',
+          accessorKey: 'status',
+          cell: ({ row }) => (
+            <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
+          ),
+        },
+      ],
+      []
+    );
+
+    const doctorColumns = useMemo<ColumnDef<Doctor>[]>(
+      () => [
+        {
+          id: 'name',
+          header: 'Arst',
+          cell: ({ row }) => (
+            <div>
+              <div>{row.original.name}</div>
+              <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+            </div>
+          ),
+        },
+        { id: 'experience', header: 'Tööstaaž', accessorKey: 'experience' },
+        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+        {
+          id: 'actions',
+          header: '',
+          cell: () => (
+            <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+              <Icon name="edit" color="brand" size={18} />
+              Muuda
+            </a>
+          ),
+        },
+      ],
+      []
+    );
+
+    return (
+      <VerticalSpacing size={1}>
+        <Table<Booking>
+          id="tedi-table-simple-bookings"
+          data={bookings}
+          columns={bookingColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+        <Table<PersonRecord>
+          id="tedi-table-simple-people"
+          data={filterablePeople}
+          columns={peopleColumns}
+          pagination={SHOWCASE_PAGINATION_4}
+        />
+        <Table<Doctor>
+          id="tedi-table-simple-doctors"
+          data={doctors}
+          columns={doctorColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </VerticalSpacing>
+    );
+  },
+};
 
 /**
  * Two long-text patterns from the Figma "Long texts" frame. Top table puts
@@ -402,62 +404,6 @@ const baseDoctorWithDescriptionColumns = (): ColumnDef<Doctor>[] => [
   },
 ];
 
-const LongTextsTemplate = () => {
-  // Block variant: the "Show more" Button sits on its own line below the
-  // truncated paragraph (matches the top table in the Figma frame). Forced
-  // via `style: { display: 'block' }` on the underlying Button.
-  const blockColumns = useMemo<ColumnDef<Doctor>[]>(
-    () => [
-      baseDoctorWithDescriptionColumns()[0],
-      {
-        id: 'description',
-        header: 'Kirjeldus',
-        cell: () => (
-          <Truncate maxLength={LONG_TEXT_MAX_LENGTH} button={{ style: { display: 'block', padding: 0 } }}>
-            {LONG_DESCRIPTION}
-          </Truncate>
-        ),
-      },
-      baseDoctorWithDescriptionColumns()[1],
-      baseDoctorWithDescriptionColumns()[2],
-    ],
-    []
-  );
-
-  // Inline variant: default Truncate renders the toggle Button inline at the
-  // end of the truncated text (matches the bottom table in the Figma frame).
-  const inlineColumns = useMemo<ColumnDef<Doctor>[]>(
-    () => [
-      baseDoctorWithDescriptionColumns()[0],
-      {
-        id: 'description',
-        header: 'Kirjeldus',
-        cell: () => <Truncate maxLength={LONG_TEXT_MAX_LENGTH}>{LONG_DESCRIPTION}</Truncate>,
-      },
-      baseDoctorWithDescriptionColumns()[1],
-      baseDoctorWithDescriptionColumns()[2],
-    ],
-    []
-  );
-
-  return (
-    <VerticalSpacing size={1}>
-      <Table<Doctor>
-        id="tedi-table-long-texts-block"
-        data={doctors}
-        columns={blockColumns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-      <Table<Doctor>
-        id="tedi-table-long-texts-inline"
-        data={doctors}
-        columns={inlineColumns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-    </VerticalSpacing>
-  );
-};
-
 /**
  * Two row-action patterns from the Figma "Actions" frame. Top table puts
  * separate edit + delete icon buttons on each row. Bottom table collapses
@@ -484,64 +430,6 @@ const rowActionsCellStyle: React.CSSProperties = {
   gap: 8,
   justifyContent: 'flex-end',
   width: '100%',
-};
-
-const ActionsTemplate = () => {
-  const editDeleteColumns = useMemo<ColumnDef<Doctor>[]>(
-    () => [
-      ...baseDoctorActionsColumns(),
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <span style={rowActionsCellStyle}>
-            <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
-              <></>
-            </Button>
-            <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
-              <></>
-            </Button>
-          </span>
-        ),
-      },
-    ],
-    []
-  );
-
-  const kebabColumns = useMemo<ColumnDef<Doctor>[]>(
-    () => [
-      ...baseDoctorActionsColumns(),
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <span style={rowActionsCellStyle}>
-            <Button visualType="secondary" icon="more_vert" aria-label="More actions" onClick={() => undefined}>
-              <></>
-            </Button>
-          </span>
-        ),
-      },
-    ],
-    []
-  );
-
-  return (
-    <VerticalSpacing size={1}>
-      <Table<Doctor>
-        id="tedi-table-actions-edit-delete"
-        data={doctors}
-        columns={editDeleteColumns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-      <Table<Doctor>
-        id="tedi-table-actions-kebab"
-        data={doctors}
-        columns={kebabColumns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-    </VerticalSpacing>
-  );
 };
 
 /**
@@ -609,137 +497,78 @@ const initialsOf = (name: string) =>
     .slice(0, 2)
     .join('');
 
-const CustomTemplate = () => {
-  const columns = useMemo<ColumnDef<CustomDoctor>[]>(
-    () => [
-      {
-        id: 'name',
-        header: 'Arst',
-        cell: ({ row }) => (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span aria-hidden="true" style={avatarStyle}>
-              {initialsOf(row.original.name)}
-            </span>
-            <div>
-              <div>{row.original.name}</div>
-              <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: 'note',
-        header: '',
-        cell: ({ row }) =>
-          row.original.note && row.original.noteColor ? (
-            <Alert type={row.original.noteColor} size="small" role="status">
-              {row.original.note}
-            </Alert>
-          ) : null,
-      },
-      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <span style={rowActionsCellStyle}>
-            <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
-              <></>
-            </Button>
-            <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
-              <></>
-            </Button>
-          </span>
-        ),
-      },
-    ],
-    []
-  );
-
-  return (
-    <VerticalSpacing size={1}>
-      <Table<CustomDoctor>
-        id="tedi-table-custom"
-        data={customDoctors}
-        columns={columns}
-        pagination={SHOWCASE_PAGINATION_3}
-      />
-    </VerticalSpacing>
-  );
-};
-
-const MergedCellsTemplate = () => {
-  const columns = useMemo<ColumnDef<Booking>[]>(
-    () => [
-      {
-        id: 'dateRange',
-        accessorKey: 'dateRange',
-        header: ({ column }) => {
-          const sorted = column.getIsSorted();
-          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-          return (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              Kuupäev
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label="Sort by Kuupäev"
-                onClick={column.getToggleSortingHandler()}
-              />
-            </span>
-          );
-        },
-      },
-      {
-        id: 'aeg',
-        header: 'Aeg',
-        columns: [
-          { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
-          { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
-        ],
-      },
-      { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <a
-            href="#"
-            onClick={(event) => event.preventDefault()}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              color: 'var(--link-primary-default)',
-              textDecoration: 'none',
-              fontWeight: 'var(--body-regular-weight)',
-            }}
-          >
-            <Icon name="edit" color="brand" size={18} />
-            Muuda
-          </a>
-        ),
-      },
-    ],
-    []
-  );
-
-  return (
-    <Table<Booking>
-      id="tedi-table-merged"
-      verticalBorders
-      data={bookings}
-      columns={columns}
-      pagination={DEFAULT_PAGINATION}
-    />
-  );
-};
-
 /**
  * Two-level header using column groups. Nest column definitions under `columns` inside a parent
  * `columnDef` — TanStack Table will render the parent as a merged header cell spanning its children.
  */
-export const MergedCells: Story = { render: () => <MergedCellsTemplate /> };
+export const MergedCells: Story = {
+  render: function MergedCells() {
+    const columns = useMemo<ColumnDef<Booking>[]>(
+      () => [
+        {
+          id: 'dateRange',
+          accessorKey: 'dateRange',
+          header: ({ column }) => {
+            const sorted = column.getIsSorted();
+            const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+            return (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                Kuupäev
+                <Table.HeaderButton
+                  icon={iconName}
+                  selected={!!sorted}
+                  aria-label="Sort by Kuupäev"
+                  onClick={column.getToggleSortingHandler()}
+                />
+              </span>
+            );
+          },
+        },
+        {
+          id: 'aeg',
+          header: 'Aeg',
+          columns: [
+            { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
+            { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+          ],
+        },
+        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+        {
+          id: 'actions',
+          header: '',
+          cell: () => (
+            <a
+              href="#"
+              onClick={(event) => event.preventDefault()}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                color: 'var(--link-primary-default)',
+                textDecoration: 'none',
+                fontWeight: 'var(--body-regular-weight)',
+              }}
+            >
+              <Icon name="edit" color="brand" size={18} />
+              Muuda
+            </a>
+          ),
+        },
+      ],
+      []
+    );
+
+    return (
+      <Table<Booking>
+        id="tedi-table-merged"
+        verticalBorders
+        data={bookings}
+        columns={columns}
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
+  },
+};
 
 /**
  * Column separator lines via `verticalBorders`. Combine with `borderless` if the outer border
@@ -809,148 +638,148 @@ const editActionsStyle: React.CSSProperties = {
   gap: 8,
 };
 
-const EditableTemplate = () => {
-  const [rows, setRows] = useState<EditableBooking[]>(editableBookingsSeed);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState<EditableBooking | null>(null);
-
-  const beginEdit = (row: EditableBooking) => {
-    setEditingId(row.id);
-    setDraft(row);
-  };
-  const cancelEdit = () => {
-    setEditingId(null);
-    setDraft(null);
-  };
-  const commitEdit = () => {
-    if (!draft) return;
-    setRows((current) => current.map((row) => (row.id === draft.id ? draft : row)));
-    setEditingId(null);
-    setDraft(null);
-  };
-
-  const columns = useMemo<ColumnDef<EditableBooking>[]>(
-    () => [
-      {
-        id: 'dateRange',
-        header: 'Kuupäev',
-        accessorKey: 'dateRange',
-        cell: ({ row }) => {
-          if (row.original.id !== editingId || !draft) return row.original.dateRange;
-          return (
-            <TextField
-              id={`date-${row.original.id}`}
-              name="date"
-              label="Kuupäev"
-              hideLabel
-              icon="calendar_today"
-              value={draft.dateRange}
-              onChange={(next) => setDraft((prev) => (prev ? { ...prev, dateRange: next } : prev))}
-            />
-          );
-        },
-      },
-      {
-        id: 'hour',
-        header: 'Kellaaeg',
-        accessorKey: 'hour',
-        cell: ({ row }) => {
-          if (row.original.id !== editingId || !draft) return row.original.hour;
-          return (
-            <TextField
-              id={`hour-${row.original.id}`}
-              name="hour"
-              label="Kellaaeg"
-              hideLabel
-              icon="schedule"
-              value={draft.hour}
-              onChange={(next) => setDraft((prev) => (prev ? { ...prev, hour: next } : prev))}
-            />
-          );
-        },
-      },
-      {
-        id: 'duration',
-        header: 'Kestus',
-        accessorKey: 'duration',
-        cell: ({ row }) => {
-          if (row.original.id !== editingId || !draft) return `${row.original.duration} min`;
-          return (
-            <TextField
-              id={`duration-${row.original.id}`}
-              name="duration"
-              label="Kestus"
-              hideLabel
-              value={draft.duration}
-              onChange={(next) => setDraft((prev) => (prev ? { ...prev, duration: next } : prev))}
-            />
-          );
-        },
-      },
-      {
-        id: 'location',
-        header: 'Asukoht',
-        accessorKey: 'location',
-        cell: ({ row }) => {
-          if (row.original.id !== editingId || !draft) return row.original.location;
-          return (
-            <TextField
-              id={`location-${row.original.id}`}
-              name="location"
-              label="Asukoht"
-              hideLabel
-              value={draft.location}
-              onChange={(next) => setDraft((prev) => (prev ? { ...prev, location: next } : prev))}
-            />
-          );
-        },
-      },
-      {
-        id: 'actions',
-        header: '',
-        cell: ({ row }) => {
-          if (row.original.id === editingId) {
-            return (
-              <span style={editActionsStyle}>
-                <Button visualType="neutral" size="small" icon="close" onClick={cancelEdit}>
-                  Tühista
-                </Button>
-                <Button visualType="primary" size="small" icon="check" onClick={commitEdit}>
-                  Kinnita
-                </Button>
-              </span>
-            );
-          }
-          return (
-            <a
-              href="#"
-              onClick={(event) => {
-                event.preventDefault();
-                beginEdit(row.original);
-              }}
-              style={muudaLinkStyle}
-            >
-              <Icon name="edit" color="brand" size={18} />
-              Muuda
-            </a>
-          );
-        },
-      },
-    ],
-    [draft, editingId]
-  );
-
-  return (
-    <Table<EditableBooking> id="tedi-table-editable" data={rows} columns={columns} pagination={DEFAULT_PAGINATION} />
-  );
-};
-
 /**
  * Row-level inline editing: clicking "Muuda" replaces static cells with `TextField` inputs and
  * swaps the action column for confirm/cancel buttons. Track `editingId` + a `draft` copy of the row
  * in local state; commit or discard on button click. Only one row edits at a time.
  */
-export const EditableValues: Story = { render: () => <EditableTemplate /> };
+export const EditableValues: Story = {
+  render: function EditableValues() {
+    const [rows, setRows] = useState<EditableBooking[]>(editableBookingsSeed);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [draft, setDraft] = useState<EditableBooking | null>(null);
+
+    const beginEdit = (row: EditableBooking) => {
+      setEditingId(row.id);
+      setDraft(row);
+    };
+    const cancelEdit = () => {
+      setEditingId(null);
+      setDraft(null);
+    };
+    const commitEdit = () => {
+      if (!draft) return;
+      setRows((current) => current.map((row) => (row.id === draft.id ? draft : row)));
+      setEditingId(null);
+      setDraft(null);
+    };
+
+    const columns = useMemo<ColumnDef<EditableBooking>[]>(
+      () => [
+        {
+          id: 'dateRange',
+          header: 'Kuupäev',
+          accessorKey: 'dateRange',
+          cell: ({ row }) => {
+            if (row.original.id !== editingId || !draft) return row.original.dateRange;
+            return (
+              <TextField
+                id={`date-${row.original.id}`}
+                name="date"
+                label="Kuupäev"
+                hideLabel
+                icon="calendar_today"
+                value={draft.dateRange}
+                onChange={(next) => setDraft((prev) => (prev ? { ...prev, dateRange: next } : prev))}
+              />
+            );
+          },
+        },
+        {
+          id: 'hour',
+          header: 'Kellaaeg',
+          accessorKey: 'hour',
+          cell: ({ row }) => {
+            if (row.original.id !== editingId || !draft) return row.original.hour;
+            return (
+              <TextField
+                id={`hour-${row.original.id}`}
+                name="hour"
+                label="Kellaaeg"
+                hideLabel
+                icon="schedule"
+                value={draft.hour}
+                onChange={(next) => setDraft((prev) => (prev ? { ...prev, hour: next } : prev))}
+              />
+            );
+          },
+        },
+        {
+          id: 'duration',
+          header: 'Kestus',
+          accessorKey: 'duration',
+          cell: ({ row }) => {
+            if (row.original.id !== editingId || !draft) return `${row.original.duration} min`;
+            return (
+              <TextField
+                id={`duration-${row.original.id}`}
+                name="duration"
+                label="Kestus"
+                hideLabel
+                value={draft.duration}
+                onChange={(next) => setDraft((prev) => (prev ? { ...prev, duration: next } : prev))}
+              />
+            );
+          },
+        },
+        {
+          id: 'location',
+          header: 'Asukoht',
+          accessorKey: 'location',
+          cell: ({ row }) => {
+            if (row.original.id !== editingId || !draft) return row.original.location;
+            return (
+              <TextField
+                id={`location-${row.original.id}`}
+                name="location"
+                label="Asukoht"
+                hideLabel
+                value={draft.location}
+                onChange={(next) => setDraft((prev) => (prev ? { ...prev, location: next } : prev))}
+              />
+            );
+          },
+        },
+        {
+          id: 'actions',
+          header: '',
+          cell: ({ row }) => {
+            if (row.original.id === editingId) {
+              return (
+                <span style={editActionsStyle}>
+                  <Button visualType="neutral" size="small" icon="close" onClick={cancelEdit}>
+                    Tühista
+                  </Button>
+                  <Button visualType="primary" size="small" icon="check" onClick={commitEdit}>
+                    Kinnita
+                  </Button>
+                </span>
+              );
+            }
+            return (
+              <a
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  beginEdit(row.original);
+                }}
+                style={muudaLinkStyle}
+              >
+                <Icon name="edit" color="brand" size={18} />
+                Muuda
+              </a>
+            );
+          },
+        },
+      ],
+      [draft, editingId]
+    );
+
+    return (
+      <Table<EditableBooking> id="tedi-table-editable" data={rows} columns={columns} pagination={DEFAULT_PAGINATION} />
+    );
+  },
+};
 
 /**
  * Sortable columns — header shows a compact sort chevron that cycles through
@@ -959,44 +788,44 @@ export const EditableValues: Story = { render: () => <EditableTemplate /> };
  * `columnDef.enableSorting` (default `true`); only columns with
  * `enableSorting: false` render as plain text.
  */
-const SortableTemplate = () => {
-  const columns = useMemo<ColumnDef<Person>[]>(
-    () =>
-      [
-        { id: 'name', header: 'Name', accessorKey: 'name' },
-        { id: 'role', header: 'Role', accessorKey: 'role' },
-        { id: 'location', header: 'Location', accessorKey: 'location' },
-        { id: 'salary', header: 'Salary', accessorKey: 'salary' },
-      ].map((col) => ({
-        ...col,
-        header: ({ column }) => {
-          const sorted = column.getIsSorted();
-          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-          return (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              {col.header}
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label={`Sort by ${col.header}`}
-                onClick={column.getToggleSortingHandler()}
-              />
-            </span>
-          );
-        },
-      })),
-    []
-  );
-
-  return <Table<Person> id="tedi-table-sortable" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
-};
-
 /**
  * Client-side sorting via `Table.HeaderButton` in the header renderer. Each click cycles
  * `unfold_more → arrow_upward → arrow_downward → unfold_more`. TanStack Table handles the
  * sort state internally; no external state needed for client-side use.
  */
-export const Sortable: Story = { render: () => <SortableTemplate /> };
+export const Sortable: Story = {
+  render: function Sortable() {
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () =>
+        [
+          { id: 'name', header: 'Name', accessorKey: 'name' },
+          { id: 'role', header: 'Role', accessorKey: 'role' },
+          { id: 'location', header: 'Location', accessorKey: 'location' },
+          { id: 'salary', header: 'Salary', accessorKey: 'salary' },
+        ].map((col) => ({
+          ...col,
+          header: ({ column }) => {
+            const sorted = column.getIsSorted();
+            const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+            return (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                {col.header}
+                <Table.HeaderButton
+                  icon={iconName}
+                  selected={!!sorted}
+                  aria-label={`Sort by ${col.header}`}
+                  onClick={column.getToggleSortingHandler()}
+                />
+              </span>
+            );
+          },
+        })),
+      []
+    );
+
+    return <Table<Person> id="tedi-table-sortable" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
+  },
+};
 
 /**
  * Per-column filter popovers — matches Figma Example table 7/8 exactly
@@ -1245,110 +1074,110 @@ const parseDate = (value: string): number | null => {
   return Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd));
 };
 
-const FiltersTemplate = () => {
-  const columns = useMemo<ColumnDef<PersonRecord>[]>(
-    () => [
-      {
-        id: 'name',
-        accessorKey: 'name',
-        filterFn: 'includesString',
-        header: ({ column }) => (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <SortLabel column={column} ariaLabel="Sorteeri Nimi">
-              Nimi
-            </SortLabel>
-            <TextFilterPopover
-              value={(column.getFilterValue() as string | undefined) ?? ''}
-              onApply={(next) => column.setFilterValue(next)}
-              label="Nimi"
-            />
-          </span>
-        ),
-      },
-      {
-        id: 'jobStart',
-        accessorKey: 'jobStart',
-        filterFn: (row, id, value: DateRangeValue) => {
-          if (!value?.from && !value?.to) return true;
-          const cell = parseDate(row.getValue(id) as string);
-          if (cell === null) return false;
-          const fromTs = value.from ? parseDate(value.from) : null;
-          const toTs = value.to ? parseDate(value.to) : null;
-          if (fromTs !== null && cell < fromTs) return false;
-          if (toTs !== null && cell > toTs) return false;
-          return true;
-        },
-        header: ({ column }) => (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <SortLabel column={column} ariaLabel="Sorteeri Töö algus">
-              Töö algus
-            </SortLabel>
-            <DateRangeFilterPopover
-              value={column.getFilterValue() as DateRangeValue | undefined}
-              onApply={(next) => column.setFilterValue(next)}
-              label="Töö algus"
-            />
-          </span>
-        ),
-      },
-      {
-        id: 'age',
-        accessorKey: 'age',
-        header: ({ column }) => (
-          <SortLabel column={column} ariaLabel="Sorteeri Vanus">
-            Vanus
-          </SortLabel>
-        ),
-      },
-      {
-        id: 'visits',
-        accessorKey: 'visits',
-        header: ({ column }) => (
-          <SortLabel column={column} ariaLabel="Sorteeri Külastuste arv">
-            Külastuste arv
-          </SortLabel>
-        ),
-      },
-      {
-        id: 'status',
-        accessorKey: 'status',
-        filterFn: (row, id, value: CertStatus[]) => !value?.length || value.includes(row.getValue(id) as CertStatus),
-        header: ({ column }) => (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <SortLabel column={column} ariaLabel="Sorteeri Tõendi staatus">
-              Tõendi staatus
-            </SortLabel>
-            <MultiSelectFilterPopover
-              value={column.getFilterValue() as CertStatus[] | undefined}
-              onApply={(next) => column.setFilterValue(next)}
-              label="Tõendi staatus"
-            />
-          </span>
-        ),
-        cell: ({ row }) => (
-          <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
-        ),
-      },
-    ],
-    []
-  );
-
-  return (
-    <Table<PersonRecord>
-      id="tedi-table-filters"
-      data={filterablePeople}
-      columns={columns}
-      pagination={DEFAULT_PAGINATION}
-    />
-  );
-};
-
 /**
  * Column filter popovers via `Table.HeaderButton` + `Popover`. Each column provides a `filterFn`
  * and stores its filter value in TanStack Table's `columnFilters` state. Filter UI varies per column:
  * text input for names, date-range fields for dates, and a checkbox list for enum values.
  */
-export const Filters: Story = { render: () => <FiltersTemplate /> };
+export const Filters: Story = {
+  render: function Filters() {
+    const columns = useMemo<ColumnDef<PersonRecord>[]>(
+      () => [
+        {
+          id: 'name',
+          accessorKey: 'name',
+          filterFn: 'includesString',
+          header: ({ column }) => (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <SortLabel column={column} ariaLabel="Sorteeri Nimi">
+                Nimi
+              </SortLabel>
+              <TextFilterPopover
+                value={(column.getFilterValue() as string | undefined) ?? ''}
+                onApply={(next) => column.setFilterValue(next)}
+                label="Nimi"
+              />
+            </span>
+          ),
+        },
+        {
+          id: 'jobStart',
+          accessorKey: 'jobStart',
+          filterFn: (row, id, value: DateRangeValue) => {
+            if (!value?.from && !value?.to) return true;
+            const cell = parseDate(row.getValue(id) as string);
+            if (cell === null) return false;
+            const fromTs = value.from ? parseDate(value.from) : null;
+            const toTs = value.to ? parseDate(value.to) : null;
+            if (fromTs !== null && cell < fromTs) return false;
+            if (toTs !== null && cell > toTs) return false;
+            return true;
+          },
+          header: ({ column }) => (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <SortLabel column={column} ariaLabel="Sorteeri Töö algus">
+                Töö algus
+              </SortLabel>
+              <DateRangeFilterPopover
+                value={column.getFilterValue() as DateRangeValue | undefined}
+                onApply={(next) => column.setFilterValue(next)}
+                label="Töö algus"
+              />
+            </span>
+          ),
+        },
+        {
+          id: 'age',
+          accessorKey: 'age',
+          header: ({ column }) => (
+            <SortLabel column={column} ariaLabel="Sorteeri Vanus">
+              Vanus
+            </SortLabel>
+          ),
+        },
+        {
+          id: 'visits',
+          accessorKey: 'visits',
+          header: ({ column }) => (
+            <SortLabel column={column} ariaLabel="Sorteeri Külastuste arv">
+              Külastuste arv
+            </SortLabel>
+          ),
+        },
+        {
+          id: 'status',
+          accessorKey: 'status',
+          filterFn: (row, id, value: CertStatus[]) => !value?.length || value.includes(row.getValue(id) as CertStatus),
+          header: ({ column }) => (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <SortLabel column={column} ariaLabel="Sorteeri Tõendi staatus">
+                Tõendi staatus
+              </SortLabel>
+              <MultiSelectFilterPopover
+                value={column.getFilterValue() as CertStatus[] | undefined}
+                onApply={(next) => column.setFilterValue(next)}
+                label="Tõendi staatus"
+              />
+            </span>
+          ),
+          cell: ({ row }) => (
+            <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
+          ),
+        },
+      ],
+      []
+    );
+
+    return (
+      <Table<PersonRecord>
+        id="tedi-table-filters"
+        data={filterablePeople}
+        columns={columns}
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
+  },
+};
 
 interface CollapsibleRecord {
   id: string;
@@ -1431,28 +1260,28 @@ export const SelectableRows: Story = {
   ),
 };
 
-const ClickableTemplate = () => {
-  const [clicked, setClicked] = useState<string | null>(null);
-  return (
-    <>
-      <Text className="margin-bottom-10">{clicked ? `You clicked ${clicked}` : 'Click a row to select it.'}</Text>
-      <Table<Person>
-        id="tedi-table-clickable"
-        data={people}
-        columns={personColumns}
-        onRowClick={(row) => setClicked(row.original.name)}
-        pagination={DEFAULT_PAGINATION}
-      />
-    </>
-  );
-};
-
 /**
  * Whole-row click via `onRowClick={(row) => ...}`. The table adds pointer cursor and hover highlight
  * automatically. Use instead of (or alongside) `enableRowSelection` when a click should navigate
  * or open a detail panel rather than toggle a checkbox.
  */
-export const ClickableRows: Story = { render: () => <ClickableTemplate /> };
+export const ClickableRows: Story = {
+  render: function ClickableRows() {
+    const [clicked, setClicked] = useState<string | null>(null);
+    return (
+      <>
+        <Text className="margin-bottom-10">{clicked ? `You clicked ${clicked}` : 'Click a row to select it.'}</Text>
+        <Table<Person>
+          id="tedi-table-clickable"
+          data={people}
+          columns={personColumns}
+          onRowClick={(row) => setClicked(row.original.name)}
+          pagination={DEFAULT_PAGINATION}
+        />
+      </>
+    );
+  },
+};
 
 /**
  * Alternating row background color via `striped`. Helps readability in wide or dense tables.
@@ -1515,7 +1344,63 @@ export const WithEmptyState: Story = {
  * chevron). Bottom table inlines the link at the end of the truncated text
  * (underlined, no icon). Tip alert in the middle explains the trade-off.
  */
-export const LongTexts: Story = { render: () => <LongTextsTemplate /> };
+export const LongTexts: Story = {
+  render: function LongTexts() {
+    // Block variant: the "Show more" Button sits on its own line below the
+    // truncated paragraph (matches the top table in the Figma frame). Forced
+    // via `style: { display: 'block' }` on the underlying Button.
+    const blockColumns = useMemo<ColumnDef<Doctor>[]>(
+      () => [
+        baseDoctorWithDescriptionColumns()[0],
+        {
+          id: 'description',
+          header: 'Kirjeldus',
+          cell: () => (
+            <Truncate maxLength={LONG_TEXT_MAX_LENGTH} button={{ style: { display: 'block', padding: 0 } }}>
+              {LONG_DESCRIPTION}
+            </Truncate>
+          ),
+        },
+        baseDoctorWithDescriptionColumns()[1],
+        baseDoctorWithDescriptionColumns()[2],
+      ],
+      []
+    );
+
+    // Inline variant: default Truncate renders the toggle Button inline at the
+    // end of the truncated text (matches the bottom table in the Figma frame).
+    const inlineColumns = useMemo<ColumnDef<Doctor>[]>(
+      () => [
+        baseDoctorWithDescriptionColumns()[0],
+        {
+          id: 'description',
+          header: 'Kirjeldus',
+          cell: () => <Truncate maxLength={LONG_TEXT_MAX_LENGTH}>{LONG_DESCRIPTION}</Truncate>,
+        },
+        baseDoctorWithDescriptionColumns()[1],
+        baseDoctorWithDescriptionColumns()[2],
+      ],
+      []
+    );
+
+    return (
+      <VerticalSpacing size={1}>
+        <Table<Doctor>
+          id="tedi-table-long-texts-block"
+          data={doctors}
+          columns={blockColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+        <Table<Doctor>
+          id="tedi-table-long-texts-inline"
+          data={doctors}
+          columns={inlineColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </VerticalSpacing>
+    );
+  },
+};
 
 /**
  * Two row-action patterns from the Figma "Actions" frame. Top table puts
@@ -1523,7 +1408,65 @@ export const LongTexts: Story = { render: () => <LongTextsTemplate /> };
  * the same affordances into a single kebab (`more_vert`) button — typical
  * pattern when the row is dense or has many possible actions.
  */
-export const Actions: Story = { render: () => <ActionsTemplate /> };
+export const Actions: Story = {
+  render: function Actions() {
+    const editDeleteColumns = useMemo<ColumnDef<Doctor>[]>(
+      () => [
+        ...baseDoctorActionsColumns(),
+        {
+          id: 'actions',
+          header: '',
+          cell: () => (
+            <span style={rowActionsCellStyle}>
+              <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
+                <></>
+              </Button>
+              <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
+                <></>
+              </Button>
+            </span>
+          ),
+        },
+      ],
+      []
+    );
+
+    const kebabColumns = useMemo<ColumnDef<Doctor>[]>(
+      () => [
+        ...baseDoctorActionsColumns(),
+        {
+          id: 'actions',
+          header: '',
+          cell: () => (
+            <span style={rowActionsCellStyle}>
+              <Button visualType="secondary" icon="more_vert" aria-label="More actions" onClick={() => undefined}>
+                <></>
+              </Button>
+            </span>
+          ),
+        },
+      ],
+      []
+    );
+
+    return (
+      <VerticalSpacing size={1}>
+        <Table<Doctor>
+          id="tedi-table-actions-edit-delete"
+          data={doctors}
+          columns={editDeleteColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+        <Table<Doctor>
+          id="tedi-table-actions-kebab"
+          data={doctors}
+          columns={kebabColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </VerticalSpacing>
+    );
+  },
+};
 
 /**
  * "Custom" Figma frame: a tip alert plus a table with custom-rendered cells —
@@ -1531,7 +1474,66 @@ export const Actions: Story = { render: () => <ActionsTemplate /> };
  * tags, and the same edit/delete row actions from the Actions showcase.
  * Demonstrates that any column can return arbitrary JSX.
  */
-export const Custom: Story = { render: () => <CustomTemplate /> };
+export const Custom: Story = {
+  render: function Custom() {
+    const columns = useMemo<ColumnDef<CustomDoctor>[]>(
+      () => [
+        {
+          id: 'name',
+          header: 'Arst',
+          cell: ({ row }) => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span aria-hidden="true" style={avatarStyle}>
+                {initialsOf(row.original.name)}
+              </span>
+              <div>
+                <div>{row.original.name}</div>
+                <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+              </div>
+            </div>
+          ),
+        },
+        {
+          id: 'note',
+          header: '',
+          cell: ({ row }) =>
+            row.original.note && row.original.noteColor ? (
+              <Alert type={row.original.noteColor} size="small" role="status">
+                {row.original.note}
+              </Alert>
+            ) : null,
+        },
+        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+        {
+          id: 'actions',
+          header: '',
+          cell: () => (
+            <span style={rowActionsCellStyle}>
+              <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
+                <></>
+              </Button>
+              <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
+                <></>
+              </Button>
+            </span>
+          ),
+        },
+      ],
+      []
+    );
+
+    return (
+      <VerticalSpacing size={1}>
+        <Table<CustomDoctor>
+          id="tedi-table-custom"
+          data={customDoctors}
+          columns={columns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </VerticalSpacing>
+    );
+  },
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stories not present in the Figma "Types" frame — kept after the Figma-driven
@@ -1621,60 +1623,6 @@ const DragHandle = ({ id, label }: { id: string; label: string }) => {
   );
 };
 
-const DraggableRowsTemplate = () => {
-  // Story owns its own reorderable copy of `people` so drag-end can mutate it.
-  const [rows, setRows] = useState<Person[]>(() => people.slice(0, 8));
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const columns = useMemo<ColumnDef<Person>[]>(
-    () => [
-      {
-        id: 'drag',
-        header: '',
-        size: 40,
-        enableSorting: false,
-        enableHiding: false,
-        cell: ({ row }) => <DragHandle id={row.original.id} label={`Drag row ${row.original.name}`} />,
-      },
-      { id: 'name', header: 'Name', accessorKey: 'name' },
-      { id: 'role', header: 'Role', accessorKey: 'role' },
-      { id: 'location', header: 'Location', accessorKey: 'location' },
-    ],
-    []
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setRows((current) => {
-      const oldIndex = current.findIndex((r) => r.id === active.id);
-      const newIndex = current.findIndex((r) => r.id === over.id);
-      if (oldIndex < 0 || newIndex < 0) return current;
-      return arrayMove(current, oldIndex, newIndex);
-    });
-  };
-
-  return (
-    <VerticalSpacing size={1}>
-      <Alert type="info" role="status" title="Row reordering" icon="lightbulb">
-        <Text>
-          Grab the <StatusBadge>≡</StatusBadge> handle on any row to reorder. Keyboard users: focus a handle and press
-          Space to lift, arrows to move, Space to drop. The parent component owns the data order and updates it on{' '}
-          <StatusBadge>onDragEnd</StatusBadge>.
-        </Text>
-      </Alert>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-          <Table<Person> id="tedi-table-row-drag" data={rows} columns={columns} />
-        </SortableContext>
-      </DndContext>
-    </VerticalSpacing>
-  );
-};
-
 /**
  * Drag rows by the grip handle to reorder them. The story owns the data array
  * and applies `arrayMove` on drag end — Table itself doesn't need to know.
@@ -1698,79 +1646,60 @@ const DraggableRowsTemplate = () => {
  * server (or in `rowOrder`) and re-derive `data` from the response on the
  * next fetch.
  */
-export const DraggableRows: Story = { render: () => <DraggableRowsTemplate /> };
+export const DraggableRows: Story = {
+  render: function DraggableRows() {
+    // Story owns its own reorderable copy of `people` so drag-end can mutate it.
+    const [rows, setRows] = useState<Person[]>(() => people.slice(0, 8));
+    const sensors = useSensors(
+      useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+      useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
 
-const DraggableColumnsTemplate = () => {
-  const baseColumns = useMemo<ColumnDef<Person>[]>(
-    () => [
-      { id: 'name', header: 'Name', accessorKey: 'name' },
-      { id: 'email', header: 'Email', accessorKey: 'email' },
-      { id: 'role', header: 'Role', accessorKey: 'role' },
-      { id: 'location', header: 'Location', accessorKey: 'location' },
-    ],
-    []
-  );
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () => [
+        {
+          id: 'drag',
+          header: '',
+          size: 40,
+          enableSorting: false,
+          enableHiding: false,
+          cell: ({ row }) => <DragHandle id={row.original.id} label={`Drag row ${row.original.name}`} />,
+        },
+        { id: 'name', header: 'Name', accessorKey: 'name' },
+        { id: 'role', header: 'Role', accessorKey: 'role' },
+        { id: 'location', header: 'Location', accessorKey: 'location' },
+      ],
+      []
+    );
 
-  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(() =>
-    baseColumns.map((column) => column.id as string)
-  );
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
+    const handleDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      setRows((current) => {
+        const oldIndex = current.findIndex((r) => r.id === active.id);
+        const newIndex = current.findIndex((r) => r.id === over.id);
+        if (oldIndex < 0 || newIndex < 0) return current;
+        return arrayMove(current, oldIndex, newIndex);
+      });
+    };
 
-  // Wrap each header in a drag handle so the column can be picked up from the
-  // header cell itself. We re-derive the columns array whenever `columnOrder`
-  // changes so the handle's id matches the column we're dragging.
-  const columns = useMemo<ColumnDef<Person>[]>(
-    () =>
-      baseColumns.map((column) => ({
-        ...column,
-        header: ({ column: ctxColumn }) => (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <DragHandle id={ctxColumn.id} label={`Drag column ${String(column.header)}`} />
-            {column.header as string}
-          </span>
-        ),
-      })),
-    [baseColumns]
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setColumnOrder((current) => {
-      const oldIndex = current.indexOf(active.id as string);
-      const newIndex = current.indexOf(over.id as string);
-      if (oldIndex < 0 || newIndex < 0) return current;
-      return arrayMove(current, oldIndex, newIndex);
-    });
-  };
-
-  return (
-    <VerticalSpacing size={1}>
-      <Alert type="info" role="status" title="Column reordering" icon="lightbulb">
-        <Text>
-          Drag a column header by its <StatusBadge>≡</StatusBadge> handle to reorder. Column order lives on{' '}
-          <StatusBadge>state.columnOrder</StatusBadge>; Table forwards it to TanStack so the cells re-render in the new
-          order automatically.
-        </Text>
-      </Alert>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
-          <Table<Person>
-            id="tedi-table-column-drag"
-            data={people.slice(0, 6)}
-            columns={columns}
-            state={{ columnOrder }}
-            onStateChange={(next) => {
-              if (next.columnOrder) setColumnOrder(next.columnOrder);
-            }}
-          />
-        </SortableContext>
-      </DndContext>
-    </VerticalSpacing>
-  );
+    return (
+      <VerticalSpacing size={1}>
+        <Alert type="info" role="status" title="Row reordering" icon="lightbulb">
+          <Text>
+            Grab the <StatusBadge>≡</StatusBadge> handle on any row to reorder. Keyboard users: focus a handle and press
+            Space to lift, arrows to move, Space to drop. The parent component owns the data order and updates it on{' '}
+            <StatusBadge>onDragEnd</StatusBadge>.
+          </Text>
+        </Alert>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+            <Table<Person> id="tedi-table-row-drag" data={rows} columns={columns} />
+          </SortableContext>
+        </DndContext>
+      </VerticalSpacing>
+    );
+  },
 };
 
 /**
@@ -1793,7 +1722,80 @@ const DraggableColumnsTemplate = () => {
  * `rowOrder` (ids only — see DraggableRows for the caveat), and
  * `columnSizing`. Use `persist.include` to opt in / out of specific slices.
  */
-export const DraggableColumns: Story = { render: () => <DraggableColumnsTemplate /> };
+export const DraggableColumns: Story = {
+  render: function DraggableColumns() {
+    const baseColumns = useMemo<ColumnDef<Person>[]>(
+      () => [
+        { id: 'name', header: 'Name', accessorKey: 'name' },
+        { id: 'email', header: 'Email', accessorKey: 'email' },
+        { id: 'role', header: 'Role', accessorKey: 'role' },
+        { id: 'location', header: 'Location', accessorKey: 'location' },
+      ],
+      []
+    );
+
+    const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(() =>
+      baseColumns.map((column) => column.id as string)
+    );
+    const sensors = useSensors(
+      useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+      useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
+
+    // Wrap each header in a drag handle so the column can be picked up from the
+    // header cell itself. We re-derive the columns array whenever `columnOrder`
+    // changes so the handle's id matches the column we're dragging.
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () =>
+        baseColumns.map((column) => ({
+          ...column,
+          header: ({ column: ctxColumn }) => (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <DragHandle id={ctxColumn.id} label={`Drag column ${String(column.header)}`} />
+              {column.header as string}
+            </span>
+          ),
+        })) as ColumnDef<Person>[],
+      [baseColumns]
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      setColumnOrder((current) => {
+        const oldIndex = current.indexOf(active.id as string);
+        const newIndex = current.indexOf(over.id as string);
+        if (oldIndex < 0 || newIndex < 0) return current;
+        return arrayMove(current, oldIndex, newIndex);
+      });
+    };
+
+    return (
+      <VerticalSpacing size={1}>
+        <Alert type="info" role="status" title="Column reordering" icon="lightbulb">
+          <Text>
+            Drag a column header by its <StatusBadge>≡</StatusBadge> handle to reorder. Column order lives on{' '}
+            <StatusBadge>state.columnOrder</StatusBadge>; Table forwards it to TanStack so the cells re-render in the
+            new order automatically.
+          </Text>
+        </Alert>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
+            <Table<Person>
+              id="tedi-table-column-drag"
+              data={people.slice(0, 6)}
+              columns={columns}
+              state={{ columnOrder }}
+              onStateChange={(next) => {
+                if (next.columnOrder) setColumnOrder(next.columnOrder);
+              }}
+            />
+          </SortableContext>
+        </DndContext>
+      </VerticalSpacing>
+    );
+  },
+};
 
 /**
  * Server-side pagination + sorting demo. `manualPagination` / `manualSorting`
@@ -1809,73 +1811,74 @@ export const DraggableColumns: Story = { render: () => <DraggableColumnsTemplate
  * - controlled `state` + `onStateChange` — observe page / sort changes and
  *   refetch
  */
-const ServerSideTemplate = () => {
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
-  const [sorting, setSorting] = useState<{ id: string; desc: boolean }[]>([]);
+export const ServerSide: Story = {
+  render: function ServerSide() {
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+    const [sorting, setSorting] = useState<{ id: string; desc: boolean }[]>([]);
 
-  const sortedData = useMemo(() => {
-    if (sorting.length === 0) return people;
-    const { id, desc } = sorting[0];
-    const direction = desc ? -1 : 1;
-    return [...people].sort((a, b) => {
-      const av = a[id as keyof Person];
-      const bv = b[id as keyof Person];
-      if (av === bv) return 0;
-      return av > bv ? direction : -direction;
-    });
-  }, [sorting]);
+    const sortedData = useMemo(() => {
+      if (sorting.length === 0) return people;
+      const { id, desc } = sorting[0];
+      const direction = desc ? -1 : 1;
+      return [...people].sort((a, b) => {
+        const av = a[id as keyof Person];
+        const bv = b[id as keyof Person];
+        if (av === bv) return 0;
+        return av > bv ? direction : -direction;
+      });
+    }, [sorting]);
 
-  const pageRows = useMemo(
-    () =>
-      sortedData.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize),
-    [sortedData, pagination]
-  );
+    const pageRows = useMemo(
+      () =>
+        sortedData.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize),
+      [sortedData, pagination]
+    );
 
-  const sortableColumns = useMemo<ColumnDef<Person>[]>(
-    () =>
-      personColumns.map((col) => ({
-        ...col,
-        header: ({ column }) => {
-          const sorted = column.getIsSorted();
-          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-          return (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              {col.header as string}
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label={`Sort by ${col.header as string}`}
-                onClick={column.getToggleSortingHandler()}
-              />
-            </span>
-          );
-        },
-      })) as ColumnDef<Person>[],
-    []
-  );
+    const sortableColumns = useMemo<ColumnDef<Person>[]>(
+      () =>
+        personColumns.map((col) => ({
+          ...col,
+          header: ({ column }) => {
+            const sorted = column.getIsSorted();
+            const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+            return (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                {col.header as string}
+                <Table.HeaderButton
+                  icon={iconName}
+                  selected={!!sorted}
+                  aria-label={`Sort by ${col.header as string}`}
+                  onClick={column.getToggleSortingHandler()}
+                />
+              </span>
+            );
+          },
+        })) as ColumnDef<Person>[],
+      []
+    );
 
-  return (
-    <VerticalSpacing size={1}>
-      <Alert type="info" role="status" title="Server-side mode" icon="lightbulb">
-        <Text>
-          This story simulates a server-paginated, server-sorted table. The parent owns the current page slice and the
-          sort state; the Table is told <StatusBadge>manualPagination</StatusBadge> +{' '}
-          <StatusBadge>manualSorting</StatusBadge> so it does not re-slice or re-sort its{' '}
-          <StatusBadge>data</StatusBadge> locally.
-        </Text>
-        <Text modifiers="bold">Wiring it up in your app</Text>
-        <pre
-          style={{
-            margin: 0,
-            padding: 'var(--tedi-dimensions-12)',
-            background: 'var(--general-surface-secondary)',
-            borderRadius: 'var(--tedi-borders-radius-default, 4px)',
-            fontFamily: 'var(--family-mono, monospace)',
-            fontSize: 'var(--body-small-regular-size)',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {`const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+    return (
+      <VerticalSpacing size={1}>
+        <Alert type="info" role="status" title="Server-side mode" icon="lightbulb">
+          <Text>
+            This story simulates a server-paginated, server-sorted table. The parent owns the current page slice and the
+            sort state; the Table is told <StatusBadge>manualPagination</StatusBadge> +{' '}
+            <StatusBadge>manualSorting</StatusBadge> so it does not re-slice or re-sort its{' '}
+            <StatusBadge>data</StatusBadge> locally.
+          </Text>
+          <Text modifiers="bold">Wiring it up in your app</Text>
+          <pre
+            style={{
+              margin: 0,
+              padding: 'var(--tedi-dimensions-12)',
+              background: 'var(--general-surface-secondary)',
+              borderRadius: 'var(--tedi-borders-radius-default, 4px)',
+              fontFamily: 'var(--family-mono, monospace)',
+              fontSize: 'var(--body-small-regular-size)',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {`const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 const [sorting, setSorting] = useState([]);
 
 // Refetch from the server whenever pagination / sort changes.
@@ -1895,35 +1898,28 @@ const { data: page, total } = useServerQuery({ pagination, sorting });
   }}
   pagination
 />`}
-        </pre>
-        <Separator axis="horizontal" spacing={1} color="secondary" />
-        <Text modifiers="small" color="secondary">
-          Tip: <StatusBadge>manualFiltering</StatusBadge> works the same way for column filters when you have them.
-        </Text>
-      </Alert>
-      <Table<Person>
-        id="tedi-table-server-side"
-        data={pageRows}
-        columns={sortableColumns}
-        manualPagination
-        manualSorting
-        pageCount={Math.ceil(people.length / pagination.pageSize)}
-        rowCount={people.length}
-        state={{ pagination, sorting }}
-        onStateChange={(next) => {
-          if (next.pagination) setPagination(next.pagination);
-          if (next.sorting !== undefined) setSorting(next.sorting);
-        }}
-        pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
-      />
-    </VerticalSpacing>
-  );
+          </pre>
+          <Separator axis="horizontal" spacing={1} color="secondary" />
+          <Text modifiers="small" color="secondary">
+            Tip: <StatusBadge>manualFiltering</StatusBadge> works the same way for column filters when you have them.
+          </Text>
+        </Alert>
+        <Table<Person>
+          id="tedi-table-server-side"
+          data={pageRows}
+          columns={sortableColumns}
+          manualPagination
+          manualSorting
+          pageCount={Math.ceil(people.length / pagination.pageSize)}
+          rowCount={people.length}
+          state={{ pagination, sorting }}
+          onStateChange={(next) => {
+            if (next.pagination) setPagination(next.pagination);
+            if (next.sorting !== undefined) setSorting(next.sorting);
+          }}
+          pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
+        />
+      </VerticalSpacing>
+    );
+  },
 };
-
-/**
- * API-driven pagination and sorting. Pass `manualPagination` + `manualSorting` so TanStack Table
- * skips in-memory work; supply `pageCount` / `rowCount` from the server response; control
- * `state.pagination` and `state.sorting`; refetch in `onStateChange` when either changes.
- * `manualFiltering` works the same way for column filters.
- */
-export const ServerSide: Story = { render: () => <ServerSideTemplate /> };

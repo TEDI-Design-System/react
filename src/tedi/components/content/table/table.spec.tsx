@@ -1,9 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Table } from './table';
 import type { TableState } from './table.types';
+import { useTableContext } from './table-context';
 
 import '@testing-library/jest-dom';
 
@@ -302,6 +303,46 @@ describe('Table', () => {
       ).not.toThrow();
       expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
     });
+
+    it('falls back gracefully when window.localStorage access throws', () => {
+      const original = Object.getOwnPropertyDescriptor(window, 'localStorage');
+      Object.defineProperty(window, 'localStorage', {
+        configurable: true,
+        get() {
+          throw new Error('blocked');
+        },
+      });
+
+      try {
+        expect(() =>
+          render(<Table<Person> id="t-block" data={data} columns={columns} persist={{ key: 'persist-block' }} />)
+        ).not.toThrow();
+        expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+      } finally {
+        if (original) Object.defineProperty(window, 'localStorage', original);
+      }
+    });
+
+    it('uses the supplied storage option when provided', () => {
+      const fakeStorage: Storage = {
+        length: 0,
+        clear: jest.fn(),
+        key: jest.fn(),
+        getItem: jest.fn().mockReturnValue(JSON.stringify({ columnVisibility: { role: false } })),
+        removeItem: jest.fn(),
+        setItem: jest.fn(),
+      };
+      render(
+        <Table<Person>
+          id="t-custom-storage"
+          data={data}
+          columns={columns}
+          persist={{ key: 'persist-custom', storage: fakeStorage }}
+        />
+      );
+      expect(fakeStorage.getItem).toHaveBeenCalledWith('persist-custom');
+      expect(screen.queryByRole('columnheader', { name: 'Role' })).not.toBeInTheDocument();
+    });
   });
 
   describe('variant classes', () => {
@@ -550,6 +591,111 @@ describe('Table', () => {
       expect(cells[0]).toHaveTextContent('Charlie');
       expect(cells[1]).toHaveTextContent('Alice');
       expect(cells[2]).toHaveTextContent('Bob');
+    });
+  });
+
+  describe('sorting & column-order handlers', () => {
+    const sortableColumns: ColumnDef<Person>[] = [
+      {
+        id: 'name',
+        header: ({ column }) => (
+          <button type="button" onClick={column.getToggleSortingHandler()}>
+            Name
+          </button>
+        ),
+        accessorKey: 'name',
+      },
+      { id: 'role', header: 'Role', accessorKey: 'role' },
+    ];
+
+    it('reorders rows when a sortable header toggles sort (function-updater path)', () => {
+      const sortable: Person[] = [
+        { id: '1', name: 'Charlie', role: 'Engineer' },
+        { id: '2', name: 'Alice', role: 'Designer' },
+        { id: '3', name: 'Bob', role: 'Manager' },
+      ];
+
+      render(<Table<Person> id="t-sort" data={sortable} columns={sortableColumns} />);
+
+      // Initial order: Charlie, Alice, Bob.
+      let nameCells = screen.getAllByRole('cell').filter((c) => /Charlie|Alice|Bob/.test(c.textContent ?? ''));
+      expect(nameCells[0]).toHaveTextContent('Charlie');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Name' }));
+
+      // After ascending sort: Alice, Bob, Charlie.
+      nameCells = screen.getAllByRole('cell').filter((c) => /Charlie|Alice|Bob/.test(c.textContent ?? ''));
+      expect(nameCells[0]).toHaveTextContent('Alice');
+      expect(nameCells[1]).toHaveTextContent('Bob');
+      expect(nameCells[2]).toHaveTextContent('Charlie');
+    });
+
+    it('fires onColumnOrderChange when the consumer reorders columns via the table instance', () => {
+      const onStateChange = jest.fn();
+
+      const ReorderTrigger = () => {
+        const { table } = useTableContext<Person>();
+        useEffect(() => {
+          table.setColumnOrder(['role', 'name']);
+        }, [table]);
+        return null;
+      };
+
+      render(
+        <Table<Person> id="t-col-order" data={data} columns={columns} onStateChange={onStateChange}>
+          <ReorderTrigger />
+        </Table>
+      );
+
+      const orders = onStateChange.mock.calls
+        .map((args) => (args[0] as TableState).columnOrder)
+        .filter((order): order is string[] => Array.isArray(order));
+      expect(orders).toContainEqual(['role', 'name']);
+    });
+  });
+
+  describe('expand column wrapper', () => {
+    it('handles Enter / Space keydown on the toggle without crashing (stopPropagation path)', () => {
+      render(
+        <Table<Person>
+          id="t-exp-keyboard"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+        />
+      );
+
+      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      fireEvent.keyDown(toggle, { key: 'Enter', bubbles: true });
+      fireEvent.keyDown(toggle, { key: ' ', bubbles: true });
+      // Pressing a non-Enter/Space key bubbles through the span without
+      // hitting the stopPropagation branch — still must not throw.
+      fireEvent.keyDown(toggle, { key: 'Tab', bubbles: true });
+      expect(toggle).toBeInTheDocument();
+    });
+  });
+
+  describe('grouped headers', () => {
+    it('renders a standalone column only in the top header row when grouped columns exist', () => {
+      const groupedColumns: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Standalone Name', accessorKey: 'name' },
+        {
+          id: 'info-group',
+          header: 'Info',
+          columns: [{ id: 'role', header: 'Role', accessorKey: 'role' }],
+        },
+      ];
+
+      render(<Table<Person> id="t-grouped" data={data} columns={groupedColumns} />);
+
+      // Top header row contains both "Standalone Name" and "Info" group label.
+      // Second header row contains only "Role" — the standalone "Standalone Name"
+      // is NOT duplicated thanks to the rowIndex > 0 short-circuit.
+      const standaloneHeaders = screen.getAllByRole('columnheader', { name: 'Standalone Name' });
+      expect(standaloneHeaders).toHaveLength(1);
+
+      expect(screen.getByRole('columnheader', { name: 'Info' })).toBeInTheDocument();
+      expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
     });
   });
 });

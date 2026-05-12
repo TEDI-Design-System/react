@@ -82,7 +82,7 @@ export interface TableProps<TData> {
   columns: ColumnDef<TData>[];
   /**
    * Visual size of the table. Matches Figma: `medium` = 49px rows, `small` = 41px rows.
-   * @default 'medium'
+   * @default medium
    */
   size?: TableSize;
   /**

@@ -19,14 +19,6 @@ export interface TableColumnsMenuProps {
   className?: string;
 }
 
-/**
- * Dropdown-based menu that toggles individual column visibility through the
- * parent `Table`'s state. Uses the column's `columnDef.header` (string) or
- * `columnDef.id` as the checkbox label.
- *
- * Prevents hiding the last visible column — a table with zero columns has no
- * useful state to reach.
- */
 export const TableColumnsMenu = ({ triggerLabel, className }: TableColumnsMenuProps) => {
   const { table, id } = useTableContext();
   const { getLabel } = useLabels();

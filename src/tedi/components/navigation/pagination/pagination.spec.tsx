@@ -322,5 +322,20 @@ describe('Pagination component', () => {
       expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
     });
+
+    it('changes page when a new value is picked from the page-jump Select', async () => {
+      const onPageChange = jest.fn();
+      render(<Pagination pageCount={5} defaultPage={1} onPageChange={onPageChange} />);
+
+      const combobox = screen.getByRole('combobox', { name: /Pagination/i });
+      await act(async () => {
+        combobox.focus();
+        fireEvent.keyDown(combobox, { key: 'ArrowDown', code: 'ArrowDown' });
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      fireEvent.click(screen.getByText('4 / 5'));
+      expect(onPageChange).toHaveBeenCalledWith(4);
+    });
   });
 });
