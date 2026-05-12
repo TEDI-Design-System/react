@@ -755,6 +755,9 @@ describe('Table', () => {
       // is NOT duplicated thanks to the rowIndex > 0 short-circuit.
       const standaloneHeaders = screen.getAllByRole('columnheader', { name: 'Standalone Name' });
       expect(standaloneHeaders).toHaveLength(1);
+      // Standalone leaf spans both header rows via rowSpan rather than being
+      // duplicated, so it stays visually aligned with the group label beside it.
+      expect(standaloneHeaders[0]).toHaveAttribute('rowspan', '2');
 
       expect(screen.getByRole('columnheader', { name: 'Info' })).toBeInTheDocument();
       expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();

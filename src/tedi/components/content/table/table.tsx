@@ -293,6 +293,12 @@ const DEFAULT_FILTER_FNS = {
   'date-range-period': passthroughFilter,
 } as const;
 
+function hasChildColumns<TData>(
+  columnDef: ColumnDef<TData>
+): columnDef is ColumnDef<TData> & { columns?: ColumnDef<TData>[] } {
+  return Array.isArray((columnDef as { columns?: ColumnDef<TData>[] }).columns);
+}
+
 function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const {
     id,
@@ -654,13 +660,15 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   {headerGroup.headers.map((header) => {
                     const isGroup = header.subHeaders.length > 0;
                     const hasParentGroup = Boolean(header.column.parent);
-                    if (header.isPlaceholder) {
+                    const columnHasChildren = hasChildColumns(header.column.columnDef);
+                    const isStandaloneLeaf = !columnHasChildren && !hasParentGroup;
+                    if (header.isPlaceholder && !isStandaloneLeaf) {
                       return null;
                     }
-                    if (!isGroup && !hasParentGroup && rowIndex > 0) {
+                    if (!header.isPlaceholder && isStandaloneLeaf && rowIndex > 0) {
                       return null;
                     }
-                    const rowSpanCount = !isGroup && !hasParentGroup ? headerGroups.length - rowIndex : 1;
+                    const rowSpanCount = isStandaloneLeaf ? headerGroups.length - rowIndex : 1;
                     const sortDirection = header.column.getIsSorted();
                     const ariaSort: 'ascending' | 'descending' | 'none' | undefined = header.column.getCanSort()
                       ? sortDirection === 'asc'
