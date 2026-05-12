@@ -173,13 +173,17 @@ describe('Table', () => {
       );
 
       fireEvent.click(screen.getByRole('button', { name: /Columns/i }));
-      const roleCheckbox = screen.getByRole('checkbox', { name: 'Role' });
+      const roleCheckbox = screen.getByRole('checkbox', { name: 'Role' }) as HTMLInputElement;
+
+      expect(roleCheckbox.checked).toBe(true);
 
       fireEvent.click(roleCheckbox);
       expect(screen.queryByRole('columnheader', { name: 'Role' })).not.toBeInTheDocument();
+      expect(roleCheckbox.checked).toBe(false);
 
       fireEvent.click(roleCheckbox);
       expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+      expect(roleCheckbox.checked).toBe(true);
     });
 
     it('prevents hiding the last visible column', () => {

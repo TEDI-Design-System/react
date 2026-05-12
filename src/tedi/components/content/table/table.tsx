@@ -274,6 +274,12 @@ export interface TableContextValue<TData = unknown> {
   table: ReactTable<TData>;
   size: TableSize;
   id?: string;
+  /**
+   * Snapshot of the current Table state. Included so the context value
+   * identity changes whenever state updates — context consumers re-render
+   * even when they're passed as referentially-stable children.
+   */
+  state: Partial<TableState>;
 }
 
 const SELECT_COLUMN_ID = '__select__';
@@ -586,8 +592,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   });
 
   const contextValue = useMemo<TableContextValue<TData>>(
-    () => ({ table, size, id: resolvedId }),
-    [table, size, resolvedId]
+    () => ({ table, size, id: resolvedId, state: tableState }),
+    [table, size, resolvedId, tableState]
   );
 
   const handlePaginationPageChange = useCallback((nextPage: number) => table.setPageIndex(nextPage - 1), [table]);
