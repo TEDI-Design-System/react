@@ -92,14 +92,6 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
     document.getElementById(id)?.click();
   };
 
-  // Radio groups follow the WAI-ARIA radio-group pattern: Tab enters/exits
-  // the group, Arrow keys move between cards, Space selects the focused one.
-  // Native <input type="radio" name="..."> already implements all of that via
-  // the browser's roving-tabstop — but only if it's the tab-reachable element.
-  // So for radio, the outer wrapper steps out of the tab order and stops
-  // claiming `role="radio"` (which would duplicate the inner input's semantics).
-  // Checkboxes keep the existing independent-tabstop behaviour since they're
-  // not a roving-tabstop group natively.
   const isRadio = type === 'radio';
   return (
     <Col {...colProps} className={ColumnBEM}>
