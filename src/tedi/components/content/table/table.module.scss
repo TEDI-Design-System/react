@@ -16,7 +16,7 @@
 .tedi-table__scroll {
   overflow-x: auto;
   background: var(--table-default);
-  border: 1px solid var(--table-border);
+  border: var(--tedi-borders-01) solid var(--table-border);
   border-radius: var(--table-radius);
 }
 
@@ -54,7 +54,7 @@
 }
 
 .tedi-table__row {
-  border-bottom: 1px solid var(--table-border);
+  border-bottom: var(--tedi-borders-01) solid var(--table-border);
 
   &:last-child {
     border-bottom: 0;
@@ -90,7 +90,7 @@
 .tedi-table__foot {
   font-weight: var(--heading-weight);
   background: var(--table-default);
-  border-top: 1px solid var(--table-border-th);
+  border-top: var(--tedi-borders-01) solid var(--table-border-th);
 }
 
 .tedi-table__cell--footer {
@@ -140,7 +140,7 @@
 .tedi-table--vertical-borders {
   .tedi-table__header-cell,
   .tedi-table__cell {
-    border-right: 1px solid var(--table-border);
+    border-right: var(--tedi-borders-01) solid var(--table-border);
   }
 
   thead tr:first-child .tedi-table__header-cell:last-child,
@@ -168,7 +168,7 @@
 }
 
 .tedi-table__pagination {
-  border: 1px solid var(--table-border);
+  border: var(--tedi-borders-01) solid var(--table-border);
   border-top: 0;
   border-bottom-right-radius: var(--table-radius);
   border-bottom-left-radius: var(--table-radius);

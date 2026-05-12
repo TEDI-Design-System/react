@@ -467,12 +467,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           <Checkbox
             id={`${resolvedId}-select-all`}
             name={`${resolvedId}-select-all`}
-            label={getLabelRef.current('table.select-all', table.getIsAllRowsSelected())}
+            label={getLabelRef.current('table.select-all', table.getIsAllPageRowsSelected())}
             hideLabel
             value="all"
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
-            onChange={(_value, checked) => table.toggleAllRowsSelected(checked)}
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
+            onChange={(_value, checked) => table.toggleAllPageRowsSelected(checked)}
           />
         ),
         cell: ({ row }) => (
@@ -654,10 +654,13 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   {headerGroup.headers.map((header) => {
                     const isGroup = header.subHeaders.length > 0;
                     const hasParentGroup = Boolean(header.column.parent);
-                    if (!header.isPlaceholder && !isGroup && !hasParentGroup && rowIndex > 0) {
+                    if (header.isPlaceholder) {
                       return null;
                     }
-                    const rowSpanCount = header.isPlaceholder ? headerGroups.length - rowIndex : 1;
+                    if (!isGroup && !hasParentGroup && rowIndex > 0) {
+                      return null;
+                    }
+                    const rowSpanCount = !isGroup && !hasParentGroup ? headerGroups.length - rowIndex : 1;
                     const sortDirection = header.column.getIsSorted();
                     const ariaSort: 'ascending' | 'descending' | 'none' | undefined = header.column.getCanSort()
                       ? sortDirection === 'asc'

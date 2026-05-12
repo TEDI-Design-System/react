@@ -1375,37 +1375,14 @@ export const WithEmptyState: Story = {
 };
 
 /**
- * Two long-text patterns from the Figma "Long texts" frame. Top table puts
- * the "Show more" link on its own line under the truncated paragraph (with a
- * chevron). Bottom table inlines the link at the end of the truncated text
- * (underlined, no icon). Tip alert in the middle explains the trade-off.
+ * Long-text columns use `<Truncate>` so the description cell collapses to a
+ * single line with a "Show more" toggle. By default the toggle renders inline
+ * at the end of the truncated text; pass `button={{ style: { display: 'block' } }}`
+ * to drop it onto its own line below the paragraph instead.
  */
 export const LongTexts: Story = {
   render: function LongTexts() {
-    // Block variant: the "Show more" Button sits on its own line below the
-    // truncated paragraph (matches the top table in the Figma frame). Forced
-    // via `style: { display: 'block' }` on the underlying Button.
-    const blockColumns = useMemo<ColumnDef<Doctor>[]>(
-      () => [
-        baseDoctorWithDescriptionColumns()[0],
-        {
-          id: 'description',
-          header: 'Kirjeldus',
-          cell: () => (
-            <Truncate maxLength={LONG_TEXT_MAX_LENGTH} button={{ style: { display: 'block', padding: 0 } }}>
-              {LONG_DESCRIPTION}
-            </Truncate>
-          ),
-        },
-        baseDoctorWithDescriptionColumns()[1],
-        baseDoctorWithDescriptionColumns()[2],
-      ],
-      []
-    );
-
-    // Inline variant: default Truncate renders the toggle Button inline at the
-    // end of the truncated text (matches the bottom table in the Figma frame).
-    const inlineColumns = useMemo<ColumnDef<Doctor>[]>(
+    const columns = useMemo<ColumnDef<Doctor>[]>(
       () => [
         baseDoctorWithDescriptionColumns()[0],
         {
@@ -1420,33 +1397,20 @@ export const LongTexts: Story = {
     );
 
     return (
-      <VerticalSpacing size={1}>
-        <Table<Doctor>
-          id="tedi-table-long-texts-block"
-          data={doctors}
-          columns={blockColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
-        <Table<Doctor>
-          id="tedi-table-long-texts-inline"
-          data={doctors}
-          columns={inlineColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
-      </VerticalSpacing>
+      <Table<Doctor> id="tedi-table-long-texts" data={doctors} columns={columns} pagination={SHOWCASE_PAGINATION_3} />
     );
   },
 };
 
 /**
- * Two row-action patterns from the Figma "Actions" frame. Top table puts
- * separate edit + delete icon buttons on each row. Bottom table collapses
- * the same affordances into a single kebab (`more_vert`) button — typical
- * pattern when the row is dense or has many possible actions.
+ * Row-action pattern from the Figma "Actions" frame: each row gets dedicated
+ * edit + delete icon buttons in a right-aligned cell. For dense rows or many
+ * possible actions, collapse them under a single `more_vert` kebab button
+ * instead — same column structure, just one icon-only Button.
  */
 export const Actions: Story = {
   render: function Actions() {
-    const editDeleteColumns = useMemo<ColumnDef<Doctor>[]>(
+    const columns = useMemo<ColumnDef<Doctor>[]>(
       () => [
         ...baseDoctorActionsColumns(),
         {
@@ -1467,39 +1431,8 @@ export const Actions: Story = {
       []
     );
 
-    const kebabColumns = useMemo<ColumnDef<Doctor>[]>(
-      () => [
-        ...baseDoctorActionsColumns(),
-        {
-          id: 'actions',
-          header: '',
-          cell: () => (
-            <span style={rowActionsCellStyle}>
-              <Button visualType="secondary" icon="more_vert" aria-label="More actions" onClick={() => undefined}>
-                <></>
-              </Button>
-            </span>
-          ),
-        },
-      ],
-      []
-    );
-
     return (
-      <VerticalSpacing size={1}>
-        <Table<Doctor>
-          id="tedi-table-actions-edit-delete"
-          data={doctors}
-          columns={editDeleteColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
-        <Table<Doctor>
-          id="tedi-table-actions-kebab"
-          data={doctors}
-          columns={kebabColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
-      </VerticalSpacing>
+      <Table<Doctor> id="tedi-table-actions" data={doctors} columns={columns} pagination={SHOWCASE_PAGINATION_3} />
     );
   },
 };
