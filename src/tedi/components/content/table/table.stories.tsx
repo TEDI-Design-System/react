@@ -1,5 +1,23 @@
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, ColumnOrderState } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
@@ -1559,6 +1577,192 @@ export const WithColumnsMenu: Story = {
     </Table>
   ),
 };
+
+// ---------------------------------------------------------------------------
+// Drag-and-drop reordering — uses `@dnd-kit` for the drag mechanics.
+//
+// Pattern (works for both rows and columns):
+//   1. Wrap the Table in `<DndContext>` + `<SortableContext items={ids} />`.
+//   2. Render a tiny "drag handle" element that calls `useSortable({ id })`
+//      and attaches its `attributes` / `listeners` to a grip button.
+//   3. In `onDragEnd`, compute the new order with `arrayMove` and either
+//      reorder the data array (rows) or set `state.columnOrder` (columns).
+// ---------------------------------------------------------------------------
+
+/**
+ * Drag handle cell shared by both stories. The `id` is whatever sortable
+ * identifier the parent context expects (row id or column id). Listeners
+ * sit on a real `<button>` for accessible keyboard / SR drag support.
+ */
+const DragHandle = ({ id, label }: { id: string; label: string }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  return (
+    <button
+      ref={setNodeRef}
+      type="button"
+      aria-label={label}
+      style={{
+        background: 'transparent',
+        border: 0,
+        padding: 4,
+        cursor: 'grab',
+        opacity: isDragging ? 0.4 : 1,
+        transform: CSS.Transform.toString(transform),
+        transition,
+        touchAction: 'none',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      <Icon name="drag_indicator" size={18} color="secondary" />
+    </button>
+  );
+};
+
+const DraggableRowsTemplate = () => {
+  // Story owns its own reorderable copy of `people` so drag-end can mutate it.
+  const [rows, setRows] = useState<Person[]>(() => people.slice(0, 8));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const columns = useMemo<ColumnDef<Person>[]>(
+    () => [
+      {
+        id: 'drag',
+        header: '',
+        size: 40,
+        enableSorting: false,
+        enableHiding: false,
+        cell: ({ row }) => <DragHandle id={row.original.id} label={`Drag row ${row.original.name}`} />,
+      },
+      { id: 'name', header: 'Name', accessorKey: 'name' },
+      { id: 'role', header: 'Role', accessorKey: 'role' },
+      { id: 'location', header: 'Location', accessorKey: 'location' },
+    ],
+    []
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setRows((current) => {
+      const oldIndex = current.findIndex((r) => r.id === active.id);
+      const newIndex = current.findIndex((r) => r.id === over.id);
+      if (oldIndex < 0 || newIndex < 0) return current;
+      return arrayMove(current, oldIndex, newIndex);
+    });
+  };
+
+  return (
+    <VerticalSpacing size={1}>
+      <Alert type="info" role="status" title="Row reordering" icon="lightbulb">
+        <Text>
+          Grab the <StatusBadge>≡</StatusBadge> handle on any row to reorder. Keyboard users: focus a handle and press
+          Space to lift, arrows to move, Space to drop. The parent component owns the data order and updates it on{' '}
+          <StatusBadge>onDragEnd</StatusBadge>.
+        </Text>
+      </Alert>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+          <Table<Person> id="tedi-table-row-drag" data={rows} columns={columns} />
+        </SortableContext>
+      </DndContext>
+    </VerticalSpacing>
+  );
+};
+
+/**
+ * Drag rows by the grip handle to reorder them. The story owns the data array
+ * and applies `arrayMove` on drag end — Table itself doesn't need to know.
+ *
+ * For server-backed data, persist the new order ids in the `rowOrder` state
+ * slice and re-derive `data` from the server response on next fetch.
+ */
+export const DraggableRows: Story = { render: () => <DraggableRowsTemplate /> };
+
+const DraggableColumnsTemplate = () => {
+  const baseColumns = useMemo<ColumnDef<Person>[]>(
+    () => [
+      { id: 'name', header: 'Name', accessorKey: 'name' },
+      { id: 'email', header: 'Email', accessorKey: 'email' },
+      { id: 'role', header: 'Role', accessorKey: 'role' },
+      { id: 'location', header: 'Location', accessorKey: 'location' },
+    ],
+    []
+  );
+
+  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(() =>
+    baseColumns.map((column) => column.id as string)
+  );
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  // Wrap each header in a drag handle so the column can be picked up from the
+  // header cell itself. We re-derive the columns array whenever `columnOrder`
+  // changes so the handle's id matches the column we're dragging.
+  const columns = useMemo<ColumnDef<Person>[]>(
+    () =>
+      baseColumns.map((column) => ({
+        ...column,
+        header: ({ column: ctxColumn }) => (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <DragHandle id={ctxColumn.id} label={`Drag column ${String(column.header)}`} />
+            {column.header as string}
+          </span>
+        ),
+      })),
+    [baseColumns]
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setColumnOrder((current) => {
+      const oldIndex = current.indexOf(active.id as string);
+      const newIndex = current.indexOf(over.id as string);
+      if (oldIndex < 0 || newIndex < 0) return current;
+      return arrayMove(current, oldIndex, newIndex);
+    });
+  };
+
+  return (
+    <VerticalSpacing size={1}>
+      <Alert type="info" role="status" title="Column reordering" icon="lightbulb">
+        <Text>
+          Drag a column header by its <StatusBadge>≡</StatusBadge> handle to reorder. Column order lives on{' '}
+          <StatusBadge>state.columnOrder</StatusBadge>; Table forwards it to TanStack so the cells re-render in the new
+          order automatically.
+        </Text>
+      </Alert>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
+          <Table<Person>
+            id="tedi-table-column-drag"
+            data={people.slice(0, 6)}
+            columns={columns}
+            state={{ columnOrder }}
+            onStateChange={(next) => {
+              if (next.columnOrder) setColumnOrder(next.columnOrder);
+            }}
+          />
+        </SortableContext>
+      </DndContext>
+    </VerticalSpacing>
+  );
+};
+
+/**
+ * Drag a column header's grip to reorder columns. The story owns
+ * `state.columnOrder`; Table forwards it to TanStack's `columnOrder` state so
+ * cells reshuffle without re-creating the column definitions.
+ */
+export const DraggableColumns: Story = { render: () => <DraggableColumnsTemplate /> };
 
 /**
  * Server-side pagination + sorting demo. `manualPagination` / `manualSorting`

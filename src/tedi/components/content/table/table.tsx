@@ -1,6 +1,7 @@
 import {
   type ColumnDef,
   type ColumnFiltersState,
+  type ColumnOrderState,
   type ExpandedState,
   type FilterFn,
   flexRender,
@@ -164,6 +165,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     [setTableState]
   );
 
+  const handleColumnOrderChange: OnChangeFn<ColumnOrderState> = useCallback(
+    (updater) => {
+      setTableState((prev) => {
+        const previous = prev.columnOrder ?? [];
+        const next = typeof updater === 'function' ? updater(previous) : updater;
+        return { columnOrder: next };
+      });
+    },
+    [setTableState]
+  );
+
   const handleSortingChange: OnChangeFn<SortingState> = useCallback(
     (updater) => {
       setTableState((prev) => {
@@ -283,6 +295,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const fallbackRowSelection = useMemo<RowSelectionState>(() => ({}), []);
   const fallbackExpanded = useMemo<ExpandedState>(() => ({}), []);
   const fallbackColumnFilters = useMemo<ColumnFiltersState>(() => [], []);
+  const fallbackColumnOrder = useMemo<ColumnOrderState>(() => [], []);
   const fallbackSorting = useMemo<SortingState>(() => [], []);
   const fallbackPagination = useMemo<PaginationState>(
     () => ({ pageIndex: 0, pageSize: paginationOptions?.pageSize ?? 10 }),
@@ -294,6 +307,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     columns: augmentedColumns,
     state: {
       columnVisibility: tableState.columnVisibility,
+      columnOrder: tableState.columnOrder ?? fallbackColumnOrder,
       rowSelection: tableState.rowSelection ?? fallbackRowSelection,
       expanded: tableState.expanded ?? fallbackExpanded,
       columnFilters: tableState.columnFilters ?? fallbackColumnFilters,
@@ -311,6 +325,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     getRowCanExpand: renderSubComponent ? getRowCanExpand ?? (() => true) : getRowCanExpand,
     getSubRows,
     onColumnVisibilityChange: handleVisibilityChange,
+    onColumnOrderChange: handleColumnOrderChange,
     onRowSelectionChange: handleRowSelectionChange,
     onExpandedChange: handleExpandedChange,
     onColumnFiltersChange: handleColumnFiltersChange,
