@@ -1872,8 +1872,6 @@ export const ServerSide: Story = {
               margin: 0,
               padding: 'var(--tedi-dimensions-12)',
               background: 'var(--general-surface-secondary)',
-              borderRadius: 'var(--tedi-borders-radius-default, 4px)',
-              fontFamily: 'var(--family-mono, monospace)',
               fontSize: 'var(--body-small-regular-size)',
               whiteSpace: 'pre-wrap',
             }}

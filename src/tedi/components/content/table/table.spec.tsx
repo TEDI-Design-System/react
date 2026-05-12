@@ -319,7 +319,15 @@ describe('Table', () => {
         ).not.toThrow();
         expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
       } finally {
-        if (original) Object.defineProperty(window, 'localStorage', original);
+        if (original) {
+          Object.defineProperty(window, 'localStorage', original);
+        } else {
+          // jsdom may define localStorage on the prototype rather than as an
+          // own property — in that case `getOwnPropertyDescriptor` returns
+          // `undefined` and we must delete our shadowing throwing getter so
+          // the prototype's working implementation is exposed again.
+          delete (window as { localStorage?: unknown }).localStorage;
+        }
       }
     });
 
