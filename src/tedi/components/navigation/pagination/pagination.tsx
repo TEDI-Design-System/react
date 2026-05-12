@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { forwardRef, useCallback, useId, useMemo, useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -186,8 +187,11 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   const rootClassName = cn(styles['tedi-pagination'], className);
 
+  const breakpoint = useBreakpoint();
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+
   const showResults = totalItems !== undefined;
-  const showPageSizeSelect = Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
+  const showPageSizeSelect = !isMobile && Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
 
   const previousItem = items[0];
   const nextItem = items[items.length - 1];
@@ -253,58 +257,62 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
           <nav aria-label={mergedLabels.ariaLabel} className={styles['tedi-pagination__nav']}>
             {renderArrow(previousItem)}
 
-            <ul className={cn(styles['tedi-pagination__list'], styles['tedi-pagination__list--desktop'])}>
-              {pageItems.map((item, index) => {
-                if (item.type === 'ellipsis') {
+            {!isMobile && (
+              <ul className={styles['tedi-pagination__list']}>
+                {pageItems.map((item, index) => {
+                  if (item.type === 'ellipsis') {
+                    return (
+                      <li
+                        key={`ellipsis-${index}`}
+                        className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
+                        aria-hidden="true"
+                      >
+                        …
+                      </li>
+                    );
+                  }
+
+                  const pageNumber = item.page as number;
                   return (
-                    <li
-                      key={`ellipsis-${index}`}
-                      className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
-                      aria-hidden="true"
-                    >
-                      …
+                    <li key={pageNumber} className={styles['tedi-pagination__item']}>
+                      <Button
+                        type="button"
+                        className={cn(styles['tedi-pagination__button'], {
+                          [styles['tedi-pagination__button--selected']]: item.selected,
+                        })}
+                        aria-label={
+                          item.selected
+                            ? mergedLabels.currentPageAriaLabel(pageNumber)
+                            : mergedLabels.pageAriaLabel(pageNumber)
+                        }
+                        aria-current={item.selected ? 'page' : undefined}
+                        onClick={() => handlePageChange(pageNumber)}
+                        noStyle
+                      >
+                        {pageNumber}
+                      </Button>
                     </li>
                   );
-                }
+                })}
+              </ul>
+            )}
 
-                const pageNumber = item.page as number;
-                return (
-                  <li key={pageNumber} className={styles['tedi-pagination__item']}>
-                    <Button
-                      type="button"
-                      className={cn(styles['tedi-pagination__button'], {
-                        [styles['tedi-pagination__button--selected']]: item.selected,
-                      })}
-                      aria-label={
-                        item.selected
-                          ? mergedLabels.currentPageAriaLabel(pageNumber)
-                          : mergedLabels.pageAriaLabel(pageNumber)
-                      }
-                      aria-current={item.selected ? 'page' : undefined}
-                      onClick={() => handlePageChange(pageNumber)}
-                      noStyle
-                    >
-                      {pageNumber}
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-
-            <div className={styles['tedi-pagination__page-jump']}>
-              <Select
-                id={`tedi-pagination-jump-${selectId}`}
-                className={styles['tedi-pagination__page-jump-select']}
-                label={mergedLabels.ariaLabel}
-                hideLabel
-                size="small"
-                options={pageJumpOptions}
-                value={currentPageJumpOption}
-                onChange={handlePageJumpChange}
-                isSearchable={false}
-                isClearable={false}
-              />
-            </div>
+            {isMobile && (
+              <div className={styles['tedi-pagination__page-jump']}>
+                <Select
+                  id={`tedi-pagination-jump-${selectId}`}
+                  className={styles['tedi-pagination__page-jump-select']}
+                  label={mergedLabels.ariaLabel}
+                  hideLabel
+                  size="small"
+                  options={pageJumpOptions}
+                  value={currentPageJumpOption}
+                  onChange={handlePageJumpChange}
+                  isSearchable={false}
+                  isClearable={false}
+                />
+              </div>
+            )}
 
             {renderArrow(nextItem)}
           </nav>

@@ -1554,7 +1554,7 @@ export const WithFooter: Story = {
         accessorKey: 'salary',
         cell: (info) => (info.getValue() as number).toLocaleString('et-EE'),
         footer: (info) => {
-          const total = info.table.getRowModel().rows.reduce((sum, row) => sum + row.original.salary, 0);
+          const total = info.table.getFilteredRowModel().rows.reduce((sum, row) => sum + row.original.salary, 0);
           return `Total €${total.toLocaleString('et-EE')}`;
         },
       },

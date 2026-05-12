@@ -38,10 +38,6 @@
   align-items: center;
   justify-self: end;
   min-width: 0;
-
-  @include breakpoints.media-breakpoint-down(md) {
-    display: none;
-  }
 }
 
 .tedi-pagination__results {
@@ -72,20 +68,10 @@
   list-style: none;
 }
 
-.tedi-pagination__list--desktop {
-  @include breakpoints.media-breakpoint-down(md) {
-    display: none;
-  }
-}
-
 .tedi-pagination__page-jump {
-  display: none;
-
-  @include breakpoints.media-breakpoint-down(md) {
-    display: inline-flex;
-    grid-column: 2;
-    justify-self: center;
-  }
+  display: inline-flex;
+  grid-column: 2;
+  justify-self: center;
 }
 
 .tedi-pagination__page-jump-select {

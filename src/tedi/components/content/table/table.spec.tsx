@@ -12,6 +12,17 @@ jest.mock('../../../providers/printing-provider/printing-provider', () => ({
   usePrint: jest.fn().mockReturnValue(false),
 }));
 
+// `Pagination` (rendered inside Table) renders different chrome below `md`
+// (page-jump Select) than at `md`+ (numbered list). The hook is mocked to
+// 'lg' so the existing assertions on the numbered list keep working;
+// breakpoint-specific behaviour is covered by Pagination's own tests.
+jest.mock('../../../helpers', () => ({
+  useBreakpoint: () => 'lg',
+  isBreakpointBelow: () => false,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useBreakpointProps: () => ({ getCurrentBreakpointProps: (props: any) => ({ ...props }) }),
+}));
+
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string, ...args: unknown[]) => {

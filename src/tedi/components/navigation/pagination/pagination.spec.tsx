@@ -6,6 +6,23 @@ import { usePagination } from './use-pagination';
 
 import '@testing-library/jest-dom';
 
+let mockBreakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' = 'lg';
+const setMockBreakpoint = (next: typeof mockBreakpoint) => {
+  mockBreakpoint = next;
+};
+
+jest.mock('../../../helpers', () => {
+  const order = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
+  return {
+    useBreakpoint: () => mockBreakpoint,
+    isBreakpointBelow: (current: string, target: string) => order.indexOf(current) < order.indexOf(target),
+    useBreakpointProps: () => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      getCurrentBreakpointProps: (props: any) => ({ ...props }),
+    }),
+  };
+});
+
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string, ...args: unknown[]) => {
@@ -32,6 +49,10 @@ jest.mock('../../../providers/label-provider', () => ({
     },
   }),
 }));
+
+beforeEach(() => {
+  setMockBreakpoint('lg');
+});
 
 describe('usePagination', () => {
   it('returns an empty list when pageCount is 0', () => {
@@ -269,5 +290,37 @@ describe('Pagination component', () => {
     render(<Pagination ref={ref} pageCount={3} defaultPage={1} />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
     expect(ref.current).toHaveAttribute('data-name', 'tedi-pagination');
+  });
+
+  describe('mobile (< md) layout', () => {
+    beforeEach(() => {
+      setMockBreakpoint('xs');
+    });
+
+    it('renders the page-jump Select instead of the numbered list', () => {
+      const { container } = render(<Pagination pageCount={10} defaultPage={3} />);
+
+      // Numbered page buttons should NOT render on mobile.
+      expect(screen.queryByRole('button', { name: /Go to page 5/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Current page, page 3/i })).not.toBeInTheDocument();
+
+      // The page-jump Select is in the DOM, identified by its stable id prefix.
+      expect(container.querySelector('[id^="tedi-pagination-jump-"]')).toBeInTheDocument();
+    });
+
+    it('hides the page-size selector even when pageSizeOptions are provided', () => {
+      const { container } = render(
+        <Pagination pageCount={5} defaultPage={1} pageSize={10} pageSizeOptions={[10, 25, 50]} />
+      );
+
+      expect(container.querySelector('[id^="tedi-pagination-page-size-"]')).not.toBeInTheDocument();
+    });
+
+    it('still renders Previous / Next nav arrows when applicable', () => {
+      render(<Pagination pageCount={5} defaultPage={3} />);
+
+      expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+    });
   });
 });
