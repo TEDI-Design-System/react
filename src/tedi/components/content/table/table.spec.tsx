@@ -2,8 +2,8 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 
+import type { TableState } from './table';
 import { Table } from './table';
-import type { TableState } from './table.types';
 import { useTableContext } from './table-context';
 
 import '@testing-library/jest-dom';
@@ -83,10 +83,63 @@ describe('Table', () => {
     expect(screen.getByRole('cell', { name: 'Designer' })).toBeInTheDocument();
   });
 
+  it('scopes the th accessible name to the column label even when the header renders extra controls', () => {
+    const customColumns: ColumnDef<Person>[] = [
+      {
+        id: 'name',
+        accessorKey: 'name',
+        meta: { label: 'Name' },
+        header: () => (
+          <span>
+            Name
+            <button type="button" aria-label="Sort by Name">
+              ▲
+            </button>
+          </span>
+        ),
+      },
+      { id: 'role', header: 'Role', accessorKey: 'role' },
+    ];
+
+    render(<Table<Person> id="t-aname" data={data} columns={customColumns} />);
+
+    // The th's accessible name must be just "Name" — not "Name Sort by Name" —
+    // so JAWS doesn't read the sort button label when announcing body cells.
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' });
+    expect(nameHeader).toHaveAttribute('aria-label', 'Name');
+  });
+
   it('renders the placeholder when data is empty', () => {
     render(<Table<Person> id="t-empty" data={[]} columns={columns} placeholder="Nothing here" />);
 
     expect(screen.getByText('Nothing here')).toBeInTheDocument();
+  });
+
+  it('wraps the placeholder in a live region when placeholderRole is set', () => {
+    const { rerender } = render(
+      <Table<Person>
+        id="t-empty-status"
+        data={[]}
+        columns={columns}
+        placeholder="No results"
+        placeholderRole="status"
+      />
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('No results');
+
+    rerender(
+      <Table<Person> id="t-empty-status" data={[]} columns={columns} placeholder="No results" placeholderRole="alert" />
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('No results');
+  });
+
+  it('omits the live-region wrapper when placeholderRole is not set', () => {
+    render(<Table<Person> id="t-empty-plain" data={[]} columns={columns} placeholder="Nothing here" />);
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('applies the small size class when size="small"', () => {
@@ -359,6 +412,7 @@ describe('Table', () => {
       ['verticalBorders', '--vertical-borders'],
       ['borderless', '--borderless'],
       ['stickyFirstColumn', '--sticky-first-column'],
+      ['stickyHeader', '--sticky-header'],
     ] as const;
 
     it.each(flags)('applies the %s class when the matching prop is true', (prop, fragment) => {

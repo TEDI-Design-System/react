@@ -33,8 +33,8 @@ import { Alert } from '../../notifications/alert/alert';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Truncate } from '../truncate/truncate';
+import type { TableProps } from './table';
 import { Table } from './table';
-import type { TableProps } from './table.types';
 
 /**
  * <a href="https://tanstack.com/table" target="_BLANK">@tanstack/react-table ↗</a><br/>
@@ -1312,6 +1312,42 @@ export const StickyFirstColumn: Story = {
         columns={personColumns}
         stickyFirstColumn
         pagination={DEFAULT_PAGINATION}
+      />
+    </div>
+  ),
+};
+
+/**
+ * Header row stays pinned during vertical scroll via `stickyHeader` + `maxHeight`. The Table's
+ * internal `.tedi-table__scroll` div is the sticky anchor — wrapping the Table in an external
+ * scrollable container will NOT work, because `position: sticky` always resolves against the
+ * nearest scrolling ancestor (always the internal div). Use the `maxHeight` prop so Table
+ * applies the height constraint to that internal div instead.
+ *
+ * Combines with `stickyFirstColumn`: when both are on, the top-left header cell stacks above
+ * both axes automatically.
+ */
+export const StickyHeader: Story = {
+  render: () => (
+    <Table<Person> id="tedi-table-sticky-header" data={people} columns={personColumns} stickyHeader maxHeight={240} />
+  ),
+};
+
+/**
+ * Both axes pinned: first column locked horizontally, header row locked vertically. The
+ * intersection cell (top-left header) stacks above both sticky planes so it stays visible
+ * regardless of scroll direction.
+ */
+export const StickyHeaderAndFirstColumn: Story = {
+  render: () => (
+    <div style={{ maxWidth: 520 }}>
+      <Table<Person>
+        id="tedi-table-sticky-both"
+        data={people}
+        columns={personColumns}
+        stickyHeader
+        stickyFirstColumn
+        maxHeight={280}
       />
     </div>
   ),

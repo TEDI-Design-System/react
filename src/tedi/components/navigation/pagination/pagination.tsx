@@ -53,6 +53,13 @@ export interface PaginationLabels {
    * @default 'Show per page'
    */
   pageSize: string;
+  /**
+   * Builds the message announced to screen readers (via a visually-hidden
+   * `aria-live="polite"` region) whenever the current page changes. Lets SR
+   * users know that the page transition happened without sighted feedback.
+   * @default (page, pageCount) => `Page ${page} of ${pageCount}`
+   */
+  pageStatus: (page: number, pageCount: number) => string;
 }
 export interface PaginationProps {
   /**
@@ -138,6 +145,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       currentPageAriaLabel: (pageNumber) => getLabel('pagination.page', pageNumber, true),
       results: (count) => getLabel('pagination.results', count),
       pageSize: getLabel('pagination.page-size'),
+      pageStatus: (pageNumber, total) => getLabel('pagination.page-status', pageNumber, total),
       ...labels,
     }),
     [getLabel, labels]
@@ -244,6 +252,10 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   return (
     <div ref={ref} className={rootClassName} data-name="tedi-pagination">
+      <span className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+        {pageCount > 1 ? mergedLabels.pageStatus(currentPage, pageCount) : ''}
+      </span>
+
       <div className={styles['tedi-pagination__slot-start']}>
         {showResults && (
           <Text className={styles['tedi-pagination__results']} color="secondary" modifiers="small">

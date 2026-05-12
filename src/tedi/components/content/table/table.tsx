@@ -2,6 +2,7 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
   type ColumnOrderState,
+  type ColumnSizingState,
   type ExpandedState,
   type FilterFn,
   flexRender,
@@ -15,11 +16,12 @@ import {
   type Row,
   type RowSelectionState,
   type SortingState,
+  type Table as ReactTable,
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
 import cn from 'classnames';
-import { Fragment, type KeyboardEvent, useCallback, useId, useMemo, useRef } from 'react';
+import { Fragment, type KeyboardEvent, type ReactNode, useCallback, useId, useMemo, useRef } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Collapse } from '../../buttons/collapse/collapse';
@@ -27,11 +29,252 @@ import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { Pagination } from '../../navigation/pagination';
 import styles from './table.module.scss';
-import type { TableContextValue, TableProps } from './table.types';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
 import { TableHeaderButton } from './table-header-button/table-header-button';
+import { TableToolbar } from './table-toolbar/table-toolbar';
 import { useTablePersistence } from './use-table-persistence';
+
+/**
+ * Persistable state slices owned by Table. Each slice can be controlled via
+ * `state`/`onStateChange`, defaulted via `defaultState`, or persisted via
+ * `persist`.
+ */
+export interface TableState {
+  columnVisibility?: VisibilityState;
+  columnOrder?: ColumnOrderState;
+  rowOrder?: string[];
+  columnSizing?: ColumnSizingState;
+  rowSelection?: RowSelectionState;
+  expanded?: ExpandedState;
+  columnFilters?: ColumnFiltersState;
+  sorting?: SortingState;
+  pagination?: PaginationState;
+}
+
+export type TableSize = 'medium' | 'small';
+
+export interface TablePersistOptions {
+  /**
+   * Storage key used to read/write persisted state. Must be stable per table.
+   */
+  key: string;
+  /**
+   * Storage backend. Defaults to `window.localStorage` when available.
+   */
+  storage?: Storage;
+  /**
+   * Subset of state slices to persist. Defaults to user-preference slices
+   * only: `columnVisibility`, `columnOrder`, `rowOrder`, `columnSizing`.
+   * Task-scoped slices (`rowSelection`, `expanded`, `columnFilters`, `sorting`,
+   * `pagination`) are deliberately excluded by default — pass them explicitly
+   * via `include` if you want them to survive across sessions.
+   */
+  include?: (keyof TableState)[];
+}
+
+export interface TablePaginationOptions {
+  /**
+   * Rows per page.
+   * @default 10
+   */
+  pageSize?: number;
+  /**
+   * Options rendered in the built-in page-size selector. Pass `false` to hide
+   * the selector entirely.
+   * @default [10, 25, 50]
+   */
+  pageSizeOptions?: number[] | false;
+}
+
+export interface TableProps<TData> {
+  /**
+   * Unique identifier for the table. Used for accessibility and as the default
+   * persistence key namespace.
+   */
+  id?: string;
+  /**
+   * Row data. Render order mirrors array order unless `rowOrder` is applied.
+   */
+  data: TData[];
+  /**
+   * Column definitions. Must include a stable `id` on every column when
+   * column visibility / reorder / persistence are used.
+   */
+  columns: ColumnDef<TData>[];
+  /**
+   * Visual size of the table. Matches Figma: `medium` = 49px rows, `small` = 41px rows.
+   * @default medium
+   */
+  size?: TableSize;
+  /**
+   * Caption rendered above the table. Announced to assistive technology.
+   */
+  caption?: ReactNode;
+  /**
+   * Alternating row backgrounds.
+   * @default false
+   */
+  striped?: boolean;
+  /**
+   * Renders vertical separators between columns.
+   * @default false
+   */
+  verticalBorders?: boolean;
+  /**
+   * Removes the outer border + radius around the table, keeping only internal
+   * row dividers.
+   * @default false
+   */
+  borderless?: boolean;
+  /**
+   * Freezes the first column during horizontal scroll.
+   * @default false
+   */
+  stickyFirstColumn?: boolean;
+  /**
+   * Pins the `<thead>` row(s) to the top during vertical scroll. Requires
+   * `maxHeight` so the table's internal scroll container becomes the sticky
+   * anchor — wrapping the Table in an external scrollable div will NOT work,
+   * because the `<thead>` sticks to its nearest scrolling ancestor (which is
+   * always the internal `.tedi-table__scroll` div). Combines safely with
+   * `stickyFirstColumn`.
+   * @default false
+   */
+  stickyHeader?: boolean;
+  /**
+   * Constrains the height of the table's internal scroll container. Accepts
+   * any CSS length value (`number` is treated as pixels). Pair with
+   * `stickyHeader` for a fixed-height table whose header stays pinned during
+   * vertical scroll.
+   */
+  maxHeight?: number | string;
+  /**
+   * Fires when a data row is clicked. Adds `role="button"`, a pointer cursor
+   * and Enter/Space keyboard activation to every row.
+   */
+  onRowClick?: (row: Row<TData>) => void;
+  /**
+   * Enables row selection. When true, Table prepends a selection column with
+   * checkboxes bound to `rowSelection` state.
+   */
+  enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
+  /**
+   * Enables per-column filter inputs rendered below the header row.
+   * Only columns whose `columnDef.enableColumnFilter !== false` render an input.
+   */
+  enableColumnFilters?: boolean;
+  /**
+   * Render function for the expanded content of a row. When provided, Table
+   * prepends an expand/collapse toggle column and renders this node in a full-
+   * width row below every expanded parent row.
+   */
+  renderSubComponent?: (row: Row<TData>) => ReactNode;
+  /**
+   * Predicate controlling which rows can be expanded. Defaults to "all rows"
+   * when `renderSubComponent` is provided, otherwise "none".
+   */
+  getRowCanExpand?: (row: Row<TData>) => boolean;
+  /**
+   * Returns the sub-rows of a data row. Enables nested hierarchical data.
+   */
+  getSubRows?: (row: TData) => TData[] | undefined;
+  /**
+   * Enables client-side pagination and renders a built-in page-switcher footer.
+   * Pass `true` for default settings or an options object to customise.
+   * Page state lives on `TableState.pagination` so it is fully controllable and
+   * persistable.
+   */
+  pagination?: boolean | TablePaginationOptions;
+  /**
+   * Switches pagination to server-side mode. When `true`, Table stops slicing
+   * `data` locally — `data` is treated as the rows for the current page only.
+   * Pair with `pageCount` (or `rowCount`) and a controlled `state.pagination`
+   * + `onStateChange` to fetch the right page from the server on each change.
+   * @default false
+   */
+  manualPagination?: boolean;
+  /**
+   * Switches sorting to server-side mode. When `true`, Table no longer sorts
+   * `data` locally — sort state still updates and fires `onStateChange` so
+   * the parent can refetch in the new order, but the rows are rendered in
+   * the order they arrive in `data`.
+   * @default false
+   */
+  manualSorting?: boolean;
+  /**
+   * Switches filtering to server-side mode. When `true`, Table stops applying
+   * `columnFilters` locally; the parent is expected to translate filter state
+   * (visible via `onStateChange`) into a server query.
+   * @default false
+   */
+  manualFiltering?: boolean;
+  /**
+   * Total number of pages on the server. Required when `manualPagination` is
+   * `true` so the pagination footer can render the right page count — local
+   * row-count math is otherwise wrong, since `data` only holds the current
+   * page's rows.
+   */
+  pageCount?: number;
+  /**
+   * Total number of rows on the server (across all pages). Used as the
+   * "X tulemust" / "X results" counter in the pagination footer when
+   * `manualPagination` is on. Falls back to the locally filtered row count
+   * when omitted.
+   */
+  rowCount?: number;
+  /**
+   * Controlled state. Pair with `onStateChange`. Any key left undefined falls
+   * back to the corresponding default or internal state.
+   */
+  state?: Partial<TableState>;
+  /**
+   * Initial state for uncontrolled usage. Ignored when `state` is provided.
+   */
+  defaultState?: Partial<TableState>;
+  /**
+   * Callback fired whenever any state slice changes.
+   */
+  onStateChange?: (state: TableState) => void;
+  /**
+   * When set, Table wires a localStorage adapter for the named key. Acts as a
+   * default state provider and persists subsequent changes. Consumers can still
+   * supply `state`/`onStateChange` to layer extra behavior on top.
+   */
+  persist?: TablePersistOptions;
+  /**
+   * Rendered inside `<tbody>` when `data` is empty.
+   * @default "No data"
+   */
+  placeholder?: ReactNode;
+  /**
+   * ARIA live-region role wrapping the empty-state placeholder. Use `'status'`
+   * for polite announcements (recommended for "no results" feedback when the
+   * user changes a filter) or `'alert'` for assertive announcements that
+   * interrupt the current SR utterance. Omit when the placeholder should not
+   * announce changes — e.g. when the table is empty on first render and the
+   * content never changes.
+   */
+  placeholderRole?: 'alert' | 'status';
+  /**
+   * Additional class name on the root element.
+   */
+  className?: string;
+  /**
+   * Toolbar + Table subcomponents such as `<Table.ColumnsMenu />`.
+   */
+  children?: ReactNode;
+}
+
+/**
+ * Value exposed through `TableContext`. Subcomponents like ColumnsMenu use it
+ * to read and mutate the table state without prop-drilling.
+ */
+export interface TableContextValue<TData = unknown> {
+  table: ReactTable<TData>;
+  size: TableSize;
+  id?: string;
+}
 
 const SELECT_COLUMN_ID = '__select__';
 const EXPAND_COLUMN_ID = '__expand__';
@@ -62,12 +305,15 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     onStateChange,
     persist,
     placeholder,
+    placeholderRole,
     className,
     children,
     striped = false,
     verticalBorders = false,
     borderless = false,
     stickyFirstColumn = false,
+    stickyHeader = false,
+    maxHeight,
     onRowClick,
     enableRowSelection,
     enableColumnFilters = false,
@@ -351,6 +597,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--vertical-borders']]: verticalBorders,
       [styles['tedi-table--borderless']]: borderless,
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
+      [styles['tedi-table--sticky-header']]: stickyHeader,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick),
       [styles['tedi-table--has-pagination']]: paginationEnabled,
       [styles['tedi-table--grouped-headers']]: hasGroupedHeaders,
@@ -386,7 +633,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     <TableContext.Provider value={contextValue as TableContextValue}>
       <div className={rootClassName} data-name="tedi-table">
         {children}
-        <div className={styles['tedi-table__scroll']}>
+        <div
+          className={styles['tedi-table__scroll']}
+          style={maxHeight !== undefined ? { maxHeight, overflowY: 'auto' } : undefined}
+        >
           <table
             id={id}
             className={styles['tedi-table__table']}
@@ -416,6 +666,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         ? 'descending'
                         : 'none'
                       : undefined;
+                    const headerMeta = header.column.columnDef.meta as { label?: string } | undefined;
+                    const headerLabel =
+                      headerMeta?.label ??
+                      (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     return (
                       <th
                         key={header.id}
@@ -426,6 +680,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         })}
                         scope="col"
                         aria-sort={ariaSort}
+                        aria-label={headerLabel}
                         style={header.column.getSize() ? { width: header.column.getSize() } : undefined}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -473,7 +728,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     colSpan={Math.max(1, leafColumnCount)}
                     className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--placeholder'])}
                   >
-                    {resolvedPlaceholder}
+                    {placeholderRole ? <div role={placeholderRole}>{resolvedPlaceholder}</div> : resolvedPlaceholder}
                   </td>
                 </tr>
               ) : (
@@ -560,15 +815,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 }
 
 TableBase.displayName = 'Table';
-
-/**
- * Optional slot rendered above the `<table>`. Hosts controls like
- * `<Table.ColumnsMenu />`. Nothing clever — it just provides consistent spacing.
- */
-const TableToolbar = ({ children, className }: { children?: React.ReactNode; className?: string }) => (
-  <div className={cn(styles['tedi-table__toolbar'], className)}>{children}</div>
-);
-TableToolbar.displayName = 'Table.Toolbar';
 
 export const Table = Object.assign(TableBase, {
   Toolbar: TableToolbar,

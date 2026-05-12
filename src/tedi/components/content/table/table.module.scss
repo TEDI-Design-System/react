@@ -200,3 +200,22 @@
     background: var(--table-striped);
   }
 }
+
+.tedi-table--sticky-header {
+  .tedi-table__head {
+    border-bottom: 0;
+  }
+
+  .tedi-table__head .tedi-table__header-cell {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--table-default);
+    box-shadow: inset 0 -1px 0 var(--table-border-th);
+  }
+
+  &.tedi-table--sticky-first-column .tedi-table__head .tedi-table__header-cell:first-child {
+    z-index: 3;
+    box-shadow: inset -1px 0 0 var(--table-border), inset 0 -1px 0 var(--table-border-th);
+  }
+}

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import type { TablePersistOptions, TableState } from './table.types';
+import type { TablePersistOptions, TableState } from './table';
 
 /**
  * State slices persisted by default when `persist` is configured without a

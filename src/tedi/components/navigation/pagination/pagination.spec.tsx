@@ -292,6 +292,18 @@ describe('Pagination component', () => {
     expect(ref.current).toHaveAttribute('data-name', 'tedi-pagination');
   });
 
+  it('announces the current page to screen readers via a live region', () => {
+    const { container, rerender } = render(<Pagination pageCount={10} defaultPage={1} />);
+
+    const status = container.querySelector('[role="status"]');
+    expect(status).not.toBeNull();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status?.textContent).toMatch(/(Page 1 of 10|pagination\.page-status)/);
+
+    rerender(<Pagination pageCount={10} page={4} />);
+    expect(container.querySelector('[role="status"]')?.textContent).toMatch(/(Page 4 of 10|pagination\.page-status)/);
+  });
+
   describe('mobile (< md) layout', () => {
     beforeEach(() => {
       setMockBreakpoint('xs');
@@ -299,12 +311,8 @@ describe('Pagination component', () => {
 
     it('renders the page-jump Select instead of the numbered list', () => {
       const { container } = render(<Pagination pageCount={10} defaultPage={3} />);
-
-      // Numbered page buttons should NOT render on mobile.
       expect(screen.queryByRole('button', { name: /Go to page 5/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /Current page, page 3/i })).not.toBeInTheDocument();
-
-      // The page-jump Select is in the DOM, identified by its stable id prefix.
       expect(container.querySelector('[id^="tedi-pagination-jump-"]')).toBeInTheDocument();
     });
 
