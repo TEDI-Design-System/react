@@ -14,7 +14,7 @@ import {
 } from '@floating-ui/react';
 import cn from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import { dateMatchModifiers, DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
@@ -45,7 +45,7 @@ type DateFieldBreakpointProps = {
   enableCalendar?: boolean;
   /**
    * What opens the calendar — only the icon (`'button'`) or anywhere in the input (`'input'`).
-   * @default 'button'
+   * @default button
    */
   calendarTrigger?: DateFieldCalendarTrigger;
   /**
@@ -227,7 +227,7 @@ export interface DateFieldProps
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
 }
 
-export const DateField: React.FC<DateFieldProps> = (props) => {
+export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     useNativePicker = false,
@@ -303,8 +303,15 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
 
   const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
 
-  // ISO `yyyy-MM-dd` for `<input type="date">`. Native date inputs only
-  // accept this format regardless of locale.
+  const setTextFieldRef = React.useCallback(
+    (node: TextFieldForwardRef | null) => {
+      textFieldRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref]
+  );
+
   const toIsoDate = (d?: Date): string => {
     if (!d) return '';
     const y = d.getFullYear();
@@ -383,27 +390,26 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
         }))
       : [];
 
+  const disabledMatchers = useMemo<Matcher[]>(() => {
+    const matchers: Matcher[] = [];
+
+    if (disabled) {
+      if (Array.isArray(disabled)) matchers.push(...disabled);
+      else matchers.push(disabled);
+    }
+    if (minDate) matchers.push({ before: minDate });
+    if (maxDate) matchers.push({ after: maxDate });
+    if (disablePast) matchers.push({ before: new Date() });
+    if (disableFuture) matchers.push({ after: new Date() });
+    if (shouldDisableMonth) matchers.push((date: Date) => shouldDisableMonth(date));
+    if (shouldDisableYear) matchers.push((date: Date) => shouldDisableYear(date));
+
+    return matchers;
+  }, [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]);
+
   const isDateDisabled = useCallback(
-    (date: Date): boolean => {
-      let disabledList: Matcher[] = [];
-
-      if (disabled) {
-        disabledList = Array.isArray(disabled) ? disabled : [disabled];
-      }
-      if (minDate) disabledList.push({ before: minDate });
-      if (maxDate) disabledList.push({ after: maxDate });
-      if (disablePast) disabledList.push({ before: new Date() });
-      if (disableFuture) disabledList.push({ after: new Date() });
-      if (shouldDisableMonth) disabledList.push((d: Date) => shouldDisableMonth(d));
-      if (shouldDisableYear) disabledList.push((d: Date) => shouldDisableYear(d));
-
-      return disabledList.some((matcher) => {
-        if (typeof matcher === 'function') return matcher(date);
-        if (matcher instanceof Date) return matcher.getTime() === date.getTime();
-        return false;
-      });
-    },
-    [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]
+    (date: Date): boolean => dateMatchModifiers(date, disabledMatchers),
+    [disabledMatchers]
   );
 
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
@@ -587,30 +593,11 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
     onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
   };
 
-  const disabledMatchers: Matcher[] = [];
-
-  if (disabled) {
-    if (Array.isArray(disabled)) {
-      disabledMatchers.push(...disabled);
-    } else {
-      disabledMatchers.push(disabled);
-    }
-  }
-
-  if (minDate) disabledMatchers.push({ before: minDate });
-  if (maxDate) disabledMatchers.push({ after: maxDate });
-  if (disablePast) disabledMatchers.push({ before: new Date() });
-  if (disableFuture) disabledMatchers.push({ after: new Date() });
-
-  if (shouldDisableMonth) disabledMatchers.push((date: Date) => shouldDisableMonth(date));
-  if (shouldDisableYear) disabledMatchers.push((date: Date) => shouldDisableYear(date));
-
   return (
     <>
       <div
         className={cn(styles['tedi-date-field__container'], className)}
         {...interactions.getReferenceProps()}
-        aria-haspopup="dialog"
         ref={refs.setReference}
       >
         {mode === 'multiple' ? (
@@ -621,7 +608,7 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
             onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
-            aria-expanded={enableCalendar ? open : undefined}
+            iconButtonProps={enableCalendar ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' } : undefined}
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -641,7 +628,7 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
         ) : (
           <TextField
             {...(inputProps as TextFieldProps)}
-            ref={textFieldRef}
+            ref={setTextFieldRef}
             id={id}
             label={label}
             readOnly={readOnly}
@@ -657,7 +644,11 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
                 setOpen((prev) => !prev);
               }
             }}
-            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
+            iconButtonProps={
+              enableCalendar && !shouldUseNativePicker
+                ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' }
+                : undefined
+            }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             required={required}
             className={cn(styles['tedi-date-field__textfield'], {
@@ -667,6 +658,9 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
             input={{
               ...((inputProps as TextFieldProps)?.input as UnknownType),
               ...(shouldUseNativePicker && { type: 'date' }),
+              ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
+                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open }
+                : {}),
             }}
           />
         )}
@@ -715,6 +709,6 @@ export const DateField: React.FC<DateFieldProps> = (props) => {
       )}
     </>
   );
-};
+});
 
 DateField.displayName = 'DateField';

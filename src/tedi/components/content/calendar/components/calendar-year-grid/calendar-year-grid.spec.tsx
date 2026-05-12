@@ -19,7 +19,7 @@ jest.mock('../../../../../providers/label-provider', () => ({
 }));
 
 jest.mock('../../calendar-grid', () => ({
-  PickerGrid: ({
+  CalendarGrid: ({
     headerLabel,
     prevAriaLabel,
     nextAriaLabel,
@@ -123,7 +123,7 @@ describe('YearGrid', () => {
     expect(screen.queryByTestId('next-btn')).not.toBeInTheDocument();
   });
 
-  it('passes className to PickerGrid', () => {
+  it('passes className to CalendarGrid', () => {
     render(<YearGrid {...defaultProps} className="custom-year-grid" />);
 
     const pickerGrid = screen.getByTestId('picker-grid');
