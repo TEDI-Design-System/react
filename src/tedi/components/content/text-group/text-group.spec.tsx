@@ -134,3 +134,102 @@ describe('TextGroup component', () => {
     expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
   });
 });
+
+describe('TextGroup.List', () => {
+  it('renders a single <dl> with N <dt>/<dd> pairs', () => {
+    const { container } = render(
+      <TextGroup.List
+        items={[
+          { label: 'Patient', value: 'Mari Maasikas' },
+          { label: 'Address', value: 'Tulbi tn 4, Tallinn' },
+          { label: 'Vaccine', value: 'COVID-19 mRNA' },
+        ]}
+      />
+    );
+
+    const lists = container.querySelectorAll('dl');
+    expect(lists).toHaveLength(1);
+    expect(lists[0]).toHaveClass('tedi-text-group');
+    expect(lists[0]).toHaveClass('tedi-text-group--list');
+
+    expect(container.querySelectorAll('dt')).toHaveLength(3);
+    expect(container.querySelectorAll('dd')).toHaveLength(3);
+
+    const labels = Array.from(container.querySelectorAll('dt')).map((dt) => dt.textContent?.trim());
+    expect(labels).toEqual(['Patient', 'Address', 'Vaccine']);
+    const values = Array.from(container.querySelectorAll('dd')).map((dd) => dd.textContent?.trim());
+    expect(values).toEqual(['Mari Maasikas', 'Tulbi tn 4, Tallinn', 'COVID-19 mRNA']);
+  });
+
+  it('applies the horizontal modifier when type="horizontal"', () => {
+    const { container } = render(
+      <TextGroup.List
+        type="horizontal"
+        labelWidth="200px"
+        items={[
+          { label: 'A', value: '1' },
+          { label: 'B', value: '2' },
+        ]}
+      />
+    );
+
+    const dl = container.querySelector('dl');
+    expect(dl).toHaveClass('tedi-text-group--horizontal');
+    expect(dl).toHaveStyle('--label-width: 200px');
+  });
+
+  it('honors per-row labelAlign overrides', () => {
+    const { container } = render(
+      <TextGroup.List
+        labelAlign="left"
+        items={[
+          { label: 'Subtotal', value: '€ 10' },
+          { label: 'Total', value: '€ 12', labelAlign: 'right' },
+        ]}
+      />
+    );
+
+    const dts = container.querySelectorAll('dt');
+    expect(dts[0]).toHaveClass('tedi-text-group--align-left');
+    expect(dts[1]).toHaveClass('tedi-text-group--align-right');
+  });
+
+  it('honors per-row labelWidth overrides via inline --label-width', () => {
+    const { container } = render(
+      <TextGroup.List
+        labelWidth="100px"
+        items={[
+          { label: 'Default', value: 'A' },
+          { label: 'Custom', value: 'B', labelWidth: '240px' },
+          { label: 'Percent', value: 'C', labelWidth: 25 },
+        ]}
+      />
+    );
+
+    const rows = container.querySelectorAll('.tedi-text-group__row');
+    expect(rows[0]).not.toHaveAttribute('style');
+    expect(rows[1]).toHaveStyle('--label-width: 240px');
+    expect(rows[2]).toHaveStyle('--label-width: 25%');
+  });
+
+  it('renders string labels via <Label>, JSX labels untouched', () => {
+    const { container } = render(
+      <TextGroup.List
+        items={[
+          { label: 'Plain', value: 'A' },
+          { label: <strong>Bold</strong>, value: 'B' },
+        ]}
+      />
+    );
+
+    const dts = container.querySelectorAll('dt');
+    expect(dts[0].querySelector('.tedi-label')).toBeInTheDocument();
+    expect(dts[1].querySelector('.tedi-label')).not.toBeInTheDocument();
+    expect(dts[1].querySelector('strong')).toBeInTheDocument();
+  });
+
+  it('applies custom className to the root <dl>', () => {
+    const { container } = render(<TextGroup.List className="custom-list" items={[{ label: 'A', value: '1' }]} />);
+    expect(container.querySelector('dl')).toHaveClass('custom-list');
+  });
+});

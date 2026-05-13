@@ -26,4 +26,22 @@
   &--align-right {
     justify-content: flex-end;
   }
+
+  &--list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tedi-dimensions-03);
+    margin: 0;
+  }
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &--list#{&}--horizontal > &__row {
+    flex-direction: row;
+    gap: 1rem;
+    align-items: flex-start;
+  }
 }
