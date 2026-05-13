@@ -269,13 +269,19 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
       if (currentIndex === -1) return;
 
       let nextIndex = -1;
+      // Track whether the new index wrapped around (e.g. 59 → 00 going down,
+      // 00 → 59 going up). When it does, animate the scroll instantly so we
+      // don't smooth-scroll across the entire wheel.
+      let wrapped = false;
 
       switch (event.key) {
         case 'ArrowDown':
-          nextIndex = Math.min(currentIndex + 1, list.length - 1);
+          nextIndex = (currentIndex + 1) % list.length;
+          wrapped = currentIndex === list.length - 1;
           break;
         case 'ArrowUp':
-          nextIndex = Math.max(currentIndex - 1, 0);
+          nextIndex = (currentIndex - 1 + list.length) % list.length;
+          wrapped = currentIndex === 0;
           break;
         case 'Home':
           nextIndex = 0;
@@ -284,10 +290,12 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
           nextIndex = list.length - 1;
           break;
         case 'PageDown':
-          nextIndex = Math.min(currentIndex + 5, list.length - 1);
+          nextIndex = (currentIndex + 5) % list.length;
+          wrapped = currentIndex + 5 >= list.length;
           break;
         case 'PageUp':
-          nextIndex = Math.max(currentIndex - 5, 0);
+          nextIndex = (currentIndex - 5 + list.length) % list.length;
+          wrapped = currentIndex - 5 < 0;
           break;
         case 'Enter':
         case ' ':
@@ -304,7 +312,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
       const el = container?.querySelector<HTMLElement>(`#${CSS.escape(`${uid}-${type}-${nextIndex}`)}`);
 
       el?.focus();
-      el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el?.scrollIntoView({ block: 'center', behavior: wrapped ? 'auto' : 'smooth' });
     };
 
   useEffect(() => {
