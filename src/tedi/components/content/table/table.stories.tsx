@@ -18,18 +18,20 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ColumnDef, ColumnOrderState } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
+import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { EmptyState } from '../../misc/empty-state';
 import Separator from '../../misc/separator/separator';
 import { Alert } from '../../notifications/alert/alert';
+import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger } from '../../overlays/dropdown';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Truncate } from '../truncate/truncate';
@@ -197,21 +199,171 @@ const nameLinkStyle: React.CSSProperties = {
   fontWeight: 'var(--body-regular-weight)',
 };
 
-/** Shared columns for the Default and Sizes stories (Figma "Sizes" frame). */
+const editRowActionsStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+};
+
+interface EditableRows<T extends { id: string }> {
+  rows: T[];
+  editingId: string | null;
+  draft: T | null;
+  setDraft: React.Dispatch<React.SetStateAction<T | null>>;
+  beginEdit: (row: T) => void;
+  cancelEdit: () => void;
+  commitEdit: () => void;
+}
+
+/**
+ * Context that flows the editor into the table cells. Cells read the latest
+ * state via context instead of taking the editor as a prop — that way the
+ * `columns` array can be a module-level constant and TanStack never rebuilds
+ * its column instances, which is what kept the TextField mounted across
+ * keystrokes so it doesn't lose focus.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const EditableRowsContext = createContext<EditableRows<any> | null>(null);
+
+function useEditor<T extends { id: string }>(): EditableRows<T> {
+  const editor = useContext(EditableRowsContext);
+  if (!editor) throw new Error('EditableRowsContext missing — wrap the table in <EditableRowsContext.Provider>.');
+  return editor as EditableRows<T>;
+}
+
+/**
+ * Tiny shared state machine for row-level inline editing. Tracks which row
+ * (if any) is currently in edit mode and the draft copy of its values; commits
+ * or discards back to the parent array on confirm / cancel. Reused across all
+ * stories that ship a "Muuda" affordance so the button actually does something.
+ */
+function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T> {
+  const [rows, setRows] = useState<T[]>(initial);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<T | null>(null);
+
+  // Read latest draft from a ref inside commitEdit so the callback identity
+  // can stay stable across renders without the `draft` dep.
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+
+  const beginEdit = useCallback((row: T) => {
+    setEditingId(row.id);
+    setDraft(row);
+  }, []);
+  const cancelEdit = useCallback(() => {
+    setEditingId(null);
+    setDraft(null);
+  }, []);
+  const commitEdit = useCallback(() => {
+    const current = draftRef.current;
+    if (!current) return;
+    setRows((existing) => existing.map((row) => (row.id === current.id ? (current as T) : row)));
+    setEditingId(null);
+    setDraft(null);
+  }, []);
+
+  return { rows, editingId, draft, setDraft, beginEdit, cancelEdit, commitEdit };
+}
+
+/**
+ * Renders the per-row action cell: a Muuda link normally, or cancel / commit
+ * buttons when this row is the one being edited.
+ */
+function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
+  const editor = useEditor<T>();
+  if (row.id === editor.editingId) {
+    return (
+      <span style={editRowActionsStyle}>
+        <ClosingButton title="Tühista" onClick={editor.cancelEdit} />
+        <Button visualType="primary" size="small" icon="check" onClick={editor.commitEdit}>
+          Kinnita
+        </Button>
+      </span>
+    );
+  }
+  return (
+    <a
+      href="#"
+      onClick={(event) => {
+        event.preventDefault();
+        editor.beginEdit(row);
+      }}
+      style={editLinkStyle}
+    >
+      <Icon name="edit" color="brand" size={18} />
+      Muuda
+    </a>
+  );
+}
+
+/** Cell renderer that flips to a `<TextField>` when its row is editing. */
+function EditableTextCell<T extends { id: string }>({
+  row,
+  field,
+  label,
+  icon,
+}: {
+  row: T;
+  field: keyof T & string;
+  label: string;
+  icon?: string;
+}) {
+  const editor = useEditor<T>();
+  const isEditing = row.id === editor.editingId && editor.draft;
+  if (!isEditing) {
+    return <>{String(row[field] ?? '')}</>;
+  }
+  const draftValue = String((editor.draft as T)[field] ?? '');
+  return (
+    <TextField
+      id={`${row.id}-${field}`}
+      name={field}
+      label={label}
+      hideLabel
+      icon={icon}
+      value={draftValue}
+      onChange={(next) => editor.setDraft((prev: T | null) => (prev ? { ...prev, [field]: next } : prev))}
+    />
+  );
+}
+
+/**
+ * Booking columns used by Default + Sizes (Figma "Sizes" frame). Each cell
+ * flips into a TextField when its row is being edited; the actions column
+ * swaps the Muuda link for cancel / commit buttons. The cells read editor
+ * state from `EditableRowsContext`, so this array stays a stable module-level
+ * constant — important for TanStack reconciliation across keystrokes.
+ */
 const bookingShowcaseColumns: ColumnDef<Booking>[] = [
-  { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
-  { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
-  { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
-  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+  {
+    id: 'dateRange',
+    header: 'Kuupäev',
+    accessorKey: 'dateRange',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="dateRange" label="Kuupäev" icon="calendar_today" />,
+  },
+  {
+    id: 'hour',
+    header: 'Kellaaeg',
+    accessorKey: 'hour',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="hour" label="Kellaaeg" icon="schedule" />,
+  },
+  {
+    id: 'duration',
+    header: 'Kestus',
+    accessorKey: 'duration',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="duration" label="Kestus" />,
+  },
+  {
+    id: 'location',
+    header: 'Asukoht',
+    accessorKey: 'location',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="location" label="Asukoht" />,
+  },
   {
     id: 'actions',
     header: '',
-    cell: () => (
-      <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-        <Icon name="edit" color="brand" size={18} />
-        Muuda
-      </a>
-    ),
+    cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
 ];
 
@@ -220,14 +372,19 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
  * the `Sizes` showcase below, just on its own.
  */
 export const Default: Story = {
-  render: () => (
-    <Table<Booking>
-      id="tedi-table-default"
-      data={bookings}
-      columns={bookingShowcaseColumns}
-      pagination={SHOWCASE_PAGINATION_3}
-    />
-  ),
+  render: function Default() {
+    const editor = useEditableRows<Booking>(bookings);
+    return (
+      <EditableRowsContext.Provider value={editor}>
+        <Table<Booking>
+          id="tedi-table-default"
+          data={editor.rows}
+          columns={bookingShowcaseColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </EditableRowsContext.Provider>
+    );
+  },
 };
 
 /**
@@ -237,23 +394,29 @@ export const Default: Story = {
  */
 export const Sizes: Story = {
   render: function Sizes() {
+    const defaultEditor = useEditableRows<Booking>(bookings);
+    const smallEditor = useEditableRows<Booking>(bookings);
     return (
       <VerticalSpacing size={1}>
         <Heading element="h3">Default</Heading>
-        <Table<Booking>
-          id="tedi-table-sizes-default"
-          data={bookings}
-          columns={bookingShowcaseColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
+        <EditableRowsContext.Provider value={defaultEditor}>
+          <Table<Booking>
+            id="tedi-table-sizes-default"
+            data={defaultEditor.rows}
+            columns={bookingShowcaseColumns}
+            pagination={SHOWCASE_PAGINATION_3}
+          />
+        </EditableRowsContext.Provider>
         <Heading element="h3">Small</Heading>
-        <Table<Booking>
-          id="tedi-table-sizes-small"
-          data={bookings}
-          columns={bookingShowcaseColumns}
-          size="small"
-          pagination={SHOWCASE_PAGINATION_3}
-        />
+        <EditableRowsContext.Provider value={smallEditor}>
+          <Table<Booking>
+            id="tedi-table-sizes-small"
+            data={smallEditor.rows}
+            columns={bookingShowcaseColumns}
+            size="small"
+            pagination={SHOWCASE_PAGINATION_3}
+          />
+        </EditableRowsContext.Provider>
       </VerticalSpacing>
     );
   },
@@ -265,102 +428,86 @@ export const Sizes: Story = {
  * names + status badges, and a doctor list with a multi-line first cell.
  * Same chrome (borders, pagination), different content patterns.
  */
+const simplePeopleColumns: ColumnDef<PersonRecord>[] = [
+  {
+    id: 'name',
+    header: 'Isik',
+    accessorKey: 'name',
+    cell: ({ row }) => (
+      <a href="#" onClick={(event) => event.preventDefault()} style={nameLinkStyle}>
+        {row.original.name}
+      </a>
+    ),
+  },
+  { id: 'age', header: 'Vanus', accessorKey: 'age' },
+  { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+  {
+    id: 'status',
+    header: 'Tõendi staatus',
+    accessorKey: 'status',
+    cell: ({ row }) => <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>,
+  },
+];
+
+const simpleDoctorColumns: ColumnDef<Doctor>[] = [
+  {
+    id: 'name',
+    header: 'Arst',
+    cell: ({ row }) => (
+      <div>
+        <div>{row.original.name}</div>
+        <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
+      </div>
+    ),
+  },
+  {
+    id: 'experience',
+    header: 'Tööstaaž',
+    accessorKey: 'experience',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="experience" label="Tööstaaž" />,
+  },
+  {
+    id: 'location',
+    header: 'Asukoht',
+    accessorKey: 'location',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="location" label="Asukoht" />,
+  },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row }) => <EditActionsCell row={row.original} />,
+  },
+];
+
 export const Simple: Story = {
   render: function Simple() {
-    const bookingColumns = useMemo<ColumnDef<Booking>[]>(
-      () => [
-        { id: 'dateRange', header: 'Kuupäev', accessorKey: 'dateRange' },
-        { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
-        { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
-        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-        {
-          id: 'actions',
-          header: '',
-          cell: () => (
-            <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-              <Icon name="edit" color="brand" size={18} />
-              Muuda
-            </a>
-          ),
-        },
-      ],
-      []
-    );
-
-    const peopleColumns = useMemo<ColumnDef<PersonRecord>[]>(
-      () => [
-        {
-          id: 'name',
-          header: 'Isik',
-          accessorKey: 'name',
-          cell: ({ row }) => (
-            <a href="#" onClick={(event) => event.preventDefault()} style={nameLinkStyle}>
-              {row.original.name}
-            </a>
-          ),
-        },
-        { id: 'age', header: 'Vanus', accessorKey: 'age' },
-        { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
-        {
-          id: 'status',
-          header: 'Tõendi staatus',
-          accessorKey: 'status',
-          cell: ({ row }) => (
-            <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
-          ),
-        },
-      ],
-      []
-    );
-
-    const doctorColumns = useMemo<ColumnDef<Doctor>[]>(
-      () => [
-        {
-          id: 'name',
-          header: 'Arst',
-          cell: ({ row }) => (
-            <div>
-              <div>{row.original.name}</div>
-              <div style={{ color: 'var(--general-text-secondary)' }}>{row.original.specialty}</div>
-            </div>
-          ),
-        },
-        { id: 'experience', header: 'Tööstaaž', accessorKey: 'experience' },
-        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-        {
-          id: 'actions',
-          header: '',
-          cell: () => (
-            <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-              <Icon name="edit" color="brand" size={18} />
-              Muuda
-            </a>
-          ),
-        },
-      ],
-      []
-    );
+    const bookingEditor = useEditableRows<Booking>(bookings);
+    const doctorEditor = useEditableRows<Doctor>(doctors);
 
     return (
       <VerticalSpacing size={1}>
-        <Table<Booking>
-          id="tedi-table-simple-bookings"
-          data={bookings}
-          columns={bookingColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
+        <EditableRowsContext.Provider value={bookingEditor}>
+          <Table<Booking>
+            id="tedi-table-simple-bookings"
+            data={bookingEditor.rows}
+            columns={bookingShowcaseColumns}
+            pagination={SHOWCASE_PAGINATION_3}
+          />
+        </EditableRowsContext.Provider>
         <Table<PersonRecord>
           id="tedi-table-simple-people"
           data={filterablePeople}
-          columns={peopleColumns}
+          columns={simplePeopleColumns}
           pagination={SHOWCASE_PAGINATION_4}
         />
-        <Table<Doctor>
-          id="tedi-table-simple-doctors"
-          data={doctors}
-          columns={doctorColumns}
-          pagination={SHOWCASE_PAGINATION_3}
-        />
+        <EditableRowsContext.Provider value={doctorEditor}>
+          <Table<Doctor>
+            id="tedi-table-simple-doctors"
+            data={doctorEditor.rows}
+            columns={simpleDoctorColumns}
+            pagination={SHOWCASE_PAGINATION_3}
+          />
+        </EditableRowsContext.Provider>
       </VerticalSpacing>
     );
   },
@@ -379,7 +526,7 @@ const LONG_DESCRIPTION =
 
 const LONG_TEXT_MAX_LENGTH = 70;
 
-const baseDoctorWithDescriptionColumns = (): ColumnDef<Doctor>[] => [
+const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'name',
     header: 'Arst',
@@ -391,16 +538,16 @@ const baseDoctorWithDescriptionColumns = (): ColumnDef<Doctor>[] => [
     ),
   },
   // Description cell injected per variant.
-  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+  {
+    id: 'location',
+    header: 'Asukoht',
+    accessorKey: 'location',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="location" label="Asukoht" />,
+  },
   {
     id: 'actions',
     header: '',
-    cell: () => (
-      <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-        <Icon name="edit" color="brand" size={18} />
-        Muuda
-      </a>
-    ),
+    cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
 ];
 
@@ -501,71 +648,71 @@ const initialsOf = (name: string) =>
  * Two-level header using column groups. Nest column definitions under `columns` inside a parent
  * `columnDef` — TanStack Table will render the parent as a merged header cell spanning its children.
  */
+const mergedCellsColumns: ColumnDef<Booking>[] = [
+  {
+    id: 'dateRange',
+    accessorKey: 'dateRange',
+    header: ({ column }) => {
+      const sorted = column.getIsSorted();
+      const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          Kuupäev
+          <Table.HeaderButton
+            icon={iconName}
+            selected={!!sorted}
+            aria-label="Sort by Kuupäev"
+            onClick={column.getToggleSortingHandler()}
+          />
+        </span>
+      );
+    },
+    cell: ({ row }) => <EditableTextCell row={row.original} field="dateRange" label="Kuupäev" icon="calendar_today" />,
+  },
+  {
+    id: 'aeg',
+    header: 'Aeg',
+    columns: [
+      {
+        id: 'hour',
+        header: 'Kellaaeg',
+        accessorKey: 'hour',
+        cell: ({ row }) => <EditableTextCell row={row.original} field="hour" label="Kellaaeg" icon="schedule" />,
+      },
+      {
+        id: 'duration',
+        header: 'Kestus',
+        accessorKey: 'duration',
+        cell: ({ row }) => <EditableTextCell row={row.original} field="duration" label="Kestus" />,
+      },
+    ],
+  },
+  {
+    id: 'location',
+    header: 'Asukoht',
+    accessorKey: 'location',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="location" label="Asukoht" />,
+  },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row }) => <EditActionsCell row={row.original} />,
+  },
+];
+
 export const MergedCells: Story = {
   render: function MergedCells() {
-    const columns = useMemo<ColumnDef<Booking>[]>(
-      () => [
-        {
-          id: 'dateRange',
-          accessorKey: 'dateRange',
-          header: ({ column }) => {
-            const sorted = column.getIsSorted();
-            const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-            return (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                Kuupäev
-                <Table.HeaderButton
-                  icon={iconName}
-                  selected={!!sorted}
-                  aria-label="Sort by Kuupäev"
-                  onClick={column.getToggleSortingHandler()}
-                />
-              </span>
-            );
-          },
-        },
-        {
-          id: 'aeg',
-          header: 'Aeg',
-          columns: [
-            { id: 'hour', header: 'Kellaaeg', accessorKey: 'hour' },
-            { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
-          ],
-        },
-        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
-        {
-          id: 'actions',
-          header: '',
-          cell: () => (
-            <a
-              href="#"
-              onClick={(event) => event.preventDefault()}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                color: 'var(--link-primary-default)',
-                textDecoration: 'none',
-                fontWeight: 'var(--body-regular-weight)',
-              }}
-            >
-              <Icon name="edit" color="brand" size={18} />
-              Muuda
-            </a>
-          ),
-        },
-      ],
-      []
-    );
-
+    const editor = useEditableRows<Booking>(bookings);
     return (
-      <Table<Booking>
-        id="tedi-table-merged"
-        verticalBorders
-        data={bookings}
-        columns={columns}
-        pagination={DEFAULT_PAGINATION}
-      />
+      <EditableRowsContext.Provider value={editor}>
+        <Table<Booking>
+          id="tedi-table-merged"
+          verticalBorders
+          data={editor.rows}
+          columns={mergedCellsColumns}
+          pagination={DEFAULT_PAGINATION}
+        />
+      </EditableRowsContext.Provider>
     );
   },
 };
@@ -747,9 +894,7 @@ export const EditableValues: Story = {
             if (row.original.id === editingId) {
               return (
                 <span style={editActionsStyle}>
-                  <Button visualType="neutral" size="small" icon="close" onClick={cancelEdit}>
-                    Tühista
-                  </Button>
+                  <ClosingButton title="Tühista" onClick={cancelEdit} />
                   <Button visualType="primary" size="small" icon="check" onClick={commitEdit}>
                     Kinnita
                   </Button>
@@ -1380,33 +1525,40 @@ export const WithEmptyState: Story = {
  * at the end of the truncated text; pass `button={{ style: { display: 'block' } }}`
  * to drop it onto its own line below the paragraph instead.
  */
+const longTextsColumns: ColumnDef<Doctor>[] = [
+  baseDoctorWithDescriptionColumns[0],
+  {
+    id: 'description',
+    header: 'Kirjeldus',
+    cell: () => <Truncate maxLength={LONG_TEXT_MAX_LENGTH}>{LONG_DESCRIPTION}</Truncate>,
+  },
+  baseDoctorWithDescriptionColumns[1],
+  baseDoctorWithDescriptionColumns[2],
+];
+
 export const LongTexts: Story = {
   render: function LongTexts() {
-    const columns = useMemo<ColumnDef<Doctor>[]>(
-      () => [
-        baseDoctorWithDescriptionColumns()[0],
-        {
-          id: 'description',
-          header: 'Kirjeldus',
-          cell: () => <Truncate maxLength={LONG_TEXT_MAX_LENGTH}>{LONG_DESCRIPTION}</Truncate>,
-        },
-        baseDoctorWithDescriptionColumns()[1],
-        baseDoctorWithDescriptionColumns()[2],
-      ],
-      []
-    );
+    const editor = useEditableRows<Doctor>(doctors);
 
     return (
-      <Table<Doctor> id="tedi-table-long-texts" data={doctors} columns={columns} pagination={SHOWCASE_PAGINATION_3} />
+      <EditableRowsContext.Provider value={editor}>
+        <Table<Doctor>
+          id="tedi-table-long-texts"
+          data={editor.rows}
+          columns={longTextsColumns}
+          pagination={SHOWCASE_PAGINATION_3}
+        />
+      </EditableRowsContext.Provider>
     );
   },
 };
 
 /**
- * Row-action pattern from the Figma "Actions" frame: each row gets dedicated
- * edit + delete icon buttons in a right-aligned cell. For dense rows or many
- * possible actions, collapse them under a single `more_vert` kebab button
- * instead — same column structure, just one icon-only Button.
+ * Row-action pattern from the Figma "Actions" frame: each row collapses its
+ * actions under a single `more_vert` kebab trigger that opens a `<Dropdown>`
+ * menu. Idiomatic for dense rows or any table with more than two actions —
+ * the menu portals out of the cell so it isn't clipped by the table's scroll
+ * container.
  */
 export const Actions: Story = {
   render: function Actions() {
@@ -1416,14 +1568,26 @@ export const Actions: Story = {
         {
           id: 'actions',
           header: '',
-          cell: () => (
+          cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
-              <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
-                <></>
-              </Button>
-              <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
-                <></>
-              </Button>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Button
+                    visualType="secondary"
+                    icon="more_vert"
+                    aria-label={`Avalda ${row.original.name} valikud`}
+                    onClick={() => undefined}
+                  >
+                    <></>
+                  </Button>
+                </DropdownTrigger>
+                <DropdownContent>
+                  <DropdownItem onClick={() => undefined}>Muuda</DropdownItem>
+                  <DropdownItem onClick={() => undefined}>Dubleeri</DropdownItem>
+                  <DropdownItem onClick={() => undefined}>Saada e-mail</DropdownItem>
+                  <DropdownItem onClick={() => undefined}>Kustuta</DropdownItem>
+                </DropdownContent>
+              </Dropdown>
             </span>
           ),
         },
@@ -1440,8 +1604,9 @@ export const Actions: Story = {
 /**
  * "Custom" Figma frame: a tip alert plus a table with custom-rendered cells —
  * avatar circle next to the name, a status note column with coloured `Alert`
- * tags, and the same edit/delete row actions from the Actions showcase.
- * Demonstrates that any column can return arbitrary JSX.
+ * tags, and a `<Popover>`-anchored info card on the actions trigger.
+ * Demonstrates that any column can return arbitrary JSX, including overlay
+ * UI like a row-level info preview with action buttons.
  */
 export const Custom: Story = {
   render: function Custom() {
@@ -1476,14 +1641,37 @@ export const Custom: Story = {
         {
           id: 'actions',
           header: '',
-          cell: () => (
+          cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
-              <Button visualType="secondary" icon="edit" aria-label="Edit row" onClick={() => undefined}>
-                <></>
-              </Button>
-              <Button visualType="secondary" icon="delete" aria-label="Delete row" onClick={() => undefined}>
-                <></>
-              </Button>
+              <Popover>
+                <PopoverTrigger>
+                  <Button
+                    visualType="secondary"
+                    icon="info"
+                    aria-label={`${row.original.name} eelvaade`}
+                    onClick={() => undefined}
+                  >
+                    <></>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <VerticalSpacing size={0.5}>
+                    <div style={{ fontWeight: 'var(--heading-weight)' }}>{row.original.name}</div>
+                    <div style={{ color: 'var(--general-text-secondary)' }}>
+                      {row.original.specialty} · {row.original.location}
+                    </div>
+                    <Separator color="primary" axis="horizontal" spacing={0.5} />
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                      <Button visualType="secondary" size="small" icon="edit" onClick={() => undefined}>
+                        Muuda
+                      </Button>
+                      <Button visualType="primary" size="small" icon="open_in_new" onClick={() => undefined}>
+                        Ava profiil
+                      </Button>
+                    </div>
+                  </VerticalSpacing>
+                </PopoverContent>
+              </Popover>
             </span>
           ),
         },
