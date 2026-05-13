@@ -14,6 +14,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Radio | `boolean` (via onChange) | Used in ChoiceGroup |
 | ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
 | Search | `string` | Search button, onSearch callback |
+| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop |
 
@@ -106,6 +107,50 @@ import { NumberField } from '@tedi-design-system/react/tedi';
   step={1}
   suffix="pcs"
 />
+```
+
+## TimeField
+
+The value is always a `"HH:mm"` 24-hour string. The popover defaults to a wheel picker; set `availableTimes` to switch to a fixed-slot grid, or `useNativePicker` to drop the custom UI entirely.
+
+```tsx
+import { TimeField } from '@tedi-design-system/react/tedi';
+
+// Wheel picker, 15-minute step
+<TimeField
+  id="meeting"
+  label="Meeting time"
+  value={time}
+  onChange={setTime}
+  stepMinutes={15}
+  required
+/>
+
+// Constrain to predefined slots, render as a radio-button grid
+<TimeField
+  id="slot"
+  label="Available slot"
+  availableTimes={['09:00', '09:30', '10:00', '14:00', '15:30']}
+  availableTimesVariant="grid-radio"
+  value={slot}
+  onChange={setSlot}
+/>
+
+// Native picker on mobile, custom wheel on desktop
+<TimeField
+  id="alarm"
+  label="Alarm"
+  useNativePicker
+  md={{ useNativePicker: false }}
+/>
+```
+
+For an always-visible time selector (e.g. side-by-side with a calendar, or inside a custom popover) use the lower-level `TimePicker` directly:
+
+```tsx
+import { TimePicker } from '@tedi-design-system/react/tedi';
+
+<TimePicker value={time} onChange={setTime} stepMinutes={5} bordered={false} />
 ```
 
 ## Checkbox & Radio
@@ -213,6 +258,7 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 - **Choice inputs:** `onChange?: (value: string, checked: boolean) => void`
 - **Select:** `onChange?: (value: ISelectOption | ISelectOption[] | null) => void`
 - **NumberField:** `onChange?: (value: number) => void`
+- **TimeField / TimePicker:** `onChange?: (time: string) => void` — value is always `"HH:mm"` 24-hour format (empty string when cleared)
 
 ## Disabled State
 
