@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import { MonthCaptionProps, useNavigation } from 'react-day-picker';
+import { useCallback, useMemo } from 'react';
+import { dateMatchModifiers, Matcher, MonthCaptionProps, useNavigation } from 'react-day-picker';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
@@ -32,6 +33,13 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    * Locale code string used for date formatting (e.g., `'et-EE'`). Defaults to the runtime locale when omitted.
    */
   localeCode?: string;
+  /**
+   * Same matcher list passed to DayPicker's `disabled` prop. When provided, the
+   * month / year dropdown items are disabled if **every** day in that month
+   * (or year) is disabled by the matchers — so users can't jump to a range
+   * that has no selectable dates.
+   */
+  disabledMatchers?: Matcher[];
 }
 
 export function CalendarHeader({
@@ -41,17 +49,55 @@ export function CalendarHeader({
   onOpenYearGrid,
   showNavigation = true,
   localeCode,
+  disabledMatchers,
 }: CalendarHeaderProps) {
   const isGridSelect = monthYearSelectType === 'grid';
   const { getLabel } = useLabels();
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
 
   const displayMonth = calendarMonth.date;
+  const displayYear = displayMonth.getFullYear();
+  const displayMonthIndex = displayMonth.getMonth();
   const months = Array.from({ length: 12 }, (_, i) =>
-    new Date(2025, i, 1).toLocaleString(localeCode, { month: 'long' })
+    new Date(displayYear, i, 1).toLocaleString(localeCode, { month: 'long' })
   );
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
+
+  const isRangeFullyDisabled = useCallback(
+    (start: Date, end: Date): boolean => {
+      if (!disabledMatchers?.length) return false;
+      const cursor = new Date(start);
+      while (cursor <= end) {
+        if (!dateMatchModifiers(cursor, disabledMatchers)) return false;
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return true;
+    },
+    [disabledMatchers]
+  );
+
+  const disabledMonths = useMemo(() => {
+    if (!disabledMatchers?.length) return new Set<number>();
+    const result = new Set<number>();
+    for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      const start = new Date(displayYear, monthIndex, 1);
+      const end = new Date(displayYear, monthIndex + 1, 0);
+      if (isRangeFullyDisabled(start, end)) result.add(monthIndex);
+    }
+    return result;
+  }, [disabledMatchers, displayYear, isRangeFullyDisabled]);
+
+  const disabledYears = useMemo(() => {
+    if (!disabledMatchers?.length) return new Set<number>();
+    const result = new Set<number>();
+    for (const year of years) {
+      const start = new Date(year, 0, 1);
+      const end = new Date(year, 11, 31);
+      if (isRangeFullyDisabled(start, end)) result.add(year);
+    }
+    return result;
+  }, [disabledMatchers, years, isRangeFullyDisabled]);
 
   return (
     <div
@@ -106,8 +152,9 @@ export function CalendarHeader({
                 <Dropdown.Item
                   key={monthLabel}
                   index={monthIndex}
-                  active={displayMonth.getMonth() === monthIndex}
-                  onClick={() => goToMonth(new Date(displayMonth.getFullYear(), monthIndex))}
+                  active={displayMonthIndex === monthIndex}
+                  disabled={disabledMonths.has(monthIndex)}
+                  onClick={() => goToMonth(new Date(displayYear, monthIndex))}
                 >
                   {monthLabel}
                 </Dropdown.Item>
@@ -133,11 +180,13 @@ export function CalendarHeader({
               </Button>
             </Dropdown.Trigger>
             <Dropdown.Content>
-              {years.map((year) => (
+              {years.map((year, yearIndex) => (
                 <Dropdown.Item
                   key={year}
-                  active={displayMonth.getFullYear() === year}
-                  onClick={() => goToMonth(new Date(year, displayMonth.getMonth()))}
+                  index={yearIndex}
+                  active={displayYear === year}
+                  disabled={disabledYears.has(year)}
+                  onClick={() => goToMonth(new Date(year, displayMonthIndex))}
                 >
                   {year}
                 </Dropdown.Item>

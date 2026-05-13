@@ -53,6 +53,46 @@
       }
     }
   }
+
+  input[type='date'] {
+    appearance: none;
+
+    &::-webkit-calendar-picker-indicator {
+      display: none !important;
+      width: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      appearance: none;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-clear-button {
+      display: none;
+      appearance: none;
+    }
+  }
+
+  input[type='date'][value='']:not(:focus)::-webkit-datetime-edit {
+    /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
+    color: transparent;
+  }
+
+  input[type='date'][value='']:not(:focus)::before {
+    position: absolute;
+    color: var(--form-input-text-placeholder);
+    content: attr(placeholder);
+  }
+
+  input[type='date'][value='']:focus::-webkit-datetime-edit {
+    color: inherit;
+  }
+
+  input[type='date'][value='']:focus::before {
+    content: '';
+  }
 }
 
 .tedi-date-field__container {

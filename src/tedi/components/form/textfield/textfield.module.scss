@@ -55,7 +55,7 @@ $input-padding-right-map: (
 .tedi-textfield__inner {
   position: relative;
 
-  &:focus-within {
+  &:focus-visible {
     @include mixins.focus-element;
   }
 }
@@ -123,6 +123,7 @@ $input-padding-right-map: (
 
     @if $size == small {
       .tedi-textfield__input {
+        height: var(--form-field-height-sm);
         min-height: var(--form-field-height-sm);
         padding: var(--form-field-padding-y-sm) var(--form-field-padding-x-md-default);
         font-size: var(--body-regular-size);
@@ -146,7 +147,7 @@ $input-padding-right-map: (
   right: 0;
   display: flex;
   gap: var(--layout-grid-gutters-04);
-  align-items: flex-start;
+  align-items: center;
   height: 100%;
   padding: var(--form-field-padding-y-md-default) var(--form-field-padding-x-md-default);
 

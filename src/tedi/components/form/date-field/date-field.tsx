@@ -14,20 +14,19 @@ import {
 } from '@floating-ui/react';
 import cn from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import { dateMatchModifiers, DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
+import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
-import TextField, { TextFieldProps } from '../textfield/textfield';
+import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
 import {
   buildDateRegexSource,
-  buildDisabledMatchers,
   CALENDAR_POPOVER_OFFSET,
   CALENDAR_POPOVER_PADDING,
-  getInitialMonth as getInitialMonthFromValue,
   getLocaleDateParts,
 } from './date-field-helpers';
 
@@ -37,7 +36,38 @@ export type DateFieldCalendarTrigger = 'input' | 'button';
 type DateTextFieldProps = Omit<TextFieldProps, 'label' | 'id'>;
 type DateMultiValueFieldProps = Omit<MultiValueFieldProps, 'label' | 'id'>;
 
-export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
+/**
+ * Subset of DateField props that can be overridden per breakpoint via the
+ * `BreakpointSupport` API (e.g. `<DateField useNativePicker md={{ useNativePicker: false }} />`).
+ */
+type DateFieldBreakpointProps = {
+  /**
+   * Whether the calendar popover is interactive.
+   * @default true
+   */
+  enableCalendar?: boolean;
+  /**
+   * What opens the calendar — only the icon (`'button'`) or anywhere in the input (`'input'`).
+   * @default button
+   */
+  calendarTrigger?: DateFieldCalendarTrigger;
+  /**
+   * Swap the custom calendar for the browser's native `<input type="date">`.
+   * Only applies to `mode='single'`.
+   * @default false
+   */
+  useNativePicker?: boolean;
+  /**
+   * Number of months shown side-by-side. On mobile (`< md`) values > 1 are
+   * automatically clamped to 1 — the popover would otherwise be unscrollable
+   * on a phone viewport.
+   */
+  numberOfMonths?: number;
+};
+
+export interface DateFieldProps
+  extends BreakpointSupport<DateFieldBreakpointProps>,
+    Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect' | 'numberOfMonths'> {
   /**
    * Unique identifier for the date field.
    */
@@ -92,14 +122,6 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * @default true
    */
   showOutsideDays?: boolean;
-  /**
-   * Determines how the calendar popover is opened:
-   * - `'button'` (default): The calendar opens when the user clicks the calendar icon button.
-   * - `'input'`: The calendar opens when the user clicks anywhere on the input field, including the calendar icon.
-   *
-   * @default button
-   */
-  calendarTrigger?: DateFieldCalendarTrigger;
   /**
    * Custom date parsing function for user input. Receives the input string and should return a `Date`, an array of `Date`s, a `DateRange`, or `undefined` if the input is invalid or cleared.
    * If not provided, the component will not allow manual input and will rely solely on the calendar picker for date selection.
@@ -206,51 +228,73 @@ export interface DateFieldProps extends Omit<DayPickerProps, 'mode' | 'selected'
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
-  /**
-   * Enables or disables the calendar popover for the date field.
-   *
-   * - When `true` (default), the calendar is active, allowing the user to select dates from the calendar.
-   * - When `false`, the calendar is hidden and only manual input is possible.
-   *
-   * @default true
-   */
-  enableCalendar?: boolean;
 }
 
-export const DateField: React.FC<DateFieldProps> = ({
-  id,
-  mode = 'single',
-  label,
-  selected,
-  onSelect,
-  disabled,
-  placeholder,
-  className,
-  formatDate,
-  required,
-  calendarTrigger = 'button',
-  showOutsideDays = true,
-  parseDate,
-  monthYearSelectType,
-  selectionLevel = 'days',
-  locale = et,
-  localeCode = 'et-EE',
-  initialMonth,
-  closeOnSelect,
-  footer,
-  defaultValue,
-  minDate,
-  maxDate,
-  disablePast,
-  disableFuture,
-  shouldDisableMonth,
-  shouldDisableYear,
-  readOnly,
-  availableDays,
-  inputProps,
-  enableCalendar = true,
-  ...dayPickerProps
-}) => {
+export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const {
+    useNativePicker = false,
+    enableCalendar = true,
+    calendarTrigger = 'button',
+    numberOfMonths,
+  } = getCurrentBreakpointProps<DateFieldBreakpointProps>(props);
+
+  const {
+    id,
+    mode = 'single',
+    label,
+    selected,
+    onSelect,
+    disabled,
+    placeholder,
+    className,
+    formatDate,
+    required,
+    showOutsideDays = true,
+    parseDate,
+    monthYearSelectType,
+    selectionLevel = 'days',
+    locale = et,
+    localeCode = 'et-EE',
+    initialMonth,
+    closeOnSelect,
+    footer,
+    defaultValue,
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+    shouldDisableMonth,
+    shouldDisableYear,
+    readOnly,
+    availableDays,
+    inputProps,
+    useNativePicker: _useNativePicker,
+    enableCalendar: _enableCalendar,
+    calendarTrigger: _calendarTrigger,
+    numberOfMonths: _numberOfMonths,
+    defaultServerBreakpoint: _defaultServerBreakpoint,
+    sm: _sm,
+    md: _md,
+    lg: _lg,
+    xl: _xl,
+    xxl: _xxl,
+    ...dayPickerProps
+  } = props;
+
+  // Native `<input type="date">` is only meaningful for a single Date — it
+  // can't express ranges or multi-selection.
+  const shouldUseNativePicker = useNativePicker && mode === 'single';
+
+  const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+  // Multi-month calendars are unwieldy on phones — the popover gets tall,
+  // wraps to a vertical stack, and any focus-into-view (react-day-picker
+  // moving focus to a day on tap) yanks the scroll back to the top. Force
+  // a single month below `md`; users navigate with the month nav buttons.
+  const effectiveNumberOfMonths =
+    isMobile && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
+
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
   const [open, setOpen] = useState(false);
@@ -260,10 +304,39 @@ export const DateField: React.FC<DateFieldProps> = ({
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
 
-  const getInitialMonth = useCallback(
-    (val: Date | Date[] | DateRange | undefined, fallback?: Date) => getInitialMonthFromValue(val, fallback),
-    []
+  const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
+
+  const setTextFieldRef = React.useCallback(
+    (node: TextFieldForwardRef | null) => {
+      textFieldRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref]
   );
+
+  const toIsoDate = (d?: Date): string => {
+    if (!d) return '';
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const nativeValue = shouldUseNativePicker && value instanceof Date ? toIsoDate(value) : '';
+
+  const getInitialMonth = useCallback((val: Date | Date[] | DateRange | undefined, fallback?: Date): Date => {
+    if (val instanceof Date) return val;
+
+    if (Array.isArray(val) && val.length > 0) {
+      return [...val].sort((a, b) => a.getTime() - b.getTime())[0];
+    }
+
+    if (val && typeof val === 'object' && 'from' in val && val.from instanceof Date) return val.from;
+    if (val && typeof val === 'object' && 'to' in val && val.to instanceof Date) return val.to;
+
+    return fallback ?? new Date();
+  }, []);
 
   const [currentMonth, setCurrentMonth] = useState<Date>(() => getInitialMonth(value, initialMonth));
 
@@ -320,27 +393,26 @@ export const DateField: React.FC<DateFieldProps> = ({
         }))
       : [];
 
+  const disabledMatchers = useMemo<Matcher[]>(() => {
+    const matchers: Matcher[] = [];
+
+    if (disabled) {
+      if (Array.isArray(disabled)) matchers.push(...disabled);
+      else matchers.push(disabled);
+    }
+    if (minDate) matchers.push({ before: minDate });
+    if (maxDate) matchers.push({ after: maxDate });
+    if (disablePast) matchers.push({ before: new Date() });
+    if (disableFuture) matchers.push({ after: new Date() });
+    if (shouldDisableMonth) matchers.push((date: Date) => shouldDisableMonth(date));
+    if (shouldDisableYear) matchers.push((date: Date) => shouldDisableYear(date));
+
+    return matchers;
+  }, [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]);
+
   const isDateDisabled = useCallback(
-    (date: Date): boolean => {
-      let disabledList: Matcher[] = [];
-
-      if (disabled) {
-        disabledList = Array.isArray(disabled) ? disabled : [disabled];
-      }
-      if (minDate) disabledList.push({ before: minDate });
-      if (maxDate) disabledList.push({ after: maxDate });
-      if (disablePast) disabledList.push({ before: new Date() });
-      if (disableFuture) disabledList.push({ after: new Date() });
-      if (shouldDisableMonth) disabledList.push((d: Date) => shouldDisableMonth(d));
-      if (shouldDisableYear) disabledList.push((d: Date) => shouldDisableYear(d));
-
-      return disabledList.some((matcher) => {
-        if (typeof matcher === 'function') return matcher(date);
-        if (matcher instanceof Date) return matcher.getTime() === date.getTime();
-        return false;
-      });
-    },
-    [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]
+    (date: Date): boolean => dateMatchModifiers(date, disabledMatchers),
+    [disabledMatchers]
   );
 
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
@@ -471,27 +543,45 @@ export const DateField: React.FC<DateFieldProps> = ({
   const { refs, context, x, y, strategy } = floating;
   const click = useClick(context);
   const interactions = useInteractions([
-    ...(enableCalendar && calendarTrigger === 'input' ? [click] : []),
+    ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' ? [click] : []),
     useDismiss(context),
     useRole(context, { role: 'dialog' }),
   ]);
 
-  const disabledMatchers: Matcher[] = buildDisabledMatchers({
-    disabled,
-    minDate,
-    maxDate,
-    disablePast,
-    disableFuture,
-    shouldDisableMonth,
-    shouldDisableYear,
-  });
+  const openNativePicker = () => {
+    const input = textFieldRef.current?.input as HTMLInputElement | undefined;
+    if (!input) return;
+    if (typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+        return;
+      } catch {
+        // showPicker() throws InvalidStateError on inputs whose type isn't
+        // date / time / etc. Fall through to focus.
+      }
+    }
+    input.focus();
+  };
+
+  const handleNativeInputChange = (val: string) => {
+    if (!val) {
+      if (!isControlled) setInternalValue(undefined);
+      onSelect?.(undefined as UnknownType, undefined as UnknownType, {}, {} as UnknownType);
+      return;
+    }
+    const [y, m, d] = val.split('-').map(Number);
+    if (!y || !m || !d) return;
+    const parsed = new Date(y, m - 1, d);
+    if (Number.isNaN(parsed.getTime())) return;
+    if (!isControlled) setInternalValue(parsed);
+    onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
+  };
 
   return (
     <>
       <div
         className={cn(styles['tedi-date-field__container'], className)}
         {...interactions.getReferenceProps()}
-        aria-haspopup="dialog"
         ref={refs.setReference}
       >
         {mode === 'multiple' ? (
@@ -502,7 +592,7 @@ export const DateField: React.FC<DateFieldProps> = ({
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
             onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
-            aria-expanded={enableCalendar ? open : undefined}
+            iconButtonProps={enableCalendar ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' } : undefined}
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -522,29 +612,48 @@ export const DateField: React.FC<DateFieldProps> = ({
         ) : (
           <TextField
             {...(inputProps as TextFieldProps)}
+            ref={setTextFieldRef}
             id={id}
             label={label}
             readOnly={readOnly}
-            value={inputValue}
+            value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
             isClearable
-            onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
-            aria-expanded={enableCalendar ? open : undefined}
-            onChange={(val) => handleInputChange(val)}
+            onIconClick={() => {
+              if (!enableCalendar) return;
+              if (shouldUseNativePicker) {
+                openNativePicker();
+              } else {
+                setOpen((prev) => !prev);
+              }
+            }}
+            iconButtonProps={
+              enableCalendar && !shouldUseNativePicker
+                ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' }
+                : undefined
+            }
+            onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             required={required}
             className={cn(styles['tedi-date-field__textfield'], {
               [styles['tedi-date-field__textfield--disabled']]: inputProps?.disabled,
               [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,
             })}
+            input={{
+              ...((inputProps as TextFieldProps)?.input as UnknownType),
+              ...(shouldUseNativePicker && { type: 'date' }),
+              ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
+                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open }
+                : {}),
+            }}
           />
         )}
       </div>
 
-      {enableCalendar && (
+      {enableCalendar && !shouldUseNativePicker && (
         <FloatingPortal>
           {open && (
-            <FloatingFocusManager context={context} modal={false}>
+            <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
                 ref={refs.setFloating}
                 {...interactions.getFloatingProps({
@@ -557,6 +666,7 @@ export const DateField: React.FC<DateFieldProps> = ({
               >
                 <Calendar
                   {...dayPickerProps}
+                  numberOfMonths={effectiveNumberOfMonths}
                   view={view}
                   selectionLevel={selectionLevel}
                   currentMonth={currentMonth}
@@ -583,6 +693,6 @@ export const DateField: React.FC<DateFieldProps> = ({
       )}
     </>
   );
-};
+});
 
 DateField.displayName = 'DateField';

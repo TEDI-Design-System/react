@@ -1,5 +1,5 @@
 import { useLabels } from '../../../../../providers/label-provider';
-import { PickerGrid } from '../../calendar-grid';
+import { CalendarGrid } from '../../calendar-grid';
 
 export interface YearGridProps {
   /*
@@ -48,7 +48,7 @@ export const YearGrid = ({ currentMonth, onSelectYear, onNavigate, showNavigatio
   });
 
   return (
-    <PickerGrid
+    <CalendarGrid
       headerLabel={currentYear}
       prevAriaLabel={getLabel('pickers.previousYear')}
       nextAriaLabel={getLabel('pickers.nextYear')}
@@ -63,3 +63,5 @@ export const YearGrid = ({ currentMonth, onSelectYear, onNavigate, showNavigatio
     />
   );
 };
+
+YearGrid.displayName = 'YearGrid';

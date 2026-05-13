@@ -209,4 +209,37 @@ describe('CalendarHeader', () => {
     expect(called.getFullYear()).toBe(targetYear);
     expect(called.getMonth()).toBe(defaultProps.calendarMonth.date.getMonth());
   });
+
+  it('disables month items whose entire month is unavailable via disabledMatchers', async () => {
+    const user = userEvent.setup();
+
+    // Anything before July 2025 is disabled — so January–June 2025 should be
+    // disabled in the month dropdown when viewing July 2025.
+    render(<CalendarHeader {...defaultProps} localeCode="et" disabledMatchers={[{ before: new Date(2025, 6, 1) }]} />);
+
+    await user.click(screen.getByRole('button', { name: /juuli/i }));
+
+    expect(await screen.findByRole('menuitem', { name: /jaanuar/i })).toBeDisabled();
+    expect(screen.getByRole('menuitem', { name: /juuni/i })).toBeDisabled();
+    expect(screen.getByRole('menuitem', { name: /juuli/i })).not.toBeDisabled();
+    expect(screen.getByRole('menuitem', { name: /august/i })).not.toBeDisabled();
+  });
+
+  it('disables year items whose entire year is unavailable via disabledMatchers', async () => {
+    const user = userEvent.setup();
+
+    const currentYear = new Date().getFullYear();
+    // Disable everything before Jan 1 of the current year — past years in the
+    // 21-year window (currentYear-10 … currentYear-1) should all be disabled.
+    render(
+      <CalendarHeader {...defaultProps} localeCode="et" disabledMatchers={[{ before: new Date(currentYear, 0, 1) }]} />
+    );
+
+    await user.click(screen.getByRole('button', { name: /2025/i }));
+
+    const previousYear = currentYear - 1;
+    expect(await screen.findByRole('menuitem', { name: String(previousYear) })).toBeDisabled();
+    expect(screen.getByRole('menuitem', { name: String(currentYear) })).not.toBeDisabled();
+    expect(screen.getByRole('menuitem', { name: String(currentYear + 1) })).not.toBeDisabled();
+  });
 });

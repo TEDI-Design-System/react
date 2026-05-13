@@ -1,6 +1,6 @@
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
-import { PickerGrid } from '../../calendar-grid';
+import { CalendarGrid } from '../../calendar-grid';
 
 export interface MonthGridProps {
   /*
@@ -53,7 +53,7 @@ export const MonthGrid = ({
   });
 
   return (
-    <PickerGrid
+    <CalendarGrid
       headerLabel={
         <>
           {currentMonth.toLocaleString(localeCode, { month: 'short' })} {year}
@@ -70,3 +70,5 @@ export const MonthGrid = ({
     />
   );
 };
+
+MonthGrid.displayName = 'MonthGrid';

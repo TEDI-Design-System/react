@@ -1,7 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { et } from 'react-day-picker/locale';
 
+import { TextFieldForwardRef } from '../textfield/textfield';
 import { DateField, DateFieldProps } from './date-field';
 
 import '@testing-library/jest-dom';
@@ -22,6 +24,15 @@ describe('DateField component', () => {
   it('renders without crashing and shows label', () => {
     render(<DateField {...defaultProps} />);
     expect(screen.getByLabelText('Birth date')).toBeInTheDocument();
+  });
+
+  it('forwards ref to the underlying TextField (single mode)', () => {
+    const ref = createRef<TextFieldForwardRef>();
+    render(<DateField {...defaultProps} ref={ref} />);
+
+    expect(ref.current).not.toBeNull();
+    expect(ref.current?.input).toBeInstanceOf(HTMLInputElement);
+    expect(ref.current?.input).toBe(screen.getByLabelText('Birth date'));
   });
 
   it('renders TextField in single mode by default', () => {
@@ -305,6 +316,42 @@ describe('DateField component', () => {
 
     await user.click(button);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('mirrors the calendar open state on the trigger button via aria-expanded', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} />);
+
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(button).toHaveAttribute('aria-haspopup', 'dialog');
+
+    await user.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('omits aria-expanded on the trigger when enableCalendar=false', () => {
+    render(<DateField {...defaultProps} enableCalendar={false} />);
+
+    const button = screen.getByRole('button');
+    expect(button).not.toHaveAttribute('aria-expanded');
+  });
+
+  it('wires aria-haspopup + aria-expanded on the input when calendarTrigger="input"', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} calendarTrigger="input" />);
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(input);
+    expect(input).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('formats range with only start date', () => {

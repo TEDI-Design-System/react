@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { forwardRef, useState } from 'react';
 
+import { useLabels } from '../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import Separator from '../../misc/separator/separator';
@@ -52,6 +53,13 @@ export interface MultiValueFieldProps {
    */
   onIconClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
   /**
+   * Extra HTML attributes spread on the icon `<button>` element. Use this to
+   * wire ARIA state (e.g. `aria-expanded`, `aria-controls`) directly to the
+   * icon trigger when it opens a popover / dialog. Only applied when
+   * `onIconClick` is set.
+   */
+  iconButtonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+  /**
    * Whether the clear button should be shown when values exist.
    * @default true
    */
@@ -83,11 +91,13 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
     className,
     icon,
     onIconClick,
+    iconButtonProps,
     isClearable = true,
     required,
     disabled,
   } = props;
 
+  const { getLabel } = useLabels();
   const [internalValues, setInternalValues] = useState<string[]>(externalValues ?? []);
 
   const values = externalValues ?? internalValues;
@@ -113,16 +123,23 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
 
     const iconProps: IconWithoutBackgroundProps = typeof icon === 'string' ? { name: icon } : icon;
 
-    const WrapperElement = onIconClick ? 'button' : 'div';
+    if (onIconClick) {
+      return (
+        <button
+          {...iconButtonProps}
+          className={classNames(styles['tedi-multi-value-field__icon-wrapper'], iconButtonProps?.className)}
+          onClick={onIconClick}
+          type="button"
+        >
+          <Icon {...iconProps} size={18} />
+        </button>
+      );
+    }
 
     return (
-      <WrapperElement
-        className={styles['tedi-multi-value-field__icon-wrapper']}
-        onClick={onIconClick}
-        type={onIconClick ? 'button' : undefined}
-      >
+      <div className={styles['tedi-multi-value-field__icon-wrapper']}>
         <Icon {...iconProps} size={18} />
-      </WrapperElement>
+      </div>
     );
   };
 
@@ -145,7 +162,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
             {showClear && (
               <ClosingButton
                 onClick={clearAll}
-                title="Clear"
+                title={getLabel('clear')}
                 className={styles['tedi-multi-value-field__clear-button']}
                 iconSize={18}
               />

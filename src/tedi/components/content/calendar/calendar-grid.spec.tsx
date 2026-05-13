@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { PickerGrid, PickerGridProps } from './calendar-grid';
+import { CalendarGrid, CalendarGridProps } from './calendar-grid';
 
 import '@testing-library/jest-dom';
 
@@ -50,14 +50,14 @@ jest.mock('../../layout/grid', () => ({
   ),
 }));
 
-describe('PickerGrid', () => {
+describe('CalendarGrid', () => {
   const defaultItems = [
     { key: '1', value: 2024, label: '2024', isSelected: true },
     { key: '2', value: 2025, label: '2025', isSelected: false },
     { key: '3', value: 2026, label: '2026', isSelected: false },
   ];
 
-  const baseProps: PickerGridProps<number> = {
+  const baseProps: CalendarGridProps<number> = {
     headerLabel: 'Year',
     prevAriaLabel: 'Previous',
     nextAriaLabel: 'Next',
@@ -70,7 +70,7 @@ describe('PickerGrid', () => {
   };
 
   it('renders the component with correct structure', () => {
-    render(<PickerGrid {...baseProps} />);
+    render(<CalendarGrid {...baseProps} />);
 
     expect(screen.getByTestId('row')).toBeInTheDocument();
     expect(screen.getAllByTestId('col')).toHaveLength(3);
@@ -78,13 +78,13 @@ describe('PickerGrid', () => {
   });
 
   it('renders header label correctly', () => {
-    render(<PickerGrid {...baseProps} headerLabel="Select Month" />);
+    render(<CalendarGrid {...baseProps} headerLabel="Select Month" />);
 
     expect(screen.getByText('Select Month')).toBeInTheDocument();
   });
 
   it('renders navigation buttons when showNavigation is true', () => {
-    render(<PickerGrid {...baseProps} />);
+    render(<CalendarGrid {...baseProps} />);
 
     const prevButton = screen.getByRole('button', { name: /previous/i });
     const nextButton = screen.getByRole('button', { name: /next/i });
@@ -96,7 +96,7 @@ describe('PickerGrid', () => {
   });
 
   it('does not render navigation buttons when showNavigation is false', () => {
-    render(<PickerGrid {...baseProps} showNavigation={false} />);
+    render(<CalendarGrid {...baseProps} showNavigation={false} />);
 
     expect(screen.queryByRole('button', { name: /previous/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument();
@@ -109,7 +109,7 @@ describe('PickerGrid', () => {
     const onPrev = jest.fn();
     const onNext = jest.fn();
 
-    render(<PickerGrid {...baseProps} onPrev={onPrev} onNext={onNext} />);
+    render(<CalendarGrid {...baseProps} onPrev={onPrev} onNext={onNext} />);
 
     fireEvent.click(screen.getByRole('button', { name: /previous/i }));
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
@@ -119,7 +119,7 @@ describe('PickerGrid', () => {
   });
 
   it('renders all items as buttons in a grid', () => {
-    render(<PickerGrid {...baseProps} />);
+    render(<CalendarGrid {...baseProps} />);
 
     const buttons = screen.getAllByTestId('button');
     expect(buttons).toHaveLength(5);
@@ -130,7 +130,7 @@ describe('PickerGrid', () => {
 
   it('calls onSelect with correct value when an item is clicked', () => {
     const onSelect = jest.fn();
-    render(<PickerGrid {...baseProps} onSelect={onSelect} />);
+    render(<CalendarGrid {...baseProps} onSelect={onSelect} />);
 
     const year2025Button = screen.getByRole('button', { name: '2025' });
     fireEvent.click(year2025Button);
@@ -139,7 +139,7 @@ describe('PickerGrid', () => {
   });
 
   it('applies selected styles and aria-pressed to selected item', () => {
-    render(<PickerGrid {...baseProps} />);
+    render(<CalendarGrid {...baseProps} />);
 
     const selectedButton = screen.getByRole('button', { name: '2024' });
     const nonSelectedButton = screen.getByRole('button', { name: '2025' });
@@ -152,7 +152,7 @@ describe('PickerGrid', () => {
   });
 
   it('applies custom className to the root container', () => {
-    render(<PickerGrid {...baseProps} className="custom-picker-grid" />);
+    render(<CalendarGrid {...baseProps} className="custom-picker-grid" />);
 
     const rootContainer = screen.getByTestId('tedi-picker-grid-container');
 
@@ -166,14 +166,14 @@ describe('PickerGrid', () => {
       { key: 'feb', value: 1, label: 'February', isSelected: false },
     ];
 
-    render(<PickerGrid {...baseProps} items={itemsWithNode} headerLabel="Months" />);
+    render(<CalendarGrid {...baseProps} items={itemsWithNode} headerLabel="Months" />);
 
     expect(screen.getByTestId('jan')).toBeInTheDocument();
     expect(screen.getByText('February')).toBeInTheDocument();
   });
 
   it('uses correct column width (4)', () => {
-    render(<PickerGrid {...baseProps} />);
+    render(<CalendarGrid {...baseProps} />);
 
     const cols = screen.getAllByTestId('col');
     cols.forEach((col) => {

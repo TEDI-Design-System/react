@@ -29,7 +29,7 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * grid — those flip as the user navigates between year / month / day.
    * `selectionLevel` is the lowest level the user can drill down to before
    * a click commits the selection.
-   * @default 'days'
+   * @default days
    */
   selectionLevel?: CalendarView;
   /**
@@ -95,7 +95,7 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Forwarded to the internal `CalendarHeader`.
    * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
    * - `'grid'` — each picker opens a full grid of options.
-   * @default 'dropdown'
+   * @default dropdown
    */
   monthYearSelectType?: 'dropdown' | 'grid';
   /**
@@ -244,6 +244,7 @@ export const Calendar = ({
                 onOpenYearGrid={() => setView('years')}
                 showNavigation={showNavigation}
                 localeCode={localeCode}
+                disabledMatchers={computedDisabled.length ? computedDisabled : undefined}
               />
             ),
             Nav: () => <></>,

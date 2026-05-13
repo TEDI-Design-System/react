@@ -5,26 +5,26 @@ import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import styles from './calendar.module.scss';
 
-export interface PickerGridItem<T> {
+export interface CalendarGridItem<T> {
   key: React.Key;
   value: T;
   label: React.ReactNode;
   isSelected?: boolean;
 }
 
-export interface PickerGridProps<T> {
+export interface CalendarGridProps<T> {
   headerLabel: React.ReactNode;
   prevAriaLabel: string;
   nextAriaLabel: string;
   onPrev: () => void;
   onNext: () => void;
-  items: PickerGridItem<T>[];
+  items: CalendarGridItem<T>[];
   onSelect: (value: T) => void;
   showNavigation?: boolean;
   className?: string;
 }
 
-export const PickerGrid = <T,>({
+export const CalendarGrid = <T,>({
   headerLabel,
   prevAriaLabel,
   nextAriaLabel,
@@ -34,7 +34,7 @@ export const PickerGrid = <T,>({
   onSelect,
   showNavigation,
   className,
-}: PickerGridProps<T>) => {
+}: CalendarGridProps<T>) => {
   return (
     <div
       className={classNames(styles['tedi-calendar__picker-grid-container'], className)}
@@ -55,7 +55,7 @@ export const PickerGrid = <T,>({
 
         {showNavigation && (
           <Button type="button" onClick={onNext} aria-label={nextAriaLabel} icon="arrow_forward" visualType="neutral">
-            {nextAriaLabel}
+            <Text modifiers="capitalize-first">{nextAriaLabel}</Text>
           </Button>
         )}
       </div>
@@ -81,3 +81,5 @@ export const PickerGrid = <T,>({
     </div>
   );
 };
+
+CalendarGrid.displayName = 'CalendarGrid';

@@ -17,6 +17,18 @@ import { DateField, DateFieldProps } from './date-field';
 export default {
   title: 'Tedi-Ready/Components/Form/DateField',
   component: DateField,
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.37.57?node-id=4620-82915&m=dev',
+    },
+  },
 } as Meta<DateFieldProps>;
 
 type Story = StoryObj<DateFieldProps>;
@@ -402,6 +414,30 @@ export const AvailableDays: Story = {
         onSelect={(date) => setSelected(date as Date)}
         availableDays={availableDays}
         id="available-days-shown"
+      />
+    );
+  },
+};
+
+/**
+ * Swaps the custom calendar popover for the browser's native date picker
+ * (`<input type="date">`). Useful when the consumer wants to skip the custom
+ * UI entirely — works on both mobile (where the native control is usually
+ * the best UX) and desktop (where it's a compact, dependency-free fallback).
+ *
+ */
+export const NativePicker: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+
+    return (
+      <DateField
+        id="date-field-native-picker"
+        mode="single"
+        label="Date"
+        useNativePicker
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
       />
     );
   },
