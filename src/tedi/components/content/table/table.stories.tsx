@@ -127,16 +127,7 @@ const people: Person[] = Array.from({ length: 28 }, (_, index) => {
   };
 });
 
-/**
- * Default pagination options applied to most stories. Matches Figma examples
- * which show pagination on every table variant (default page size 10).
- */
 const DEFAULT_PAGINATION = { pageSize: 10, pageSizeOptions: [10, 25, 50] };
-
-/**
- * Used by `Sizes` and `Simple` stories — the Figma frames show 3-4 visible
- * rows per page so the table comparison fits without scrolling.
- */
 const SHOWCASE_PAGINATION_3 = { pageSize: 3, pageSizeOptions: [3, 10, 25, 50] };
 const SHOWCASE_PAGINATION_4 = { pageSize: 4, pageSizeOptions: [4, 10, 25, 50] };
 
@@ -329,8 +320,7 @@ function EditableTextCell<T extends { id: string }>({
 }
 
 /**
- * Booking columns used by Default + Sizes (Figma "Sizes" frame). Each cell
- * flips into a TextField when its row is being edited; the actions column
+ * Each cell flips into a TextField when its row is being edited; the actions column
  * swaps the Muuda link for cancel / commit buttons. The cells read editor
  * state from `EditableRowsContext`, so this array stays a stable module-level
  * constant — important for TanStack reconciliation across keystrokes.
@@ -387,11 +377,6 @@ export const Default: Story = {
   },
 };
 
-/**
- * Both table sizes side-by-side, mirroring the Figma "Sizes" frame:
- * `default` and `small` variants of the same booking columns so the
- * difference in row/header padding is easy to compare.
- */
 export const Sizes: Story = {
   render: function Sizes() {
     const defaultEditor = useEditableRows<Booking>(bookings);
@@ -422,12 +407,6 @@ export const Sizes: Story = {
   },
 };
 
-/**
- * Three "simple" table layouts side-by-side, mirroring the Figma "Simple"
- * frame: a bookings list with an edit action, a people list with linked
- * names + status badges, and a doctor list with a multi-line first cell.
- * Same chrome (borders, pagination), different content patterns.
- */
 const simplePeopleColumns: ColumnDef<PersonRecord>[] = [
   {
     id: 'name',
@@ -513,12 +492,6 @@ export const Simple: Story = {
   },
 };
 
-/**
- * Two long-text patterns from the Figma "Long texts" frame. Top table puts
- * the "Show more" link on its own line under the truncated paragraph (with a
- * chevron). Bottom table inlines the link at the end of the truncated text
- * (underlined, no icon). Tip alert in the middle explains the trade-off.
- */
 const LONG_DESCRIPTION =
   'Pellentesque mattis augue at mi tristique dignissim. Aliquam lobortis hendrerit ' +
   'augue, sit amet pellentesque nibh ultricies eu. Nullam ut nibh non lectus pulvinar ' +
@@ -551,12 +524,6 @@ const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   },
 ];
 
-/**
- * Two row-action patterns from the Figma "Actions" frame. Top table puts
- * separate edit + delete icon buttons on each row. Bottom table collapses
- * the same affordances into a single kebab (`more_vert`) button — typical
- * pattern when the row is dense or has many possible actions.
- */
 const baseDoctorActionsColumns = (): ColumnDef<Doctor>[] => [
   {
     id: 'name',
@@ -579,12 +546,6 @@ const rowActionsCellStyle: React.CSSProperties = {
   width: '100%',
 };
 
-/**
- * "Custom" Figma frame: a tip alert plus a table with custom-rendered cells —
- * avatar circle next to the name, a status note column with coloured
- * `StatusBadge`s, and the same edit/delete row actions from the Actions
- * showcase. Demonstrates that any column can return arbitrary JSX.
- */
 type CustomNoteColor = 'warning' | 'danger' | undefined;
 
 interface CustomDoctor extends Doctor {
@@ -750,189 +711,30 @@ export const NoOutsideBorder: Story = {
 };
 
 /**
- * Editable rows — matches Figma "Changeable values". Click "Muuda" on any row
- * to swap its cells for form inputs (date range, time, duration, location)
- * plus a cancel (×) / confirm (✓) pair. Other rows stay static until picked.
- */
-interface EditableBooking {
-  id: string;
-  dateRange: string;
-  hour: string;
-  duration: string;
-  location: string;
-}
-
-const editableBookingsSeed: EditableBooking[] = Array.from({ length: 28 }, (_, index) => ({
-  id: String(index + 1),
-  dateRange: '22.03.2029 – 29.03.2029',
-  hour: '11:14',
-  duration: '6',
-  location: 'Harjumaa',
-}));
-
-const muudaLinkStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  color: 'var(--link-primary-default)',
-  textDecoration: 'none',
-  fontWeight: 'var(--body-regular-weight)',
-};
-
-const editActionsStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 8,
-};
-
-/**
- * Row-level inline editing: clicking "Muuda" replaces static cells with `TextField` inputs and
- * swaps the action column for confirm/cancel buttons. Track `editingId` + a `draft` copy of the row
- * in local state; commit or discard on button click. Only one row edits at a time.
+ * Built on the shared `useEditableRows` hook + `EditableRowsContext` and the
+ * module-level `bookingShowcaseColumns` array: the editor state lives in the
+ * hook, flows through context, and is read by `EditableTextCell` /
+ * `EditActionsCell` inside each cell. Keeping the columns array stable across
+ * renders is what prevents TanStack from rebuilding column instances on every
+ * keystroke (which would otherwise unmount the inner `<TextField>` and lose
+ * focus after each character).
  */
 export const EditableValues: Story = {
   render: function EditableValues() {
-    const [rows, setRows] = useState<EditableBooking[]>(editableBookingsSeed);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [draft, setDraft] = useState<EditableBooking | null>(null);
-
-    const beginEdit = (row: EditableBooking) => {
-      setEditingId(row.id);
-      setDraft(row);
-    };
-    const cancelEdit = () => {
-      setEditingId(null);
-      setDraft(null);
-    };
-    const commitEdit = () => {
-      if (!draft) return;
-      setRows((current) => current.map((row) => (row.id === draft.id ? draft : row)));
-      setEditingId(null);
-      setDraft(null);
-    };
-
-    const columns = useMemo<ColumnDef<EditableBooking>[]>(
-      () => [
-        {
-          id: 'dateRange',
-          header: 'Kuupäev',
-          accessorKey: 'dateRange',
-          cell: ({ row }) => {
-            if (row.original.id !== editingId || !draft) return row.original.dateRange;
-            return (
-              <TextField
-                id={`date-${row.original.id}`}
-                name="date"
-                label="Kuupäev"
-                hideLabel
-                icon="calendar_today"
-                value={draft.dateRange}
-                onChange={(next) => setDraft((prev) => (prev ? { ...prev, dateRange: next } : prev))}
-              />
-            );
-          },
-        },
-        {
-          id: 'hour',
-          header: 'Kellaaeg',
-          accessorKey: 'hour',
-          cell: ({ row }) => {
-            if (row.original.id !== editingId || !draft) return row.original.hour;
-            return (
-              <TextField
-                id={`hour-${row.original.id}`}
-                name="hour"
-                label="Kellaaeg"
-                hideLabel
-                icon="schedule"
-                value={draft.hour}
-                onChange={(next) => setDraft((prev) => (prev ? { ...prev, hour: next } : prev))}
-              />
-            );
-          },
-        },
-        {
-          id: 'duration',
-          header: 'Kestus',
-          accessorKey: 'duration',
-          cell: ({ row }) => {
-            if (row.original.id !== editingId || !draft) return `${row.original.duration} min`;
-            return (
-              <TextField
-                id={`duration-${row.original.id}`}
-                name="duration"
-                label="Kestus"
-                hideLabel
-                value={draft.duration}
-                onChange={(next) => setDraft((prev) => (prev ? { ...prev, duration: next } : prev))}
-              />
-            );
-          },
-        },
-        {
-          id: 'location',
-          header: 'Asukoht',
-          accessorKey: 'location',
-          cell: ({ row }) => {
-            if (row.original.id !== editingId || !draft) return row.original.location;
-            return (
-              <TextField
-                id={`location-${row.original.id}`}
-                name="location"
-                label="Asukoht"
-                hideLabel
-                value={draft.location}
-                onChange={(next) => setDraft((prev) => (prev ? { ...prev, location: next } : prev))}
-              />
-            );
-          },
-        },
-        {
-          id: 'actions',
-          header: '',
-          cell: ({ row }) => {
-            if (row.original.id === editingId) {
-              return (
-                <span style={editActionsStyle}>
-                  <ClosingButton title="Tühista" onClick={cancelEdit} />
-                  <Button visualType="primary" size="small" icon="check" onClick={commitEdit}>
-                    Kinnita
-                  </Button>
-                </span>
-              );
-            }
-            return (
-              <a
-                href="#"
-                onClick={(event) => {
-                  event.preventDefault();
-                  beginEdit(row.original);
-                }}
-                style={muudaLinkStyle}
-              >
-                <Icon name="edit" color="brand" size={18} />
-                Muuda
-              </a>
-            );
-          },
-        },
-      ],
-      [draft, editingId]
-    );
-
+    const editor = useEditableRows<Booking>(bookings);
     return (
-      <Table<EditableBooking> id="tedi-table-editable" data={rows} columns={columns} pagination={DEFAULT_PAGINATION} />
+      <EditableRowsContext.Provider value={editor}>
+        <Table<Booking>
+          id="tedi-table-editable"
+          data={editor.rows}
+          columns={bookingShowcaseColumns}
+          pagination={DEFAULT_PAGINATION}
+        />
+      </EditableRowsContext.Provider>
     );
   },
 };
 
-/**
- * Sortable columns — header shows a compact sort chevron that cycles through
- * `unsorted → ascending → descending → unsorted` on click. Matches the Figma
- * sort indicator from Example table 7/8. Columns opt in via
- * `columnDef.enableSorting` (default `true`); only columns with
- * `enableSorting: false` render as plain text.
- */
 /**
  * Client-side sorting via `Table.HeaderButton` in the header renderer. Each click cycles
  * `unfold_more → arrow_upward → arrow_downward → unfold_more`. TanStack Table handles the
@@ -973,9 +775,6 @@ export const Sortable: Story = {
 };
 
 /**
- * Per-column filter popovers — matches Figma Example table 7/8 exactly
- * (Nimi / Töö algus / Vanus / Külastuste arv / Tõendi staatus).
- *
  * Each filterable header pairs a `unfold_more`/`arrow_upward`/`arrow_downward`
  * sort chevron with a `filter_alt` funnel `Popover` trigger. Popover contents
  * vary per column:
@@ -1553,13 +1352,6 @@ export const LongTexts: Story = {
   },
 };
 
-/**
- * Row-action pattern from the Figma "Actions" frame: each row collapses its
- * actions under a single `more_vert` kebab trigger that opens a `<Dropdown>`
- * menu. Idiomatic for dense rows or any table with more than two actions —
- * the menu portals out of the cell so it isn't clipped by the table's scroll
- * container.
- */
 export const Actions: Story = {
   render: function Actions() {
     const columns = useMemo<ColumnDef<Doctor>[]>(
@@ -1601,13 +1393,6 @@ export const Actions: Story = {
   },
 };
 
-/**
- * "Custom" Figma frame: a tip alert plus a table with custom-rendered cells —
- * avatar circle next to the name, a status note column with coloured `Alert`
- * tags, and a `<Popover>`-anchored info card on the actions trigger.
- * Demonstrates that any column can return arbitrary JSX, including overlay
- * UI like a row-level info preview with action buttons.
- */
 export const Custom: Story = {
   render: function Custom() {
     const columns = useMemo<ColumnDef<CustomDoctor>[]>(
@@ -1691,11 +1476,6 @@ export const Custom: Story = {
     );
   },
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stories not present in the Figma "Types" frame — kept after the Figma-driven
-// showcase so the story sidebar follows the design's documented order first.
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Footer row showing per-column aggregates (e.g. salary total, headcount).
