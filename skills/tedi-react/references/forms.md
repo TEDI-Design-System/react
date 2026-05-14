@@ -15,6 +15,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
 | Search | `string` | Search button, onSearch callback |
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
+| Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop |
 
@@ -176,6 +177,77 @@ const [date, setDate] = useState<Date>();
   }}
 />
 ```
+
+## Filter
+
+Compact pill-shaped trigger for refining result sets. Renders one of four modes depending on
+which props are present: **toggle** (no `options`/`children`), **single-select dropdown**
+(`options`), **multi-select dropdown** (`options` + `multiselect`), or **custom dropdown
+content** (`children`).
+
+```tsx
+import { Filter, FilterGroup } from '@tedi-design-system/react/tedi';
+
+// Toggle
+<Filter text="Active" selected={active} onSelectedChange={setActive} />
+
+// Single-select — `preserveLabel` renders "Label: Selected value"
+<Filter
+  text="Service"
+  options={serviceOptions}
+  selectedValue={service}
+  onSelectedValueChange={setService}
+  preserveLabel
+  showClear
+  appendTo="body"
+/>
+
+// Multi-select with searchable + select all + clear
+<Filter
+  text="Hospitals"
+  multiselect
+  options={hospitalOptions}
+  selectedValues={hospitals}
+  onSelectedValuesChange={setHospitals}
+  searchable
+  showSelectAll
+  showClear
+  appendTo="body"
+/>
+
+// Custom dropdown content
+<Filter text={periodLabel} selected={!!period} showClear onClear={() => setPeriod('')}>
+  <ChoiceGroup id="period" label="Period" inputType="radio" items={periodItems}
+    value={period} onChange={setPeriod} />
+</Filter>
+```
+
+Group filters with `FilterGroup` to coordinate selection — radio-like by default, checkbox-like
+when `multiselect`:
+
+```tsx
+<FilterGroup label="Status" value={status} onValueChange={setStatus}>
+  <Filter text="All" value="all" />
+  <Filter text="Active" value="active" />
+  <Filter text="Done" value="done" />
+</FilterGroup>
+
+<FilterGroup label="Tags" multiselect values={tags} onValuesChange={setTags}>
+  <Filter text="Urgent" value="urgent" />
+  <Filter text="Review" value="review" />
+</FilterGroup>
+```
+
+A `FilterGroup` without any of `value` / `defaultValue` / `values` / `defaultValues` /
+`onValueChange` / `onValuesChange` / `label` / `multiselect` is **unmanaged** — children
+behave as standalone toggles and the wrapper exists only for visual grouping.
+
+Variants and customisation:
+- `variant?: 'primary' | 'secondary'`, `size?: 'default' | 'large'`
+- `prepend` / `append` for icons or badges. `hidePrependWhenSelected` (default `true`) swaps
+  the prepend slot for the check icon when the filter becomes selected.
+- `appendTo: 'body' | HTMLElement` portals the dropdown out of the trigger's stacking context.
+- Estonian copy by default: `selectAllLabel='Vali kõik'`, `clearLabel='Tühjenda valik'`.
 
 ## Checkbox & Radio
 

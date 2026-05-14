@@ -4,7 +4,7 @@
   z-index: var(--z-index-dropdown);
   display: flex;
   flex-direction: column;
-  width: var(--dropdown-min-width, 10rem);
+  width: var(--dropdown-min-width, max-content);
   pointer-events: none;
   background-color: var(--dropdown-item-default-background);
   border: 1px solid var(--card-border-primary);

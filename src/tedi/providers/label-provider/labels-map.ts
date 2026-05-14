@@ -114,6 +114,20 @@ export const labelsMap = validateDefaultLabels({
     en: 'Clear',
     ru: 'Очистить',
   },
+  'filter.clear-selection': {
+    description: 'Clear-selection action shown in the Filter dropdown',
+    components: ['Filter'],
+    et: 'Tühjenda valik',
+    en: 'Clear selection',
+    ru: 'Очистить выбор',
+  },
+  'filter.select-all': {
+    description: 'Select-all checkbox shown in the multi-select Filter dropdown',
+    components: ['Filter'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
+  },
   search: {
     description: 'For searching',
     components: ['TableFilter'],

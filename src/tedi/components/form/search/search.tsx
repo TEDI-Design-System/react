@@ -38,6 +38,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       button,
       ariaLabel,
       className,
+      input,
       ...rest
     },
     ref
@@ -61,6 +62,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       isClearable,
       onKeyDown: handleKeyDown,
       onChange,
+      input: { role: 'searchbox' as const, ...input },
       ...(button ? {} : { icon: searchIcon }),
     };
 

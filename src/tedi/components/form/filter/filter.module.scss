@@ -1,0 +1,205 @@
+.tedi-filter {
+  --filter-bg: transparent;
+  --filter-text: inherit;
+  --filter-border: transparent;
+  --filter-border-width: var(--tedi-borders-01);
+  --filter-padding-x: var(--filter-default-padding-x);
+  --filter-radius: var(--form-checkbox-radio-card-radius);
+
+  display: inline-flex;
+
+  &__button {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    max-width: var(--button-width-max);
+    padding: 0 var(--filter-padding-x);
+    font-family: var(--family-default);
+    font-size: var(--body-regular-size);
+    font-weight: var(--body-regular-weight);
+    line-height: var(--body-regular-line-height);
+    color: var(--filter-text);
+    cursor: pointer;
+    background-color: var(--filter-bg);
+    border: var(--filter-border-width) solid var(--filter-border);
+    border-radius: var(--filter-radius);
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 1px var(--tedi-neutral-100), 0 0 0 3px var(--form-input-border-active);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__text {
+    padding: calc(var(--filter-default-padding-y) - var(--filter-border-width)) var(--filter-default-inner-spacing);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__icon {
+    display: inline-flex;
+    padding: 0 var(--filter-default-inner-spacing-sm);
+  }
+
+  &__prepend {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--filter-default-inner-spacing-sm);
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__append {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--layout-grid-gutters-02);
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__prepend--hidden {
+    display: none;
+  }
+
+  &__count {
+    padding-left: var(--layout-grid-gutters-04);
+  }
+
+  &--primary {
+    --filter-border-width: 0px;
+    --filter-bg: var(--filter-primary-default-background);
+    --filter-text: var(--filter-primary-default-text);
+
+    .tedi-filter__button:hover,
+    .tedi-filter__button:active,
+    .tedi-filter__button[aria-expanded='true'] {
+      --filter-bg: var(--filter-primary-hover-background);
+      --filter-text: var(--filter-primary-hover-text);
+    }
+
+    &.tedi-filter--selected {
+      --filter-bg: var(--filter-primary-selected-background);
+      --filter-text: var(--filter-primary-selected-text);
+
+      .tedi-filter__button:hover,
+      .tedi-filter__button:active,
+      .tedi-filter__button[aria-expanded='true'] {
+        --filter-bg: var(--filter-primary-hover-background);
+        --filter-text: var(--filter-primary-hover-text);
+      }
+    }
+  }
+
+  &--secondary {
+    --filter-bg: var(--filter-secondary-default-background);
+    --filter-text: var(--filter-secondary-default-text);
+    --filter-border: var(--filter-secondary-default-border);
+
+    .tedi-filter__button:hover,
+    .tedi-filter__button:active,
+    .tedi-filter__button[aria-expanded='true'] {
+      --filter-bg: var(--filter-secondary-hover-background);
+      --filter-text: var(--filter-secondary-hover-text);
+      --filter-border: var(--filter-secondary-hover-border);
+    }
+
+    &.tedi-filter--selected {
+      --filter-bg: var(--filter-secondary-selected-background);
+      --filter-text: var(--filter-secondary-selected-text);
+      --filter-border: var(--filter-secondary-selected-border);
+      --filter-border-width: var(--general-selected-border-width);
+
+      // Selected + hover/active keeps the 2px selected border but swaps the surface to the
+      // secondary hover tint.
+      .tedi-filter__button:hover,
+      .tedi-filter__button:active,
+      .tedi-filter__button[aria-expanded='true'] {
+        --filter-bg: var(--filter-secondary-hover-background);
+        --filter-border: var(--filter-secondary-hover-border);
+      }
+    }
+  }
+
+  &--large {
+    --filter-padding-x: var(--filter-lg-padding-x);
+
+    .tedi-filter__text {
+      padding-top: calc(var(--filter-lg-padding-y) - var(--filter-border-width));
+      padding-bottom: calc(var(--filter-lg-padding-y) - var(--filter-border-width));
+    }
+  }
+}
+
+.tedi-filter-group {
+  display: inline-flex;
+
+  .tedi-filter {
+    --filter-radius: 0;
+  }
+
+  .tedi-filter--secondary + .tedi-filter--secondary {
+    margin-left: calc(-1 * var(--tedi-borders-01));
+  }
+
+  .tedi-filter--primary:not(:last-child) .tedi-filter__button {
+    border-right: var(--tedi-borders-01) solid var(--filter-secondary-default-border);
+
+    // On hover/active the button is filled with the hover bg — match the divider colour so
+    // it blends into the surface instead of cutting through it.
+    &:hover,
+    &:active,
+    &[aria-expanded='true'] {
+      border-right-color: var(--filter-primary-hover-background);
+    }
+  }
+
+  .tedi-filter--selected,
+  .tedi-filter:focus-within {
+    z-index: 1;
+  }
+
+  .tedi-filter--secondary.tedi-filter--selected + .tedi-filter--secondary,
+  .tedi-filter--secondary + .tedi-filter--secondary.tedi-filter--selected {
+    margin-left: calc(-1 * var(--general-selected-border-width));
+  }
+
+  .tedi-filter:first-child {
+    --filter-radius: var(--form-checkbox-radio-card-radius) 0 0 var(--form-checkbox-radio-card-radius);
+  }
+
+  .tedi-filter:last-child {
+    --filter-radius: 0 var(--form-checkbox-radio-card-radius) var(--form-checkbox-radio-card-radius) 0;
+  }
+
+  .tedi-filter:only-child {
+    --filter-radius: var(--form-checkbox-radio-card-radius);
+  }
+}
+
+.tedi-filter-dropdown {
+  &__custom-content {
+    padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+  }
+
+  &__search {
+    padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+  }
+
+  &__clear {
+    display: flex;
+    justify-content: center;
+    padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+    background: var(--dropdown-item-default-background);
+  }
+}
