@@ -156,6 +156,43 @@ Sub-component: `List.Item`
 - `maxLength?: number = 200`
 - `expandable?: boolean = true`
 
+### Calendar
+> **For plain date inputs use `DateField`.** Calendar is the lower-level primitive — reach for it only when you need an always-visible inline calendar (scheduling grid, availability picker) or are building a custom date control on top.
+
+**Props:** `CalendarProps` extends `DayPickerProps`
+- `mode?: 'single' | 'multiple' | 'range' = 'single'`
+- `value: Date | Date[] | DateRange | undefined` (required) — shape matches the active `mode`
+- `handleSelect: OnSelectHandler<...>` (required) — fires when a day is clicked
+- `applyValue: (date: Date) => void` (required) — invoked when a month / year cell commits a selection via `selectionLevel`
+- `currentMonth: Date` (required), `setCurrentMonth: (date: Date) => void` (required) — controlled visible month
+- `view?: 'days' | 'months' | 'years' = 'days'`, `setView?: (view) => void` — controlled visible grid (independent of `selectionLevel`)
+- `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level: `'years'` selects Jan 1 of the picked year, `'months'` selects day 1
+- `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
+- `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
+- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header picker style
+- `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
+- `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
+- `required?: boolean`, `footer?: ReactNode`, `className?: string`
+
+```tsx
+import { Calendar } from '@tedi-design-system/react/tedi';
+
+const [view, setView] = useState<'days' | 'months' | 'years'>('days');
+const [month, setMonth] = useState(new Date());
+const [date, setDate] = useState<Date | undefined>();
+
+<Calendar
+  mode="single"
+  view={view}
+  setView={setView}
+  currentMonth={month}
+  setCurrentMonth={setMonth}
+  value={date}
+  handleSelect={(value) => setDate(value as Date)}
+  applyValue={setDate}
+/>
+```
+
 ## Form
 
 ### TextField
@@ -251,6 +288,113 @@ Same as Checkbox (without indeterminate)
 **Props:** `SearchProps` extends TextFieldProps | bp, form
 - `onSearch?: (value: string) => void`
 - `button?: Partial<ButtonProps>`
+
+### DateField
+**Props:** `DateFieldProps` extends `DayPickerProps` | fRef (`TextFieldForwardRef`), bp, form
+- `id: string` (required), `label: string` (required)
+- `mode?: 'single' | 'multiple' | 'range' = 'single'` — selection model
+- `selected?: Date | Date[] | DateRange`, `defaultValue?: Date | Date[] | DateRange`
+- `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>`
+- `placeholder?: string`
+- `required?: boolean`, `readOnly?: boolean`
+- `formatDate?: (date) => string` — display formatter (default: `dd.MM.yyyy`, et-EE)
+- `parseDate?: (value: string) => Date | Date[] | DateRange | undefined` — manual-input parser; without it the field is calendar-only
+- `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
+- `initialMonth?: Date`
+- `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
+- `footer?: ReactNode` — slot below the calendar grid
+- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
+- `showOutsideDays?: boolean = true`
+- **Disabling:** `disabled?: Matcher | Matcher[]`, `minDate?: Date`, `maxDate?: Date`, `disablePast?: boolean`, `disableFuture?: boolean`, `shouldDisableMonth?: (date) => boolean`, `shouldDisableYear?: (date) => boolean`
+- `availableDays?: Date[] | ((date) => boolean)` — opposite of `disabled`
+- `inputProps?: Omit<TextFieldProps | MultiValueFieldProps, 'label' | 'id'>` — pass-through to the underlying input
+- **Breakpoint-aware:** `enableCalendar?: boolean = true`, `calendarTrigger?: 'input' | 'button' = 'button'`, `useNativePicker?: boolean = false` (`'single'` mode only — swaps to `<input type="date">`), `numberOfMonths?: number` (clamped to 1 below `md`)
+
+The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the underlying control is `MultiValueField`, so `ref.current.input` is `null` there. The calendar trigger button carries `aria-haspopup="dialog"` + `aria-expanded`; when `calendarTrigger="input"` those land on the `<input>` instead.
+
+```tsx
+<DateField
+  id="birthdate"
+  label="Birth date"
+  defaultValue={new Date(1990, 0, 1)}
+  onSelect={(date) => console.log(date)}
+  minDate={new Date(1900, 0, 1)}
+  disableFuture
+/>
+
+// Range with manual input parsing
+<DateField
+  id="period"
+  label="Period"
+  mode="range"
+  parseDate={(v) => /* return DateRange */}
+  selected={range}
+  onSelect={setRange}
+  closeOnSelect={false}
+/>
+
+// Native picker on mobile, custom calendar on desktop
+<DateField id="dob" label="Date of birth" useNativePicker md={{ useNativePicker: false }} />
+```
+
+### TimeField
+**Props:** `TimeFieldProps` | bp, form
+- `id: string` (required), `label: string` (required)
+- `value?: string`, `defaultValue?: string` — `"HH:mm"` 24-hour format
+- `onChange?: (time: string) => void`
+- `placeholder?: string`
+- `required?: boolean`, `readOnly?: boolean`
+- `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
+- `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
+- `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
+- `className?: string`
+- **Breakpoint-aware:** `useNativePicker?: boolean = false` (swap to `<input type="time">`; ignores `availableTimes`), `showPicker?: boolean = true`, `timePickerTrigger?: 'input' | 'button' = 'button'`, `availableTimesVariant?: 'grid-buttons' | 'grid-radio' | 'dropdown'` — which variant the picker renders when `availableTimes` is set
+
+```tsx
+<TimeField id="meeting" label="Meeting time" value={time} onChange={setTime} stepMinutes={15} />
+
+// Constrain to specific slots, render as a radio-button grid
+<TimeField
+  id="slot"
+  label="Available slot"
+  availableTimes={['09:00', '09:30', '10:00', '14:00', '15:30']}
+  availableTimesVariant="grid-radio"
+  value={slot}
+  onChange={setSlot}
+/>
+
+// Native picker on mobile, custom wheel on desktop
+<TimeField id="alarm" label="Alarm" useNativePicker md={{ useNativePicker: false }} />
+```
+
+### TimePicker
+> **For plain time inputs use `TimeField`.** TimePicker is the lower-level picker primitive — reach for it only when you need a standalone, always-visible time selector (scheduling UI, custom popover, side-by-side with a calendar in a DateTime composite).
+
+**Props:** `TimePickerProps` | form
+- `value?: string`, `defaultValue?: string` — `"HH:mm"`
+- `onChange?: (time: string) => void`
+- `stepMinutes?: number = 1` — minute increment for the wheel
+- `availableTimes?: string[]` — switches from scroll-wheel mode to a predefined-slots grid
+- `gridVariant?: 'button' | 'radio' = 'button'` — only used with `availableTimes`
+- `bordered?: boolean = true` — set `false` when embedding inside a parent that already provides its own surface (e.g. alongside a Calendar)
+- `className?: string`
+
+The wheel column supports full keyboard navigation: `ArrowUp` / `ArrowDown` and `PageUp` / `PageDown` cycle through the column (wrap at both ends), `Home` / `End` jump to the bounds, `Enter` / `Space` commit the highlighted value.
+
+```tsx
+import { TimePicker } from '@tedi-design-system/react/tedi';
+
+<TimePicker value={time} onChange={setTime} stepMinutes={5} />
+
+// Predefined slots
+<TimePicker
+  availableTimes={['09:00', '10:00', '11:00', '14:00']}
+  gridVariant="radio"
+  value={slot}
+  onChange={setSlot}
+/>
+```
 
 ### FileUpload
 **Props:** `FileUploadProps` | form

@@ -53,6 +53,14 @@ export interface TimePickerProps {
    * Useful for custom styling and layout overrides.
    */
   className?: string;
+  /**
+   * Whether to render the surrounding card (border, background, radius).
+   * Set to `false` when embedding inside a parent that already provides
+   * its own surface — e.g. alongside a calendar inside `DateTimeField`.
+   * The inner gradient masks and column separators are preserved either way.
+   * @default true
+   */
+  bordered?: boolean;
 }
 
 export const TimePicker: React.FC<TimePickerProps> = ({
@@ -63,6 +71,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   availableTimes,
   gridVariant = 'button',
   className,
+  bordered = true,
 }) => {
   const [internal, setInternal] = React.useState(defaultValue);
   const isControlled = value !== undefined;
@@ -88,6 +97,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         variant={gridVariant}
         onSelect={handleChange}
         className={className}
+        bordered={bordered}
       />
     );
   }
@@ -100,6 +110,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
       selectedMinute={selectedMinute}
       onChange={(hour, minute) => handleChange(`${hour}:${minute}`)}
       className={className}
+      bordered={bordered}
     />
   );
 };

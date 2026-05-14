@@ -20,12 +20,15 @@ import { Dropdown } from '../../overlays/dropdown';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import { TimePicker } from '../time-picker/time-picker';
 import styles from './time-field.module.scss';
-import { TIMEPICKER_OFFSET } from './time-field-helpers';
+import { normalizeTime, TIMEPICKER_OFFSET } from './time-field-helpers';
 
 type TimeFieldBreakpointProps = {
   /**
-   * If `true`, uses the native time picker of the browser instead of a custom one.
-   * Note: When using the native picker, the `availableTimes` prop will not be applied.
+   * If `true`, the field swaps the custom time-picker popover for the
+   * browser's native time picker (`<input type="time">`). Works on both
+   * mobile and desktop — useful when the consumer wants to skip the custom
+   * UI entirely.
+   * Note: When using the native picker, the `availableTimes` prop is ignored.
    * @default false
    */
   useNativePicker?: boolean;
@@ -136,6 +139,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const currentValue = isControlled ? value : internalValue;
   const [open, setOpen] = useState(false);
   const isInputTrigger = timePickerTrigger === 'input';
+  const shouldUseNativePicker = useNativePicker;
 
   const floating = useFloating({
     open,
@@ -150,7 +154,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
-  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !useNativePicker;
+  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !shouldUseNativePicker;
 
   const interactions = useInteractions([...(shouldUseCustomInputTrigger ? [click] : []), dismiss, role]);
 
@@ -162,6 +166,23 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     }
 
     onChange?.(cleaned);
+  };
+
+  // Normalise common typed shorthands on blur (e.g. "1155" → "11:55",
+  // "9:5" → "09:05"). Doesn't run while the user is still typing — we keep
+  // the raw value visible until they tab/click away so the field doesn't
+  // fight mid-keystroke. Invalid input is left as-is for the consumer's
+  // validation to flag.
+  const handleInputBlur: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
+    // Read off the target BEFORE running consumer's onBlur — React pools
+    // SyntheticEvents and `currentTarget` is nulled after the listener
+    // returns, so we must capture upfront.
+    const raw = (event.target as HTMLInputElement).value ?? '';
+    (inputProps?.onBlur as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined)?.(event);
+    const normalised = normalizeTime(raw);
+    if (normalised !== null && normalised !== raw) {
+      updateTime(normalised);
+    }
   };
 
   useEffect(() => {
@@ -196,7 +217,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const handleIconClick = () => {
     if (readOnly || !showPicker) return;
 
-    if (useNativePicker) {
+    if (shouldUseNativePicker) {
       openNativePicker();
     } else if (timePickerTrigger === 'button') {
       openCustomPicker();
@@ -209,31 +230,33 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     label,
     value: currentValue,
     placeholder,
-    readOnly: readOnly || (!useNativePicker && isInputTrigger),
+    readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
     icon: 'schedule',
     isClearable: true,
     required,
     onIconClick: handleIconClick,
     onChange: updateTime,
+    onBlur: handleInputBlur,
     className: cn(
       styles['tedi-time-field__textfield'],
       { [styles['tedi-time-field__icon--disabled']]: !showPicker || readOnly },
       { [styles['tedi-time-field__textfield--disabled']]: inputProps?.disabled },
-      { [styles['tedi-time-field--native']]: useNativePicker }
+      { [styles['tedi-time-field--native']]: shouldUseNativePicker }
     ),
     input: {
       ...(inputProps?.input as UnknownType),
-      type: 'time',
+      ...(shouldUseNativePicker && { type: 'time' }),
     },
   };
 
   const shouldUseDropdownPicker =
-    !useNativePicker && showPicker && !readOnly && availableTimesVariant === 'dropdown' && !!availableTimes?.length;
+    !shouldUseNativePicker &&
+    showPicker &&
+    !readOnly &&
+    availableTimesVariant === 'dropdown' &&
+    !!availableTimes?.length;
 
   if (shouldUseDropdownPicker) {
-    // Land focus on the previously selected item when the dropdown opens; if
-    // nothing is selected yet, focus the first item. Lets the user Enter/Space
-    // to reconfirm or Arrow to move without a priming keystroke.
     const selectedIndex = availableTimes.indexOf(currentValue);
     const defaultActiveIndex = selectedIndex >= 0 ? selectedIndex : 0;
 
@@ -242,7 +265,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         <Dropdown.Trigger>
           <div
             className={cn(styles['tedi-time-field__container'], className, {
-              [styles['tedi-time-field__container--native']]: useNativePicker,
+              [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
             })}
           >
             <TextField ref={textFieldRef} {...textFieldProps} />
@@ -271,7 +294,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         <TextField ref={textFieldRef} aria-expanded={showPicker ? open : undefined} {...textFieldProps} />
       </div>
 
-      {!useNativePicker && showPicker && (
+      {!shouldUseNativePicker && showPicker && (
         <FloatingPortal>
           {open && !readOnly && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>

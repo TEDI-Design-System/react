@@ -159,7 +159,7 @@ export interface DateFieldProps
    * Distinct from the *currently visible* grid — that's managed internally
    * and flips as the user navigates between year / month / day. This prop
    * is the lowest level the user can drill down to before a click commits.
-   * @default days
+   * @default 'days'
    */
   selectionLevel?: CalendarView;
   /**

@@ -308,7 +308,7 @@ describe('TimeWheel', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('ArrowUp focuses the previous hour item and clamps at 0', () => {
+  it('ArrowUp from index 0 wraps to the last item', () => {
     render(
       <TimeWheel
         hours={['00', '01', '02']}
@@ -321,13 +321,43 @@ describe('TimeWheel', () => {
 
     const col = screen.getAllByRole('listbox')[0];
     const items = col.querySelectorAll('[role="option"]');
-    const focusSpy = jest.spyOn(items[0] as HTMLElement, 'focus');
+    // Wrap target: from index 0 going up should jump to the last item
+    // (mirrors Angular's TimeWheel where 00 → 23 / 59 on ArrowUp).
+    const lastFocusSpy = jest.spyOn(items[items.length - 1] as HTMLElement, 'focus');
+    const lastScrollSpy = jest.spyOn(items[items.length - 1] as HTMLElement, 'scrollIntoView');
 
     act(() => {
       col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
     });
 
-    expect(focusSpy).toHaveBeenCalled();
+    expect(lastFocusSpy).toHaveBeenCalled();
+    // Wrap-around scrolls use 'auto' so the wheel jumps instantly instead of
+    // smooth-scrolling across every item.
+    expect(lastScrollSpy).toHaveBeenCalledWith({ block: 'center', behavior: 'auto' });
+  });
+
+  it('ArrowDown from the last index wraps to the first item', () => {
+    render(
+      <TimeWheel
+        hours={['00', '01', '02']}
+        minutes={['00']}
+        selectedHour="02"
+        selectedMinute="00"
+        onChange={jest.fn()}
+      />
+    );
+
+    const col = screen.getAllByRole('listbox')[0];
+    const items = col.querySelectorAll('[role="option"]');
+    const firstFocusSpy = jest.spyOn(items[0] as HTMLElement, 'focus');
+    const firstScrollSpy = jest.spyOn(items[0] as HTMLElement, 'scrollIntoView');
+
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    });
+
+    expect(firstFocusSpy).toHaveBeenCalled();
+    expect(firstScrollSpy).toHaveBeenCalledWith({ block: 'center', behavior: 'auto' });
   });
 
   it('Home focuses the first item and End focuses the last item', () => {
@@ -357,41 +387,58 @@ describe('TimeWheel', () => {
     expect(lastFocusSpy).toHaveBeenCalled();
   });
 
-  it('PageDown and PageUp jump by 5 items and clamp at both ends', () => {
+  it('PageDown jumps by 5 items within bounds', () => {
     const list = ['00', '01', '02', '03', '04', '05', '06', '07'];
 
     render(<TimeWheel hours={list} minutes={['00']} selectedHour="01" selectedMinute="00" onChange={jest.fn()} />);
 
     const col = screen.getAllByRole('listbox')[0];
     const items = col.querySelectorAll('[role="option"]');
-    const pageDownSpy = jest.spyOn(items[6] as HTMLElement, 'focus');
 
+    // From index 1, +5 = 6 (within bounds) → focuses index 6 with a smooth scroll.
+    const pageDownSpy = jest.spyOn(items[6] as HTMLElement, 'focus');
+    const pageDownScrollSpy = jest.spyOn(items[6] as HTMLElement, 'scrollIntoView');
     act(() => {
       col.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
     });
     expect(pageDownSpy).toHaveBeenCalled();
-
-    const pageUpSpy = jest.spyOn(items[0] as HTMLElement, 'focus');
-    act(() => {
-      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true }));
-    });
-    expect(pageUpSpy).toHaveBeenCalled();
+    expect(pageDownScrollSpy).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' });
   });
 
-  it('PageDown clamps to the last item when near the end of the list', () => {
+  it('PageDown wraps around when the jump would exceed the end', () => {
     const list = ['00', '01', '02', '03'];
 
     render(<TimeWheel hours={list} minutes={['00']} selectedHour="02" selectedMinute="00" onChange={jest.fn()} />);
 
     const col = screen.getAllByRole('listbox')[0];
     const items = col.querySelectorAll('[role="option"]');
-    const lastFocusSpy = jest.spyOn(items[3] as HTMLElement, 'focus');
 
+    // From index 2, +5 = 7 → wraps to (2 + 5) % 4 = 3 with an instant 'auto' scroll.
+    const wrapSpy = jest.spyOn(items[3] as HTMLElement, 'focus');
+    const wrapScrollSpy = jest.spyOn(items[3] as HTMLElement, 'scrollIntoView');
     act(() => {
       col.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true }));
     });
+    expect(wrapSpy).toHaveBeenCalled();
+    expect(wrapScrollSpy).toHaveBeenCalledWith({ block: 'center', behavior: 'auto' });
+  });
 
-    expect(lastFocusSpy).toHaveBeenCalled();
+  it('PageUp wraps around when the jump would go below 0', () => {
+    const list = ['00', '01', '02', '03', '04', '05', '06', '07'];
+
+    render(<TimeWheel hours={list} minutes={['00']} selectedHour="01" selectedMinute="00" onChange={jest.fn()} />);
+
+    const col = screen.getAllByRole('listbox')[0];
+    const items = col.querySelectorAll('[role="option"]');
+
+    // From index 1, -5 = -4 → wraps to (1 - 5 + 8) % 8 = 4 with an instant 'auto' scroll.
+    const wrapSpy = jest.spyOn(items[4] as HTMLElement, 'focus');
+    const wrapScrollSpy = jest.spyOn(items[4] as HTMLElement, 'scrollIntoView');
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageUp', bubbles: true }));
+    });
+    expect(wrapSpy).toHaveBeenCalled();
+    expect(wrapScrollSpy).toHaveBeenCalledWith({ block: 'center', behavior: 'auto' });
   });
 
   it('ignores unhandled keys', () => {

@@ -32,6 +32,11 @@ export interface TimeGridProps {
    * Additional CSS class name for custom styling
    */
   className?: string;
+  /**
+   * Whether to render the surrounding card chrome (border, background, radius).
+   * @default true
+   */
+  bordered?: boolean;
 }
 
 export const TimeGrid: React.FC<TimeGridProps> = ({
@@ -41,6 +46,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   className,
   colWidth = 4,
   variant = 'button',
+  bordered = true,
 }) => {
   const timeGridId = useId();
   const { getLabel } = useLabels();
@@ -101,9 +107,15 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
     radios[nextIndex]?.focus();
   };
 
+  const rootClassName = cn(
+    styles['tedi-time-picker__grid'],
+    { [styles['tedi-time-picker__grid--borderless']]: !bordered },
+    className
+  );
+
   if (variant === 'radio') {
     return (
-      <div ref={rootRef} className={cn(styles['tedi-time-picker__grid'], className)} onKeyDown={handleRadioKeyDown}>
+      <div ref={rootRef} className={rootClassName} onKeyDown={handleRadioKeyDown}>
         <ChoiceGroup
           id={`time-picker-group-${timeGridId}`}
           label={getLabel('timePicker.pickTime')}
@@ -128,7 +140,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   }
 
   return (
-    <div ref={rootRef} className={cn(styles['tedi-time-picker__grid'], className)}>
+    <div ref={rootRef} className={rootClassName}>
       <Row gutter={2}>
         {times.map((time) => (
           <Col width={colWidth} key={time}>
