@@ -52,27 +52,19 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   const { getLabel } = useLabels();
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // When the grid mounts (i.e. the picker opens), land focus on the card that
-  // matches the current value. Lets keyboard users arrow-navigate from where
-  // they left off and mirrors the way native <select> opens pre-highlighted.
-  // Runs once per mount — TimeGrid remounts every time the picker reopens.
   useEffect(() => {
     if (!value) return;
     const root = rootRef.current;
     if (!root) return;
+
+    const safeValue = CSS.escape(value);
     const target = root.querySelector<HTMLElement>(
-      `input[type="radio"][value="${value}"], button[data-time="${value}"]`
+      `input[type="radio"][value="${safeValue}"], button[data-time="${safeValue}"]`
     );
     target?.focus({ preventScroll: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Listbox-style keyboard handling for the radio variant: arrow keys move
-  // focus between slots *without* triggering native same-name-radio
-  // auto-selection. Without this, Arrow-Down would also mark the next radio
-  // checked, fire onSelect/onChange, and (inside TimeField) close the picker.
-  // Space/Enter fall through to native radio activation — that still fires
-  // onChange and lets the picker close on explicit confirmation.
   const handleRadioKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (variant !== 'radio') return;
     const root = rootRef.current;

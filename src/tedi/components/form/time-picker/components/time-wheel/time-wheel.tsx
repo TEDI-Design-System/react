@@ -265,13 +265,11 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
   const handleColumnKeyDown =
     (type: 'hour' | 'minute', list: string[], selected: string, onSelect: (v: string) => void) =>
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      const currentIndex = list.indexOf(selected);
+      const selectedIndex = list.indexOf(selected);
+      const currentIndex = (type === 'hour' ? activeHourIndex : activeMinuteIndex) ?? selectedIndex;
       if (currentIndex === -1) return;
 
       let nextIndex = -1;
-      // Track whether the new index wrapped around (e.g. 59 → 00 going down,
-      // 00 → 59 going up). When it does, animate the scroll instantly so we
-      // don't smooth-scroll across the entire wheel.
       let wrapped = false;
 
       switch (event.key) {
@@ -307,6 +305,9 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
       }
 
       event.preventDefault();
+
+      if (type === 'hour') setActiveHourIndex(nextIndex);
+      else setActiveMinuteIndex(nextIndex);
 
       const container = type === 'hour' ? hourRef.current : minuteRef.current;
       const el = container?.querySelector<HTMLElement>(`#${CSS.escape(`${uid}-${type}-${nextIndex}`)}`);

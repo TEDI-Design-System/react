@@ -121,13 +121,13 @@ export const OnClickType: Story = {
         <Row>
           <Col lg={3} md={6}>
             <Text>Clock button is clickable</Text>
-            <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="button" />
+            <TimeField label="Time" id="time-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
             <Text>Input is clickable</Text>
-            <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="input" />
+            <TimeField label="Time" id="time-input-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
       </VerticalSpacing>

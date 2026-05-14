@@ -184,6 +184,68 @@ describe('TimeWheel', () => {
     expect(onChange).toHaveBeenCalledWith('01', '00');
   });
 
+  it('consecutive ArrowDowns advance through the column, not stall on stale `selected`', () => {
+    render(
+      <TimeWheel
+        hours={['00', '01', '02', '03']}
+        minutes={['00']}
+        selectedHour="00"
+        selectedMinute="00"
+        onChange={jest.fn()}
+      />
+    );
+
+    const col = screen.getAllByRole('listbox')[0];
+    const items = col.querySelectorAll('[role="option"]');
+    const secondFocusSpy = jest.spyOn(items[2] as HTMLElement, 'focus');
+    const thirdFocusSpy = jest.spyOn(items[3] as HTMLElement, 'focus');
+
+    // selected stays "00" throughout. Each act() flushes the activeHourIndex
+    // update so the next press reads the in-flight navigated position — that's
+    // exactly the stall the anchoring fix repairs.
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    });
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    });
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    });
+
+    expect(secondFocusSpy).toHaveBeenCalled();
+    expect(thirdFocusSpy).toHaveBeenCalled();
+  });
+
+  it('Enter commits the navigated value, not the stale `selected` prop', () => {
+    const onChange = jest.fn();
+
+    render(
+      <TimeWheel
+        hours={['00', '01', '02']}
+        minutes={['00']}
+        selectedHour="00"
+        selectedMinute="00"
+        onChange={onChange}
+      />
+    );
+
+    const col = screen.getAllByRole('listbox')[0];
+
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    });
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    });
+    act(() => {
+      col.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    });
+
+    // selected was "00", two arrows + Enter → must commit "02", not "00".
+    expect(onChange).toHaveBeenCalledWith('02', '00');
+  });
+
   it('cleans up timers on unmount', () => {
     const { unmount } = render(
       <TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={jest.fn()} />
