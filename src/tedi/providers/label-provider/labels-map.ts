@@ -508,11 +508,12 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Следущая страница',
   },
   'pagination.results': {
-    description: 'Total results text',
+    description:
+      'Total results text. Returns the full localised string with count embedded — locales decide their own word order.',
     components: ['Table', 'Pagination'],
-    et: (count?: number) => (count === 1 ? 'tulemus' : 'tulemust'),
-    en: (count?: number) => (count === 1 ? 'result' : 'results'),
-    ru: (count?: number) => (count === 1 ? 'результат' : 'результа'),
+    et: (count?: number) => `${count ?? 0} ${count === 1 ? 'tulemus' : 'tulemust'}`,
+    en: (count?: number) => `${count ?? 0} ${count === 1 ? 'result' : 'results'}`,
+    ru: (count?: number) => `${count ?? 0} ${count === 1 ? 'результат' : 'результа'}`,
   },
   'pagination.page-size': {
     description: 'Label of page size select',
@@ -565,17 +566,43 @@ export const labelsMap = validateDefaultLabels({
   },
   'pickers.previousMonth': {
     description: `Translation for ${muiTranslationsUrl}`,
-    components: ['Pickers'],
+    components: ['Pickers', 'DateField'],
     et: 'Eelmine kuu',
     en: 'Previous month',
     ru: 'Прошлый месяц',
   },
   'pickers.nextMonth': {
     description: `Translation for ${muiTranslationsUrl}`,
-    components: ['Pickers'],
+    components: ['Pickers', 'DateField'],
     et: 'Järgmine kuu',
     en: 'Next month',
     ru: 'Следующий месяц',
+  },
+  'pickers.previousYear': {
+    description: `Translation for ${muiTranslationsUrl}`,
+    components: ['Pickers', 'DateField'],
+    et: 'Eelmine aasta',
+    en: 'Previous year',
+    ru: 'Предыдущий год',
+  },
+  'pickers.nextYear': {
+    description: `Translation for ${muiTranslationsUrl}`,
+    components: ['Pickers', 'DateField'],
+    et: 'Järgmine aasta',
+    en: 'Next year',
+    ru: 'Следующий год',
+  },
+  'pickers.yearSelection': {
+    components: ['DateField'],
+    et: 'Aasta valimine',
+    en: 'Year selection',
+    ru: 'Выбор года',
+  },
+  'pickers.monthSelection': {
+    components: ['DateField'],
+    et: 'Kuu valimine',
+    en: 'Month selection',
+    ru: 'Выбор месяца',
   },
   'pickers.openPreviousView': {
     description: `Translation for ${muiTranslationsUrl}`,
