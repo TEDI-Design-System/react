@@ -88,6 +88,12 @@ const meta: Meta<typeof Filter> = {
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6562-159554&m=dev',
     },
   },
+  argTypes: {
+    options: { control: false },
+    children: { control: false },
+    prepend: { control: false },
+    append: { control: false },
+  },
 };
 export default meta;
 type Story = StoryObj<FilterProps>;
@@ -221,38 +227,88 @@ export const SingleValueFilter: Story = {
         <div className="display-flex gap-2 flex-wrap">
           <Filter text="Raviasutus" options={raviasutusOptions} />
           <Filter text="Teenus" options={teenusOptions} />
-          <RangeFilter text="Ajavahemik" defaultRange={{ from: new Date(2025, 6, 13), to: new Date(2026, 5, 15) }} />
+          <RangeFilter text="Ajavahemik" defaultRange={{ from: new Date(2026, 6, 13), to: new Date(2026, 7, 15) }} />
         </div>
         <div className="display-flex gap-2 flex-wrap">
           <Filter text="Raviasutus" variant="secondary" options={raviasutusOptions} />
           <Filter text="Teenus" variant="secondary" options={teenusOptions} />
-          <RangeFilter text="Ajavahemik" variant="secondary" />
+          <RangeFilter
+            text="Ajavahemik"
+            variant="secondary"
+            defaultRange={{ from: new Date(2026, 6, 13), to: new Date(2026, 7, 15) }}
+          />
         </div>
       </VerticalSpacing>
     </VerticalSpacing>
   ),
 };
 
+const arstOptions: FilterOption[] = [
+  { label: 'Dr Anna Tamm', value: 'tamm' },
+  { label: 'Dr Mari Kask', value: 'kask' },
+  { label: 'Dr Jaan Saar', value: 'saar' },
+  { label: 'Dr Liis Põld', value: 'pold' },
+];
+
+const ajavahemikOptions: FilterOption[] = [
+  { label: 'Viimane nädal', value: 'week' },
+  { label: 'Viimane kuu', value: 'month' },
+  { label: 'Viimane aasta', value: 'year' },
+  { label: 'Kohandatud', value: 'custom' },
+];
+
 /**
  * Multi value filters open a dropdown with checkboxes. Supports search, "Select all", and
- * "Clear selection" out of the box.
+ * "Clear selection" out of the box. Selected count is shown as a status badge on the trigger.
  */
 export const MultiValueFilter: Story = {
   render: () => (
     <VerticalSpacing>
       <div className="display-flex gap-2 flex-wrap">
-        <Filter text="Raviasutus" multiselect options={raviasutusOptions} searchable showSelectAll showClear />
+        <Filter
+          text="Teenused"
+          multiselect
+          options={teenusOptions}
+          defaultSelectedValues={['1', '2']}
+          searchable
+          showSelectAll
+          showClear
+        />
+        <Filter
+          text="Raviasutus"
+          multiselect
+          options={raviasutusOptions}
+          defaultSelectedValues={['4']}
+          searchable
+          showSelectAll
+          showClear
+        />
+        <Filter text="Arst" multiselect options={arstOptions} searchable showSelectAll showClear />
+        <Filter text="Ajavahemik" multiselect options={ajavahemikOptions} showClear />
       </div>
       <div className="display-flex gap-2 flex-wrap">
+        <Filter
+          text="Teenused"
+          variant="secondary"
+          multiselect
+          options={teenusOptions}
+          defaultSelectedValues={['1', '2']}
+          searchable
+          showSelectAll
+          showClear
+        />
         <Filter
           text="Raviasutus"
           variant="secondary"
           multiselect
           options={raviasutusOptions}
+          defaultSelectedValues={['4']}
           searchable
           showSelectAll
           showClear
         />
+        <Filter text="Arst" variant="secondary" multiselect options={arstOptions} searchable showSelectAll showClear />
+        <Filter text="Ajavahemik" variant="secondary" multiselect options={ajavahemikOptions} showClear />
       </div>
     </VerticalSpacing>
   ),
