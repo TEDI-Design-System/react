@@ -2,8 +2,11 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
 import { UnknownType } from '../../../types/commonTypes';
+import { Text } from '../../base/typography/text/text';
+import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { TextFieldProps } from '../textfield/textfield';
 import { DateTimeField, DateTimeFieldProps } from './date-time-field';
 
 /**
@@ -59,6 +62,79 @@ export const Default: Story = {
     layout: 'side-by-side',
     stepMinutes: 1,
   },
+};
+
+const sizeArray: TextFieldProps['size'][] = ['default', 'small'];
+
+export const Size: StoryFn = () => (
+  <div className="example-list">
+    {sizeArray.map((size, idx) => (
+      <Row key={size ?? 'default'} className={`${idx === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`}>
+        <Col lg={2} xs={12}>
+          <Text modifiers="bold">{size ? size.charAt(0).toUpperCase() + size.slice(1) : ''}</Text>
+        </Col>
+        <Col lg={10} xs={12} className="d-flex">
+          <DateTimeField
+            id={`date-time-size-${size}`}
+            label="Date"
+            placeholder="pp.kk.aaaa hh:mm"
+            inputProps={{ size }}
+          />
+        </Col>
+      </Row>
+    ))}
+  </div>
+);
+
+/**
+ * Demonstrates `inputProps` pass-through on the input control: helper hint,
+ * and a controlled-value pattern wired to quick-pick buttons (Today, Tomorrow
+ * at 09:00). Mirrors DateField's `FieldOptions` story.
+ */
+export const FieldOptions: StoryFn = () => {
+  const [shortcutValue, setShortcutValue] = useState<Date | undefined>(undefined);
+
+  const today = new Date();
+  today.setHours(9, 0, 0, 0);
+
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  tomorrow.setHours(9, 0, 0, 0);
+
+  return (
+    <Row>
+      <Col lg={6} xs={12}>
+        <div className="flex gap-4 flex-column">
+          <DateTimeField id="date-time-options-default" label="Date and time" placeholder="pp.kk.aaaa hh:mm" />
+
+          <DateTimeField
+            id="date-time-options-hint"
+            label="Date and time with hint"
+            placeholder="pp.kk.aaaa hh:mm"
+            inputProps={{ helper: { text: 'pp.kk.aaaa hh:mm' } }}
+          />
+
+          <div>
+            <DateTimeField
+              id="date-time-options-shortcuts"
+              label="Date and time with shortcuts"
+              placeholder="pp.kk.aaaa hh:mm"
+              value={shortcutValue}
+              onChange={(v) => setShortcutValue(v instanceof Date ? v : undefined)}
+            />
+            <div className="flex gap-3" style={{ marginTop: '8px' }}>
+              <Button visualType="link" size="small" onClick={() => setShortcutValue(today)}>
+                Täna 9:00
+              </Button>
+              <Button visualType="link" size="small" onClick={() => setShortcutValue(tomorrow)}>
+                Homme 9:00
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Col>
+    </Row>
+  );
 };
 
 export const PredefinedTimeSlots: Story = {
@@ -146,6 +222,67 @@ export const Controlled: Story = {
     placeholder: 'pp.kk.aaaa hh:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
+  },
+};
+
+/**
+ * Calendar constraints — `disablePast`, `disableFuture`, and explicit
+ * `minDate` / `maxDate`. The time picker doesn't enforce time-of-day bounds
+ * (every minute is selectable inside the allowed days), only the calendar
+ * grid is constrained.
+ */
+export const DateConstraints: StoryFn = () => {
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() - 7);
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 7);
+
+  return (
+    <Row gutterY={3}>
+      <Col lg={6} xs={12}>
+        <Text modifiers="bold">disablePast</Text>
+        <DateTimeField
+          id="date-time-disable-past"
+          label="Future date and time only"
+          placeholder="pp.kk.aaaa hh:mm"
+          disablePast
+        />
+      </Col>
+      <Col lg={6} xs={12}>
+        <Text modifiers="bold">disableFuture</Text>
+        <DateTimeField
+          id="date-time-disable-future"
+          label="Past date and time only"
+          placeholder="pp.kk.aaaa hh:mm"
+          disableFuture
+        />
+      </Col>
+      <Col lg={6} xs={12}>
+        <Text modifiers="bold">minDate / maxDate (±7 days)</Text>
+        <DateTimeField
+          id="date-time-min-max"
+          label="Date inside a 14-day window"
+          placeholder="pp.kk.aaaa hh:mm"
+          minDate={minDate}
+          maxDate={maxDate}
+        />
+      </Col>
+    </Row>
+  );
+};
+
+/**
+ * Header month / year pickers render as a full grid instead of the default
+ * `<Select>` dropdown. Easier to scan when the user needs to jump several
+ * years backward / forward.
+ */
+export const YearGrid: Story = {
+  render: Template,
+  args: {
+    id: 'date-time-year-grid',
+    label: 'Date',
+    placeholder: 'pp.kk.aaaa hh:mm',
+    monthYearSelectType: 'grid',
   },
 };
 

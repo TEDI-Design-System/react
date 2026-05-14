@@ -190,8 +190,8 @@
   }
 
   .tedi-date-time-field__time-picker--wheel {
-    --tedi-time-wheel-height: 7.1875rem;
-    --tedi-time-wheel-fade: 2.313rem;
+    --tedi-time-wheel-height: 7.25rem;
+    --tedi-time-wheel-fade: 2.25rem;
   }
 }
 
@@ -272,7 +272,6 @@
   font-weight: 500;
   line-height: var(--body-regular-line-height);
   color: var(--general-text-primary);
-  letter-spacing: 0.15px;
 }
 
 .tedi-date-time-field__time-body {

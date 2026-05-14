@@ -396,6 +396,51 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 />
 ```
 
+### DateTimeField
+**Props:** `DateTimeFieldProps` | bp, form
+- `id: string` (required), `label: string` (required)
+- `mode?: 'single' | 'range' = 'single'` — note: no `'multiple'` (combining multi-date with per-row times is ambiguous)
+- `value?: Date | DateTimeRange`, `defaultValue?: Date | DateTimeRange` — shape matches `mode` (`Date` for single, `{ from?, to? }` for range)
+- `onChange?: (value: Date | DateTimeRange | undefined) => void`
+- `placeholder?: string`, `required?: boolean`, `readOnly?: boolean`, `disabled?: boolean`
+- `minDate?: Date`, `maxDate?: Date`, `disablePast?: boolean`, `disableFuture?: boolean` — calendar-only; the time wheel still allows every minute
+- `stepMinutes?: number = 15` — minute increment for the time wheel (ignored when `availableTimes` is set)
+- `initialMonth?: Date`
+- `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
+- `selectTimeLabel?: string`, `backLabel?: string` — multi-step layout button labels (fall back to localised labels)
+- `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input (helper, icon, isClearable, size, …)
+- **Breakpoint-aware:** `layout?: 'side-by-side' | 'multi-step' = 'side-by-side'`, `availableTimes?: string[]` (switches the time step to a grid of fixed slots), `timeGridVariant?: 'button' | 'radio'` (default `'button'` for side-by-side, `'radio'` for multi-step), `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'`, `showOutsideDays?: boolean = true`, `useNativePicker?: boolean = false` (renders `<input type="datetime-local">`; ignored when `mode='range'`), `timeHeading?: ReactNode` (heading above the time picker in side-by-side layout)
+
+In `mode='range'` the popover renders a 2-month calendar plus **two** time pickers stacked underneath — one for `from`, one for `to` — and each `from`/`to` `Date` carries its own time component.
+
+```tsx
+import { DateTimeField } from '@tedi-design-system/react/tedi';
+
+// Side-by-side wheel
+<DateTimeField id="meeting" label="Meeting" placeholder="pp.kk.aaaa hh:mm" stepMinutes={15} />
+
+// Predefined slots, multi-step layout (pick date → pick slot)
+<DateTimeField
+  id="appointment"
+  label="Appointment"
+  layout="multi-step"
+  availableTimes={['09:30', '10:00', '11:30']}
+  timeGridVariant="radio"
+/>
+
+// Range mode — two calendars + two time pickers
+<DateTimeField
+  id="period"
+  label="Booking period"
+  mode="range"
+  value={range}
+  onChange={(v) => setRange(v && 'from' in v ? v : undefined)}
+/>
+
+// Native fallback (single mode only)
+<DateTimeField id="alarm" label="Alarm" useNativePicker md={{ useNativePicker: false }} />
+```
+
 ### FileUpload
 **Props:** `FileUploadProps` | form
 - `id: string` (required), `name: string` (required)

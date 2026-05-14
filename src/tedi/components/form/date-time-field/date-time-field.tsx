@@ -12,7 +12,7 @@ import {
   useRole,
 } from '@floating-ui/react';
 import cn from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DateRange, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
@@ -54,7 +54,9 @@ type DateTimeFieldBreakpointProps = {
    */
   useNativePicker?: boolean;
   /**
-   * Layout of the date-and-time popover.
+   * Layout of the date-and-time popover. `mode='range'` always uses
+   * `'side-by-side'` regardless of this value — the range UI needs the
+   * calendar and both `from` / `to` time pickers visible at once.
    * @default side-by-side
    */
   layout?: DateTimeFieldLayout;
@@ -236,7 +238,7 @@ const asRange = (val: DateTimeFieldValue | undefined): DateTimeRange => {
 
 const asSingle = (val: DateTimeFieldValue | undefined): Date | undefined => (isDate(val) ? val : undefined);
 
-export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
+export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeFieldProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const { getLabel } = useLabels();
   const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
@@ -293,18 +295,16 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   const monthAnchor = isRange ? rangeValue.from : singleValue;
   const [currentMonth, setCurrentMonth] = useState<Date>(() => monthAnchor ?? initialMonth ?? new Date());
 
+  const monthAnchorRef = useRef(monthAnchor);
+  monthAnchorRef.current = monthAnchor;
+
   useEffect(() => {
     if (!open) {
       setStep('date');
       setView('days');
-      setCurrentMonth(monthAnchor ?? initialMonth ?? new Date());
+      setCurrentMonth(monthAnchorRef.current ?? initialMonth ?? new Date());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentValue, initialMonth]);
-
-  useEffect(() => {
-    if (isControlled) setInternalValue(value);
-  }, [isControlled, value]);
+  }, [open, initialMonth]);
 
   const dateFormatter = useMemo(
     () =>
@@ -408,6 +408,15 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   const interactions = useInteractions([useDismiss(context), useRole(context, { role: 'dialog' })]);
 
   const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
+
+  const setTextFieldRef = useCallback(
+    (node: TextFieldForwardRef | null) => {
+      textFieldRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref]
+  );
 
   useEffect(() => {
     if (textFieldRef.current?.inner) {
@@ -602,7 +611,7 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
   return (
     <>
       <div className={cn(styles['tedi-date-time-field__container'], className)} aria-haspopup="dialog">
-        <TextField ref={textFieldRef} {...textFieldProps} />
+        <TextField ref={setTextFieldRef} {...textFieldProps} />
       </div>
 
       {!useNative && (
@@ -680,7 +689,7 @@ export const DateTimeField: React.FC<DateTimeFieldProps> = (props) => {
       )}
     </>
   );
-};
+});
 
 DateTimeField.displayName = 'DateTimeField';
 

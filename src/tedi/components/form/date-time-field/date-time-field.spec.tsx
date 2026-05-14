@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 
+import { TextFieldForwardRef } from '../textfield/textfield';
 import { DateTimeField, DateTimeFieldProps } from './date-time-field';
 
 import '@testing-library/jest-dom';
@@ -28,6 +30,15 @@ describe('DateTimeField component', () => {
   it('renders the field with its label', () => {
     render(<DateTimeField {...defaultProps} />);
     expect(screen.getByLabelText('When')).toBeInTheDocument();
+  });
+
+  it('forwards ref to the underlying TextField', () => {
+    const ref = createRef<TextFieldForwardRef>();
+    render(<DateTimeField {...defaultProps} ref={ref} />);
+
+    expect(ref.current).not.toBeNull();
+    expect(ref.current?.input).toBeInstanceOf(HTMLInputElement);
+    expect(ref.current?.input).toBe(screen.getByLabelText('When'));
   });
 
   it('shows the placeholder when no value is provided', () => {

@@ -16,6 +16,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Search | `string` | Search button, onSearch callback |
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
 | TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
+| DateTimeField | `Date \| DateTimeRange` | Calendar + time wheel / slots, side-by-side or multi-step layout, range mode, native fallback |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop |
 
@@ -222,6 +223,57 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 <TimePicker value={time} onChange={setTime} stepMinutes={5} bordered={false} />
 ```
 
+## DateTimeField
+
+Combines a `DateField` calendar with a `TimePicker` in one input. The popover shows them either side-by-side (default) or as a two-step flow (`layout='multi-step'`). The committed value is a single `Date` (carrying both date and time) — or a `DateTimeRange` (`{ from, to }`) in `mode='range'`.
+
+```tsx
+import { DateTimeField } from '@tedi-design-system/react/tedi';
+
+// Default — side-by-side calendar + time wheel
+<DateTimeField
+  id="meeting"
+  label="Meeting"
+  placeholder="pp.kk.aaaa hh:mm"
+  stepMinutes={15}
+  value={value}
+  onChange={(v) => setValue(v instanceof Date ? v : undefined)}
+/>
+
+// Predefined time slots rendered as a button grid
+<DateTimeField
+  id="slot"
+  label="Available slot"
+  availableTimes={['09:30', '10:00', '11:30', '15:30']}
+  timeGridVariant="button"
+  value={slot}
+  onChange={setSlot}
+/>
+
+// Multi-step layout — pick the day first, then a slot
+<DateTimeField
+  id="appointment"
+  label="Appointment"
+  layout="multi-step"
+  availableTimes={['09:30', '10:00', '11:30']}
+  timeGridVariant="radio"
+/>
+
+// Range mode — two-month calendar + `from` / `to` time pickers
+<DateTimeField
+  id="period"
+  label="Booking period"
+  mode="range"
+  value={range}
+  onChange={(v) => setRange(v && 'from' in v ? v : undefined)}
+/>
+
+// Native fallback (`<input type="datetime-local">`) — `mode='single'` only
+<DateTimeField id="alarm" label="Alarm" useNativePicker md={{ useNativePicker: false }} />
+```
+
+Constraints (`minDate` / `maxDate` / `disablePast` / `disableFuture`) apply to the **calendar only** — the time wheel still allows every minute inside the allowed days.
+
 ## Checkbox & Radio
 
 ```tsx
@@ -329,6 +381,7 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 - **NumberField:** `onChange?: (value: number) => void`
 - **DateField:** `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>` — value shape depends on `mode` (`'single'` → `Date`, `'multiple'` → `Date[]`, `'range'` → `DateRange`)
 - **TimeField / TimePicker:** `onChange?: (time: string) => void` — value is always `"HH:mm"` 24-hour format (empty string when cleared)
+- **DateTimeField:** `onChange?: (value: Date | DateTimeRange | undefined) => void` — value shape depends on `mode` (`'single'` → `Date`, `'range'` → `{ from, to }`)
 
 ## Disabled State
 
