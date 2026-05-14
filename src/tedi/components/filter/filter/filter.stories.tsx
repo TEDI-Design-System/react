@@ -1,8 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
-import { useMemo, useState } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
@@ -511,7 +512,9 @@ export const States: Story = {
       focusVisible: '.pseudo-focus button',
     },
   },
-  render: () => {
+  render: function StatesStory() {
+    const breakpoint = useBreakpoint();
+    const isMobile = isBreakpointBelow(breakpoint, 'md');
     const stateRows: { label: string; id: string; selected: boolean }[] = [
       { label: 'Default', id: 'default', selected: false },
       { label: 'Hover', id: 'hover', selected: false },
@@ -525,59 +528,68 @@ export const States: Story = {
       { label: 'Hambaarsti vastuvõtt', value: '3' },
     ];
 
+    const columns: { label: string; render: (row: (typeof stateRows)[number]) => ReactNode }[] = [
+      { label: 'Primary', render: (row) => <Filter text="Filter" selected={row.selected} /> },
+      {
+        label: 'Primary multiselect',
+        render: (row) => (
+          <Filter
+            text="Filter"
+            multiselect
+            options={stateOptions}
+            defaultSelectedValues={row.selected ? ['1', '2'] : []}
+          />
+        ),
+      },
+      { label: 'Secondary', render: (row) => <Filter text="Filter" variant="secondary" selected={row.selected} /> },
+      {
+        label: 'Secondary multiselect',
+        render: (row) => (
+          <Filter
+            text="Filter"
+            variant="secondary"
+            multiselect
+            options={stateOptions}
+            defaultSelectedValues={row.selected ? ['1', '2'] : []}
+          />
+        ),
+      },
+      { label: 'Large', render: (row) => <Filter text="Filter" size="large" selected={row.selected} /> },
+    ];
+
     return (
       <VerticalSpacing>
-        <Row gutter={2}>
-          <Col xs={2}>
-            <Text modifiers="bold">State</Text>
-          </Col>
-          <Col xs={2}>
-            <Text modifiers="bold">Primary</Text>
-          </Col>
-          <Col xs={2}>
-            <Text modifiers="bold">Primary multiselect</Text>
-          </Col>
-          <Col xs={2}>
-            <Text modifiers="bold">Secondary</Text>
-          </Col>
-          <Col xs={2}>
-            <Text modifiers="bold">Secondary multiselect</Text>
-          </Col>
-          <Col xs={2}>
-            <Text modifiers="bold">Large</Text>
-          </Col>
-        </Row>
+        {!isMobile && (
+          <Row gutter={2}>
+            <Col md={2}>
+              <Text modifiers="bold">State</Text>
+            </Col>
+            {columns.map((c) => (
+              <Col key={c.label} md={2}>
+                <Text modifiers="bold">{c.label}</Text>
+              </Col>
+            ))}
+          </Row>
+        )}
         {stateRows.map((row) => (
-          <Row key={row.id} gutter={2} className={`pseudo-${row.id}`}>
-            <Col xs={2}>
-              <Text>{row.label}</Text>
+          <Row key={row.id} gutter={2} alignItems="end" className={`pseudo-${row.id}`}>
+            <Col xs={12} md={2}>
+              <Text modifiers="bold">{row.label}</Text>
             </Col>
-            <Col xs={2}>
-              <Filter text="Filter" selected={row.selected} />
-            </Col>
-            <Col xs={2}>
-              <Filter
-                text="Filter"
-                multiselect
-                options={stateOptions}
-                defaultSelectedValues={row.selected ? ['1', '2'] : []}
-              />
-            </Col>
-            <Col xs={2}>
-              <Filter text="Filter" variant="secondary" selected={row.selected} />
-            </Col>
-            <Col xs={2}>
-              <Filter
-                text="Filter"
-                variant="secondary"
-                multiselect
-                options={stateOptions}
-                defaultSelectedValues={row.selected ? ['1', '2'] : []}
-              />
-            </Col>
-            <Col xs={2}>
-              <Filter text="Filter" size="large" selected={row.selected} />
-            </Col>
+            {columns.map((c) => (
+              <Col key={c.label} xs={6} sm={4} md={2}>
+                {isMobile ? (
+                  <VerticalSpacing size={0.25}>
+                    <Text modifiers="small" color="tertiary">
+                      {c.label}
+                    </Text>
+                    {c.render(row)}
+                  </VerticalSpacing>
+                ) : (
+                  c.render(row)
+                )}
+              </Col>
+            ))}
           </Row>
         ))}
       </VerticalSpacing>
