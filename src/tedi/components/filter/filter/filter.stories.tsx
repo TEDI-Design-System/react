@@ -1,18 +1,75 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useMemo, useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import { et } from 'react-day-picker/locale';
 
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
+import { Calendar, CalendarProps } from '../../content/calendar/calendar';
+import { ChoiceGroup } from '../../form/choice-group';
+import { CalendarView } from '../../form/date-field/date-field';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { StatusIndicator } from '../../tags/status-indicator/status-indicator';
 import { Tag } from '../../tags/tag/tag';
-import { ChoiceGroup } from '../choice-group';
 import { Filter, FilterOption, FilterProps } from './filter';
 import { FilterGroup } from './filter-group';
+
+const formatDayMonthShort = new Intl.DateTimeFormat('et-EE', { day: '2-digit', month: '2-digit', year: '2-digit' });
+const formatRange = (range: DateRange | undefined): string | null => {
+  if (!range?.from) return null;
+  const from = formatDayMonthShort.format(range.from);
+  const to = range.to ? formatDayMonthShort.format(range.to) : '…';
+  return `${from} - ${to}`;
+};
+
+/**
+ * Small wrapper that hosts a range Calendar inside a Filter's custom-content dropdown.
+ * Keeps the story bodies readable.
+ */
+const RangeFilter = ({
+  text,
+  variant,
+  defaultRange,
+  numberOfMonths = 2,
+}: {
+  text: string;
+  variant?: FilterProps['variant'];
+  defaultRange?: DateRange;
+  numberOfMonths?: number;
+}) => {
+  const [range, setRange] = useState<DateRange | undefined>(defaultRange);
+  const [currentMonth, setCurrentMonth] = useState<Date>(defaultRange?.from ?? new Date());
+  const [view, setView] = useState<CalendarView>('days');
+
+  const handleSelect: CalendarProps['handleSelect'] = (selected) => {
+    setRange(selected as DateRange | undefined);
+  };
+  const applyValue: CalendarProps['applyValue'] = (d) => setCurrentMonth(d);
+  const triggerText = formatRange(range) ?? text;
+
+  return (
+    <Filter text={triggerText} variant={variant} selected={Boolean(range?.from)}>
+      <Calendar
+        mode="range"
+        value={range}
+        currentMonth={currentMonth}
+        setCurrentMonth={setCurrentMonth}
+        view={view}
+        setView={setView}
+        handleSelect={handleSelect}
+        applyValue={applyValue}
+        locale={et}
+        numberOfMonths={numberOfMonths}
+        showOutsideDays
+        bordered={false}
+      />
+    </Filter>
+  );
+};
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6562-159554&m=dev" target="_BLANK">Figma ↗</a>
@@ -20,7 +77,7 @@ import { FilterGroup } from './filter-group';
 
 const meta: Meta<typeof Filter> = {
   component: Filter,
-  title: 'TEDI-Ready/Components/Form/Filter',
+  title: 'TEDI-Ready/Components/Filter/Filter',
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -164,10 +221,12 @@ export const SingleValueFilter: Story = {
         <div className="display-flex gap-2 flex-wrap">
           <Filter text="Raviasutus" options={raviasutusOptions} />
           <Filter text="Teenus" options={teenusOptions} />
+          <RangeFilter text="Ajavahemik" defaultRange={{ from: new Date(2025, 6, 13), to: new Date(2026, 5, 15) }} />
         </div>
         <div className="display-flex gap-2 flex-wrap">
           <Filter text="Raviasutus" variant="secondary" options={raviasutusOptions} />
           <Filter text="Teenus" variant="secondary" options={teenusOptions} />
+          <RangeFilter text="Ajavahemik" variant="secondary" />
         </div>
       </VerticalSpacing>
     </VerticalSpacing>

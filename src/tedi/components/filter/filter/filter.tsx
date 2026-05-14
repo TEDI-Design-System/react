@@ -5,10 +5,10 @@ import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
+import Checkbox from '../../form/checkbox/checkbox';
+import { Search } from '../../form/search/search';
 import { Dropdown } from '../../overlays/dropdown/dropdown';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
-import { Checkbox } from '../checkbox/checkbox';
-import { Search } from '../search/search';
 import styles from './filter.module.scss';
 import { FilterGroupContext } from './filter-group-context';
 
