@@ -61,14 +61,37 @@
   }
 }
 
-.tedi-table__body .tedi-table__row:hover {
-  background: var(--table-hover);
-}
-
 .tedi-table__cell {
   padding: var(--table-data-padding-y) var(--table-data-padding-x);
   color: var(--general-text-primary);
   vertical-align: middle;
+}
+
+// Column-level alignment modifiers driven by `column.meta.align` / `meta.vAlign`. Applied
+// uniformly to header / body / footer cells so a numeric column lines up at the right edge
+// across all three rows without per-render wrapper spans.
+.tedi-table__cell--align-left {
+  text-align: left;
+}
+
+.tedi-table__cell--align-center {
+  text-align: center;
+}
+
+.tedi-table__cell--align-right {
+  text-align: right;
+}
+
+.tedi-table__cell--valign-top {
+  vertical-align: top;
+}
+
+.tedi-table__cell--valign-middle {
+  vertical-align: middle;
+}
+
+.tedi-table__cell--valign-bottom {
+  vertical-align: bottom;
 }
 
 .tedi-table__cell--placeholder {
@@ -135,6 +158,15 @@
 
 .tedi-table--striped .tedi-table__body .tedi-table__row:nth-of-type(even) {
   background: var(--table-striped);
+}
+
+.tedi-table.tedi-table--row-hover .tedi-table__body .tedi-table__row:hover {
+  background: var(--table-hover);
+}
+
+.tedi-table .tedi-table__body .tedi-table__row.tedi-table__row--active,
+.tedi-table .tedi-table__body .tedi-table__row.tedi-table__row--active:hover {
+  background: var(--table-hover);
 }
 
 .tedi-table--vertical-borders {

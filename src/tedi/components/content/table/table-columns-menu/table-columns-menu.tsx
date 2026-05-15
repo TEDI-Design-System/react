@@ -35,7 +35,7 @@ export const TableColumnsMenu = ({ triggerLabel, className }: TableColumnsMenuPr
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
-        <Button type="button" visualType="neutral" iconLeft="view_column" className={className}>
+        <Button type="button" visualType="neutral" iconLeft="tune" className={className}>
           {resolvedTriggerLabel}
         </Button>
       </DropdownTrigger>

@@ -206,9 +206,9 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const pageItems = items.slice(1, -1);
 
   const renderArrow = (item: PaginationItem) => {
-    if (item.disabled) return null;
     const label = item.type === 'previous' ? mergedLabels.previous : mergedLabels.next;
     const iconName = item.type === 'previous' ? 'arrow_back' : 'arrow_forward';
+
     return (
       <Button
         type="button"
@@ -218,6 +218,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
           styles[`tedi-pagination__button--nav-${item.type}`]
         )}
         aria-label={label}
+        disabled={item.disabled}
         onClick={() => item.page !== null && handlePageChange(item.page)}
         noStyle
       >
@@ -226,18 +227,23 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     );
   };
 
+  // Dropdown options carry plain page numbers — "1", "2", "3" — so the open menu reads as
+  // a clean list of jump targets rather than repeating the total on every row.
   const pageJumpOptions = useMemo<ISelectOption[]>(
     () =>
       Array.from({ length: pageCount }, (_, idx) => {
         const pageNumber = idx + 1;
-        return { value: String(pageNumber), label: `${pageNumber} / ${pageCount}` };
+        return { value: String(pageNumber), label: String(pageNumber) };
       }),
     [pageCount]
   );
 
+  // The trigger (closed-state value) shows the current page in context — "1 / 10" — so the
+  // user can see at a glance where they are and how many pages exist. react-select picks
+  // the active option in the dropdown by `value` equality, so the divergent label is OK.
   const currentPageJumpOption = useMemo<ISelectOption | null>(
-    () => pageJumpOptions.find((option) => option.value === String(currentPage)) ?? null,
-    [pageJumpOptions, currentPage]
+    () => ({ value: String(currentPage), label: `${currentPage} / ${pageCount}` }),
+    [currentPage, pageCount]
   );
 
   const handlePageJumpChange = useCallback(
@@ -272,10 +278,16 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
             {!isMobile && (
               <ul className={styles['tedi-pagination__list']}>
                 {pageItems.map((item, index) => {
+                  // Slot-based keys so React reuses the same `<li>` / `<button>` DOM across
+                  // renders. With page-number keys, every threshold crossing was
+                  // unmounting buttons and the `transition: all 250ms` on background /
+                  // colour never fired — the new buttons just rendered in their final state.
+                  // Reusing the DOM lets the `--selected` class change animate smoothly.
+                  const slotKey = `slot-${index}`;
                   if (item.type === 'ellipsis') {
                     return (
                       <li
-                        key={`ellipsis-${index}`}
+                        key={slotKey}
                         className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
                         aria-hidden="true"
                       >
@@ -286,7 +298,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
                   const pageNumber = item.page as number;
                   return (
-                    <li key={pageNumber} className={styles['tedi-pagination__item']}>
+                    <li key={slotKey} className={styles['tedi-pagination__item']}>
                       <Button
                         type="button"
                         className={cn(styles['tedi-pagination__button'], {
@@ -301,7 +313,13 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
                         onClick={() => handlePageChange(pageNumber)}
                         noStyle
                       >
-                        {pageNumber}
+                        {/* Inner span keyed by page number — when the slot's label
+                            changes (e.g. "5" → "4" at a threshold crossing) the span
+                            remounts and CSS fades the new digit in over the slot's
+                            persistent surface colour. Avoids the instant-flip feel. */}
+                        <span key={pageNumber} className={styles['tedi-pagination__button-label']}>
+                          {pageNumber}
+                        </span>
                       </Button>
                     </li>
                   );

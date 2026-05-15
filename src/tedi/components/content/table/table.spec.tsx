@@ -545,9 +545,10 @@ describe('Table', () => {
 
       expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Current page, page 1/i })).toHaveAttribute('aria-current', 'page');
-      // Previous arrow is hidden on the first page (intentional — see Pagination).
-      expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+      // Previous arrow stays in the DOM but is `disabled` on the first page so the strip
+      // doesn't jump when the user navigates back to / away from the first page.
+      expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /Next page/i })).toBeEnabled();
       expect(screen.getByText('7 results')).toBeInTheDocument();
     });
 

@@ -85,7 +85,8 @@
 }
 
 .tedi-pagination__item--ellipsis {
-  min-width: var(--tedi-dimensions-13);
+  width: var(--pagination-button-size);
+  height: var(--pagination-button-size);
   color: var(--general-text-secondary);
   user-select: none;
 }
@@ -102,7 +103,6 @@
   background: var(--button-main-neutral-icon-only-background-default);
   border: 1px solid var(--tedi-neutral-100);
   border-radius: 100%;
-  transition: all 250ms ease;
 
   &:hover:not(:disabled, .tedi-pagination__button--selected) {
     color: var(--button-main-neutral-text-hover);
@@ -185,4 +185,19 @@
 
 .tedi-pagination__select {
   min-width: var(--tedi-dimensions-18);
+}
+
+@keyframes tedi-pagination-label-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.tedi-pagination__button-label {
+  display: inline-block;
+  animation: tedi-pagination-label-in 0s ease;
 }

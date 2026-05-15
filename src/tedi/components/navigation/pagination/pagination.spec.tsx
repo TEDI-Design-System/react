@@ -172,14 +172,14 @@ describe('Pagination component', () => {
     expect(screen.getByRole('button', { name: /Current page, page 4/i })).toBeInTheDocument();
   });
 
-  it('hides Previous on the first page and Next on the last', () => {
+  it('disables Previous on the first page and Next on the last so the layout footprint is stable', () => {
     const { rerender } = render(<Pagination pageCount={3} page={1} />);
-    expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeEnabled();
 
     rerender(<Pagination pageCount={3} page={3} />);
-    expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Next page/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeDisabled();
   });
 
   it('Previous / Next move the current page by one', () => {
@@ -342,7 +342,9 @@ describe('Pagination component', () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      fireEvent.click(screen.getByText('4 / 5'));
+      // Dropdown options show just the page number. The trigger shows "1 / 5" (current/total),
+      // but the open menu lists plain "1", "2", "3", "4", "5". Match the option, not the trigger.
+      fireEvent.click(screen.getByRole('option', { name: '4' }));
       expect(onPageChange).toHaveBeenCalledWith(4);
     });
   });

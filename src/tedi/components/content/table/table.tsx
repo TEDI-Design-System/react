@@ -36,6 +36,32 @@ import { TableToolbar } from './table-toolbar/table-toolbar';
 import { useTablePersistence } from './use-table-persistence';
 
 /**
+ * Optional shape that columns can put in `columnDef.meta` to:
+ *
+ * - drive the column-filter aria-label when the header is non-textual (`label`),
+ * - align the column's `<th>` / `<td>` content horizontally (`align`) or vertically
+ *   (`vAlign`) without wrapping every cell render in a styled span.
+ *
+ * Wrapper spans still work for the "I want this *one* cell to be different" case;
+ * `meta` covers the common "every cell in the column lines up the same way".
+ */
+export interface TableColumnMeta {
+  /** Accessible label used when the column header isn't a plain string. */
+  label?: string;
+  /**
+   * Horizontal alignment applied to every header / body / footer cell in the column.
+   * Maps directly to `text-align`. Defaults to `left` (the table's CSS default).
+   */
+  align?: 'left' | 'center' | 'right';
+  /**
+   * Vertical alignment applied to every header / body / footer cell in the column.
+   * Maps directly to `vertical-align`. Defaults to `middle` for body cells via the
+   * table's stylesheet.
+   */
+  vAlign?: 'top' | 'middle' | 'bottom';
+}
+
+/**
  * Persistable state slices owned by Table. Each slice can be controlled via
  * `state`/`onStateChange`, defaulted via `defaultState`, or persisted via
  * `persist`.
@@ -154,6 +180,22 @@ export interface TableProps<TData> {
    * and Enter/Space keyboard activation to every row.
    */
   onRowClick?: (row: Row<TData>) => void;
+  /**
+   * Highlights the row whose `id` matches as the currently-active row.
+   *
+   * Useful in master-detail layouts where the click handler navigates or opens a side
+   * panel and the table should stay visibly anchored to that row. Distinct from row
+   * selection (which is checkbox-driven via `enableRowSelection`) and from the
+   * transient `:hover` state. Renders with `aria-current="true"` for screen readers.
+   */
+  activeRowId?: string;
+  /**
+   * Paint a hover background on data rows when the cursor is over them. Off by default —
+   * a hover highlight implies the row is interactive, which is misleading when there's
+   * nothing to click. Pass `true` for read-only tables that still want the affordance,
+   * or omit and the table will turn hover on automatically whenever `onRowClick` is set.
+   */
+  rowHover?: boolean;
   /**
    * Enables row selection. When true, Table prepends a selection column with
    * checkboxes bound to `rowSelection` state.
@@ -327,6 +369,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     stickyHeader = false,
     maxHeight,
     onRowClick,
+    activeRowId,
+    rowHover,
     enableRowSelection,
     enableColumnFilters = false,
     renderSubComponent,
@@ -600,6 +644,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
 
   const hasGroupedHeaders = table.getHeaderGroups().length > 1;
+  // Hover affordance follows interactivity by default — clickable rows always get it,
+  // read-only tables stay flat unless `rowHover` is explicitly opted into.
+  const hoverEnabled = rowHover ?? Boolean(onRowClick);
 
   const rootClassName = cn(
     styles['tedi-table'],
@@ -611,6 +658,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
       [styles['tedi-table--sticky-header']]: stickyHeader,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick),
+      [styles['tedi-table--row-hover']]: hoverEnabled,
       [styles['tedi-table--has-pagination']]: paginationEnabled,
       [styles['tedi-table--grouped-headers']]: hasGroupedHeaders,
     },
@@ -683,7 +731,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         ? 'descending'
                         : 'none'
                       : undefined;
-                    const headerMeta = header.column.columnDef.meta as { label?: string } | undefined;
+                    const headerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
                     const headerLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
@@ -694,6 +742,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         rowSpan={rowSpanCount > 1 ? rowSpanCount : undefined}
                         className={cn(styles['tedi-table__header-cell'], {
                           [styles['tedi-table__header-cell--group']]: isGroup,
+                          [styles[`tedi-table__cell--align-${headerMeta?.align}`]]: headerMeta?.align,
+                          [styles[`tedi-table__cell--valign-${headerMeta?.vAlign}`]]: headerMeta?.vAlign,
                         })}
                         scope="col"
                         aria-sort={ariaSort}
@@ -712,7 +762,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   aria-rowindex={paginationEnabled ? headerGroups.length + 1 : undefined}
                 >
                   {leafColumns.map((column) => {
-                    const meta = column.columnDef.meta as { label?: string } | undefined;
+                    const meta = column.columnDef.meta as TableColumnMeta | undefined;
                     const headerLabel =
                       meta?.label ??
                       (typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id);
@@ -751,8 +801,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               ) : (
                 rows.map((row, visibleIndex) => {
                   const clickable = Boolean(onRowClick);
+                  const isActiveRow = activeRowId !== undefined && row.id === activeRowId;
                   const rowClassName = cn(styles['tedi-table__row'], {
                     [styles['tedi-table__row--selected']]: row.getIsSelected(),
+                    [styles['tedi-table__row--active']]: isActiveRow,
                     [styles['tedi-table__row--clickable']]: clickable,
                     [styles['tedi-table__row--sub-row']]: row.depth > 0,
                   });
@@ -769,12 +821,22 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         tabIndex={clickable ? 0 : undefined}
                         role={clickable ? 'button' : undefined}
                         aria-rowindex={ariaRowIndex}
+                        aria-current={isActiveRow ? 'true' : undefined}
                       >
-                        {row.getVisibleCells().map((cell) => (
-                          <td key={cell.id} className={styles['tedi-table__cell']}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </td>
-                        ))}
+                        {row.getVisibleCells().map((cell) => {
+                          const cellMeta = cell.column.columnDef.meta as TableColumnMeta | undefined;
+                          return (
+                            <td
+                              key={cell.id}
+                              className={cn(styles['tedi-table__cell'], {
+                                [styles[`tedi-table__cell--align-${cellMeta?.align}`]]: cellMeta?.align,
+                                [styles[`tedi-table__cell--valign-${cellMeta?.vAlign}`]]: cellMeta?.vAlign,
+                              })}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                          );
+                        })}
                       </tr>
                       {renderSubComponent && row.getIsExpanded() && (
                         <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--sub-component'])}>
@@ -798,15 +860,23 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               <tfoot className={styles['tedi-table__foot']}>
                 {footerGroups.map((group) => (
                   <tr key={group.id} className={styles['tedi-table__row']}>
-                    {group.headers.map((header) => (
-                      <td
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--footer'])}
-                      >
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.footer, header.getContext())}
-                      </td>
-                    ))}
+                    {group.headers.map((header) => {
+                      const footerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
+                      return (
+                        <td
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--footer'], {
+                            [styles[`tedi-table__cell--align-${footerMeta?.align}`]]: footerMeta?.align,
+                            [styles[`tedi-table__cell--valign-${footerMeta?.vAlign}`]]: footerMeta?.vAlign,
+                          })}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.footer, header.getContext())}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tfoot>

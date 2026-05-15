@@ -361,9 +361,9 @@ export const labelsMap = validateDefaultLabels({
   'table.columns': {
     description: 'Default label on the `Table.ColumnsMenu` trigger (column-visibility menu).',
     components: ['TableColumnsMenu'],
-    et: 'Veerud',
-    en: 'Columns',
-    ru: 'Столбцы',
+    et: 'Kohanda',
+    en: 'Customize',
+    ru: 'Настроить',
   },
   'stepper.completed': {
     description: 'Label for screen-reader that this step is completed (visually hidden)',
@@ -570,9 +570,9 @@ export const labelsMap = validateDefaultLabels({
   'pagination.page-size': {
     description: 'Label of page size select',
     components: ['Table', 'Pagination'],
-    et: 'Lehe suurus',
-    en: 'Page size',
-    ru: 'Размер страницы',
+    et: 'Kuva korraga',
+    en: 'Show per page',
+    ru: 'Показывать по',
   },
   'pagination.page-status': {
     description:

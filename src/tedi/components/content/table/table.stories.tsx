@@ -2,6 +2,9 @@ import {
   closestCenter,
   DndContext,
   type DragEndEvent,
+  type DragOverEvent,
+  DragOverlay,
+  type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -25,6 +28,7 @@ import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
+import InfoButton from '../../buttons/info-button/info-button';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -33,6 +37,7 @@ import Separator from '../../misc/separator/separator';
 import { Alert } from '../../notifications/alert/alert';
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger } from '../../overlays/dropdown';
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
+import { Tooltip } from '../../overlays/tooltip';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Truncate } from '../truncate/truncate';
 import type { TableProps } from './table';
@@ -191,9 +196,11 @@ const nameLinkStyle: React.CSSProperties = {
 };
 
 const editRowActionsStyle: React.CSSProperties = {
-  display: 'inline-flex',
+  display: 'flex',
   alignItems: 'center',
+  justifyContent: 'flex-end',
   gap: 8,
+  width: '100%',
 };
 
 interface EditableRows<T extends { id: string }> {
@@ -274,17 +281,19 @@ function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
     );
   }
   return (
-    <a
-      href="#"
-      onClick={(event) => {
-        event.preventDefault();
-        editor.beginEdit(row);
-      }}
-      style={editLinkStyle}
-    >
-      <Icon name="edit" color="brand" size={18} />
-      Muuda
-    </a>
+    <span style={editRowActionsStyle}>
+      <a
+        href="#"
+        onClick={(event) => {
+          event.preventDefault();
+          editor.beginEdit(row);
+        }}
+        style={editLinkStyle}
+      >
+        <Icon name="edit" color="brand" size={18} />
+        Muuda
+      </a>
+    </span>
   );
 }
 
@@ -353,6 +362,7 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
 ];
@@ -454,6 +464,7 @@ const simpleDoctorColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
 ];
@@ -510,7 +521,6 @@ const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
       </div>
     ),
   },
-  // Description cell injected per variant.
   {
     id: 'location',
     header: 'Asukoht',
@@ -520,6 +530,7 @@ const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
 ];
@@ -613,6 +624,7 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
     accessorKey: 'dateRange',
+    size: 240,
     header: ({ column }) => {
       const sorted = column.getIsSorted();
       const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
@@ -657,6 +669,7 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
 ];
@@ -678,20 +691,103 @@ export const MergedCells: Story = {
   },
 };
 
+const HeaderWithInfo = ({ label, info, align }: { label: string; info: string; align?: 'left' | 'right' }) => (
+  <span
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4,
+      justifyContent: align === 'right' ? 'flex-end' : 'flex-start',
+    }}
+  >
+    {label}
+    <Tooltip>
+      <Tooltip.Trigger>
+        <InfoButton isSmall aria-label={`${label} info`} />
+      </Tooltip.Trigger>
+      <Tooltip.Content>{info}</Tooltip.Content>
+    </Tooltip>
+  </span>
+);
+
+interface Service {
+  id: string;
+  service: string;
+  doctor: string;
+  price: number;
+  location: string;
+}
+
+const serviceSeed: Omit<Service, 'id'>[] = [
+  { service: 'Vaimse tervise nõustamisteenus', doctor: 'Pille Paunküla', price: 45.5, location: 'Tallinn' },
+  { service: 'Hematoloogia', doctor: 'Kalle Kuusik', price: 89.99, location: 'Tallinn' },
+  { service: 'Ortopeedia', doctor: 'Märt Männimets', price: 110, location: 'Tallinn' },
+  { service: 'Dermatoloogia', doctor: 'Anna Tamm', price: 75, location: 'Tartu' },
+  { service: 'Kardioloogia', doctor: 'Mati Saar', price: 120.5, location: 'Pärnu' },
+  { service: 'Neuroloogia', doctor: 'Liis Põld', price: 95.25, location: 'Tallinn' },
+  { service: 'Pediaatria', doctor: 'Jaan Lepp', price: 60, location: 'Tartu' },
+];
+const services: Service[] = Array.from({ length: 28 }, (_, index) => ({
+  id: String(index + 1),
+  ...serviceSeed[index % serviceSeed.length],
+}));
+
+const priceFormatter = new Intl.NumberFormat('et-EE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 /**
  * Column separator lines via `verticalBorders`. Combine with `borderless` if the outer border
  * should be removed at the same time.
  */
 export const VerticalBorders: Story = {
-  render: () => (
-    <Table<Person>
-      id="tedi-table-vb"
-      data={people}
-      columns={personColumns}
-      verticalBorders
-      pagination={DEFAULT_PAGINATION}
-    />
-  ),
+  render: () => {
+    const columns: ColumnDef<Service>[] = [
+      {
+        id: 'service',
+        accessorKey: 'service',
+        header: ({ column }) => {
+          const sorted = column.getIsSorted();
+          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+          return (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              Teenus
+              <Table.HeaderButton
+                icon={iconName}
+                selected={!!sorted}
+                aria-label="Sorteeri Teenus järgi"
+                onClick={column.getToggleSortingHandler()}
+              />
+            </span>
+          );
+        },
+      },
+      {
+        id: 'doctor',
+        accessorKey: 'doctor',
+        header: () => <HeaderWithInfo label="Arst" info="Vastutav raviarst, kes teostab teenuse." />,
+      },
+      {
+        id: 'price',
+        accessorKey: 'price',
+        header: 'Maksumus',
+        meta: { align: 'right' },
+        cell: ({ row }) => `${priceFormatter.format(row.original.price)} €/h`,
+      },
+      {
+        id: 'location',
+        accessorKey: 'location',
+        header: () => <HeaderWithInfo label="Asukoht" info="Vastuvõtu toimumiskoht." />,
+      },
+    ];
+    return (
+      <Table<Service>
+        id="tedi-table-vb"
+        data={services}
+        columns={columns}
+        verticalBorders
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
+  },
 };
 
 /**
@@ -1208,18 +1304,24 @@ export const SelectableRows: Story = {
  * Whole-row click via `onRowClick={(row) => ...}`. The table adds pointer cursor and hover highlight
  * automatically. Use instead of (or alongside) `enableRowSelection` when a click should navigate
  * or open a detail panel rather than toggle a checkbox.
+ *
+ * Pair the click handler with `activeRowId` to pin the clicked row visually — useful for
+ * master-detail layouts where the row should stay highlighted while a side pane shows its
+ * content. The active row paints with the same `--table-hover` surface as `:hover` but
+ * survives cursor movement, and announces itself to screen readers via `aria-current="true"`.
  */
 export const ClickableRows: Story = {
   render: function ClickableRows() {
-    const [clicked, setClicked] = useState<string | null>(null);
+    const [active, setActive] = useState<{ id: string; name: string } | null>(null);
     return (
       <>
-        <Text className="margin-bottom-10">{clicked ? `You clicked ${clicked}` : 'Click a row to select it.'}</Text>
+        <Text className="margin-bottom-10">{active ? `You clicked ${active.name}` : 'Click a row to select it.'}</Text>
         <Table<Person>
           id="tedi-table-clickable"
           data={people}
           columns={personColumns}
-          onRowClick={(row) => setClicked(row.original.name)}
+          onRowClick={(row) => setActive({ id: row.id, name: row.original.name })}
+          activeRowId={active?.id}
           pagination={DEFAULT_PAGINATION}
         />
       </>
@@ -1242,18 +1344,82 @@ export const Striped: Story = {
   ),
 };
 
+interface StickyDoctor extends Doctor {
+  personalId: string;
+}
+
+const stickyDoctorSeed: Omit<StickyDoctor, 'id'>[] = [
+  {
+    name: 'Kalle Kask',
+    personalId: '49504080456',
+    specialty: 'Dermatovenereoloog',
+    experience: '4 a',
+    location: 'Tallinn',
+  },
+  {
+    name: 'Mari Maasikas',
+    personalId: '39404080456',
+    specialty: 'Kopsuarst',
+    experience: '4 a',
+    location: 'Tallinn',
+  },
+  {
+    name: 'Vello Vaarikas',
+    personalId: '39403080865',
+    specialty: 'Kõrva-nina-kurguarst',
+    experience: '4 a',
+    location: 'Tallinn',
+  },
+];
+
+const stickyDoctors: StickyDoctor[] = Array.from({ length: 28 }, (_, index) => ({
+  ...stickyDoctorSeed[index % stickyDoctorSeed.length],
+  id: String(index + 1),
+}));
+
+const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
+  {
+    id: 'name',
+    header: 'Arst',
+    accessorKey: 'name',
+    size: 280,
+    cell: ({ row }) => (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 16 }}>
+        {row.original.name}
+        <span style={{ color: 'var(--general-text-tertiary)' }}>{row.original.personalId}</span>
+      </span>
+    ),
+  },
+  { id: 'specialty', header: 'Eriala', accessorKey: 'specialty', size: 240 },
+  { id: 'experience', header: 'Tööstaaž', accessorKey: 'experience', size: 200 },
+  { id: 'location', header: 'Asukoht', accessorKey: 'location', size: 200 },
+  {
+    id: 'actions',
+    header: '',
+    size: 1,
+    cell: () => (
+      <span style={rowActionsCellStyle}>
+        <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
+          <Icon name="edit" color="brand" size={18} />
+          Muuda
+        </a>
+      </span>
+    ),
+  },
+];
+
 /**
  * First column stays fixed during horizontal scroll via `stickyFirstColumn`. Constrain the
- * container width (e.g. `maxWidth: 520`) so there is something to scroll — the sticky effect
- * is invisible when the table fits without overflow.
+ * container width so the table overflows — the sticky effect is invisible when the table fits
+ * without scroll.
  */
 export const StickyFirstColumn: Story = {
   render: () => (
-    <div style={{ maxWidth: 520 }}>
-      <Table<Person>
+    <div style={{ maxWidth: 600 }}>
+      <Table<StickyDoctor>
         id="tedi-table-sticky"
-        data={people}
-        columns={personColumns}
+        data={stickyDoctors}
+        columns={stickyDoctorColumns}
         stickyFirstColumn
         pagination={DEFAULT_PAGINATION}
       />
@@ -1284,11 +1450,11 @@ export const StickyHeader: Story = {
  */
 export const StickyHeaderAndFirstColumn: Story = {
   render: () => (
-    <div style={{ maxWidth: 520 }}>
-      <Table<Person>
+    <div style={{ maxWidth: 600 }}>
+      <Table<StickyDoctor>
         id="tedi-table-sticky-both"
-        data={people}
-        columns={personColumns}
+        data={stickyDoctors}
+        columns={stickyDoctorColumns}
         stickyHeader
         stickyFirstColumn
         maxHeight={280}
@@ -1329,6 +1495,7 @@ const longTextsColumns: ColumnDef<Doctor>[] = [
   {
     id: 'description',
     header: 'Kirjeldus',
+    size: 480,
     cell: () => <Truncate maxLength={LONG_TEXT_MAX_LENGTH}>{LONG_DESCRIPTION}</Truncate>,
   },
   baseDoctorWithDescriptionColumns[1],
@@ -1360,12 +1527,14 @@ export const Actions: Story = {
         {
           id: 'actions',
           header: '',
+          size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Button
                     visualType="secondary"
+                    size="small"
                     icon="more_vert"
                     aria-label={`Avalda ${row.original.name} valikud`}
                     onClick={() => undefined}
@@ -1426,18 +1595,12 @@ export const Custom: Story = {
         {
           id: 'actions',
           header: '',
+          size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
               <Popover>
                 <PopoverTrigger>
-                  <Button
-                    visualType="secondary"
-                    icon="info"
-                    aria-label={`${row.original.name} eelvaade`}
-                    onClick={() => undefined}
-                  >
-                    <></>
-                  </Button>
+                  <InfoButton isSmall aria-label={`${row.original.name} eelvaade`} />
                 </PopoverTrigger>
                 <PopoverContent>
                   <VerticalSpacing size={0.5}>
@@ -1489,8 +1652,9 @@ export const WithFooter: Story = {
       { id: 'location', header: 'Location', accessorKey: 'location' },
       {
         id: 'salary',
-        header: 'Salary (€)',
         accessorKey: 'salary',
+        header: 'Salary (€)',
+        meta: { align: 'right' },
         cell: (info) => (info.getValue() as number).toLocaleString('et-EE'),
         footer: (info) => {
           const total = info.table.getFilteredRowModel().rows.reduce((sum, row) => sum + row.original.salary, 0);
@@ -1527,6 +1691,59 @@ export const WithColumnsMenu: Story = {
 //   3. In `onDragEnd`, compute the new order with `arrayMove` and either
 //      reorder the data array (rows) or set `state.columnOrder` (columns).
 // ---------------------------------------------------------------------------
+
+const dragOverlayTableStyle: React.CSSProperties = {
+  borderCollapse: 'collapse',
+  background: 'var(--card-background-primary)',
+  border: 'var(--tedi-borders-01) solid var(--card-border-primary)',
+  borderRadius: 'var(--table-radius)',
+  boxShadow: '0 6px 16px var(--tedi-alpha-20)',
+  cursor: 'grabbing',
+};
+const dragOverlayRowStyle: React.CSSProperties = {
+  background: 'var(--table-hover)',
+};
+const dragOverlayCellStyle: React.CSSProperties = {
+  padding: 'var(--table-data-padding-y) var(--table-data-padding-x)',
+  color: 'var(--general-text-primary)',
+  whiteSpace: 'nowrap',
+};
+
+const DragOverColumnContext = createContext<string | null>(null);
+
+const SortableColumnHeader = ({ id, label }: { id: string; label: string }) => {
+  const overId = useContext(DragOverColumnContext);
+  const isOver = overId === id;
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        boxShadow: isOver ? 'inset 0 -3px 0 var(--general-border-focus)' : undefined,
+        transition: 'box-shadow 100ms ease',
+      }}
+    >
+      <DragHandle id={id} label={`Drag column ${label}`} />
+      {label}
+    </span>
+  );
+};
+
+const dragOverlayHeaderChipStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '8px 14px',
+  fontFamily: 'var(--family-default)',
+  fontWeight: 'var(--body-bold-weight)',
+  color: 'var(--general-text-secondary)',
+  background: 'var(--card-background-primary)',
+  border: 'var(--tedi-borders-01) solid var(--card-border-primary)',
+  borderRadius: 'var(--table-radius)',
+  boxShadow: '0 6px 16px var(--tedi-alpha-20)',
+  cursor: 'grabbing',
+};
 
 /**
  * Drag handle cell shared by both stories. The `id` is whatever sortable
@@ -1587,6 +1804,8 @@ export const DraggableRows: Story = {
   render: function DraggableRows() {
     // Story owns its own reorderable copy of `people` so drag-end can mutate it.
     const [rows, setRows] = useState<Person[]>(() => people.slice(0, 8));
+    const [activeRowId, setActiveRowId] = useState<string | null>(null);
+    const [overRowId, setOverRowId] = useState<string | null>(null);
     const sensors = useSensors(
       useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
       useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -1609,7 +1828,16 @@ export const DraggableRows: Story = {
       []
     );
 
+    const handleDragStart = (event: DragStartEvent) => {
+      setActiveRowId(String(event.active.id));
+      setOverRowId(String(event.active.id));
+    };
+    const handleDragOver = (event: DragOverEvent) => {
+      setOverRowId(event.over ? String(event.over.id) : null);
+    };
     const handleDragEnd = (event: DragEndEvent) => {
+      setActiveRowId(null);
+      setOverRowId(null);
       const { active, over } = event;
       if (!over || active.id === over.id) return;
       setRows((current) => {
@@ -1619,6 +1847,11 @@ export const DraggableRows: Story = {
         return arrayMove(current, oldIndex, newIndex);
       });
     };
+    const handleDragCancel = () => {
+      setActiveRowId(null);
+      setOverRowId(null);
+    };
+    const activeRow = activeRowId ? rows.find((r) => r.id === activeRowId) : null;
 
     return (
       <VerticalSpacing size={1}>
@@ -1629,10 +1862,38 @@ export const DraggableRows: Story = {
             <StatusBadge>onDragEnd</StatusBadge>.
           </Text>
         </Alert>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
           <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-            <Table<Person> id="tedi-table-row-drag" data={rows} columns={columns} />
+            <Table<Person>
+              id="tedi-table-row-drag"
+              data={rows}
+              columns={columns}
+              activeRowId={overRowId ?? undefined}
+            />
           </SortableContext>
+          <DragOverlay dropAnimation={null}>
+            {activeRow ? (
+              <table style={dragOverlayTableStyle}>
+                <tbody>
+                  <tr style={dragOverlayRowStyle}>
+                    <td style={{ ...dragOverlayCellStyle, width: 40 }} aria-hidden="true">
+                      <Icon name="drag_indicator" size={18} color="secondary" />
+                    </td>
+                    <td style={dragOverlayCellStyle}>{activeRow.name}</td>
+                    <td style={dragOverlayCellStyle}>{activeRow.role}</td>
+                    <td style={dragOverlayCellStyle}>{activeRow.location}</td>
+                  </tr>
+                </tbody>
+              </table>
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </VerticalSpacing>
     );
@@ -1674,29 +1935,32 @@ export const DraggableColumns: Story = {
     const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(() =>
       baseColumns.map((column) => column.id as string)
     );
+    const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+    const [overColumnId, setOverColumnId] = useState<string | null>(null);
     const sensors = useSensors(
       useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
       useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
 
-    // Wrap each header in a drag handle so the column can be picked up from the
-    // header cell itself. We re-derive the columns array whenever `columnOrder`
-    // changes so the handle's id matches the column we're dragging.
     const columns = useMemo<ColumnDef<Person>[]>(
       () =>
         baseColumns.map((column) => ({
           ...column,
-          header: ({ column: ctxColumn }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <DragHandle id={ctxColumn.id} label={`Drag column ${String(column.header)}`} />
-              {column.header as string}
-            </span>
-          ),
+          header: ({ column: ctxColumn }) => <SortableColumnHeader id={ctxColumn.id} label={column.header as string} />,
         })) as ColumnDef<Person>[],
       [baseColumns]
     );
 
+    const handleDragStart = (event: DragStartEvent) => {
+      setActiveColumnId(String(event.active.id));
+      setOverColumnId(String(event.active.id));
+    };
+    const handleDragOver = (event: DragOverEvent) => {
+      setOverColumnId(event.over ? String(event.over.id) : null);
+    };
     const handleDragEnd = (event: DragEndEvent) => {
+      setActiveColumnId(null);
+      setOverColumnId(null);
       const { active, over } = event;
       if (!over || active.id === over.id) return;
       setColumnOrder((current) => {
@@ -1706,6 +1970,13 @@ export const DraggableColumns: Story = {
         return arrayMove(current, oldIndex, newIndex);
       });
     };
+    const handleDragCancel = () => {
+      setActiveColumnId(null);
+      setOverColumnId(null);
+    };
+    const activeColumnHeader = activeColumnId
+      ? (baseColumns.find((c) => c.id === activeColumnId)?.header as string | undefined)
+      : undefined;
 
     return (
       <VerticalSpacing size={1}>
@@ -1716,18 +1987,35 @@ export const DraggableColumns: Story = {
             new order automatically.
           </Text>
         </Alert>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
-            <Table<Person>
-              id="tedi-table-column-drag"
-              data={people.slice(0, 6)}
-              columns={columns}
-              state={{ columnOrder }}
-              onStateChange={(next) => {
-                if (next.columnOrder) setColumnOrder(next.columnOrder);
-              }}
-            />
-          </SortableContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <DragOverColumnContext.Provider value={overColumnId}>
+            <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
+              <Table<Person>
+                id="tedi-table-column-drag"
+                data={people.slice(0, 6)}
+                columns={columns}
+                state={{ columnOrder }}
+                onStateChange={(next) => {
+                  if (next.columnOrder) setColumnOrder(next.columnOrder);
+                }}
+              />
+            </SortableContext>
+          </DragOverColumnContext.Provider>
+          <DragOverlay dropAnimation={null}>
+            {activeColumnHeader ? (
+              <span style={dragOverlayHeaderChipStyle}>
+                <Icon name="drag_indicator" size={18} color="secondary" />
+                {activeColumnHeader}
+              </span>
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </VerticalSpacing>
     );
