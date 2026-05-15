@@ -1,3 +1,10 @@
+# [17.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.4...react-17.1.0-rc.5) (2026-05-14)
+
+
+### Features
+
+* **date-field, calendar:** new TEDI-Ready DateField component [#24](https://github.com/TEDI-Design-System/react/issues/24) ([#595](https://github.com/TEDI-Design-System/react/issues/595)) ([bb34846](https://github.com/TEDI-Design-System/react/commit/bb3484613d83080e340d657881a753d063eca555)), closes [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94)
+
 # [17.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.3...react-17.1.0-rc.4) (2026-05-08)
 
 

@@ -14,6 +14,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Radio | `boolean` (via onChange) | Used in ChoiceGroup |
 | ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
 | Search | `string` | Search button, onSearch callback |
+| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop |
 
@@ -105,6 +106,74 @@ import { NumberField } from '@tedi-design-system/react/tedi';
   max={100}
   step={1}
   suffix="pcs"
+/>
+```
+
+## DateField
+
+Three modes (`'single'`, `'multiple'`, `'range'`) sharing one calendar popover. `selected`/`defaultValue`/`onSelect` adapt their value shape to the active mode (`Date`, `Date[]`, or `DateRange`). Manual text input is **off** by default — supply a `parseDate` to enable it.
+
+```tsx
+import { DateField } from '@tedi-design-system/react/tedi';
+
+// Single date (controlled)
+const [date, setDate] = useState<Date>();
+<DateField id="birthdate" label="Birth date" selected={date} onSelect={setDate} required />
+
+// Range with manual input parsing
+<DateField
+  id="period"
+  label="Period"
+  mode="range"
+  selected={range}
+  onSelect={setRange}
+  parseDate={(value) => parseDateRange(value)}
+  closeOnSelect={false}
+/>
+
+// Multiple dates (renders MultiValueField as the input)
+<DateField id="appointments" label="Appointments" mode="multiple" selected={dates} onSelect={setDates} />
+```
+
+**Constraining the calendar** — every option also greys out the corresponding entries in the month / year header dropdowns:
+```tsx
+<DateField
+  id="future-only"
+  label="Pick a future date"
+  disablePast
+  maxDate={new Date(2030, 11, 31)}
+  shouldDisableYear={(year) => year.getFullYear() === 2026}
+/>
+```
+
+**Native picker on small screens** — uses `<input type="date">` below `md`, custom calendar from `md` up. Only valid with `mode="single"`:
+```tsx
+<DateField id="dob" label="Date of birth" useNativePicker md={{ useNativePicker: false }} />
+```
+
+**Custom display formatting**:
+```tsx
+<DateField
+  id="iso"
+  label="ISO date"
+  formatDate={(d) => (d instanceof Date ? d.toISOString().slice(0, 10) : '')}
+/>
+```
+
+**Calendar selection granularity** — `selectionLevel="months"` or `"years"` commits at a coarser level (useful for "pick a year" UIs):
+```tsx
+<DateField id="year" label="Year" selectionLevel="years" />
+```
+
+**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`, `isClearable`):
+```tsx
+<DateField
+  id="end"
+  label="End date"
+  inputProps={{
+    helper: { type: 'hint', text: 'Leave empty for "ongoing"' },
+    isClearable: true,
+  }}
 />
 ```
 
@@ -213,6 +282,7 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 - **Choice inputs:** `onChange?: (value: string, checked: boolean) => void`
 - **Select:** `onChange?: (value: ISelectOption | ISelectOption[] | null) => void`
 - **NumberField:** `onChange?: (value: number) => void`
+- **DateField:** `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>` — value shape depends on `mode` (`'single'` → `Date`, `'multiple'` → `Date[]`, `'range'` → `DateRange`)
 
 ## Disabled State
 
