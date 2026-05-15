@@ -31,8 +31,11 @@
     }
 
     &:disabled {
+      --filter-bg: var(--button-main-disabled-general-background);
+      --filter-text: var(--button-main-disabled-general-text);
+      --filter-border: var(--button-main-disabled-general-border);
+
       cursor: not-allowed;
-      opacity: 0.5;
     }
   }
 
@@ -81,9 +84,9 @@
     --filter-bg: var(--filter-primary-default-background);
     --filter-text: var(--filter-primary-default-text);
 
-    .tedi-filter__button:hover,
-    .tedi-filter__button:active,
-    .tedi-filter__button[aria-expanded='true'] {
+    .tedi-filter__button:hover:not(:disabled),
+    .tedi-filter__button:active:not(:disabled),
+    .tedi-filter__button[aria-expanded='true']:not(:disabled) {
       --filter-bg: var(--filter-primary-hover-background);
       --filter-text: var(--filter-primary-hover-text);
     }
@@ -106,9 +109,9 @@
     --filter-text: var(--filter-secondary-default-text);
     --filter-border: var(--filter-secondary-default-border);
 
-    .tedi-filter__button:hover,
-    .tedi-filter__button:active,
-    .tedi-filter__button[aria-expanded='true'] {
+    .tedi-filter__button:hover:not(:disabled),
+    .tedi-filter__button:active:not(:disabled),
+    .tedi-filter__button[aria-expanded='true']:not(:disabled) {
       --filter-bg: var(--filter-secondary-hover-background);
       --filter-text: var(--filter-secondary-hover-text);
       --filter-border: var(--filter-secondary-hover-border);
@@ -120,8 +123,6 @@
       --filter-border: var(--filter-secondary-selected-border);
       --filter-border-width: var(--general-selected-border-width);
 
-      // Selected + hover/active keeps the 2px selected border but swaps the surface to the
-      // secondary hover tint.
       .tedi-filter__button:hover,
       .tedi-filter__button:active,
       .tedi-filter__button[aria-expanded='true'] {
@@ -152,16 +153,18 @@
     margin-left: calc(-1 * var(--tedi-borders-01));
   }
 
-  .tedi-filter--primary:not(:last-child) .tedi-filter__button {
+  .tedi-filter--primary:not(:last-child, .tedi-filter--selected) .tedi-filter__button {
     border-right: var(--tedi-borders-01) solid var(--filter-secondary-default-border);
 
-    // On hover/active the button is filled with the hover bg — match the divider colour so
-    // it blends into the surface instead of cutting through it.
-    &:hover,
-    &:active,
-    &[aria-expanded='true'] {
+    &:hover:not(:disabled),
+    &:active:not(:disabled),
+    &[aria-expanded='true']:not(:disabled) {
       border-right-color: var(--filter-primary-hover-background);
     }
+  }
+
+  .tedi-filter--primary.tedi-filter--selected:has(+ .tedi-filter--primary.tedi-filter--selected) .tedi-filter__button {
+    border-right: var(--tedi-borders-01) solid var(--filter-primary-selected-border);
   }
 
   .tedi-filter--selected,

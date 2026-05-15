@@ -515,12 +515,13 @@ export const States: Story = {
   render: function StatesStory() {
     const breakpoint = useBreakpoint();
     const isMobile = isBreakpointBelow(breakpoint, 'md');
-    const stateRows: { label: string; id: string; selected: boolean }[] = [
+    const stateRows: { label: string; id: string; selected: boolean; disabled?: boolean }[] = [
       { label: 'Default', id: 'default', selected: false },
       { label: 'Hover', id: 'hover', selected: false },
       { label: 'Active', id: 'active', selected: false },
       { label: 'Focus', id: 'focus', selected: false },
       { label: 'Selected', id: 'selected', selected: true },
+      { label: 'Disabled', id: 'disabled', selected: false, disabled: true },
     ];
     const stateOptions: FilterOption[] = [
       { label: 'Optometristi vastuvõtt', value: '1' },
@@ -529,7 +530,10 @@ export const States: Story = {
     ];
 
     const columns: { label: string; render: (row: (typeof stateRows)[number]) => ReactNode }[] = [
-      { label: 'Primary', render: (row) => <Filter text="Filter" selected={row.selected} /> },
+      {
+        label: 'Primary',
+        render: (row) => <Filter text="Filter" selected={row.selected} disabled={row.disabled} />,
+      },
       {
         label: 'Primary multiselect',
         render: (row) => (
@@ -538,10 +542,14 @@ export const States: Story = {
             multiselect
             options={stateOptions}
             defaultSelectedValues={row.selected ? ['1', '2'] : []}
+            disabled={row.disabled}
           />
         ),
       },
-      { label: 'Secondary', render: (row) => <Filter text="Filter" variant="secondary" selected={row.selected} /> },
+      {
+        label: 'Secondary',
+        render: (row) => <Filter text="Filter" variant="secondary" selected={row.selected} disabled={row.disabled} />,
+      },
       {
         label: 'Secondary multiselect',
         render: (row) => (
@@ -551,10 +559,14 @@ export const States: Story = {
             multiselect
             options={stateOptions}
             defaultSelectedValues={row.selected ? ['1', '2'] : []}
+            disabled={row.disabled}
           />
         ),
       },
-      { label: 'Large', render: (row) => <Filter text="Filter" size="large" selected={row.selected} /> },
+      {
+        label: 'Large',
+        render: (row) => <Filter text="Filter" size="large" selected={row.selected} disabled={row.disabled} />,
+      },
     ];
 
     return (
