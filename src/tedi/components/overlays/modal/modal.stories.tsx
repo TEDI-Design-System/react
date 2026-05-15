@@ -285,12 +285,23 @@ export const CustomWidth: Story = {
   ),
 };
 
+/**
+ * Three sizing modes plus the breakpoint shortcut:
+ *
+ * - `fullscreen={true}` — padded fullscreen (modal fills the overlay's content box,
+ *   16px backdrop visible all around — matches Figma `5981:67531`).
+ * - `fullscreen="edge"` — true edge-to-edge takeover (no backdrop, no border, no radius).
+ * - `fullscreen="sm"` / `"md"` / `"lg"` / `"xl"` — padded fullscreen at and below that
+ *   breakpoint. Useful for "fullscreen on mobile only".
+ */
 export const Fullscreen: Story = {
   render: () => {
     const variants: { label: string; value: ModalFullscreen }[] = [
-      { label: 'Always fullscreen', value: true },
-      { label: 'Fullscreen below md', value: 'md' },
-      { label: 'Fullscreen on mobile (≤ sm)', value: 'sm' },
+      { label: 'Normal (default)', value: false },
+      { label: 'Padded fullscreen', value: true },
+      { label: 'Edge-to-edge fullscreen', value: 'edge' },
+      { label: 'Padded below md', value: 'md' },
+      { label: 'Padded on mobile (≤ sm)', value: 'sm' },
     ];
     return (
       <Row gutterY={2}>

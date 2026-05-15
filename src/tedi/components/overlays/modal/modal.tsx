@@ -44,7 +44,7 @@ export interface ModalProps {
    * (delete, cancel subscription) — screen readers announce alertdialogs with higher
    * urgency and require an explicit user action to dismiss. Affects both the trigger's
    * `aria-haspopup` and the floating element's `role`.
-   * @default 'dialog'
+   * @default dialog
    */
   role?: ModalRole;
 }

@@ -1,6 +1,9 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
 .tedi-modal__overlay {
   z-index: var(--z-index-modal);
   display: flex;
+  padding: var(--modal-body-padding);
   background: var(--general-surface-overlay);
 }
 
@@ -27,11 +30,13 @@
 .tedi-modal__overlay--position-right {
   align-items: stretch;
   justify-content: flex-end;
+  padding: 0;
 }
 
 .tedi-modal__overlay--position-left {
   align-items: stretch;
   justify-content: flex-start;
+  padding: 0;
 }
 
 .tedi-modal__overlay--scroll-page {
@@ -41,14 +46,18 @@
 .tedi-modal__overlay--scroll-page.tedi-modal__overlay--position-center,
 .tedi-modal__overlay--scroll-page.tedi-modal__overlay--position-top {
   align-items: flex-start;
-  padding: var(--tedi-dimensions-10) 0;
+}
+
+.tedi-modal__overlay--fullscreen-edge {
+  padding: 0;
 }
 
 .tedi-modal__container {
   display: flex;
   flex-direction: column;
-  width: calc(100vw - var(--tedi-dimensions-13) * 2);
-  max-height: calc(100vh - var(--tedi-dimensions-13) * 2);
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
   background: var(--modal-background);
   border: var(--tedi-borders-01) solid var(--modal-border-outer);
   border-radius: var(--modal-radius);
@@ -56,7 +65,7 @@
   .tedi-modal__overlay--position-right &,
   .tedi-modal__overlay--position-left & {
     width: 100%;
-    max-height: 100vh;
+    max-height: 100dvh;
     border-radius: 0;
   }
 
@@ -86,37 +95,42 @@
 }
 
 @mixin tedi-modal-fullscreen {
-  width: 100vw;
-  max-width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
-  border: 0;
-  border-radius: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
 }
 
 .tedi-modal__container--fullscreen {
   @include tedi-modal-fullscreen;
 }
 
-@media (width <= 575.98px) {
+.tedi-modal__container--fullscreen-edge {
+  @include tedi-modal-fullscreen;
+
+  border: 0;
+  border-radius: 0;
+}
+
+@include breakpoints.media-breakpoint-down(sm) {
   .tedi-modal__container--fullscreen-sm {
     @include tedi-modal-fullscreen;
   }
 }
 
-@media (width <= 767.98px) {
+@include breakpoints.media-breakpoint-down(md) {
   .tedi-modal__container--fullscreen-md {
     @include tedi-modal-fullscreen;
   }
 }
 
-@media (width <= 991.98px) {
+@include breakpoints.media-breakpoint-down(lg) {
   .tedi-modal__container--fullscreen-lg {
     @include tedi-modal-fullscreen;
   }
 }
 
-@media (width <= 1199.98px) {
+@include breakpoints.media-breakpoint-down(xl) {
   .tedi-modal__container--fullscreen-xl {
     @include tedi-modal-fullscreen;
   }
@@ -177,7 +191,7 @@
 
 .tedi-modal__overlay--position-center .tedi-modal__container:has(.tedi-modal__body > [data-name='scroll-fade']),
 .tedi-modal__overlay--position-top .tedi-modal__container:has(.tedi-modal__body > [data-name='scroll-fade']) {
-  height: calc(100vh - var(--tedi-dimensions-13) * 2);
+  height: 100%;
 }
 
 .tedi-modal__footer {

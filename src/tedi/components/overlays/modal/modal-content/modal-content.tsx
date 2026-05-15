@@ -13,7 +13,7 @@ export type ModalSize = 'default' | 'small';
 export type ModalPosition = 'center' | 'top' | 'right' | 'left';
 export type ModalScrollBehavior = 'content' | 'page';
 export type ModalFullscreenBreakpoint = 'sm' | 'md' | 'lg' | 'xl';
-export type ModalFullscreen = boolean | ModalFullscreenBreakpoint;
+export type ModalFullscreen = boolean | 'edge' | ModalFullscreenBreakpoint;
 
 const WIDTH_PRESETS: readonly ModalWidthPreset[] = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 const isPresetWidth = (value: ModalWidth): value is ModalWidthPreset =>
@@ -30,7 +30,7 @@ type ModalContentBreakpointProps = {
   /**
    * Hard cap on width. Useful when `width` is a custom value (e.g. `width="800px"` with
    * `maxWidth="75%"`).
-   * @default `calc(100vw - 16px * 2)`
+   * @default calc(100vw - 16px * 2)
    */
   maxWidth?: string;
   /**
@@ -53,11 +53,18 @@ export interface ModalContentProps extends BreakpointSupport<ModalContentBreakpo
    */
   size?: ModalSize;
   /**
-   * Fullscreen behaviour:
-   * - `true` — always fullscreen.
-   * - `'sm' | 'md' | 'lg' | 'xl'` — fullscreen at and below the given breakpoint
-   *   (useful for "fullscreen on mobile only" via `'sm'`).
-   * - `false` (default) — never fullscreen.
+   * Three sizing modes:
+   *
+   * - `false` (default) — **normal**: content-sized modal floating inside the
+   *   16px backdrop padding (Figma example `4631:92443`).
+   * - `true` — **padded fullscreen**: modal fills the overlay's content box;
+   *   16px backdrop stays visible all around (Figma example `5981:67531`).
+   * - `'edge'` — **edge-to-edge fullscreen**: overlay padding is removed and the
+   *   modal covers the entire viewport with no border or radius.
+   * - `'sm' | 'md' | 'lg' | 'xl'` — engages padded fullscreen at and below the
+   *   given breakpoint (use `'sm'` for "fullscreen on mobile only"). The
+   *   edge-to-edge variant is desktop-rare; not exposed as a breakpoint shortcut.
+   *
    * @default false
    */
   fullscreen?: ModalFullscreen;
@@ -123,7 +130,19 @@ export interface ModalContentProps extends BreakpointSupport<ModalContentBreakpo
    */
   initialFocus?: ComponentProps<typeof FloatingFocusManager>['initialFocus'];
   /**
-   * Additional class name on the modal container.
+   * Additional class name on the modal container (the box with the border + radius).
+   * Lands last so it can override the built-in styles. Use this for one-off visual
+   * treatments like a coloured top accent on error / success / warning modals:
+   *
+   * ```css
+   * .my-error-modal {
+   *   border-top: 4px solid var(--general-feedback-error-text);
+   * }
+   * ```
+   *
+   * ```tsx
+   * <Modal.Content className={styles['my-error-modal']}>...</Modal.Content>
+   * ```
    */
   className?: string;
 }
@@ -156,25 +175,35 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
   const ariaLabel = !ariaLabelledBy ? props['aria-label'] : undefined;
 
   const widthIsPreset = isPresetWidth(width);
+  // Inline styles cover the cases that can't be expressed via a preset class —
+  // a custom CSS-length `width` (e.g. `"800px"`) and the optional `maxWidth` cap.
   const inlineStyle: CSSProperties = {};
   if (!widthIsPreset) inlineStyle.width = width;
   if (maxWidth) inlineStyle.maxWidth = maxWidth;
 
-  const fullscreenClass =
+  const fullscreenContainerClass =
     fullscreen === true
       ? styles['tedi-modal__container--fullscreen']
+      : fullscreen === 'edge'
+      ? styles['tedi-modal__container--fullscreen-edge']
       : typeof fullscreen === 'string'
       ? styles[`tedi-modal__container--fullscreen-${fullscreen}`]
       : undefined;
+  const fullscreenOverlayClass = fullscreen === 'edge' ? styles['tedi-modal__overlay--fullscreen-edge'] : undefined;
 
   return (
     <FloatingPortal>
       <FloatingOverlay
         lockScroll={lockScroll}
-        className={cn(styles['tedi-modal__overlay'], styles[`tedi-modal__overlay--position-${position}`], {
-          [styles['tedi-modal__overlay--no-overlay']]: !showOverlay,
-          [styles['tedi-modal__overlay--scroll-page']]: scrollBehavior === 'page',
-        })}
+        className={cn(
+          styles['tedi-modal__overlay'],
+          styles[`tedi-modal__overlay--position-${position}`],
+          fullscreenOverlayClass,
+          {
+            [styles['tedi-modal__overlay--no-overlay']]: !showOverlay,
+            [styles['tedi-modal__overlay--scroll-page']]: scrollBehavior === 'page',
+          }
+        )}
       >
         <FloatingFocusManager
           context={context}
@@ -195,7 +224,7 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
                 styles['tedi-modal__container'],
                 widthIsPreset && styles[`tedi-modal__container--${width}`],
                 styles[`tedi-modal--${size}`],
-                fullscreenClass,
+                fullscreenContainerClass,
                 className
               ),
             })}
