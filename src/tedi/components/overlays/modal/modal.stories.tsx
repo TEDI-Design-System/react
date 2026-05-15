@@ -10,14 +10,7 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ScrollFade } from '../../misc/scroll-fade/scroll-fade';
 import Separator from '../../misc/separator/separator';
 import { Modal, ModalProps } from './modal';
-import {
-  ModalContentProps,
-  ModalFullscreen,
-  ModalPosition,
-  ModalScrollBehavior,
-  ModalSize,
-  ModalWidthPreset,
-} from './modal-content/modal-content';
+import { ModalContentProps, ModalFullscreen, ModalWidthPreset } from './modal-content/modal-content';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4624-94325&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -198,40 +191,6 @@ const DefaultTemplate: StoryFn<ModalStoryArgs> = ({
 
 export const Default: Story = {
   render: DefaultTemplate,
-  args: {
-    heading: 'Modal title',
-    description: '',
-    closeButton: true,
-    size: 'default',
-    width: 'md',
-    position: 'center',
-    scrollBehavior: 'content',
-    fullscreen: false,
-    closeOnBackdropClick: true,
-    closeOnEscape: true,
-  },
-  argTypes: {
-    heading: { control: 'text' },
-    description: { control: 'text' },
-    closeButton: { control: 'boolean' },
-    size: { control: 'select', options: ['default', 'small'] satisfies ModalSize[] },
-    width: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg', 'xl'] satisfies ModalWidthPreset[],
-    },
-    maxWidth: { control: 'text' },
-    position: {
-      control: 'select',
-      options: ['center', 'top', 'right', 'left'] satisfies ModalPosition[],
-    },
-    scrollBehavior: {
-      control: 'select',
-      options: ['content', 'page'] satisfies ModalScrollBehavior[],
-    },
-    fullscreen: { control: 'select', options: [false, true, 'sm', 'md', 'lg', 'xl'] },
-    closeOnBackdropClick: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-  },
 };
 
 export const Position: Story = {
@@ -296,9 +255,6 @@ export const Size: Story = {
   ),
 };
 
-/**
- * Five preset widths from Figma — `xs` (460), `sm` (616), `md` (820), `lg` (1024), `xl` (1212).
- */
 export const Width: Story = {
   render: () => (
     <Row gutterY={2}>
@@ -651,9 +607,7 @@ export const AlertDialog: Story = {
     return (
       <Modal role="alertdialog" closeOnBackdropClick={false}>
         <Modal.Trigger>
-          <Button visualType="secondary" color="danger">
-            Delete account
-          </Button>
+          <Button color="danger">Delete account</Button>
         </Modal.Trigger>
         <Modal.Content width="xs" initialFocus={cancelRef}>
           <Modal.Header
