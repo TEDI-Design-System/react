@@ -202,7 +202,7 @@
   &__clear {
     display: flex;
     justify-content: center;
-    padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+    padding: 0 var(--dropdown-item-padding-x);
     background: var(--dropdown-item-default-background);
   }
 }
