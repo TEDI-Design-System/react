@@ -20,8 +20,8 @@ type ModalStoryArgs = ModalProps &
   };
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4624-94325&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/9842cf-modal" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4624-83113&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/31221b-modal" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<ModalStoryArgs> = {
   component: Modal,
