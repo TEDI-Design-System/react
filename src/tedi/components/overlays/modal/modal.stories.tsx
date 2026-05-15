@@ -12,25 +12,6 @@ import Separator from '../../misc/separator/separator';
 import { Modal, ModalProps } from './modal';
 import { ModalContentProps, ModalFullscreen, ModalWidthPreset } from './modal-content/modal-content';
 
-/**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4624-94325&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/9842cf-modal" target="_BLANK">Zeroheight ↗</a>
- *
- * ### Accessibility
- *
- * - **Role & name** — sets `role="dialog"` + `aria-modal="true"` by default. Use `role="alertdialog"` on the
- *   provider for destructive confirmations so screen readers announce them with higher urgency. Every dialog
- *   needs an accessible name (WCAG 4.1.2): pass `title` to `Modal.Header` (auto-wires `aria-labelledby`), or
- *   set `aria-label` on `Modal.Content` for header-less modals.
- * - **Keyboard** — `Esc` closes (override with `closeOnEscape={false}`); `Tab` / `Shift+Tab` cycle within
- *   the dialog; focus is trapped via `FloatingFocusManager`; focus returns to the trigger on close.
- * - **Initial focus** — defaults to the first tabbable element. Override with `initialFocus` (ref to a
- *   specific element, or `-1` for the dialog container itself). For destructive confirmations, point this
- *   at the "Cancel" button so an accidental Enter doesn't trigger the destructive action.
- * - **Screen readers** — the description text (`Modal.Header description`) is auto-wired to
- *   `aria-describedby`. Background content is hidden from AT via `aria-modal="true"`. For touch screen
- *   readers without an Escape key, set `visuallyHiddenDismiss` on `Modal.Content`.
- */
 type ModalStoryArgs = ModalProps &
   ModalContentProps & {
     heading?: string;
@@ -38,6 +19,10 @@ type ModalStoryArgs = ModalProps &
     closeButton?: boolean;
   };
 
+/**
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4624-94325&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/9842cf-modal" target="_BLANK">Zeroheight ↗</a>
+ */
 const meta: Meta<ModalStoryArgs> = {
   component: Modal,
   subcomponents: {
