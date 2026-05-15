@@ -22,6 +22,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ColumnDef, ColumnOrderState } from '@tanstack/react-table';
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
 
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
@@ -30,6 +31,7 @@ import Button from '../../buttons/button/button';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import InfoButton from '../../buttons/info-button/info-button';
 import { Checkbox } from '../../form/checkbox/checkbox';
+import { DateField } from '../../form/date-field/date-field';
 import { TextField } from '../../form/textfield/textfield';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { EmptyState } from '../../misc/empty-state';
@@ -147,19 +149,36 @@ type Story = StoryObj<TableProps<Person>>;
 
 interface Booking {
   id: string;
-  dateRange: string;
+  dateRange: DateRange;
   hour: string;
   duration: string;
   location: string;
 }
 
+const bookingDateRange: DateRange = {
+  from: new Date(2029, 2, 22),
+  to: new Date(2029, 2, 29),
+};
+
 const bookings: Booking[] = Array.from({ length: 28 }, (_, index) => ({
   id: String(index + 1),
-  dateRange: '22.03.2029 – 29.03.2029',
+  dateRange: bookingDateRange,
   hour: '11:14',
   duration: '6 min',
   location: 'Harjumaa',
 }));
+
+const dateRangeFormatter = new Intl.DateTimeFormat('et-EE', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+
+const formatDateRange = (range: DateRange | undefined): string => {
+  if (!range?.from) return '';
+  const from = dateRangeFormatter.format(range.from);
+  return range.to ? `${from} – ${dateRangeFormatter.format(range.to)}` : from;
+};
 
 interface Doctor {
   id: string;
@@ -328,6 +347,39 @@ function EditableTextCell<T extends { id: string }>({
   );
 }
 
+/** Cell renderer that flips to a `<DateField mode="range">` when its row is editing. */
+function EditableDateRangeCell<T extends { id: string }>({
+  row,
+  field,
+  label,
+}: {
+  row: T;
+  field: keyof T & string;
+  label: string;
+}) {
+  const editor = useEditor<T>();
+  const isEditing = row.id === editor.editingId && editor.draft;
+  const value = row[field] as DateRange | undefined;
+  if (!isEditing) {
+    return <>{formatDateRange(value)}</>;
+  }
+  const draftValue = (editor.draft as T)[field] as DateRange | undefined;
+  return (
+    <DateField
+      id={`${row.id}-${field}`}
+      mode="range"
+      label={label}
+      inputProps={{ hideLabel: true }}
+      selected={draftValue}
+      onSelect={(next) =>
+        editor.setDraft((prev: T | null) =>
+          prev ? { ...prev, [field]: (next as DateRange | undefined) ?? { from: undefined } } : prev
+        )
+      }
+    />
+  );
+}
+
 /**
  * Each cell flips into a TextField when its row is being edited; the actions column
  * swaps the Muuda link for cancel / commit buttons. The cells read editor
@@ -339,7 +391,7 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
     id: 'dateRange',
     header: 'Kuupäev',
     accessorKey: 'dateRange',
-    cell: ({ row }) => <EditableTextCell row={row.original} field="dateRange" label="Kuupäev" icon="calendar_today" />,
+    cell: ({ row }) => <EditableDateRangeCell row={row.original} field="dateRange" label="Kuupäev" />,
   },
   {
     id: 'hour',
@@ -640,7 +692,7 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
         </span>
       );
     },
-    cell: ({ row }) => <EditableTextCell row={row.original} field="dateRange" label="Kuupäev" icon="calendar_today" />,
+    cell: ({ row }) => <EditableDateRangeCell row={row.original} field="dateRange" label="Kuupäev" />,
   },
   {
     id: 'aeg',
