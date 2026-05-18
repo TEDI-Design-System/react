@@ -475,7 +475,7 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
       <span className={styles['tedi-filter__text']}>{displayText}</span>
       {append !== undefined && append !== null && <span className={styles['tedi-filter__append']}>{append}</span>}
       {isMultiSelect && isSelected && multiValues.length > 0 && (
-        <StatusBadge className={styles['tedi-filter__count']} color="brand">
+        <StatusBadge className={styles['tedi-filter__count']} color={disabled ? 'neutral' : 'brand'}>
           {String(multiValues.length)}
         </StatusBadge>
       )}

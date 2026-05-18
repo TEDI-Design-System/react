@@ -31,10 +31,6 @@
     }
 
     &:disabled {
-      --filter-bg: var(--button-main-disabled-general-background);
-      --filter-text: var(--button-main-disabled-general-text);
-      --filter-border: var(--button-main-disabled-general-border);
-
       cursor: not-allowed;
     }
   }
@@ -91,13 +87,25 @@
       --filter-text: var(--filter-primary-hover-text);
     }
 
+    .tedi-filter__button:disabled {
+      --filter-bg: var(--filter-primary-disabled-background);
+      --filter-text: var(--filter-primary-disabled-text);
+      --filter-border: var(--filter-primary-disabled-border);
+      --filter-border-width: var(--tedi-borders-01);
+
+      // Force the count `StatusBadge` (which uses `color="neutral"` when the filter
+      // is disabled) to inherit the filter's disabled text token so the badge stays
+      // visually grouped with the rest of the disabled chip.
+      --status-badge-text-neutral: var(--filter-primary-disabled-text);
+    }
+
     &.tedi-filter--selected {
       --filter-bg: var(--filter-primary-selected-background);
       --filter-text: var(--filter-primary-selected-text);
 
-      .tedi-filter__button:hover,
-      .tedi-filter__button:active,
-      .tedi-filter__button[aria-expanded='true'] {
+      .tedi-filter__button:hover:not(:disabled),
+      .tedi-filter__button:active:not(:disabled),
+      .tedi-filter__button[aria-expanded='true']:not(:disabled) {
         --filter-bg: var(--filter-primary-hover-background);
         --filter-text: var(--filter-primary-hover-text);
       }
@@ -117,15 +125,22 @@
       --filter-border: var(--filter-secondary-hover-border);
     }
 
+    .tedi-filter__button:disabled {
+      --filter-bg: var(--filter-secondary-disabled-background);
+      --filter-text: var(--filter-secondary-disabled-text);
+      --filter-border: var(--filter-secondary-disabled-border);
+      --status-badge-text-neutral: var(--filter-secondary-disabled-text);
+    }
+
     &.tedi-filter--selected {
       --filter-bg: var(--filter-secondary-selected-background);
       --filter-text: var(--filter-secondary-selected-text);
       --filter-border: var(--filter-secondary-selected-border);
       --filter-border-width: var(--general-selected-border-width);
 
-      .tedi-filter__button:hover,
-      .tedi-filter__button:active,
-      .tedi-filter__button[aria-expanded='true'] {
+      .tedi-filter__button:hover:not(:disabled),
+      .tedi-filter__button:active:not(:disabled),
+      .tedi-filter__button[aria-expanded='true']:not(:disabled) {
         --filter-bg: var(--filter-secondary-hover-background);
         --filter-border: var(--filter-secondary-hover-border);
       }

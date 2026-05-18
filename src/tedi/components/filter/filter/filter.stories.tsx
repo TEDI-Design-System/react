@@ -1,5 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
-import { ReactNode, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
@@ -504,6 +504,13 @@ export const CustomizeContent: Story = {
   ),
 };
 
+/**
+ * Mirrors the Figma states grid (`4612:83728`) — one table per variant
+ * (Primary, Secondary), each with five rows (Default, Hover, Active, Focus,
+ * Disabled) × two columns (Not selected, Selected). Each cell renders both a
+ * plain text Filter and a multi-select Filter with a count badge so the count
+ * appearance is covered alongside the bare button.
+ */
 export const States: Story = {
   parameters: {
     pseudo: {
@@ -515,13 +522,12 @@ export const States: Story = {
   render: function StatesStory() {
     const breakpoint = useBreakpoint();
     const isMobile = isBreakpointBelow(breakpoint, 'md');
-    const stateRows: { label: string; id: string; selected: boolean; disabled?: boolean }[] = [
-      { label: 'Default', id: 'default', selected: false },
-      { label: 'Hover', id: 'hover', selected: false },
-      { label: 'Active', id: 'active', selected: false },
-      { label: 'Focus', id: 'focus', selected: false },
-      { label: 'Selected', id: 'selected', selected: true },
-      { label: 'Disabled', id: 'disabled', selected: false, disabled: true },
+    const stateRows: { label: string; id: string; disabled?: boolean }[] = [
+      { label: 'Default', id: 'default' },
+      { label: 'Hover', id: 'hover' },
+      { label: 'Active', id: 'active' },
+      { label: 'Focus', id: 'focus' },
+      { label: 'Disabled', id: 'disabled', disabled: true },
     ];
     const stateOptions: FilterOption[] = [
       { label: 'Optometristi vastuvõtt', value: '1' },
@@ -529,80 +535,83 @@ export const States: Story = {
       { label: 'Hambaarsti vastuvõtt', value: '3' },
     ];
 
-    const columns: { label: string; render: (row: (typeof stateRows)[number]) => ReactNode }[] = [
-      {
-        label: 'Primary',
-        render: (row) => <Filter text="Filter" selected={row.selected} disabled={row.disabled} />,
-      },
-      {
-        label: 'Primary multiselect',
-        render: (row) => (
-          <Filter
-            text="Filter"
-            multiselect
-            options={stateOptions}
-            defaultSelectedValues={row.selected ? ['1', '2'] : []}
-            disabled={row.disabled}
-          />
-        ),
-      },
-      {
-        label: 'Secondary',
-        render: (row) => <Filter text="Filter" variant="secondary" selected={row.selected} disabled={row.disabled} />,
-      },
-      {
-        label: 'Secondary multiselect',
-        render: (row) => (
-          <Filter
-            text="Filter"
-            variant="secondary"
-            multiselect
-            options={stateOptions}
-            defaultSelectedValues={row.selected ? ['1', '2'] : []}
-            disabled={row.disabled}
-          />
-        ),
-      },
-      {
-        label: 'Large',
-        render: (row) => <Filter text="Filter" size="large" selected={row.selected} disabled={row.disabled} />,
-      },
+    const variants: { label: string; variant: FilterProps['variant'] }[] = [
+      { label: 'Primary', variant: 'primary' },
+      { label: 'Secondary', variant: 'secondary' },
     ];
 
-    return (
-      <VerticalSpacing>
+    const renderCell = (variant: FilterProps['variant'], selected: boolean, disabled: boolean | undefined) => (
+      <Row gutter={1} gutterX={3} alignItems="center">
+        <Col xs="auto">
+          <Filter text="Text" variant={variant} selected={selected} disabled={disabled} />
+        </Col>
+        <Col xs="auto">
+          <Filter
+            text="Text"
+            variant={variant}
+            multiselect
+            options={stateOptions}
+            defaultSelectedValues={selected ? ['1', '2'] : []}
+            disabled={disabled}
+          />
+        </Col>
+      </Row>
+    );
+
+    const renderTable = (label: string, variant: FilterProps['variant']) => (
+      <VerticalSpacing size={0.75}>
+        <Text element="h3" modifiers="h4">
+          {label}
+        </Text>
         {!isMobile && (
           <Row gutter={2}>
-            <Col md={2}>
-              <Text modifiers="bold">State</Text>
+            <Col md={2} />
+            <Col md={3}>
+              <Text modifiers="bold">Not selected</Text>
             </Col>
-            {columns.map((c) => (
-              <Col key={c.label} md={2}>
-                <Text modifiers="bold">{c.label}</Text>
-              </Col>
-            ))}
+            <Col md={5}>
+              <Text modifiers="bold">Selected</Text>
+            </Col>
           </Row>
         )}
         {stateRows.map((row) => (
-          <Row key={row.id} gutter={2} alignItems="end" className={`pseudo-${row.id}`}>
+          <Row key={row.id} gutter={2} alignItems="center" className={`pseudo-${row.id}`}>
             <Col xs={12} md={2}>
               <Text modifiers="bold">{row.label}</Text>
             </Col>
-            {columns.map((c) => (
-              <Col key={c.label} xs={6} sm={4} md={2}>
-                {isMobile ? (
-                  <VerticalSpacing size={0.25}>
-                    <Text modifiers="small" color="tertiary">
-                      {c.label}
-                    </Text>
-                    {c.render(row)}
-                  </VerticalSpacing>
-                ) : (
-                  c.render(row)
-                )}
-              </Col>
-            ))}
+            <Col xs={12} md={3}>
+              {isMobile ? (
+                <VerticalSpacing size={0.25}>
+                  <Text modifiers="small" color="tertiary">
+                    Not selected
+                  </Text>
+                  {renderCell(variant, false, row.disabled)}
+                </VerticalSpacing>
+              ) : (
+                renderCell(variant, false, row.disabled)
+              )}
+            </Col>
+            <Col xs={12} md={5}>
+              {isMobile ? (
+                <VerticalSpacing size={0.25}>
+                  <Text modifiers="small" color="tertiary">
+                    Selected
+                  </Text>
+                  {renderCell(variant, true, row.disabled)}
+                </VerticalSpacing>
+              ) : (
+                renderCell(variant, true, row.disabled)
+              )}
+            </Col>
           </Row>
+        ))}
+      </VerticalSpacing>
+    );
+
+    return (
+      <VerticalSpacing size={2}>
+        {variants.map((v) => (
+          <div key={v.label}>{renderTable(v.label, v.variant)}</div>
         ))}
       </VerticalSpacing>
     );
