@@ -205,6 +205,10 @@
   border-bottom-left-radius: var(--modal-radius);
 }
 
+.tedi-modal__header + .tedi-modal__footer {
+  border-top: 0;
+}
+
 .tedi-modal__footer--split {
   justify-content: space-between;
 }
