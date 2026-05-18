@@ -504,13 +504,6 @@ export const CustomizeContent: Story = {
   ),
 };
 
-/**
- * Mirrors the Figma states grid (`4612:83728`) — one table per variant
- * (Primary, Secondary), each with five rows (Default, Hover, Active, Focus,
- * Disabled) × two columns (Not selected, Selected). Each cell renders both a
- * plain text Filter and a multi-select Filter with a count badge so the count
- * appearance is covered alongside the bare button.
- */
 export const States: Story = {
   parameters: {
     pseudo: {
@@ -889,7 +882,6 @@ export const Examples: Story = {
 
         <Separator />
 
-        {/* — Section 2: Andmed (single-select FilterGroup) */}
         <Text element="h1" modifiers="h1" color="secondary">
           Andmed
         </Text>
@@ -924,7 +916,6 @@ export const Examples: Story = {
 
         <Separator />
 
-        {/* — Section 3: Menetlusdokumendid (multi-select FilterGroup) */}
         <Text element="h1" modifiers="h1" color="secondary">
           Menetlusdokumendid
         </Text>
@@ -949,7 +940,6 @@ export const Examples: Story = {
 
         <Separator />
 
-        {/* — Section 4: Taotlused (primary variant) */}
         <Text element="h1" modifiers="h1" color="secondary">
           Taotlused (primary)
         </Text>
