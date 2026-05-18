@@ -220,6 +220,28 @@ describe('Filter — custom dropdown content', () => {
     await user.click(screen.getByRole('button', { name: /tühjenda valik/i }));
     expect(onClear).toHaveBeenCalled();
   });
+
+  it('warns when defaultSelected / onSelectedChange are passed alongside custom-content children', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(
+      <Filter text="Period" defaultSelected onSelectedChange={() => undefined}>
+        <div>custom panel</div>
+      </Filter>
+    );
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('not honoured in custom-content mode'));
+    warn.mockRestore();
+  });
+
+  it('does not warn when custom-content filter uses the controlled `selected` prop', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(
+      <Filter text="Period" selected>
+        <div>custom panel</div>
+      </Filter>
+    );
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });
 
 describe('FilterGroup — single-select (radiogroup)', () => {
@@ -306,6 +328,76 @@ describe('FilterGroup — unmanaged', () => {
     const buttons = screen.getAllByRole('button');
     expect(buttons[0]).toHaveAttribute('aria-pressed', 'true');
     expect(buttons[1]).toHaveAttribute('aria-pressed', 'false');
+  });
+});
+
+describe('FilterGroup — dropdown filters keep their own selection state', () => {
+  // Regression: when a Filter with `options` (single- or multi-select) lives inside a
+  // managed FilterGroup, the chip used to read `isSelected` from `group.isSelected(...)`,
+  // which was never updated by the dropdown commit paths. The chip stayed unselected
+  // even after the user picked a value.
+  it('single-select dropdown inside a managed group reflects the dropdown selection', () => {
+    const options = [
+      { value: 'a', label: 'Option A' },
+      { value: 'b', label: 'Option B' },
+    ];
+    const { container } = render(
+      <FilterGroup label="Sort">
+        <Filter text="Sort" options={options} defaultSelectedValue="a" value="group-key" />
+      </FilterGroup>
+    );
+
+    // Pre-fix the wrapper read `isSelected` from the group (unset), so this
+    // class was missing even though the dropdown had a selected value.
+    expect(container.querySelector('.tedi-filter')?.className).toMatch(/tedi-filter--selected/);
+  });
+
+  it('multi-select dropdown inside a managed group reflects the dropdown selection', async () => {
+    const user = userEvent.setup();
+    const options = [
+      { value: 'a', label: 'Option A' },
+      { value: 'b', label: 'Option B' },
+    ];
+    render(
+      <FilterGroup label="Tags" multiselect>
+        <Filter text="Tags" multiselect options={options} value="group-key" />
+      </FilterGroup>
+    );
+
+    await user.click(screen.getByRole('button', { name: /tags/i }));
+    await user.click(screen.getByRole('checkbox', { name: 'Option A' }));
+    // The count badge renders only when `isSelected` is true. Pre-fix the chip
+    // read `isSelected` from the unset group state, so the badge never appeared.
+    expect(screen.getByText('1')).toBeInTheDocument();
+  });
+});
+
+describe('FilterGroup — accessible name', () => {
+  it('uses ariaLabelledBy when set (alternative to `label`)', () => {
+    render(
+      <>
+        <h2 id="tags-heading">Tags</h2>
+        <FilterGroup ariaLabelledBy="tags-heading" multiselect>
+          <Filter text="Foo" value="foo" />
+          <Filter text="Bar" value="bar" />
+        </FilterGroup>
+      </>
+    );
+    const group = screen.getByRole('group');
+    expect(group).toHaveAttribute('aria-labelledby', 'tags-heading');
+    expect(group).not.toHaveAttribute('aria-label');
+  });
+
+  it('warns in dev when a managed group has no accessible name', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(
+      <FilterGroup multiselect>
+        <Filter text="Foo" value="foo" />
+        <Filter text="Bar" value="bar" />
+      </FilterGroup>
+    );
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('needs an accessible name'));
+    warn.mockRestore();
   });
 });
 

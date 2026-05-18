@@ -8,11 +8,20 @@ interface FilterGroupCommonProps {
   /**
    * Accessible label for the group, exposed as `aria-label` on the container.
    *
-   * Recommended whenever the group is managed (single- or multi-select) so screen readers
-   * announce the radio/group semantics with context (e.g. "Status, radio group"). Setting
-   * `label` also implicitly turns the group into managed mode.
+   * **Required when the group is managed** (single- or multi-select). The container then
+   * has `role="radiogroup"` / `role="group"`, and ARIA requires every role to carry an
+   * accessible name — otherwise screen readers announce e.g. "radio group" with no context.
+   * Use `ariaLabelledBy` instead if the name lives in an existing heading.
+   *
+   * Setting `label` also implicitly turns the group into managed mode.
    */
   label?: string;
+  /**
+   * ID of an existing element that labels the group (alternative to `label`). Useful when
+   * the group is preceded by a heading that should also act as the accessible name —
+   * avoids duplicating the text. Sets `aria-labelledby` on the container.
+   */
+  ariaLabelledBy?: string;
   /**
    * When `true`, every `<Filter>` inside the group is disabled, regardless of their own
    * `disabled` props. Useful for "this section isn't applicable yet" UX.
@@ -97,9 +106,17 @@ type FilterGroupInternalProps = FilterGroupCommonProps & {
   onValuesChange?: (values: string[]) => void;
 };
 
+/**
+ * Tracks groups that already warned so we only nag once per render cycle.
+ * Module-scoped Set is fine: the warning only fires in development and the
+ * cost of holding a few strings is trivial.
+ */
+const warnedGroups = new Set<string>();
+
 export const FilterGroup = (props: FilterGroupProps): JSX.Element => {
   const {
     label,
+    ariaLabelledBy,
     disabled = false,
     className,
     children,
@@ -168,9 +185,26 @@ export const FilterGroup = (props: FilterGroupProps): JSX.Element => {
 
   const role = isManaged ? (multiselect ? 'group' : 'radiogroup') : undefined;
 
+  if (process.env.NODE_ENV !== 'production' && isManaged && !label && !ariaLabelledBy) {
+    const key = role + '|' + (controlledValue ?? defaultValue ?? '') + '|' + multiselect;
+    if (!warnedGroups.has(key)) {
+      warnedGroups.add(key);
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[FilterGroup] role="${role}" needs an accessible name. Pass either \`label\` or ` +
+          '`ariaLabelledBy` so screen readers can announce the group with context.'
+      );
+    }
+  }
+
   return (
     <FilterGroupContext.Provider value={context}>
-      <div className={cn(styles['tedi-filter-group'], className)} role={role} aria-label={label}>
+      <div
+        className={cn(styles['tedi-filter-group'], className)}
+        role={role}
+        aria-label={label}
+        aria-labelledby={ariaLabelledBy}
+      >
         {children}
       </div>
     </FilterGroupContext.Provider>

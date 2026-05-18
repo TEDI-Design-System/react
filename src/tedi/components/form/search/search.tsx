@@ -62,7 +62,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       isClearable,
       onKeyDown: handleKeyDown,
       onChange,
-      input: { role: 'searchbox' as const, ...input },
+      input: { ...input, role: 'searchbox' as const },
       ...(button ? {} : { icon: searchIcon }),
     };
 

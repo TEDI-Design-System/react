@@ -77,28 +77,36 @@ export interface FilterProps extends BreakpointSupport<FilterBreakpointProps> {
    */
   id?: string;
   /**
-   * **Controlled** selected state for **toggle** mode (no options, no children) and
-   * **custom-content** mode (children provided).
+   * Selected appearance flag.
    *
-   * Provide this together with `onSelectedChange` to fully own the state from outside.
-   * Ignored in single-select and multi-select modes — those derive `isSelected` from
-   * `selectedValue` / `selectedValues` respectively.
+   * - **Toggle mode** (no `options`, no `children`): can be either controlled
+   *   (pair with `onSelectedChange`) or uncontrolled (use `defaultSelected`).
+   * - **Custom-content mode** (`children` provided): **controlled-only**. The
+   *   Filter can't know what counts as "selected" inside your custom dropdown,
+   *   so you must drive `selected` yourself based on the picked value
+   *   (e.g. `selected={Boolean(dateRange?.from)}`). `defaultSelected` and
+   *   `onSelectedChange` are not honoured in this mode — the dropdown open /
+   *   close toggle doesn't fire either of them.
+   * - **Single-select / multi-select modes** (`options` provided): ignored.
+   *   The selected appearance is derived from `selectedValue` / `selectedValues`.
    */
   selected?: boolean;
   /**
-   * **Uncontrolled** initial selected state for toggle / custom-content mode.
+   * **Uncontrolled** initial selected state — **toggle mode only** (no `options`,
+   * no `children`). For custom-content filters the toggle event isn't wired
+   * (the click opens the dropdown instead), so this would never update —
+   * pass `selected` as a controlled prop instead.
    *
-   * Use this when you don't need to read the state from outside; the component manages
-   * the value internally. Ignored when `selected` is also provided (controlled mode wins).
+   * Ignored when `selected` is also provided (controlled mode wins).
    *
    * @default false
    */
   defaultSelected?: boolean;
   /**
-   * Fires whenever the toggle state changes, receiving the new boolean.
-   *
-   * Called in both controlled and uncontrolled modes. Not called in single- or multi-select
-   * modes — see `onSelectedValueChange` / `onSelectedValuesChange`.
+   * Fires whenever the toggle state changes — **toggle mode only**. Custom-content
+   * filters don't fire this callback (the click opens the dropdown; closing the
+   * dropdown doesn't toggle a boolean). Single- and multi-select modes use
+   * `onSelectedValueChange` / `onSelectedValuesChange` respectively.
    */
   onSelectedChange?: (selected: boolean) => void;
   /**
@@ -325,23 +333,38 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
   const isSingleSelect = hasOptions && !multiselect;
   const isMultiSelect = hasOptions && multiselect;
   const isGrouped = Boolean(group?.isManaged);
-  const isGroupedRadio = isGrouped && !group?.multiselect;
+  const groupOwnsSelection = isGrouped && groupValue !== undefined && !hasDropdown;
+  const isGroupedRadio = groupOwnsSelection && !group?.multiselect;
   const disabled = disabledProp || (group?.disabled ?? false);
 
   const [innerSelected, setInnerSelected] = useState(defaultSelected);
   const [innerSingle, setInnerSingle] = useState(defaultSelectedValue ?? '');
   const [innerMulti, setInnerMulti] = useState<string[]>(defaultSelectedValues ?? []);
 
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    hasCustomContent &&
+    (defaultSelected || onSelectedChange) &&
+    selectedProp === undefined
+  ) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[Filter] `defaultSelected` and `onSelectedChange` are not honoured in custom-content mode ' +
+        '(when `children` is provided). Drive the selected state yourself via the controlled `selected` prop, ' +
+        'e.g. `selected={Boolean(value)}`.'
+    );
+  }
+
   const toggleSelected = selectedProp !== undefined ? selectedProp : innerSelected;
   const singleValue = selectedValue !== undefined ? selectedValue : innerSingle;
   const multiValues = selectedValues !== undefined ? selectedValues : innerMulti;
 
   const isSelected = useMemo(() => {
-    if (isGrouped && groupValue !== undefined) return group!.isSelected(groupValue);
+    if (groupOwnsSelection) return group!.isSelected(groupValue!);
     if (isMultiSelect) return multiValues.length > 0;
     if (isSingleSelect) return singleValue !== '';
     return toggleSelected;
-  }, [isGrouped, groupValue, group, isMultiSelect, multiValues, isSingleSelect, singleValue, toggleSelected]);
+  }, [groupOwnsSelection, groupValue, group, isMultiSelect, multiValues, isSingleSelect, singleValue, toggleSelected]);
 
   const selectedLabel = useMemo(() => {
     if (!isSingleSelect || !singleValue) return null;
@@ -390,14 +413,14 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
   );
 
   const handleToggle = useCallback(() => {
-    if (isGrouped && groupValue !== undefined) {
-      group!.selectFilter(groupValue);
+    if (groupOwnsSelection) {
+      group!.selectFilter(groupValue!);
       return;
     }
     const next = !toggleSelected;
     if (selectedProp === undefined) setInnerSelected(next);
     onSelectedChange?.(next);
-  }, [isGrouped, group, groupValue, toggleSelected, selectedProp, onSelectedChange]);
+  }, [groupOwnsSelection, group, groupValue, toggleSelected, selectedProp, onSelectedChange]);
 
   const commitSingle = useCallback(
     (val: string) => {
