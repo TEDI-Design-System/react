@@ -160,6 +160,24 @@ describe('Filter — multi-select dropdown', () => {
     expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
   });
 
+  it('select-all deselects all when every filtered option is already selected', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+    render(
+      <Filter
+        text="Tags"
+        multiselect
+        options={options}
+        showSelectAll
+        defaultSelectedValues={['a', 'b']}
+        onSelectedValuesChange={onChange}
+      />
+    );
+    await user.click(screen.getByRole('button'));
+    await user.click(screen.getByRole('checkbox', { name: /vali kõik/i }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+  });
+
   it('search input filters the visible options', async () => {
     const user = userEvent.setup();
     render(<Filter text="Tags" multiselect options={options} searchable />);
@@ -288,5 +306,60 @@ describe('FilterGroup — unmanaged', () => {
     const buttons = screen.getAllByRole('button');
     expect(buttons[0]).toHaveAttribute('aria-pressed', 'true');
     expect(buttons[1]).toHaveAttribute('aria-pressed', 'false');
+  });
+});
+
+describe('FilterGroup — uncontrolled', () => {
+  it('single-select tracks the selection in internal state when `value` is not provided', async () => {
+    const user = userEvent.setup();
+    const onValueChange = jest.fn();
+    render(
+      <FilterGroup label="Tags" onValueChange={onValueChange}>
+        <Filter text="Foo" value="foo" />
+        <Filter text="Bar" value="bar" />
+      </FilterGroup>
+    );
+
+    const [foo, bar] = screen.getAllByRole('radio');
+    await user.click(foo);
+    expect(foo).toBeChecked();
+    expect(bar).not.toBeChecked();
+    expect(onValueChange).toHaveBeenLastCalledWith('foo');
+
+    await user.click(bar);
+    expect(foo).not.toBeChecked();
+    expect(bar).toBeChecked();
+    expect(onValueChange).toHaveBeenLastCalledWith('bar');
+
+    // Clicking the active one toggles it back to null.
+    await user.click(bar);
+    expect(bar).not.toBeChecked();
+    expect(onValueChange).toHaveBeenLastCalledWith(null);
+  });
+
+  it('multi-select tracks the selection in internal state when `values` is not provided', async () => {
+    const user = userEvent.setup();
+    const onValuesChange = jest.fn();
+    render(
+      <FilterGroup label="Tags" multiselect onValuesChange={onValuesChange}>
+        <Filter text="Foo" value="foo" />
+        <Filter text="Bar" value="bar" />
+      </FilterGroup>
+    );
+
+    const [foo, bar] = screen.getAllByRole('button');
+    await user.click(foo);
+    expect(foo).toHaveAttribute('aria-pressed', 'true');
+    expect(onValuesChange).toHaveBeenLastCalledWith(['foo']);
+
+    await user.click(bar);
+    expect(foo).toHaveAttribute('aria-pressed', 'true');
+    expect(bar).toHaveAttribute('aria-pressed', 'true');
+    expect(onValuesChange).toHaveBeenLastCalledWith(['foo', 'bar']);
+
+    // Toggle one off.
+    await user.click(foo);
+    expect(foo).toHaveAttribute('aria-pressed', 'false');
+    expect(onValuesChange).toHaveBeenLastCalledWith(['bar']);
   });
 });
