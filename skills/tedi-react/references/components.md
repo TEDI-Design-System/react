@@ -193,6 +193,52 @@ const [date, setDate] = useState<Date | undefined>();
 />
 ```
 
+### Table
+TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filterable / selectable / pinnable / expandable. Built-in pagination announces page changes via `aria-live` so JAWS reports state changes automatically.
+
+```tsx
+<Table<Person> id="people" data={rows} columns={columns} pagination={pagination} />
+```
+
+**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `placeholder`, `placeholderRole`.
+
+#### Accessibility — required for column headers with non-text content
+
+- **`Table.HeaderButton` requires `aria-label`** (TS-enforced). Always include the column name in the label — JAWS otherwise reads only "Sorteeri kasvavalt, button" with no indication of *what* you're sorting:
+  ```tsx
+  <Table.HeaderButton icon="unfold_more" aria-label={`Sorteeri ${columnLabel} järgi`} />
+  <Table.HeaderButton icon="filter_alt" aria-label={`Filtreeri ${columnLabel}`} />
+  ```
+- **For columns with a function `header` (custom JSX containing sort / filter buttons, info icons, etc.), set `meta.label`**. The Table puts `aria-label={meta.label}` on the `<th>` so screen readers use the clean column name as the column header announcement for every cell. Without it, JAWS reads the full visible header text — including the button labels — for *every* data cell:
+  ```tsx
+  {
+    id: 'teenus',
+    accessorKey: 'teenus',
+    header: ({ column }) => (
+      <span>
+        Teenus
+        <Table.HeaderButton icon="unfold_more" aria-label="Sorteeri Teenus järgi"
+          onClick={column.getToggleSortingHandler()} />
+      </span>
+    ),
+    meta: { label: 'Teenus' },  // ← required when `header` is a function
+  }
+  ```
+  String headers (`header: 'Teenus'`) don't need `meta.label` — the string is used automatically.
+- **Filter popovers with validation must use `TextField`'s `invalid` + `helper` props**, not a custom red-bordered div. The Table doesn't ship built-in filter validation today, but if you add min-length / format checks, the only WCAG 3.3.1-compliant path is to wire the error through `TextField`. `invalid` sets `aria-invalid`; `helper` with `type: 'error'` renders the message via `<FeedbackText>` and auto-wires it into the input's `aria-describedby`. A red border + red helper text alone (the Angular bug) fails error identification because screen readers can't see colour:
+  ```tsx
+  <TextField
+    id={`filter-${column}`} label={column} value={draft} onChange={setDraft}
+    invalid={hasError}
+    helper={hasError ? { type: 'error', text: getLabel('table.filter.validation.min-length', 3) } : undefined}
+  />
+  ```
+  The labels `table.filter.validation.min-length` / `table.filter.validation.no-spaces` already exist in `labels-map.ts` — use them as-is for parity with Angular. **Max length / pattern / any other validation rule** belongs on `TextField` directly — pass `maxLength={40}` and let the native HTML attribute enforce it, plus mirror the rule in `invalid` + `helper` if you want a visible error before submit. Don't invent a Table-level `validation: { minLength, maxLength }` config — the primitives already cover it.
+- **For "no results after filter" announcements, set `placeholderRole="status"` on the Table.** The Table wraps the empty-state placeholder in `<div role={placeholderRole}>` (an ARIA live region), so screen readers announce the empty state when a filter empties the rows. `'status'` is polite (recommended); `'alert'` is assertive (interrupts the current SR utterance). Leave the prop undefined for tables that are empty on first mount and never change — otherwise the live region announces on every render.
+  ```tsx
+  <Table data={rows} columns={columns} placeholderRole="status" />
+  ```
+
 ## Form
 
 ### TextField
