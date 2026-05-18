@@ -199,21 +199,6 @@ const doctors: Doctor[] = Array.from({ length: 28 }, (_, index) => ({
   id: String(index + 1),
 }));
 
-const editLinkStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  color: 'var(--link-primary-default)',
-  textDecoration: 'none',
-  fontWeight: 'var(--body-regular-weight)',
-};
-
-const nameLinkStyle: React.CSSProperties = {
-  color: 'var(--link-primary-default)',
-  textDecoration: 'none',
-  fontWeight: 'var(--body-regular-weight)',
-};
-
 const editRowActionsStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -232,13 +217,6 @@ interface EditableRows<T extends { id: string }> {
   commitEdit: () => void;
 }
 
-/**
- * Context that flows the editor into the table cells. Cells read the latest
- * state via context instead of taking the editor as a prop — that way the
- * `columns` array can be a module-level constant and TanStack never rebuilds
- * its column instances, which is what kept the TextField mounted across
- * keystrokes so it doesn't lose focus.
- */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EditableRowsContext = createContext<EditableRows<any> | null>(null);
 
@@ -248,19 +226,11 @@ function useEditor<T extends { id: string }>(): EditableRows<T> {
   return editor as EditableRows<T>;
 }
 
-/**
- * Tiny shared state machine for row-level inline editing. Tracks which row
- * (if any) is currently in edit mode and the draft copy of its values; commits
- * or discards back to the parent array on confirm / cancel. Reused across all
- * stories that ship a "Muuda" affordance so the button actually does something.
- */
 function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T> {
   const [rows, setRows] = useState<T[]>(initial);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<T | null>(null);
 
-  // Read latest draft from a ref inside commitEdit so the callback identity
-  // can stay stable across renders without the `draft` dep.
   const draftRef = useRef(draft);
   draftRef.current = draft;
 
@@ -283,10 +253,6 @@ function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T
   return { rows, editingId, draft, setDraft, beginEdit, cancelEdit, commitEdit };
 }
 
-/**
- * Renders the per-row action cell: a Muuda link normally, or cancel / commit
- * buttons when this row is the one being edited.
- */
 function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
   const editor = useEditor<T>();
   if (row.id === editor.editingId) {
@@ -301,22 +267,13 @@ function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
   }
   return (
     <span style={editRowActionsStyle}>
-      <a
-        href="#"
-        onClick={(event) => {
-          event.preventDefault();
-          editor.beginEdit(row);
-        }}
-        style={editLinkStyle}
-      >
-        <Icon name="edit" color="brand" size={18} />
+      <Button visualType="link" iconLeft="edit" onClick={() => editor.beginEdit(row)}>
         Muuda
-      </a>
+      </Button>
     </span>
   );
 }
 
-/** Cell renderer that flips to a `<TextField>` when its row is editing. */
 function EditableTextCell<T extends { id: string }>({
   row,
   field,
@@ -347,7 +304,6 @@ function EditableTextCell<T extends { id: string }>({
   );
 }
 
-/** Cell renderer that flips to a `<DateField mode="range">` when its row is editing. */
 function EditableDateRangeCell<T extends { id: string }>({
   row,
   field,
@@ -380,12 +336,6 @@ function EditableDateRangeCell<T extends { id: string }>({
   );
 }
 
-/**
- * Each cell flips into a TextField when its row is being edited; the actions column
- * swaps the Muuda link for cancel / commit buttons. The cells read editor
- * state from `EditableRowsContext`, so this array stays a stable module-level
- * constant — important for TanStack reconciliation across keystrokes.
- */
 const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
@@ -419,10 +369,6 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   },
 ];
 
-/**
- * Baseline render: a single default-size booking table — same content used in
- * the `Sizes` showcase below, just on its own.
- */
 export const Default: Story = {
   render: function Default() {
     const editor = useEditableRows<Booking>(bookings);
@@ -474,11 +420,7 @@ const simplePeopleColumns: ColumnDef<PersonRecord>[] = [
     id: 'name',
     header: 'Isik',
     accessorKey: 'name',
-    cell: ({ row }) => (
-      <a href="#" onClick={(event) => event.preventDefault()} style={nameLinkStyle}>
-        {row.original.name}
-      </a>
-    ),
+    cell: ({ row }) => <Button visualType="link">{row.original.name}</Button>,
   },
   { id: 'age', header: 'Vanus', accessorKey: 'age' },
   { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
@@ -668,10 +610,6 @@ const initialsOf = (name: string) =>
     .slice(0, 2)
     .join('');
 
-/**
- * Two-level header using column groups. Nest column definitions under `columns` inside a parent
- * `columnDef` — TanStack Table will render the parent as a merged header cell spanning its children.
- */
 const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
@@ -922,16 +860,6 @@ export const Sortable: Story = {
   },
 };
 
-/**
- * Each filterable header pairs a `unfold_more`/`arrow_upward`/`arrow_downward`
- * sort chevron with a `filter_alt` funnel `Popover` trigger. Popover contents
- * vary per column:
- * - text filter for `Nimi`
- * - date-range (Alates / Kuni) for `Töö algus`
- * - multi-select checkbox list for `Tõendi staatus`
- *
- * Both icons tint `brand` when their state is active; otherwise `tertiary`.
- */
 type CertStatus = 'Kehtiv' | 'Kehtetu' | 'Aegumas' | 'Aegunud';
 
 const certStatusColor: Record<CertStatus, StatusBadgeColor> = {
@@ -1451,10 +1379,9 @@ const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
     size: 1,
     cell: () => (
       <span style={rowActionsCellStyle}>
-        <a href="#" onClick={(event) => event.preventDefault()} style={editLinkStyle}>
-          <Icon name="edit" color="brand" size={18} />
+        <Button visualType="link" iconLeft="edit">
           Muuda
-        </a>
+        </Button>
       </span>
     ),
   },
