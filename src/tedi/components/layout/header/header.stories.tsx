@@ -93,10 +93,10 @@ const languages = [
 ];
 
 const representatives: Representative[] = [
-  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
-  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person' } },
+  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle' } },
+  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle' } },
+  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle' } },
 ];
 
 const loggedInNavItems = [
@@ -221,8 +221,11 @@ const ProfileExample = () => {
       <ShowAt lg>
         <Separator axis="horizontal" />
       </ShowAt>
-      <Link underline={false} iconLeft="notifications" href="#">
-        {t('notifications')}
+      <Link underline={false} href="#">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--link-inner-spacing-x)' }}>
+          <Icon name="notifications" size={16} />
+          {t('notifications')}
+        </div>
       </Link>
       <ShowAt lg>
         <Separator axis="horizontal" />
@@ -252,16 +255,16 @@ const NavigationLinks = () => {
 
   return (
     <>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('home')}
       </Link>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('services')}
       </Link>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('blog')}
       </Link>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('contact')}
       </Link>
     </>
@@ -308,7 +311,7 @@ const SidenavLayout = ({ isOpen, children }: { isOpen: boolean; children: React.
 };
 
 const ResponsiveLogo = (props: HeaderLogoProps) => {
-  const query = '(min-width: 360px)';
+  const query = '(min-width: 420px)';
 
   const getMatches = () => (typeof window !== 'undefined' ? window.matchMedia(query).matches : true);
 
@@ -334,19 +337,19 @@ export const Default: Story = {
         <div style={{ display: 'flex', flexDirection: 'column', ...(isOpen && { height: '100vh' }) }}>
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
             <Header.Logo logoDark={logoDark} logo={logo} href="#" />
-            <Header.Center>
-              <ShowAt lg>
-                <Link color="text" underline={false} href="#">
+            <ShowAt lg>
+              <Header.Center>
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-              </ShowAt>
-            </Header.Center>
+              </Header.Center>
+            </ShowAt>
             <Header.Actions>
               <Header.Language languages={languages} currentLanguage={languages[0].label} />
               <Separator axis="vertical" />
@@ -391,25 +394,25 @@ export const LoggedOut1: Story = {
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
             <Header.Logo logoDark={logoDark} logo={logo} />
 
-            <Header.Center>
-              <ShowAt lg>
-                <Link color="text" underline={false} href="#">
+            <ShowAt lg>
+              <Header.Center>
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-              </ShowAt>
-            </Header.Center>
+              </Header.Center>
+            </ShowAt>
 
             <Header.Actions>
               <Header.Language languages={languages} currentLanguage={languages[0].label} />
@@ -463,8 +466,8 @@ export const LoggedOut2: Story = {
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
             <ResponsiveLogo logoDark={logoDark} logo={logo} />
 
-            <Header.Center alignment="space-between">
-              <ShowAt lg>
+            <ShowAt lg>
+              <Header.Center alignment="space-between">
                 <div>
                   <NavigationLinks />
                 </div>
@@ -473,8 +476,8 @@ export const LoggedOut2: Story = {
                     <Search label="search-1" hideLabel id="search-1" />
                   </div>
                 </Header.Search>
-              </ShowAt>
-            </Header.Center>
+              </Header.Center>
+            </ShowAt>
 
             <Header.Actions>
               <HideAt lg>

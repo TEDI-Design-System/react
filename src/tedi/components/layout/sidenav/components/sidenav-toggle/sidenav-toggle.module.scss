@@ -16,6 +16,10 @@ $toggle-button-width: 3.5rem;
     display: none;
   }
 
+  &__icon {
+    color: var(--button-main-primary-text-default);
+  }
+
   &.tedi-sidenav-toggle--collapse {
     position: absolute;
     top: calc(var(--navigation-vertical-item-min-height-medium) / 5.5);

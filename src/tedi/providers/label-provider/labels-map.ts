@@ -205,7 +205,7 @@ export const labelsMap = validateDefaultLabels({
     en: 'Log in',
     ru: 'Зайти на портал',
   },
-  'header.login-small': {
+  'header.login.mobile': {
     description: 'Label for login button (small)',
     components: ['Header', 'HeaderLogin'],
     et: 'Sisene',
@@ -219,7 +219,7 @@ export const labelsMap = validateDefaultLabels({
     en: 'Log out',
     ru: 'Выйти',
   },
-  'header.logout-small': {
+  'header.logout.mobile': {
     description: 'Label for logout button (small)',
     components: ['Header', 'HeaderLogout'],
     et: 'Välju',

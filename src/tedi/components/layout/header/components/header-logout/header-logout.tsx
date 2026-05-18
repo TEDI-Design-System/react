@@ -14,7 +14,7 @@ interface HeaderLogoutBreakpointProps {
    * Automatically falls back to `'small'` on mobile viewports when not specified.
    */
   size?: 'default' | 'small';
-  /** Custom label text for the logout button. Falls back to the `header.logout` or `header.logout-small` translation key. */
+  /** Custom label text for the logout button. Falls back to the `header.logout` or `header.logout.mobile` translation key. */
   label?: string;
 }
 
@@ -37,7 +37,7 @@ export const HeaderLogout = (props: HeaderLogoutProps) => {
   const size = sizeProp ?? (isMobileView ? 'small' : 'default');
   const isSmall = size === 'small';
 
-  const resolvedLabel = label ?? (isSmall ? getLabel('header.logout-small') : getLabel('header.logout'));
+  const resolvedLabel = label ?? (isSmall ? getLabel('header.logout.mobile') : getLabel('header.logout'));
 
   return (
     <>

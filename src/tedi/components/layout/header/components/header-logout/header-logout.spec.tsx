@@ -41,7 +41,7 @@ describe('HeaderLogout component', () => {
 
     render(<HeaderLogout />);
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.logout-small');
+    expect(mockGetLabel).toHaveBeenCalledWith('header.logout.mobile');
   });
 
   it('renders with custom label', () => {
@@ -93,6 +93,6 @@ describe('HeaderLogout component', () => {
 
     render(<HeaderLogout />);
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.logout-small');
+    expect(mockGetLabel).toHaveBeenCalledWith('header.logout.mobile');
   });
 });

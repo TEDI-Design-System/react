@@ -22,10 +22,14 @@
       align-self: stretch;
       width: 100%;
     }
+
+    [class*='tedi-header-logout'] [class*='tedi-icon'] {
+      font-size: var(--icon-02);
+    }
   }
 
   &__modal {
-    position: absolute;
+    position: fixed;
     top: var(--layout-header-height);
     right: 0;
     z-index: var(--z-index-header);
@@ -33,8 +37,7 @@
     flex-direction: column;
     width: var(--navigation-vertical-item-width-default);
     max-width: 100%;
-    min-height: calc(100dvh - var(--layout-header-height));
-    max-height: 100%;
+    height: calc(100dvh - var(--layout-header-height));
     overflow-y: auto;
     background: var(--general-surface-primary);
     border-top: 1px solid var(--general-border-primary);
@@ -60,15 +63,19 @@
         border-radius: unset;
       }
     }
+
+    [class*='tedi-header-logout'] [class*='tedi-icon'] {
+      font-size: var(--icon-02);
+    }
   }
 
   &__overlay {
-    position: absolute;
+    position: fixed;
     top: var(--layout-header-height);
     left: 0;
     z-index: calc(var(--z-index-header) - 1);
     width: 100%;
-    min-height: calc(100dvh - var(--layout-header-height));
+    height: calc(100dvh - var(--layout-header-height));
     background: var(--general-surface-overlay);
   }
 

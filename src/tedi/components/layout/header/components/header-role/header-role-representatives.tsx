@@ -16,9 +16,20 @@ export interface Representative {
   name: string;
   /** Additional context shown below the name (e.g. role, organization, personal code). */
   description?: string;
-  /** Icon displayed next to the representative in the selection list. */
-  icon?: IconProps;
+  /**
+   * Icon displayed next to the representative in the selection list. Accepts either a
+   * Material Icon name as a string (`'person'`) for the common case, or a full
+   * `IconProps` object (`{ name: 'person', size: 18 }`) when explicit props are needed.
+   */
+  icon?: string | IconProps;
 }
+
+const resolveIcon = (icon: string | IconProps | undefined): IconProps | null => {
+  if (!icon) return null;
+  if (typeof icon === 'string') return { name: icon };
+  return icon;
+};
+
 interface HeaderRoleRepresentativesProps {
   /** Unique id for the collapsible panel, used for aria-controls on the toggle. */
   id?: string;
@@ -118,6 +129,7 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
             />
             {representatives.map((rep) => {
               const isSelected = representative?.id === rep.id;
+              const icon = resolveIcon(rep.icon);
 
               return (
                 <React.Fragment key={rep.id}>
@@ -132,7 +144,7 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
                     noStyle
                   >
                     <div className={styles['tedi-header-role__item-inner']}>
-                      {rep.icon && <Icon name={rep.icon.name} size={rep.icon.size} color="inherit" />}
+                      {icon && <Icon name={icon.name} size={icon.size} color="inherit" />}
                       <div className={styles['tedi-header-role__item-text']}>
                         {rep.name}
 

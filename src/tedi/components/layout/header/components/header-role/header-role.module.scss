@@ -5,6 +5,10 @@
   flex-direction: column;
   align-items: flex-start;
 
+  [data-name='button'] {
+    color: var(--header-dropdown-link);
+  }
+
   &__label {
     display: flex;
     gap: var(--layout-grid-gutters-04);

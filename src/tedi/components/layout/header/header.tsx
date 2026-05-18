@@ -35,14 +35,14 @@ export const Header = (props: HeaderProps) => {
 
   return (
     <Print visibility="hide">
-      <div className={cn(styles['tedi-header'], className)}>
-        <header className={cn(styles['tedi-header__main'])}>
+      <header className={cn(styles['tedi-header'], className)}>
+        <div className={styles['tedi-header__main']}>
           {toggle}
           <div className={styles['tedi-header__main--content']}>{children}</div>
-        </header>
+        </div>
 
         {bottom && <div className={styles['tedi-header__bottom']}>{bottom}</div>}
-      </div>
+      </header>
     </Print>
   );
 };
@@ -62,7 +62,7 @@ export interface HeaderLogoProps {
   /**
    * Controls visibility of the logo.
    * Useful for conditionally hiding the logo based on application state, feature flags,
-   * or custom media queries that fall between standard breakpoints (e.g. 360px).
+   * or custom media queries that fall between standard breakpoints (e.g. 420px).
    * For responsive hiding at standard breakpoints, prefer wrapping Header.Logo with HideAt/ShowAt.
    * @default true
    */

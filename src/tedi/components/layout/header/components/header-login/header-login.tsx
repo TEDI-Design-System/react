@@ -13,7 +13,7 @@ interface HeaderLoginBreakpointProps {
    * Automatically falls back to `'small'` on mobile viewports when not specified.
    */
   size?: 'default' | 'small';
-  /** Custom label text for the login button. Falls back to the `header.login` or `header.login-small` translation key. */
+  /** Custom label text for the login button. Falls back to the `header.login` or `header.login.mobile` translation key. */
   label?: string;
 }
 
@@ -36,7 +36,7 @@ export const HeaderLogin = (props: HeaderLoginProps) => {
   const size = sizeProp ?? (isMobileView ? 'small' : 'default');
   const isSmall = size === 'small';
 
-  const resolvedLabel = label ?? (isSmall ? getLabel('header.login-small') : getLabel('header.login'));
+  const resolvedLabel = label ?? (isSmall ? getLabel('header.login.mobile') : getLabel('header.login'));
 
   return (
     <>
