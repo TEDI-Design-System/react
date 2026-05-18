@@ -16,6 +16,19 @@ description: >
 
 React component library with 50+ accessible components. Built on React 18/19 with TypeScript, CSS Modules, and design tokens from `@tedi-design-system/core`.
 
+## Authoritative Sources
+
+This skill bundles a snapshot of the API and patterns, but the library is public and ships fast. When a prop, default, or component listed below feels stale or absent, treat these as the source of truth and fetch from them:
+
+- **Source code & releases**: [github.com/TEDI-Design-System/react](https://github.com/TEDI-Design-System/react) — TEDI-Ready components live under [`src/tedi/components/`](https://github.com/TEDI-Design-System/react/tree/main/src/tedi/components), community under [`src/community/components/`](https://github.com/TEDI-Design-System/react/tree/main/src/community/components). The barrel export [`src/tedi/index.ts`](https://github.com/TEDI-Design-System/react/blob/main/src/tedi/index.ts) is the canonical list of TEDI-Ready exports.
+- **Live Storybook (interactive docs + prop tables)**: [storybook.tedi.ee/react/main](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started) — has every component's args table, default values, and runnable examples. Prefer this over the bundled `references/*.md` when verifying a specific prop.
+- **Design system wiki** (cross-framework guidelines): [github.com/TEDI-Design-System/general/wiki](https://github.com/TEDI-Design-System/general/wiki)
+- **Issues / changelog**: [github.com/TEDI-Design-System/react/issues](https://github.com/TEDI-Design-System/react/issues), [CHANGELOG.md](https://github.com/TEDI-Design-System/react/blob/main/CHANGELOG.md)
+- **npm**: [@tedi-design-system/react](https://www.npmjs.com/package/@tedi-design-system/react)
+- **Sibling packages**: [@tedi-design-system/core](https://www.npmjs.com/package/@tedi-design-system/core) (tokens, SCSS, icons), [@tedi-design-system/angular](https://www.npmjs.com/package/@tedi-design-system/angular) (Angular counterpart — useful for behavioral parity questions)
+
+**Verification tip**: if the user asks about a recently added component or a prop you're unsure of, fetch the relevant `.tsx` file from the repo (e.g. `src/tedi/components/<category>/<name>/<name>.tsx`) — the JSDoc on `interface ...Props` is the canonical spec.
+
 ## Installation
 
 ```bash
