@@ -1,9 +1,15 @@
 ---
 name: tedi-react
 description: >
-  Build UIs with @tedi-design-system/react — 50+ accessible React components with design token
-  theming. Use when creating interfaces, integrating form controls, customizing themes, or working
-  with TEDI components in a React application.
+  Build UIs with @tedi-design-system/react — the official Estonian government React component
+  library (`@tedi-design-system/react`). Use whenever the user is integrating, importing, or
+  composing TEDI components in a downstream React app: `Button`, `Alert`, `TextField`, `Select`,
+  `Card`, `Tooltip`, `Dropdown`, `Tabs`, `Toggle`, `Pagination`, `EmptyState`, `Table`, `Modal`,
+  etc. Triggers on theming with TEDI design tokens, switching dark/light theme via
+  `ThemeProvider`, wiring `LabelProvider` / `StyleProvider` / `AccessibilityProvider`, form
+  validation with the `helper` prop, responsive `xs` / `md` / `lg` breakpoint props, and
+  polymorphic `as`-prop usage. Do NOT use when contributing to the TEDI library repo itself —
+  use `tedi-react-contributing` for that.
 ---
 
 # TEDI Design System — React
@@ -29,20 +35,29 @@ dayjs: ^1.11.10
 ### 1. Wrap your app with providers
 
 ```tsx
-import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system/react/tedi';
+import {
+  ThemeProvider,
+  LabelProvider,
+  StyleProvider,
+  AccessibilityProvider,
+} from '@tedi-design-system/react/tedi';
 
 function App() {
   return (
     <ThemeProvider>
       <LabelProvider>
         <StyleProvider>
-          <YourApp />
+          <AccessibilityProvider>
+            <YourApp />
+          </AccessibilityProvider>
         </StyleProvider>
       </LabelProvider>
     </ThemeProvider>
   );
 }
 ```
+
+`AccessibilityProvider` exposes `useDeclareLoader` and other a11y hooks; omit it only if you have no loaders/announcements. `PrintingProvider` is also available — wrap it inside `AccessibilityProvider` when you need the `usePrint` context.
 
 ### 2. Import core styles
 
@@ -185,6 +200,18 @@ import { Alert, sendNotification, ToastContainer } from '@tedi-design-system/rea
 <ToastContainer />
 sendNotification({ type: 'success', title: 'Done', children: 'Task completed' });
 ```
+
+## Common Pitfalls
+
+A handful of mistakes account for most TEDI integration issues. Avoid them up front:
+
+- **Import from `/tedi` or `/community`, never the package root.** `@tedi-design-system/react` is not a valid import path — the package has explicit entry points (`@tedi-design-system/react/tedi`, `@tedi-design-system/react/community`, `@tedi-design-system/react/index.css`). Importing from the root will fail or silently miss types.
+- **Prefer TEDI-Ready over Community whenever possible.** Several Community components (`Button`, `Anchor`, `Check`, `Radio`, `Tabs`, `Toggle`, `Tooltip`, `Dropdown`, `Tag`) are deprecated in favor of TEDI-Ready equivalents. Reach into Community only when no TEDI-Ready alternative exists (e.g. `Modal`, `Stepper`, `Table`, `DateTimePicker`).
+- **Always pass `id` to form controls.** `TextField`, `Select`, `Checkbox`, `Radio`, etc. require it — it's how the label/helper/aria wiring works. There is no auto-generated fallback.
+- **Use design tokens, not hardcoded colors.** Reach for `var(--tedi-color-*)`, `var(--tedi-spacing-*)`, etc. from `@tedi-design-system/core` instead of hex codes. This is what makes theme switching and brand overrides work.
+- **Do not add CSS `var()` fallbacks.** Write `var(--tedi-spacing-4)`, not `var(--tedi-spacing-4, 16px)` — fallbacks defeat token-driven theming.
+- **Support both controlled and uncontrolled.** When wrapping a TEDI form control with your own, accept `value`/`defaultValue` and forward both — don't force consumers into one mode.
+- **Mock `useBreakpointProps` in tests** for any component you wrote that uses breakpoint support; jsdom won't respond to media queries.
 
 ## Additional References
 

@@ -140,16 +140,27 @@ import { Checkbox, Radio, ChoiceGroup } from '@tedi-design-system/react/tedi';
   onChange={setSize}
 />
 
-// Segmented choice group
+// Segmented choice group (single visually-merged control)
 <ChoiceGroup
   id="view"
   name="view"
   label="View"
-  variant="segmented"
   layout="segmented"
   items={viewOptions}
   value={view}
   onChange={setView}
+/>
+
+// Card-style choices (each item rendered as a selectable card)
+<ChoiceGroup
+  id="plan"
+  name="plan"
+  label="Plan"
+  variant="card"
+  layout="separated"
+  items={planOptions}
+  value={plan}
+  onChange={setPlan}
 />
 ```
 

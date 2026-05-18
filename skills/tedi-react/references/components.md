@@ -265,6 +265,40 @@ Same as Checkbox (without indeterminate)
 - `label: string` (required)
 - `accept?: string`, `multiple?: boolean`, `maxSize?: number`
 
+### Toggle
+**Props:** `ToggleProps` | fRef, form
+- `id: string` (required)
+- `label: ReactNode` (required), `hideLabel?: boolean`, `labelPosition?: 'left' | 'right' = 'right'`
+- `checked?: boolean`, `defaultChecked?: boolean`
+- `onChange?: (value: boolean) => void`
+- `size?: 'default' | 'large'`
+- `color?: 'primary' | 'colored'`
+- `helper?: FeedbackTextProps`
+- `disabled?: boolean`, `isLoading?: boolean`
+
+```tsx
+<Toggle id="notifications" label="Email me" checked={on} onChange={setOn} />
+```
+
+### InputGroup
+Compose a labeled input with prefix/suffix slots (e.g. currency symbol, unit, button addon).
+
+**Props:** `InputGroupProps` extends `FormLabelProps`
+- `children: ReactNode` (required) — use `InputGroup.Input` plus optional `InputGroup.Prefix` / `InputGroup.Suffix`
+- `addons?: boolean = true` — merge borders/radius into a single visual control
+- `helper?: FeedbackTextProps | FeedbackTextProps[]`
+- `disabled?: boolean`, plus all `FormLabel` props (`label`, `id`, `required`, etc.)
+
+Sub-components: `InputGroup.Input`, `InputGroup.Prefix`, `InputGroup.Suffix`
+
+```tsx
+<InputGroup id="price" label="Price">
+  <InputGroup.Prefix>€</InputGroup.Prefix>
+  <InputGroup.Input type="number" />
+  <InputGroup.Suffix>/ month</InputGroup.Suffix>
+</InputGroup>
+```
+
 ## Layout
 
 ### Row / Col (Grid)
@@ -326,6 +360,53 @@ Sub-component: `Skeleton.Block`
 <Link href="/docs" target="_blank">Documentation</Link>
 <Link as={NavLink} to="/profile">Profile</Link>
 ```
+
+### Tabs
+**Props:** `TabsProps`
+- `children: ReactNode` (required) — use `Tabs.List` + `Tabs.Trigger` and `Tabs.Content`
+- `value?: string` (controlled), `defaultValue?: string`
+- `onChange?: (tabId: string) => void`
+
+Sub-components: `Tabs.List`, `Tabs.Trigger` (props: `id` required, `icon?`, `disabled?`), `Tabs.Content` (props: `id` to scope content to a tab)
+
+```tsx
+<Tabs defaultValue="overview">
+  <Tabs.List>
+    <Tabs.Trigger id="overview">Overview</Tabs.Trigger>
+    <Tabs.Trigger id="settings" icon="settings">Settings</Tabs.Trigger>
+  </Tabs.List>
+  <Tabs.Content id="overview">Overview panel</Tabs.Content>
+  <Tabs.Content id="settings">Settings panel</Tabs.Content>
+</Tabs>
+```
+
+### Pagination
+**Props:** `PaginationProps`
+- `pageCount: number` (required)
+- `page?: number` (controlled, 1-based), `defaultPage?: number = 1`
+- `onPageChange?: (page: number) => void`
+- `totalItems?: number` — renders a "{count} results" label when set
+- `pageSize?: number`, `pageSizeOptions?: number[]`, `onPageSizeChange?: (size: number) => void`
+- `labels?: Partial<PaginationLabels>` — override default English labels (`ariaLabel`, `previous`, `next`, `pageAriaLabel`, `currentPageAriaLabel`, `results`, `pageSize`)
+
+```tsx
+<Pagination
+  pageCount={20}
+  page={page}
+  onPageChange={setPage}
+  totalItems={195}
+  pageSize={10}
+  pageSizeOptions={[10, 20, 50]}
+  onPageSizeChange={setPageSize}
+/>
+```
+
+### HashTrigger
+Triggers a callback when the URL hash matches a specific value — handy for opening modals or scrolling to sections from external links.
+
+**Props:** `HashTriggerProps`
+- `hash: string` (required) — without `#`
+- `onMatch: () => void`
 
 ## Notifications
 
@@ -413,6 +494,20 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 <StatusBadge color="success" status="success" icon="check">Active</StatusBadge>
 ```
 
+### StatusIndicator
+Small colored dot for status — pair with a label or position over another element.
+
+**Props:** `StatusIndicatorProps`
+- `type?: 'success' | 'danger' | 'warning' | 'inactive' = 'success'`
+- `size?: 'sm' | 'lg' = 'sm'`
+- `hasBorder?: boolean` — white ring (use over avatars/icons)
+- `position?: 'default' | 'top-right'` — absolute-positioned at parent's corner
+
+```tsx
+<StatusIndicator type="success" />
+<StatusIndicator type="danger" size="lg" hasBorder position="top-right" />
+```
+
 ## Misc
 
 ### Separator
@@ -422,6 +517,36 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 - `variant?: 'dotted' | 'dot-only'`
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
+
+### EmptyState
+"Nothing here yet" placeholder with icon, copy, and a CTA slot.
+
+**Props:** `EmptyStateProps`
+- `type?: 'separate' | 'attached' | 'inside' = 'separate'` — `attached` removes top border (sits under a card/table); `inside` removes border + radius (lives inside another container)
+- `size?: 'default' | 'small' = 'default'`
+- `icon?: string | IconWithoutBackgroundProps | null = 'spa'`
+- `heading?: ReactNode`
+- `children?: ReactNode` — body text
+- `actions?: ReactNode` — CTA slot, usually a `<Button>` or `<Link>`
+
+```tsx
+<EmptyState heading="No results" actions={<Button>Clear filters</Button>}>
+  Try a different search term.
+</EmptyState>
+```
+
+### Utility Components
+
+Niche helpers exported from `@tedi-design-system/react/tedi` — load on demand:
+
+- **Affix** — sticky-position wrapper (top/bottom offset)
+- **Ellipsis** — single-line truncation with tooltip on overflow
+- **Print** — show/hide subtree based on `usePrint()` context (paired with `PrintingProvider`)
+- **ScrollFade** — fade edges of a scrollable container as content runs off
+- **ScrollVisibility** — show/hide an element based on scroll position
+- **StretchContent** — fill available space inside flex/grid parents
+- **HashTrigger** — react to URL hash changes (see Navigation)
+- **FeedbackText**, **FormLabel**, **Field** — primitives for composing custom form controls
 
 ---
 
@@ -448,18 +573,12 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Check (Checkbox) — **DEPRECATED** (use TEDI-Ready Checkbox)
 ### Radio — **DEPRECATED** (use TEDI-Ready Radio via ChoiceGroup)
+### Toggle — **DEPRECATED** (use TEDI-Ready Toggle)
+### ChoiceGroup — **DEPRECATED** (use TEDI-Ready ChoiceGroup)
 
 ### Select
 - `id: string`, `options`, `value?`, `defaultValue?`, `onChange?`
 - `multiple?: boolean`, `async?: boolean`, `isSearchable?: boolean`, `isClearable?: boolean`
-
-### Toggle
-- `ariaLabel: string`, `label?`, `checked?`, `defaultChecked?`, `onChange?`
-- `size?: 'medium' | 'large'`, `color?: 'default' | 'alternative'`, `icon?`, `disabled?`
-
-### ChoiceGroup
-- `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
-- `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`
 
 ### FileUpload
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
@@ -483,9 +602,8 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `activeStep?`, `defaultActiveStep?: number`, `onActiveStepChange?`
 - `allowStepLabelClick?: boolean`, `ariaLabel: string`, `card?: CardProps | boolean`
 
-### Tabs
-- `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
-- Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
+### Tabs — **DEPRECATED** (use TEDI-Ready Tabs)
+Legacy variant with `Tabs.Nav`, `Tabs.NavItem`, `Tabs.Item`. New code should use the TEDI-Ready `Tabs` component (different API: `Tabs.List` / `Tabs.Trigger` / `Tabs.Content`).
 
 ### TableOfContents
 - `items: TableOfContentsItemProps[]`, `heading?`, `open?`, `defaultOpen?`
