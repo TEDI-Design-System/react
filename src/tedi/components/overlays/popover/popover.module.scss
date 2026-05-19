@@ -16,9 +16,13 @@ $popover-width: (
   border-radius: var(--popover-radius-rounded);
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
+  // `100%` resolves to the popover's containing block (the FloatingPortal wrapper
+  // inside `<body>`) and naturally excludes the vertical scrollbar gutter. Using
+  // `100vw` would include the gutter and let the large popover overflow on narrow
+  // viewports — visible as a horizontal scrollbar appearing when the popover opens.
   @each $name, $width in $popover-width {
     &--#{$name} {
-      width: min(#{$width}, calc(100vw - 1rem));
+      width: min(#{$width}, calc(100% - 1rem));
     }
   }
 
