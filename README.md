@@ -40,13 +40,13 @@ It teaches an agent:
 
 ### Install
 
-Drop the skill into your agent's skill directory (the exact location depends on the tool — for example `.<tool>/skills/` in the project root, or a user-level equivalent). [`degit`](https://github.com/Rich-Harris/degit) is the simplest way to fetch a single folder:
+Use the [skills.sh](https://skills.sh) CLI from your project root:
 
 ```bash
-npx degit TEDI-Design-System/react/skills/tedi-react <skills-dir>/tedi-react
+npx skills add TEDI-Design-System/react
 ```
 
-Once installed, the agent will trigger the skill whenever you work with TEDI React components.
+The CLI auto-discovers the `tedi-react` skill under [`skills/`](./skills) and registers it for any compatible agent. Once installed, the agent will trigger the skill whenever you work with TEDI React components.
 
 > Skills for **contributing to** the TEDI Design System (contributor skills, standards validation, etc.) live in a separate repo: [TEDI-Design-System/ai-skills](https://github.com/TEDI-Design-System/ai-skills).
 

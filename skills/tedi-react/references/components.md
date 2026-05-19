@@ -402,11 +402,19 @@ Sub-components: `Tabs.List`, `Tabs.Trigger` (props: `id` required, `icon?`, `dis
 ```
 
 ### HashTrigger
-Triggers a callback when the URL hash matches a specific value — handy for opening modals or scrolling to sections from external links.
+Wraps an element and fires a callback (and optionally scrolls to it) when the URL hash matches. The `id` is injected onto the first child element so the browser can resolve it. Handy for opening modals or scrolling to sections from external deep links.
 
 **Props:** `HashTriggerProps`
-- `hash: string` (required) — without `#`
-- `onMatch: () => void`
+- `children: ReactNode` (required) — receives `id` injected onto the first child element; if `children` isn't a valid element, `HashTrigger` wraps them in a `<div id={id}>`
+- `id: string` (required) — hash value to match (without the leading `#`)
+- `onMatch?: (id: string) => void` — fired when the hash matches; receives the matched id
+- `scrollOnMatch?: boolean = true` — scrolls the element into view if it's off-screen (instant on initial load, smooth otherwise)
+
+```tsx
+<HashTrigger id="section-2" onMatch={(id) => console.log('matched', id)}>
+  <section>Section 2 content</section>
+</HashTrigger>
+```
 
 ## Notifications
 

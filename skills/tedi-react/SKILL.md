@@ -18,16 +18,31 @@ React component library with 50+ accessible components. Built on React 18/19 wit
 
 ## Authoritative Sources
 
-This skill bundles a snapshot of the API and patterns, but the library is public and ships fast. When a prop, default, or component listed below feels stale or absent, treat these as the source of truth and fetch from them:
+This skill bundles a snapshot of the API and patterns, but the library is public and ships fast. When a prop, default, or component listed below feels stale or absent, treat these as the source of truth and fetch from them.
 
-- **Source code & releases**: [github.com/TEDI-Design-System/react](https://github.com/TEDI-Design-System/react) — TEDI-Ready components live under [`src/tedi/components/`](https://github.com/TEDI-Design-System/react/tree/main/src/tedi/components), community under [`src/community/components/`](https://github.com/TEDI-Design-System/react/tree/main/src/community/components). The barrel export [`src/tedi/index.ts`](https://github.com/TEDI-Design-System/react/blob/main/src/tedi/index.ts) is the canonical list of TEDI-Ready exports.
-- **Live Storybook (interactive docs + prop tables)**: [storybook.tedi.ee/react/main](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started) — has every component's args table, default values, and runnable examples. Prefer this over the bundled `references/*.md` when verifying a specific prop.
+### Pin to the consumer's installed version
+
+Before fetching source, **determine which version of `@tedi-design-system/react` the project actually has installed** and browse the matching git tag — not `main`. The repo's release tags follow the pattern `react-<version>` (e.g. `react-17.0.0-rc.8`, `react-17.1.0-rc.4`).
+
+1. Read the resolved version from the project — `package.json`'s `dependencies."@tedi-design-system/react"`, or `npm ls @tedi-design-system/react`, or the lockfile entry. Strip any range prefix (`^`, `~`).
+2. Construct the tag URL: `https://github.com/TEDI-Design-System/react/tree/react-<version>/...`
+3. If the resolved version is a pre-release or the tag doesn't exist (rare), fall back to `main` and note the version mismatch when answering.
+
+**Example** for a project on `17.0.0-rc.8`:
+- TEDI-Ready components: `https://github.com/TEDI-Design-System/react/tree/react-17.0.0-rc.8/src/tedi/components`
+- Barrel export: `https://github.com/TEDI-Design-System/react/blob/react-17.0.0-rc.8/src/tedi/index.ts`
+- Specific component: `https://github.com/TEDI-Design-System/react/blob/react-17.0.0-rc.8/src/tedi/components/buttons/button/button.tsx`
+
+### Canonical references
+
+- **Source code & releases**: [github.com/TEDI-Design-System/react](https://github.com/TEDI-Design-System/react) — TEDI-Ready components live under `src/tedi/components/`, community under `src/community/components/`. The barrel export `src/tedi/index.ts` is the canonical list of TEDI-Ready exports. Always prefer the version-pinned tag URLs (see above) over `main` when consulting source.
+- **Live Storybook (interactive docs + prop tables)**: [storybook.tedi.ee/react/main](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started) — has every component's args table, default values, and runnable examples. Note that the public Storybook tracks `main`; if it disagrees with the consumer's installed tag, the tag wins.
 - **Design system wiki** (cross-framework guidelines): [github.com/TEDI-Design-System/general/wiki](https://github.com/TEDI-Design-System/general/wiki)
-- **Issues / changelog**: [github.com/TEDI-Design-System/react/issues](https://github.com/TEDI-Design-System/react/issues), [CHANGELOG.md](https://github.com/TEDI-Design-System/react/blob/main/CHANGELOG.md)
+- **Releases & changelog**: [github.com/TEDI-Design-System/react/releases](https://github.com/TEDI-Design-System/react/releases), [CHANGELOG.md](https://github.com/TEDI-Design-System/react/blob/main/CHANGELOG.md), [Issues](https://github.com/TEDI-Design-System/react/issues)
 - **npm**: [@tedi-design-system/react](https://www.npmjs.com/package/@tedi-design-system/react)
 - **Sibling packages**: [@tedi-design-system/core](https://www.npmjs.com/package/@tedi-design-system/core) (tokens, SCSS, icons), [@tedi-design-system/angular](https://www.npmjs.com/package/@tedi-design-system/angular) (Angular counterpart — useful for behavioral parity questions)
 
-**Verification tip**: if the user asks about a recently added component or a prop you're unsure of, fetch the relevant `.tsx` file from the repo (e.g. `src/tedi/components/<category>/<name>/<name>.tsx`) — the JSDoc on `interface ...Props` is the canonical spec.
+**Verification tip**: if the user asks about a recently added component or a prop you're unsure of, fetch the relevant `.tsx` file from the version-pinned tag (e.g. `src/tedi/components/<category>/<name>/<name>.tsx`) — the JSDoc on `interface ...Props` is the canonical spec.
 
 ## Installation
 
