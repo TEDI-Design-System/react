@@ -1,31 +1,12 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../field-icon-button' as field-icon-button;
 
 .tedi-date-time-field__container {
   width: 100%;
 }
 
 .tedi-date-time-field__textfield {
-  button:not([data-name='closing-button']):last-child {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--button-xs-icon-size);
-    min-height: var(--form-field-button-height-sm);
-    max-height: var(--form-field-button-height-sm);
-    border-radius: var(--button-radius-sm);
-
-    > span {
-      color: var(--button-main-neutral-text-default);
-    }
-
-    &:hover {
-      background-color: var(--form-datepicker-date-hover);
-    }
-  }
-
-  &[aria-expanded='true'] button:not([data-name='closing-button']):last-child {
-    background-color: var(--form-datepicker-date-hover);
-  }
+  @include field-icon-button.states;
 
   input[type='datetime-local']::-webkit-calendar-picker-indicator {
     display: none !important;
@@ -52,13 +33,7 @@
 }
 
 .tedi-date-time-field__icon--disabled {
-  button:not([data-name='closing-button']):last-child {
-    &:hover,
-    &:focus {
-      cursor: auto;
-      background: none;
-    }
-  }
+  @include field-icon-button.icon-only-disabled;
 }
 
 .tedi-date-time-field__popup {

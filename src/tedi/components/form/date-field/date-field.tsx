@@ -619,6 +619,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
+            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
             isClearable
             onIconClick={() => {
               if (!enableCalendar) return;

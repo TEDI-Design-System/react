@@ -86,6 +86,56 @@ export const Size: StoryFn = () => (
   </div>
 );
 
+const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
+
+export const States: Story = {
+  render: () => (
+    <div className="state-example">
+      {stateArray.map((state) => (
+        <Row key={state} className="padding-14-16">
+          <Col width={2} className="display-flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          <Col md={4} xs={12} className="display-flex align-items-center">
+            <DateTimeField id={state} label="Date and time" inputProps={{ disabled: state === 'Disabled' }} />
+          </Col>
+        </Row>
+      ))}
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Success</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <DateTimeField
+            id="success-datetimefield"
+            label="Date and time"
+            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
+          />
+        </Col>
+      </Row>
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Error</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <DateTimeField
+            id="error-datetimefield"
+            label="Date and time"
+            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
+          />
+        </Col>
+      </Row>
+    </div>
+  ),
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
+  },
+};
+
 /**
  * Demonstrates `inputProps` pass-through on the input control: helper hint,
  * and a controlled-value pattern wired to quick-pick buttons (Today, Tomorrow

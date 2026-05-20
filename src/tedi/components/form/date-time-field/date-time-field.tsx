@@ -611,7 +611,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
   return (
     <>
       <div className={cn(styles['tedi-date-time-field__container'], className)} aria-haspopup="dialog">
-        <TextField ref={setTextFieldRef} {...textFieldProps} />
+        <TextField ref={setTextFieldRef} aria-expanded={useNative ? undefined : open} {...textFieldProps} />
       </div>
 
       {!useNative && (
