@@ -196,6 +196,14 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    */
   backLabel?: string;
   /**
+   * Lowest calendar drill-down level the user can pick from before the value
+   * commits. `'days'` (default) requires drilling all the way down to a day;
+   * `'months'` commits as soon as a month is picked; `'years'` commits on
+   * year selection. Only meaningful when `monthYearSelectType='grid'`.
+   * @default days
+   */
+  selectionLevel?: CalendarView;
+  /**
    * Forwarded to the underlying `TextField`. `id`, `label`, `value`, and
    * `onChange` are owned by `DateTimeField`.
    */
@@ -275,6 +283,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     selectTimeLabel = getLabel('dateTimeField.selectTime'),
     backLabel = getLabel('dateTimeField.back'),
     mode = 'single',
+    selectionLevel = 'days',
     inputProps,
   } = props;
 
@@ -535,7 +544,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     <Calendar
       view={view}
       setView={setView}
-      selectionLevel="days"
+      selectionLevel={selectionLevel}
       currentMonth={currentMonth}
       setCurrentMonth={setCurrentMonth}
       mode={isRange ? 'range' : 'single'}
