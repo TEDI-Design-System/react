@@ -82,6 +82,56 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
   },
 };
 
+const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
+
+export const States: StoryObj<TimeFieldProps> = {
+  render: () => (
+    <div className="state-example">
+      {stateArray.map((state) => (
+        <Row key={state} className="padding-14-16">
+          <Col width={2} className="display-flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          <Col md={4} xs={12} className="display-flex align-items-center">
+            <TimeField id={state} label="Time" inputProps={{ disabled: state === 'Disabled' }} />
+          </Col>
+        </Row>
+      ))}
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Success</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <TimeField
+            id="success-timefield"
+            label="Time"
+            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
+          />
+        </Col>
+      </Row>
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Error</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <TimeField
+            id="error-timefield"
+            label="Time"
+            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
+          />
+        </Col>
+      </Row>
+    </div>
+  ),
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
+  },
+};
+
 export const FieldOptions: StoryFn = () => {
   return (
     <Row>
@@ -121,13 +171,13 @@ export const OnClickType: Story = {
         <Row>
           <Col lg={3} md={6}>
             <Text>Clock button is clickable</Text>
-            <TimeField label="Time" id="time-button-trigger" timePickerTrigger="button" />
+            <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
             <Text>Input is clickable</Text>
-            <TimeField label="Time" id="time-input-trigger" timePickerTrigger="input" />
+            <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
       </VerticalSpacing>

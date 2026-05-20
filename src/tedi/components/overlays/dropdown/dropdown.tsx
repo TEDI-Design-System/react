@@ -166,7 +166,7 @@ export const Dropdown = (props: DropdownProps) => {
       onNavigate: setActiveIndex,
       loop: true,
       selectedIndex: defaultActiveIndex ?? null,
-      focusItemOnOpen: defaultActiveIndex !== undefined ? true : 'auto',
+      focusItemOnOpen: defaultActiveIndex !== null ? true : 'auto',
     }),
   ]);
 

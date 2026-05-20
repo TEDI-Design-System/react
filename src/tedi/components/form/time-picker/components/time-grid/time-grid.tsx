@@ -3,7 +3,7 @@ import { useEffect, useId, useRef } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import Button from '../../../../buttons/button/button';
-import { Col, ColSize, Row } from '../../../../layout/grid';
+import { Col, ColProps, ColSize, Row } from '../../../../layout/grid';
 import ChoiceGroup from '../../../choice-group/choice-group';
 import styles from '../../time-picker.module.scss';
 
@@ -21,9 +21,17 @@ export interface TimeGridProps {
    */
   onSelect: (time: string) => void;
   /**
-   * Grid column width
+   * Grid column width per time slot. Accepts either:
+   *
+   * - a single `ColSize` (1–12 or `'auto'`) applied at every breakpoint, or
+   * - a breakpoint object (`{ xs?, sm?, md?, lg?, xl?, xxl? }`) for responsive
+   *   layouts.
+   *
+   * Default is `{ xs: 6, md: 4 }` — 2 slots per row on phones (where 33%
+   * is too narrow for the radio card's intrinsic content width and would
+   * otherwise wrap one-per-row), 3 slots per row from `md` up.
    */
-  colWidth?: ColSize;
+  colWidth?: ColSize | Pick<ColProps, 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'>;
   /**
    * Display mode
    */
@@ -44,7 +52,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   value,
   onSelect,
   className,
-  colWidth = 4,
+  colWidth = { xs: 6, md: 4 },
   variant = 'button',
   bordered = true,
 }) => {
@@ -56,10 +64,8 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
     if (!value) return;
     const root = rootRef.current;
     if (!root) return;
-
-    const safeValue = CSS.escape(value);
     const target = root.querySelector<HTMLElement>(
-      `input[type="radio"][value="${safeValue}"], button[data-time="${safeValue}"]`
+      `input[type="radio"][value="${value}"], button[data-time="${value}"]`
     );
     target?.focus({ preventScroll: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,9 +107,14 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
 
   const rootClassName = cn(
     styles['tedi-time-picker__grid'],
-    { [styles['tedi-time-picker__grid--borderless']]: !bordered },
+    {
+      [styles['tedi-time-picker__grid--borderless']]: !bordered,
+    },
     className
   );
+
+  const resolvedColProps: Pick<ColProps, 'width' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'> =
+    typeof colWidth === 'object' ? colWidth : { width: colWidth };
 
   if (variant === 'radio') {
     return (
@@ -119,7 +130,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
             id: `time-${timeGridId}-${time}`,
             label: time,
             value: time,
-            colProps: { width: colWidth },
+            colProps: resolvedColProps,
           }))}
           direction="row"
           variant="card"
@@ -135,7 +146,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
     <div ref={rootRef} className={rootClassName}>
       <Row gutter={2}>
         {times.map((time) => (
-          <Col width={colWidth} key={time}>
+          <Col {...resolvedColProps} key={time}>
             <Button
               noStyle
               data-time={time}

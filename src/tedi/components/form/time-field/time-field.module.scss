@@ -19,6 +19,10 @@
 
   &[aria-expanded='true'] button:not([data-name='closing-button']):last-child {
     background-color: var(--form-datepicker-date-hover);
+
+    > span {
+      color: var(--button-main-neutral-text-active);
+    }
   }
 
   &--disabled {
