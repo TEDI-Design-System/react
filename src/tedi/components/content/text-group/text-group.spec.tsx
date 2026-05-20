@@ -5,17 +5,13 @@ import { TextGroup } from './text-group';
 
 import '@testing-library/jest-dom';
 
-// TextGroup + TextGroup.List both run their props through `useBreakpointProps`
-// to support per-breakpoint overrides. Mock it once so layout / class
-// assertions are deterministic and don't depend on the runtime viewport.
 jest.mock('../../../helpers', () => ({
   useBreakpointProps: jest.fn(),
 }));
 
 beforeEach(() => {
   (useBreakpointProps as jest.Mock).mockImplementation(() => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getCurrentBreakpointProps: (props: any) => ({ ...props }),
+    getCurrentBreakpointProps: <T extends Record<string, unknown>>(props: T): T => ({ ...props }),
   }));
 });
 
