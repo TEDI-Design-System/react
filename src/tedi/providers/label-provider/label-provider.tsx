@@ -42,6 +42,12 @@ export interface ILabelContext {
     key: TKey,
     ...args: TArgs
   ): string;
+  /**
+   * Currently active locale. Exposed so components can derive locale-sensitive
+   * formatting defaults (e.g. `NumberField`'s `decimalSeparator`) without
+   * forcing every consumer to repeat the prop on every instance.
+   */
+  locale: TediLanguage;
 }
 
 export const LabelContext = React.createContext<ILabelContext>({
@@ -51,6 +57,7 @@ export const LabelContext = React.createContext<ILabelContext>({
     }
     return key;
   },
+  locale: 'en',
 });
 
 export interface LabelProviderProps<TRecord extends TediLabelEntryRecord<TRecord> = Record<string, never>> {
@@ -151,7 +158,7 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
   }, {} as Partial<PickersLocaleText<unknown>>);
 
   return (
-    <LabelContext.Provider value={{ getLabel }}>
+    <LabelContext.Provider value={{ getLabel, locale }}>
       <LocalizationProvider
         dateAdapter={AdapterDayjs}
         dateLibInstance={dayjs}

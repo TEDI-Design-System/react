@@ -91,12 +91,31 @@ describe('NumberField component', () => {
     expect(handleChange).not.toHaveBeenCalled();
   });
 
-  it('fires onChange with 0 when the input is cleared', () => {
+  it('does not re-fire onChange when the parsed value is unchanged (e.g. trailing decimal separator)', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={0} max={100} />);
+    const input = screen.getByRole('spinbutton');
+
+    fireEvent.change(input, { target: { value: '2' } });
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenLastCalledWith(2);
+
+    // Typing the separator keeps parseFloat at 2, so onChange must not fire.
+    fireEvent.change(input, { target: { value: '2,' } });
+    expect(handleChange).toHaveBeenCalledTimes(1);
+
+    // The next keystroke produces a new number — onChange fires again.
+    fireEvent.change(input, { target: { value: '2,5' } });
+    expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleChange).toHaveBeenLastCalledWith(2.5);
+  });
+
+  it('fires onChange with undefined when the input is cleared', () => {
     const handleChange = jest.fn();
     render(<NumberField {...defaultProps} onChange={handleChange} defaultValue={5} />);
     const input = screen.getByRole('spinbutton');
     fireEvent.change(input, { target: { value: '' } });
-    expect(handleChange).toHaveBeenCalledWith(0);
+    expect(handleChange).toHaveBeenCalledWith(undefined);
   });
 
   it('renders helper text when provided', () => {
