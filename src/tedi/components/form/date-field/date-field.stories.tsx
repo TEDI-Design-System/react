@@ -85,6 +85,58 @@ export const Size: StoryObj<TemplateMultipleProps> = {
   },
 };
 
+const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
+
+export const States: Story = {
+  render: () => (
+    <div className="state-example">
+      {stateArray.map((state) => (
+        <Row key={state} className="padding-14-16">
+          <Col width={2} className="display-flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          <Col md={4} xs={12} className="display-flex align-items-center">
+            <DateField id={state} mode="single" label="Date" inputProps={{ disabled: state === 'Disabled' }} />
+          </Col>
+        </Row>
+      ))}
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Success</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <DateField
+            id="success-datefield"
+            mode="single"
+            label="Date"
+            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
+          />
+        </Col>
+      </Row>
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Error</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <DateField
+            id="error-datefield"
+            mode="single"
+            label="Date"
+            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
+          />
+        </Col>
+      </Row>
+    </div>
+  ),
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
+  },
+};
+
 export const FieldOptions: StoryFn = () => {
   const [shortcutValue, setShortcutValue] = useState<Date | undefined>(undefined);
 
@@ -440,57 +492,5 @@ export const NativePicker: Story = {
         onSelect={(date) => setSelected(date as Date)}
       />
     );
-  },
-};
-
-const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
-
-export const States: Story = {
-  render: () => (
-    <div className="state-example">
-      {stateArray.map((state) => (
-        <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
-          </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
-            <DateField id={state} mode="single" label="Date" inputProps={{ disabled: state === 'Disabled' }} />
-          </Col>
-        </Row>
-      ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
-          <Text modifiers="bold">Success</Text>
-        </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
-          <DateField
-            id="success-datefield"
-            mode="single"
-            label="Date"
-            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
-          />
-        </Col>
-      </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
-          <Text modifiers="bold">Error</Text>
-        </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
-          <DateField
-            id="error-datefield"
-            mode="single"
-            label="Date"
-            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
-          />
-        </Col>
-      </Row>
-    </div>
-  ),
-  parameters: {
-    pseudo: {
-      hover: '#Hover',
-      focus: '#Focus',
-      active: '#Active',
-    },
   },
 };

@@ -82,6 +82,56 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
   },
 };
 
+const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
+
+export const States: StoryObj<TimeFieldProps> = {
+  render: () => (
+    <div className="state-example">
+      {stateArray.map((state) => (
+        <Row key={state} className="padding-14-16">
+          <Col width={2} className="display-flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          <Col md={4} xs={12} className="display-flex align-items-center">
+            <TimeField id={state} label="Time" inputProps={{ disabled: state === 'Disabled' }} />
+          </Col>
+        </Row>
+      ))}
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Success</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <TimeField
+            id="success-timefield"
+            label="Time"
+            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
+          />
+        </Col>
+      </Row>
+      <Row className="padding-14-16">
+        <Col width={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Error</Text>
+        </Col>
+        <Col md={4} xs={12} className="display-flex align-items-center">
+          <TimeField
+            id="error-timefield"
+            label="Time"
+            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
+          />
+        </Col>
+      </Row>
+    </div>
+  ),
+  parameters: {
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
+  },
+};
+
 export const FieldOptions: StoryFn = () => {
   return (
     <Row>
@@ -270,56 +320,6 @@ export const NativePicker: Story = {
         story:
           'Native time picker uses the browser’s built-in input[type="time"] UI instead of the custom TimePicker. Prefer this on mobile devices for better native UX, improved accessibility, and reduced UI complexity. It is also useful when you want to minimize bundle/UI overhead or align with platform conventions. Note: when enabled, availableTimes is ignored because native inputs do not support restricting selectable values.',
       },
-    },
-  },
-};
-
-const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
-
-export const States: StoryObj<TimeFieldProps> = {
-  render: () => (
-    <div className="state-example">
-      {stateArray.map((state) => (
-        <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
-          </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
-            <TimeField id={state} label="Time" inputProps={{ disabled: state === 'Disabled' }} />
-          </Col>
-        </Row>
-      ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
-          <Text modifiers="bold">Success</Text>
-        </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
-          <TimeField
-            id="success-timefield"
-            label="Time"
-            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
-          />
-        </Col>
-      </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
-          <Text modifiers="bold">Error</Text>
-        </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
-          <TimeField
-            id="error-timefield"
-            label="Time"
-            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
-          />
-        </Col>
-      </Row>
-    </div>
-  ),
-  parameters: {
-    pseudo: {
-      hover: '#Hover',
-      focus: '#Focus',
-      active: '#Active',
     },
   },
 };
