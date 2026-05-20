@@ -1,3 +1,10 @@
+# [17.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.6...react-17.1.0-rc.7) (2026-05-20)
+
+
+### Features
+
+* **text-group:** add TextGroupList feature [#81](https://github.com/TEDI-Design-System/react/issues/81) ([#625](https://github.com/TEDI-Design-System/react/issues/625)) ([cc8253f](https://github.com/TEDI-Design-System/react/commit/cc8253fb1676e57e873628306150447b025d30d7))
+
 # [17.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.5...react-17.1.0-rc.6) (2026-05-20)
 
 
