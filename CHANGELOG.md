@@ -1,3 +1,10 @@
+# [17.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.7...react-17.1.0-rc.8) (2026-05-20)
+
+
+### Features
+
+* **time-field:** new TEDI-ready component [#25](https://github.com/TEDI-Design-System/react/issues/25) ([#601](https://github.com/TEDI-Design-System/react/issues/601)) ([7d0d346](https://github.com/TEDI-Design-System/react/commit/7d0d3461b971d9b6cfec3571fc0d5f65df845052))
+
 # [17.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.6...react-17.1.0-rc.7) (2026-05-20)
 
 
