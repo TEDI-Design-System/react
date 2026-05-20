@@ -47,7 +47,11 @@
       }
     }
 
-    &:focus-visible {
+    // The outline fires when the card itself is focused (checkbox variant) or
+    // when the inner radio input is focused (radio variant — the wrapper has
+    // tabIndex=-1, so only the input receives focus).
+    &:focus-visible,
+    &:has(input:focus-visible) {
       z-index: 5;
       outline: 2px solid var(--form-checkbox-radio-default-border-selected);
       outline-offset: 2px;

@@ -875,6 +875,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'More information',
     ru: 'Больше информации',
   },
+  'timePicker.pickTime': {
+    description: 'Internal label for time picker, not visible for users but announced by screen readers',
+    components: ['TimePicker'],
+    et: 'Vali kellaaeg',
+    en: 'Pick time',
+    ru: 'Выберите время',
+  },
 });
 
 type DefaultLabels = typeof labelsMap;
