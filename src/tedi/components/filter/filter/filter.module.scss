@@ -81,10 +81,14 @@
     --filter-text: var(--filter-primary-default-text);
 
     .tedi-filter__button:hover:not(:disabled),
-    .tedi-filter__button:active:not(:disabled),
     .tedi-filter__button[aria-expanded='true']:not(:disabled) {
       --filter-bg: var(--filter-primary-hover-background);
       --filter-text: var(--filter-primary-hover-text);
+    }
+
+    .tedi-filter__button:active:not(:disabled) {
+      --filter-bg: var(--filter-primary-active-background);
+      --filter-text: var(--filter-primary-active-text);
     }
 
     .tedi-filter__button:disabled {
@@ -104,10 +108,14 @@
       --filter-text: var(--filter-primary-selected-text);
 
       .tedi-filter__button:hover:not(:disabled),
-      .tedi-filter__button:active:not(:disabled),
       .tedi-filter__button[aria-expanded='true']:not(:disabled) {
         --filter-bg: var(--filter-primary-hover-background);
         --filter-text: var(--filter-primary-hover-text);
+      }
+
+      .tedi-filter__button:active:not(:disabled) {
+        --filter-bg: var(--filter-primary-active-background);
+        --filter-text: var(--filter-primary-active-text);
       }
     }
   }
@@ -118,11 +126,16 @@
     --filter-border: var(--filter-secondary-default-border);
 
     .tedi-filter__button:hover:not(:disabled),
-    .tedi-filter__button:active:not(:disabled),
     .tedi-filter__button[aria-expanded='true']:not(:disabled) {
       --filter-bg: var(--filter-secondary-hover-background);
       --filter-text: var(--filter-secondary-hover-text);
       --filter-border: var(--filter-secondary-hover-border);
+    }
+
+    .tedi-filter__button:active:not(:disabled) {
+      --filter-bg: var(--filter-secondary-active-background);
+      --filter-text: var(--filter-secondary-active-text);
+      --filter-border: var(--filter-secondary-active-border);
     }
 
     .tedi-filter__button:disabled {
@@ -139,10 +152,14 @@
       --filter-border-width: var(--general-selected-border-width);
 
       .tedi-filter__button:hover:not(:disabled),
-      .tedi-filter__button:active:not(:disabled),
       .tedi-filter__button[aria-expanded='true']:not(:disabled) {
         --filter-bg: var(--filter-secondary-hover-background);
         --filter-border: var(--filter-secondary-hover-border);
+      }
+
+      .tedi-filter__button:active:not(:disabled) {
+        --filter-bg: var(--filter-secondary-active-background);
+        --filter-border: var(--filter-secondary-active-border);
       }
     }
   }
@@ -172,9 +189,12 @@
     border-right: var(--tedi-borders-01) solid var(--filter-secondary-default-border);
 
     &:hover:not(:disabled),
-    &:active:not(:disabled),
     &[aria-expanded='true']:not(:disabled) {
       border-right-color: var(--filter-primary-hover-background);
+    }
+
+    &:active:not(:disabled) {
+      border-right-color: var(--filter-primary-active-background);
     }
   }
 
