@@ -1,15 +1,49 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+$modal-enter-duration: 320ms;
+$modal-enter-easing: ease-out;
+$modal-fade-duration: 200ms;
+
+@keyframes tedi-modal-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes tedi-modal-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes tedi-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
 
 .tedi-modal__overlay {
   z-index: var(--z-index-modal);
   display: flex;
   padding: var(--modal-body-padding);
   background: var(--general-surface-overlay);
+  animation: tedi-modal-fade-in $modal-fade-duration ease-out;
 }
 
 .tedi-modal__overlay--no-overlay {
   pointer-events: none;
   background: none;
+  animation: none;
 
   & .tedi-modal__container {
     pointer-events: auto;
@@ -27,16 +61,39 @@
   padding-top: var(--modal-top-margin);
 }
 
-.tedi-modal__overlay--position-right {
+.tedi-modal__overlay--position-right,
+.tedi-modal__overlay--position-left {
   align-items: stretch;
-  justify-content: flex-end;
   padding: 0;
+  overflow: clip !important;
+}
+
+.tedi-modal__overlay--position-right {
+  justify-content: flex-end;
+
+  .tedi-modal__container {
+    animation: tedi-modal-slide-in-right $modal-enter-duration $modal-enter-easing;
+  }
 }
 
 .tedi-modal__overlay--position-left {
-  align-items: stretch;
   justify-content: flex-start;
-  padding: 0;
+
+  .tedi-modal__container {
+    animation: tedi-modal-slide-in-left $modal-enter-duration $modal-enter-easing;
+  }
+}
+
+.tedi-modal__overlay--position-center .tedi-modal__container,
+.tedi-modal__overlay--position-top .tedi-modal__container {
+  animation: tedi-modal-fade-in $modal-fade-duration ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tedi-modal__overlay,
+  .tedi-modal__container {
+    animation: none !important;
+  }
 }
 
 .tedi-modal__overlay--scroll-page {
@@ -110,30 +167,6 @@
 
   border: 0;
   border-radius: 0;
-}
-
-@include breakpoints.media-breakpoint-down(sm) {
-  .tedi-modal__container--fullscreen-sm {
-    @include tedi-modal-fullscreen;
-  }
-}
-
-@include breakpoints.media-breakpoint-down(md) {
-  .tedi-modal__container--fullscreen-md {
-    @include tedi-modal-fullscreen;
-  }
-}
-
-@include breakpoints.media-breakpoint-down(lg) {
-  .tedi-modal__container--fullscreen-lg {
-    @include tedi-modal-fullscreen;
-  }
-}
-
-@include breakpoints.media-breakpoint-down(xl) {
-  .tedi-modal__container--fullscreen-xl {
-    @include tedi-modal-fullscreen;
-  }
 }
 
 .tedi-modal__header {

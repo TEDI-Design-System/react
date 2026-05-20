@@ -286,13 +286,15 @@ export const CustomWidth: Story = {
 };
 
 /**
- * Three sizing modes plus the breakpoint shortcut:
+ * Three sizing modes:
  *
  * - `fullscreen={true}` — padded fullscreen (modal fills the overlay's content box,
  *   16px backdrop visible all around — matches Figma `5981:67531`).
  * - `fullscreen="edge"` — true edge-to-edge takeover (no backdrop, no border, no radius).
- * - `fullscreen="sm"` / `"md"` / `"lg"` / `"xl"` — padded fullscreen at and below that
- *   breakpoint. Useful for "fullscreen on mobile only".
+ *
+ * For responsive behaviour (e.g. fullscreen on phone, centered modal on
+ * desktop) combine `fullscreen` with the breakpoint API — see the
+ * **Responsive props** story.
  */
 export const Fullscreen: Story = {
   render: () => {
@@ -300,8 +302,6 @@ export const Fullscreen: Story = {
       { label: 'Normal (default)', value: false },
       { label: 'Padded fullscreen', value: true },
       { label: 'Edge-to-edge fullscreen', value: 'edge' },
-      { label: 'Padded below md', value: 'md' },
-      { label: 'Padded on mobile (≤ sm)', value: 'sm' },
     ];
     return (
       <Row gutterY={2}>
@@ -511,7 +511,7 @@ export const FooterVariants: Story = {
             <Modal.Footer
               left={
                 <Modal.Closer>
-                  <Button visualType="neutral" icon="arrow_back">
+                  <Button visualType="neutral" iconLeft="arrow_back">
                     Back
                   </Button>
                 </Modal.Closer>
@@ -562,7 +562,7 @@ export const ResponsiveProps: Story = {
           <Modal.Trigger>
             <Button visualType="secondary">Side on desktop, centered on mobile</Button>
           </Modal.Trigger>
-          <Modal.Content position="right" width="sm" md={{ position: 'right' }} defaultServerBreakpoint="md">
+          <Modal.Content position="center" width="sm" md={{ position: 'right' }} defaultServerBreakpoint="md">
             <Modal.Header title="Responsive position" />
             <Modal.Body>
               <Text>Side drawer at `md` and up; centered modal below `md`.</Text>
@@ -575,12 +575,16 @@ export const ResponsiveProps: Story = {
       <Col xs="auto">
         <Modal>
           <Modal.Trigger>
-            <Button visualType="secondary">lg on desktop, sm on mobile</Button>
+            <Button visualType="secondary">lg on desktop, fullscreen on mobile</Button>
           </Modal.Trigger>
-          <Modal.Content width="sm" md={{ width: 'lg' }} defaultServerBreakpoint="md">
+          <Modal.Content width="lg" fullscreen="edge" md={{ fullscreen: false }} defaultServerBreakpoint="md">
             <Modal.Header title="Responsive width" />
             <Modal.Body>
-              <Text>Wide `lg` modal on desktop; compact `sm` modal below `md`.</Text>
+              <Text>
+                Wide `lg` modal on desktop; edge-to-edge fullscreen below `md`. Width presets don&apos;t differentiate
+                on phone viewports — every preset is wider than a 375px screen and clamps to viewport width — so the
+                responsive payoff is usually a fullscreen flip, not a width swap.
+              </Text>
               <SampleForm />
             </Modal.Body>
             <DefaultFooter />
@@ -603,7 +607,9 @@ export const AlertDialog: Story = {
     return (
       <Modal role="alertdialog" closeOnBackdropClick={false}>
         <Modal.Trigger>
-          <Button color="danger">Delete account</Button>
+          <Button visualType="neutral" color="danger">
+            Delete account
+          </Button>
         </Modal.Trigger>
         <Modal.Content width="xs" initialFocus={cancelRef}>
           <Modal.Header

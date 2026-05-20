@@ -12,8 +12,7 @@ export type ModalWidth = ModalWidthPreset | (string & Record<never, never>);
 export type ModalSize = 'default' | 'small';
 export type ModalPosition = 'center' | 'top' | 'right' | 'left';
 export type ModalScrollBehavior = 'content' | 'page';
-export type ModalFullscreenBreakpoint = 'sm' | 'md' | 'lg' | 'xl';
-export type ModalFullscreen = boolean | 'edge' | ModalFullscreenBreakpoint;
+export type ModalFullscreen = boolean | 'edge';
 
 const WIDTH_PRESETS: readonly ModalWidthPreset[] = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 const isPresetWidth = (value: ModalWidth): value is ModalWidthPreset =>
@@ -24,7 +23,7 @@ type ModalContentBreakpointProps = {
    * Modal width. Accepts a Figma preset (`xs` ≈ 460, `sm` ≈ 616, `md` ≈ 820, `lg` ≈ 1024,
    * `xl` ≈ 1212) or any CSS length (`'800px'`, `'60vw'`, `'75%'`). Side-positioned modals
    * stretch to full height regardless of width.
-   * @default sm
+   * @default md
    */
   width?: ModalWidth;
   /**
@@ -39,6 +38,26 @@ type ModalContentBreakpointProps = {
    * @default center
    */
   position?: ModalPosition;
+  /**
+   * Three sizing modes:
+   *
+   * - `false` (default) — **normal**: content-sized modal floating inside the
+   *   16px backdrop padding (Figma example `4631:92443`).
+   * - `true` — **padded fullscreen**: modal fills the overlay's content box;
+   *   16px backdrop stays visible all around (Figma example `5981:67531`).
+   * - `'edge'` — **edge-to-edge fullscreen**: overlay padding is removed and the
+   *   modal covers the entire viewport with no border or radius.
+   *
+   * Combine with the breakpoint API for responsive behaviour — e.g. fullscreen
+   * on phone, centered modal on desktop:
+   *
+   * ```tsx
+   * <Modal.Content fullscreen md={{ fullscreen: false }} />
+   * ```
+   *
+   * @default false
+   */
+  fullscreen?: ModalFullscreen;
 };
 
 export interface ModalContentProps extends BreakpointSupport<ModalContentBreakpointProps> {
@@ -52,22 +71,6 @@ export interface ModalContentProps extends BreakpointSupport<ModalContentBreakpo
    * @default default
    */
   size?: ModalSize;
-  /**
-   * Three sizing modes:
-   *
-   * - `false` (default) — **normal**: content-sized modal floating inside the
-   *   16px backdrop padding (Figma example `4631:92443`).
-   * - `true` — **padded fullscreen**: modal fills the overlay's content box;
-   *   16px backdrop stays visible all around (Figma example `5981:67531`).
-   * - `'edge'` — **edge-to-edge fullscreen**: overlay padding is removed and the
-   *   modal covers the entire viewport with no border or radius.
-   * - `'sm' | 'md' | 'lg' | 'xl'` — engages padded fullscreen at and below the
-   *   given breakpoint (use `'sm'` for "fullscreen on mobile only"). The
-   *   edge-to-edge variant is desktop-rare; not exposed as a breakpoint shortcut.
-   *
-   * @default false
-   */
-  fullscreen?: ModalFullscreen;
   /**
    * Where overflow is allowed. `'content'` keeps the modal frame fixed and scrolls the body
    * (recommended — matches Figma's "scrollbar" variant). `'page'` lets the entire modal
@@ -149,12 +152,16 @@ export interface ModalContentProps extends BreakpointSupport<ModalContentBreakpo
 
 export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { width = 'sm', maxWidth, position = 'center' } = getCurrentBreakpointProps<ModalContentBreakpointProps>(props);
+  const {
+    width = 'md',
+    maxWidth,
+    position = 'center',
+    fullscreen = false,
+  } = getCurrentBreakpointProps<ModalContentBreakpointProps>(props);
 
   const {
     children,
     size = 'default',
-    fullscreen = false,
     scrollBehavior = 'content',
     trapFocus = true,
     returnFocus = true,
@@ -186,8 +193,6 @@ export const ModalContent = (props: ModalContentProps): JSX.Element | null => {
       ? styles['tedi-modal__container--fullscreen']
       : fullscreen === 'edge'
       ? styles['tedi-modal__container--fullscreen-edge']
-      : typeof fullscreen === 'string'
-      ? styles[`tedi-modal__container--fullscreen-${fullscreen}`]
       : undefined;
   const fullscreenOverlayClass = fullscreen === 'edge' ? styles['tedi-modal__overlay--fullscreen-edge'] : undefined;
 
