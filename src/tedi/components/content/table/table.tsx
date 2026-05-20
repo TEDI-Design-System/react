@@ -21,11 +21,20 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table';
 import cn from 'classnames';
-import { Fragment, type KeyboardEvent, type ReactNode, useCallback, useId, useMemo, useRef } from 'react';
+import {
+  type CSSProperties,
+  Fragment,
+  type KeyboardEvent,
+  type ReactNode,
+  useCallback,
+  useId,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
-import { Collapse } from '../../buttons/collapse/collapse';
-import { Checkbox } from '../../form/checkbox/checkbox';
+import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
+import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
 import { Pagination } from '../../navigation/pagination';
 import styles from './table.module.scss';
@@ -79,6 +88,25 @@ export interface TableState {
 }
 
 export type TableSize = 'medium' | 'small';
+
+export type TableSelectionCheckboxProps = Omit<
+  CheckboxProps,
+  | 'id'
+  | 'name'
+  | 'label'
+  | 'hideLabel'
+  | 'value'
+  | 'checked'
+  | 'defaultChecked'
+  | 'indeterminate'
+  | 'disabled'
+  | 'onChange'
+>;
+
+export type TableExpandCollapseProps = Omit<
+  CollapseProps,
+  'id' | 'controlsId' | 'children' | 'open' | 'onToggle' | 'openText' | 'closeText' | 'title'
+>;
 
 export interface TablePersistOptions {
   /**
@@ -303,6 +331,38 @@ export interface TableProps<TData> {
    */
   className?: string;
   /**
+   * Props forwarded to the row-selection checkboxes (the header select-all
+   * checkbox and every per-row cell checkbox). Use this to e.g. switch the
+   * checkboxes to `size: 'large'`. Wiring props (id, name, label, value,
+   * checked, indeterminate, disabled, onChange, hideLabel) are owned by
+   * Table and cannot be overridden.
+   */
+  checkboxProps?: TableSelectionCheckboxProps;
+  /**
+   * Props forwarded to the row-expand Collapse toggle. Use this to e.g.
+   * switch to `arrowType: 'default'`, change the icon size, or disable
+   * `iconOnly`. Wiring props (id, controlsId, open, onToggle, openText,
+   * closeText, children) are owned by Table and cannot be overridden.
+   */
+  collapseProps?: TableExpandCollapseProps;
+  /**
+   * Per-row className / inline style hook. Called once for every data row and
+   * the returned `className` is merged with Table's own row classes; the
+   * returned `style` is applied to the `<tr>`. Useful for drag-and-drop drop
+   * indicators, conditional row tinting, etc. Row event handlers are NOT
+   * accepted here — Table owns row click / keyboard behavior.
+   */
+  rowProps?: (row: Row<TData>) => { className?: string; style?: CSSProperties } | undefined;
+  /**
+   * Per-column className / inline style hook. Called for every header cell
+   * and every body cell; whatever is returned is applied to *both* the `<th>`
+   * (including the column-filter row) and every `<td>` belonging to the
+   * column. Useful for drag-and-drop drop indicators that should span the
+   * full column height, or for column-level theming. Identify the column via
+   * the `columnId` argument.
+   */
+  columnProps?: (columnId: string) => { className?: string; style?: CSSProperties } | undefined;
+  /**
    * Toolbar + Table subcomponents such as `<Table.ColumnsMenu />`.
    */
   children?: ReactNode;
@@ -382,6 +442,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     manualFiltering = false,
     pageCount,
     rowCount,
+    checkboxProps,
+    collapseProps,
+    rowProps,
+    columnProps,
   } = props;
 
   const { getLabel } = useLabels();
@@ -521,6 +585,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         size: 40,
         header: ({ table }) => (
           <Checkbox
+            {...checkboxProps}
             id={`${resolvedId}-select-all`}
             name={`${resolvedId}-select-all`}
             label={getLabelRef.current('table.select-all', table.getIsAllPageRowsSelected())}
@@ -533,6 +598,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         ),
         cell: ({ row }) => (
           <Checkbox
+            {...checkboxProps}
             id={`${resolvedId}-select-${row.id}`}
             name={`${resolvedId}-select-${row.id}`}
             label={getLabelRef.current('table.select-row', row.getIsSelected())}
@@ -567,11 +633,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               }}
             >
               <Collapse
-                id={`${resolvedId}-expand-${row.id}`}
-                controlsId={subRowId}
                 iconOnly
                 arrowType="secondary"
                 hideCollapseText
+                {...collapseProps}
+                id={`${resolvedId}-expand-${row.id}`}
+                controlsId={subRowId}
                 openText={getLabelRef.current('table.expand-row')}
                 closeText={getLabelRef.current('table.collapse-row')}
                 open={row.getIsExpanded()}
@@ -586,7 +653,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     }
 
     return [...leading, ...columns];
-  }, [columns, hasSelection, hasExpansion, resolvedId]);
+  }, [columns, hasSelection, hasExpansion, resolvedId, checkboxProps, collapseProps]);
 
   const fallbackRowSelection = useMemo<RowSelectionState>(() => ({}), []);
   const fallbackExpanded = useMemo<ExpandedState>(() => ({}), []);
@@ -644,8 +711,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
 
   const hasGroupedHeaders = table.getHeaderGroups().length > 1;
-  // Hover affordance follows interactivity by default — clickable rows always get it,
-  // read-only tables stay flat unless `rowHover` is explicitly opted into.
   const hoverEnabled = rowHover ?? Boolean(onRowClick);
 
   const rootClassName = cn(
@@ -735,20 +800,30 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     const headerLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
+                    const userColumnProps = columnProps?.(header.column.id);
+                    const headerSize = header.column.getSize();
                     return (
                       <th
                         key={header.id}
                         colSpan={header.colSpan}
                         rowSpan={rowSpanCount > 1 ? rowSpanCount : undefined}
-                        className={cn(styles['tedi-table__header-cell'], {
-                          [styles['tedi-table__header-cell--group']]: isGroup,
-                          [styles[`tedi-table__cell--align-${headerMeta?.align}`]]: headerMeta?.align,
-                          [styles[`tedi-table__cell--valign-${headerMeta?.vAlign}`]]: headerMeta?.vAlign,
-                        })}
+                        className={cn(
+                          styles['tedi-table__header-cell'],
+                          {
+                            [styles['tedi-table__header-cell--group']]: isGroup,
+                            [styles[`tedi-table__cell--align-${headerMeta?.align}`]]: headerMeta?.align,
+                            [styles[`tedi-table__cell--valign-${headerMeta?.vAlign}`]]: headerMeta?.vAlign,
+                          },
+                          userColumnProps?.className
+                        )}
                         scope="col"
                         aria-sort={ariaSort}
                         aria-label={headerLabel}
-                        style={header.column.getSize() ? { width: header.column.getSize() } : undefined}
+                        style={
+                          headerSize || userColumnProps?.style
+                            ? { ...(headerSize ? { width: headerSize } : null), ...userColumnProps?.style }
+                            : undefined
+                        }
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
                       </th>
@@ -767,9 +842,15 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       meta?.label ??
                       (typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id);
                     const filterId = `${resolvedId}-filter-${column.id}`;
+                    const userColumnProps = columnProps?.(column.id);
 
                     return (
-                      <th key={column.id} className={styles['tedi-table__header-cell']} scope="col">
+                      <th
+                        key={column.id}
+                        className={cn(styles['tedi-table__header-cell'], userColumnProps?.className)}
+                        style={userColumnProps?.style}
+                        scope="col"
+                      >
                         {column.getCanFilter() && (
                           <TextField
                             id={filterId}
@@ -802,12 +883,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 rows.map((row, visibleIndex) => {
                   const clickable = Boolean(onRowClick);
                   const isActiveRow = activeRowId !== undefined && row.id === activeRowId;
-                  const rowClassName = cn(styles['tedi-table__row'], {
-                    [styles['tedi-table__row--selected']]: row.getIsSelected(),
-                    [styles['tedi-table__row--active']]: isActiveRow,
-                    [styles['tedi-table__row--clickable']]: clickable,
-                    [styles['tedi-table__row--sub-row']]: row.depth > 0,
-                  });
+                  const userRowProps = rowProps?.(row);
+                  const rowClassName = cn(
+                    styles['tedi-table__row'],
+                    {
+                      [styles['tedi-table__row--selected']]: row.getIsSelected(),
+                      [styles['tedi-table__row--active']]: isActiveRow,
+                      [styles['tedi-table__row--clickable']]: clickable,
+                      [styles['tedi-table__row--sub-row']]: row.depth > 0,
+                    },
+                    userRowProps?.className
+                  );
                   const ariaRowIndex = paginationEnabled
                     ? headerRowCount + rowIndexOffset + visibleIndex + 1
                     : undefined;
@@ -816,6 +902,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     <Fragment key={row.id}>
                       <tr
                         className={rowClassName}
+                        style={userRowProps?.style}
                         onClick={clickable ? () => onRowClick?.(row) : undefined}
                         onKeyDown={clickable ? handleRowKeyDown(row) : undefined}
                         tabIndex={clickable ? 0 : undefined}
@@ -825,13 +912,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       >
                         {row.getVisibleCells().map((cell) => {
                           const cellMeta = cell.column.columnDef.meta as TableColumnMeta | undefined;
+                          const userColumnProps = columnProps?.(cell.column.id);
                           return (
                             <td
                               key={cell.id}
-                              className={cn(styles['tedi-table__cell'], {
-                                [styles[`tedi-table__cell--align-${cellMeta?.align}`]]: cellMeta?.align,
-                                [styles[`tedi-table__cell--valign-${cellMeta?.vAlign}`]]: cellMeta?.vAlign,
-                              })}
+                              className={cn(
+                                styles['tedi-table__cell'],
+                                {
+                                  [styles[`tedi-table__cell--align-${cellMeta?.align}`]]: cellMeta?.align,
+                                  [styles[`tedi-table__cell--valign-${cellMeta?.vAlign}`]]: cellMeta?.vAlign,
+                                },
+                                userColumnProps?.className
+                              )}
+                              style={userColumnProps?.style}
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </td>

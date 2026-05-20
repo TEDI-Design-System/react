@@ -3,7 +3,6 @@ import {
   DndContext,
   type DragEndEvent,
   type DragOverEvent,
-  DragOverlay,
   type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
@@ -1671,58 +1670,18 @@ export const WithColumnsMenu: Story = {
 //      reorder the data array (rows) or set `state.columnOrder` (columns).
 // ---------------------------------------------------------------------------
 
-const dragOverlayTableStyle: React.CSSProperties = {
-  borderCollapse: 'collapse',
-  background: 'var(--card-background-primary)',
-  border: 'var(--tedi-borders-01) solid var(--card-border-primary)',
-  borderRadius: 'var(--table-radius)',
-  boxShadow: '0 6px 16px var(--tedi-alpha-20)',
-  cursor: 'grabbing',
-};
-const dragOverlayRowStyle: React.CSSProperties = {
-  background: 'var(--table-hover)',
-};
-const dragOverlayCellStyle: React.CSSProperties = {
-  padding: 'var(--table-data-padding-y) var(--table-data-padding-x)',
-  color: 'var(--general-text-primary)',
-  whiteSpace: 'nowrap',
-};
+// Drop-indicator color used by both row and column drag affordances.
+// Provisional — design review will confirm the final token.
+const DROP_INDICATOR_COLOR = 'var(--general-border-brand)';
 
-const DragOverColumnContext = createContext<string | null>(null);
+type ColumnDropTarget = { id: string };
 
-const SortableColumnHeader = ({ id, label }: { id: string; label: string }) => {
-  const overId = useContext(DragOverColumnContext);
-  const isOver = overId === id;
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        boxShadow: isOver ? 'inset 0 -3px 0 var(--general-border-focus)' : undefined,
-        transition: 'box-shadow 100ms ease',
-      }}
-    >
-      <DragHandle id={id} label={`Drag column ${label}`} />
-      {label}
-    </span>
-  );
-};
-
-const dragOverlayHeaderChipStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 8,
-  padding: '8px 14px',
-  fontFamily: 'var(--family-default)',
-  fontWeight: 'var(--body-bold-weight)',
-  color: 'var(--general-text-secondary)',
-  background: 'var(--card-background-primary)',
-  border: 'var(--tedi-borders-01) solid var(--card-border-primary)',
-  borderRadius: 'var(--table-radius)',
-  boxShadow: '0 6px 16px var(--tedi-alpha-20)',
-  cursor: 'grabbing',
-};
+const SortableColumnHeader = ({ id, label }: { id: string; label: string }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+    <DragHandle id={id} label={`Drag column ${label}`} />
+    {label}
+  </span>
+);
 
 /**
  * Drag handle cell shared by both stories. The `id` is whatever sortable
@@ -1830,7 +1789,14 @@ export const DraggableRows: Story = {
       setActiveRowId(null);
       setOverRowId(null);
     };
-    const activeRow = activeRowId ? rows.find((r) => r.id === activeRowId) : null;
+
+    const rowDropTarget: { id: string; side: 'above' | 'below' } | null = (() => {
+      if (!activeRowId || !overRowId || activeRowId === overRowId) return null;
+      const activeIdx = rows.findIndex((r) => r.id === activeRowId);
+      const overIdx = rows.findIndex((r) => r.id === overRowId);
+      if (activeIdx < 0 || overIdx < 0) return null;
+      return { id: overRowId, side: activeIdx < overIdx ? 'below' : 'above' };
+    })();
 
     return (
       <VerticalSpacing size={1}>
@@ -1854,25 +1820,17 @@ export const DraggableRows: Story = {
               id="tedi-table-row-drag"
               data={rows}
               columns={columns}
-              activeRowId={overRowId ?? undefined}
+              rowProps={(row) => {
+                if (!rowDropTarget || row.original.id !== rowDropTarget.id) return undefined;
+                return {
+                  style:
+                    rowDropTarget.side === 'above'
+                      ? { borderTop: `2px solid ${DROP_INDICATOR_COLOR}` }
+                      : { borderBottom: `2px solid ${DROP_INDICATOR_COLOR}` },
+                };
+              }}
             />
           </SortableContext>
-          <DragOverlay dropAnimation={null}>
-            {activeRow ? (
-              <table style={dragOverlayTableStyle}>
-                <tbody>
-                  <tr style={dragOverlayRowStyle}>
-                    <td style={{ ...dragOverlayCellStyle, width: 40 }} aria-hidden="true">
-                      <Icon name="drag_indicator" size={18} color="secondary" />
-                    </td>
-                    <td style={dragOverlayCellStyle}>{activeRow.name}</td>
-                    <td style={dragOverlayCellStyle}>{activeRow.role}</td>
-                    <td style={dragOverlayCellStyle}>{activeRow.location}</td>
-                  </tr>
-                </tbody>
-              </table>
-            ) : null}
-          </DragOverlay>
         </DndContext>
       </VerticalSpacing>
     );
@@ -1953,9 +1911,9 @@ export const DraggableColumns: Story = {
       setActiveColumnId(null);
       setOverColumnId(null);
     };
-    const activeColumnHeader = activeColumnId
-      ? (baseColumns.find((c) => c.id === activeColumnId)?.header as string | undefined)
-      : undefined;
+
+    const columnDropTarget: ColumnDropTarget | null =
+      !activeColumnId || !overColumnId || activeColumnId === overColumnId ? null : { id: overColumnId };
 
     return (
       <VerticalSpacing size={1}>
@@ -1974,27 +1932,23 @@ export const DraggableColumns: Story = {
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <DragOverColumnContext.Provider value={overColumnId}>
-            <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
-              <Table<Person>
-                id="tedi-table-column-drag"
-                data={people.slice(0, 6)}
-                columns={columns}
-                state={{ columnOrder }}
-                onStateChange={(next) => {
-                  if (next.columnOrder) setColumnOrder(next.columnOrder);
-                }}
-              />
-            </SortableContext>
-          </DragOverColumnContext.Provider>
-          <DragOverlay dropAnimation={null}>
-            {activeColumnHeader ? (
-              <span style={dragOverlayHeaderChipStyle}>
-                <Icon name="drag_indicator" size={18} color="secondary" />
-                {activeColumnHeader}
-              </span>
-            ) : null}
-          </DragOverlay>
+          <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
+            <Table<Person>
+              id="tedi-table-column-drag"
+              data={people.slice(0, 6)}
+              columns={columns}
+              state={{ columnOrder }}
+              onStateChange={(next) => {
+                if (next.columnOrder) setColumnOrder(next.columnOrder);
+              }}
+              columnProps={(id) => {
+                if (!columnDropTarget || columnDropTarget.id !== id) return undefined;
+                return {
+                  style: { boxShadow: `inset 2px 0 0 ${DROP_INDICATOR_COLOR}` },
+                };
+              }}
+            />
+          </SortableContext>
         </DndContext>
       </VerticalSpacing>
     );
