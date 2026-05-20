@@ -9,6 +9,7 @@ import { SelectTagsContext } from './select-tags-context';
 
 const TAG_GAP_PX = 8;
 const COUNTER_TAG_WIDTH_PX = 40;
+const FOCUSED_INPUT_RESERVE_PX = 80;
 
 type Props = ValueContainerProps<ISelectOption, boolean> & {
   selectProps: ValueContainerProps<ISelectOption, boolean>['selectProps'] & { tagsDirection?: 'row' | 'stack' };
@@ -27,15 +28,17 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const lastMeasuredWidthRef = useRef<number>(0);
   const [visibleCount, setVisibleCount] = useState<number | null>(null);
+  const [trackedInputs, setTrackedInputs] = useState({ isSingleRow, totalCount, isFocused, inputValue });
 
-  useLayoutEffect(() => {
-    if (!isSingleRow) {
-      if (visibleCount !== null) setVisibleCount(null);
-      return;
-    }
-    setVisibleCount(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSingleRow, totalCount, isFocused, inputValue]);
+  if (
+    trackedInputs.isSingleRow !== isSingleRow ||
+    trackedInputs.totalCount !== totalCount ||
+    trackedInputs.isFocused !== isFocused ||
+    trackedInputs.inputValue !== inputValue
+  ) {
+    setTrackedInputs({ isSingleRow, totalCount, isFocused, inputValue });
+    if (visibleCount !== null) setVisibleCount(null);
+  }
 
   useEffect(() => {
     if (!isSingleRow) return;
@@ -63,20 +66,32 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
 
     const tags = container.querySelectorAll<HTMLElement>('[data-tedi-tag-index]');
     if (tags.length === 0) {
-      lastMeasuredWidthRef.current = containerWidth;
-      setVisibleCount(0);
+      if (totalCount === 0) {
+        lastMeasuredWidthRef.current = containerWidth;
+        setVisibleCount(0);
+      }
       return;
     }
 
     const inputEl = container.querySelector<HTMLElement>('.select__input-container');
     let inputReserve = 0;
-    if (inputEl) {
-      const rendered = inputEl.offsetWidth;
-      const minWidth = parseFloat(getComputedStyle(inputEl).minWidth) || 0;
-      inputReserve = Math.max(rendered, minWidth);
+    if (inputValue && inputEl) {
+      inputReserve = inputEl.offsetWidth;
+    } else if (isFocused) {
+      inputReserve = FOCUSED_INPUT_RESERVE_PX;
     }
 
     const available = containerWidth - inputReserve - TAG_GAP_PX;
+
+    let totalTagsWidth = 0;
+    for (let i = 0; i < tags.length; i++) {
+      totalTagsWidth += tags[i].offsetWidth + (i > 0 ? TAG_GAP_PX : 0);
+    }
+    if (totalTagsWidth <= available) {
+      lastMeasuredWidthRef.current = containerWidth;
+      setVisibleCount(tags.length);
+      return;
+    }
 
     let usedWidth = 0;
     let visible = 0;
@@ -99,7 +114,7 @@ export const SelectValueContainer = ({ children, ...props }: Props) => {
 
     lastMeasuredWidthRef.current = containerWidth;
     setVisibleCount(visible);
-  }, [isSingleRow, visibleCount, totalCount]);
+  }, [isSingleRow, visibleCount, totalCount, isFocused, inputValue]);
 
   const hiddenCount = isSingleRow && visibleCount !== null ? Math.max(0, totalCount - visibleCount) : 0;
 

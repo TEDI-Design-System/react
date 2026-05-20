@@ -86,9 +86,13 @@ div.tedi-select__control {
     border-color: var(--form-input-border-disabled);
   }
 
-  .tedi-select__single-value,
-  .tedi-select__multi-value,
-  .tedi-select__placeholder,
+  :global {
+    .select__single-value,
+    .select__placeholder {
+      color: var(--form-input-text-disabled);
+    }
+  }
+
   .tedi-select__input {
     color: var(--form-input-text-disabled);
   }
