@@ -1,15 +1,4 @@
-.tedi-date-field__calendar {
-  position: relative;
-  z-index: var(--z-index-dropdown);
-  min-width: 20rem;
-  font-family: var(--family-default);
-  background: var(--card-background-primary);
-  border: 1px solid var(--card-border-primary);
-  border-radius: var(--card-radius-rounded);
-  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
-}
-
-.tedi-date-field__textfield {
+.tedi-time-field__textfield {
   button:not([data-name='closing-button']):last-child {
     display: flex;
     align-items: center;
@@ -38,7 +27,7 @@
 
   &--disabled {
     button:not([data-name='closing-button']):last-child {
-      span {
+      > span {
         color: var(--button-main-disabled-general-text);
       }
 
@@ -48,17 +37,7 @@
     }
   }
 
-  &.tedi-date-field__icon--disabled {
-    button:not([data-name='closing-button']):last-child {
-      &:hover,
-      &:focus {
-        cursor: auto;
-        background: none;
-      }
-    }
-  }
-
-  input[type='date'] {
+  input[type='time'] {
     appearance: none;
 
     &::-webkit-calendar-picker-indicator {
@@ -79,26 +58,37 @@
     }
   }
 
-  input[type='date'][value='']:not(:focus)::-webkit-datetime-edit {
+  input[type='time'][value='']:not(:focus)::-webkit-datetime-edit {
     /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
     color: transparent;
   }
 
-  input[type='date'][value='']:not(:focus)::before {
+  input[type='time'][value='']:not(:focus)::before {
     position: absolute;
     color: var(--form-input-text-placeholder);
     content: attr(placeholder);
   }
 
-  input[type='date'][value='']:focus::-webkit-datetime-edit {
+  input[type='time'][value='']:focus::-webkit-datetime-edit {
     color: inherit;
   }
 
-  input[type='date'][value='']:focus::before {
+  input[type='time'][value='']:focus::before {
     content: '';
   }
 }
 
-.tedi-date-field__container {
+.tedi-time-field__container {
   width: 100%;
+}
+
+.tedi-time-field__icon--disabled button:not([data-name='closing-button']):last-child {
+  &:hover {
+    cursor: auto;
+    background: none;
+  }
+}
+
+.tedi-time-field__picker-wrapper {
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 }

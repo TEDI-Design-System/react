@@ -344,8 +344,10 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   const renderIcon = useCallback(() => {
     if (!icon) return null;
 
+    const isInteractiveIcon = Boolean(onIconClick);
+    const smallIconSize = isInteractiveIcon ? 18 : 16;
     const defaultIconProps: Partial<IconWithoutBackgroundProps> = {
-      size: size === 'large' ? 24 : size === 'small' ? 16 : 18,
+      size: size === 'large' ? 24 : size === 'small' ? smallIconSize : 18,
       className: styles['tedi-textfield__icon'],
     };
 
