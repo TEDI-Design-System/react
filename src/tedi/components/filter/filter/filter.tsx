@@ -341,12 +341,7 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
   const [innerSingle, setInnerSingle] = useState(defaultSelectedValue ?? '');
   const [innerMulti, setInnerMulti] = useState<string[]>(defaultSelectedValues ?? []);
 
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    hasCustomContent &&
-    (defaultSelected || onSelectedChange) &&
-    selectedProp === undefined
-  ) {
+  if (hasCustomContent && (defaultSelected || onSelectedChange) && selectedProp === undefined) {
     // eslint-disable-next-line no-console
     console.warn(
       '[Filter] `defaultSelected` and `onSelectedChange` are not honoured in custom-content mode ' +

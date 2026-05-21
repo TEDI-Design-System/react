@@ -185,7 +185,7 @@ export const FilterGroup = (props: FilterGroupProps): JSX.Element => {
 
   const role = isManaged ? (multiselect ? 'group' : 'radiogroup') : undefined;
 
-  if (process.env.NODE_ENV !== 'production' && isManaged && !label && !ariaLabelledBy) {
+  if (isManaged && !label && !ariaLabelledBy) {
     const key = role + '|' + (controlledValue ?? defaultValue ?? '') + '|' + multiselect;
     if (!warnedGroups.has(key)) {
       warnedGroups.add(key);
