@@ -119,11 +119,21 @@ export function CalendarHeader({
 
       {isGridSelect ? (
         <>
-          <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenMonthGrid}>
+          <Button
+            noStyle
+            className={styles['tedi-calendar__month-year-selector']}
+            onClick={onOpenMonthGrid}
+            data-testid="tedi-calendar-month-trigger"
+          >
             {displayMonth.toLocaleString(localeCode, { month: 'long' })}
             <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>
-          <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenYearGrid}>
+          <Button
+            noStyle
+            className={styles['tedi-calendar__month-year-selector']}
+            onClick={onOpenYearGrid}
+            data-testid="tedi-calendar-year-trigger"
+          >
             {displayMonth.getFullYear()}
             <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>

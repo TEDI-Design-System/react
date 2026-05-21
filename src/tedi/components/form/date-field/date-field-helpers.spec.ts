@@ -48,8 +48,6 @@ describe('date-field-helpers', () => {
 
     it('falls back to range.to when range.from is missing', () => {
       const to = new Date(2024, 2, 20);
-      // `react-day-picker`'s `DateRange` type requires `from`, but the helper
-      // tolerates a `to`-only object at runtime — exercise that path.
       expect(getInitialMonth({ to } as unknown as SelectedValueLike)).toBe(to);
     });
 
@@ -133,8 +131,6 @@ describe('date-field-helpers', () => {
     });
 
     it('returns false from the function matcher when shouldDisableMonth omits a return', () => {
-      // The implementation uses `?? false` so a missing return becomes false
-      // rather than `undefined` — protects callers that treat the value strictly.
       const shouldDisableMonth = jest.fn(() => undefined as unknown as boolean);
       const [matcher] = buildDisabledMatchers({ shouldDisableMonth });
       expect((matcher as (d: Date) => boolean)(new Date())).toBe(false);
@@ -183,7 +179,6 @@ describe('date-field-helpers', () => {
       const parts = getLocaleDateParts(formatter);
       expect(parts.fieldOrder).toEqual(['day', 'month', 'year']);
       expect(parts.separators).toHaveLength(2);
-      // Estonian and many EU locales use "." as the separator.
       expect(parts.separators[0]).toMatch(/^[.\u00a0\s/-]+$/);
     });
 
@@ -195,7 +190,6 @@ describe('date-field-helpers', () => {
     });
 
     it('caps the separators array at two entries even with verbose formatters', () => {
-      // ISO-style with explicit separators still produces 2 separators total.
       const formatter = new Intl.DateTimeFormat('en-CA', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const parts = getLocaleDateParts(formatter);
       expect(parts.separators.length).toBeLessThanOrEqual(2);
@@ -218,7 +212,6 @@ describe('date-field-helpers', () => {
     });
 
     it('escapes regex meta-characters in the separator', () => {
-      // A "+" in the separator would be a quantifier if left unescaped.
       const source = buildDateRegexSource({ fieldOrder: ['day', 'month', 'year'], separators: ['+', '+'] });
       const regex = new RegExp(`^${source}$`);
       expect(regex.test('31+12+2099')).toBe(true);
@@ -228,12 +221,10 @@ describe('date-field-helpers', () => {
     it('emits a 4-digit slot for `year` and 2-digit for day/month', () => {
       const source = buildDateRegexSource({ fieldOrder: ['day', 'month', 'year'], separators: ['.', '.'] });
       const regex = new RegExp(`^${source}$`);
-      // 2-digit year must fail because the year capture is `\d{4}`.
       expect(regex.test('31.12.99')).toBe(false);
     });
 
     it('handles a missing separator entry without crashing', () => {
-      // `separators[0]` is undefined for a single-field order — coerced to '' by the helper.
       const source = buildDateRegexSource({ fieldOrder: ['year'], separators: [] });
       expect(new RegExp(`^${source}$`).test('2099')).toBe(true);
     });

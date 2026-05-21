@@ -70,6 +70,7 @@ export const CalendarGrid = <T,>({
                   [styles['tedi-calendar__grid-button--selected']]: item.isSelected,
                 })}
                 aria-pressed={item.isSelected}
+                data-testid="tedi-calendar-grid-cell"
                 noStyle
               >
                 {item.label}
