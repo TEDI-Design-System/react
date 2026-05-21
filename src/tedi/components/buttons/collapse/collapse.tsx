@@ -210,6 +210,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
                       size === 'small' && styles['tedi-collapse__icon--small']
                     )}
                     name="expand_more"
+                    color="inherit"
                     size={size === 'small' || arrowType === 'secondary' ? 18 : 24}
                   />
                 </div>
