@@ -205,16 +205,20 @@ export const NumberField = (props: NumberFieldProps) => {
     }
 
     const normalized = rawValue.replace(',', '.');
+
+    if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(normalized)) {
+      return;
+    }
+
     const parsed = parseFloat(normalized);
+    if (Number.isNaN(parsed)) return;
 
-    if (!Number.isNaN(parsed)) {
-      const clamped = forceToLimits(parsed);
-      const rounded = roundValue(clamped);
+    const clamped = forceToLimits(parsed);
+    const rounded = roundValue(clamped);
 
-      if (rounded !== currentValue) {
-        onChange?.(rounded);
-        setInputInnerValue(rounded);
-      }
+    if (rounded !== currentValue) {
+      onChange?.(rounded);
+      setInputInnerValue(rounded);
     }
   };
 

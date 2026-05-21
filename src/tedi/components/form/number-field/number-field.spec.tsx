@@ -91,6 +91,19 @@ describe('NumberField component', () => {
     expect(handleChange).not.toHaveBeenCalled();
   });
 
+  it('does not fire onChange for inputs with trailing non-numeric characters (1a, 12-, 1.5xyz)', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={-100} max={100} />);
+    const input = screen.getByRole('spinbutton');
+
+    fireEvent.change(input, { target: { value: '1a' } });
+    fireEvent.change(input, { target: { value: '12-' } });
+    fireEvent.change(input, { target: { value: '1.5xyz' } });
+    fireEvent.change(input, { target: { value: '1e5' } });
+
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
   it('does not re-fire onChange when the parsed value is unchanged (e.g. trailing decimal separator)', () => {
     const handleChange = jest.fn();
     render(<NumberField {...defaultProps} onChange={handleChange} min={0} max={100} />);
@@ -100,11 +113,9 @@ describe('NumberField component', () => {
     expect(handleChange).toHaveBeenCalledTimes(1);
     expect(handleChange).toHaveBeenLastCalledWith(2);
 
-    // Typing the separator keeps parseFloat at 2, so onChange must not fire.
     fireEvent.change(input, { target: { value: '2,' } });
     expect(handleChange).toHaveBeenCalledTimes(1);
 
-    // The next keystroke produces a new number — onChange fires again.
     fireEvent.change(input, { target: { value: '2,5' } });
     expect(handleChange).toHaveBeenCalledTimes(2);
     expect(handleChange).toHaveBeenLastCalledWith(2.5);
