@@ -295,13 +295,40 @@ Sub-component: `VerticalSpacing.Item`
 Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Language`, `Header.Login`, `Header.Logout`, `Header.Profile`, `Header.Role`, `Header.Search`
 
 **Header.Logo:** `logo: ReactNode`, `logoDark?: ReactNode`, `href?: string`, `showLogo?: boolean = true`
+- `showLogo` is a simple boolean for feature flags or custom media queries. For responsive hiding at standard breakpoints, wrap with `<ShowAt>`/`<HideAt>` instead (e.g. `<ShowAt md><Header.Logo ... /></ShowAt>`).
+
 **Header.Center:** `children: ReactNode`, `alignment?: 'flex-start' | 'center' | 'space-between' = 'center'`
 **Header.Actions:** `children: ReactNode`
-**Header.Role:** `representatives: Representative[]`, `label?: ReactNode`, `showDescription?: boolean = true`, `accordionLabels?: { open?, close? }`, `onRepresentativeChange?`, `onRoleSelectionToggle?`
-**Header.Language:** bp — language selector
-**Header.Login:** bp — login button
-**Header.Logout:** bp — logout button
-**Header.Profile:** bp — user profile display
+
+**Header.Role:** `HeaderRoleProps`
+- `representatives: Representative[]` (required) — `Representative` has `id: string` (required), `name: string`, `description?: string`, `icon?: string | IconProps`
+- `label?: ReactNode` — descriptive label above the name
+- `showDescription?: boolean = true` — show the selected representative's description in the header area
+- `isOrganization?: boolean` — organization context (affects search label)
+- `accordionLabels?: { open?: string; close?: string }` — custom toggle labels on mobile
+- `searchLabel?: string` — search input label (falls back to i18n)
+- `organizationSearchLabel?: string` — search label when `isOrganization` is true
+- `searchId?: string` — id for the search input (falls back to `useId()`)
+- `showSearch?: boolean = false` — show search input above the representative list
+- `searchClearable?: boolean = false` — show clear button on search input
+- `clearSearchOnSelect?: boolean = true` — clear search when a representative is selected
+- `showRoleSwitch?: boolean` — show the role selection toggle (defaults to true when multiple representatives)
+- `children?: ReactNode` — custom content replacing the default representative list
+- `noResultsContent?: ReactNode` — custom content when filtered list is empty
+- `onRepresentativeChange?: (representative: Representative) => void`
+- `onRoleSelectionToggle?: (isOpen: boolean) => void`
+- When multiple `Header.Role` components are inside a `Header.Profile`, opening one accordion automatically closes the others on mobile/tablet.
+
+**Header.Language:** `HeaderLanguageProps`
+- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `isSelected?: boolean`, `aria-label?: string`
+- `currentLanguage?: string` — initially displayed label (falls back to matching locale or first item)
+- `selectLabel?: string` — label for the selector (falls back to i18n)
+
+**Header.Login:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
+**Header.Logout:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
+**Header.Profile:** bp — `showPopover?: Breakpoint = 'lg'`, `label?: string`, `showLabel?: boolean = false`, `disabled?: boolean = false`, `noStyle?: boolean = false`, `children: ReactNode`
+- `noStyle` removes default padding, borders, and background from modal children. Does not affect `Header.Role`'s own 4px brand bottom border.
+
 **Header.Search:** wrapper that accepts a Search child (and optional `mobileVariant`). `children: ReactNode`, `mobileVariant?: 'modal' | 'inline'`, `mobileLabels?: { button?, modalTitle? }`, `disabled?: boolean`
 
 ```tsx

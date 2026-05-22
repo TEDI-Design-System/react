@@ -67,6 +67,26 @@ interface HeaderRoleRepresentativesProps {
   searchId?: string;
   /** Whether to keep the role selection open after selecting a representative. */
   keepOpenOnSelect?: boolean;
+  /**
+   * Whether to display the search input above the representative list.
+   * @default false
+   */
+  showSearch?: boolean;
+  /**
+   * Whether the search input shows a clear button.
+   * @default false
+   */
+  searchClearable?: boolean;
+  /**
+   * Whether to clear the search input when a representative is selected.
+   * @default true
+   */
+  clearSearchOnSelect?: boolean;
+  /**
+   * Custom content rendered when the filtered representative list is empty.
+   * Falls back to the default "no results" label when not provided.
+   */
+  noResultsContent?: React.ReactNode;
 }
 
 const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
@@ -86,6 +106,10 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
     organizationSearchLabel,
     searchId,
     keepOpenOnSelect,
+    showSearch = false,
+    searchClearable = false,
+    clearSearchOnSelect = true,
+    noResultsContent,
   } = props;
   const { getLabel } = useLabels();
 
@@ -95,7 +119,10 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
 
   const handleSelect = (rep: Representative) => {
     setRepresentative(rep);
-    setInputValue('');
+
+    if (clearSearchOnSelect) {
+      setInputValue('');
+    }
 
     if (!keepOpenOnSelect) {
       if (isRoleSelectionOpen && onRoleSelectionToggle) {
@@ -113,49 +140,56 @@ const HeaderRoleRepresentatives = (props: HeaderRoleRepresentativesProps) => {
       id={id}
       role="region"
       aria-labelledby={toggleId}
-      className={cn(styles['tedi-header-role__selection'], {
-        [styles['tedi-header-role__selection--open']]: isRoleSelectionOpen,
+      className={cn(styles['tedi-header-role__collapse'], {
+        [styles['tedi-header-role__collapse--open']]: isRoleSelectionOpen,
       })}
       {...(!isRoleSelectionOpen && { inert: '' })}
     >
-      <div className={styles['tedi-header-role__selection-inner']}>
-        <div className={styles['tedi-header-role__selection-body']}>
-          <div className={styles['tedi-header-role__list']}>
+      <div className={styles['tedi-header-role__collapse--items']}>
+        <div className={styles['tedi-header-role__list']}>
+          {showSearch && (
             <Search
               id={searchId ?? generatedSearchId}
               value={inputValue}
               onChange={(value) => setInputValue(value)}
               label={resolvedSearchLabel}
+              isClearable={searchClearable}
             />
-            {representatives.map((rep) => {
-              const isSelected = representative?.id === rep.id;
-              const icon = resolveIcon(rep.icon);
+          )}
+          {representatives.length === 0 &&
+            (noResultsContent ?? (
+              <Text className={styles['tedi-header-role__no-results']} color="secondary">
+                {getLabel('header.role-selection.no-results')}
+              </Text>
+            ))}
+          {representatives.map((rep, index) => {
+            const isSelected = representative?.id === rep.id;
+            const icon = resolveIcon(rep.icon);
 
-              return (
-                <React.Fragment key={rep.id}>
-                  <Separator />
-                  <Button
-                    onClick={() => handleSelect(rep)}
-                    visualType={isSelected ? 'primary' : 'neutral'}
-                    aria-current={isSelected || undefined}
-                    className={cn(styles['tedi-header-role__item'], {
-                      [styles['tedi-header-role__item--selected']]: isSelected,
-                    })}
-                    noStyle
-                  >
-                    <div className={styles['tedi-header-role__item-inner']}>
-                      {icon && <Icon name={icon.name} size={icon.size} color="inherit" />}
-                      <div className={styles['tedi-header-role__item-text']}>
-                        {rep.name}
+            return (
+              <React.Fragment key={rep.id}>
+                {(showSearch || index !== 0) && <Separator />}
+                <Button
+                  onClick={() => handleSelect(rep)}
+                  visualType={isSelected ? 'primary' : 'neutral'}
+                  aria-current={isSelected || undefined}
+                  className={cn(styles['tedi-header-role__item'], {
+                    [styles['tedi-header-role__item--selected']]: isSelected,
+                  })}
+                  noStyle
+                >
+                  <div className={styles['tedi-header-role__item-inner']}>
+                    {icon && <Icon name={icon.name} size={icon.size} color="inherit" />}
+                    <div className={styles['tedi-header-role__item-text']}>
+                      {rep.name}
 
-                        <Text modifiers="small">{rep.description}</Text>
-                      </div>
+                      <Text modifiers="small">{rep.description}</Text>
                     </div>
-                  </Button>
-                </React.Fragment>
-              );
-            })}
-          </div>
+                  </div>
+                </Button>
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -74,7 +74,10 @@
     margin-left: auto;
 
     > [data-name='separator'] {
-      padding: var(--layout-header-separator-padding-y) 0;
+      --vertical-separator-height: auto;
+
+      align-self: stretch;
+      margin: var(--layout-header-separator-padding-y) 0;
     }
 
     @include breakpoints.media-breakpoint-only(md) {

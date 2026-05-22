@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../../../helpers';
+import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
+import { HeaderProfile } from '../header-profile/header-profile';
 import { HeaderRole } from './header-role';
 import HeaderRoleRepresentatives, { Representative } from './header-role-representatives';
 
@@ -11,6 +12,7 @@ jest.mock('../../../../../helpers', () => ({
   ...jest.requireActual('../../../../../helpers'),
   useBreakpoint: jest.fn(),
   isBreakpointBelow: jest.fn(),
+  useBreakpointProps: jest.fn(),
 }));
 
 jest.mock('../../../../../providers/label-provider', () => ({
@@ -32,6 +34,9 @@ describe('HeaderRole component', () => {
     jest.clearAllMocks();
     (useBreakpoint as jest.Mock).mockReturnValue('lg');
     (isBreakpointBelow as jest.Mock).mockReturnValue(false);
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => props),
+    });
     (useLabels as jest.Mock).mockReturnValue({ getLabel: mockGetLabel });
   });
 
@@ -223,7 +228,7 @@ describe('HeaderRole component', () => {
     });
 
     it('forwards searchLabel to representatives', () => {
-      render(<HeaderRole representatives={mockRepresentatives} searchLabel="Find person" />);
+      render(<HeaderRole representatives={mockRepresentatives} showSearch searchLabel="Find person" />);
 
       const toggle = screen.getByText('header.role-selection');
       fireEvent.click(toggle);
@@ -233,7 +238,12 @@ describe('HeaderRole component', () => {
 
     it('forwards organizationSearchLabel when isOrganization', () => {
       render(
-        <HeaderRole representatives={mockRepresentatives} isOrganization organizationSearchLabel="Find organization" />
+        <HeaderRole
+          representatives={mockRepresentatives}
+          showSearch
+          isOrganization
+          organizationSearchLabel="Find organization"
+        />
       );
 
       const toggle = screen.getByText('header.role-selection');
@@ -243,7 +253,7 @@ describe('HeaderRole component', () => {
     });
 
     it('filters representatives by name when search input changes', () => {
-      render(<HeaderRole representatives={mockRepresentatives} searchLabel="Search" />);
+      render(<HeaderRole representatives={mockRepresentatives} showSearch searchLabel="Search" />);
 
       const toggle = screen.getByText('header.role-selection');
       fireEvent.click(toggle);
@@ -256,7 +266,7 @@ describe('HeaderRole component', () => {
     });
 
     it('filters representatives by description', () => {
-      render(<HeaderRole representatives={mockRepresentatives} searchLabel="Search" />);
+      render(<HeaderRole representatives={mockRepresentatives} showSearch searchLabel="Search" />);
 
       const toggle = screen.getByText('header.role-selection');
       fireEvent.click(toggle);
@@ -426,7 +436,7 @@ describe('HeaderRoleRepresentatives component', () => {
       />
     );
 
-    const collapse = container.querySelector('[class*="header-role__selection"]');
+    const collapse = container.querySelector('[class*="header-role__collapse"]');
     expect(collapse).toHaveAttribute('inert');
   });
 
@@ -444,7 +454,7 @@ describe('HeaderRoleRepresentatives component', () => {
       />
     );
 
-    const collapse = container.querySelector('[class*="header-role__selection"]');
+    const collapse = container.querySelector('[class*="header-role__collapse"]');
     expect(collapse).not.toHaveAttribute('inert');
   });
 
@@ -497,5 +507,114 @@ describe('HeaderRoleRepresentatives component', () => {
     expect(mockSetInputValue).toHaveBeenCalledWith('');
     expect(mockOnRoleSelectionToggle).not.toHaveBeenCalled();
     expect(mockSetIsRoleSelectionOpen).not.toHaveBeenCalled();
+  });
+
+  describe('resolveIcon', () => {
+    it('renders an icon when representative has a string icon', () => {
+      const repsWithStringIcon: Representative[] = [
+        { id: '1', name: 'Alice', description: 'Lead', icon: 'person' },
+        { id: '2', name: 'Bob', description: 'Dev' },
+      ];
+
+      const { container } = render(
+        <HeaderRoleRepresentatives
+          representatives={repsWithStringIcon}
+          representative={repsWithStringIcon[0]}
+          inputValue=""
+          setInputValue={jest.fn()}
+          setRepresentative={jest.fn()}
+          setIsRoleSelectionOpen={jest.fn()}
+          isRoleSelectionOpen={true}
+        />
+      );
+
+      const icons = container.querySelectorAll('[class*="icon"]');
+      expect(icons.length).toBeGreaterThan(0);
+    });
+
+    it('renders an icon when representative has an IconProps object icon', () => {
+      const repsWithObjectIcon: Representative[] = [
+        { id: '1', name: 'Alice', description: 'Lead', icon: { name: 'business', size: 18 } },
+        { id: '2', name: 'Bob', description: 'Dev' },
+      ];
+
+      const { container } = render(
+        <HeaderRoleRepresentatives
+          representatives={repsWithObjectIcon}
+          representative={repsWithObjectIcon[0]}
+          inputValue=""
+          setInputValue={jest.fn()}
+          setRepresentative={jest.fn()}
+          setIsRoleSelectionOpen={jest.fn()}
+          isRoleSelectionOpen={true}
+        />
+      );
+
+      const icons = container.querySelectorAll('[class*="icon"]');
+      expect(icons.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('HeaderRole inside HeaderProfile (mutual exclusion)', () => {
+  const mockGetLabel = jest.fn((key: string) => key);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    (isBreakpointBelow as jest.Mock).mockReturnValue(true);
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => props),
+    });
+    (useLabels as jest.Mock).mockReturnValue({ getLabel: mockGetLabel });
+  });
+
+  const repsA: Representative[] = [
+    { id: '1', name: 'Alice', description: 'Lead' },
+    { id: '2', name: 'Bob', description: 'Dev' },
+  ];
+  const repsB: Representative[] = [
+    { id: '3', name: 'Charlie', description: 'QA' },
+    { id: '4', name: 'Dana', description: 'PM' },
+  ];
+
+  it('sets activeRoleId on the profile context when a role accordion opens', () => {
+    render(
+      <HeaderProfile>
+        <HeaderRole representatives={repsA} />
+      </HeaderProfile>
+    );
+
+    // Open the mobile modal first
+    const profileButton = screen.getByRole('button');
+    fireEvent.click(profileButton);
+
+    // Open the role accordion
+    const toggle = screen.getByText('header.role-selection');
+    fireEvent.click(toggle);
+
+    expect(toggle.closest('button')).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('closes the first role when the second role opens (mutual exclusion)', () => {
+    render(
+      <HeaderProfile>
+        <HeaderRole representatives={repsA} accordionLabels={{ open: 'Switch A', close: 'Close A' }} />
+        <HeaderRole representatives={repsB} accordionLabels={{ open: 'Switch B', close: 'Close B' }} />
+      </HeaderProfile>
+    );
+
+    const profileButton = screen.getByRole('button');
+    fireEvent.click(profileButton);
+
+    const toggleA = screen.getByText('Switch A');
+    fireEvent.click(toggleA);
+    expect(toggleA.closest('button')).toHaveAttribute('aria-expanded', 'true');
+
+    const toggleB = screen.getByText('Switch B');
+    fireEvent.click(toggleB);
+
+    expect(toggleB.closest('button')).toHaveAttribute('aria-expanded', 'true');
+    expect(toggleA.closest('button')).toHaveAttribute('aria-expanded', 'false');
   });
 });

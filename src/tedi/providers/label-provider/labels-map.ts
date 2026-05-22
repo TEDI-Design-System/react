@@ -185,18 +185,25 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Закрыть',
   },
   'header.role-selection.search.label': {
-    description: 'Label for Search in Role selection',
+    description: 'Label for search in Role selection',
     components: ['HeaderRole'],
     et: 'Otsi isikut',
     en: 'Search representative',
     ru: 'Найти представителя',
   },
   'header.role-selection.search.organizationLabel': {
-    description: 'Label for Organization Search in Role selection',
+    description: 'Label for organization search in Role selection',
     components: ['HeaderRole'],
     et: 'Otsi asutust',
     en: 'Search organization',
     ru: 'Найти организацию',
+  },
+  'header.role-selection.no-results': {
+    description: 'Text shown when representative search yields no results',
+    components: ['HeaderRole'],
+    et: 'Esindajaid ei leitud',
+    en: 'No representatives found',
+    ru: 'Представители не найдены',
   },
   'header.login': {
     description: 'Label for login button',

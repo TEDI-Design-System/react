@@ -1,3 +1,21 @@
+@mixin header-language-button {
+  [data-name='button'] {
+    color: var(--header-dropdown-default);
+
+    &:hover {
+      color: var(--header-dropdown-hover);
+    }
+
+    &:active {
+      color: var(--header-dropdown-active);
+    }
+
+    &:focus {
+      color: var(--header-dropdown-focus);
+    }
+  }
+}
+
 .tedi-header-language {
   display: flex;
   flex-direction: column;
@@ -5,9 +23,7 @@
   justify-content: center;
   height: 100%;
 
-  [data-name='button'] {
-    color: var(--header-dropdown-link);
-  }
+  @include header-language-button;
 
   &__icon {
     transition: transform 0.2s ease-in-out;
@@ -38,8 +54,6 @@
     gap: var(--layout-grid-gutters-08);
     align-items: flex-start;
 
-    [data-name='button'] {
-      color: var(--header-dropdown-link);
-    }
+    @include header-language-button;
   }
 }

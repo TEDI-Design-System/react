@@ -8,6 +8,7 @@ import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
 import Separator from '../../../../misc/separator/separator';
 import Popover from '../../../../overlays/popover/popover';
+import { useHeaderProfile } from '../header-profile/header-profile';
 import styles from './header-role.module.scss';
 import HeaderRoleRepresentatives, { Representative } from './header-role-representatives';
 
@@ -47,6 +48,36 @@ export interface HeaderRoleProps {
   onRoleSelectionToggle?: (isOpen: boolean) => void;
   /** Callback fired when a representative is selected. */
   onRepresentativeChange?: (representative: Representative) => void;
+  /**
+   * Whether to display the search input above the representative list.
+   * @default false
+   */
+  showSearch?: boolean;
+  /**
+   * Whether the search input shows a clear button.
+   * @default false
+   */
+  searchClearable?: boolean;
+  /**
+   * Whether to clear the search input when a representative is selected.
+   * @default true
+   */
+  clearSearchOnSelect?: boolean;
+  /**
+   * Custom content rendered inside the role selection popover (desktop) or accordion (tablet and mobile).
+   * When provided, replaces the default representative list entirely.
+   */
+  children?: React.ReactNode;
+  /**
+   * Whether to show the role selection toggle and dropdown.
+   * When omitted, defaults to showing the selection when there are multiple representatives.
+   */
+  showRoleSwitch?: boolean;
+  /**
+   * Custom content rendered when the filtered representative list is empty.
+   * Falls back to the default "no results" label when not provided.
+   */
+  noResultsContent?: React.ReactNode;
 }
 
 export const HeaderRole = (props: HeaderRoleProps) => {
@@ -61,12 +92,19 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     searchId,
     onRoleSelectionToggle,
     onRepresentativeChange,
+    showSearch,
+    searchClearable,
+    clearSearchOnSelect,
+    children,
+    showRoleSwitch,
+    noResultsContent,
   } = props;
   const { getLabel } = useLabels();
   const roleId = useId();
   const [representative, setRepresentative] = useState<Representative | undefined>(representatives?.[0]);
   const [isRoleSelectionOpen, setIsRoleSelectionOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const headerProfile = useHeaderProfile();
 
   useEffect(() => {
     if (!representatives?.length) {
@@ -81,9 +119,21 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     }
   }, [representatives]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (
+      headerProfile &&
+      headerProfile.activeRoleId !== null &&
+      headerProfile.activeRoleId !== roleId &&
+      isRoleSelectionOpen
+    ) {
+      setIsRoleSelectionOpen(false);
+      setInputValue('');
+    }
+  }, [headerProfile?.activeRoleId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const breakpoint = useBreakpoint();
   const isTabletView = isBreakpointBelow(breakpoint, 'lg');
-  const hasMultipleRepresentatives = (representatives?.length ?? 0) > 1;
+  const hasRoleSelection = showRoleSwitch ?? (representatives?.length ?? 0) > 1;
 
   const filteredRepresentatives = useMemo(() => {
     if (!representatives) return [];
@@ -99,6 +149,10 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     const next = !isRoleSelectionOpen;
     setIsRoleSelectionOpen(next);
     onRoleSelectionToggle?.(next);
+
+    if (next && headerProfile) {
+      headerProfile.setActiveRoleId(roleId);
+    }
   };
 
   const handleRepresentativeChange = (rep: Representative) => {
@@ -124,6 +178,10 @@ export const HeaderRole = (props: HeaderRoleProps) => {
     searchLabel,
     organizationSearchLabel,
     searchId,
+    showSearch,
+    searchClearable,
+    clearSearchOnSelect,
+    noResultsContent,
   };
 
   if (isTabletView) {
@@ -134,14 +192,13 @@ export const HeaderRole = (props: HeaderRoleProps) => {
       <div className={styles['tedi-header-role__container']}>
         <div
           className={cn(styles['tedi-header-role__content'], {
-            [styles['tedi-header-role__content--open']]: isRoleSelectionOpen,
-            [styles['tedi-header-role__content--has-representatives']]: hasMultipleRepresentatives,
+            [styles['tedi-header-role__content--has-representatives']]: hasRoleSelection,
           })}
         >
           <div
             className={cn(styles['tedi-header-role__content--body'], {
               [styles['tedi-header-role__content--body-inline']]:
-                !hasMultipleRepresentatives && showDescription && representative?.description,
+                !hasRoleSelection && showDescription && representative?.description,
             })}
           >
             <div className={styles['tedi-header-role__content--title']}>
@@ -152,13 +209,13 @@ export const HeaderRole = (props: HeaderRoleProps) => {
             </div>
             {showDescription && representative?.description && (
               <>
-                {!hasMultipleRepresentatives && <Separator axis="vertical" />}
+                {!hasRoleSelection && <Separator axis="vertical" />}
                 <Text color="secondary">{representative?.description}</Text>
               </>
             )}
           </div>
 
-          {hasMultipleRepresentatives && (
+          {hasRoleSelection && (
             <Button
               id={toggleId}
               visualType="link"
@@ -181,7 +238,22 @@ export const HeaderRole = (props: HeaderRoleProps) => {
           )}
         </div>
 
-        {hasMultipleRepresentatives && <HeaderRoleRepresentatives {...representativesProps} keepOpenOnSelect />}
+        {hasRoleSelection &&
+          (children ? (
+            <div
+              id={panelId}
+              role="region"
+              aria-labelledby={toggleId}
+              className={cn(styles['tedi-header-role__collapse'], {
+                [styles['tedi-header-role__collapse--open']]: isRoleSelectionOpen,
+              })}
+              {...(!isRoleSelectionOpen && { inert: '' })}
+            >
+              <div className={styles['tedi-header-role__collapse--items']}>{children}</div>
+            </div>
+          ) : (
+            <HeaderRoleRepresentatives {...representativesProps} keepOpenOnSelect />
+          ))}
       </div>
     );
   }
@@ -197,7 +269,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
         )}
       </div>
 
-      {hasMultipleRepresentatives ? (
+      {hasRoleSelection ? (
         <Popover placement="bottom" open={isRoleSelectionOpen} onToggle={handleToggle} withBorder={true}>
           <Popover.Trigger>
             <Button visualType="link" underline={false}>
@@ -214,9 +286,7 @@ export const HeaderRole = (props: HeaderRoleProps) => {
               </span>
             </Button>
           </Popover.Trigger>
-          <Popover.Content>
-            <HeaderRoleRepresentatives {...representativesProps} />
-          </Popover.Content>
+          <Popover.Content>{children ?? <HeaderRoleRepresentatives {...representativesProps} />}</Popover.Content>
         </Popover>
       ) : (
         <div className={styles['tedi-header-role__value']}>
