@@ -548,14 +548,7 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
 
       if (isMultiSelect) {
         return (
-          <Dropdown.Item
-            key={option.value}
-            index={index}
-            asChild
-            disabled={option.disabled}
-            closeOnSelect={false}
-            active={optionSelected}
-          >
+          <Dropdown.Item key={option.value} index={index} asChild disabled={option.disabled} closeOnSelect={false}>
             <Checkbox
               id={`${baseId}-option-${i}`}
               label={option.label}
