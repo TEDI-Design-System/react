@@ -32,6 +32,7 @@ import InfoButton from '../../buttons/info-button/info-button';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { DateField } from '../../form/date-field/date-field';
 import { TextField } from '../../form/textfield/textfield';
+import { TimeField } from '../../form/time-field/time-field';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { EmptyState } from '../../misc/empty-state';
 import Separator from '../../misc/separator/separator';
@@ -277,12 +278,10 @@ function EditableTextCell<T extends { id: string }>({
   row,
   field,
   label,
-  icon,
 }: {
   row: T;
   field: keyof T & string;
   label: string;
-  icon?: string;
 }) {
   const editor = useEditor<T>();
   const isEditing = row.id === editor.editingId && editor.draft;
@@ -296,8 +295,33 @@ function EditableTextCell<T extends { id: string }>({
       name={field}
       label={label}
       hideLabel
-      icon={icon}
       value={draftValue}
+      onChange={(next) => editor.setDraft((prev: T | null) => (prev ? { ...prev, [field]: next } : prev))}
+    />
+  );
+}
+
+function EditableTimeCell<T extends { id: string }>({
+  row,
+  field,
+  label,
+}: {
+  row: T;
+  field: keyof T & string;
+  label: string;
+}) {
+  const editor = useEditor<T>();
+  const isEditing = row.id === editor.editingId && editor.draft;
+  if (!isEditing) {
+    return <>{String(row[field] ?? '')}</>;
+  }
+  const draftValue = String((editor.draft as T)[field] ?? '');
+  return (
+    <TimeField
+      id={`${row.id}-${field}`}
+      label={label}
+      value={draftValue}
+      inputProps={{ hideLabel: true, name: field }}
       onChange={(next) => editor.setDraft((prev: T | null) => (prev ? { ...prev, [field]: next } : prev))}
     />
   );
@@ -346,7 +370,7 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
     id: 'hour',
     header: 'Kellaaeg',
     accessorKey: 'hour',
-    cell: ({ row }) => <EditableTextCell row={row.original} field="hour" label="Kellaaeg" icon="schedule" />,
+    cell: ({ row }) => <EditableTimeCell row={row.original} field="hour" label="Kellaaeg" />,
   },
   {
     id: 'duration',
@@ -639,7 +663,7 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
         id: 'hour',
         header: 'Kellaaeg',
         accessorKey: 'hour',
-        cell: ({ row }) => <EditableTextCell row={row.original} field="hour" label="Kellaaeg" icon="schedule" />,
+        cell: ({ row }) => <EditableTimeCell row={row.original} field="hour" label="Kellaaeg" />,
       },
       {
         id: 'duration',
