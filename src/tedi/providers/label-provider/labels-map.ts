@@ -313,6 +313,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
+  'select.select-all': {
+    description: 'Label for the "Select all" toggle inside multi-select dropdown',
+    components: ['select'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
+  },
   'stepper.completed': {
     description: 'Label for screen-reader that this step is completed (visually hidden)',
     components: ['StepperNav'],
