@@ -327,6 +327,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
+  'select.select-all': {
+    description: 'Label for the "Select all" toggle inside multi-select dropdown',
+    components: ['select'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
+  },
   'stepper.completed': {
     description: 'Label for screen-reader that this step is completed (visually hidden)',
     components: ['StepperNav'],
@@ -888,6 +895,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Rohkem infot',
     en: 'More information',
     ru: 'Больше информации',
+  },
+  'timePicker.pickTime': {
+    description: 'Internal label for time picker, not visible for users but announced by screen readers',
+    components: ['TimePicker'],
+    et: 'Vali kellaaeg',
+    en: 'Pick time',
+    ru: 'Выберите время',
   },
 });
 

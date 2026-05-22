@@ -338,6 +338,64 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 <DateField id="dob" label="Date of birth" useNativePicker md={{ useNativePicker: false }} />
 ```
 
+### TimeField
+**Props:** `TimeFieldProps` | bp, form
+- `id: string` (required), `label: string` (required)
+- `value?: string`, `defaultValue?: string` — `"HH:mm"` 24-hour format
+- `onChange?: (time: string) => void`
+- `placeholder?: string`
+- `required?: boolean`, `readOnly?: boolean`
+- `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
+- `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
+- `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
+- `className?: string`
+- **Breakpoint-aware:** `useNativePicker?: boolean = false` (swap to `<input type="time">`; ignores `availableTimes`), `showPicker?: boolean = true`, `timePickerTrigger?: 'input' | 'button' = 'button'`, `availableTimesVariant?: 'grid-buttons' | 'grid-radio' | 'dropdown'` — which variant the picker renders when `availableTimes` is set
+
+```tsx
+<TimeField id="meeting" label="Meeting time" value={time} onChange={setTime} stepMinutes={15} />
+
+// Constrain to specific slots, render as a radio-button grid
+<TimeField
+  id="slot"
+  label="Available slot"
+  availableTimes={['09:00', '09:30', '10:00', '14:00', '15:30']}
+  availableTimesVariant="grid-radio"
+  value={slot}
+  onChange={setSlot}
+/>
+
+// Native picker on mobile, custom wheel on desktop
+<TimeField id="alarm" label="Alarm" useNativePicker md={{ useNativePicker: false }} />
+```
+
+### TimePicker
+> **For plain time inputs use `TimeField`.** TimePicker is the lower-level picker primitive — reach for it only when you need a standalone, always-visible time selector (scheduling UI, custom popover, side-by-side with a calendar in a DateTime composite).
+
+**Props:** `TimePickerProps` | form
+- `value?: string`, `defaultValue?: string` — `"HH:mm"`
+- `onChange?: (time: string) => void`
+- `stepMinutes?: number = 1` — minute increment for the wheel
+- `availableTimes?: string[]` — switches from scroll-wheel mode to a predefined-slots grid
+- `gridVariant?: 'button' | 'radio' = 'button'` — only used with `availableTimes`
+- `bordered?: boolean = true` — set `false` when embedding inside a parent that already provides its own surface (e.g. alongside a Calendar)
+- `className?: string`
+
+The wheel column supports full keyboard navigation: `ArrowUp` / `ArrowDown` and `PageUp` / `PageDown` cycle through the column (wrap at both ends), `Home` / `End` jump to the bounds, `Enter` / `Space` commit the highlighted value.
+
+```tsx
+import { TimePicker } from '@tedi-design-system/react/tedi';
+
+<TimePicker value={time} onChange={setTime} stepMinutes={5} />
+
+// Predefined slots
+<TimePicker
+  availableTimes={['09:00', '10:00', '11:00', '14:00']}
+  gridVariant="radio"
+  value={slot}
+  onChange={setSlot}
+/>
+```
+
 ### Filter / FilterGroup
 **Props:** `FilterProps`, `FilterGroupProps` | form
 
@@ -415,6 +473,7 @@ Key props:
 - `prepend?: ReactNode`, `append?: ReactNode`, `hidePrependWhenSelected?: boolean`
 - `appendTo?: 'body' | HTMLElement` — portal target for the dropdown
 - `selectAllLabel?: string` (default `'Vali kõik'`), `clearLabel?: string` (default `'Tühjenda valik'`)
+
 
 ### FileUpload
 **Props:** `FileUploadProps` | form

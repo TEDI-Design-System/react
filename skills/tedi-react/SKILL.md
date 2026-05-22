@@ -154,7 +154,7 @@ const [email, setEmail] = useState('');
 <Checkbox id="agree" label="I agree" value="agree" onChange={(val, checked) => setAgreed(checked)} />
 ```
 
-Form controls: `TextField`, `Select`, `TextArea`, `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Search`, `DateField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`.
+Form controls: `TextField`, `Select`, `TextArea`, `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`.
 
 ## Theming
 

@@ -15,6 +15,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
 | Search | `string` | Search button, onSearch callback |
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
+| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop |
@@ -178,6 +179,50 @@ const [date, setDate] = useState<Date>();
 />
 ```
 
+## TimeField
+
+The value is always a `"HH:mm"` 24-hour string. The popover defaults to a wheel picker; set `availableTimes` to switch to a fixed-slot grid, or `useNativePicker` to drop the custom UI entirely.
+
+```tsx
+import { TimeField } from '@tedi-design-system/react/tedi';
+
+// Wheel picker, 15-minute step
+<TimeField
+  id="meeting"
+  label="Meeting time"
+  value={time}
+  onChange={setTime}
+  stepMinutes={15}
+  required
+/>
+
+// Constrain to predefined slots, render as a radio-button grid
+<TimeField
+  id="slot"
+  label="Available slot"
+  availableTimes={['09:00', '09:30', '10:00', '14:00', '15:30']}
+  availableTimesVariant="grid-radio"
+  value={slot}
+  onChange={setSlot}
+/>
+
+// Native picker on mobile, custom wheel on desktop
+<TimeField
+  id="alarm"
+  label="Alarm"
+  useNativePicker
+  md={{ useNativePicker: false }}
+/>
+```
+
+For an always-visible time selector (e.g. side-by-side with a calendar, or inside a custom popover) use the lower-level `TimePicker` directly:
+
+```tsx
+import { TimePicker } from '@tedi-design-system/react/tedi';
+
+<TimePicker value={time} onChange={setTime} stepMinutes={5} bordered={false} />
+```
+
 ## Filter
 
 Compact pill-shaped trigger for refining result sets. Renders one of four modes depending on
@@ -248,6 +293,7 @@ Variants and customisation:
   the prepend slot for the check icon when the filter becomes selected.
 - `appendTo: 'body' | HTMLElement` portals the dropdown out of the trigger's stacking context.
 - Estonian copy by default: `selectAllLabel='Vali kõik'`, `clearLabel='Tühjenda valik'`.
+
 
 ## Checkbox & Radio
 
@@ -355,6 +401,7 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 - **Select:** `onChange?: (value: ISelectOption | ISelectOption[] | null) => void`
 - **NumberField:** `onChange?: (value: number) => void`
 - **DateField:** `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>` — value shape depends on `mode` (`'single'` → `Date`, `'multiple'` → `Date[]`, `'range'` → `DateRange`)
+- **TimeField / TimePicker:** `onChange?: (time: string) => void` — value is always `"HH:mm"` 24-hour format (empty string when cleared)
 
 ## Disabled State
 
