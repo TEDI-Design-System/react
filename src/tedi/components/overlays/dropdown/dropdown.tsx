@@ -90,6 +90,15 @@ export interface DropdownProps extends BreakpointSupport<DropdownBreakpointProps
    * Change handler (fires for both modes)
    */
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Index of the item that should be focused when the dropdown opens.
+   *
+   * Pass the index of the "current selection" so the user can arrow-key or
+   * Enter/Space to reconfirm without first pressing an arrow. Omit (or pass
+   * `undefined`) to keep the default behaviour — no item is pre-focused and
+   * the user has to press an arrow key to start navigating.
+   */
+  defaultActiveIndex?: number;
   /*
    * Additional class name(s) to apply to the dropdown container
    * @default undefined
@@ -108,6 +117,7 @@ export const Dropdown = (props: DropdownProps) => {
     open: controlledOpen,
     defaultOpen = false,
     onOpenChange,
+    defaultActiveIndex,
     placement = 'bottom-start',
     className,
   } = getCurrentBreakpointProps<DropdownProps>(props);
@@ -115,11 +125,18 @@ export const Dropdown = (props: DropdownProps) => {
   const nodeId = useFloatingNodeId();
 
   const listItemsRef = React.useRef<Array<HTMLButtonElement | null>>([]);
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(defaultActiveIndex ?? null);
   const [content, setContent] = React.useState<React.ReactNode>(null);
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
 
   const open = controlledOpen ?? uncontrolledOpen;
+
+  // Re-seed the active index every time the dropdown closes, so the next open
+  // starts with the caller-provided "current selection" pre-focused — not
+  // whatever activeIndex useListNavigation last left behind.
+  React.useEffect(() => {
+    if (!open) setActiveIndex(defaultActiveIndex ?? null);
+  }, [open, defaultActiveIndex]);
 
   const setOpen = React.useCallback(
     (next: boolean) => {
@@ -151,6 +168,11 @@ export const Dropdown = (props: DropdownProps) => {
       activeIndex,
       onNavigate: setActiveIndex,
       loop: true,
+      // When the caller passes `defaultActiveIndex`, treat that item as the
+      // current selection and force focus to land on it when the dropdown
+      // opens — regardless of whether it was opened via click or keyboard.
+      selectedIndex: defaultActiveIndex ?? null,
+      focusItemOnOpen: defaultActiveIndex !== null ? true : 'auto',
     }),
   ]);
 

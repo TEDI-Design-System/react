@@ -1,8 +1,19 @@
-import { render } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { TextGroup } from './text-group';
 
 import '@testing-library/jest-dom';
+
+jest.mock('../../../helpers', () => ({
+  useBreakpointProps: jest.fn(),
+}));
+
+beforeEach(() => {
+  (useBreakpointProps as jest.Mock).mockImplementation(() => ({
+    getCurrentBreakpointProps: <T extends Record<string, unknown>>(props: T): T => ({ ...props }),
+  }));
+});
 
 describe('TextGroup component', () => {
   it('renders with default props', () => {
@@ -132,5 +143,124 @@ describe('TextGroup component', () => {
     expect(dt).toHaveTextContent('Role: Admin');
     expect(dt?.querySelector('em')).toBeInTheDocument();
     expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
+  });
+});
+
+describe('TextGroup.List', () => {
+  it('renders a single <dl> with N <dt>/<dd> pairs', () => {
+    render(
+      <TextGroup.List
+        items={[
+          { label: 'Patient', value: 'Mari Maasikas' },
+          { label: 'Address', value: 'Tulbi tn 4, Tallinn' },
+          { label: 'Vaccine', value: 'COVID-19 mRNA' },
+        ]}
+      />
+    );
+
+    // Three semantic `term` (<dt>) and three `definition` (<dd>) entries grouped
+    // under the same definition list. RTL maps <dt> → "term" and <dd> →
+    // "definition" via dom-accessibility-api, so we can assert structure
+    // through accessible roles instead of DOM selectors.
+    const terms = screen.getAllByRole('term');
+    const definitions = screen.getAllByRole('definition');
+    expect(terms).toHaveLength(3);
+    expect(definitions).toHaveLength(3);
+
+    expect(terms.map((dt) => dt.textContent?.trim())).toEqual(['Patient', 'Address', 'Vaccine']);
+    expect(definitions.map((dd) => dd.textContent?.trim())).toEqual([
+      'Mari Maasikas',
+      'Tulbi tn 4, Tallinn',
+      'COVID-19 mRNA',
+    ]);
+
+    // All terms share the same parent <dl>, so there's exactly one definition
+    // list wrapping the whole content.
+    const dl = terms[0].closest('dl');
+    expect(dl).not.toBeNull();
+    expect(terms.every((dt) => dt.closest('dl') === dl)).toBe(true);
+    expect(dl).toHaveClass('tedi-text-group');
+    expect(dl).toHaveClass('tedi-text-group--list');
+  });
+
+  it('applies the horizontal modifier when type="horizontal"', () => {
+    render(
+      <TextGroup.List
+        type="horizontal"
+        labelWidth="200px"
+        items={[
+          { label: 'A', value: '1' },
+          { label: 'B', value: '2' },
+        ]}
+      />
+    );
+
+    const dl = screen.getByText('A').closest('dl');
+    expect(dl).toHaveClass('tedi-text-group--horizontal');
+    expect(dl).toHaveStyle('--label-width: 200px');
+  });
+
+  it('honors per-row labelAlign overrides', () => {
+    render(
+      <TextGroup.List
+        labelAlign="left"
+        items={[
+          { label: 'Subtotal', value: '€ 10' },
+          { label: 'Total', value: '€ 12', labelAlign: 'right' },
+        ]}
+      />
+    );
+
+    expect(screen.getByText('Subtotal').closest('dt')).toHaveClass('tedi-text-group--align-left');
+    expect(screen.getByText('Total').closest('dt')).toHaveClass('tedi-text-group--align-right');
+  });
+
+  it('honors per-row labelWidth overrides via inline --label-width', () => {
+    render(
+      <TextGroup.List
+        labelWidth="100px"
+        items={[
+          { label: 'Default', value: 'A' },
+          { label: 'Custom', value: 'B', labelWidth: '240px' },
+          { label: 'Percent', value: 'C', labelWidth: 25 },
+        ]}
+      />
+    );
+
+    // Each row is the <dt>'s parent <div>; semantically "the group containing
+    // this label". Resolve it via the visible label text and walk up to the
+    // group rather than poking at a class name.
+    const rowOf = (labelName: string) => screen.getByText(labelName).closest('dt')?.parentElement as HTMLElement;
+    expect(rowOf('Default')).not.toHaveAttribute('style');
+    expect(rowOf('Custom')).toHaveStyle('--label-width: 240px');
+    expect(rowOf('Percent')).toHaveStyle('--label-width: 25%');
+  });
+
+  it('renders string labels via <Label>, JSX labels untouched', () => {
+    render(
+      <TextGroup.List
+        items={[
+          { label: 'Plain', value: 'A' },
+          { label: <strong>Bold</strong>, value: 'B' },
+        ]}
+      />
+    );
+
+    // String labels go through `<Label>` which renders an HTML <label>.
+    expect(screen.getByText('Plain').tagName.toLowerCase()).toBe('label');
+
+    // JSX labels are rendered verbatim — the <strong> stays as-is, no Label
+    // wrapping happens.
+    const boldText = screen.getByText('Bold');
+    expect(boldText.tagName.toLowerCase()).toBe('strong');
+    const boldTerm = boldText.closest('dt');
+    expect(
+      within(boldTerm as HTMLElement).queryByText((_, node) => node?.tagName?.toLowerCase() === 'label')
+    ).toBeNull();
+  });
+
+  it('applies custom className to the root <dl>', () => {
+    render(<TextGroup.List className="custom-list" items={[{ label: 'A', value: '1' }]} />);
+    expect(screen.getByText('A').closest('dl')).toHaveClass('custom-list');
   });
 });

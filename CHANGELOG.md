@@ -1,3 +1,38 @@
+# [17.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.9...react-17.1.0-rc.10) (2026-05-22)
+
+
+### Bug Fixes
+
+* **breakpoints:** replace px values with rem [#633](https://github.com/TEDI-Design-System/react/issues/633) ([#636](https://github.com/TEDI-Design-System/react/issues/636)) ([0934794](https://github.com/TEDI-Design-System/react/commit/0934794078330cad776128e6fc91b1c116f0849f))
+
+# [17.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.8...react-17.1.0-rc.9) (2026-05-22)
+
+
+### Features
+
+* **select:** multiselect tag handling improvements, story updates, visual fixes [#587](https://github.com/TEDI-Design-System/react/issues/587) ([#613](https://github.com/TEDI-Design-System/react/issues/613)) ([abb2c36](https://github.com/TEDI-Design-System/react/commit/abb2c36329c04977eabec7b698994a9623c230c0))
+
+# [17.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.7...react-17.1.0-rc.8) (2026-05-20)
+
+
+### Features
+
+* **time-field:** new TEDI-ready component [#25](https://github.com/TEDI-Design-System/react/issues/25) ([#601](https://github.com/TEDI-Design-System/react/issues/601)) ([7d0d346](https://github.com/TEDI-Design-System/react/commit/7d0d3461b971d9b6cfec3571fc0d5f65df845052))
+
+# [17.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.6...react-17.1.0-rc.7) (2026-05-20)
+
+
+### Features
+
+* **text-group:** add TextGroupList feature [#81](https://github.com/TEDI-Design-System/react/issues/81) ([#625](https://github.com/TEDI-Design-System/react/issues/625)) ([cc8253f](https://github.com/TEDI-Design-System/react/commit/cc8253fb1676e57e873628306150447b025d30d7))
+
+# [17.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.5...react-17.1.0-rc.6) (2026-05-20)
+
+
+### Bug Fixes
+
+* **popover:** fix large popover overflow in smaller screens [#628](https://github.com/TEDI-Design-System/react/issues/628) ([#634](https://github.com/TEDI-Design-System/react/issues/634)) ([0f7396d](https://github.com/TEDI-Design-System/react/commit/0f7396d1d7656ac613ae22005f6efe6f98aad693))
+
 # [17.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.4...react-17.1.0-rc.5) (2026-05-14)
 
 

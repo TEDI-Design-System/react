@@ -125,4 +125,19 @@ describe('ChoiceGroupItem', () => {
     fireEvent.click(input);
     expect(mockInputClick).not.toHaveBeenCalled();
   });
+
+  it('makes the outer wrapper non-tabbable for radio type (arrow-navigated group)', () => {
+    const { container } = renderWithContext({ type: 'radio', variant: 'card' });
+    const card = container.querySelector('.tedi-choice-group-item') as HTMLElement;
+    expect(card).toHaveAttribute('tabIndex', '-1');
+    expect(card).not.toHaveAttribute('role');
+    expect(card).not.toHaveAttribute('aria-checked');
+  });
+
+  it('keeps the outer wrapper tabbable with role=checkbox for checkbox type', () => {
+    const { container } = renderWithContext({ type: 'checkbox', variant: 'card' });
+    const card = container.querySelector('.tedi-choice-group-item') as HTMLElement;
+    expect(card).toHaveAttribute('tabIndex', '0');
+    expect(card).toHaveAttribute('role', 'checkbox');
+  });
 });

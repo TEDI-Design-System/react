@@ -175,6 +175,10 @@ $input-padding-right-map: (
     color: var(--form-input-text-filled);
   }
 
+  &:not(div, :disabled):active {
+    color: var(--button-main-neutral-text-active);
+  }
+
   &:disabled {
     cursor: initial;
   }
@@ -198,6 +202,7 @@ div.tedi-textfield__icon-wrapper {
 
 .tedi-textfield__feedback-wrapper {
   display: flex;
+  margin-top: var(--form-field-outer-spacing);
 }
 
 .tedi-textfield__separator {
