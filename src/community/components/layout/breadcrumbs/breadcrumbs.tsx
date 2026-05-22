@@ -26,6 +26,9 @@ type ConditionalTypes<C extends React.ElementType> =
       crumbs: CrumbProps<IntentionalAny>[];
     };
 
+/**
+ * @deprecated Use Breadcrumb from `@tedi-design-system/react/tedi` instead.
+ */
 export type BreadcrumbsProps<C extends React.ElementType = 'a'> = ConditionalTypes<C> & {
   /**
    * Additional custom class.
@@ -39,6 +42,9 @@ export type BreadcrumbsProps<C extends React.ElementType = 'a'> = ConditionalTyp
   showMinimalCrumbs?: boolean | Layouts;
 };
 
+/**
+ * @deprecated Use Breadcrumb from `@tedi-design-system/react/tedi` instead.
+ */
 export const Breadcrumbs = <C extends React.ElementType = 'a'>(props: BreadcrumbsProps<C>): JSX.Element | null => {
   const { getLabel } = useLabels();
   const { className, crumbs, linkAs, showMinimalCrumbs = ['mobile', 'tablet'], ...rest } = props;

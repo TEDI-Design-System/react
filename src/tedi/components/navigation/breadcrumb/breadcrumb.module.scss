@@ -1,0 +1,28 @@
+.tedi-breadcrumb {
+  display: flex;
+}
+
+.tedi-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--breadcrumb-inner-spacing);
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tedi-breadcrumb__separator {
+  display: inline-flex;
+  align-items: center;
+  color: var(--link-primary-default);
+}
+
+.tedi-breadcrumb__current {
+  color: var(--general-text-secondary);
+}
