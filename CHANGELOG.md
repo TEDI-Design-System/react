@@ -1,3 +1,10 @@
+# [17.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.8...react-17.1.0-rc.9) (2026-05-22)
+
+
+### Features
+
+* **select:** multiselect tag handling improvements, story updates, visual fixes [#587](https://github.com/TEDI-Design-System/react/issues/587) ([#613](https://github.com/TEDI-Design-System/react/issues/613)) ([abb2c36](https://github.com/TEDI-Design-System/react/commit/abb2c36329c04977eabec7b698994a9623c230c0))
+
 # [17.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.7...react-17.1.0-rc.8) (2026-05-20)
 
 
