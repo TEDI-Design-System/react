@@ -528,6 +528,36 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 
 **`Modal.Closer`** — wraps any clickable element to close the modal on click. Preserves the wrapped element's `onClick`.
 
+**`useModal()` hook** — read the public subset of Modal state from any descendant of `<Modal>`. **This is the hook to reach for as a consumer.** Returns:
+- `open: boolean`
+- `onOpenChange: (open: boolean) => void` — programmatically open / close
+- `labelId: string`, `descriptionId: string` — for manual `aria-labelledby` / `aria-describedby` wiring when you replace `Modal.Header`
+
+Throws if called outside a `<Modal>` subtree.
+
+> `useModalContext` and `ModalContext` are also exported alongside `useModal`, but they're for the package's own sub-components — they expose floating-ui plumbing (`reference`, `floating`, `getReferenceProps`, …) which causes subtle focus / dismissal bugs when touched from outside the Modal package. **Always prefer `useModal()`** in consumer code.
+
+```tsx
+import { Modal, useModal, Button, ClosingButton } from '@tedi-design-system/react/tedi';
+
+function CustomHeader({ title }: { title: string }) {
+  const { labelId, onOpenChange } = useModal();
+  return (
+    <Modal.Header>
+      <h2 id={labelId}>{title}</h2>
+      <ClosingButton onClick={() => onOpenChange(false)} />
+    </Modal.Header>
+  );
+}
+
+function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
+  const { onOpenChange } = useModal();
+  return (
+    <Button onClick={() => { onConfirm(); onOpenChange(false); }}>Confirm</Button>
+  );
+}
+```
+
 ```tsx
 // Responsive: side drawer on desktop, centered on mobile
 <Modal.Content position="right" md={{ position: 'center' }} defaultServerBreakpoint="md">

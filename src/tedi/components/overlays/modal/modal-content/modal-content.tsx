@@ -20,16 +20,28 @@ const isPresetWidth = (value: ModalWidth): value is ModalWidthPreset =>
 
 type ModalContentBreakpointProps = {
   /**
-   * Modal width. Accepts a Figma preset (`xs` ≈ 460, `sm` ≈ 616, `md` ≈ 820, `lg` ≈ 1024,
-   * `xl` ≈ 1212) or any CSS length (`'800px'`, `'60vw'`, `'75%'`). Side-positioned modals
-   * stretch to full height regardless of width.
-   * @default md
+   * Modal width. Prefer one of the Figma-aligned presets:
+   *
+   * | Preset | Approx. max-width   |
+   * |--------|---------------------|
+   * | `xs`   | ~28.75rem           |
+   * | `sm`   | ~38.5rem            |
+   * | `md`   | ~51.25rem (default) |
+   * | `lg`   | ~64rem              |
+   * | `xl`   | ~77rem              |
+   *
+   * For edge cases that don't fit a preset, pass any valid CSS length
+   * (e.g. `'50rem'`, `'60vw'`). When you only need to _cap_ the width
+   * rather than set it exactly, prefer the lighter `maxWidth` prop instead.
+   *
+   * `@default` md
    */
   width?: ModalWidth;
   /**
-   * Hard cap on width. Useful when `width` is a custom value (e.g. `width="800px"` with
-   * `maxWidth="75%"`).
-   * @default calc(100vw - 16px * 2)
+   * Hard cap on width. This is the preferred lightweight alternative to a
+   * fully custom `width` — e.g. use `maxWidth="75%"` together with the
+   * default `width="md"` instead of overriding `width` directly.
+   * `@default` calc(100vw - 16px * 2)
    */
   maxWidth?: string;
   /**

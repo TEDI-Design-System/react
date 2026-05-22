@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Modal } from './modal';
+import { useModal } from './modal-context';
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: jest.fn(() => ({
@@ -24,7 +25,7 @@ describe('Modal', () => {
     );
 
     expect(screen.queryByText('Body content')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText('Open'));
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     expect(screen.getByText('Body content')).toBeInTheDocument();
   });
 
@@ -59,7 +60,7 @@ describe('Modal', () => {
       </Modal>
     );
 
-    fireEvent.click(screen.getByTitle('Close'));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(onToggle).toHaveBeenCalledWith(false);
   });
 
@@ -77,7 +78,7 @@ describe('Modal', () => {
       </Modal>
     );
 
-    fireEvent.click(screen.getByText('Custom close'));
+    fireEvent.click(screen.getByRole('button', { name: 'Custom close' }));
     expect(onToggle).toHaveBeenCalledWith(false);
   });
 
@@ -107,8 +108,8 @@ describe('Modal', () => {
       </Modal>
     );
 
-    expect(screen.getByText('Delete')).toBeInTheDocument();
-    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
   });
 
   it('uses aria-label as the accessible-name fallback when no header title is set', () => {
@@ -138,6 +139,73 @@ describe('Modal', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-labelledby');
     expect(dialog).not.toHaveAttribute('aria-label');
+  });
+
+  it('preserves a ref on Modal.Trigger children while still wiring floating-ui', () => {
+    const CapturingTrigger = () => {
+      const triggerRef = useRef<HTMLButtonElement>(null);
+      return (
+        <Modal>
+          <Modal.Trigger>
+            <button ref={triggerRef} type="button">
+              Open
+            </button>
+          </Modal.Trigger>
+          <Modal.Content>
+            <Modal.Body>Body</Modal.Body>
+          </Modal.Content>
+          <button
+            type="button"
+            onClick={() => {
+              if (triggerRef.current) triggerRef.current.dataset.captured = 'yes';
+            }}
+          >
+            check
+          </button>
+        </Modal>
+      );
+    };
+
+    render(<CapturingTrigger />);
+    const trigger = screen.getByRole('button', { name: 'Open' });
+    fireEvent.click(screen.getByRole('button', { name: 'check' }));
+    expect(trigger.dataset.captured).toBe('yes');
+    fireEvent.click(trigger);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('wires aria-labelledby / aria-describedby when Modal.Header uses custom children', () => {
+    const CustomHeader = () => {
+      const { labelId, descriptionId } = useModal();
+      return (
+        <Modal.Header>
+          <h2 id={labelId} data-testid="custom-title">
+            Custom title
+          </h2>
+          <p id={descriptionId} data-testid="custom-description">
+            Supporting text
+          </p>
+        </Modal.Header>
+      );
+    };
+
+    render(
+      <Modal defaultOpen>
+        <Modal.Content>
+          <CustomHeader />
+          <Modal.Body>Body</Modal.Body>
+        </Modal.Content>
+      </Modal>
+    );
+
+    const title = screen.getByTestId('custom-title');
+    const description = screen.getByTestId('custom-description');
+    expect(title.id).toBeTruthy();
+    expect(description.id).toBeTruthy();
+
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveAttribute('aria-labelledby', title.id);
+    expect(dialog).toHaveAttribute('aria-describedby', description.id);
   });
 
   it('sets role="alertdialog" when role="alertdialog" is passed to Modal', () => {
@@ -189,7 +257,7 @@ describe('Modal', () => {
 
     render(<Wrapper />);
     expect(screen.queryByText('Controlled body')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText('External open'));
+    fireEvent.click(screen.getByRole('button', { name: 'External open' }));
     expect(screen.getByText('Controlled body')).toBeInTheDocument();
   });
 });

@@ -35,17 +35,8 @@ const meta: Meta<ModalStoryArgs> = {
   } as never,
   title: 'TEDI-Ready/Components/Overlay/Modal',
   parameters: {
-    docs: {
-      source: {
-        transform: (code: string) =>
-          code
-            .replaceAll('ModalTrigger', 'Modal.Trigger')
-            .replaceAll('ModalContent', 'Modal.Content')
-            .replaceAll('ModalHeader', 'Modal.Header')
-            .replaceAll('ModalBody', 'Modal.Body')
-            .replaceAll('ModalFooter', 'Modal.Footer')
-            .replaceAll('ModalCloser', 'Modal.Closer'),
-      },
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
     design: {
       type: 'figma',

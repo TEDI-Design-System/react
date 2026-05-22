@@ -64,14 +64,14 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
   const { onOpenChange, labelId, descriptionId, setHasTitle, setHasDescription } = useModalContext();
 
   useEffect(() => {
-    setHasTitle(Boolean(title));
+    setHasTitle(Boolean(title) || Boolean(children));
     return () => setHasTitle(false);
-  }, [title, setHasTitle]);
+  }, [title, children, setHasTitle]);
 
   useEffect(() => {
-    setHasDescription(Boolean(description));
+    setHasDescription(Boolean(description) || Boolean(children));
     return () => setHasDescription(false);
-  }, [description, setHasDescription]);
+  }, [description, children, setHasDescription]);
 
   const handleClose = () => onOpenChange(false);
 
