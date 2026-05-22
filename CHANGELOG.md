@@ -1,3 +1,10 @@
+# [17.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.9...react-17.1.0-rc.10) (2026-05-22)
+
+
+### Bug Fixes
+
+* **breakpoints:** replace px values with rem [#633](https://github.com/TEDI-Design-System/react/issues/633) ([#636](https://github.com/TEDI-Design-System/react/issues/636)) ([0934794](https://github.com/TEDI-Design-System/react/commit/0934794078330cad776128e6fc91b1c116f0849f))
+
 # [17.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.8...react-17.1.0-rc.9) (2026-05-22)
 
 
