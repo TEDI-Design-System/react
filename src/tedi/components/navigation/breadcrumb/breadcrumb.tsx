@@ -106,22 +106,34 @@ export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
     if (crumbs.length < 2) return null;
     const parent = crumbs[crumbs.length - 2];
     const parentProps = parent.props as { iconLeft?: unknown };
-    const withIcon = parentProps.iconLeft === undefined ? cloneElement(parent, { iconLeft: 'arrow_back' }) : parent;
+    const withIcon =
+      typeof parent.type !== 'string' && parentProps.iconLeft === undefined
+        ? cloneElement(parent, { iconLeft: 'arrow_back' })
+        : parent;
     return (
       <nav aria-label={navLabel} className={cn(styles['tedi-breadcrumb'], className)}>
-        {withIcon}
+        <ol className={styles['tedi-breadcrumb__list']}>
+          <li className={styles['tedi-breadcrumb__item']}>{withIcon}</li>
+        </ol>
       </nav>
     );
   }
 
+  const safeItemsBeforeCollapse = Math.max(0, itemsBeforeCollapse);
+  const safeItemsAfterCollapse = Math.max(1, itemsAfterCollapse);
   const shouldCollapse =
-    maxItems !== undefined && crumbs.length > maxItems && crumbs.length > itemsBeforeCollapse + itemsAfterCollapse;
+    maxItems !== undefined &&
+    crumbs.length > maxItems &&
+    crumbs.length > safeItemsBeforeCollapse + safeItemsAfterCollapse;
 
   const tokens: RenderToken[] = shouldCollapse
     ? [
-        ...crumbs.slice(0, itemsBeforeCollapse).map((element) => ({ kind: 'item' as const, element })),
-        { kind: 'ellipsis' as const, hidden: crumbs.slice(itemsBeforeCollapse, crumbs.length - itemsAfterCollapse) },
-        ...crumbs.slice(crumbs.length - itemsAfterCollapse).map((element) => ({ kind: 'item' as const, element })),
+        ...crumbs.slice(0, safeItemsBeforeCollapse).map((element) => ({ kind: 'item' as const, element })),
+        {
+          kind: 'ellipsis' as const,
+          hidden: crumbs.slice(safeItemsBeforeCollapse, crumbs.length - safeItemsAfterCollapse),
+        },
+        ...crumbs.slice(crumbs.length - safeItemsAfterCollapse).map((element) => ({ kind: 'item' as const, element })),
       ]
     : crumbs.map((element) => ({ kind: 'item' as const, element }));
 

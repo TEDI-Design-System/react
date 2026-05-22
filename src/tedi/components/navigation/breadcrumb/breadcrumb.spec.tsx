@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpointProps } from '../../../helpers';
 import { Link } from '../link/link';
@@ -76,7 +76,8 @@ describe('Breadcrumb', () => {
     );
     const link = screen.getByRole('link', { name: /Documents/ });
     expect(link).toHaveAttribute('href', '/docs');
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(link).toHaveTextContent('arrow_back');
+    expect(screen.getAllByRole('listitem')).toHaveLength(1);
   });
 
   it('renders nothing in short mode when fewer than two children are supplied', () => {
@@ -113,6 +114,24 @@ describe('Breadcrumb', () => {
     const trigger = screen.getByRole('button', { name: 'breadcrumbs.show-more' });
     expect(trigger).toBeInTheDocument();
     expect(container.querySelectorAll('.tedi-breadcrumb__separator')).toHaveLength(3);
+  });
+
+  it('opens the dropdown and reveals the hidden crumbs when the ellipsis is clicked', () => {
+    render(
+      <Breadcrumb maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
+        <Link href="/">A</Link>
+        <Link href="/b">B</Link>
+        <Link href="/c">C</Link>
+        <Link href="/d">D</Link>
+        <Link href="/e">E</Link>
+        <span aria-current="page">F</span>
+      </Breadcrumb>
+    );
+    const trigger = screen.getByRole('button', { name: 'breadcrumbs.show-more' });
+    fireEvent.click(trigger);
+    expect(screen.getByRole('link', { name: 'B' })).toHaveAttribute('href', '/b');
+    expect(screen.getByRole('link', { name: 'C' })).toHaveAttribute('href', '/c');
+    expect(screen.getByRole('link', { name: 'D' })).toHaveAttribute('href', '/d');
   });
 
   it('skips collapse when maxItems is not exceeded', () => {
