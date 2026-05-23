@@ -320,9 +320,6 @@ export const labelsMap = validateDefaultLabels({
     en: 'No data',
     ru: 'Нет данных',
   },
-  // `table.select-all` / `table.select-row` already exist further down with a
-  // state-aware function signature shared with the community Table — we reuse
-  // them via `getLabel('table.select-all', isAllSelected)` etc.
   'table.expand-row': {
     description: 'Accessible label on the expand toggle in expandable rows.',
     components: ['Table'],
@@ -364,6 +361,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Kohanda',
     en: 'Customize',
     ru: 'Настроить',
+  },
+  'select.select-all': {
+    description: 'Label for the "Select all" toggle inside multi-select dropdown',
+    components: ['select'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
   },
   'stepper.completed': {
     description: 'Label for screen-reader that this step is completed (visually hidden)',
