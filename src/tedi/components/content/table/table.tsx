@@ -23,16 +23,20 @@ import {
 import cn from 'classnames';
 import {
   type CSSProperties,
+  type DragEvent as ReactDragEvent,
   Fragment,
   type KeyboardEvent,
   type ReactNode,
   useCallback,
+  useEffect,
   useId,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
+import { Icon } from '../../base/icon/icon';
 import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { TextField } from '../../form/textfield/textfield';
@@ -366,7 +370,158 @@ export interface TableProps<TData> {
    * Toolbar + Table subcomponents such as `<Table.ColumnsMenu />`.
    */
   children?: ReactNode;
+  /**
+   * Enables row drag-and-drop reordering. The Table auto-injects a leading
+   * drag-handle column and wires up the native HTML5 drag API internally —
+   * the consumer just listens to `onRowDrop` and applies the new order to the
+   * source `data` array.
+   *
+   * Each `row.id` returned by TanStack is used as the drag identifier, so the
+   * data must have a stable `id` (or supply `getRowId`).
+   *
+   * **Accessibility caveat:** HTML5 drag-and-drop is pointer-only — keyboard
+   * users cannot reorder rows by focusing the grip. Provide an alternative
+   * reorder mechanism (e.g. "Move up" / "Move down" buttons in a row action
+   * menu) if keyboard parity matters for your audience.
+   *
+   * @default false
+   */
+  draggableRows?: boolean;
+  /**
+   * Enables column drag-and-drop reordering. Each (non-built-in, non-grouped)
+   * leaf header gets a grip button next to its label. Dropping a column
+   * pushes the new order into TanStack's `columnOrder` state — flows through
+   * `onStateChange` and the `persist` adapter automatically.
+   *
+   * Grouped header parents are never draggable; only flat / leaf columns are.
+   * Built-in slots (`__drag__`, `__select__`, `__expand__`) are skipped.
+   *
+   * **Same a11y caveat as `draggableRows`** — pointer-only.
+   *
+   * @default false
+   */
+  draggableColumns?: boolean;
+  /**
+   * Fires when a draggable row is dropped to a new position. Receives the
+   * before/after `row.id`s and the convenience indexes. Apply the move to your
+   * data with `arrayMove(data, fromIndex, toIndex)` and pass the result back
+   * via `data`.
+   *
+   * Only invoked when `draggableRows` is enabled and the drop actually changes
+   * the row order.
+   */
+  onRowDrop?: (event: TableRowDropEvent) => void;
 }
+
+interface TableDataRowProps<TData> {
+  row: Row<TData>;
+  rowClassName: string;
+  rowStyle: CSSProperties | undefined;
+  isActiveRow: boolean;
+  clickable: boolean;
+  onClick: ((row: Row<TData>) => void) | undefined;
+  onKeyDownHandler: ((event: KeyboardEvent<HTMLTableRowElement>) => void) | undefined;
+  ariaRowIndex: number | undefined;
+  columnProps: ((columnId: string) => { className?: string; style?: CSSProperties } | undefined) | undefined;
+  draggable: boolean;
+  dragHandleLabel: string;
+  /** When `draggable` is true, native HTML5 drag handlers wired by the parent Table. */
+  dragHandlers?: {
+    onDragStart: (event: ReactDragEvent<HTMLTableRowElement>) => void;
+    onDragOver: (event: ReactDragEvent<HTMLTableRowElement>) => void;
+    onDragLeave: () => void;
+    onDragEnd: () => void;
+    onDrop: (event: ReactDragEvent<HTMLTableRowElement>) => void;
+    onHandlePointerDown: () => void;
+  };
+  /** Column id currently being dragged over (for drop-target indicator on body cells). */
+  dragOverColumnId?: string | null;
+}
+
+const DRAG_HANDLE_ATTR = 'data-tedi-drag-handle';
+
+const DragHandleCell = ({ label, onHandlePointerDown }: { label: string; onHandlePointerDown: () => void }) => (
+  <button
+    type="button"
+    className={styles['tedi-table__drag-handle']}
+    aria-label={label}
+    onClick={(event) => event.stopPropagation()}
+    onMouseDown={onHandlePointerDown}
+    onTouchStart={onHandlePointerDown}
+    {...{ [DRAG_HANDLE_ATTR]: '' }}
+  >
+    <Icon name="drag_indicator" size={18} color="inherit" />
+  </button>
+);
+
+const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
+  const {
+    row,
+    rowClassName,
+    rowStyle,
+    isActiveRow,
+    clickable,
+    onClick,
+    onKeyDownHandler,
+    ariaRowIndex,
+    columnProps,
+    draggable,
+    dragHandleLabel,
+    dragHandlers,
+    dragOverColumnId,
+  } = props;
+
+  return (
+    <tr
+      className={rowClassName}
+      style={rowStyle}
+      draggable={draggable || undefined}
+      onDragStart={dragHandlers?.onDragStart}
+      onDragOver={dragHandlers?.onDragOver}
+      onDragLeave={dragHandlers?.onDragLeave}
+      onDragEnd={dragHandlers?.onDragEnd}
+      onDrop={dragHandlers?.onDrop}
+      onClick={clickable && onClick ? () => onClick(row) : undefined}
+      onKeyDown={clickable ? onKeyDownHandler : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      role={clickable ? 'button' : undefined}
+      aria-rowindex={ariaRowIndex}
+      aria-current={isActiveRow ? 'true' : undefined}
+    >
+      {row.getVisibleCells().map((cell) => {
+        const cellMeta = cell.column.columnDef.meta as TableColumnMeta | undefined;
+        const userColumnProps = columnProps?.(cell.column.id);
+        const isDragCell = draggable && cell.column.id === DRAG_COLUMN_ID;
+        const isDragOverThisCol = !!dragOverColumnId && cell.column.id === dragOverColumnId;
+        return (
+          <td
+            key={cell.id}
+            className={cn(
+              styles['tedi-table__cell'],
+              {
+                [styles[`tedi-table__cell--align-${cellMeta?.align}`]]: cellMeta?.align,
+                [styles[`tedi-table__cell--valign-${cellMeta?.vAlign}`]]: cellMeta?.vAlign,
+                [styles['tedi-table__cell--drag-handle']]: isDragCell,
+                [styles['tedi-table__cell--drag-over']]: isDragOverThisCol,
+              },
+              userColumnProps?.className
+            )}
+            style={userColumnProps?.style}
+          >
+            {isDragCell ? (
+              <DragHandleCell
+                label={dragHandleLabel}
+                onHandlePointerDown={dragHandlers?.onHandlePointerDown ?? (() => undefined)}
+              />
+            ) : (
+              flexRender(cell.column.columnDef.cell, cell.getContext())
+            )}
+          </td>
+        );
+      })}
+    </tr>
+  );
+};
 
 /**
  * Value exposed through `TableContext`. Subcomponents like ColumnsMenu use it
@@ -386,6 +541,19 @@ export interface TableContextValue<TData = unknown> {
 
 const SELECT_COLUMN_ID = '__select__';
 const EXPAND_COLUMN_ID = '__expand__';
+const DRAG_COLUMN_ID = '__drag__';
+
+/**
+ * Payload emitted by `Table` when a row is reordered via drag-and-drop.
+ * Use the indexes to apply the new order to your source `data` array, e.g.
+ * `arrayMove(data, fromIndex, toIndex)`.
+ */
+export interface TableRowDropEvent {
+  fromId: string;
+  toId: string;
+  fromIndex: number;
+  toIndex: number;
+}
 
 // Satisfy the community-side `declare module '@tanstack/table-core'` FilterFns
 // augmentation so the typed `useReactTable` signature accepts our options. The
@@ -446,6 +614,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     collapseProps,
     rowProps,
     columnProps,
+    draggableRows = false,
+    onRowDrop,
+    draggableColumns = false,
   } = props;
 
   const { getLabel } = useLabels();
@@ -576,6 +747,21 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const augmentedColumns = useMemo<ColumnDef<TData>[]>(() => {
     const leading: ColumnDef<TData>[] = [];
 
+    if (draggableRows) {
+      leading.push({
+        id: DRAG_COLUMN_ID,
+        enableSorting: false,
+        enableHiding: false,
+        enableColumnFilter: false,
+        size: 40,
+        header: '',
+        // The DragHandle button is rendered inside the SortableRow wrapper
+        // (not here) because `useSortable` must be called per row. This cell
+        // is just a placeholder; the actual button is positioned via CSS.
+        cell: () => null,
+      });
+    }
+
     if (hasSelection) {
       leading.push({
         id: SELECT_COLUMN_ID,
@@ -653,7 +839,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     }
 
     return [...leading, ...columns];
-  }, [columns, hasSelection, hasExpansion, resolvedId, checkboxProps, collapseProps]);
+  }, [columns, hasSelection, hasExpansion, draggableRows, resolvedId, checkboxProps, collapseProps]);
 
   const fallbackRowSelection = useMemo<RowSelectionState>(() => ({}), []);
   const fallbackExpanded = useMemo<ExpandedState>(() => ({}), []);
@@ -754,6 +940,207 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const totalDataRowCount = paginationEnabled ? rowCount ?? table.getFilteredRowModel().rows.length : rows.length;
   const ariaRowCount = paginationEnabled ? headerRowCount + totalDataRowCount : undefined;
 
+  const [draggingRowId, setDraggingRowId] = useState<string | null>(null);
+  const [dragOverRowId, setDragOverRowId] = useState<string | null>(null);
+  const draggingRowIdRef = useRef<string | null>(null);
+  // Flag set on the handle's mousedown/touchstart so we know the very next
+  // `dragstart` was initiated from the grip. Reset on dragend AND on a stray
+  // mouseup so a plain click on the handle doesn't poison the next drag.
+  const armedRowIdRef = useRef<string | null>(null);
+
+  const [draggingColumnId, setDraggingColumnId] = useState<string | null>(null);
+  const [dragOverColumnId, setDragOverColumnId] = useState<string | null>(null);
+  const draggingColumnIdRef = useRef<string | null>(null);
+  const armedColumnIdRef = useRef<string | null>(null);
+
+  const rowIds = useMemo(() => (draggableRows ? rows.map((r) => r.id) : []), [draggableRows, rows]);
+
+  // Disarm if the user pressed down on a handle but never started a drag
+  // (e.g. clicked, or pressed-and-released without moving).
+  useEffect(() => {
+    if (!draggableRows && !draggableColumns) return;
+    const disarm = () => {
+      armedRowIdRef.current = null;
+      armedColumnIdRef.current = null;
+    };
+    window.addEventListener('mouseup', disarm);
+    window.addEventListener('touchend', disarm);
+    return () => {
+      window.removeEventListener('mouseup', disarm);
+      window.removeEventListener('touchend', disarm);
+    };
+  }, [draggableRows, draggableColumns]);
+
+  const buildRowDragHandlers = useCallback(
+    (rowId: string) => ({
+      onHandlePointerDown: () => {
+        armedRowIdRef.current = rowId;
+      },
+      onDragStart: (event: ReactDragEvent<HTMLTableRowElement>) => {
+        if (armedRowIdRef.current !== rowId) {
+          event.preventDefault();
+          return;
+        }
+        armedRowIdRef.current = null;
+        event.dataTransfer.effectAllowed = 'move';
+        try {
+          event.dataTransfer.setData('text/plain', rowId);
+        } catch {
+          /* IE / older Safari quirks — safe to ignore */
+        }
+
+        const sourceRow = event.currentTarget;
+        const sourceTable = sourceRow.closest('table');
+        if (sourceTable) {
+          const rowRect = sourceRow.getBoundingClientRect();
+          const sourceCells = Array.from(sourceRow.children) as HTMLElement[];
+          const ghost = document.createElement('div');
+          ghost.style.cssText = `position:fixed;top:-10000px;left:0;width:${rowRect.width}px;pointer-events:none;`;
+          const ghostTable = document.createElement('table');
+          ghostTable.className = sourceTable.className;
+          ghostTable.style.cssText = `width:${rowRect.width}px;table-layout:fixed;border-collapse:collapse;`;
+          const ghostBody = document.createElement('tbody');
+          const ghostRow = sourceRow.cloneNode(true) as HTMLTableRowElement;
+          ghostRow.classList.add(styles['tedi-table__row--drag-preview']);
+          const ghostCells = Array.from(ghostRow.children) as HTMLElement[];
+          sourceCells.forEach((cell, i) => {
+            const ghostCell = ghostCells[i];
+            if (!ghostCell) return;
+            const cellRect = cell.getBoundingClientRect();
+            ghostCell.style.width = `${cellRect.width}px`;
+            ghostCell.style.minWidth = `${cellRect.width}px`;
+            ghostCell.style.maxWidth = `${cellRect.width}px`;
+          });
+          ghostBody.appendChild(ghostRow);
+          ghostTable.appendChild(ghostBody);
+          ghost.appendChild(ghostTable);
+          document.body.appendChild(ghost);
+          event.dataTransfer.setDragImage(ghost, 24, rowRect.height / 2);
+          window.setTimeout(() => ghost.remove(), 0);
+        }
+
+        draggingRowIdRef.current = rowId;
+        setDraggingRowId(rowId);
+      },
+      onDragOver: (event: ReactDragEvent<HTMLTableRowElement>) => {
+        if (!draggingRowIdRef.current || draggingRowIdRef.current === rowId) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        setDragOverRowId(rowId);
+      },
+      onDragLeave: () => {
+        setDragOverRowId((current) => (current === rowId ? null : current));
+      },
+      onDragEnd: () => {
+        draggingRowIdRef.current = null;
+        armedRowIdRef.current = null;
+        setDraggingRowId(null);
+        setDragOverRowId(null);
+      },
+      onDrop: (event: ReactDragEvent<HTMLTableRowElement>) => {
+        event.preventDefault();
+        const fromId = draggingRowIdRef.current;
+        const toId = rowId;
+        draggingRowIdRef.current = null;
+        armedRowIdRef.current = null;
+        setDraggingRowId(null);
+        setDragOverRowId(null);
+        if (!fromId || fromId === toId) return;
+        const fromIndex = rowIds.indexOf(fromId);
+        const toIndex = rowIds.indexOf(toId);
+        if (fromIndex < 0 || toIndex < 0) return;
+        onRowDrop?.({ fromId, toId, fromIndex, toIndex });
+      },
+    }),
+    [rowIds, onRowDrop]
+  );
+
+  const moveItem = <T,>(array: T[], from: number, to: number): T[] => {
+    const next = array.slice();
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    return next;
+  };
+
+  const buildColumnDragHandlers = useCallback(
+    (columnId: string) => ({
+      onHandlePointerDown: () => {
+        armedColumnIdRef.current = columnId;
+      },
+      onDragStart: (event: ReactDragEvent<HTMLTableCellElement>) => {
+        if (armedColumnIdRef.current !== columnId) {
+          event.preventDefault();
+          return;
+        }
+        armedColumnIdRef.current = null;
+        event.dataTransfer.effectAllowed = 'move';
+        try {
+          event.dataTransfer.setData('text/plain', columnId);
+        } catch {
+          /* */
+        }
+
+        const sourceCell = event.currentTarget;
+        const rect = sourceCell.getBoundingClientRect();
+        const ghost = document.createElement('div');
+        ghost.style.cssText = `position:fixed;top:-10000px;left:0;width:${rect.width}px;pointer-events:none;`;
+        const ghostTable = document.createElement('table');
+        const sourceTable = sourceCell.closest('table');
+        ghostTable.className = sourceTable?.className ?? '';
+        ghostTable.style.cssText = `width:${rect.width}px;table-layout:fixed;border-collapse:collapse;`;
+        const ghostHead = document.createElement('thead');
+        const ghostRow = document.createElement('tr');
+        ghostRow.className = styles['tedi-table__row'] ?? '';
+        const ghostCell = sourceCell.cloneNode(true) as HTMLTableCellElement;
+        ghostCell.classList.add(styles['tedi-table__header-cell--drag-preview']);
+        ghostCell.style.width = `${rect.width}px`;
+        ghostRow.appendChild(ghostCell);
+        ghostHead.appendChild(ghostRow);
+        ghostTable.appendChild(ghostHead);
+        ghost.appendChild(ghostTable);
+        document.body.appendChild(ghost);
+        event.dataTransfer.setDragImage(ghost, rect.width / 2, rect.height / 2);
+        window.setTimeout(() => ghost.remove(), 0);
+
+        draggingColumnIdRef.current = columnId;
+        setDraggingColumnId(columnId);
+      },
+      onDragOver: (event: ReactDragEvent<HTMLTableCellElement>) => {
+        if (!draggingColumnIdRef.current || draggingColumnIdRef.current === columnId) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        setDragOverColumnId(columnId);
+      },
+      onDragLeave: () => {
+        setDragOverColumnId((current) => (current === columnId ? null : current));
+      },
+      onDragEnd: () => {
+        draggingColumnIdRef.current = null;
+        armedColumnIdRef.current = null;
+        setDraggingColumnId(null);
+        setDragOverColumnId(null);
+      },
+      onDrop: (event: ReactDragEvent<HTMLTableCellElement>) => {
+        event.preventDefault();
+        const fromId = draggingColumnIdRef.current;
+        const toId = columnId;
+        draggingColumnIdRef.current = null;
+        armedColumnIdRef.current = null;
+        setDraggingColumnId(null);
+        setDragOverColumnId(null);
+        if (!fromId || fromId === toId) return;
+
+        const currentOrder = table.getState().columnOrder;
+        const baseOrder = currentOrder.length > 0 ? currentOrder : table.getAllLeafColumns().map((c) => c.id);
+        const fromIndex = baseOrder.indexOf(fromId);
+        const toIndex = baseOrder.indexOf(toId);
+        if (fromIndex < 0 || toIndex < 0) return;
+        table.setColumnOrder(moveItem(baseOrder, fromIndex, toIndex));
+      },
+    }),
+    [table]
+  );
+
   return (
     <TableContext.Provider value={contextValue as TableContextValue}>
       <div className={rootClassName} data-name="tedi-table">
@@ -802,15 +1189,32 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     const userColumnProps = columnProps?.(header.column.id);
                     const headerSize = header.column.getSize();
+                    const isBuiltInColumn =
+                      header.column.id === DRAG_COLUMN_ID ||
+                      header.column.id === SELECT_COLUMN_ID ||
+                      header.column.id === EXPAND_COLUMN_ID;
+                    const colDraggable = draggableColumns && isStandaloneLeaf && !isBuiltInColumn;
+                    const colHandlers = colDraggable ? buildColumnDragHandlers(header.column.id) : undefined;
+                    const isDraggingThisCol = colDraggable && draggingColumnId === header.column.id;
+                    const isDragOverThisCol =
+                      colDraggable && dragOverColumnId === header.column.id && draggingColumnId !== header.column.id;
                     return (
                       <th
                         key={header.id}
                         colSpan={header.colSpan}
                         rowSpan={rowSpanCount > 1 ? rowSpanCount : undefined}
+                        draggable={colDraggable || undefined}
+                        onDragStart={colHandlers?.onDragStart}
+                        onDragOver={colHandlers?.onDragOver}
+                        onDragLeave={colHandlers?.onDragLeave}
+                        onDragEnd={colHandlers?.onDragEnd}
+                        onDrop={colHandlers?.onDrop}
                         className={cn(
                           styles['tedi-table__header-cell'],
                           {
                             [styles['tedi-table__header-cell--group']]: isGroup,
+                            [styles['tedi-table__header-cell--dragging']]: isDraggingThisCol,
+                            [styles['tedi-table__header-cell--drag-over']]: isDragOverThisCol,
                             [styles[`tedi-table__cell--align-${headerMeta?.align}`]]: headerMeta?.align,
                             [styles[`tedi-table__cell--valign-${headerMeta?.vAlign}`]]: headerMeta?.vAlign,
                           },
@@ -825,7 +1229,24 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             : undefined
                         }
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {colDraggable && colHandlers ? (
+                          <span className={styles['tedi-table__header-cell-inner']}>
+                            <button
+                              type="button"
+                              className={styles['tedi-table__drag-handle']}
+                              aria-label={getLabel('table.drag-column', headerLabel ?? header.column.id)}
+                              onClick={(event) => event.stopPropagation()}
+                              onMouseDown={colHandlers.onHandlePointerDown}
+                              onTouchStart={colHandlers.onHandlePointerDown}
+                              {...{ [DRAG_HANDLE_ATTR]: '' }}
+                            >
+                              <Icon name="drag_indicator" size={18} color="inherit" />
+                            </button>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </span>
+                        ) : (
+                          flexRender(header.column.columnDef.header, header.getContext())
+                        )}
                       </th>
                     );
                   })}
@@ -898,39 +1319,29 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     ? headerRowCount + rowIndexOffset + visibleIndex + 1
                     : undefined;
                   const subRowId = `${resolvedId}-sub-${row.id}`;
+                  const isDraggingThisRow = draggableRows && draggingRowId === row.id;
+                  const isDragOverThisRow = draggableRows && dragOverRowId === row.id && draggingRowId !== row.id;
+                  const rowProps2: TableDataRowProps<TData> = {
+                    row,
+                    rowClassName: cn(rowClassName, {
+                      [styles['tedi-table__row--dragging']]: isDraggingThisRow,
+                      [styles['tedi-table__row--drag-over']]: isDragOverThisRow,
+                    }),
+                    rowStyle: userRowProps?.style,
+                    isActiveRow,
+                    clickable,
+                    onClick: onRowClick,
+                    onKeyDownHandler: handleRowKeyDown(row),
+                    ariaRowIndex,
+                    columnProps,
+                    draggable: draggableRows,
+                    dragHandleLabel: getLabel('table.drag-row'),
+                    dragHandlers: draggableRows ? buildRowDragHandlers(row.id) : undefined,
+                    dragOverColumnId: draggableColumns ? dragOverColumnId : null,
+                  };
                   return (
                     <Fragment key={row.id}>
-                      <tr
-                        className={rowClassName}
-                        style={userRowProps?.style}
-                        onClick={clickable ? () => onRowClick?.(row) : undefined}
-                        onKeyDown={clickable ? handleRowKeyDown(row) : undefined}
-                        tabIndex={clickable ? 0 : undefined}
-                        role={clickable ? 'button' : undefined}
-                        aria-rowindex={ariaRowIndex}
-                        aria-current={isActiveRow ? 'true' : undefined}
-                      >
-                        {row.getVisibleCells().map((cell) => {
-                          const cellMeta = cell.column.columnDef.meta as TableColumnMeta | undefined;
-                          const userColumnProps = columnProps?.(cell.column.id);
-                          return (
-                            <td
-                              key={cell.id}
-                              className={cn(
-                                styles['tedi-table__cell'],
-                                {
-                                  [styles[`tedi-table__cell--align-${cellMeta?.align}`]]: cellMeta?.align,
-                                  [styles[`tedi-table__cell--valign-${cellMeta?.vAlign}`]]: cellMeta?.vAlign,
-                                },
-                                userColumnProps?.className
-                              )}
-                              style={userColumnProps?.style}
-                            >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </td>
-                          );
-                        })}
-                      </tr>
+                      <TableDataRowBody {...rowProps2} />
                       {renderSubComponent && row.getIsExpanded() && (
                         <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--sub-component'])}>
                           <td

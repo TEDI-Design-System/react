@@ -355,6 +355,20 @@ export const labelsMap = validateDefaultLabels({
     en: 'Row details',
     ru: 'Сведения о строке',
   },
+  'table.drag-row': {
+    description: 'Accessible label for the drag-handle button when `draggableRows` is on.',
+    components: ['Table'],
+    et: 'Lohista rida',
+    en: 'Drag row',
+    ru: 'Перетащить строку',
+  },
+  'table.drag-column': {
+    description: 'Accessible label for the column drag-handle button when `draggableColumns` is on.',
+    components: ['Table'],
+    et: (columnLabel: string) => `Lohista veergu ${columnLabel}`,
+    en: (columnLabel: string) => `Drag column ${columnLabel}`,
+    ru: (columnLabel: string) => `Перетащить столбец ${columnLabel}`,
+  },
   'table.columns': {
     description: 'Default label on the `Table.ColumnsMenu` trigger (column-visibility menu).',
     components: ['TableColumnsMenu'],

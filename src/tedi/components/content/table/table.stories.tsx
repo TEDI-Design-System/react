@@ -1,29 +1,9 @@
-import {
-  closestCenter,
-  DndContext,
-  type DragEndEvent,
-  type DragOverEvent,
-  type DragStartEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { arrayMove } from '@dnd-kit/sortable';
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ColumnDef, ColumnOrderState } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 
-import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
@@ -1684,60 +1664,10 @@ export const WithColumnsMenu: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// Drag-and-drop reordering — uses `@dnd-kit` for the drag mechanics.
-//
-// Pattern (works for both rows and columns):
-//   1. Wrap the Table in `<DndContext>` + `<SortableContext items={ids} />`.
-//   2. Render a tiny "drag handle" element that calls `useSortable({ id })`
-//      and attaches its `attributes` / `listeners` to a grip button.
-//   3. In `onDragEnd`, compute the new order with `arrayMove` and either
-//      reorder the data array (rows) or set `state.columnOrder` (columns).
+// Drag-and-drop reordering — fully owned by Table via `draggableRows` /
+// `draggableColumns` boolean props. The stories below only manage the data /
+// state pieces the consumer would manage in a real app.
 // ---------------------------------------------------------------------------
-
-// Drop-indicator color used by both row and column drag affordances.
-// Provisional — design review will confirm the final token.
-const DROP_INDICATOR_COLOR = 'var(--general-border-brand)';
-
-type ColumnDropTarget = { id: string };
-
-const SortableColumnHeader = ({ id, label }: { id: string; label: string }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-    <DragHandle id={id} label={`Drag column ${label}`} />
-    {label}
-  </span>
-);
-
-/**
- * Drag handle cell shared by both stories. The `id` is whatever sortable
- * identifier the parent context expects (row id or column id). Listeners
- * sit on a real `<button>` for accessible keyboard / SR drag support.
- */
-const DragHandle = ({ id, label }: { id: string; label: string }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  return (
-    <button
-      ref={setNodeRef}
-      type="button"
-      aria-label={label}
-      style={{
-        background: 'transparent',
-        border: 0,
-        padding: 4,
-        cursor: 'grab',
-        opacity: isDragging ? 0.4 : 1,
-        transform: CSS.Transform.toString(transform),
-        transition,
-        touchAction: 'none',
-        display: 'inline-flex',
-        alignItems: 'center',
-      }}
-      {...attributes}
-      {...listeners}
-    >
-      <Icon name="drag_indicator" size={18} color="secondary" />
-    </button>
-  );
-};
 
 /**
  * Drag rows by the grip handle to reorder them. The story owns the data array
@@ -1764,25 +1694,12 @@ const DragHandle = ({ id, label }: { id: string; label: string }) => {
  */
 export const DraggableRows: Story = {
   render: function DraggableRows() {
-    // Story owns its own reorderable copy of `people` so drag-end can mutate it.
+    // Story owns its own reorderable copy of `people` so the Table's onRowDrop
+    // can apply the new order via `arrayMove`.
     const [rows, setRows] = useState<Person[]>(() => people.slice(0, 8));
-    const [activeRowId, setActiveRowId] = useState<string | null>(null);
-    const [overRowId, setOverRowId] = useState<string | null>(null);
-    const sensors = useSensors(
-      useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-      useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-    );
 
     const columns = useMemo<ColumnDef<Person>[]>(
       () => [
-        {
-          id: 'drag',
-          header: '',
-          size: 40,
-          enableSorting: false,
-          enableHiding: false,
-          cell: ({ row }) => <DragHandle id={row.original.id} label={`Drag row ${row.original.name}`} />,
-        },
         { id: 'name', header: 'Name', accessorKey: 'name' },
         { id: 'role', header: 'Role', accessorKey: 'role' },
         { id: 'location', header: 'Location', accessorKey: 'location' },
@@ -1790,72 +1707,22 @@ export const DraggableRows: Story = {
       []
     );
 
-    const handleDragStart = (event: DragStartEvent) => {
-      setActiveRowId(String(event.active.id));
-      setOverRowId(String(event.active.id));
-    };
-    const handleDragOver = (event: DragOverEvent) => {
-      setOverRowId(event.over ? String(event.over.id) : null);
-    };
-    const handleDragEnd = (event: DragEndEvent) => {
-      setActiveRowId(null);
-      setOverRowId(null);
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      setRows((current) => {
-        const oldIndex = current.findIndex((r) => r.id === active.id);
-        const newIndex = current.findIndex((r) => r.id === over.id);
-        if (oldIndex < 0 || newIndex < 0) return current;
-        return arrayMove(current, oldIndex, newIndex);
-      });
-    };
-    const handleDragCancel = () => {
-      setActiveRowId(null);
-      setOverRowId(null);
-    };
-
-    const rowDropTarget: { id: string; side: 'above' | 'below' } | null = (() => {
-      if (!activeRowId || !overRowId || activeRowId === overRowId) return null;
-      const activeIdx = rows.findIndex((r) => r.id === activeRowId);
-      const overIdx = rows.findIndex((r) => r.id === overRowId);
-      if (activeIdx < 0 || overIdx < 0) return null;
-      return { id: overRowId, side: activeIdx < overIdx ? 'below' : 'above' };
-    })();
-
     return (
       <VerticalSpacing size={1}>
         <Alert type="info" role="status" title="Row reordering" icon="lightbulb">
           <Text>
             Grab the <StatusBadge>≡</StatusBadge> handle on any row to reorder. Keyboard users: focus a handle and press
-            Space to lift, arrows to move, Space to drop. The parent component owns the data order and updates it on{' '}
-            <StatusBadge>onDragEnd</StatusBadge>.
+            Space to lift, arrows to move, Space to drop. The Table owns all dnd-kit wiring — the parent only listens to{' '}
+            <StatusBadge>onRowDrop</StatusBadge> and applies the new order to its data.
           </Text>
         </Alert>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
-            <Table<Person>
-              id="tedi-table-row-drag"
-              data={rows}
-              columns={columns}
-              rowProps={(row) => {
-                if (!rowDropTarget || row.original.id !== rowDropTarget.id) return undefined;
-                return {
-                  style:
-                    rowDropTarget.side === 'above'
-                      ? { borderTop: `2px solid ${DROP_INDICATOR_COLOR}` }
-                      : { borderBottom: `2px solid ${DROP_INDICATOR_COLOR}` },
-                };
-              }}
-            />
-          </SortableContext>
-        </DndContext>
+        <Table<Person>
+          id="tedi-table-row-drag"
+          data={rows}
+          columns={columns}
+          draggableRows
+          onRowDrop={({ fromIndex, toIndex }) => setRows((current) => arrayMove(current, fromIndex, toIndex))}
+        />
       </VerticalSpacing>
     );
   },
@@ -1883,7 +1750,7 @@ export const DraggableRows: Story = {
  */
 export const DraggableColumns: Story = {
   render: function DraggableColumns() {
-    const baseColumns = useMemo<ColumnDef<Person>[]>(
+    const columns = useMemo<ColumnDef<Person>[]>(
       () => [
         { id: 'name', header: 'Name', accessorKey: 'name' },
         { id: 'email', header: 'Email', accessorKey: 'email' },
@@ -1893,87 +1760,16 @@ export const DraggableColumns: Story = {
       []
     );
 
-    const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(() =>
-      baseColumns.map((column) => column.id as string)
-    );
-    const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-    const [overColumnId, setOverColumnId] = useState<string | null>(null);
-    const sensors = useSensors(
-      useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-      useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-    );
-
-    const columns = useMemo<ColumnDef<Person>[]>(
-      () =>
-        baseColumns.map((column) => ({
-          ...column,
-          header: ({ column: ctxColumn }) => <SortableColumnHeader id={ctxColumn.id} label={column.header as string} />,
-        })) as ColumnDef<Person>[],
-      [baseColumns]
-    );
-
-    const handleDragStart = (event: DragStartEvent) => {
-      setActiveColumnId(String(event.active.id));
-      setOverColumnId(String(event.active.id));
-    };
-    const handleDragOver = (event: DragOverEvent) => {
-      setOverColumnId(event.over ? String(event.over.id) : null);
-    };
-    const handleDragEnd = (event: DragEndEvent) => {
-      setActiveColumnId(null);
-      setOverColumnId(null);
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-      setColumnOrder((current) => {
-        const oldIndex = current.indexOf(active.id as string);
-        const newIndex = current.indexOf(over.id as string);
-        if (oldIndex < 0 || newIndex < 0) return current;
-        return arrayMove(current, oldIndex, newIndex);
-      });
-    };
-    const handleDragCancel = () => {
-      setActiveColumnId(null);
-      setOverColumnId(null);
-    };
-
-    const columnDropTarget: ColumnDropTarget | null =
-      !activeColumnId || !overColumnId || activeColumnId === overColumnId ? null : { id: overColumnId };
-
     return (
       <VerticalSpacing size={1}>
         <Alert type="info" role="status" title="Column reordering" icon="lightbulb">
           <Text>
-            Drag a column header by its <StatusBadge>≡</StatusBadge> handle to reorder. Column order lives on{' '}
-            <StatusBadge>state.columnOrder</StatusBadge>; Table forwards it to TanStack so the cells re-render in the
-            new order automatically.
+            Drag a column header by its <StatusBadge>≡</StatusBadge> handle to reorder. The Table owns the drag wiring
+            and pushes the new order into TanStack&apos;s <StatusBadge>state.columnOrder</StatusBadge> — combine with{' '}
+            <StatusBadge>persist</StatusBadge> to keep the order across refreshes.
           </Text>
         </Alert>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
-            <Table<Person>
-              id="tedi-table-column-drag"
-              data={people.slice(0, 6)}
-              columns={columns}
-              state={{ columnOrder }}
-              onStateChange={(next) => {
-                if (next.columnOrder) setColumnOrder(next.columnOrder);
-              }}
-              columnProps={(id) => {
-                if (!columnDropTarget || columnDropTarget.id !== id) return undefined;
-                return {
-                  style: { boxShadow: `inset 2px 0 0 ${DROP_INDICATOR_COLOR}` },
-                };
-              }}
-            />
-          </SortableContext>
-        </DndContext>
+        <Table<Person> id="tedi-table-column-drag" data={people.slice(0, 6)} columns={columns} draggableColumns />
       </VerticalSpacing>
     );
   },

@@ -124,6 +124,77 @@
   background: var(--table-active);
 }
 
+.tedi-table__row--dragging {
+  cursor: grabbing;
+  opacity: 0.3;
+}
+
+.tedi-table__row--drag-over {
+  box-shadow: inset 0 -1px 0 0 var(--general-border-brand);
+}
+
+.tedi-table__row--drag-preview {
+  display: table;
+  cursor: grabbing;
+  background: var(--table-active);
+  box-shadow: 0 6px 16px var(--tedi-alpha-20);
+}
+
+.tedi-table__header-cell--dragging {
+  cursor: grabbing;
+  opacity: 0.3;
+}
+
+.tedi-table__header-cell--drag-over,
+.tedi-table__cell--drag-over {
+  box-shadow: inset 1px 0 0 0 var(--general-border-brand);
+}
+
+.tedi-table__header-cell--drag-preview {
+  cursor: grabbing;
+  background: var(--table-active);
+  box-shadow: 0 6px 16px var(--tedi-alpha-20);
+}
+
+.tedi-table__header-cell-inner {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.tedi-table__cell--drag-handle {
+  width: 40px;
+  padding-right: 0;
+  padding-left: 0;
+  text-align: center;
+}
+
+.tedi-table__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: var(--general-icon-secondary);
+  touch-action: none;
+  cursor: grab;
+  background: transparent;
+  border: 0;
+
+  &:focus-visible {
+    border-radius: var(--button-radius-sm);
+    outline: var(--tedi-borders-02) solid var(--general-border-focus);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.tedi-table__row--dragging .tedi-table__drag-handle {
+  cursor: grabbing;
+}
+
 .tedi-table__row--clickable {
   cursor: pointer;
 
