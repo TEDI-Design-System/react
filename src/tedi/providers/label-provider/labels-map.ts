@@ -128,6 +128,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Required field',
     ru: 'Обязательное поле',
   },
+  'button-group.selected': {
+    description: 'Visually-hidden suffix that marks the currently active item in a ButtonGroup mobile dropdown.',
+    components: ['ButtonGroup'],
+    et: 'Valitud',
+    en: 'Selected',
+    ru: 'Выбрано',
+  },
   breadcrumbs: {
     description: 'Breadcrumbs navigation label',
     components: ['Breadcrumbs'],
