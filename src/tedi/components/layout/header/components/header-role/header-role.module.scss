@@ -180,7 +180,7 @@
       }
     }
 
-    &__items {
+    &--items {
       display: flex;
       flex-direction: column;
       gap: var(--layout-grid-gutters-16);
