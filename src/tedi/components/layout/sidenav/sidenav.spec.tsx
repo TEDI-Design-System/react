@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { MobileNav as SideNavMobile } from '../mobile-nav/mobile-nav';
 import { SideNavItemProps } from './components/sidenav-item/sidenav-item';
-import { SideNavMobile } from './components/sidenav-mobile/sidenav-mobile';
 import SidenavToggle from './components/sidenav-toggle/sidenav-toggle';
 import { SideNav } from './sidenav';
 
-jest.mock('./components/sidenav-mobile/sidenav-mobile');
+jest.mock('../mobile-nav/mobile-nav');
 jest.mock('./components/sidenav-item/sidenav-item');
 jest.mock('./components/sidenav-toggle/sidenav-toggle');
 jest.mock('../../../helpers');

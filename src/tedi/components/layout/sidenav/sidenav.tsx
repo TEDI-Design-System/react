@@ -5,9 +5,9 @@ import Print from '../../../../tedi/components/misc/print/print';
 import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { AllowedHTMLTags } from '../../../helpers/polymorphic/types';
 import { UnknownType } from '../../../types/commonTypes';
+import { MobileNav as SideNavMobile } from '../mobile-nav/mobile-nav';
 import { SideNavDropdown } from './components/sidenav-dropdown/sidenav-dropdown';
 import { SideNavItem, SideNavItemProps } from './components/sidenav-item/sidenav-item';
-import { SideNavMobile } from './components/sidenav-mobile/sidenav-mobile';
 import SidenavToggle from './components/sidenav-toggle/sidenav-toggle';
 import styles from './sidenav.module.scss';
 

@@ -2,11 +2,11 @@ import { FloatingOverlay } from '@floating-ui/react';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
 
-import { useLabels } from '../../../../../providers/label-provider';
-import { Icon } from '../../../../base/icon/icon';
-import Button from '../../../../buttons/button/button';
-import styles from '../../sidenav.module.scss';
-import { SideNavItem, SideNavItemProps } from '../sidenav-item/sidenav-item';
+import { useLabels } from '../../../providers/label-provider';
+import { Icon } from '../../base/icon/icon';
+import Button from '../../buttons/button/button';
+import { SideNavItem, SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
+import styles from '../sidenav/sidenav.module.scss';
 
 type NavigationLevel<C extends React.ElementType> = {
   items: SideNavItemProps<C>[];
@@ -14,7 +14,7 @@ type NavigationLevel<C extends React.ElementType> = {
   renderParentLink?: boolean;
 };
 
-type SideNavMobileProps<C extends React.ElementType = 'a'> = {
+export type MobileNavProps<C extends React.ElementType = 'a'> = {
   navItems: SideNavItemProps<C>[];
   ariaLabel: string;
   linkAs?: C;
@@ -25,7 +25,7 @@ type SideNavMobileProps<C extends React.ElementType = 'a'> = {
   className?: string;
 };
 
-export const SideNavMobile = <C extends React.ElementType = 'a'>({
+export const MobileNav = <C extends React.ElementType = 'a'>({
   navItems,
   ariaLabel,
   linkAs,
@@ -34,7 +34,7 @@ export const SideNavMobile = <C extends React.ElementType = 'a'>({
   showOverlay = true,
   id,
   className,
-}: SideNavMobileProps<C>) => {
+}: MobileNavProps<C>) => {
   const { getLabel } = useLabels();
   const [navigationStack, setNavigationStack] = useState<NavigationLevel<C>[]>([{ items: navItems }]);
 
@@ -222,3 +222,11 @@ export const SideNavMobile = <C extends React.ElementType = 'a'>({
     content
   );
 };
+
+/**
+ * @deprecated Use `MobileNav` (same component, vendor-neutral name). Kept for
+ * backward compatibility with the `SideNav.Mobile` sub-component alias.
+ */
+export const SideNavMobile = MobileNav;
+/** @deprecated Use `MobileNavProps`. */
+export type SideNavMobileProps<C extends React.ElementType = 'a'> = MobileNavProps<C>;

@@ -440,6 +440,44 @@ Sub-component: `VerticalSpacing.Item`
 
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
+### HorizontalNav
+**Props:** `HorizontalNavProps`
+- `children: ReactNode` (required) — only `HorizontalNav.Item` children render; others are ignored
+- `ariaLabel: string` (required) — accessible name for the `<nav>` landmark
+- `mobileBreakpoint?: Breakpoint = 'md'` — below this, the bar collapses into the shared Sidenav mobile drawer
+- `isMobileOpen?: boolean`, `onMenuToggle?: (open: boolean) => void` — controlled-mode drawer open state
+- `showMobileOverlay?: boolean = true`
+- `className?: string`, `id?: string`
+
+Sub-component: `HorizontalNav.Item`
+
+**`HorizontalNav.Item` props**
+- `children: ReactNode` (required) — visible label
+- `href?: string`
+- `icon?: string | IconWithoutBackgroundProps`
+- `isActive?: boolean = false` — adds `aria-current="page"` and the active visual
+- `disabled?: boolean = false`
+- `onClick?: (event) => void`
+- `as?: 'a' | ComponentType` — polymorphic for routing libs (e.g. `NavLink`)
+- `className?: string`
+
+Compound API. Below `mobileBreakpoint` the bar disappears and the items are projected into the same `SideNavMobile` drawer the Sidenav uses — apps that mix both navs get one consistent mobile experience instead of two competing drawers.
+
+```tsx
+import { HorizontalNav } from '@tedi-design-system/react/tedi';
+
+<HorizontalNav ariaLabel="Primary navigation">
+  <HorizontalNav.Item href="/" icon="home" isActive>Dashboard</HorizontalNav.Item>
+  <HorizontalNav.Item href="/data" icon="folder_shared">My data</HorizontalNav.Item>
+  <HorizontalNav.Item href="/settings" icon="settings">Settings</HorizontalNav.Item>
+</HorizontalNav>
+
+// Controlled mobile drawer paired with an external hamburger
+<HorizontalNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
+  ...
+</HorizontalNav>
+```
+
 ## Loaders
 
 ### Spinner
