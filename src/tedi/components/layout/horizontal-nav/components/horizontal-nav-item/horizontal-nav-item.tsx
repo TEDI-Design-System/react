@@ -59,6 +59,8 @@ export interface HorizontalNavItemProps {
   renderSubmenuInline?: boolean;
   /** @internal Parent-controlled submenu visibility. Defaults to `isActive` when undefined (standalone use / link items). */
   isSubmenuOpen?: boolean;
+  /** @internal Shared id used to link the toggle button (`aria-controls`) to the submenu panel (`id`). */
+  panelId?: string;
 }
 
 export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element => {
@@ -75,6 +77,7 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
     submenu,
     renderSubmenuInline = false,
     isSubmenuOpen,
+    panelId,
   } = props;
   const isToggle = !href && hasSubmenu;
   const Component = as ?? (isToggle ? 'button' : 'a');
@@ -110,8 +113,9 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
           ? {
               type: 'button',
               disabled,
-              'aria-haspopup': 'menu',
+              'aria-haspopup': true,
               'aria-expanded': submenuOpen,
+              'aria-controls': panelId,
             }
           : {
               href: disabled ? undefined : href,
@@ -134,6 +138,7 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
       </Component>
       {showInlineSubmenu && (
         <div
+          id={panelId}
           className={cn(styles['tedi-horizontal-nav__submenu'], styles['tedi-horizontal-nav__submenu--inline'])}
           data-name="horizontal-nav-submenu"
         >

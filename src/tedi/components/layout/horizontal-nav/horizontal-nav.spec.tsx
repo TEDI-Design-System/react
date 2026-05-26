@@ -284,6 +284,70 @@ describe('HorizontalNav', () => {
     expect(screen.queryByRole('link', { name: 'Item' })).not.toBeInTheDocument();
   });
 
+  it('links the toggle button to its submenu via matching id / aria-controls', () => {
+    const { container } = render(
+      <HorizontalNav ariaLabel="Primary">
+        <HorizontalNav.Item
+          isActive
+          submenu={
+            <HorizontalNav.Group title="More">
+              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
+            </HorizontalNav.Group>
+          }
+        >
+          Family
+        </HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    const trigger = screen.getByRole('button', { name: /Family/ });
+    const controls = trigger.getAttribute('aria-controls');
+    expect(controls).toBeTruthy();
+    const panel = container.querySelector(`#${CSS.escape(controls as string)}`);
+    expect(panel).toHaveAttribute('data-name', 'horizontal-nav-submenu');
+  });
+
+  it('returns focus to the trigger when Escape closes the panel', () => {
+    render(
+      <HorizontalNav ariaLabel="Primary">
+        <HorizontalNav.Item
+          submenu={
+            <HorizontalNav.Group title="More">
+              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
+            </HorizontalNav.Group>
+          }
+        >
+          Family
+        </HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    const trigger = screen.getByRole('button', { name: /Family/ });
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    (document.body as HTMLElement).focus();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('renders the Group title with the requested heading level', () => {
+    render(
+      <HorizontalNav ariaLabel="Primary">
+        <HorizontalNav.Item
+          href="/"
+          isActive
+          submenu={
+            <HorizontalNav.Group title="Section" headingLevel="h2">
+              <HorizontalNav.SubItem href="/a">Link</HorizontalNav.SubItem>
+            </HorizontalNav.Group>
+          }
+        >
+          Home
+        </HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    expect(screen.getByRole('heading', { level: 2, name: 'Section' })).toBeInTheDocument();
+  });
+
   it('closes an open submenu when Escape is pressed', () => {
     render(
       <HorizontalNav ariaLabel="Primary">
@@ -351,7 +415,7 @@ describe('HorizontalNav', () => {
     );
     const trigger = screen.getByRole('button', { name: /Family/ });
     expect(trigger).toHaveAttribute('type', 'button');
-    expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    expect(trigger).toHaveAttribute('aria-haspopup', 'true');
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
     expect(trigger).not.toHaveAttribute('href');
   });

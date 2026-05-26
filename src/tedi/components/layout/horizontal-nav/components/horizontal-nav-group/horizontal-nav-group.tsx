@@ -21,28 +21,43 @@ export interface HorizontalNavGroupProps {
    */
   icon?: string | IconWithoutBackgroundProps;
   /**
+   * HTML heading level used for the title — pick the value that keeps the
+   * document outline correct on the host page.
+   * @default h3
+   */
+  headingLevel?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /**
    * Additional class name applied to the column.
    */
   className?: string;
 }
 
-export const HorizontalNavGroup = ({ title, children, icon, className }: HorizontalNavGroupProps): JSX.Element => (
-  <section className={cn(styles['tedi-horizontal-nav__group'], className)}>
-    {title && (
-      <h3 className={styles['tedi-horizontal-nav__group-title']}>
-        {icon && (
-          <Icon
-            className={styles['tedi-horizontal-nav__group-icon']}
-            {...(typeof icon === 'string' ? { name: icon } : icon)}
-            size={typeof icon === 'string' ? 16 : icon.size ?? 16}
-            color="inherit"
-          />
-        )}
-        {title}
-      </h3>
-    )}
-    <ul className={styles['tedi-horizontal-nav__group-list']}>{children}</ul>
-  </section>
-);
+export const HorizontalNavGroup = ({
+  title,
+  children,
+  icon,
+  headingLevel = 'h3',
+  className,
+}: HorizontalNavGroupProps): JSX.Element => {
+  const HeadingTag = headingLevel;
+  return (
+    <section className={cn(styles['tedi-horizontal-nav__group'], className)}>
+      {title && (
+        <HeadingTag className={styles['tedi-horizontal-nav__group-title']}>
+          {icon && (
+            <Icon
+              className={styles['tedi-horizontal-nav__group-icon']}
+              {...(typeof icon === 'string' ? { name: icon } : icon)}
+              size={typeof icon === 'string' ? 16 : icon.size ?? 16}
+              color="inherit"
+            />
+          )}
+          {title}
+        </HeadingTag>
+      )}
+      <ul className={styles['tedi-horizontal-nav__group-list']}>{children}</ul>
+    </section>
+  );
+};
 
 export default HorizontalNavGroup;

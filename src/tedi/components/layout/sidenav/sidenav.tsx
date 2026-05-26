@@ -5,10 +5,10 @@ import Print from '../../../../tedi/components/misc/print/print';
 import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { AllowedHTMLTags } from '../../../helpers/polymorphic/types';
 import { UnknownType } from '../../../types/commonTypes';
+import MobileNavToggle from '../mobile-nav/components/mobile-nav-toggle/mobile-nav-toggle';
 import { MobileNav as SideNavMobile } from '../mobile-nav/mobile-nav';
 import { SideNavDropdown } from './components/sidenav-dropdown/sidenav-dropdown';
 import { SideNavItem, SideNavItemProps } from './components/sidenav-item/sidenav-item';
-import SidenavToggle from './components/sidenav-toggle/sidenav-toggle';
 import styles from './sidenav.module.scss';
 
 export type SideNavItemSize = 'default' | 'medium' | 'small';
@@ -178,7 +178,7 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
   return (
     <Print visibility="hide">
       <nav id={props.id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
-        {isCollapsible && <SidenavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
+        {isCollapsible && <MobileNavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
         <ul className={styles['tedi-sidenav__list']} role="menubar" aria-label={ariaLabel}>
           {navItems.map((item, key) => (
             <SideNavItem
@@ -197,7 +197,7 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
 };
 
 export const SideNav = Object.assign(SideNavComponent, {
-  Toggle: SidenavToggle,
+  Toggle: MobileNavToggle,
   Item: SideNavItem,
   Dropdown: SideNavDropdown,
   Mobile: SideNavMobile,

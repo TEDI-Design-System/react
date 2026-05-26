@@ -6,6 +6,7 @@ import React, {
   ReactElement,
   ReactNode,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -197,6 +198,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
   }, []);
   const [openButtonIndex, setOpenButtonIndex] = useState<number | null>(initialOpenButtonIndex);
   const navRef = useRef<HTMLElement>(null);
+  const panelId = useId();
 
   useEffect(() => {
     if (openButtonIndex === null) return;
@@ -206,7 +208,13 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
       }
     };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpenButtonIndex(null);
+      if (event.key !== 'Escape') return;
+
+      const trigger = navRef.current?.querySelector<HTMLButtonElement>(
+        `[aria-controls="${CSS.escape(panelId)}"][aria-expanded="true"]`
+      );
+      trigger?.focus();
+      setOpenButtonIndex(null);
     };
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('keydown', onKey);
@@ -214,7 +222,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
       document.removeEventListener('mousedown', onMouseDown);
       document.removeEventListener('keydown', onKey);
     };
-  }, [openButtonIndex]);
+  }, [openButtonIndex, panelId]);
 
   const isItemSubmenuOpen = (item: ReactElement<HorizontalNavItemProps>, indexInItems: number) =>
     isToggleItem(item) ? openButtonIndex === indexInItems : Boolean(item.props.isActive);
@@ -286,6 +294,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
               hasSubmenu,
               renderSubmenuInline,
               isSubmenuOpen,
+              panelId,
               onClick: wrappedOnClick,
             });
           }
@@ -293,7 +302,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
         })}
       </ul>
       {!renderSubmenuInline && activeItemWithSubmenu && (
-        <div className={styles['tedi-horizontal-nav__submenu']} data-name="horizontal-nav-submenu">
+        <div id={panelId} className={styles['tedi-horizontal-nav__submenu']} data-name="horizontal-nav-submenu">
           <div
             className={styles['tedi-horizontal-nav__submenu-inner']}
             style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}

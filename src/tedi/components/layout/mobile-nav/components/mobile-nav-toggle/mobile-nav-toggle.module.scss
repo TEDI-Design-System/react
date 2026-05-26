@@ -3,7 +3,7 @@
 $toggle-button-height: 3.5rem;
 $toggle-button-width: 3.5rem;
 
-.tedi-sidenav-toggle {
+.tedi-mobile-nav-toggle {
   z-index: var(--z-index-sidenav);
   width: $toggle-button-width;
   height: $toggle-button-height;
@@ -16,7 +16,7 @@ $toggle-button-width: 3.5rem;
     display: none;
   }
 
-  &.tedi-sidenav-toggle--collapse {
+  &.tedi-mobile-nav-toggle--collapse {
     position: absolute;
     top: calc(var(--navigation-vertical-item-min-height-medium) / 5.5);
     right: calc(var(--button-sm-icon-size) / 2 * -1);
@@ -33,7 +33,7 @@ $toggle-button-width: 3.5rem;
     }
   }
 
-  &.tedi-sidenav-toggle--with-label {
+  &.tedi-mobile-nav-toggle--with-label {
     display: inline-flex;
     flex-direction: column;
     gap: var(--tedi-spacing-04, 0.25rem);
@@ -68,7 +68,7 @@ $toggle-button-width: 3.5rem;
   }
 }
 
-.tedi-sidenav-toggle__label {
+.tedi-mobile-nav-toggle__label {
   font-size: var(--body-extra-small-regular-size, 0.75rem);
   font-weight: var(--body-extra-small-regular-weight, 400);
   line-height: 1;

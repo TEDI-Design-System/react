@@ -6,11 +6,11 @@ import { UnknownType } from '../../../../../types/commonTypes';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
 import FloatingButton from '../../../../buttons/floating-button/floating-button';
-import styles from './sidenav-toggle.module.scss';
+import styles from './mobile-nav-toggle.module.scss';
 
-export type SidenavToggleVariant = 'mobile' | 'collapse';
+export type MobileNavToggleVariant = 'mobile' | 'collapse';
 
-export type SidenavToggleProps = {
+export type MobileNavToggleProps = {
   /**
    * Is the menu open (for mobile) or expanded (for collapse)
    */
@@ -30,7 +30,7 @@ export type SidenavToggleProps = {
   /**
    * Variant of toggle (mobile overlay or collapse control)
    */
-  variant?: SidenavToggleVariant;
+  variant?: MobileNavToggleVariant;
   /**
    * Show the open/close label visibly below the icon (mobile variant only).
    * The label text comes from the `header.toggle` i18n key by default — pass
@@ -52,7 +52,7 @@ export type SidenavToggleProps = {
   className?: string;
 };
 
-export const SidenavToggle = ({
+export const MobileNavToggle = ({
   menuOpen,
   toggleMenu,
   referenceRef,
@@ -61,7 +61,7 @@ export const SidenavToggle = ({
   showLabel = false,
   label,
   className,
-}: SidenavToggleProps) => {
+}: MobileNavToggleProps) => {
   const { getLabel } = useLabels();
 
   const toggleLabel =
@@ -71,11 +71,11 @@ export const SidenavToggle = ({
   const useLabelledLayout = showLabel && variant === 'mobile';
 
   const BEM = cn(
-    styles['tedi-sidenav-toggle'],
+    styles['tedi-mobile-nav-toggle'],
     {
-      [styles['tedi-sidenav-toggle--open']]: menuOpen,
-      [styles[`tedi-sidenav-toggle--${variant}`]]: true,
-      [styles['tedi-sidenav-toggle--with-label']]: useLabelledLayout,
+      [styles['tedi-mobile-nav-toggle--open']]: menuOpen,
+      [styles[`tedi-mobile-nav-toggle--${variant}`]]: true,
+      [styles['tedi-mobile-nav-toggle--with-label']]: useLabelledLayout,
     },
     className
   );
@@ -98,8 +98,8 @@ export const SidenavToggle = ({
         onClick={() => toggleMenu(!menuOpen)}
         onKeyDown={handleKeyDown}
       >
-        <Icon name={iconName} size={24} className={styles['tedi-sidenav-toggle__icon']} color="inherit" />
-        <span className={styles['tedi-sidenav-toggle__label']}>{toggleLabel}</span>
+        <Icon name={iconName} size={24} className={styles['tedi-mobile-nav-toggle__icon']} color="inherit" />
+        <span className={styles['tedi-mobile-nav-toggle__label']}>{toggleLabel}</span>
       </button>
     );
   }
@@ -112,7 +112,7 @@ export const SidenavToggle = ({
       ref={referenceRef}
       icon={{
         name: iconName,
-        className: styles['tedi-sidenav-toggle__icon'],
+        className: styles['tedi-mobile-nav-toggle__icon'],
         size: variant === 'collapse' ? 18 : 24,
       }}
       visualType={variant === 'collapse' ? 'secondary' : 'primary'}
@@ -127,4 +127,11 @@ export const SidenavToggle = ({
   );
 };
 
-export default SidenavToggle;
+/** @deprecated Use `MobileNavToggle` — same component, vendor-neutral name. */
+export const SidenavToggle = MobileNavToggle;
+/** @deprecated Use `MobileNavToggleProps`. */
+export type SidenavToggleProps = MobileNavToggleProps;
+/** @deprecated Use `MobileNavToggleVariant`. */
+export type SidenavToggleVariant = MobileNavToggleVariant;
+
+export default MobileNavToggle;
