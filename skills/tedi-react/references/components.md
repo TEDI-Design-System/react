@@ -430,6 +430,45 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 
 Sub-component: `VerticalSpacing.Item`
 
+### Header
+**Props:** `HeaderProps`
+- `children: ReactNode` (required)
+- `toggle?: ReactNode` — mobile side navigation toggle
+- `bottom?: ReactNode` — content below header on mobile
+
+Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Language`, `Header.Login`, `Header.Logout`, `Header.Profile`, `Header.Role`, `Header.Search`
+
+**Header.Logo:** `logo: ReactNode`, `logoDark?: ReactNode`, `href?: string`, `showLogo?: boolean = true`
+**Header.Center:** `children: ReactNode`, `alignment?: 'flex-start' | 'center' | 'space-between' = 'center'`
+**Header.Actions:** `children: ReactNode`
+**Header.Role:** `representatives: Representative[]`, `label?: ReactNode`, `showDescription?: boolean = true`, `accordionLabels?: { open?, close? }`, `onRepresentativeChange?`, `onRoleSelectionToggle?`
+**Header.Language:** bp — language selector
+**Header.Login:** bp — login button
+**Header.Logout:** bp — logout button
+**Header.Profile:** bp — user profile display
+**Header.Search:** wrapper that accepts a Search child (and optional `mobileVariant`). `children: ReactNode`, `mobileVariant?: 'modal' | 'inline'`, `mobileLabels?: { button?, modalTitle? }`, `disabled?: boolean`
+
+```tsx
+<Header
+  toggle={<SideNav.Toggle />}
+  bottom={
+    <Header.Search mobileVariant="inline">
+      <Search label="Search" hideLabel id="header-search" />
+    </Header.Search>
+  }
+>
+  <Header.Logo logo={<img src="/logo.svg" alt="Logo" />} href="/" />
+  <Header.Center><Link href="/about">About</Link></Header.Center>
+  <Header.Actions>
+    <Header.Search>
+      <Search label="Search" hideLabel id="header-search" />
+    </Header.Search>
+    <Header.Language />
+    <Header.Login />
+  </Header.Actions>
+</Header>
+```
+
 ### SideNav
 **Props:** `SideNavProps<C>` | poly
 - `ariaLabel: string` (required)
@@ -706,7 +745,8 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ## Layout
 
 ### Header
-Comprehensive header with sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
+- Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
+- **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
 
 ## Misc
 

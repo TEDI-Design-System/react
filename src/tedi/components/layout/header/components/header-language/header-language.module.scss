@@ -1,0 +1,37 @@
+.tedi-header-language {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+
+  &__icon {
+    transition: transform 0.2s ease-in-out;
+
+    &--open {
+      transform: rotate(-180deg);
+    }
+  }
+
+  &__mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--layout-header-mobile-button-size);
+    min-width: var(--layout-header-mobile-button-min-size);
+    height: var(--layout-header-mobile-button-min-size);
+  }
+
+  &__selected {
+    display: flex;
+    gap: var(--link-inner-spacing-x);
+    align-items: center;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}

@@ -42,6 +42,8 @@ export interface ILabelContext {
     key: TKey,
     ...args: TArgs
   ): string;
+  setLocale?: (locale: TediLanguage) => void;
+  locale?: TediLanguage;
 }
 
 export const LabelContext = React.createContext<ILabelContext>({
@@ -51,6 +53,12 @@ export const LabelContext = React.createContext<ILabelContext>({
     }
     return key;
   },
+  setLocale: () => {
+    if (!isTestEnvironment) {
+      console.error('LabelProvider missing! Application must be wrapped with <LabelProvider>');
+    }
+  },
+  locale: 'en',
 });
 
 export interface LabelProviderProps<TRecord extends TediLabelEntryRecord<TRecord> = Record<string, never>> {
@@ -78,6 +86,12 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
 ): JSX.Element => {
   const { labels = {}, children, locale = 'en' } = props;
 
+  const [currentLocale, setCurrentLocale] = React.useState<TediLanguage>(locale);
+
+  React.useEffect(() => {
+    setCurrentLocale(locale);
+  }, [locale]);
+
   const mergedLabels = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = {} as Record<string, string | LabelFunctionValue<any>>;
@@ -85,14 +99,14 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
 
     for (const k of allKeys) {
       const key = k as keyof TediLabels;
-      const defaultEntry = labelsMap[key] ? labelsMap[key][locale] : undefined;
+      const defaultEntry = labelsMap[key] ? labelsMap[key][currentLocale] : undefined;
       const customEntry = labels[key] ?? undefined;
 
       let newEntry;
 
       if (customEntry) {
         if (typeof customEntry === 'object') {
-          newEntry = customEntry[locale];
+          newEntry = customEntry[currentLocale];
         } else {
           newEntry = customEntry;
         }
@@ -104,9 +118,11 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
     }
 
     return result;
-  }, [labels, locale]);
+  }, [labels, currentLocale]);
 
-  dayjs.locale(locale);
+  React.useEffect(() => {
+    dayjs.locale(currentLocale);
+  }, [currentLocale]);
 
   const getLabel = useCallback(
     <
@@ -151,12 +167,12 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
   }, {} as Partial<PickersLocaleText<unknown>>);
 
   return (
-    <LabelContext.Provider value={{ getLabel }}>
+    <LabelContext.Provider value={{ getLabel, setLocale: setCurrentLocale, locale: currentLocale }}>
       <LocalizationProvider
         dateAdapter={AdapterDayjs}
         dateLibInstance={dayjs}
         localeText={muiLabels}
-        adapterLocale={locale}
+        adapterLocale={currentLocale}
       >
         {children}
       </LocalizationProvider>
