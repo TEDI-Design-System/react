@@ -234,6 +234,14 @@ export interface TableProps<TData> {
    */
   enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
   /**
+   * Paints the `--table-active` background tint on every selected row. Turn
+   * off when checkboxes are used purely for "pick some rows for a bulk
+   * action" and the row-level highlight would be visually noisy. The
+   * checkbox itself still reflects the selected state.
+   * @default true
+   */
+  highlightSelectedRows?: boolean;
+  /**
    * Enables per-column filter inputs rendered below the header row.
    * Only columns whose `columnDef.enableColumnFilter !== false` render an input.
    */
@@ -600,6 +608,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     activeRowId,
     rowHover,
     enableRowSelection,
+    highlightSelectedRows = true,
     enableColumnFilters = false,
     renderSubComponent,
     getRowCanExpand,
@@ -1308,7 +1317,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   const rowClassName = cn(
                     styles['tedi-table__row'],
                     {
-                      [styles['tedi-table__row--selected']]: row.getIsSelected(),
+                      [styles['tedi-table__row--selected']]: highlightSelectedRows && row.getIsSelected(),
                       [styles['tedi-table__row--active']]: isActiveRow,
                       [styles['tedi-table__row--clickable']]: clickable,
                       [styles['tedi-table__row--sub-row']]: row.depth > 0,

@@ -474,6 +474,29 @@ describe('Table', () => {
 
       rowBoxes.forEach((box) => expect(box).toBeChecked());
     });
+
+    it('paints the `--selected` background on selected rows by default', () => {
+      const { container } = render(<Table<Person> id="t-sel-bg" data={data} columns={columns} enableRowSelection />);
+      const checkboxes = screen.getAllByRole('checkbox');
+      fireEvent.click(checkboxes[1]);
+      expect(container.querySelector('.tedi-table__row--selected')).toBeInTheDocument();
+    });
+
+    it('skips the selected-row background when `highlightSelectedRows` is false (checkbox still tracks state)', () => {
+      const { container } = render(
+        <Table<Person>
+          id="t-sel-no-bg"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          highlightSelectedRows={false}
+        />
+      );
+      const checkboxes = screen.getAllByRole('checkbox');
+      fireEvent.click(checkboxes[1]);
+      expect(checkboxes[1]).toBeChecked();
+      expect(container.querySelector('.tedi-table__row--selected')).not.toBeInTheDocument();
+    });
   });
 
   describe('expansion', () => {
