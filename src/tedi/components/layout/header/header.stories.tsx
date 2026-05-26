@@ -215,13 +215,6 @@ const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
       <Link underline={false} href="#">
         {t('contacts')}
       </Link>
-      <ShowAt lg>
-        <Separator axis="horizontal" />
-      </ShowAt>
-
-      <div>
-        <Toggle id={id} onChange={handleToggle} label={t('darkMode')} checked={theme === 'dark'} />
-      </div>
 
       <ShowAt lg>
         <Separator axis="horizontal" />
@@ -232,6 +225,14 @@ const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
           {t('notifications')}
         </div>
       </Link>
+
+      <ShowAt lg>
+        <Separator axis="horizontal" />
+      </ShowAt>
+      <div>
+        <Toggle id={id} onChange={handleToggle} label={t('darkMode')} checked={theme === 'dark'} />
+      </div>
+
       <ShowAt lg>
         <Separator axis="horizontal" />
       </ShowAt>
@@ -371,7 +372,7 @@ export const Default: Story = {
           </Header>
 
           <HideAt lg>
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div style={{ flex: 1 }}>
               <SideNav
                 ariaLabel="Main navigation"
                 linkAs="a"
@@ -435,7 +436,7 @@ export const LoggedOut: Story = {
           </Header>
 
           <HideAt lg>
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div style={{ flex: 1 }}>
               <SideNav
                 ariaLabel="Main navigation"
                 linkAs="a"
@@ -493,20 +494,28 @@ export const LoggedOutWithSearch: Story = {
             </ShowAt>
 
             <Header.Actions>
-              <HideAt lg>
+              <ShowAt md>
+                <HideAt lg>
+                  <Header.Search>
+                    <Search label="search-1" hideLabel id="search-1-tablet" />
+                  </Header.Search>
+                  <Separator axis="vertical" />
+                </HideAt>
+              </ShowAt>
+              <Header.Language languages={languages} />
+              <Separator axis="vertical" />
+              <HideAt md>
                 <Header.Search>
-                  <Search label="search-1" hideLabel id="search-1" />
+                  <Search label="search-1" hideLabel id="search-1-mobile" />
                 </Header.Search>
                 <Separator axis="vertical" />
               </HideAt>
-              <Header.Language languages={languages} />
-              <Separator axis="vertical" />
               <Header.Login href="#" />
             </Header.Actions>
           </Header>
 
           <HideAt lg>
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div style={{ flex: 1 }}>
               <NavigationSideNav isMobileOpen={isOpen} />
             </div>
           </HideAt>
@@ -897,10 +906,12 @@ export const WithInlineSearch: Story = {
         <Header>
           <Header.Logo logoDark={logoDark} logo={logo} />
           <Header.Actions>
-            <Header.Search>
-              <Search label="search-3" hideLabel id="search-3" />
-            </Header.Search>
-            <Separator axis="vertical" />
+            <ShowAt md>
+              <Header.Search>
+                <Search label="search-3" hideLabel id="search-3-desktop" />
+              </Header.Search>
+              <Separator axis="vertical" />
+            </ShowAt>
             <ShowAt lg>
               <Header.Role
                 showSearch
@@ -915,6 +926,12 @@ export const WithInlineSearch: Story = {
             </ShowAt>
             <Header.Language languages={languages} />
             <Separator axis="vertical" />
+            <HideAt md>
+              <Header.Search>
+                <Search label="search-3" hideLabel id="search-3-mobile" />
+              </Header.Search>
+              <Separator axis="vertical" />
+            </HideAt>
             <Header.Profile>
               <HideAt lg>
                 <Header.Role
@@ -1071,7 +1088,7 @@ export const LoggedInWithSidenav: Story = {
                 </Header.Actions>
               </Header>
 
-              <div style={{ display: 'flex', flex: 1 }}>
+              <div style={{ flex: 1 }}>
                 <SideNav ariaLabel="Main navigation" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
               </div>
             </SidenavLayout>
