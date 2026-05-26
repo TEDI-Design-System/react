@@ -471,10 +471,10 @@ Sub-component: `Skeleton.Block`
 <Link as={NavLink} to="/profile">Profile</Link>
 ```
 
-### Breadcrumb
-**Props:** `BreadcrumbProps` | bp
+### Breadcrumbs
+**Props:** `BreadcrumbsProps` | bp
 
-> The community `Breadcrumbs` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of this component.
+> The community `Breadcrumbs` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of this TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
 
 - `children: ReactNode` (required) — each top-level child becomes one crumb; chevron separators are inserted between them
 - `ariaLabel?: string` — falls back to the `breadcrumbs` label from `LabelProvider`
@@ -491,30 +491,30 @@ Children-as-data API (same shape as MUI's `Breadcrumbs`). Use `<Link>` (or any a
 In short mode the component clones the second-to-last child to inject `iconLeft="arrow_back"` (works if that child is a TEDI `Link`; otherwise pass `iconLeft` explicitly or the clone is a no-op for unrecognised props).
 
 ```tsx
-import { Breadcrumb, Link } from '@tedi-design-system/react/tedi';
+import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 
-<Breadcrumb>
+<Breadcrumbs>
   <Link href="/">Dashboard</Link>
   <Link href="/docs">Documents</Link>
   <Link href="/docs/mine">My documents</Link>
   <span aria-current="page">Application nr 506</span>
-</Breadcrumb>
+</Breadcrumbs>
 
 // Short variant — renders only "← My documents"
-<Breadcrumb variant="short">{...}</Breadcrumb>
+<Breadcrumbs variant="short">{...}</Breadcrumbs>
 
 // Short on mobile, full trail from md up
-<Breadcrumb variant="short" md={{ variant: 'long' }}>{...}</Breadcrumb>
+<Breadcrumbs variant="short" md={{ variant: 'long' }}>{...}</Breadcrumbs>
 
 // Condensed — middle crumbs collapse into a "…" dropdown
-<Breadcrumb maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
+<Breadcrumbs maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
   <Link href="/">Dashboard</Link>
   <Link href="/patients">Patients</Link>
   <Link href="/patients/anna">Anna Tamm</Link>
   <Link href="/patients/anna/visits">Visits</Link>
   <Link href="/patients/anna/visits/2024-05-12">2024-05-12</Link>
   <span aria-current="page">Restrictions</span>
-</Breadcrumb>
+</Breadcrumbs>
 ```
 
 ## Notifications

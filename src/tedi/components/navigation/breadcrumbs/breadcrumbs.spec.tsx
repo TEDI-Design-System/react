@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpointProps } from '../../../helpers';
 import { Link } from '../link/link';
-import { Breadcrumb } from './breadcrumb';
+import { Breadcrumbs } from './breadcrumbs';
 
 import '@testing-library/jest-dom';
 
@@ -18,15 +18,15 @@ beforeEach(() => {
 });
 
 const trail = (
-  <Breadcrumb>
+  <Breadcrumbs>
     <Link href="/">Dashboard</Link>
     <Link href="/docs">Documents</Link>
     <Link href="/docs/mine">My documents</Link>
     <span aria-current="page">Application nr 506</span>
-  </Breadcrumb>
+  </Breadcrumbs>
 );
 
-describe('Breadcrumb', () => {
+describe('Breadcrumbs', () => {
   it('renders a nav landmark with an accessible label from LabelProvider', () => {
     render(trail);
     expect(screen.getByRole('navigation', { name: 'breadcrumbs' })).toBeInTheDocument();
@@ -53,26 +53,26 @@ describe('Breadcrumb', () => {
 
   it('renders one separator between each pair of crumbs', () => {
     const { container } = render(trail);
-    expect(container.querySelectorAll('.tedi-breadcrumb__separator')).toHaveLength(3);
+    expect(container.querySelectorAll('.tedi-breadcrumbs__separator')).toHaveLength(3);
   });
 
   it('uses a custom aria-label when provided', () => {
     render(
-      <Breadcrumb ariaLabel="Site path">
+      <Breadcrumbs ariaLabel="Site path">
         <Link href="/">Home</Link>
         <span aria-current="page">Page</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     expect(screen.getByRole('navigation', { name: 'Site path' })).toBeInTheDocument();
   });
 
   it('renders short variant as the second-to-last child with an arrow_back icon', () => {
     render(
-      <Breadcrumb variant="short">
+      <Breadcrumbs variant="short">
         <Link href="/">Dashboard</Link>
         <Link href="/docs">Documents</Link>
         <span aria-current="page">Application nr 506</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     const link = screen.getByRole('link', { name: /Documents/ });
     expect(link).toHaveAttribute('href', '/docs');
@@ -82,28 +82,28 @@ describe('Breadcrumb', () => {
 
   it('renders nothing in short mode when fewer than two children are supplied', () => {
     const { container } = render(
-      <Breadcrumb variant="short">
+      <Breadcrumbs variant="short">
         <span aria-current="page">Solo</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     expect(container).toBeEmptyDOMElement();
   });
 
   it('renders nothing when there are no children', () => {
-    const { container } = render(<Breadcrumb>{null}</Breadcrumb>);
+    const { container } = render(<Breadcrumbs>{null}</Breadcrumbs>);
     expect(container).toBeEmptyDOMElement();
   });
 
   it('collapses the middle into an ellipsis dropdown when crumbs exceed maxItems', async () => {
     const { container } = render(
-      <Breadcrumb maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
+      <Breadcrumbs maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
         <Link href="/">A</Link>
         <Link href="/b">B</Link>
         <Link href="/c">C</Link>
         <Link href="/d">D</Link>
         <Link href="/e">E</Link>
         <span aria-current="page">F</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     expect(screen.getByRole('link', { name: 'A' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'E' })).toBeInTheDocument();
@@ -113,19 +113,19 @@ describe('Breadcrumb', () => {
     expect(screen.queryByRole('link', { name: 'D' })).not.toBeInTheDocument();
     const trigger = screen.getByRole('button', { name: 'breadcrumbs.show-more' });
     expect(trigger).toBeInTheDocument();
-    expect(container.querySelectorAll('.tedi-breadcrumb__separator')).toHaveLength(3);
+    expect(container.querySelectorAll('.tedi-breadcrumbs__separator')).toHaveLength(3);
   });
 
   it('opens the dropdown and reveals the hidden crumbs when the ellipsis is clicked', () => {
     render(
-      <Breadcrumb maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
+      <Breadcrumbs maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
         <Link href="/">A</Link>
         <Link href="/b">B</Link>
         <Link href="/c">C</Link>
         <Link href="/d">D</Link>
         <Link href="/e">E</Link>
         <span aria-current="page">F</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     const trigger = screen.getByRole('button', { name: 'breadcrumbs.show-more' });
     fireEvent.click(trigger);
@@ -136,11 +136,11 @@ describe('Breadcrumb', () => {
 
   it('skips collapse when maxItems is not exceeded', () => {
     render(
-      <Breadcrumb maxItems={4}>
+      <Breadcrumbs maxItems={4}>
         <Link href="/">A</Link>
         <Link href="/b">B</Link>
         <span aria-current="page">C</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     expect(screen.queryByRole('button', { name: 'breadcrumbs.show-more' })).not.toBeInTheDocument();
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
@@ -148,26 +148,26 @@ describe('Breadcrumb', () => {
 
   it('renders a custom separator between crumbs', () => {
     const { container } = render(
-      <Breadcrumb separator="/">
+      <Breadcrumbs separator="/">
         <Link href="/">A</Link>
         <Link href="/b">B</Link>
         <span aria-current="page">C</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
-    const separators = container.querySelectorAll('.tedi-breadcrumb__separator');
+    const separators = container.querySelectorAll('.tedi-breadcrumbs__separator');
     expect(separators).toHaveLength(2);
     separators.forEach((sep) => expect(sep).toHaveTextContent('/'));
   });
 
   it('flattens Fragment children so each grand-child becomes its own crumb', () => {
     render(
-      <Breadcrumb>
+      <Breadcrumbs>
         <>
           <Link href="/">Dashboard</Link>
           <Link href="/docs">Documents</Link>
         </>
         <span aria-current="page">Current</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     );
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();

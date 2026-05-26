@@ -1,8 +1,8 @@
-.tedi-breadcrumb {
+.tedi-breadcrumbs {
   display: flex;
 }
 
-.tedi-breadcrumb__list {
+.tedi-breadcrumbs__list {
   display: flex;
   flex-wrap: wrap;
   gap: var(--breadcrumb-inner-spacing);
@@ -12,17 +12,25 @@
   list-style: none;
 }
 
-.tedi-breadcrumb__item {
+.tedi-breadcrumbs__item {
   display: inline-flex;
   align-items: center;
 }
 
-.tedi-breadcrumb__separator {
+.tedi-breadcrumbs__separator {
   display: inline-flex;
   align-items: center;
   color: var(--link-primary-default);
 }
 
-.tedi-breadcrumb__current {
+.tedi-breadcrumbs__current {
   color: var(--general-text-secondary);
+}
+
+.tedi-breadcrumbs__ellipsis {
+  color: var(--link-primary-default);
+
+  &:hover {
+    color: var(--link-primary-hover);
+  }
 }

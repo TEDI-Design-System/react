@@ -27,7 +27,7 @@ type ConditionalTypes<C extends React.ElementType> =
     };
 
 /**
- * @deprecated Use Breadcrumb from `@tedi-design-system/react/tedi` instead.
+ * @deprecated Use Breadcrumbs from `@tedi-design-system/react/tedi` instead.
  */
 export type BreadcrumbsProps<C extends React.ElementType = 'a'> = ConditionalTypes<C> & {
   /**
@@ -43,7 +43,7 @@ export type BreadcrumbsProps<C extends React.ElementType = 'a'> = ConditionalTyp
 };
 
 /**
- * @deprecated Use Breadcrumb from `@tedi-design-system/react/tedi` instead.
+ * @deprecated Use Breadcrumbs from `@tedi-design-system/react/tedi` instead.
  */
 export const Breadcrumbs = <C extends React.ElementType = 'a'>(props: BreadcrumbsProps<C>): JSX.Element | null => {
   const { getLabel } = useLabels();

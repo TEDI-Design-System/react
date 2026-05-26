@@ -3,15 +3,15 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { Icon } from '../../base/icon/icon';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../link/link';
-import Breadcrumb, { BreadcrumbProps } from './breadcrumb';
+import Breadcrumbs, { BreadcrumbsProps } from './breadcrumbs';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=2409-21799&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/43adad-breadcrumb" target="_BLANK">Zeroheight ↗</a>
  */
 export default {
-  title: 'TEDI-Ready/Components/Navigation/Breadcrumb',
-  component: Breadcrumb,
+  title: 'TEDI-Ready/Components/Navigation/Breadcrumbs',
+  component: Breadcrumbs,
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -26,9 +26,9 @@ export default {
   },
 } as Meta;
 
-type Story = StoryObj<BreadcrumbProps>;
+type Story = StoryObj<BreadcrumbsProps>;
 
-const Template: StoryFn<BreadcrumbProps> = (args) => <Breadcrumb {...args} />;
+const Template: StoryFn<BreadcrumbsProps> = (args) => <Breadcrumbs {...args} />;
 
 export const Default: Story = {
   render: Template,
@@ -46,22 +46,22 @@ export const Default: Story = {
 export const Long: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <Breadcrumb>
+      <Breadcrumbs>
         <Link href="#">Dashboard</Link>
         <Link href="#">Applications</Link>
         <span aria-current="page">Application nr 506</span>
-      </Breadcrumb>
-      <Breadcrumb>
+      </Breadcrumbs>
+      <Breadcrumbs>
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <Link href="#">My documents</Link>
         <Link href="#">Application nr 506</Link>
         <span aria-current="page">Restrictions</span>
-      </Breadcrumb>
-      <Breadcrumb>
+      </Breadcrumbs>
+      <Breadcrumbs>
         <Link href="#">Medications</Link>
         <span aria-current="page">Ibuprofen</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     </VerticalSpacing>
   ),
 };
@@ -146,21 +146,21 @@ export const ResponsiveVariant: Story = {
 export const CustomSeparator: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <Breadcrumb separator="/">
+      <Breadcrumbs separator="/">
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
-      </Breadcrumb>
-      <Breadcrumb separator={<Icon name="arrow_forward" color="inherit" size={16} aria-hidden />}>
+      </Breadcrumbs>
+      <Breadcrumbs separator={<Icon name="arrow_forward" color="inherit" size={16} aria-hidden />}>
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
-      </Breadcrumb>
-      <Breadcrumb separator="—">
+      </Breadcrumbs>
+      <Breadcrumbs separator="—">
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
-      </Breadcrumb>
+      </Breadcrumbs>
     </VerticalSpacing>
   ),
 };

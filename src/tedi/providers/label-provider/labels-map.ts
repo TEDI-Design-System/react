@@ -130,14 +130,14 @@ export const labelsMap = validateDefaultLabels({
   },
   breadcrumbs: {
     description: 'Breadcrumbs navigation label',
-    components: ['Breadcrumb'],
+    components: ['Breadcrumbs'],
     et: 'Jäljerida',
     en: 'Breadcrumbs',
     ru: 'Навигационная цепочка',
   },
   'breadcrumbs.show-more': {
     description: 'Accessible label for the collapsed-crumbs ellipsis button',
-    components: ['Breadcrumb'],
+    components: ['Breadcrumbs'],
     et: 'Näita peidetud lehti',
     en: 'Show hidden pages',
     ru: 'Показать скрытые страницы',

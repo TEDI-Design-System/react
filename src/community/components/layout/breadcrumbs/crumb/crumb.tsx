@@ -8,7 +8,7 @@ import { Anchor, AnchorProps } from '../../../anchor/anchor';
 import styles from '../breadcrumbs.module.scss';
 
 /**
- * @deprecated Use Breadcrumb from `@tedi-design-system/react/tedi` instead.
+ * @deprecated Use Breadcrumbs from `@tedi-design-system/react/tedi` instead.
  */
 export type CrumbProps<C extends React.ElementType = 'a'> = {
   /**
@@ -19,7 +19,7 @@ export type CrumbProps<C extends React.ElementType = 'a'> = {
 } & AnchorProps<C>;
 
 /**
- * @deprecated Use Breadcrumb from `@tedi-design-system/react/tedi` instead.
+ * @deprecated Use Breadcrumbs from `@tedi-design-system/react/tedi` instead.
  */
 const Crumb = <C extends React.ElementType = 'a'>(props: CrumbProps<C> & { singleCrumb?: boolean }): JSX.Element => {
   const { isLast = false, children, singleCrumb, ...rest } = props;

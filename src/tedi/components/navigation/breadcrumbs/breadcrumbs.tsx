@@ -6,7 +6,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
 import { Dropdown } from '../../overlays/dropdown';
-import styles from './breadcrumb.module.scss';
+import styles from './breadcrumbs.module.scss';
 
 const flattenCrumbs = (children: ReactNode): ReactElement[] => {
   const result: ReactElement[] = [];
@@ -21,7 +21,7 @@ const flattenCrumbs = (children: ReactNode): ReactElement[] => {
   return result;
 };
 
-type BreadcrumbBreakpointProps = {
+type BreadcrumbsBreakpointProps = {
   /**
    * - `'long'` — full trail of crumbs separated by chevrons.
    * - `'short'` — only the second-to-last child rendered as a back-link with
@@ -50,7 +50,7 @@ type BreadcrumbBreakpointProps = {
   itemsAfterCollapse?: number;
 };
 
-export interface BreadcrumbProps extends BreakpointSupport<BreadcrumbBreakpointProps> {
+export interface BreadcrumbsProps extends BreakpointSupport<BreadcrumbsBreakpointProps> {
   /**
    * Crumbs in order from the root page to the current page. Each child becomes
    * one crumb; chevron separators are inserted between them. Use a `Link` (or
@@ -86,7 +86,7 @@ type RenderToken = { kind: 'item'; element: ReactElement } | { kind: 'ellipsis';
 
 const defaultSeparator = <Icon name="chevron_right" size={16} color="brand" />;
 
-export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
+export const Breadcrumbs = (props: BreadcrumbsProps): JSX.Element | null => {
   const { children, ariaLabel, showMoreLabel, separator = defaultSeparator, className } = props;
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
@@ -94,7 +94,7 @@ export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
     maxItems,
     itemsBeforeCollapse = 1,
     itemsAfterCollapse = 1,
-  } = getCurrentBreakpointProps<BreadcrumbBreakpointProps>(props);
+  } = getCurrentBreakpointProps<BreadcrumbsBreakpointProps>(props);
   const { getLabel } = useLabels();
   const navLabel = ariaLabel ?? getLabel('breadcrumbs');
   const showMoreText = showMoreLabel ?? getLabel('breadcrumbs.show-more');
@@ -111,9 +111,9 @@ export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
         ? cloneElement(parent, { iconLeft: 'arrow_back' })
         : parent;
     return (
-      <nav aria-label={navLabel} className={cn(styles['tedi-breadcrumb'], className)}>
-        <ol className={styles['tedi-breadcrumb__list']}>
-          <li className={styles['tedi-breadcrumb__item']}>{withIcon}</li>
+      <nav aria-label={navLabel} className={cn(styles['tedi-breadcrumbs'], className)}>
+        <ol className={styles['tedi-breadcrumbs__list']}>
+          <li className={styles['tedi-breadcrumbs__item']}>{withIcon}</li>
         </ol>
       </nav>
     );
@@ -140,23 +140,24 @@ export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
   const lastIndex = tokens.length - 1;
 
   return (
-    <nav aria-label={navLabel} className={cn(styles['tedi-breadcrumb'], className)}>
-      <ol className={styles['tedi-breadcrumb__list']}>
+    <nav aria-label={navLabel} className={cn(styles['tedi-breadcrumbs'], className)}>
+      <ol className={styles['tedi-breadcrumbs__list']}>
         {tokens.map((token, index) => (
           <Fragment key={index}>
             {token.kind === 'item' ? (
               <li
-                className={cn(styles['tedi-breadcrumb__item'], {
-                  [styles['tedi-breadcrumb__current']]: index === lastIndex,
+                className={cn(styles['tedi-breadcrumbs__item'], {
+                  [styles['tedi-breadcrumbs__current']]: index === lastIndex,
                 })}
               >
                 {token.element}
               </li>
             ) : (
-              <li className={styles['tedi-breadcrumb__item']}>
+              <li className={styles['tedi-breadcrumbs__item']}>
                 <Dropdown>
                   <Dropdown.Trigger>
-                    <Button visualType="link" size="small" icon="more_horiz">
+                    <Button noStyle className={styles['tedi-breadcrumbs__ellipsis']}>
+                      <span aria-hidden="true">…</span>
                       <span className="sr-only">{showMoreText}</span>
                     </Button>
                   </Dropdown.Trigger>
@@ -171,7 +172,7 @@ export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
               </li>
             )}
             {index < lastIndex && (
-              <li className={styles['tedi-breadcrumb__separator']} aria-hidden="true">
+              <li className={styles['tedi-breadcrumbs__separator']} aria-hidden="true">
                 {separator}
               </li>
             )}
@@ -182,6 +183,6 @@ export const Breadcrumb = (props: BreadcrumbProps): JSX.Element | null => {
   );
 };
 
-Breadcrumb.displayName = 'Breadcrumb';
+Breadcrumbs.displayName = 'Breadcrumbs';
 
-export default Breadcrumb;
+export default Breadcrumbs;
