@@ -108,6 +108,38 @@ describe('SidenavToggle', () => {
     expect(button.className).toContain('tedi-sidenav-toggle--open');
   });
 
+  test('overrides the i18n label when a string `label` prop is passed', () => {
+    render(<SidenavToggle {...defaultProps} showLabel label="Menüü" />);
+    const button = screen.getByRole('button', { name: 'Menüü' });
+    expect(button.querySelector('.tedi-sidenav-toggle__label')).toHaveTextContent('Menüü');
+  });
+
+  test('label as a function receives menuOpen and returns the current label', () => {
+    const { rerender } = render(
+      <SidenavToggle {...defaultProps} showLabel label={(open) => (open ? 'Sulge' : 'Ava')} />
+    );
+    expect(screen.getByRole('button').querySelector('.tedi-sidenav-toggle__label')).toHaveTextContent('Ava');
+    rerender(<SidenavToggle {...defaultProps} menuOpen showLabel label={(open) => (open ? 'Sulge' : 'Ava')} />);
+    expect(screen.getByRole('button').querySelector('.tedi-sidenav-toggle__label')).toHaveTextContent('Sulge');
+  });
+
+  test('renders visible label below the icon when showLabel is true (mobile variant)', () => {
+    render(<SidenavToggle {...defaultProps} showLabel />);
+    const button = screen.getByRole('button', { name: 'Toggle Menu' });
+    expect(button).toHaveClass('tedi-sidenav-toggle--with-label');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    // The label text is visible (not screen-reader-only) — it lives in a dedicated label span.
+    const label = button.querySelector('.tedi-sidenav-toggle__label');
+    expect(label).toBeInTheDocument();
+    expect(label).toHaveTextContent('Toggle Menu');
+  });
+
+  test('ignores showLabel when variant is collapse', () => {
+    render(<SidenavToggle {...defaultProps} variant="collapse" showLabel />);
+    const button = screen.getByRole('button');
+    expect(button).not.toHaveClass('tedi-sidenav-toggle--with-label');
+  });
+
   test('applies custom className prop', () => {
     const customClass = 'my-special-toggle extra-class';
 

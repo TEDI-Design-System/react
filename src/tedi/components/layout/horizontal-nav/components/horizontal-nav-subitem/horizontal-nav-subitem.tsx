@@ -23,7 +23,7 @@ export interface HorizontalNavSubItemProps {
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   /**
    * Render the link as a different element/component (e.g. a router `NavLink`).
-   * @default 'a'
+   * @default a
    */
   as?: 'a' | React.ComponentType<React.AnchorHTMLAttributes<HTMLElement> & Record<string, unknown>>;
   /**

@@ -158,6 +158,37 @@ describe('HorizontalNav', () => {
     expect(screen.getByRole('menuitem', { name: 'Settings' })).toBeInTheDocument();
   });
 
+  it('passes submenu groups and sub-items into the mobile drawer', () => {
+    setBreakpoint('sm');
+    render(
+      <HorizontalNav ariaLabel="Primary" isMobileOpen>
+        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
+        <HorizontalNav.Item
+          href="/family"
+          submenu={
+            <>
+              <HorizontalNav.Group title="Marriage">
+                <HorizontalNav.SubItem href="/m">Get married</HorizontalNav.SubItem>
+                <HorizontalNav.SubItem href="/d">Divorce</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+              <HorizontalNav.Group title="Children">
+                <HorizontalNav.SubItem href="/c">Adoption</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            </>
+          }
+        >
+          Family
+        </HorizontalNav.Item>
+      </HorizontalNav>
+    );
+
+    const familyButton = screen.getByRole('button', { name: /Family/ });
+    fireEvent.click(familyButton);
+    expect(screen.getByRole('menuitem', { name: 'Get married' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Divorce' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Adoption' })).toBeInTheDocument();
+  });
+
   it('falls through to the shared Sidenav mobile drawer below the breakpoint', () => {
     setBreakpoint('sm');
     render(
@@ -342,6 +373,24 @@ describe('HorizontalNav', () => {
     );
     expect(screen.getByRole('link', { name: /Family/ })).toHaveAttribute('href', '/family');
     expect(screen.queryByRole('button', { name: /Family/ })).not.toBeInTheDocument();
+  });
+
+  it('defaults the bar maxWidth to "xxl" (87.5rem)', () => {
+    const { container } = render(
+      <HorizontalNav ariaLabel="Primary">
+        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('87.5rem');
+  });
+
+  it('removes the maxWidth cap when maxWidth="none"', () => {
+    const { container } = render(
+      <HorizontalNav ariaLabel="Primary" maxWidth="none">
+        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('');
   });
 
   it('renders the submenu inline under the active item when submenuFit="item"', () => {

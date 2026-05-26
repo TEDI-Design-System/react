@@ -1,12 +1,43 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Affix } from '../../misc/affix/affix';
+import Separator from '../../misc/separator/separator';
 import { Col, Row } from '../grid';
+import { Representative } from '../header/components/header-role/header-role-representatives';
+import { Header } from '../header/header';
+import { ShowAt } from '../show-at/show-at';
 import { SideNav } from '../sidenav/sidenav';
 import { VerticalSpacing } from '../vertical-spacing';
 import { HorizontalNav, HorizontalNavProps } from './horizontal-nav';
+
+const headerLanguages = [
+  { 'aria-label': 'Estonian', label: 'EST', locale: 'et' as const },
+  { 'aria-label': 'English', label: 'ENG', locale: 'en' as const },
+  { 'aria-label': 'Russian', label: 'RUS', locale: 'ru' as const },
+];
+
+const headerRepresentatives: Representative[] = [
+  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
+  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle', size: 24 } },
+];
+
+const headerLogo = <img src="header-logo.svg" alt="Logo" />;
+
+/**
+ * Shared mobile-drawer state between the meta-level Header (which renders the
+ * hamburger in its `toggle` slot at smaller viewports) and every Template-
+ * based `HorizontalNav` story. Stories rendered via `Template` automatically
+ * read this context — so when the viewport shrinks below the nav's
+ * `mobileBreakpoint`, clicking the header's hamburger opens the nav's drawer.
+ */
+const MobileNavStateContext = createContext<{
+  open: boolean;
+  setOpen: (open: boolean) => void;
+} | null>(null);
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.46.70?node-id=31693-133265&m=dev" target="_BLANK">Figma ↗</a>
@@ -20,7 +51,38 @@ const meta: Meta<typeof HorizontalNav> = {
     'HorizontalNav.SubItem': HorizontalNav.SubItem,
     'HorizontalNav.Separator': HorizontalNav.Separator,
   },
+  decorators: [
+    function MetaHeaderDecorator(Story, context) {
+      const [open, setOpen] = useState(false);
+      if (context.parameters?.noHeader) return <Story />;
+      return (
+        <MobileNavStateContext.Provider value={{ open, setOpen }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <Header toggle={<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />}>
+              <Header.Logo logo={headerLogo} href="#" />
+              <Header.Center>{null}</Header.Center>
+              <Header.Actions>
+                <ShowAt lg>
+                  <Header.Role representatives={headerRepresentatives} label="Isikukood:" />
+                  <Separator axis="vertical" />
+                </ShowAt>
+                <Header.Language languages={headerLanguages} currentLanguage="EST" />
+                <ShowAt lg>
+                  <Separator axis="vertical" />
+                  <Header.Profile label="Minu profiil">
+                    <p style={{ margin: 0 }}>Profile menu content</p>
+                  </Header.Profile>
+                </ShowAt>
+              </Header.Actions>
+            </Header>
+            <Story />
+          </div>
+        </MobileNavStateContext.Provider>
+      );
+    },
+  ],
   parameters: {
+    layout: 'fullscreen',
     docs: {
       source: {
         transform: (code: string) => {
@@ -42,7 +104,20 @@ export default meta;
 
 type Story = StoryObj<HorizontalNavProps>;
 
-const Template: StoryFn<HorizontalNavProps> = (args) => <HorizontalNav {...args} />;
+const Template: StoryFn<HorizontalNavProps> = (args) => {
+  const mobileState = useContext(MobileNavStateContext);
+  const integratedProps =
+    mobileState && args.isMobileOpen === undefined
+      ? {
+          isMobileOpen: mobileState.open,
+          onMenuToggle: (open: boolean) => {
+            mobileState.setOpen(open);
+            args.onMenuToggle?.(open);
+          },
+        }
+      : null;
+  return <HorizontalNav {...args} {...integratedProps} />;
+};
 
 export const Default: Story = {
   render: Template,
@@ -84,24 +159,6 @@ export const WithIcons: Story = {
         <HorizontalNav.Item href="#" icon="folder_shared">
           Minu andmed
         </HorizontalNav.Item>
-      </>
-    ),
-  },
-};
-
-export const Disabled: Story = {
-  render: Template,
-  args: {
-    ariaLabel: 'Primary navigation',
-    children: (
-      <>
-        <HorizontalNav.Item href="#" isActive>
-          Avaleht
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#" disabled>
-          Locked section
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö</HorizontalNav.Item>
       </>
     ),
   },
@@ -164,16 +221,17 @@ export const MegaMenu: Story = {
 };
 
 /**
- * Constrained inner width — set `maxWidth` to clamp the item bar (and the
- * full-width submenu) to a system-content body width while the blue `<nav>`
- * background still spans 100% of its container. The inner content centers
- * automatically.
+ * Custom inner width — the bar defaults to `maxWidth="xl"` (75rem). Override
+ * `maxWidth` with any CSS length, number, or another TEDI breakpoint name
+ * (`'sm' | 'md' | 'lg' | 'xl' | 'xxl'`) to align the nav inner with your
+ * page's content container. Pass `'none'` to disable the cap and let the bar
+ * fill the full `<nav>` width.
  */
 export const ConstrainedInnerWidth: Story = {
   render: Template,
   args: {
     ariaLabel: 'Primary navigation',
-    maxWidth: 'xl',
+    maxWidth: 'lg',
     children: (
       <>
         <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
@@ -362,7 +420,7 @@ export const ItemStates: StoryObj = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col className="display-flex align-items-center">
-            <HorizontalNav ariaLabel={`Horizontal nav — ${state}`}>
+            <HorizontalNav ariaLabel={`Horizontal nav — ${state}`} mobileBreakpoint="xs">
               {itemColumns.map(({ key, icon, withSubmenu }) => (
                 <HorizontalNav.Item
                   key={key}
@@ -388,6 +446,8 @@ export const ItemStates: StoryObj = {
     </VerticalSpacing>
   ),
   parameters: {
+    noHeader: true,
+    layout: 'padded',
     pseudo: {
       hover: itemColumns.map(({ key }) => `.${itemStateClass('Hover', key)}`),
       active: itemColumns.map(({ key }) => `.${itemStateClass('Active', key)}`),
@@ -427,6 +487,8 @@ export const SubItemStates: StoryObj = {
     </div>
   ),
   parameters: {
+    noHeader: true,
+    layout: 'padded',
     pseudo: {
       hover: `.${subItemStateClass('Hover')}`,
       active: `.${subItemStateClass('Active')}`,
@@ -436,6 +498,7 @@ export const SubItemStates: StoryObj = {
 };
 
 export const GroupVariants: StoryObj = {
+  parameters: { noHeader: true, layout: 'padded' },
   render: () => (
     <div
       style={{
@@ -479,14 +542,25 @@ export const GroupVariants: StoryObj = {
 
 /**
  * Below `mobileBreakpoint` the bar collapses into the shared Sidenav mobile
- * drawer. Control the drawer externally to pair it with a header hamburger.
+ * drawer. In a real layout the toggle button lives inside the responsive
+ * `Header` (via its `toggle` slot) and shares its open state with the nav so
+ * the same hamburger drives the drawer. The story below forces mobile view
+ * (`mobileBreakpoint="xxl"`) so you can see the toggle/drawer interaction
+ * on a desktop viewport without resizing.
  */
 export const ControlledMobile: Story = {
+  parameters: { noHeader: true },
   render: function ControlledMobile() {
     const [open, setOpen] = useState(false);
     return (
-      <VerticalSpacing size={1}>
-        <SideNav.Toggle menuOpen={open} toggleMenu={setOpen} />
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Header toggle={<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />}>
+          <Header.Logo logo={headerLogo} href="#" />
+          <Header.Center>{null}</Header.Center>
+          <Header.Actions>
+            <Header.Language languages={headerLanguages} currentLanguage="EST" />
+          </Header.Actions>
+        </Header>
         <HorizontalNav ariaLabel="Primary navigation" mobileBreakpoint="xxl" isMobileOpen={open} onMenuToggle={setOpen}>
           <HorizontalNav.Item href="#" isActive>
             Avaleht
@@ -494,7 +568,7 @@ export const ControlledMobile: Story = {
           <HorizontalNav.Item href="#">Perekond</HorizontalNav.Item>
           <HorizontalNav.Item href="#">Hüvitised</HorizontalNav.Item>
         </HorizontalNav>
-      </VerticalSpacing>
+      </div>
     );
   },
 };
@@ -529,6 +603,7 @@ const stickyDemoFiller = (
  * have a sticky header above it). This story wraps the nav in a sticky div.
  */
 export const Sticky: StoryObj = {
+  parameters: { noHeader: true },
   render: () => (
     <div style={{ height: '600px', overflowY: 'auto', border: '1px dashed var(--general-border-primary)' }}>
       <div style={{ position: 'sticky', top: 0, zIndex: 10 }}>{stickyDemoNav}</div>
@@ -543,6 +618,7 @@ export const Sticky: StoryObj = {
  * any registered header and offsets the sticky position accordingly.
  */
 export const StickyOnScroll: StoryObj = {
+  parameters: { noHeader: true },
   render: () => (
     <div style={{ height: '600px', overflowY: 'auto', border: '1px dashed var(--general-border-primary)' }}>
       <div style={{ padding: '1.5rem' }}>

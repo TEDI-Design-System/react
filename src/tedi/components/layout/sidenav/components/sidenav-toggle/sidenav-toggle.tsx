@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import { UnknownType } from '../../../../../types/commonTypes';
+import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
 import FloatingButton from '../../../../buttons/floating-button/floating-button';
 import styles from './sidenav-toggle.module.scss';
@@ -31,6 +32,21 @@ export type SidenavToggleProps = {
    */
   variant?: SidenavToggleVariant;
   /**
+   * Show the open/close label visibly below the icon (mobile variant only).
+   * The label text comes from the `header.toggle` i18n key by default — pass
+   * `label` to override it. When `false` (default), the button renders
+   * icon-only and the label is still exposed as accessible text.
+   * @default false
+   */
+  showLabel?: boolean;
+  /**
+   * Override the toggle's label text. Accepts a static `ReactNode` (used for
+   * both states) or a function that returns a `ReactNode` for the current
+   * `menuOpen` state (e.g. `(open) => open ? 'Sulge' : 'Menüü'`). When
+   * omitted, the label falls back to the `header.toggle` i18n value.
+   */
+  label?: React.ReactNode | ((menuOpen: boolean) => React.ReactNode);
+  /**
    * Add custom class to override styles
    */
   className?: string;
@@ -42,22 +58,27 @@ export const SidenavToggle = ({
   referenceRef,
   getReferenceProps = () => ({}),
   variant = 'mobile',
+  showLabel = false,
+  label,
   className,
 }: SidenavToggleProps) => {
   const { getLabel } = useLabels();
 
-  const toggleLabel = getLabel('header.toggle', menuOpen);
+  const toggleLabel =
+    label !== undefined ? (typeof label === 'function' ? label(menuOpen) : label) : getLabel('header.toggle', menuOpen);
+  const iconName =
+    variant === 'collapse' ? (menuOpen ? 'right_panel_open' : 'left_panel_open') : menuOpen ? 'close' : 'menu';
+  const useLabelledLayout = showLabel && variant === 'mobile';
 
   const BEM = cn(
     styles['tedi-sidenav-toggle'],
     {
       [styles['tedi-sidenav-toggle--open']]: menuOpen,
       [styles[`tedi-sidenav-toggle--${variant}`]]: true,
+      [styles['tedi-sidenav-toggle--with-label']]: useLabelledLayout,
     },
     className
   );
-
-  const Element = variant === 'collapse' ? FloatingButton : Button;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -66,13 +87,31 @@ export const SidenavToggle = ({
     }
   };
 
+  if (useLabelledLayout) {
+    return (
+      <button
+        {...getReferenceProps()}
+        ref={referenceRef as React.Ref<HTMLButtonElement>}
+        type="button"
+        aria-expanded={menuOpen}
+        className={BEM}
+        onClick={() => toggleMenu(!menuOpen)}
+        onKeyDown={handleKeyDown}
+      >
+        <Icon name={iconName} size={24} className={styles['tedi-sidenav-toggle__icon']} color="inherit" />
+        <span className={styles['tedi-sidenav-toggle__label']}>{toggleLabel}</span>
+      </button>
+    );
+  }
+
+  const Element = variant === 'collapse' ? FloatingButton : Button;
+
   return (
     <Element
       {...getReferenceProps()}
       ref={referenceRef}
       icon={{
-        name:
-          variant === 'collapse' ? (menuOpen ? 'right_panel_open' : 'left_panel_open') : menuOpen ? 'close' : 'menu',
+        name: iconName,
         className: styles['tedi-sidenav-toggle__icon'],
         size: variant === 'collapse' ? 18 : 24,
       }}

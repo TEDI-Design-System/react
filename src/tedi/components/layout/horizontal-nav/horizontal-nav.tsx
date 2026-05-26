@@ -11,34 +11,29 @@ import React, {
   useState,
 } from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { Breakpoint, BREAKPOINT_WIDTHS, isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { MobileNav } from '../mobile-nav/mobile-nav';
+import { SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
+import { HorizontalNavGroup, HorizontalNavGroupProps } from './components/horizontal-nav-group/horizontal-nav-group';
+import { HorizontalNavItem, HorizontalNavItemProps } from './components/horizontal-nav-item/horizontal-nav-item';
+import { HorizontalNavSeparator } from './components/horizontal-nav-separator/horizontal-nav-separator';
+import {
+  HorizontalNavSubItem,
+  HorizontalNavSubItemProps,
+} from './components/horizontal-nav-subitem/horizontal-nav-subitem';
+import styles from './horizontal-nav.module.scss';
 
 type BreakpointWidthName = Exclude<Breakpoint, 'xs'>;
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type HorizontalNavMaxWidth = number | BreakpointWidthName | (string & {});
 
-const BREAKPOINT_WIDTHS: Record<BreakpointWidthName, string> = {
-  sm: '36rem',
-  md: '48rem',
-  lg: '62rem',
-  xl: '75rem',
-  xxl: '87.5rem',
-};
-
-const resolveMaxWidth = (value: HorizontalNavMaxWidth | undefined): number | string | undefined => {
-  if (value === undefined) return undefined;
-  if (typeof value === 'string' && value in BREAKPOINT_WIDTHS) {
+const resolveMaxWidth = (value: HorizontalNavMaxWidth | 'none' | undefined): number | string | undefined => {
+  if (value === undefined || value === 'none' || value === 0) return undefined;
+  if (typeof value === 'string' && value !== 'xs' && value in BREAKPOINT_WIDTHS) {
     return BREAKPOINT_WIDTHS[value as BreakpointWidthName];
   }
   return value;
 };
-import { MobileNav } from '../mobile-nav/mobile-nav';
-import { SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
-import { HorizontalNavGroup } from './components/horizontal-nav-group/horizontal-nav-group';
-import { HorizontalNavItem, HorizontalNavItemProps } from './components/horizontal-nav-item/horizontal-nav-item';
-import { HorizontalNavSeparator } from './components/horizontal-nav-separator/horizontal-nav-separator';
-import { HorizontalNavSubItem } from './components/horizontal-nav-subitem/horizontal-nav-subitem';
-import styles from './horizontal-nav.module.scss';
 
 export interface HorizontalNavProps {
   /**
@@ -54,7 +49,7 @@ export interface HorizontalNavProps {
   /**
    * Breakpoint below which the bar collapses into the shared Sidenav mobile
    * drawer. Pass any TEDI breakpoint name (`xs`/`sm`/`md`/`lg`/`xl`/`xxl`).
-   * @default 'md'
+   * @default md
    */
   mobileBreakpoint?: Breakpoint;
   /**
@@ -88,7 +83,7 @@ export interface HorizontalNavProps {
    * - `'item'` — the panel sits left-aligned directly under the active item
    *   with content-driven width, suitable for narrow single- or few-column
    *   menus.
-   * @default 'full'
+   * @default full
    */
   submenuFit?: 'full' | 'item';
   /**
@@ -99,10 +94,12 @@ export interface HorizontalNavProps {
    * breakpoint's `min-width` (36rem / 48rem / 62rem / 75rem / 87.5rem
    * respectively), useful for aligning the nav inner with a breakpoint-driven
    * content container. The `<nav>` itself still spans 100% of its container.
-   * Leave unset to let the bar fill the full width of the nav (current
-   * default).
+   *
+   * Pass `'none'` (or `0`) to disable the constraint and let the bar fill the
+   * full width of the nav.
+   * @default xxl
    */
-  maxWidth?: HorizontalNavMaxWidth;
+  maxWidth?: HorizontalNavMaxWidth | 'none';
 }
 
 const flattenChildren = (children: ReactNode): ReactElement[] => {
@@ -123,6 +120,38 @@ const flattenChildren = (children: ReactNode): ReactElement[] => {
 const isNavItem = (element: ReactElement): element is ReactElement<HorizontalNavItemProps> =>
   element.type === HorizontalNavItem;
 
+type MobileSubItemGroup = NonNullable<SideNavItemProps['subItemGroups']>[number];
+
+const extractMobileSubItem = (element: ReactElement<HorizontalNavSubItemProps>): SideNavItemProps => ({
+  children: element.props.children,
+  href: element.props.href,
+  isActive: element.props.isActive,
+  onClick: element.props.onClick as SideNavItemProps['onClick'],
+});
+
+const extractMobileSubmenuGroups = (submenu: ReactNode): MobileSubItemGroup[] | undefined => {
+  if (!submenu) return undefined;
+  const groups: MobileSubItemGroup[] = [];
+  Children.forEach(submenu, (child) => {
+    if (!isValidElement(child)) return;
+    if (child.type === Fragment) {
+      const nested = extractMobileSubmenuGroups((child.props as { children?: ReactNode }).children);
+      if (nested) groups.push(...nested);
+      return;
+    }
+    if (child.type !== HorizontalNavGroup) return;
+    const groupProps = child.props as HorizontalNavGroupProps;
+    const subItems: SideNavItemProps[] = [];
+    Children.forEach(groupProps.children, (subChild) => {
+      if (!isValidElement(subChild)) return;
+      if (subChild.type !== HorizontalNavSubItem) return;
+      subItems.push(extractMobileSubItem(subChild as ReactElement<HorizontalNavSubItemProps>));
+    });
+    if (subItems.length > 0) groups.push({ subHeading: groupProps.title, subItems });
+  });
+  return groups.length > 0 ? groups : undefined;
+};
+
 const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement | null => {
   const {
     children,
@@ -134,7 +163,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
     className,
     id,
     submenuFit = 'full',
-    maxWidth,
+    maxWidth = 'xxl',
   } = props;
 
   const breakpoint = useBreakpoint();
@@ -204,6 +233,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
         icon: item.props.icon,
         isActive: item.props.isActive,
         onClick: item.props.onClick as SideNavItemProps['onClick'],
+        subItemGroups: extractMobileSubmenuGroups(item.props.submenu),
       })),
     [items]
   );
