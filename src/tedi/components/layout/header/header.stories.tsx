@@ -181,7 +181,7 @@ const profileTranslations = {
   representatives: { et: 'Esindatavad', en: 'Representatives', ru: 'Представители' },
   contacts: { et: 'Kontaktid', en: 'Contacts', ru: 'Контакты' },
   darkMode: { et: 'Tume režiim', en: 'Dark mode', ru: 'Тёмная тема' },
-  notifications: { et: 'Riiklikud teated', en: 'Official Notices', ru: 'Государственные уведомления' },
+  notifications: { et: 'Teated', en: 'Notifications', ru: 'Уведомления' },
   accessibility: { et: 'Ligipääsetavus', en: 'Accessibility', ru: 'Доступность' },
   home: { et: 'Avaleht', en: 'Home', ru: 'Главная' },
   services: { et: 'Teenused', en: 'Services', ru: 'Услуги' },
@@ -473,6 +473,33 @@ export const LoggedOut: Story = {
 };
 
 export const LoggedOutWithSearch: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+On the narrowest viewports the header has to fit a sidenav toggle, a search input and several action buttons in a single row, which leaves no room for the logo. This story wraps \`Header.Logo\` in a small \`ResponsiveLogo\` helper that listens to \`(min-width: 420px)\` via \`window.matchMedia\` and toggles \`showLogo\` accordingly, so the logo is hidden below that width and rendered again as soon as there is space.
+
+\`\`\`tsx
+const ResponsiveLogo = (props: HeaderLogoProps) => {
+  const query = '(min-width: 420px)';
+  const [show, setShow] = useState(() => window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setShow(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
+  return <Header.Logo {...props} showLogo={show} />;
+};
+\`\`\`
+
+Use \`showLogo\` whenever you need to hide the logo at a custom breakpoint that does not match the standard \`xs\`/\`sm\`/\`md\`/\`lg\`/\`xl\`/\`xxl\` tiers — wrap \`Header.Logo\` in \`ShowAt\` / \`HideAt\` for the standard ones, and use \`showLogo\` for the in-between cases.
+`,
+      },
+    },
+  },
   render: () => (
     <StoryWrapper>
       {({ isOpen, setIsOpen }) => (
