@@ -184,7 +184,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const floating = useFloating({
     open,
     onOpenChange: setOpen,
-    placement: isInputTrigger ? 'bottom-start' : 'bottom-end',
+    placement: 'bottom-end',
     middleware: [offset(TIMEPICKER_OFFSET), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
