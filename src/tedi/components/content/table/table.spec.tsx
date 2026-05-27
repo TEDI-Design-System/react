@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 
 import type { TableState } from './table';
-import { Table } from './table';
+import { groupRowSpan, Table } from './table';
 import { useTableContext } from './table-context';
 
 import '@testing-library/jest-dom';
@@ -825,6 +825,43 @@ describe('Table', () => {
 
       expect(screen.getByRole('columnheader', { name: 'Info' })).toBeInTheDocument();
       expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+    });
+  });
+
+  describe('grouped rows (meta.rowSpan)', () => {
+    interface PatientRow {
+      id: string;
+      date: string;
+      doctor: string;
+    }
+    const patients: PatientRow[] = [
+      { id: '1', date: '2026-05-20', doctor: 'Dr Tamm' },
+      { id: '2', date: '2026-05-20', doctor: 'Dr Tamm' },
+      { id: '3', date: '2026-05-21', doctor: 'Dr Kask' },
+    ];
+
+    it('spans the first cell of a group and skips later cells for the same key', () => {
+      const columns: ColumnDef<PatientRow>[] = [
+        {
+          id: 'date',
+          header: 'Date',
+          accessorKey: 'date',
+          meta: { rowSpan: groupRowSpan(patients, (row) => row.date) },
+        },
+        { id: 'doctor', header: 'Doctor', accessorKey: 'doctor' },
+      ];
+
+      const { container } = render(<Table<PatientRow> id="t-grouped-rows" data={patients} columns={columns} />);
+
+      const bodyRows = container.querySelectorAll('tbody tr');
+      // First row: date cell has rowSpan=2 + doctor cell — 2 cells.
+      expect(bodyRows[0].querySelectorAll('td')).toHaveLength(2);
+      expect(bodyRows[0].querySelector('td')?.getAttribute('rowspan')).toBe('2');
+      // Second row in group: date cell skipped — only the doctor cell renders.
+      expect(bodyRows[1].querySelectorAll('td')).toHaveLength(1);
+      // Third row starts a new group, span=1 — no rowSpan attribute.
+      expect(bodyRows[2].querySelectorAll('td')).toHaveLength(2);
+      expect(bodyRows[2].querySelector('td')?.hasAttribute('rowspan')).toBe(false);
     });
   });
 });

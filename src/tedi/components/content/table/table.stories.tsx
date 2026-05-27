@@ -23,7 +23,7 @@ import { Tooltip } from '../../overlays/tooltip';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Truncate } from '../truncate/truncate';
 import type { TableProps } from './table';
-import { Table } from './table';
+import { groupRowSpan, Table } from './table';
 
 /**
  * <a href="https://tanstack.com/table" target="_BLANK">@tanstack/react-table ↗</a><br/>
@@ -681,6 +681,56 @@ export const MergedCells: Story = {
         />
       </EditableRowsContext.Provider>
     );
+  },
+};
+
+/**
+ * Vertical row spanning via `meta: { rowSpan: groupRowSpan(data, getKey) }`. Consecutive rows
+ * that share the chosen key collapse that column's cell into a single span, so a shared value
+ * (e.g. a date) is shown once for the whole group instead of repeating on every row.
+ *
+ * Resolves against the original `data` array order — sort the data on the consumer side
+ * before passing it in, since runtime sorting / pagination won't regroup spanned cells.
+ */
+export const GroupedRows: Story = {
+  render: function GroupedRows() {
+    interface PatientRow {
+      id: string;
+      date: string;
+      doctor: string;
+      procedure: string;
+    }
+
+    const patientRows = useMemo<PatientRow[]>(
+      () => [
+        { id: '1', date: '2026-05-20', doctor: 'Dr Tamm', procedure: 'Consultation' },
+        { id: '2', date: '2026-05-20', doctor: 'Dr Tamm', procedure: 'Follow-up' },
+        { id: '3', date: '2026-05-21', doctor: 'Dr Kask', procedure: 'X-ray' },
+        { id: '4', date: '2026-05-21', doctor: 'Dr Kask', procedure: 'Consultation' },
+      ],
+      []
+    );
+
+    const columns = useMemo<ColumnDef<PatientRow>[]>(
+      () => [
+        {
+          id: 'date',
+          header: 'Date',
+          accessorKey: 'date',
+          meta: { rowSpan: groupRowSpan(patientRows, (row) => row.date), vAlign: 'top' },
+        },
+        {
+          id: 'doctor',
+          header: 'Doctor',
+          accessorKey: 'doctor',
+          meta: { rowSpan: groupRowSpan(patientRows, (row) => `${row.date}|${row.doctor}`), vAlign: 'top' },
+        },
+        { id: 'procedure', header: 'Procedure', accessorKey: 'procedure' },
+      ],
+      [patientRows]
+    );
+
+    return <Table<PatientRow> id="tedi-table-grouped" data={patientRows} columns={columns} verticalBorders />;
   },
 };
 
@@ -1730,9 +1780,10 @@ export const DraggableRows: Story = {
       <VerticalSpacing size={1}>
         <Alert type="info" role="status" title="Row reordering" icon="lightbulb">
           <Text>
-            Grab the <StatusBadge>≡</StatusBadge> handle on any row to reorder. Keyboard users: focus a handle and press
-            Space to lift, arrows to move, Space to drop. The Table owns all dnd-kit wiring — the parent only listens to{' '}
-            <StatusBadge>onRowDrop</StatusBadge> and applies the new order to its data.
+            Grab the <StatusBadge>≡</StatusBadge> handle on any row with the pointer to reorder. The Table wires the
+            native HTML5 drag API internally; the parent only listens to <StatusBadge>onRowDrop</StatusBadge> and
+            applies the new order to its data. Row drag is currently pointer-only — keyboard reorder is not implemented,
+            so provide an alternative control (e.g. an &ldquo;Edit order&rdquo; dialog) when accessibility matters.
           </Text>
         </Alert>
         <Table<Person>

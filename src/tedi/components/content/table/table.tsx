@@ -73,7 +73,69 @@ export interface TableColumnMeta {
    * table's stylesheet.
    */
   vAlign?: 'top' | 'middle' | 'bottom';
+  /**
+   * Per-cell `rowSpan` resolver. Lets a column collapse consecutive rows that
+   * share a value into a single vertically-spanning cell ("grouped rows").
+   *
+   * Return:
+   * - `n >= 2` — render the cell with `rowSpan={n}`,
+   * - `1` (or undefined) — render the cell normally,
+   * - `0` — skip the `<td>` entirely; a previous row's spanning cell covers it.
+   *
+   * Pair with the `groupRowSpan` helper for the common "consecutive rows sharing
+   * a key" case. Only the body cells honor this hook — header and footer cells
+   * are unaffected.
+   */
+  rowSpan?: (row: Row<UnknownTData>) => number;
 }
+
+/**
+ * Internal type alias used in `TableColumnMeta.rowSpan` so the resolver can
+ * accept any row shape without forcing the meta interface to be generic
+ * (TanStack's `columnDef.meta` is intentionally loosely-typed).
+ */
+type UnknownTData = unknown;
+
+/**
+ * Builds a `meta.rowSpan` resolver that collapses **consecutive** rows sharing
+ * the same key into a single spanning cell — the React equivalent of
+ * Angular's `groupRowSpan`.
+ *
+ * Pass the same array you hand to `<Table data={...}>` plus a key extractor:
+ *
+ * ```tsx
+ * const data = [
+ *   { id: '1', date: '2026-05-20', doctor: 'Dr Tamm' },
+ *   { id: '2', date: '2026-05-20', doctor: 'Dr Tamm' },
+ *   { id: '3', date: '2026-05-21', doctor: 'Dr Kask' },
+ * ];
+ * const columns: ColumnDef<Row>[] = [
+ *   { accessorKey: 'date', header: 'Date', meta: { rowSpan: groupRowSpan(data, (d) => d.date) } },
+ *   { accessorKey: 'doctor', header: 'Doctor' },
+ * ];
+ * ```
+ *
+ * Resolves against the original `data` array order — sorting / filtering /
+ * pagination will not regroup rows, so the data should already be ordered
+ * for the grouping you want before passing it in.
+ */
+export const groupRowSpan = <TData,>(
+  data: TData[],
+  getKey: (item: TData) => unknown
+): ((row: Row<TData>) => number) => {
+  return (row) => {
+    const idx = row.index;
+    if (idx < 0 || idx >= data.length) return 1;
+    const currentKey = getKey(data[idx]);
+    if (idx > 0 && getKey(data[idx - 1]) === currentKey) return 0;
+    let span = 1;
+    for (let i = idx + 1; i < data.length; i++) {
+      if (getKey(data[i]) === currentKey) span++;
+      else break;
+    }
+    return span;
+  };
+};
 
 /**
  * Persistable state slices owned by Table. Each slice can be controlled via
@@ -535,9 +597,12 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
         const userColumnProps = columnProps?.(cell.column.id);
         const isDragCell = draggable && cell.column.id === DRAG_COLUMN_ID;
         const isDragOverThisCol = !!dragOverColumnId && cell.column.id === dragOverColumnId;
+        const resolvedRowSpan = cellMeta?.rowSpan?.(cell.row as Row<unknown>);
+        if (resolvedRowSpan === 0) return null;
         return (
           <td
             key={cell.id}
+            rowSpan={resolvedRowSpan && resolvedRowSpan > 1 ? resolvedRowSpan : undefined}
             className={cn(
               styles['tedi-table__cell'],
               {
@@ -587,13 +652,19 @@ const DRAG_COLUMN_ID = '__drag__';
 
 /**
  * Payload emitted by `Table` when a row is reordered via drag-and-drop.
- * Use the indexes to apply the new order to your source `data` array, e.g.
- * `arrayMove(data, fromIndex, toIndex)`.
+ *
+ * `fromIndex` / `toIndex` are positions in the **source `data` array** —
+ * unchanged by sorting, filtering, or pagination. Apply directly with e.g.
+ * `arrayMove(data, fromIndex, toIndex)`. `fromId` / `toId` mirror those
+ * positions via the rows' TanStack ids (defaulting to the row's string
+ * index in `data`, unless overridden via `getRowId`).
  */
 export interface TableRowDropEvent {
   fromId: string;
   toId: string;
+  /** Index of the dragged row in the original `data` array. */
   fromIndex: number;
+  /** Index of the drop target in the original `data` array. */
   toIndex: number;
 }
 
@@ -1016,9 +1087,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const [draggingRowId, setDraggingRowId] = useState<string | null>(null);
   const [dragOverRowId, setDragOverRowId] = useState<string | null>(null);
   const draggingRowIdRef = useRef<string | null>(null);
-  // Flag set on the handle's mousedown/touchstart so we know the very next
-  // `dragstart` was initiated from the grip. Reset on dragend AND on a stray
-  // mouseup so a plain click on the handle doesn't poison the next drag.
   const armedRowIdRef = useRef<string | null>(null);
 
   const [draggingColumnId, setDraggingColumnId] = useState<string | null>(null);
@@ -1026,10 +1094,11 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const draggingColumnIdRef = useRef<string | null>(null);
   const armedColumnIdRef = useRef<string | null>(null);
 
-  const rowIds = useMemo(() => (draggableRows ? rows.map((r) => r.id) : []), [draggableRows, rows]);
+  const rowIndexById = useMemo<Map<string, number>>(
+    () => (draggableRows ? new Map(rows.map((r) => [r.id, r.index])) : new Map()),
+    [draggableRows, rows]
+  );
 
-  // Disarm if the user pressed down on a handle but never started a drag
-  // (e.g. clicked, or pressed-and-released without moving).
   useEffect(() => {
     if (!draggableRows && !draggableColumns) return;
     const disarm = () => {
@@ -1119,13 +1188,13 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         setDraggingRowId(null);
         setDragOverRowId(null);
         if (!fromId || fromId === toId) return;
-        const fromIndex = rowIds.indexOf(fromId);
-        const toIndex = rowIds.indexOf(toId);
-        if (fromIndex < 0 || toIndex < 0) return;
+        const fromIndex = rowIndexById.get(fromId);
+        const toIndex = rowIndexById.get(toId);
+        if (fromIndex === undefined || toIndex === undefined) return;
         onRowDrop?.({ fromId, toId, fromIndex, toIndex });
       },
     }),
-    [rowIds, onRowDrop]
+    [rowIndexById, onRowDrop]
   );
 
   const moveItem = <T,>(array: T[], from: number, to: number): T[] => {

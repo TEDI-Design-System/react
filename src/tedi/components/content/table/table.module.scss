@@ -302,6 +302,16 @@
   &.tedi-table--striped .tedi-table__body .tedi-table__row:nth-of-type(even) > .tedi-table__cell:first-child {
     background: var(--table-striped);
   }
+
+  .tedi-table__body .tedi-table__row.tedi-table__row--selected > .tedi-table__cell:first-child {
+    background: var(--table-active);
+  }
+
+  &.tedi-table--row-hover .tedi-table__body .tedi-table__row:hover > .tedi-table__cell:first-child,
+  .tedi-table__body .tedi-table__row.tedi-table__row--active > .tedi-table__cell:first-child,
+  .tedi-table__body .tedi-table__row.tedi-table__row--active:hover > .tedi-table__cell:first-child {
+    background: var(--table-hover);
+  }
 }
 
 .tedi-table--sticky-header {
