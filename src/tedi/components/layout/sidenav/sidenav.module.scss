@@ -253,7 +253,7 @@
   }
 }
 
-.tedi-sidenav__item--mobile {
+.tedi-sidenav__item--mobile:not(:last-child) {
   border-bottom: var(--tedi-borders-01) solid var(--navigation-vertical-item-border);
 }
 
