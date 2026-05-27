@@ -1284,6 +1284,25 @@ export const SelectableRows: Story = {
 };
 
 /**
+ * Single-select via `selectionMode="single"`. Each row gets a radio instead of a checkbox, the
+ * select-all header is omitted, and `rowSelection` holds at most one row id at a time — picking
+ * a new row clears the previous selection automatically. The controlled `state.rowSelection`
+ * / `onStateChange` API is unchanged, so existing consumers keep working.
+ */
+export const SingleSelectRows: Story = {
+  render: () => (
+    <Table<Person>
+      id="tedi-table-single-select"
+      data={people}
+      columns={personColumns}
+      enableRowSelection
+      selectionMode="single"
+      pagination={DEFAULT_PAGINATION}
+    />
+  ),
+};
+
+/**
  * Whole-row click via `onRowClick={(row) => ...}`. The table adds pointer cursor and hover highlight
  * automatically. Use instead of (or alongside) `enableRowSelection` when a click should navigate
  * or open a detail panel rather than toggle a checkbox.

@@ -39,6 +39,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
+import { Radio, RadioProps } from '../../form/radio/radio';
 import { TextField } from '../../form/textfield/textfield';
 import { Pagination } from '../../navigation/pagination';
 import styles from './table.module.scss';
@@ -106,6 +107,18 @@ export type TableSelectionCheckboxProps = Omit<
   | 'disabled'
   | 'onChange'
 >;
+
+export type TableSelectionRadioProps = Omit<
+  RadioProps,
+  'id' | 'name' | 'label' | 'hideLabel' | 'value' | 'checked' | 'defaultChecked' | 'disabled' | 'onChange'
+>;
+
+/**
+ * Row-selection indicator type. `'multiple'` (default) uses checkboxes with a
+ * select-all header; `'single'` uses radios, hides the header, and limits
+ * `rowSelection` to a single row at a time.
+ */
+export type TableSelectionMode = 'multiple' | 'single';
 
 export type TableExpandCollapseProps = Omit<
   CollapseProps,
@@ -230,9 +243,23 @@ export interface TableProps<TData> {
   rowHover?: boolean;
   /**
    * Enables row selection. When true, Table prepends a selection column with
-   * checkboxes bound to `rowSelection` state.
+   * a checkbox (or radio, when `selectionMode === 'single'`) bound to
+   * `rowSelection` state.
    */
   enableRowSelection?: boolean | ((row: Row<TData>) => boolean);
+  /**
+   * How rows are selected when `enableRowSelection` is on:
+   * - `'multiple'` (default) — checkbox per row + select-all in the header.
+   *   `rowSelection` can hold any number of row ids.
+   * - `'single'` — radio per row, no select-all. Selecting a row clears any
+   *   previous selection, so `rowSelection` holds at most one row id.
+   *
+   * In both modes the controlled `state.rowSelection` / `onStateChange` API
+   * is unchanged — only the indicator and TanStack's underlying multi-select
+   * behavior change.
+   * @default multiple
+   */
+  selectionMode?: TableSelectionMode;
   /**
    * Paints the `--table-active` background tint on every selected row. Turn
    * off when checkboxes are used purely for "pick some rows for a bulk
@@ -347,9 +374,16 @@ export interface TableProps<TData> {
    * checkbox and every per-row cell checkbox). Use this to e.g. switch the
    * checkboxes to `size: 'large'`. Wiring props (id, name, label, value,
    * checked, indeterminate, disabled, onChange, hideLabel) are owned by
-   * Table and cannot be overridden.
+   * Table and cannot be overridden. Ignored when `selectionMode === 'single'`.
    */
   checkboxProps?: TableSelectionCheckboxProps;
+  /**
+   * Props forwarded to the row-selection radios when `selectionMode === 'single'`.
+   * Use this to e.g. switch the radios to `size: 'large'`. Wiring props
+   * (id, name, label, value, checked, disabled, onChange, hideLabel) are owned
+   * by Table and cannot be overridden.
+   */
+  radioProps?: TableSelectionRadioProps;
   /**
    * Props forwarded to the row-expand Collapse toggle. Use this to e.g.
    * switch to `arrowType: 'default'`, change the icon size, or disable
@@ -608,6 +642,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     activeRowId,
     rowHover,
     enableRowSelection,
+    selectionMode = 'multiple',
     highlightSelectedRows = true,
     enableColumnFilters = false,
     renderSubComponent,
@@ -620,6 +655,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     pageCount,
     rowCount,
     checkboxProps,
+    radioProps,
     collapseProps,
     rowProps,
     columnProps,
@@ -764,47 +800,64 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableColumnFilter: false,
         size: 40,
         header: '',
-        // The DragHandle button is rendered inside the SortableRow wrapper
-        // (not here) because `useSortable` must be called per row. This cell
-        // is just a placeholder; the actual button is positioned via CSS.
         cell: () => null,
       });
     }
 
     if (hasSelection) {
+      const isSingle = selectionMode === 'single';
+      const radioGroupName = `${resolvedId}-select`;
+
       leading.push({
         id: SELECT_COLUMN_ID,
         enableSorting: false,
         enableHiding: false,
         enableColumnFilter: false,
         size: 40,
-        header: ({ table }) => (
-          <Checkbox
-            {...checkboxProps}
-            id={`${resolvedId}-select-all`}
-            name={`${resolvedId}-select-all`}
-            label={getLabelRef.current('table.select-all', table.getIsAllPageRowsSelected())}
-            hideLabel
-            value="all"
-            checked={table.getIsAllPageRowsSelected()}
-            indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
-            onChange={(_value, checked) => table.toggleAllPageRowsSelected(checked)}
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            {...checkboxProps}
-            id={`${resolvedId}-select-${row.id}`}
-            name={`${resolvedId}-select-${row.id}`}
-            label={getLabelRef.current('table.select-row', row.getIsSelected())}
-            hideLabel
-            value={row.id}
-            checked={row.getIsSelected()}
-            disabled={!row.getCanSelect()}
-            indeterminate={row.getIsSomeSelected()}
-            onChange={(_value, checked) => row.toggleSelected(checked)}
-          />
-        ),
+        header: isSingle
+          ? ''
+          : ({ table }) => (
+              <Checkbox
+                {...checkboxProps}
+                id={`${resolvedId}-select-all`}
+                name={`${resolvedId}-select-all`}
+                label={getLabelRef.current('table.select-all', table.getIsAllPageRowsSelected())}
+                hideLabel
+                value="all"
+                checked={table.getIsAllPageRowsSelected()}
+                indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
+                onChange={(_value, checked) => table.toggleAllPageRowsSelected(checked)}
+              />
+            ),
+        cell: ({ row }) =>
+          isSingle ? (
+            <Radio
+              {...radioProps}
+              id={`${resolvedId}-select-${row.id}`}
+              name={radioGroupName}
+              label={getLabelRef.current('table.select-row', row.getIsSelected())}
+              hideLabel
+              value={row.id}
+              checked={row.getIsSelected()}
+              disabled={!row.getCanSelect()}
+              onChange={(_value, checked) => {
+                if (checked) row.toggleSelected(true);
+              }}
+            />
+          ) : (
+            <Checkbox
+              {...checkboxProps}
+              id={`${resolvedId}-select-${row.id}`}
+              name={`${resolvedId}-select-${row.id}`}
+              label={getLabelRef.current('table.select-row', row.getIsSelected())}
+              hideLabel
+              value={row.id}
+              checked={row.getIsSelected()}
+              disabled={!row.getCanSelect()}
+              indeterminate={row.getIsSomeSelected()}
+              onChange={(_value, checked) => row.toggleSelected(checked)}
+            />
+          ),
       });
     }
 
@@ -848,7 +901,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     }
 
     return [...leading, ...columns];
-  }, [columns, hasSelection, hasExpansion, draggableRows, resolvedId, checkboxProps, collapseProps]);
+  }, [
+    columns,
+    hasSelection,
+    selectionMode,
+    hasExpansion,
+    draggableRows,
+    resolvedId,
+    checkboxProps,
+    radioProps,
+    collapseProps,
+  ]);
 
   const fallbackRowSelection = useMemo<RowSelectionState>(() => ({}), []);
   const fallbackExpanded = useMemo<ExpandedState>(() => ({}), []);
@@ -873,6 +936,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       pagination: paginationEnabled ? tableState.pagination ?? fallbackPagination : undefined,
     },
     enableRowSelection,
+    enableMultiRowSelection: selectionMode !== 'single',
     enableColumnFilters,
     manualPagination,
     manualSorting,

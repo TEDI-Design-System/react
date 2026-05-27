@@ -497,6 +497,42 @@ describe('Table', () => {
       expect(checkboxes[1]).toBeChecked();
       expect(container.querySelector('.tedi-table__row--selected')).not.toBeInTheDocument();
     });
+
+    it('renders radios and omits the select-all header when selectionMode is "single"', () => {
+      render(
+        <Table<Person> id="t-sel-single" data={data} columns={columns} enableRowSelection selectionMode="single" />
+      );
+
+      expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+      const radios = screen.getAllByRole('radio');
+      // 1 radio per data row, no select-all in the header
+      expect(radios).toHaveLength(data.length);
+    });
+
+    it('limits selection to one row at a time in single mode', () => {
+      const onStateChange = jest.fn();
+      render(
+        <Table<Person>
+          id="t-sel-single-one"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          selectionMode="single"
+          onStateChange={onStateChange}
+        />
+      );
+
+      const radios = screen.getAllByRole('radio');
+      fireEvent.click(radios[0]);
+      expect(radios[0]).toBeChecked();
+
+      fireEvent.click(radios[1]);
+      expect(radios[1]).toBeChecked();
+      expect(radios[0]).not.toBeChecked();
+
+      const lastCall = onStateChange.mock.calls.at(-1)?.[0];
+      expect(Object.keys(lastCall?.rowSelection ?? {})).toHaveLength(1);
+    });
   });
 
   describe('expansion', () => {
