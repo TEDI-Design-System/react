@@ -164,11 +164,28 @@ export const WithIcons: Story = {
   },
 };
 
-/**
- * Mega-menu panel — pass `HorizontalNav.Group` elements via the active
- * `HorizontalNav.Item`'s `submenu` prop.
- */
-export const MegaMenu: Story = {
+export const WithSeparator: Story = {
+  render: Template,
+  args: {
+    ariaLabel: 'Primary navigation',
+    children: (
+      <>
+        <HorizontalNav.Item href="#" isActive>
+          Töölaud
+        </HorizontalNav.Item>
+        <HorizontalNav.Item href="#">Minu taotlused</HorizontalNav.Item>
+        <HorizontalNav.Item href="#">Minu dokumendid</HorizontalNav.Item>
+        <HorizontalNav.Item href="#">Koolitused</HorizontalNav.Item>
+        <HorizontalNav.Separator />
+        <HorizontalNav.Item href="#" icon="settings">
+          Seaded
+        </HorizontalNav.Item>
+      </>
+    ),
+  },
+};
+
+export const MenuOpen: Story = {
   render: Template,
   args: {
     ariaLabel: 'Primary navigation',
@@ -221,11 +238,7 @@ export const MegaMenu: Story = {
 };
 
 /**
- * Custom inner width — the bar defaults to `maxWidth="xl"` (75rem). Override
- * `maxWidth` with any CSS length, number, or another TEDI breakpoint name
- * (`'sm' | 'md' | 'lg' | 'xl' | 'xxl'`) to align the nav inner with your
- * page's content container. Pass `'none'` to disable the cap and let the bar
- * fill the full `<nav>` width.
+ * Overrides the default `maxWidth` (`'xxl'`) with a tighter `'lg'`.
  */
 export const ConstrainedInnerWidth: Story = {
   render: Template,
@@ -262,14 +275,8 @@ export const ConstrainedInnerWidth: Story = {
 };
 
 /**
- * Toggle-only parent — omit `href` on a `HorizontalNav.Item` that has a
- * `submenu`, and the trigger automatically renders as `<button>` with
- * `aria-haspopup="menu"` and `aria-expanded`. The submenu open/close state is
- * managed by `HorizontalNav` itself: clicking the parent toggles its panel,
- * clicking another parent switches to that one, and clicking outside the nav
- * or pressing `Escape` closes it. Pass `isActive` only if you also want the
- * panel open on mount and the parent visually marked as selected (e.g.
- * because the user is currently on a child route).
+ * Parent item with no `href` — renders as a `<button>` and uses the built-in
+ * toggle / outside-click / Escape behavior.
  */
 export const ToggleOnlyParent: Story = {
   render: Template,
@@ -302,9 +309,8 @@ export const ToggleOnlyParent: Story = {
 };
 
 /**
- * Narrow mega-menu — set `submenuFit="item"` to align the panel under the
- * active item with content-driven width, instead of spanning the whole nav.
- * Groups still flow in a row; pass fewer groups for a tighter footprint.
+ * `submenuFit="item"` aligns the panel directly under the active item with
+ * content-driven width instead of spanning the whole nav.
  */
 export const NarrowMegaMenu: Story = {
   render: Template,
@@ -344,9 +350,7 @@ export const NarrowMegaMenu: Story = {
 };
 
 /**
- * Single-column submenu without a group title — omit `HorizontalNav.Group`'s
- * `title` to skip the `<h3>` heading. Combined with `submenuFit="item"` it
- * gives a compact menu aligned under the active item.
+ * `HorizontalNav.Group` without a `title` — the heading is omitted entirely.
  */
 export const NarrowSubmenuNoTitle: Story = {
   render: Template,
@@ -373,27 +377,6 @@ export const NarrowSubmenuNoTitle: Story = {
         <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
         <HorizontalNav.Item href="#">Liiklus ja sõidukid</HorizontalNav.Item>
         <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
-      </>
-    ),
-  },
-};
-
-export const WithSeparator: Story = {
-  render: Template,
-  args: {
-    ariaLabel: 'Primary navigation',
-    children: (
-      <>
-        <HorizontalNav.Item href="#" isActive>
-          Töölaud
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu taotlused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu dokumendid</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Koolitused</HorizontalNav.Item>
-        <HorizontalNav.Separator />
-        <HorizontalNav.Item href="#" icon="settings">
-          Seaded
-        </HorizontalNav.Item>
       </>
     ),
   },
@@ -541,12 +524,8 @@ export const GroupVariants: StoryObj = {
 };
 
 /**
- * Below `mobileBreakpoint` the bar collapses into the shared Sidenav mobile
- * drawer. In a real layout the toggle button lives inside the responsive
- * `Header` (via its `toggle` slot) and shares its open state with the nav so
- * the same hamburger drives the drawer. The story below forces mobile view
- * (`mobileBreakpoint="xxl"`) so you can see the toggle/drawer interaction
- * on a desktop viewport without resizing.
+ * Forces mobile mode (`mobileBreakpoint="xxl"`) so the drawer + header toggle
+ * interaction is visible on a desktop canvas without resizing.
  */
 export const ControlledMobile: Story = {
   parameters: { noHeader: true },
@@ -597,10 +576,11 @@ const stickyDemoFiller = (
 );
 
 /**
- * Plain sticky — `HorizontalNav` has no built-in stickiness because it is a
- * layout concern. To pin the bar to the top while scrolling, wrap it in a
- * container with `position: sticky; top: 0` (or `top: <headerHeight>` if you
- * have a sticky header above it). This story wraps the nav in a sticky div.
+ * Wrap the nav in a `position: sticky; top: 0` container to pin it.
+ *
+ * **Note:** below `mobileBreakpoint` the bar collapses into the mobile drawer,
+ * so the sticky demo isn't meaningful on a mobile viewport — preview this on
+ * desktop.
  */
 export const Sticky: StoryObj = {
   parameters: { noHeader: true },
@@ -613,9 +593,11 @@ export const Sticky: StoryObj = {
 };
 
 /**
- * Sticky on scroll — use the existing `Affix` component to pin the nav after
- * the user scrolls past it. `Affix` (backed by `react-sticky-box`) measures
- * any registered header and offsets the sticky position accordingly.
+ * Pin via `Affix` once the nav reaches the top of the viewport.
+ *
+ * **Note:** below `mobileBreakpoint` the bar collapses into the mobile drawer,
+ * so the sticky demo isn't meaningful on a mobile viewport — preview this on
+ * desktop.
  */
 export const StickyOnScroll: StoryObj = {
   parameters: { noHeader: true },
