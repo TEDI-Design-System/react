@@ -22,6 +22,11 @@ const meta: Meta<typeof ModalProvider> = {
   component: ModalProvider,
   subcomponents: { Modal, ModalTrigger, ModalCloser } as never,
   title: 'Community/Modal',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

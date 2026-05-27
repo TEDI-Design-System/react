@@ -532,6 +532,102 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 
 **Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`
 
+### Modal
+Portalled dialog with focus trapping, backdrop, and scroll locking (built on floating-ui).
+
+Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, `Modal.Footer`, `Modal.Closer`
+
+```tsx
+<Modal>
+  <Modal.Trigger><Button>Open</Button></Modal.Trigger>
+  <Modal.Content width="md" position="center">
+    <Modal.Header title="Title" description="Optional supporting text" />
+    <Modal.Body>{/* content */}</Modal.Body>
+    <Modal.Footer>
+      <Modal.Closer><Button visualType="secondary">Cancel</Button></Modal.Closer>
+      <Modal.Closer><Button>Save</Button></Modal.Closer>
+    </Modal.Footer>
+  </Modal.Content>
+</Modal>
+```
+
+**`Modal` props (provider — open/close state)**
+- `defaultOpen?: boolean` — uncontrolled initial state
+- `open?: boolean` + `onToggle?: (open: boolean) => void` — controlled mode
+- `closeOnBackdropClick: boolean = true`
+- `closeOnEscape: boolean = true`
+
+**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`)
+- `width: ModalWidth = 'sm'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
+- `maxWidth?: string` — cap for custom widths
+- `size: 'default' | 'small' = 'default'` — header/body/footer padding density
+- `position: 'center' | 'top' | 'right' | 'left' = 'center'` — side positions render full-height drawers
+- `fullscreen: boolean | 'sm' | 'md' | 'lg' | 'xl' = false` — `true` = always, breakpoint string = below that breakpoint
+- `scrollBehavior: 'content' | 'page' = 'content'` — internal body scroll vs. overlay-level page scroll
+- `trapFocus: boolean = true`, `returnFocus: boolean = true`
+- `showOverlay: boolean = true` — toggle the dimmed backdrop
+- `lockScroll: boolean = true`
+- `visuallyHiddenDismiss?: boolean` — adds SR-only dismiss buttons for touch screen readers
+- `aria-labelledby?`, `aria-describedby?` — usually wired automatically by `Modal.Header`
+
+**`Modal.Header` props**
+- `title?: ReactNode` — rendered as `<h3>`, auto-registered as `aria-labelledby`
+- `description?: ReactNode` — auto-registered as `aria-describedby`
+- `closeButton: boolean = true`
+- `closeButtonProps?: Omit<ClosingButtonProps, 'onClick'>`
+- `children?: ReactNode` — replaces the default title/description layout
+
+**`Modal.Body` props**
+- `noScroll?: boolean` — disable internal scroll (pair with `scrollBehavior="page"` on Content)
+
+**`Modal.Footer` props**
+- `children?: ReactNode` — right-aligned actions (default)
+- `left?: ReactNode` — when set, footer splits into left + right halves
+
+**`Modal.Closer`** — wraps any clickable element to close the modal on click. Preserves the wrapped element's `onClick`.
+
+**`useModal()` hook** — read the public subset of Modal state from any descendant of `<Modal>`. **This is the hook to reach for as a consumer.** Returns:
+- `open: boolean`
+- `onOpenChange: (open: boolean) => void` — programmatically open / close
+- `labelId: string`, `descriptionId: string` — for manual `aria-labelledby` / `aria-describedby` wiring when you replace `Modal.Header`
+
+Throws if called outside a `<Modal>` subtree.
+
+> `useModalContext` and `ModalContext` are also exported alongside `useModal`, but they're for the package's own sub-components — they expose floating-ui plumbing (`reference`, `floating`, `getReferenceProps`, …) which causes subtle focus / dismissal bugs when touched from outside the Modal package. **Always prefer `useModal()`** in consumer code.
+
+```tsx
+import { Modal, useModal, Button, ClosingButton } from '@tedi-design-system/react/tedi';
+
+function CustomHeader({ title }: { title: string }) {
+  const { labelId, onOpenChange } = useModal();
+  return (
+    <Modal.Header>
+      <h2 id={labelId}>{title}</h2>
+      <ClosingButton onClick={() => onOpenChange(false)} />
+    </Modal.Header>
+  );
+}
+
+function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
+  const { onOpenChange } = useModal();
+  return (
+    <Button onClick={() => { onConfirm(); onOpenChange(false); }}>Confirm</Button>
+  );
+}
+```
+
+```tsx
+// Responsive: side drawer on desktop, centered on mobile
+<Modal.Content position="right" md={{ position: 'center' }} defaultServerBreakpoint="md">
+
+// ScrollFade inside the body — modal hands scroll-ownership over automatically
+<Modal.Body>
+  <ScrollFade fadePosition="both" fadeSize={10}>
+    <div style={{ padding: 'var(--modal-body-padding)' }}>{/* long content */}</div>
+  </ScrollFade>
+</Modal.Body>
+```
+
 ## Tags
 
 ### Tag
