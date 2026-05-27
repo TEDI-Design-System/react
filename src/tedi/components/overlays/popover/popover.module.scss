@@ -12,7 +12,7 @@ $popover-width: (
   padding: var(--popover-padding-sm);
   color: var(--popover-text);
   background: var(--popover-background);
-  border: 1px solid var(--popover-border);
+  border: var(--popover-border-width-md) solid var(--popover-border-default);
   border-radius: var(--popover-radius-rounded);
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
@@ -34,15 +34,33 @@ $popover-width: (
       height: 1.5rem;
       clip-path: polygon(100% 0, 100% 100%, 0 100%);
       background: var(--popover-background);
-      border-right: 4px solid var(--header-popover-border-top);
-      border-bottom: 4px solid var(--header-popover-border-top);
+      border-right: var(--popover-border-width-lg) solid var(--popover-border-prominent);
+      border-bottom: var(--popover-border-width-lg) solid var(--popover-border-prominent);
       fill: transparent;
+    }
+  }
+
+  &--border {
+    position: relative;
+
+    &::before {
+      position: absolute;
+      content: '';
+      background: var(--popover-border-prominent);
     }
   }
 
   &[data-placement^='bottom'] {
     &.tedi-popover--border {
-      border-top: 4px solid var(--header-popover-border-top);
+      border-top-left-radius: var(--popover-radius-sharp);
+      border-top-right-radius: var(--popover-radius-sharp);
+
+      &::before {
+        top: calc(-1 * var(--popover-border-width-lg));
+        right: calc(-1 * var(--popover-border-width-md));
+        left: calc(-1 * var(--popover-border-width-md));
+        height: var(--popover-border-width-lg);
+      }
     }
 
     .tedi-popover__arrow--border {
@@ -53,7 +71,15 @@ $popover-width: (
 
   &[data-placement^='top'] {
     &.tedi-popover--border {
-      border-bottom: 4px solid var(--header-popover-border-top);
+      border-bottom-right-radius: var(--popover-radius-sharp);
+      border-bottom-left-radius: var(--popover-radius-sharp);
+
+      &::before {
+        right: calc(-1 * var(--popover-border-width-md));
+        bottom: calc(-1 * var(--popover-border-width-lg));
+        left: calc(-1 * var(--popover-border-width-md));
+        height: var(--popover-border-width-lg);
+      }
     }
 
     .tedi-popover__arrow--border {
@@ -65,7 +91,15 @@ $popover-width: (
 
   &[data-placement^='right'] {
     &.tedi-popover--border {
-      border-left: 4px solid var(--header-popover-border-top);
+      border-top-left-radius: var(--popover-radius-sharp);
+      border-bottom-left-radius: var(--popover-radius-sharp);
+
+      &::before {
+        top: calc(-1 * var(--popover-border-width-md));
+        bottom: calc(-1 * var(--popover-border-width-md));
+        left: calc(-1 * var(--popover-border-width-lg));
+        width: var(--popover-border-width-lg);
+      }
     }
 
     .tedi-popover__arrow--border {
@@ -76,7 +110,15 @@ $popover-width: (
 
   &[data-placement^='left'] {
     &.tedi-popover--border {
-      border-right: 4px solid var(--header-popover-border-top);
+      border-top-right-radius: var(--popover-radius-sharp);
+      border-bottom-right-radius: var(--popover-radius-sharp);
+
+      &::before {
+        top: calc(-1 * var(--popover-border-width-md));
+        right: calc(-1 * var(--popover-border-width-lg));
+        bottom: calc(-1 * var(--popover-border-width-md));
+        width: var(--popover-border-width-lg);
+      }
     }
 
     .tedi-popover__arrow--border {

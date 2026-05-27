@@ -128,6 +128,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Required field',
     ru: 'Обязательное поле',
   },
+  'button-group.selected': {
+    description: 'Visually-hidden suffix that marks the currently active item in a ButtonGroup mobile dropdown.',
+    components: ['ButtonGroup'],
+    et: 'Valitud',
+    en: 'Selected',
+    ru: 'Выбрано',
+  },
   breadcrumbs: {
     description: 'Breadcrumbs navigation label',
     components: ['Breadcrumbs'],
@@ -185,18 +192,25 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Закрыть',
   },
   'header.role-selection.search.label': {
-    description: 'Label for Search in Role selection',
+    description: 'Label for search in Role selection',
     components: ['HeaderRole'],
     et: 'Otsi isikut',
     en: 'Search representative',
     ru: 'Найти представителя',
   },
   'header.role-selection.search.organizationLabel': {
-    description: 'Label for Organization Search in Role selection',
+    description: 'Label for organization search in Role selection',
     components: ['HeaderRole'],
     et: 'Otsi asutust',
     en: 'Search organization',
     ru: 'Найти организацию',
+  },
+  'header.role-selection.no-results': {
+    description: 'Text shown when representative search yields no results',
+    components: ['HeaderRole'],
+    et: 'Esindajaid ei leitud',
+    en: 'No representatives found',
+    ru: 'Представители не найдены',
   },
   'header.login': {
     description: 'Label for login button',
@@ -205,7 +219,7 @@ export const labelsMap = validateDefaultLabels({
     en: 'Log in',
     ru: 'Зайти на портал',
   },
-  'header.login-small': {
+  'header.login.mobile': {
     description: 'Label for login button (small)',
     components: ['Header', 'HeaderLogin'],
     et: 'Sisene',
@@ -219,7 +233,7 @@ export const labelsMap = validateDefaultLabels({
     en: 'Log out',
     ru: 'Выйти',
   },
-  'header.logout-small': {
+  'header.logout.mobile': {
     description: 'Label for logout button (small)',
     components: ['Header', 'HeaderLogout'],
     et: 'Välju',

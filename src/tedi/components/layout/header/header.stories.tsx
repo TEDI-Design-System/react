@@ -10,6 +10,7 @@ import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Search } from '../../form/search/search';
+import { EmptyState } from '../../misc/empty-state/empty-state';
 import Link from '../../navigation/link/link';
 import { Tag } from '../../tags/tag/tag';
 import { HideAt } from '../hide-at/hide-at';
@@ -93,10 +94,10 @@ const languages = [
 ];
 
 const representatives: Representative[] = [
-  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
-  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person' } },
+  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle' } },
+  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle' } },
+  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle' } },
 ];
 
 const loggedInNavItems = [
@@ -180,15 +181,19 @@ const profileTranslations = {
   representatives: { et: 'Esindatavad', en: 'Representatives', ru: 'Представители' },
   contacts: { et: 'Kontaktid', en: 'Contacts', ru: 'Контакты' },
   darkMode: { et: 'Tume režiim', en: 'Dark mode', ru: 'Тёмная тема' },
-  notifications: { et: 'Riiklikud teated', en: 'National notifications', ru: 'Государственные уведомления' },
+  notifications: { et: 'Teated', en: 'Notifications', ru: 'Уведомления' },
   accessibility: { et: 'Ligipääsetavus', en: 'Accessibility', ru: 'Доступность' },
   home: { et: 'Avaleht', en: 'Home', ru: 'Главная' },
   services: { et: 'Teenused', en: 'Services', ru: 'Услуги' },
   blog: { et: 'Blogi', en: 'Blog', ru: 'Блог' },
   contact: { et: 'Kontakt', en: 'Contact', ru: 'Контакт' },
+  organization: { et: 'Asutus', en: 'Organization', ru: 'Организация' },
+  personalCode: { et: 'Isikukood', en: 'Personal code', ru: 'Личный код' },
+  role: { et: 'Roll', en: 'Role', ru: 'Роль' },
+  representative: { et: 'Esindatav', en: 'Representative', ru: 'Представитель' },
 } as const;
 
-const ProfileExample = () => {
+const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
   const { theme, setTheme } = useTheme();
   const { locale = 'en' } = useLabels();
   const id = useId();
@@ -210,10 +215,20 @@ const ProfileExample = () => {
       <Link underline={false} href="#">
         {t('contacts')}
       </Link>
+
       <ShowAt lg>
         <Separator axis="horizontal" />
       </ShowAt>
+      <Link underline={false} href="#">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--link-inner-spacing-x)' }}>
+          <Icon name="notifications" size={16} />
+          {t('notifications')}
+        </div>
+      </Link>
 
+      <ShowAt lg>
+        <Separator axis="horizontal" />
+      </ShowAt>
       <div>
         <Toggle id={id} onChange={handleToggle} label={t('darkMode')} checked={theme === 'dark'} />
       </div>
@@ -221,13 +236,7 @@ const ProfileExample = () => {
       <ShowAt lg>
         <Separator axis="horizontal" />
       </ShowAt>
-      <Link underline={false} iconLeft="notifications" href="#">
-        {t('notifications')}
-      </Link>
-      <ShowAt lg>
-        <Separator axis="horizontal" />
-      </ShowAt>
-      <Header.Logout size="default" href="#" />
+      {showLogout && <Header.Logout size="default" href="#" />}
     </>
   );
 };
@@ -252,16 +261,16 @@ const NavigationLinks = () => {
 
   return (
     <>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('home')}
       </Link>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('services')}
       </Link>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('blog')}
       </Link>
-      <Link color="text" underline={false} href="#">
+      <Link underline={false} href="#">
         {pt('contact')}
       </Link>
     </>
@@ -287,6 +296,14 @@ const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
   );
 };
 
+type StoryTranslateFn = (key: keyof typeof profileTranslations) => string;
+
+const WithTranslations = ({ children }: { children: (t: StoryTranslateFn) => React.ReactNode }) => {
+  const { locale = 'en' } = useLabels();
+  const t: StoryTranslateFn = (key) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  return <>{children(t)}</>;
+};
+
 type StoryWrapperProps = {
   children: (args: { isOpen: boolean; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => React.ReactNode;
 };
@@ -308,7 +325,7 @@ const SidenavLayout = ({ isOpen, children }: { isOpen: boolean; children: React.
 };
 
 const ResponsiveLogo = (props: HeaderLogoProps) => {
-  const query = '(min-width: 360px)';
+  const query = '(min-width: 420px)';
 
   const getMatches = () => (typeof window !== 'undefined' ? window.matchMedia(query).matches : true);
 
@@ -334,19 +351,19 @@ export const Default: Story = {
         <div style={{ display: 'flex', flexDirection: 'column', ...(isOpen && { height: '100vh' }) }}>
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
             <Header.Logo logoDark={logoDark} logo={logo} href="#" />
-            <Header.Center>
-              <ShowAt lg>
-                <Link color="text" underline={false} href="#">
+            <ShowAt lg>
+              <Header.Center>
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-              </ShowAt>
-            </Header.Center>
+              </Header.Center>
+            </ShowAt>
             <Header.Actions>
               <Header.Language languages={languages} currentLanguage={languages[0].label} />
               <Separator axis="vertical" />
@@ -355,7 +372,7 @@ export const Default: Story = {
           </Header>
 
           <HideAt lg>
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div style={{ flex: 1 }}>
               <SideNav
                 ariaLabel="Main navigation"
                 linkAs="a"
@@ -383,7 +400,7 @@ export const Default: Story = {
   ),
 };
 
-export const LoggedOut1: Story = {
+export const LoggedOut: Story = {
   render: () => (
     <StoryWrapper>
       {({ isOpen, setIsOpen }) => (
@@ -391,25 +408,25 @@ export const LoggedOut1: Story = {
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
             <Header.Logo logoDark={logoDark} logo={logo} />
 
-            <Header.Center>
-              <ShowAt lg>
-                <Link color="text" underline={false} href="#">
+            <ShowAt lg>
+              <Header.Center>
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-                <Link color="text" underline={false} href="#">
+                <Link underline={false} href="#">
                   Link text
                 </Link>
-              </ShowAt>
-            </Header.Center>
+              </Header.Center>
+            </ShowAt>
 
             <Header.Actions>
               <Header.Language languages={languages} currentLanguage={languages[0].label} />
@@ -419,7 +436,7 @@ export const LoggedOut1: Story = {
           </Header>
 
           <HideAt lg>
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div style={{ flex: 1 }}>
               <SideNav
                 ariaLabel="Main navigation"
                 linkAs="a"
@@ -455,7 +472,34 @@ export const LoggedOut1: Story = {
   ),
 };
 
-export const LoggedOut2: Story = {
+export const LoggedOutWithSearch: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+On the narrowest viewports the header has to fit a sidenav toggle, a search input and several action buttons in a single row, which leaves no room for the logo. This story wraps \`Header.Logo\` in a small \`ResponsiveLogo\` helper that listens to \`(min-width: 420px)\` via \`window.matchMedia\` and toggles \`showLogo\` accordingly, so the logo is hidden below that width and rendered again as soon as there is space.
+
+\`\`\`tsx
+const ResponsiveLogo = (props: HeaderLogoProps) => {
+  const query = '(min-width: 420px)';
+  const [show, setShow] = useState(() => window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setShow(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
+  return <Header.Logo {...props} showLogo={show} />;
+};
+\`\`\`
+
+Use \`showLogo\` whenever you need to hide the logo at a custom breakpoint that does not match the standard \`xs\`/\`sm\`/\`md\`/\`lg\`/\`xl\`/\`xxl\` tiers — wrap \`Header.Logo\` in \`ShowAt\` / \`HideAt\` for the standard ones, and use \`showLogo\` for the in-between cases.
+`,
+      },
+    },
+  },
   render: () => (
     <StoryWrapper>
       {({ isOpen, setIsOpen }) => (
@@ -463,8 +507,8 @@ export const LoggedOut2: Story = {
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
             <ResponsiveLogo logoDark={logoDark} logo={logo} />
 
-            <Header.Center alignment="space-between">
-              <ShowAt lg>
+            <ShowAt lg>
+              <Header.Center alignment="space-between">
                 <div>
                   <NavigationLinks />
                 </div>
@@ -473,24 +517,32 @@ export const LoggedOut2: Story = {
                     <Search label="search-1" hideLabel id="search-1" />
                   </div>
                 </Header.Search>
-              </ShowAt>
-            </Header.Center>
+              </Header.Center>
+            </ShowAt>
 
             <Header.Actions>
-              <HideAt lg>
+              <ShowAt md>
+                <HideAt lg>
+                  <Header.Search>
+                    <Search label="search-1" hideLabel id="search-1-tablet" />
+                  </Header.Search>
+                  <Separator axis="vertical" />
+                </HideAt>
+              </ShowAt>
+              <Header.Language languages={languages} />
+              <Separator axis="vertical" />
+              <HideAt md>
                 <Header.Search>
-                  <Search label="search-1" hideLabel id="search-1" />
+                  <Search label="search-1" hideLabel id="search-1-mobile" />
                 </Header.Search>
                 <Separator axis="vertical" />
               </HideAt>
-              <Header.Language languages={languages} />
-              <Separator axis="vertical" />
               <Header.Login href="#" />
             </Header.Actions>
           </Header>
 
           <HideAt lg>
-            <div style={{ display: 'flex', flex: 1 }}>
+            <div style={{ flex: 1 }}>
               <NavigationSideNav isMobileOpen={isOpen} />
             </div>
           </HideAt>
@@ -500,266 +552,314 @@ export const LoggedOut2: Story = {
   ),
 };
 
-export const LoggedIn1: Story = {
+export const LoggedIn: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Roll:
-              </Text>
-            }
-            representatives={representatives}
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile>
-          <HideAt lg>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Roll:
-                </Text>
-              }
-              representatives={representatives}
-            />
-            <AccessibilityLink />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('role')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const LoggedIn2: Story = {
+export const LoggedInWithTagLabel: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role label={<Tag>Esindatav</Tag>} showDescription={false} representatives={representatives} />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile>
-          <HideAt lg>
-            <Header.Role label={<Tag>Esindatav:</Tag>} showDescription={false} representatives={representatives} />
-            <AccessibilityLink />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={<Tag>{t('representative')}</Tag>}
+                showDescription={false}
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={<Tag>{t('representative')}:</Tag>}
+                  showDescription={false}
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const WithOrganizationSelection1: Story = {
+export const WithOrganizationSelection: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Asutus
-              </Text>
-            }
-            representatives={organizations}
-            isOrganization
-          />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Roll:
-              </Text>
-            }
-            representatives={representatives}
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile>
-          <HideAt lg>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Asutus:
-                </Text>
-              }
-              representatives={organizations}
-              isOrganization
-            />
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Roll:
-                </Text>
-              }
-              representatives={representatives}
-            />
-            <AccessibilityLink />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('role')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('organization')}:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const WithOrganizationSelection2: Story = {
+export const WithSingleOrganization: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Asutus
-              </Text>
-            }
-            representatives={organizations2}
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile>
-          <HideAt lg>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Asutus:
-                </Text>
-              }
-              representatives={organizations2}
-              isOrganization
-            />
-            <AccessibilityLink />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations2}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('organization')}:
+                    </Text>
+                  }
+                  representatives={organizations2}
+                  isOrganization
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const AlternativeProfileAndLogoutButton1: Story = {
+export const WithProfileLabel: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Asutus
-              </Text>
-            }
-            representatives={organizations}
-            isOrganization
-          />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Isikukood:
-              </Text>
-            }
-            representatives={representatives}
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile showLabel>
-          <HideAt lg>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Asutus:
-                </Text>
-              }
-              representatives={organizations}
-              isOrganization
-            />
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Roll:
-                </Text>
-              }
-              representatives={representatives}
-            />
-            <AccessibilityLink />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('personalCode')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile showLabel>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('organization')}:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const AlternativeProfileAndLogoutButton2: Story = {
+export const WithProfileLabelAndNoOrganization: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Isikukood:
-              </Text>
-            }
-            representatives={representatives}
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile showLabel>
-          <HideAt lg>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Roll:
-                </Text>
-              }
-              representatives={representatives}
-            />
-            <AccessibilityLink />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('personalCode')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile showLabel>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const AlternativeProfileAndLogoutButton3: Story = {
+export const WithNameAsProfileLabel: Story = {
   render: () => (
     <Header>
       <Header.Logo logoDark={logoDark} logo={logo} />
@@ -769,7 +869,7 @@ export const AlternativeProfileAndLogoutButton3: Story = {
 
         <Header.Profile showLabel md={{ label: representatives2[0].name }}>
           <HideAt lg>
-            <Header.Role representatives={representatives2}></Header.Role>
+            <Header.Role showSearch representatives={representatives2}></Header.Role>
           </HideAt>
           <ProfileExample />
         </Header.Profile>
@@ -778,89 +878,109 @@ export const AlternativeProfileAndLogoutButton3: Story = {
   ),
 };
 
-export const AlternativeProfileAndLogoutButton4: Story = {
+export const WithStandaloneLogoutButton: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <ShowAt lg>
-          <AccessibilityLink />
-          <Separator axis="vertical" />
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Asutus
-              </Text>
-            }
-            representatives={organizations}
-            isOrganization
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <HideAt lg>
-          <Header.Profile>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Asutus:
-                </Text>
-              }
-              representatives={organizations}
-              isOrganization
-            />
-            <AccessibilityLink />
-          </Header.Profile>
-          <Separator axis="vertical" />
-        </HideAt>
-        <Header.Logout href="#" />
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <HideAt lg>
+              <Header.Profile>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('organization')}:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <AccessibilityLink />
+              </Header.Profile>
+              <Separator axis="vertical" />
+            </HideAt>
+            <Header.Logout href="#" />
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const WithSearch1: Story = {
+export const WithInlineSearch: Story = {
   render: () => (
-    <Header>
-      <Header.Logo logoDark={logoDark} logo={logo} />
-      <Header.Actions>
-        <Header.Search>
-          <Search label="search-3" hideLabel id="search-3" />
-        </Header.Search>
-        <Separator axis="vertical" />
-        <ShowAt lg>
-          <Header.Role
-            label={
-              <Text modifiers={['small', 'bold']} color="secondary">
-                Roll:
-              </Text>
-            }
-            representatives={representatives}
-          />
-          <Separator axis="vertical" />
-        </ShowAt>
-        <Header.Language languages={languages} />
-        <Separator axis="vertical" />
-        <Header.Profile>
-          <HideAt lg>
-            <Header.Role
-              label={
-                <Text modifiers="bold" color="secondary">
-                  Roll:
-                </Text>
-              }
-              representatives={representatives}
-            />
-          </HideAt>
-          <ProfileExample />
-        </Header.Profile>
-      </Header.Actions>
-    </Header>
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt md>
+              <Header.Search>
+                <Search label="search-3" hideLabel id="search-3-desktop" />
+              </Header.Search>
+              <Separator axis="vertical" />
+            </ShowAt>
+            <ShowAt lg>
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('role')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <HideAt md>
+              <Header.Search>
+                <Search label="search-3" hideLabel id="search-3-mobile" />
+              </Header.Search>
+              <Separator axis="vertical" />
+            </HideAt>
+            <Header.Profile>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
   ),
 };
 
-export const WithSearch2: Story = {
+export const WithMobileBottomSearch: Story = {
   render: () => (
     <Header
       bottom={
@@ -878,16 +998,16 @@ export const WithSearch2: Story = {
         </ShowAt>
         <ShowAt lg>
           <Separator axis="vertical" />
-          <Header.Role representatives={representatives2} />
+          <Header.Role showSearch representatives={representatives2} />
           <Separator axis="vertical" />
         </ShowAt>
         <Header.Language languages={languages} />
         <Separator axis="vertical" />
         <Header.Profile showLabel md={{ label: representatives2[0].name }}>
           <HideAt lg>
-            <Header.Role representatives={representatives2} />
+            <Header.Role showSearch representatives={representatives2} />
           </HideAt>
-          <ProfileExample />
+          <ProfileExample showLogout={false} />
         </Header.Profile>
         <Separator axis="vertical" />
         <Header.Logout href="#" />
@@ -896,50 +1016,111 @@ export const WithSearch2: Story = {
   ),
 };
 
+export const WithCustomRoleContent: Story = {
+  render: () => (
+    <WithTranslations>
+      {(t) => (
+        <Header>
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('role')}:
+                  </Text>
+                }
+                representatives={representatives2}
+                showRoleSwitch
+              >
+                <div style={{ ['--empty-state-padding-sm' as string]: '0' }}>
+                  <EmptyState type="inside" size="small" icon="heart_check">
+                    Sul puuduvad esindatavad
+                  </EmptyState>
+                </div>
+              </Header.Role>
+              <Separator axis="vertical" />
+            </ShowAt>
+            <Header.Language languages={languages} />
+            <Separator axis="vertical" />
+            <Header.Profile>
+              <HideAt lg>
+                <Header.Role
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives2}
+                  showRoleSwitch
+                >
+                  <EmptyState type="inside" size="small" icon="heart_check">
+                    Sul puuduvad esindatavad
+                  </EmptyState>
+                </Header.Role>
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
+  ),
+};
+
 export const LoggedInWithSidenav: Story = {
   render: () => (
     <StoryWrapper>
       {({ isOpen, setIsOpen }) => (
-        <SidenavLayout isOpen={isOpen}>
-          <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
-            <Header.Logo logoDark={logoDark} logo={logo} />
-            <Header.Actions>
-              <ShowAt lg>
-                <AccessibilityLink />
-                <Separator axis="vertical" />
-                <Header.Role
-                  label={
-                    <Text modifiers={['small', 'bold']} color="secondary">
-                      Roll:
-                    </Text>
-                  }
-                  representatives={representatives}
-                />
-                <Separator axis="vertical" />
-              </ShowAt>
-              <Header.Language languages={languages} />
-              <Separator axis="vertical" />
-              <Header.Profile>
-                <HideAt lg>
-                  <Header.Role
-                    label={
-                      <Text modifiers="bold" color="secondary">
-                        Roll:
-                      </Text>
-                    }
-                    representatives={representatives}
-                  />
-                  <AccessibilityLink />
-                </HideAt>
-                <ProfileExample />
-              </Header.Profile>
-            </Header.Actions>
-          </Header>
+        <WithTranslations>
+          {(t) => (
+            <SidenavLayout isOpen={isOpen}>
+              <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+                <Header.Logo logoDark={logoDark} logo={logo} />
+                <Header.Actions>
+                  <ShowAt lg>
+                    <AccessibilityLink />
+                    <Separator axis="vertical" />
+                    <Header.Role
+                      showSearch
+                      label={
+                        <Text modifiers={['small', 'bold']} color="secondary">
+                          {t('role')}:
+                        </Text>
+                      }
+                      representatives={representatives}
+                    />
+                    <Separator axis="vertical" />
+                  </ShowAt>
+                  <Header.Language languages={languages} />
+                  <Separator axis="vertical" />
+                  <Header.Profile>
+                    <HideAt lg>
+                      <Header.Role
+                        showSearch
+                        label={
+                          <Text modifiers="bold" color="secondary">
+                            {t('role')}:
+                          </Text>
+                        }
+                        representatives={representatives}
+                      />
+                      <AccessibilityLink />
+                    </HideAt>
+                    <ProfileExample />
+                  </Header.Profile>
+                </Header.Actions>
+              </Header>
 
-          <div style={{ display: 'flex', flex: 1 }}>
-            <SideNav ariaLabel="Main navigation" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
-          </div>
-        </SidenavLayout>
+              <div style={{ flex: 1 }}>
+                <SideNav ariaLabel="Main navigation" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
+              </div>
+            </SidenavLayout>
+          )}
+        </WithTranslations>
       )}
     </StoryWrapper>
   ),

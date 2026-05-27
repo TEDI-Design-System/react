@@ -41,7 +41,7 @@ describe('HeaderLogin component', () => {
 
     render(<HeaderLogin />);
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.login-small');
+    expect(mockGetLabel).toHaveBeenCalledWith('header.login.mobile');
   });
 
   it('renders with custom label', () => {
@@ -93,6 +93,6 @@ describe('HeaderLogin component', () => {
 
     render(<HeaderLogin />);
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.login-small');
+    expect(mockGetLabel).toHaveBeenCalledWith('header.login.mobile');
   });
 });

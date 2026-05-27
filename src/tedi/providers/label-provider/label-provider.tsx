@@ -42,8 +42,8 @@ export interface ILabelContext {
     key: TKey,
     ...args: TArgs
   ): string;
-  setLocale?: (locale: TediLanguage) => void;
-  locale?: TediLanguage;
+  setLocale: (locale: TediLanguage) => void;
+  locale: TediLanguage;
 }
 
 export const LabelContext = React.createContext<ILabelContext>({
@@ -154,6 +154,11 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
     [mergedLabels]
   );
 
+  const contextValue = useMemo<ILabelContext>(
+    () => ({ getLabel, setLocale: setCurrentLocale, locale: currentLocale }),
+    [getLabel, setCurrentLocale, currentLocale]
+  );
+
   // find all labels that we need to pass into LocalizationProvider
   const muiLabels = Object.keys(mergedLabels).reduce((a, c) => {
     return {
@@ -167,7 +172,7 @@ export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
   }, {} as Partial<PickersLocaleText<unknown>>);
 
   return (
-    <LabelContext.Provider value={{ getLabel, setLocale: setCurrentLocale, locale: currentLocale }}>
+    <LabelContext.Provider value={contextValue}>
       <LocalizationProvider
         dateAdapter={AdapterDayjs}
         dateLibInstance={dayjs}

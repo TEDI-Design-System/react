@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useEffect, useId, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from 'react';
 
 import {
   Breakpoint,
@@ -14,6 +14,15 @@ import Button from '../../../../buttons/button/button';
 import Popover from '../../../../overlays/popover/popover';
 import HeaderMobileButton from '../header-mobile-button/header-mobile-button';
 import styles from './header-profile.module.scss';
+
+interface HeaderProfileContextValue {
+  activeRoleId: string | null;
+  setActiveRoleId: (id: string | null) => void;
+}
+
+const HeaderProfileContext = createContext<HeaderProfileContextValue | null>(null);
+
+export const useHeaderProfile = () => useContext(HeaderProfileContext);
 
 interface HeaderProfileBreakpointProps {
   /**
@@ -57,8 +66,14 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
 
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [activeRoleId, setActiveRoleId] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const modalId = useId();
+
+  const profileContextValue = {
+    activeRoleId,
+    setActiveRoleId: useCallback((id: string | null) => setActiveRoleId(id), []),
+  };
 
   const breakpoint = useBreakpoint();
   const isMobileView = isBreakpointBelow(breakpoint, 'md');
@@ -103,8 +118,9 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
       onClick={handleToggleModal}
       ref={triggerRef}
       disabled={disabled}
+      className={styles['tedi-header-profile__button']}
     >
-      <div className={styles['tedi-header-profile__button']}>
+      <div className={styles['tedi-header-profile__button-inner']}>
         {resolvedLabel}
         <Icon
           name="expand_more"
@@ -129,7 +145,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
   );
 
   return (
-    <>
+    <HeaderProfileContext.Provider value={profileContextValue}>
       {usePopover ? (
         <Popover
           placement="bottom-end"
@@ -175,7 +191,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
           )}
         </>
       )}
-    </>
+    </HeaderProfileContext.Provider>
   );
 };
 

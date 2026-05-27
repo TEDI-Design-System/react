@@ -1,9 +1,29 @@
+@mixin header-language-button {
+  [data-name='button'] {
+    color: var(--header-dropdown-default);
+
+    &:hover {
+      color: var(--header-dropdown-hover);
+    }
+
+    &:active {
+      color: var(--header-dropdown-active);
+    }
+
+    &:focus {
+      color: var(--header-dropdown-focus);
+    }
+  }
+}
+
 .tedi-header-language {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   height: 100%;
+
+  @include header-language-button;
 
   &__icon {
     transition: transform 0.2s ease-in-out;
@@ -31,7 +51,9 @@
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--layout-grid-gutters-08);
     align-items: flex-start;
+
+    @include header-language-button;
   }
 }

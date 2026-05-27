@@ -16,7 +16,9 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 ## Base
 
 ### Icon
+
 **Props:** `IconProps` | fRef
+
 - `name: string` (required)
 - `size: IconSize = 24` — 8, 12, 16, 18, 24, 36, 48
 - `color: IconColor = 'primary'`
@@ -26,20 +28,26 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 - `label?: string` — screen reader label
 
 ### Text
+
 **Props:** `TextProps` | bp
+
 - `children: ReactNode` (required)
 - `element: TextElement = 'p'` — div, p, span, li, label, h1-h6
 - `modifiers?: TextModifiers | TextModifiers[]` — normal, small, bold, italic, h1-h6, uppercase, etc.
 - `color: TextColor = 'primary'`
 
 ### Heading
+
 **Props:** `HeadingProps` extends TextProps | bp
+
 - `element: HeadingLevel = 'h1'` — h1-h6
 
 ## Buttons
 
 ### Button
+
 **Props:** `ButtonProps<C>` | fRef, poly, bp
+
 - `children: ReactNode` (required)
 - `visualType: ButtonType = 'primary'` — primary, secondary, neutral, link
 - `color: ButtonColor = 'default'` — default, danger, success, inverted, text
@@ -58,19 +66,25 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 ```
 
 ### ButtonGroup
+
 **Props:** `ButtonGroupProps`
+
 - `children: ReactNode`
 - `type: 'primary' | 'secondary' = 'primary'`
 - `stretch?: boolean`
 - `onSelectionChange?: (id: string) => void`
 
 ### ClosingButton
+
 **Props:** `ClosingButtonProps`
+
 - `size: 'default' | 'small' = 'default'`
 - `color: 'primary' | 'brand' | 'white' = 'primary'`
 
 ### Collapse
+
 **Props:** `CollapseProps` | bp
+
 - `id: string` (required)
 - `children: ReactNode`
 - `open?: boolean` (controlled), `defaultOpen?: boolean`
@@ -79,7 +93,9 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 - `iconOnly?: boolean`
 
 ### FloatingButton
+
 **Props:** `FloatingButtonProps`
+
 - `children: ReactNode`
 - `axis: 'horizontal' | 'vertical' = 'horizontal'`
 - `size: 'medium' | 'large' = 'medium'`
@@ -87,14 +103,18 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 - `placement?: FloatingButtonPlacement`
 
 ### InfoButton
+
 **Props:** `InfoButtonProps` | fRef
+
 - `isSmall?: boolean`
 - `color: 'default' | 'inverted' = 'default'`
 
 ## Cards
 
 ### Card
+
 **Props:** `CardProps` | fRef, bp
+
 - `children?: ReactNode`
 - `padding: CardContentPadding = 1`
 - `background: CardBackground = 'primary'`
@@ -112,7 +132,9 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 ## Content
 
 ### Label
+
 **Props:** `LabelProps` | fRef, poly, bp
+
 - `children: ReactNode`
 - `required?: boolean`
 - `isBold?: boolean`
@@ -121,7 +143,9 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 - `htmlFor?: string`
 
 ### TextGroup
+
 **Props:** `TextGroupProps` | bp
+
 - `label: ReactNode` (required)
 - `value: ReactNode | ReactNode[]` (required)
 - `type: 'horizontal' | 'vertical' = 'vertical'`
@@ -132,7 +156,9 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 ```
 
 ### List
+
 **Props:** `ListProps` | bp
+
 - `children: ReactElement<ListItemProps>[]`
 - `element: 'ul' | 'ol' = 'ul'`
 - `style: 'styled' | 'none' = 'none'`
@@ -141,25 +167,33 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 Sub-component: `List.Item`
 
 ### Section
+
 **Props:** `SectionProps`
+
 - `as?: 'section' | 'article' | 'aside' | 'div' = 'section'`
 
 ### HeadingWithIcon
+
 **Props:** `HeadingWithIconProps`
+
 - `children: ReactNode` (required)
 - `name: string` (icon name)
 - `element?: HeadingLevel = 'h4'`
 
 ### Truncate
+
 **Props:** `TruncateProps` | bp
+
 - `children: string` (required)
 - `maxLength?: number = 200`
 - `expandable?: boolean = true`
 
 ### Calendar
+
 > **For plain date inputs use `DateField`.** Calendar is the lower-level primitive — reach for it only when you need an always-visible inline calendar (scheduling grid, availability picker) or are building a custom date control on top.
 
 **Props:** `CalendarProps` extends `DayPickerProps`
+
 - `mode?: 'single' | 'multiple' | 'range' = 'single'`
 - `value: Date | Date[] | DateRange | undefined` (required) — shape matches the active `mode`
 - `handleSelect: OnSelectHandler<...>` (required) — fires when a day is clicked
@@ -190,13 +224,15 @@ const [date, setDate] = useState<Date | undefined>();
   value={date}
   handleSelect={(value) => setDate(value as Date)}
   applyValue={setDate}
-/>
+/>;
 ```
 
 ## Form
 
 ### TextField
+
 **Props:** `TextFieldProps` | fRef, bp, form
+
 - `id: string` (required)
 - `label?: string`
 - `value?: string`, `defaultValue?: string`
@@ -212,7 +248,9 @@ const [date, setDate] = useState<Date | undefined>();
 ```
 
 ### Select
+
 **Props:** `SelectProps` | fRef, bp, form
+
 - `id: string` (required)
 - `label?: string`
 - `options?: OptionsOrGroups<ISelectOption>`
@@ -229,11 +267,15 @@ const [date, setDate] = useState<Date | undefined>();
 ```
 
 ### TextArea
+
 **Props:** `TextAreaProps` extends TextFieldProps | fRef, bp, form
+
 - `characterLimit?: number`
 
 ### NumberField
+
 **Props:** `NumberFieldProps` | form
+
 - `id: string` (required)
 - `label?: string`
 - `value?: number`, `defaultValue?: number`
@@ -242,7 +284,9 @@ const [date, setDate] = useState<Date | undefined>();
 - `suffix?: string`
 
 ### Slider
+
 **Props:** `SliderProps` extends `BreakpointSupport` | fRef (HTMLInputElement)
+
 - `id?: string`, `name?: string`
 - `label?: ReactNode`, `hideLabel?: boolean | 'keep-space'`, `required?: boolean`
 - `min?: number = 0`, `max?: number = 100`, `step?: number = 1`
@@ -262,7 +306,9 @@ const [date, setDate] = useState<Date | undefined>();
 ```
 
 ### Checkbox
+
 **Props:** `CheckboxProps` | form
+
 - `id: string` (required)
 - `label?: ReactNode`
 - `value: string` (required)
@@ -272,11 +318,14 @@ const [date, setDate] = useState<Date | undefined>();
 - `size?: 'default' | 'small'`
 
 ### Radio
+
 **Props:** `RadioProps` | form
 Same as Checkbox (without indeterminate)
 
 ### ChoiceGroup
+
 **Props:** `ChoiceGroupProps` | bp, form
+
 - `id: string` (required), `name: string` (required)
 - `label: ReactNode | string`
 - `items: ExtendedChoiceGroupItemProps[]`
@@ -285,12 +334,16 @@ Same as Checkbox (without indeterminate)
 - `variant?: 'default' | 'segmented'`
 
 ### Search
+
 **Props:** `SearchProps` extends TextFieldProps | bp, form
+
 - `onSearch?: (value: string) => void`
 - `button?: Partial<ButtonProps>`
 
 ### DateField
+
 **Props:** `DateFieldProps` extends `DayPickerProps` | fRef (`TextFieldForwardRef`), bp, form
+
 - `id: string` (required), `label: string` (required)
 - `mode?: 'single' | 'multiple' | 'range' = 'single'` — selection model
 - `selected?: Date | Date[] | DateRange`, `defaultValue?: Date | Date[] | DateRange`
@@ -339,7 +392,9 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 ```
 
 ### TimeField
+
 **Props:** `TimeFieldProps` | bp, form
+
 - `id: string` (required), `label: string` (required)
 - `value?: string`, `defaultValue?: string` — `"HH:mm"` 24-hour format
 - `onChange?: (time: string) => void`
@@ -369,9 +424,11 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 ```
 
 ### TimePicker
+
 > **For plain time inputs use `TimeField`.** TimePicker is the lower-level picker primitive — reach for it only when you need a standalone, always-visible time selector (scheduling UI, custom popover, side-by-side with a calendar in a DateTime composite).
 
 **Props:** `TimePickerProps` | form
+
 - `value?: string`, `defaultValue?: string` — `"HH:mm"`
 - `onChange?: (time: string) => void`
 - `stepMinutes?: number = 1` — minute increment for the wheel
@@ -397,7 +454,9 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 ```
 
 ### FileUpload
+
 **Props:** `FileUploadProps` | form
+
 - `id: string` (required), `name: string` (required)
 - `accept?: string`
 - `multiple?: boolean`
@@ -405,13 +464,16 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 - `maxSize?: number`
 
 ### FileDropzone
+
 **Props:** `FileDropzoneProps`
+
 - `label: string` (required)
 - `accept?: string`, `multiple?: boolean`, `maxSize?: number`
 
 ## Layout
 
 ### Row / Col (Grid)
+
 ```tsx
 <Row cols={3} gutter={2} alignItems="center">
   <Col width={6}>Half</Col>
@@ -423,7 +485,9 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 **Col:** `width` (1-12 or 'auto'), `offset`, `order`, `grow`, `shrink` + breakpoints
 
 ### VerticalSpacing
+
 **Props:** `VerticalSpacingProps` | bp
+
 - `children: ReactNode`
 - `size?: VerticalSpacingSize = 1` — 0-5 in em
 - `element?: keyof JSX.IntrinsicElements = 'div'`
@@ -431,7 +495,9 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 Sub-component: `VerticalSpacing.Item`
 
 ### Header
+
 **Props:** `HeaderProps`
+
 - `children: ReactNode` (required)
 - `toggle?: ReactNode` — mobile side navigation toggle
 - `bottom?: ReactNode` — content below header on mobile
@@ -439,13 +505,44 @@ Sub-component: `VerticalSpacing.Item`
 Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Language`, `Header.Login`, `Header.Logout`, `Header.Profile`, `Header.Role`, `Header.Search`
 
 **Header.Logo:** `logo: ReactNode`, `logoDark?: ReactNode`, `href?: string`, `showLogo?: boolean = true`
+
+- `showLogo` is a simple boolean for feature flags or custom media queries. For responsive hiding at standard breakpoints, wrap with `<ShowAt>`/`<HideAt>` instead (e.g. `<ShowAt md><Header.Logo ... /></ShowAt>`).
+
 **Header.Center:** `children: ReactNode`, `alignment?: 'flex-start' | 'center' | 'space-between' = 'center'`
 **Header.Actions:** `children: ReactNode`
-**Header.Role:** `representatives: Representative[]`, `label?: ReactNode`, `showDescription?: boolean = true`, `accordionLabels?: { open?, close? }`, `onRepresentativeChange?`, `onRoleSelectionToggle?`
-**Header.Language:** bp — language selector
-**Header.Login:** bp — login button
-**Header.Logout:** bp — logout button
-**Header.Profile:** bp — user profile display
+
+**Header.Role:** `HeaderRoleProps`
+
+- `representatives: Representative[]` (required) — `Representative` has `id: string` (required), `name: string`, `description?: string`, `icon?: string | IconProps`
+- `label?: ReactNode` — descriptive label above the name
+- `showDescription?: boolean = true` — show the selected representative's description in the header area
+- `isOrganization?: boolean` — organization context (affects search label)
+- `accordionLabels?: { open?: string; close?: string }` — custom toggle labels on mobile
+- `searchLabel?: string` — search input label (falls back to i18n)
+- `organizationSearchLabel?: string` — search label when `isOrganization` is true
+- `searchId?: string` — id for the search input (falls back to `useId()`)
+- `showSearch?: boolean = false` — show search input above the representative list
+- `searchClearable?: boolean = false` — show clear button on search input
+- `clearSearchOnSelect?: boolean = true` — clear search when a representative is selected
+- `showRoleSwitch?: boolean` — show the role selection toggle (defaults to true when multiple representatives)
+- `children?: ReactNode` — custom content replacing the default representative list
+- `noResultsContent?: ReactNode` — custom content when filtered list is empty
+- `onRepresentativeChange?: (representative: Representative) => void`
+- `onRoleSelectionToggle?: (isOpen: boolean) => void`
+- When multiple `Header.Role` components are inside a `Header.Profile`, opening one accordion automatically closes the others on mobile/tablet.
+
+**Header.Language:** `HeaderLanguageProps`
+
+- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `isSelected?: boolean`, `aria-label?: string`
+- `currentLanguage?: string` — initially displayed label (falls back to matching locale or first item)
+- `selectLabel?: string` — label for the selector (falls back to i18n)
+
+**Header.Login:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
+**Header.Logout:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
+**Header.Profile:** bp — `showPopover?: Breakpoint = 'lg'`, `label?: string`, `showLabel?: boolean = false`, `disabled?: boolean = false`, `noStyle?: boolean = false`, `children: ReactNode`
+
+- `noStyle` removes default padding, borders, and background from modal children. Does not affect `Header.Role`'s own 4px brand bottom border.
+
 **Header.Search:** wrapper that accepts a Search child (and optional `mobileVariant`). `children: ReactNode`, `mobileVariant?: 'modal' | 'inline'`, `mobileLabels?: { button?, modalTitle? }`, `disabled?: boolean`
 
 ```tsx
@@ -458,7 +555,9 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
   }
 >
   <Header.Logo logo={<img src="/logo.svg" alt="Logo" />} href="/" />
-  <Header.Center><Link href="/about">About</Link></Header.Center>
+  <Header.Center>
+    <Link href="/about">About</Link>
+  </Header.Center>
   <Header.Actions>
     <Header.Search>
       <Search label="Search" hideLabel id="header-search" />
@@ -470,7 +569,9 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 ```
 
 ### SideNav
+
 **Props:** `SideNavProps<C>` | poly
+
 - `ariaLabel: string` (required)
 - `navItems: SideNavItemProps<C>[]` (required)
 - `linkAs?: ElementType` — polymorphic link component
@@ -480,7 +581,9 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
 ### HorizontalNav
+
 **Props:** `HorizontalNavProps`
+
 - `children: ReactNode` (required) — only `HorizontalNav.Item` children render; others are ignored
 - `ariaLabel: string` (required) — accessible name for the `<nav>` landmark
 - `mobileBreakpoint?: Breakpoint = 'md'` — below this, the bar collapses into the shared Sidenav mobile drawer
@@ -491,6 +594,7 @@ Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.M
 Sub-component: `HorizontalNav.Item`
 
 **`HorizontalNav.Item` props**
+
 - `children: ReactNode` (required) — visible label
 - `href?: string`
 - `icon?: string | IconWithoutBackgroundProps`
@@ -520,13 +624,17 @@ import { HorizontalNav } from '@tedi-design-system/react/tedi';
 ## Loaders
 
 ### Spinner
+
 **Props:** `SpinnerProps` | bp
+
 - `size: SpinnerSize = 16` — 10, 16, 18, 48
 - `color: 'primary' | 'secondary' = 'primary'`
 - `label?: string`
 
 ### Skeleton
+
 **Props:** `SkeletonProps`
+
 - `children?: ReactNode`
 - `label?: string`
 
@@ -535,7 +643,9 @@ Sub-component: `Skeleton.Block`
 ## Navigation
 
 ### Link
+
 **Props:** `LinkProps<C>` | fRef, poly, bp
+
 - `children: ReactNode`
 - `underline?: boolean = true`
 - `visualType?: ButtonType = 'link'`
@@ -551,7 +661,9 @@ Sub-component: `Skeleton.Block`
 ## Notifications
 
 ### Alert
+
 **Props:** `AlertProps` | bp
+
 - `children?: ReactNode`
 - `title?: ReactNode`
 - `type: AlertType = 'info'` — info, success, warning, danger
@@ -560,15 +672,18 @@ Sub-component: `Skeleton.Block`
 - `role?: 'alert' | 'status' | 'none' = 'alert'`
 
 ```tsx
-<Alert type="success" title="Saved" onClose={dismiss}>Changes saved.</Alert>
+<Alert type="success" title="Saved" onClose={dismiss}>
+  Changes saved.
+</Alert>
 ```
 
 ### Toast
+
 ```tsx
 import { sendNotification, ToastContainer } from '@tedi-design-system/react/tedi';
 
 // In root
-<ToastContainer />
+<ToastContainer />;
 
 // Trigger
 sendNotification({ type: 'info', title: 'Update', children: 'New version available' });
@@ -577,11 +692,14 @@ sendNotification({ type: 'info', title: 'Update', children: 'New version availab
 ## Overlays
 
 ### Tooltip
+
 Sub-components: `Tooltip.Trigger`, `Tooltip.Content`
 
 ```tsx
 <Tooltip>
-  <Tooltip.Trigger><Icon name="info" /></Tooltip.Trigger>
+  <Tooltip.Trigger>
+    <Icon name="info" />
+  </Tooltip.Trigger>
   <Tooltip.Content>Help text</Tooltip.Content>
 </Tooltip>
 ```
@@ -589,11 +707,14 @@ Sub-components: `Tooltip.Trigger`, `Tooltip.Content`
 **Props:** `openWith?: 'hover' | 'click' | 'focus' | 'manual'`
 
 ### Dropdown
+
 Sub-components: `Dropdown.Trigger`, `Dropdown.Content`, `Dropdown.Item`, `Dropdown.Separator`
 
 ```tsx
 <Dropdown>
-  <Dropdown.Trigger><Button>Menu</Button></Dropdown.Trigger>
+  <Dropdown.Trigger>
+    <Button>Menu</Button>
+  </Dropdown.Trigger>
   <Dropdown.Content>
     <Dropdown.Item onClick={edit}>Edit</Dropdown.Item>
     <Dropdown.Separator />
@@ -605,6 +726,7 @@ Sub-components: `Dropdown.Trigger`, `Dropdown.Content`, `Dropdown.Item`, `Dropdo
 **Props:** `width`, `placement`, `divided`, `open?` (controlled), `modal?: boolean`
 
 ### Popover
+
 Sub-components: `Popover.Trigger`, `Popover.Content`
 
 **Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`
@@ -612,18 +734,24 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 ## Tags
 
 ### Tag
+
 **Props:** `TagProps` | bp
+
 - `children: ReactNode` (required)
 - `color: TagColor = 'primary'`
 - `onClose?: MouseEventHandler` — shows close button
 - `isLoading?: boolean`
 
 ```tsx
-<Tag color="primary" onClose={remove}>React</Tag>
+<Tag color="primary" onClose={remove}>
+  React
+</Tag>
 ```
 
 ### StatusBadge
+
 **Props:** `StatusBadgeProps` | bp
+
 - `children?: ReactNode`
 - `color: StatusBadgeColor = 'neutral'`
 - `variant: 'filled' | 'filled-bordered' | 'bordered' = 'filled'`
@@ -631,13 +759,17 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 - `icon?: string`
 
 ```tsx
-<StatusBadge color="success" status="success" icon="check">Active</StatusBadge>
+<StatusBadge color="success" status="success" icon="check">
+  Active
+</StatusBadge>
 ```
 
 ## Misc
 
 ### Separator
+
 **Props:** `SeparatorProps` | bp
+
 - `axis: 'horizontal' | 'vertical' = 'horizontal'`
 - `color: 'primary' | 'secondary' | 'accent' = 'primary'`
 - `variant?: 'dotted' | 'dot-only'`
@@ -653,62 +785,76 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ## Cards
 
 ### Accordion
+
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
 ### Card
+
 - `border?: CardBorderType`, `borderless?: boolean`, `padding?: number`, `background?: CardBackground`
 - Sub-components: Card.Header, Card.Content, Card.Notification
 
 ## Buttons
 
 ### Button — **DEPRECATED** (use TEDI-Ready Button)
+
 ### Anchor — **DEPRECATED** (use TEDI-Ready Link)
 
 ## Form
 
 ### Check (Checkbox) — **DEPRECATED** (use TEDI-Ready Checkbox)
+
 ### Radio — **DEPRECATED** (use TEDI-Ready Radio via ChoiceGroup)
 
 ### Select
+
 - `id: string`, `options`, `value?`, `defaultValue?`, `onChange?`
 - `multiple?: boolean`, `async?: boolean`, `isSearchable?: boolean`, `isClearable?: boolean`
 
 ### Toggle
+
 - `ariaLabel: string`, `label?`, `checked?`, `defaultChecked?`, `onChange?`
 - `size?: 'medium' | 'large'`, `color?: 'default' | 'alternative'`, `icon?`, `disabled?`
 
 ### ChoiceGroup
+
 - `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
 - `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`
 
 ### FileUpload
+
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
 - `files?`, `defaultFiles?`, `onChange?`, `onDelete?`
 
 ### TextEditor (Draft.js)
+
 - `id: string`, `defaultValue?`, `onChange?`, `placeholder?`
 - `inlineStyleControls?: string[]`, `blockStyleControls?: string[]`
 
 ### HiddenField (toggle-to-edit)
+
 - `fieldType: 'textfield' | 'select' | 'datetime'`
 - `fieldOptions: TextFieldProps | SelectProps | DateTimePickerProps`
 - `content: ReactNode`
 
 ### DateTimePicker
+
 - Date/time picker using MUI x-date-pickers
 
 ## Navigation
 
 ### Stepper
+
 - `activeStep?`, `defaultActiveStep?: number`, `onActiveStepChange?`
 - `allowStepLabelClick?: boolean`, `ariaLabel: string`, `card?: CardProps | boolean`
 
 ### Tabs
+
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
 
 ### TableOfContents
+
 - `items: TableOfContentsItemProps[]`, `heading?`, `open?`, `defaultOpen?`
 - `showIcons?: boolean`, `breakToMobile?: boolean`
 
@@ -717,6 +863,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ### Dropdown — **DEPRECATED** (use TEDI-Ready Dropdown)
 
 ### Modal
+
 - `size?: 12 | 10 | 8 | 6`, `position?: 'center' | 'right' | 'bottom'`
 - `lockScroll?: boolean`, `trapFocus?: boolean`, `returnFocus?: boolean`
 - Sub-components: ModalProvider, ModalTrigger, ModalCloser
@@ -724,6 +871,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ### Tooltip — **DEPRECATED** (use TEDI-Ready Tooltip)
 
 ### Feedback (modal-based)
+
 - `triggerProps?: ButtonProps`, `fixedTrigger?: 'both' | 'desktop' | 'mobile'`
 
 ## Tags
@@ -731,12 +879,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ### Tag — **DEPRECATED** (use TEDI-Ready Tag)
 
 ### Status
+
 - `type: 'error' | 'success' | 'inactive' | 'warning'`
 - `tooltipContent?: ReactNode`
 
 ## Table
 
 ### Table (TanStack React Table wrapper)
+
 - `data: TData[]`, `columns: ColumnDef[]`
 - `pagination?`, `sorting?`, `rowSelection?`, `columnPinning?`
 - `onPaginationChange?`, `onSortingChange?`, `onRowSelectionChange?`
@@ -745,23 +895,29 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ## Layout
 
 ### Header
+
 - Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
 - **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
 
 ## Misc
 
 ### Placeholder (empty state)
+
 - `icon?: string | IconProps | ReactNode`, `cardProps?`, `isNested?: boolean`
 
 ### VerticalStepper
+
 - `isCompact?: boolean`
 - Sub-components: StepItem, SubItem
 
 ### VerticalProgress
+
 - `children: ReactNode`, `onItemOpen: (index: number) => void`
 
 ### ToggleOpen
+
 - `openText: string`, `closeText: string`, `isOpen: boolean`
 
 ### Map Components
+
 14 specialized components for map UI interactions (BaseMapSelection, Legend, MapLayer, Directions, Timeline, etc.)
