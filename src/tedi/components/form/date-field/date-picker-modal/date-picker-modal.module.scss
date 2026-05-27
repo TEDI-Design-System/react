@@ -1,0 +1,30 @@
+// Modal's default body padding adds extra chrome around the Calendar's own
+// rounded surface — drop it so the calendar sits flush.
+.tedi-date-picker-modal {
+  --modal-body-padding: 0;
+  --modal-body-padding-sm: 0;
+}
+
+// Custom header layout — h4 heading + small closer mirrors what the
+// TimeField modal uses, matching the compact mobile-picker visual.
+.tedi-date-picker-modal__header {
+  display: flex;
+  gap: var(--tedi-dimensions-05);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tedi-date-picker-modal__title {
+  flex: 1 0 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.tedi-date-picker-modal__body {
+  display: flex;
+  justify-content: center;
+}
+
+.tedi-date-picker-modal__calendar {
+  width: 100%;
+}

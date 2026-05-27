@@ -481,13 +481,55 @@ export const AvailableDays: Story = {
 export const NativePicker: Story = {
   render: () => {
     const [selected, setSelected] = useState<Date | undefined>();
-
     return (
       <DateField
         id="date-field-native-picker"
         mode="single"
         label="Date"
         useNativePicker
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+      />
+    );
+  },
+};
+
+/**
+ * Pass `modal` to open the calendar inside a modal (Cancel / Confirm footer)
+ * instead of the floating popover. The selection is held as a draft and only
+ * committed on Confirm — Cancel / Escape / backdrop dismiss discards it.
+ */
+export const ModalPicker: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+    return (
+      <DateField
+        id="date-field-modal"
+        mode="single"
+        label="Date"
+        modal
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+      />
+    );
+  },
+};
+
+/**
+ * `modal="md"` opens the calendar in a modal only below `md` viewports and
+ * keeps the popover on desktop. Resize the Storybook canvas to see the modal
+ * kick in.
+ */
+export const ResponsiveModalPicker: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+    return (
+      <DateField
+        id="date-field-modal-responsive"
+        mode="single"
+        label="Date"
+        modal="md"
+        calendarTrigger="input"
         selected={selected}
         onSelect={(date) => setSelected(date as Date)}
       />

@@ -17,12 +17,22 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { dateMatchModifiers, DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
+import {
+  type Breakpoint,
+  BreakpointSupport,
+  isBreakpointBelow,
+  useBreakpoint,
+  useBreakpointProps,
+} from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
+import type { ModalFullscreen } from '../../overlays/modal/modal-content/modal-content';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
+import { DatePickerModal } from './date-picker-modal/date-picker-modal';
+
+export type DateFieldModal = boolean | Exclude<Breakpoint, 'xs'>;
 
 const CALENDAR_OFFSET = 4;
 const CALENDAR_PADDING = 8;
@@ -225,6 +235,28 @@ export interface DateFieldProps
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
+  /**
+   * Open the calendar inside a modal instead of a floating popover. Useful
+   * on narrow viewports where a popover overlaps the input itself. Mirrors
+   * `TimeField`'s `modal` prop.
+   *
+   * - `true` always opens in a modal
+   * - `false` (default) always uses the popover
+   * - A breakpoint name (e.g. `'md'`) opens in a modal *below* that breakpoint
+   *   and falls back to the popover from that breakpoint up
+   *
+   * Ignored when `useNativePicker` resolves to `true` (the native picker is
+   * already handled by the OS).
+   * @default false
+   */
+  modal?: DateFieldModal;
+  /**
+   * Forwarded to `Modal.Content.fullscreen` when the modal calendar is shown
+   * — `true` / `'edge'` / `false` / a breakpoint name. Lets the consumer make
+   * the mobile date picker fully cover the viewport.
+   * @default false
+   */
+  modalFullscreen?: ModalFullscreen;
 }
 
 export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
@@ -266,6 +298,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     readOnly,
     availableDays,
     inputProps,
+    modal = false,
+    modalFullscreen = false,
     useNativePicker: _useNativePicker,
     enableCalendar: _enableCalendar,
     calendarTrigger: _calendarTrigger,
@@ -295,8 +329,15 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
   const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [view, setView] = useState<CalendarView>(selectionLevel);
   const [inputValue, setInputValue] = useState('');
+
+  const useModalPicker =
+    enableCalendar &&
+    !shouldUseNativePicker &&
+    !readOnly &&
+    (modal === true || (typeof modal === 'string' && isBreakpointBelow(breakpoint, modal)));
 
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
@@ -559,7 +600,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const { refs, context, x, y, strategy } = floating;
   const click = useClick(context);
   const interactions = useInteractions([
-    ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' ? [click] : []),
+    ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' && !useModalPicker ? [click] : []),
     useDismiss(context),
     useRole(context, { role: 'dialog' }),
   ]);
@@ -577,6 +618,28 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       }
     }
     input.focus();
+  };
+
+  const openCalendar = () => {
+    if (!enableCalendar || readOnly) return;
+    if (shouldUseNativePicker) {
+      openNativePicker();
+    } else if (useModalPicker) {
+      setModalOpen(true);
+    } else {
+      setOpen((prev) => !prev);
+    }
+  };
+
+  const handleModalConfirm = (next: Date | Date[] | DateRange | undefined) => {
+    if (!isControlled) setInternalValue(next);
+    onSelect?.(next, next as UnknownType, {}, {} as UnknownType);
+    if (next) {
+      const formatted = formatDate ? formatDate(next) : defaultFormatter(next);
+      setInputValue(formatted);
+    } else {
+      setInputValue('');
+    }
   };
 
   const handleNativeInputChange = (val: string) => {
@@ -607,8 +670,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             label={label}
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
-            onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
-            iconButtonProps={enableCalendar ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' } : undefined}
+            onIconClick={openCalendar}
+            iconButtonProps={
+              enableCalendar
+                ? { 'aria-expanded': useModalPicker ? modalOpen : open, 'aria-haspopup': 'dialog' }
+                : undefined
+            }
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -636,17 +703,10 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             placeholder={placeholder}
             icon="calendar_today"
             isClearable
-            onIconClick={() => {
-              if (!enableCalendar) return;
-              if (shouldUseNativePicker) {
-                openNativePicker();
-              } else {
-                setOpen((prev) => !prev);
-              }
-            }}
+            onIconClick={openCalendar}
             iconButtonProps={
               enableCalendar && !shouldUseNativePicker
-                ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' }
+                ? { 'aria-expanded': useModalPicker ? modalOpen : open, 'aria-haspopup': 'dialog' }
                 : undefined
             }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
@@ -666,7 +726,30 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
         )}
       </div>
 
-      {enableCalendar && !shouldUseNativePicker && (
+      {useModalPicker && (
+        <DatePickerModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          value={value}
+          onConfirm={handleModalConfirm}
+          mode={mode}
+          numberOfMonths={effectiveNumberOfMonths}
+          locale={locale}
+          localeCode={localeCode}
+          showOutsideDays={showOutsideDays}
+          disabledMatchers={disabledMatchers}
+          required={required}
+          availableDays={availableDays}
+          footer={footer}
+          monthYearSelectType={monthYearSelectType}
+          selectionLevel={selectionLevel}
+          initialMonth={initialMonth}
+          fullscreen={modalFullscreen}
+          {...(dayPickerProps as UnknownType)}
+        />
+      )}
+
+      {enableCalendar && !shouldUseNativePicker && !useModalPicker && (
         <FloatingPortal>
           {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>

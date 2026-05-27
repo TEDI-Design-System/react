@@ -1,0 +1,175 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import type { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+
+import { useLabels } from '../../../../providers/label-provider';
+import { UnknownType } from '../../../../types/commonTypes';
+import { Heading } from '../../../base/typography/heading/heading';
+import Button from '../../../buttons/button/button';
+import ClosingButton from '../../../buttons/closing-button/closing-button';
+import { Calendar } from '../../../content/calendar/calendar';
+import { Modal, ModalContentProps, useModal } from '../../../overlays/modal';
+import { CalendarView } from '../date-field';
+import styles from './date-picker-modal.module.scss';
+
+type DateFieldMode = 'single' | 'multiple' | 'range';
+type DateValue = Date | Date[] | DateRange | undefined;
+
+export interface DatePickerModalProps
+  extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect' | 'numberOfMonths'> {
+  /** Whether the modal is open. Pair with `onOpenChange`. */
+  open: boolean;
+  /** Fires when the modal opens or closes (Escape / backdrop / Cancel / Confirm). */
+  onOpenChange: (open: boolean) => void;
+  /** Current committed value. Used to seed the draft when the modal opens. */
+  value: DateValue;
+  /**
+   * Fires with the chosen value when the user clicks "Confirm". Cancel /
+   * Escape / backdrop dismiss discards the draft.
+   */
+  onConfirm: (date: DateValue) => void;
+  /** Selection mode forwarded to `Calendar`. @default single */
+  mode?: DateFieldMode;
+  numberOfMonths?: number;
+  locale?: Locale;
+  localeCode?: string;
+  showOutsideDays?: boolean;
+  disabledMatchers?: Matcher[];
+  required?: boolean;
+  availableDays?: Date[] | ((date: Date) => boolean);
+  footer?: React.ReactNode;
+  monthYearSelectType?: 'dropdown' | 'grid';
+  selectionLevel?: CalendarView;
+  /** Initial month to display when the modal opens. Defaults to the selected date or today. */
+  initialMonth?: Date;
+  /** Forwarded to `Modal.Content` — make the modal fill the viewport at smaller sizes. */
+  fullscreen?: ModalContentProps['fullscreen'];
+  /** Modal title text. Falls back to the `date-field.modal-title` i18n key. */
+  title?: string;
+}
+
+const getInitialMonth = (val: DateValue, fallback?: Date): Date => {
+  if (val instanceof Date) return val;
+  if (Array.isArray(val) && val.length > 0) {
+    return [...val].sort((a, b) => a.getTime() - b.getTime())[0];
+  }
+  if (val && typeof val === 'object' && 'from' in val && val.from instanceof Date) return val.from;
+  if (val && typeof val === 'object' && 'to' in val && val.to instanceof Date) return val.to;
+  return fallback ?? new Date();
+};
+
+const DatePickerModalHeader = ({ title }: { title: string }): JSX.Element => {
+  const { labelId, onOpenChange } = useModal();
+  return (
+    <div className={styles['tedi-date-picker-modal__header']}>
+      <Heading element="h2" modifiers="h4" id={labelId} className={styles['tedi-date-picker-modal__title']}>
+        {title}
+      </Heading>
+      <ClosingButton size="small" onClick={() => onOpenChange(false)} />
+    </div>
+  );
+};
+
+export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
+  const {
+    open,
+    onOpenChange,
+    value,
+    onConfirm,
+    mode = 'single',
+    numberOfMonths,
+    locale,
+    localeCode,
+    showOutsideDays = true,
+    disabledMatchers,
+    required,
+    availableDays,
+    footer,
+    monthYearSelectType,
+    selectionLevel = 'days',
+    initialMonth,
+    fullscreen,
+    title,
+    ...dayPickerProps
+  } = props;
+
+  const { getLabel } = useLabels();
+
+  const [draft, setDraft] = useState<DateValue>(value);
+  const [view, setView] = useState<CalendarView>(selectionLevel);
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => getInitialMonth(value, initialMonth));
+
+  useEffect(() => {
+    if (open) {
+      setDraft(value);
+      setView(selectionLevel);
+      setCurrentMonth(getInitialMonth(value, initialMonth));
+    }
+  }, [open, value, selectionLevel, initialMonth]);
+
+  const handleSelect: OnSelectHandler<DateValue> = useCallback((date) => {
+    setDraft(date);
+  }, []);
+
+  const applyValue = useCallback((date: Date) => {
+    setDraft(date);
+  }, []);
+
+  const handleConfirm = () => {
+    onConfirm(draft);
+    onOpenChange(false);
+  };
+
+  const resolvedTitle = title ?? getLabel('date-field.modal-title');
+
+  return (
+    <Modal open={open} onToggle={onOpenChange}>
+      <Modal.Content
+        md={{ width: '315px' }}
+        sm={{ width: 'full' }}
+        position="center"
+        fullscreen={fullscreen}
+        className={styles['tedi-date-picker-modal']}
+        aria-label={resolvedTitle}
+      >
+        <Modal.Header>
+          <DatePickerModalHeader title={resolvedTitle} />
+        </Modal.Header>
+        <Modal.Body className={styles['tedi-date-picker-modal__body']}>
+          <Calendar
+            {...(dayPickerProps as UnknownType)}
+            numberOfMonths={numberOfMonths}
+            view={view}
+            selectionLevel={selectionLevel}
+            currentMonth={currentMonth}
+            setCurrentMonth={setCurrentMonth}
+            setView={setView}
+            mode={mode}
+            value={draft}
+            locale={locale}
+            localeCode={localeCode}
+            showOutsideDays={showOutsideDays}
+            disabledMatchers={disabledMatchers}
+            required={required}
+            availableDays={availableDays}
+            footer={footer}
+            monthYearSelectType={monthYearSelectType}
+            handleSelect={handleSelect}
+            applyValue={applyValue}
+            className={styles['tedi-date-picker-modal__calendar']}
+            bordered={false}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button visualType="secondary" onClick={() => onOpenChange(false)}>
+            {getLabel('date-field.cancel')}
+          </Button>
+          <Button onClick={handleConfirm}>{getLabel('date-field.confirm')}</Button>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal>
+  );
+};
+
+DatePickerModal.displayName = 'DatePickerModal';
+
+export default DatePickerModal;

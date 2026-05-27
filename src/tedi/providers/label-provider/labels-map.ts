@@ -107,6 +107,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'Cancel',
     ru: 'Отмена',
   },
+  'date-field.modal-title': {
+    description: 'Title of the mobile date-picker modal opened by DateField',
+    components: ['DateField'],
+    et: 'Vali kuupäev',
+    en: 'Pick a date',
+    ru: 'Выберите дату',
+  },
+  'date-field.cancel': {
+    description: 'Cancel button label inside the date-picker modal',
+    components: ['DateField'],
+    et: 'Tühista',
+    en: 'Cancel',
+    ru: 'Отмена',
+  },
+  'date-field.confirm': {
+    description: 'Confirm button label inside the date-picker modal',
+    components: ['DateField'],
+    et: 'Kinnita',
+    en: 'Confirm',
+    ru: 'Подтвердить',
+  },
   clear: {
     description: 'For clearing a value',
     components: ['TableFilter', 'TextField'],

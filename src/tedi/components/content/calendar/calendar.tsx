@@ -115,6 +115,13 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Optional additional CSS class for the calendar container.
    */
   className?: string;
+  /**
+   * Whether to render the surrounding card chrome (border, radius). When `false`,
+   * the calendar sits flush within its parent — useful when embedded inside a
+   * container that already provides its own border (e.g. `DatePickerModal`).
+   * @default true
+   */
+  bordered?: boolean;
 }
 
 export const Calendar = ({
@@ -138,6 +145,7 @@ export const Calendar = ({
   applyValue,
   showNavigation = true,
   className,
+  bordered = true,
   ...dayPickerProps
 }: CalendarProps) => {
   const isAvailable = (date: Date) => {
@@ -202,7 +210,7 @@ export const Calendar = ({
               setView('months');
             }
           }}
-          className={className}
+          className={classNames(className, { [styles['tedi-calendar--borderless']]: !bordered })}
         />
       )}
 
@@ -221,7 +229,7 @@ export const Calendar = ({
               setView('days');
             }
           }}
-          className={className}
+          className={classNames(className, { [styles['tedi-calendar--borderless']]: !bordered })}
         />
       )}
 
@@ -251,7 +259,7 @@ export const Calendar = ({
           }}
           footer={footer}
           classNames={{
-            root: classNames(styles['tedi-calendar'], className),
+            root: classNames(styles['tedi-calendar'], { [styles['tedi-calendar--borderless']]: !bordered }, className),
             month_caption: styles['tedi-calendar__caption'],
             head: styles['tedi-calendar__head'],
             row: styles['tedi-calendar__row'],
