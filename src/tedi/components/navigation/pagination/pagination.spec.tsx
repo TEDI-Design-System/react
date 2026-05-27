@@ -26,12 +26,24 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'pagination.page-size':
           return 'Page size';
+        case 'pagination.page-status': {
+          const [page, total] = args as [number, number];
+          return `Page ${page} of ${total}`;
+        }
         default:
           return key;
       }
     },
   }),
 }));
+
+jest.mock('../../../helpers', () => {
+  const actual = jest.requireActual('../../../helpers');
+  return {
+    ...actual,
+    useBreakpoint: jest.fn(() => 'lg'),
+  };
+});
 
 describe('usePagination', () => {
   it('returns an empty list when pageCount is 0', () => {
@@ -151,14 +163,14 @@ describe('Pagination component', () => {
     expect(screen.getByRole('button', { name: /Current page, page 4/i })).toBeInTheDocument();
   });
 
-  it('hides Previous on the first page and Next on the last', () => {
+  it('disables Previous on the first page and Next on the last', () => {
     const { rerender } = render(<Pagination pageCount={3} page={1} />);
-    expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Next page/i })).not.toBeDisabled();
 
     rerender(<Pagination pageCount={3} page={3} />);
-    expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Next page/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Previous page/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeDisabled();
   });
 
   it('Previous / Next move the current page by one', () => {
@@ -237,7 +249,6 @@ describe('Pagination component', () => {
   it('does not render the nav when pageCount <= 1', () => {
     render(<Pagination pageCount={1} defaultPage={1} totalItems={3} />);
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
-    // results label still renders
     expect(screen.getByText('3 results')).toBeInTheDocument();
   });
 
@@ -261,10 +272,62 @@ describe('Pagination component', () => {
     });
   });
 
+  it('renders the polite aria-live status text when there are multiple pages', () => {
+    const { container } = render(<Pagination pageCount={10} defaultPage={3} />);
+    const status = container.querySelector('[role="status"]');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveTextContent('Page 3 of 10');
+  });
+
+  it('hides the results slot when hideResults is `true`', () => {
+    render(<Pagination pageCount={10} defaultPage={1} totalItems={97} hideResults />);
+    expect(screen.queryByText('97 results')).not.toBeInTheDocument();
+  });
+
+  it('hides the pager when hidePager is `true`', () => {
+    render(<Pagination pageCount={10} defaultPage={1} totalItems={97} hidePager />);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByText('97 results')).toBeInTheDocument();
+  });
+
+  it('applies the transparent background modifier class', () => {
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} background="transparent" />);
+    const root = container.querySelector('[data-name="tedi-pagination"]');
+    expect(root?.className).toMatch(/tedi-pagination--bg-transparent/);
+  });
+
   it('forwards ref to the root element', () => {
     const ref = createRef<HTMLDivElement>();
     render(<Pagination ref={ref} pageCount={3} defaultPage={1} />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
     expect(ref.current).toHaveAttribute('data-name', 'tedi-pagination');
+  });
+});
+
+describe('Pagination — compact mobile picker (below md)', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const helpers = require('../../../helpers') as { useBreakpoint: jest.Mock };
+
+  beforeEach(() => helpers.useBreakpoint.mockReturnValue('sm'));
+  afterEach(() => helpers.useBreakpoint.mockReturnValue('lg'));
+
+  it('swaps the page list for a compact trigger button labelled "current / total"', () => {
+    render(<Pagination pageCount={10} defaultPage={3} />);
+    // Numeric page buttons are replaced by the picker trigger.
+    expect(screen.queryByRole('button', { name: /Go to page 5/i })).not.toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: /3 \/ 10/ });
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('opens the page-picker modal and selects a page', () => {
+    const onPageChange = jest.fn();
+    render(<Pagination pageCount={5} defaultPage={2} onPageChange={onPageChange} />);
+    fireEvent.click(screen.getByRole('button', { name: /2 \/ 5/ }));
+    const modal = screen.getByRole('dialog', { name: 'Pagination' });
+    expect(modal).toBeInTheDocument();
+    fireEvent.click(within(modal).getByRole('button', { name: 'Go to page 4' }));
+    expect(onPageChange).toHaveBeenCalledWith(4);
   });
 });

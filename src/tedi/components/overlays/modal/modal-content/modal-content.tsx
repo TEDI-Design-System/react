@@ -10,7 +10,7 @@ import { useModalContext } from '../modal-context';
 export type ModalWidthPreset = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type ModalWidth = ModalWidthPreset | (string & Record<never, never>);
 export type ModalSize = 'default' | 'small';
-export type ModalPosition = 'center' | 'top' | 'right' | 'left';
+export type ModalPosition = 'center' | 'top' | 'right' | 'left' | 'bottom';
 export type ModalScrollBehavior = 'content' | 'page';
 export type ModalFullscreen = boolean | 'edge';
 

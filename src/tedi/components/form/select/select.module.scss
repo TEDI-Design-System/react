@@ -199,6 +199,10 @@ div .tedi-select__menu {
   .tedi-select__arrow {
     padding: 0;
   }
+
+  .tedi-select__control .tedi-select__indicators-container {
+    align-items: center;
+  }
 }
 
 div.tedi-select__multi-value-item {

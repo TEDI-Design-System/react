@@ -14,9 +14,6 @@ const meta: Meta<typeof Pagination> = {
   component: Pagination,
   title: 'TEDI-Ready/Components/Navigation/Pagination',
   parameters: {
-    status: {
-      type: 'partiallyTediReady',
-    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=8478-72385&m=dev',
@@ -141,6 +138,94 @@ export const WiderSiblings: Story = {
 };
 
 /**
+ * `background="transparent"` removes the surface fill and top border. Use it
+ * when pagination sits on a non-white container.
+ */
+export const Transparent: Story = {
+  args: {
+    pageCount: 10,
+    defaultPage: 3,
+    totalItems: 97,
+    pageSize: 10,
+    pageSizeOptions: [10, 25, 50, 100],
+    background: 'transparent',
+  },
+  decorators: [
+    (StoryEl) => (
+      <div style={{ background: 'var(--general-surface-secondary)', padding: '1rem' }}>
+        <StoryEl />
+      </div>
+    ),
+  ],
+};
+
+/**
+ * Use the per-slot hide toggles to render different parts of the pagination
+ * above and below a table. Top row shows results + page-size; bottom row shows
+ * only the pager.
+ */
+export const TopBottomSplit: Story = {
+  render: function TopBottomSplit() {
+    const [page, setPage] = useState(3);
+    const [pageSize, setPageSize] = useState(10);
+    const sharedProps = {
+      pageCount: Math.ceil(97 / pageSize),
+      page,
+      onPageChange: setPage,
+      totalItems: 97,
+      pageSize,
+      pageSizeOptions: [10, 25, 50, 100],
+      onPageSizeChange: (next: number) => {
+        setPageSize(next);
+        setPage(1);
+      },
+    };
+    return (
+      <>
+        <Pagination {...sharedProps} hidePager />
+        <div style={{ padding: '1.5rem 0', color: 'var(--general-text-tertiary)', textAlign: 'center' }}>
+          — table content goes here —
+        </div>
+        <Pagination {...sharedProps} hideResults hidePageSize />
+      </>
+    );
+  },
+};
+
+/**
+ * Pass a breakpoint name to `hideResults`, `hidePageSize`, or `hidePager` to
+ * hide that slot only below that breakpoint. Here, `hidePageSize="md"` hides
+ * the page-size dropdown on screens smaller than `md`. Resize the viewport to
+ * see it appear/disappear.
+ */
+export const ResponsiveVisibility: Story = {
+  args: {
+    pageCount: 10,
+    defaultPage: 3,
+    totalItems: 97,
+    pageSize: 10,
+    pageSizeOptions: [10, 25, 50, 100],
+    hidePageSize: 'md',
+  },
+};
+
+/**
+ * Below `md` the pager swaps to a compact `current / total` button that opens
+ * a modal page list. Resize the Storybook viewport (or pick a mobile preset)
+ * to see it. The modal closes on selection / Escape / backdrop click and
+ * returns focus to the trigger.
+ */
+export const MobilePicker: Story = {
+  args: {
+    pageCount: 24,
+    defaultPage: 7,
+    totalItems: 240,
+    pageSize: 10,
+    pageSizeOptions: [10, 25, 50, 100],
+  },
+};
+
+/**
  * Localised via the `labels` prop. Note: the default labels already come from
  * the LabelProvider (`pagination.*` keys), so changing app locale is enough
  * for most cases — this story only demonstrates per-instance overrides.
@@ -160,6 +245,7 @@ export const CustomLabels: Story = {
       currentPageAriaLabel: (page) => `Praegune lehekülg, lehekülg ${page}`,
       results: (count) => `${count} tulemust`,
       pageSize: 'Kuva korraga',
+      pageStatus: (page, total) => `Lehekülg ${page} / ${total}`,
     },
   },
 };

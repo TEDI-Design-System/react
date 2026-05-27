@@ -536,6 +536,14 @@ export const labelsMap = validateDefaultLabels({
     en: 'Page size',
     ru: 'Размер страницы',
   },
+  'pagination.page-status': {
+    description:
+      'Polite aria-live announcement when the current page changes. Read by screen readers so navigation does not steal focus.',
+    components: ['Pagination'],
+    et: (page?: number, total?: number) => `Leht ${page ?? 0} ${total ?? 0}-st`,
+    en: (page?: number, total?: number) => `Page ${page ?? 0} of ${total ?? 0}`,
+    ru: (page?: number, total?: number) => `Страница ${page ?? 0} из ${total ?? 0}`,
+  },
   'table-of-contents.title': {
     description: 'Title of the table of contents',
     components: ['TableOfContents'],
