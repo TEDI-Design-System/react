@@ -1,3 +1,10 @@
+# [17.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.10...react-17.1.0-rc.11) (2026-05-27)
+
+
+### Bug Fixes
+
+* **button-group:** improve accessibility [#638](https://github.com/TEDI-Design-System/react/issues/638) ([#643](https://github.com/TEDI-Design-System/react/issues/643)) ([2617844](https://github.com/TEDI-Design-System/react/commit/26178445c656c08812c40dcb6fd5aa81ccffc57f))
+
 # [17.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.9...react-17.1.0-rc.10) (2026-05-22)
 
 
