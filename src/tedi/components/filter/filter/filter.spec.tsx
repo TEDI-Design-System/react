@@ -373,6 +373,11 @@ describe('FilterGroup — dropdown filters keep their own selection state', () =
 });
 
 describe('FilterGroup — accessible name', () => {
+  // FilterGroup warns at most once per instance (via a per-instance ref). Each
+  // test renders fresh instances, so no module-level state could swallow the
+  // warning. This block stays alone (no shared mocks) so adding a new
+  // `FilterGroup` test elsewhere can't accidentally suppress these.
+
   it('uses ariaLabelledBy when set (alternative to `label`)', () => {
     render(
       <>
