@@ -5,6 +5,17 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../link/link';
 import Breadcrumbs, { BreadcrumbsProps } from './breadcrumbs';
 
+// Preset `separator` values that the controls panel can switch between.
+// Storybook's `select` control only emits string keys, so we use `mapping`
+// to translate each key into the real ReactNode the prop accepts.
+const separatorOptions = {
+  Chevron: undefined,
+  Slash: '/',
+  Arrow: <Icon name="arrow_forward" color="inherit" size={16} aria-hidden />,
+  Dash: '—',
+  Dot: '·',
+};
+
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=2409-21799&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/43adad-breadcrumb" target="_BLANK">Zeroheight ↗</a>
@@ -12,6 +23,19 @@ import Breadcrumbs, { BreadcrumbsProps } from './breadcrumbs';
 export default {
   title: 'TEDI-Ready/Components/Navigation/Breadcrumbs',
   component: Breadcrumbs,
+  argTypes: {
+    separator: {
+      description:
+        'Node rendered between crumbs. Pass a string for text separators (e.g. `/` or `›`) or any React node for custom markup. Hidden from assistive technology — screen readers announce only the crumbs themselves.',
+      control: { type: 'select' },
+      options: Object.keys(separatorOptions),
+      mapping: separatorOptions,
+      table: {
+        type: { summary: 'ReactNode' },
+        defaultValue: { summary: '<Icon name="chevron_right" size={16} color="brand" />' },
+      },
+    },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
