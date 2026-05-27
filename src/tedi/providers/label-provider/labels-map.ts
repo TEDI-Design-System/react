@@ -107,6 +107,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'Cancel',
     ru: 'Отмена',
   },
+  'time-field.modal-title': {
+    description: 'Title of the mobile time-picker modal opened by TimeField',
+    components: ['TimeField'],
+    et: 'Kellaaeg',
+    en: 'Time',
+    ru: 'Время',
+  },
+  'time-field.cancel': {
+    description: 'Cancel button label inside the time-picker modal',
+    components: ['TimeField'],
+    et: 'Tühista',
+    en: 'Cancel',
+    ru: 'Отмена',
+  },
+  'time-field.confirm': {
+    description: 'Confirm button label inside the time-picker modal',
+    components: ['TimeField'],
+    et: 'Kinnita',
+    en: 'Confirm',
+    ru: 'Подтвердить',
+  },
   clear: {
     description: 'For clearing a value',
     components: ['TableFilter', 'TextField'],

@@ -307,6 +307,41 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
   );
 };
 
+/**
+ * Pass `modal` to open the picker inside a centered modal (with Cancel / Confirm
+ * footer buttons) instead of the floating popover. The most common use is the
+ * mobile pattern — `modal="md"` opens in a modal below `md` and falls back to
+ * the popover from `md` up. Pass `modal` alone (or `modal={true}`) to always
+ * use the modal. The user's choice is held as a draft and only committed on
+ * Confirm — Cancel / Escape / backdrop dismiss discards it.
+ */
+export const ModalPicker: Story = {
+  render: Template,
+  args: {
+    id: 'time-modal',
+    label: 'Aeg',
+    placeholder: 'hh:mm',
+    modal: true,
+    timePickerTrigger: 'input',
+  },
+};
+
+/**
+ * `modal="md"` opens the picker in a modal only below `md` viewports and
+ * leaves the popover behavior unchanged on desktop. Resize the Storybook
+ * canvas or pick a mobile preset to see the modal kick in.
+ */
+export const ResponsiveModalPicker: Story = {
+  render: Template,
+  args: {
+    id: 'time-modal-responsive',
+    label: 'Time',
+    placeholder: 'hh:mm',
+    modal: 'md',
+    timePickerTrigger: 'input',
+  },
+};
+
 export const NativePicker: Story = {
   render: Template,
   args: {
