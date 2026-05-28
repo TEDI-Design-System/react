@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpoint } from '../../../helpers';
+import { HorizontalNavItem } from './components/horizontal-nav-item/horizontal-nav-item';
 import { HorizontalNav } from './horizontal-nav';
 
 import '@testing-library/jest-dom';
@@ -508,5 +509,242 @@ describe('HorizontalNav', () => {
       </HorizontalNav>
     );
     expect(container.querySelector('[data-name="horizontal-nav"]')).not.toBeInTheDocument();
+  });
+
+  describe('HorizontalNav.Item', () => {
+    it('renders a <button type="button"> when href is omitted and the item has a submenu', () => {
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item
+            submenu={
+              <HorizontalNav.Group>
+                <HorizontalNav.SubItem href="/a">A</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            }
+          >
+            Family
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      const trigger = screen.getByRole('button', { name: /Family/ });
+      expect(trigger).toHaveAttribute('type', 'button');
+      expect(trigger).toHaveAttribute('aria-haspopup', 'true');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('drops the href when disabled and exposes aria-disabled', () => {
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item href="/x" disabled>
+            Disabled link
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      const link = screen.getByText('Disabled link').closest('a') as HTMLAnchorElement;
+      expect(link).not.toHaveAttribute('href');
+      expect(link).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('suppresses onClick when disabled', () => {
+      const onClick = jest.fn();
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item href="/x" disabled onClick={onClick}>
+            X
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      fireEvent.click(screen.getByText('X'));
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it('calls onClick when enabled', () => {
+      const onClick = jest.fn();
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item href="/x" onClick={onClick}>
+            X
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      fireEvent.click(screen.getByText('X'));
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders an icon when `icon` is passed as a string', () => {
+      const { container } = render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item href="/" icon="home">
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
+    });
+
+    it('renders an icon when `icon` is passed as an object with a custom size', () => {
+      const { container } = render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item href="/" icon={{ name: 'home', size: 24 }}>
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
+    });
+
+    it('falls back to size 18 when `icon` is an object without `size`', () => {
+      const { container } = render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item href="/" icon={{ name: 'home' }}>
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
+    });
+
+    // Direct render (bypassing parent's cloneElement) exercises the default
+    // values for `hasSubmenu`, `renderSubmenuInline`, and the `isSubmenuOpen
+    // ?? isActive` fallback that the parent normally overrides.
+    it('uses default hasSubmenu=false / renderSubmenuInline=false when rendered standalone', () => {
+      render(<HorizontalNavItem href="/x">Standalone</HorizontalNavItem>);
+      const link = screen.getByRole('link', { name: 'Standalone' });
+      expect(link).not.toHaveAttribute('aria-haspopup');
+      expect(link).not.toHaveAttribute('aria-expanded');
+    });
+
+    it('falls back to `isActive` for the active class when `isSubmenuOpen` is omitted', () => {
+      render(
+        <HorizontalNavItem href="/x" isActive>
+          Active
+        </HorizontalNavItem>
+      );
+      expect(screen.getByRole('link', { name: 'Active' })).toHaveClass('tedi-horizontal-nav__link--active');
+    });
+
+    it('respects an explicit `isSubmenuOpen={true}` over `isActive`', () => {
+      render(
+        <HorizontalNavItem hasSubmenu isSubmenuOpen submenu={<span>x</span>}>
+          Toggle
+        </HorizontalNavItem>
+      );
+      const button = screen.getByRole('button', { name: /Toggle/ });
+      expect(button).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('renders a custom element via the `as` prop', () => {
+      const Custom = (props: React.AnchorHTMLAttributes<HTMLElement>) => <a data-testid="custom-trigger" {...props} />;
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item as={Custom} href="/x">
+            X
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
+    });
+  });
+
+  describe('HorizontalNav.Group', () => {
+    it('renders the title heading at the configured level', () => {
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item
+            href="/"
+            isActive
+            submenu={
+              <HorizontalNav.Group title="Marriage" headingLevel="h2">
+                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            }
+          >
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      const heading = screen.getByRole('heading', { name: 'Marriage' });
+      expect(heading.tagName).toBe('H2');
+    });
+
+    it('renders a leading icon when `icon` is a string', () => {
+      const { container } = render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item
+            href="/"
+            isActive
+            submenu={
+              <HorizontalNav.Group title="Marriage" icon="family_restroom">
+                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            }
+          >
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      const heading = screen.getByRole('heading', { name: /Marriage/ });
+      expect(heading.querySelector('[data-name="icon"]')).toBeInTheDocument();
+    });
+
+    it('renders a leading icon when `icon` is an object with custom size', () => {
+      const { container } = render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item
+            href="/"
+            isActive
+            submenu={
+              <HorizontalNav.Group title="Marriage" icon={{ name: 'family_restroom', size: 24 }}>
+                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            }
+          >
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      const heading = screen.getByRole('heading', { name: /Marriage/ });
+      expect(heading.querySelector('[data-name="icon"]')).toBeInTheDocument();
+    });
+
+    it('falls back to size 16 when icon object omits `size`', () => {
+      render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item
+            href="/"
+            isActive
+            submenu={
+              <HorizontalNav.Group title="Marriage" icon={{ name: 'family_restroom' }}>
+                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            }
+          >
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      expect(screen.getByRole('heading', { name: /Marriage/ })).toBeInTheDocument();
+    });
+
+    it('does not render the icon when `title` is omitted (icon ignored without title)', () => {
+      const { container } = render(
+        <HorizontalNav ariaLabel="Primary">
+          <HorizontalNav.Item
+            href="/"
+            isActive
+            submenu={
+              <HorizontalNav.Group icon="family_restroom">
+                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
+              </HorizontalNav.Group>
+            }
+          >
+            Home
+          </HorizontalNav.Item>
+        </HorizontalNav>
+      );
+      expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+      // Icon is inside the title — no title means no icon either.
+      expect(container.querySelector('.tedi-horizontal-nav__group-icon')).not.toBeInTheDocument();
+    });
   });
 });

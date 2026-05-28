@@ -153,4 +153,41 @@ describe('MobileNavToggle', () => {
     expect(button).toHaveClass('tedi-mobile-nav-toggle--mobile');
     expect(button).not.toHaveClass('tedi-mobile-nav-toggle--open');
   });
+
+  test('renders without crashing when `getReferenceProps` is not supplied (uses default)', () => {
+    const toggleMenu = jest.fn();
+    render(<MobileNavToggle menuOpen={false} toggleMenu={toggleMenu} />);
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  test('calls toggleMenu when the labelled-layout button is clicked', () => {
+    const toggleMenu = jest.fn();
+    render(<MobileNavToggle {...defaultProps} toggleMenu={toggleMenu} showLabel />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(toggleMenu).toHaveBeenCalledWith(true);
+  });
+
+  test('labelled-layout button toggles on Space and Enter', () => {
+    const toggleMenu = jest.fn();
+    render(<MobileNavToggle {...defaultProps} toggleMenu={toggleMenu} showLabel />);
+    fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
+    fireEvent.keyDown(screen.getByRole('button'), { key: ' ' });
+    expect(toggleMenu).toHaveBeenCalledTimes(2);
+    expect(toggleMenu).toHaveBeenNthCalledWith(1, true);
+    expect(toggleMenu).toHaveBeenNthCalledWith(2, true);
+  });
+
+  test('renders the open icon on the labelled-layout button when menuOpen is true', () => {
+    render(<MobileNavToggle {...defaultProps} menuOpen showLabel />);
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('tedi-mobile-nav-toggle--with-label');
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    expect(button.querySelector('span[data-name="icon"]')).toBeInTheDocument();
+  });
+
+  test('renders the collapse-variant open icon when menuOpen is true', () => {
+    render(<MobileNavToggle {...defaultProps} variant="collapse" menuOpen />);
+    expect(screen.getByRole('button')).toHaveClass('tedi-mobile-nav-toggle--collapse');
+    expect(screen.getByRole('button')).toHaveClass('tedi-mobile-nav-toggle--open');
+  });
 });

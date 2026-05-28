@@ -584,42 +584,86 @@ Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.M
 
 **Props:** `HorizontalNavProps`
 
-- `children: ReactNode` (required) — only `HorizontalNav.Item` children render; others are ignored
+- `children: ReactNode` (required) — only `HorizontalNav.Item` and `HorizontalNav.Separator` children render; others are ignored. Fragments are flattened.
 - `ariaLabel: string` (required) — accessible name for the `<nav>` landmark
-- `mobileBreakpoint?: Breakpoint = 'md'` — below this, the bar collapses into the shared Sidenav mobile drawer
-- `isMobileOpen?: boolean`, `onMenuToggle?: (open: boolean) => void` — controlled-mode drawer open state
+- `mobileBreakpoint?: Breakpoint = 'md'` — below this, the bar collapses into a `SideNavMobile` drawer
+- `isMobileOpen?: boolean`, `onMenuToggle?: (open: boolean) => void` — controlled mobile drawer state
 - `showMobileOverlay?: boolean = true`
+- `submenuFit?: 'full' | 'item' = 'full'` — `'full'` renders a centered full-width mega-menu panel below the bar; `'item'` opens a narrow content-sized dropdown anchored to the active item
+- `maxWidth?: number | string | 'none' = 'xxl'` — clamps the inner content (bar items + mega-menu inner panel) to a max width and centers it inside the full-width blue bar. Accepts a CSS length (`1440`, `'90rem'`), a breakpoint name (`'sm'|'md'|'lg'|'xl'|'xxl'` → that breakpoint's min-width), or `'none'`/`0` to disable.
 - `className?: string`, `id?: string`
 
-Sub-component: `HorizontalNav.Item`
+Sub-components: `HorizontalNav.Item`, `HorizontalNav.Group`, `HorizontalNav.SubItem`, `HorizontalNav.Separator`
 
 **`HorizontalNav.Item` props**
 
 - `children: ReactNode` (required) — visible label
-- `href?: string`
+- `href?: string` — omit + provide `submenu` for a toggle-only mega-menu parent (renders `<button type="button">` with `aria-haspopup`/`aria-expanded`)
+- `submenu?: ReactNode` — mega-menu content, typically `HorizontalNav.Group` children
 - `icon?: string | IconWithoutBackgroundProps`
-- `isActive?: boolean = false` — adds `aria-current="page"` and the active visual
-- `disabled?: boolean = false`
+- `isActive?: boolean = false` — adds `aria-current="page"`, applies the active visual, and (when paired with `submenu`) opens the mega-menu panel
+- `disabled?: boolean = false` — drops `href` and suppresses `onClick`; on toggle items sets native `disabled`
 - `onClick?: (event) => void`
-- `as?: 'a' | ComponentType` — polymorphic for routing libs (e.g. `NavLink`)
+- `as?: 'a' | 'button' | ComponentType` — polymorphic for routing libs (e.g. `NavLink`)
 - `className?: string`
 
-Compound API. Below `mobileBreakpoint` the bar disappears and the items are projected into the same `SideNavMobile` drawer the Sidenav uses — apps that mix both navs get one consistent mobile experience instead of two competing drawers.
+**`HorizontalNav.Group` props** (mega-menu column)
+
+- `children: ReactNode` (required) — `HorizontalNav.SubItem` children only
+- `title?: ReactNode` — uppercase section heading; when omitted, no heading renders (and the `icon` prop is ignored)
+- `icon?: string | IconWithoutBackgroundProps` — leading icon next to the title
+- `headingLevel?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' = 'h3'`
+- `className?: string`
+
+**`HorizontalNav.SubItem` props** (mega-menu link)
+
+- `children: ReactNode` (required), `href?: string`, `isActive?: boolean`, `onClick?`, `as?`, `className?`
+
+**`HorizontalNav.Separator`** — visual divider between bar items (no props)
+
+Compound API. Below `mobileBreakpoint` the bar disappears and the items + mega-menu groups are projected into the same `SideNavMobile` drawer that Sidenav uses — apps that mix both navs get one consistent mobile experience instead of two competing drawers. The full-width blue bar background stops at the item row; the mega-menu opens below it as a true dropdown (white panel with shadow, clamped to `maxWidth`).
 
 ```tsx
 import { HorizontalNav } from '@tedi-design-system/react/tedi';
 
+// Flat bar
 <HorizontalNav ariaLabel="Primary navigation">
   <HorizontalNav.Item href="/" icon="home" isActive>Dashboard</HorizontalNav.Item>
   <HorizontalNav.Item href="/data" icon="folder_shared">My data</HorizontalNav.Item>
+  <HorizontalNav.Separator />
   <HorizontalNav.Item href="/settings" icon="settings">Settings</HorizontalNav.Item>
 </HorizontalNav>
+
+// Mega-menu (toggle-only parent: omit href, provide submenu)
+<HorizontalNav ariaLabel="Primary" maxWidth="xl">
+  <HorizontalNav.Item submenu={
+    <>
+      <HorizontalNav.Group title="Marriage" icon="favorite">
+        <HorizontalNav.SubItem href="/m/apply">Get married</HorizontalNav.SubItem>
+        <HorizontalNav.SubItem href="/m/cert">Marriage certificate</HorizontalNav.SubItem>
+      </HorizontalNav.Group>
+      <HorizontalNav.Group title="Children">
+        <HorizontalNav.SubItem href="/c/birth">Birth registration</HorizontalNav.SubItem>
+      </HorizontalNav.Group>
+    </>
+  }>Family</HorizontalNav.Item>
+</HorizontalNav>
+
+// Narrow mega-menu anchored to the item (single-column dropdown style)
+<HorizontalNav ariaLabel="Primary" submenuFit="item">…</HorizontalNav>
 
 // Controlled mobile drawer paired with an external hamburger
 <HorizontalNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
   ...
 </HorizontalNav>
 ```
+
+**Notes / gotchas**
+
+- Only one item can open a mega-menu at a time — the component tracks `isActive` for link items and internal toggle state for `<button>` parents.
+- Top-level items either link (`href`) or toggle (no `href` + `submenu`) — don't pass an `<a>` parent to `submenu`; the mega-menu lives below the trigger, not inside it.
+- The `<nav>` blue background only paints the bar row, not the area behind the mega-menu. The mega-menu panel is white with a drop shadow and centers itself inside the `maxWidth` constraint.
+- Pair an external hamburger (`SideNav.Toggle` or `MobileNavToggle`) with `isMobileOpen` + `onMenuToggle` to put a header-level toggle in charge of opening the mobile drawer. Wrap the toggle in `<HideAt md>` (or whichever breakpoint matches `mobileBreakpoint`) so it only appears in mobile mode.
 
 ## Loaders
 
