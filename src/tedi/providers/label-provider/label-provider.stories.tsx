@@ -31,8 +31,8 @@ const Template: StoryFn<LabelProviderProps> = () => {
           (Custom label provided by Application)
         </Text>
       </p>
-      <p>1 {getLabel('pagination.results', 1)}</p>
-      <p>4 {getLabel('pagination.results', 4)}</p>
+      <p>{getLabel('pagination.results', 1)}</p>
+      <p>{getLabel('pagination.results', 4)}</p>
       <p>
         {/* Intentional missing label to showcase error in console */}
         {getLabel('missing.label' as UnknownType)} -{' '}

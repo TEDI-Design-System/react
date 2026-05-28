@@ -180,6 +180,42 @@ describe('Dropdown component', () => {
     expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-0');
   });
 
+  it('focuses the item at defaultActiveIndex on open', () => {
+    renderDropdown(
+      { children: <span>Trigger</span> },
+      <>
+        <Dropdown.Item index={0}>First</Dropdown.Item>
+        <Dropdown.Item index={1}>Second</Dropdown.Item>
+        <Dropdown.Item index={2}>Third</Dropdown.Item>
+      </>,
+      { defaultActiveIndex: 2 }
+    );
+
+    fireEvent.click(screen.getByText('Trigger'));
+    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-2');
+  });
+
+  it('resets the active index when the dropdown closes', () => {
+    renderDropdown(
+      { children: <span>Trigger</span> },
+      <>
+        <Dropdown.Item index={0}>First</Dropdown.Item>
+        <Dropdown.Item index={1}>Second</Dropdown.Item>
+      </>,
+      { defaultActiveIndex: 1 }
+    );
+
+    // Open → close → reopen. Ensure the seeded index is reapplied cleanly.
+    fireEvent.click(screen.getByText('Trigger'));
+    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+
+    fireEvent.click(screen.getByText('Trigger'));
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Trigger'));
+    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+  });
+
   it('applies pixel width when width is a number', () => {
     renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
       width: 300,
