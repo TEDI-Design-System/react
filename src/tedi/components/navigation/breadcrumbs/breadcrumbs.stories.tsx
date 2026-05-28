@@ -17,8 +17,8 @@ const separatorOptions = {
 };
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=2409-21799&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/43adad-breadcrumb" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.48.71?node-id=2409-21798&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/43adad-breadcrumbs" target="_BLANK">Zeroheight ↗</a>
  */
 export default {
   title: 'TEDI-Ready/Components/Navigation/Breadcrumbs',
