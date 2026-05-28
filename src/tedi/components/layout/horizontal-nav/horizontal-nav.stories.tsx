@@ -51,7 +51,7 @@ const meta: Meta<typeof HorizontalNav> = {
     'HorizontalNav.Group': HorizontalNav.Group,
     'HorizontalNav.SubItem': HorizontalNav.SubItem,
     'HorizontalNav.Separator': HorizontalNav.Separator,
-  },
+  } as never,
   decorators: [
     function MetaHeaderDecorator(Story, context) {
       const [open, setOpen] = useState(false);
@@ -90,17 +90,6 @@ const meta: Meta<typeof HorizontalNav> = {
   ],
   parameters: {
     layout: 'fullscreen',
-    docs: {
-      source: {
-        transform: (code: string) => {
-          return code
-            .replaceAll('HorizontalNavItem', 'HorizontalNav.Item')
-            .replaceAll('HorizontalNavGroup', 'HorizontalNav.Group')
-            .replaceAll('HorizontalNavSubItem', 'HorizontalNav.SubItem')
-            .replaceAll('HorizontalNavSeparator', 'HorizontalNav.Separator');
-        },
-      },
-    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.46.70?node-id=31693-133265&m=dev',

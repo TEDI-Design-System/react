@@ -110,6 +110,32 @@ describe('HorizontalNav', () => {
     expect(screen.getByRole('link', { name: 'Get married' })).toHaveAttribute('href', '/family/marriage');
   });
 
+  it('resyncs the open toggle when `isActive` changes on a toggle-only item after mount', () => {
+    const Submenu = (
+      <HorizontalNav.Group title="Marriage">
+        <HorizontalNav.SubItem href="/m">Get married</HorizontalNav.SubItem>
+      </HorizontalNav.Group>
+    );
+    const { rerender, container } = render(
+      <HorizontalNav ariaLabel="Primary">
+        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
+        <HorizontalNav.Item submenu={Submenu}>Family</HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    expect(container.querySelector('[data-name="horizontal-nav-submenu"]')).not.toBeInTheDocument();
+
+    rerender(
+      <HorizontalNav ariaLabel="Primary">
+        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
+        <HorizontalNav.Item submenu={Submenu} isActive>
+          Family
+        </HorizontalNav.Item>
+      </HorizontalNav>
+    );
+    expect(container.querySelector('[data-name="horizontal-nav-submenu"]')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Family/ })).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('does not render the panel when the item is NOT active', () => {
     const { container } = render(
       <HorizontalNav ariaLabel="Primary">
@@ -634,7 +660,7 @@ describe('HorizontalNav', () => {
     });
 
     it('renders a custom element via the `as` prop', () => {
-      const Custom = (props: React.AnchorHTMLAttributes<HTMLElement>) => <a data-testid="custom-trigger" {...props} />;
+      const Custom = (props: React.AnchorHTMLAttributes<HTMLElement>) => <a data-custom {...props} />;
       render(
         <HorizontalNav ariaLabel="Primary">
           <HorizontalNav.Item as={Custom} href="/x">
@@ -642,7 +668,10 @@ describe('HorizontalNav', () => {
           </HorizontalNav.Item>
         </HorizontalNav>
       );
-      expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
+      const link = screen.getByRole('link', { name: 'X' });
+      expect(link).toBeInTheDocument();
+      // Sanity: the `as`-supplied component rendered (not the default <a>).
+      expect(link).toHaveAttribute('data-custom');
     });
   });
 

@@ -60,4 +60,6 @@ export const HorizontalNavGroup = ({
   );
 };
 
+HorizontalNavGroup.displayName = 'HorizontalNav.Group';
+
 export default HorizontalNavGroup;

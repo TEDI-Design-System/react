@@ -153,7 +153,7 @@ const extractMobileSubmenuGroups = (submenu: ReactNode): MobileSubItemGroup[] | 
   return groups.length > 0 ? groups : undefined;
 };
 
-const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement | null => {
+export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | null => {
   const {
     children,
     ariaLabel,
@@ -191,12 +191,16 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
   const isToggleItem = (item: ReactElement<HorizontalNavItemProps>) =>
     !item.props.href && Children.count(item.props.submenu) > 0;
 
-  const initialOpenButtonIndex = useMemo(() => {
+  const activeToggleIndex = useMemo(() => {
     const idx = items.findIndex((item) => isToggleItem(item) && item.props.isActive);
     return idx === -1 ? null : idx;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const [openButtonIndex, setOpenButtonIndex] = useState<number | null>(initialOpenButtonIndex);
+  }, [items]);
+  const [openButtonIndex, setOpenButtonIndex] = useState<number | null>(activeToggleIndex);
+
+  useEffect(() => {
+    setOpenButtonIndex(activeToggleIndex);
+  }, [activeToggleIndex]);
   const navRef = useRef<HTMLElement>(null);
   const panelId = useId();
 
@@ -237,6 +241,7 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
     () =>
       items.map((item) => ({
         children: item.props.children,
+        disabled: item.props.disabled,
         href: item.props.href,
         icon: item.props.icon,
         isActive: item.props.isActive,
@@ -317,13 +322,11 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
   );
 };
 
-HorizontalNavComponent.displayName = 'HorizontalNav';
+HorizontalNav.displayName = 'HorizontalNav';
 
-export const HorizontalNav = Object.assign(HorizontalNavComponent, {
-  Item: HorizontalNavItem,
-  Group: HorizontalNavGroup,
-  SubItem: HorizontalNavSubItem,
-  Separator: HorizontalNavSeparator,
-});
+HorizontalNav.Item = HorizontalNavItem;
+HorizontalNav.Group = HorizontalNavGroup;
+HorizontalNav.SubItem = HorizontalNavSubItem;
+HorizontalNav.Separator = HorizontalNavSeparator;
 
 export default HorizontalNav;

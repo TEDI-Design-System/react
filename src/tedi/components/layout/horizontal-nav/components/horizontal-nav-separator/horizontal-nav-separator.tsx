@@ -15,4 +15,6 @@ export const HorizontalNavSeparator = ({ className }: HorizontalNavSeparatorProp
   </li>
 );
 
+HorizontalNavSeparator.displayName = 'HorizontalNav.Separator';
+
 export default HorizontalNavSeparator;

@@ -53,4 +53,6 @@ export const HorizontalNavSubItem = (props: HorizontalNavSubItemProps): JSX.Elem
   );
 };
 
+HorizontalNavSubItem.displayName = 'HorizontalNav.SubItem';
+
 export default HorizontalNavSubItem;

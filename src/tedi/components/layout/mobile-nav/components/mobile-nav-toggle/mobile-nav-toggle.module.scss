@@ -36,14 +36,14 @@ $toggle-button-width: 3.5rem;
   &.tedi-mobile-nav-toggle--with-label {
     display: inline-flex;
     flex-direction: column;
-    gap: var(--tedi-spacing-04, 0.25rem);
+    gap: var(--tedi-spacing-04);
     align-items: center;
     justify-content: center;
     width: auto;
     min-width: $toggle-button-width;
     height: auto;
     min-height: $toggle-button-height;
-    padding: var(--tedi-spacing-08, 0.5rem);
+    padding: var(--tedi-spacing-08);
     color: var(--button-main-primary-text-default);
     cursor: pointer;
     background-color: var(--button-main-primary-background-default);
@@ -69,7 +69,7 @@ $toggle-button-width: 3.5rem;
 }
 
 .tedi-mobile-nav-toggle__label {
-  font-size: var(--body-extra-small-regular-size, 0.75rem);
-  font-weight: var(--body-extra-small-regular-weight, 400);
+  font-size: var(--body-extra-small-regular-size);
+  font-weight: var(--body-extra-small-regular-weight);
   line-height: 1;
 }
