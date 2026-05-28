@@ -272,35 +272,37 @@ const HorizontalNavComponent = (props: HorizontalNavProps): React.ReactElement |
       aria-label={ariaLabel}
       data-name="horizontal-nav"
     >
-      <ul
-        className={styles['tedi-horizontal-nav__list']}
-        style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
-      >
-        {allChildren.map((child, index) => {
-          if (isNavItem(child)) {
-            const itemIndex = itemCursor++;
-            const hasSubmenu = Children.count(child.props.submenu) > 0;
-            const toggle = isToggleItem(child);
-            const isSubmenuOpen = isItemSubmenuOpen(child, itemIndex);
-            const consumerOnClick = child.props.onClick;
-            const wrappedOnClick = toggle
-              ? (event: React.MouseEvent | React.KeyboardEvent) => {
-                  consumerOnClick?.(event);
-                  setOpenButtonIndex((current) => (current === itemIndex ? null : itemIndex));
-                }
-              : consumerOnClick;
-            return React.cloneElement(child, {
-              key: index,
-              hasSubmenu,
-              renderSubmenuInline,
-              isSubmenuOpen,
-              panelId,
-              onClick: wrappedOnClick,
-            });
-          }
-          return React.cloneElement(child, { key: index });
-        })}
-      </ul>
+      <div className={styles['tedi-horizontal-nav__bar']}>
+        <ul
+          className={styles['tedi-horizontal-nav__list']}
+          style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
+        >
+          {allChildren.map((child, index) => {
+            if (isNavItem(child)) {
+              const itemIndex = itemCursor++;
+              const hasSubmenu = Children.count(child.props.submenu) > 0;
+              const toggle = isToggleItem(child);
+              const isSubmenuOpen = isItemSubmenuOpen(child, itemIndex);
+              const consumerOnClick = child.props.onClick;
+              const wrappedOnClick = toggle
+                ? (event: React.MouseEvent | React.KeyboardEvent) => {
+                    consumerOnClick?.(event);
+                    setOpenButtonIndex((current) => (current === itemIndex ? null : itemIndex));
+                  }
+                : consumerOnClick;
+              return React.cloneElement(child, {
+                key: index,
+                hasSubmenu,
+                renderSubmenuInline,
+                isSubmenuOpen,
+                panelId,
+                onClick: wrappedOnClick,
+              });
+            }
+            return React.cloneElement(child, { key: index });
+          })}
+        </ul>
+      </div>
       {!renderSubmenuInline && activeItemWithSubmenu && (
         <div id={panelId} className={styles['tedi-horizontal-nav__submenu']} data-name="horizontal-nav-submenu">
           <div

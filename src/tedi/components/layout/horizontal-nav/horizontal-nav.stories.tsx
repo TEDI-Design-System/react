@@ -7,6 +7,7 @@ import Separator from '../../misc/separator/separator';
 import { Col, Row } from '../grid';
 import { Representative } from '../header/components/header-role/header-role-representatives';
 import { Header } from '../header/header';
+import { HideAt } from '../hide-at/hide-at';
 import { ShowAt } from '../show-at/show-at';
 import { SideNav } from '../sidenav/sidenav';
 import { VerticalSpacing } from '../vertical-spacing';
@@ -58,7 +59,13 @@ const meta: Meta<typeof HorizontalNav> = {
       return (
         <MobileNavStateContext.Provider value={{ open, setOpen }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <Header toggle={<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />}>
+            <Header
+              toggle={
+                <HideAt md>
+                  <SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />
+                </HideAt>
+              }
+            >
               <Header.Logo logo={headerLogo} href="#" />
               <Header.Center>{null}</Header.Center>
               <Header.Actions>
