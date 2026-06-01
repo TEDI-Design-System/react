@@ -1,3 +1,15 @@
+# [18.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.2.0-rc.1...react-18.0.0-rc.1) (2026-06-01)
+
+
+### Features
+
+* **number-field:** add decimalSeparator prop [#596](https://github.com/TEDI-Design-System/react/issues/596) ([#623](https://github.com/TEDI-Design-System/react/issues/623)) ([c1de6d7](https://github.com/TEDI-Design-System/react/commit/c1de6d753db1a28b15ac89b881a30d9f716c09aa))
+
+
+### BREAKING CHANGES
+
+* **number-field:** onChange signature widened from (value: number) => void to (value: number | undefined) => void
+
 # [17.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.1.0...react-17.2.0-rc.1) (2026-06-01)
 
 
