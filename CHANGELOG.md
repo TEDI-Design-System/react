@@ -1,3 +1,10 @@
+# [18.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.1...react-18.0.0-rc.2) (2026-06-01)
+
+
+### Features
+
+* **collapse:** add inverted variant [#647](https://github.com/TEDI-Design-System/react/issues/647) ([#650](https://github.com/TEDI-Design-System/react/issues/650)) ([76f7594](https://github.com/TEDI-Design-System/react/commit/76f75948c595f143b132109b5d0413c2fbd42f2c))
+
 # [18.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.2.0-rc.1...react-18.0.0-rc.1) (2026-06-01)
 
 
