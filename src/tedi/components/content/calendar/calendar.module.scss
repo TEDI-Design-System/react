@@ -1,0 +1,245 @@
+%tedi-calendar-surface {
+  position: relative;
+  z-index: var(--z-index-dropdown);
+  font-family: var(--family-default);
+  background: var(--card-background-primary);
+}
+
+%tedi-calendar-cell-size {
+  width: var(--form-calendar-date-width);
+  height: var(--form-calendar-date-width);
+}
+
+.tedi-calendar {
+  width: fit-content;
+  max-width: none;
+  border: var(--tedi-borders-01) solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+
+  table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate;
+  }
+
+  &__container {
+    position: relative;
+    width: 100%;
+  }
+
+  &__months-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--layout-grid-gutters-08);
+  }
+
+  &__month {
+    padding: var(--card-padding-md-default);
+  }
+
+  &__footer {
+    padding-top: var(--layout-grid-gutters-08);
+    margin: 0 var(--card-padding-md-default) var(--card-padding-xs);
+    border-top: var(--tedi-borders-01) solid var(--general-border-primary);
+  }
+
+  &__head th {
+    border-bottom: var(--tedi-borders-01) solid var(--card-border-primary);
+  }
+
+  &__weekday {
+    @extend %tedi-calendar-cell-size;
+
+    font-weight: 500;
+    color: var(--general-text-tertiary);
+    border-bottom: var(--tedi-borders-01) solid var(--card-border-primary);
+  }
+
+  &__day {
+    @extend %tedi-calendar-cell-size;
+
+    padding: var(--tedi-borders-02);
+    text-align: center;
+    border-radius: var(--button-radius-sm);
+    transition: background 0.15s ease;
+
+    button {
+      all: unset;
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-size: var(--body-regular-size);
+      font-weight: var(--tedi-weight-02);
+      color: var(--general-text-primary);
+      cursor: pointer;
+
+      &:focus-visible {
+        outline: var(--tedi-borders-02) solid var(--form-datepicker-today-border);
+        outline-offset: var(--tedi-borders-02);
+      }
+    }
+
+    &:hover:not(.tedi-calendar__disabled) {
+      color: var(--general-text-primary);
+      cursor: pointer;
+      background-color: var(--form-datepicker-date-hover);
+    }
+
+    &[data-outside='true']:not(.tedi-calendar__day--selected) {
+      cursor: auto;
+      background: unset;
+    }
+  }
+
+  &__today {
+    button {
+      margin-left: -1px;
+      border: var(--tedi-borders-01) solid var(--form-datepicker-today-border);
+      border-radius: 50%;
+    }
+
+    &.tedi-calendar__available-day {
+      color: var(--form-datepicker-date-text-available);
+      background: var(--form-datepicker-date-available);
+    }
+  }
+
+  &__available-day {
+    color: var(--form-datepicker-date-text-available);
+    background: var(--form-datepicker-date-available);
+
+    button {
+      color: inherit;
+    }
+  }
+
+  &__unavailable-day {
+    text-decoration: line-through;
+  }
+
+  &__day--selected {
+    color: var(--form-datepicker-date-text-selected);
+    background-color: var(--form-datepicker-date-selected);
+
+    &.tedi-calendar__today {
+      button {
+        border-color: var(--form-datepicker-date-text-selected);
+      }
+    }
+
+    button {
+      color: inherit;
+    }
+  }
+
+  &__range-middle {
+    background-color: var(--form-datepicker-date-active);
+    border-radius: 0;
+
+    button {
+      color: var(--general-text-primary);
+    }
+  }
+
+  &__range-start {
+    background-color: var(--form-datepicker-date-selected);
+    border-radius: var(--button-radius-sm) 0 0 var(--button-radius-sm);
+  }
+
+  &__range-end {
+    background-color: var(--form-datepicker-date-selected);
+    border-radius: 0 var(--button-radius-sm) var(--button-radius-sm) 0;
+  }
+
+  &__outside-days:not(.tedi-calendar__day--selected) {
+    button {
+      color: var(--form-datepicker-date-text-muted);
+    }
+  }
+
+  &__week-number {
+    @extend %tedi-calendar-cell-size;
+
+    font-weight: 500;
+    color: var(--general-text-tertiary);
+    text-align: center;
+    border-right: var(--tedi-borders-01) solid var(--general-border-primary);
+  }
+
+  &__disabled {
+    opacity: 0.3;
+
+    button {
+      color: var(--general-text-primary);
+      cursor: not-allowed;
+    }
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.tedi-calendar__multivalue div:last-child {
+  align-items: start;
+}
+
+.tedi-calendar__picker-grid {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  padding: var(--card-padding-md-default);
+}
+
+.tedi-calendar__picker-grid-container {
+  @extend %tedi-calendar-surface;
+
+  max-width: 20rem;
+  border: var(--tedi-borders-01) solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+}
+
+.tedi-calendar__picker-grid-header {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--card-padding-md-default);
+  padding-bottom: 0;
+
+  &.tedi-calendar__picker--no-navigation {
+    justify-content: center;
+    padding-bottom: var(--card-padding-md-default);
+  }
+}
+
+.tedi-calendar__grid-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: calc(var(--button-md-padding-y) - var(--tedi-borders-01)) var(--button-md-padding-x);
+  font-size: var(--button-text-size-default);
+  color: var(--form-checkbox-radio-card-primary-default-text);
+  text-align: center;
+  border: var(--tedi-borders-01) solid var(--form-checkbox-radio-card-secondary-default-border);
+  border-radius: var(--form-checkbox-radio-card-radius);
+
+  &:hover {
+    color: var(--form-checkbox-radio-card-secondary-hover-text);
+    cursor: pointer;
+    border: var(--tedi-borders-01) solid var(--form-checkbox-radio-card-secondary-hover-border);
+  }
+
+  &--selected {
+    color: var(--form-checkbox-radio-card-secondary-selected-text);
+    border-color: var(--form-checkbox-radio-card-secondary-selected-border);
+    box-shadow: 0 0 0 var(--tedi-borders-01) var(--form-checkbox-radio-card-secondary-selected-border);
+
+    &:hover {
+      box-shadow: 0 0 0 var(--tedi-borders-01) var(--form-checkbox-radio-card-secondary-selected-border);
+    }
+  }
+}

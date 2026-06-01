@@ -382,7 +382,7 @@ $btn-width-large: 3.72rem;
   }
 }
 
-.tedi-btn--text-color {
+.tedi-btn--text {
   &.tedi-btn--link {
     @include link-variant(
       inherit,

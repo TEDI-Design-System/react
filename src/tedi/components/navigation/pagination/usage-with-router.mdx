@@ -1,0 +1,72 @@
+import { Meta } from '@storybook/blocks';
+import * as PaginationStories from './pagination.stories';
+
+<Meta of={PaginationStories} name="Usage with React Router" />
+
+# Usage with React Router
+
+Pagination state maps naturally to URL search params — bind `page` (and
+optionally `pageSize`) to `useSearchParams` so users can bookmark, share, and
+refresh a specific page of the result set.
+
+---
+
+## Example
+
+```tsx
+import { useSearchParams } from 'react-router-dom';
+import { Pagination } from '@tedi-design-system/react/tedi';
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50];
+
+function ResultsWithPagination({ totalItems }: { totalItems: number }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const pageSize = Number(searchParams.get('pageSize') ?? PAGE_SIZE_OPTIONS[0]);
+  const pageCount = Math.max(1, Math.ceil(totalItems / pageSize));
+  const page = Math.min(pageCount, Math.max(1, Number(searchParams.get('page') ?? 1)));
+
+  const update = (next: Partial<{ page: number; pageSize: number }>) => {
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        if (next.page !== undefined) {
+          if (next.page === 1) params.delete('page');
+          else params.set('page', String(next.page));
+        }
+        if (next.pageSize !== undefined) {
+          params.set('pageSize', String(next.pageSize));
+          params.delete('page'); // jump back to the first page on size change
+        }
+        return params;
+      },
+      { replace: true }
+    );
+  };
+
+  return (
+    <Pagination
+      pageCount={pageCount}
+      page={page}
+      onPageChange={(next) => update({ page: next })}
+      totalItems={totalItems}
+      pageSize={pageSize}
+      pageSizeOptions={PAGE_SIZE_OPTIONS}
+      onPageSizeChange={(next) => update({ pageSize: next })}
+    />
+  );
+}
+```
+
+---
+
+## Key Points
+
+- Bind `page` (and optionally `pageSize`) to `useSearchParams` so users can
+  bookmark and share URLs.
+- Pass `{ replace: true }` to `setSearchParams` — paging is navigation within
+  the same view and shouldn't stack history entries.
+- Clamp the URL-derived page into `[1, pageCount]` before feeding it to
+  `<Pagination>`; URLs can be hand-edited and may hold stale values.
+- Reset `page` back to 1 whenever `pageSize` changes, and omit `page=1` from
+  the URL to keep the default URL clean.

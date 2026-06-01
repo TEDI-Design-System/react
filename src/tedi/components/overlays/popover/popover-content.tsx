@@ -7,6 +7,7 @@ import ClosingButton, { ClosingButtonProps } from '../../buttons/closing-button/
 import { OverlayContext } from '../overlay/overlay';
 import { OverlayContent, OverlayContentProps } from '../overlay/overlay-content';
 import styles from './popover.module.scss';
+import { PopoverContext } from './popover-context';
 
 export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames'> {
   /**
@@ -34,7 +35,7 @@ export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNam
    * Popover width.
    * @default small
    */
-  width?: 'small' | 'medium' | 'large';
+  width?: 'small' | 'medium' | 'large' | 'none';
 }
 
 export const PopoverContent = (props: PopoverContentProps) => {
@@ -48,6 +49,10 @@ export const PopoverContent = (props: PopoverContentProps) => {
     closeProps = { size: 'default' },
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
+  // `withBorder` is owned by <Popover> because it also influences floating-ui
+  // arrow padding, not just styling. Reading it from context keeps the two
+  // concerns in sync.
+  const { withBorder } = useContext(PopoverContext);
   const titleId = useId();
   const hasDescription = Boolean(children);
   const descriptionId = useId();
@@ -55,8 +60,15 @@ export const PopoverContent = (props: PopoverContentProps) => {
   return (
     <OverlayContent
       classNames={{
-        content: cn(styles['tedi-popover'], { [styles[`tedi-popover--${width}`]]: width }, className),
-        arrow: styles['tedi-popover__arrow'],
+        content: cn(
+          styles['tedi-popover'],
+          {
+            [styles[`tedi-popover--${width}`]]: width && width !== 'none',
+            [styles['tedi-popover--border']]: withBorder,
+          },
+          className
+        ),
+        arrow: cn(styles['tedi-popover__arrow'], { [styles['tedi-popover__arrow--border']]: withBorder }),
       }}
       labelledBy={title ? titleId : undefined}
       describedBy={hasDescription ? descriptionId : undefined}
@@ -83,3 +95,5 @@ export const PopoverContent = (props: PopoverContentProps) => {
     </OverlayContent>
   );
 };
+
+PopoverContent.displayName = 'PopoverContent';
