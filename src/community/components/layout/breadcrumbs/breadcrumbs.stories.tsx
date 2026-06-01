@@ -6,6 +6,11 @@ import { Breadcrumbs } from './breadcrumbs';
 const meta: Meta<typeof Breadcrumbs> = {
   component: Breadcrumbs,
   title: 'Community/Layout/Breadcrumbs',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
   argTypes: {
     linkAs: {
       type: 'function',

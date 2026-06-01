@@ -142,6 +142,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Breadcrumbs',
     ru: 'Навигационная цепочка',
   },
+  'breadcrumbs.show-more': {
+    description: 'Accessible label for the collapsed-crumbs ellipsis button',
+    components: ['Breadcrumbs'],
+    et: 'Näita peidetud lehti',
+    en: 'Show hidden pages',
+    ru: 'Показать скрытые страницы',
+  },
   'anchor.new-tab': {
     description: 'Label for when anchor opens in new tab',
     components: ['Anchor'],
