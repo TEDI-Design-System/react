@@ -39,7 +39,8 @@ type TemplateMultipleProps<Type = typeof buttonStateArray> = CollapseProps & {
 };
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, hideSizes, ...collapseProps } = args;
+  const { array, hideSizes, inverted, ...collapseProps } = args;
+  const labelColor = inverted ? 'white' : undefined;
 
   return (
     <>
@@ -47,11 +48,15 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
         <Row>
           <Col md={1}></Col>
           <Col>
-            <Text modifiers="bold">Default</Text>
+            <Text modifiers="bold" color={labelColor}>
+              Default
+            </Text>
           </Col>
           {!hideSizes && (
             <Col className="text-bold">
-              <Text modifiers="bold">Small</Text>
+              <Text modifiers="bold" color={labelColor}>
+                Small
+              </Text>
             </Col>
           )}
         </Row>
@@ -59,22 +64,24 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
         {array.map((value, key) => (
           <Row key={key}>
             <Col md={1} className="display-flex align-items-start">
-              <Text modifiers="bold">{value}</Text>
+              <Text modifiers="bold" color={labelColor}>
+                {value}
+              </Text>
             </Col>
             <Col className="display-flex align-items-start gap-3">
-              <Collapse {...collapseProps} id={value}>
+              <Collapse {...collapseProps} inverted={inverted} id={value}>
                 <>&nbsp;</>
               </Collapse>
-              <Collapse {...collapseProps} id={value} open>
+              <Collapse {...collapseProps} inverted={inverted} id={value} open>
                 <>&nbsp;</>
               </Collapse>
             </Col>
             {!hideSizes && (
               <Col className="display-flex align-items-start gap-3">
-                <Collapse {...collapseProps} id={value} size="small">
+                <Collapse {...collapseProps} inverted={inverted} id={value} size="small">
                   <>&nbsp;</>
                 </Collapse>
-                <Collapse {...collapseProps} id={value} open size="small">
+                <Collapse {...collapseProps} inverted={inverted} id={value} open size="small">
                   <>&nbsp;</>
                 </Collapse>
               </Col>
@@ -114,6 +121,41 @@ export const IconOnly = {
       active: '#Active__trigger',
       focusVisible: '#Focus__trigger',
     },
+  },
+};
+
+export const WithTextInverted = {
+  render: TemplateColumn,
+  args: {
+    array: buttonStateArray,
+    visualType: 'primary',
+    inverted: true,
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover__trigger',
+      active: '#Active__trigger',
+      focusVisible: '#Focus__trigger',
+    },
+    backgrounds: { default: 'brand' },
+  },
+};
+
+export const IconOnlyInverted = {
+  render: TemplateColumn,
+  args: {
+    array: buttonStateArray,
+    visualType: 'primary',
+    iconOnly: true,
+    inverted: true,
+  },
+  parameters: {
+    pseudo: {
+      hover: '#Hover__trigger',
+      active: '#Active__trigger',
+      focusVisible: '#Focus__trigger',
+    },
+    backgrounds: { default: 'brand' },
   },
 };
 

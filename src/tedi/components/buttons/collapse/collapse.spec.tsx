@@ -150,4 +150,65 @@ describe('Collapse component with breakpoint support', () => {
 
     expect(screen.getByRole('button', { name: 'Toggle section' })).toBeInTheDocument();
   });
+
+  describe('inverted variant', () => {
+    it('does NOT apply the inverted modifier by default', () => {
+      const { container } = getComponent();
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).not.toHaveClass('tedi-collapse--inverted');
+    });
+
+    it('applies the inverted modifier on the with-text variant', () => {
+      const { container } = getComponent({ inverted: true });
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).toHaveClass('tedi-collapse--inverted');
+    });
+
+    it('keeps the with-text variant class set (no icon-only modifier) when inverted', () => {
+      const { container } = getComponent({ inverted: true });
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).toHaveClass('tedi-collapse--inverted');
+      expect(root).not.toHaveClass('tedi-collapse--icon-only');
+    });
+
+    it('applies both the icon-only and inverted modifiers together', () => {
+      const { container } = render(
+        <Collapse id="collapse-inverted-icon" iconOnly inverted>
+          Content
+        </Collapse>
+      );
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).toHaveClass('tedi-collapse--icon-only');
+      expect(root).toHaveClass('tedi-collapse--inverted');
+    });
+
+    it('composes the inverted modifier with the open state', () => {
+      const { container } = getComponent({ inverted: true, open: true });
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).toHaveClass('tedi-collapse--inverted');
+      expect(root).toHaveClass('tedi-collapse--is-open');
+    });
+
+    it('composes the inverted modifier with the small size', () => {
+      const { container } = getComponent({ inverted: true, size: 'small' });
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).toHaveClass('tedi-collapse--inverted');
+      expect(root).toHaveClass('tedi-collapse--small');
+    });
+
+    it('drops the inverted modifier when paired with arrowType="secondary" (no inverted secondary form)', () => {
+      const { container } = getComponent({ inverted: true, arrowType: 'secondary' });
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).not.toHaveClass('tedi-collapse--inverted');
+    });
+
+    it('still toggles the open state on click when inverted', () => {
+      getComponent({ inverted: true });
+      const button = screen.getByRole('button', { name: /näita rohkem/i });
+      expect(screen.queryByRole('region', { name: /näita vähem/i })).not.toBeInTheDocument();
+      fireEvent.click(button);
+      expect(button).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('region', { name: /näita vähem/i })).toBeInTheDocument();
+    });
+  });
 });
