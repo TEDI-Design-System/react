@@ -15,20 +15,17 @@ import React, {
 import { Breakpoint, BREAKPOINT_WIDTHS, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { MobileNav } from '../mobile-nav/mobile-nav';
 import { SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
-import { HorizontalNavGroup, HorizontalNavGroupProps } from './components/horizontal-nav-group/horizontal-nav-group';
-import { HorizontalNavItem, HorizontalNavItemProps } from './components/horizontal-nav-item/horizontal-nav-item';
-import { HorizontalNavSeparator } from './components/horizontal-nav-separator/horizontal-nav-separator';
-import {
-  HorizontalNavSubItem,
-  HorizontalNavSubItemProps,
-} from './components/horizontal-nav-subitem/horizontal-nav-subitem';
-import styles from './horizontal-nav.module.scss';
+import { TopNavGroup, TopNavGroupProps } from './components/top-nav-group/top-nav-group';
+import { TopNavItem, TopNavItemProps } from './components/top-nav-item/top-nav-item';
+import { TopNavSeparator } from './components/top-nav-separator/top-nav-separator';
+import { TopNavSubItem, TopNavSubItemProps } from './components/top-nav-subitem/top-nav-subitem';
+import styles from './top-nav.module.scss';
 
 type BreakpointWidthName = Exclude<Breakpoint, 'xs'>;
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type HorizontalNavMaxWidth = number | BreakpointWidthName | (string & {});
+export type TopNavMaxWidth = number | BreakpointWidthName | (string & {});
 
-const resolveMaxWidth = (value: HorizontalNavMaxWidth | 'none' | undefined): number | string | undefined => {
+const resolveMaxWidth = (value: TopNavMaxWidth | 'none' | undefined): number | string | undefined => {
   if (value === undefined || value === 'none' || value === 0) return undefined;
   if (typeof value === 'string' && value !== 'xs' && value in BREAKPOINT_WIDTHS) {
     return BREAKPOINT_WIDTHS[value as BreakpointWidthName];
@@ -36,9 +33,9 @@ const resolveMaxWidth = (value: HorizontalNavMaxWidth | 'none' | undefined): num
   return value;
 };
 
-export interface HorizontalNavProps {
+export interface TopNavProps {
   /**
-   * `HorizontalNav.Item` and `HorizontalNav.Separator` children. Any other
+   * `TopNav.Item` and `TopNav.Separator` children. Any other
    * React node is ignored. Fragments are flattened, so `<>…</>` wrappers work
    * transparently.
    */
@@ -100,7 +97,7 @@ export interface HorizontalNavProps {
    * full width of the nav.
    * @default xxl
    */
-  maxWidth?: HorizontalNavMaxWidth | 'none';
+  maxWidth?: TopNavMaxWidth | 'none';
 }
 
 const flattenChildren = (children: ReactNode): ReactElement[] => {
@@ -111,19 +108,18 @@ const flattenChildren = (children: ReactNode): ReactElement[] => {
       result.push(...flattenChildren((child.props as { children?: ReactNode }).children));
       return;
     }
-    if (child.type === HorizontalNavItem || child.type === HorizontalNavSeparator) {
+    if (child.type === TopNavItem || child.type === TopNavSeparator) {
       result.push(child);
     }
   });
   return result;
 };
 
-const isNavItem = (element: ReactElement): element is ReactElement<HorizontalNavItemProps> =>
-  element.type === HorizontalNavItem;
+const isNavItem = (element: ReactElement): element is ReactElement<TopNavItemProps> => element.type === TopNavItem;
 
 type MobileSubItemGroup = NonNullable<SideNavItemProps['subItemGroups']>[number];
 
-const extractMobileSubItem = (element: ReactElement<HorizontalNavSubItemProps>): SideNavItemProps => ({
+const extractMobileSubItem = (element: ReactElement<TopNavSubItemProps>): SideNavItemProps => ({
   children: element.props.children,
   href: element.props.href,
   isActive: element.props.isActive,
@@ -140,20 +136,20 @@ const extractMobileSubmenuGroups = (submenu: ReactNode): MobileSubItemGroup[] | 
       if (nested) groups.push(...nested);
       return;
     }
-    if (child.type !== HorizontalNavGroup) return;
-    const groupProps = child.props as HorizontalNavGroupProps;
+    if (child.type !== TopNavGroup) return;
+    const groupProps = child.props as TopNavGroupProps;
     const subItems: SideNavItemProps[] = [];
     Children.forEach(groupProps.children, (subChild) => {
       if (!isValidElement(subChild)) return;
-      if (subChild.type !== HorizontalNavSubItem) return;
-      subItems.push(extractMobileSubItem(subChild as ReactElement<HorizontalNavSubItemProps>));
+      if (subChild.type !== TopNavSubItem) return;
+      subItems.push(extractMobileSubItem(subChild as ReactElement<TopNavSubItemProps>));
     });
     if (subItems.length > 0) groups.push({ subHeading: groupProps.title, subItems });
   });
   return groups.length > 0 ? groups : undefined;
 };
 
-export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | null => {
+export const TopNav = (props: TopNavProps): React.ReactElement | null => {
   const {
     children,
     ariaLabel,
@@ -188,7 +184,7 @@ export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | n
   const allChildren = useMemo(() => flattenChildren(children), [children]);
   const items = useMemo(() => allChildren.filter(isNavItem), [allChildren]);
 
-  const isToggleItem = (item: ReactElement<HorizontalNavItemProps>) =>
+  const isToggleItem = (item: ReactElement<TopNavItemProps>) =>
     !item.props.href && Children.count(item.props.submenu) > 0;
 
   const activeToggleIndex = useMemo(() => {
@@ -228,7 +224,7 @@ export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | n
     };
   }, [openButtonIndex, panelId]);
 
-  const isItemSubmenuOpen = (item: ReactElement<HorizontalNavItemProps>, indexInItems: number) =>
+  const isItemSubmenuOpen = (item: ReactElement<TopNavItemProps>, indexInItems: number) =>
     isToggleItem(item) ? openButtonIndex === indexInItems : Boolean(item.props.isActive);
 
   const activeItemWithSubmenu = useMemo(
@@ -273,13 +269,13 @@ export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | n
     <nav
       ref={navRef}
       id={id}
-      className={cn(styles['tedi-horizontal-nav'], className)}
+      className={cn(styles['tedi-top-nav'], className)}
       aria-label={ariaLabel}
-      data-name="horizontal-nav"
+      data-name="top-nav"
     >
-      <div className={styles['tedi-horizontal-nav__bar']}>
+      <div className={styles['tedi-top-nav__bar']}>
         <ul
-          className={styles['tedi-horizontal-nav__list']}
+          className={styles['tedi-top-nav__list']}
           style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
         >
           {allChildren.map((child, index) => {
@@ -309,9 +305,9 @@ export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | n
         </ul>
       </div>
       {!renderSubmenuInline && activeItemWithSubmenu && (
-        <div id={panelId} className={styles['tedi-horizontal-nav__submenu']} data-name="horizontal-nav-submenu">
+        <div id={panelId} className={styles['tedi-top-nav__submenu']} data-name="top-nav-submenu">
           <div
-            className={styles['tedi-horizontal-nav__submenu-inner']}
+            className={styles['tedi-top-nav__submenu-inner']}
             style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
           >
             {activeItemWithSubmenu.props.submenu}
@@ -322,11 +318,11 @@ export const HorizontalNav = (props: HorizontalNavProps): React.ReactElement | n
   );
 };
 
-HorizontalNav.displayName = 'HorizontalNav';
+TopNav.displayName = 'TopNav';
 
-HorizontalNav.Item = HorizontalNavItem;
-HorizontalNav.Group = HorizontalNavGroup;
-HorizontalNav.SubItem = HorizontalNavSubItem;
-HorizontalNav.Separator = HorizontalNavSeparator;
+TopNav.Item = TopNavItem;
+TopNav.Group = TopNavGroup;
+TopNav.SubItem = TopNavSubItem;
+TopNav.Separator = TopNavSeparator;
 
-export default HorizontalNav;
+export default TopNav;

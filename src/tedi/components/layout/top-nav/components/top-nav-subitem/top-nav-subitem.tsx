@@ -1,9 +1,9 @@
 import cn from 'classnames';
 import React from 'react';
 
-import styles from '../../horizontal-nav.module.scss';
+import styles from '../../top-nav.module.scss';
 
-export interface HorizontalNavSubItemProps {
+export interface TopNavSubItemProps {
   /**
    * Link label.
    */
@@ -32,15 +32,15 @@ export interface HorizontalNavSubItemProps {
   className?: string;
 }
 
-export const HorizontalNavSubItem = (props: HorizontalNavSubItemProps): JSX.Element => {
+export const TopNavSubItem = (props: TopNavSubItemProps): JSX.Element => {
   const { children, href, isActive = false, onClick, as, className } = props;
   const Component = as ?? 'a';
   return (
-    <li className={styles['tedi-horizontal-nav__subitem']}>
+    <li className={styles['tedi-top-nav__subitem']}>
       <Component
         className={cn(
-          styles['tedi-horizontal-nav__subitem-link'],
-          { [styles['tedi-horizontal-nav__subitem-link--active']]: isActive },
+          styles['tedi-top-nav__subitem-link'],
+          { [styles['tedi-top-nav__subitem-link--active']]: isActive },
           className
         )}
         href={href}
@@ -53,6 +53,6 @@ export const HorizontalNavSubItem = (props: HorizontalNavSubItemProps): JSX.Elem
   );
 };
 
-HorizontalNavSubItem.displayName = 'HorizontalNav.SubItem';
+TopNavSubItem.displayName = 'TopNav.SubItem';
 
-export default HorizontalNavSubItem;
+export default TopNavSubItem;

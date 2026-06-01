@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/addon-docs';
 
-<Meta title="TEDI-Ready/Layout/HorizontalNav/Documentation" />
+<Meta title="TEDI-Ready/Layout/TopNav/Documentation" />
 
-# HorizontalNav
+# TopNav
 
 A primary, horizontal site navigation. Renders as a blue bar of items on desktop and
 collapses into the shared `MobileNav` drawer below `mobileBreakpoint`. Supports an
@@ -13,47 +13,47 @@ optional mega-menu panel under the active item.
 ## Quick start
 
 ```tsx
-import { HorizontalNav } from '@tedi-design-system/react/tedi';
+import { TopNav } from '@tedi-design-system/react/tedi';
 
-<HorizontalNav ariaLabel="Primary navigation">
-  <HorizontalNav.Item href="/" isActive>
+<TopNav ariaLabel="Primary navigation">
+  <TopNav.Item href="/" isActive>
     Home
-  </HorizontalNav.Item>
-  <HorizontalNav.Item href="/services">Services</HorizontalNav.Item>
-  <HorizontalNav.Item href="/contact">Contact</HorizontalNav.Item>
-</HorizontalNav>;
+  </TopNav.Item>
+  <TopNav.Item href="/services">Services</TopNav.Item>
+  <TopNav.Item href="/contact">Contact</TopNav.Item>
+</TopNav>;
 ```
 
 - `ariaLabel` is required — it labels the `<nav>` landmark for screen readers.
-- Mark the current page with `isActive` on the matching `HorizontalNav.Item`.
+- Mark the current page with `isActive` on the matching `TopNav.Item`.
 
 ---
 
 ## Subcomponents
 
-`HorizontalNav` is a compound component. All sub-elements are reachable via dot
+`TopNav` is a compound component. All sub-elements are reachable via dot
 notation:
 
 ```
 | Subcomponent              | Purpose                                                                   |
 | ------------------------- | ------------------------------------------------------------------------- |
-| `HorizontalNav.Item`      | A top-level item on the bar (link or toggle-only mega-menu trigger).      |
-| `HorizontalNav.Group`     | A column inside a mega-menu panel — optional `title` heading + sub-items. |
-| `HorizontalNav.SubItem`   | A single link inside a `Group`.                                           |
-| `HorizontalNav.Separator` | A thin vertical divider between items.                                    |
+| `TopNav.Item`      | A top-level item on the bar (link or toggle-only mega-menu trigger).      |
+| `TopNav.Group`     | A column inside a mega-menu panel — optional `title` heading + sub-items. |
+| `TopNav.SubItem`   | A single link inside a `Group`.                                           |
+| `TopNav.Separator` | A thin vertical divider between items.                                    |
 ```
 
 ```tsx
-<HorizontalNav ariaLabel="Primary">
-  <HorizontalNav.Item href="/" isActive>
+<TopNav ariaLabel="Primary">
+  <TopNav.Item href="/" isActive>
     Dashboard
-  </HorizontalNav.Item>
-  <HorizontalNav.Item href="/docs">Docs</HorizontalNav.Item>
-  <HorizontalNav.Separator />
-  <HorizontalNav.Item href="/settings" icon="settings">
+  </TopNav.Item>
+  <TopNav.Item href="/docs">Docs</TopNav.Item>
+  <TopNav.Separator />
+  <TopNav.Item href="/settings" icon="settings">
     Settings
-  </HorizontalNav.Item>
-</HorizontalNav>
+  </TopNav.Item>
+</TopNav>
 ```
 
 Fragments (`<>…</>`) are flattened, so you can group children freely.
@@ -62,27 +62,27 @@ Fragments (`<>…</>`) are flattened, so you can group children freely.
 
 ## Mega-menu (submenu)
 
-A `HorizontalNav.Item` accepts a `submenu` prop. When the item is _open_ and has
+A `TopNav.Item` accepts a `submenu` prop. When the item is _open_ and has
 submenu content, the panel appears below the bar.
 
 ```tsx
-<HorizontalNav.Item
+<TopNav.Item
   href="/family"
   isActive
   submenu={
     <>
-      <HorizontalNav.Group title="Marriage">
-        <HorizontalNav.SubItem href="/family/marriage">Get married</HorizontalNav.SubItem>
-        <HorizontalNav.SubItem href="/family/divorce">Divorce</HorizontalNav.SubItem>
-      </HorizontalNav.Group>
-      <HorizontalNav.Group title="Documents">
-        <HorizontalNav.SubItem href="/family/certificate">Certificate</HorizontalNav.SubItem>
-      </HorizontalNav.Group>
+      <TopNav.Group title="Marriage">
+        <TopNav.SubItem href="/family/marriage">Get married</TopNav.SubItem>
+        <TopNav.SubItem href="/family/divorce">Divorce</TopNav.SubItem>
+      </TopNav.Group>
+      <TopNav.Group title="Documents">
+        <TopNav.SubItem href="/family/certificate">Certificate</TopNav.SubItem>
+      </TopNav.Group>
     </>
   }
 >
   Family
-</HorizontalNav.Item>
+</TopNav.Item>
 ```
 
 A chevron is added next to the label automatically when an item has a submenu.
@@ -93,10 +93,10 @@ For single-column menus or compact link lists, omit `title` to skip the heading
 entirely:
 
 ```tsx
-<HorizontalNav.Group>
-  <HorizontalNav.SubItem href="/a">Link A</HorizontalNav.SubItem>
-  <HorizontalNav.SubItem href="/b">Link B</HorizontalNav.SubItem>
-</HorizontalNav.Group>
+<TopNav.Group>
+  <TopNav.SubItem href="/a">Link A</TopNav.SubItem>
+  <TopNav.SubItem href="/b">Link B</TopNav.SubItem>
+</TopNav.Group>
 ```
 
 ---
@@ -117,11 +117,11 @@ Accepted values:
 - `'none'` (or `0`) — disables the cap entirely.
 
 ```tsx
-<HorizontalNav ariaLabel="Primary" maxWidth="xl">…</HorizontalNav>
+<TopNav ariaLabel="Primary" maxWidth="xl">…</TopNav>
 // or
-<HorizontalNav ariaLabel="Primary" maxWidth={1200}>…</HorizontalNav>
+<TopNav ariaLabel="Primary" maxWidth={1200}>…</TopNav>
 // or
-<HorizontalNav ariaLabel="Primary" maxWidth="none">…</HorizontalNav>
+<TopNav ariaLabel="Primary" maxWidth="none">…</TopNav>
 ```
 
 **Default:** `'xxl'` (87.5rem).
@@ -130,7 +130,7 @@ Accepted values:
 
 ## Item triggers — link vs button
 
-The element rendered for a `HorizontalNav.Item` is chosen automatically:
+The element rendered for a `TopNav.Item` is chosen automatically:
 
 ```
 | Item config              | Renders                        | Notes                                                                           |
@@ -164,9 +164,9 @@ Defaults: `mobileBreakpoint='md'`, `showMobileOverlay=true`.
 ### Uncontrolled (simple)
 
 ```tsx
-<HorizontalNav ariaLabel="Primary">
-  <HorizontalNav.Item href="/">Home</HorizontalNav.Item>…
-</HorizontalNav>
+<TopNav ariaLabel="Primary">
+  <TopNav.Item href="/">Home</TopNav.Item>…
+</TopNav>
 ```
 
 The drawer manages its own open state internally — fine for stand-alone usage.
@@ -178,7 +178,7 @@ In a real layout the drawer is usually opened from the responsive `Header` via
 
 ```tsx
 import { useState } from 'react';
-import { Header, HorizontalNav, SideNav } from '@tedi-design-system/react/tedi';
+import { Header, TopNav, SideNav } from '@tedi-design-system/react/tedi';
 
 const Page = () => {
   const [open, setOpen] = useState(false);
@@ -187,12 +187,12 @@ const Page = () => {
       <Header toggle={<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />}>
         {/* Header.Logo, Actions, etc. */}
       </Header>
-      <HorizontalNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
-        <HorizontalNav.Item href="/" isActive>
+      <TopNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
+        <TopNav.Item href="/" isActive>
           Home
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="/services">Services</HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+        <TopNav.Item href="/services">Services</TopNav.Item>
+      </TopNav>
     </>
   );
 };
@@ -226,9 +226,9 @@ Pass a large `mobileBreakpoint` (e.g. `'xxl'`) to keep the nav in drawer mode on
 desktop — useful for previewing the mobile UI in Storybook:
 
 ```tsx
-<HorizontalNav ariaLabel="Primary" mobileBreakpoint="xxl" isMobileOpen>
+<TopNav ariaLabel="Primary" mobileBreakpoint="xxl" isMobileOpen>
   …
-</HorizontalNav>
+</TopNav>
 ```
 
 To keep the nav in **desktop layout at every viewport** (e.g. for visual state
@@ -239,14 +239,14 @@ mobile check is never satisfied.
 
 ## Sticky positioning
 
-`HorizontalNav` has no built-in stickiness — it's a layout concern of the
+`TopNav` has no built-in stickiness — it's a layout concern of the
 container.
 
 **Plain sticky** — wrap the nav in a sticky container:
 
 ```tsx
 <div style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-  <HorizontalNav ariaLabel="Primary">…</HorizontalNav>
+  <TopNav ariaLabel="Primary">…</TopNav>
 </div>
 ```
 
@@ -256,7 +256,7 @@ container.
 import { Affix } from '@tedi-design-system/react/tedi';
 
 <Affix top={0}>
-  <HorizontalNav ariaLabel="Primary">…</HorizontalNav>
+  <TopNav ariaLabel="Primary">…</TopNav>
 </Affix>;
 ```
 
@@ -282,16 +282,16 @@ The full pattern in a real page:
     </ShowAt>
   </Header.Actions>
 </Header>
-<HorizontalNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
+<TopNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
   …
-</HorizontalNav>
+</TopNav>
 ```
 
 Wrap desktop-only header items in `<ShowAt lg>` so the header collapses cleanly
 into a logo + toggle at mobile widths.
 
 > See the **Default** story sidebar in Storybook for the full prop table of
-> `HorizontalNav` and each subcomponent — they're auto-generated from the
+> `TopNav` and each subcomponent — they're auto-generated from the
 > TypeScript types.
 
 ---
@@ -304,7 +304,7 @@ into a logo + toggle at mobile widths.
   both the header and the nav drawer, use `isMobileOpen` + `onMenuToggle` and
   share the state via your own `useState`.
 - **Don't pass an `<a>` parent to the `submenu` prop** — the mega-menu items
-  should be `HorizontalNav.SubItem`s wrapped in `HorizontalNav.Group`s so the
+  should be `TopNav.SubItem`s wrapped in `TopNav.Group`s so the
   mobile drill-down works correctly.
 - **Polymorphic links:** use `as` to render a router `NavLink` (or any
   component) without losing the styling.

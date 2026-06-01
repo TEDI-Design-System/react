@@ -2,9 +2,9 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
-import styles from '../../horizontal-nav.module.scss';
+import styles from '../../top-nav.module.scss';
 
-export interface HorizontalNavGroupProps {
+export interface TopNavGroupProps {
   /**
    * Uppercase section title rendered above the link list. When omitted, the
    * heading is not rendered — useful for a single-column mega-menu that only
@@ -12,7 +12,7 @@ export interface HorizontalNavGroupProps {
    */
   title?: React.ReactNode;
   /**
-   * `HorizontalNav.SubItem` children. Anything else is ignored.
+   * `TopNav.SubItem` children. Anything else is ignored.
    */
   children: React.ReactNode;
   /**
@@ -32,21 +32,21 @@ export interface HorizontalNavGroupProps {
   className?: string;
 }
 
-export const HorizontalNavGroup = ({
+export const TopNavGroup = ({
   title,
   children,
   icon,
   headingLevel = 'h3',
   className,
-}: HorizontalNavGroupProps): JSX.Element => {
+}: TopNavGroupProps): JSX.Element => {
   const HeadingTag = headingLevel;
   return (
-    <section className={cn(styles['tedi-horizontal-nav__group'], className)}>
+    <section className={cn(styles['tedi-top-nav__group'], className)}>
       {title && (
-        <HeadingTag className={styles['tedi-horizontal-nav__group-title']}>
+        <HeadingTag className={styles['tedi-top-nav__group-title']}>
           {icon && (
             <Icon
-              className={styles['tedi-horizontal-nav__group-icon']}
+              className={styles['tedi-top-nav__group-icon']}
               {...(typeof icon === 'string' ? { name: icon } : icon)}
               size={typeof icon === 'string' ? 16 : icon.size ?? 16}
               color="inherit"
@@ -55,11 +55,11 @@ export const HorizontalNavGroup = ({
           {title}
         </HeadingTag>
       )}
-      <ul className={styles['tedi-horizontal-nav__group-list']}>{children}</ul>
+      <ul className={styles['tedi-top-nav__group-list']}>{children}</ul>
     </section>
   );
 };
 
-HorizontalNavGroup.displayName = 'HorizontalNav.Group';
+TopNavGroup.displayName = 'TopNav.Group';
 
-export default HorizontalNavGroup;
+export default TopNavGroup;

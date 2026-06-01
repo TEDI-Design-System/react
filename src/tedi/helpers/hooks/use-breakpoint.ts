@@ -7,7 +7,7 @@ export const breakpoints: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
 /**
  * Minimum viewport width (as a CSS length string) at which each TEDI breakpoint
  * activates. `xs` starts at 0 — i.e. anything below `sm`. Used by `useBreakpoint`
- * for `matchMedia` checks and by other components (e.g. `HorizontalNav`) that
+ * for `matchMedia` checks and by other components (e.g. `TopNav`) that
  * need to translate a breakpoint name into a pixel/rem width.
  */
 export const BREAKPOINT_WIDTHS: Record<Breakpoint, string> = {

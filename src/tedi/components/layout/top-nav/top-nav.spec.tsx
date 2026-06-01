@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpoint } from '../../../helpers';
-import { HorizontalNavItem } from './components/horizontal-nav-item/horizontal-nav-item';
-import { HorizontalNav } from './horizontal-nav';
+import { TopNavItem } from './components/top-nav-item/top-nav-item';
+import { TopNav } from './top-nav';
 
 import '@testing-library/jest-dom';
 
@@ -16,27 +16,27 @@ jest.mock('../../../helpers', () => {
 
 const setBreakpoint = (bp: string) => (useBreakpoint as jest.Mock).mockReturnValue(bp);
 
-describe('HorizontalNav', () => {
+describe('TopNav', () => {
   beforeEach(() => {
     setBreakpoint('lg');
   });
 
   it('renders a nav landmark with the supplied aria-label', () => {
     render(
-      <HorizontalNav ariaLabel="Primary navigation">
-        <HorizontalNav.Item href="/">Dashboard</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary navigation">
+        <TopNav.Item href="/">Dashboard</TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
   });
 
-  it('renders an <li> per HorizontalNav.Item and ignores non-item children', () => {
+  it('renders an <li> per TopNav.Item and ignores non-item children', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/a">A</HorizontalNav.Item>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/a">A</TopNav.Item>
         <span>not an item</span>
-        <HorizontalNav.Item href="/b">B</HorizontalNav.Item>
-      </HorizontalNav>
+        <TopNav.Item href="/b">B</TopNav.Item>
+      </TopNav>
     );
     const navList = screen.getByRole('navigation').querySelector('ul');
     expect(navList?.children).toHaveLength(2);
@@ -45,13 +45,13 @@ describe('HorizontalNav', () => {
 
   it('flattens Fragment children so wrappers like `<>…</>` work transparently', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
+      <TopNav ariaLabel="Primary">
         <>
-          <HorizontalNav.Item href="/a">A</HorizontalNav.Item>
-          <HorizontalNav.Item href="/b">B</HorizontalNav.Item>
+          <TopNav.Item href="/a">A</TopNav.Item>
+          <TopNav.Item href="/b">B</TopNav.Item>
         </>
-        <HorizontalNav.Item href="/c">C</HorizontalNav.Item>
-      </HorizontalNav>
+        <TopNav.Item href="/c">C</TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('link', { name: 'A' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'B' })).toBeInTheDocument();
@@ -60,12 +60,12 @@ describe('HorizontalNav', () => {
 
   it('marks the active item with aria-current="page"', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/" isActive>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/" isActive>
           Home
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="/docs">Docs</HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+        <TopNav.Item href="/docs">Docs</TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Docs' })).not.toHaveAttribute('aria-current');
@@ -74,11 +74,11 @@ describe('HorizontalNav', () => {
   it('respects `disabled` — strips href, sets aria-disabled, blocks onClick', () => {
     const onClick = jest.fn();
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/x" disabled onClick={onClick}>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/x" disabled onClick={onClick}>
           Disabled
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     const link = screen.getByText('Disabled').closest('a')!;
     expect(link).not.toHaveAttribute('href');
@@ -89,81 +89,81 @@ describe('HorizontalNav', () => {
 
   it('renders the mega-menu panel when the active item has a submenu', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item
           href="/family"
           isActive
           submenu={
-            <HorizontalNav.Group title="Marriage">
-              <HorizontalNav.SubItem href="/family/marriage">Get married</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="/family/divorce">Divorce</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="Marriage">
+              <TopNav.SubItem href="/family/marriage">Get married</TopNav.SubItem>
+              <TopNav.SubItem href="/family/divorce">Divorce</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
-    expect(container.querySelector('[data-name="horizontal-nav-submenu"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-name="top-nav-submenu"]')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Marriage' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Get married' })).toHaveAttribute('href', '/family/marriage');
   });
 
   it('resyncs the open toggle when `isActive` changes on a toggle-only item after mount', () => {
     const Submenu = (
-      <HorizontalNav.Group title="Marriage">
-        <HorizontalNav.SubItem href="/m">Get married</HorizontalNav.SubItem>
-      </HorizontalNav.Group>
+      <TopNav.Group title="Marriage">
+        <TopNav.SubItem href="/m">Get married</TopNav.SubItem>
+      </TopNav.Group>
     );
     const { rerender, container } = render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item submenu={Submenu}>Family</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item submenu={Submenu}>Family</TopNav.Item>
+      </TopNav>
     );
-    expect(container.querySelector('[data-name="horizontal-nav-submenu"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-name="top-nav-submenu"]')).not.toBeInTheDocument();
 
     rerender(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item submenu={Submenu} isActive>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item submenu={Submenu} isActive>
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
-    expect(container.querySelector('[data-name="horizontal-nav-submenu"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-name="top-nav-submenu"]')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Family/ })).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('does not render the panel when the item is NOT active', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/" isActive>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/" isActive>
           Home
-        </HorizontalNav.Item>
-        <HorizontalNav.Item
+        </TopNav.Item>
+        <TopNav.Item
           href="/family"
           submenu={
-            <HorizontalNav.Group title="Marriage">
-              <HorizontalNav.SubItem href="/x">x</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="Marriage">
+              <TopNav.SubItem href="/x">x</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
-    expect(container.querySelector('[data-name="horizontal-nav-submenu"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-name="top-nav-submenu"]')).not.toBeInTheDocument();
   });
 
   it('renders a Separator between items on desktop and exposes role="separator"', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/">Dashboard</HorizontalNav.Item>
-        <HorizontalNav.Separator />
-        <HorizontalNav.Item href="/settings">Settings</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Dashboard</TopNav.Item>
+        <TopNav.Separator />
+        <TopNav.Item href="/settings">Settings</TopNav.Item>
+      </TopNav>
     );
     const separator = screen.getByRole('separator');
     expect(separator).toHaveAttribute('aria-orientation', 'vertical');
@@ -174,11 +174,11 @@ describe('HorizontalNav', () => {
   it('omits Separators from the mobile drawer', () => {
     setBreakpoint('sm');
     render(
-      <HorizontalNav ariaLabel="Primary" isMobileOpen>
-        <HorizontalNav.Item href="/">Dashboard</HorizontalNav.Item>
-        <HorizontalNav.Separator />
-        <HorizontalNav.Item href="/settings">Settings</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary" isMobileOpen>
+        <TopNav.Item href="/">Dashboard</TopNav.Item>
+        <TopNav.Separator />
+        <TopNav.Item href="/settings">Settings</TopNav.Item>
+      </TopNav>
     );
     expect(screen.queryByRole('separator')).not.toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Dashboard' })).toBeInTheDocument();
@@ -188,25 +188,25 @@ describe('HorizontalNav', () => {
   it('passes submenu groups and sub-items into the mobile drawer', () => {
     setBreakpoint('sm');
     render(
-      <HorizontalNav ariaLabel="Primary" isMobileOpen>
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary" isMobileOpen>
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item
           href="/family"
           submenu={
             <>
-              <HorizontalNav.Group title="Marriage">
-                <HorizontalNav.SubItem href="/m">Get married</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="/d">Divorce</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Children">
-                <HorizontalNav.SubItem href="/c">Adoption</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Marriage">
+                <TopNav.SubItem href="/m">Get married</TopNav.SubItem>
+                <TopNav.SubItem href="/d">Divorce</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Children">
+                <TopNav.SubItem href="/c">Adoption</TopNav.SubItem>
+              </TopNav.Group>
             </>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
 
     const familyButton = screen.getByRole('button', { name: /Family/ });
@@ -219,10 +219,10 @@ describe('HorizontalNav', () => {
   it('falls through to the shared Sidenav mobile drawer below the breakpoint', () => {
     setBreakpoint('sm');
     render(
-      <HorizontalNav ariaLabel="Primary navigation" isMobileOpen>
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item href="/docs">Docs</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary navigation" isMobileOpen>
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item href="/docs">Docs</TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Home' })).toBeInTheDocument();
@@ -231,49 +231,49 @@ describe('HorizontalNav', () => {
 
   it('applies maxWidth as inline style on the inner list and submenu inner', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary" maxWidth={1200}>
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary" maxWidth={1200}>
+        <TopNav.Item
           href="/"
           isActive
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Home
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     const list = container.querySelector('ul') as HTMLElement;
     expect(list.style.maxWidth).toBe('1200px');
-    const submenuInner = container.querySelector('[data-name="horizontal-nav-submenu"] > div') as HTMLElement;
+    const submenuInner = container.querySelector('[data-name="top-nav-submenu"] > div') as HTMLElement;
     expect(submenuInner.style.maxWidth).toBe('1200px');
   });
 
   it('resolves a TEDI breakpoint name passed to maxWidth into the breakpoint min-width', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary" maxWidth="lg">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary" maxWidth="lg">
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
     );
     expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('62rem');
   });
 
   it('toggles a button-trigger submenu on click and closes it again', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     const trigger = screen.getByRole('button', { name: /Family/ });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
@@ -291,18 +291,18 @@ describe('HorizontalNav', () => {
   it('closes an open submenu when clicking outside the nav', () => {
     render(
       <div>
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             isActive
             submenu={
-              <HorizontalNav.Group title="More">
-                <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="More">
+                <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Family
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
         <button>Outside</button>
       </div>
     );
@@ -313,39 +313,39 @@ describe('HorizontalNav', () => {
 
   it('links the toggle button to its submenu via matching id / aria-controls', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           isActive
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     const trigger = screen.getByRole('button', { name: /Family/ });
     const controls = trigger.getAttribute('aria-controls');
     expect(controls).toBeTruthy();
     const panel = container.querySelector(`#${CSS.escape(controls as string)}`);
-    expect(panel).toHaveAttribute('data-name', 'horizontal-nav-submenu');
+    expect(panel).toHaveAttribute('data-name', 'top-nav-submenu');
   });
 
   it('returns focus to the trigger when Escape closes the panel', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     const trigger = screen.getByRole('button', { name: /Family/ });
     fireEvent.click(trigger);
@@ -358,37 +358,37 @@ describe('HorizontalNav', () => {
 
   it('renders the Group title with the requested heading level', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           href="/"
           isActive
           submenu={
-            <HorizontalNav.Group title="Section" headingLevel="h2">
-              <HorizontalNav.SubItem href="/a">Link</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="Section" headingLevel="h2">
+              <TopNav.SubItem href="/a">Link</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Home
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('heading', { level: 2, name: 'Section' })).toBeInTheDocument();
   });
 
   it('closes an open submenu when Escape is pressed', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           isActive
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('link', { name: 'Item' })).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -397,26 +397,26 @@ describe('HorizontalNav', () => {
 
   it('switching between two button-trigger submenus closes the previous one', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           submenu={
-            <HorizontalNav.Group title="A">
-              <HorizontalNav.SubItem href="/a">A-item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="A">
+              <TopNav.SubItem href="/a">A-item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           A
-        </HorizontalNav.Item>
-        <HorizontalNav.Item
+        </TopNav.Item>
+        <TopNav.Item
           submenu={
-            <HorizontalNav.Group title="B">
-              <HorizontalNav.SubItem href="/b">B-item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="B">
+              <TopNav.SubItem href="/b">B-item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           B
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     fireEvent.click(screen.getByRole('button', { name: 'A' }));
     expect(screen.getByRole('link', { name: 'A-item' })).toBeInTheDocument();
@@ -427,18 +427,18 @@ describe('HorizontalNav', () => {
 
   it('renders the parent as <button> with aria-haspopup/aria-expanded when it has a submenu but no href', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           isActive
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     const trigger = screen.getByRole('button', { name: /Family/ });
     expect(trigger).toHaveAttribute('type', 'button');
@@ -449,18 +449,18 @@ describe('HorizontalNav', () => {
 
   it('keeps <a> when href is provided even if a submenu is present', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           href="/family"
           submenu={
-            <HorizontalNav.Group title="More">
-              <HorizontalNav.SubItem href="/m">Item</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     expect(screen.getByRole('link', { name: /Family/ })).toHaveAttribute('href', '/family');
     expect(screen.queryByRole('button', { name: /Family/ })).not.toBeInTheDocument();
@@ -468,40 +468,40 @@ describe('HorizontalNav', () => {
 
   it('defaults the bar maxWidth to "xxl" (87.5rem)', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
     );
     expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('87.5rem');
   });
 
   it('removes the maxWidth cap when maxWidth="none"', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary" maxWidth="none">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary" maxWidth="none">
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
     );
     expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('');
   });
 
   it('renders the submenu inline under the active item when submenuFit="item"', () => {
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary" submenuFit="item">
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary" submenuFit="item">
+        <TopNav.Item href="/">Home</TopNav.Item>
+        <TopNav.Item
           href="/family"
           isActive
           submenu={
-            <HorizontalNav.Group title="Marriage">
-              <HorizontalNav.SubItem href="/m">Get married</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="Marriage">
+              <TopNav.SubItem href="/m">Get married</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Family
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
-    const submenu = container.querySelector('[data-name="horizontal-nav-submenu"]');
+    const submenu = container.querySelector('[data-name="top-nav-submenu"]');
     expect(submenu).toBeInTheDocument();
     const activeItem = screen.getByRole('link', { name: /Family/ }).closest('li');
     expect(activeItem).toContainElement(submenu as HTMLElement);
@@ -509,19 +509,19 @@ describe('HorizontalNav', () => {
 
   it('omits the <h3> heading when a Group has no title', () => {
     render(
-      <HorizontalNav ariaLabel="Primary">
-        <HorizontalNav.Item
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
           href="/"
           isActive
           submenu={
-            <HorizontalNav.Group>
-              <HorizontalNav.SubItem href="/a">A</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group>
+              <TopNav.SubItem href="/a">A</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Home
-        </HorizontalNav.Item>
-      </HorizontalNav>
+        </TopNav.Item>
+      </TopNav>
     );
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'A' })).toBeInTheDocument();
@@ -530,27 +530,27 @@ describe('HorizontalNav', () => {
   it('does NOT render the desktop bar markup when in mobile mode', () => {
     setBreakpoint('sm');
     const { container } = render(
-      <HorizontalNav ariaLabel="Primary" isMobileOpen>
-        <HorizontalNav.Item href="/">Home</HorizontalNav.Item>
-      </HorizontalNav>
+      <TopNav ariaLabel="Primary" isMobileOpen>
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
     );
-    expect(container.querySelector('[data-name="horizontal-nav"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-name="top-nav"]')).not.toBeInTheDocument();
   });
 
-  describe('HorizontalNav.Item', () => {
+  describe('TopNav.Item', () => {
     it('renders a <button type="button"> when href is omitted and the item has a submenu', () => {
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             submenu={
-              <HorizontalNav.Group>
-                <HorizontalNav.SubItem href="/a">A</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group>
+                <TopNav.SubItem href="/a">A</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Family
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       const trigger = screen.getByRole('button', { name: /Family/ });
       expect(trigger).toHaveAttribute('type', 'button');
@@ -560,11 +560,11 @@ describe('HorizontalNav', () => {
 
     it('drops the href when disabled and exposes aria-disabled', () => {
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item href="/x" disabled>
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item href="/x" disabled>
             Disabled link
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       const link = screen.getByText('Disabled link').closest('a') as HTMLAnchorElement;
       expect(link).not.toHaveAttribute('href');
@@ -574,11 +574,11 @@ describe('HorizontalNav', () => {
     it('suppresses onClick when disabled', () => {
       const onClick = jest.fn();
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item href="/x" disabled onClick={onClick}>
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item href="/x" disabled onClick={onClick}>
             X
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       fireEvent.click(screen.getByText('X'));
       expect(onClick).not.toHaveBeenCalled();
@@ -587,11 +587,11 @@ describe('HorizontalNav', () => {
     it('calls onClick when enabled', () => {
       const onClick = jest.fn();
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item href="/x" onClick={onClick}>
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item href="/x" onClick={onClick}>
             X
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       fireEvent.click(screen.getByText('X'));
       expect(onClick).toHaveBeenCalledTimes(1);
@@ -599,33 +599,33 @@ describe('HorizontalNav', () => {
 
     it('renders an icon when `icon` is passed as a string', () => {
       const { container } = render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item href="/" icon="home">
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item href="/" icon="home">
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
     });
 
     it('renders an icon when `icon` is passed as an object with a custom size', () => {
       const { container } = render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item href="/" icon={{ name: 'home', size: 24 }}>
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item href="/" icon={{ name: 'home', size: 24 }}>
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
     });
 
     it('falls back to size 18 when `icon` is an object without `size`', () => {
       const { container } = render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item href="/" icon={{ name: 'home' }}>
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item href="/" icon={{ name: 'home' }}>
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
     });
@@ -634,7 +634,7 @@ describe('HorizontalNav', () => {
     // values for `hasSubmenu`, `renderSubmenuInline`, and the `isSubmenuOpen
     // ?? isActive` fallback that the parent normally overrides.
     it('uses default hasSubmenu=false / renderSubmenuInline=false when rendered standalone', () => {
-      render(<HorizontalNavItem href="/x">Standalone</HorizontalNavItem>);
+      render(<TopNavItem href="/x">Standalone</TopNavItem>);
       const link = screen.getByRole('link', { name: 'Standalone' });
       expect(link).not.toHaveAttribute('aria-haspopup');
       expect(link).not.toHaveAttribute('aria-expanded');
@@ -642,18 +642,18 @@ describe('HorizontalNav', () => {
 
     it('falls back to `isActive` for the active class when `isSubmenuOpen` is omitted', () => {
       render(
-        <HorizontalNavItem href="/x" isActive>
+        <TopNavItem href="/x" isActive>
           Active
-        </HorizontalNavItem>
+        </TopNavItem>
       );
-      expect(screen.getByRole('link', { name: 'Active' })).toHaveClass('tedi-horizontal-nav__link--active');
+      expect(screen.getByRole('link', { name: 'Active' })).toHaveClass('tedi-top-nav__link--active');
     });
 
     it('respects an explicit `isSubmenuOpen={true}` over `isActive`', () => {
       render(
-        <HorizontalNavItem hasSubmenu isSubmenuOpen submenu={<span>x</span>}>
+        <TopNavItem hasSubmenu isSubmenuOpen submenu={<span>x</span>}>
           Toggle
-        </HorizontalNavItem>
+        </TopNavItem>
       );
       const button = screen.getByRole('button', { name: /Toggle/ });
       expect(button).toHaveAttribute('aria-expanded', 'true');
@@ -662,11 +662,11 @@ describe('HorizontalNav', () => {
     it('renders a custom element via the `as` prop', () => {
       const Custom = (props: React.AnchorHTMLAttributes<HTMLElement>) => <a data-custom {...props} />;
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item as={Custom} href="/x">
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item as={Custom} href="/x">
             X
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       const link = screen.getByRole('link', { name: 'X' });
       expect(link).toBeInTheDocument();
@@ -675,22 +675,22 @@ describe('HorizontalNav', () => {
     });
   });
 
-  describe('HorizontalNav.Group', () => {
+  describe('TopNav.Group', () => {
     it('renders the title heading at the configured level', () => {
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             href="/"
             isActive
             submenu={
-              <HorizontalNav.Group title="Marriage" headingLevel="h2">
-                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Marriage" headingLevel="h2">
+                <TopNav.SubItem href="/m">A</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       const heading = screen.getByRole('heading', { name: 'Marriage' });
       expect(heading.tagName).toBe('H2');
@@ -698,19 +698,19 @@ describe('HorizontalNav', () => {
 
     it('renders a leading icon when `icon` is a string', () => {
       const { container } = render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             href="/"
             isActive
             submenu={
-              <HorizontalNav.Group title="Marriage" icon="family_restroom">
-                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Marriage" icon="family_restroom">
+                <TopNav.SubItem href="/m">A</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       const heading = screen.getByRole('heading', { name: /Marriage/ });
       expect(heading.querySelector('[data-name="icon"]')).toBeInTheDocument();
@@ -718,19 +718,19 @@ describe('HorizontalNav', () => {
 
     it('renders a leading icon when `icon` is an object with custom size', () => {
       const { container } = render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             href="/"
             isActive
             submenu={
-              <HorizontalNav.Group title="Marriage" icon={{ name: 'family_restroom', size: 24 }}>
-                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Marriage" icon={{ name: 'family_restroom', size: 24 }}>
+                <TopNav.SubItem href="/m">A</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       const heading = screen.getByRole('heading', { name: /Marriage/ });
       expect(heading.querySelector('[data-name="icon"]')).toBeInTheDocument();
@@ -738,42 +738,42 @@ describe('HorizontalNav', () => {
 
     it('falls back to size 16 when icon object omits `size`', () => {
       render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             href="/"
             isActive
             submenu={
-              <HorizontalNav.Group title="Marriage" icon={{ name: 'family_restroom' }}>
-                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Marriage" icon={{ name: 'family_restroom' }}>
+                <TopNav.SubItem href="/m">A</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       expect(screen.getByRole('heading', { name: /Marriage/ })).toBeInTheDocument();
     });
 
     it('does not render the icon when `title` is omitted (icon ignored without title)', () => {
       const { container } = render(
-        <HorizontalNav ariaLabel="Primary">
-          <HorizontalNav.Item
+        <TopNav ariaLabel="Primary">
+          <TopNav.Item
             href="/"
             isActive
             submenu={
-              <HorizontalNav.Group icon="family_restroom">
-                <HorizontalNav.SubItem href="/m">A</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group icon="family_restroom">
+                <TopNav.SubItem href="/m">A</TopNav.SubItem>
+              </TopNav.Group>
             }
           >
             Home
-          </HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+        </TopNav>
       );
       expect(screen.queryByRole('heading')).not.toBeInTheDocument();
       // Icon is inside the title — no title means no icon either.
-      expect(container.querySelector('.tedi-horizontal-nav__group-icon')).not.toBeInTheDocument();
+      expect(container.querySelector('.tedi-top-nav__group-icon')).not.toBeInTheDocument();
     });
   });
 });

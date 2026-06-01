@@ -2,16 +2,16 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
-import styles from '../../horizontal-nav.module.scss';
+import styles from '../../top-nav.module.scss';
 
-export interface HorizontalNavItemProps {
+export interface TopNavItemProps {
   /**
    * Bar label. Pass a string or any ReactNode that renders inline.
    */
   children: React.ReactNode;
   /**
-   * Submenu content — typically a fragment of `HorizontalNav.Group` elements.
-   * When provided and `isActive` is `true`, the parent `HorizontalNav` renders
+   * Submenu content — typically a fragment of `TopNav.Group` elements.
+   * When provided and `isActive` is `true`, the parent `TopNav` renders
    * the submenu inside the mega-menu panel below the bar, and a
    * `keyboard_arrow_down` chevron is added next to the label.
    */
@@ -63,7 +63,7 @@ export interface HorizontalNavItemProps {
   panelId?: string;
 }
 
-export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element => {
+export const TopNavItem = (props: TopNavItemProps): JSX.Element => {
   const {
     children,
     href,
@@ -93,17 +93,17 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
   };
 
   const linkClassName = cn(
-    styles['tedi-horizontal-nav__link'],
+    styles['tedi-top-nav__link'],
     {
-      [styles['tedi-horizontal-nav__link--active']]: isActive || submenuOpen,
+      [styles['tedi-top-nav__link--active']]: isActive || submenuOpen,
     },
     className
   );
 
   return (
     <li
-      className={cn(styles['tedi-horizontal-nav__item'], {
-        [styles['tedi-horizontal-nav__item--has-inline-submenu']]: showInlineSubmenu,
+      className={cn(styles['tedi-top-nav__item'], {
+        [styles['tedi-top-nav__item--has-inline-submenu']]: showInlineSubmenu,
       })}
     >
       <Component
@@ -125,7 +125,7 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
       >
         {icon && (
           <Icon
-            className={styles['tedi-horizontal-nav__icon']}
+            className={styles['tedi-top-nav__icon']}
             {...(typeof icon === 'string' ? { name: icon } : icon)}
             size={typeof icon === 'string' ? 18 : icon.size ?? 18}
             color="inherit"
@@ -133,21 +133,16 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
         )}
         {children}
         {hasSubmenu && (
-          <Icon className={styles['tedi-horizontal-nav__icon']} name="keyboard_arrow_down" size={18} color="inherit" />
+          <Icon className={styles['tedi-top-nav__icon']} name="keyboard_arrow_down" size={18} color="inherit" />
         )}
       </Component>
       {showInlineSubmenu && (
         <div
           id={panelId}
-          className={cn(styles['tedi-horizontal-nav__submenu'], styles['tedi-horizontal-nav__submenu--inline'])}
-          data-name="horizontal-nav-submenu"
+          className={cn(styles['tedi-top-nav__submenu'], styles['tedi-top-nav__submenu--inline'])}
+          data-name="top-nav-submenu"
         >
-          <div
-            className={cn(
-              styles['tedi-horizontal-nav__submenu-inner'],
-              styles['tedi-horizontal-nav__submenu-inner--inline']
-            )}
-          >
+          <div className={cn(styles['tedi-top-nav__submenu-inner'], styles['tedi-top-nav__submenu-inner--inline'])}>
             {submenu}
           </div>
         </div>
@@ -156,6 +151,6 @@ export const HorizontalNavItem = (props: HorizontalNavItemProps): JSX.Element =>
   );
 };
 
-HorizontalNavItem.displayName = 'HorizontalNav.Item';
+TopNavItem.displayName = 'TopNav.Item';
 
-export default HorizontalNavItem;
+export default TopNavItem;

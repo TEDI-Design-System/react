@@ -580,11 +580,11 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
-### HorizontalNav
+### TopNav
 
-**Props:** `HorizontalNavProps`
+**Props:** `TopNavProps`
 
-- `children: ReactNode` (required) — only `HorizontalNav.Item` and `HorizontalNav.Separator` children render; others are ignored. Fragments are flattened.
+- `children: ReactNode` (required) — only `TopNav.Item` and `TopNav.Separator` children render; others are ignored. Fragments are flattened.
 - `ariaLabel: string` (required) — accessible name for the `<nav>` landmark
 - `mobileBreakpoint?: Breakpoint = 'md'` — below this, the bar collapses into a `SideNavMobile` drawer
 - `isMobileOpen?: boolean`, `onMenuToggle?: (open: boolean) => void` — controlled mobile drawer state
@@ -593,13 +593,13 @@ Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.M
 - `maxWidth?: number | string | 'none' = 'xxl'` — clamps the inner content (bar items + mega-menu inner panel) to a max width and centers it inside the full-width blue bar. Accepts a CSS length (`1440`, `'90rem'`), a breakpoint name (`'sm'|'md'|'lg'|'xl'|'xxl'` → that breakpoint's min-width), or `'none'`/`0` to disable.
 - `className?: string`, `id?: string`
 
-Sub-components: `HorizontalNav.Item`, `HorizontalNav.Group`, `HorizontalNav.SubItem`, `HorizontalNav.Separator`
+Sub-components: `TopNav.Item`, `TopNav.Group`, `TopNav.SubItem`, `TopNav.Separator`
 
-**`HorizontalNav.Item` props**
+**`TopNav.Item` props**
 
 - `children: ReactNode` (required) — visible label
 - `href?: string` — omit + provide `submenu` for a toggle-only mega-menu parent (renders `<button type="button">` with `aria-haspopup`/`aria-expanded`)
-- `submenu?: ReactNode` — mega-menu content, typically `HorizontalNav.Group` children
+- `submenu?: ReactNode` — mega-menu content, typically `TopNav.Group` children
 - `icon?: string | IconWithoutBackgroundProps`
 - `isActive?: boolean = false` — adds `aria-current="page"`, applies the active visual, and (when paired with `submenu`) opens the mega-menu panel
 - `disabled?: boolean = false` — drops `href` and suppresses `onClick`; on toggle items sets native `disabled`
@@ -607,55 +607,55 @@ Sub-components: `HorizontalNav.Item`, `HorizontalNav.Group`, `HorizontalNav.SubI
 - `as?: 'a' | 'button' | ComponentType` — polymorphic for routing libs (e.g. `NavLink`)
 - `className?: string`
 
-**`HorizontalNav.Group` props** (mega-menu column)
+**`TopNav.Group` props** (mega-menu column)
 
-- `children: ReactNode` (required) — `HorizontalNav.SubItem` children only
+- `children: ReactNode` (required) — `TopNav.SubItem` children only
 - `title?: ReactNode` — uppercase section heading; when omitted, no heading renders (and the `icon` prop is ignored)
 - `icon?: string | IconWithoutBackgroundProps` — leading icon next to the title
 - `headingLevel?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' = 'h3'`
 - `className?: string`
 
-**`HorizontalNav.SubItem` props** (mega-menu link)
+**`TopNav.SubItem` props** (mega-menu link)
 
 - `children: ReactNode` (required), `href?: string`, `isActive?: boolean`, `onClick?`, `as?`, `className?`
 
-**`HorizontalNav.Separator`** — visual divider between bar items (no props)
+**`TopNav.Separator`** — visual divider between bar items (no props)
 
 Compound API. Below `mobileBreakpoint` the bar disappears and the items + mega-menu groups are projected into the same `SideNavMobile` drawer that Sidenav uses — apps that mix both navs get one consistent mobile experience instead of two competing drawers. The full-width blue bar background stops at the item row; the mega-menu opens below it as a true dropdown (white panel with shadow, clamped to `maxWidth`).
 
 ```tsx
-import { HorizontalNav } from '@tedi-design-system/react/tedi';
+import { TopNav } from '@tedi-design-system/react/tedi';
 
 // Flat bar
-<HorizontalNav ariaLabel="Primary navigation">
-  <HorizontalNav.Item href="/" icon="home" isActive>Dashboard</HorizontalNav.Item>
-  <HorizontalNav.Item href="/data" icon="folder_shared">My data</HorizontalNav.Item>
-  <HorizontalNav.Separator />
-  <HorizontalNav.Item href="/settings" icon="settings">Settings</HorizontalNav.Item>
-</HorizontalNav>
+<TopNav ariaLabel="Primary navigation">
+  <TopNav.Item href="/" icon="home" isActive>Dashboard</TopNav.Item>
+  <TopNav.Item href="/data" icon="folder_shared">My data</TopNav.Item>
+  <TopNav.Separator />
+  <TopNav.Item href="/settings" icon="settings">Settings</TopNav.Item>
+</TopNav>
 
 // Mega-menu (toggle-only parent: omit href, provide submenu)
-<HorizontalNav ariaLabel="Primary" maxWidth="xl">
-  <HorizontalNav.Item submenu={
+<TopNav ariaLabel="Primary" maxWidth="xl">
+  <TopNav.Item submenu={
     <>
-      <HorizontalNav.Group title="Marriage" icon="favorite">
-        <HorizontalNav.SubItem href="/m/apply">Get married</HorizontalNav.SubItem>
-        <HorizontalNav.SubItem href="/m/cert">Marriage certificate</HorizontalNav.SubItem>
-      </HorizontalNav.Group>
-      <HorizontalNav.Group title="Children">
-        <HorizontalNav.SubItem href="/c/birth">Birth registration</HorizontalNav.SubItem>
-      </HorizontalNav.Group>
+      <TopNav.Group title="Marriage" icon="favorite">
+        <TopNav.SubItem href="/m/apply">Get married</TopNav.SubItem>
+        <TopNav.SubItem href="/m/cert">Marriage certificate</TopNav.SubItem>
+      </TopNav.Group>
+      <TopNav.Group title="Children">
+        <TopNav.SubItem href="/c/birth">Birth registration</TopNav.SubItem>
+      </TopNav.Group>
     </>
-  }>Family</HorizontalNav.Item>
-</HorizontalNav>
+  }>Family</TopNav.Item>
+</TopNav>
 
 // Narrow mega-menu anchored to the item (single-column dropdown style)
-<HorizontalNav ariaLabel="Primary" submenuFit="item">…</HorizontalNav>
+<TopNav ariaLabel="Primary" submenuFit="item">…</TopNav>
 
 // Controlled mobile drawer paired with an external hamburger
-<HorizontalNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
+<TopNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
   ...
-</HorizontalNav>
+</TopNav>
 ```
 
 **Notes / gotchas**

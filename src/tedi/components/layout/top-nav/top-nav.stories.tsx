@@ -11,7 +11,7 @@ import { HideAt } from '../hide-at/hide-at';
 import { ShowAt } from '../show-at/show-at';
 import { SideNav } from '../sidenav/sidenav';
 import { VerticalSpacing } from '../vertical-spacing';
-import { HorizontalNav, HorizontalNavProps } from './horizontal-nav';
+import { TopNav, TopNavProps } from './top-nav';
 
 const headerLanguages = [
   { 'aria-label': 'Estonian', label: 'EST', locale: 'et' as const },
@@ -31,7 +31,7 @@ const headerLogo = <img src="header-logo.svg" alt="Logo" />;
 /**
  * Shared mobile-drawer state between the meta-level Header (which renders the
  * hamburger in its `toggle` slot at smaller viewports) and every Template-
- * based `HorizontalNav` story. Stories rendered via `Template` automatically
+ * based `TopNav` story. Stories rendered via `Template` automatically
  * read this context — so when the viewport shrinks below the nav's
  * `mobileBreakpoint`, clicking the header's hamburger opens the nav's drawer.
  */
@@ -43,14 +43,14 @@ const MobileNavStateContext = createContext<{
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.46.70?node-id=31693-133265&m=dev" target="_BLANK">Figma ↗</a>
  */
-const meta: Meta<typeof HorizontalNav> = {
-  component: HorizontalNav,
-  title: 'TEDI-Ready/Layout/HorizontalNav',
+const meta: Meta<typeof TopNav> = {
+  component: TopNav,
+  title: 'TEDI-Ready/Layout/TopNav',
   subcomponents: {
-    'HorizontalNav.Item': HorizontalNav.Item,
-    'HorizontalNav.Group': HorizontalNav.Group,
-    'HorizontalNav.SubItem': HorizontalNav.SubItem,
-    'HorizontalNav.Separator': HorizontalNav.Separator,
+    'TopNav.Item': TopNav.Item,
+    'TopNav.Group': TopNav.Group,
+    'TopNav.SubItem': TopNav.SubItem,
+    'TopNav.Separator': TopNav.Separator,
   } as never,
   decorators: [
     function MetaHeaderDecorator(Story, context) {
@@ -98,9 +98,9 @@ const meta: Meta<typeof HorizontalNav> = {
 };
 export default meta;
 
-type Story = StoryObj<HorizontalNavProps>;
+type Story = StoryObj<TopNavProps>;
 
-const Template: StoryFn<HorizontalNavProps> = (args) => {
+const Template: StoryFn<TopNavProps> = (args) => {
   const mobileState = useContext(MobileNavStateContext);
   const integratedProps =
     mobileState && args.isMobileOpen === undefined
@@ -112,7 +112,7 @@ const Template: StoryFn<HorizontalNavProps> = (args) => {
           },
         }
       : null;
-  return <HorizontalNav {...args} {...integratedProps} />;
+  return <TopNav {...args} {...integratedProps} />;
 };
 
 export const Default: Story = {
@@ -121,14 +121,14 @@ export const Default: Story = {
     ariaLabel: 'Primary navigation',
     children: (
       <>
-        <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
-        <HorizontalNav.Item href="#" isActive>
+        <TopNav.Item href="#">Avaleht</TopNav.Item>
+        <TopNav.Item href="#" isActive>
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Liiklus ja sõidukid</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
+        </TopNav.Item>
+        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
+        <TopNav.Item href="#">Liiklus ja sõidukid</TopNav.Item>
+        <TopNav.Item href="#">Minu andmed</TopNav.Item>
       </>
     ),
   },
@@ -140,21 +140,21 @@ export const WithIcons: Story = {
     ariaLabel: 'Primary navigation',
     children: (
       <>
-        <HorizontalNav.Item href="#" icon="home" isActive>
+        <TopNav.Item href="#" icon="home" isActive>
           Avaleht
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#" icon="family_restroom">
+        </TopNav.Item>
+        <TopNav.Item href="#" icon="family_restroom">
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#" icon="payments">
+        </TopNav.Item>
+        <TopNav.Item href="#" icon="payments">
           Hüvitised
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#" icon="work">
+        </TopNav.Item>
+        <TopNav.Item href="#" icon="work">
           Töö
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#" icon="folder_shared">
+        </TopNav.Item>
+        <TopNav.Item href="#" icon="folder_shared">
           Minu andmed
-        </HorizontalNav.Item>
+        </TopNav.Item>
       </>
     ),
   },
@@ -166,16 +166,16 @@ export const WithSeparator: Story = {
     ariaLabel: 'Primary navigation',
     children: (
       <>
-        <HorizontalNav.Item href="#" isActive>
+        <TopNav.Item href="#" isActive>
           Töölaud
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu taotlused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu dokumendid</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Koolitused</HorizontalNav.Item>
-        <HorizontalNav.Separator />
-        <HorizontalNav.Item href="#" icon="settings">
+        </TopNav.Item>
+        <TopNav.Item href="#">Minu taotlused</TopNav.Item>
+        <TopNav.Item href="#">Minu dokumendid</TopNav.Item>
+        <TopNav.Item href="#">Koolitused</TopNav.Item>
+        <TopNav.Separator />
+        <TopNav.Item href="#" icon="settings">
           Seaded
-        </HorizontalNav.Item>
+        </TopNav.Item>
       </>
     ),
   },
@@ -187,47 +187,47 @@ export const MenuOpen: Story = {
     ariaLabel: 'Primary navigation',
     children: (
       <>
-        <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
-        <HorizontalNav.Item
+        <TopNav.Item href="#">Avaleht</TopNav.Item>
+        <TopNav.Item
           href="#"
           isActive
           submenu={
             <>
-              <HorizontalNav.Group title="Abielu">
-                <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Kooselu registreerimine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Dokumendid">
-                <HorizontalNav.SubItem href="#">Perekonnasündmuse tõend ja abieluvõimetõend</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Rahvastikuregistri väljavõte</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Teatis ja perekonnaseisundi kinnitatud koopia</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Lapse saamine">
-                <HorizontalNav.SubItem href="#">Lapsendamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Raseduse planeerimine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Viljatus ja kunstlik viljastamine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Sünnitus">
-                <HorizontalNav.SubItem href="#">Ennetähtaegse lapse sünd ja toetused</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Erivajadusega lapse sünd</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Kodusünnitus</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Lapsest loobumine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Abi">
-                <HorizontalNav.SubItem href="#">Kohaliku omavalitsuse sotsiaalabi</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Kohaliku omavalitsuse sünnitoetus</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Lasteaiakoht ja selle taotlemine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Abielu">
+                <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Kooselu registreerimine</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Dokumendid">
+                <TopNav.SubItem href="#">Perekonnasündmuse tõend ja abieluvõimetõend</TopNav.SubItem>
+                <TopNav.SubItem href="#">Rahvastikuregistri väljavõte</TopNav.SubItem>
+                <TopNav.SubItem href="#">Teatis ja perekonnaseisundi kinnitatud koopia</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Lapse saamine">
+                <TopNav.SubItem href="#">Lapsendamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Raseduse planeerimine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Viljatus ja kunstlik viljastamine</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Sünnitus">
+                <TopNav.SubItem href="#">Ennetähtaegse lapse sünd ja toetused</TopNav.SubItem>
+                <TopNav.SubItem href="#">Erivajadusega lapse sünd</TopNav.SubItem>
+                <TopNav.SubItem href="#">Kodusünnitus</TopNav.SubItem>
+                <TopNav.SubItem href="#">Lapsest loobumine</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Abi">
+                <TopNav.SubItem href="#">Kohaliku omavalitsuse sotsiaalabi</TopNav.SubItem>
+                <TopNav.SubItem href="#">Kohaliku omavalitsuse sünnitoetus</TopNav.SubItem>
+                <TopNav.SubItem href="#">Lasteaiakoht ja selle taotlemine</TopNav.SubItem>
+              </TopNav.Group>
             </>
           }
         >
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Liiklus ja sõidukid</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
+        </TopNav.Item>
+        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
+        <TopNav.Item href="#">Liiklus ja sõidukid</TopNav.Item>
+        <TopNav.Item href="#">Minu andmed</TopNav.Item>
       </>
     ),
   },
@@ -243,28 +243,28 @@ export const ConstrainedInnerWidth: Story = {
     maxWidth: 'lg',
     children: (
       <>
-        <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
-        <HorizontalNav.Item
+        <TopNav.Item href="#">Avaleht</TopNav.Item>
+        <TopNav.Item
           href="#"
           isActive
           submenu={
             <>
-              <HorizontalNav.Group title="Abielu">
-                <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Dokumendid">
-                <HorizontalNav.SubItem href="#">Lastega perede nõustamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Lapsendamine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Abielu">
+                <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Dokumendid">
+                <TopNav.SubItem href="#">Lastega perede nõustamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Lapsendamine</TopNav.SubItem>
+              </TopNav.Group>
             </>
           }
         >
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
+        </TopNav.Item>
+        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
+        <TopNav.Item href="#">Minu andmed</TopNav.Item>
       </>
     ),
   },
@@ -280,25 +280,25 @@ export const ToggleOnlyParent: Story = {
     ariaLabel: 'Primary navigation',
     children: (
       <>
-        <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
-        <HorizontalNav.Item
+        <TopNav.Item href="#">Avaleht</TopNav.Item>
+        <TopNav.Item
           submenu={
             <>
-              <HorizontalNav.Group title="Abielu">
-                <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Dokumendid">
-                <HorizontalNav.SubItem href="#">Lastega perede nõustamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Lapsendamine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Abielu">
+                <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Dokumendid">
+                <TopNav.SubItem href="#">Lastega perede nõustamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Lapsendamine</TopNav.SubItem>
+              </TopNav.Group>
             </>
           }
         >
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
+        </TopNav.Item>
+        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
       </>
     ),
   },
@@ -315,38 +315,38 @@ export const NarrowMegaMenu: Story = {
     submenuFit: 'item',
     children: (
       <>
-        <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
-        <HorizontalNav.Item
+        <TopNav.Item href="#">Avaleht</TopNav.Item>
+        <TopNav.Item
           href="#"
           isActive
           submenu={
             <>
-              <HorizontalNav.Group title="Abielu">
-                <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Kooselu registreerimine</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
-              <HorizontalNav.Group title="Dokumendid">
-                <HorizontalNav.SubItem href="#">Lastega perede nõustamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Lapsendamine</HorizontalNav.SubItem>
-                <HorizontalNav.SubItem href="#">Terviseprobleemiga laps</HorizontalNav.SubItem>
-              </HorizontalNav.Group>
+              <TopNav.Group title="Abielu">
+                <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Kooselu registreerimine</TopNav.SubItem>
+              </TopNav.Group>
+              <TopNav.Group title="Dokumendid">
+                <TopNav.SubItem href="#">Lastega perede nõustamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Lapsendamine</TopNav.SubItem>
+                <TopNav.SubItem href="#">Terviseprobleemiga laps</TopNav.SubItem>
+              </TopNav.Group>
             </>
           }
         >
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Liiklus ja sõidukid</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
+        </TopNav.Item>
+        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
+        <TopNav.Item href="#">Liiklus ja sõidukid</TopNav.Item>
+        <TopNav.Item href="#">Minu andmed</TopNav.Item>
       </>
     ),
   },
 };
 
 /**
- * `HorizontalNav.Group` without a `title` — the heading is omitted entirely.
+ * `TopNav.Group` without a `title` — the heading is omitted entirely.
  */
 export const NarrowSubmenuNoTitle: Story = {
   render: Template,
@@ -355,24 +355,24 @@ export const NarrowSubmenuNoTitle: Story = {
     submenuFit: 'item',
     children: (
       <>
-        <HorizontalNav.Item href="#">Avaleht</HorizontalNav.Item>
-        <HorizontalNav.Item
+        <TopNav.Item href="#">Avaleht</TopNav.Item>
+        <TopNav.Item
           href="#"
           isActive
           submenu={
-            <HorizontalNav.Group>
-              <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="#">Kooselu registreerimine</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group>
+              <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+              <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+              <TopNav.SubItem href="#">Kooselu registreerimine</TopNav.SubItem>
+            </TopNav.Group>
           }
         >
           Perekond
-        </HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Liiklus ja sõidukid</HorizontalNav.Item>
-        <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
+        </TopNav.Item>
+        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
+        <TopNav.Item href="#">Liiklus ja sõidukid</TopNav.Item>
+        <TopNav.Item href="#">Minu andmed</TopNav.Item>
       </>
     ),
   },
@@ -399,9 +399,9 @@ export const ItemStates: StoryObj = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col className="display-flex align-items-center">
-            <HorizontalNav ariaLabel={`Horizontal nav — ${state}`} mobileBreakpoint="xs">
+            <TopNav ariaLabel={`Horizontal nav — ${state}`} mobileBreakpoint="xs">
               {itemColumns.map(({ key, icon, withSubmenu }) => (
-                <HorizontalNav.Item
+                <TopNav.Item
                   key={key}
                   href="#"
                   icon={icon}
@@ -409,16 +409,16 @@ export const ItemStates: StoryObj = {
                   className={itemStateClass(state, key)}
                   submenu={
                     withSubmenu ? (
-                      <HorizontalNav.Group title="Section">
-                        <HorizontalNav.SubItem href="#">Link</HorizontalNav.SubItem>
-                      </HorizontalNav.Group>
+                      <TopNav.Group title="Section">
+                        <TopNav.SubItem href="#">Link</TopNav.SubItem>
+                      </TopNav.Group>
                     ) : undefined
                   }
                 >
                   Item
-                </HorizontalNav.Item>
+                </TopNav.Item>
               ))}
-            </HorizontalNav>
+            </TopNav>
           </Col>
         </Row>
       ))}
@@ -455,9 +455,9 @@ export const SubItemStates: StoryObj = {
             </Col>
             <Col>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, width: '240px' }}>
-                <HorizontalNav.SubItem href="#" isActive={state === 'Selected'} className={subItemStateClass(state)}>
+                <TopNav.SubItem href="#" isActive={state === 'Selected'} className={subItemStateClass(state)}>
                   Placeholder link
-                </HorizontalNav.SubItem>
+                </TopNav.SubItem>
               </ul>
             </Col>
           </Row>
@@ -493,11 +493,11 @@ export const GroupVariants: StoryObj = {
             </Text>
           </Col>
           <Col>
-            <HorizontalNav.Group title="Abielu">
-              <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="#">Kooselu registreerimine</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="Abielu">
+              <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+              <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+              <TopNav.SubItem href="#">Kooselu registreerimine</TopNav.SubItem>
+            </TopNav.Group>
           </Col>
         </Row>
         <Row>
@@ -507,11 +507,11 @@ export const GroupVariants: StoryObj = {
             </Text>
           </Col>
           <Col>
-            <HorizontalNav.Group title="Abielu" icon="favorite_border">
-              <HorizontalNav.SubItem href="#">Abiellumine</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="#">Abielu lahutamine</HorizontalNav.SubItem>
-              <HorizontalNav.SubItem href="#">Kooselu registreerimine</HorizontalNav.SubItem>
-            </HorizontalNav.Group>
+            <TopNav.Group title="Abielu" icon="favorite_border">
+              <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
+              <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
+              <TopNav.SubItem href="#">Kooselu registreerimine</TopNav.SubItem>
+            </TopNav.Group>
           </Col>
         </Row>
       </VerticalSpacing>
@@ -536,28 +536,28 @@ export const ControlledMobile: Story = {
             <Header.Language languages={headerLanguages} currentLanguage="EST" />
           </Header.Actions>
         </Header>
-        <HorizontalNav ariaLabel="Primary navigation" mobileBreakpoint="xxl" isMobileOpen={open} onMenuToggle={setOpen}>
-          <HorizontalNav.Item href="#" isActive>
+        <TopNav ariaLabel="Primary navigation" mobileBreakpoint="xxl" isMobileOpen={open} onMenuToggle={setOpen}>
+          <TopNav.Item href="#" isActive>
             Avaleht
-          </HorizontalNav.Item>
-          <HorizontalNav.Item href="#">Perekond</HorizontalNav.Item>
-          <HorizontalNav.Item href="#">Hüvitised</HorizontalNav.Item>
-        </HorizontalNav>
+          </TopNav.Item>
+          <TopNav.Item href="#">Perekond</TopNav.Item>
+          <TopNav.Item href="#">Hüvitised</TopNav.Item>
+        </TopNav>
       </div>
     );
   },
 };
 
 const stickyDemoNav = (
-  <HorizontalNav ariaLabel="Primary navigation">
-    <HorizontalNav.Item href="#" isActive>
+  <TopNav ariaLabel="Primary navigation">
+    <TopNav.Item href="#" isActive>
       Avaleht
-    </HorizontalNav.Item>
-    <HorizontalNav.Item href="#">Perekond</HorizontalNav.Item>
-    <HorizontalNav.Item href="#">Hüvitised ja toetused</HorizontalNav.Item>
-    <HorizontalNav.Item href="#">Töö ja töösuhted</HorizontalNav.Item>
-    <HorizontalNav.Item href="#">Minu andmed</HorizontalNav.Item>
-  </HorizontalNav>
+    </TopNav.Item>
+    <TopNav.Item href="#">Perekond</TopNav.Item>
+    <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
+    <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
+    <TopNav.Item href="#">Minu andmed</TopNav.Item>
+  </TopNav>
 );
 
 const stickyDemoFiller = (
