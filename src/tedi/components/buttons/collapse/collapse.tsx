@@ -141,13 +141,14 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
   );
 
   const isIconOnly = iconOnly === true && !title;
+  const isInverted = inverted && arrowType !== 'secondary';
 
   const CollapseBEM = cn(
     styles['tedi-collapse'],
     size === 'small' && styles['tedi-collapse--small'],
     isOpen && styles['tedi-collapse--is-open'],
     isIconOnly && styles['tedi-collapse--icon-only'],
-    inverted && styles['tedi-collapse--inverted'],
+    isInverted && styles['tedi-collapse--inverted'],
     styles[`tedi-collapse--arrow-${arrowType}`],
     className
   );

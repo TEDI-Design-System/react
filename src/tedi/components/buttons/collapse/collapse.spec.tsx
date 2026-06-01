@@ -196,15 +196,19 @@ describe('Collapse component with breakpoint support', () => {
       expect(root).toHaveClass('tedi-collapse--small');
     });
 
+    it('drops the inverted modifier when paired with arrowType="secondary" (no inverted secondary form)', () => {
+      const { container } = getComponent({ inverted: true, arrowType: 'secondary' });
+      const root = container.querySelector('[data-name="collapse"]');
+      expect(root).not.toHaveClass('tedi-collapse--inverted');
+    });
+
     it('still toggles the open state on click when inverted', () => {
-      const { getByTestId } = getComponent({ inverted: true });
-      const content = getByTestId('collapse-inner');
+      getComponent({ inverted: true });
       const button = screen.getByRole('button', { name: /näita rohkem/i });
-      expect(content).toHaveStyle('height: 0px');
+      expect(screen.queryByRole('region', { name: /näita vähem/i })).not.toBeInTheDocument();
       fireEvent.click(button);
-      // height transitions via AnimateHeight — the click commits the toggle,
-      // which is what we're actually verifying here.
       expect(button).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('region', { name: /näita vähem/i })).toBeInTheDocument();
     });
   });
 });
