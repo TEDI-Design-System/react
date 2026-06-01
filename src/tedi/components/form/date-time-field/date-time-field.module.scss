@@ -33,7 +33,7 @@
 }
 
 .tedi-date-time-field__icon--disabled {
-  @include field-icon-button.icon-only-disabled;
+  @include field-icon-button.disabled;
 }
 
 .tedi-date-time-field__popup {
@@ -123,8 +123,10 @@
 
 .tedi-date-time-field__split-heading {
   font-size: var(--body-regular-size);
+  font-weight: 500;
   line-height: var(--body-regular-line-height);
   color: var(--general-text-primary);
+  letter-spacing: 0.15px;
 }
 
 .tedi-date-time-field__split-time-body {
@@ -240,6 +242,13 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--card-padding-md-default) var(--card-padding-md-default) 0;
+
+  // Same icon-centring fix as `__select-time-wrapper` — the "Back" link
+  // button shares the link variant's inline-icon alignment quirk.
+  :global .tedi-btn--link .tedi-btn__icon--left {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 .tedi-date-time-field__time-date {

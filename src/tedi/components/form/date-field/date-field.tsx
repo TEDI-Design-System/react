@@ -101,8 +101,22 @@ export interface DateFieldProps
   onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>;
   /**
    * Disable specific dates. Accepts the same matchers as React DayPicker's `disabled` prop.
+   *
+   * @deprecated Use `disabledMatchers` instead — same shape, semantics, and merging
+   * behaviour. The current overload re-uses the form-control `disabled` name for a
+   * matcher prop, which is inconsistent with `DateTimeField`'s boolean `disabled`
+   * and confusing for consumers migrating between the two siblings. `disabledMatchers`
+   * stays additive for now; this overload will be replaced by `disabled?: boolean`
+   * in a future major.
    */
   disabled?: Matcher | Matcher[];
+  /**
+   * Disable specific dates via react-day-picker matchers. Mirrors the
+   * `disabledMatchers` prop on `DateTimeField` so the API is consistent across
+   * the date-field family. Merges with the (deprecated) `disabled` overload —
+   * if both are supplied, the union of both matcher sets is applied.
+   */
+  disabledMatchers?: Matcher | Matcher[];
   /**
    * Input placeholder text when no date is selected.
    */
@@ -246,6 +260,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     selected,
     onSelect,
     disabled,
+    disabledMatchers: disabledMatchersProp,
     placeholder,
     className,
     formatDate,
@@ -396,9 +411,16 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const disabledMatchers = useMemo<Matcher[]>(() => {
     const matchers: Matcher[] = [];
 
+    // Legacy `disabled` overload (matcher-shaped) — still supported, will be
+    // replaced by a boolean `disabled` form-control prop in a future major.
     if (disabled) {
       if (Array.isArray(disabled)) matchers.push(...disabled);
       else matchers.push(disabled);
+    }
+    // Preferred prop name, matches `DateTimeField`.
+    if (disabledMatchersProp) {
+      if (Array.isArray(disabledMatchersProp)) matchers.push(...disabledMatchersProp);
+      else matchers.push(disabledMatchersProp);
     }
     if (minDate) matchers.push({ before: minDate });
     if (maxDate) matchers.push({ after: maxDate });
@@ -408,7 +430,16 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (shouldDisableYear) matchers.push((date: Date) => shouldDisableYear(date));
 
     return matchers;
-  }, [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]);
+  }, [
+    disabled,
+    disabledMatchersProp,
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+    shouldDisableMonth,
+    shouldDisableYear,
+  ]);
 
   const isDateDisabled = useCallback(
     (date: Date): boolean => dateMatchModifiers(date, disabledMatchers),

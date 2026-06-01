@@ -13,7 +13,7 @@ import {
 } from '@floating-ui/react';
 import cn from 'classnames';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DateRange, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import { dateMatchModifiers, DateRange, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
@@ -63,8 +63,22 @@ type DateTimeFieldBreakpointProps = {
   /**
    * Predefined time slots, each in `"HH:mm"` format. When provided, the
    * time step renders a grid of slots instead of the scroll-wheel picker.
+   *
+   * Accepts either:
+   * - a static array — the same slot list for every date,
+   * - or a function `(date: Date) => string[]` evaluated per render with the
+   *   currently-selected date. Use the function form when slots depend on
+   *   the picked date (e.g. clinic appointments where Tuesdays differ from
+   *   Wednesdays). In `mode='range'` the function is called twice: once
+   *   with `rangeValue.from` for the `from` time picker, once with
+   *   `rangeValue.to` for the `to` time picker. When no date is picked yet
+   *   the function is called with today's date as a fallback.
+   *
+   * Returning an empty array currently falls back to the wheel picker —
+   * if you need a dedicated "no times available" UX, render it from the
+   * consumer side via `onChange` / `value` state for now.
    */
-  availableTimes?: string[];
+  availableTimes?: string[] | ((date: Date) => string[]);
   /**
    * Layout variant for the time grid when `availableTimes` is set.
    * Defaults differ per layout: `'button'` for `side-by-side`, `'radio'`
@@ -163,6 +177,13 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    */
   disableFuture?: boolean;
   /**
+   * Disable specific dates via react-day-picker matchers. Layered on top of
+   * the `minDate` / `maxDate` / `disablePast` / `disableFuture` shortcuts —
+   * use this for free-form matchers like "every Sunday" or "specific
+   * blacklisted dates". Mirrors the `disabledMatchers` prop on `DateField`.
+   */
+  disabledMatchers?: Matcher | Matcher[];
+  /**
    * Step interval (minutes) for the time-wheel picker. Ignored when
    * `availableTimes` is set.
    * @default 15
@@ -175,7 +196,7 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
   initialMonth?: Date;
   /**
    * Locale object used by react-day-picker for the calendar grid.
-   * @default Estonian
+   * @default et
    */
   locale?: Locale;
   /**
@@ -276,6 +297,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     maxDate,
     disablePast,
     disableFuture,
+    disabledMatchers: disabledMatchersProp,
     stepMinutes = 15,
     initialMonth,
     locale = et,
@@ -439,6 +461,25 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     setInputText(formatValue(next));
   };
 
+  const resolveAvailableTimes = useCallback(
+    (date: Date | undefined): string[] | undefined => {
+      if (!availableTimes) return undefined;
+      if (typeof availableTimes === 'function') return availableTimes(date ?? new Date());
+      return availableTimes;
+    },
+    [availableTimes]
+  );
+
+  const pickTimeForDate = useCallback(
+    (date: Date, previousTime: string): string => {
+      const slots = resolveAvailableTimes(date);
+      if (!slots || slots.length === 0) return previousTime;
+      if (slots.includes(previousTime)) return previousTime;
+      return slots[0];
+    },
+    [resolveAvailableTimes]
+  );
+
   const handleCalendarSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (selected) => {
     if (isRange) {
       const range = selected as DateRange | undefined;
@@ -446,16 +487,14 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
         updateValue(undefined);
         return;
       }
-      const fromTime = getTimeOf(rangeValue.from);
-      const toTime = getTimeOf(rangeValue.to);
       const next: DateTimeRange = {};
-      if (range.from) next.from = combineDateTime(range.from, fromTime);
-      if (range.to) next.to = combineDateTime(range.to, toTime);
+      if (range.from) next.from = combineDateTime(range.from, pickTimeForDate(range.from, getTimeOf(rangeValue.from)));
+      if (range.to) next.to = combineDateTime(range.to, pickTimeForDate(range.to, getTimeOf(rangeValue.to)));
       updateValue(next);
       return;
     }
     if (selected instanceof Date) {
-      updateValue(combineDateTime(selected, getTimeOf(singleValue)));
+      updateValue(combineDateTime(selected, pickTimeForDate(selected, getTimeOf(singleValue))));
     } else if (selected === undefined) {
       updateValue(undefined);
     }
@@ -463,22 +502,44 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
 
   const handleApplyValue = (date: Date) => {
     if (isRange) {
-      updateValue({ from: combineDateTime(date, getTimeOf(rangeValue.from)) });
+      updateValue({ from: combineDateTime(date, pickTimeForDate(date, getTimeOf(rangeValue.from))) });
       return;
     }
-    updateValue(combineDateTime(date, getTimeOf(singleValue)));
+    updateValue(combineDateTime(date, pickTimeForDate(date, getTimeOf(singleValue))));
   };
 
   const handleTimeSelect = (time: string) => {
     const baseDate = singleValue ?? new Date();
     updateValue(combineDateTime(baseDate, time));
-    if (effectiveLayout === 'multi-step' && availableTimes) setOpen(false);
+    if (effectiveLayout === 'multi-step' && resolveAvailableTimes(baseDate)) setOpen(false);
   };
 
   const handleRangeTimeSelect = (kind: 'from' | 'to') => (time: string) => {
     const baseDate = rangeValue[kind] ?? rangeValue.from ?? new Date();
     updateValue({ ...rangeValue, [kind]: combineDateTime(baseDate, time) });
   };
+
+  const disabledMatchers: Matcher[] = useMemo(
+    () => [
+      ...buildDisabledMatchers({
+        minDate,
+        maxDate,
+        disablePast,
+        disableFuture,
+      }),
+      ...(disabledMatchersProp
+        ? Array.isArray(disabledMatchersProp)
+          ? disabledMatchersProp
+          : [disabledMatchersProp]
+        : []),
+    ],
+    [minDate, maxDate, disablePast, disableFuture, disabledMatchersProp]
+  );
+
+  const isDateDisabled = useCallback(
+    (date: Date): boolean => dateMatchModifiers(date, disabledMatchers),
+    [disabledMatchers]
+  );
 
   const handleInputChange = (newText: string) => {
     setInputText(newText);
@@ -491,6 +552,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     if (useNative) {
       const parsed = parseNativeValue(newText);
       if (!parsed) return;
+      if (isDateDisabled(parsed)) return;
       updateValue(parsed);
       setCurrentMonth(parsed);
       return;
@@ -500,6 +562,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
 
     const parsed = parseDateTimeText(newText);
     if (!parsed) return;
+    if (isDateDisabled(parsed)) return;
 
     updateValue(parsed);
     setCurrentMonth(parsed);
@@ -516,7 +579,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
   };
 
   const handleIconClick = () => {
-    if (readOnly || disabled) return;
+    if (disabled) return;
     if (useNative) {
       openNativePicker();
       return;
@@ -524,17 +587,10 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     setOpen((prev) => !prev);
   };
 
-  const disabledMatchers: Matcher[] = buildDisabledMatchers({
-    minDate,
-    maxDate,
-    disablePast,
-    disableFuture,
-  });
-
   const calendarFooter =
     effectiveLayout === 'multi-step' ? (
       <div className={styles['tedi-date-time-field__select-time-wrapper']}>
-        <Button type="button" visualType="link" iconLeft="schedule" onClick={() => setStep('time')}>
+        <Button type="button" visualType="link" size="small" iconLeft="schedule" onClick={() => setStep('time')}>
           {selectTimeLabel}
         </Button>
       </div>
@@ -566,13 +622,14 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     />
   );
 
-  const isWheelMode = !availableTimes || availableTimes.length === 0;
+  const singleAvailableTimes = resolveAvailableTimes(singleValue);
+  const isWheelMode = !singleAvailableTimes || singleAvailableTimes.length === 0;
 
   const timePickerElement = (
     <TimePicker
       value={getTimeOf(singleValue)}
       stepMinutes={stepMinutes}
-      availableTimes={availableTimes}
+      availableTimes={singleAvailableTimes}
       gridVariant={resolvedGridVariant}
       onChange={handleTimeSelect}
       className={cn(styles['tedi-date-time-field__time-picker'], {
@@ -581,18 +638,22 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     />
   );
 
-  const renderRangeTimePicker = (kind: 'from' | 'to') => (
-    <TimePicker
-      value={getTimeOf(rangeValue[kind])}
-      stepMinutes={stepMinutes}
-      availableTimes={availableTimes}
-      gridVariant={resolvedGridVariant}
-      onChange={handleRangeTimeSelect(kind)}
-      className={cn(styles['tedi-date-time-field__time-picker'], {
-        [styles['tedi-date-time-field__time-picker--wheel']]: isWheelMode,
-      })}
-    />
-  );
+  const renderRangeTimePicker = (kind: 'from' | 'to') => {
+    const rangeTimes = resolveAvailableTimes(rangeValue[kind]);
+    const isRangeWheelMode = !rangeTimes || rangeTimes.length === 0;
+    return (
+      <TimePicker
+        value={getTimeOf(rangeValue[kind])}
+        stepMinutes={stepMinutes}
+        availableTimes={rangeTimes}
+        gridVariant={resolvedGridVariant}
+        onChange={handleRangeTimeSelect(kind)}
+        className={cn(styles['tedi-date-time-field__time-picker'], {
+          [styles['tedi-date-time-field__time-picker--wheel']]: isRangeWheelMode,
+        })}
+      />
+    );
+  };
 
   const textFieldProps: TextFieldProps = {
     ...(inputProps as TextFieldProps),
@@ -608,7 +669,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     onIconClick: handleIconClick,
     onChange: handleInputChange,
     className: cn(styles['tedi-date-time-field__textfield'], inputProps?.className, {
-      [styles['tedi-date-time-field__icon--disabled']]: disabled || readOnly,
+      [styles['tedi-date-time-field__icon--disabled']]: disabled,
     }),
     input: {
       ...(inputProps?.input as UnknownType),
@@ -681,7 +742,13 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
                 ) : (
                   <div className={styles['tedi-date-time-field__time-step']}>
                     <header className={styles['tedi-date-time-field__time-header']}>
-                      <Button type="button" visualType="link" iconLeft="arrow_back" onClick={() => setStep('date')}>
+                      <Button
+                        type="button"
+                        visualType="link"
+                        size="small"
+                        iconLeft="arrow_back"
+                        onClick={() => setStep('date')}
+                      >
                         {backLabel}
                       </Button>
                       <span className={styles['tedi-date-time-field__time-date']}>

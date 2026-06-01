@@ -104,6 +104,38 @@ describe('DateTimeField component', () => {
     expect(await screen.findByRole('button', { name: /select time/i })).toBeInTheDocument();
   });
 
+  it('defaults a fresh date pick to the first available slot (not 00:00) in slot mode', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(<DateTimeField {...defaultProps} onChange={onChange} availableTimes={['09:30', '11:30', '15:30']} />);
+
+    await user.click(screen.getByRole('button'));
+    // Pick the 15th of whatever month opens — matches the DateField spec pattern.
+    const day = await screen.findByText('15');
+    await user.click(day);
+
+    expect(onChange).toHaveBeenCalled();
+    const committed = onChange.mock.calls[onChange.mock.calls.length - 1][0] as Date;
+    expect(committed).toBeInstanceOf(Date);
+    expect(committed.getHours()).toBe(9);
+    expect(committed.getMinutes()).toBe(30);
+  });
+
+  it('resolves `availableTimes` per date when a function is supplied', async () => {
+    const user = userEvent.setup();
+    const availableTimes = jest.fn((date: Date) => (date.getDay() === 1 ? ['08:00', '09:00'] : ['13:00', '14:00']));
+    render(
+      <DateTimeField {...defaultProps} defaultValue={new Date(2025, 8, 1, 0, 0)} availableTimes={availableTimes} />
+    );
+
+    await user.click(screen.getByRole('button'));
+
+    expect(await screen.findByText('08:00')).toBeInTheDocument();
+    expect(screen.queryByText('13:00')).not.toBeInTheDocument();
+    const monday = availableTimes.mock.calls[0][0] as Date;
+    expect(monday.getDay()).toBe(1);
+  });
+
   it('renders a custom `timeHeading` in the side-by-side layout', async () => {
     const user = userEvent.setup();
     render(<DateTimeField {...defaultProps} availableTimes={['09:30', '11:30']} timeHeading="Pick a time" />);
@@ -402,6 +434,32 @@ describe('DateTimeField component', () => {
       expect(last).toBeInstanceOf(Date);
       expect(last.getFullYear()).toBe(2025);
     });
+
+    it('rejects a typed past date when `disablePast` is set (matches calendar click-blocking)', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(<DateTimeField {...defaultProps} onChange={onChange} disablePast />);
+
+      // 1999 is unambiguously before "today" and well-formed — only `disablePast`
+      // should decide whether onChange fires.
+      await user.type(screen.getByLabelText('When'), '15.06.1999 10:00');
+      expect(onChange).not.toHaveBeenCalledWith(expect.any(Date));
+    });
+
+    it('rejects a typed disabled date when `disabledMatchers` blocks it', async () => {
+      const onChange = jest.fn();
+      const user = userEvent.setup();
+      render(
+        <DateTimeField
+          {...defaultProps}
+          onChange={onChange}
+          disabledMatchers={[{ from: new Date(2025, 5, 1), to: new Date(2025, 5, 30) }]}
+        />
+      );
+
+      await user.type(screen.getByLabelText('When'), '15.06.2025 10:00');
+      expect(onChange).not.toHaveBeenCalledWith(expect.any(Date));
+    });
   });
 
   describe('inputProps passthrough', () => {
@@ -415,6 +473,14 @@ describe('DateTimeField component', () => {
     it('disables the underlying input when the top-level `disabled` prop is set', () => {
       render(<DateTimeField {...defaultProps} disabled />);
       expect(screen.getByLabelText('When')).toBeDisabled();
+    });
+
+    it('opens the picker when readOnly is true (typing blocked, picking still available)', async () => {
+      const user = userEvent.setup();
+      render(<DateTimeField {...defaultProps} readOnly />);
+      expect(screen.getByLabelText('When')).toHaveAttribute('readonly');
+      await user.click(screen.getByRole('button'));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
@@ -478,7 +544,6 @@ describe('DateTimeField component', () => {
 
       expect(onChange).toHaveBeenCalled();
       const last = onChange.mock.calls[onChange.mock.calls.length - 1][0];
-      // Time component must be preserved from the previous value.
       expect(last).toBeInstanceOf(Date);
       expect((last as Date).getHours()).toBe(10);
       expect((last as Date).getMinutes()).toBe(30);

@@ -145,6 +145,7 @@ export function CalendarHeader({
               [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
             })}
             width="auto"
+            defaultActiveIndex={displayMonthIndex}
           >
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>
@@ -177,6 +178,10 @@ export function CalendarHeader({
               [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
             })}
             width="auto"
+            // Year list spans `currentYear ± 10`. When the visible year sits
+            // outside that window we omit the default so the dropdown opens
+            // at the top instead of trying to focus a non-existent index.
+            defaultActiveIndex={years.indexOf(displayYear) === -1 ? undefined : years.indexOf(displayYear)}
           >
             <Dropdown.Trigger>
               <Button noStyle className={styles['tedi-calendar__month-year-selector']}>

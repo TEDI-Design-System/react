@@ -19,7 +19,6 @@ const meta: Meta<DateTimeFieldProps> = {
   argTypes: {
     inputProps: { control: false },
     locale: { control: false },
-    timeHeading: { control: false },
   },
   parameters: {
     design: {
@@ -58,7 +57,7 @@ export const Default: Story = {
   args: {
     id: 'date-time-default',
     label: 'Date',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm',
     layout: 'side-by-side',
     stepMinutes: 1,
   },
@@ -77,7 +76,7 @@ export const Size: StoryFn = () => (
           <DateTimeField
             id={`date-time-size-${size}`}
             label="Date"
-            placeholder="pp.kk.aaaa hh:mm"
+            placeholder="dd.mm.yyyy hh:mm"
             inputProps={{ size }}
           />
         </Col>
@@ -97,7 +96,7 @@ export const States: Story = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col md={4} xs={12} className="display-flex align-items-center">
-            <DateTimeField id={state} label="Date and time" inputProps={{ disabled: state === 'Disabled' }} />
+            <DateTimeField id={state} label="Date and time" disabled={state === 'Disabled'} />
           </Col>
         </Row>
       ))}
@@ -155,20 +154,20 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
-          <DateTimeField id="date-time-options-default" label="Date and time" placeholder="pp.kk.aaaa hh:mm" />
+          <DateTimeField id="date-time-options-default" label="Date and time" placeholder="dd.mm.yyyy hh:mm" />
 
           <DateTimeField
             id="date-time-options-hint"
             label="Date and time with hint"
-            placeholder="pp.kk.aaaa hh:mm"
-            inputProps={{ helper: { text: 'pp.kk.aaaa hh:mm' } }}
+            placeholder="dd.mm.yyyy hh:mm"
+            inputProps={{ helper: { text: 'dd.mm.yyyy hh:mm' } }}
           />
 
           <div>
             <DateTimeField
               id="date-time-options-shortcuts"
               label="Date and time with shortcuts"
-              placeholder="pp.kk.aaaa hh:mm"
+              placeholder="dd.mm.yyyy hh:mm"
               value={shortcutValue}
               onChange={(v) => setShortcutValue(v instanceof Date ? v : undefined)}
             />
@@ -192,7 +191,7 @@ export const PredefinedTimeSlots: Story = {
   args: {
     id: 'date-time-predefined',
     label: 'Date',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'button',
@@ -204,7 +203,7 @@ export const MultiSteps: Story = {
   args: {
     id: 'date-time-multi-step',
     label: 'Time',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm',
     layout: 'multi-step',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'radio',
@@ -241,7 +240,7 @@ export const Range: Story = {
   args: {
     id: 'date-time-range',
     label: 'Date range',
-    placeholder: 'pp.kk.aaaa hh:mm – pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm – dd.mm.yyyy hh:mm',
     mode: 'range',
     stepMinutes: 1,
   },
@@ -252,7 +251,7 @@ export const RangePredefinedTimeSlots: Story = {
   args: {
     id: 'date-time-range-predefined',
     label: 'Date range',
-    placeholder: 'pp.kk.aaaa hh:mm – pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm – dd.mm.yyyy hh:mm',
     mode: 'range',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'button',
@@ -269,7 +268,7 @@ export const Controlled: Story = {
   args: {
     id: 'date-time-controlled',
     label: 'Date',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
   },
@@ -294,7 +293,7 @@ export const DateConstraints: StoryFn = () => {
         <DateTimeField
           id="date-time-disable-past"
           label="Future date and time only"
-          placeholder="pp.kk.aaaa hh:mm"
+          placeholder="dd.mm.yyyy hh:mm"
           disablePast
         />
       </Col>
@@ -303,7 +302,7 @@ export const DateConstraints: StoryFn = () => {
         <DateTimeField
           id="date-time-disable-future"
           label="Past date and time only"
-          placeholder="pp.kk.aaaa hh:mm"
+          placeholder="dd.mm.yyyy hh:mm"
           disableFuture
         />
       </Col>
@@ -312,7 +311,7 @@ export const DateConstraints: StoryFn = () => {
         <DateTimeField
           id="date-time-min-max"
           label="Date inside a 14-day window"
-          placeholder="pp.kk.aaaa hh:mm"
+          placeholder="dd.mm.yyyy hh:mm"
           minDate={minDate}
           maxDate={maxDate}
         />
@@ -331,7 +330,7 @@ export const YearGrid: Story = {
   args: {
     id: 'date-time-year-grid',
     label: 'Date',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm',
     monthYearSelectType: 'grid',
   },
 };
@@ -349,7 +348,7 @@ export const Native: Story = {
   args: {
     id: 'date-time-native',
     label: 'Date',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'dd.mm.yyyy hh:mm',
     useNativePicker: true,
   },
 };
