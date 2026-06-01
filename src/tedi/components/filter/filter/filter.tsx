@@ -38,241 +38,74 @@ type FilterBreakpointProps = {
 };
 
 export interface FilterProps extends BreakpointSupport<FilterBreakpointProps> {
-  /**
-   * Text shown on the trigger button. Acts as the accessible name when no
-   * dropdown options are selected; in single-select mode this is replaced by the
-   * selected option's label (or prefixed with it when `preserveLabel` is on).
-   */
+  /** Trigger label. In single-select mode it's replaced by the picked option (or prefixed when `preserveLabel`). */
   text: string;
-  /**
-   * Stable identifier used when the filter participates in a managed `<FilterGroup>`.
-   *
-   * The group reads this value to know which child is selected and writes it back
-   * via its `onValueChange` / `onValuesChange` handlers. Unused outside of a managed
-   * group context.
-   */
+  /** Identifier for participating in a managed `<FilterGroup>`. Unused outside a group. */
   value?: string;
-  /**
-   * When `true`, the trigger button is non-interactive and rendered with a muted style.
-   *
-   * If the filter lives inside a `<FilterGroup disabled>`, the group's disabled flag
-   * also propagates here — there's no need to set both.
-   *
-   * @default false
-   */
+  /** @default false */
   disabled?: boolean;
-  /**
-   * Extra class name appended to the root wrapper `<div>` (not the inner `<button>`).
-   *
-   * Use this for layout adjustments like `margin` or `flex` overrides. To style the
-   * trigger itself, target the wrapper's child `button` from your own stylesheet.
-   */
+  /** Class on the root wrapper `<div>` (not the inner `<button>`). */
   className?: string;
-  /**
-   * Optional HTML `id` placed on the trigger `<button>`.
-   *
-   * When omitted, the component generates a stable id internally (`tedi-filter-…`)
-   * and uses it as the prefix for sub-element ids (search input, options). Set this
-   * when you need an outside `<label htmlFor>` association or deep-linking.
-   */
+  /** Trigger `<button>` id. Auto-generated when omitted; also used as a prefix for sub-element ids. */
   id?: string;
   /**
-   * Selected appearance flag.
-   *
-   * - **Toggle mode** (no `options`, no `children`): can be either controlled
-   *   (pair with `onSelectedChange`) or uncontrolled (use `defaultSelected`).
-   * - **Custom-content mode** (`children` provided): **controlled-only**. The
-   *   Filter can't know what counts as "selected" inside your custom dropdown,
-   *   so you must drive `selected` yourself based on the picked value
-   *   (e.g. `selected={Boolean(dateRange?.from)}`). `defaultSelected` and
-   *   `onSelectedChange` are not honoured in this mode — the dropdown open /
-   *   close toggle doesn't fire either of them.
-   * - **Single-select / multi-select modes** (`options` provided): ignored.
-   *   The selected appearance is derived from `selectedValue` / `selectedValues`.
+   * Selected appearance.
+   * - Toggle mode (no `options`, no `children`): controlled or uncontrolled (`defaultSelected`).
+   * - Custom-content mode (`children`): controlled-only — derive it from your own state.
+   * - Dropdown mode (`options`): ignored; derived from `selectedValue` / `selectedValues`.
    */
   selected?: boolean;
-  /**
-   * **Uncontrolled** initial selected state — **toggle mode only** (no `options`,
-   * no `children`). For custom-content filters the toggle event isn't wired
-   * (the click opens the dropdown instead), so this would never update —
-   * pass `selected` as a controlled prop instead.
-   *
-   * Ignored when `selected` is also provided (controlled mode wins).
-   *
-   * @default false
-   */
+  /** Toggle-mode initial state. Ignored when `selected` is set. @default false */
   defaultSelected?: boolean;
-  /**
-   * Fires whenever the toggle state changes — **toggle mode only**. Custom-content
-   * filters don't fire this callback (the click opens the dropdown; closing the
-   * dropdown doesn't toggle a boolean). Single- and multi-select modes use
-   * `onSelectedValueChange` / `onSelectedValuesChange` respectively.
-   */
+  /** Toggle-mode change callback. Not fired in custom-content or dropdown modes. */
   onSelectedChange?: (selected: boolean) => void;
-  /**
-   * **Controlled** value for single-select dropdown mode. Pair with `options`.
-   *
-   * An empty string (`''`) means "nothing selected". Provide this together with
-   * `onSelectedValueChange` to own the selection externally.
-   */
+  /** Single-select controlled value (`''` = nothing selected). Pair with `options`. */
   selectedValue?: string;
-  /**
-   * **Uncontrolled** initial value for single-select dropdown mode. Pair with `options`.
-   *
-   * Ignored once `selectedValue` (controlled) is provided.
-   */
+  /** Single-select initial value. Ignored when `selectedValue` is set. */
   defaultSelectedValue?: string;
-  /**
-   * Fires when the single-select value changes — when an option is committed or the
-   * "Clear selection" action is used. Receives the new value (or `''` when cleared).
-   *
-   * The dropdown closes automatically after a commit; this callback fires before close.
-   */
+  /** Single-select change callback — fires on commit or clear (`''`). */
   onSelectedValueChange?: (value: string) => void;
-  /**
-   * When `true`, the dropdown switches from single-select (one value) to multi-select
-   * (an array of values rendered as checkboxes). Has no effect unless `options` is also set.
-   *
-   * Multi-select dropdowns do **not** close on each click — the user picks several
-   * options and dismisses the dropdown manually (Escape / outside-click).
-   *
-   * @default false
-   */
+  /** Switch the dropdown to multi-select (checkboxes). Requires `options`. @default false */
   multiselect?: boolean;
-  /**
-   * **Controlled** values array for multi-select dropdown mode.
-   *
-   * The order of entries is preserved as the user toggles options. Pair with
-   * `onSelectedValuesChange` to own the selection externally.
-   */
+  /** Multi-select controlled values. */
   selectedValues?: string[];
-  /**
-   * **Uncontrolled** initial values array for multi-select dropdown mode.
-   *
-   * Ignored once `selectedValues` (controlled) is provided.
-   */
+  /** Multi-select initial values. Ignored when `selectedValues` is set. */
   defaultSelectedValues?: string[];
-  /**
-   * Fires when the multi-select values array changes — option toggle, "Select all"
-   * toggle, or "Clear selection". Receives the new array.
-   */
+  /** Multi-select change callback — fires on toggle, "Select all", or clear. */
   onSelectedValuesChange?: (values: string[]) => void;
-  /**
-   * Option list rendered inside the dropdown. Each entry needs a unique `value` and a
-   * `label`; flag entries as `disabled` to prevent selection.
-   *
-   * Presence of options is what turns the filter into a dropdown — it's mutually
-   * exclusive with `children` (custom content takes precedence if both are set).
-   */
+  /** Dropdown options. Mutually exclusive with `children` (children wins if both). */
   options?: FilterOption[];
-  /**
-   * When `true`, renders a search input above the option list that live-filters
-   * options by their `label` (case-insensitive, substring match).
-   *
-   * Has no effect in custom-content mode.
-   *
-   * @default false
-   */
+  /** Search input that filters `options` by label (case-insensitive substring). @default false */
   searchable?: boolean;
-  /**
-   * Multi-select only — when `true`, renders a "Select all" checkbox above the option
-   * list that toggles every **enabled, currently-visible** option (so it works
-   * correctly together with `searchable`).
-   *
-   * @default false
-   */
+  /** Multi-select "Select all" toggle; targets enabled + visible options. @default false */
   showSelectAll?: boolean;
-  /**
-   * Custom label for the "Select all" row. When omitted, falls back to the
-   * `filter.select-all` translation from `<LabelProvider>` (default `'Vali kõik'`
-   * in `et`, `'Select all'` in `en`).
-   */
+  /** Override the `filter.select-all` i18n label. */
   selectAllLabel?: string;
   /**
-   * When `true`, renders a "Clear selection" button under the option list (or under
-   * `children` in custom-content mode).
-   *
-   * In single/multi-select modes this empties the selection automatically. In
-   * custom-content mode it doesn't touch consumer state — wire up `onClear` to reset
-   * whatever the children are bound to.
-   *
-   * @default false
+   * "Clear selection" button below the panel. Dropdown modes clear automatically;
+   * custom-content mode delegates to `onClear`. @default false
    */
   showClear?: boolean;
-  /**
-   * Custom label for the "Clear selection" action. When omitted, falls back to the
-   * `filter.clear-selection` translation from `<LabelProvider>` (default
-   * `'Tühjenda valik'` in `et`, `'Clear selection'` in `en`).
-   */
+  /** Override the `filter.clear-selection` i18n label. */
   clearLabel?: string;
-  /**
-   * Single-select only — when `true`, the filter `text` stays on the trigger as a
-   * prefix once a value is picked: `"Teenus: Optometristi vastuvõtt"` instead of just
-   * `"Optometristi vastuvõtt"`.
-   *
-   * Useful when the filter category isn't obvious from the option label alone.
-   *
-   * @default false
-   */
+  /** Single-select: keep `text` as a prefix once a value is picked ("Teenus: …"). @default false */
   preserveLabel?: boolean;
-  /**
-   * Custom dropdown panel content (e.g. a `<ChoiceGroup>`, calendar, or arbitrary UI).
-   *
-   * Providing `children` switches the filter into custom-content mode and overrides
-   * the option-list rendering even if `options` is also set. The trigger's selected
-   * state in this mode is driven by `selected` / `defaultSelected`; the consumer is
-   * responsible for any state behind the panel.
-   */
+  /** Custom dropdown content. Switches the filter into controlled custom-content mode. */
   children?: React.ReactNode;
-  /**
-   * Fires when the user clicks the "Clear selection" button while `children` are
-   * rendered (custom-content mode only).
-   *
-   * Use this to reset the consumer-managed state behind the custom panel — the
-   * component itself has nothing to clear in this mode.
-   */
+  /** Fires when "Clear" is clicked in custom-content mode — reset your own state here. */
   onClear?: () => void;
   /**
-   * Slot rendered before `text` on the trigger button — typically an `<Icon>`,
-   * `<StatusIndicator>` or `<StatusBadge>`.
-   *
-   * In toggle mode the prepend is automatically replaced by a check icon when the
-   * filter becomes selected (override with `hidePrependWhenSelected={false}`).
+   * Slot before `text` (icon, status). Auto-replaced by a check icon when toggle-mode
+   * selected — disable via `hidePrependWhenSelected={false}`.
    */
   prepend?: React.ReactNode;
-  /**
-   * When `true`, the `prepend` slot disappears while the filter is selected so the
-   * check icon can take its place. Set to `false` to keep the prepend visible
-   * regardless of selection state.
-   *
-   * @default true
-   */
+  /** Hide `prepend` while selected so the check icon can take its place. @default true */
   hidePrependWhenSelected?: boolean;
-  /**
-   * Slot rendered after `text` (and before the dropdown chevron, if any). Always
-   * visible — useful for badges that count related items or status pills.
-   *
-   * In multi-select dropdown mode the component also renders its own count badge
-   * showing the number of selected values; `append` sits beside it.
-   */
+  /** Slot after `text`. In multi-select sits alongside the built-in count badge. */
   append?: React.ReactNode;
-  /**
-   * Where the dropdown panel is positioned relative to the trigger.
-   *
-   * Accepts any Floating UI placement (`'top'`, `'bottom'`, `'left'`, `'right'`,
-   * and their `-start`/`-end` variants). The panel flips automatically when there
-   * isn't enough room on the preferred side.
-   *
-   * @default bottom-start
-   */
+  /** Floating UI placement; flips when room is tight. @default bottom-start */
   placement?: React.ComponentProps<typeof Dropdown>['placement'];
-  /**
-   * Accessible name for the dropdown's search input. When omitted, the filter's
-   * `text` is used as the search field label.
-   *
-   * Set this when the filter `text` doesn't read sensibly as a search-input label
-   * (e.g. when the trigger uses `preserveLabel` and includes a colon).
-   */
+  /** Accessible label for the search input. Falls back to `text`. */
   searchLabel?: string;
 }
 

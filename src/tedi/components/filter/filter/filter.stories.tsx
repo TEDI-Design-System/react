@@ -568,33 +568,37 @@ export const States: Story = {
           </Row>
         )}
         {stateRows.map((row) => (
-          <Row key={row.id} gutter={2} alignItems="center" className={`pseudo-${row.id}`}>
+          <Row key={row.id} gutter={2} alignItems="center">
             <Col xs={12} md={2}>
               <Text modifiers="bold">{row.label}</Text>
             </Col>
             <Col xs={12} md={3}>
-              {isMobile ? (
-                <VerticalSpacing size={0.25}>
-                  <Text modifiers="small" color="tertiary">
-                    Not selected
-                  </Text>
-                  {renderCell(variant, false, row.disabled)}
-                </VerticalSpacing>
-              ) : (
-                renderCell(variant, false, row.disabled)
-              )}
+              <span className={`pseudo-${row.id}`} style={{ display: 'contents' }}>
+                {isMobile ? (
+                  <VerticalSpacing size={0.25}>
+                    <Text modifiers="small" color="tertiary">
+                      Not selected
+                    </Text>
+                    {renderCell(variant, false, row.disabled)}
+                  </VerticalSpacing>
+                ) : (
+                  renderCell(variant, false, row.disabled)
+                )}
+              </span>
             </Col>
             <Col xs={12} md={5}>
-              {isMobile ? (
-                <VerticalSpacing size={0.25}>
-                  <Text modifiers="small" color="tertiary">
-                    Selected
-                  </Text>
-                  {renderCell(variant, true, row.disabled)}
-                </VerticalSpacing>
-              ) : (
-                renderCell(variant, true, row.disabled)
-              )}
+              <span className={`pseudo-${row.id}`} style={{ display: 'contents' }}>
+                {isMobile ? (
+                  <VerticalSpacing size={0.25}>
+                    <Text modifiers="small" color="tertiary">
+                      Selected
+                    </Text>
+                    {renderCell(variant, true, row.disabled)}
+                  </VerticalSpacing>
+                ) : (
+                  renderCell(variant, true, row.disabled)
+                )}
+              </span>
             </Col>
           </Row>
         ))}
@@ -941,7 +945,7 @@ export const Examples: Story = {
         <Separator />
 
         <Text element="h1" modifiers="h1" color="secondary">
-          Taotlused (primary)
+          Taotlused
         </Text>
         <div className="display-flex gap-2 flex-wrap align-items-center">
           <FilterGroup label="Tüüp" value={typePrimary} onValueChange={setTypePrimary}>
