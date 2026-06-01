@@ -57,6 +57,14 @@ type CollapseBreakpointProps = {
    * @default false
    */
   iconOnly?: boolean;
+  /**
+   * Inverted color palette — flips the link / icon colors to their
+   * inverted-surface equivalents (white text + icon), for use on top of dark
+   * backgrounds. Pairs with both the with-text and icon-only variants; the
+   * secondary-arrow style has no inverted form in the design.
+   * @default false
+   */
+  inverted?: boolean;
 };
 
 export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps> {
@@ -116,6 +124,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     underline = true,
     toggleLabel,
     iconOnly = false,
+    inverted = false,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -138,6 +147,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     size === 'small' && styles['tedi-collapse--small'],
     isOpen && styles['tedi-collapse--is-open'],
     isIconOnly && styles['tedi-collapse--icon-only'],
+    inverted && styles['tedi-collapse--inverted'],
     styles[`tedi-collapse--arrow-${arrowType}`],
     className
   );
