@@ -14,7 +14,7 @@ export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }:
   const OptionBEM = cn(
     styles['tedi-select__option'],
     { [styles['tedi-select__option--disabled']]: props.isDisabled },
-    { [styles['tedi-select__option--selected']]: props.isSelected },
+    { [styles['tedi-select__option--selected']]: props.isSelected && !showRadioButtons },
     { [styles['tedi-select__option--focused']]: props.isFocused }
   );
 
@@ -40,6 +40,7 @@ export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }:
             value={props.data.value}
             checked={props.isSelected}
             disabled={props.isDisabled}
+            onChange={() => null}
           />
         </>
       ) : renderOption ? (

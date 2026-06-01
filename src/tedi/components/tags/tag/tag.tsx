@@ -3,7 +3,7 @@ import { MouseEventHandler } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
-import ClosingButton from '../../buttons/closing-button/closing-button';
+import ClosingButton, { ClosingButtonProps } from '../../buttons/closing-button/closing-button';
 import { Spinner } from '../../loaders/spinner/spinner';
 import styles from './tag.module.scss';
 
@@ -34,6 +34,13 @@ export interface TagProps extends BreakpointSupport<TagBreakpointProps> {
    */
   onClose?: MouseEventHandler<HTMLButtonElement>;
   /**
+   * Extra props forwarded to the inner close button (when `onClose` is set).
+   * Lets consumers wire up keyboard handlers, tab focus, or event isolation
+   * without reaching past the Tag API. `onClick` and `iconSize` are owned by
+   * Tag and can't be overridden here.
+   */
+  closeButtonProps?: Omit<ClosingButtonProps, 'onClick' | 'iconSize'>;
+  /**
    * Determines whether the Tag is in a loading state
    * @default false
    */
@@ -46,6 +53,7 @@ export const Tag = (props: TagProps): JSX.Element => {
     children,
     className,
     onClose,
+    closeButtonProps,
     isLoading = false,
     color = 'primary',
     ...rest
@@ -71,7 +79,7 @@ export const Tag = (props: TagProps): JSX.Element => {
           <Spinner className={styles['tedi-tag__loader']} />
         </div>
       )}
-      {!isLoading && onClose && <ClosingButton iconSize={18} onClick={onClose} />}
+      {!isLoading && onClose && <ClosingButton iconSize={18} {...closeButtonProps} onClick={onClose} />}
     </div>
   );
 };

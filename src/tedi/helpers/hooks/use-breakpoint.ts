@@ -13,15 +13,15 @@ export const useBreakpoint = (defaultServerBreakpoint: Breakpoint = 'xs'): Break
 
   useLayoutEffect(() => {
     const getBreakpoint = (): Breakpoint => {
-      if (window.matchMedia('(min-width: 1400px)').matches) {
+      if (window.matchMedia('(min-width: 87.5rem)').matches) {
         return 'xxl';
-      } else if (window.matchMedia('(min-width: 1200px)').matches) {
+      } else if (window.matchMedia('(min-width: 75rem)').matches) {
         return 'xl';
-      } else if (window.matchMedia('(min-width: 992px)').matches) {
+      } else if (window.matchMedia('(min-width: 62rem)').matches) {
         return 'lg';
-      } else if (window.matchMedia('(min-width: 768px)').matches) {
+      } else if (window.matchMedia('(min-width: 48rem)').matches) {
         return 'md';
-      } else if (window.matchMedia('(min-width: 576px)').matches) {
+      } else if (window.matchMedia('(min-width: 36rem)').matches) {
         return 'sm';
       } else {
         return 'xs';
