@@ -1,3 +1,10 @@
+# [17.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.1.0...react-17.2.0-rc.1) (2026-06-01)
+
+
+### Features
+
+* **breadcrumb:** new TEDI-Ready component [#22](https://github.com/TEDI-Design-System/react/issues/22) ([#637](https://github.com/TEDI-Design-System/react/issues/637)) ([fe65d69](https://github.com/TEDI-Design-System/react/commit/fe65d69f25f2482987f242bd28747e3444730cdd))
+
 # [17.1.0](https://github.com/TEDI-Design-System/react/compare/react-17.0.0...react-17.1.0) (2026-05-28)
 
 
