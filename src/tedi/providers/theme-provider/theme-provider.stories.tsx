@@ -7,7 +7,7 @@ import { Button } from '../../components/buttons/button/button';
 import { ThemeProvider } from './theme-provider';
 
 export default {
-  title: 'TEDI-Ready/Providers/ThemeProvider/ThemeProvider',
+  title: 'TEDI-Ready/Providers/ThemeProvider',
   component: ThemeProvider,
   decorators: [
     (Story, options) => {
