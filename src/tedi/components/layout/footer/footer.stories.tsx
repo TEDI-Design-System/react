@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import Link from '../../navigation/link/link';
 import { VerticalSpacing } from '../vertical-spacing';
@@ -29,23 +30,16 @@ const meta: Meta<typeof Footer> = {
 export default meta;
 type Story = StoryObj<typeof Footer>;
 
-const LogoPlaceholder = ({ width = 88, height = 40 }: { width?: number; height?: number }) => (
-  <div
-    style={{
-      width,
-      height,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--general-surface-primary)',
-      color: 'var(--general-text-primary)',
-      fontSize: 12,
-      fontWeight: 600,
-    }}
-  >
-    Logo
-  </div>
-);
+const LogoPlaceholder = () => {
+  const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
+  return (
+    <img
+      src={isMobile ? 'sf_logod.jpg' : 'sf_logod_vertikaalne.jpg'}
+      alt="EU structural funds logo"
+      style={isMobile ? { width: '9rem', height: '5.25rem' } : { width: '3.75rem', height: '7rem' }}
+    />
+  );
+};
 
 const SectionLinks = ({ count = 4 }: { count?: number }) => (
   <>

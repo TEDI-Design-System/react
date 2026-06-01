@@ -28,7 +28,7 @@
 
 .tedi-footer-body--mobile {
   flex-direction: column;
-  gap: var(--tedi-dimensions-10);
+  gap: var(--layout-grid-gutters-08);
   padding: var(--layout-footer-padding-y) var(--layout-footer-padding-x);
 }
 
@@ -57,7 +57,7 @@
 }
 
 .tedi-footer-section__container {
-  padding-bottom: var(--tedi-dimensions-10);
+  padding-bottom: var(--layout-footer-item-vertical-spacing);
 
   @include footer-links;
 }
@@ -72,8 +72,6 @@
 
 .tedi-footer-section__content-inner {
   @include footer-links;
-
-  padding-bottom: var(--tedi-dimensions-10);
 }
 
 .tedi-footer-section__heading {
@@ -88,28 +86,11 @@
   [data-name='collapse-trigger'] {
     width: 100%;
     padding: 0;
-    color: var(--link-inverted-default);
-
-    &:hover,
-    &:focus-visible {
-      color: var(--link-inverted-hover);
-    }
 
     > * {
       gap: var(--link-inner-spacing-x);
     }
-
-    [class*='tedi-collapse__icon-wrapper'] {
-      width: auto;
-      height: auto;
-      background: transparent;
-      border: 0;
-    }
   }
-}
-
-.tedi-footer-section__collapse-title {
-  font-weight: var(--body-bold-weight);
 }
 
 .tedi-footer-side {

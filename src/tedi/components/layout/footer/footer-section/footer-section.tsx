@@ -3,6 +3,7 @@ import { ReactNode, useContext, useId } from 'react';
 
 import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../../helpers';
 import { Icon } from '../../../base/icon/icon';
+import { Heading } from '../../../base/typography/heading/heading';
 import { Collapse } from '../../../buttons/collapse/collapse';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
@@ -87,9 +88,13 @@ export const FooterSection = ({
         {applyCollapse ? (
           <Collapse
             id={`tedi-footer-section-${collapseId}`}
-            title={<span className={styles['tedi-footer-section__collapse-title']}>{heading}</span>}
+            title={
+              <Heading element="h5" color="white">
+                {heading}
+              </Heading>
+            }
+            inverted
             hideCollapseText
-            underline={false}
             defaultOpen={defaultOpen}
             toggleLabel={typeof heading === 'string' ? heading : undefined}
             className={styles['tedi-footer-section__collapse']}
