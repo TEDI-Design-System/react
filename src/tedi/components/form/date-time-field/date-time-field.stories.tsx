@@ -198,6 +198,93 @@ export const PredefinedTimeSlots: Story = {
   },
 };
 
+/**
+ * When `availableTimes` returns an empty array for the picked date,
+ * `DateTimeField` falls back to the scroll-wheel picker — there's no
+ * built-in "no times available" empty state inside the popover. Surface
+ * that condition from the consumer side:
+ *
+ * - render a helper / error message on the field (shown below), and / or
+ * - disable those days entirely via `disabledMatchers` so the user can't
+ *   land on them in the first place.
+ *
+ * This example treats Mondays as closed: the field is pre-selected to a
+ * Monday so the helper is visible, and the matcher greys Mondays out in
+ * the calendar.
+ */
+export const NoTimesAvailable: StoryFn<DateTimeFieldProps> = (args) => {
+  const upcomingMonday = (() => {
+    const d = new Date();
+    const daysUntilMonday = (8 - d.getDay()) % 7 || 7;
+    d.setDate(d.getDate() + daysUntilMonday);
+    d.setHours(10, 0, 0, 0);
+    return d;
+  })();
+
+  const [value, setValue] = useState<Date | undefined>(upcomingMonday);
+
+  const getSlots = (date: Date): string[] => {
+    const day = date.getDay();
+    if (day === 1) return [];
+    if (day === 0) return ['10:00', '11:00', '12:00'];
+    return ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+  };
+
+  const slotsForSelectedDate = value ? getSlots(value) : null;
+  const noSlots = slotsForSelectedDate !== null && slotsForSelectedDate.length === 0;
+
+  return (
+    <Row>
+      <Col lg={4} md={6} xs={12}>
+        <DateTimeField
+          {...args}
+          value={value}
+          onChange={(v) => setValue(v instanceof Date ? v : undefined)}
+          availableTimes={getSlots}
+          disabledMatchers={{ dayOfWeek: [1] }}
+          inputProps={
+            noSlots
+              ? { helper: { text: 'No appointments available on this day — closed on Mondays.', type: 'error' } }
+              : undefined
+          }
+        />
+      </Col>
+    </Row>
+  );
+};
+NoTimesAvailable.args = {
+  id: 'date-time-no-slots',
+  label: 'Appointment',
+  placeholder: 'dd.mm.yyyy hh:mm',
+  layout: 'side-by-side',
+  timeGridVariant: 'button',
+};
+
+/**
+ * `availableTimes` also accepts a function `(date: Date) => string[]`,
+ * evaluated per render with the currently-selected date. Use this when the
+ * slot list depends on the day — e.g. a clinic with longer weekday hours
+ * than weekends, or a venue that's closed on Mondays.
+ *
+ * Pick a weekday vs. a Saturday vs. a Sunday to see the time grid change.
+ */
+export const PerDayTimeSlots: Story = {
+  render: Template,
+  args: {
+    id: 'date-time-per-day',
+    label: 'Appointment',
+    placeholder: 'dd.mm.yyyy hh:mm',
+    layout: 'side-by-side',
+    timeGridVariant: 'button',
+    availableTimes: (date: Date) => {
+      const day = date.getDay();
+      if (day === 0) return ['10:00', '11:00', '12:00'];
+      if (day === 6) return ['09:00', '10:00', '11:00', '12:00', '13:00'];
+      return ['08:30', '09:30', '10:30', '11:30', '13:00', '14:00', '15:00', '16:00', '17:00'];
+    },
+  },
+};
+
 export const MultiSteps: Story = {
   render: Template,
   args: {
@@ -279,6 +366,11 @@ export const Controlled: Story = {
  * `minDate` / `maxDate`. The time picker doesn't enforce time-of-day bounds
  * (every minute is selectable inside the allowed days), only the calendar
  * grid is constrained.
+ *
+ * If the user types a date that fails the disable matchers, the field
+ * surfaces an inline error (overridable via `disabledDateErrorMessage`).
+ * Try typing a past date into the first input or a future date into the
+ * second.
  */
 export const DateConstraints: StoryFn = () => {
   const minDate = new Date();

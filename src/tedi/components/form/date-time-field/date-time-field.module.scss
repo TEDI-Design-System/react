@@ -8,8 +8,15 @@
 .tedi-date-time-field__textfield {
   @include field-icon-button.states;
 
-  input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  input[type='datetime-local'] {
+    appearance: none;
+  }
+
+  input[type='datetime-local']::-webkit-calendar-picker-indicator,
+  input[type='datetime-local']::-webkit-inner-spin-button,
+  input[type='datetime-local']::-webkit-clear-button {
     display: none !important;
+    appearance: none;
   }
 
   input[type='datetime-local'][value='']:not(:focus)::-webkit-datetime-edit {
@@ -243,8 +250,6 @@
   justify-content: space-between;
   padding: var(--card-padding-md-default) var(--card-padding-md-default) 0;
 
-  // Same icon-centring fix as `__select-time-wrapper` — the "Back" link
-  // button shares the link variant's inline-icon alignment quirk.
   :global .tedi-btn--link .tedi-btn__icon--left {
     display: inline-flex;
     align-items: center;

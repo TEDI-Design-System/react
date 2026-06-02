@@ -18,6 +18,7 @@ import { dateMatchModifiers, DateRange, DayPickerProps, Locale, Matcher, OnSelec
 import { et } from 'react-day-picker/locale';
 
 import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
@@ -242,10 +243,19 @@ export interface DateFieldProps
    * Props to pass down to the underlying TextField (in 'single' mode) or MultiValueField (in 'multiple' mode). This allows for additional customization of the input field, such as adding custom styles, attributes, or event handlers.
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
+  /**
+   * Error message rendered below the input when the user types a date that
+   * matches one of the disable matchers (`disablePast`, `disableFuture`,
+   * `minDate`, `maxDate`, `disabledMatchers`, or the deprecated `disabled`
+   * overload). Falls back to the localised `dateField.disabledDateError`
+   * label.
+   */
+  disabledDateErrorMessage?: string;
 }
 
 export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getLabel } = useLabels();
   const {
     useNativePicker = false,
     enableCalendar = true,
@@ -284,6 +294,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     readOnly,
     availableDays,
     inputProps,
+    disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
     useNativePicker: _useNativePicker,
     enableCalendar: _enableCalendar,
     calendarTrigger: _calendarTrigger,
@@ -297,16 +308,10 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     ...dayPickerProps
   } = props;
 
-  // Native `<input type="date">` is only meaningful for a single Date — it
-  // can't express ranges or multi-selection.
   const shouldUseNativePicker = useNativePicker && mode === 'single';
 
   const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobile = isBreakpointBelow(breakpoint, 'md');
-  // Multi-month calendars are unwieldy on phones — the popover gets tall,
-  // wraps to a vertical stack, and any focus-into-view (react-day-picker
-  // moving focus to a day on tap) yanks the scroll back to the top. Force
-  // a single month below `md`; users navigate with the month nav buttons.
   const effectiveNumberOfMonths =
     isMobile && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
@@ -315,6 +320,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<CalendarView>(selectionLevel);
   const [inputValue, setInputValue] = useState('');
+  const [hasDisabledDateError, setHasDisabledDateError] = useState(false);
 
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
@@ -411,8 +417,6 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const disabledMatchers = useMemo<Matcher[]>(() => {
     const matchers: Matcher[] = [];
 
-    // Legacy `disabled` overload (matcher-shaped) — still supported, will be
-    // replaced by a boolean `disabled` form-control prop in a future major.
     if (disabled) {
       if (Array.isArray(disabled)) matchers.push(...disabled);
       else matchers.push(disabled);
@@ -505,6 +509,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const handleInputChange = (val: string) => {
     setInputValue(val);
 
+    if (val.trim() === '') {
+      setHasDisabledDateError(false);
+      return;
+    }
+
     const parser = parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined);
     const parsed = parser(val);
 
@@ -513,11 +522,23 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       (mode === 'multiple' && Array.isArray(parsed)) ||
       (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
 
-    if (!isValidForMode) return;
-
-    if (parsed instanceof Date && isDateDisabled(parsed)) {
+    if (!isValidForMode) {
+      setHasDisabledDateError(false);
       return;
     }
+
+    const range = parsed && !Array.isArray(parsed) && 'from' in parsed ? (parsed as DateRange) : null;
+    const isDisabled =
+      (parsed instanceof Date && isDateDisabled(parsed)) ||
+      (Array.isArray(parsed) && parsed.some((d) => d instanceof Date && isDateDisabled(d))) ||
+      (!!range && ((range.from && isDateDisabled(range.from)) || (range.to && isDateDisabled(range.to))));
+
+    if (isDisabled) {
+      setHasDisabledDateError(true);
+      return;
+    }
+
+    setHasDisabledDateError(false);
 
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as Date, {}, {} as UnknownType);
@@ -596,6 +617,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   const handleNativeInputChange = (val: string) => {
     if (!val) {
+      setHasDisabledDateError(false);
       if (!isControlled) setInternalValue(undefined);
       onSelect?.(undefined as UnknownType, undefined as UnknownType, {}, {} as UnknownType);
       return;
@@ -604,6 +626,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (!y || !m || !d) return;
     const parsed = new Date(y, m - 1, d);
     if (Number.isNaN(parsed.getTime())) return;
+
+    if (isDateDisabled(parsed)) {
+      setHasDisabledDateError(true);
+      return;
+    }
+    setHasDisabledDateError(false);
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
   };
@@ -667,6 +695,16 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             required={required}
+            invalid={hasDisabledDateError || (inputProps as TextFieldProps)?.invalid}
+            helper={(() => {
+              const consumerHelper = (inputProps as TextFieldProps)?.helper;
+              const errorHelper = hasDisabledDateError
+                ? { text: disabledDateErrorMessage, type: 'error' as const }
+                : null;
+              if (!errorHelper) return consumerHelper;
+              if (!consumerHelper) return errorHelper;
+              return Array.isArray(consumerHelper) ? [...consumerHelper, errorHelper] : [consumerHelper, errorHelper];
+            })()}
             className={cn(styles['tedi-date-field__textfield'], {
               [styles['tedi-date-field__textfield--disabled']]: inputProps?.disabled,
               [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,

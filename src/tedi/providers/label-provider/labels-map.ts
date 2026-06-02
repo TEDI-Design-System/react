@@ -383,6 +383,14 @@ export const labelsMap = validateDefaultLabels({
     en: 'Close modal',
     ru: 'Закрыть модальное окно',
   },
+  'dateField.disabledDateError': {
+    description:
+      'Inline error shown when the user types a date that fails the disable matchers (`disablePast`, `disableFuture`, `minDate`, `maxDate`, `disabledMatchers`).',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Valitud kuupäev pole saadaval',
+    en: 'Selected date is not available',
+    ru: 'Выбранная дата недоступна',
+  },
   'dateTimeField.timeHeading': {
     description: 'Heading rendered above the time picker in DateTimeField',
     components: ['DateTimeField'],

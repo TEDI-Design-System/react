@@ -229,6 +229,13 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    * `onChange` are owned by `DateTimeField`.
    */
   inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>;
+  /**
+   * Error message rendered below the input when the user types a date that
+   * fails the disable matchers (`disablePast`, `disableFuture`, `minDate`,
+   * `maxDate`, `disabledMatchers`). Falls back to the localised
+   * `dateField.disabledDateError` label.
+   */
+  disabledDateErrorMessage?: string;
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -307,6 +314,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     mode = 'single',
     selectionLevel = 'days',
     inputProps,
+    disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
   } = props;
 
   const isRange = mode === 'range';
@@ -413,6 +421,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
   }, [dateFormatter]);
 
   const [inputText, setInputText] = useState<string>(() => formatValue(currentValue));
+  const [hasDisabledDateError, setHasDisabledDateError] = useState(false);
 
   useEffect(() => {
     setInputText(formatValue(currentValue));
@@ -545,14 +554,22 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     setInputText(newText);
 
     if (newText === '') {
+      setHasDisabledDateError(false);
       updateValue(undefined);
       return;
     }
 
     if (useNative) {
       const parsed = parseNativeValue(newText);
-      if (!parsed) return;
-      if (isDateDisabled(parsed)) return;
+      if (!parsed) {
+        setHasDisabledDateError(false);
+        return;
+      }
+      if (isDateDisabled(parsed)) {
+        setHasDisabledDateError(true);
+        return;
+      }
+      setHasDisabledDateError(false);
       updateValue(parsed);
       setCurrentMonth(parsed);
       return;
@@ -561,8 +578,15 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     if (isRange) return;
 
     const parsed = parseDateTimeText(newText);
-    if (!parsed) return;
-    if (isDateDisabled(parsed)) return;
+    if (!parsed) {
+      setHasDisabledDateError(false);
+      return;
+    }
+    if (isDateDisabled(parsed)) {
+      setHasDisabledDateError(true);
+      return;
+    }
+    setHasDisabledDateError(false);
 
     updateValue(parsed);
     setCurrentMonth(parsed);
@@ -655,6 +679,16 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     );
   };
 
+  const consumerHelper = (inputProps as TextFieldProps)?.helper;
+  const errorHelper = hasDisabledDateError ? { text: disabledDateErrorMessage, type: 'error' as const } : null;
+  const mergedHelper = !errorHelper
+    ? consumerHelper
+    : !consumerHelper
+    ? errorHelper
+    : Array.isArray(consumerHelper)
+    ? [...consumerHelper, errorHelper]
+    : [consumerHelper, errorHelper];
+
   const textFieldProps: TextFieldProps = {
     ...(inputProps as TextFieldProps),
     id,
@@ -666,6 +700,8 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     isClearable: true,
     required,
     disabled,
+    invalid: hasDisabledDateError || (inputProps as TextFieldProps)?.invalid,
+    helper: mergedHelper,
     onIconClick: handleIconClick,
     onChange: handleInputChange,
     className: cn(styles['tedi-date-time-field__textfield'], inputProps?.className, {
