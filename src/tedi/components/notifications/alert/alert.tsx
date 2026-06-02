@@ -184,4 +184,6 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
   ) : null;
 };
 
+Alert.displayName = 'Alert';
+
 export default Alert;
