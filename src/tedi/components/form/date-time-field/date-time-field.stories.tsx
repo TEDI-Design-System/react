@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { enGB } from 'react-day-picker/locale';
 
 import { UnknownType } from '../../../types/commonTypes';
 import { Text } from '../../base/typography/text/text';
@@ -16,6 +17,10 @@ import { DateTimeField, DateTimeFieldProps } from './date-time-field';
 const meta: Meta<DateTimeFieldProps> = {
   component: DateTimeField,
   title: 'TEDI-Ready/Components/Form/DateTimeField',
+  args: {
+    locale: enGB,
+    localeCode: 'en-GB',
+  },
   argTypes: {
     inputProps: { control: false },
     locale: { control: false },
@@ -37,6 +42,12 @@ const meta: Meta<DateTimeFieldProps> = {
 export default meta;
 
 type Story = StoryObj<DateTimeFieldProps>;
+
+// Meta-level `args` only flow into stories that read them; custom-render
+// stories below (Size, States, FieldOptions, DateConstraints) instantiate
+// DateTimeField directly, so they spread this object to inherit the same
+// English locale.
+const englishLocale = { locale: enGB, localeCode: 'en-GB' };
 
 const Template: StoryFn<DateTimeFieldProps> = (args) => (
   <Row>
@@ -74,6 +85,7 @@ export const Size: StoryFn = () => (
         </Col>
         <Col lg={10} xs={12} className="d-flex">
           <DateTimeField
+            {...englishLocale}
             id={`date-time-size-${size}`}
             label="Date"
             placeholder="dd.mm.yyyy hh:mm"
@@ -96,7 +108,7 @@ export const States: Story = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col md={4} xs={12} className="display-flex align-items-center">
-            <DateTimeField id={state} label="Date and time" disabled={state === 'Disabled'} />
+            <DateTimeField {...englishLocale} id={state} label="Date and time" disabled={state === 'Disabled'} />
           </Col>
         </Row>
       ))}
@@ -106,6 +118,7 @@ export const States: Story = {
         </Col>
         <Col md={4} xs={12} className="display-flex align-items-center">
           <DateTimeField
+            {...englishLocale}
             id="success-datetimefield"
             label="Date and time"
             inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
@@ -118,6 +131,7 @@ export const States: Story = {
         </Col>
         <Col md={4} xs={12} className="display-flex align-items-center">
           <DateTimeField
+            {...englishLocale}
             id="error-datetimefield"
             label="Date and time"
             inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
@@ -154,9 +168,15 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
-          <DateTimeField id="date-time-options-default" label="Date and time" placeholder="dd.mm.yyyy hh:mm" />
+          <DateTimeField
+            {...englishLocale}
+            id="date-time-options-default"
+            label="Date and time"
+            placeholder="dd.mm.yyyy hh:mm"
+          />
 
           <DateTimeField
+            {...englishLocale}
             id="date-time-options-hint"
             label="Date and time with hint"
             placeholder="dd.mm.yyyy hh:mm"
@@ -165,6 +185,7 @@ export const FieldOptions: StoryFn = () => {
 
           <div>
             <DateTimeField
+              {...englishLocale}
               id="date-time-options-shortcuts"
               label="Date and time with shortcuts"
               placeholder="dd.mm.yyyy hh:mm"
@@ -383,6 +404,7 @@ export const DateConstraints: StoryFn = () => {
       <Col lg={6} xs={12}>
         <Text modifiers="bold">disablePast</Text>
         <DateTimeField
+          {...englishLocale}
           id="date-time-disable-past"
           label="Future date and time only"
           placeholder="dd.mm.yyyy hh:mm"
@@ -392,6 +414,7 @@ export const DateConstraints: StoryFn = () => {
       <Col lg={6} xs={12}>
         <Text modifiers="bold">disableFuture</Text>
         <DateTimeField
+          {...englishLocale}
           id="date-time-disable-future"
           label="Past date and time only"
           placeholder="dd.mm.yyyy hh:mm"
@@ -401,6 +424,7 @@ export const DateConstraints: StoryFn = () => {
       <Col lg={6} xs={12}>
         <Text modifiers="bold">minDate / maxDate (±7 days)</Text>
         <DateTimeField
+          {...englishLocale}
           id="date-time-min-max"
           label="Date inside a 14-day window"
           placeholder="dd.mm.yyyy hh:mm"
