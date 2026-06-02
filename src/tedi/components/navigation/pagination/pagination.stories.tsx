@@ -162,7 +162,8 @@ export const Transparent: Story = {
 /**
  * Use the per-slot hide toggles to render different parts of the pagination
  * above and below a table. Top row shows results + page-size; bottom row shows
- * only the pager.
+ * only the pager. `borders="both"` adds top **and** bottom separators so the
+ * pager stays visually anchored when content sits beneath it.
  */
 export const TopBottomSplit: Story = {
   render: function TopBottomSplit() {
@@ -182,14 +183,95 @@ export const TopBottomSplit: Story = {
     };
     return (
       <>
-        <Pagination {...sharedProps} hidePager />
+        <Pagination {...sharedProps} hidePager borders="bottom" />
         <div style={{ padding: '1.5rem 0', color: 'var(--general-text-tertiary)', textAlign: 'center' }}>
           — table content goes here —
         </div>
-        <Pagination {...sharedProps} hideResults hidePageSize />
+        <Pagination {...sharedProps} hideResults hidePageSize borders="top" />
       </>
     );
   },
+};
+
+/**
+ * `showPrevNextButtons` defaults to `false` — the disabled Previous on page 1
+ * (or disabled Next on the last page) drops out of the DOM for a compact look.
+ * Set the prop to `true` to keep both arrows rendered (disabled) at the edges
+ * so the pager width stays stable as the user navigates.
+ */
+export const AlwaysShowPrevNextButtons: Story = {
+  render: function AlwaysShowPrevNextButtons() {
+    const [page, setPage] = useState(1);
+    return <Pagination pageCount={5} page={page} onPageChange={setPage} showPrevNextButtons />;
+  },
+};
+
+/**
+ * `showEdgeNavLabels` puts the `previous` / `next` label text next to the arrow
+ * icons on the edge nav buttons — useful for desktop-only layouts where the
+ * icon-only variant feels too terse. The aria-label stays the same so screen
+ * readers aren't double-announced.
+ */
+export const WithEdgeNavLabels: Story = {
+  args: {
+    pageCount: 8,
+    defaultPage: 3,
+    showEdgeNavLabels: true,
+  },
+};
+
+/**
+ * `borders` controls the separator around the pagination strip.
+ * - `top` (default) — separator above only.
+ * - `bottom` — separator below only.
+ * - `both` — separators above and below; use when the pager sits between two
+ *   content rows.
+ * - `none` — borderless, e.g. when an outer container already provides framing.
+ */
+export const Borders: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div>
+        <p style={{ margin: '0 0 0.5rem', color: 'var(--general-text-secondary)' }}>
+          borders=&quot;top&quot; (default)
+        </p>
+        <Pagination pageCount={10} defaultPage={3} totalItems={97} pageSize={10} pageSizeOptions={[10, 25, 50]} />
+      </div>
+      <div>
+        <p style={{ margin: '0 0 0.5rem', color: 'var(--general-text-secondary)' }}>borders=&quot;bottom&quot;</p>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="bottom"
+        />
+      </div>
+      <div>
+        <p style={{ margin: '0 0 0.5rem', color: 'var(--general-text-secondary)' }}>borders=&quot;both&quot;</p>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="both"
+        />
+      </div>
+      <div>
+        <p style={{ margin: '0 0 0.5rem', color: 'var(--general-text-secondary)' }}>borders=&quot;none&quot;</p>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="none"
+        />
+      </div>
+    </div>
+  ),
 };
 
 /**
@@ -226,26 +308,32 @@ export const MobilePicker: Story = {
 };
 
 /**
- * Localised via the `labels` prop. Note: the default labels already come from
- * the LabelProvider (`pagination.*` keys), so changing app locale is enough
- * for most cases — this story only demonstrates per-instance overrides.
+ * `labels` lets the consumer override any of the built-in / localised strings.
+ * `results` accepts any `ReactNode`, so you can drop in inline markup — here a
+ * bold count, an em-dashed clamp, and an Estonian unit. `previous` / `next` /
+ * `pageSize` swap to Estonian via the same prop.
  */
 export const CustomLabels: Story = {
   args: {
-    pageCount: 10,
-    defaultPage: 1,
-    totalItems: 97,
-    pageSize: 10,
-    pageSizeOptions: [10, 25, 50],
+    pageCount: 24,
+    defaultPage: 3,
+    totalItems: 1234,
+    pageSize: 50,
+    pageSizeOptions: [25, 50, 100],
     labels: {
-      ariaLabel: 'Lehekülgede sirvimine',
-      previous: 'Eelmine lehekülg',
-      next: 'Järgmine lehekülg',
-      pageAriaLabel: (page) => `Mine leheküljele ${page}`,
-      currentPageAriaLabel: (page) => `Praegune lehekülg, lehekülg ${page}`,
-      results: (count) => `${count} tulemust`,
-      pageSize: 'Kuva korraga',
-      pageStatus: (page, total) => `Lehekülg ${page} / ${total}`,
+      results: (count) =>
+        count > 999 ? (
+          <>
+            <strong>1000+</strong> tulemust
+          </>
+        ) : (
+          <>
+            <strong>{count}</strong> tulemust
+          </>
+        ),
+      previous: 'Eelmine',
+      next: 'Järgmine',
+      pageSize: 'Tulemusi lehel',
     },
   },
 };

@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { forwardRef, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { type Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -20,16 +20,7 @@ export interface PaginationItem {
 }
 
 export type PaginationBackground = 'white' | 'transparent';
-
-/**
- * Visibility toggle for the results / page-size / pager slots.
- * - `true` — always hidden
- * - `false` (default) — always visible
- * - `'sm'` / `'md'` / `'lg'` / `'xl'` / `'xxl'` — hidden below that breakpoint
- *
- * Mirrors the `boolean | breakpoint` pattern used elsewhere in the design
- * system (e.g. `Modal`'s `fullscreen` prop).
- */
+export type PaginationBorders = 'top' | 'bottom' | 'both' | 'none';
 export type PaginationVisibility = boolean | Exclude<Breakpoint, 'xs'>;
 
 export interface PaginationLabels {
@@ -60,9 +51,11 @@ export interface PaginationLabels {
   currentPageAriaLabel: (page: number) => string;
   /**
    * Rendered to the left of the pagination nav when `totalItems` is set.
+   * Returns any React node, so consumers can mix copy with formatting markup
+   * (e.g. a bold count or a status badge) — not just a plain string.
    * @default (count) => `${count} results`
    */
-  results: (count: number) => string;
+  results: (count: number) => ReactNode;
   /**
    * Prefix label for the page-size select.
    * @default 'Show per page'
@@ -127,11 +120,26 @@ export interface PaginationProps {
    */
   labels?: Partial<PaginationLabels>;
   /**
-   * Background variant. `transparent` removes the surface fill and top
-   * border — use it when pagination sits on a non-white container.
+   * Background variant. `transparent` removes the surface fill — use it when
+   * pagination sits on a non-white container. Border behaviour is controlled
+   * separately via `borders`.
    * @default white
    */
   background?: PaginationBackground;
+  /**
+   * Where the separator border is drawn around the pagination strip:
+   * - `'top'` (default) — separator above only (typical "table then pager"
+   *   layout).
+   * - `'both'` — separator above and below (split layout where the pager is
+   *   sandwiched between content rows, e.g. a fixed header table + a footer
+   *   beneath the pager).
+   * - `'none'` — borderless, for embedded contexts where the outer container
+   *   already provides framing.
+   *
+   * Ignored when `background='transparent'` — that variant is always borderless.
+   * @default top
+   */
+  borders?: PaginationBorders;
   /**
    * Hide the "X results" label even when `totalItems` is set. Pass a
    * breakpoint name (e.g. `"md"`) to hide only below that breakpoint.
@@ -150,6 +158,22 @@ export interface PaginationProps {
    * @default false
    */
   hidePager?: PaginationVisibility;
+  /**
+   * Keep the Previous / Next buttons visible even when they would be disabled
+   * (Previous on the first page, Next on the last). Default `false` drops the
+   * disabled edge button entirely — compact layout. Set `true` to keep both
+   * buttons rendered (disabled) at the edges so the pager width stays stable.
+   * @default false
+   */
+  showPrevNextButtons?: boolean;
+  /**
+   * Show the textual `previous` / `next` labels alongside the arrow icons on
+   * the edge nav buttons. The labels are sourced from `labels.previous` /
+   * `labels.next` (or the corresponding i18n keys). Default keeps the
+   * icon-only Figma variant.
+   * @default false
+   */
+  showEdgeNavLabels?: boolean;
   /**
    * Additional class name on the root element.
    */
@@ -179,9 +203,12 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     siblingCount = 1,
     labels,
     background = 'white',
+    borders = 'top',
     hideResults = false,
     hidePageSize = false,
     hidePager = false,
+    showPrevNextButtons = false,
+    showEdgeNavLabels = false,
     className,
   } = props;
 
@@ -268,6 +295,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const rootClassName = cn(
     styles['tedi-pagination'],
     styles[`tedi-pagination--bg-${background}`],
+    background !== 'transparent' && styles[`tedi-pagination--borders-${borders}`],
     {
       [styles['tedi-pagination--no-pager']]: !showPager,
       [styles['tedi-pagination--no-results']]: !showResults,
@@ -312,30 +340,36 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       <div className={styles['tedi-pagination__slot-center']}>
         {showPager && (
           <nav aria-label={mergedLabels.ariaLabel} className={styles['tedi-pagination__nav']}>
-            <Button
-              type="button"
-              className={cn(
-                styles['tedi-pagination__button'],
-                styles['tedi-pagination__button--nav'],
-                styles['tedi-pagination__button--nav-previous']
-              )}
-              aria-label={mergedLabels.previous}
-              disabled={previousItem?.disabled}
-              onClick={() => handlePageChange(previousItem?.page ?? null)}
-              noStyle
-            >
-              <Icon name="arrow_back" size={18} color="brand" />
-            </Button>
+            {!showPrevNextButtons && previousItem?.disabled ? null : (
+              <Button
+                type="button"
+                className={cn(
+                  styles['tedi-pagination__button'],
+                  styles['tedi-pagination__button--nav'],
+                  styles['tedi-pagination__button--nav-previous'],
+                  { [styles['tedi-pagination__button--nav-with-label']]: showEdgeNavLabels }
+                )}
+                aria-label={mergedLabels.previous}
+                disabled={previousItem?.disabled}
+                onClick={() => handlePageChange(previousItem?.page ?? null)}
+                noStyle
+              >
+                {showEdgeNavLabels ? (
+                  <span className={styles['tedi-pagination__nav-icon']}>
+                    <Icon name="arrow_back" size={18} color="brand" />
+                  </span>
+                ) : (
+                  <Icon name="arrow_back" size={18} color="brand" />
+                )}
+                {showEdgeNavLabels && (
+                  <span className={styles['tedi-pagination__nav-label']}>{mergedLabels.previous}</span>
+                )}
+              </Button>
+            )}
 
             {!useCompactPicker && (
               <ul className={styles['tedi-pagination__list']}>
                 {pageItems.map((item, index) => {
-                  // Slot-based key keeps each `<li>` in the same DOM position when
-                  // the active page crosses a threshold and the slot's number
-                  // shifts (e.g. "5" → "4"). With page-number keys React unmounts
-                  // and remounts the button, killing any CSS transitions on the
-                  // `--selected` state. Reusing the DOM lets the label-fade and
-                  // background animations land smoothly.
                   const slotKey = `slot-${index}`;
                   if (item.type === 'ellipsis') {
                     return (
@@ -365,9 +399,6 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
                         onClick={() => handlePageChange(pageNumber)}
                         noStyle
                       >
-                        {/* Inner span keyed by the page number so the new digit
-                            remounts and fades in via CSS while the outer button
-                            (kept stable by the slot key) animates its background. */}
                         <span key={pageNumber} className={styles['tedi-pagination__button-label']}>
                           {pageNumber}
                         </span>
@@ -397,20 +428,30 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
               </button>
             )}
 
-            <Button
-              type="button"
-              className={cn(
-                styles['tedi-pagination__button'],
-                styles['tedi-pagination__button--nav'],
-                styles['tedi-pagination__button--nav-next']
-              )}
-              aria-label={mergedLabels.next}
-              disabled={nextItem?.disabled}
-              onClick={() => handlePageChange(nextItem?.page ?? null)}
-              noStyle
-            >
-              <Icon name="arrow_forward" size={18} color="brand" />
-            </Button>
+            {!showPrevNextButtons && nextItem?.disabled ? null : (
+              <Button
+                type="button"
+                className={cn(
+                  styles['tedi-pagination__button'],
+                  styles['tedi-pagination__button--nav'],
+                  styles['tedi-pagination__button--nav-next'],
+                  { [styles['tedi-pagination__button--nav-with-label']]: showEdgeNavLabels }
+                )}
+                aria-label={mergedLabels.next}
+                disabled={nextItem?.disabled}
+                onClick={() => handlePageChange(nextItem?.page ?? null)}
+                noStyle
+              >
+                {showEdgeNavLabels && <span className={styles['tedi-pagination__nav-label']}>{mergedLabels.next}</span>}
+                {showEdgeNavLabels ? (
+                  <span className={styles['tedi-pagination__nav-icon']}>
+                    <Icon name="arrow_forward" size={18} color="brand" />
+                  </span>
+                ) : (
+                  <Icon name="arrow_forward" size={18} color="brand" />
+                )}
+              </Button>
+            )}
           </nav>
         )}
       </div>

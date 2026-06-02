@@ -27,7 +27,19 @@
 
 .tedi-pagination--bg-white {
   background: var(--general-surface-primary);
+}
+
+.tedi-pagination--borders-top {
   border-top: 1px solid var(--general-border-secondary);
+}
+
+.tedi-pagination--borders-bottom {
+  border-bottom: 1px solid var(--general-border-secondary);
+}
+
+.tedi-pagination--borders-both {
+  border-top: 1px solid var(--general-border-secondary);
+  border-bottom: 1px solid var(--general-border-secondary);
 }
 
 .tedi-pagination--bg-transparent {
@@ -207,6 +219,55 @@
   }
 }
 
+.tedi-pagination__button--nav-with-label {
+  gap: var(--layout-grid-gutters-04);
+  width: auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+
+  &:hover:not(:disabled, .tedi-pagination__button--selected),
+  &:active:not(:disabled, .tedi-pagination__button--selected),
+  &:focus-visible:not(:disabled, .tedi-pagination__button--selected) {
+    background: transparent;
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:hover:not(:disabled) .tedi-pagination__nav-icon {
+    color: var(--button-main-neutral-text-hover);
+    background: var(--button-main-neutral-icon-only-background-hover);
+  }
+
+  &:active:not(:disabled) .tedi-pagination__nav-icon {
+    color: var(--button-main-neutral-text-active);
+    background: var(--button-main-neutral-icon-only-background-active);
+  }
+
+  &:focus-visible:not(:disabled) .tedi-pagination__nav-icon {
+    color: var(--button-main-neutral-text-focus);
+    background: var(--button-main-neutral-icon-only-background-focus);
+    box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
+      0 0 0 var(--tedi-borders-03) var(--tedi-primary-500);
+  }
+}
+
+.tedi-pagination__nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--pagination-button-size);
+  height: var(--pagination-button-size);
+  background: var(--button-main-neutral-icon-only-background-default);
+  border: 1px solid var(--tedi-neutral-100);
+  border-radius: 100%;
+}
+
+.tedi-pagination__nav-label {
+  font-size: var(--body-small-regular-size);
+  color: inherit;
+}
+
 .tedi-pagination__button--nav-previous {
   @include breakpoints.media-breakpoint-down(md) {
     grid-column: 1;
@@ -260,6 +321,13 @@
   flex: 0 0 auto;
   gap: var(--tedi-dimensions-05);
   align-items: center;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    flex-direction: column;
+    gap: var(--form-field-inner-spacing);
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .tedi-pagination__page-size-label {

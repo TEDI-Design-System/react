@@ -163,14 +163,76 @@ describe('Pagination component', () => {
     expect(screen.getByRole('button', { name: /Current page, page 4/i })).toBeInTheDocument();
   });
 
-  it('disables Previous on the first page and Next on the last', () => {
-    const { rerender } = render(<Pagination pageCount={3} page={1} />);
+  it('disables Previous on the first page and Next on the last when showPrevNextButtons keeps them rendered', () => {
+    const { rerender } = render(<Pagination pageCount={3} page={1} showPrevNextButtons />);
     expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /Next page/i })).not.toBeDisabled();
 
-    rerender(<Pagination pageCount={3} page={3} />);
+    rerender(<Pagination pageCount={3} page={3} showPrevNextButtons />);
     expect(screen.getByRole('button', { name: /Previous page/i })).not.toBeDisabled();
     expect(screen.getByRole('button', { name: /Next page/i })).toBeDisabled();
+  });
+
+  it('drops the disabled edge nav button by default (compact mode)', () => {
+    const { rerender } = render(<Pagination pageCount={3} page={1} />);
+    expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+
+    rerender(<Pagination pageCount={3} page={3} />);
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Next page/i })).not.toBeInTheDocument();
+  });
+
+  it('keeps both edge nav buttons rendered (disabled) when showPrevNextButtons is true', () => {
+    render(<Pagination pageCount={3} page={1} showPrevNextButtons />);
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+  });
+
+  it('renders visible Previous / Next label text when showEdgeNavLabels is true', () => {
+    render(<Pagination pageCount={5} defaultPage={3} showEdgeNavLabels />);
+    // The label sits inside the button (aria-label still wins as the accessible name).
+    const prev = screen.getByRole('button', { name: /Previous page/i });
+    const next = screen.getByRole('button', { name: /Next page/i });
+    expect(prev).toHaveTextContent(/Previous page/i);
+    expect(next).toHaveTextContent(/Next page/i);
+  });
+
+  it('keeps edge nav buttons icon-only by default (no visible Previous/Next text)', () => {
+    render(<Pagination pageCount={5} defaultPage={3} />);
+    const prev = screen.getByRole('button', { name: /Previous page/i });
+    expect(prev).not.toHaveTextContent(/Previous page/i);
+  });
+
+  it('uses a custom results label when `labels.results` is provided', () => {
+    render(
+      <Pagination
+        pageCount={5}
+        defaultPage={1}
+        totalItems={1234}
+        labels={{ results: (count) => (count > 999 ? '1000+ tulemust' : `${count} tulemust`) }}
+      />
+    );
+    expect(screen.getByText('1000+ tulemust')).toBeInTheDocument();
+  });
+
+  it('accepts a ReactNode (JSX) from `labels.results`', () => {
+    render(
+      <Pagination
+        pageCount={5}
+        defaultPage={1}
+        totalItems={42}
+        labels={{
+          results: (count) => (
+            <>
+              <strong data-testid="results-count">{count}</strong> tulemust
+            </>
+          ),
+        }}
+      />
+    );
+    expect(screen.getByTestId('results-count')).toHaveTextContent('42');
+    expect(screen.getByText(/tulemust/)).toBeInTheDocument();
   });
 
   it('Previous / Next move the current page by one', () => {
@@ -228,7 +290,6 @@ describe('Pagination component', () => {
 
     const combobox = screen.getByRole('combobox', { name: /Page size/i });
     expect(combobox).toBeInTheDocument();
-    // The current page size label is rendered inside the Select
     expect(screen.getByText('25')).toBeInTheDocument();
 
     await act(async () => {
@@ -297,6 +358,32 @@ describe('Pagination component', () => {
     expect(root?.className).toMatch(/tedi-pagination--bg-transparent/);
   });
 
+  it('applies the top border modifier by default', () => {
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} />);
+    const root = container.querySelector('[data-name="tedi-pagination"]');
+    expect(root?.className).toMatch(/tedi-pagination--borders-top/);
+  });
+
+  it('applies both top and bottom borders when borders="both"', () => {
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} borders="both" />);
+    const root = container.querySelector('[data-name="tedi-pagination"]');
+    expect(root?.className).toMatch(/tedi-pagination--borders-both/);
+  });
+
+  it('drops the border modifier when borders="none"', () => {
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} borders="none" />);
+    const root = container.querySelector('[data-name="tedi-pagination"]');
+    expect(root?.className).toMatch(/tedi-pagination--borders-none/);
+    expect(root?.className).not.toMatch(/tedi-pagination--borders-top\b/);
+    expect(root?.className).not.toMatch(/tedi-pagination--borders-both/);
+  });
+
+  it('skips the border modifier entirely when background="transparent"', () => {
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} background="transparent" borders="both" />);
+    const root = container.querySelector('[data-name="tedi-pagination"]');
+    expect(root?.className).not.toMatch(/tedi-pagination--borders-/);
+  });
+
   it('forwards ref to the root element', () => {
     const ref = createRef<HTMLDivElement>();
     render(<Pagination ref={ref} pageCount={3} defaultPage={1} />);
@@ -314,7 +401,6 @@ describe('Pagination — compact mobile picker (below md)', () => {
 
   it('swaps the page list for a compact trigger button labelled "current / total"', () => {
     render(<Pagination pageCount={10} defaultPage={3} />);
-    // Numeric page buttons are replaced by the picker trigger.
     expect(screen.queryByRole('button', { name: /Go to page 5/i })).not.toBeInTheDocument();
     const trigger = screen.getByRole('button', { name: /3 \/ 10/ });
     expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
