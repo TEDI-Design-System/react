@@ -671,6 +671,39 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 
 ## Misc
 
+### Attachment
+**Props:** `AttachmentProps` | fRef
+- `name: string` (required) — file label
+- `meta?: ReactNode` — secondary line inside the card (e.g. `'PDF'`, uploader)
+- `feedback?: FeedbackTextProps` — hint / error rendered below the card, wired via `aria-describedby`
+- `fileSize?: number` — bytes; rendered inline before the remove slot
+- `fileSizeUnit?: 'auto' | 'B' | 'KB' | 'MB' | 'GB' = 'auto'`
+- `fileSizeLocale?: string = 'et-EE'` — `Intl.NumberFormat` locale
+- `formatFileSize?: (bytes: number) => string` — full override for the file-size string
+- `icon?: string | null = 'description'` — left file-type glyph; pass `null` to omit
+- `href?: string` — renders the card as `<a>` (download / open); `target?: string` (defaults to `_blank` with `rel="noopener noreferrer"`)
+- `onRemove?: () => void` — when set, shows the inline remove button (visible during loading so the upload can be cancelled)
+- `removeIcon?: string = 'delete'`, `removeLabel?: string` — falls back to `${label('remove')} ${name}`
+- `isLoading?: boolean = false` — swaps `meta` for an inline `ProgressBar`; `progress?: number = 0` (0..100)
+- `isValid?: boolean` — `false` flips to the danger surface and adds an error glyph next to the name
+
+`href` and `onRemove` are independent: a row can be both a download link and removable. The progress bar takes over the `meta` slot during loading so upload feedback stays grouped.
+
+```tsx
+<Attachment name="contract.pdf" fileSize={1_240_000} href="/files/contract.pdf" />
+
+// Upload in progress
+<Attachment name="scan.jpg" isLoading progress={42} onRemove={cancel} />
+
+// Rejected by validation
+<Attachment
+  name="too-big.zip"
+  isValid={false}
+  feedback={{ text: 'File exceeds 10 MB limit', type: 'error' }}
+  onRemove={remove}
+/>
+```
+
 ### Separator
 **Props:** `SeparatorProps` | bp
 - `axis: 'horizontal' | 'vertical' = 'horizontal'`
