@@ -174,8 +174,8 @@
   }
 
   &:focus-visible {
-    border: 1px solid var(--tedi-neutral-100);
     outline: 1px solid var(--navigation-vertical-item-background-focus);
+    border: 1px solid var(--tedi-neutral-100);
   }
 }
 
@@ -362,8 +362,8 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
   }
 
   &:focus-visible {
-    border: 1px solid var(--tedi-neutral-100);
     outline: 1px solid var(--navigation-vertical-item-background-focus);
+    border: 1px solid var(--tedi-neutral-100);
   }
 }
 

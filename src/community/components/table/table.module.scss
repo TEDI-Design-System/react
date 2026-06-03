@@ -58,9 +58,9 @@
     }
 
     .sort__icon--desc {
+      transform: rotate(0);
       transition-duration: 600ms;
       transition-property: transform;
-      transform: rotate(0);
     }
   }
 

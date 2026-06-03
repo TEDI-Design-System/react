@@ -4,11 +4,11 @@
 
 html {
   box-sizing: border-box;
+  scroll-behavior: smooth;
   font-family: var(--font-family);
   line-height: var(--font-line-height-base);
   color: var(--general-text-primary);
   scroll-padding-top: var(--header-bottom-height, 0);
-  scroll-behavior: smooth;
 }
 
 html,

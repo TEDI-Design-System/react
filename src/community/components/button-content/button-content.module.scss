@@ -322,10 +322,10 @@ $btn-height-small: 2.25rem;
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-wrap: wrap;
-      word-break: break-word;
       -webkit-line-clamp: 2;
       line-clamp: 2;
+      word-break: break-word;
+      text-wrap: wrap;
       -webkit-box-orient: vertical;
     }
   }
