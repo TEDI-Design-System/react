@@ -41,10 +41,10 @@ $btn-width-large: 3.72rem;
   }
 
   &:focus-visible:not(:disabled, [aria-disabled='true']) {
-    background-color: $background-focus;
-    border-color: $border;
     outline: 2px solid $border-focus;
     outline-offset: 1px;
+    background-color: $background-focus;
+    border-color: $border;
   }
 
   &:disabled {
@@ -102,9 +102,9 @@ $btn-width-large: 3.72rem;
 
   &:focus-visible:not(:disabled) {
     color: $color-focus;
-    border-radius: 0;
     outline: 2px solid $color-focus;
     outline-offset: 1px;
+    border-radius: 0;
 
     .tedi-btn__text {
       text-decoration: underline;
@@ -209,8 +209,8 @@ $btn-width-large: 3.72rem;
     height: 1px !important;
     padding: 0 !important;
     overflow: hidden;
-    clip: rect(1px, 1px, 1px, 1px);
     border: 0 !important;
+    clip: rect(1px, 1px, 1px, 1px);
 
     @include mixins.visually-hidden;
   }
@@ -466,9 +466,9 @@ $btn-width-large: 3.72rem;
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;
-      word-break: break-word;
       -webkit-line-clamp: 2;
       line-clamp: 2;
+      word-break: break-word;
       -webkit-box-orient: vertical;
     }
   }

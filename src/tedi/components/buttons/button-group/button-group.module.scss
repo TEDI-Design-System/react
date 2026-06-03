@@ -104,9 +104,9 @@
       &.tedi-button-group__item--active:not(:disabled) {
         z-index: 1;
         color: var(--button-group-secondary-selected-text);
-        background-color: var(--button-group-secondary-selected-background);
         outline: 2px solid var(--button-group-secondary-selected-border);
         outline-offset: -2px;
+        background-color: var(--button-group-secondary-selected-background);
       }
 
       &:focus-visible:not(:disabled, .tedi-button-group__item--active) {
