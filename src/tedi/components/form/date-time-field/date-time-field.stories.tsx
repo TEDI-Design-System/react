@@ -1,6 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { enGB } from 'react-day-picker/locale';
 
 import { UnknownType } from '../../../types/commonTypes';
 import { Text } from '../../base/typography/text/text';
@@ -17,10 +16,6 @@ import { DateTimeField, DateTimeFieldProps } from './date-time-field';
 const meta: Meta<DateTimeFieldProps> = {
   component: DateTimeField,
   title: 'TEDI-Ready/Components/Form/DateTimeField',
-  args: {
-    locale: enGB,
-    localeCode: 'en-GB',
-  },
   argTypes: {
     inputProps: { control: false },
     locale: { control: false },
@@ -43,12 +38,6 @@ export default meta;
 
 type Story = StoryObj<DateTimeFieldProps>;
 
-// Meta-level `args` only flow into stories that read them; custom-render
-// stories below (Size, States, FieldOptions, DateConstraints) instantiate
-// DateTimeField directly, so they spread this object to inherit the same
-// English locale.
-const englishLocale = { locale: enGB, localeCode: 'en-GB' };
-
 const Template: StoryFn<DateTimeFieldProps> = (args) => (
   <Row>
     <Col lg={4} md={6} xs={12}>
@@ -57,18 +46,12 @@ const Template: StoryFn<DateTimeFieldProps> = (args) => (
   </Row>
 );
 
-/**
- * Side-by-side layout with the scroll-wheel time picker — matches the
- * Figma "One day → Default" frame. Calendar on the left, hour/minute wheel
- * on the right under the "Kellaaeg" / "Time" heading. Both are interactive
- * at the same time; the popover stays open until the user clicks outside.
- */
 export const Default: Story = {
   render: Template,
   args: {
     id: 'date-time-default',
-    label: 'Date',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa hh:mm',
     layout: 'side-by-side',
     stepMinutes: 1,
   },
@@ -85,10 +68,9 @@ export const Size: StoryFn = () => (
         </Col>
         <Col lg={10} xs={12} className="d-flex">
           <DateTimeField
-            {...englishLocale}
             id={`date-time-size-${size}`}
-            label="Date"
-            placeholder="dd.mm.yyyy hh:mm"
+            label="Kuupäev"
+            placeholder="pp.kk.aaaa hh:mm"
             inputProps={{ size }}
           />
         </Col>
@@ -108,7 +90,7 @@ export const States: Story = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col md={4} xs={12} className="display-flex align-items-center">
-            <DateTimeField {...englishLocale} id={state} label="Date and time" disabled={state === 'Disabled'} />
+            <DateTimeField id={state} label="Kuupäev ja kellaaeg" disabled={state === 'Disabled'} />
           </Col>
         </Row>
       ))}
@@ -118,10 +100,9 @@ export const States: Story = {
         </Col>
         <Col md={4} xs={12} className="display-flex align-items-center">
           <DateTimeField
-            {...englishLocale}
             id="success-datetimefield"
-            label="Date and time"
-            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
+            label="Kuupäev ja kellaaeg"
+            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'valid' } }}
           />
         </Col>
       </Row>
@@ -131,10 +112,9 @@ export const States: Story = {
         </Col>
         <Col md={4} xs={12} className="display-flex align-items-center">
           <DateTimeField
-            {...englishLocale}
             id="error-datetimefield"
-            label="Date and time"
-            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
+            label="Kuupäev ja kellaaeg"
+            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'error' } }}
           />
         </Col>
       </Row>
@@ -168,27 +148,20 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
-          <DateTimeField
-            {...englishLocale}
-            id="date-time-options-default"
-            label="Date and time"
-            placeholder="dd.mm.yyyy hh:mm"
-          />
+          <DateTimeField id="date-time-options-default" label="Kuupäev ja kellaaeg" placeholder="pp.kk.aaaa hh:mm" />
 
           <DateTimeField
-            {...englishLocale}
             id="date-time-options-hint"
-            label="Date and time with hint"
-            placeholder="dd.mm.yyyy hh:mm"
-            inputProps={{ helper: { text: 'dd.mm.yyyy hh:mm' } }}
+            label="Kuupäev ja kellaaeg vihjega"
+            placeholder="pp.kk.aaaa hh:mm"
+            inputProps={{ helper: { text: 'pp.kk.aaaa hh:mm' } }}
           />
 
           <div>
             <DateTimeField
-              {...englishLocale}
               id="date-time-options-shortcuts"
-              label="Date and time with shortcuts"
-              placeholder="dd.mm.yyyy hh:mm"
+              label="Kuupäev ja kellaaeg kiirvalikutega"
+              placeholder="pp.kk.aaaa hh:mm"
               value={shortcutValue}
               onChange={(v) => setShortcutValue(v instanceof Date ? v : undefined)}
             />
@@ -211,8 +184,8 @@ export const PredefinedTimeSlots: Story = {
   render: Template,
   args: {
     id: 'date-time-predefined',
-    label: 'Date',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa hh:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'button',
@@ -265,7 +238,7 @@ export const NoTimesAvailable: StoryFn<DateTimeFieldProps> = (args) => {
           disabledMatchers={{ dayOfWeek: [1] }}
           inputProps={
             noSlots
-              ? { helper: { text: 'No appointments available on this day — closed on Mondays.', type: 'error' } }
+              ? { helper: { text: 'Sellel päeval vastuvõtt puudub — esmaspäeviti suletud.', type: 'error' } }
               : undefined
           }
         />
@@ -275,8 +248,8 @@ export const NoTimesAvailable: StoryFn<DateTimeFieldProps> = (args) => {
 };
 NoTimesAvailable.args = {
   id: 'date-time-no-slots',
-  label: 'Appointment',
-  placeholder: 'dd.mm.yyyy hh:mm',
+  label: 'Vastuvõtuaeg',
+  placeholder: 'pp.kk.aaaa hh:mm',
   layout: 'side-by-side',
   timeGridVariant: 'button',
 };
@@ -293,8 +266,8 @@ export const PerDayTimeSlots: Story = {
   render: Template,
   args: {
     id: 'date-time-per-day',
-    label: 'Appointment',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Vastuvõtuaeg',
+    placeholder: 'pp.kk.aaaa hh:mm',
     layout: 'side-by-side',
     timeGridVariant: 'button',
     availableTimes: (date: Date) => {
@@ -310,8 +283,8 @@ export const MultiSteps: Story = {
   render: Template,
   args: {
     id: 'date-time-multi-step',
-    label: 'Time',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Kellaaeg',
+    placeholder: 'pp.kk.aaaa hh:mm',
     layout: 'multi-step',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'radio',
@@ -347,8 +320,8 @@ export const Range: Story = {
   render: Template,
   args: {
     id: 'date-time-range',
-    label: 'Date range',
-    placeholder: 'dd.mm.yyyy hh:mm – dd.mm.yyyy hh:mm',
+    label: 'Kuupäevavahemik',
+    placeholder: 'pp.kk.aaaa hh:mm – pp.kk.aaaa hh:mm',
     mode: 'range',
     stepMinutes: 1,
   },
@@ -358,8 +331,8 @@ export const RangePredefinedTimeSlots: Story = {
   render: Template,
   args: {
     id: 'date-time-range-predefined',
-    label: 'Date range',
-    placeholder: 'dd.mm.yyyy hh:mm – dd.mm.yyyy hh:mm',
+    label: 'Kuupäevavahemik',
+    placeholder: 'pp.kk.aaaa hh:mm – pp.kk.aaaa hh:mm',
     mode: 'range',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'button',
@@ -375,8 +348,8 @@ export const Controlled: Story = {
   render: ControlledTemplate,
   args: {
     id: 'date-time-controlled',
-    label: 'Date',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa hh:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
   },
@@ -404,30 +377,27 @@ export const DateConstraints: StoryFn = () => {
       <Col lg={6} xs={12}>
         <Text modifiers="bold">disablePast</Text>
         <DateTimeField
-          {...englishLocale}
           id="date-time-disable-past"
-          label="Future date and time only"
-          placeholder="dd.mm.yyyy hh:mm"
+          label="Ainult tulevikus"
+          placeholder="pp.kk.aaaa hh:mm"
           disablePast
         />
       </Col>
       <Col lg={6} xs={12}>
         <Text modifiers="bold">disableFuture</Text>
         <DateTimeField
-          {...englishLocale}
           id="date-time-disable-future"
-          label="Past date and time only"
-          placeholder="dd.mm.yyyy hh:mm"
+          label="Ainult minevikus"
+          placeholder="pp.kk.aaaa hh:mm"
           disableFuture
         />
       </Col>
       <Col lg={6} xs={12}>
-        <Text modifiers="bold">minDate / maxDate (±7 days)</Text>
+        <Text modifiers="bold">minDate / maxDate (±7 päeva)</Text>
         <DateTimeField
-          {...englishLocale}
           id="date-time-min-max"
-          label="Date inside a 14-day window"
-          placeholder="dd.mm.yyyy hh:mm"
+          label="Kuupäev 14-päevases vahemikus"
+          placeholder="pp.kk.aaaa hh:mm"
           minDate={minDate}
           maxDate={maxDate}
         />
@@ -445,8 +415,8 @@ export const YearGrid: Story = {
   render: Template,
   args: {
     id: 'date-time-year-grid',
-    label: 'Date',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa hh:mm',
     monthYearSelectType: 'grid',
   },
 };
@@ -463,8 +433,8 @@ export const Native: Story = {
   render: Template,
   args: {
     id: 'date-time-native',
-    label: 'Date',
-    placeholder: 'dd.mm.yyyy hh:mm',
+    label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa hh:mm',
     useNativePicker: true,
   },
 };
