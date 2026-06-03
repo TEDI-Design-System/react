@@ -1,3 +1,29 @@
+# [18.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.2...react-18.0.0-rc.3) (2026-06-02)
+
+
+### Features
+
+* **alert:** add action prop to replace ClosingButton if necessary [#552](https://github.com/TEDI-Design-System/react/issues/552) ([#659](https://github.com/TEDI-Design-System/react/issues/659)) ([529f191](https://github.com/TEDI-Design-System/react/commit/529f191f3175c8e5ebec385af74d340d5f822808)), closes [#652](https://github.com/TEDI-Design-System/react/issues/652)
+
+# [18.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.1...react-18.0.0-rc.2) (2026-06-01)
+
+
+### Features
+
+* **collapse:** add inverted variant [#647](https://github.com/TEDI-Design-System/react/issues/647) ([#650](https://github.com/TEDI-Design-System/react/issues/650)) ([76f7594](https://github.com/TEDI-Design-System/react/commit/76f75948c595f143b132109b5d0413c2fbd42f2c))
+
+# [18.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.2.0-rc.1...react-18.0.0-rc.1) (2026-06-01)
+
+
+### Features
+
+* **number-field:** add decimalSeparator prop [#596](https://github.com/TEDI-Design-System/react/issues/596) ([#623](https://github.com/TEDI-Design-System/react/issues/623)) ([c1de6d7](https://github.com/TEDI-Design-System/react/commit/c1de6d753db1a28b15ac89b881a30d9f716c09aa))
+
+
+### BREAKING CHANGES
+
+* **number-field:** onChange signature widened from (value: number) => void to (value: number | undefined) => void
+
 # [17.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.1.0...react-17.2.0-rc.1) (2026-06-01)
 
 

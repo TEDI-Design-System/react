@@ -43,6 +43,11 @@ export interface ILabelContext {
     ...args: TArgs
   ): string;
   setLocale: (locale: TediLanguage) => void;
+  /**
+   * Currently active locale. Exposed so components can derive locale-sensitive
+   * formatting defaults (e.g. `NumberField`'s `decimalSeparator`) without
+   * forcing every consumer to repeat the prop on every instance.
+   */
   locale: TediLanguage;
 }
 
