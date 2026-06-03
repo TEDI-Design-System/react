@@ -35,7 +35,7 @@ export const Tooltip = (props: TooltipProps) => {
       focusManager={{
         modal: false,
         order: ['reference', 'content'],
-        returnFocus: true,
+        returnFocus: false,
         ...focusManager,
       }}
       {...rest}
