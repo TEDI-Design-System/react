@@ -1,0 +1,80 @@
+.tedi-progress-bar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tedi-progress-bar__label-wrapper {
+  margin-bottom: var(--layout-grid-gutters-08);
+}
+
+.tedi-progress-bar__row {
+  display: flex;
+  flex: 1;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+
+  &--label-inline {
+    gap: var(--layout-grid-gutters-16);
+  }
+}
+
+.tedi-progress-bar__label {
+  margin: 0;
+}
+
+.tedi-progress-bar__track {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: var(--progress-bar-height);
+  overflow: hidden;
+  background-color: var(--progress-bar-background-passive);
+  border: var(--tedi-borders-01) solid var(--progress-bar-border-default);
+  border-radius: var(--progress-bar-radius);
+}
+
+.tedi-progress-bar__fill {
+  height: 100%;
+  background-color: var(--progress-bar-background-active);
+  border-radius: var(--progress-bar-radius);
+  transition: width 200ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.tedi-progress-bar__value {
+  font-size: var(--body-regular-size);
+  line-height: var(--body-regular-line-height);
+  color: var(--progress-bar-range-label-text);
+}
+
+.tedi-progress-bar__hint-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--layout-grid-gutters-08);
+  align-items: flex-start;
+  justify-content: space-between;
+
+  &--with-value {
+    margin-top: var(--form-field-outer-spacing);
+  }
+
+  .tedi-progress-bar__value {
+    font-size: var(--body-small-size);
+    line-height: var(--body-small-line-height);
+  }
+}
+
+.tedi-progress-bar__hint {
+  flex: 1;
+  min-width: 0;
+}
+
+.tedi-progress-bar--small {
+  .tedi-progress-bar__track {
+    height: var(--progress-bar-height-sm);
+  }
+}

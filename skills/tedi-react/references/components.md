@@ -679,6 +679,26 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
 
+### ProgressBar
+**Props:** `ProgressBarProps`
+- `value?: number = 0` — clamped to `0..100`; `NaN` treated as `0`
+- `id?: string` — forwarded to the bar (auto-generated when omitted)
+- `small?: boolean = false` — 4px bar (default 8px)
+- `label?: string`, `labelPosition?: 'top' | 'horizontal' = 'top'`, `required?: boolean = false`
+- `showValue?: boolean = true`, `valuePosition?: 'horizontal' | 'bottom' = 'horizontal'`
+- `valueLabel?: string` — override the rendered % (e.g. `"1 / 5"`); also exposed via `aria-valuetext`
+- `ariaLabel?: string` — falls back to `label`
+- `helper?: FeedbackTextProps` — hint or error row rendered below the bar
+- `className?: string`
+
+Renders `role="progressbar"` with `aria-valuenow / aria-valuemin / aria-valuemax`. Pair with `label` (or `ariaLabel`) for the accessible name. Error / hint rows use the shared `FeedbackText` component.
+
+```tsx
+<ProgressBar value={60} label="Upload progress" />
+<ProgressBar value={20} label="Step" valueLabel="1 / 5" />
+<ProgressBar value={50} label="Upload" helper={{ text: 'Upload failed', type: 'error' }} />
+```
+
 ---
 
 # Community Components
