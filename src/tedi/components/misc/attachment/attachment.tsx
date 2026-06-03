@@ -121,7 +121,7 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   /**
    * Material icon name for the remove button. Defaults to `'close'`. Common
    * alternative: `'delete'` (trash can) for already-saved attachments.
-   * @default close
+   * @default delete
    */
   removeIcon?: string;
   /**
