@@ -172,13 +172,13 @@ export const OnClickType: Story = {
       <VerticalSpacing>
         <Row>
           <Col lg={3} md={6}>
-            <Text>Kella nupp on klikitav</Text>
+            <Text>Clock button is clickable</Text>
             <TimeField label="Kellaaeg" placeholder="hh:mm" id="calendar-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
-            <Text>Sisendiväli on klikitav</Text>
+            <Text>Input is clickable</Text>
             <TimeField label="Kellaaeg" placeholder="hh:mm" id="calendar-input-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
