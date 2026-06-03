@@ -6,10 +6,14 @@ import { FileUploadFile, useFileUpload, UseFileUploadProps } from '../../../help
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { List } from '../../content/list';
-import { Attachment } from '../../misc/attachment/attachment';
+import { Attachment, AttachmentProps } from '../../misc/attachment/attachment';
 import FeedbackText, { FeedbackTextProps } from '../feedback-text/feedback-text';
 import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './file-dropzone.module.scss';
+
+export type FileDropzoneAttachmentProps =
+  | Partial<Omit<AttachmentProps, 'name' | 'onRemove'>>
+  | ((file: FileUploadFile) => Partial<Omit<AttachmentProps, 'name' | 'onRemove'>>);
 
 export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLabel'>, UseFileUploadProps {
   /*
@@ -32,11 +36,27 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
    * Disables the file dropzone, preventing user interaction.
    */
   disabled?: boolean;
+  /**
+   * Overrides forwarded to each rendered `Attachment` (e.g. `icon`,
+   * `fileSize`, `meta`, `progress`, `removeIcon`, `feedback`). Pass a
+   * function to vary per file. Defaults applied by `FileDropzone`
+   * (`name`, `isValid`, `isLoading`, `onRemove`) take precedence and
+   * cannot be overridden.
+   */
+  attachmentProps?: FileDropzoneAttachmentProps;
 }
 
 export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
   const { getLabel } = useLabels();
-  const { label = getLabel('file-dropzone.label'), className, disabled = false, helper, id, ...rest } = props;
+  const {
+    label = getLabel('file-dropzone.label'),
+    className,
+    disabled = false,
+    helper,
+    id,
+    attachmentProps,
+    ...rest
+  } = props;
   const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove } = useFileUpload(props);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -90,16 +110,20 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           style="none"
           aria-label={getLabel('file-dropzone.selected-files')}
         >
-          {innerFiles.map((file: FileUploadFile) => (
-            <List.Item key={file.id || file.name} className={styles['tedi-file-dropzone__file-list-item']}>
-              <Attachment
-                name={file.name ?? ''}
-                isValid={file.isValid}
-                isLoading={file.isLoading}
-                onRemove={() => onFileRemove(file)}
-              />
-            </List.Item>
-          ))}
+          {innerFiles.map((file: FileUploadFile) => {
+            const overrides = typeof attachmentProps === 'function' ? attachmentProps(file) : attachmentProps;
+            return (
+              <List.Item key={file.id || file.name} className={styles['tedi-file-dropzone__file-list-item']}>
+                <Attachment
+                  {...overrides}
+                  name={file.name ?? ''}
+                  isValid={file.isValid ?? overrides?.isValid}
+                  isLoading={file.isLoading ?? overrides?.isLoading}
+                  onRemove={() => onFileRemove(file)}
+                />
+              </List.Item>
+            );
+          })}
         </List>
       )}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
