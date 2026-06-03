@@ -22,7 +22,7 @@ export interface TooltipProps
 }
 
 export const Tooltip = (props: TooltipProps) => {
-  const { openWith = 'hover', focusManager, ...rest } = props;
+  const { openWith = 'hover', ...rest } = props;
 
   return (
     <Overlay
@@ -32,12 +32,6 @@ export const Tooltip = (props: TooltipProps) => {
       }}
       openWith={openWith}
       role="tooltip"
-      focusManager={{
-        modal: false,
-        order: ['reference', 'content'],
-        returnFocus: false,
-        ...focusManager,
-      }}
       {...rest}
     />
   );
