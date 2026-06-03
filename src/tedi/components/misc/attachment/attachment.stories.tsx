@@ -128,14 +128,18 @@ export const AsDownloadLink: StoryFn<AttachmentProps> = () => (
 );
 
 /**
- * Async upload UX: `isLoading` swaps the remove button for a spinner so the
- * user can't remove the file mid-upload. `isValid={false}` flips the row to
- * the danger surface and surfaces the error glyph next to the name.
+ * Async upload UX: `isLoading` swaps the meta line for an inline
+ * `ProgressBar` and hides the remove button so the user can't remove the
+ * file mid-upload. `progress` controls the bar value (0..100). If `meta` is
+ * also set, it's passed into the progress bar's feedback slot instead of
+ * rendering on its own line. `isValid={false}` flips the row to the danger
+ * surface and surfaces the error glyph next to the name.
  */
 export const LoadingAndInvalid: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.5}>
-      <Attachment name="arve_üleslaadimine.pdf" meta="Üleslaadimine…" isLoading onRemove={() => null} />
+      <Attachment name="arve_üleslaadimine.pdf" isLoading progress={45} onRemove={() => null} />
+      <Attachment name="suur_pilt.jpg" meta="Üleslaadimine…" isLoading progress={72} onRemove={() => null} />
       <Attachment
         name="pilt_2026_06.heic"
         fileSize={8_500_000}

@@ -6,8 +6,8 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import FeedbackText, { FeedbackTextProps } from '../../form/feedback-text/feedback-text';
-import { Spinner } from '../../loaders/spinner/spinner';
 import { Link } from '../../navigation/link/link';
+import { ProgressBar } from '../progress-bar/progress-bar';
 import styles from './attachment.module.scss';
 
 export type AttachmentFileSizeUnit = 'auto' | 'B' | 'KB' | 'MB' | 'GB';
@@ -114,8 +114,8 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   target?: string;
   /**
    * Click handler for the remove action. When provided, renders the inline
-   * delete button on the right. Ignored while `isLoading` is true (the
-   * spinner replaces the button to prevent removal mid-upload).
+   * delete button on the right. Stays visible during `isLoading` so the user
+   * can cancel an in-flight upload.
    */
   onRemove?: () => void;
   /**
@@ -131,10 +131,21 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
    */
   removeLabel?: string;
   /**
-   * Shows a spinner instead of the remove button — use during async uploads.
+   * Shows an upload progress bar inside the card — use during async uploads.
+   * The progress value is controlled via the `progress` prop (defaults to
+   * `0`). When `meta` is also set, it's passed into the progress bar's
+   * feedback slot instead of rendering on its own row, so the two pieces of
+   * upload feedback stay grouped. The remove button stays visible during
+   * loading so the user can cancel the upload.
    * @default false
    */
   isLoading?: boolean;
+  /**
+   * Upload progress as a percentage (0..100). Only rendered when `isLoading`
+   * is true. Out-of-range values are clamped by `ProgressBar`.
+   * @default 0
+   */
+  progress?: number;
   /**
    * `false` flips the attachment into the danger surface variant and surfaces
    * a warning glyph next to the file name. Use for files that failed
@@ -164,13 +175,14 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     removeIcon = 'delete',
     removeLabel,
     isLoading = false,
+    progress,
     isValid,
     className,
     id,
     ...rest
   } = props;
 
-  const hasMultiLine = !!meta;
+  const hasMultiLine = !!meta || isLoading;
   const reactId = React.useId();
   const rowId = id ?? `tedi-attachment-${reactId}`;
   const feedbackId = feedback ? feedback.id ?? `${rowId}-feedback` : undefined;
@@ -214,10 +226,19 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
             />
           )}
         </span>
-        {meta && (
-          <Text element="span" modifiers="small" color="tertiary" className={styles['tedi-attachment__meta']}>
-            {meta}
-          </Text>
+        {isLoading ? (
+          <ProgressBar
+            value={progress}
+            ariaLabel={name}
+            helper={meta ? { text: meta } : undefined}
+            className={styles['tedi-attachment__progress']}
+          />
+        ) : (
+          meta && (
+            <Text element="span" modifiers="small" color="tertiary" className={styles['tedi-attachment__meta']}>
+              {meta}
+            </Text>
+          )
         )}
       </span>
       {formattedFileSize && (
@@ -228,11 +249,7 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     </>
   );
 
-  const action = isLoading ? (
-    <span className={styles['tedi-attachment__action']} aria-hidden="true">
-      <Spinner size={18} />
-    </span>
-  ) : onRemove ? (
+  const action = onRemove ? (
     <Button
       className={styles['tedi-attachment__remove']}
       onClick={(event) => {

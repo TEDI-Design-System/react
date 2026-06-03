@@ -60,9 +60,29 @@ describe('Attachment component', () => {
     expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
   });
 
-  it('hides the remove button while loading', () => {
-    render(<Attachment name="invoice.pdf" isLoading onRemove={() => undefined} />);
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  it('keeps the remove button visible while loading so the upload can be cancelled', () => {
+    const handleRemove = jest.fn();
+    render(<Attachment name="invoice.pdf" isLoading onRemove={handleRemove} />);
+    const removeButton = screen.getByRole('button', { name: /invoice\.pdf/ });
+    fireEvent.click(removeButton);
+    expect(handleRemove).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders a progress bar while loading and reflects the progress value', () => {
+    render(<Attachment name="invoice.pdf" isLoading progress={42} onRemove={() => undefined} />);
+    const bar = screen.getByRole('progressbar', { name: 'invoice.pdf' });
+    expect(bar).toHaveAttribute('aria-valuenow', '42');
+  });
+
+  it('uses meta as the progress bar feedback when both are provided while loading', () => {
+    render(<Attachment name="invoice.pdf" isLoading progress={10} meta="Üleslaadimine…" />);
+    expect(screen.getByText('Üleslaadimine…')).toBeInTheDocument();
+    expect(screen.queryByText('Üleslaadimine…')?.closest('.tedi-attachment__meta')).toBeNull();
+  });
+
+  it('does not render a progress bar when not loading', () => {
+    render(<Attachment name="invoice.pdf" />);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
   it('applies the invalid modifier when `isValid` is false', () => {

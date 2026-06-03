@@ -79,6 +79,10 @@
   display: inline-block;
 }
 
+.tedi-attachment__progress {
+  width: 100%;
+}
+
 .tedi-attachment__file-size {
   flex-shrink: 0;
   white-space: nowrap;
