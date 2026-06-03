@@ -24,18 +24,18 @@ $popover-width: (
 
   &__arrow {
     z-index: 1;
-    clip-path: inset(0 -5px -5px -5px);
     filter: drop-shadow(0 0 5px var(--tedi-alpha-20));
+    clip-path: inset(0 -5px -5px -5px);
     fill: var(--popover-background);
 
     &--border {
       box-sizing: border-box;
       width: 1.5rem;
       height: 1.5rem;
-      clip-path: polygon(100% 0, 100% 100%, 0 100%);
       background: var(--popover-background);
       border-right: var(--popover-border-width-lg) solid var(--popover-border-prominent);
       border-bottom: var(--popover-border-width-lg) solid var(--popover-border-prominent);
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
       fill: transparent;
     }
   }

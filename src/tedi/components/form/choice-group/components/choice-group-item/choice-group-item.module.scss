@@ -127,8 +127,8 @@
     }
 
     &.tedi-choice-group-item--disabled {
-      background-color: var(--form-checkbox-radio-card-secondary-disabled-selected-background);
       outline-color: var(--form-checkbox-radio-card-secondary-disabled-selected-border);
+      background-color: var(--form-checkbox-radio-card-secondary-disabled-selected-background);
     }
 
     &.tedi-choice-group-item--disabled label,
@@ -314,9 +314,9 @@
 
   .tedi-choice-group-item--card-secondary {
     &:not(.tedi-choice-group-item--disabled):hover {
-      background-color: var(--form-checkbox-radio-card-secondary-hover-background);
       outline: 2px solid var(--form-checkbox-radio-card-secondary-hover-border);
       outline-offset: -2px;
+      background-color: var(--form-checkbox-radio-card-secondary-hover-background);
 
       label,
       .tedi-choice-group-item__label,
