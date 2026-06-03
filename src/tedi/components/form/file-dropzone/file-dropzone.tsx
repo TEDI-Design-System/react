@@ -5,10 +5,8 @@ import { useDropzone } from 'react-dropzone';
 import { FileUploadFile, useFileUpload, UseFileUploadProps } from '../../../helpers/hooks/use-file-upload';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
-import ClosingButton from '../../buttons/closing-button/closing-button';
-import { Card, CardContent } from '../../cards/card';
 import { List } from '../../content/list';
-import { Col, Row } from '../../layout/grid';
+import { Attachment } from '../../misc/attachment/attachment';
 import FeedbackText, { FeedbackTextProps } from '../feedback-text/feedback-text';
 import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './file-dropzone.module.scss';
@@ -94,27 +92,12 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         >
           {innerFiles.map((file: FileUploadFile) => (
             <List.Item key={file.id || file.name} className={styles['tedi-file-dropzone__file-list-item']}>
-              <Card
-                background={file.isValid === false ? 'danger-primary' : 'tertiary'}
-                borderless
-                className={styles['tedi-file-dropzone__file-item']}
-              >
-                <CardContent padding={0.5}>
-                  <Row alignItems="center">
-                    <Col className={styles['tedi-file-dropzone__file-name']}>
-                      {file.name}{' '}
-                      {file.isValid === false && <Icon name="info" color="danger" display="inline" size={18} />}
-                    </Col>
-                    <Col width="auto">
-                      <ClosingButton
-                        iconSize={18}
-                        title={getLabel('remove') + ' ' + file.name}
-                        onClick={() => onFileRemove(file)}
-                      />
-                    </Col>
-                  </Row>
-                </CardContent>
-              </Card>
+              <Attachment
+                name={file.name ?? ''}
+                isValid={file.isValid}
+                isLoading={file.isLoading}
+                onRemove={() => onFileRemove(file)}
+              />
             </List.Item>
           ))}
         </List>
