@@ -583,6 +583,32 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### TableOfContents
+Navigational TOC for long pages / multistep forms. **Compound API** — composed from `TableOfContents.Item` children; nest items by placing `Item`s inside an `Item` (alongside its link). Renders a (optionally sticky) card. Mark the current section with `activeId` for the left accent bar + active link colour; the active branch auto-expands its nested items. _(A responsive mobile variant is pending a TEDI-Ready `Accordion`; for now the card renders at every breakpoint.)_
+
+- `<TableOfContents>` props: `heading?` (default LabelProvider `table-of-contents.title`), `activeId?`, `numbered?` (ordered list with auto hierarchical numbers `1.` / `2.` / `2.1`), `showIcons?` (multistep-form glyphs: check / neutral check / warning), `sticky?: boolean = true`, `className?`. Children must be `TableOfContents.Item` elements (direct children — don't wrap them in another component).
+- `<TableOfContents.Item id? isValid? separator? hideIcon?>` — its non-`Item` children are the link / label; nested `TableOfContents.Item` children become its sub-items.
+- Semantics: `<nav aria-labelledby>` + `<ul>`/`<ol>` + `<li>`, active item `aria-current="true"`. Provide the item link/button yourself; pass **`underline={false}` on the `Link`** so it matches the design (no underline at rest, underline on hover). Use matching `id`s on the in-page sections (and `tabIndex={-1}` on them for SR focus).
+
+```tsx
+<TableOfContents activeId="analysis" heading="Contents">
+  <TableOfContents.Item id="intro">
+    <Link href="#intro" underline={false}>Intro</Link>
+  </TableOfContents.Item>
+  <TableOfContents.Item id="methods">
+    <Link href="#methods" underline={false}>Methods</Link>
+    <TableOfContents.Item id="analysis">
+      <Link href="#analysis" underline={false}>Analysis</Link>
+    </TableOfContents.Item>
+  </TableOfContents.Item>
+</TableOfContents>
+
+// Numbered: <TableOfContents numbered>…</TableOfContents>
+// Multistep form: <TableOfContents showIcons activeId="step-2">
+//   <TableOfContents.Item id="step-1" isValid><Link …>Step 1</Link></TableOfContents.Item> …
+// </TableOfContents>
+```
+
 ## Notifications
 
 ### Alert
@@ -743,9 +769,10 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
 
-### TableOfContents
+### TableOfContents — **⚠️ DEPRECATED** (use TEDI-Ready `TableOfContents`)
+- Superseded by the TEDI-Ready component (import from `/tedi`), which adds `activeId` active-section highlighting and hierarchical `numbered` lists. (The TEDI-Ready version is desktop-only for now — its responsive mobile variant is pending a TEDI-Ready `Accordion`; this community one still uses a mobile Modal.)
 - `items: TableOfContentsItemProps[]`, `heading?`, `open?`, `defaultOpen?`
-- `showIcons?: boolean`, `breakToMobile?: boolean`
+- `showIcons?: boolean`, `breakToMobile?: Layouts`
 
 ## Overlay
 

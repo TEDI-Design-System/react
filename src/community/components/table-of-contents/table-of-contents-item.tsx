@@ -31,6 +31,9 @@ export type TableOfContentsItemConditionalTypes =
       children: TableOfContentsItemProps[];
     };
 
+/**
+ * @deprecated Use TableOfContents from `@tedi-design-system/react/tedi` instead.
+ */
 export type TableOfContentsItemProps = TableOfContentsItemConditionalTypes & {
   /**
    * Content should generally use the anchor or button element
@@ -57,6 +60,9 @@ export type TableOfContentsItemProps = TableOfContentsItemConditionalTypes & {
   hideIcon?: boolean;
 };
 
+/**
+ * @deprecated Use TableOfContents from `@tedi-design-system/react/tedi` instead.
+ */
 export function TableOfContentsItem(props: TableOfContentsItemProps & { handleCloseModal: () => void }) {
   const { children, content, isValid, separator, hideIcon, id, handleCloseModal } = props;
   const { openItems, showIcons } = useContext(TableOfContentsContext);

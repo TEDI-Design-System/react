@@ -1,0 +1,36 @@
+import { useContext, useId } from 'react';
+
+import { Heading } from '../../base/typography/heading/heading';
+import { TableOfContentsContext, type TableOfContentsNode } from './table-of-contents';
+import styles from './table-of-contents.module.scss';
+import { TableOfContentsRow } from './table-of-contents-row';
+
+export interface TableOfContentsListProps {
+  nodes: TableOfContentsNode[];
+  heading?: string;
+}
+
+export const TableOfContentsList = ({ nodes, heading }: TableOfContentsListProps): JSX.Element => {
+  const { numbered } = useContext(TableOfContentsContext);
+  const headingId = useId();
+  const List = numbered ? 'ol' : 'ul';
+
+  return (
+    <>
+      {heading && (
+        <Heading element="h3" modifiers="h4" id={headingId} className={styles['tedi-table-of-contents__heading']}>
+          {heading}
+        </Heading>
+      )}
+      <nav aria-labelledby={heading ? headingId : undefined} aria-label={heading ? undefined : 'Table of contents'}>
+        <List className={styles['tedi-table-of-contents__list']}>
+          {nodes.map((node, index) => (
+            <TableOfContentsRow key={node.id ?? index} node={node} depth={1} index={index} />
+          ))}
+        </List>
+      </nav>
+    </>
+  );
+};
+
+TableOfContentsList.displayName = 'TableOfContentsList';
