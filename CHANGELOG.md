@@ -1,3 +1,65 @@
+# [18.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.2...react-18.0.0-rc.3) (2026-06-02)
+
+
+### Features
+
+* **alert:** add action prop to replace ClosingButton if necessary [#552](https://github.com/TEDI-Design-System/react/issues/552) ([#659](https://github.com/TEDI-Design-System/react/issues/659)) ([529f191](https://github.com/TEDI-Design-System/react/commit/529f191f3175c8e5ebec385af74d340d5f822808)), closes [#652](https://github.com/TEDI-Design-System/react/issues/652)
+
+# [18.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.1...react-18.0.0-rc.2) (2026-06-01)
+
+
+### Features
+
+* **collapse:** add inverted variant [#647](https://github.com/TEDI-Design-System/react/issues/647) ([#650](https://github.com/TEDI-Design-System/react/issues/650)) ([76f7594](https://github.com/TEDI-Design-System/react/commit/76f75948c595f143b132109b5d0413c2fbd42f2c))
+
+# [18.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.2.0-rc.1...react-18.0.0-rc.1) (2026-06-01)
+
+
+### Features
+
+* **number-field:** add decimalSeparator prop [#596](https://github.com/TEDI-Design-System/react/issues/596) ([#623](https://github.com/TEDI-Design-System/react/issues/623)) ([c1de6d7](https://github.com/TEDI-Design-System/react/commit/c1de6d753db1a28b15ac89b881a30d9f716c09aa))
+
+
+### BREAKING CHANGES
+
+* **number-field:** onChange signature widened from (value: number) => void to (value: number | undefined) => void
+
+# [17.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-17.1.0...react-17.2.0-rc.1) (2026-06-01)
+
+
+### Features
+
+* **breadcrumb:** new TEDI-Ready component [#22](https://github.com/TEDI-Design-System/react/issues/22) ([#637](https://github.com/TEDI-Design-System/react/issues/637)) ([fe65d69](https://github.com/TEDI-Design-System/react/commit/fe65d69f25f2482987f242bd28747e3444730cdd))
+
+# [17.1.0](https://github.com/TEDI-Design-System/react/compare/react-17.0.0...react-17.1.0) (2026-05-28)
+
+
+### Bug Fixes
+
+* **breakpoints:** replace px values with rem [#633](https://github.com/TEDI-Design-System/react/issues/633) ([#636](https://github.com/TEDI-Design-System/react/issues/636)) ([0934794](https://github.com/TEDI-Design-System/react/commit/0934794078330cad776128e6fc91b1c116f0849f))
+* **button-group:** improve accessibility [#638](https://github.com/TEDI-Design-System/react/issues/638) ([#643](https://github.com/TEDI-Design-System/react/issues/643)) ([2617844](https://github.com/TEDI-Design-System/react/commit/26178445c656c08812c40dcb6fd5aa81ccffc57f))
+* **popover:** fix large popover overflow in smaller screens [#628](https://github.com/TEDI-Design-System/react/issues/628) ([#634](https://github.com/TEDI-Design-System/react/issues/634)) ([0f7396d](https://github.com/TEDI-Design-System/react/commit/0f7396d1d7656ac613ae22005f6efe6f98aad693))
+
+
+### Features
+
+* **date-field, calendar:** new TEDI-Ready DateField component [#24](https://github.com/TEDI-Design-System/react/issues/24) ([#595](https://github.com/TEDI-Design-System/react/issues/595)) ([bb34846](https://github.com/TEDI-Design-System/react/commit/bb3484613d83080e340d657881a753d063eca555)), closes [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94)
+* **empty-state:** new TEDI-Ready component [#10](https://github.com/TEDI-Design-System/react/issues/10) ([#611](https://github.com/TEDI-Design-System/react/issues/611)) ([490cf4d](https://github.com/TEDI-Design-System/react/commit/490cf4dfaa252483262c9a330fe0a2c30f8f94f4))
+* **header:** add new TEDI-Ready component [#506](https://github.com/TEDI-Design-System/react/issues/506) ([#602](https://github.com/TEDI-Design-System/react/issues/602)) ([a4e8707](https://github.com/TEDI-Design-System/react/commit/a4e87079ff334346a841b0b7db99acaebc9c7f10))
+* **input-group:** new TEDI-Ready component [#23](https://github.com/TEDI-Design-System/react/issues/23) ([#610](https://github.com/TEDI-Design-System/react/issues/610)) ([6e9c20c](https://github.com/TEDI-Design-System/react/commit/6e9c20c6c93d7741cd4933c71e2b0aaac32214ce))
+* **pagination:** new TEDI-Ready component [#20](https://github.com/TEDI-Design-System/react/issues/20) ([#612](https://github.com/TEDI-Design-System/react/issues/612)) ([c564788](https://github.com/TEDI-Design-System/react/commit/c564788c89dc231506584702aa525a0aa53cf35a))
+* **select:** multiselect tag handling improvements, story updates, visual fixes [#587](https://github.com/TEDI-Design-System/react/issues/587) ([#613](https://github.com/TEDI-Design-System/react/issues/613)) ([abb2c36](https://github.com/TEDI-Design-System/react/commit/abb2c36329c04977eabec7b698994a9623c230c0))
+* **slider:** new TEDI-Ready component [#13](https://github.com/TEDI-Design-System/react/issues/13) ([#607](https://github.com/TEDI-Design-System/react/issues/607)) ([3567038](https://github.com/TEDI-Design-System/react/commit/3567038b63256c682c09937784ea48b7f2decf87))
+* **text-group:** add TextGroupList feature [#81](https://github.com/TEDI-Design-System/react/issues/81) ([#625](https://github.com/TEDI-Design-System/react/issues/625)) ([cc8253f](https://github.com/TEDI-Design-System/react/commit/cc8253fb1676e57e873628306150447b025d30d7))
+* **time-field:** new TEDI-ready component [#25](https://github.com/TEDI-Design-System/react/issues/25) ([#601](https://github.com/TEDI-Design-System/react/issues/601)) ([7d0d346](https://github.com/TEDI-Design-System/react/commit/7d0d3461b971d9b6cfec3571fc0d5f65df845052))
+
+# [17.1.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.11...react-17.1.0-rc.12) (2026-05-27)
+
+
+### Features
+
+* **header:** add new TEDI-Ready component [#506](https://github.com/TEDI-Design-System/react/issues/506) ([#602](https://github.com/TEDI-Design-System/react/issues/602)) ([a4e8707](https://github.com/TEDI-Design-System/react/commit/a4e87079ff334346a841b0b7db99acaebc9c7f10))
+
 # [17.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-17.1.0-rc.10...react-17.1.0-rc.11) (2026-05-27)
 
 

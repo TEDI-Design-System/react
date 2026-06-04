@@ -34,8 +34,8 @@
 
 .tedi-left-panel__footer {
   display: flex;
-  flex-direction: column;
   flex-shrink: 0;
+  flex-direction: column;
   gap: var(--layout-grid-gutters-04);
   align-items: flex-start;
   align-self: stretch;

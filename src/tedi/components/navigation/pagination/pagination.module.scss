@@ -177,8 +177,8 @@
 
   &:focus-visible:not(:disabled, .tedi-pagination__button--selected) {
     color: var(--button-main-neutral-text-focus);
-    background: var(--button-main-neutral-icon-only-background-focus);
     outline: none;
+    background: var(--button-main-neutral-icon-only-background-focus);
     box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
       0 0 0 var(--tedi-borders-03) var(--tedi-primary-500);
   }

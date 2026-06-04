@@ -1,3 +1,5 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
 @mixin alert-variant($background, $border) {
   color: var(--general-text-primary);
   background-color: $background;
@@ -64,6 +66,16 @@
     border-right: none;
     border-left: none;
     border-radius: 0;
+  }
+
+  &--has-action {
+    @include breakpoints.media-breakpoint-down(sm) {
+      [data-name='row'] {
+        flex-direction: column;
+        gap: var(--layout-grid-gutters-12);
+        align-items: flex-start;
+      }
+    }
   }
 }
 
