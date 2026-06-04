@@ -1602,7 +1602,7 @@ export const StickyHeaderAndFirstColumn: Story = {
 
 /**
  * Empty-state rendering: when `data` is empty, Table falls back to the
- * `placeholder` prop. Passing an `<EmptyState>` node produces the richer
+ * `emptyState` prop. Passing an `<EmptyState>` node produces the richer
  * zero-data layout (icon + heading + description + actions) inside the table
  * body.
  */
@@ -1612,7 +1612,7 @@ export const WithEmptyState: Story = {
       id="tedi-table-empty-state"
       data={[]}
       columns={personColumns}
-      placeholder={
+      emptyState={
         <EmptyState type="inside" icon={{ name: 'spa', color: 'tertiary' }}>
           No results found
         </EmptyState>

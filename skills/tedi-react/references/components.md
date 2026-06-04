@@ -200,7 +200,17 @@ TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filt
 <Table<Person> id="people" data={rows} columns={columns} pagination={pagination} />
 ```
 
-**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `placeholder`, `placeholderRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`, `autoResetPageIndex`.
+**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `emptyState`, `emptyStateRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`, `autoResetPageIndex`.
+
+#### Pagination — `pageSize`, `pageSizeOptions`, and appearance
+`pagination` accepts `true` (defaults) or an options object: `{ pageSize?, pageSizeOptions?, paginationProps? }`. `pageSizeOptions` is the page-size selector list (`false` hides it). **`paginationProps`** forwards extra props to the built-in `Pagination` to change its appearance/behaviour (e.g. `background`, `borders`, `hideResults`, `showPrevNextButtons`, `arrowVariant`, `labels`); the data/state props the Table owns (`pageCount`, `page`, `totalItems`, `pageSize`, `pageSizeOptions`, change handlers) are managed internally and can't be overridden.
+
+```tsx
+<Table
+  data={rows} columns={columns}
+  pagination={{ pageSize: 25, pageSizeOptions: [25, 50], paginationProps: { background: 'transparent', showPrevNextButtons: true } }}
+/>
+```
 
 #### Inline editing — keep the page with `autoResetPageIndex={false}`
 
@@ -293,9 +303,9 @@ When `renderSubComponent` is `undefined` (≥ md) the expand column isn't render
   />
   ```
   The labels `table.filter.validation.min-length` / `table.filter.validation.no-spaces` already exist in `labels-map.ts` — use them as-is for parity with Angular. **Max length / pattern / any other validation rule** belongs on `TextField` directly — pass `maxLength={40}` and let the native HTML attribute enforce it, plus mirror the rule in `invalid` + `helper` if you want a visible error before submit. Don't invent a Table-level `validation: { minLength, maxLength }` config — the primitives already cover it.
-- **For "no results after filter" announcements, set `placeholderRole="status"` on the Table.** The Table wraps the empty-state placeholder in `<div role={placeholderRole}>` (an ARIA live region), so screen readers announce the empty state when a filter empties the rows. `'status'` is polite (recommended); `'alert'` is assertive (interrupts the current SR utterance). Leave the prop undefined for tables that are empty on first mount and never change — otherwise the live region announces on every render.
+- **For "no results after filter" announcements, set `emptyStateRole="status"` on the Table.** The Table wraps the empty state in `<div role={emptyStateRole}>` (an ARIA live region), so screen readers announce it when a filter empties the rows. `'status'` is polite (recommended); `'alert'` is assertive (interrupts the current SR utterance). Leave the prop undefined for tables that are empty on first mount and never change — otherwise the live region announces on every render. The empty-state content itself is the `emptyState` prop (a string or an `<EmptyState>` node).
   ```tsx
-  <Table data={rows} columns={columns} placeholderRole="status" />
+  <Table data={rows} columns={columns} emptyStateRole="status" />
   ```
 
 ## Form

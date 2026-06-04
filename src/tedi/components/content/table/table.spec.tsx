@@ -109,34 +109,28 @@ describe('Table', () => {
     expect(nameHeader).toHaveAttribute('aria-label', 'Name');
   });
 
-  it('renders the placeholder when data is empty', () => {
-    render(<Table<Person> id="t-empty" data={[]} columns={columns} placeholder="Nothing here" />);
+  it('renders the empty state when data is empty', () => {
+    render(<Table<Person> id="t-empty" data={[]} columns={columns} emptyState="Nothing here" />);
 
     expect(screen.getByText('Nothing here')).toBeInTheDocument();
   });
 
-  it('wraps the placeholder in a live region when placeholderRole is set', () => {
+  it('wraps the empty state in a live region when emptyStateRole is set', () => {
     const { rerender } = render(
-      <Table<Person>
-        id="t-empty-status"
-        data={[]}
-        columns={columns}
-        placeholder="No results"
-        placeholderRole="status"
-      />
+      <Table<Person> id="t-empty-status" data={[]} columns={columns} emptyState="No results" emptyStateRole="status" />
     );
 
     expect(screen.getByRole('status')).toHaveTextContent('No results');
 
     rerender(
-      <Table<Person> id="t-empty-status" data={[]} columns={columns} placeholder="No results" placeholderRole="alert" />
+      <Table<Person> id="t-empty-status" data={[]} columns={columns} emptyState="No results" emptyStateRole="alert" />
     );
 
     expect(screen.getByRole('alert')).toHaveTextContent('No results');
   });
 
-  it('omits the live-region wrapper when placeholderRole is not set', () => {
-    render(<Table<Person> id="t-empty-plain" data={[]} columns={columns} placeholder="Nothing here" />);
+  it('omits the live-region wrapper when emptyStateRole is not set', () => {
+    render(<Table<Person> id="t-empty-plain" data={[]} columns={columns} emptyState="Nothing here" />);
 
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

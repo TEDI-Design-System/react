@@ -41,7 +41,7 @@ import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { Radio, RadioProps } from '../../form/radio/radio';
 import { TextField } from '../../form/textfield/textfield';
-import { Pagination } from '../../navigation/pagination';
+import { Pagination, type PaginationProps } from '../../navigation/pagination';
 import styles from './table.module.scss';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
@@ -218,6 +218,17 @@ export interface TablePaginationOptions {
    * @default [10, 25, 50]
    */
   pageSizeOptions?: number[] | false;
+  /**
+   * Props forwarded to the built-in `Pagination` to customise its appearance
+   * and behaviour — e.g. `background`, `borders`, `hideResults`,
+   * `showPrevNextButtons`, `arrowVariant`, `labels`. The data / state props the
+   * Table owns (`pageCount`, `page`, `totalItems`, `pageSize`, `pageSizeOptions`
+   * and the change handlers) are managed internally and cannot be overridden.
+   */
+  paginationProps?: Omit<
+    PaginationProps,
+    'pageCount' | 'page' | 'onPageChange' | 'totalItems' | 'pageSize' | 'pageSizeOptions' | 'onPageSizeChange'
+  >;
 }
 
 export interface TableProps<TData> {
@@ -448,19 +459,19 @@ export interface TableProps<TData> {
    */
   persist?: TablePersistOptions;
   /**
-   * Rendered inside `<tbody>` when `data` is empty.
+   * Rendered inside `<tbody>` when `data` is empty — typically an `EmptyState`
+   * node, or any string / node.
    * @default "No data"
    */
-  placeholder?: ReactNode;
+  emptyState?: ReactNode;
   /**
-   * ARIA live-region role wrapping the empty-state placeholder. Use `'status'`
-   * for polite announcements (recommended for "no results" feedback when the
-   * user changes a filter) or `'alert'` for assertive announcements that
-   * interrupt the current SR utterance. Omit when the placeholder should not
-   * announce changes — e.g. when the table is empty on first render and the
-   * content never changes.
+   * ARIA live-region role wrapping the empty state. Use `'status'` for polite
+   * announcements (recommended for "no results" feedback when the user changes
+   * a filter) or `'alert'` for assertive announcements that interrupt the
+   * current SR utterance. Omit when the empty state should not announce changes
+   * — e.g. when the table is empty on first render and the content never changes.
    */
-  placeholderRole?: 'alert' | 'status';
+  emptyStateRole?: 'alert' | 'status';
   /**
    * Additional class name on the root element.
    */
@@ -707,8 +718,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     defaultState,
     onStateChange,
     persist,
-    placeholder,
-    placeholderRole,
+    emptyState,
+    emptyStateRole,
     className,
     children,
     striped = false,
@@ -747,7 +758,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   } = props;
 
   const { getLabel } = useLabels();
-  const resolvedPlaceholder = placeholder ?? getLabel('table.no-data');
+  const resolvedEmptyState = emptyState ?? getLabel('table.no-data');
   const getLabelRef = useRef(getLabel);
   getLabelRef.current = getLabel;
 
@@ -756,11 +767,14 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const paginationOptions = useMemo(() => {
     if (!paginationProp) return null;
-    if (paginationProp === true) return { pageSize: 10, pageSizeOptions: [10, 25, 50] as number[] | false };
+    if (paginationProp === true) {
+      return { pageSize: 10, pageSizeOptions: [10, 25, 50] as number[] | false, paginationProps: undefined };
+    }
     return {
       pageSize: paginationProp.pageSize ?? 10,
       pageSizeOptions:
         paginationProp.pageSizeOptions === undefined ? ([10, 25, 50] as number[]) : paginationProp.pageSizeOptions,
+      paginationProps: paginationProp.paginationProps,
     };
   }, [paginationProp]);
   const paginationEnabled = paginationOptions !== null;
@@ -1459,7 +1473,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     colSpan={Math.max(1, leafColumnCount)}
                     className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--placeholder'])}
                   >
-                    {placeholderRole ? <div role={placeholderRole}>{resolvedPlaceholder}</div> : resolvedPlaceholder}
+                    {emptyStateRole ? <div role={emptyStateRole}>{resolvedEmptyState}</div> : resolvedEmptyState}
                   </td>
                 </tr>
               ) : (
@@ -1552,6 +1566,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         {paginationEnabled && (
           <div className={styles['tedi-table__pagination']}>
             <Pagination
+              {...paginationOptions?.paginationProps}
               pageCount={Math.max(1, table.getPageCount())}
               page={table.getState().pagination.pageIndex + 1}
               onPageChange={handlePaginationPageChange}
