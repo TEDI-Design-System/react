@@ -14,6 +14,12 @@ const meta: Meta<typeof Pagination> = {
   component: Pagination,
   title: 'TEDI-Ready/Components/Navigation/Pagination',
   parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=8478-72385&m=dev',
@@ -240,11 +246,31 @@ export const CustomArrowIcons: Story = {
  * `Button`s with the label text and a leading / trailing arrow icon, for more
  * prominent navigation. Pair with `showPrevNextButtons` to keep the disabled
  * boundary button visible.
+ *
+ * Every visual prop accepts per-breakpoint overrides via the `sm`/`md`/`lg`/`xl`/`xxl`
+ * keys (mobile-first — a bare value is the `xs` baseline). Here the baseline
+ * `arrowVariant="default"` shows the compact icon-only circular arrows, while
+ * `md={{ arrowVariant: 'primary' }}` swaps to the prominent labelled buttons from
+ * `md` up. Resize the viewport (or pick a mobile preset) to see the switch.
  */
 export const ArrowsPrimaryVariant: Story = {
+  parameters: {
+    status: {
+      type: 'mobileViewDifference',
+    },
+  },
   render: function ArrowsPrimaryVariant() {
     const [page, setPage] = useState(3);
-    return <Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="primary" showPrevNextButtons />;
+    return (
+      <Pagination
+        pageCount={10}
+        page={page}
+        onPageChange={setPage}
+        arrowVariant="default"
+        showPrevNextButtons
+        md={{ arrowVariant: 'primary' }}
+      />
+    );
   },
 };
 

@@ -1,14 +1,23 @@
 import cn from 'classnames';
 import { forwardRef, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
-import { type Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import {
+  type Breakpoint,
+  type BreakpointSupport,
+  isBreakpointBelow,
+  useBreakpoint,
+  useBreakpointProps,
+} from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { type ISelectOption, Select, type TSelectValue } from '../../form/select/select';
 import styles from './pagination.module.scss';
-import { PaginationMobileModal } from './pagination-mobile-modal/pagination-mobile-modal';
+import {
+  PaginationMobileModal,
+  type PaginationMobileModalOption,
+} from './pagination-mobile-modal/pagination-mobile-modal';
 import { usePagination } from './use-pagination';
 
 export type PaginationItemType = 'page' | 'previous' | 'next' | 'ellipsis';
@@ -68,42 +77,8 @@ export interface PaginationLabels {
    */
   pageStatus: (page: number, pageCount: number) => string;
 }
-export interface PaginationProps {
-  /**
-   * Total number of pages.
-   */
-  pageCount: number;
-  /**
-   * Controlled current page (1-based). Pair with `onPageChange`.
-   */
-  page?: number;
-  /**
-   * Initial page for uncontrolled mode (1-based).
-   * @default 1
-   */
-  defaultPage?: number;
-  /**
-   * Fires whenever the user navigates to a different page.
-   */
-  onPageChange?: (page: number) => void;
-  /**
-   * Total number of items across all pages. Renders a "{count} results" label
-   * to the left of the nav when set.
-   */
-  totalItems?: number;
-  /**
-   * Current page size. Shown in the page-size select when
-   * `pageSizeOptions` is provided.
-   */
-  pageSize?: number;
-  /**
-   * Options for the page-size select. Omit to hide the select.
-   */
-  pageSizeOptions?: number[];
-  /**
-   * Fires when the user picks a different page size.
-   */
-  onPageSizeChange?: (pageSize: number) => void;
+
+type PaginationBreakpointProps = {
   /**
    * Number of pages always shown at the start and end of the range before
    * ellipsis kicks in.
@@ -115,10 +90,6 @@ export interface PaginationProps {
    * @default 1
    */
   siblingCount?: number;
-  /**
-   * Override any of the default text labels / aria labels.
-   */
-  labels?: Partial<PaginationLabels>;
   /**
    * Background variant. `transparent` removes the surface fill — use it when
    * pagination sits on a non-white container. Border behaviour is controlled
@@ -140,24 +111,6 @@ export interface PaginationProps {
    * @default top
    */
   borders?: PaginationBorders;
-  /**
-   * Hide the "X results" label even when `totalItems` is set. Pass a
-   * breakpoint name (e.g. `"md"`) to hide only below that breakpoint.
-   * @default false
-   */
-  hideResults?: PaginationVisibility;
-  /**
-   * Hide the page-size dropdown even when `pageSizeOptions` is non-empty.
-   * Pass a breakpoint name to hide only below that breakpoint.
-   * @default false
-   */
-  hidePageSize?: PaginationVisibility;
-  /**
-   * Hide the pager (prev/next + page list). Pass a breakpoint name to hide
-   * only below that breakpoint.
-   * @default false
-   */
-  hidePager?: PaginationVisibility;
   /**
    * Keep the Previous / Next buttons visible even when they would be disabled
    * (Previous on the first page, Next on the last). Default `false` drops the
@@ -199,6 +152,66 @@ export interface PaginationProps {
    * @default default
    */
   arrowVariant?: 'default' | 'primary';
+};
+
+export interface PaginationProps extends BreakpointSupport<PaginationBreakpointProps> {
+  /**
+   * Total number of pages.
+   */
+  pageCount: number;
+  /**
+   * Controlled current page (1-based). Pair with `onPageChange`.
+   */
+  page?: number;
+  /**
+   * Initial page for uncontrolled mode (1-based).
+   * @default 1
+   */
+  defaultPage?: number;
+  /**
+   * Fires whenever the user navigates to a different page.
+   */
+  onPageChange?: (page: number) => void;
+  /**
+   * Total number of items across all pages. Renders a "{count} results" label
+   * to the left of the nav when set.
+   */
+  totalItems?: number;
+  /**
+   * Current page size. Shown in the page-size select when
+   * `pageSizeOptions` is provided.
+   */
+  pageSize?: number;
+  /**
+   * Options for the page-size select. Omit to hide the select.
+   */
+  pageSizeOptions?: number[];
+  /**
+   * Fires when the user picks a different page size.
+   */
+  onPageSizeChange?: (pageSize: number) => void;
+  /**
+   * Override any of the default text labels / aria labels.
+   */
+  labels?: Partial<PaginationLabels>;
+  /**
+   * Hide the "X results" label even when `totalItems` is set. Pass a
+   * breakpoint name (e.g. `"md"`) to hide only below that breakpoint.
+   * @default false
+   */
+  hideResults?: PaginationVisibility;
+  /**
+   * Hide the page-size dropdown even when `pageSizeOptions` is non-empty.
+   * Pass a breakpoint name to hide only below that breakpoint.
+   * @default false
+   */
+  hidePageSize?: PaginationVisibility;
+  /**
+   * Hide the pager (prev/next + page list). Pass a breakpoint name to hide
+   * only below that breakpoint.
+   * @default false
+   */
+  hidePager?: PaginationVisibility;
   /**
    * Additional class name on the root element.
    */
@@ -224,21 +237,25 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     pageSize,
     pageSizeOptions,
     onPageSizeChange,
-    boundaryCount = 1,
-    siblingCount = 1,
     labels,
-    background = 'white',
-    borders = 'top',
     hideResults = false,
     hidePageSize = false,
     hidePager = false,
+    className,
+  } = props;
+
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const {
+    boundaryCount = 1,
+    siblingCount = 1,
+    background = 'white',
+    borders = 'top',
     showPrevNextButtons = false,
     showEdgeNavLabels = false,
     previousIcon = 'arrow_back',
     nextIcon = 'arrow_forward',
     arrowVariant = 'default',
-    className,
-  } = props;
+  } = getCurrentBreakpointProps<PaginationBreakpointProps>(props);
 
   const { getLabel } = useLabels();
   const breakpoint = useBreakpoint();
@@ -312,6 +329,32 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     [onPageSizeChange]
   );
 
+  const currentPageSizeValue = currentPageSizeOption ? Number(currentPageSizeOption.value) : pageSize ?? 0;
+
+  const pageOptions = useMemo<PaginationMobileModalOption[]>(
+    () =>
+      Array.from({ length: pageCount }, (_, index) => {
+        const value = index + 1;
+        return {
+          value,
+          label: String(value),
+          ariaLabel:
+            value === currentPage ? mergedLabels.currentPageAriaLabel(value) : mergedLabels.pageAriaLabel(value),
+        };
+      }),
+    [pageCount, currentPage, mergedLabels]
+  );
+
+  const pageSizeModalOptions = useMemo<PaginationMobileModalOption[]>(
+    () =>
+      pageSizeSelectOptions.map((option) => ({
+        value: Number(option.value),
+        label: String(option.value),
+        ariaLabel: `${mergedLabels.pageSize} ${option.value}`,
+      })),
+    [pageSizeSelectOptions, mergedLabels]
+  );
+
   const isResultsHidden = resolveVisibility(hideResults, breakpoint);
   const isPageSizeHidden = resolveVisibility(hidePageSize, breakpoint);
   const isPagerHidden = resolveVisibility(hidePager, breakpoint);
@@ -342,6 +385,17 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     }
     prevModalOpenRef.current = isMobileModalOpen;
   }, [isMobileModalOpen]);
+
+  const [isPageSizeModalOpen, setIsPageSizeModalOpen] = useState(false);
+  const pageSizeTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const prevPageSizeModalOpenRef = useRef(isPageSizeModalOpen);
+  useEffect(() => {
+    if (prevPageSizeModalOpenRef.current && !isPageSizeModalOpen) {
+      pageSizeTriggerRef.current?.focus();
+    }
+    prevPageSizeModalOpenRef.current = isPageSizeModalOpen;
+  }, [isPageSizeModalOpen]);
 
   const statusText = pageCount > 1 ? mergedLabels.pageStatus(currentPage, pageCount) : '';
   const mobileTriggerLabel = `${currentPage} / ${pageCount}`;
@@ -505,18 +559,35 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
             >
               {mergedLabels.pageSize}
             </Text>
-            <Select
-              id={`tedi-pagination-page-size-${selectId}`}
-              className={styles['tedi-pagination__select']}
-              label={mergedLabels.pageSize}
-              hideLabel
-              size="small"
-              options={pageSizeSelectOptions}
-              value={currentPageSizeOption}
-              onChange={handlePageSizeChange}
-              isSearchable={false}
-              isClearable={false}
-            />
+            {useCompactPicker ? (
+              <button
+                ref={pageSizeTriggerRef}
+                type="button"
+                className={styles['tedi-pagination__mobile-trigger']}
+                aria-haspopup="dialog"
+                aria-expanded={isPageSizeModalOpen}
+                aria-label={`${mergedLabels.pageSize} ${currentPageSizeValue}`}
+                onClick={() => setIsPageSizeModalOpen(true)}
+              >
+                <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
+                  <strong>{currentPageSizeValue}</strong>
+                </span>
+                <Icon name="arrow_drop_down" size={24} color="inherit" />
+              </button>
+            ) : (
+              <Select
+                id={`tedi-pagination-page-size-${selectId}`}
+                className={styles['tedi-pagination__select']}
+                label={mergedLabels.pageSize}
+                hideLabel
+                size="small"
+                options={pageSizeSelectOptions}
+                value={currentPageSizeOption}
+                onChange={handlePageSizeChange}
+                isSearchable={false}
+                isClearable={false}
+              />
+            )}
           </div>
         )}
       </div>
@@ -525,14 +596,23 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
         <PaginationMobileModal
           open={isMobileModalOpen}
           onOpenChange={setIsMobileModalOpen}
-          pageCount={pageCount}
-          currentPage={currentPage}
-          labels={{
-            ariaLabel: mergedLabels.ariaLabel,
-            pageAriaLabel: mergedLabels.pageAriaLabel,
-            currentPageAriaLabel: mergedLabels.currentPageAriaLabel,
-          }}
-          onSelectPage={handlePageChange}
+          options={pageOptions}
+          selectedValue={currentPage}
+          onSelect={handlePageChange}
+          ariaLabel={mergedLabels.ariaLabel}
+          ariaCurrent="page"
+        />
+      )}
+
+      {useCompactPicker && showPageSizeSelect && (
+        <PaginationMobileModal
+          open={isPageSizeModalOpen}
+          onOpenChange={setIsPageSizeModalOpen}
+          options={pageSizeModalOptions}
+          selectedValue={currentPageSizeValue}
+          onSelect={(value) => onPageSizeChange?.(value)}
+          ariaLabel={mergedLabels.pageSize}
+          title={mergedLabels.pageSize}
         />
       )}
     </div>

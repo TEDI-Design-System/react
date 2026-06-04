@@ -125,7 +125,7 @@
   @include breakpoints.media-breakpoint-down(md) {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    gap: var(--tedi-dimensions-10);
+    gap: var(--layout-grid-gutters-08);
   }
 }
 
@@ -277,6 +277,7 @@
 
 .tedi-pagination__mobile-trigger {
   display: inline-flex;
+  grid-column: 2;
   gap: var(--form-field-inner-spacing);
   align-items: center;
   justify-self: center;

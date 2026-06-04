@@ -584,9 +584,9 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 ```
 
 ### Pagination
-**Props:** `PaginationProps` | fRef
+**Props:** `PaginationProps` | fRef | bp
 
-Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` the number list collapses into a "page / total" trigger that opens a mobile modal picker.
+Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` **both** the number list **and** the page-size select collapse into compact triggers that open a mobile modal picker (radio-style list; opening it scrolls the active option to the top and focuses it).
 
 - `pageCount: number` (required), `page?` (controlled, 1-based) + `onPageChange?`, or `defaultPage?` (uncontrolled)
 - `totalItems?` → renders the results label; `pageSize?` + `pageSizeOptions?: number[]` + `onPageSizeChange?` → renders the page-size select
@@ -601,6 +601,8 @@ Page-number list with prev/next arrows, an optional "X results" label, and an op
 - `previousIcon? = 'arrow_back'`, `nextIcon? = 'arrow_forward'` — override the arrow glyphs (e.g. `'chevron_left'` / `'chevron_right'`).
 - `arrowVariant?: 'default' | 'primary' = 'default'` — `'primary'` renders the arrows as **primary small `Button`s with the label text + a leading/trailing arrow icon** (always shows the label, so `showEdgeNavLabels` has no effect in this mode).
 
+**Breakpoint support:** the visual props — `boundaryCount`, `siblingCount`, `background`, `borders`, `showPrevNextButtons`, `showEdgeNavLabels`, `previousIcon`, `nextIcon`, `arrowVariant` — accept per-breakpoint overrides via the `sm`/`md`/`lg`/`xl`/`xxl` keys (mobile-first: a bare value is the `xs` baseline; `defaultServerBreakpoint?` sets the SSR baseline). e.g. icon-only arrows on mobile, labelled primary buttons on desktop.
+
 ```tsx
 const [page, setPage] = useState(1);
 <Pagination
@@ -610,6 +612,9 @@ const [page, setPage] = useState(1);
 
 // Prominent, labelled navigation
 <Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="primary" showPrevNextButtons />
+
+// Responsive: compact icon-only arrows below md, prominent labelled buttons from md up
+<Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="default" showPrevNextButtons md={{ arrowVariant: 'primary' }} />
 ```
 
 ## Notifications
