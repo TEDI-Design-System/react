@@ -570,7 +570,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
                 onClick={() => setIsPageSizeModalOpen(true)}
               >
                 <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
-                  <strong>{currentPageSizeValue}</strong>
+                  {currentPageSizeValue}
                 </span>
                 <Icon name="arrow_drop_down" size={24} color="inherit" />
               </button>

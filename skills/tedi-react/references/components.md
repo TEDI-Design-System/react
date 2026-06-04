@@ -702,19 +702,22 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `open?: boolean` + `onToggle?: (open: boolean) => void` — controlled mode
 - `closeOnBackdropClick: boolean = true`
 - `closeOnEscape: boolean = true`
+- `role: 'dialog' | 'alertdialog' = 'dialog'` — use `'alertdialog'` for destructive confirmations (higher SR urgency, requires explicit dismissal)
 
-**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`)
-- `width: ModalWidth = 'sm'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
-- `maxWidth?: string` — cap for custom widths
-- `size: 'default' | 'small' = 'default'` — header/body/footer padding density
-- `position: 'center' | 'top' | 'right' | 'left' = 'center'` — side positions render full-height drawers
-- `fullscreen: boolean | 'sm' | 'md' | 'lg' | 'xl' = false` — `true` = always, breakpoint string = below that breakpoint
+**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`, `fullscreen`)
+- `width: ModalWidth = 'md'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
+- `maxWidth?: string` — cap for custom widths (lighter than overriding `width`)
+- `size: 'default' | 'small' = 'default'` — header/body/footer padding density (`'small'` ≈ 42px header)
+- `position: 'center' | 'top' | 'right' | 'left' | 'bottom' = 'center'` — side positions render drawers; flip per breakpoint, e.g. `position="right" md={{ position: 'center' }}` or `position="bottom"` for a mobile sheet
+- `fullscreen: boolean | 'edge' = false` — `true` = padded fullscreen (16px backdrop stays), `'edge'` = edge-to-edge (no padding/border/radius); combine with bp keys for responsive (e.g. `fullscreen md={{ fullscreen: false }}`)
 - `scrollBehavior: 'content' | 'page' = 'content'` — internal body scroll vs. overlay-level page scroll
 - `trapFocus: boolean = true`, `returnFocus: boolean = true`
+- `initialFocus?: number | RefObject<HTMLElement>` — element focused on open (tabbable index, `0` = first/default, `-1` = the dialog itself, or a ref to a specific element — e.g. focus the active option in a picker)
 - `showOverlay: boolean = true` — toggle the dimmed backdrop
 - `lockScroll: boolean = true`
 - `visuallyHiddenDismiss?: boolean` — adds SR-only dismiss buttons for touch screen readers
 - `aria-labelledby?`, `aria-describedby?` — usually wired automatically by `Modal.Header`
+- `aria-label?: string` — plain-text accessible name when there's no visible title (icon-only / list-only dialogs); ignored when `aria-labelledby` is set
 
 **`Modal.Header` props**
 - `title?: ReactNode` — rendered as `<h3>`, auto-registered as `aria-labelledby`
@@ -725,6 +728,7 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 
 **`Modal.Body` props**
 - `noScroll?: boolean` — disable internal scroll (pair with `scrollBehavior="page"` on Content)
+- Body padding is driven by the `--modal-body-padding` / `--modal-body-padding-sm` CSS custom properties — override them on `Modal.Content` (e.g. set to `0`) for an edge-to-edge body such as a full-bleed list or sheet
 
 **`Modal.Footer` props**
 - `children?: ReactNode` — right-aligned actions (default)
