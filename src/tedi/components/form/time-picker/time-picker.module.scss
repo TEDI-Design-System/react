@@ -1,0 +1,153 @@
+.tedi-time-picker__wheel {
+  position: relative;
+  z-index: var(--z-index-dropdown);
+  display: flex;
+  width: 160px;
+  height: 200px;
+  overflow: hidden;
+  user-select: none;
+  background: var(--card-background-primary);
+  border: 1px solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+
+  &--borderless {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(
+      to bottom,
+      var(--card-background-primary) 0%,
+      transparent 30%,
+      transparent 70%,
+      var(--card-background-primary) 100%
+    );
+  }
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    top: 50%;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    height: 40px;
+    pointer-events: none;
+    content: '';
+    background: var(--dropdown-item-active-background);
+    transform: translateY(-50%);
+  }
+}
+
+.tedi-time-picker__wheel-column {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding: 80px 0;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y mandatory;
+  scroll-padding: 80px;
+  scrollbar-width: none;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+
+  &:first-child {
+    border-right: 1px solid var(--general-border-primary);
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:focus-visible {
+    z-index: 5;
+    outline: 2px solid var(--general-border-brand);
+    outline-offset: -2px;
+  }
+}
+
+.tedi-time-picker__wheel-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  color: var(--general-text-primary);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
+
+  &--selected {
+    z-index: 2;
+    color: var(--dropdown-item-active-text);
+  }
+}
+
+.tedi-time-picker__grid {
+  position: relative;
+  z-index: var(--z-index-dropdown);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--layout-grid-gutters-08);
+  align-self: flex-start;
+  justify-content: space-between;
+  width: fit-content;
+  max-width: 310px;
+  height: fit-content;
+  padding: var(--card-padding-md-default);
+  background: var(--card-background-primary);
+  border: 1px solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+
+  &--borderless {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .tedi-time-picker__grid-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 2.5rem;
+    padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
+    font-size: var(--button-text-size-default);
+    color: var(--form-checkbox-radio-card-primary-default-text);
+    text-align: center;
+    border: 1px solid var(--form-checkbox-radio-card-secondary-default-border);
+    border-radius: var(--form-checkbox-radio-card-radius);
+
+    &:hover {
+      color: var(--form-checkbox-radio-card-secondary-hover-text);
+      cursor: pointer;
+      border-color: var(--form-checkbox-radio-card-secondary-hover-border);
+    }
+
+    &--selected {
+      color: var(--form-checkbox-radio-card-secondary-selected-text);
+      border-color: var(--form-checkbox-radio-card-secondary-selected-border);
+      box-shadow: 0 0 0 1px var(--form-checkbox-radio-card-secondary-selected-border);
+
+      &:hover {
+        box-shadow: 0 0 0 1px var(--form-checkbox-radio-card-secondary-selected-border);
+      }
+    }
+  }
+}

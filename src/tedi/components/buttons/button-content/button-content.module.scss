@@ -386,7 +386,7 @@ $btn-width-large: 3.72rem;
   }
 }
 
-.tedi-btn--text-color {
+.tedi-btn--text {
   &.tedi-btn--link {
     @include link-variant(
       inherit,
@@ -470,9 +470,9 @@ $btn-width-large: 3.72rem;
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;
-      word-break: break-word;
       -webkit-line-clamp: 2;
       line-clamp: 2;
+      word-break: break-word;
       -webkit-box-orient: vertical;
     }
   }

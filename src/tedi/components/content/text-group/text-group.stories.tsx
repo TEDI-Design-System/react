@@ -16,6 +16,7 @@ import { TextGroup, TextGroupProps } from './text-group';
 const meta: Meta<typeof TextGroup> = {
   component: TextGroup,
   title: 'Tedi-Ready/Content/TextGroup',
+  subcomponents: { 'TextGroup.List': TextGroup.List } as never,
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -245,6 +246,71 @@ export const CustomLabel: Story = {
         }
         value={<Text>Some text regarding to status</Text>}
         type="horizontal"
+      />
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * `TextGroup.List` renders multiple label / value pairs inside a **single**
+ * `<dl>` element instead of stacking N separate `<TextGroup>`s — so screen
+ * readers announce them as one definition list rather than N fragments. Use
+ * it whenever the rows describe the same entity (patient summary, document
+ * metadata, …). Each row supports the same `labelAlign` / `labelWidth`
+ * overrides as the single-pair component when you need per-row tweaks.
+ */
+export const WithList: Story = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Text modifiers="bold">Vertical list (default)</Text>
+      <TextGroup.List
+        items={[
+          { label: 'Patient', value: <Text>Mari Maasikas</Text> },
+          { label: 'Address', value: <Text>Tulbi tn 4, Tallinn, 23562, Estonia</Text> },
+          { label: 'Vaccine', value: <Text>COVID-19 mRNA</Text> },
+          { label: 'Next vaccination', value: <Text>Immunization finished</Text> },
+        ]}
+      />
+
+      <Text modifiers="bold">Horizontal list with shared label column</Text>
+      <TextGroup.List
+        type="horizontal"
+        labelWidth="220px"
+        items={[
+          {
+            label: 'Patient',
+            value: (
+              <>
+                <Icon name="person" size={18} color="tertiary" />
+                <Text>Mari Maasikas</Text>
+              </>
+            ),
+          },
+          {
+            label: 'Address',
+            value: (
+              <>
+                <Icon name="location_on" size={16} color="tertiary" />
+                <Text>Tulbi tn 4, Tallinn, 23562, Estonia</Text>
+              </>
+            ),
+          },
+          { label: 'Healthcare provider', value: <Text>SA Põhja-Eesti Regionaalhaigla</Text> },
+          { label: 'Healthcare specialist', value: <Text>Mart Mets</Text> },
+          { label: 'Document creation time', value: <Text>16.08.2023 14:51:48</Text> },
+        ]}
+      />
+
+      <Text modifiers="bold">Per-row labelAlign / labelWidth overrides</Text>
+      <TextGroup.List
+        type="horizontal"
+        labelWidth="160px"
+        items={[
+          { label: 'Item', value: <Text>USB-C charging cable</Text> },
+          { label: 'Quantity', value: <Text>2</Text> },
+          { label: 'Unit price', value: <Text>€ 12.50</Text>, labelAlign: 'right', labelWidth: '220px' },
+          { label: 'Total', value: <Text modifiers="bold">€ 25.00</Text>, labelAlign: 'right', labelWidth: '220px' },
+        ]}
       />
     </VerticalSpacing>
   ),

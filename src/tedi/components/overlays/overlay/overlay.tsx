@@ -103,6 +103,13 @@ export interface OverlayProps {
    * @default false
    */
   trackReferencePosition?: boolean;
+  /**
+   * Minimum distance (in px) between the arrow and the edges of the content.
+   * Helps keep the arrow away from rounded corners, especially on `-start` and `-end` placements.
+   * Use a larger value for bigger arrows or arrows with borders.
+   * @default 4
+   */
+  arrowPadding?: number;
 }
 
 export interface OverlayContextType {
@@ -173,6 +180,7 @@ export const Overlay = (props: OverlayProps) => {
     role = 'tooltip',
     arrowDimensions,
     offset: offsetOptions = GAP + (arrowDimensions?.height ?? 0),
+    arrowPadding = 4,
     focusManager,
     dismissible,
     scrollLock,
@@ -212,7 +220,7 @@ export const Overlay = (props: OverlayProps) => {
       shift({ padding: 8 }),
       arrow({
         element: arrowRef,
-        padding: 4,
+        padding: arrowPadding,
       }),
     ],
     whileElementsMounted: trackReferencePosition

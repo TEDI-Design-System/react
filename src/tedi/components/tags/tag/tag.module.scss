@@ -58,6 +58,12 @@ $tag-colors: (
       flex-shrink: 0;
       border-top-right-radius: var(--button-radius-sm);
       border-bottom-right-radius: var(--button-radius-sm);
+
+      &:focus-visible {
+        color: inherit;
+        outline: 2px solid var(--button-main-primary-border-focus);
+        outline-offset: -2px;
+      }
     }
   }
 
