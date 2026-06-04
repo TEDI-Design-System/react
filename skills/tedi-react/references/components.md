@@ -109,6 +109,92 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 </Card>
 ```
 
+### Accordion
+Compound component for collapsible content. The item owns the expand state and the layout flags that affect both header and content (`selected`, `showIconCard`, `defaultExpanded`); the header and content sub-components own their own appearance.
+
+**Props:** `AccordionProps` | bp
+- `children?: ReactNode` — one or more `Accordion.Item` components
+- `allowMultiple?: boolean = false` — allow several items expanded simultaneously
+- `defaultExpanded?: boolean = false` — group-level default; per-item `defaultExpanded` (including explicit `false`) takes precedence
+- `itemGap?: number` — vertical gap between sibling items, in **rem** (matches TEDI's layout-spacing convention; scales with user font-size). Any number is accepted. Forwarded as the `--tedi-accordion-item-gap` CSS variable — consumers needing an exact-pixel override can set that variable directly on a class. Defaults to the design-token value `var(--layout-grid-gutters-08)` (0.5rem) when omitted.
+- `className?: string`
+
+Breakpoint-aware: `allowMultiple`, `defaultExpanded`, `itemGap`, and `className` can each be overridden per breakpoint via `sm`, `md`, `lg`, `xl`, `xxl` (e.g. `<Accordion allowMultiple lg={{ allowMultiple: false }}>`). `defaultServerBreakpoint?: Breakpoint` controls which variant renders during SSR before the real viewport size is known.
+
+Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Content`
+
+#### Accordion.Item
+**Props:** `AccordionItemProps`
+- `children?: ReactNode` — must include an `Accordion.Item.Header` and an `Accordion.Item.Content`
+- `defaultExpanded?: boolean` — falls back to the parent Accordion's `defaultExpanded`, then `false`
+- `expanded?: boolean`, `onToggle?: (expanded: boolean) => void` — controlled mode (omit for uncontrolled)
+- `showIconCard?: boolean = false`, `iconCard?: ReactNode` — left icon-card layout (only rendered when `showIconCard`)
+- `selected?: boolean = false` — visual 'selected' state
+- `disabled?: boolean = false` — header trigger becomes non-interactive (native `disabled`); current expanded state is preserved
+- `id?: string` — stable id for ARIA wiring (auto-generated via `React.useId()` if omitted). Also used by `openOnHashMatch`.
+- `openOnHashMatch?: boolean = false` — when `id` is set and `window.location.hash === '#<id>'`, auto-expands the item. Listens to `hashchange` so in-page navigation also opens the matching item. Requires an explicit `id`; no-op otherwise.
+
+#### Accordion.Item.Header
+**Props:** `AccordionItemHeaderProps`
+- `title?: ReactNode` — title content (string or node)
+- `headerClickable?: boolean = true` — when `false`, the header is a non-interactive container and a separate `Link` is rendered as the toggle (use this when projecting interactive children like buttons or checkboxes into the header)
+- `titleLayout?: 'hug' | 'fill' = 'hug'` — `fill` pushes trailing elements to the end
+- `openLabel?: string = 'open'`, `closeLabel?: string = 'close'` — the defaults are translation **keys**, resolved through `LabelProvider` (`'open'` → `Ava` / `Open` / `Открыть` depending on locale, same for `close`). Pass a custom string to override per-instance — known translation keys are localised, arbitrary strings are used literally.
+- `showExpandLabel?: boolean = true`
+- `showDefaultExpandAction?: boolean = true` — set `false` and provide a custom `endAction` to fully replace the default toggle
+- `expandActionPosition?: 'start' | 'end' = 'end'`
+- `headerClass?: string` — appended to the header host (useful for class-based theming via inherited properties like `font-weight`, `background`, etc.)
+- `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — wraps the trigger in a semantic `<h1>`–`<h6>` element per WAI-ARIA Accordion Pattern. Wrapper uses `display: contents` so it doesn't affect layout. Recommended for docs / FAQ pages where the accordion participates in the document outline.
+- **Slot props (`ReactNode`):** `beforeTitle`, `afterTitle`, `startAction`, `endAction`, `startDescription`, `endDescription`
+
+#### Accordion.Item.Content
+**Props:** `AccordionItemContentProps`
+- `children?: ReactNode` — collapsible body
+- `contentClass?: string` — appended to the content host
+
+**Mobile icon-card layout:** below the `md` breakpoint (`< 768px`), items with `showIconCard` stack the icon-card *above* the header instead of placing it in a left column — phone-sized viewports can't fit both side-by-side without truncating the icon-card text or the header content. Borders and corner radii are redistributed accordingly. No prop needed; the rule is applied via `media-breakpoint-down(md)`.
+
+**Print:** the accordion uses a `@media print` rule that forces every item to expand on paper so collapsed content isn't lost. No prop needed.
+
+```tsx
+<Accordion allowMultiple>
+  <Accordion.Item>
+    <Accordion.Item.Header
+      title="Section 1"
+      afterTitle={<StatusBadge color="success">New</StatusBadge>}
+    />
+    <Accordion.Item.Content>Body content for section 1.</Accordion.Item.Content>
+  </Accordion.Item>
+  <Accordion.Item>
+    <Accordion.Item.Header title="Section 2" />
+    <Accordion.Item.Content>Body content for section 2.</Accordion.Item.Content>
+  </Accordion.Item>
+</Accordion>
+
+// Open all items by default (per-item override still works)
+<Accordion allowMultiple defaultExpanded>
+  <Accordion.Item>...</Accordion.Item>
+  <Accordion.Item defaultExpanded={false}>...</Accordion.Item>  {/* stays closed */}
+</Accordion>
+
+// Custom toggle: external "Show more / Show less" via controlled mode
+const [expanded, setExpanded] = useState(false);
+
+<Accordion.Item expanded={expanded} onToggle={setExpanded}>
+  <Accordion.Item.Header
+    headerClickable={false}
+    showDefaultExpandAction={false}
+    title="Profile"
+    endAction={
+      <Button visualType="neutral" onClick={() => setExpanded((v) => !v)}>
+        {expanded ? 'Show less' : 'Show more'}
+      </Button>
+    }
+  />
+  <Accordion.Item.Content>...</Accordion.Item.Content>
+</Accordion.Item>
+```
+
 ## Content
 
 ### Label
@@ -517,7 +603,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ## Cards
 
-### Accordion
+### Accordion — **DEPRECATED** (use TEDI-Ready Accordion)
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
