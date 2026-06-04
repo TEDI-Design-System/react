@@ -875,9 +875,10 @@ export const EditableValues: Story = {
 };
 
 /**
- * Client-side sorting via `Table.HeaderButton` in the header renderer. Each click cycles
- * `unfold_more → arrow_upward → arrow_downward → unfold_more`. TanStack Table handles the
- * sort state internally; no external state needed for client-side use.
+ * Client-side sorting via `Table.HeaderButton` in the header renderer. The column label is
+ * passed as the button's children, so the whole "text + icon" header is one clickable sort
+ * target. Each click cycles `unfold_more → arrow_upward → arrow_downward → unfold_more`.
+ * TanStack Table handles the sort state internally; no external state needed for client-side use.
  */
 export const Sortable: Story = {
   render: function Sortable() {
@@ -894,15 +895,14 @@ export const Sortable: Story = {
             const sorted = column.getIsSorted();
             const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
             return (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Table.HeaderButton
+                icon={iconName}
+                selected={!!sorted}
+                aria-label={`Sort by ${col.header}`}
+                onClick={column.getToggleSortingHandler()}
+              >
                 {col.header}
-                <Table.HeaderButton
-                  icon={iconName}
-                  selected={!!sorted}
-                  aria-label={`Sort by ${col.header}`}
-                  onClick={column.getToggleSortingHandler()}
-                />
-              </span>
+              </Table.HeaderButton>
             );
           },
         })),
@@ -967,15 +967,14 @@ const SortLabel = ({
   const sorted = column.getIsSorted();
   const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+    <Table.HeaderButton
+      icon={iconName}
+      selected={!!sorted}
+      aria-label={ariaLabel}
+      onClick={column.getToggleSortingHandler()}
+    >
       {children}
-      <Table.HeaderButton
-        icon={iconName}
-        selected={!!sorted}
-        aria-label={ariaLabel}
-        onClick={column.getToggleSortingHandler()}
-      />
-    </span>
+    </Table.HeaderButton>
   );
 };
 

@@ -4,8 +4,7 @@ import React, { forwardRef } from 'react';
 import { Icon, IconSize } from '../../../base/icon/icon';
 import styles from './table-header-button.module.scss';
 
-export interface TableHeaderButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'aria-label'> {
+export interface TableHeaderButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Material icon name rendered inside the button (e.g. `unfold_more`,
    * `arrow_downward`, `filter_alt`).
@@ -25,27 +24,48 @@ export interface TableHeaderButtonProps
    */
   selected?: boolean;
   /**
-   * Required accessible name — these are icon-only buttons, so screen readers
-   * have nothing else to announce.
+   * Optional label rendered before the icon — use it for sortable column
+   * headers so the whole "text + icon" area is one clickable button. When
+   * omitted the button is icon-only (e.g. a filter trigger) and an
+   * `aria-label` should be supplied instead.
    */
-  'aria-label': string;
+  children?: React.ReactNode;
+  /**
+   * Accessible name. Required for icon-only buttons (no `children`), since
+   * screen readers have nothing else to announce. Optional when `children`
+   * provides visible text.
+   */
+  'aria-label'?: string;
   /** Size of the icon, in pixels. @default 18 */
   iconSize?: IconSize;
 }
 
 /**
- * Compact icon-only button intended for table header cells — sort toggles,
- * filter triggers, and similar inline header actions. Matches the Figma
- * "Filter and sort buttons" frame: transparent at rest, light-tint on
- * hover / active, brand colour when `selected` or focused, focus ring on
- * keyboard focus.
+ * Compact button intended for table header cells — sort toggles, filter
+ * triggers, and similar inline header actions. Pass `children` to render a
+ * label before the icon (the whole label + icon area becomes one clickable
+ * sort button, matching the Angular implementation); omit it for an icon-only
+ * trigger such as a filter. Matches the Figma "Filter and sort buttons" frame:
+ * transparent at rest, light-tint on hover / active, brand colour when
+ * `selected` or focused, focus ring on keyboard focus.
  *
  * `forwardRef` is wired through so the component can be used directly as a
  * `Popover.Trigger` child or referenced for imperative focus management.
  */
 export const TableHeaderButton = forwardRef<HTMLButtonElement, TableHeaderButtonProps>(
   (
-    { icon, filled = false, selected = false, disabled, onClick, className, iconSize = 18, type = 'button', ...rest },
+    {
+      icon,
+      filled = false,
+      selected = false,
+      disabled,
+      onClick,
+      className,
+      iconSize = 18,
+      type = 'button',
+      children,
+      ...rest
+    },
     ref
   ) => (
     <button
@@ -60,6 +80,7 @@ export const TableHeaderButton = forwardRef<HTMLButtonElement, TableHeaderButton
         className
       )}
     >
+      {children}
       <Icon name={icon} filled={filled} color="inherit" size={iconSize} />
     </button>
   )

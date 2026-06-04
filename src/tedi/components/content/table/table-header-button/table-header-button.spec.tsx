@@ -6,8 +6,22 @@ import { TableHeaderButton } from './table-header-button';
 import '@testing-library/jest-dom';
 
 describe('TableHeaderButton', () => {
-  it('renders an icon-only button with the required aria-label', () => {
+  it('renders an icon-only button named by aria-label', () => {
     render(<TableHeaderButton icon="unfold_more" aria-label="Sort by name" />);
+    expect(screen.getByRole('button', { name: 'Sort by name' })).toBeInTheDocument();
+  });
+
+  it('renders label children before the icon so the whole button is the sort target', () => {
+    render(<TableHeaderButton icon="unfold_more">Name</TableHeaderButton>);
+    expect(screen.getByRole('button', { name: 'Name' })).toBeInTheDocument();
+  });
+
+  it('lets aria-label override visible label text for the accessible name', () => {
+    render(
+      <TableHeaderButton icon="unfold_more" aria-label="Sort by name">
+        Name
+      </TableHeaderButton>
+    );
     expect(screen.getByRole('button', { name: 'Sort by name' })).toBeInTheDocument();
   });
 

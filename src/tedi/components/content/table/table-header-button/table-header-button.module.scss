@@ -1,9 +1,14 @@
 .tedi-table-header-button {
   display: inline-flex;
+  gap: var(--layout-grid-gutters-04);
   align-items: center;
   justify-content: center;
+  min-width: var(--button-xs-icon-size);
+  min-height: var(--button-xs-icon-size);
   padding: 0;
-  color: var(--general-text-tertiary);
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
   cursor: pointer;
   background: transparent;
   border: 0;
