@@ -63,13 +63,10 @@
 
 .tedi-table__cell {
   padding: var(--table-data-padding-y) var(--table-data-padding-x);
-  color: var(--general-text-primary);
   vertical-align: middle;
+  color: var(--general-text-primary);
 }
 
-// Column-level alignment modifiers driven by `column.meta.align` / `meta.vAlign`. Applied
-// uniformly to header / body / footer cells so a numeric column lines up at the right edge
-// across all three rows without per-render wrapper spans.
 .tedi-table__cell--align-left {
   text-align: left;
 }
@@ -181,9 +178,9 @@
   border: 0;
 
   &:focus-visible {
-    border-radius: var(--button-radius-sm);
     outline: var(--tedi-borders-02) solid var(--general-border-focus);
     outline-offset: -2px;
+    border-radius: var(--button-radius-sm);
   }
 
   &:disabled {

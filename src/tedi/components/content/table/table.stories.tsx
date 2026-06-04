@@ -381,6 +381,7 @@ export const Default: Story = {
       <EditableRowsContext.Provider value={editor}>
         <Table<Booking>
           id="tedi-table-default"
+          autoResetPageIndex={false}
           data={editor.rows}
           columns={bookingShowcaseColumns}
           pagination={SHOWCASE_PAGINATION_3}
@@ -400,6 +401,7 @@ export const Sizes: Story = {
         <EditableRowsContext.Provider value={defaultEditor}>
           <Table<Booking>
             id="tedi-table-sizes-default"
+            autoResetPageIndex={false}
             data={defaultEditor.rows}
             columns={bookingShowcaseColumns}
             pagination={SHOWCASE_PAGINATION_3}
@@ -409,6 +411,7 @@ export const Sizes: Story = {
         <EditableRowsContext.Provider value={smallEditor}>
           <Table<Booking>
             id="tedi-table-sizes-small"
+            autoResetPageIndex={false}
             data={smallEditor.rows}
             columns={bookingShowcaseColumns}
             size="small"
@@ -478,6 +481,7 @@ export const Simple: Story = {
         <EditableRowsContext.Provider value={bookingEditor}>
           <Table<Booking>
             id="tedi-table-simple-bookings"
+            autoResetPageIndex={false}
             data={bookingEditor.rows}
             columns={bookingShowcaseColumns}
             pagination={SHOWCASE_PAGINATION_3}
@@ -492,6 +496,7 @@ export const Simple: Story = {
         <EditableRowsContext.Provider value={doctorEditor}>
           <Table<Doctor>
             id="tedi-table-simple-doctors"
+            autoResetPageIndex={false}
             data={doctorEditor.rows}
             columns={simpleDoctorColumns}
             pagination={SHOWCASE_PAGINATION_3}
@@ -677,6 +682,7 @@ export const MergedCells: Story = {
         <Table<Booking>
           id="tedi-table-merged"
           verticalBorders
+          autoResetPageIndex={false}
           data={editor.rows}
           columns={mergedCellsColumns}
           pagination={DEFAULT_PAGINATION}
@@ -867,6 +873,7 @@ export const EditableValues: Story = {
       <EditableRowsContext.Provider value={editor}>
         <Table<Booking>
           id="tedi-table-editable"
+          autoResetPageIndex={false}
           data={editor.rows}
           columns={bookingShowcaseColumns}
           pagination={DEFAULT_PAGINATION}
@@ -990,8 +997,9 @@ const TextFilterPopover = ({
   label: string;
 }) => {
   const [draft, setDraft] = useState(value);
+  const [open, setOpen] = useState(false);
   return (
-    <Popover>
+    <Popover open={open} onToggle={setOpen}>
       <PopoverTrigger>
         <Table.HeaderButton icon="filter_alt" selected={!!value} filled={!!value} aria-label={`Filtreeri ${label}`} />
       </PopoverTrigger>
@@ -1012,11 +1020,19 @@ const TextFilterPopover = ({
               onClick={() => {
                 setDraft('');
                 onApply(undefined);
+                setOpen(false);
               }}
             >
               Tühista
             </Button>
-            <Button visualType="primary" size="small" onClick={() => onApply(draft || undefined)}>
+            <Button
+              visualType="primary"
+              size="small"
+              onClick={() => {
+                onApply(draft || undefined);
+                setOpen(false);
+              }}
+            >
               Filtreeri
             </Button>
           </div>
@@ -1028,6 +1044,21 @@ const TextFilterPopover = ({
 
 type DateRangeValue = { from?: string; to?: string };
 
+const dateRangeStringToDate = (value?: string): Date | undefined => {
+  if (!value) return undefined;
+  const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
+  if (!match) return undefined;
+  const [, dd, mm, yyyy] = match;
+  return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+};
+
+const dateToDateRangeString = (date?: Date): string | undefined => {
+  if (!date) return undefined;
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  return `${dd}.${mm}.${date.getFullYear()}`;
+};
+
 const DateRangeFilterPopover = ({
   value,
   onApply,
@@ -1037,40 +1068,36 @@ const DateRangeFilterPopover = ({
   onApply: (next: DateRangeValue | undefined) => void;
   label: string;
 }) => {
-  const [from, setFrom] = useState(value?.from ?? '');
-  const [to, setTo] = useState(value?.to ?? '');
+  const [range, setRange] = useState<DateRange | undefined>(() => {
+    const from = dateRangeStringToDate(value?.from);
+    const to = dateRangeStringToDate(value?.to);
+    return from || to ? { from, to } : undefined;
+  });
+  const [open, setOpen] = useState(false);
   const active = Boolean(value?.from || value?.to);
   return (
-    <Popover>
+    <Popover open={open} onToggle={setOpen}>
       <PopoverTrigger>
         <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent width="medium">
         <VerticalSpacing size={0.5}>
-          <TextField
-            id="filter-date-from"
-            name="filter-date-from"
-            label="Alates"
-            placeholder="pp.kk.aaaa"
-            value={from}
-            onChange={setFrom}
-          />
-          <TextField
-            id="filter-date-to"
-            name="filter-date-to"
-            label="Kuni"
-            placeholder="pp.kk.aaaa"
-            value={to}
-            onChange={setTo}
+          <DateField
+            id="filter-date-range"
+            mode="range"
+            label={label}
+            selected={range}
+            placeholder="pp.kk.aaaa - pp.kk.aaaa"
+            onSelect={(next) => setRange(next as DateRange | undefined)}
           />
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
             <Button
               visualType="secondary"
               size="small"
               onClick={() => {
-                setFrom('');
-                setTo('');
+                setRange(undefined);
                 onApply(undefined);
+                setOpen(false);
               }}
             >
               Tühista
@@ -1078,7 +1105,12 @@ const DateRangeFilterPopover = ({
             <Button
               visualType="primary"
               size="small"
-              onClick={() => onApply(from || to ? { from: from || undefined, to: to || undefined } : undefined)}
+              onClick={() => {
+                const fromStr = dateToDateRangeString(range?.from);
+                const toStr = dateToDateRangeString(range?.to);
+                onApply(fromStr || toStr ? { from: fromStr, to: toStr } : undefined);
+                setOpen(false);
+              }}
             >
               Filtreeri
             </Button>
@@ -1099,9 +1131,10 @@ const MultiSelectFilterPopover = ({
   label: string;
 }) => {
   const [draft, setDraft] = useState<CertStatus[]>(value ?? []);
+  const [open, setOpen] = useState(false);
   const active = (value?.length ?? 0) > 0;
   return (
-    <Popover>
+    <Popover open={open} onToggle={setOpen}>
       <PopoverTrigger>
         <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
       </PopoverTrigger>
@@ -1127,11 +1160,19 @@ const MultiSelectFilterPopover = ({
               onClick={() => {
                 setDraft([]);
                 onApply(undefined);
+                setOpen(false);
               }}
             >
               Tühista
             </Button>
-            <Button visualType="primary" size="small" onClick={() => onApply(draft.length ? draft : undefined)}>
+            <Button
+              visualType="primary"
+              size="small"
+              onClick={() => {
+                onApply(draft.length ? draft : undefined);
+                setOpen(false);
+              }}
+            >
               Filtreeri
             </Button>
           </div>
@@ -1606,6 +1647,7 @@ export const LongTexts: Story = {
       <EditableRowsContext.Provider value={editor}>
         <Table<Doctor>
           id="tedi-table-long-texts"
+          autoResetPageIndex={false}
           data={editor.rows}
           columns={longTextsColumns}
           pagination={SHOWCASE_PAGINATION_3}

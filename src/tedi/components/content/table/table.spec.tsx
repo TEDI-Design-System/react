@@ -300,6 +300,45 @@ describe('Table', () => {
       expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
     });
+
+    // Mirrors the editable stories: a state-held data array, mutated in place
+    // when the user "saves" a row (new array reference, same row count).
+    const EditableHarness = ({ autoResetPageIndex }: { autoResetPageIndex?: boolean }) => {
+      const [rows, setRows] = useState<Person[]>([
+        { id: '1', name: 'Anna', role: 'Engineer' },
+        { id: '2', name: 'Jüri', role: 'Designer' },
+      ]);
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => setRows((prev) => prev.map((r) => (r.id === '2' ? { ...r, role: 'Lead Designer' } : r)))}
+          >
+            mutate data
+          </button>
+          <Table<Person>
+            id="t-autoreset"
+            data={rows}
+            columns={columns}
+            autoResetPageIndex={autoResetPageIndex}
+            pagination={{ pageSize: 1, pageSizeOptions: [1, 2] }}
+          />
+        </>
+      );
+    };
+
+    it('keeps the current page across data changes when autoResetPageIndex is false', () => {
+      render(<EditableHarness autoResetPageIndex={false} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
+
+      // Same save, but the user stays on page 2 with the saved value.
+      fireEvent.click(screen.getByRole('button', { name: 'mutate data' }));
+
+      expect(screen.getByRole('cell', { name: 'Lead Designer' })).toBeInTheDocument();
+      expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
+    });
   });
 
   describe('persistence', () => {
@@ -618,6 +657,70 @@ describe('Table', () => {
       // Anna can expand → her row is exposed as a button; Jüri cannot, so his row stays a plain row.
       expect(screen.getByRole('cell', { name: 'Anna' }).closest('tr')).toHaveAttribute('role', 'button');
       expect(screen.getByRole('cell', { name: 'Jüri' }).closest('tr')).not.toHaveAttribute('role', 'button');
+    });
+  });
+
+  describe('paginateExpandedRows', () => {
+    interface NestedPerson extends Person {
+      subRows?: NestedPerson[];
+    }
+    // Page size 2: page 1 holds the top-level Alpha + Bravo, page 2 holds Charlie.
+    // Alpha has two children.
+    const nested: NestedPerson[] = [
+      {
+        id: 'A',
+        name: 'Alpha',
+        role: 'R',
+        subRows: [
+          { id: 'A1', name: 'Alpha-1', role: 'R' },
+          { id: 'A2', name: 'Alpha-2', role: 'R' },
+        ],
+      },
+      { id: 'B', name: 'Bravo', role: 'R' },
+      { id: 'C', name: 'Charlie', role: 'R' },
+    ];
+
+    it('keeps a parent’s expanded children on its page without pushing siblings off (default)', () => {
+      render(
+        <Table<NestedPerson>
+          id="t-pag-exp-default"
+          data={nested}
+          columns={columns}
+          getSubRows={(row) => row.subRows}
+          pagination={{ pageSize: 2, pageSizeOptions: [2, 5] }}
+        />
+      );
+
+      expect(screen.getByRole('cell', { name: 'Alpha' })).toBeInTheDocument();
+      expect(screen.getByRole('cell', { name: 'Bravo' })).toBeInTheDocument();
+
+      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+
+      // Both children render on the same page and Bravo is NOT pushed to page 2.
+      expect(screen.getByRole('cell', { name: 'Alpha-1' })).toBeInTheDocument();
+      expect(screen.getByRole('cell', { name: 'Alpha-2' })).toBeInTheDocument();
+      expect(screen.getByRole('cell', { name: 'Bravo' })).toBeInTheDocument();
+    });
+
+    it('splits children across pages when paginateExpandedRows is true (TanStack default)', () => {
+      render(
+        <Table<NestedPerson>
+          id="t-pag-exp-true"
+          data={nested}
+          columns={columns}
+          getSubRows={(row) => row.subRows}
+          paginateExpandedRows
+          pagination={{ pageSize: 2, pageSizeOptions: [2, 5] }}
+        />
+      );
+
+      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+
+      // Children now occupy page slots: only the first child fits, the second
+      // child and Bravo are pushed to page 2.
+      expect(screen.getByRole('cell', { name: 'Alpha-1' })).toBeInTheDocument();
+      expect(screen.queryByRole('cell', { name: 'Alpha-2' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('cell', { name: 'Bravo' })).not.toBeInTheDocument();
     });
   });
 

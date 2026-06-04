@@ -200,7 +200,15 @@ TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filt
 <Table<Person> id="people" data={rows} columns={columns} pagination={pagination} />
 ```
 
-**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `placeholder`, `placeholderRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`.
+**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `placeholder`, `placeholderRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`, `autoResetPageIndex`.
+
+#### Inline editing — keep the page with `autoResetPageIndex={false}`
+
+`autoResetPageIndex` maps to TanStack's option of the same name and **defaults to `true`** — any change to the `data` array snaps the table back to page 1, which is right after filtering/sorting but wrong for inline editing. If the consumer mutates `data` in place (e.g. a "Muuda"/"Salvesta" row editor that replaces the rows array on save), pass `autoResetPageIndex={false}` so saving a row on page 10 leaves the user on page 10.
+
+```tsx
+<Table<Booking> id="bookings" data={editor.rows} columns={columns} autoResetPageIndex={false} pagination={pagination} />
+```
 
 #### Sortable headers — pass the column label as `Table.HeaderButton` children
 
@@ -250,6 +258,10 @@ const columnVisibility = { email: !belowMd, role: !belowMd, location: !belowMd }
 ```
 
 When `renderSubComponent` is `undefined` (≥ md) the expand column isn't rendered at all — the full table shows. See the `Responsive` story.
+
+#### Nested rows + pagination — `paginateExpandedRows`
+
+`paginateExpandedRows` maps to TanStack's option but **defaults to `false`** (TanStack's own default is `true`), matching Angular: expanding a parent renders its children on the *same* page and only top-level rows count toward `pageSize`, so opening a row never pushes siblings to the next page or splits a parent's children across pages. Pass `true` to restore TanStack's behavior where sub-rows occupy page slots like any other row. Only relevant when the table is both expandable (`getSubRows`) and client-paginated.
 
 #### Accessibility — required for column headers with non-text content
 
@@ -870,6 +882,8 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `onPaginationChange?`, `onSortingChange?`, `onRowSelectionChange?`
 - `hidePagination?: boolean`, `size?: 'medium'`
 - `getSubRows?`, `renderSubComponent?`, `expandTrigger?: 'button' | 'row'` (`'row'` = whole expandable row toggles, neutral chevron)
+- `autoResetPageIndex?: boolean` (default `true`) — set `false` for inline-editing tables so saving a row doesn't jump back to page 1
+- `paginateExpandedRows?: boolean` (default `false`, unlike TanStack's `true`) — keeps a parent's expanded children on its page instead of letting them consume page slots / split across pages
 - `Table.HeaderButton` accepts `children` (label before icon) so the whole sort header is clickable; `aria-label` optional when `children` present, required for icon-only buttons
 - Responsive: horizontal scroll is the default (built-in `overflow-x: auto`). For a stacked layout, hide columns below a breakpoint via controlled `columnVisibility` + reveal them in `renderSubComponent` (no dedicated prop — composed at the call site)
 

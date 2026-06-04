@@ -364,12 +364,33 @@ export interface TableProps<TData> {
    */
   expandTrigger?: 'button' | 'row';
   /**
+   * Whether expanded sub-rows count toward pagination (TanStack's
+   * `paginateExpandedRows`). Defaults to `false` so expanding a parent keeps its
+   * children on the same page and only top-level rows fill `pageSize` — opening
+   * a row never pushes siblings to the next page or splits a parent's children
+   * across pages. Set to `true` for TanStack's default, where sub-rows occupy
+   * page slots like any other row.
+   *
+   * Has no effect unless the table is both expandable and paginated.
+   * @default false
+   */
+  paginateExpandedRows?: boolean;
+  /**
    * Enables client-side pagination and renders a built-in page-switcher footer.
    * Pass `true` for default settings or an options object to customise.
    * Page state lives on `TableState.pagination` so it is fully controllable and
    * persistable.
    */
   pagination?: boolean | TablePaginationOptions;
+  /**
+   * Whether the current page resets to the first page whenever `data` changes
+   * (TanStack's `autoResetPageIndex`). Defaults to `true`, which keeps the user
+   * on a valid page after filtering or sorting. Set to `false` for tables that
+   * mutate `data` in place — e.g. inline row editing — so saving a row doesn't
+   * yank the user back to page 1.
+   * @default true
+   */
+  autoResetPageIndex?: boolean;
   /**
    * Switches pagination to server-side mode. When `true`, Table stops slicing
    * `data` locally — `data` is treated as the rows for the current page only.
@@ -551,7 +572,6 @@ interface TableDataRowProps<TData> {
     onDrop: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onHandlePointerDown: () => void;
   };
-  /** Column id currently being dragged over (for drop-target indicator on body cells). */
   dragOverColumnId?: string | null;
 }
 
@@ -643,19 +663,10 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
   );
 };
 
-/**
- * Value exposed through `TableContext`. Subcomponents like ColumnsMenu use it
- * to read and mutate the table state without prop-drilling.
- */
 export interface TableContextValue<TData = unknown> {
   table: ReactTable<TData>;
   size: TableSize;
   id?: string;
-  /**
-   * Snapshot of the current Table state. Included so the context value
-   * identity changes whenever state updates — context consumers re-render
-   * even when they're passed as referentially-stable children.
-   */
   state: Partial<TableState>;
 }
 
@@ -663,29 +674,13 @@ const SELECT_COLUMN_ID = '__select__';
 const EXPAND_COLUMN_ID = '__expand__';
 const DRAG_COLUMN_ID = '__drag__';
 
-/**
- * Payload emitted by `Table` when a row is reordered via drag-and-drop.
- *
- * `fromIndex` / `toIndex` are positions in the **source `data` array** —
- * unchanged by sorting, filtering, or pagination. Apply directly with e.g.
- * `arrayMove(data, fromIndex, toIndex)`. `fromId` / `toId` mirror those
- * positions via the rows' TanStack ids (defaulting to the row's string
- * index in `data`, unless overridden via `getRowId`).
- */
 export interface TableRowDropEvent {
   fromId: string;
   toId: string;
-  /** Index of the dragged row in the original `data` array. */
   fromIndex: number;
-  /** Index of the drop target in the original `data` array. */
   toIndex: number;
 }
 
-// Satisfy the community-side `declare module '@tanstack/table-core'` FilterFns
-// augmentation so the typed `useReactTable` signature accepts our options. The
-// community Table uses richer implementations; the TEDI-Ready Table's stories
-// drive filtering via built-ins (`includesString`) or per-column `filterFn`
-// overrides, so these stubs are never invoked in practice.
 const passthroughFilter: FilterFn<unknown> = () => true;
 const DEFAULT_FILTER_FNS = {
   text: passthroughFilter,
@@ -733,7 +728,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     getRowCanExpand,
     getSubRows,
     expandTrigger = 'button',
+    paginateExpandedRows = false,
     pagination: paginationProp,
+    autoResetPageIndex = true,
     manualPagination = false,
     manualSorting = false,
     manualFiltering = false,
@@ -754,8 +751,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const getLabelRef = useRef(getLabel);
   getLabelRef.current = getLabel;
 
-  // Stable fallback id so two unidentified `<Table>`s on the same page don't
-  // collide on the synthetic checkbox / expand / filter input ids.
   const generatedId = useId();
   const resolvedId = id ?? generatedId;
 
@@ -1024,6 +1019,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
     enableColumnFilters,
+    autoResetPageIndex,
+    paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
     manualSorting,
     manualFiltering,
