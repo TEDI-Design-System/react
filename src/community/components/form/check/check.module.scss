@@ -33,14 +33,14 @@
   .check__input:not(:disabled) + &:hover,
   .check__input:focus:not(:disabled) + & {
     cursor: pointer;
-    border-color: var(--color-primary-main);
     outline: var(--color-primary-main) solid 1px;
+    border-color: var(--color-primary-main);
   }
 
   .check__input:focus-visible:not(:disabled) + & {
-    border-color: var(--color-primary-main);
     outline: var(--color-primary-main) solid 2px;
     outline-offset: 2px;
+    border-color: var(--color-primary-main);
   }
 
   [type='checkbox']:checked + &,

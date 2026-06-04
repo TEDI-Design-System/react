@@ -523,6 +523,72 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 
 Sub-component: `VerticalSpacing.Item`
 
+### Header
+**Props:** `HeaderProps`
+- `children: ReactNode` (required)
+- `toggle?: ReactNode` — mobile side navigation toggle
+- `bottom?: ReactNode` — content below header on mobile
+
+Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Language`, `Header.Login`, `Header.Logout`, `Header.Profile`, `Header.Role`, `Header.Search`
+
+**Header.Logo:** `logo: ReactNode`, `logoDark?: ReactNode`, `href?: string`, `showLogo?: boolean = true`
+- `showLogo` is a simple boolean for feature flags or custom media queries. For responsive hiding at standard breakpoints, wrap with `<ShowAt>`/`<HideAt>` instead (e.g. `<ShowAt md><Header.Logo ... /></ShowAt>`).
+
+**Header.Center:** `children: ReactNode`, `alignment?: 'flex-start' | 'center' | 'space-between' = 'center'`
+**Header.Actions:** `children: ReactNode`
+
+**Header.Role:** `HeaderRoleProps`
+- `representatives: Representative[]` (required) — `Representative` has `id: string` (required), `name: string`, `description?: string`, `icon?: string | IconProps`
+- `label?: ReactNode` — descriptive label above the name
+- `showDescription?: boolean = true` — show the selected representative's description in the header area
+- `isOrganization?: boolean` — organization context (affects search label)
+- `accordionLabels?: { open?: string; close?: string }` — custom toggle labels on mobile
+- `searchLabel?: string` — search input label (falls back to i18n)
+- `organizationSearchLabel?: string` — search label when `isOrganization` is true
+- `searchId?: string` — id for the search input (falls back to `useId()`)
+- `showSearch?: boolean = false` — show search input above the representative list
+- `searchClearable?: boolean = false` — show clear button on search input
+- `clearSearchOnSelect?: boolean = true` — clear search when a representative is selected
+- `showRoleSwitch?: boolean` — show the role selection toggle (defaults to true when multiple representatives)
+- `children?: ReactNode` — custom content replacing the default representative list
+- `noResultsContent?: ReactNode` — custom content when filtered list is empty
+- `onRepresentativeChange?: (representative: Representative) => void`
+- `onRoleSelectionToggle?: (isOpen: boolean) => void`
+- When multiple `Header.Role` components are inside a `Header.Profile`, opening one accordion automatically closes the others on mobile/tablet.
+
+**Header.Language:** `HeaderLanguageProps`
+- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `isSelected?: boolean`, `aria-label?: string`
+- `currentLanguage?: string` — initially displayed label (falls back to matching locale or first item)
+- `selectLabel?: string` — label for the selector (falls back to i18n)
+
+**Header.Login:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
+**Header.Logout:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
+**Header.Profile:** bp — `showPopover?: Breakpoint = 'lg'`, `label?: string`, `showLabel?: boolean = false`, `disabled?: boolean = false`, `noStyle?: boolean = false`, `children: ReactNode`
+- `noStyle` removes default padding, borders, and background from modal children. Does not affect `Header.Role`'s own 4px brand bottom border.
+
+**Header.Search:** wrapper that accepts a Search child (and optional `mobileVariant`). `children: ReactNode`, `mobileVariant?: 'modal' | 'inline'`, `mobileLabels?: { button?, modalTitle? }`, `disabled?: boolean`
+
+```tsx
+<Header
+  toggle={<SideNav.Toggle />}
+  bottom={
+    <Header.Search mobileVariant="inline">
+      <Search label="Search" hideLabel id="header-search" />
+    </Header.Search>
+  }
+>
+  <Header.Logo logo={<img src="/logo.svg" alt="Logo" />} href="/" />
+  <Header.Center><Link href="/about">About</Link></Header.Center>
+  <Header.Actions>
+    <Header.Search>
+      <Search label="Search" hideLabel id="header-search" />
+    </Header.Search>
+    <Header.Language />
+    <Header.Login />
+  </Header.Actions>
+</Header>
+```
+
 ### SideNav
 **Props:** `SideNavProps<C>` | poly
 - `ariaLabel: string` (required)
@@ -562,6 +628,52 @@ Sub-component: `Skeleton.Block`
 ```tsx
 <Link href="/docs" target="_blank">Documentation</Link>
 <Link as={NavLink} to="/profile">Profile</Link>
+```
+
+### Breadcrumbs
+**Props:** `BreadcrumbsProps` | bp
+
+> The community `Breadcrumbs` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of this TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
+
+- `children: ReactNode` (required) — each top-level child becomes one crumb; chevron separators are inserted between them
+- `ariaLabel?: string` — falls back to the `breadcrumbs` label from `LabelProvider`
+- `showMoreLabel?: string` — sr-only label for the ellipsis button in collapsed mode; falls back to the `breadcrumbs.show-more` label from `LabelProvider`
+- `separator?: ReactNode` — node rendered between crumbs (string like `'/'`, an `Icon`, or any markup); defaults to a chevron icon and is always hidden from assistive technology
+- `className?: string`
+- **Breakpoint-aware:**
+  - `variant?: 'long' | 'short' = 'long'` — `'short'` renders only the second-to-last child as a back-link with an `arrow_back` icon (mobile pattern); renders nothing if fewer than two children are supplied
+  - `maxItems?: number` — when set and the trail is longer, the middle crumbs collapse into a `…` button that opens a `Dropdown` listing the hidden crumbs (long variant only)
+  - `itemsBeforeCollapse?: number = 1`, `itemsAfterCollapse?: number = 1` — how many crumbs stay visible on each side of the ellipsis
+
+Children-as-data API (same shape as MUI's `Breadcrumbs`). Use `<Link>` (or any anchor) for navigable crumbs and a plain element (e.g. `<span>`) for the current page — add `aria-current="page"` to it yourself. The component wraps each child in an `<li>` inside an `<ol>`; separators are `<li aria-hidden="true">` so screen readers announce only the actual crumbs.
+
+In short mode the component clones the second-to-last child to inject `iconLeft="arrow_back"` (works if that child is a TEDI `Link`; otherwise pass `iconLeft` explicitly or the clone is a no-op for unrecognised props).
+
+```tsx
+import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
+
+<Breadcrumbs>
+  <Link href="/">Dashboard</Link>
+  <Link href="/docs">Documents</Link>
+  <Link href="/docs/mine">My documents</Link>
+  <span aria-current="page">Application nr 506</span>
+</Breadcrumbs>
+
+// Short variant — renders only "← My documents"
+<Breadcrumbs variant="short">{...}</Breadcrumbs>
+
+// Short on mobile, full trail from md up
+<Breadcrumbs variant="short" md={{ variant: 'long' }}>{...}</Breadcrumbs>
+
+// Condensed — middle crumbs collapse into a "…" dropdown
+<Breadcrumbs maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2}>
+  <Link href="/">Dashboard</Link>
+  <Link href="/patients">Patients</Link>
+  <Link href="/patients/anna">Anna Tamm</Link>
+  <Link href="/patients/anna/visits">Visits</Link>
+  <Link href="/patients/anna/visits/2024-05-12">2024-05-12</Link>
+  <span aria-current="page">Restrictions</span>
+</Breadcrumbs>
 ```
 
 ## Notifications
@@ -764,7 +876,8 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ## Layout
 
 ### Header
-Comprehensive header with sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
+- Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
+- **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
 
 ## Misc
 

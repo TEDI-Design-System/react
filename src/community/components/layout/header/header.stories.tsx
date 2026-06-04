@@ -17,6 +17,11 @@ import Header, { HeaderProps } from './header/header';
 export default {
   component: Header,
   title: 'Community/Layout/Header',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 } as Meta;
 type Story = StoryObj<typeof Header>;
 
