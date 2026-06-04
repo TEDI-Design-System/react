@@ -96,9 +96,9 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
    */
   formatFileSize?: (bytes: number) => string;
   /**
-   * Material icon name for the file-type glyph rendered on the left. Defaults
-   * to `'description'`. Pass `null` to omit the icon entirely.
-   * @default description
+   * Optional Material icon name for a file-type glyph rendered on the left.
+   * Omitted by default to match the Figma component (name-only row); opt in
+   * with e.g. `'description'`, `'picture_as_pdf'`, `'image'`.
    */
   icon?: string | null;
   /**
@@ -119,8 +119,8 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
    */
   onRemove?: () => void;
   /**
-   * Material icon name for the remove button. Defaults to `'close'`. Common
-   * alternative: `'delete'` (trash can) for already-saved attachments.
+   * Material icon name for the remove button. Defaults to `'delete'` (trash
+   * can), matching Figma. Override with e.g. `'close'` for a dismiss affordance.
    * @default delete
    */
   removeIcon?: string;
@@ -221,7 +221,7 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
               name="error"
               color="danger"
               display="inline"
-              size={18}
+              size={16}
               className={styles['tedi-attachment__invalid-icon']}
             />
           )}
