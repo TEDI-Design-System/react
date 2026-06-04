@@ -171,9 +171,34 @@ export interface PaginationProps {
    * the edge nav buttons. The labels are sourced from `labels.previous` /
    * `labels.next` (or the corresponding i18n keys). Default keeps the
    * icon-only Figma variant.
+   *
+   * When set, the arrows render as small text links (label + icon, link
+   * colour, underline on hover) rather than circular icon buttons —
+   * `arrowVariant` is ignored in this mode.
    * @default false
    */
   showEdgeNavLabels?: boolean;
+  /**
+   * Material icon name for the Previous arrow. Override to swap the default
+   * chevron (e.g. `'first_page'`, `'chevron_left'`).
+   * @default 'arrow_back'
+   */
+  previousIcon?: string;
+  /**
+   * Material icon name for the Next arrow.
+   * @default 'arrow_forward'
+   */
+  nextIcon?: string;
+  /**
+   * Visual treatment of the prev/next arrow buttons:
+   * - `'default'` — brand-coloured icon on a transparent circle (light tint on
+   *   hover); pair with `showEdgeNavLabels` for the small-link style.
+   * - `'primary'` — a primary small `Button` with the label text and a leading
+   *   (previous) / trailing (next) arrow icon, for prominent navigation. The
+   *   text label is always shown, so `showEdgeNavLabels` has no effect here.
+   * @default default
+   */
+  arrowVariant?: 'default' | 'primary';
   /**
    * Additional class name on the root element.
    */
@@ -209,6 +234,9 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     hidePager = false,
     showPrevNextButtons = false,
     showEdgeNavLabels = false,
+    previousIcon = 'arrow_back',
+    nextIcon = 'arrow_forward',
+    arrowVariant = 'default',
     className,
   } = props;
 
@@ -323,6 +351,60 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const nextItem = items[items.length - 1];
   const pageItems = items.slice(1, -1);
 
+  const renderEdgeButton = (
+    side: 'previous' | 'next',
+    item: PaginationItem | undefined,
+    icon: string,
+    label: string
+  ) => {
+    const sideClass = styles[`tedi-pagination__button--nav-${side}`];
+
+    if (arrowVariant === 'primary') {
+      return (
+        <Button
+          type="button"
+          visualType="primary"
+          size="small"
+          iconLeft={side === 'previous' ? icon : undefined}
+          iconRight={side === 'next' ? icon : undefined}
+          className={sideClass}
+          disabled={item?.disabled}
+          onClick={() => handlePageChange(item?.page ?? null)}
+        >
+          {label}
+        </Button>
+      );
+    }
+
+    const iconNode = <Icon name={icon} size={18} color="inherit" />;
+    const labelNode = showEdgeNavLabels ? <span className={styles['tedi-pagination__nav-label']}>{label}</span> : null;
+
+    return (
+      <Button
+        type="button"
+        className={cn(styles['tedi-pagination__button'], styles['tedi-pagination__button--nav'], sideClass, {
+          [styles['tedi-pagination__button--nav-link']]: showEdgeNavLabels,
+        })}
+        aria-label={label}
+        disabled={item?.disabled}
+        onClick={() => handlePageChange(item?.page ?? null)}
+        noStyle
+      >
+        {side === 'previous' ? (
+          <>
+            {iconNode}
+            {labelNode}
+          </>
+        ) : (
+          <>
+            {labelNode}
+            {iconNode}
+          </>
+        )}
+      </Button>
+    );
+  };
+
   return (
     <div ref={ref} className={rootClassName} data-name="tedi-pagination">
       <span className={styles['tedi-pagination__status']} role="status" aria-live="polite" aria-atomic="true">
@@ -340,32 +422,9 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       <div className={styles['tedi-pagination__slot-center']}>
         {showPager && (
           <nav aria-label={mergedLabels.ariaLabel} className={styles['tedi-pagination__nav']}>
-            {!showPrevNextButtons && previousItem?.disabled ? null : (
-              <Button
-                type="button"
-                className={cn(
-                  styles['tedi-pagination__button'],
-                  styles['tedi-pagination__button--nav'],
-                  styles['tedi-pagination__button--nav-previous'],
-                  { [styles['tedi-pagination__button--nav-with-label']]: showEdgeNavLabels }
-                )}
-                aria-label={mergedLabels.previous}
-                disabled={previousItem?.disabled}
-                onClick={() => handlePageChange(previousItem?.page ?? null)}
-                noStyle
-              >
-                {showEdgeNavLabels ? (
-                  <span className={styles['tedi-pagination__nav-icon']}>
-                    <Icon name="arrow_back" size={18} color="brand" />
-                  </span>
-                ) : (
-                  <Icon name="arrow_back" size={18} color="brand" />
-                )}
-                {showEdgeNavLabels && (
-                  <span className={styles['tedi-pagination__nav-label']}>{mergedLabels.previous}</span>
-                )}
-              </Button>
-            )}
+            {!showPrevNextButtons && previousItem?.disabled
+              ? null
+              : renderEdgeButton('previous', previousItem, previousIcon, mergedLabels.previous)}
 
             {!useCompactPicker && (
               <ul className={styles['tedi-pagination__list']}>
@@ -428,30 +487,9 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
               </button>
             )}
 
-            {!showPrevNextButtons && nextItem?.disabled ? null : (
-              <Button
-                type="button"
-                className={cn(
-                  styles['tedi-pagination__button'],
-                  styles['tedi-pagination__button--nav'],
-                  styles['tedi-pagination__button--nav-next'],
-                  { [styles['tedi-pagination__button--nav-with-label']]: showEdgeNavLabels }
-                )}
-                aria-label={mergedLabels.next}
-                disabled={nextItem?.disabled}
-                onClick={() => handlePageChange(nextItem?.page ?? null)}
-                noStyle
-              >
-                {showEdgeNavLabels && <span className={styles['tedi-pagination__nav-label']}>{mergedLabels.next}</span>}
-                {showEdgeNavLabels ? (
-                  <span className={styles['tedi-pagination__nav-icon']}>
-                    <Icon name="arrow_forward" size={18} color="brand" />
-                  </span>
-                ) : (
-                  <Icon name="arrow_forward" size={18} color="brand" />
-                )}
-              </Button>
-            )}
+            {!showPrevNextButtons && nextItem?.disabled
+              ? null
+              : renderEdgeButton('next', nextItem, nextIcon, mergedLabels.next)}
           </nav>
         )}
       </div>

@@ -194,29 +194,57 @@ export const TopBottomSplit: Story = {
 };
 
 /**
- * `showPrevNextButtons` defaults to `false` — the disabled Previous on page 1
- * (or disabled Next on the last page) drops out of the DOM for a compact look.
- * Set the prop to `true` to keep both arrows rendered (disabled) at the edges
- * so the pager width stays stable as the user navigates.
+ * By default the disabled Previous on page 1 (or disabled Next on the last
+ * page) drops out of the DOM for a compact look. Set `showPrevNextButtons` to
+ * keep both arrows rendered (disabled) at the boundaries so the pager width
+ * stays stable as the user navigates. Mirrors Angular's `disableArrowsAtBoundary`.
  */
-export const AlwaysShowPrevNextButtons: Story = {
-  render: function AlwaysShowPrevNextButtons() {
+export const DisabledBoundaryArrows: Story = {
+  render: function DisabledBoundaryArrows() {
     const [page, setPage] = useState(1);
     return <Pagination pageCount={5} page={page} onPageChange={setPage} showPrevNextButtons />;
   },
 };
 
 /**
- * `showEdgeNavLabels` puts the `previous` / `next` label text next to the arrow
- * icons on the edge nav buttons — useful for desktop-only layouts where the
- * icon-only variant feels too terse. The aria-label stays the same so screen
- * readers aren't double-announced.
+ * `showEdgeNavLabels` renders the prev / next arrows as small text links
+ * (label + icon, link colour, underline on hover) instead of icon-only circular
+ * buttons — useful for desktop-only layouts where the icon-only variant feels
+ * too terse. The aria-label stays the same so screen readers aren't
+ * double-announced.
  */
-export const WithEdgeNavLabels: Story = {
+export const ArrowsWithLabels: Story = {
   args: {
     pageCount: 8,
     defaultPage: 3,
     showEdgeNavLabels: true,
+  },
+};
+
+/**
+ * Override the default `arrow_back` / `arrow_forward` icons via `previousIcon`
+ * and `nextIcon` (any Material icon name) — e.g. chevrons or first/last-page
+ * glyphs.
+ */
+export const CustomArrowIcons: Story = {
+  args: {
+    pageCount: 10,
+    defaultPage: 4,
+    previousIcon: 'chevron_left',
+    nextIcon: 'chevron_right',
+  },
+};
+
+/**
+ * `arrowVariant="primary"` renders the prev / next arrows as primary small
+ * `Button`s with the label text and a leading / trailing arrow icon, for more
+ * prominent navigation. Pair with `showPrevNextButtons` to keep the disabled
+ * boundary button visible.
+ */
+export const ArrowsPrimaryVariant: Story = {
+  render: function ArrowsPrimaryVariant() {
+    const [page, setPage] = useState(3);
+    return <Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="primary" showPrevNextButtons />;
   },
 };
 

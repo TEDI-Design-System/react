@@ -204,6 +204,27 @@ describe('Pagination component', () => {
     expect(prev).not.toHaveTextContent(/Previous page/i);
   });
 
+  it('renders the default arrow glyphs', () => {
+    render(<Pagination pageCount={5} defaultPage={3} />);
+    expect(screen.getByRole('button', { name: /Previous page/i })).toHaveTextContent('arrow_back');
+    expect(screen.getByRole('button', { name: /Next page/i })).toHaveTextContent('arrow_forward');
+  });
+
+  it('renders custom arrow glyphs via previousIcon / nextIcon', () => {
+    render(<Pagination pageCount={5} defaultPage={3} previousIcon="chevron_left" nextIcon="chevron_right" />);
+    expect(screen.getByRole('button', { name: /Previous page/i })).toHaveTextContent('chevron_left');
+    expect(screen.getByRole('button', { name: /Next page/i })).toHaveTextContent('chevron_right');
+  });
+
+  it('navigates with primary-variant arrows', () => {
+    const onPageChange = jest.fn();
+    render(<Pagination pageCount={5} page={3} arrowVariant="primary" onPageChange={onPageChange} />);
+    fireEvent.click(screen.getByRole('button', { name: /Next page/i }));
+    expect(onPageChange).toHaveBeenCalledWith(4);
+    fireEvent.click(screen.getByRole('button', { name: /Previous page/i }));
+    expect(onPageChange).toHaveBeenCalledWith(2);
+  });
+
   it('uses a custom results label when `labels.results` is provided', () => {
     render(
       <Pagination

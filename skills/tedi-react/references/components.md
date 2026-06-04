@@ -583,6 +583,35 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### Pagination
+**Props:** `PaginationProps` | fRef
+
+Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` the number list collapses into a "page / total" trigger that opens a mobile modal picker.
+
+- `pageCount: number` (required), `page?` (controlled, 1-based) + `onPageChange?`, or `defaultPage?` (uncontrolled)
+- `totalItems?` → renders the results label; `pageSize?` + `pageSizeOptions?: number[]` + `onPageSizeChange?` → renders the page-size select
+- `boundaryCount? = 1`, `siblingCount? = 1` — how many page numbers stay visible at the ends / around the active page before `…`
+- `background?: 'white' | 'transparent' = 'white'`, `borders?: 'top' | 'bottom' | 'both' | 'none' = 'top'`
+- `hideResults?`, `hidePageSize?`, `hidePager?: boolean | Breakpoint` — hide a slot entirely, or only below the given breakpoint
+- `labels?: Partial<PaginationLabels>` — override aria/text labels (`previous`, `next`, `results`, `pageSize`, `pageStatus`, …); otherwise sourced from `LabelProvider`
+
+**Arrow variants** (harmonized with Angular):
+- `showPrevNextButtons?: boolean = false` — keep the prev/next arrow visible-but-disabled at the first/last page instead of dropping it (stable footprint). Angular calls this `disableArrowsAtBoundary`.
+- `showEdgeNavLabels?: boolean = false` — render the arrows as **small text links** (label + icon, link colour, underline on hover) instead of icon-only circles.
+- `previousIcon? = 'arrow_back'`, `nextIcon? = 'arrow_forward'` — override the arrow glyphs (e.g. `'chevron_left'` / `'chevron_right'`).
+- `arrowVariant?: 'default' | 'primary' = 'default'` — `'primary'` renders the arrows as **primary small `Button`s with the label text + a leading/trailing arrow icon** (always shows the label, so `showEdgeNavLabels` has no effect in this mode).
+
+```tsx
+const [page, setPage] = useState(1);
+<Pagination
+  pageCount={10} page={page} onPageChange={setPage}
+  totalItems={97} pageSize={10} pageSizeOptions={[10, 25, 50, 100]} onPageSizeChange={setSize}
+/>
+
+// Prominent, labelled navigation
+<Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="primary" showPrevNextButtons />
+```
+
 ## Notifications
 
 ### Alert
