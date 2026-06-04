@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
@@ -21,6 +22,7 @@ import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger } from '../../
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { Tooltip } from '../../overlays/tooltip';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
+import { TextGroup } from '../text-group/text-group';
 import { Truncate } from '../truncate/truncate';
 import type { TableProps } from './table';
 import { groupRowSpan, Table } from './table';
@@ -1317,6 +1319,50 @@ export const CollapsibleRows: Story = {
 };
 
 /**
+ * Same nested data as `CollapsibleRows`, but `expandTrigger="row"` makes a click
+ * anywhere on an expandable row toggle it (Enter / Space too) — only rows that can
+ * expand become clickable. The chevron renders in the neutral `default` arrow style
+ * as a plain icon-only indicator rather than the bordered `secondary` button.
+ */
+export const CollapsibleRowsRowTrigger: Story = {
+  render: () => {
+    const columns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'name', header: 'Isik', accessorKey: 'name' },
+      { id: 'age', header: 'Vanus', accessorKey: 'age' },
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+      {
+        id: 'status',
+        header: 'Tõendi staatus',
+        accessorKey: 'status',
+        cell: ({ row }) => (
+          <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
+        ),
+      },
+    ];
+    return (
+      <Table<CollapsibleRecord>
+        id="tedi-table-collapse-row-trigger"
+        data={collapsiblePeople}
+        columns={columns}
+        getSubRows={(row) => row.subRows}
+        expandTrigger="row"
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
+  },
+};
+
+/**
+ * Columns hidden on narrow viewports — the secondary columns whose `id` is in `RESPONSIVE_SECONDARY_COLUMNS`
+ * are toggled off below `md` and re-surfaced inside the expandable detail row.
+ */
+const RESPONSIVE_SECONDARY_COLUMNS: { id: keyof Person; header: string }[] = [
+  { id: 'email', header: 'E-post' },
+  { id: 'role', header: 'Roll' },
+  { id: 'location', header: 'Asukoht' },
+];
+
+/**
  * Row checkboxes via `enableRowSelection`. A header checkbox selects/deselects all rows on the
  * current page. Read selected rows with `table.getSelectedRowModel().rows` in `onStateChange`.
  */
@@ -1965,6 +2011,69 @@ const { data: page, total } = useServerQuery({ pagination, sorting });
           pagination={{ pageSize: 5, pageSizeOptions: [5, 10, 25] }}
         />
       </VerticalSpacing>
+    );
+  },
+};
+
+/**
+ * Responsive table. The default for any wide table is **horizontal scroll** — the Table already wraps
+ * itself in an `overflow-x: auto` container, so no extra props are needed for that. This story shows the
+ * *opt-in* alternative that mirrors the Angular `Responsive` story: below the `md` breakpoint the secondary
+ * columns are hidden (via controlled `columnVisibility`) and re-surfaced as label/value pairs inside an
+ * expandable detail row (`renderSubComponent` + `getRowCanExpand`, both gated on the breakpoint). At `md`
+ * and up the full table renders and the expand column disappears. Resize the preview to see the switch.
+ */
+export const Responsive: Story = {
+  render: function Responsive() {
+    const breakpoint = useBreakpoint();
+    const belowMd = isBreakpointBelow(breakpoint, 'md');
+
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () => [
+        { id: 'name', header: 'Nimi', accessorKey: 'name' },
+        { id: 'email', header: 'E-post', accessorKey: 'email' },
+        { id: 'role', header: 'Roll', accessorKey: 'role' },
+        { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+        { id: 'salary', header: 'Palk', accessorKey: 'salary' },
+      ],
+      []
+    );
+
+    const columnVisibility = useMemo(
+      () =>
+        RESPONSIVE_SECONDARY_COLUMNS.reduce<Record<string, boolean>>((acc, col) => {
+          acc[col.id] = !belowMd;
+          return acc;
+        }, {}),
+      [belowMd]
+    );
+
+    return (
+      <Table<Person>
+        id="tedi-table-responsive"
+        data={people}
+        columns={columns}
+        state={{ columnVisibility }}
+        getRowCanExpand={() => belowMd}
+        renderSubComponent={
+          belowMd
+            ? (row) => (
+                <VerticalSpacing size={0.5}>
+                  {RESPONSIVE_SECONDARY_COLUMNS.map((col) => (
+                    <TextGroup
+                      key={col.id}
+                      type="horizontal"
+                      labelWidth="6rem"
+                      label={col.header}
+                      value={String(row.original[col.id])}
+                    />
+                  ))}
+                </VerticalSpacing>
+              )
+            : undefined
+        }
+        pagination={DEFAULT_PAGINATION}
+      />
     );
   },
 };

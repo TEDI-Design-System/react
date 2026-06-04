@@ -559,6 +559,68 @@ describe('Table', () => {
     });
   });
 
+  describe('expandTrigger="row"', () => {
+    interface NestedPerson extends Person {
+      subRows?: NestedPerson[];
+    }
+    const nested: NestedPerson[] = [
+      { id: '1', name: 'Anna', role: 'Engineer', subRows: [{ id: '1-1', name: 'Anna Jr', role: 'Intern' }] },
+      { id: '2', name: 'Jüri', role: 'Designer' },
+    ];
+
+    it('toggles an expandable row when the row body is clicked', () => {
+      render(
+        <Table<NestedPerson>
+          id="t-exp-row"
+          data={nested}
+          columns={columns}
+          getSubRows={(row) => row.subRows}
+          expandTrigger="row"
+        />
+      );
+
+      expect(screen.queryByRole('cell', { name: 'Anna Jr' })).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('cell', { name: 'Anna' }));
+      expect(screen.getByRole('cell', { name: 'Anna Jr' })).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('cell', { name: 'Anna' }));
+      expect(screen.queryByRole('cell', { name: 'Anna Jr' })).not.toBeInTheDocument();
+    });
+
+    it('toggles via Enter / Space when the row is focused', () => {
+      render(
+        <Table<NestedPerson>
+          id="t-exp-row-kbd"
+          data={nested}
+          columns={columns}
+          getSubRows={(row) => row.subRows}
+          expandTrigger="row"
+        />
+      );
+
+      const annaRow = screen.getByRole('cell', { name: 'Anna' }).closest('tr') as HTMLTableRowElement;
+      fireEvent.keyDown(annaRow, { key: 'Enter' });
+      expect(screen.getByRole('cell', { name: 'Anna Jr' })).toBeInTheDocument();
+      fireEvent.keyDown(annaRow, { key: ' ' });
+      expect(screen.queryByRole('cell', { name: 'Anna Jr' })).not.toBeInTheDocument();
+    });
+
+    it('makes only expandable rows interactive', () => {
+      render(
+        <Table<NestedPerson>
+          id="t-exp-row-roles"
+          data={nested}
+          columns={columns}
+          getSubRows={(row) => row.subRows}
+          expandTrigger="row"
+        />
+      );
+
+      // Anna can expand → her row is exposed as a button; Jüri cannot, so his row stays a plain row.
+      expect(screen.getByRole('cell', { name: 'Anna' }).closest('tr')).toHaveAttribute('role', 'button');
+      expect(screen.getByRole('cell', { name: 'Jüri' }).closest('tr')).not.toHaveAttribute('role', 'button');
+    });
+  });
+
   describe('column filters', () => {
     it('filters rows based on the per-column filter input', () => {
       render(<Table<Person> id="t-filter" data={data} columns={columns} enableColumnFilters />);

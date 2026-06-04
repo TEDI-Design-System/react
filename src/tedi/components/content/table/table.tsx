@@ -351,6 +351,19 @@ export interface TableProps<TData> {
    */
   getSubRows?: (row: TData) => TData[] | undefined;
   /**
+   * How an expandable row is toggled:
+   * - `'button'` (default) — only the chevron button toggles expansion, and it
+   *   renders in the bordered `secondary` arrow style.
+   * - `'row'` — a click anywhere on an expandable row toggles it (Enter/Space
+   *   too), and the chevron renders in the neutral `default` arrow style as a
+   *   plain indicator. Only rows that can expand become clickable.
+   *
+   * Has no effect unless the table is expandable (`getSubRows` or
+   * `renderSubComponent` is set).
+   * @default button
+   */
+  expandTrigger?: 'button' | 'row';
+  /**
    * Enables client-side pagination and renders a built-in page-switcher footer.
    * Pass `true` for default settings or an options object to customise.
    * Page state lives on `TableState.pagination` so it is fully controllable and
@@ -719,6 +732,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     renderSubComponent,
     getRowCanExpand,
     getSubRows,
+    expandTrigger = 'button',
     pagination: paginationProp,
     manualPagination = false,
     manualSorting = false,
@@ -953,7 +967,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
             >
               <Collapse
                 iconOnly
-                arrowType="secondary"
+                arrowType={expandTrigger === 'row' ? 'default' : 'secondary'}
                 hideCollapseText
                 {...collapseProps}
                 id={`${resolvedId}-expand-${row.id}`}
@@ -977,6 +991,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     hasSelection,
     selectionMode,
     hasExpansion,
+    expandTrigger,
     draggableRows,
     resolvedId,
     checkboxProps,
@@ -1041,7 +1056,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
 
   const hasGroupedHeaders = table.getHeaderGroups().length > 1;
-  const hoverEnabled = rowHover ?? Boolean(onRowClick);
+  const rowExpandsOnClick = expandTrigger === 'row' && hasExpansion;
+  const hoverEnabled = rowHover ?? (Boolean(onRowClick) || rowExpandsOnClick);
 
   const rootClassName = cn(
     styles['tedi-table'],
@@ -1052,7 +1068,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--borderless']]: borderless,
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
       [styles['tedi-table--sticky-header']]: stickyHeader,
-      [styles['tedi-table--clickable-rows']]: Boolean(onRowClick),
+      [styles['tedi-table--clickable-rows']]: Boolean(onRowClick) || rowExpandsOnClick,
       [styles['tedi-table--row-hover']]: hoverEnabled,
       [styles['tedi-table--has-pagination']]: paginationEnabled,
       [styles['tedi-table--grouped-headers']]: hasGroupedHeaders,
@@ -1069,12 +1085,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     group.headers.some((header) => header.column.columnDef.footer !== undefined)
   );
 
+  const isRowClickable = (row: Row<TData>) => Boolean(onRowClick) || (rowExpandsOnClick && row.getCanExpand());
+
+  const handleRowActivate = (row: Row<TData>) => {
+    if (rowExpandsOnClick && row.getCanExpand()) row.toggleExpanded();
+    onRowClick?.(row);
+  };
+
   const handleRowKeyDown = (row: Row<TData>) => (event: KeyboardEvent<HTMLTableRowElement>) => {
-    if (!onRowClick) return;
+    if (!isRowClickable(row)) return;
     if (event.target !== event.currentTarget) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      onRowClick(row);
+      handleRowActivate(row);
     }
   };
 
@@ -1444,7 +1467,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 </tr>
               ) : (
                 rows.map((row, visibleIndex) => {
-                  const clickable = Boolean(onRowClick);
+                  const clickable = isRowClickable(row);
                   const isActiveRow = activeRowId !== undefined && row.id === activeRowId;
                   const userRowProps = rowProps?.(row);
                   const rowClassName = cn(
@@ -1472,7 +1495,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     rowStyle: userRowProps?.style,
                     isActiveRow,
                     clickable,
-                    onClick: onRowClick,
+                    onClick: handleRowActivate,
                     onKeyDownHandler: handleRowKeyDown(row),
                     ariaRowIndex,
                     columnProps,

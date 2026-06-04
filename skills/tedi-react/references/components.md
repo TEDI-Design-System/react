@@ -200,14 +200,62 @@ TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filt
 <Table<Person> id="people" data={rows} columns={columns} pagination={pagination} />
 ```
 
-**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `placeholder`, `placeholderRole`.
+**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `placeholder`, `placeholderRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`.
+
+#### Sortable headers — pass the column label as `Table.HeaderButton` children
+
+`Table.HeaderButton` renders optional `children` **before** the icon, so the whole "label + icon" area is one clickable sort target (matches the Angular table — not an icon-only toggle next to inert text). Put the column label inside the button:
+
+```tsx
+header: ({ column }) => {
+  const sorted = column.getIsSorted();
+  const icon = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+  return (
+    <Table.HeaderButton icon={icon} selected={!!sorted}
+      aria-label={`Sorteeri ${columnLabel} järgi`} onClick={column.getToggleSortingHandler()}>
+      {columnLabel}
+    </Table.HeaderButton>
+  );
+}
+```
+
+#### Row-click expansion — `expandTrigger`
+
+`expandTrigger?: 'button' | 'row'` (default `'button'`) controls how an expandable row (`getSubRows` / `renderSubComponent`) toggles:
+- `'button'` — only the chevron toggles; it renders in the bordered `secondary` arrow style.
+- `'row'` — a click anywhere on an **expandable** row toggles it (Enter / Space too); the chevron renders in the neutral `default` arrow style as a plain indicator. Only rows that can expand become clickable (get `role="button"`), so non-expandable rows stay inert.
+
+```tsx
+<Table<Person> id="people" data={rows} columns={columns} getSubRows={(r) => r.subRows} expandTrigger="row" />
+```
+
+#### Responsive — default is horizontal scroll; opt into a stacked layout
+
+The Table already wraps itself in an `overflow-x: auto` container, so **wide tables scroll horizontally by default** with no props. There's no built-in "responsive" prop (parity with Angular, which composes the pattern in its story). To opt into a stacked layout, drive it at the call site with primitives the Table already has: hide secondary columns below a breakpoint via controlled `columnVisibility`, then re-surface them inside the expandable detail row (`renderSubComponent` + `getRowCanExpand`, both gated on the breakpoint). Use `useBreakpoint()` + `isBreakpointBelow(bp, 'md')` for the breakpoint, and `TextGroup` (`type="horizontal"`) for the label/value pairs. Only `columnVisibility` is controlled — expansion state stays internal:
+
+```tsx
+const belowMd = isBreakpointBelow(useBreakpoint(), 'md');
+const columnVisibility = { email: !belowMd, role: !belowMd, location: !belowMd };
+<Table<Person>
+  id="people" data={rows} columns={columns}
+  state={{ columnVisibility }}
+  getRowCanExpand={() => belowMd}
+  renderSubComponent={belowMd ? (row) => (
+    <VerticalSpacing size={0.5}>
+      <TextGroup type="horizontal" labelWidth="6rem" label="E-post" value={row.original.email} />
+      {/* …one per hidden column */}
+    </VerticalSpacing>
+  ) : undefined}
+/>
+```
+
+When `renderSubComponent` is `undefined` (≥ md) the expand column isn't rendered at all — the full table shows. See the `Responsive` story.
 
 #### Accessibility — required for column headers with non-text content
 
-- **`Table.HeaderButton` requires `aria-label`** (TS-enforced). Always include the column name in the label — JAWS otherwise reads only "Sorteeri kasvavalt, button" with no indication of *what* you're sorting:
+- **Icon-only `Table.HeaderButton` requires `aria-label`.** With visible `children` (sortable headers above) the text supplies the accessible name and `aria-label` is optional — keep it to give a richer name like "Sorteeri X järgi". An icon-only button (e.g. a filter trigger) has no text, so `aria-label` is mandatory. Always include the column name — JAWS otherwise reads only "Sorteeri kasvavalt, button" with no indication of *what* you're sorting:
   ```tsx
-  <Table.HeaderButton icon="unfold_more" aria-label={`Sorteeri ${columnLabel} järgi`} />
-  <Table.HeaderButton icon="filter_alt" aria-label={`Filtreeri ${columnLabel}`} />
+  <Table.HeaderButton icon="filter_alt" aria-label={`Filtreeri ${columnLabel}`} />  {/* icon-only → aria-label required */}
   ```
 - **For columns with a function `header` (custom JSX containing sort / filter buttons, info icons, etc.), set `meta.label`**. The Table puts `aria-label={meta.label}` on the `<th>` so screen readers use the clean column name as the column header announcement for every cell. Without it, JAWS reads the full visible header text — including the button labels — for *every* data cell:
   ```tsx
@@ -215,11 +263,10 @@ TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filt
     id: 'teenus',
     accessorKey: 'teenus',
     header: ({ column }) => (
-      <span>
+      <Table.HeaderButton icon="unfold_more" aria-label="Sorteeri Teenus järgi"
+        onClick={column.getToggleSortingHandler()}>
         Teenus
-        <Table.HeaderButton icon="unfold_more" aria-label="Sorteeri Teenus järgi"
-          onClick={column.getToggleSortingHandler()} />
-      </span>
+      </Table.HeaderButton>
     ),
     meta: { label: 'Teenus' },  // ← required when `header` is a function
   }
@@ -710,6 +757,9 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `pagination?`, `sorting?`, `rowSelection?`, `columnPinning?`
 - `onPaginationChange?`, `onSortingChange?`, `onRowSelectionChange?`
 - `hidePagination?: boolean`, `size?: 'medium'`
+- `getSubRows?`, `renderSubComponent?`, `expandTrigger?: 'button' | 'row'` (`'row'` = whole expandable row toggles, neutral chevron)
+- `Table.HeaderButton` accepts `children` (label before icon) so the whole sort header is clickable; `aria-label` optional when `children` present, required for icon-only buttons
+- Responsive: horizontal scroll is the default (built-in `overflow-x: auto`). For a stacked layout, hide columns below a breakpoint via controlled `columnVisibility` + reveal them in `renderSubComponent` (no dedicated prop — composed at the call site)
 
 ## Layout
 
