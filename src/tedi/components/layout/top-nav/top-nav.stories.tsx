@@ -4,6 +4,7 @@ import { createContext, useContext, useState } from 'react';
 import { Text } from '../../base/typography/text/text';
 import { Affix } from '../../misc/affix/affix';
 import Separator from '../../misc/separator/separator';
+import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { Col, Row } from '../grid';
 import { Representative } from '../header/components/header-role/header-role-representatives';
 import { Header } from '../header/header';
@@ -181,6 +182,27 @@ export const WithSeparator: Story = {
   },
 };
 
+export const CustomItemContent: Story = {
+  render: Template,
+  args: {
+    ariaLabel: 'Primary navigation',
+    children: (
+      <>
+        <TopNav.Item href="#" isActive>
+          Töölaud
+        </TopNav.Item>
+        <TopNav.Item href="#" icon="mail">
+          Sõnumid <StatusBadge color="accent">3</StatusBadge>
+        </TopNav.Item>
+        <TopNav.Item href="#">
+          Taotlused <StatusBadge color="brand">Uus</StatusBadge>
+        </TopNav.Item>
+        <TopNav.Item href="#">Minu andmed</TopNav.Item>
+      </>
+    ),
+  },
+};
+
 export const MenuOpen: Story = {
   render: Template,
   args: {
@@ -305,14 +327,15 @@ export const ToggleOnlyParent: Story = {
 };
 
 /**
- * `submenuFit="item"` aligns the panel directly under the active item with
- * content-driven width instead of spanning the whole nav.
+ * `submenuFit="content"` makes the panel only as wide as its content and aligns it directly under
+ * the active item, instead of stretching to the full nav width. It is **not** a smaller / tighter
+ * variant — the padding is identical to the default; only the width and horizontal position differ.
  */
-export const NarrowMegaMenu: Story = {
+export const ContentWidthMegaMenu: Story = {
   render: Template,
   args: {
     ariaLabel: 'Primary navigation',
-    submenuFit: 'item',
+    submenuFit: 'content',
     children: (
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
@@ -346,13 +369,14 @@ export const NarrowMegaMenu: Story = {
 };
 
 /**
- * `TopNav.Group` without a `title` — the heading is omitted entirely.
+ * `TopNav.Group` without a `title` — the heading is omitted entirely. Shown here with the
+ * content-width fit (`submenuFit="content"`).
  */
-export const NarrowSubmenuNoTitle: Story = {
+export const SubmenuGroupWithoutTitle: Story = {
   render: Template,
   args: {
     ariaLabel: 'Primary navigation',
-    submenuFit: 'item',
+    submenuFit: 'content',
     children: (
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
@@ -399,26 +423,20 @@ export const ItemStates: StoryObj = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col className="display-flex align-items-center">
-            <TopNav ariaLabel={`Horizontal nav — ${state}`} mobileBreakpoint="xs">
+            <ul style={{ display: 'flex', gap: '1rem', listStyle: 'none', margin: 0, padding: 0 }}>
               {itemColumns.map(({ key, icon, withSubmenu }) => (
                 <TopNav.Item
                   key={key}
                   href="#"
                   icon={icon}
+                  hasSubmenu={withSubmenu}
                   isActive={state === 'Selected'}
                   className={itemStateClass(state, key)}
-                  submenu={
-                    withSubmenu ? (
-                      <TopNav.Group title="Section">
-                        <TopNav.SubItem href="#">Link</TopNav.SubItem>
-                      </TopNav.Group>
-                    ) : undefined
-                  }
                 >
                   Item
                 </TopNav.Item>
               ))}
-            </TopNav>
+            </ul>
           </Col>
         </Row>
       ))}

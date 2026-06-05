@@ -1,9 +1,12 @@
 import cn from 'classnames';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
+import { PolymorphicComponentPropWithRef, PolymorphicRef } from '../../../../../helpers/polymorphic/types';
+import { UnknownType } from '../../../../../types/commonTypes';
 import styles from '../../top-nav.module.scss';
+import { useTopNavContext } from '../../top-nav-context';
 
-export interface TopNavSubItemProps {
+type TopNavSubItemBaseProps = {
   /**
    * Link label.
    */
@@ -18,41 +21,56 @@ export interface TopNavSubItemProps {
    */
   isActive?: boolean;
   /**
-   * Click handler.
+   * Click handler. Receives the original mouse / keyboard event.
    */
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   /**
-   * Render the link as a different element/component (e.g. a router `NavLink`).
-   * @default a
-   */
-  as?: 'a' | React.ComponentType<React.AnchorHTMLAttributes<HTMLElement> & Record<string, unknown>>;
-  /**
-   * Additional class name applied to the anchor.
+   * Additional class name applied to the link element.
    */
   className?: string;
-}
-
-export const TopNavSubItem = (props: TopNavSubItemProps): JSX.Element => {
-  const { children, href, isActive = false, onClick, as, className } = props;
-  const Component = as ?? 'a';
-  return (
-    <li className={styles['tedi-top-nav__subitem']}>
-      <Component
-        className={cn(
-          styles['tedi-top-nav__subitem-link'],
-          { [styles['tedi-top-nav__subitem-link--active']]: isActive },
-          className
-        )}
-        href={href}
-        aria-current={isActive ? 'page' : undefined}
-        onClick={onClick}
-      >
-        {children}
-      </Component>
-    </li>
-  );
 };
 
-TopNavSubItem.displayName = 'TopNav.SubItem';
+export type TopNavSubItemProps<C extends React.ElementType = 'a'> = PolymorphicComponentPropWithRef<
+  C,
+  TopNavSubItemBaseProps
+>;
+
+const TopNavSubItemComponent = forwardRef(
+  <C extends React.ElementType = 'a'>(props: TopNavSubItemProps<C>, ref?: PolymorphicRef<C>) => {
+    const { children, href, isActive = false, onClick, as, className, ...rest } = props;
+    const Component = (as || 'a') as React.ElementType;
+    const topNav = useTopNavContext();
+
+    const handleClick = (event: React.MouseEvent | React.KeyboardEvent) => {
+      onClick?.(event);
+      topNav?.closeSubmenu();
+    };
+
+    const componentProps = {
+      ...rest,
+      ref,
+      className: cn(
+        styles['tedi-top-nav__subitem-link'],
+        { [styles['tedi-top-nav__subitem-link--active']]: isActive },
+        className
+      ),
+      href,
+      'aria-current': isActive ? 'page' : undefined,
+      onClick: handleClick,
+    } as UnknownType;
+
+    return (
+      <li className={styles['tedi-top-nav__subitem']}>
+        <Component {...componentProps}>{children}</Component>
+      </li>
+    );
+  }
+);
+
+TopNavSubItemComponent.displayName = 'TopNav.SubItem';
+
+export const TopNavSubItem = TopNavSubItemComponent as <C extends React.ElementType = 'a'>(
+  props: TopNavSubItemProps<C>
+) => React.ReactElement | null;
 
 export default TopNavSubItem;

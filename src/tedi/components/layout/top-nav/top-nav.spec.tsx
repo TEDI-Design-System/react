@@ -288,6 +288,60 @@ describe('TopNav', () => {
     expect(screen.queryByRole('link', { name: 'Item' })).not.toBeInTheDocument();
   });
 
+  it('rotates the chevron (toggles the open class) while the submenu is open', () => {
+    const { container } = render(
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
+          submenu={
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
+          }
+        >
+          Family
+        </TopNav.Item>
+      </TopNav>
+    );
+
+    expect(container.querySelector('.tedi-top-nav__chevron')).not.toHaveClass('tedi-top-nav__chevron--open');
+
+    fireEvent.click(screen.getByRole('button', { name: /Family/ }));
+    expect(container.querySelector('.tedi-top-nav__chevron')).toHaveClass('tedi-top-nav__chevron--open');
+
+    fireEvent.click(screen.getByRole('button', { name: /Family/ }));
+    expect(container.querySelector('.tedi-top-nav__chevron')).not.toHaveClass('tedi-top-nav__chevron--open');
+  });
+
+  it('closes the open submenu when a sub-item link is activated (navigation)', () => {
+    const onSubItemClick = jest.fn();
+    render(
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
+          submenu={
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m" onClick={onSubItemClick}>
+                Item
+              </TopNav.SubItem>
+            </TopNav.Group>
+          }
+        >
+          Family
+        </TopNav.Item>
+      </TopNav>
+    );
+
+    const trigger = screen.getByRole('button', { name: /Family/ });
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(screen.getByRole('link', { name: 'Item' }));
+
+    // The consumer's handler still fires, and the mega-menu dismisses on navigation.
+    expect(onSubItemClick).toHaveBeenCalledTimes(1);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('link', { name: 'Item' })).not.toBeInTheDocument();
+  });
+
   it('closes an open submenu when clicking outside the nav', () => {
     render(
       <div>
@@ -484,9 +538,18 @@ describe('TopNav', () => {
     expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('');
   });
 
-  it('renders the submenu inline under the active item when submenuFit="item"', () => {
+  it('removes the maxWidth cap when maxWidth={0} (not a literal 0px)', () => {
     const { container } = render(
-      <TopNav ariaLabel="Primary" submenuFit="item">
+      <TopNav ariaLabel="Primary" maxWidth={0}>
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
+    );
+    expect((container.querySelector('ul') as HTMLElement).style.maxWidth).toBe('');
+  });
+
+  it('renders the submenu inline under the active item when submenuFit="content"', () => {
+    const { container } = render(
+      <TopNav ariaLabel="Primary" submenuFit="content">
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item
           href="/family"

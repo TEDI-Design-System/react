@@ -5,6 +5,7 @@ import React, {
   isValidElement,
   ReactElement,
   ReactNode,
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -20,6 +21,7 @@ import { TopNavItem, TopNavItemProps } from './components/top-nav-item/top-nav-i
 import { TopNavSeparator } from './components/top-nav-separator/top-nav-separator';
 import { TopNavSubItem, TopNavSubItemProps } from './components/top-nav-subitem/top-nav-subitem';
 import styles from './top-nav.module.scss';
+import { TopNavContext } from './top-nav-context';
 
 type BreakpointWidthName = Exclude<Breakpoint, 'xs'>;
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -74,16 +76,19 @@ export interface TopNavProps {
   id?: string;
   /**
    * Controls how the submenu (mega-menu) panel sizes and positions itself
-   * when the active item has submenu content.
+   * when the active item has submenu content. Both options use the same
+   * padding — this only affects the panel's width and horizontal position,
+   * not its density.
    *
-   * - `'full'` (default) — the panel spans the full nav width and is centered,
-   *   suitable for wide multi-column mega-menus.
-   * - `'item'` — the panel sits left-aligned directly under the active item
-   *   with content-driven width, suitable for narrow single- or few-column
+   * - `'full'` (default) — the panel stretches to the full nav width and is
+   *   centered, suitable for wide multi-column mega-menus.
+   * - `'content'` — the panel is only as wide as its content and sits
+   *   left-aligned directly under the active item (it is *not* a smaller /
+   *   tighter variant — just not stretched). Good for single- or few-column
    *   menus.
    * @default full
    */
-  submenuFit?: 'full' | 'item';
+  submenuFit?: 'full' | 'content';
   /**
    * Constrains the inner content (item bar and full-width submenu inner) to a
    * maximum width and centers it inside the blue `<nav>` background. Pass any
@@ -197,6 +202,10 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
   useEffect(() => {
     setOpenButtonIndex(activeToggleIndex);
   }, [activeToggleIndex]);
+
+  const closeSubmenu = useCallback(() => setOpenButtonIndex(null), []);
+  const topNavContextValue = useMemo(() => ({ closeSubmenu }), [closeSubmenu]);
+
   const navRef = useRef<HTMLElement>(null);
   const panelId = useId();
 
@@ -260,61 +269,63 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
     );
   }
 
-  const renderSubmenuInline = submenuFit === 'item';
+  const renderSubmenuInline = submenuFit === 'content';
   const resolvedMaxWidth = resolveMaxWidth(maxWidth);
 
   let itemCursor = 0;
 
   return (
-    <nav
-      ref={navRef}
-      id={id}
-      className={cn(styles['tedi-top-nav'], className)}
-      aria-label={ariaLabel}
-      data-name="top-nav"
-    >
-      <div className={styles['tedi-top-nav__bar']}>
-        <ul
-          className={styles['tedi-top-nav__list']}
-          style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
-        >
-          {allChildren.map((child, index) => {
-            if (isNavItem(child)) {
-              const itemIndex = itemCursor++;
-              const hasSubmenu = Children.count(child.props.submenu) > 0;
-              const toggle = isToggleItem(child);
-              const isSubmenuOpen = isItemSubmenuOpen(child, itemIndex);
-              const consumerOnClick = child.props.onClick;
-              const wrappedOnClick = toggle
-                ? (event: React.MouseEvent | React.KeyboardEvent) => {
-                    consumerOnClick?.(event);
-                    setOpenButtonIndex((current) => (current === itemIndex ? null : itemIndex));
-                  }
-                : consumerOnClick;
-              return React.cloneElement(child, {
-                key: index,
-                hasSubmenu,
-                renderSubmenuInline,
-                isSubmenuOpen,
-                panelId,
-                onClick: wrappedOnClick,
-              });
-            }
-            return React.cloneElement(child, { key: index });
-          })}
-        </ul>
-      </div>
-      {!renderSubmenuInline && activeItemWithSubmenu && (
-        <div id={panelId} className={styles['tedi-top-nav__submenu']} data-name="top-nav-submenu">
-          <div
-            className={styles['tedi-top-nav__submenu-inner']}
+    <TopNavContext.Provider value={topNavContextValue}>
+      <nav
+        ref={navRef}
+        id={id}
+        className={cn(styles['tedi-top-nav'], className)}
+        aria-label={ariaLabel}
+        data-name="top-nav"
+      >
+        <div className={styles['tedi-top-nav__bar']}>
+          <ul
+            className={styles['tedi-top-nav__list']}
             style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
           >
-            {activeItemWithSubmenu.props.submenu}
-          </div>
+            {allChildren.map((child, index) => {
+              if (isNavItem(child)) {
+                const itemIndex = itemCursor++;
+                const hasSubmenu = Children.count(child.props.submenu) > 0;
+                const toggle = isToggleItem(child);
+                const isSubmenuOpen = isItemSubmenuOpen(child, itemIndex);
+                const consumerOnClick = child.props.onClick;
+                const wrappedOnClick = toggle
+                  ? (event: React.MouseEvent | React.KeyboardEvent) => {
+                      consumerOnClick?.(event);
+                      setOpenButtonIndex((current) => (current === itemIndex ? null : itemIndex));
+                    }
+                  : consumerOnClick;
+                return React.cloneElement(child, {
+                  key: index,
+                  hasSubmenu,
+                  renderSubmenuInline,
+                  isSubmenuOpen,
+                  panelId,
+                  onClick: wrappedOnClick,
+                });
+              }
+              return React.cloneElement(child, { key: index });
+            })}
+          </ul>
         </div>
-      )}
-    </nav>
+        {!renderSubmenuInline && activeItemWithSubmenu && (
+          <div id={panelId} className={styles['tedi-top-nav__submenu']} data-name="top-nav-submenu">
+            <div
+              className={styles['tedi-top-nav__submenu-inner']}
+              style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
+            >
+              {activeItemWithSubmenu.props.submenu}
+            </div>
+          </div>
+        )}
+      </nav>
+    </TopNavContext.Provider>
   );
 };
 

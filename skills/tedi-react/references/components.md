@@ -589,7 +589,7 @@ Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.M
 - `mobileBreakpoint?: Breakpoint = 'md'` — below this, the bar collapses into a `SideNavMobile` drawer
 - `isMobileOpen?: boolean`, `onMenuToggle?: (open: boolean) => void` — controlled mobile drawer state
 - `showMobileOverlay?: boolean = true`
-- `submenuFit?: 'full' | 'item' = 'full'` — `'full'` renders a centered full-width mega-menu panel below the bar; `'item'` opens a narrow content-sized dropdown anchored to the active item
+- `submenuFit?: 'full' | 'content' = 'full'` — `'full'` renders a centered full-width mega-menu panel below the bar; `'content'` makes the panel only as wide as its content, anchored under the active item (same padding — not a smaller/tighter variant)
 - `maxWidth?: number | string | 'none' = 'xxl'` — clamps the inner content (bar items + mega-menu inner panel) to a max width and centers it inside the full-width blue bar. Accepts a CSS length (`1440`, `'90rem'`), a breakpoint name (`'sm'|'md'|'lg'|'xl'|'xxl'` → that breakpoint's min-width), or `'none'`/`0` to disable.
 - `className?: string`, `id?: string`
 
@@ -604,7 +604,7 @@ Sub-components: `TopNav.Item`, `TopNav.Group`, `TopNav.SubItem`, `TopNav.Separat
 - `isActive?: boolean = false` — adds `aria-current="page"`, applies the active visual, and (when paired with `submenu`) opens the mega-menu panel
 - `disabled?: boolean = false` — drops `href` and suppresses `onClick`; on toggle items sets native `disabled`
 - `onClick?: (event) => void`
-- `as?: 'a' | 'button' | ComponentType` — polymorphic for routing libs (e.g. `NavLink`)
+- `as?: C extends ElementType` — polymorphic `forwardRef` (defaults to the auto `<a>`/`<button>`); pass a routing component (e.g. `NavLink`) and its props + `ref` are typed. `TopNav.SubItem` is polymorphic the same way.
 - `className?: string`
 
 **`TopNav.Group` props** (mega-menu column)
