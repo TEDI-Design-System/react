@@ -3,8 +3,8 @@
 
   // Fallback for unsupported browsers
   overflow: hidden;
-  hyphens: auto;
   text-overflow: ellipsis;
+  hyphens: auto;
   word-break: break-word;
   -webkit-box-orient: vertical;
 }

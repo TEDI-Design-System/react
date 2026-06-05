@@ -419,6 +419,13 @@ export const ArrowPosition: Story = {
   args: {},
 };
 
+export const WithBorder: Story = {
+  render: ArrowPositionTemplate,
+  args: {
+    withBorder: true,
+  },
+};
+
 export const Size: Story = {
   render: SizeTemplate,
   args: {},
@@ -497,7 +504,7 @@ export const FocusLocked: Story = {
     docs: {
       description: {
         story: `
-          This story demonstrates a Popover with a “locked” focus behavior, where keyboard navigation (Tab) is confined 
+          This story demonstrates a Popover with a “locked” focus behavior, where keyboard navigation (Tab) is confined
           to the Popover content until the user clicks an action like "Cancel" or "Submit".
 
           Key points:

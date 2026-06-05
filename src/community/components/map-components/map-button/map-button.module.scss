@@ -28,9 +28,9 @@
   }
 
   &:focus-visible {
-    border-color: var(--button-primary-border-hover);
     outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
     outline-offset: 1px;
+    border-color: var(--button-primary-border-hover);
   }
 
   &__text {
@@ -60,10 +60,10 @@
 
   &--selected {
     color: var(--button-primary-text-active);
-    background-color: var(--button-primary-background-hover);
-    border-color: var(--tedi-alpha-01);
     outline: 2px solid var(--button-primary-border-active);
     outline-offset: -2px;
+    background-color: var(--button-primary-background-hover);
+    border-color: var(--tedi-alpha-01);
 
     .tedi-map-button__icon {
       color: var(--button-primary-text-active);

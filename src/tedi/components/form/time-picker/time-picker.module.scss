@@ -52,14 +52,14 @@
   flex: 1;
   padding: 80px 0;
   overflow-y: scroll;
-  overscroll-behavior-y: contain;
-  will-change: scroll-position;
-  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y mandatory;
   scroll-padding: 80px;
+  scrollbar-width: none;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
 
   &:first-child {
     border-right: 1px solid var(--general-border-primary);
