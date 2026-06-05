@@ -13,9 +13,9 @@ $spinner-sizes: (8, 10, 12, 16, 18, 24, 36, 48);
   }
 
   &__inner {
+    stroke-width: 4px;
     stroke-dasharray: 80px, 200px;
     stroke-dashoffset: 0;
-    stroke-width: 4px;
     animation: 1.4s ease-in-out 0s infinite normal none running tedi-spinner-inner;
 
     @media (prefers-reduced-motion: reduce) {

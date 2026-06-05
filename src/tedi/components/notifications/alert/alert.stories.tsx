@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 import { Text } from '../../base/typography/text/text';
+import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Link from '../../navigation/link/link';
@@ -190,5 +191,27 @@ export const WithTitleLongTextAndClosingButton: Story = {
   },
   render: (args) => {
     return <Alert {...args} />;
+  },
+};
+
+/**
+ * The `action` prop fills the right slot of the alert with any ReactNode —
+ * here a CTA button that takes the user somewhere relevant.
+ *
+ * **Note:** when `action` is set, the default close button is ignored even if
+ * `onClose` is also passed. The slot is single-purpose — if you need both a
+ * CTA and a dismiss control, render both inside `action` (e.g. wrap them in
+ * a flex `<div>` with a small gap).
+ */
+export const WithActionButton: Story = {
+  args: {
+    type: 'warning',
+    icon: 'warning',
+    children: 'Your account is missing a profile photo — add one so colleagues can recognise you in shared documents.',
+    action: (
+      <Button visualType="secondary" iconRight="arrow_forward">
+        Open profile
+      </Button>
+    ),
   },
 };

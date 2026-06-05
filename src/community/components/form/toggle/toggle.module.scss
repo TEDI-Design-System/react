@@ -207,10 +207,10 @@ button.toggle {
   align-items: center;
   justify-content: center;
   border-radius: 1.5rem;
+  transform: translate(0, -50%);
   transition-timing-function: $toggle-transition-timing-function;
   transition-duration: $toggle-transition-duration;
   transition-property: right, background-color, border-color;
-  transform: translate(0, -50%);
 }
 
 .toggle__icon {

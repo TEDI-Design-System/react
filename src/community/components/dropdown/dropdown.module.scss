@@ -32,8 +32,8 @@
     &:not(.dropdown__item--disabled) {
       color: var(--color-primary-active);
       cursor: pointer;
-      background-color: var(--color-primary-highlight-subtle);
       outline: 0;
+      background-color: var(--color-primary-highlight-subtle);
     }
   }
 }
