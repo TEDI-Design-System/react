@@ -10,6 +10,9 @@ import styles from './modal.module.scss';
 import ModalCloser from './modal-closer';
 import { ModalContext } from './modal-provider';
 
+/**
+ * @deprecated Use Modal from `@tedi-design-system/react/tedi` instead.
+ */
 export interface ModalProps {
   /**
    * Content of the modal
@@ -69,6 +72,9 @@ export interface ModalProps {
   overlay?: 'none';
 }
 
+/**
+ * @deprecated Use Modal from `@tedi-design-system/react/tedi` instead.
+ */
 export const Modal = (props: ModalProps): JSX.Element | null => {
   const {
     children,
