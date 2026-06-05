@@ -12,6 +12,9 @@ import ModalProvider, { ModalProviderProps } from './modal-provider';
 import ModalTrigger from './modal-trigger';
 
 /**
+ * **⚠️ DEPRECATED** — use `Modal` from `@tedi-design-system/react/tedi` instead. This Community
+ * version is no longer maintained and will be removed in a future release.
+ *
  * Modal consist of 4 components: <b>ModalProvider</b>, <b>Modal</b>, <b>ModalTrigger</b> and <b>ModalCloser</b>.<br />
  * **ModalProvider** - Provider context for other components. Handles modal open state.<br />
  * **Modal** - Visual UI component. Should always contain CardContent or CardHeader as children.<br />
