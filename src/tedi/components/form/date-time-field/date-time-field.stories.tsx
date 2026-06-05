@@ -51,7 +51,7 @@ export const Default: Story = {
   args: {
     id: 'date-time-default',
     label: 'Kuupäev',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     layout: 'side-by-side',
     stepMinutes: 1,
   },
@@ -70,7 +70,7 @@ export const Size: StoryFn = () => (
           <DateTimeField
             id={`date-time-size-${size}`}
             label="Kuupäev"
-            placeholder="pp.kk.aaaa hh:mm"
+            placeholder="pp.kk.aaaa tt:mm"
             inputProps={{ size }}
           />
         </Col>
@@ -148,20 +148,20 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
-          <DateTimeField id="date-time-options-default" label="Kuupäev ja kellaaeg" placeholder="pp.kk.aaaa hh:mm" />
+          <DateTimeField id="date-time-options-default" label="Kuupäev ja kellaaeg" placeholder="pp.kk.aaaa tt:mm" />
 
           <DateTimeField
             id="date-time-options-hint"
             label="Kuupäev ja kellaaeg vihjega"
-            placeholder="pp.kk.aaaa hh:mm"
-            inputProps={{ helper: { text: 'pp.kk.aaaa hh:mm' } }}
+            placeholder="pp.kk.aaaa tt:mm"
+            inputProps={{ helper: { text: 'pp.kk.aaaa tt:mm' } }}
           />
 
           <div>
             <DateTimeField
               id="date-time-options-shortcuts"
               label="Kuupäev ja kellaaeg kiirvalikutega"
-              placeholder="pp.kk.aaaa hh:mm"
+              placeholder="pp.kk.aaaa tt:mm"
               value={shortcutValue}
               onChange={(v) => setShortcutValue(v instanceof Date ? v : undefined)}
             />
@@ -185,7 +185,7 @@ export const PredefinedTimeSlots: Story = {
   args: {
     id: 'date-time-predefined',
     label: 'Kuupäev',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'button',
@@ -249,7 +249,7 @@ export const NoTimesAvailable: StoryFn<DateTimeFieldProps> = (args) => {
 NoTimesAvailable.args = {
   id: 'date-time-no-slots',
   label: 'Vastuvõtuaeg',
-  placeholder: 'pp.kk.aaaa hh:mm',
+  placeholder: 'pp.kk.aaaa tt:mm',
   layout: 'side-by-side',
   timeGridVariant: 'button',
 };
@@ -267,7 +267,7 @@ export const PerDayTimeSlots: Story = {
   args: {
     id: 'date-time-per-day',
     label: 'Vastuvõtuaeg',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     layout: 'side-by-side',
     timeGridVariant: 'button',
     availableTimes: (date: Date) => {
@@ -284,7 +284,7 @@ export const MultiSteps: Story = {
   args: {
     id: 'date-time-multi-step',
     label: 'Kellaaeg',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     layout: 'multi-step',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'radio',
@@ -321,7 +321,7 @@ export const Range: Story = {
   args: {
     id: 'date-time-range',
     label: 'Kuupäevavahemik',
-    placeholder: 'pp.kk.aaaa hh:mm – pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm – pp.kk.aaaa tt:mm',
     mode: 'range',
     stepMinutes: 1,
   },
@@ -332,7 +332,7 @@ export const RangePredefinedTimeSlots: Story = {
   args: {
     id: 'date-time-range-predefined',
     label: 'Kuupäevavahemik',
-    placeholder: 'pp.kk.aaaa hh:mm – pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm – pp.kk.aaaa tt:mm',
     mode: 'range',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
     timeGridVariant: 'button',
@@ -349,7 +349,7 @@ export const Controlled: Story = {
   args: {
     id: 'date-time-controlled',
     label: 'Kuupäev',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     layout: 'side-by-side',
     availableTimes: ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'],
   },
@@ -379,7 +379,7 @@ export const DateConstraints: StoryFn = () => {
         <DateTimeField
           id="date-time-disable-past"
           label="Ainult tulevikus"
-          placeholder="pp.kk.aaaa hh:mm"
+          placeholder="pp.kk.aaaa tt:mm"
           disablePast
         />
       </Col>
@@ -388,7 +388,7 @@ export const DateConstraints: StoryFn = () => {
         <DateTimeField
           id="date-time-disable-future"
           label="Ainult minevikus"
-          placeholder="pp.kk.aaaa hh:mm"
+          placeholder="pp.kk.aaaa tt:mm"
           disableFuture
         />
       </Col>
@@ -397,7 +397,7 @@ export const DateConstraints: StoryFn = () => {
         <DateTimeField
           id="date-time-min-max"
           label="Kuupäev 14-päevases vahemikus"
-          placeholder="pp.kk.aaaa hh:mm"
+          placeholder="pp.kk.aaaa tt:mm"
           minDate={minDate}
           maxDate={maxDate}
         />
@@ -416,7 +416,7 @@ export const YearGrid: Story = {
   args: {
     id: 'date-time-year-grid',
     label: 'Kuupäev',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     monthYearSelectType: 'grid',
   },
 };
@@ -434,7 +434,7 @@ export const Native: Story = {
   args: {
     id: 'date-time-native',
     label: 'Kuupäev',
-    placeholder: 'pp.kk.aaaa hh:mm',
+    placeholder: 'pp.kk.aaaa tt:mm',
     useNativePicker: true,
   },
 };
