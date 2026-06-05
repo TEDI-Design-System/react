@@ -131,6 +131,17 @@ export const ManyPagesEllipsis: Story = {
 };
 
 /**
+ * Stress-test with a very large page count (5000 pages). The pager still renders a compact range
+ * with ellipses on both sides, and the mobile page-jump modal stays usable.
+ */
+export const HugePageCount: Story = {
+  args: {
+    pageCount: 5000,
+    defaultPage: 2500,
+  },
+};
+
+/**
  * Boundary and sibling tuning — keep more neighbours visible around the active
  * page. Useful for dense layouts where users rarely paginate one-at-a-time.
  */

@@ -156,14 +156,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--pagination-button-size);
+  min-width: var(--pagination-button-size);
   height: var(--pagination-button-size);
+  padding: 0 var(--layout-grid-gutters-04);
   font-size: var(--body-small-regular-size);
   color: var(--general-text-secondary);
   cursor: pointer;
   background: var(--button-main-neutral-icon-only-background-default);
   border: 1px solid var(--button-main-neutral-border-default);
-  border-radius: 100%;
+  border-radius: var(--button-radius-default);
 
   &:hover:not(:disabled, .tedi-pagination__button--selected) {
     color: var(--button-main-neutral-text-hover);
