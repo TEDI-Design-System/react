@@ -31,13 +31,9 @@ export const Prefix = ({ children, className, ...props }: PrefixProps) => {
 
   const isText = typeof children === 'string' || typeof children === 'number';
 
-  // Propagate the group's disabled state to an interactive child (e.g. a Button addon) so it
-  // becomes truly disabled and uses its own disabled styling rather than its enabled colours.
   const content =
     disabled && isValidElement(children)
-      ? cloneElement(children as ReactElement<{ disabled?: boolean }>, {
-          disabled: disabled || children.props.disabled,
-        })
+      ? cloneElement(children as ReactElement<{ disabled?: boolean }>, { disabled: true })
       : children;
 
   return (
