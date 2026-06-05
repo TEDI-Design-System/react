@@ -78,14 +78,14 @@
   .tedi-checkbox__input:not(:disabled) + &:hover,
   .tedi-checkbox__input:focus:not(:disabled) + & {
     cursor: pointer;
-    border-color: var(--form-checkbox-radio-default-border-selected);
     outline: 1px solid var(--form-checkbox-radio-default-border-selected);
+    border-color: var(--form-checkbox-radio-default-border-selected);
   }
 
   .tedi-checkbox__input:focus-visible:not(:disabled) + & {
-    border-color: var(--form-checkbox-radio-default-border-selected);
     outline: var(--form-checkbox-radio-default-border-selected) solid 2px;
     outline-offset: 2px;
+    border-color: var(--form-checkbox-radio-default-border-selected);
   }
 
   [type='checkbox']:checked + &,
@@ -100,13 +100,13 @@
     .tedi-checkbox__input:hover:not(:disabled) + &,
     .tedi-checkbox__input:not(:disabled) + &:hover,
     .tedi-checkbox__input:focus:not(:disabled) + & {
-      border-color: var(--form-general-feedback-error-border);
       outline: 1px solid var(--form-general-feedback-error-border);
+      border-color: var(--form-general-feedback-error-border);
     }
 
     .tedi-checkbox__input:focus-visible:not(:disabled) + & {
-      border-color: var(--form-general-feedback-error-border);
       outline: var(--form-general-feedback-error-border) solid 2px;
+      border-color: var(--form-general-feedback-error-border);
     }
   }
 
