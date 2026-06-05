@@ -312,6 +312,13 @@ When `renderSubComponent` is `undefined` (≥ md) the expand column isn't render
   />
   ```
   The labels `table.filter.validation.min-length` / `table.filter.validation.no-spaces` already exist in `labels-map.ts` — use them as-is for parity with Angular. **Max length / pattern / any other validation rule** belongs on `TextField` directly — pass `maxLength={40}` and let the native HTML attribute enforce it, plus mirror the rule in `invalid` + `helper` if you want a visible error before submit. Don't invent a Table-level `validation: { minLength, maxLength }` config — the primitives already cover it.
+- **Customise the built-in per-column filter input via `meta.filterProps`.** When you use `enableColumnFilters` (the auto-rendered filter row), forward `TextField` props to a column's filter field through `meta.filterProps` — e.g. cap the length with `meta: { filterProps: { input: { maxLength: 40 } } }`, or set a custom `placeholder`/`helper`. The Table owns the field's identity and state (`id`, `name`, `label`, `hideLabel`, `value`, `onChange`), so those can't be overridden; everything else (incl. `input` HTML attributes, `size`, `invalid`) passes through.
+  ```tsx
+  const columns: ColumnDef<Row>[] = [
+    { accessorKey: 'name', header: 'Name', meta: { filterProps: { input: { maxLength: 40 } } } },
+  ];
+  <Table data={rows} columns={columns} enableColumnFilters />
+  ```
 - **For "no results after filter" announcements, set `emptyStateRole="status"` on the Table.** The Table wraps the empty state in `<div role={emptyStateRole}>` (an ARIA live region), so screen readers announce it when a filter empties the rows. `'status'` is polite (recommended); `'alert'` is assertive (interrupts the current SR utterance). Leave the prop undefined for tables that are empty on first mount and never change — otherwise the live region announces on every render. The empty-state content itself is the `emptyState` prop (a string or an `<EmptyState>` node).
   ```tsx
   <Table data={rows} columns={columns} emptyStateRole="status" />

@@ -753,6 +753,17 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Anna' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
     });
+
+    it('forwards meta.filterProps (e.g. maxLength) to the built-in column filter input', () => {
+      const filterColumns: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { filterProps: { input: { maxLength: 40 } } } },
+        { id: 'role', header: 'Role', accessorKey: 'role' },
+      ];
+      render(<Table<Person> id="t-filter-props" data={data} columns={filterColumns} enableColumnFilters />);
+
+      expect(screen.getByLabelText('Filter Name')).toHaveAttribute('maxlength', '40');
+      expect(screen.getByLabelText('Filter Name')).toBeInTheDocument();
+    });
   });
 
   describe('footer', () => {

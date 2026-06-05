@@ -40,7 +40,7 @@ import { Icon } from '../../base/icon/icon';
 import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { Radio, RadioProps } from '../../form/radio/radio';
-import { TextField } from '../../form/textfield/textfield';
+import { TextField, type TextFieldProps } from '../../form/textfield/textfield';
 import { Pagination, type PaginationProps } from '../../navigation/pagination';
 import styles from './table.module.scss';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
@@ -62,6 +62,16 @@ import { useTablePersistence } from './use-table-persistence';
 export interface TableColumnMeta {
   /** Accessible label used when the column header isn't a plain string. */
   label?: string;
+  /**
+   * Props forwarded to the built-in per-column filter input (the `TextField`
+   * rendered for this column when `enableColumnFilters` is set). Use it to
+   * constrain or tweak the filter field without replacing it — e.g. cap the
+   * length with `{ input: { maxLength: 40 } }`, set a custom `placeholder`, or
+   * attach `helper` text. The Table owns the field's identity and state
+   * (`id`, `name`, `label`, `hideLabel`, `value`, `onChange`), so those are not
+   * overridable.
+   */
+  filterProps?: Omit<TextFieldProps, 'id' | 'name' | 'label' | 'hideLabel' | 'value' | 'onChange'>;
   /**
    * Horizontal alignment applied to every header / body / footer cell in the column.
    * Maps directly to `text-align`. Defaults to `left` (the table's CSS default).
@@ -1450,12 +1460,13 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       >
                         {column.getCanFilter() && (
                           <TextField
+                            size="small"
+                            placeholder={getLabel('table.filter-placeholder')}
+                            {...(meta?.filterProps as TableColumnMeta['filterProps'])}
                             id={filterId}
                             name={filterId}
                             label={getLabel('table.filter-input', headerLabel)}
                             hideLabel
-                            size="small"
-                            placeholder={getLabel('table.filter-placeholder')}
                             value={(column.getFilterValue() as string | undefined) ?? ''}
                             onChange={(next) => column.setFilterValue(next || undefined)}
                           />
