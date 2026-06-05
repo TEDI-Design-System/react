@@ -1,8 +1,10 @@
+import cn from 'classnames';
 import { Children, createContext, isValidElement, type ReactElement, type ReactNode, useMemo } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Card, CardContent } from '../../cards/card';
 import { Affix } from '../../misc/affix/affix';
+import styles from './table-of-contents.module.scss';
 import { TableOfContentsItem, type TableOfContentsItemProps } from './table-of-contents-item';
 import { TableOfContentsList } from './table-of-contents-list';
 
@@ -23,9 +25,9 @@ export interface TableOfContentsProps {
    */
   activeId?: string;
   /**
-   * Show a validation glyph before each item (multistep-form usage): a check
-   * for `isValid === true`, a neutral check for `undefined`, and a warning for
-   * `isValid === false`.
+   * Show a validation glyph before each item (multistep-form usage). Each state uses a distinct
+   * icon shape (not colour alone) with a localised text alternative: a check for `isValid === true`,
+   * an empty circle for `undefined` (not completed), and a warning for `isValid === false`.
    * @default false
    */
   showIcons?: boolean;
@@ -141,7 +143,7 @@ const TableOfContentsComponent = (props: TableOfContentsProps): JSX.Element => {
   );
 
   const card = (
-    <Card className={className}>
+    <Card className={cn(sticky && styles['tedi-table-of-contents--sticky'], className)}>
       <CardContent padding={0}>
         <TableOfContentsList nodes={nodes} heading={heading} />
       </CardContent>

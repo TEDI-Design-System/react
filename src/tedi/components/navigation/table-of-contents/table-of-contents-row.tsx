@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { useContext } from 'react';
 
+import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import Separator from '../../misc/separator/separator';
 import { TableOfContentsContext, type TableOfContentsNode } from './table-of-contents';
@@ -16,6 +17,7 @@ interface TableOfContentsRowProps {
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
   const { activeId, showIcons, numbered, activeTrail } = useContext(TableOfContentsContext);
+  const { getLabel } = useLabels();
   const { id, content, children, isValid, separator, hideIcon } = node;
 
   const hasChildren = !!children?.length;
@@ -41,8 +43,17 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         {showIcons && !hideIcon && (
           <Icon
             className={styles['tedi-table-of-contents__icon']}
-            name={isValid === false ? 'warning' : 'check'}
+            // Distinct icon shape per state (not colour alone) so the status is perceivable without
+            // colour (WCAG 1.4.1); `label` gives it a text alternative for assistive tech (1.1.1).
+            name={isValid === false ? 'warning' : isValid === true ? 'check' : 'radio_button_unchecked'}
             color={isValid === false ? 'danger' : isValid === true ? 'success' : 'tertiary'}
+            label={getLabel(
+              isValid === false
+                ? 'table-of-contents.step-invalid'
+                : isValid === true
+                ? 'table-of-contents.step-valid'
+                : 'table-of-contents.step-incomplete'
+            )}
             size={18}
           />
         )}

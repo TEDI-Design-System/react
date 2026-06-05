@@ -1,3 +1,8 @@
+.tedi-table-of-contents--sticky {
+  max-height: calc(100dvh - 3rem);
+  overflow-y: auto;
+}
+
 .tedi-table-of-contents__heading {
   padding: var(--card-padding-md-default);
 }

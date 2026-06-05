@@ -11,7 +11,13 @@ jest.mock('../../misc/affix/affix', () => ({
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
-    getLabel: (key: string) => (key === 'table-of-contents.title' ? 'Table of contents' : key),
+    getLabel: (key: string) =>
+      ({
+        'table-of-contents.title': 'Table of contents',
+        'table-of-contents.step-valid': 'Valid',
+        'table-of-contents.step-invalid': 'Invalid',
+        'table-of-contents.step-incomplete': 'Not completed',
+      }[key] ?? key),
   }),
 }));
 
@@ -66,7 +72,27 @@ describe('TableOfContents', () => {
     expect(screen.getByRole('navigation', { name: 'Sisukord' })).toBeInTheDocument();
   });
 
-  it('renders validation glyphs when showIcons is set', () => {
+  it('uses a navigation landmark and never the tree/treeitem roles (WCAG)', () => {
+    render(<Tree activeId="a1" />);
+    expect(screen.getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
+    expect(screen.queryByRole('tree')).not.toBeInTheDocument();
+    expect(screen.queryAllByRole('treeitem')).toHaveLength(0);
+    expect(screen.getByRole('link', { name: 'Alpha' }).closest('li')).toBeInTheDocument();
+  });
+
+  it('labels the navigation with the localized table-of-contents title when no heading is shown', () => {
+    render(
+      <TableOfContents heading="">
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
+  });
+
+  it('renders a distinct icon shape and text alternative per validation state (not colour alone)', () => {
     render(
       <TableOfContents showIcons>
         <TableOfContents.Item id="x" isValid>
@@ -80,8 +106,13 @@ describe('TableOfContents', () => {
         </TableOfContents.Item>
       </TableOfContents>
     );
-    expect(screen.getAllByText('check').length).toBeGreaterThanOrEqual(2);
+
+    expect(screen.getByText('check')).toBeInTheDocument();
+    expect(screen.getByText('radio_button_unchecked')).toBeInTheDocument();
     expect(screen.getByText('warning')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Valid' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Invalid' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Not completed' })).toBeInTheDocument();
   });
 
   it('renders an ordered list with auto hierarchical numbers when numbered', () => {
@@ -90,5 +121,19 @@ describe('TableOfContents', () => {
     expect(screen.getByText('1.')).toBeInTheDocument();
     expect(screen.getByText('2.')).toBeInTheDocument();
     expect(screen.getByText('1.1')).toBeInTheDocument();
+  });
+
+  it('applies the sticky height-cap class only when sticky (so the last item stays reachable on zoom)', () => {
+    const { container, rerender } = render(<Tree />);
+    expect(container.querySelector('.tedi-table-of-contents--sticky')).toBeInTheDocument();
+
+    rerender(
+      <TableOfContents sticky={false}>
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    expect(container.querySelector('.tedi-table-of-contents--sticky')).not.toBeInTheDocument();
   });
 });

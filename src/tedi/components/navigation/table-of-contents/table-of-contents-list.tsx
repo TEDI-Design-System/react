@@ -1,5 +1,6 @@
 import { useContext, useId } from 'react';
 
+import { useLabels } from '../../../providers/label-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import { TableOfContentsContext, type TableOfContentsNode } from './table-of-contents';
 import styles from './table-of-contents.module.scss';
@@ -12,6 +13,7 @@ export interface TableOfContentsListProps {
 
 export const TableOfContentsList = ({ nodes, heading }: TableOfContentsListProps): JSX.Element => {
   const { numbered } = useContext(TableOfContentsContext);
+  const { getLabel } = useLabels();
   const headingId = useId();
   const List = numbered ? 'ol' : 'ul';
 
@@ -22,7 +24,10 @@ export const TableOfContentsList = ({ nodes, heading }: TableOfContentsListProps
           {heading}
         </Heading>
       )}
-      <nav aria-labelledby={heading ? headingId : undefined} aria-label={heading ? undefined : 'Table of contents'}>
+      <nav
+        aria-labelledby={heading ? headingId : undefined}
+        aria-label={heading ? undefined : getLabel('table-of-contents.title')}
+      >
         <List className={styles['tedi-table-of-contents__list']}>
           {nodes.map((node, index) => (
             <TableOfContentsRow key={node.id ?? index} node={node} depth={1} index={index} />
