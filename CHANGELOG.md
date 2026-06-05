@@ -1,3 +1,10 @@
+# [18.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.3...react-18.0.0-rc.4) (2026-06-05)
+
+
+### Features
+
+* **modal:** TEDI-Ready Modal component [#75](https://github.com/TEDI-Design-System/react/issues/75) ([#639](https://github.com/TEDI-Design-System/react/issues/639)) ([19495b3](https://github.com/TEDI-Design-System/react/commit/19495b34c44a58eca8237acc737ef6377fbbaf76))
+
 # [18.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.2...react-18.0.0-rc.3) (2026-06-02)
 
 
