@@ -139,3 +139,10 @@ export const CustomIcon: Story = {
     icon: { name: 'shopping_cart_off' },
   },
 };
+
+export const DifferentIconColor: Story = {
+  args: {
+    children: 'You have no data to display',
+    icon: { name: 'spa', color: 'tertiary' },
+  },
+};
