@@ -1398,7 +1398,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         )}
                         scope="col"
                         aria-sort={ariaSort}
-                        aria-label={headerLabel}
+                        aria-label={headerLabel ?? (columnHasChildren ? undefined : header.column.id)}
                         style={
                           headerSize || userColumnProps?.style
                             ? { ...(headerSize ? { width: headerSize } : null), ...userColumnProps?.style }

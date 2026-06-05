@@ -109,6 +109,29 @@ describe('Table', () => {
     expect(nameHeader).toHaveAttribute('aria-label', 'Name');
   });
 
+  it('falls back the leaf header accessible name to the column id when no label is provided', () => {
+    const customColumns: ColumnDef<Person>[] = [
+      {
+        id: 'name',
+        accessorKey: 'name',
+        header: () => (
+          <span>
+            Name
+            <button type="button" aria-label="Sort by Name">
+              ▲
+            </button>
+          </span>
+        ),
+      },
+      { id: 'role', header: 'Role', accessorKey: 'role' },
+    ];
+
+    render(<Table<Person> id="t-fallback" data={data} columns={customColumns} />);
+
+    const nameHeader = screen.getByRole('columnheader', { name: 'name' });
+    expect(nameHeader).toHaveAttribute('aria-label', 'name');
+  });
+
   it('renders the empty state when data is empty', () => {
     render(<Table<Person> id="t-empty" data={[]} columns={columns} emptyState="Nothing here" />);
 

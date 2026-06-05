@@ -900,6 +900,7 @@ export const Sortable: Story = {
           { id: 'salary', header: 'Salary', accessorKey: 'salary' },
         ].map((col) => ({
           ...col,
+          meta: { label: col.header },
           header: ({ column }) => {
             const sorted = column.getIsSorted();
             const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';

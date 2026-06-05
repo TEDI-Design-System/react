@@ -194,7 +194,7 @@ const [date, setDate] = useState<Date | undefined>();
 ```
 
 ### Table
-TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filterable / selectable / pinnable / expandable. Built-in pagination announces page changes via `aria-live` so JAWS reports state changes automatically.
+TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filterable / selectable / pinnable / expandable. Built-in pagination announces both **page changes and the result count** via `aria-live`, so JAWS reports state changes (incl. filtering down to a single page) automatically.
 
 ```tsx
 <Table<Person> id="people" data={rows} columns={columns} pagination={pagination} />
@@ -220,20 +220,29 @@ TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filt
 <Table<Booking> id="bookings" data={editor.rows} columns={columns} autoResetPageIndex={false} pagination={pagination} />
 ```
 
-#### Sortable headers — pass the column label as `Table.HeaderButton` children
+#### Sortable / filterable headers — accessibility (set `meta.label`!)
 
-`Table.HeaderButton` renders optional `children` **before** the icon, so the whole "label + icon" area is one clickable sort target (matches the Angular table — not an icon-only toggle next to inert text). Put the column label inside the button:
+`Table.HeaderButton` renders optional `children` **before** the icon, so the whole "label + icon" area is one clickable sort target (matches the Angular table — not an icon-only toggle next to inert text). Put the column label inside the button.
+
+**When a column's `header` is a render function (custom sort/filter controls), always set `meta.label` on the column.** The Table uses it as the `<th>`'s `aria-label`, so screen readers announce just the column name for each body cell — **without it, the th's accessible name is computed from its contents and JAWS reads the sort/filter controls' text** (e.g. "Number, sort ascending, filter") as the column header (WCAG 1.3.1 / 4.1.2). As a safety net the Table falls back to the column `id`, but `meta.label` gives the human-friendly name.
+
+Give the sort/filter controls themselves a column-scoped accessible name. The built-in labels are column-aware: `getLabel('table.sort', direction, columnLabel)` → e.g. "Sort by Name ascending"; `getLabel('table.filter', columnLabel)` → "Filter Name". (The per-column built-in filter input already uses `table.filter-input` with the column.)
 
 ```tsx
-header: ({ column }) => {
-  const sorted = column.getIsSorted();
-  const icon = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-  return (
-    <Table.HeaderButton icon={icon} selected={!!sorted}
-      aria-label={`Sorteeri ${columnLabel} järgi`} onClick={column.getToggleSortingHandler()}>
-      {columnLabel}
-    </Table.HeaderButton>
-  );
+{
+  id: 'name',
+  accessorKey: 'name',
+  meta: { label: 'Name' }, // ← th accessible name; without it the sort/filter controls get read as the header
+  header: ({ column }) => {
+    const sorted = column.getIsSorted();
+    const icon = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+    return (
+      <Table.HeaderButton icon={icon} selected={!!sorted}
+        aria-label={getLabel('table.sort', sorted, 'Name')} onClick={column.getToggleSortingHandler()}>
+        Name
+      </Table.HeaderButton>
+    );
+  },
 }
 ```
 

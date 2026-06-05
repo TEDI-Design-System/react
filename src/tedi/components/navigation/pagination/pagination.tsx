@@ -264,7 +264,14 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
       <div className={styles['tedi-pagination__slot-start']}>
         {showResults && (
-          <Text className={styles['tedi-pagination__results']} color="secondary" modifiers="small">
+          <Text
+            className={styles['tedi-pagination__results']}
+            color="secondary"
+            modifiers="small"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {mergedLabels.results(totalItems)}
           </Text>
         )}

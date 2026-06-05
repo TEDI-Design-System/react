@@ -608,22 +608,41 @@ export const labelsMap = validateDefaultLabels({
     ru: (isSelected: boolean) => (isSelected ? 'Отменить выбор строки' : 'Выбрать ряд'),
   },
   'table.sort': {
-    description: 'Label for sort button',
+    description:
+      'Accessible label for a column sort button. Receives the current sort direction and, optionally, the column label so screen readers announce which column is sorted.',
     components: ['Table'],
-    et: (direction: 'asc' | 'desc' | false) =>
-      direction === 'asc'
-        ? 'Sorteeri kahanevalt'
+    et: (direction: 'asc' | 'desc' | false, columnLabel?: string) => {
+      const col = columnLabel ? ` veergu ${columnLabel}` : '';
+      return direction === 'asc'
+        ? `Sorteeri${col} kahanevalt`
         : direction === 'desc'
-        ? 'Eemalda sorteerimine'
-        : 'Sorteeri kasvavalt',
-    en: (direction: 'asc' | 'desc' | false) =>
-      direction === 'asc' ? 'Sort decending' : direction === 'desc' ? 'Remove sorting' : 'Sort ascending',
-    ru: (direction: 'asc' | 'desc' | false) =>
-      direction === 'asc'
-        ? 'Сортировать по убыванию'
+        ? `Eemalda${col} sorteerimine`
+        : `Sorteeri${col} kasvavalt`;
+    },
+    en: (direction: 'asc' | 'desc' | false, columnLabel?: string) => {
+      const by = columnLabel ? ` by ${columnLabel}` : '';
+      return direction === 'asc'
+        ? `Sort${by} descending`
         : direction === 'desc'
-        ? 'Отменить сортировку'
-        : 'Сортировать по возрастанию',
+        ? `Remove sorting${by}`
+        : `Sort${by} ascending`;
+    },
+    ru: (direction: 'asc' | 'desc' | false, columnLabel?: string) => {
+      const col = columnLabel ? ` по столбцу ${columnLabel}` : '';
+      return direction === 'asc'
+        ? `Сортировать${col} по убыванию`
+        : direction === 'desc'
+        ? `Отменить сортировку${col}`
+        : `Сортировать${col} по возрастанию`;
+    },
+  },
+  'table.filter': {
+    description:
+      'Accessible label for a column filter trigger button. Receives the column label so screen readers announce which column is filtered.',
+    components: ['Table'],
+    et: (columnLabel?: string) => `Filtreeri${columnLabel ? ` veergu ${columnLabel}` : ''}`,
+    en: (columnLabel?: string) => `Filter${columnLabel ? ` ${columnLabel}` : ''}`,
+    ru: (columnLabel?: string) => `Фильтровать${columnLabel ? ` ${columnLabel}` : ''}`,
   },
   'tooltip.icon-trigger': {
     description: 'Label we use for icons that are tooltip triggers',
