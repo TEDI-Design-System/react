@@ -206,9 +206,9 @@ describe('Pagination component', () => {
 
   it('exposes the results count as a polite live region so result changes are announced', () => {
     render(<Pagination pageCount={5} defaultPage={1} totalItems={42} />);
-    const results = screen.getByText('42 results');
-    expect(results).toHaveAttribute('role', 'status');
-    expect(results).toHaveAttribute('aria-live', 'polite');
+    const liveRegion = screen.getByText('42 results').closest('[role="status"]');
+    expect(liveRegion).not.toBeNull();
+    expect(liveRegion).toHaveAttribute('aria-live', 'polite');
   });
 
   it('allows overriding labels for localisation', () => {

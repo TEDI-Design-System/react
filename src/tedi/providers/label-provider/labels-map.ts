@@ -524,11 +524,12 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Произошла ошибка при получении данных таблицы',
   },
   'table.filter': {
-    description: 'Label for filter toggle',
+    description:
+      'Label for a filter toggle / trigger. Optionally receives the column label so screen readers announce which column is filtered (e.g. "Filter Name"); called with no argument it returns the bare "Filter".',
     components: ['Table', 'TableFilter'],
-    et: 'Filtreeri',
-    en: 'Filter',
-    ru: 'Фильтровать',
+    et: (columnLabel?: string) => `Filtreeri${columnLabel ? ` veergu ${columnLabel}` : ''}`,
+    en: (columnLabel?: string) => `Filter${columnLabel ? ` ${columnLabel}` : ''}`,
+    ru: (columnLabel?: string) => `Фильтровать${columnLabel ? ` ${columnLabel}` : ''}`,
   },
   'table.filter.select-all': {
     description: 'Label for selecting all',
@@ -635,14 +636,6 @@ export const labelsMap = validateDefaultLabels({
         ? `Отменить сортировку${col}`
         : `Сортировать${col} по возрастанию`;
     },
-  },
-  'table.filter': {
-    description:
-      'Accessible label for a column filter trigger button. Receives the column label so screen readers announce which column is filtered.',
-    components: ['Table'],
-    et: (columnLabel?: string) => `Filtreeri${columnLabel ? ` veergu ${columnLabel}` : ''}`,
-    en: (columnLabel?: string) => `Filter${columnLabel ? ` ${columnLabel}` : ''}`,
-    ru: (columnLabel?: string) => `Фильтровать${columnLabel ? ` ${columnLabel}` : ''}`,
   },
   'tooltip.icon-trigger': {
     description: 'Label we use for icons that are tooltip triggers',
