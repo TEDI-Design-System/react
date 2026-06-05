@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { ReactNode, useEffect } from 'react';
+import { cloneElement, isValidElement, ReactElement, ReactNode, useEffect } from 'react';
 
 import { useInputGroup } from '../../input-group';
 import styles from '../../input-group.module.scss';
@@ -31,6 +31,15 @@ export const Suffix = ({ children, className, ...props }: SuffixProps) => {
 
   const isText = typeof children === 'string' || typeof children === 'number';
 
+  // Propagate the group's disabled state to an interactive child (e.g. a Button addon) so it
+  // becomes truly disabled and uses its own disabled styling rather than its enabled colours.
+  const content =
+    disabled && isValidElement(children)
+      ? cloneElement(children as ReactElement<{ disabled?: boolean }>, {
+          disabled: disabled || children.props.disabled,
+        })
+      : children;
+
   return (
     <div
       {...props}
@@ -41,7 +50,7 @@ export const Suffix = ({ children, className, ...props }: SuffixProps) => {
       )}
       aria-disabled={disabled}
     >
-      {children}
+      {content}
     </div>
   );
 };
