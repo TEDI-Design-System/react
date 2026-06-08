@@ -1,11 +1,22 @@
 import cn from 'classnames';
 import { ReactNode, useContext } from 'react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../../helpers';
+import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../helpers';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
 
-export interface FooterBodyProps {
+type FooterBodyBreakpointProps = {
+  /**
+   * Number of equal-width columns laid out per row, controllable per breakpoint via the
+   * `sm`/`md`/`lg`/`xl`/`xxl` keys (e.g. `columns={4} md={{ columns: 2 }} sm={{ columns: 1 }}`).
+   * When set, the body uses a CSS grid of `columns` equal tracks; when omitted, columns are
+   * content-sized and spread with `space-between` (the default). Ignored below the footer's
+   * `mobileBreakpoint`, where the body always stacks into a single column.
+   */
+  columns?: number;
+};
+
+export interface FooterBodyProps extends BreakpointSupport<FooterBodyBreakpointProps> {
   /**
    * `<Footer.Section>` children. Other nodes render verbatim but won't pick up the
    * mobile-collapse behaviour.
@@ -17,15 +28,24 @@ export interface FooterBodyProps {
   className?: string;
 }
 
-export const FooterBody = ({ children, className }: FooterBodyProps): JSX.Element => {
+export const FooterBody = (props: FooterBodyProps): JSX.Element => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { children, className, columns } = getCurrentBreakpointProps<FooterBodyProps>(props);
+
   const breakpoint = useBreakpoint();
   const { mobileBreakpoint } = useContext(FooterContext);
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
+  const useGrid = !isMobile && typeof columns === 'number' && columns > 0;
 
   return (
     <div
       data-name="footer-body"
-      className={cn(styles['tedi-footer-body'], { [styles['tedi-footer-body--mobile']]: isMobile }, className)}
+      className={cn(
+        styles['tedi-footer-body'],
+        { [styles['tedi-footer-body--mobile']]: isMobile, [styles['tedi-footer-body--grid']]: useGrid },
+        className
+      )}
+      style={useGrid ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}
     >
       {children}
     </div>

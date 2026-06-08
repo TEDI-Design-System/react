@@ -15,6 +15,13 @@ export interface FooterContextValue {
    * viewports (e.g. tablet 600–760px).
    */
   mobileBreakpoint: Breakpoint;
+  /**
+   * Optional cap for the inner content width (the column row and the bottom
+   * strip's content), centered inside the full-bleed backgrounds. Set on
+   * `<Footer maxWidth="…">`; subcomponents read it so the body row and the
+   * bottom strip align to the same width.
+   */
+  maxWidth?: number | string;
 }
 
 export const FooterContext = createContext<FooterContextValue>({

@@ -89,10 +89,11 @@ export const FooterSection = ({
           <Collapse
             id={`tedi-footer-section-${collapseId}`}
             title={
-              <Heading element="h5" color="white">
+              <Heading element="h6" color="white">
                 {heading}
               </Heading>
             }
+            size="small"
             inverted
             hideCollapseText
             defaultOpen={defaultOpen}
@@ -114,4 +115,5 @@ export const FooterSection = ({
 };
 
 FooterSection.displayName = 'Footer.Section';
+
 export default FooterSection;

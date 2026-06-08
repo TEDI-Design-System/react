@@ -510,13 +510,15 @@ Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.M
 **Props:** `FooterProps`
 - `children: ReactNode` — composition of `Footer.Side`, `Footer.Body` (with `Footer.Section` children), `Footer.Bottom`
 - `mobileBreakpoint?: Breakpoint = 'sm'` — viewport at and below which the entire footer flips to stacked mobile layout (sections become accordions, sides stack, bottom strip wraps). Propagated to every sub-slot via context so they all agree on the threshold.
+- `maxWidth?: number | string` — caps the inner content (the column row **and** the bottom strip's content) to a max width and centers it, while the dark backgrounds stay full-bleed. Pass any CSS length (`1280`, `'1280px'`, `'80rem'`). Read by `Footer.Bottom` via context so both align to the same width.
 - `className?: string`
 
 **Sub-components:**
 - `Footer.Side` — logo slot, `placement?: 'start' | 'end' = 'start'`, `position?: 'start' | 'center' | 'end' = 'center'`
-- `Footer.Body` — wraps `Footer.Section` columns; switches to stacked column layout below `mobileBreakpoint`
+- `Footer.Body` — wraps `Footer.Section` columns; switches to stacked column layout below `mobileBreakpoint`. Accepts breakpoint-aware `columns?: number` (e.g. `columns={4} lg={{ columns: 2 }} sm={{ columns: 1 }}`) — when set, lays the sections out as a CSS grid of that many equal-width tracks instead of the default content-sized `space-between` row; ignored below `mobileBreakpoint`, where the body always stacks into one column.
 - `Footer.Section` — section column with `heading`, optional `icon`, `collapsible?` (accordion below `mobileBreakpoint`), `defaultOpen?`, `iconBreakpoint?: Breakpoint = 'lg'` (separate threshold for icon hiding)
-- `Footer.Bottom` — bottom strip for legal / utility links
+- `Footer.Bottom` — bottom strip for legal / utility links; `separator?: boolean = false` inserts a dot between items (Figma "with separator" variant) instead of plain `gap` spacing
+- All three content slots (`Footer.Body`, `Footer.Side`, `Footer.Bottom`) accept arbitrary nodes — the footer is a layout shell, so you can drop social-icon links in a right-hand `Footer.Side`, a centered brand logo in `Footer.Bottom`, etc.
 
 ```tsx
 // Default: flips to mobile at `sm` (≤ 576px)
@@ -541,6 +543,11 @@ Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.M
 
 // Hide section icons earlier (at `xl` instead of the default `lg`)
 <Footer.Section iconBreakpoint="xl" icon="mail" heading="Newsletter">…</Footer.Section>
+
+// Cap + center the content on wide screens; fixed 4-col grid that steps to 2 at `lg`
+<Footer maxWidth={1280}>
+  <Footer.Body columns={4} lg={{ columns: 2 }}>{/* … */}</Footer.Body>
+</Footer>
 ```
 
 `mobileBreakpoint` is the single knob for layout flip — set it once on `<Footer>` and every sub-slot picks it up. `Footer.Section`'s `iconBreakpoint` is independent because design typically drops the section icons one tier earlier than the full mobile flip.

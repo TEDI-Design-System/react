@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactNode, useContext } from 'react';
+import { Children, Fragment, isValidElement, ReactNode, useContext } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../../helpers';
 import styles from '../footer.module.scss';
@@ -7,35 +7,49 @@ import { FooterContext } from '../footer-context';
 
 export interface FooterBottomProps {
   /**
-   * Bottom-row content — typically a sequence of `<Link>` elements. Items are rendered
-   * verbatim with the flex `gap` providing spacing; no separator dots are injected.
-   * On mobile the gap shrinks and items wrap to multiple lines.
+   * Bottom-row content — typically a sequence of `<Link>` elements. On mobile the gap shrinks
+   * and items wrap to multiple lines.
    */
   children: ReactNode;
+  /**
+   * Insert a small dot between items (matches the Figma "with separator" bottom variant). When
+   * `false`, items are spaced only by the flex `gap`.
+   * @default false
+   */
+  separator?: boolean;
   /**
    * Additional class name on the bottom strip.
    */
   className?: string;
 }
 
-/**
- * Bottom strip rendered below `<Footer.Body>`. Holds legal / utility links; items are
- * spaced via flex `gap` and wrap on narrow viewports.
- */
-export const FooterBottom = ({ children, className }: FooterBottomProps): JSX.Element => {
+export const FooterBottom = ({ children, separator = false, className }: FooterBottomProps): JSX.Element => {
   const breakpoint = useBreakpoint();
-  const { mobileBreakpoint } = useContext(FooterContext);
+  const { mobileBreakpoint, maxWidth } = useContext(FooterContext);
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
+
+  const items = separator ? Children.toArray(children).filter((child) => isValidElement(child) || child) : null;
 
   return (
     <div
       data-name="footer-bottom"
       className={cn(styles['tedi-footer-bottom'], { [styles['tedi-footer-bottom--mobile']]: isMobile }, className)}
     >
-      {children}
+      {/* Inner wrapper keeps the strip background full-bleed while its content caps to `maxWidth`. */}
+      <div className={styles['tedi-footer-bottom__inner']} style={maxWidth !== undefined ? { maxWidth } : undefined}>
+        {items
+          ? items.map((child, index) => (
+              <Fragment key={index}>
+                {child}
+                {index < items.length - 1 && <span className={styles['tedi-footer-bottom__dot']} aria-hidden="true" />}
+              </Fragment>
+            ))
+          : children}
+      </div>
     </div>
   );
 };
 
 FooterBottom.displayName = 'Footer.Bottom';
+
 export default FooterBottom;

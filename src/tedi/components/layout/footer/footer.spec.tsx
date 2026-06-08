@@ -8,9 +8,6 @@ jest.mock('../../../providers/label-provider', () => ({
   })),
 }));
 
-// `<Collapse>` (used inside Footer.Section's mobile branch) calls `usePrint()`,
-// which throws when there's no PrintingProvider. Bypass both the provider
-// requirement and the print state so tests can render Footer in isolation.
 jest.mock('../../../providers/printing-provider/printing-provider', () => ({
   PrintingProvider: ({ children }: { children: React.ReactNode }) => children,
   usePrint: jest.fn(() => false),
@@ -65,8 +62,6 @@ describe('Footer', () => {
   });
 
   it('collapsible section renders a toggle button at xs and toggles aria-expanded on click', () => {
-    // jsdom defaults to xs (no matchMedia matches), so `isMobile` is true and the
-    // collapsible branch engages — exactly the responsive case the prop covers.
     render(
       <Footer>
         <Footer.Body>
@@ -109,9 +104,68 @@ describe('Footer', () => {
       </Footer>
     );
 
+    const inner = container.querySelector('.tedi-footer-bottom__inner') as HTMLElement;
+    expect(inner.children).toHaveLength(3);
+    Array.from(inner.children).forEach((el) => expect(el.tagName.toLowerCase()).toBe('a'));
+  });
+
+  it('caps the inner content to `maxWidth` (container + bottom inner) while the background stays full-bleed', () => {
+    const { container } = render(
+      <Footer maxWidth={1280}>
+        <Footer.Body>
+          <Footer.Section heading="Heading">
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+        <Footer.Bottom>
+          <a href="#">Terms</a>
+        </Footer.Bottom>
+      </Footer>
+    );
+
+    const row = container.querySelector('.tedi-footer__container') as HTMLElement;
+    expect(row.style.maxWidth).toBe('1280px');
+    const bottomInner = container.querySelector('.tedi-footer-bottom__inner') as HTMLElement;
+    expect(bottomInner.style.maxWidth).toBe('1280px');
+  });
+
+  it('lays the body out as a grid with the given column count above the mobile breakpoint', () => {
+    const { container } = render(
+      <Footer mobileBreakpoint="xs">
+        <Footer.Body columns={3}>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
+          </Footer.Section>
+          <Footer.Section heading="B">
+            <a href="#">B</a>
+          </Footer.Section>
+          <Footer.Section heading="C">
+            <a href="#">C</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    expect(body.className).toMatch(/--grid/);
+    expect(body.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+  });
+
+  it('Footer.Bottom with `separator` inserts a decorative dot between items', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Bottom separator>
+          <a href="#">A</a>
+          <a href="#">B</a>
+          <a href="#">C</a>
+        </Footer.Bottom>
+      </Footer>
+    );
+
     const bottom = container.querySelector('.tedi-footer-bottom') as HTMLElement;
-    // Only the three link children — no separator spans, no svg dots.
-    expect(bottom.children).toHaveLength(3);
-    Array.from(bottom.children).forEach((el) => expect(el.tagName.toLowerCase()).toBe('a'));
+    expect(bottom.querySelectorAll('a')).toHaveLength(3);
+    const dots = bottom.querySelectorAll('.tedi-footer-bottom__dot');
+    expect(dots).toHaveLength(2); // n items → n-1 separators
+    dots.forEach((dot) => expect(dot).toHaveAttribute('aria-hidden', 'true'));
   });
 });

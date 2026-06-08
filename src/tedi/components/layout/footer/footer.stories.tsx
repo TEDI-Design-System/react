@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { useEffect, useRef, useState } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import Link from '../../navigation/link/link';
+import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { VerticalSpacing } from '../vertical-spacing';
 import { Footer } from './footer';
 
@@ -24,6 +27,12 @@ const meta: Meta<typeof Footer> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6541-67240&m=dev',
     },
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
   },
 };
 
@@ -41,41 +50,154 @@ const LogoPlaceholder = () => {
   );
 };
 
-const SectionLinks = ({ count = 4 }: { count?: number }) => (
+const ContactLinks = () => (
   <>
-    {Array.from({ length: count }, (_, i) => (
-      <Link key={i} href="#" color="inverted">
-        Link
-      </Link>
-    ))}
+    <Link href="#" color="inverted">
+      +372 555 5555
+    </Link>
+    <Link href="#" color="inverted">
+      tedi@tehik.ee
+    </Link>
+    <Link href="#" color="inverted">
+      Pärnu mnt. 132, 11317 Tallinn
+    </Link>
   </>
 );
 
-const Caption = ({ children }: { children: React.ReactNode }) => (
-  <Text element="h3" modifiers="h5" color="primary">
-    {children}
-  </Text>
+const StandardSections = ({
+  collapsible = false,
+  firstOpen = false,
+}: {
+  collapsible?: boolean;
+  firstOpen?: boolean;
+}) => (
+  <>
+    <Footer.Section icon="info" heading="Uuri lähemalt" collapsible={collapsible} defaultOpen={firstOpen}>
+      <Link href="#" color="inverted">
+        Privaatsuspoliitika
+      </Link>
+      <Link href="#" color="inverted">
+        Küpsised
+      </Link>
+      <Link href="#" color="inverted">
+        Korduma kippuvad küsimused
+      </Link>
+      <Link href="#" color="inverted">
+        Karjäärivõimalused
+      </Link>
+    </Footer.Section>
+    <Footer.Section icon="share" heading="Sotsiaalmeedia ja uuendused" collapsible={collapsible}>
+      <Link href="#" color="inverted">
+        Uudiskirja tellimine
+      </Link>
+      <Link href="#" color="inverted">
+        Jälgi meid Twitteris
+      </Link>
+      <Link href="#" color="inverted">
+        Jälgi meid Facebookis
+      </Link>
+      <Link href="#" color="inverted">
+        Liitu meie kogukonnaga
+      </Link>
+    </Footer.Section>
+    <Footer.Section icon="call" heading="Kontakt" collapsible={collapsible}>
+      <ContactLinks />
+    </Footer.Section>
+  </>
 );
 
-const Note = ({ children }: { children: React.ReactNode }) => (
-  <Text element="p" modifiers="small" color="secondary">
-    {children}
-  </Text>
+const Avatar = () => (
+  <span
+    style={{
+      display: 'inline-flex',
+      flexShrink: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '4rem',
+      height: '4rem',
+      borderRadius: '50%',
+      backgroundColor: 'var(--footer-icon-background)',
+    }}
+  >
+    <Icon name="person" color="white" size={36} />
+  </span>
 );
+
+const DeviceFrame = ({
+  storyId,
+  label,
+  width,
+  theme,
+}: {
+  storyId: string;
+  label?: string;
+  width: number;
+  theme: string;
+}) => {
+  const ref = useRef<HTMLIFrameElement>(null);
+  const [height, setHeight] = useState(320);
+
+  useEffect(() => {
+    const iframe = ref.current;
+    if (!iframe) return;
+
+    let observer: ResizeObserver | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const getFooter = () => iframe.contentDocument?.querySelector<HTMLElement>('[data-name="footer"]') ?? null;
+    const measure = (footer: HTMLElement) => setHeight(footer.offsetHeight);
+
+    let attempts = 0;
+    const poll = () => {
+      const footer = getFooter();
+      if (footer) {
+        measure(footer);
+        observer = new ResizeObserver(() => measure(footer));
+        observer.observe(footer);
+      } else if (attempts++ < 100) {
+        timer = setTimeout(poll, 50);
+      }
+    };
+    poll();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      observer?.disconnect();
+    };
+  }, [storyId, theme]);
+
+  return (
+    <div style={{ flex: '0 0 auto' }}>
+      {label && (
+        <Text element="p" color="secondary">
+          {label}
+        </Text>
+      )}
+      <div
+        style={{
+          width,
+          overflow: 'hidden',
+        }}
+      >
+        <iframe
+          ref={ref}
+          title={label}
+          src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
+          style={{ display: 'block', width: '100%', height, border: 0 }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const DEVICE_FRAME_SOURCE_ID = 'tedi-ready-layout-footer--device-frame-source';
+const DEVICE_FRAME_SOURCE_ACCORDIONS_ID = 'tedi-ready-layout-footer--device-frame-source-accordions';
+const DEVICE_FRAME_SOURCE_ACCORDIONS_OPEN_ID = 'tedi-ready-layout-footer--device-frame-source-accordions-open';
 
 export const Default: Story = {
   render: () => (
     <Footer>
       <Footer.Body>
-        <Footer.Section icon="info" heading="Heading">
-          <SectionLinks />
-        </Footer.Section>
-        <Footer.Section icon="help" heading="Heading">
-          <SectionLinks />
-        </Footer.Section>
-        <Footer.Section icon="support" heading="Heading">
-          <SectionLinks />
-        </Footer.Section>
+        <StandardSections />
       </Footer.Body>
       <Footer.Side placement="end">
         <LogoPlaceholder />
@@ -85,168 +207,258 @@ export const Default: Story = {
 };
 
 export const DeviceSize: Story = {
-  render: () => (
-    <VerticalSpacing size={2}>
-      <div style={{ padding: '16px' }}>
-        <Caption>Desktop / Tablet / Mobile (default)</Caption>
-        <Note>
-          Same footer at any viewport — resize to see the layout adapt. Icons auto-hide below `lg`; sections stack below
-          `sm`.
-        </Note>
-      </div>
-      <Footer>
-        <Footer.Body>
-          <Footer.Section icon="info" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="help" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="support" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-      </Footer>
+  render: (_args, context) => {
+    const theme = (context.globals.theme as string) ?? 'default';
+    return (
+      <VerticalSpacing size={1}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <Text element="h3" modifiers="h5" color="primary">
+            Desktop
+          </Text>
+          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} />
+          <Text element="h3" modifiers="h5" color="primary">
+            Tablet
+          </Text>
+          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} />
+          <Text element="h3" modifiers="h5" color="primary">
+            Mobile
+          </Text>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', overflowX: 'auto' }}>
+            <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} label="Default" width={360} theme={theme} />
+            <DeviceFrame
+              storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_ID}
+              label="Compact view, accordions"
+              width={360}
+              theme={theme}
+            />
+            <DeviceFrame
+              storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_OPEN_ID}
+              label="Compact view, accordions (open)"
+              width={360}
+              theme={theme}
+            />
+          </div>
+        </div>
+      </VerticalSpacing>
+    );
+  },
+};
 
-      <div style={{ padding: '0 16px' }}>
-        <Caption>Mobile — Compact view, accordions</Caption>
-        <Note>
-          `collapsible` sections become accordions below `sm`. On wider viewports the prop is a no-op so this looks
-          identical to the default footer.
-        </Note>
-      </div>
-      <Footer>
-        <Footer.Body>
-          <Footer.Section icon="info" heading="Heading" collapsible>
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="help" heading="Heading" collapsible>
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="support" heading="Heading" collapsible>
-            <SectionLinks />
-          </Footer.Section>
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-      </Footer>
+const DeviceFrameFooter = ({ collapsible, firstOpen }: { collapsible?: boolean; firstOpen?: boolean }) => (
+  <Footer>
+    <Footer.Body>
+      <StandardSections collapsible={collapsible} firstOpen={firstOpen} />
+    </Footer.Body>
+    <Footer.Side placement="end">
+      <LogoPlaceholder />
+    </Footer.Side>
+  </Footer>
+);
 
-      <div style={{ padding: '0 16px' }}>
-        <Caption>Mobile — Compact view, accordions (open)</Caption>
-        <Note>First accordion section pre-opened via `defaultOpen`.</Note>
-      </div>
-      <Footer>
-        <Footer.Body>
-          <Footer.Section icon="info" heading="Heading" collapsible defaultOpen>
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="help" heading="Heading" collapsible>
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="support" heading="Heading" collapsible>
-            <SectionLinks />
-          </Footer.Section>
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-      </Footer>
-    </VerticalSpacing>
-  ),
+const deviceFrameSourceParams = { docs: { disable: true }, layout: 'fullscreen' as const };
+
+export const DeviceFrameSource: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: deviceFrameSourceParams,
+  render: () => <DeviceFrameFooter />,
+};
+
+export const DeviceFrameSourceAccordions: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: deviceFrameSourceParams,
+  render: () => <DeviceFrameFooter collapsible />,
+};
+
+export const DeviceFrameSourceAccordionsOpen: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: deviceFrameSourceParams,
+  render: () => <DeviceFrameFooter collapsible firstOpen />,
 };
 
 export const LogoPosition: Story = {
   render: () => (
     <VerticalSpacing size={2}>
-      <div style={{ padding: '16px' }}>
-        <Caption>Right — centered (default)</Caption>
-        <Note>`Footer.Side placement=&quot;end&quot;` with default `position=&quot;center&quot;`.</Note>
-      </div>
       <Footer>
         <Footer.Body>
-          <Footer.Section icon="info" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="help" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="support" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
+          <StandardSections />
         </Footer.Body>
         <Footer.Side placement="end">
           <LogoPlaceholder />
         </Footer.Side>
       </Footer>
 
-      <div style={{ padding: '0 16px' }}>
-        <Caption>Right — top edge</Caption>
-        <Note>
-          `Footer.Side placement=&quot;end&quot; position=&quot;start&quot;` pins the logo to the top of the footer.
-        </Note>
-      </div>
       <Footer>
         <Footer.Body>
-          <Footer.Section icon="info" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="help" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="support" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
+          <StandardSections />
         </Footer.Body>
         <Footer.Side placement="end" position="start">
           <LogoPlaceholder />
         </Footer.Side>
       </Footer>
 
-      <div style={{ padding: '0 16px' }}>
-        <Caption>Left — centered (default)</Caption>
-        <Note>`Footer.Side placement=&quot;start&quot;` with default `position=&quot;center&quot;`.</Note>
-      </div>
       <Footer>
         <Footer.Side placement="start">
           <LogoPlaceholder />
         </Footer.Side>
         <Footer.Body>
-          <Footer.Section icon="info" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="help" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
-          <Footer.Section icon="support" heading="Heading">
-            <SectionLinks />
-          </Footer.Section>
+          <StandardSections />
         </Footer.Body>
       </Footer>
 
-      <div style={{ padding: '0 16px' }}>
-        <Caption>Left — top edge</Caption>
-        <Note>
-          `Footer.Side placement=&quot;start&quot; position=&quot;start&quot;` pins the logo to the top of the footer.
-        </Note>
-      </div>
       <Footer>
         <Footer.Side placement="start" position="start">
           <LogoPlaceholder />
         </Footer.Side>
         <Footer.Body>
-          <Footer.Section icon="info" heading="Heading">
-            <SectionLinks />
+          <StandardSections />
+        </Footer.Body>
+      </Footer>
+    </VerticalSpacing>
+  ),
+};
+
+export const WithBottomSection: Story = {
+  render: () => (
+    <VerticalSpacing size={2}>
+      <Footer>
+        <Footer.Body>
+          <StandardSections />
+        </Footer.Body>
+        <Footer.Side placement="end">
+          <LogoPlaceholder />
+        </Footer.Side>
+        <Footer.Bottom>
+          <Link href="#" color="inverted">
+            Facebook
+          </Link>
+          <Link href="#" color="inverted">
+            Instagram
+          </Link>
+          <Link href="#" color="inverted">
+            LinkedIn
+          </Link>
+        </Footer.Bottom>
+      </Footer>
+      <Footer>
+        <Footer.Body>
+          <StandardSections />
+        </Footer.Body>
+        <Footer.Side placement="end">
+          <LogoPlaceholder />
+        </Footer.Side>
+        <Footer.Bottom separator>
+          <Link href="#" color="inverted">
+            Facebook
+          </Link>
+          <Link href="#" color="inverted">
+            Instagram
+          </Link>
+          <Link href="#" color="inverted">
+            LinkedIn
+          </Link>
+        </Footer.Bottom>
+      </Footer>
+
+      <Footer>
+        <Footer.Body>
+          <StandardSections />
+        </Footer.Body>
+        <Footer.Side placement="end">
+          <LogoPlaceholder />
+        </Footer.Side>
+        <Footer.Bottom>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <Link href="#" color="inverted" aria-label="Facebook">
+              <Icon name="public" color="white" />
+            </Link>
+            <Link href="#" color="inverted" aria-label="Instagram">
+              <Icon name="photo_camera" color="white" />
+            </Link>
+            <Link href="#" color="inverted" aria-label="LinkedIn">
+              <Icon name="groups" color="white" />
+            </Link>
+          </div>
+          <StatusBadge color="success" status="success" variant="filled-bordered">
+            Kõik süsteemid töökorras
+          </StatusBadge>
+        </Footer.Bottom>
+      </Footer>
+    </VerticalSpacing>
+  ),
+};
+
+export const CustomContent: Story = {
+  render: () => (
+    <VerticalSpacing size={2}>
+      <Footer>
+        <Footer.Body>
+          <Footer.Section icon="call" heading="Kontakt">
+            <ContactLinks />
           </Footer.Section>
-          <Footer.Section icon="help" heading="Heading">
-            <SectionLinks />
+          <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'center' }}>
+            <Link href="#" color="inverted" aria-label="Facebook">
+              <Icon name="public" color="white" />
+            </Link>
+            <Link href="#" color="inverted" aria-label="Instagram">
+              <Icon name="photo_camera" color="white" />
+            </Link>
+          </div>
+        </Footer.Body>
+      </Footer>
+
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Uuri lähemalt">
+            <Link href="#" color="inverted">
+              Privaatsuspoliitika
+            </Link>
+            <Link href="#" color="inverted">
+              Küpsised
+            </Link>
+            <Link href="#" color="inverted">
+              Korduma kippuvad küsimused
+            </Link>
           </Footer.Section>
-          <Footer.Section icon="support" heading="Heading">
-            <SectionLinks />
+          <Footer.Section heading="Sotsiaalmeedia">
+            <Link href="#" color="inverted">
+              Jälgi meid Twitteris
+            </Link>
+            <Link href="#" color="inverted">
+              Jälgi meid Facebookis
+            </Link>
+            <Link href="#" color="inverted">
+              Liitu meie kogukonnaga
+            </Link>
           </Footer.Section>
+          <Footer.Section heading="Uudised">
+            <Link href="#" color="inverted">
+              Uudiskirja tellimine
+            </Link>
+          </Footer.Section>
+          <Footer.Section icon="call" heading="Kontakt">
+            <ContactLinks />
+          </Footer.Section>
+        </Footer.Body>
+        <Footer.Bottom>
+          <img src="TEHIK_logo.svg" alt="TEHIK" style={{ height: '2.5rem' }} />
+        </Footer.Bottom>
+      </Footer>
+
+      <Footer>
+        <Footer.Body>
+          <div style={{ alignSelf: 'center' }}>
+            <Footer.Section heading="Osale meie terviseuuringus">
+              <Text element="p" modifiers="small" color="white">
+                Liitu meie uuringuga ja avasta uut enda tervise kohta!
+              </Text>
+            </Footer.Section>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+            <Avatar />
+            <Footer.Section heading="Kontakt">
+              <ContactLinks />
+            </Footer.Section>
+          </div>
         </Footer.Body>
       </Footer>
     </VerticalSpacing>
@@ -254,41 +466,37 @@ export const LogoPosition: Story = {
 };
 
 /**
- * Optional strip rendered below the main row, intended for legal / utility links.
- * Items are spaced via flex `gap`; on narrow viewports they wrap to multiple lines.
+ * On wide viewports the footer content can grow uncomfortably far apart. `maxWidth` caps the inner
+ * content (the column row **and** the bottom strip) to a fixed width and centers it, while the dark
+ * backgrounds stay full-bleed. `Footer.Body`'s `columns` lays the sections out as a fixed grid of
+ * equal-width tracks instead of the default content-sized `space-between` row — and it accepts
+ * per-breakpoint overrides, so you can step the column count down as the viewport narrows
+ * (`columns={4} lg={{ columns: 2 }}`). Below the footer's `mobileBreakpoint` the body always stacks
+ * into a single column regardless of `columns`.
  */
-export const WithBottomSection: Story = {
+export const MaxWidthAndColumns: Story = {
   render: () => (
-    <Footer>
-      <Footer.Body>
-        <Footer.Section icon="info" heading="Heading">
-          <SectionLinks />
-        </Footer.Section>
-        <Footer.Section icon="help" heading="Heading">
-          <SectionLinks />
-        </Footer.Section>
-        <Footer.Section icon="support" heading="Heading">
-          <SectionLinks />
+    <Footer maxWidth={1280}>
+      <Footer.Body columns={4} lg={{ columns: 2 }}>
+        <StandardSections />
+        <Footer.Section icon="local_library" heading="Uudised">
+          <Link href="#" color="inverted">
+            Pressiteated
+          </Link>
+          <Link href="#" color="inverted">
+            Blogi
+          </Link>
         </Footer.Section>
       </Footer.Body>
-      <Footer.Side placement="end">
-        <LogoPlaceholder />
-      </Footer.Side>
-      <Footer.Bottom>
+      <Footer.Bottom separator>
         <Link href="#" color="inverted">
-          Link
+          Privaatsuspoliitika
         </Link>
         <Link href="#" color="inverted">
-          Link
+          Küpsised
         </Link>
         <Link href="#" color="inverted">
-          Link
-        </Link>
-        <Link href="#" color="inverted">
-          Link
-        </Link>
-        <Link href="#" color="inverted">
-          Link
+          Ligipääsetavus
         </Link>
       </Footer.Bottom>
     </Footer>

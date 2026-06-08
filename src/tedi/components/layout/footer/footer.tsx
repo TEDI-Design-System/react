@@ -31,15 +31,24 @@ export interface FooterProps {
    */
   mobileBreakpoint?: Breakpoint;
   /**
+   * Caps the inner content — the column row and the bottom strip's content — to a maximum width
+   * and centers it, while the dark backgrounds stay full-bleed. Pass any CSS length (e.g. `1280`,
+   * `'1280px'`, `'80rem'`). Omit to let the content fill the full width (with the 40px padding).
+   */
+  maxWidth?: number | string;
+  /**
    * Additional class name on the `<footer>` root.
    */
   className?: string;
 }
 
-export const Footer = ({ children, className, mobileBreakpoint = 'sm' }: FooterProps): JSX.Element => {
+export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth }: FooterProps): JSX.Element => {
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
-  const contextValue = useMemo<FooterContextValue>(() => ({ mobileBreakpoint }), [mobileBreakpoint]);
+  const contextValue = useMemo<FooterContextValue>(
+    () => ({ mobileBreakpoint, maxWidth }),
+    [mobileBreakpoint, maxWidth]
+  );
 
   const start: ReactNode[] = [];
   const end: ReactNode[] = [];
@@ -72,7 +81,10 @@ export const Footer = ({ children, className, mobileBreakpoint = 'sm' }: FooterP
   return (
     <FooterContext.Provider value={contextValue}>
       <footer data-name="footer" className={cn(styles['tedi-footer'], className)}>
-        <div className={cn(styles['tedi-footer__container'], { [styles['tedi-footer__container--mobile']]: isMobile })}>
+        <div
+          className={cn(styles['tedi-footer__container'], { [styles['tedi-footer__container--mobile']]: isMobile })}
+          style={maxWidth !== undefined ? { maxWidth, marginInline: 'auto' } : undefined}
+        >
           {start}
           {body !== null && <div className={styles['tedi-footer__center']}>{body}</div>}
           {passthrough}
@@ -90,4 +102,5 @@ Footer.Section = FooterSection;
 Footer.Bottom = FooterBottom;
 
 Footer.displayName = 'Footer';
+
 export default Footer;
