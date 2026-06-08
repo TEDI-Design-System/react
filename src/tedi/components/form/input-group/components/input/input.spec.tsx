@@ -75,10 +75,10 @@ describe('InputGroup.Input', () => {
 
   it('propagates invalid and wrapperClassName to a non-intrinsic child', () => {
     const Probe = ({ invalid, wrapperClassName }: { invalid?: boolean; wrapperClassName?: string }) => (
-      <div data-testid="probe" data-invalid={String(!!invalid)} className={wrapperClassName} />
+      <div role="group" aria-label="probe" data-invalid={String(!!invalid)} className={wrapperClassName} />
     );
 
-    const { getByTestId } = render(
+    const { getByRole } = render(
       <InputGroup invalid id="test-group" label="Test Group">
         <InputGroup.Input>
           <Probe />
@@ -86,17 +86,17 @@ describe('InputGroup.Input', () => {
       </InputGroup>
     );
 
-    const probe = getByTestId('probe');
+    const probe = getByRole('group', { name: 'probe' });
     expect(probe).toHaveAttribute('data-invalid', 'true');
     expect(probe).toHaveClass('tedi-input-group__input');
   });
 
   it('keeps a non-intrinsic child invalid and merges its wrapperClassName when the group is valid', () => {
     const Probe = ({ invalid, wrapperClassName }: { invalid?: boolean; wrapperClassName?: string }) => (
-      <div data-testid="probe" data-invalid={String(!!invalid)} className={wrapperClassName} />
+      <div role="group" aria-label="probe" data-invalid={String(!!invalid)} className={wrapperClassName} />
     );
 
-    const { getByTestId } = render(
+    const { getByRole } = render(
       <InputGroup id="test-group" label="Test Group">
         <InputGroup.Input>
           <Probe invalid wrapperClassName="own-wrapper" />
@@ -104,7 +104,7 @@ describe('InputGroup.Input', () => {
       </InputGroup>
     );
 
-    const probe = getByTestId('probe');
+    const probe = getByRole('group', { name: 'probe' });
     expect(probe).toHaveAttribute('data-invalid', 'true');
     expect(probe).toHaveClass('own-wrapper');
     expect(probe).toHaveClass('tedi-input-group__input');
