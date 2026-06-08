@@ -165,15 +165,15 @@
 
   &__collapse {
     display: grid;
+    visibility: hidden;
     grid-template-rows: minmax(0, 0fr);
     width: 100%;
     overflow: hidden;
-    visibility: hidden;
     transition: grid-template-rows 0.3s ease;
 
     &--open {
-      grid-template-rows: minmax(0, 1fr);
       visibility: visible;
+      grid-template-rows: minmax(0, 1fr);
 
       .tedi-header-role__collapse--items {
         visibility: visible;
@@ -182,11 +182,11 @@
 
     &--items {
       display: flex;
+      visibility: hidden;
       flex-direction: column;
       gap: var(--layout-grid-gutters-16);
       min-height: 0;
       overflow: hidden;
-      visibility: hidden;
       transition: visibility 0.3s ease;
 
       .tedi-header-role__container & {

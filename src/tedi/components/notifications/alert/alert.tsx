@@ -64,8 +64,18 @@ export interface AlertProps extends BreakpointSupport<AlertBreakpointProps> {
    * Callback function triggered when the close button is clicked.
    * Adding this handler renders a close button in the alert.
    * Useful for dismissible alerts.
+   *
+   * Ignored when `action` is also set — the consumer's slot wins, and is
+   * responsible for any close affordance it wants to expose.
    */
   onClose?: () => void;
+  /**
+   * Custom content for the right-side slot of the alert (e.g. a CTA button,
+   * a link, or a small icon stack). Replaces the default close button when
+   * provided. Use this instead of squeezing buttons into `children` so the
+   * layout slot is reserved and aligned consistently.
+   */
+  action?: React.ReactNode;
   /**
    * The ARIA role of the alert, informing screen readers about the alert's purpose.
    * Options:
@@ -101,6 +111,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     type = 'info',
     icon,
     onClose,
+    action,
     isGlobal = false,
     noSideBorders = false,
     titleElement = 'h3',
@@ -115,6 +126,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     {
       [styles['tedi-alert--global']]: isGlobal,
       [styles['tedi-alert--no-side-borders']]: noSideBorders,
+      [styles['tedi-alert--has-action']]: Boolean(action),
     },
     className
   );
@@ -156,10 +168,14 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
               )}
             </div>
           </Col>
-          {onClose && (
-            <Col width="auto">
-              <ClosingButton onClick={onClose} iconSize={18} />
-            </Col>
+          {action ? (
+            <Col width="auto">{action}</Col>
+          ) : (
+            onClose && (
+              <Col width="auto">
+                <ClosingButton onClick={onClose} iconSize={18} />
+              </Col>
+            )
           )}
         </Row>
         {title && children && <div className="tedi-alert__content-wrapper">{children}</div>}
@@ -167,5 +183,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     </div>
   ) : null;
 };
+
+Alert.displayName = 'Alert';
 
 export default Alert;

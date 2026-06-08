@@ -88,9 +88,9 @@
   }
 
   &__title:focus-visible .tedi-collapse__icon-wrapper--secondary {
-    background: var(--button-main-secondary-background-focus);
     outline: var(--tedi-borders-02) solid var(--general-border-brand);
     outline-offset: 2px;
+    background: var(--button-main-secondary-background-focus);
   }
 
   &__icon-wrapper--default {
@@ -146,9 +146,9 @@
         outline: none;
 
         .tedi-collapse__icon-wrapper {
-          border-radius: 100%;
           outline: var(--tedi-borders-02) solid var(--general-border-brand);
           outline-offset: 2px;
+          border-radius: 100%;
         }
 
         .tedi-collapse__icon-wrapper &.tedi-collapse__icon-wrapper--secondary {
@@ -224,8 +224,8 @@
       }
 
       &:focus-visible .tedi-collapse__icon-wrapper {
-        background: var(--button-main-neutral-inverted-icon-only-background-focus);
         outline-color: var(--button-main-neutral-inverted-border-focus);
+        background: var(--button-main-neutral-inverted-icon-only-background-focus);
       }
     }
   }

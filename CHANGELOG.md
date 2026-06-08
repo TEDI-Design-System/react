@@ -1,3 +1,17 @@
+# [18.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.3...react-18.0.0-rc.4) (2026-06-05)
+
+
+### Features
+
+* **modal:** TEDI-Ready Modal component [#75](https://github.com/TEDI-Design-System/react/issues/75) ([#639](https://github.com/TEDI-Design-System/react/issues/639)) ([19495b3](https://github.com/TEDI-Design-System/react/commit/19495b34c44a58eca8237acc737ef6377fbbaf76))
+
+# [18.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.2...react-18.0.0-rc.3) (2026-06-02)
+
+
+### Features
+
+* **alert:** add action prop to replace ClosingButton if necessary [#552](https://github.com/TEDI-Design-System/react/issues/552) ([#659](https://github.com/TEDI-Design-System/react/issues/659)) ([529f191](https://github.com/TEDI-Design-System/react/commit/529f191f3175c8e5ebec385af74d340d5f822808)), closes [#652](https://github.com/TEDI-Design-System/react/issues/652)
+
 # [18.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.1...react-18.0.0-rc.2) (2026-06-01)
 
 
