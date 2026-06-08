@@ -1934,6 +1934,35 @@ export const DraggableColumns: Story = {
 };
 
 /**
+ * `draggableColumns` works alongside a pinned header (`stickyHeader` + `maxHeight`). Column
+ * reordering is data-driven — the drop rewrites TanStack's `state.columnOrder` and the header simply
+ * re-renders in the new order — so `position: sticky` doesn't interfere with the native HTML5 drag.
+ * Scroll the body to confirm the header stays pinned, then drag a column header by its
+ * <StatusBadge>≡</StatusBadge> handle: the order updates while the header remains fixed.
+ */
+export const DraggableColumnsStickyHeader: Story = {
+  render: () => (
+    <VerticalSpacing size={1}>
+      <Alert type="info" role="status" title="Drag columns + sticky header" icon="lightbulb">
+        <Text>
+          Reorder columns by dragging a header handle while the header stays pinned during vertical scroll. The two
+          features are independent — drag rewrites <StatusBadge>state.columnOrder</StatusBadge>; the sticky header is
+          pure CSS.
+        </Text>
+      </Alert>
+      <Table<Person>
+        id="tedi-table-column-drag-sticky"
+        data={people}
+        columns={personColumns}
+        draggableColumns
+        stickyHeader
+        maxHeight={280}
+      />
+    </VerticalSpacing>
+  ),
+};
+
+/**
  * Server-side pagination + sorting demo. `manualPagination` / `manualSorting`
  * tell the Table not to slice or re-order `data` locally; the parent owns
  * the current page slice and the sort, and re-derives them when state
