@@ -23,7 +23,7 @@ import {
 } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
-import type { ModalFullscreen } from '../../overlays/modal/modal-content/modal-content';
+import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import { TimePicker } from '../time-picker/time-picker';
 import styles from './time-field.module.scss';
@@ -130,12 +130,12 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
    */
   modal?: TimeFieldModal;
   /**
-   * Forwarded to `Modal.Content.fullscreen` when the modal picker is shown —
-   * `true` / `'edge'` / `false` / a breakpoint name. Lets the consumer make
-   * the mobile time picker fully cover the viewport.
-   * @default false
+   * Extra props forwarded to the picker modal's `Modal.Content` — e.g. `size`, `width`, `maxWidth`,
+   * `position`, `fullscreen`, and per-breakpoint overrides. Lets the consumer tune the modal beyond
+   * its `size="small"` / `width="xs"` defaults. `className` is merged with the component's own (so
+   * the internal padding reset is preserved). Only applies when the picker opens as a modal.
    */
-  modalFullscreen?: ModalFullscreen;
+  modalProps?: Omit<ModalContentProps, 'children'>;
 }
 
 export const TimeField: React.FC<TimeFieldProps> = (props) => {
@@ -155,7 +155,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     className,
     availableTimes,
     modal = false,
-    modalFullscreen = false,
+    modalProps,
   } = props;
 
   const {
@@ -184,7 +184,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const floating = useFloating({
     open,
     onOpenChange: setOpen,
-    placement: 'bottom-end',
+    placement: isInputTrigger ? 'bottom-start' : 'bottom-end',
     middleware: [offset(TIMEPICKER_OFFSET), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
@@ -274,10 +274,10 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     value: currentValue,
     placeholder,
     readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
-    icon: 'schedule',
+    icon: showPicker ? 'schedule' : { name: 'schedule', color: 'inherit' },
     isClearable: true,
     required,
-    onIconClick: handleIconClick,
+    onIconClick: showPicker ? handleIconClick : undefined,
     onChange: updateTime,
     onBlur: handleInputBlur,
     className: cn(
@@ -312,7 +312,18 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
               [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
             })}
           >
-            <TextField ref={textFieldRef} {...textFieldProps} />
+            <TextField
+              ref={textFieldRef}
+              {...textFieldProps}
+              input={
+                {
+                  ...textFieldProps.input,
+                  ...(!isInputTrigger && {
+                    onClick: (event: React.MouseEvent<HTMLInputElement>) => event.stopPropagation(),
+                  }),
+                } as UnknownType
+              }
+            />
           </div>
         </Dropdown.Trigger>
 
@@ -347,7 +358,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
           stepMinutes={stepMinutes}
           availableTimes={availableTimes}
           gridVariant={availableTimesVariant === 'grid-radio' ? 'radio' : 'button'}
-          fullscreen={modalFullscreen}
+          modalProps={modalProps}
         />
       )}
 

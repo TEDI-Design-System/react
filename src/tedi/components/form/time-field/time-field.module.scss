@@ -89,6 +89,10 @@
   }
 }
 
+.tedi-time-field__icon--disabled [aria-hidden='true'] {
+  color: var(--form-input-text-placeholder);
+}
+
 .tedi-time-field__picker-wrapper {
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 }

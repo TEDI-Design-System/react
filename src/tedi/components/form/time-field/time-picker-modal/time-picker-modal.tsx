@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import { useEffect, useState } from 'react';
 
 import { useLabels } from '../../../../providers/label-provider';
@@ -23,8 +24,11 @@ export interface TimePickerModalProps {
   availableTimes?: TimePickerProps['availableTimes'];
   /** Forwarded to the inner `TimePicker`. */
   gridVariant?: TimePickerProps['gridVariant'];
-  /** Forwarded to `Modal.Content` — make the modal fill the viewport at smaller sizes. */
-  fullscreen?: ModalContentProps['fullscreen'];
+  /**
+   * Extra props spread onto `Modal.Content`, overriding the `size="small"` / `width="xs"` defaults
+   * (including `fullscreen`). `className` is merged, not replaced, so the internal padding reset survives.
+   */
+  modalProps?: Omit<ModalContentProps, 'children'>;
   /** Modal title text. Falls back to the `time-field.modal-title` i18n key. */
   title?: string;
 }
@@ -48,7 +52,7 @@ const TimePickerModalHeader = ({ title }: { title: string }): JSX.Element => {
 };
 
 export const TimePickerModal = (props: TimePickerModalProps): JSX.Element => {
-  const { open, onOpenChange, value, onConfirm, stepMinutes, availableTimes, gridVariant, fullscreen, title } = props;
+  const { open, onOpenChange, value, onConfirm, stepMinutes, availableTimes, gridVariant, modalProps, title } = props;
   const { getLabel } = useLabels();
   const resolvedTitle = title ?? getLabel('time-field.modal-title');
 
@@ -68,9 +72,9 @@ export const TimePickerModal = (props: TimePickerModalProps): JSX.Element => {
       <Modal.Content
         size="small"
         width="xs"
-        fullscreen={fullscreen}
-        className={styles['tedi-time-picker-modal']}
         aria-label={resolvedTitle}
+        {...modalProps}
+        className={cn(styles['tedi-time-picker-modal'], modalProps?.className)}
       >
         <Modal.Header>
           <TimePickerModalHeader title={resolvedTitle} />

@@ -67,6 +67,7 @@ jest.mock('../textfield/textfield', () => {
     return (
       <div>
         <input
+          {...props.input}
           ref={inputRef}
           data-testid="textfield-input"
           value={props.value || ''}
@@ -212,6 +213,47 @@ describe('TimeField', () => {
     await user.click(screen.getByText('10:00'));
 
     expect(onChange).toHaveBeenCalledWith('10:00');
+  });
+
+  it('button-trigger dropdown does not open from an input click (stops propagation to the trigger)', async () => {
+    const user = userEvent.setup();
+    const parentClick = jest.fn();
+
+    render(
+      <div onClick={parentClick}>
+        <TimeField
+          id="t1"
+          label="Time"
+          availableTimes={['09:00', '10:00']}
+          availableTimesVariant="dropdown"
+          timePickerTrigger="button"
+        />
+      </div>
+    );
+
+    await user.click(screen.getByTestId('textfield-input'));
+    // Input click must not bubble to the Dropdown trigger — only the icon opens a button-trigger dropdown.
+    expect(parentClick).not.toHaveBeenCalled();
+  });
+
+  it('input-trigger dropdown opens from an input click (click reaches the trigger)', async () => {
+    const user = userEvent.setup();
+    const parentClick = jest.fn();
+
+    render(
+      <div onClick={parentClick}>
+        <TimeField
+          id="t2"
+          label="Time"
+          availableTimes={['09:00', '10:00']}
+          availableTimesVariant="dropdown"
+          timePickerTrigger="input"
+        />
+      </div>
+    );
+
+    await user.click(screen.getByTestId('textfield-input'));
+    expect(parentClick).toHaveBeenCalled();
   });
 
   it('uses native picker path (focus/showPicker)', async () => {
