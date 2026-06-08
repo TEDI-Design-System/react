@@ -27,4 +27,8 @@
 
 .tedi-date-picker-modal__calendar {
   width: 100%;
+
+  [class*='tedi-calendar__months-container'] {
+    justify-content: center;
+  }
 }

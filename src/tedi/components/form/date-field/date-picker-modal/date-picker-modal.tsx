@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import type { DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 
@@ -38,11 +39,15 @@ export interface DatePickerModalProps
   availableDays?: Date[] | ((date: Date) => boolean);
   footer?: React.ReactNode;
   monthYearSelectType?: 'dropdown' | 'grid';
+  showNavigation?: boolean;
   selectionLevel?: CalendarView;
   /** Initial month to display when the modal opens. Defaults to the selected date or today. */
   initialMonth?: Date;
-  /** Forwarded to `Modal.Content` — make the modal fill the viewport at smaller sizes. */
-  fullscreen?: ModalContentProps['fullscreen'];
+  /**
+   * Extra props spread onto `Modal.Content`, overriding the responsive width / `position="center"`
+   * defaults (including `fullscreen`). `className` is merged, not replaced, so the internal layout survives.
+   */
+  modalProps?: Omit<ModalContentProps, 'children'>;
   /** Modal title text. Falls back to the `date-field.modal-title` i18n key. */
   title?: string;
 }
@@ -85,9 +90,10 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
     availableDays,
     footer,
     monthYearSelectType,
+    showNavigation,
     selectionLevel = 'days',
     initialMonth,
-    fullscreen,
+    modalProps,
     title,
     ...dayPickerProps
   } = props;
@@ -124,12 +130,12 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
   return (
     <Modal open={open} onToggle={onOpenChange}>
       <Modal.Content
-        md={{ width: '315px' }}
-        sm={{ width: 'full' }}
         position="center"
-        fullscreen={fullscreen}
-        className={styles['tedi-date-picker-modal']}
         aria-label={resolvedTitle}
+        {...modalProps}
+        md={{ width: '315px', ...modalProps?.md }}
+        sm={{ width: 'full', ...modalProps?.sm }}
+        className={cn(styles['tedi-date-picker-modal'], modalProps?.className)}
       >
         <Modal.Header>
           <DatePickerModalHeader title={resolvedTitle} />
@@ -153,6 +159,7 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
             availableDays={availableDays}
             footer={footer}
             monthYearSelectType={monthYearSelectType}
+            showNavigation={showNavigation}
             handleSelect={handleSelect}
             applyValue={applyValue}
             className={styles['tedi-date-picker-modal__calendar']}

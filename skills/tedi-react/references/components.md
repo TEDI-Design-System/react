@@ -304,12 +304,16 @@ Same as Checkbox (without indeterminate)
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
 - `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
 - `showOutsideDays?: boolean = true`
 - **Disabling:** `disabled?: Matcher | Matcher[]`, `minDate?: Date`, `maxDate?: Date`, `disablePast?: boolean`, `disableFuture?: boolean`, `shouldDisableMonth?: (date) => boolean`, `shouldDisableYear?: (date) => boolean`
 - `availableDays?: Date[] | ((date) => boolean)` — opposite of `disabled`
 - `inputProps?: Omit<TextFieldProps | MultiValueFieldProps, 'label' | 'id'>` — pass-through to the underlying input
-- **Breakpoint-aware:** `enableCalendar?: boolean = true`, `calendarTrigger?: 'input' | 'button' = 'button'`, `useNativePicker?: boolean = false` (`'single'` mode only — swaps to `<input type="date">`), `numberOfMonths?: number` (clamped to 1 below `md`)
+- `modal?: boolean | Breakpoint = false` — open the calendar in a modal instead of the popover (`true` always, a breakpoint name → modal *below* that breakpoint)
+- `modalProps?: Omit<ModalContentProps, 'children'>` — escape hatch forwarded to the calendar modal's `Modal.Content` (e.g. `size`, `width`, `maxWidth`, `position`, `fullscreen`, per-breakpoint overrides); overrides the responsive-width defaults, `className` is merged. Only applies when the calendar opens as a modal
+- `modalTitle?: string` — heading for the calendar modal (falls back to the `date-field.modal-title` label); handy for month/year-only pickers (`"Vali kuu"` / `"Vali aasta"`). Only applies when the calendar opens as a modal
+- **Breakpoint-aware:** `enableCalendar?: boolean = true`, `calendarTrigger?: 'input' | 'button' = 'button'`, `useNativePicker?: boolean = false` (`'single'` mode only — swaps to `<input type="date">`), `numberOfMonths?: number` (clamped to 1 below `md` **in the popover**; kept in a modal, where months stack vertically and scroll)
 
 The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the underlying control is `MultiValueField`, so `ref.current.input` is `null` there. The calendar trigger button carries `aria-haspopup="dialog"` + `aria-expanded`; when `calendarTrigger="input"` those land on the `<input>` instead.
 
@@ -669,12 +673,12 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `closeOnBackdropClick: boolean = true`
 - `closeOnEscape: boolean = true`
 
-**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`)
+**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`, `fullscreen`)
 - `width: ModalWidth = 'sm'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
 - `maxWidth?: string` — cap for custom widths
 - `size: 'default' | 'small' = 'default'` — header/body/footer padding density
 - `position: 'center' | 'top' | 'right' | 'left' = 'center'` — side positions render full-height drawers
-- `fullscreen: boolean | 'sm' | 'md' | 'lg' | 'xl' = false` — `true` = always, breakpoint string = below that breakpoint
+- `fullscreen: boolean | 'edge' = false` — `true` = always fullscreen, `'edge'` = edge-to-edge; breakpoint-aware, so for "fullscreen below `md`" set `fullscreen md={{ fullscreen: false }}`
 - `scrollBehavior: 'content' | 'page' = 'content'` — internal body scroll vs. overlay-level page scroll
 - `trapFocus: boolean = true`, `returnFocus: boolean = true`
 - `showOverlay: boolean = true` — toggle the dimmed backdrop

@@ -26,7 +26,7 @@ import {
 } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
-import type { ModalFullscreen } from '../../overlays/modal/modal-content/modal-content';
+import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
@@ -65,9 +65,9 @@ type DateFieldBreakpointProps = {
    */
   useNativePicker?: boolean;
   /**
-   * Number of months shown side-by-side. On mobile (`< md`) values > 1 are
-   * automatically clamped to 1 — the popover would otherwise be unscrollable
-   * on a phone viewport.
+   * Number of months shown side-by-side. In the **popover** on mobile (`< md`) values > 1 are
+   * clamped to 1 — a multi-month popover gets unscrollable on a phone viewport. In a **modal** the
+   * count is kept: the months wrap to a vertical stack and the modal body scrolls.
    */
   numberOfMonths?: number;
 };
@@ -152,6 +152,13 @@ export interface DateFieldProps
    * @default dropdown
    */
   monthYearSelectType?: 'dropdown' | 'grid';
+  /**
+   * Show or hide the calendar header's previous/next navigation. When hidden, the month/year header
+   * also becomes a static, non-interactive label (no dropdown / grid jumping) — so the calendar is
+   * locked to the visible month(s): a clean "pick from these" view for a fixed month or range.
+   * @default true
+   */
+  showNavigation?: boolean;
   /**
    * **Selection granularity** — controls the level at which a click finalises
    * the date selection rather than drilling further into days. Use a coarser
@@ -251,12 +258,18 @@ export interface DateFieldProps
    */
   modal?: DateFieldModal;
   /**
-   * Forwarded to `Modal.Content.fullscreen` when the modal calendar is shown
-   * — `true` / `'edge'` / `false` / a breakpoint name. Lets the consumer make
-   * the mobile date picker fully cover the viewport.
-   * @default false
+   * Extra props forwarded to the calendar modal's `Modal.Content` — e.g. `size`, `width`, `maxWidth`,
+   * `position`, `fullscreen`, and per-breakpoint overrides. Lets the consumer tune the modal beyond
+   * its responsive-width defaults. `className` is merged with the component's own (so the internal
+   * layout is preserved). Only applies when the calendar opens as a modal.
    */
-  modalFullscreen?: ModalFullscreen;
+  modalProps?: Omit<ModalContentProps, 'children'>;
+  /**
+   * Heading shown at the top of the calendar modal. Falls back to the `date-field.modal-title`
+   * label. Handy for month/year-only pickers (e.g. `"Vali kuu"` / `"Vali aasta"`). Only applies when
+   * the calendar opens as a modal.
+   */
+  modalTitle?: string;
 }
 
 export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
@@ -282,6 +295,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     showOutsideDays = true,
     parseDate,
     monthYearSelectType,
+    showNavigation = true,
     selectionLevel = 'days',
     locale = et,
     localeCode = 'et-EE',
@@ -299,7 +313,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     availableDays,
     inputProps,
     modal = false,
-    modalFullscreen = false,
+    modalProps,
+    modalTitle,
     useNativePicker: _useNativePicker,
     enableCalendar: _enableCalendar,
     calendarTrigger: _calendarTrigger,
@@ -313,18 +328,10 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     ...dayPickerProps
   } = props;
 
-  // Native `<input type="date">` is only meaningful for a single Date — it
-  // can't express ranges or multi-selection.
   const shouldUseNativePicker = useNativePicker && mode === 'single';
 
   const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobile = isBreakpointBelow(breakpoint, 'md');
-  // Multi-month calendars are unwieldy on phones — the popover gets tall,
-  // wraps to a vertical stack, and any focus-into-view (react-day-picker
-  // moving focus to a day on tap) yanks the scroll back to the top. Force
-  // a single month below `md`; users navigate with the month nav buttons.
-  const effectiveNumberOfMonths =
-    isMobile && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
@@ -338,6 +345,9 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     !shouldUseNativePicker &&
     !readOnly &&
     (modal === true || (typeof modal === 'string' && isBreakpointBelow(breakpoint, modal)));
+
+  const effectiveNumberOfMonths =
+    isMobile && !useModalPicker && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
@@ -742,10 +752,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           availableDays={availableDays}
           footer={footer}
           monthYearSelectType={monthYearSelectType}
+          showNavigation={showNavigation}
           selectionLevel={selectionLevel}
           initialMonth={initialMonth}
-          fullscreen={modalFullscreen}
+          modalProps={modalProps}
           {...(dayPickerProps as UnknownType)}
+          title={modalTitle}
         />
       )}
 
@@ -781,6 +793,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   availableDays={availableDays}
                   footer={footer}
                   monthYearSelectType={monthYearSelectType}
+                  showNavigation={showNavigation}
                   handleSelect={handleSelect}
                   applyValue={applyValue}
                   className={styles['tedi-date-field__calendar']}

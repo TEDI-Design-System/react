@@ -4,6 +4,7 @@ import { dateMatchModifiers, Matcher, MonthCaptionProps, useNavigation } from 'r
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
+import { Text } from '../../../../base/typography/text/text';
 import Button from '../../../../buttons/button/button';
 import { Dropdown } from '../../../../overlays/dropdown';
 import styles from './calendar-header.module.scss';
@@ -117,7 +118,12 @@ export function CalendarHeader({
         </Button>
       )}
 
-      {isGridSelect ? (
+      {!showNavigation ? (
+        <div className={styles['tedi-calendar__month-year-label']}>
+          <Text>{displayMonth.toLocaleString(localeCode, { month: 'long' })}</Text>
+          <Text>{displayYear}</Text>
+        </div>
+      ) : isGridSelect ? (
         <>
           <Button noStyle className={styles['tedi-calendar__month-year-selector']} onClick={onOpenMonthGrid}>
             {displayMonth.toLocaleString(localeCode, { month: 'long' })}
