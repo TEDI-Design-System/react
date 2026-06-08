@@ -1,6 +1,15 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { Breakpoint } from '../../../helpers';
 import { Footer } from './footer';
+
+const mockUseBreakpoint = jest.fn(() => 'lg' as Breakpoint);
+
+jest.mock('../../../helpers', () => ({
+  __esModule: true,
+  ...jest.requireActual('../../../helpers'),
+  useBreakpoint: () => mockUseBreakpoint(),
+}));
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: jest.fn(() => ({
@@ -14,6 +23,10 @@ jest.mock('../../../providers/printing-provider/printing-provider', () => ({
 }));
 
 describe('Footer', () => {
+  beforeEach(() => {
+    mockUseBreakpoint.mockReturnValue('lg');
+  });
+
   it('renders body sections and bottom slot when provided', () => {
     render(
       <Footer>
@@ -40,7 +53,6 @@ describe('Footer', () => {
   it('places start sides before the body and end sides after', () => {
     const { container } = render(
       <Footer>
-        {/* Source order intentionally reversed — Footer should re-order by placement prop. */}
         <Footer.Side placement="end">
           <span>END</span>
         </Footer.Side>
@@ -61,7 +73,8 @@ describe('Footer', () => {
     expect(texts.indexOf('END')).toBeGreaterThan(texts.findIndex((t) => t?.includes('Link')));
   });
 
-  it('collapsible section renders a toggle button at xs and toggles aria-expanded on click', () => {
+  it('collapsible section renders a toggle button below the mobile breakpoint and toggles aria-expanded on click', () => {
+    mockUseBreakpoint.mockReturnValue('xs');
     render(
       <Footer>
         <Footer.Body>
@@ -130,8 +143,9 @@ describe('Footer', () => {
   });
 
   it('lays the body out as a grid with the given column count above the mobile breakpoint', () => {
+    mockUseBreakpoint.mockReturnValue('lg');
     const { container } = render(
-      <Footer mobileBreakpoint="xs">
+      <Footer>
         <Footer.Body columns={3}>
           <Footer.Section heading="A">
             <a href="#">A</a>
@@ -151,6 +165,27 @@ describe('Footer', () => {
     expect(body.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
   });
 
+  it('ignores `columns` below the mobile breakpoint — the body stacks into one column', () => {
+    mockUseBreakpoint.mockReturnValue('xs');
+    const { container } = render(
+      <Footer>
+        <Footer.Body columns={3}>
+          <Footer.Section heading="A">
+            <a href="#">A</a>
+          </Footer.Section>
+          <Footer.Section heading="B">
+            <a href="#">B</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const body = container.querySelector('.tedi-footer-body') as HTMLElement;
+    expect(body.className).not.toMatch(/--grid/);
+    expect(body.className).toMatch(/--mobile/);
+    expect(body.style.gridTemplateColumns).toBe('');
+  });
+
   it('Footer.Bottom with `separator` inserts a decorative dot between items', () => {
     const { container } = render(
       <Footer>
@@ -165,7 +200,7 @@ describe('Footer', () => {
     const bottom = container.querySelector('.tedi-footer-bottom') as HTMLElement;
     expect(bottom.querySelectorAll('a')).toHaveLength(3);
     const dots = bottom.querySelectorAll('.tedi-footer-bottom__dot');
-    expect(dots).toHaveLength(2); // n items → n-1 separators
+    expect(dots).toHaveLength(2);
     dots.forEach((dot) => expect(dot).toHaveAttribute('aria-hidden', 'true'));
   });
 });
