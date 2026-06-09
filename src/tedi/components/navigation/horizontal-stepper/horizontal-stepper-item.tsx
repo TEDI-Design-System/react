@@ -97,6 +97,6 @@ export const HorizontalStepperItem = (props: HorizontalStepperItemProps): JSX.El
   );
 };
 
-HorizontalStepperItem.displayName = 'HorizontalStepper.Item';
+HorizontalStepperItem.displayName = 'HorizontalStepperItem';
 
 export default HorizontalStepperItem;
