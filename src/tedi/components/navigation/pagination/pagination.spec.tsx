@@ -323,6 +323,29 @@ describe('Pagination component', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(50);
   });
 
+  it('supports labelled page-size options (e.g. "Show all") and emits their numeric value', async () => {
+    const onPageSizeChange = jest.fn();
+    render(
+      <Pagination
+        pageCount={5}
+        defaultPage={1}
+        pageSize={10}
+        pageSizeOptions={[10, 25, { value: 97, label: 'Show all' }]}
+        onPageSizeChange={onPageSizeChange}
+      />
+    );
+
+    const combobox = screen.getByRole('combobox', { name: /Page size/i });
+    await act(async () => {
+      combobox.focus();
+      fireEvent.keyDown(combobox, { key: 'ArrowDown', code: 'ArrowDown' });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    fireEvent.click(screen.getByText('Show all'));
+    expect(onPageSizeChange).toHaveBeenCalledWith(97);
+  });
+
   it('omits the page-size selector when pageSizeOptions is empty', () => {
     render(<Pagination pageCount={5} defaultPage={1} pageSizeOptions={[]} />);
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();

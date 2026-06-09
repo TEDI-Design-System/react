@@ -589,7 +589,7 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` **both** the number list **and** the page-size select collapse into compact triggers that open a mobile modal picker (radio-style list; opening it scrolls the active option to the top and focuses it).
 
 - `pageCount: number` (required), `page?` (controlled, 1-based) + `onPageChange?`, or `defaultPage?` (uncontrolled)
-- `totalItems?` → renders the results label; `pageSize?` + `pageSizeOptions?: number[]` + `onPageSizeChange?` → renders the page-size select
+- `totalItems?` → renders the results label; `pageSize?` + `pageSizeOptions?: (number | PaginationPageSizeOption)[]` + `onPageSizeChange?` → renders the page-size select. Options are plain numbers, or `{ value, label }` objects when the visible text should differ — most commonly a **"Show all"** entry `{ value: totalItems, label: 'Show all' }`. Selecting emits the option's numeric `value`; the consumer recomputes `pageCount` (a large value collapses it to 1, hiding the pager). Pass the label already translated.
 - `boundaryCount? = 1`, `siblingCount? = 1` — how many page numbers stay visible at the ends / around the active page before `…`
 - `background?: 'white' | 'transparent' = 'white'`, `borders?: 'top' | 'bottom' | 'both' | 'none' = 'top'`
 - `hideResults?`, `hidePageSize?`, `hidePager?: boolean | Breakpoint` — hide a slot entirely, or only below the given breakpoint
@@ -608,6 +608,14 @@ const [page, setPage] = useState(1);
 <Pagination
   pageCount={10} page={page} onPageChange={setPage}
   totalItems={97} pageSize={10} pageSizeOptions={[10, 25, 50, 100]} onPageSizeChange={setSize}
+/>
+
+// "Show all" — a labelled page-size option; recompute pageCount so it collapses to one page
+<Pagination
+  pageCount={Math.max(1, Math.ceil(total / size))} page={page} onPageChange={setPage}
+  totalItems={total} pageSize={size}
+  pageSizeOptions={[10, 25, 50, { value: total, label: 'Show all' }]}
+  onPageSizeChange={setSize}
 />
 
 // Prominent, labelled navigation

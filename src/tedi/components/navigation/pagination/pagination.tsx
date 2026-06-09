@@ -32,6 +32,11 @@ export type PaginationBackground = 'white' | 'transparent';
 export type PaginationBorders = 'top' | 'bottom' | 'both' | 'none';
 export type PaginationVisibility = boolean | Exclude<Breakpoint, 'xs'>;
 
+export interface PaginationPageSizeOption {
+  value: number;
+  label: string;
+}
+
 export interface PaginationLabels {
   /**
    * Accessible label for the nav wrapper.
@@ -183,9 +188,12 @@ export interface PaginationProps extends BreakpointSupport<PaginationBreakpointP
    */
   pageSize?: number;
   /**
-   * Options for the page-size select. Omit to hide the select.
+   * Options for the page-size select. Omit to hide the select. Accepts plain numbers, or
+   * `{ value, label }` objects when the visible text should differ from the value — e.g. a
+   * "Show all" entry `{ value: totalItems, label: 'Show all' }`. Selecting an option emits its
+   * `value` via `onPageSizeChange`; the pager collapses once the consumer recomputes `pageCount` to 1.
    */
-  pageSizeOptions?: number[];
+  pageSizeOptions?: (number | PaginationPageSizeOption)[];
   /**
    * Fires when the user picks a different page size.
    */
@@ -303,15 +311,19 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   const selectId = useId();
 
-  const pageSizeSelectOptions = useMemo<ISelectOption[]>(
+  const normalizedPageSizeOptions = useMemo<PaginationPageSizeOption[]>(
     () =>
       Array.isArray(pageSizeOptions)
-        ? pageSizeOptions.map((option) => ({
-            value: String(option),
-            label: String(option),
-          }))
+        ? pageSizeOptions.map((option) =>
+            typeof option === 'number' ? { value: option, label: String(option) } : option
+          )
         : [],
     [pageSizeOptions]
+  );
+
+  const pageSizeSelectOptions = useMemo<ISelectOption[]>(
+    () => normalizedPageSizeOptions.map((option) => ({ value: String(option.value), label: option.label })),
+    [normalizedPageSizeOptions]
   );
 
   const currentPageSizeOption = useMemo<ISelectOption | null>(() => {
@@ -331,6 +343,10 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   const currentPageSizeValue = currentPageSizeOption ? Number(currentPageSizeOption.value) : pageSize ?? 0;
 
+  const currentPageSizeLabel =
+    normalizedPageSizeOptions.find((option) => option.value === pageSize)?.label ??
+    (pageSize !== undefined ? String(pageSize) : '');
+
   const pageOptions = useMemo<PaginationMobileModalOption[]>(
     () =>
       Array.from({ length: pageCount }, (_, index) => {
@@ -347,12 +363,12 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   const pageSizeModalOptions = useMemo<PaginationMobileModalOption[]>(
     () =>
-      pageSizeSelectOptions.map((option) => ({
-        value: Number(option.value),
-        label: String(option.value),
-        ariaLabel: `${mergedLabels.pageSize} ${option.value}`,
+      normalizedPageSizeOptions.map((option) => ({
+        value: option.value,
+        label: option.label,
+        ariaLabel: `${mergedLabels.pageSize} ${option.label}`,
       })),
-    [pageSizeSelectOptions, mergedLabels]
+    [normalizedPageSizeOptions, mergedLabels]
   );
 
   const isResultsHidden = resolveVisibility(hideResults, breakpoint);
@@ -566,11 +582,11 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
                 className={styles['tedi-pagination__mobile-trigger']}
                 aria-haspopup="dialog"
                 aria-expanded={isPageSizeModalOpen}
-                aria-label={`${mergedLabels.pageSize} ${currentPageSizeValue}`}
+                aria-label={`${mergedLabels.pageSize} ${currentPageSizeLabel}`}
                 onClick={() => setIsPageSizeModalOpen(true)}
               >
                 <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
-                  {currentPageSizeValue}
+                  {currentPageSizeLabel}
                 </span>
                 <Icon name="arrow_drop_down" size={24} color="inherit" />
               </button>

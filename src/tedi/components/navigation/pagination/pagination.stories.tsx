@@ -402,3 +402,32 @@ export const CustomLabels: Story = {
     },
   },
 };
+
+/**
+ * **"Show all"** is just a labelled page-size option: `{ value: totalItems, label: 'Show all' }`.
+ * `pageSizeOptions` accepts plain numbers and `{ value, label }` objects side by side. Pagination
+ * stays presentational — selecting it emits the option's `value`, and the consumer recomputes
+ * `pageCount` from `totalItems / pageSize`. When that collapses to 1, the pager hides itself. Supply
+ * the label already translated (there's no built-in `pagination.show-all` key).
+ */
+export const ShowAllPageSize: Story = {
+  render: function ShowAllPageSize() {
+    const totalItems = 97;
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    return (
+      <Pagination
+        pageCount={Math.max(1, Math.ceil(totalItems / pageSize))}
+        page={page}
+        onPageChange={setPage}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        pageSizeOptions={[10, 25, 50, { value: totalItems, label: 'Show all' }]}
+        onPageSizeChange={(next) => {
+          setPageSize(next);
+          setPage(1);
+        }}
+      />
+    );
+  },
+};
