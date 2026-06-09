@@ -193,6 +193,148 @@ const [date, setDate] = useState<Date | undefined>();
 />
 ```
 
+### Table
+TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filterable / selectable / pinnable / expandable. Built-in pagination announces both **page changes and the result count** via `aria-live`, so JAWS reports state changes (incl. filtering down to a single page) automatically.
+
+```tsx
+<Table<Person> id="people" data={rows} columns={columns} pagination={pagination} />
+```
+
+**Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `emptyState`, `emptyStateRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`, `autoResetPageIndex`, `getRowId` (stable row id — set it when using `rowSelection`/`activeRowId`/`reorderableRows` with data that has a key, else ids fall back to the row index).
+
+#### Pagination — `pageSize`, `pageSizeOptions`, and appearance
+`pagination` accepts `true` (defaults) or an options object: `{ pageSize?, pageSizeOptions?, paginationProps? }`. `pageSizeOptions` is the page-size selector list (`false` hides it). **`paginationProps`** forwards extra props to the built-in `Pagination` to change its appearance/behaviour (e.g. `background`, `borders`, `hideResults`, `showPrevNextButtons`, `arrowVariant`, `labels`); the data/state props the Table owns (`pageCount`, `page`, `totalItems`, `pageSize`, `pageSizeOptions`, change handlers) are managed internally and can't be overridden.
+
+```tsx
+<Table
+  data={rows} columns={columns}
+  pagination={{ pageSize: 25, pageSizeOptions: [25, 50], paginationProps: { background: 'transparent', showPrevNextButtons: true } }}
+/>
+```
+
+#### Inline editing — keep the page with `autoResetPageIndex={false}`
+
+`autoResetPageIndex` maps to TanStack's option of the same name and **defaults to `true`** — any change to the `data` array snaps the table back to page 1, which is right after filtering/sorting but wrong for inline editing. If the consumer mutates `data` in place (e.g. a "Muuda"/"Salvesta" row editor that replaces the rows array on save), pass `autoResetPageIndex={false}` so saving a row on page 10 leaves the user on page 10.
+
+```tsx
+<Table<Booking> id="bookings" data={editor.rows} columns={columns} autoResetPageIndex={false} pagination={pagination} />
+```
+
+#### Sortable / filterable headers — accessibility (set `meta.label`!)
+
+`Table.HeaderButton` renders optional `children` **before** the icon, so the whole "label + icon" area is one clickable sort target (matches the Angular table — not an icon-only toggle next to inert text). Put the column label inside the button.
+
+**When a column's `header` is a render function (custom sort/filter controls), always set `meta.label` on the column.** The Table uses it as the `<th>`'s `aria-label`, so screen readers announce just the column name for each body cell — **without it, the th's accessible name is computed from its contents and JAWS reads the sort/filter controls' text** (e.g. "Number, sort ascending, filter") as the column header (WCAG 1.3.1 / 4.1.2). As a safety net the Table falls back to the column `id`, but `meta.label` gives the human-friendly name.
+
+Give the sort/filter controls themselves a column-scoped accessible name. The built-in labels are column-aware: `getLabel('table.sort', direction, columnLabel)` → e.g. "Sort by Name ascending"; `getLabel('table.filter', columnLabel)` → "Filter Name". (The per-column built-in filter input already uses `table.filter-input` with the column.)
+
+```tsx
+{
+  id: 'name',
+  accessorKey: 'name',
+  meta: { label: 'Name' }, // ← th accessible name; without it the sort/filter controls get read as the header
+  header: ({ column }) => {
+    const sorted = column.getIsSorted();
+    const icon = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
+    return (
+      <Table.HeaderButton icon={icon} selected={!!sorted}
+        aria-label={getLabel('table.sort', sorted, 'Name')} onClick={column.getToggleSortingHandler()}>
+        Name
+      </Table.HeaderButton>
+    );
+  },
+}
+```
+
+#### Row-click expansion — `expandTrigger`
+
+`expandTrigger?: 'button' | 'row'` (default `'button'`) controls how an expandable row (`getSubRows` / `renderSubComponent`) toggles:
+- `'button'` — only the chevron toggles; it renders in the bordered `secondary` arrow style.
+- `'row'` — a click anywhere on an **expandable** row toggles it (Enter / Space too); the chevron renders in the neutral `default` arrow style as a plain indicator. Only rows that can expand become clickable (get `role="button"`), so non-expandable rows stay inert.
+
+```tsx
+<Table<Person> id="people" data={rows} columns={columns} getSubRows={(r) => r.subRows} expandTrigger="row" />
+```
+
+#### Responsive — default is horizontal scroll; opt into a stacked layout
+
+The Table already wraps itself in an `overflow-x: auto` container, so **wide tables scroll horizontally by default** with no props. There's no built-in "responsive" prop (parity with Angular, which composes the pattern in its story). To opt into a stacked layout, drive it at the call site with primitives the Table already has: hide secondary columns below a breakpoint via controlled `columnVisibility`, then re-surface them inside the expandable detail row (`renderSubComponent` + `getRowCanExpand`, both gated on the breakpoint). Use `useBreakpoint()` + `isBreakpointBelow(bp, 'md')` for the breakpoint, and `TextGroup` (`type="horizontal"`) for the label/value pairs. Only `columnVisibility` is controlled — expansion state stays internal:
+
+```tsx
+const belowMd = isBreakpointBelow(useBreakpoint(), 'md');
+const columnVisibility = { email: !belowMd, role: !belowMd, location: !belowMd };
+<Table<Person>
+  id="people" data={rows} columns={columns}
+  state={{ columnVisibility }}
+  getRowCanExpand={() => belowMd}
+  renderSubComponent={belowMd ? (row) => (
+    <VerticalSpacing size={0.5}>
+      <TextGroup type="horizontal" labelWidth="6rem" label="E-post" value={row.original.email} />
+      {/* …one per hidden column */}
+    </VerticalSpacing>
+  ) : undefined}
+/>
+```
+
+When `renderSubComponent` is `undefined` (≥ md) the expand column isn't rendered at all — the full table shows. See the `Responsive` story.
+
+#### Nested rows + pagination — `paginateExpandedRows`
+
+`paginateExpandedRows` maps to TanStack's option but **defaults to `false`** (TanStack's own default is `true`), matching Angular: expanding a parent renders its children on the *same* page and only top-level rows count toward `pageSize`, so opening a row never pushes siblings to the next page or splits a parent's children across pages. Pass `true` to restore TanStack's behavior where sub-rows occupy page slots like any other row. Only relevant when the table is both expandable (`getSubRows`) and client-paginated.
+
+#### Accessibility — required for column headers with non-text content
+
+- **Icon-only `Table.HeaderButton` requires `aria-label`.** With visible `children` (sortable headers above) the text supplies the accessible name and `aria-label` is optional — keep it to give a richer name like "Sorteeri X järgi". An icon-only button (e.g. a filter trigger) has no text, so `aria-label` is mandatory. Always include the column name — JAWS otherwise reads only "Sorteeri kasvavalt, button" with no indication of *what* you're sorting:
+  ```tsx
+  <Table.HeaderButton icon="filter_alt" aria-label={`Filtreeri ${columnLabel}`} />  {/* icon-only → aria-label required */}
+  ```
+- **For columns with a function `header` (custom JSX containing sort / filter buttons, info icons, etc.), set `meta.label`**. The Table puts `aria-label={meta.label}` on the `<th>` so screen readers use the clean column name as the column header announcement for every cell. Without it, JAWS reads the full visible header text — including the button labels — for *every* data cell:
+  ```tsx
+  {
+    id: 'teenus',
+    accessorKey: 'teenus',
+    header: ({ column }) => (
+      <Table.HeaderButton icon="unfold_more" aria-label="Sorteeri Teenus järgi"
+        onClick={column.getToggleSortingHandler()}>
+        Teenus
+      </Table.HeaderButton>
+    ),
+    meta: { label: 'Teenus' },  // ← required when `header` is a function
+  }
+  ```
+  String headers (`header: 'Teenus'`) don't need `meta.label` — the string is used automatically.
+- **Filter popovers with validation must use `TextField`'s `invalid` + `helper` props**, not a custom red-bordered div. The Table doesn't ship built-in filter validation today, but if you add min-length / format checks, the only WCAG 3.3.1-compliant path is to wire the error through `TextField`. `invalid` sets `aria-invalid`; `helper` with `type: 'error'` renders the message via `<FeedbackText>` and auto-wires it into the input's `aria-describedby`. A red border + red helper text alone (the Angular bug) fails error identification because screen readers can't see colour:
+  ```tsx
+  <TextField
+    id={`filter-${column}`} label={column} value={draft} onChange={setDraft}
+    invalid={hasError}
+    helper={hasError ? { type: 'error', text: getLabel('table.filter.validation.min-length', 3) } : undefined}
+  />
+  ```
+  The labels `table.filter.validation.min-length` / `table.filter.validation.no-spaces` already exist in `labels-map.ts` — use them as-is for parity with Angular. **Max length / pattern / any other validation rule** belongs on `TextField` directly — pass `maxLength={40}` and let the native HTML attribute enforce it, plus mirror the rule in `invalid` + `helper` if you want a visible error before submit. Don't invent a Table-level `validation: { minLength, maxLength }` config — the primitives already cover it.
+- **Customise the built-in per-column filter input via `meta.filterProps`.** When you use `enableColumnFilters` (the auto-rendered filter row), forward `TextField` props to a column's filter field through `meta.filterProps` — e.g. cap the length with `meta: { filterProps: { input: { maxLength: 40 } } }`, or set a custom `placeholder`/`helper`. The Table owns the field's identity and state (`id`, `name`, `label`, `hideLabel`, `value`, `onChange`), so those can't be overridden; everything else (incl. `input` HTML attributes, `size`, `invalid`) passes through.
+  ```tsx
+  const columns: ColumnDef<Row>[] = [
+    { accessorKey: 'name', header: 'Name', meta: { filterProps: { input: { maxLength: 40 } } } },
+  ];
+  <Table data={rows} columns={columns} enableColumnFilters />
+  ```
+- **For "no results after filter" announcements, set `emptyStateRole="status"` on the Table.** The Table wraps the empty state in `<div role={emptyStateRole}>` (an ARIA live region), so screen readers announce it when a filter empties the rows. `'status'` is polite (recommended); `'alert'` is assertive (interrupts the current SR utterance). Leave the prop undefined for tables that are empty on first mount and never change — otherwise the live region announces on every render. The empty-state content itself is the `emptyState` prop (a string or an `<EmptyState>` node).
+  ```tsx
+  <Table data={rows} columns={columns} emptyStateRole="status" />
+  ```
+
+#### Reordering — `reorderableRows` / `reorderableColumns` (mouse + keyboard)
+
+Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to each row / draggable header; keyboard users Tab to it, press `Space`/`Enter` to pick up, arrow keys to move (`↑`/`↓` rows, `←`/`→` columns), `Space`/`Enter` to drop, `Escape` to cancel. Every move/drop/cancel is announced via a built-in `aria-live` region (i18n keys `table.reorder.*` / `table.row-reorder.*`).
+
+- **`reorderableColumns`** is self-contained — it reorders TanStack's `columnOrder` internally (flows through `onStateChange` / `persist`). No extra wiring. Built-in (`__select__`/`__expand__`/`__drag__`) and grouped columns are skipped.
+- **`reorderableRows`** emits **`onRowDrop({ fromId, toId, fromIndex, toIndex })`** on every move (keyboard too) — the consumer applies it to its data and passes the new array back. Stepping requires the consumer to apply each emit:
+  ```tsx
+  <Table id="t" data={rows} columns={columns} reorderableRows
+    onRowDrop={({ fromIndex, toIndex }) => setRows((cur) => arrayMove(cur, fromIndex, toIndex))} />
+  ```
+
 ## Form
 
 ### TextField
@@ -395,6 +537,85 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
   onChange={setSlot}
 />
 ```
+
+### Filter / FilterGroup
+**Props:** `FilterProps`, `FilterGroupProps` | form
+
+Compact pill-shaped trigger used to refine result sets. Four modes — chosen at render time
+by which props are present:
+
+- **Toggle** — no `options`, no `children`. Acts like a sticky checkbox.
+- **Single-select dropdown** — pass `options`. Selecting commits the value and closes the panel.
+- **Multi-select dropdown** — `options` + `multiselect`. Clicking does not close. Supports
+  `searchable`, `showSelectAll`, `showClear`.
+- **Custom dropdown content** — pass `children` to embed any panel (date picker, radio group).
+
+```tsx
+import { Filter, FilterGroup } from '@tedi-design-system/react/tedi';
+
+// Toggle
+<Filter text="Active" selected={active} onSelectedChange={setActive} />
+
+// Single-select with "Label: Value" trigger
+<Filter
+  text="Service"
+  options={[{ label: 'Optometrist', value: '1' }, { label: 'Dentist', value: '2' }]}
+  preserveLabel
+  selectedValue={service}
+  onSelectedValueChange={setService}
+  showClear
+  appendTo="body"
+/>
+
+// Multi-select with search & "select all"
+<Filter
+  text="Hospitals"
+  multiselect
+  options={hospitalOptions}
+  selectedValues={hospitals}
+  onSelectedValuesChange={setHospitals}
+  searchable
+  showSelectAll
+  showClear
+  appendTo="body"
+/>
+
+// Custom dropdown content — show clear action that resets consumer state
+<Filter text={periodLabel} selected={!!period} showClear onClear={() => setPeriod('')}>
+  <ChoiceGroup id="period" label="Period" inputType="radio" items={periodItems}
+    value={period} onChange={setPeriod} />
+</Filter>
+```
+
+Wrap related filters in `FilterGroup` to coordinate selection:
+
+```tsx
+// Single-select group (radio-like, role="radiogroup")
+<FilterGroup label="Status" value={status} onValueChange={setStatus}>
+  <Filter text="All" value="all" />
+  <Filter text="Active" value="active" />
+  <Filter text="Done" value="done" />
+</FilterGroup>
+
+// Multi-select group (checkbox-like, role="group")
+<FilterGroup label="Tags" multiselect values={tags} onValuesChange={setTags}>
+  <Filter text="Urgent" value="urgent" />
+  <Filter text="Review" value="review" />
+</FilterGroup>
+
+// Visual-only group (no managed props — children stay independent)
+<FilterGroup>
+  <Filter text="Foo" defaultSelected />
+  <Filter text="Bar" />
+</FilterGroup>
+```
+
+Key props:
+- `variant?: 'primary' | 'secondary'`, `size?: 'default' | 'large'`
+- `prepend?: ReactNode`, `append?: ReactNode`, `hidePrependWhenSelected?: boolean`
+- `appendTo?: 'body' | HTMLElement` — portal target for the dropdown
+- `selectAllLabel?: string` (default `'Vali kõik'`), `clearLabel?: string` (default `'Tühjenda valik'`)
+
 
 ### FileUpload
 **Props:** `FileUploadProps` | form
@@ -644,6 +865,102 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 
 **Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`
 
+### Modal
+Portalled dialog with focus trapping, backdrop, and scroll locking (built on floating-ui).
+
+Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, `Modal.Footer`, `Modal.Closer`
+
+```tsx
+<Modal>
+  <Modal.Trigger><Button>Open</Button></Modal.Trigger>
+  <Modal.Content width="md" position="center">
+    <Modal.Header title="Title" description="Optional supporting text" />
+    <Modal.Body>{/* content */}</Modal.Body>
+    <Modal.Footer>
+      <Modal.Closer><Button visualType="secondary">Cancel</Button></Modal.Closer>
+      <Modal.Closer><Button>Save</Button></Modal.Closer>
+    </Modal.Footer>
+  </Modal.Content>
+</Modal>
+```
+
+**`Modal` props (provider — open/close state)**
+- `defaultOpen?: boolean` — uncontrolled initial state
+- `open?: boolean` + `onToggle?: (open: boolean) => void` — controlled mode
+- `closeOnBackdropClick: boolean = true`
+- `closeOnEscape: boolean = true`
+
+**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`)
+- `width: ModalWidth = 'sm'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
+- `maxWidth?: string` — cap for custom widths
+- `size: 'default' | 'small' = 'default'` — header/body/footer padding density
+- `position: 'center' | 'top' | 'right' | 'left' = 'center'` — side positions render full-height drawers
+- `fullscreen: boolean | 'sm' | 'md' | 'lg' | 'xl' = false` — `true` = always, breakpoint string = below that breakpoint
+- `scrollBehavior: 'content' | 'page' = 'content'` — internal body scroll vs. overlay-level page scroll
+- `trapFocus: boolean = true`, `returnFocus: boolean = true`
+- `showOverlay: boolean = true` — toggle the dimmed backdrop
+- `lockScroll: boolean = true`
+- `visuallyHiddenDismiss?: boolean` — adds SR-only dismiss buttons for touch screen readers
+- `aria-labelledby?`, `aria-describedby?` — usually wired automatically by `Modal.Header`
+
+**`Modal.Header` props**
+- `title?: ReactNode` — rendered as `<h3>`, auto-registered as `aria-labelledby`
+- `description?: ReactNode` — auto-registered as `aria-describedby`
+- `closeButton: boolean = true`
+- `closeButtonProps?: Omit<ClosingButtonProps, 'onClick'>`
+- `children?: ReactNode` — replaces the default title/description layout
+
+**`Modal.Body` props**
+- `noScroll?: boolean` — disable internal scroll (pair with `scrollBehavior="page"` on Content)
+
+**`Modal.Footer` props**
+- `children?: ReactNode` — right-aligned actions (default)
+- `left?: ReactNode` — when set, footer splits into left + right halves
+
+**`Modal.Closer`** — wraps any clickable element to close the modal on click. Preserves the wrapped element's `onClick`.
+
+**`useModal()` hook** — read the public subset of Modal state from any descendant of `<Modal>`. **This is the hook to reach for as a consumer.** Returns:
+- `open: boolean`
+- `onOpenChange: (open: boolean) => void` — programmatically open / close
+- `labelId: string`, `descriptionId: string` — for manual `aria-labelledby` / `aria-describedby` wiring when you replace `Modal.Header`
+
+Throws if called outside a `<Modal>` subtree.
+
+> `useModalContext` and `ModalContext` are also exported alongside `useModal`, but they're for the package's own sub-components — they expose floating-ui plumbing (`reference`, `floating`, `getReferenceProps`, …) which causes subtle focus / dismissal bugs when touched from outside the Modal package. **Always prefer `useModal()`** in consumer code.
+
+```tsx
+import { Modal, useModal, Button, ClosingButton } from '@tedi-design-system/react/tedi';
+
+function CustomHeader({ title }: { title: string }) {
+  const { labelId, onOpenChange } = useModal();
+  return (
+    <Modal.Header>
+      <h2 id={labelId}>{title}</h2>
+      <ClosingButton onClick={() => onOpenChange(false)} />
+    </Modal.Header>
+  );
+}
+
+function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
+  const { onOpenChange } = useModal();
+  return (
+    <Button onClick={() => { onConfirm(); onOpenChange(false); }}>Confirm</Button>
+  );
+}
+```
+
+```tsx
+// Responsive: side drawer on desktop, centered on mobile
+<Modal.Content position="right" md={{ position: 'center' }} defaultServerBreakpoint="md">
+
+// ScrollFade inside the body — modal hands scroll-ownership over automatically
+<Modal.Body>
+  <ScrollFade fadePosition="both" fadeSize={10}>
+    <div style={{ padding: 'var(--modal-body-padding)' }}>{/* long content */}</div>
+  </ScrollFade>
+</Modal.Body>
+```
+
 ## Tags
 
 ### Tag
@@ -776,6 +1093,11 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `pagination?`, `sorting?`, `rowSelection?`, `columnPinning?`
 - `onPaginationChange?`, `onSortingChange?`, `onRowSelectionChange?`
 - `hidePagination?: boolean`, `size?: 'medium'`
+- `getSubRows?`, `renderSubComponent?`, `expandTrigger?: 'button' | 'row'` (`'row'` = whole expandable row toggles, neutral chevron)
+- `autoResetPageIndex?: boolean` (default `true`) — set `false` for inline-editing tables so saving a row doesn't jump back to page 1
+- `paginateExpandedRows?: boolean` (default `false`, unlike TanStack's `true`) — keeps a parent's expanded children on its page instead of letting them consume page slots / split across pages
+- `Table.HeaderButton` accepts `children` (label before icon) so the whole sort header is clickable; `aria-label` optional when `children` present, required for icon-only buttons
+- Responsive: horizontal scroll is the default (built-in `overflow-x: auto`). For a stacked layout, hide columns below a breakpoint via controlled `columnVisibility` + reveal them in `renderSubComponent` (no dedicated prop — composed at the call site)
 
 ## Layout
 

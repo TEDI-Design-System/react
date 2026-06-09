@@ -40,6 +40,11 @@ const meta: Meta<typeof Table> = {
       control: false,
     },
   },
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -1,3 +1,24 @@
+# [18.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.5...react-18.0.0-rc.6) (2026-06-09)
+
+
+### Features
+
+* **filter:** new TEDI-Ready component [#530](https://github.com/TEDI-Design-System/react/issues/530) ([#629](https://github.com/TEDI-Design-System/react/issues/629)) ([e29a504](https://github.com/TEDI-Design-System/react/commit/e29a504f5f56e0d9a6ba4324a5777d4660e070b1))
+
+# [18.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.4...react-18.0.0-rc.5) (2026-06-09)
+
+
+### Features
+
+* **table:** new TEDI-Ready component [#122](https://github.com/TEDI-Design-System/react/issues/122) ([#624](https://github.com/TEDI-Design-System/react/issues/624)) ([4b04806](https://github.com/TEDI-Design-System/react/commit/4b04806cbb7f417938f084488f67c0b4ffa8c9e9)), closes [#20](https://github.com/TEDI-Design-System/react/issues/20) [#20](https://github.com/TEDI-Design-System/react/issues/20) [#10](https://github.com/TEDI-Design-System/react/issues/10) [#112](https://github.com/TEDI-Design-System/react/issues/112) [#20](https://github.com/TEDI-Design-System/react/issues/20)
+
+# [18.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.3...react-18.0.0-rc.4) (2026-06-05)
+
+
+### Features
+
+* **modal:** TEDI-Ready Modal component [#75](https://github.com/TEDI-Design-System/react/issues/75) ([#639](https://github.com/TEDI-Design-System/react/issues/639)) ([19495b3](https://github.com/TEDI-Design-System/react/commit/19495b34c44a58eca8237acc737ef6377fbbaf76))
+
 # [18.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.2...react-18.0.0-rc.3) (2026-06-02)
 
 

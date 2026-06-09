@@ -1,3 +1,5 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
 .tedi-pagination {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -6,6 +8,11 @@
   width: 100%;
   padding: var(--tedi-dimensions-07) var(--tedi-dimensions-09);
   border-top: 1px solid var(--general-border-secondary);
+
+  @include breakpoints.media-breakpoint-down(md) {
+    grid-template-columns: 1fr;
+    gap: var(--layout-grid-gutters-08);
+  }
 }
 
 .tedi-pagination__slot-start {
@@ -13,6 +20,11 @@
   align-items: center;
   justify-self: start;
   min-width: 0;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    justify-content: center;
+    justify-self: center;
+  }
 }
 
 .tedi-pagination__slot-center {
@@ -35,8 +47,15 @@
 
 .tedi-pagination__nav {
   display: flex;
+  gap: var(--layout-grid-gutters-08);
   align-items: center;
   justify-content: center;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--layout-grid-gutters-16);
+  }
 }
 
 .tedi-pagination__list {
@@ -49,6 +68,16 @@
   list-style: none;
 }
 
+.tedi-pagination__page-jump {
+  display: inline-flex;
+  grid-column: 2;
+  justify-self: center;
+}
+
+.tedi-pagination__page-jump-select {
+  min-width: var(--tedi-dimensions-18);
+}
+
 .tedi-pagination__item {
   display: inline-flex;
   align-items: center;
@@ -56,7 +85,8 @@
 }
 
 .tedi-pagination__item--ellipsis {
-  min-width: var(--tedi-dimensions-13);
+  width: var(--pagination-button-size);
+  height: var(--pagination-button-size);
   color: var(--general-text-secondary);
   user-select: none;
 }
@@ -73,7 +103,6 @@
   background: var(--button-main-neutral-icon-only-background-default);
   border: 1px solid var(--tedi-neutral-100);
   border-radius: 100%;
-  transition: all 250ms ease;
 
   &:hover:not(:disabled, .tedi-pagination__button--selected) {
     color: var(--button-main-neutral-text-hover);
@@ -117,6 +146,30 @@
 
 .tedi-pagination__button--nav {
   padding: 0;
+
+  @include breakpoints.media-breakpoint-down(md) {
+    background: transparent;
+    border: 0;
+
+    &:hover:not(:disabled, .tedi-pagination__button--selected),
+    &:active:not(:disabled, .tedi-pagination__button--selected) {
+      background: transparent;
+    }
+  }
+}
+
+.tedi-pagination__button--nav-previous {
+  @include breakpoints.media-breakpoint-down(md) {
+    grid-column: 1;
+    justify-self: end;
+  }
+}
+
+.tedi-pagination__button--nav-next {
+  @include breakpoints.media-breakpoint-down(md) {
+    grid-column: 3;
+    justify-self: start;
+  }
 }
 
 .tedi-pagination__page-size {
@@ -132,4 +185,19 @@
 
 .tedi-pagination__select {
   min-width: var(--tedi-dimensions-18);
+}
+
+@keyframes tedi-pagination-label-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.tedi-pagination__button-label {
+  display: inline-block;
+  animation: tedi-pagination-label-in 0s ease;
 }
