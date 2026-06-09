@@ -196,6 +196,8 @@ describe('Pagination component', () => {
     const next = screen.getByRole('button', { name: /Next page/i });
     expect(prev).toHaveTextContent(/Previous page/i);
     expect(next).toHaveTextContent(/Next page/i);
+    expect(prev).toHaveTextContent('arrow_back');
+    expect(next).toHaveTextContent('arrow_forward');
   });
 
   it('keeps edge nav buttons icon-only by default (no visible Previous/Next text)', () => {

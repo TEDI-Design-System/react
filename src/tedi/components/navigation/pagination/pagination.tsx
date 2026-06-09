@@ -447,30 +447,32 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     }
 
     const iconNode = <Icon name={icon} size={18} color="inherit" />;
-    const labelNode = showEdgeNavLabels ? <span className={styles['tedi-pagination__nav-label']}>{label}</span> : null;
+    const labelNode = <span className={styles['tedi-pagination__nav-label']}>{label}</span>;
 
     return (
       <Button
-        type="button"
         className={cn(styles['tedi-pagination__button'], styles['tedi-pagination__button--nav'], sideClass, {
           [styles['tedi-pagination__button--nav-link']]: showEdgeNavLabels,
         })}
         aria-label={label}
         disabled={item?.disabled}
         onClick={() => handlePageChange(item?.page ?? null)}
-        noStyle
+        visualType="neutral"
+        size="small"
+        icon={!showEdgeNavLabels ? icon : undefined}
       >
-        {side === 'previous' ? (
-          <>
-            {iconNode}
-            {labelNode}
-          </>
-        ) : (
-          <>
-            {labelNode}
-            {iconNode}
-          </>
-        )}
+        {showEdgeNavLabels &&
+          (side === 'previous' ? (
+            <>
+              {iconNode}
+              {labelNode}
+            </>
+          ) : (
+            <>
+              {labelNode}
+              {iconNode}
+            </>
+          ))}
       </Button>
     );
   };

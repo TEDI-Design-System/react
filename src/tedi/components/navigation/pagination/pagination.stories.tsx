@@ -8,7 +8,7 @@ import { Pagination, PaginationProps } from './pagination';
  * with optional results label and page-size selector.
  *
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=8478-72385&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/35aad8-pagination" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/35aad8-pagination" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Pagination> = {
   component: Pagination,
@@ -214,7 +214,7 @@ export const TopBottomSplit: Story = {
  * By default the disabled Previous on page 1 (or disabled Next on the last
  * page) drops out of the DOM for a compact look. Set `showPrevNextButtons` to
  * keep both arrows rendered (disabled) at the boundaries so the pager width
- * stays stable as the user navigates. Mirrors Angular's `disableArrowsAtBoundary`.
+ * stays stable as the user navigates.
  */
 export const DisabledBoundaryArrows: Story = {
   render: function DisabledBoundaryArrows() {
