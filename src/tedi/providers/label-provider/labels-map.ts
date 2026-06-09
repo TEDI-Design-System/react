@@ -440,18 +440,79 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Сведения о строке',
   },
   'table.drag-row': {
-    description: 'Accessible label for the drag-handle button when `draggableRows` is on.',
+    description: 'Accessible label for the drag-handle button when `reorderableRows` is on.',
     components: ['Table'],
     et: 'Lohista rida',
     en: 'Drag row',
     ru: 'Перетащить строку',
   },
   'table.drag-column': {
-    description: 'Accessible label for the column drag-handle button when `draggableColumns` is on.',
+    description: 'Accessible label for the column drag-handle button when `reorderableColumns` is on.',
     components: ['Table'],
     et: (columnLabel: string) => `Lohista veergu ${columnLabel}`,
     en: (columnLabel: string) => `Drag column ${columnLabel}`,
     ru: (columnLabel: string) => `Перетащить столбец ${columnLabel}`,
+  },
+  'table.reorder.pickup': {
+    description: 'Live-region message when a column is picked up for keyboard reordering.',
+    components: ['Table'],
+    et: (columnLabel: string) =>
+      `Veerg ${columnLabel} on valitud. Kasuta vasak-/paremnoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
+    en: (columnLabel: string) =>
+      `Column ${columnLabel} picked up. Use Left/Right arrow to move, Space or Enter to drop.`,
+    ru: (columnLabel: string) =>
+      `Столбец ${columnLabel} взят. Используйте стрелки влево/вправо для перемещения, Пробел или Enter для подтверждения.`,
+  },
+  'table.reorder.move': {
+    description: 'Live-region message while a picked-up column is moved between positions.',
+    components: ['Table'],
+    et: (columnLabel: string, position: number) => `Veerg ${columnLabel} positsioonil ${position}.`,
+    en: (columnLabel: string, position: number) => `Column ${columnLabel} at position ${position}.`,
+    ru: (columnLabel: string, position: number) => `Столбец ${columnLabel} на позиции ${position}.`,
+  },
+  'table.reorder.drop': {
+    description: 'Live-region message when a column is dropped at its new position.',
+    components: ['Table'],
+    et: (columnLabel: string, position: number) => `Veerg ${columnLabel} paigutatud positsioonile ${position}.`,
+    en: (columnLabel: string, position: number) => `Column ${columnLabel} moved to position ${position}.`,
+    ru: (columnLabel: string, position: number) => `Столбец ${columnLabel} перемещён на позицию ${position}.`,
+  },
+  'table.reorder.cancel': {
+    description: 'Live-region message when column reordering is cancelled.',
+    components: ['Table'],
+    et: 'Veeru ümberjärjestamine tühistatud.',
+    en: 'Column reordering cancelled.',
+    ru: 'Перестановка столбцов отменена.',
+  },
+  'table.row-reorder.pickup': {
+    description: 'Live-region message when a row is picked up for keyboard reordering.',
+    components: ['Table'],
+    et: (position: number) =>
+      `Rida ${position} on valitud. Kasuta üles-/allanoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
+    en: (position: number) => `Row ${position} picked up. Use Up/Down arrow to move, Space or Enter to drop.`,
+    ru: (position: number) =>
+      `Строка ${position} взята. Используйте стрелки вверх/вниз для перемещения, Пробел или Enter для подтверждения.`,
+  },
+  'table.row-reorder.move': {
+    description: 'Live-region message while a picked-up row is moved between positions.',
+    components: ['Table'],
+    et: (position: number) => `Rida liigutatud positsioonile ${position}.`,
+    en: (position: number) => `Row moved to position ${position}.`,
+    ru: (position: number) => `Строка перемещена на позицию ${position}.`,
+  },
+  'table.row-reorder.drop': {
+    description: 'Live-region message when a row is dropped at its new position.',
+    components: ['Table'],
+    et: (position: number) => `Rida paigutatud positsioonile ${position}.`,
+    en: (position: number) => `Row dropped at position ${position}.`,
+    ru: (position: number) => `Строка размещена на позиции ${position}.`,
+  },
+  'table.row-reorder.cancel': {
+    description: 'Live-region message when row reordering is cancelled.',
+    components: ['Table'],
+    et: 'Ridade ümberjärjestamine tühistatud.',
+    en: 'Row reordering cancelled.',
+    ru: 'Перестановка строк отменена.',
   },
   'table.columns': {
     description: 'Default label on the `Table.ColumnsMenu` trigger (column-visibility menu).',

@@ -530,43 +530,41 @@ export interface TableProps<TData> {
    */
   children?: ReactNode;
   /**
-   * Enables row drag-and-drop reordering. The Table auto-injects a leading
-   * drag-handle column and wires up the native HTML5 drag API internally —
-   * the consumer just listens to `onRowDrop` and applies the new order to the
-   * source `data` array.
+   * Enables row reordering by **mouse and keyboard**. The Table auto-injects a
+   * leading drag-handle column. Mouse: drag a row by its handle. Keyboard: focus
+   * a handle, `Space`/`Enter` to pick the row up, `↑`/`↓` to move it (clamped to
+   * the rendered rows), `Space`/`Enter` to drop, `Escape` to cancel — every move
+   * (and the drop/cancel) is announced via a live region. Both paths emit
+   * `onRowDrop`; the consumer applies the new order to the source `data` array.
    *
    * Each `row.id` returned by TanStack is used as the drag identifier, so the
    * data must have a stable `id` (or supply `getRowId`).
    *
-   * **Accessibility caveat:** HTML5 drag-and-drop is pointer-only — keyboard
-   * users cannot reorder rows by focusing the grip. Provide an alternative
-   * reorder mechanism (e.g. "Move up" / "Move down" buttons in a row action
-   * menu) if keyboard parity matters for your audience.
-   *
    * @default false
    */
-  draggableRows?: boolean;
+  reorderableRows?: boolean;
   /**
-   * Enables column drag-and-drop reordering. Each (non-built-in, non-grouped)
-   * leaf header gets a grip button next to its label. Dropping a column
-   * pushes the new order into TanStack's `columnOrder` state — flows through
-   * `onStateChange` and the `persist` adapter automatically.
+   * Enables column reordering by **mouse and keyboard**. Each (non-built-in,
+   * non-grouped) leaf header gets a grip button next to its label. Mouse: drag
+   * the header by its grip. Keyboard: focus the grip, `Space`/`Enter` to pick
+   * the column up, `←`/`→` to move it, `Space`/`Enter` to drop, `Escape` to
+   * cancel (announced via a live region). Reordering pushes the new order into
+   * TanStack's `columnOrder` state — flows through `onStateChange` and the
+   * `persist` adapter automatically; no `onRowDrop`-style wiring needed.
    *
    * Grouped header parents are never draggable; only flat / leaf columns are.
    * Built-in slots (`__drag__`, `__select__`, `__expand__`) are skipped.
    *
-   * **Same a11y caveat as `draggableRows`** — pointer-only.
-   *
    * @default false
    */
-  draggableColumns?: boolean;
+  reorderableColumns?: boolean;
   /**
    * Fires when a draggable row is dropped to a new position. Receives the
    * before/after `row.id`s and the convenience indexes. Apply the move to your
    * data with `arrayMove(data, fromIndex, toIndex)` and pass the result back
    * via `data`.
    *
-   * Only invoked when `draggableRows` is enabled and the drop actually changes
+   * Only invoked when `reorderableRows` is enabled and the drop actually changes
    * the row order.
    */
   onRowDrop?: (event: TableRowDropEvent) => void;
@@ -592,20 +590,43 @@ interface TableDataRowProps<TData> {
     onDragEnd: () => void;
     onDrop: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onHandlePointerDown: () => void;
+    /** Keyboard reordering on the drag handle (pick up / move / drop / cancel). */
+    onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
   };
+  /** Stable id for the row's drag handle — lets the parent restore focus after a keyboard move. */
+  dragHandleId?: string;
+  /** Whether this row is currently picked up for keyboard reordering. */
+  dragHandlePickedUp?: boolean;
   dragOverColumnId?: string | null;
 }
 
 const DRAG_HANDLE_ATTR = 'data-tedi-drag-handle';
 
-const DragHandleCell = ({ label, onHandlePointerDown }: { label: string; onHandlePointerDown: () => void }) => (
+const DragHandleCell = ({
+  label,
+  onHandlePointerDown,
+  id,
+  pickedUp,
+  onKeyDown,
+}: {
+  label: string;
+  onHandlePointerDown: () => void;
+  id?: string;
+  pickedUp?: boolean;
+  onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
+}) => (
   <button
     type="button"
-    className={styles['tedi-table__drag-handle']}
+    id={id}
+    className={cn(styles['tedi-table__drag-handle'], {
+      [styles['tedi-table__drag-handle--picked-up']]: pickedUp,
+    })}
     aria-label={label}
+    aria-pressed={pickedUp}
     onClick={(event) => event.stopPropagation()}
     onMouseDown={onHandlePointerDown}
     onTouchStart={onHandlePointerDown}
+    onKeyDown={onKeyDown}
     {...{ [DRAG_HANDLE_ATTR]: '' }}
   >
     <Icon name="drag_indicator" size={18} color="inherit" />
@@ -626,6 +647,8 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
     draggable,
     dragHandleLabel,
     dragHandlers,
+    dragHandleId,
+    dragHandlePickedUp,
     dragOverColumnId,
   } = props;
 
@@ -673,6 +696,9 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
               <DragHandleCell
                 label={dragHandleLabel}
                 onHandlePointerDown={dragHandlers?.onHandlePointerDown ?? (() => undefined)}
+                onKeyDown={dragHandlers?.onKeyDown}
+                id={dragHandleId}
+                pickedUp={dragHandlePickedUp}
               />
             ) : (
               flexRender(cell.column.columnDef.cell, cell.getContext())
@@ -762,9 +788,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     collapseProps,
     rowProps,
     columnProps,
-    draggableRows = false,
+    reorderableRows = false,
     onRowDrop,
-    draggableColumns = false,
+    reorderableColumns = false,
   } = props;
 
   const { getLabel } = useLabels();
@@ -896,7 +922,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const augmentedColumns = useMemo<ColumnDef<TData>[]>(() => {
     const leading: ColumnDef<TData>[] = [];
 
-    if (draggableRows) {
+    if (reorderableRows) {
       leading.push({
         id: DRAG_COLUMN_ID,
         enableSorting: false,
@@ -1011,7 +1037,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     selectionMode,
     hasExpansion,
     expandTrigger,
-    draggableRows,
+    reorderableRows,
     resolvedId,
     checkboxProps,
     radioProps,
@@ -1138,13 +1164,24 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const draggingColumnIdRef = useRef<string | null>(null);
   const armedColumnIdRef = useRef<string | null>(null);
 
+  const [pickedUpColumnId, setPickedUpColumnId] = useState<string | null>(null);
+  const originalColumnOrderRef = useRef<string[]>([]);
+  const [pickedUpRowOriginal, setPickedUpRowOriginal] = useState<TData | null>(null);
+  const originalRowIndexRef = useRef<number>(-1);
+
+  const [reorderAnnouncement, setReorderAnnouncement] = useState('');
+
+  const pendingFocusRef = useRef<{ kind: 'column'; id: string } | { kind: 'row'; original: TData } | null>(null);
+
+  const [reorderFocusTick, setReorderFocusTick] = useState(0);
+
   const rowIndexById = useMemo<Map<string, number>>(
-    () => (draggableRows ? new Map(rows.map((r) => [r.id, r.index])) : new Map()),
-    [draggableRows, rows]
+    () => (reorderableRows ? new Map(rows.map((r) => [r.id, r.index])) : new Map()),
+    [reorderableRows, rows]
   );
 
   useEffect(() => {
-    if (!draggableRows && !draggableColumns) return;
+    if (!reorderableRows && !reorderableColumns) return;
     const disarm = () => {
       armedRowIdRef.current = null;
       armedColumnIdRef.current = null;
@@ -1155,7 +1192,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       window.removeEventListener('mouseup', disarm);
       window.removeEventListener('touchend', disarm);
     };
-  }, [draggableRows, draggableColumns]);
+  }, [reorderableRows, reorderableColumns]);
 
   const buildRowDragHandlers = useCallback(
     (rowId: string) => ({
@@ -1327,10 +1364,177 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     [table]
   );
 
+  const columnReorderHandleId = (columnId: string) => `${resolvedId}-col-reorder-${columnId}`;
+  const rowReorderHandleId = (rowId: string) => `${resolvedId}-row-reorder-${rowId}`;
+
+  const reorderableColumnIds = (): string[] =>
+    table
+      .getVisibleLeafColumns()
+      .filter((c) => !c.parent && c.id !== DRAG_COLUMN_ID && c.id !== SELECT_COLUMN_ID && c.id !== EXPAND_COLUMN_ID)
+      .map((c) => c.id);
+
+  const columnReorderLabel = (columnId: string): string => {
+    const col = table.getColumn(columnId);
+    const meta = col?.columnDef.meta as TableColumnMeta | undefined;
+    return meta?.label ?? (typeof col?.columnDef.header === 'string' ? col.columnDef.header : columnId);
+  };
+
+  const moveColumnByKeyboard = (direction: -1 | 1, columnId: string) => {
+    const ids = reorderableColumnIds();
+    const currentIndex = ids.indexOf(columnId);
+    if (currentIndex < 0) return;
+    const targetIndex = currentIndex + direction;
+    if (targetIndex < 0 || targetIndex >= ids.length) return;
+    const reorderedSub = moveItem(ids, currentIndex, targetIndex);
+    const base =
+      table.getState().columnOrder.length > 0
+        ? [...table.getState().columnOrder]
+        : table.getAllLeafColumns().map((c) => c.id);
+    const reorderableSet = new Set(ids);
+    let cursor = 0;
+    const next = base.map((id) => (reorderableSet.has(id) ? reorderedSub[cursor++] : id));
+    for (const id of reorderedSub) if (!next.includes(id)) next.push(id);
+    table.setColumnOrder(next);
+    setReorderAnnouncement(getLabel('table.reorder.move', columnReorderLabel(columnId), targetIndex + 1));
+    pendingFocusRef.current = { kind: 'column', id: columnId };
+    setReorderFocusTick((tick) => tick + 1);
+  };
+
+  const handleColumnReorderKeydown = (event: KeyboardEvent<HTMLButtonElement>, columnId: string) => {
+    if (!reorderableColumns) return;
+    const picked = pickedUpColumnId;
+    switch (event.key) {
+      case ' ':
+      case 'Enter':
+        event.preventDefault();
+        if (picked === null) {
+          originalColumnOrderRef.current = [...(table.getState().columnOrder ?? [])];
+          setPickedUpColumnId(columnId);
+          setReorderAnnouncement(getLabel('table.reorder.pickup', columnReorderLabel(columnId)));
+        } else {
+          const position = reorderableColumnIds().indexOf(picked) + 1;
+          setPickedUpColumnId(null);
+          originalColumnOrderRef.current = [];
+          setReorderAnnouncement(getLabel('table.reorder.drop', columnReorderLabel(picked), position));
+        }
+        break;
+      case 'Escape':
+        if (picked !== null) {
+          event.preventDefault();
+          table.setColumnOrder(originalColumnOrderRef.current);
+          setPickedUpColumnId(null);
+          originalColumnOrderRef.current = [];
+          setReorderAnnouncement(getLabel('table.reorder.cancel'));
+        }
+        break;
+      case 'ArrowLeft':
+        if (picked !== null) {
+          event.preventDefault();
+          moveColumnByKeyboard(-1, picked);
+        }
+        break;
+      case 'ArrowRight':
+        if (picked !== null) {
+          event.preventDefault();
+          moveColumnByKeyboard(1, picked);
+        }
+        break;
+    }
+  };
+
+  const moveRowByKeyboard = (direction: -1 | 1, original: TData) => {
+    const currentIndex = rows.findIndex((r) => r.original === original);
+    if (currentIndex < 0) return;
+    const targetIndex = currentIndex + direction;
+    if (targetIndex < 0 || targetIndex >= rows.length) return;
+    const currentRow = rows[currentIndex];
+    const targetRow = rows[targetIndex];
+
+    onRowDrop?.({
+      fromId: currentRow.id,
+      toId: targetRow.id,
+      fromIndex: currentRow.index,
+      toIndex: targetRow.index,
+    });
+    setReorderAnnouncement(getLabel('table.row-reorder.move', targetIndex + 1));
+    pendingFocusRef.current = { kind: 'row', original };
+    setReorderFocusTick((tick) => tick + 1);
+  };
+
+  const handleRowReorderKeydown = (event: KeyboardEvent<HTMLButtonElement>, row: Row<TData>) => {
+    if (!reorderableRows) return;
+    const picked = pickedUpRowOriginal;
+    switch (event.key) {
+      case ' ':
+      case 'Enter':
+        event.preventDefault();
+        if (picked === null) {
+          setPickedUpRowOriginal(row.original);
+          originalRowIndexRef.current = row.index;
+          setReorderAnnouncement(getLabel('table.row-reorder.pickup', rows.indexOf(row) + 1));
+        } else {
+          const position = rows.findIndex((r) => r.original === picked) + 1;
+          setPickedUpRowOriginal(null);
+          originalRowIndexRef.current = -1;
+          setReorderAnnouncement(getLabel('table.row-reorder.drop', position));
+        }
+        break;
+      case 'Escape':
+        if (picked !== null) {
+          event.preventDefault();
+          const currentIndex = rows.findIndex((r) => r.original === picked);
+          if (currentIndex >= 0 && originalRowIndexRef.current >= 0) {
+            const currentRow = rows[currentIndex];
+            onRowDrop?.({
+              fromId: currentRow.id,
+              toId: currentRow.id,
+              fromIndex: currentRow.index,
+              toIndex: originalRowIndexRef.current,
+            });
+          }
+          setPickedUpRowOriginal(null);
+          originalRowIndexRef.current = -1;
+          setReorderAnnouncement(getLabel('table.row-reorder.cancel'));
+        }
+        break;
+      case 'ArrowUp':
+        if (picked !== null) {
+          event.preventDefault();
+          moveRowByKeyboard(-1, picked);
+        }
+        break;
+      case 'ArrowDown':
+        if (picked !== null) {
+          event.preventDefault();
+          moveRowByKeyboard(1, picked);
+        }
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const pending = pendingFocusRef.current;
+    if (!pending) return;
+    pendingFocusRef.current = null;
+    let handleId: string | null;
+    if (pending.kind === 'column') {
+      handleId = `${resolvedId}-col-reorder-${pending.id}`;
+    } else {
+      const row = rows.find((r) => r.original === pending.original);
+      handleId = row ? `${resolvedId}-row-reorder-${row.id}` : null;
+    }
+    if (handleId) document.getElementById(handleId)?.focus();
+  }, [reorderFocusTick, rows, resolvedId]);
+
   return (
     <TableContext.Provider value={contextValue as TableContextValue}>
       <div className={rootClassName} data-name="tedi-table">
         {children}
+        {(reorderableRows || reorderableColumns) && (
+          <div className={styles['tedi-table__sr-only']} aria-live="polite" aria-atomic="true">
+            {reorderAnnouncement}
+          </div>
+        )}
         <div
           className={styles['tedi-table__scroll']}
           style={maxHeight !== undefined ? { maxHeight, overflowY: 'auto' } : undefined}
@@ -1379,11 +1583,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       header.column.id === DRAG_COLUMN_ID ||
                       header.column.id === SELECT_COLUMN_ID ||
                       header.column.id === EXPAND_COLUMN_ID;
-                    const colDraggable = draggableColumns && isStandaloneLeaf && !isBuiltInColumn;
+                    const colDraggable = reorderableColumns && isStandaloneLeaf && !isBuiltInColumn;
                     const colHandlers = colDraggable ? buildColumnDragHandlers(header.column.id) : undefined;
                     const isDraggingThisCol = colDraggable && draggingColumnId === header.column.id;
                     const isDragOverThisCol =
                       colDraggable && dragOverColumnId === header.column.id && draggingColumnId !== header.column.id;
+                    const isPickedUpThisCol = colDraggable && pickedUpColumnId === header.column.id;
                     return (
                       <th
                         key={header.id}
@@ -1401,6 +1606,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             [styles['tedi-table__header-cell--group']]: isGroup,
                             [styles['tedi-table__header-cell--dragging']]: isDraggingThisCol,
                             [styles['tedi-table__header-cell--drag-over']]: isDragOverThisCol,
+                            [styles['tedi-table__header-cell--picked-up']]: isPickedUpThisCol,
                             [styles[`tedi-table__cell--align-${headerMeta?.align}`]]: headerMeta?.align,
                             [styles[`tedi-table__cell--valign-${headerMeta?.vAlign}`]]: headerMeta?.vAlign,
                           },
@@ -1419,11 +1625,16 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                           <span className={styles['tedi-table__header-cell-inner']}>
                             <button
                               type="button"
-                              className={styles['tedi-table__drag-handle']}
+                              id={columnReorderHandleId(header.column.id)}
+                              className={cn(styles['tedi-table__drag-handle'], {
+                                [styles['tedi-table__drag-handle--picked-up']]: isPickedUpThisCol,
+                              })}
                               aria-label={getLabel('table.drag-column', headerLabel ?? header.column.id)}
+                              aria-pressed={isPickedUpThisCol}
                               onClick={(event) => event.stopPropagation()}
                               onMouseDown={colHandlers.onHandlePointerDown}
                               onTouchStart={colHandlers.onHandlePointerDown}
+                              onKeyDown={(event) => handleColumnReorderKeydown(event, header.column.id)}
                               {...{ [DRAG_HANDLE_ATTR]: '' }}
                             >
                               <Icon name="drag_indicator" size={18} color="inherit" />
@@ -1506,13 +1717,15 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     ? headerRowCount + rowIndexOffset + visibleIndex + 1
                     : undefined;
                   const subRowId = `${resolvedId}-sub-${row.id}`;
-                  const isDraggingThisRow = draggableRows && draggingRowId === row.id;
-                  const isDragOverThisRow = draggableRows && dragOverRowId === row.id && draggingRowId !== row.id;
+                  const isDraggingThisRow = reorderableRows && draggingRowId === row.id;
+                  const isDragOverThisRow = reorderableRows && dragOverRowId === row.id && draggingRowId !== row.id;
+                  const isPickedUpThisRow = reorderableRows && pickedUpRowOriginal === row.original;
                   const rowProps2: TableDataRowProps<TData> = {
                     row,
                     rowClassName: cn(rowClassName, {
                       [styles['tedi-table__row--dragging']]: isDraggingThisRow,
                       [styles['tedi-table__row--drag-over']]: isDragOverThisRow,
+                      [styles['tedi-table__row--picked-up']]: isPickedUpThisRow,
                     }),
                     rowStyle: userRowProps?.style,
                     isActiveRow,
@@ -1521,10 +1734,14 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     onKeyDownHandler: handleRowKeyDown(row),
                     ariaRowIndex,
                     columnProps,
-                    draggable: draggableRows,
+                    draggable: reorderableRows,
                     dragHandleLabel: getLabel('table.drag-row'),
-                    dragHandlers: draggableRows ? buildRowDragHandlers(row.id) : undefined,
-                    dragOverColumnId: draggableColumns ? dragOverColumnId : null,
+                    dragHandlers: reorderableRows
+                      ? { ...buildRowDragHandlers(row.id), onKeyDown: (event) => handleRowReorderKeydown(event, row) }
+                      : undefined,
+                    dragHandleId: reorderableRows ? rowReorderHandleId(row.id) : undefined,
+                    dragHandlePickedUp: isPickedUpThisRow,
+                    dragOverColumnId: reorderableColumns ? dragOverColumnId : null,
                   };
                   return (
                     <Fragment key={row.id}>

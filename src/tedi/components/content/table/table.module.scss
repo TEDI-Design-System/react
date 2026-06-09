@@ -123,7 +123,6 @@
 
 .tedi-table__row--dragging {
   cursor: grabbing;
-  opacity: 0.3;
 }
 
 .tedi-table__row--drag-over {
@@ -139,7 +138,6 @@
 
 .tedi-table__header-cell--dragging {
   cursor: grabbing;
-  opacity: 0.3;
 }
 
 .tedi-table__header-cell--drag-over,
@@ -151,6 +149,30 @@
   cursor: grabbing;
   background: var(--table-active);
   box-shadow: 0 6px 16px var(--tedi-alpha-20);
+}
+
+.tedi-table__row--dragging,
+.tedi-table__row--picked-up,
+.tedi-table__header-cell--dragging,
+.tedi-table__header-cell--picked-up {
+  background: var(--table-active);
+}
+
+.tedi-table__drag-handle--picked-up {
+  color: var(--general-icon-brand);
+  cursor: grabbing;
+}
+
+.tedi-table__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
 }
 
 .tedi-table__header-cell-inner {
@@ -176,11 +198,19 @@
   cursor: grab;
   background: transparent;
   border: 0;
+  border-radius: var(--button-radius-sm);
+  transition: background-color 120ms ease, color 120ms ease, outline-color 120ms ease;
+
+  &:hover:not(:disabled) {
+    color: var(--button-main-neutral-text-hover);
+    background: var(--button-main-neutral-icon-only-background-hover);
+  }
 
   &:focus-visible {
+    color: var(--button-main-primary-background-default);
     outline: var(--tedi-borders-02) solid var(--general-border-focus);
-    outline-offset: -2px;
-    border-radius: var(--button-radius-sm);
+    outline-offset: 0;
+    background: var(--button-main-neutral-icon-only-background-hover);
   }
 
   &:disabled {

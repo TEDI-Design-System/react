@@ -1821,8 +1821,8 @@ export const WithColumnsMenu: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// Drag-and-drop reordering — fully owned by Table via `draggableRows` /
-// `draggableColumns` boolean props. The stories below only manage the data /
+// Drag-and-drop reordering — fully owned by Table via `reorderableRows` /
+// `reorderableColumns` boolean props. The stories below only manage the data /
 // state pieces the consumer would manage in a real app.
 // ---------------------------------------------------------------------------
 
@@ -1849,10 +1849,8 @@ export const WithColumnsMenu: Story = {
  * server (or in `rowOrder`) and re-derive `data` from the response on the
  * next fetch.
  */
-export const DraggableRows: Story = {
+export const ReorderableRows: Story = {
   render: function DraggableRows() {
-    // Story owns its own reorderable copy of `people` so the Table's onRowDrop
-    // can apply the new order via `arrayMove`.
     const [rows, setRows] = useState<Person[]>(() => people.slice(0, 8));
 
     const columns = useMemo<ColumnDef<Person>[]>(
@@ -1868,17 +1866,20 @@ export const DraggableRows: Story = {
       <VerticalSpacing size={1}>
         <Alert type="info" role="status" title="Row reordering" icon="lightbulb">
           <Text>
-            Grab the <StatusBadge>≡</StatusBadge> handle on any row with the pointer to reorder. The Table wires the
-            native HTML5 drag API internally; the parent only listens to <StatusBadge>onRowDrop</StatusBadge> and
-            applies the new order to its data. Row drag is currently pointer-only — keyboard reorder is not implemented,
-            so provide an alternative control (e.g. an &ldquo;Edit order&rdquo; dialog) when accessibility matters.
+            Reorder by mouse (grab the <StatusBadge>≡</StatusBadge> handle) or <strong>keyboard</strong>: Tab to a
+            handle, press <StatusBadge>Space</StatusBadge>/<StatusBadge>Enter</StatusBadge> to pick the row up, then{' '}
+            <StatusBadge>↑</StatusBadge>/<StatusBadge>↓</StatusBadge> to move, <StatusBadge>Space</StatusBadge>/
+            <StatusBadge>Enter</StatusBadge> to drop, or <StatusBadge>Esc</StatusBadge> to cancel. Each move emits{' '}
+            <StatusBadge>onRowDrop</StatusBadge> with source indices — the parent applies it (e.g. with{' '}
+            <StatusBadge>arrayMove</StatusBadge>) and passes the new data back. Moves are announced to screen readers
+            via a live region.
           </Text>
         </Alert>
         <Table<Person>
           id="tedi-table-row-drag"
           data={rows}
           columns={columns}
-          draggableRows
+          reorderableRows
           onRowDrop={({ fromIndex, toIndex }) => setRows((current) => arrayMove(current, fromIndex, toIndex))}
         />
       </VerticalSpacing>
@@ -1887,7 +1888,7 @@ export const DraggableRows: Story = {
 };
 
 /**
- * Drag a column header's grip to reorder columns. The story owns
+ * Reorder a column header's grip to reorder columns. The story owns
  * `state.columnOrder`; Table forwards it to TanStack's `columnOrder` state so
  * cells reshuffle without re-creating the column definitions.
  *
@@ -1903,10 +1904,10 @@ export const DraggableRows: Story = {
  * `columnOrder` is in Table's `DEFAULT_PERSISTED_KEYS`, so the persist
  * adapter writes it to `localStorage` on every change and hydrates it on
  * mount — no extra wiring needed. The same prop covers `columnVisibility`,
- * `rowOrder` (ids only — see DraggableRows for the caveat), and
+ * `rowOrder` (ids only — see ReorderableRows for the caveat), and
  * `columnSizing`. Use `persist.include` to opt in / out of specific slices.
  */
-export const DraggableColumns: Story = {
+export const ReorderableColumns: Story = {
   render: function DraggableColumns() {
     const columns = useMemo<ColumnDef<Person>[]>(
       () => [
@@ -1922,28 +1923,31 @@ export const DraggableColumns: Story = {
       <VerticalSpacing size={1}>
         <Alert type="info" role="status" title="Column reordering" icon="lightbulb">
           <Text>
-            Drag a column header by its <StatusBadge>≡</StatusBadge> handle to reorder. The Table owns the drag wiring
-            and pushes the new order into TanStack&apos;s <StatusBadge>state.columnOrder</StatusBadge> — combine with{' '}
-            <StatusBadge>persist</StatusBadge> to keep the order across refreshes.
+            Reorder by mouse (reorder a header by its <StatusBadge>≡</StatusBadge> handle) or <strong>keyboard</strong>:
+            Tab to a handle, <StatusBadge>Space</StatusBadge>/<StatusBadge>Enter</StatusBadge> to pick up, then{' '}
+            <StatusBadge>←</StatusBadge>/<StatusBadge>→</StatusBadge> to move, <StatusBadge>Space</StatusBadge>/
+            <StatusBadge>Enter</StatusBadge> to drop, or <StatusBadge>Esc</StatusBadge> to cancel. The Table owns the
+            wiring and pushes the new order into TanStack&apos;s <StatusBadge>state.columnOrder</StatusBadge> (announced
+            to screen readers) — combine with <StatusBadge>persist</StatusBadge> to keep the order across refreshes.
           </Text>
         </Alert>
-        <Table<Person> id="tedi-table-column-drag" data={people.slice(0, 6)} columns={columns} draggableColumns />
+        <Table<Person> id="tedi-table-column-drag" data={people.slice(0, 6)} columns={columns} reorderableColumns />
       </VerticalSpacing>
     );
   },
 };
 
 /**
- * `draggableColumns` works alongside a pinned header (`stickyHeader` + `maxHeight`). Column
+ * `reorderableColumns` works alongside a pinned header (`stickyHeader` + `maxHeight`). Column
  * reordering is data-driven — the drop rewrites TanStack's `state.columnOrder` and the header simply
  * re-renders in the new order — so `position: sticky` doesn't interfere with the native HTML5 drag.
  * Scroll the body to confirm the header stays pinned, then drag a column header by its
  * <StatusBadge>≡</StatusBadge> handle: the order updates while the header remains fixed.
  */
-export const DraggableColumnsStickyHeader: Story = {
+export const ReorderableColumnsStickyHeader: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <Alert type="info" role="status" title="Drag columns + sticky header" icon="lightbulb">
+      <Alert type="info" role="status" title="Reorder columns + sticky header" icon="lightbulb">
         <Text>
           Reorder columns by dragging a header handle while the header stays pinned during vertical scroll. The two
           features are independent — drag rewrites <StatusBadge>state.columnOrder</StatusBadge>; the sticky header is
@@ -1954,7 +1958,7 @@ export const DraggableColumnsStickyHeader: Story = {
         id="tedi-table-column-drag-sticky"
         data={people}
         columns={personColumns}
-        draggableColumns
+        reorderableColumns
         stickyHeader
         maxHeight={280}
       />
@@ -2090,7 +2094,7 @@ const { data: page, total } = useServerQuery({ pagination, sorting });
 /**
  * Responsive table. The default for any wide table is **horizontal scroll** — the Table already wraps
  * itself in an `overflow-x: auto` container, so no extra props are needed for that. This story shows the
- * *opt-in* alternative that mirrors the Angular `Responsive` story: below the `md` breakpoint the secondary
+ * *opt-in* alternative: below the `md` breakpoint the secondary
  * columns are hidden (via controlled `columnVisibility`) and re-surfaced as label/value pairs inside an
  * expandable detail row (`renderSubComponent` + `getRowCanExpand`, both gated on the breakpoint). At `md`
  * and up the full table renders and the expand column disappears. Resize the preview to see the switch.

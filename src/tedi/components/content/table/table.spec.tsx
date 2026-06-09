@@ -50,6 +50,12 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'table.row-details':
           return 'Row details';
+        case 'table.drag-column': {
+          const [columnLabel] = args as [string];
+          return `Drag column ${columnLabel}`;
+        }
+        case 'table.drag-row':
+          return 'Drag row';
         default:
           return key;
       }
@@ -970,6 +976,60 @@ describe('Table', () => {
         .map((args) => (args[0] as TableState).columnOrder)
         .filter((order): order is string[] => Array.isArray(order));
       expect(orders).toContainEqual(['role', 'name']);
+    });
+  });
+
+  describe('keyboard reordering', () => {
+    it('renders a polite live region when reordering is enabled', () => {
+      const { container } = render(<Table<Person> id="t-kb-live" data={data} columns={columns} reorderableColumns />);
+      expect(container.querySelector('[aria-live="polite"]')).toBeInTheDocument();
+    });
+
+    it('reorders a column with the keyboard (pick up → ArrowRight → drop)', () => {
+      const onStateChange = jest.fn();
+      render(
+        <Table<Person> id="t-kb-col" data={data} columns={columns} reorderableColumns onStateChange={onStateChange} />
+      );
+
+      const handle = screen.getByRole('button', { name: 'Drag column Name' });
+      handle.focus();
+      fireEvent.keyDown(handle, { key: ' ' });
+      expect(handle).toHaveAttribute('aria-pressed', 'true');
+      fireEvent.keyDown(handle, { key: 'ArrowRight' });
+      fireEvent.keyDown(handle, { key: ' ' });
+
+      const orders = onStateChange.mock.calls
+        .map((args) => (args[0] as TableState).columnOrder)
+        .filter((order): order is string[] => Array.isArray(order));
+      expect(orders).toContainEqual(['role', 'name']);
+    });
+
+    it('Escape cancels a column pickup and restores the original order', () => {
+      render(<Table<Person> id="t-kb-cancel" data={data} columns={columns} reorderableColumns />);
+
+      const handle = screen.getByRole('button', { name: 'Drag column Name' });
+      handle.focus();
+      fireEvent.keyDown(handle, { key: ' ' });
+      fireEvent.keyDown(handle, { key: 'ArrowRight' });
+      // Mid-move the order is Role, Name.
+      expect(screen.getAllByRole('columnheader').map((h) => h.getAttribute('aria-label'))).toEqual(['Role', 'Name']);
+
+      fireEvent.keyDown(handle, { key: 'Escape' });
+      // After cancel it is restored to Name, Role.
+      expect(screen.getAllByRole('columnheader').map((h) => h.getAttribute('aria-label'))).toEqual(['Name', 'Role']);
+    });
+
+    it('reorders a row with the keyboard via onRowDrop (pick up → ArrowDown)', () => {
+      const onRowDrop = jest.fn();
+      render(<Table<Person> id="t-kb-row" data={data} columns={columns} reorderableRows onRowDrop={onRowDrop} />);
+
+      const handles = screen.getAllByRole('button', { name: 'Drag row' });
+      handles[0].focus();
+      fireEvent.keyDown(handles[0], { key: 'Enter' });
+      expect(handles[0]).toHaveAttribute('aria-pressed', 'true');
+      fireEvent.keyDown(handles[0], { key: 'ArrowDown' });
+
+      expect(onRowDrop).toHaveBeenCalledWith(expect.objectContaining({ fromIndex: 0, toIndex: 1 }));
     });
   });
 

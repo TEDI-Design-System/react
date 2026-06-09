@@ -324,6 +324,17 @@ When `renderSubComponent` is `undefined` (≥ md) the expand column isn't render
   <Table data={rows} columns={columns} emptyStateRole="status" />
   ```
 
+#### Reordering — `reorderableRows` / `reorderableColumns` (mouse + keyboard)
+
+Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to each row / draggable header; keyboard users Tab to it, press `Space`/`Enter` to pick up, arrow keys to move (`↑`/`↓` rows, `←`/`→` columns), `Space`/`Enter` to drop, `Escape` to cancel. Every move/drop/cancel is announced via a built-in `aria-live` region (i18n keys `table.reorder.*` / `table.row-reorder.*`).
+
+- **`reorderableColumns`** is self-contained — it reorders TanStack's `columnOrder` internally (flows through `onStateChange` / `persist`). No extra wiring. Built-in (`__select__`/`__expand__`/`__drag__`) and grouped columns are skipped.
+- **`reorderableRows`** emits **`onRowDrop({ fromId, toId, fromIndex, toIndex })`** on every move (keyboard too) — the consumer applies it to its data and passes the new array back. Stepping requires the consumer to apply each emit:
+  ```tsx
+  <Table id="t" data={rows} columns={columns} reorderableRows
+    onRowDrop={({ fromIndex, toIndex }) => setRows((cur) => arrayMove(cur, fromIndex, toIndex))} />
+  ```
+
 ## Form
 
 ### TextField
