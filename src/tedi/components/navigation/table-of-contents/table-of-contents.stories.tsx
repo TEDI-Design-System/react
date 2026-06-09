@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -49,18 +49,6 @@ const sectionItems = () =>
 export const Default: Story = {
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false}>
-      {sectionItems()}
-    </TableOfContents>
-  ),
-};
-
-/**
- * Mark the current section with `activeId` to surface the left accent bar and
- * active link colour.
- */
-export const ActiveItem: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
       {sectionItems()}
     </TableOfContents>
   ),
@@ -175,33 +163,67 @@ export const WithValidationIcons: Story = {
   ),
 };
 
-/**
- * The three item states from the Figma spec:
- * - **Default** — link colour, no underline.
- * - **Hover** — hover colour + underline (forced here via the `Link`'s
- *   `isHovered` prop; in real use it appears on pointer hover / keyboard focus).
- * - **Active** — left accent bar + active colour, driven by `activeId`.
- */
 export const ItemStates: Story = {
-  render: () => (
-    <TableOfContents heading="Item states" sticky={false} activeId="active">
-      <TableOfContents.Item id="default">
-        <Link href="#default" underline={false}>
-          Default
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="hover">
-        <Link href="#hover" underline={false} isHovered>
-          Hover
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="active">
-        <Link href="#active" underline={false}>
-          Active
-        </Link>
-      </TableOfContents.Item>
-    </TableOfContents>
-  ),
+  parameters: { fullWidth: true },
+  render: () => {
+    const rowStyle = (active: boolean) => ({
+      display: 'inline-flex',
+      borderLeft: `var(--table-of-contents-active-item-border-width) solid ${
+        active ? 'var(--general-border-brand)' : 'transparent'
+      }`,
+      paddingLeft: 'calc(var(--table-of-contents-padding-level-1) - var(--table-of-contents-active-item-border-width))',
+    });
+
+    const states = [
+      {
+        label: 'Default',
+        item: (
+          <Link href="#default" underline={false}>
+            Heading
+          </Link>
+        ),
+        active: false,
+      },
+      {
+        label: 'Hover',
+        item: (
+          <Link href="#hover" underline={false} isHovered>
+            Heading
+          </Link>
+        ),
+        active: false,
+      },
+      {
+        label: 'Active',
+        item: (
+          <Link href="#active" underline={false} isActive>
+            Heading
+          </Link>
+        ),
+        active: true,
+      },
+    ];
+
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'auto auto',
+          justifyContent: 'start',
+          alignItems: 'center',
+          columnGap: '2rem',
+          rowGap: '0.75rem',
+        }}
+      >
+        {states.map(({ label, item, active }) => (
+          <Fragment key={label}>
+            <Text modifiers="bold">{label}</Text>
+            <span style={rowStyle(active)}>{item}</span>
+          </Fragment>
+        ))}
+      </div>
+    );
+  },
 };
 
 const LOREM =
@@ -209,15 +231,6 @@ const LOREM =
   'dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ' +
   'ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
 
-/**
- * Sticky in a page layout. The card stays pinned beside the content while the
- * page scrolls (`sticky`, the default — backed by `Affix`). The demo is wrapped
- * in a fixed-height scroll viewport so the stickiness is visible without
- * resizing the window; in a real app the page/`Layout` is the scroll container.
- * A small `IntersectionObserver` updates `activeId` so the accent bar tracks the
- * visible section, and the in-page sections carry a matching `id` + `tabIndex={-1}`
- * so anchor jumps move screen-reader focus.
- */
 export const StickyInLayout: Story = {
   parameters: { fullWidth: true },
   render: function StickyInLayout() {
