@@ -1,4 +1,5 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '@tedi-design-system/core/mixins';
 
 @mixin compact-styles {
   .tedi-horizontal-stepper-item {
@@ -13,14 +14,10 @@
       justify-content: center;
       width: 100%;
     }
+  }
 
-    .tedi-horizontal-stepper-item__content {
-      display: none;
-    }
-
-    &--selected .tedi-horizontal-stepper-item__content {
-      display: flex;
-    }
+  .tedi-horizontal-stepper-item:not(.tedi-horizontal-stepper-item--selected) .tedi-horizontal-stepper-item__content {
+    @include mixins.visually-hidden;
   }
 }
 
