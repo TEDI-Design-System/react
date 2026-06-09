@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useEffect, useRef, useState } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
-import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import Link from '../../navigation/link/link';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
@@ -106,23 +105,6 @@ const StandardSections = ({
   </>
 );
 
-const Avatar = () => (
-  <span
-    style={{
-      display: 'inline-flex',
-      flexShrink: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '4rem',
-      height: '4rem',
-      borderRadius: '50%',
-      backgroundColor: 'var(--footer-icon-background)',
-    }}
-  >
-    <Icon name="person" color="white" size={36} />
-  </span>
-);
-
 const DeviceFrame = ({
   storyId,
   label,
@@ -168,7 +150,7 @@ const DeviceFrame = ({
   return (
     <div style={{ flex: '0 0 auto' }}>
       {label && (
-        <Text element="p" color="secondary">
+        <Text element="h5" color="secondary">
           {label}
         </Text>
       )}
@@ -182,7 +164,7 @@ const DeviceFrame = ({
           ref={ref}
           title={label}
           src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
-          style={{ display: 'block', width: '100%', height, border: 0 }}
+          style={{ display: 'block', width: '100%', height, border: 0, marginTop: '1rem' }}
         />
       </div>
     </div>
@@ -211,19 +193,25 @@ export const DeviceSize: Story = {
     const theme = (context.globals.theme as string) ?? 'default';
     return (
       <VerticalSpacing size={1}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <Text element="h3" modifiers="h5" color="primary">
+        {/* `minWidth: 0` lets the fixed-width device frames overflow into their own scroll
+            containers instead of stretching the page when the canvas is narrower than the frame. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
+          <Text element="h4" color="primary">
             Desktop
           </Text>
-          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} />
-          <Text element="h3" modifiers="h5" color="primary">
+          <div style={{ maxWidth: '100%', overflowX: 'auto' }}>
+            <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} />
+          </div>
+          <Text element="h4" color="primary">
             Tablet
           </Text>
-          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} />
-          <Text element="h3" modifiers="h5" color="primary">
+          <div style={{ maxWidth: '100%', overflowX: 'auto' }}>
+            <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} />
+          </div>
+          <Text element="h4" color="primary">
             Mobile
           </Text>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', overflowX: 'auto' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', maxWidth: '100%', overflowX: 'auto' }}>
             <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} label="Default" width={360} theme={theme} />
             <DeviceFrame
               storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_ID}
@@ -367,19 +355,8 @@ export const WithBottomSection: Story = {
           <LogoPlaceholder />
         </Footer.Side>
         <Footer.Bottom>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <Link href="#" color="inverted" aria-label="Facebook">
-              <Icon name="public" color="white" />
-            </Link>
-            <Link href="#" color="inverted" aria-label="Instagram">
-              <Icon name="photo_camera" color="white" />
-            </Link>
-            <Link href="#" color="inverted" aria-label="LinkedIn">
-              <Icon name="groups" color="white" />
-            </Link>
-          </div>
-          <StatusBadge color="success" status="success" variant="filled-bordered">
-            Kõik süsteemid töökorras
+          <StatusBadge color="success" variant="filled-bordered">
+            TEDI poolt heaks kiidetud
           </StatusBadge>
         </Footer.Bottom>
       </Footer>
@@ -397,10 +374,10 @@ export const CustomContent: Story = {
           </Footer.Section>
           <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'center' }}>
             <Link href="#" color="inverted" aria-label="Facebook">
-              <Icon name="public" color="white" />
+              <img src="custom_fb_logo.png" alt="" style={{ display: 'block', height: '40px' }} />
             </Link>
             <Link href="#" color="inverted" aria-label="Instagram">
-              <Icon name="photo_camera" color="white" />
+              <img src="custom_instagram_logo.png" alt="" style={{ display: 'block', height: '40px' }} />
             </Link>
           </div>
         </Footer.Body>
@@ -454,7 +431,11 @@ export const CustomContent: Story = {
             </Footer.Section>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-            <Avatar />
+            <img
+              src="placeholder_image.png"
+              alt=""
+              style={{ flexShrink: 0, width: '4rem', height: '4rem', borderRadius: '50%', objectFit: 'cover' }}
+            />
             <Footer.Section heading="Kontakt">
               <ContactLinks />
             </Footer.Section>
@@ -470,14 +451,15 @@ export const CustomContent: Story = {
  * content (the column row **and** the bottom strip) to a fixed width and centers it, while the dark
  * backgrounds stay full-bleed. `Footer.Body`'s `columns` lays the sections out as a fixed grid of
  * equal-width tracks instead of the default content-sized `space-between` row — and it accepts
- * per-breakpoint overrides, so you can step the column count down as the viewport narrows
- * (`columns={4} lg={{ columns: 2 }}`). Below the footer's `mobileBreakpoint` the body always stacks
- * into a single column regardless of `columns`.
+ * per-breakpoint overrides. The keys are **mobile-first** (a value applies at that breakpoint and
+ * up), so raise the count as the viewport widens — `columns={2} lg={{ columns: 4 }}` shows 2 columns
+ * from `sm`, then 4 from `lg`. Below the footer's `mobileBreakpoint` the body always stacks into a
+ * single column regardless of `columns`.
  */
 export const MaxWidthAndColumns: Story = {
   render: () => (
     <Footer maxWidth={1280}>
-      <Footer.Body columns={4} lg={{ columns: 2 }}>
+      <Footer.Body columns={2} lg={{ columns: 4 }}>
         <StandardSections />
         <Footer.Section icon="local_library" heading="Uudised">
           <Link href="#" color="inverted">

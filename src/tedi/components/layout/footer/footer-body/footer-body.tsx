@@ -8,10 +8,12 @@ import { FooterContext } from '../footer-context';
 type FooterBodyBreakpointProps = {
   /**
    * Number of equal-width columns laid out per row, controllable per breakpoint via the
-   * `sm`/`md`/`lg`/`xl`/`xxl` keys (e.g. `columns={4} md={{ columns: 2 }} sm={{ columns: 1 }}`).
-   * When set, the body uses a CSS grid of `columns` equal tracks; when omitted, columns are
-   * content-sized and spread with `space-between` (the default). Ignored below the footer's
-   * `mobileBreakpoint`, where the body always stacks into a single column.
+   * `sm`/`md`/`lg`/`xl`/`xxl` keys. The keys are **mobile-first** — a value applies at that
+   * breakpoint and up — so raise the count as the viewport widens
+   * (e.g. `columns={2} md={{ columns: 3 }} lg={{ columns: 4 }}`). When set, the body uses a CSS grid
+   * of `columns` equal tracks; when omitted, columns are content-sized and spread with
+   * `space-between` (the default). Ignored below the footer's `mobileBreakpoint`, where the body
+   * always stacks into a single column.
    */
   columns?: number;
 };
@@ -53,4 +55,5 @@ export const FooterBody = (props: FooterBodyProps): JSX.Element => {
 };
 
 FooterBody.displayName = 'Footer.Body';
+
 export default FooterBody;
