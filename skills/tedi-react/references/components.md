@@ -583,6 +583,35 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### HorizontalStepper
+**Props:** `HorizontalStepperProps` | fRef
+- `children: ReactNode` (required) — `HorizontalStepper.Item` elements; the parent auto-numbers the steps
+- `aria-label?: string` — accessible name for the `<nav>` landmark
+- `background?: 'default' | 'transparent' = 'default'`
+- `compact?: boolean | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' = 'sm'` — collapse to indicators + the selected label (`true` = always; a breakpoint = collapse below it)
+- `className?: string`
+
+**`HorizontalStepper.Item`** — `HorizontalStepperItemProps` | fRef
+- `label: string` (required), `description?: string`
+- `completed?: boolean`, `error?: boolean` (error wins over completed), `selected?: boolean`, `disabled?: boolean`
+- `onSelect?: () => void` — fires on click unless `selected` or `disabled`
+
+```tsx
+import { HorizontalStepper } from '@tedi-design-system/react/tedi';
+
+<HorizontalStepper aria-label="Form progress">
+  {steps.map((label, i) => (
+    <HorizontalStepper.Item
+      key={label}
+      label={label}
+      completed={i < current}
+      selected={i === current}
+      onSelect={() => setCurrent(i)}
+    />
+  ))}
+</HorizontalStepper>
+```
+
 ## Notifications
 
 ### Alert
