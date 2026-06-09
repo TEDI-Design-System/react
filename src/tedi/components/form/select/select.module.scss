@@ -186,13 +186,6 @@ div .tedi-select__menu {
     min-height: $input-height-small;
     padding: calc(var(--form-field-padding-y-sm) - 1px) var(--form-field-padding-x-md-default);
     font-size: var(--body-small-regular-size);
-
-    @include breakpoints.media-breakpoint-down(md) {
-      min-height: $input-height;
-      padding-top: calc(var(--form-field-padding-y-md-default-top) - 1px);
-      padding-bottom: calc(var(--form-field-padding-y-md-default-bottom) - 1px);
-      font-size: var(--body-regular-size);
-    }
   }
 
   .tedi-select__input,
