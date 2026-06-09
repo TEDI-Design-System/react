@@ -11,7 +11,7 @@ const STEPS = ['Kutse', 'Tahteavaldus', 'Geenianalüüs', 'Vastus'];
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.51.75?node-id=11201-120696&m=dev" target="_blank">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/42d5cb-stepper-horizontal" target="_blank">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/42d5cb-stepper-horizontal" target="_blank">Zeroheight ↗</a>
  */
 const meta: Meta<typeof HorizontalStepper> = {
   component: HorizontalStepper,
