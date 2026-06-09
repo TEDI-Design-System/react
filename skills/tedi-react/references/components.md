@@ -538,6 +538,85 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 />
 ```
 
+### Filter / FilterGroup
+**Props:** `FilterProps`, `FilterGroupProps` | form
+
+Compact pill-shaped trigger used to refine result sets. Four modes — chosen at render time
+by which props are present:
+
+- **Toggle** — no `options`, no `children`. Acts like a sticky checkbox.
+- **Single-select dropdown** — pass `options`. Selecting commits the value and closes the panel.
+- **Multi-select dropdown** — `options` + `multiselect`. Clicking does not close. Supports
+  `searchable`, `showSelectAll`, `showClear`.
+- **Custom dropdown content** — pass `children` to embed any panel (date picker, radio group).
+
+```tsx
+import { Filter, FilterGroup } from '@tedi-design-system/react/tedi';
+
+// Toggle
+<Filter text="Active" selected={active} onSelectedChange={setActive} />
+
+// Single-select with "Label: Value" trigger
+<Filter
+  text="Service"
+  options={[{ label: 'Optometrist', value: '1' }, { label: 'Dentist', value: '2' }]}
+  preserveLabel
+  selectedValue={service}
+  onSelectedValueChange={setService}
+  showClear
+  appendTo="body"
+/>
+
+// Multi-select with search & "select all"
+<Filter
+  text="Hospitals"
+  multiselect
+  options={hospitalOptions}
+  selectedValues={hospitals}
+  onSelectedValuesChange={setHospitals}
+  searchable
+  showSelectAll
+  showClear
+  appendTo="body"
+/>
+
+// Custom dropdown content — show clear action that resets consumer state
+<Filter text={periodLabel} selected={!!period} showClear onClear={() => setPeriod('')}>
+  <ChoiceGroup id="period" label="Period" inputType="radio" items={periodItems}
+    value={period} onChange={setPeriod} />
+</Filter>
+```
+
+Wrap related filters in `FilterGroup` to coordinate selection:
+
+```tsx
+// Single-select group (radio-like, role="radiogroup")
+<FilterGroup label="Status" value={status} onValueChange={setStatus}>
+  <Filter text="All" value="all" />
+  <Filter text="Active" value="active" />
+  <Filter text="Done" value="done" />
+</FilterGroup>
+
+// Multi-select group (checkbox-like, role="group")
+<FilterGroup label="Tags" multiselect values={tags} onValuesChange={setTags}>
+  <Filter text="Urgent" value="urgent" />
+  <Filter text="Review" value="review" />
+</FilterGroup>
+
+// Visual-only group (no managed props — children stay independent)
+<FilterGroup>
+  <Filter text="Foo" defaultSelected />
+  <Filter text="Bar" />
+</FilterGroup>
+```
+
+Key props:
+- `variant?: 'primary' | 'secondary'`, `size?: 'default' | 'large'`
+- `prepend?: ReactNode`, `append?: ReactNode`, `hidePrependWhenSelected?: boolean`
+- `appendTo?: 'body' | HTMLElement` — portal target for the dropdown
+- `selectAllLabel?: string` (default `'Vali kõik'`), `clearLabel?: string` (default `'Tühjenda valik'`)
+
+
 ### FileUpload
 **Props:** `FileUploadProps` | form
 - `id: string` (required), `name: string` (required)
