@@ -8,7 +8,7 @@ import type { TablePersistOptions, TableState } from './table';
  * / order / sizing). Task-scoped slices (selection, expanded, filters, sort,
  * pagination) are intentionally excluded — they should reset between sessions.
  */
-const DEFAULT_PERSISTED_KEYS: (keyof TableState)[] = ['columnVisibility', 'columnOrder', 'rowOrder', 'columnSizing'];
+const DEFAULT_PERSISTED_KEYS: (keyof TableState)[] = ['columnVisibility', 'columnOrder'];
 
 function getStorage(options?: TablePersistOptions): Storage | null {
   if (!options) return null;

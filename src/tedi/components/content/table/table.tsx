@@ -2,7 +2,6 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
   type ColumnOrderState,
-  type ColumnSizingState,
   type ExpandedState,
   type FilterFn,
   flexRender,
@@ -155,8 +154,6 @@ export const groupRowSpan = <TData,>(
 export interface TableState {
   columnVisibility?: VisibilityState;
   columnOrder?: ColumnOrderState;
-  rowOrder?: string[];
-  columnSizing?: ColumnSizingState;
   rowSelection?: RowSelectionState;
   expanded?: ExpandedState;
   columnFilters?: ColumnFiltersState;
@@ -208,7 +205,7 @@ export interface TablePersistOptions {
   storage?: Storage;
   /**
    * Subset of state slices to persist. Defaults to user-preference slices
-   * only: `columnVisibility`, `columnOrder`, `rowOrder`, `columnSizing`.
+   * only: `columnVisibility`, `columnOrder`.
    * Task-scoped slices (`rowSelection`, `expanded`, `columnFilters`, `sorting`,
    * `pagination`) are deliberately excluded by default — pass them explicitly
    * via `include` if you want them to survive across sessions.
@@ -248,9 +245,17 @@ export interface TableProps<TData> {
    */
   id?: string;
   /**
-   * Row data. Render order mirrors array order unless `rowOrder` is applied.
+   * Row data. Render order mirrors the array order; reorder the array yourself
+   * (e.g. in `onRowDrop`) to change it.
    */
   data: TData[];
+  /**
+   * Returns a stable id for each row. Without it, TanStack falls back to the
+   * row index — so identifiers shift when rows sort / paginate / reorder, which
+   * breaks record stability for `rowSelection`, `activeRowId`, and the
+   * `onRowDrop` `fromId`/`toId`. Set this whenever your data has a stable key.
+   */
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
   /**
    * Column definitions. Must include a stable `id` on every column when
    * column visibility / reorder / persistence are used.
@@ -774,6 +779,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     renderSubComponent,
     getRowCanExpand,
     getSubRows,
+    getRowId,
     expandTrigger = 'button',
     paginateExpandedRows = false,
     pagination: paginationProp,
@@ -1079,6 +1085,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     rowCount: manualPagination && rowCount !== undefined ? rowCount : undefined,
     getRowCanExpand: renderSubComponent ? getRowCanExpand ?? (() => true) : getRowCanExpand,
     getSubRows,
+    getRowId,
     onColumnVisibilityChange: handleVisibilityChange,
     onColumnOrderChange: handleColumnOrderChange,
     onRowSelectionChange: handleRowSelectionChange,

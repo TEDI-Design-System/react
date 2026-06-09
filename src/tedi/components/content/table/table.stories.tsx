@@ -189,7 +189,9 @@ const editRowActionsStyle: React.CSSProperties = {
   width: '100%',
 };
 
-interface EditableRows<T extends { id: string }> {
+type EditableRowBase = { id: string };
+
+interface EditableRows<T extends EditableRowBase> {
   rows: T[];
   editingId: string | null;
   draft: T | null;
@@ -199,13 +201,26 @@ interface EditableRows<T extends { id: string }> {
   commitEdit: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const EditableRowsContext = createContext<EditableRows<any> | null>(null);
+const EditableRowsContext = createContext<EditableRows<EditableRowBase> | null>(null);
 
-function useEditor<T extends { id: string }>(): EditableRows<T> {
+function EditableRowsProvider<T extends EditableRowBase>({
+  value,
+  children,
+}: {
+  value: EditableRows<T>;
+  children: React.ReactNode;
+}) {
+  return (
+    <EditableRowsContext.Provider value={value as unknown as EditableRows<EditableRowBase>}>
+      {children}
+    </EditableRowsContext.Provider>
+  );
+}
+
+function useEditor<T extends EditableRowBase>(): EditableRows<T> {
   const editor = useContext(EditableRowsContext);
-  if (!editor) throw new Error('EditableRowsContext missing — wrap the table in <EditableRowsContext.Provider>.');
-  return editor as EditableRows<T>;
+  if (!editor) throw new Error('EditableRowsContext missing — wrap the table in <EditableRowsProvider>.');
+  return editor as unknown as EditableRows<T>;
 }
 
 function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T> {
@@ -378,7 +393,7 @@ export const Default: Story = {
   render: function Default() {
     const editor = useEditableRows<Booking>(bookings);
     return (
-      <EditableRowsContext.Provider value={editor}>
+      <EditableRowsProvider value={editor}>
         <Table<Booking>
           id="tedi-table-default"
           autoResetPageIndex={false}
@@ -386,7 +401,7 @@ export const Default: Story = {
           columns={bookingShowcaseColumns}
           pagination={SHOWCASE_PAGINATION_3}
         />
-      </EditableRowsContext.Provider>
+      </EditableRowsProvider>
     );
   },
 };
@@ -398,7 +413,7 @@ export const Sizes: Story = {
     return (
       <VerticalSpacing size={1}>
         <Heading element="h3">Default</Heading>
-        <EditableRowsContext.Provider value={defaultEditor}>
+        <EditableRowsProvider value={defaultEditor}>
           <Table<Booking>
             id="tedi-table-sizes-default"
             autoResetPageIndex={false}
@@ -406,9 +421,9 @@ export const Sizes: Story = {
             columns={bookingShowcaseColumns}
             pagination={SHOWCASE_PAGINATION_3}
           />
-        </EditableRowsContext.Provider>
+        </EditableRowsProvider>
         <Heading element="h3">Small</Heading>
-        <EditableRowsContext.Provider value={smallEditor}>
+        <EditableRowsProvider value={smallEditor}>
           <Table<Booking>
             id="tedi-table-sizes-small"
             autoResetPageIndex={false}
@@ -417,7 +432,7 @@ export const Sizes: Story = {
             size="small"
             pagination={SHOWCASE_PAGINATION_3}
           />
-        </EditableRowsContext.Provider>
+        </EditableRowsProvider>
       </VerticalSpacing>
     );
   },
@@ -478,7 +493,7 @@ export const Simple: Story = {
 
     return (
       <VerticalSpacing size={1}>
-        <EditableRowsContext.Provider value={bookingEditor}>
+        <EditableRowsProvider value={bookingEditor}>
           <Table<Booking>
             id="tedi-table-simple-bookings"
             autoResetPageIndex={false}
@@ -486,14 +501,14 @@ export const Simple: Story = {
             columns={bookingShowcaseColumns}
             pagination={SHOWCASE_PAGINATION_3}
           />
-        </EditableRowsContext.Provider>
+        </EditableRowsProvider>
         <Table<PersonRecord>
           id="tedi-table-simple-people"
           data={filterablePeople}
           columns={simplePeopleColumns}
           pagination={SHOWCASE_PAGINATION_4}
         />
-        <EditableRowsContext.Provider value={doctorEditor}>
+        <EditableRowsProvider value={doctorEditor}>
           <Table<Doctor>
             id="tedi-table-simple-doctors"
             autoResetPageIndex={false}
@@ -501,7 +516,7 @@ export const Simple: Story = {
             columns={simpleDoctorColumns}
             pagination={SHOWCASE_PAGINATION_3}
           />
-        </EditableRowsContext.Provider>
+        </EditableRowsProvider>
       </VerticalSpacing>
     );
   },
@@ -678,7 +693,7 @@ export const MergedCells: Story = {
   render: function MergedCells() {
     const editor = useEditableRows<Booking>(bookings);
     return (
-      <EditableRowsContext.Provider value={editor}>
+      <EditableRowsProvider value={editor}>
         <Table<Booking>
           id="tedi-table-merged"
           verticalBorders
@@ -687,7 +702,7 @@ export const MergedCells: Story = {
           columns={mergedCellsColumns}
           pagination={DEFAULT_PAGINATION}
         />
-      </EditableRowsContext.Provider>
+      </EditableRowsProvider>
     );
   },
 };
@@ -870,7 +885,7 @@ export const EditableValues: Story = {
   render: function EditableValues() {
     const editor = useEditableRows<Booking>(bookings);
     return (
-      <EditableRowsContext.Provider value={editor}>
+      <EditableRowsProvider value={editor}>
         <Table<Booking>
           id="tedi-table-editable"
           autoResetPageIndex={false}
@@ -878,7 +893,7 @@ export const EditableValues: Story = {
           columns={bookingShowcaseColumns}
           pagination={DEFAULT_PAGINATION}
         />
-      </EditableRowsContext.Provider>
+      </EditableRowsProvider>
     );
   },
 };
@@ -1645,7 +1660,7 @@ export const LongTexts: Story = {
     const editor = useEditableRows<Doctor>(doctors);
 
     return (
-      <EditableRowsContext.Provider value={editor}>
+      <EditableRowsProvider value={editor}>
         <Table<Doctor>
           id="tedi-table-long-texts"
           autoResetPageIndex={false}
@@ -1653,7 +1668,7 @@ export const LongTexts: Story = {
           columns={longTextsColumns}
           pagination={SHOWCASE_PAGINATION_3}
         />
-      </EditableRowsContext.Provider>
+      </EditableRowsProvider>
     );
   },
 };
@@ -1831,23 +1846,12 @@ export const WithColumnsMenu: Story = {
  * and applies `arrayMove` on drag end — Table itself doesn't need to know.
  *
  * **Persistence (not applied in this story).** The order lives in the
- * component's local `useState`, so refreshing the page resets it. TanStack
- * has no native rowOrder, so Table can't auto-persist the visual order on
- * your behalf — you have two options:
- *
- * 1. **Persist the data array yourself**: serialise the reordered `rows`
- *    array (or just the ids) into `localStorage` on every drag-end and
- *    hydrate the `useState` initial value from there on mount.
- * 2. **Use Table's `rowOrder` state slice**: `state.rowOrder` is in Table's
- *    `DEFAULT_PERSISTED_KEYS`, so passing `persist={{ key: '…' }}` writes
- *    the list of ids to `localStorage` automatically. On mount, read it
- *    back (via `defaultState.rowOrder`) and physically reorder your `data`
- *    array before passing it to `<Table>`. Table itself only stores the
- *    list — your component still owns the data shape.
- *
- * For server-backed data the same applies: persist the new order ids on the
- * server (or in `rowOrder`) and re-derive `data` from the response on the
- * next fetch.
+ * component's local `useState`, so refreshing the page resets it. Row order is
+ * owned entirely by your `data` array — Table doesn't hold a row-order slice —
+ * so to persist it, serialise the reordered `rows` (or just their ids) into
+ * `localStorage` on every reorder and hydrate the `useState` initial value
+ * from there on mount. For server-backed data, persist the new order on the
+ * server and re-derive `data` from the response on the next fetch.
  */
 export const ReorderableRows: Story = {
   render: function DraggableRows() {
@@ -1903,9 +1907,8 @@ export const ReorderableRows: Story = {
  *
  * `columnOrder` is in Table's `DEFAULT_PERSISTED_KEYS`, so the persist
  * adapter writes it to `localStorage` on every change and hydrates it on
- * mount — no extra wiring needed. The same prop covers `columnVisibility`,
- * `rowOrder` (ids only — see ReorderableRows for the caveat), and
- * `columnSizing`. Use `persist.include` to opt in / out of specific slices.
+ * mount — no extra wiring needed. The same prop also covers `columnVisibility`.
+ * Use `persist.include` to opt in / out of specific slices.
  */
 export const ReorderableColumns: Story = {
   render: function DraggableColumns() {
