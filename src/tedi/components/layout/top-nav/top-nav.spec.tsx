@@ -92,7 +92,6 @@ describe('TopNav', () => {
       <TopNav ariaLabel="Primary">
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item
-          href="/family"
           isActive
           submenu={
             <TopNav.Group title="Marriage">
@@ -143,7 +142,6 @@ describe('TopNav', () => {
           Home
         </TopNav.Item>
         <TopNav.Item
-          href="/family"
           submenu={
             <TopNav.Group title="Marriage">
               <TopNav.SubItem href="/x">x</TopNav.SubItem>
@@ -191,7 +189,6 @@ describe('TopNav', () => {
       <TopNav ariaLabel="Primary" isMobileOpen>
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item
-          href="/family"
           submenu={
             <>
               <TopNav.Group title="Marriage">
@@ -233,7 +230,6 @@ describe('TopNav', () => {
     const { container } = render(
       <TopNav ariaLabel="Primary" maxWidth={1200}>
         <TopNav.Item
-          href="/"
           isActive
           submenu={
             <TopNav.Group title="More">
@@ -414,7 +410,6 @@ describe('TopNav', () => {
     render(
       <TopNav ariaLabel="Primary">
         <TopNav.Item
-          href="/"
           isActive
           submenu={
             <TopNav.Group title="Section" headingLevel="h2">
@@ -501,11 +496,10 @@ describe('TopNav', () => {
     expect(trigger).not.toHaveAttribute('href');
   });
 
-  it('keeps <a> when href is provided even if a submenu is present', () => {
+  it('renders a submenu item as a toggle <button>, not a link (href is disallowed with submenu)', () => {
     render(
       <TopNav ariaLabel="Primary">
         <TopNav.Item
-          href="/family"
           submenu={
             <TopNav.Group title="More">
               <TopNav.SubItem href="/m">Item</TopNav.SubItem>
@@ -516,8 +510,8 @@ describe('TopNav', () => {
         </TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('link', { name: /Family/ })).toHaveAttribute('href', '/family');
-    expect(screen.queryByRole('button', { name: /Family/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Family/ })).toHaveAttribute('aria-haspopup', 'true');
+    expect(screen.queryByRole('link', { name: /Family/ })).not.toBeInTheDocument();
   });
 
   it('defaults the bar maxWidth to "xxl" (87.5rem)', () => {
@@ -552,7 +546,6 @@ describe('TopNav', () => {
       <TopNav ariaLabel="Primary" submenuFit="content">
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item
-          href="/family"
           isActive
           submenu={
             <TopNav.Group title="Marriage">
@@ -566,7 +559,7 @@ describe('TopNav', () => {
     );
     const submenu = container.querySelector('[data-name="top-nav-submenu"]');
     expect(submenu).toBeInTheDocument();
-    const activeItem = screen.getByRole('link', { name: /Family/ }).closest('li');
+    const activeItem = screen.getByRole('button', { name: /Family/ }).closest('li');
     expect(activeItem).toContainElement(submenu as HTMLElement);
   });
 
@@ -574,7 +567,6 @@ describe('TopNav', () => {
     render(
       <TopNav ariaLabel="Primary">
         <TopNav.Item
-          href="/"
           isActive
           submenu={
             <TopNav.Group>
@@ -743,7 +735,6 @@ describe('TopNav', () => {
       render(
         <TopNav ariaLabel="Primary">
           <TopNav.Item
-            href="/"
             isActive
             submenu={
               <TopNav.Group title="Marriage" headingLevel="h2">
@@ -763,7 +754,6 @@ describe('TopNav', () => {
       const { container } = render(
         <TopNav ariaLabel="Primary">
           <TopNav.Item
-            href="/"
             isActive
             submenu={
               <TopNav.Group title="Marriage" icon="family_restroom">
@@ -780,10 +770,9 @@ describe('TopNav', () => {
     });
 
     it('renders a leading icon when `icon` is an object with custom size', () => {
-      const { container } = render(
+      render(
         <TopNav ariaLabel="Primary">
           <TopNav.Item
-            href="/"
             isActive
             submenu={
               <TopNav.Group title="Marriage" icon={{ name: 'family_restroom', size: 24 }}>
@@ -803,7 +792,6 @@ describe('TopNav', () => {
       render(
         <TopNav ariaLabel="Primary">
           <TopNav.Item
-            href="/"
             isActive
             submenu={
               <TopNav.Group title="Marriage" icon={{ name: 'family_restroom' }}>
@@ -822,7 +810,6 @@ describe('TopNav', () => {
       const { container } = render(
         <TopNav ariaLabel="Primary">
           <TopNav.Item
-            href="/"
             isActive
             submenu={
               <TopNav.Group icon="family_restroom">

@@ -6,22 +6,33 @@ import { UnknownType } from '../../../../../types/commonTypes';
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
 import styles from '../../top-nav.module.scss';
 
-type TopNavItemBaseProps = {
+type TopNavItemLinkProps =
+  | {
+      /**
+       * Submenu content — typically a fragment of `TopNav.Group` elements.
+       * When provided and `isActive` is `true`, the parent `TopNav` renders
+       * the submenu inside the mega-menu panel below the bar, and a
+       * `keyboard_arrow_down` chevron is added next to the label.
+       *
+       * A mega-menu item is a toggle, not a link, so `href` is **not** allowed
+       * alongside `submenu` — the two are mutually exclusive.
+       */
+      submenu: React.ReactNode;
+      href?: never;
+    }
+  | {
+      /**
+       * Destination URL. Omit when the item only opens a submenu.
+       */
+      href?: string;
+      submenu?: never;
+    };
+
+type TopNavItemOwnProps = {
   /**
    * Bar label. Pass a string or any ReactNode that renders inline.
    */
   children: React.ReactNode;
-  /**
-   * Submenu content — typically a fragment of `TopNav.Group` elements.
-   * When provided and `isActive` is `true`, the parent `TopNav` renders
-   * the submenu inside the mega-menu panel below the bar, and a
-   * `keyboard_arrow_down` chevron is added next to the label.
-   */
-  submenu?: React.ReactNode;
-  /**
-   * Destination URL. Omit when the item only opens a submenu.
-   */
-  href?: string;
   /**
    * Optional leading icon — material-symbol name or full `IconWithoutBackgroundProps`.
    */
@@ -57,6 +68,8 @@ type TopNavItemBaseProps = {
   /** @internal Shared id used to link the toggle button (`aria-controls`) to the submenu panel (`id`). */
   panelId?: string;
 };
+
+type TopNavItemBaseProps = TopNavItemOwnProps & TopNavItemLinkProps;
 
 export type TopNavItemProps<C extends React.ElementType = 'a'> = PolymorphicComponentPropWithRef<
   C,

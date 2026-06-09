@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Decorator, Meta, StoryFn, StoryObj } from '@storybook/react';
 import { createContext, useContext, useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -116,6 +116,13 @@ const Template: StoryFn<TopNavProps> = (args) => {
   return <TopNav {...args} {...integratedProps} />;
 };
 
+/**
+ * `submenuFit="content"` renders the mega-menu as an absolutely-positioned overlay, which
+ * doesn't add page height — so it would float off the bottom of the Storybook canvas. This
+ * decorator reserves room below the nav so the open panel is fully visible without scrolling.
+ */
+const reserveSubmenuSpace: Decorator = (Story) => <div style={{ minHeight: '24rem' }}>{Story()}</div>;
+
 export const Default: Story = {
   render: Template,
   args: {
@@ -211,7 +218,6 @@ export const MenuOpen: Story = {
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
         <TopNav.Item
-          href="#"
           isActive
           submenu={
             <>
@@ -267,7 +273,6 @@ export const ConstrainedInnerWidth: Story = {
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
         <TopNav.Item
-          href="#"
           isActive
           submenu={
             <>
@@ -293,46 +298,13 @@ export const ConstrainedInnerWidth: Story = {
 };
 
 /**
- * Parent item with no `href` — renders as a `<button>` and uses the built-in
- * toggle / outside-click / Escape behavior.
- */
-export const ToggleOnlyParent: Story = {
-  render: Template,
-  args: {
-    ariaLabel: 'Primary navigation',
-    children: (
-      <>
-        <TopNav.Item href="#">Avaleht</TopNav.Item>
-        <TopNav.Item
-          submenu={
-            <>
-              <TopNav.Group title="Abielu">
-                <TopNav.SubItem href="#">Abiellumine</TopNav.SubItem>
-                <TopNav.SubItem href="#">Abielu lahutamine</TopNav.SubItem>
-              </TopNav.Group>
-              <TopNav.Group title="Dokumendid">
-                <TopNav.SubItem href="#">Lastega perede nõustamine</TopNav.SubItem>
-                <TopNav.SubItem href="#">Lapsendamine</TopNav.SubItem>
-              </TopNav.Group>
-            </>
-          }
-        >
-          Perekond
-        </TopNav.Item>
-        <TopNav.Item href="#">Hüvitised ja toetused</TopNav.Item>
-        <TopNav.Item href="#">Töö ja töösuhted</TopNav.Item>
-      </>
-    ),
-  },
-};
-
-/**
  * `submenuFit="content"` makes the panel only as wide as its content and aligns it directly under
  * the active item, instead of stretching to the full nav width. It is **not** a smaller / tighter
  * variant — the padding is identical to the default; only the width and horizontal position differ.
  */
 export const ContentWidthMegaMenu: Story = {
   render: Template,
+  decorators: [reserveSubmenuSpace],
   args: {
     ariaLabel: 'Primary navigation',
     submenuFit: 'content',
@@ -340,7 +312,6 @@ export const ContentWidthMegaMenu: Story = {
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
         <TopNav.Item
-          href="#"
           isActive
           submenu={
             <>
@@ -374,6 +345,7 @@ export const ContentWidthMegaMenu: Story = {
  */
 export const SubmenuGroupWithoutTitle: Story = {
   render: Template,
+  decorators: [reserveSubmenuSpace],
   args: {
     ariaLabel: 'Primary navigation',
     submenuFit: 'content',
@@ -381,7 +353,6 @@ export const SubmenuGroupWithoutTitle: Story = {
       <>
         <TopNav.Item href="#">Avaleht</TopNav.Item>
         <TopNav.Item
-          href="#"
           isActive
           submenu={
             <TopNav.Group>
