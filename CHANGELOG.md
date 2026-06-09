@@ -1,3 +1,10 @@
+# [18.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.6...react-18.0.0-rc.7) (2026-06-09)
+
+
+### Bug Fixes
+
+* **tooltip:** fix lingering focus visible on mouse hover [#663](https://github.com/TEDI-Design-System/react/issues/663) ([#664](https://github.com/TEDI-Design-System/react/issues/664)) ([9acd74a](https://github.com/TEDI-Design-System/react/commit/9acd74ae841a0ecfbfab2dcdc3b213e269bf0959))
+
 # [18.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.5...react-18.0.0-rc.6) (2026-06-09)
 
 
