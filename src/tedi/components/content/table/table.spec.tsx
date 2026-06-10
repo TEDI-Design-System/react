@@ -798,14 +798,14 @@ describe('Table', () => {
       role: 'Tester',
     }));
 
-    it('renders the pagination bar with prev/next buttons and current page marker', () => {
+    it('renders the pagination bar with the next button and current page marker', () => {
       render(<Table<Person> id="t-page" data={many} columns={columns} pagination={{ pageSize: 3 }} />);
 
       expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Current page, page 1/i })).toHaveAttribute('aria-current', 'page');
-      // Previous arrow stays in the DOM but is `disabled` on the first page so the strip
-      // doesn't jump when the user navigates back to / away from the first page.
-      expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
+      // The Table does not set `showPrevNextButtons`, so the disabled Previous arrow is
+      // dropped on the first page (compact default); only the enabled Next arrow renders.
+      expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Next page/i })).toBeEnabled();
       expect(screen.getByText('7 results')).toBeInTheDocument();
     });

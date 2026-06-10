@@ -973,6 +973,48 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### Pagination
+**Props:** `PaginationProps` | fRef | bp
+
+Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` **both** the number list **and** the page-size select collapse into compact triggers that open a mobile modal picker (radio-style list; opening it scrolls the active option to the top and focuses it).
+
+- `pageCount: number` (required), `page?` (controlled, 1-based) + `onPageChange?`, or `defaultPage?` (uncontrolled)
+- `totalItems?` → renders the results label; `pageSize?` + `pageSizeOptions?: (number | PaginationPageSizeOption)[]` + `onPageSizeChange?` → renders the page-size select. Options are plain numbers, or `{ value, label }` objects when the visible text should differ — most commonly a **"Show all"** entry `{ value: totalItems, label: 'Show all' }`. Selecting emits the option's numeric `value`; the consumer recomputes `pageCount` (a large value collapses it to 1, hiding the pager). Pass the label already translated.
+- `boundaryCount? = 1`, `siblingCount? = 1` — how many page numbers stay visible at the ends / around the active page before `…`
+- `background?: 'white' | 'transparent' = 'white'`, `borders?: 'top' | 'bottom' | 'both' | 'none' = 'top'`
+- `hideResults?`, `hidePageSize?`, `hidePager?: boolean | Breakpoint` — hide a slot entirely, or only below the given breakpoint
+- `labels?: Partial<PaginationLabels>` — override aria/text labels (`previous`, `next`, `results`, `pageSize`, `pageStatus`, …); otherwise sourced from `LabelProvider`
+
+**Arrow variants** (harmonized with Angular):
+- `showPrevNextButtons?: boolean = false` — keep the prev/next arrow visible-but-disabled at the first/last page instead of dropping it (stable footprint). Angular calls this `disableArrowsAtBoundary`.
+- `showEdgeNavLabels?: boolean = false` — render the arrows as **small text links** (label + icon, link colour, underline on hover) instead of icon-only circles.
+- `previousIcon? = 'arrow_back'`, `nextIcon? = 'arrow_forward'` — override the arrow glyphs (e.g. `'chevron_left'` / `'chevron_right'`).
+- `arrowVariant?: 'default' | 'primary' = 'default'` — `'primary'` renders the arrows as **primary small `Button`s with the label text + a leading/trailing arrow icon** (always shows the label, so `showEdgeNavLabels` has no effect in this mode).
+
+**Breakpoint support:** the visual props — `boundaryCount`, `siblingCount`, `background`, `borders`, `showPrevNextButtons`, `showEdgeNavLabels`, `previousIcon`, `nextIcon`, `arrowVariant` — accept per-breakpoint overrides via the `sm`/`md`/`lg`/`xl`/`xxl` keys (mobile-first: a bare value is the `xs` baseline; `defaultServerBreakpoint?` sets the SSR baseline). e.g. icon-only arrows on mobile, labelled primary buttons on desktop.
+
+```tsx
+const [page, setPage] = useState(1);
+<Pagination
+  pageCount={10} page={page} onPageChange={setPage}
+  totalItems={97} pageSize={10} pageSizeOptions={[10, 25, 50, 100]} onPageSizeChange={setSize}
+/>
+
+// "Show all" — a labelled page-size option; recompute pageCount so it collapses to one page
+<Pagination
+  pageCount={Math.max(1, Math.ceil(total / size))} page={page} onPageChange={setPage}
+  totalItems={total} pageSize={size}
+  pageSizeOptions={[10, 25, 50, { value: total, label: 'Show all' }]}
+  onPageSizeChange={setSize}
+/>
+
+// Prominent, labelled navigation
+<Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="primary" showPrevNextButtons />
+
+// Responsive: compact icon-only arrows below md, prominent labelled buttons from md up
+<Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="default" showPrevNextButtons md={{ arrowVariant: 'primary' }} />
+```
+
 ## Notifications
 
 ### Alert
@@ -1070,19 +1112,22 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `open?: boolean` + `onToggle?: (open: boolean) => void` — controlled mode
 - `closeOnBackdropClick: boolean = true`
 - `closeOnEscape: boolean = true`
+- `role: 'dialog' | 'alertdialog' = 'dialog'` — use `'alertdialog'` for destructive confirmations (higher SR urgency, requires explicit dismissal)
 
 **`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`, `fullscreen`)
-- `width: ModalWidth = 'sm'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
-- `maxWidth?: string` — cap for custom widths
-- `size: 'default' | 'small' = 'default'` — header/body/footer padding density
-- `position: 'center' | 'top' | 'right' | 'left' = 'center'` — side positions render full-height drawers
-- `fullscreen: boolean | 'edge' = false` — `true` = always fullscreen, `'edge'` = edge-to-edge; breakpoint-aware, so for "fullscreen below `md`" set `fullscreen md={{ fullscreen: false }}`
+- `width: ModalWidth = 'md'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
+- `maxWidth?: string` — cap for custom widths (lighter than overriding `width`)
+- `size: 'default' | 'small' = 'default'` — header/body/footer padding density (`'small'` ≈ 42px header)
+- `position: 'center' | 'top' | 'right' | 'left' | 'bottom' = 'center'` — side positions render drawers; flip per breakpoint, e.g. `position="right" md={{ position: 'center' }}` or `position="bottom"` for a mobile sheet
+- `fullscreen: boolean | 'edge' = false` — `true` = padded fullscreen (16px backdrop stays), `'edge'` = edge-to-edge (no padding/border/radius); combine with bp keys for responsive (e.g. `fullscreen md={{ fullscreen: false }}`)
 - `scrollBehavior: 'content' | 'page' = 'content'` — internal body scroll vs. overlay-level page scroll
 - `trapFocus: boolean = true`, `returnFocus: boolean = true`
+- `initialFocus?: number | RefObject<HTMLElement>` — element focused on open (tabbable index, `0` = first/default, `-1` = the dialog itself, or a ref to a specific element — e.g. focus the active option in a picker)
 - `showOverlay: boolean = true` — toggle the dimmed backdrop
 - `lockScroll: boolean = true`
 - `visuallyHiddenDismiss?: boolean` — adds SR-only dismiss buttons for touch screen readers
 - `aria-labelledby?`, `aria-describedby?` — usually wired automatically by `Modal.Header`
+- `aria-label?: string` — plain-text accessible name when there's no visible title (icon-only / list-only dialogs); ignored when `aria-labelledby` is set
 
 **`Modal.Header` props**
 - `title?: ReactNode` — rendered as `<h3>`, auto-registered as `aria-labelledby`
@@ -1093,6 +1138,7 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 
 **`Modal.Body` props**
 - `noScroll?: boolean` — disable internal scroll (pair with `scrollBehavior="page"` on Content)
+- Body padding is driven by the `--modal-body-padding` / `--modal-body-padding-sm` CSS custom properties — override them on `Modal.Content` (e.g. set to `0`) for an edge-to-edge body such as a full-bleed list or sheet
 
 **`Modal.Footer` props**
 - `children?: ReactNode` — right-aligned actions (default)
