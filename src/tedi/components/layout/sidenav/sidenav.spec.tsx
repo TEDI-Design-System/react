@@ -1,14 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import MobileNavToggle from '../mobile-nav/components/mobile-nav-toggle/mobile-nav-toggle';
+import { MobileNav as SideNavMobile } from '../mobile-nav/mobile-nav';
 import { SideNavItemProps } from './components/sidenav-item/sidenav-item';
-import { SideNavMobile } from './components/sidenav-mobile/sidenav-mobile';
-import SidenavToggle from './components/sidenav-toggle/sidenav-toggle';
 import { SideNav } from './sidenav';
 
-jest.mock('./components/sidenav-mobile/sidenav-mobile');
+jest.mock('../mobile-nav/mobile-nav');
 jest.mock('./components/sidenav-item/sidenav-item');
-jest.mock('./components/sidenav-toggle/sidenav-toggle');
+jest.mock('../mobile-nav/components/mobile-nav-toggle/mobile-nav-toggle');
 jest.mock('../../../helpers');
 
 const mockNavItems: SideNavItemProps[] = [
@@ -48,7 +48,7 @@ describe('SideNav', () => {
   });
 
   test('handles collapse toggle', () => {
-    (SidenavToggle as jest.Mock).mockImplementation(({ toggleMenu }) => (
+    (MobileNavToggle as jest.Mock).mockImplementation(({ toggleMenu }) => (
       <button onClick={() => toggleMenu()} data-testid="collapse-toggle">
         Toggle
       </button>
@@ -60,7 +60,7 @@ describe('SideNav', () => {
     fireEvent.click(toggleButton);
 
     expect(defaultProps.onCollapseToggle).toHaveBeenCalledWith(true);
-    expect(SidenavToggle).toHaveBeenCalled();
+    expect(MobileNavToggle).toHaveBeenCalled();
   });
 
   test('does not render nav when isMenuOpen is false (mobile)', () => {

@@ -1,9 +1,12 @@
 .tedi-time-picker__wheel {
+  --tedi-time-wheel-height: 12.5rem;
+  --tedi-time-wheel-fade: 5rem;
+
   position: relative;
   z-index: var(--z-index-dropdown);
   display: flex;
-  width: 160px;
-  height: 200px;
+  width: 10rem;
+  height: var(--tedi-time-wheel-height);
   overflow: hidden;
   user-select: none;
   background: var(--card-background-primary);
@@ -50,7 +53,7 @@
   position: relative;
   z-index: 2;
   flex: 1;
-  padding: 80px 0;
+  padding: var(--tedi-time-wheel-fade) 0;
   overflow-y: scroll;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;

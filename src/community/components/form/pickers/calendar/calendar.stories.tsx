@@ -6,6 +6,11 @@ import Calendar, { CalendarStatus } from './calendar';
 const meta: Meta<typeof Calendar> = {
   component: Calendar,
   title: 'Community/Form/Pickers/Calendar',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

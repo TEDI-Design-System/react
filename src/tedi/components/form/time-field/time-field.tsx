@@ -91,6 +91,15 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
    */
   readOnly?: boolean;
   /**
+   * Disables the input and the picker. Equivalent of `<DateTimeField disabled>`
+   * — added so all three field siblings (`DateField`, `TimeField`,
+   * `DateTimeField`) share the same form-control idiom for "this field is
+   * fully unavailable". Forwards to the underlying `TextField`'s `disabled`
+   * attribute and short-circuits the picker open path.
+   * @default false
+   */
+  disabled?: boolean;
+  /**
    * Marks the input as required.
    */
   required?: boolean;
@@ -148,6 +157,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     defaultValue,
     onChange,
     readOnly = false,
+    disabled = false,
     required,
     placeholder,
     inputProps,
@@ -195,7 +205,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
   const shouldUseCustomInputTrigger =
-    showPicker && isInputTrigger && !readOnly && !shouldUseNativePicker && !useModalPicker;
+    showPicker && isInputTrigger && !readOnly && !disabled && !shouldUseNativePicker && !useModalPicker;
 
   const interactions = useInteractions([...(shouldUseCustomInputTrigger ? [click] : []), dismiss, role]);
 
@@ -249,7 +259,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const openModalPicker = () => setModalOpen(true);
 
   const handleIconClick = () => {
-    if (readOnly || !showPicker) return;
+    if (!showPicker || disabled) return;
 
     if (shouldUseNativePicker) {
       openNativePicker();
@@ -274,6 +284,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     value: currentValue,
     placeholder,
     readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
+    disabled: disabled || inputProps?.disabled,
     icon: showPicker ? 'schedule' : { name: 'schedule', color: 'inherit' },
     isClearable: true,
     required,
@@ -282,8 +293,8 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     onBlur: handleInputBlur,
     className: cn(
       styles['tedi-time-field__textfield'],
-      { [styles['tedi-time-field__icon--disabled']]: !showPicker || readOnly },
-      { [styles['tedi-time-field__textfield--disabled']]: inputProps?.disabled },
+      { [styles['tedi-time-field__icon--disabled']]: !showPicker || disabled },
+      { [styles['tedi-time-field__textfield--disabled']]: disabled || inputProps?.disabled },
       { [styles['tedi-time-field--native']]: shouldUseNativePicker }
     ),
     input: {
@@ -296,7 +307,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const shouldUseDropdownPicker =
     !shouldUseNativePicker &&
     showPicker &&
-    !readOnly &&
+    !disabled &&
     availableTimesVariant === 'dropdown' &&
     !!availableTimes?.length;
 
@@ -362,9 +373,9 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         />
       )}
 
-      {!shouldUseNativePicker && showPicker && !useModalPicker && (
+      {!shouldUseNativePicker && showPicker && !disabled && !useModalPicker && (
         <FloatingPortal>
-          {open && !readOnly && (
+          {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
                 ref={refs.setFloating}

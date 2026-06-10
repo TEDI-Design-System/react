@@ -194,9 +194,8 @@ export const States: Story = {
 };
 
 /**
- * Mirrors the Angular `ValueType` frame: no value, default, placeholder,
- * multi-row multiselect, and **single-row multiselect** with overflow `+N`
- * counter (the `tagsDirection="row"` handling).
+ * Value states: no value, default, placeholder, multi-row multiselect, and
+ * **single-row multiselect** with overflow `+N` counter (the `tagsDirection="row"` handling).
  */
 const longTagOptions: ISelectOption[] = [
   { value: 'longer-text', label: 'Longer text' },

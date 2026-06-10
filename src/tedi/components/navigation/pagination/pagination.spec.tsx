@@ -6,6 +6,23 @@ import { usePagination } from './use-pagination';
 
 import '@testing-library/jest-dom';
 
+let mockBreakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' = 'lg';
+const setMockBreakpoint = (next: typeof mockBreakpoint) => {
+  mockBreakpoint = next;
+};
+
+jest.mock('../../../helpers', () => {
+  const order = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
+  return {
+    useBreakpoint: () => mockBreakpoint,
+    isBreakpointBelow: (current: string, target: string) => order.indexOf(current) < order.indexOf(target),
+    useBreakpointProps: () => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      getCurrentBreakpointProps: (props: any) => ({ ...props }),
+    }),
+  };
+});
+
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string, ...args: unknown[]) => {
@@ -32,6 +49,10 @@ jest.mock('../../../providers/label-provider', () => ({
     },
   }),
 }));
+
+beforeEach(() => {
+  setMockBreakpoint('lg');
+});
 
 describe('usePagination', () => {
   it('returns an empty list when pageCount is 0', () => {
@@ -151,14 +172,14 @@ describe('Pagination component', () => {
     expect(screen.getByRole('button', { name: /Current page, page 4/i })).toBeInTheDocument();
   });
 
-  it('hides Previous on the first page and Next on the last', () => {
+  it('disables Previous on the first page and Next on the last so the layout footprint is stable', () => {
     const { rerender } = render(<Pagination pageCount={3} page={1} />);
-    expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeEnabled();
 
     rerender(<Pagination pageCount={3} page={3} />);
-    expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Next page/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Previous page/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Next page/i })).toBeDisabled();
   });
 
   it('Previous / Next move the current page by one', () => {
@@ -181,6 +202,13 @@ describe('Pagination component', () => {
   it('renders the results label when totalItems is set', () => {
     render(<Pagination pageCount={10} defaultPage={1} totalItems={97} />);
     expect(screen.getByText('97 results')).toBeInTheDocument();
+  });
+
+  it('exposes the results count as a polite live region so result changes are announced', () => {
+    render(<Pagination pageCount={5} defaultPage={1} totalItems={42} />);
+    const liveRegion = screen.getByText('42 results').closest('[role="status"]');
+    expect(liveRegion).not.toBeNull();
+    expect(liveRegion).toHaveAttribute('aria-live', 'polite');
   });
 
   it('allows overriding labels for localisation', () => {
@@ -230,8 +258,11 @@ describe('Pagination component', () => {
   });
 
   it('omits the page-size selector when pageSizeOptions is empty', () => {
-    render(<Pagination pageCount={5} defaultPage={1} pageSizeOptions={[]} />);
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    const { container } = render(<Pagination pageCount={5} defaultPage={1} pageSizeOptions={[]} />);
+    // The page-jump Select (mobile collapse) is always in the DOM but hidden
+    // via CSS at desktop widths — so we target the page-size select directly
+    // by its id prefix rather than asserting "no combobox anywhere".
+    expect(container.querySelector('[id^="tedi-pagination-page-size-"]')).not.toBeInTheDocument();
   });
 
   it('does not render the nav when pageCount <= 1', () => {
@@ -266,5 +297,62 @@ describe('Pagination component', () => {
     render(<Pagination ref={ref} pageCount={3} defaultPage={1} />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
     expect(ref.current).toHaveAttribute('data-name', 'tedi-pagination');
+  });
+
+  it('announces the current page to screen readers via a live region', () => {
+    const { container, rerender } = render(<Pagination pageCount={10} defaultPage={1} />);
+
+    const status = container.querySelector('[role="status"]');
+    expect(status).not.toBeNull();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status?.textContent).toMatch(/(Page 1 of 10|pagination\.page-status)/);
+
+    rerender(<Pagination pageCount={10} page={4} />);
+    expect(container.querySelector('[role="status"]')?.textContent).toMatch(/(Page 4 of 10|pagination\.page-status)/);
+  });
+
+  describe('mobile (< md) layout', () => {
+    beforeEach(() => {
+      setMockBreakpoint('xs');
+    });
+
+    it('renders the page-jump Select instead of the numbered list', () => {
+      const { container } = render(<Pagination pageCount={10} defaultPage={3} />);
+      expect(screen.queryByRole('button', { name: /Go to page 5/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Current page, page 3/i })).not.toBeInTheDocument();
+      expect(container.querySelector('[id^="tedi-pagination-jump-"]')).toBeInTheDocument();
+    });
+
+    it('hides the page-size selector even when pageSizeOptions are provided', () => {
+      const { container } = render(
+        <Pagination pageCount={5} defaultPage={1} pageSize={10} pageSizeOptions={[10, 25, 50]} />
+      );
+
+      expect(container.querySelector('[id^="tedi-pagination-page-size-"]')).not.toBeInTheDocument();
+    });
+
+    it('still renders Previous / Next nav arrows when applicable', () => {
+      render(<Pagination pageCount={5} defaultPage={3} />);
+
+      expect(screen.getByRole('button', { name: /Previous page/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Next page/i })).toBeInTheDocument();
+    });
+
+    it('changes page when a new value is picked from the page-jump Select', async () => {
+      const onPageChange = jest.fn();
+      render(<Pagination pageCount={5} defaultPage={1} onPageChange={onPageChange} />);
+
+      const combobox = screen.getByRole('combobox', { name: /Pagination/i });
+      await act(async () => {
+        combobox.focus();
+        fireEvent.keyDown(combobox, { key: 'ArrowDown', code: 'ArrowDown' });
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      // Dropdown options show just the page number. The trigger shows "1 / 5" (current/total),
+      // but the open menu lists plain "1", "2", "3", "4", "5". Match the option, not the trigger.
+      fireEvent.click(screen.getByRole('option', { name: '4' }));
+      expect(onPageChange).toHaveBeenCalledWith(4);
+    });
   });
 });

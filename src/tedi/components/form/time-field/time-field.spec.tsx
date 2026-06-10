@@ -157,14 +157,14 @@ describe('TimeField', () => {
     expect(screen.queryByTestId('timepicker')).not.toBeInTheDocument();
   });
 
-  it('does NOT open picker when readOnly', async () => {
+  it('still opens the picker when readOnly (typing is blocked, picking is not)', async () => {
     const user = userEvent.setup();
 
     render(<TimeField id="t1" label="Time" defaultValue="10:00" readOnly />);
 
     await user.click(screen.getByTestId('icon'));
 
-    expect(screen.queryByTestId('timepicker')).not.toBeInTheDocument();
+    expect(screen.getByTestId('timepicker')).toBeInTheDocument();
   });
 
   it('updates value from TimePicker', async () => {
