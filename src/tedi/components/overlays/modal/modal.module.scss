@@ -61,6 +61,12 @@ $modal-fade-duration: 200ms;
   padding-top: var(--modal-top-margin);
 }
 
+.tedi-modal__overlay--position-bottom {
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--modal-top-margin);
+}
+
 .tedi-modal__overlay--position-right,
 .tedi-modal__overlay--position-left {
   align-items: stretch;
@@ -85,7 +91,8 @@ $modal-fade-duration: 200ms;
 }
 
 .tedi-modal__overlay--position-center .tedi-modal__container,
-.tedi-modal__overlay--position-top .tedi-modal__container {
+.tedi-modal__overlay--position-top .tedi-modal__container,
+.tedi-modal__overlay--position-bottom .tedi-modal__container {
   animation: tedi-modal-fade-in $modal-fade-duration ease-out;
 }
 
@@ -101,7 +108,8 @@ $modal-fade-duration: 200ms;
 }
 
 .tedi-modal__overlay--scroll-page.tedi-modal__overlay--position-center,
-.tedi-modal__overlay--scroll-page.tedi-modal__overlay--position-top {
+.tedi-modal__overlay--scroll-page.tedi-modal__overlay--position-top,
+.tedi-modal__overlay--scroll-page.tedi-modal__overlay--position-bottom {
   align-items: flex-start;
 }
 
@@ -223,7 +231,8 @@ $modal-fade-duration: 200ms;
 }
 
 .tedi-modal__overlay--position-center .tedi-modal__container:has(.tedi-modal__body > [data-name='scroll-fade']),
-.tedi-modal__overlay--position-top .tedi-modal__container:has(.tedi-modal__body > [data-name='scroll-fade']) {
+.tedi-modal__overlay--position-top .tedi-modal__container:has(.tedi-modal__body > [data-name='scroll-fade']),
+.tedi-modal__overlay--position-bottom .tedi-modal__container:has(.tedi-modal__body > [data-name='scroll-fade']) {
   height: 100%;
 }
 
