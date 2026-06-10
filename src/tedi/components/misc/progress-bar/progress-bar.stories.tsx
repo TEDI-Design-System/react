@@ -21,8 +21,8 @@ const SizesTemplate: StoryFn = () => (
           <ProgressBar
             value={60}
             small={row.small}
-            ariaLabel="Upload progress"
-            helper={{ text: 'This could take a few minutes.', type: 'hint' }}
+            ariaLabel="Edenemisriba pealkiri"
+            helper={{ text: 'Üleslaadimine', type: 'hint' }}
           />
         </Col>
       </Row>
@@ -54,7 +54,7 @@ const Template: StoryFn<ProgressBarProps> = (args) => <ProgressBar {...args} />;
 
 export const Default: Story = {
   render: Template,
-  args: { value: 60, ariaLabel: 'Upload progress' },
+  args: { value: 60, ariaLabel: 'Edenemisriba pealkiri' },
 };
 
 export const Sizes: Story = {
@@ -63,24 +63,24 @@ export const Sizes: Story = {
 
 export const WithLabelTop: Story = {
   render: Template,
-  args: { value: 20, label: 'Upload progress', labelPosition: 'top' },
+  args: { value: 20, label: 'Edenemisriba pealkiri', labelPosition: 'top' },
 };
 
 export const WithLabelHorizontal: Story = {
   render: Template,
-  args: { value: 75, label: 'Upload progress', labelPosition: 'horizontal' },
+  args: { value: 75, label: 'Edenemisriba pealkiri', labelPosition: 'horizontal' },
 };
 
 export const Required: Story = {
   render: Template,
-  args: { value: 30, label: 'Upload progress', required: true },
+  args: { value: 30, label: 'Edenemisriba pealkiri', required: true },
 };
 
 export const ValueBelow: Story = {
   render: Template,
   args: {
     value: 55,
-    label: 'Upload progress',
+    label: 'Edenemisriba pealkiri',
     valuePosition: 'bottom',
   },
 };
@@ -89,8 +89,8 @@ export const WithHint: Story = {
   render: Template,
   args: {
     value: 50,
-    ariaLabel: 'Upload progress',
-    helper: { text: 'Uploading', type: 'hint' },
+    ariaLabel: 'Edenemisriba pealkiri',
+    helper: { text: 'Üleslaadimine', type: 'hint' },
   },
 };
 
@@ -98,8 +98,8 @@ export const WithError: Story = {
   render: Template,
   args: {
     value: 50,
-    ariaLabel: 'Upload progress',
-    helper: { text: 'Uploading failed. Try again', type: 'error' },
+    ariaLabel: 'Edenemisriba pealkiri',
+    helper: { text: 'Üles laadimine ebaõnnestus. Proovi uuesti.', type: 'error' },
   },
 };
 
@@ -107,9 +107,9 @@ export const ValueBelowWithHint: Story = {
   render: Template,
   args: {
     value: 55,
-    ariaLabel: 'Upload progress',
+    ariaLabel: 'Edenemisriba pealkiri',
     valuePosition: 'bottom',
-    helper: { text: 'This could take few minutes.', type: 'hint' },
+    helper: { text: 'See võib võtta mõned minutid.', type: 'hint' },
   },
 };
 
@@ -117,7 +117,7 @@ export const CustomValueLabel: Story = {
   render: Template,
   args: {
     value: 20,
-    label: 'Step',
+    label: 'Edenemisriba pealkiri',
     valueLabel: '1 / 5',
   },
 };
@@ -126,7 +126,7 @@ export const ValueHidden: Story = {
   render: Template,
   args: {
     value: 60,
-    ariaLabel: 'Upload progress',
+    ariaLabel: 'Edenemisriba pealkiri',
     showValue: false,
   },
 };
@@ -145,6 +145,6 @@ export const Animated: Story = {
       }, 300);
       return () => window.clearInterval(id);
     }, []);
-    return <ProgressBar value={value} label="Live progress" />;
+    return <ProgressBar value={value} label="Üleslaadimine..." />;
   },
 };

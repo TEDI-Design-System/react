@@ -93,7 +93,6 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
 
   const safeValue = clampValue(value);
   const displayValue = valueLabel ?? `${Math.round(safeValue)}%`;
-  const accessibleName = ariaLabel ?? label;
 
   const renderLabel = label ? (
     <FormLabel
@@ -119,7 +118,7 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
       aria-valuemax={100}
       aria-valuetext={valueLabel}
       aria-labelledby={label && !ariaLabel ? labelId : undefined}
-      aria-label={accessibleName && !label ? accessibleName : undefined}
+      aria-label={ariaLabel || undefined}
       aria-describedby={helperId}
       className={styles['tedi-progress-bar__track']}
     >

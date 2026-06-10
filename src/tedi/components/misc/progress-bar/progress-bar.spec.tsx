@@ -45,6 +45,13 @@ describe('ProgressBar', () => {
     expect(screen.getByRole('progressbar', { name: 'Uploading file' })).toBeInTheDocument();
   });
 
+  it('keeps an accessible name (ariaLabel wins) when both label and ariaLabel are provided', () => {
+    render(<ProgressBar label="Upload" ariaLabel="Uploading file" value={10} />);
+    // ariaLabel overrides the visible label for assistive tech; the bar is never unnamed.
+    expect(screen.getByRole('progressbar', { name: 'Uploading file' })).toBeInTheDocument();
+    expect(screen.getByText('Upload')).toBeInTheDocument();
+  });
+
   it('shows the percentage by default', () => {
     render(<ProgressBar value={37} />);
     expect(screen.getByText('37%')).toBeInTheDocument();
