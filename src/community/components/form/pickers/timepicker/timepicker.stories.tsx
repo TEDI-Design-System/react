@@ -9,6 +9,11 @@ import TimePicker, { TimePickerProps } from './timepicker';
 const meta: Meta<typeof TimePicker> = {
   component: TimePicker,
   title: 'Community/Form/Pickers/TimePicker',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

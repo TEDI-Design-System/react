@@ -24,18 +24,22 @@ import {
   useBreakpoint,
   useBreakpointProps,
 } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
 import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
+import {
+  buildDateRegexSource,
+  CALENDAR_POPOVER_OFFSET,
+  CALENDAR_POPOVER_PADDING,
+  getLocaleDateParts,
+} from './date-field-helpers';
 import { DatePickerModal } from './date-picker-modal/date-picker-modal';
 
 export type DateFieldModal = boolean | Exclude<Breakpoint, 'xs'>;
-
-const CALENDAR_OFFSET = 4;
-const CALENDAR_PADDING = 8;
 
 export type DateFieldMode = 'single' | 'multiple' | 'range';
 export type CalendarView = 'days' | 'months' | 'years';
@@ -108,8 +112,22 @@ export interface DateFieldProps
   onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>;
   /**
    * Disable specific dates. Accepts the same matchers as React DayPicker's `disabled` prop.
+   *
+   * @deprecated Use `disabledMatchers` instead — same shape, semantics, and merging
+   * behaviour. The current overload re-uses the form-control `disabled` name for a
+   * matcher prop, which is inconsistent with `DateTimeField`'s boolean `disabled`
+   * and confusing for consumers migrating between the two siblings. `disabledMatchers`
+   * stays additive for now; this overload will be replaced by `disabled?: boolean`
+   * in a future major.
    */
   disabled?: Matcher | Matcher[];
+  /**
+   * Disable specific dates via react-day-picker matchers. Mirrors the
+   * `disabledMatchers` prop on `DateTimeField` so the API is consistent across
+   * the date-field family. Merges with the (deprecated) `disabled` overload —
+   * if both are supplied, the union of both matcher sets is applied.
+   */
+  disabledMatchers?: Matcher | Matcher[];
   /**
    * Input placeholder text when no date is selected.
    */
@@ -270,10 +288,19 @@ export interface DateFieldProps
    * the calendar opens as a modal.
    */
   modalTitle?: string;
+  /**
+   * Error message rendered below the input when the user types a date that
+   * matches one of the disable matchers (`disablePast`, `disableFuture`,
+   * `minDate`, `maxDate`, `disabledMatchers`, or the deprecated `disabled`
+   * overload). Falls back to the localised `dateField.disabledDateError`
+   * label.
+   */
+  disabledDateErrorMessage?: string;
 }
 
 export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getLabel } = useLabels();
   const {
     useNativePicker = false,
     enableCalendar = true,
@@ -288,6 +315,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     selected,
     onSelect,
     disabled,
+    disabledMatchers: disabledMatchersProp,
     placeholder,
     className,
     formatDate,
@@ -315,6 +343,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     modal = false,
     modalProps,
     modalTitle,
+    disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
     useNativePicker: _useNativePicker,
     enableCalendar: _enableCalendar,
     calendarTrigger: _calendarTrigger,
@@ -339,6 +368,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const [modalOpen, setModalOpen] = useState(false);
   const [view, setView] = useState<CalendarView>(selectionLevel);
   const [inputValue, setInputValue] = useState('');
+  const [hasDisabledDateError, setHasDisabledDateError] = useState(false);
 
   const useModalPicker =
     enableCalendar &&
@@ -448,6 +478,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       if (Array.isArray(disabled)) matchers.push(...disabled);
       else matchers.push(disabled);
     }
+    // Preferred prop name, matches `DateTimeField`.
+    if (disabledMatchersProp) {
+      if (Array.isArray(disabledMatchersProp)) matchers.push(...disabledMatchersProp);
+      else matchers.push(disabledMatchersProp);
+    }
     if (minDate) matchers.push({ before: minDate });
     if (maxDate) matchers.push({ after: maxDate });
     if (disablePast) matchers.push({ before: new Date() });
@@ -456,7 +491,16 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (shouldDisableYear) matchers.push((date: Date) => shouldDisableYear(date));
 
     return matchers;
-  }, [disabled, minDate, maxDate, disablePast, disableFuture, shouldDisableMonth, shouldDisableYear]);
+  }, [
+    disabled,
+    disabledMatchersProp,
+    minDate,
+    maxDate,
+    disablePast,
+    disableFuture,
+    shouldDisableMonth,
+    shouldDisableYear,
+  ]);
 
   const isDateDisabled = useCallback(
     (date: Date): boolean => dateMatchModifiers(date, disabledMatchers),
@@ -490,28 +534,9 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   };
 
   const defaultParseDate = useMemo(() => {
-    const ref = new Date(2099, 11, 31);
-    const parts = dateFormatter.formatToParts(ref);
-
-    const fieldOrder: ('day' | 'month' | 'year')[] = [];
-    const separators: string[] = [];
-    for (const part of parts) {
-      if (part.type === 'day' || part.type === 'month' || part.type === 'year') {
-        fieldOrder.push(part.type);
-      } else if (part.type === 'literal' && fieldOrder.length > 0 && separators.length < 2) {
-        separators.push(part.value);
-      }
-    }
-
-    const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regexSource = fieldOrder
-      .map((field, i) => {
-        const digits = field === 'year' ? '\\d{4}' : '\\d{2}';
-        const sep = i > 0 ? escapeRegex(separators[i - 1] ?? '') : '';
-        return `${sep}(${digits})`;
-      })
-      .join('');
-    const regex = new RegExp(`^${regexSource}$`);
+    const localeParts = getLocaleDateParts(dateFormatter);
+    const regex = new RegExp(`^${buildDateRegexSource(localeParts)}$`);
+    const { fieldOrder } = localeParts;
 
     return (value: string): Date | undefined => {
       const match = value.match(regex);
@@ -541,6 +566,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const handleInputChange = (val: string) => {
     setInputValue(val);
 
+    if (val.trim() === '') {
+      setHasDisabledDateError(false);
+      return;
+    }
+
     const parser = parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined);
     const parsed = parser(val);
 
@@ -549,11 +579,23 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       (mode === 'multiple' && Array.isArray(parsed)) ||
       (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
 
-    if (!isValidForMode) return;
-
-    if (parsed instanceof Date && isDateDisabled(parsed)) {
+    if (!isValidForMode) {
+      setHasDisabledDateError(false);
       return;
     }
+
+    const range = parsed && !Array.isArray(parsed) && 'from' in parsed ? (parsed as DateRange) : null;
+    const isDisabled =
+      (parsed instanceof Date && isDateDisabled(parsed)) ||
+      (Array.isArray(parsed) && parsed.some((d) => d instanceof Date && isDateDisabled(d))) ||
+      (!!range && ((range.from && isDateDisabled(range.from)) || (range.to && isDateDisabled(range.to))));
+
+    if (isDisabled) {
+      setHasDisabledDateError(true);
+      return;
+    }
+
+    setHasDisabledDateError(false);
 
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as Date, {}, {} as UnknownType);
@@ -583,11 +625,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     onOpenChange: setOpen,
     placement: calendarTrigger === 'input' ? 'bottom-start' : 'bottom-end',
     middleware: [
-      offset(CALENDAR_OFFSET),
+      offset(CALENDAR_POPOVER_OFFSET),
       flip(),
-      shift({ padding: CALENDAR_PADDING }),
+      shift({ padding: CALENDAR_POPOVER_PADDING }),
       size({
-        padding: CALENDAR_PADDING,
+        padding: CALENDAR_POPOVER_PADDING,
         apply({ availableWidth, elements }) {
           const el = elements.floating;
           el.style.width = 'max-content';
@@ -611,7 +653,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const click = useClick(context);
   const interactions = useInteractions([
     ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' && !useModalPicker ? [click] : []),
-    useDismiss(context),
+    useDismiss(context, {
+      outsidePress: (event) => {
+        const target = event.target as Element | null;
+        return !target?.closest('[role="menu"], [role="listbox"]');
+      },
+    }),
     useRole(context, { role: 'dialog' }),
   ]);
 
@@ -654,6 +701,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   const handleNativeInputChange = (val: string) => {
     if (!val) {
+      setHasDisabledDateError(false);
       if (!isControlled) setInternalValue(undefined);
       onSelect?.(undefined as UnknownType, undefined as UnknownType, {}, {} as UnknownType);
       return;
@@ -662,6 +710,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (!y || !m || !d) return;
     const parsed = new Date(y, m - 1, d);
     if (Number.isNaN(parsed.getTime())) return;
+
+    if (isDateDisabled(parsed)) {
+      setHasDisabledDateError(true);
+      return;
+    }
+    setHasDisabledDateError(false);
     if (!isControlled) setInternalValue(parsed);
     onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
   };
@@ -712,6 +766,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
+            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
             isClearable
             onIconClick={openCalendar}
             iconButtonProps={
@@ -721,6 +776,16 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             required={required}
+            invalid={hasDisabledDateError || (inputProps as TextFieldProps)?.invalid}
+            helper={(() => {
+              const consumerHelper = (inputProps as TextFieldProps)?.helper;
+              const errorHelper = hasDisabledDateError
+                ? { text: disabledDateErrorMessage, type: 'error' as const }
+                : null;
+              if (!errorHelper) return consumerHelper;
+              if (!consumerHelper) return errorHelper;
+              return Array.isArray(consumerHelper) ? [...consumerHelper, errorHelper] : [consumerHelper, errorHelper];
+            })()}
             className={cn(styles['tedi-date-field__textfield'], {
               [styles['tedi-date-field__textfield--disabled']]: inputProps?.disabled,
               [styles['tedi-date-field__icon--disabled']]: !enableCalendar || readOnly,

@@ -382,6 +382,10 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
       position: relative;
       z-index: 10;
       margin-left: var(--layout-grid-gutters-08);
+
+      @include breakpoints.media-breakpoint-down(md) {
+        margin: 0;
+      }
     }
   }
 }

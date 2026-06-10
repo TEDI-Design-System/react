@@ -83,6 +83,7 @@ export const Default: Story = {
   args: {
     mode: 'single',
     label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa',
     required: true,
   },
 };
@@ -119,7 +120,7 @@ export const States: Story = {
             id="success-datefield"
             mode="single"
             label="Kuupäev"
-            inputProps={{ helper: { text: 'Vihjetekst', type: 'valid' } }}
+            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'valid' } }}
           />
         </Col>
       </Row>
@@ -132,7 +133,7 @@ export const States: Story = {
             id="error-datefield"
             mode="single"
             label="Kuupäev"
-            inputProps={{ helper: { text: 'Vihjetekst', type: 'error' } }}
+            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'error' } }}
           />
         </Col>
       </Row>
@@ -161,20 +162,21 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
-          <DateField id="date-default" label="Kuupäev" mode="single" />
+          <DateField id="date-default" label="Kuupäeva väli vaikimisi" placeholder="pp.kk.aaaa" mode="single" />
 
           <DateField
             id="date-with-hint"
-            label="Kuupäev vihjetekstiga"
+            label="Kuupäeva väli vihjega"
             placeholder="pp.kk.aaaa"
             mode="single"
-            inputProps={{ helper: { text: 'kk.pp.aaaa' } }}
+            inputProps={{ helper: { text: 'pp.kk.aaaa' } }}
           />
 
           <div>
             <DateField
               id="date-with-shortcuts"
-              label="Kuupäev koos kiirvalikutega"
+              label="Kuupäeva väli kiirvalikutega"
+              placeholder="pp.kk.aaaa"
               mode="single"
               selected={shortcutValue}
               parseDate={(val) => {
@@ -219,7 +221,7 @@ export const ValueType: StoryFn = () => {
 
           <DateField
             id="date-with-multiple-dates"
-            label="Date"
+            label="Kuupäev"
             placeholder="pp.kk.aaaa"
             defaultValue={[new Date(2026, 2, 24), new Date(2026, 2, 26)]}
             mode="multiple"
@@ -247,11 +249,11 @@ export const OnClickType: Story = {
       <Row gutterY={2}>
         <Col lg={6} xs={12}>
           <p style={{ marginBottom: '16px', display: 'block' }}>Calendar button is clickable</p>
-          <DateField label="Kuupäev" id="calendar-button-trigger" calendarTrigger="button" />
+          <DateField label="Kuupäev" placeholder="pp.kk.aaaa" id="calendar-button-trigger" calendarTrigger="button" />
         </Col>
         <Col lg={6} xs={12}>
           <p style={{ marginBottom: '16px', display: 'block' }}>Input is clickable</p>
-          <DateField label="Kuupäev" id="calendar-input-trigger" calendarTrigger="input" />
+          <DateField label="Kuupäev" placeholder="pp.kk.aaaa" id="calendar-input-trigger" calendarTrigger="input" />
         </Col>
       </Row>
     );
@@ -310,6 +312,7 @@ export const MultipleValues: Story = {
   args: {
     mode: 'multiple',
     label: 'Kuupäevad',
+    placeholder: 'pp.kk.aaaa',
   },
 };
 
@@ -329,7 +332,8 @@ export const Range: Story = {
         <Col lg={6} xs={12}>
           <DateField
             mode="range"
-            label="Kuupäevade vahemik"
+            label="Vaikimisi vahemik"
+            placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={defaultRange}
             onSelect={(range) => setDefaultRange(range as DateRange)}
             id="range-default"
@@ -339,7 +343,8 @@ export const Range: Story = {
         <Col lg={6} xs={12}>
           <DateField
             mode="range"
-            label="Kuupäevade vahemik piirangutega"
+            label="Vahemik keelatud tulevikuga"
+            placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={rangeWithLimits}
             onSelect={(range) => setRangeWithLimits(range as DateRange)}
             minDate={twoMonthsAgo}
@@ -351,7 +356,8 @@ export const Range: Story = {
         <Col lg={6} xs={12}>
           <DateField
             mode="range"
-            label="Kuupäevade vahemik, kus ainult alguskuupäev on valitav"
+            label="Ainult alguskuupäev"
+            placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={startOnly}
             onSelect={(range) => setStartOnly(range as DateRange)}
             id="range-with-start-only"
@@ -361,7 +367,8 @@ export const Range: Story = {
         <Col lg={6} xs={12}>
           <DateField
             mode="range"
-            label="Kuupäevade vahemik, kus minevikku ei saa valida"
+            label="Vahemik keelatud minevikuga"
+            placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={disablePastRange}
             onSelect={(range) => setDisablePastRange(range as DateRange)}
             disablePast
@@ -371,7 +378,8 @@ export const Range: Story = {
         <Col width={12}>
           <DateField
             mode="range"
-            label="Kuupäevade vahemik, kus on korraga näha kaks kuud"
+            label="Vahemik mitme kuuga"
+            placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={defaultRange}
             onSelect={(range) => setDefaultRange(range as DateRange)}
             id="range-with-multiple-months"
@@ -389,6 +397,7 @@ export const DisabledWeekends: Story = {
     mode: 'single',
     disabled: { dayOfWeek: [0, 6] },
     label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa',
   },
 };
 
@@ -397,19 +406,110 @@ export const ShowWeekCount: Story = {
   args: {
     mode: 'single',
     label: 'Kuupäev',
+    placeholder: 'pp.kk.aaaa',
     showWeekNumber: true,
   },
 };
 
 export const MultipleMonths: Story = {
   render: () => {
-    return <DateField label="Kuupäev" numberOfMonths={2} mode="single" id="multiple-shown-single" />;
+    return (
+      <DateField label="Kuupäev" placeholder="pp.kk.aaaa" numberOfMonths={2} mode="single" id="multiple-shown-single" />
+    );
   },
 };
 
 export const YearGrid: Story = {
   render: () => {
-    return <DateField label="Kuupäev" monthYearSelectType="grid" id="month-year-grid" selectionLevel="years" />;
+    return (
+      <DateField
+        label="Kuupäev"
+        placeholder="pp.kk.aaaa"
+        monthYearSelectType="grid"
+        id="month-year-grid"
+        selectionLevel="years"
+      />
+    );
+  },
+};
+
+/**
+ * Month + year picker — no day grid. `selectionLevel="months"` makes the
+ * calendar commit when the user clicks a month tile (the day grid is
+ * skipped). The `formatDate` / `parseDate` overrides change the input
+ * display + manual-typing format to `kk.aaaa` (e.g. `06.2026`); the
+ * underlying value is still a `Date` that falls on the first of the month.
+ */
+export const MonthYearOnly: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+
+    const formatMonthYear = (date: Date | Date[] | DateRange | undefined): string => {
+      if (!date || !(date instanceof Date)) return '';
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${month}.${date.getFullYear()}`;
+    };
+
+    const parseMonthYear = (input: string): Date | undefined => {
+      const match = input.trim().match(/^(\d{1,2})\.(\d{4})$/);
+      if (!match) return undefined;
+      const month = Number(match[1]);
+      const year = Number(match[2]);
+      if (month < 1 || month > 12) return undefined;
+      const d = new Date(year, month - 1, 1);
+      return isNaN(d.getTime()) ? undefined : d;
+    };
+
+    return (
+      <DateField
+        id="date-month-year-only"
+        mode="single"
+        label="Kuu ja aasta"
+        placeholder="kk.aaaa"
+        selectionLevel="months"
+        monthYearSelectType="grid"
+        selected={selected}
+        onSelect={(d) => setSelected(d as Date)}
+        formatDate={formatMonthYear}
+        parseDate={parseMonthYear}
+      />
+    );
+  },
+};
+
+/**
+ * Year-only picker. `selectionLevel="years"` commits when the user clicks a
+ * year tile (Jan 1 of that year). `formatDate` / `parseDate` swap the
+ * display format to a plain four-digit year.
+ */
+export const YearOnly: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+
+    const formatYear = (date: Date | Date[] | DateRange | undefined): string =>
+      date instanceof Date ? String(date.getFullYear()) : '';
+
+    const parseYear = (input: string): Date | undefined => {
+      const match = input.trim().match(/^(\d{4})$/);
+      if (!match) return undefined;
+      const d = new Date(Number(match[1]), 0, 1);
+      return isNaN(d.getTime()) ? undefined : d;
+    };
+
+    return (
+      <DateField
+        id="date-year-only"
+        mode="single"
+        label="Aasta"
+        placeholder="aaaa"
+        selectionLevel="years"
+        monthYearSelectType="grid"
+        selected={selected}
+        onSelect={(d) => setSelected(d as Date)}
+        formatDate={formatYear}
+        parseDate={parseYear}
+      />
+    );
   },
 };
 
@@ -420,12 +520,13 @@ export const WithFooter: Story = {
         <Col lg={6} xs={12}>
           <DateField
             label="Kuupäev"
+            placeholder="pp.kk.aaaa"
             id="calendar-with-footer"
             footer={
               <Row>
                 <Col width={12} className="text-center">
                   <Button visualType="link" size="small" iconRight="schedule">
-                    Vali aeg
+                    Vali kellaaeg
                   </Button>
                 </Col>
               </Row>
@@ -435,6 +536,7 @@ export const WithFooter: Story = {
         <Col lg={6} xs={12}>
           <DateField
             label="Kuupäev"
+            placeholder="pp.kk.aaaa"
             id="calendar-with-footer-2"
             footer={
               <Row>
@@ -472,6 +574,7 @@ export const AvailableDays: Story = {
       <DateField
         mode="single"
         label="Kuupäev"
+        placeholder="pp.kk.aaaa"
         selected={selected}
         onSelect={(date) => setSelected(date as Date)}
         availableDays={availableDays}
@@ -496,6 +599,7 @@ export const NativePicker: Story = {
         id="date-field-native-picker"
         mode="single"
         label="Kuupäev"
+        placeholder="pp.kk.aaaa"
         useNativePicker
         selected={selected}
         onSelect={(date) => setSelected(date as Date)}
@@ -561,9 +665,10 @@ export const ResponsiveModalPicker: Story = {
  * desktop. `selectionLevel` restricts the picker to **month** or **year** — with
  * `monthYearSelectType="grid"` the navigation replaces the content in place instead of dropping down
  * — and `modalTitle` sets the heading. The **range** modal shows two months side by side on desktop
- * (`numberOfMonths={2}`, auto-clamped to one below `md`), so its `modalProps` widens the dialog; it
- * also passes `showNavigation={false}`, which locks it to the two shown months — no prev/next
- * navigation and the month/year header renders as a static (non-clickable) label.
+ * (`numberOfMonths={2}`): the dialog's `width: max-content` default auto-sizes to fit both, and on
+ * narrow / mobile-fullscreen the calendar wraps them into a vertical stack. It also passes
+ * `showNavigation={false}`, which locks it to the two shown months — no prev/next navigation and the
+ * month/year header renders as a static (non-clickable) label.
  */
 export const ModalPickers: Story = {
   render: () => {
@@ -617,7 +722,7 @@ export const ModalPickers: Story = {
             monthYearSelectType="grid"
             modalTitle="Vali vahemik"
             showNavigation={false}
-            modalProps={{ fullscreen: 'edge', md: { fullscreen: false, width: '660px' } }}
+            modalProps={{ fullscreen: 'edge', md: { fullscreen: false } }}
             selected={range}
             onSelect={(date) => setRange(date as DateRange)}
           />

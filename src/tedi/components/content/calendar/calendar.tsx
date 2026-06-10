@@ -116,9 +116,11 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    */
   className?: string;
   /**
-   * Whether to render the surrounding card chrome (border, radius). When `false`,
-   * the calendar sits flush within its parent — useful when embedded inside a
-   * container that already provides its own border (e.g. `DatePickerModal`).
+   * Whether to render the surrounding card (border, background, radius).
+   * Set to `false` when embedding inside a parent that already provides its
+   * own surface — e.g. inside `DatePickerModal`, or alongside a calendar in
+   * `DateTimeField`. The inner gradient masks and column separators are
+   * preserved either way.
    * @default true
    */
   bordered?: boolean;
@@ -148,6 +150,8 @@ export const Calendar = ({
   bordered = true,
   ...dayPickerProps
 }: CalendarProps) => {
+  const borderlessClass = !bordered ? styles['tedi-calendar--borderless'] : undefined;
+  const containerClassName = classNames(borderlessClass, className);
   const isAvailable = (date: Date) => {
     if (!availableDays) return true;
 
@@ -210,7 +214,7 @@ export const Calendar = ({
               setView('months');
             }
           }}
-          className={classNames(className, { [styles['tedi-calendar--borderless']]: !bordered })}
+          className={containerClassName}
         />
       )}
 
@@ -229,7 +233,7 @@ export const Calendar = ({
               setView('days');
             }
           }}
-          className={classNames(className, { [styles['tedi-calendar--borderless']]: !bordered })}
+          className={containerClassName}
         />
       )}
 
@@ -259,7 +263,7 @@ export const Calendar = ({
           }}
           footer={footer}
           classNames={{
-            root: classNames(styles['tedi-calendar'], { [styles['tedi-calendar--borderless']]: !bordered }, className),
+            root: classNames(styles['tedi-calendar'], borderlessClass, className),
             month_caption: styles['tedi-calendar__caption'],
             head: styles['tedi-calendar__head'],
             row: styles['tedi-calendar__row'],

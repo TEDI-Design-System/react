@@ -1,3 +1,31 @@
+# [18.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.7...react-18.0.0-rc.8) (2026-06-10)
+
+
+### Features
+
+* **top-nav:** TEDI-Ready component [#418](https://github.com/TEDI-Design-System/react/issues/418) ([#645](https://github.com/TEDI-Design-System/react/issues/645)) ([db4e8aa](https://github.com/TEDI-Design-System/react/commit/db4e8aa8e5f360791478ea8cf32caad7b9d8c8c1)), closes [#506](https://github.com/TEDI-Design-System/react/issues/506) [#506](https://github.com/TEDI-Design-System/react/issues/506) [#506](https://github.com/TEDI-Design-System/react/issues/506) [#506](https://github.com/TEDI-Design-System/react/issues/506)
+
+# [18.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.6...react-18.0.0-rc.7) (2026-06-09)
+
+
+### Bug Fixes
+
+* **tooltip:** fix lingering focus visible on mouse hover [#663](https://github.com/TEDI-Design-System/react/issues/663) ([#664](https://github.com/TEDI-Design-System/react/issues/664)) ([9acd74a](https://github.com/TEDI-Design-System/react/commit/9acd74ae841a0ecfbfab2dcdc3b213e269bf0959))
+
+# [18.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.5...react-18.0.0-rc.6) (2026-06-09)
+
+
+### Features
+
+* **filter:** new TEDI-Ready component [#530](https://github.com/TEDI-Design-System/react/issues/530) ([#629](https://github.com/TEDI-Design-System/react/issues/629)) ([e29a504](https://github.com/TEDI-Design-System/react/commit/e29a504f5f56e0d9a6ba4324a5777d4660e070b1))
+
+# [18.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.4...react-18.0.0-rc.5) (2026-06-09)
+
+
+### Features
+
+* **table:** new TEDI-Ready component [#122](https://github.com/TEDI-Design-System/react/issues/122) ([#624](https://github.com/TEDI-Design-System/react/issues/624)) ([4b04806](https://github.com/TEDI-Design-System/react/commit/4b04806cbb7f417938f084488f67c0b4ffa8c9e9)), closes [#20](https://github.com/TEDI-Design-System/react/issues/20) [#20](https://github.com/TEDI-Design-System/react/issues/20) [#10](https://github.com/TEDI-Design-System/react/issues/10) [#112](https://github.com/TEDI-Design-System/react/issues/112) [#20](https://github.com/TEDI-Design-System/react/issues/20)
+
 # [18.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.3...react-18.0.0-rc.4) (2026-06-05)
 
 

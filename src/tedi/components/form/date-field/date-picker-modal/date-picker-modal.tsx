@@ -133,7 +133,7 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
         position="center"
         aria-label={resolvedTitle}
         {...modalProps}
-        md={{ width: '315px', ...modalProps?.md }}
+        md={{ width: 'max-content', ...modalProps?.md }}
         sm={{ width: 'full', ...modalProps?.sm }}
         className={cn(styles['tedi-date-picker-modal'], modalProps?.className)}
       >

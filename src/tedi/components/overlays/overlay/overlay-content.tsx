@@ -62,6 +62,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
     arrow,
     scrollLock,
     contentId,
+    role,
   } = useContext(OverlayContext);
 
   useEffect(() => {
@@ -82,37 +83,45 @@ export const OverlayContent = (props: OverlayContentProps) => {
 
   if (!open) return null;
 
+  const floatingNode = (
+    <div
+      {...getFloatingProps({
+        ref: floating,
+        tabIndex: -1,
+        id: contentId,
+        'aria-labelledby': labelledBy,
+        'aria-describedby': describedBy,
+        style: {
+          position: strategy,
+          left: x,
+          top: y,
+        },
+        className: classNames?.content,
+      })}
+      data-placement={placement}
+      data-testid="overlay-content"
+    >
+      <FloatingArrow
+        ref={(el) => (arrowRef.current = el)}
+        context={context}
+        className={classNames?.arrow}
+        height={arrow?.height}
+        width={arrow?.width}
+        data-testid="overlay-arrow"
+      />
+      {children}
+    </div>
+  );
+
   return (
     <FloatingPortal>
-      <FloatingFocusManager modal={focusManager?.modal || false} {...focusManager} context={context}>
-        <div
-          {...getFloatingProps({
-            ref: floating,
-            tabIndex: -1,
-            id: contentId,
-            'aria-labelledby': labelledBy,
-            'aria-describedby': describedBy,
-            style: {
-              position: strategy,
-              left: x,
-              top: y,
-            },
-            className: classNames?.content,
-          })}
-          data-placement={placement}
-          data-testid="overlay-content"
-        >
-          <FloatingArrow
-            ref={(el) => (arrowRef.current = el)}
-            context={context}
-            className={classNames?.arrow}
-            height={arrow?.height}
-            width={arrow?.width}
-            data-testid="overlay-arrow"
-          />
-          {children}
-        </div>
-      </FloatingFocusManager>
+      {role === 'tooltip' ? (
+        floatingNode
+      ) : (
+        <FloatingFocusManager modal={focusManager?.modal || false} {...focusManager} context={context}>
+          {floatingNode}
+        </FloatingFocusManager>
+      )}
     </FloatingPortal>
   );
 };

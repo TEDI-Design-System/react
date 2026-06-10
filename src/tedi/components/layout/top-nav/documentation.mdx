@@ -1,0 +1,313 @@
+import { Meta } from '@storybook/blocks';
+import * as TopNavStories from './top-nav.stories';
+
+<Meta of={TopNavStories} name="Documentation" />
+
+# TopNav
+
+A primary, horizontal site navigation. Renders as a blue bar of items on desktop and
+collapses into the shared `MobileNav` drawer below `mobileBreakpoint`. Supports an
+optional mega-menu panel under the active item.
+
+---
+
+## Quick start
+
+```tsx
+import { TopNav } from '@tedi-design-system/react/tedi';
+
+<TopNav ariaLabel="Primary navigation">
+  <TopNav.Item href="/" isActive>
+    Home
+  </TopNav.Item>
+  <TopNav.Item href="/services">Services</TopNav.Item>
+  <TopNav.Item href="/contact">Contact</TopNav.Item>
+</TopNav>;
+```
+
+- `ariaLabel` is required — it labels the `<nav>` landmark for screen readers.
+- Mark the current page with `isActive` on the matching `TopNav.Item`.
+
+---
+
+## Subcomponents
+
+`TopNav` is a compound component. All sub-elements are reachable via dot
+notation:
+
+```
+| Subcomponent              | Purpose                                                                   |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `TopNav.Item`      | A top-level item on the bar (link or toggle-only mega-menu trigger).      |
+| `TopNav.Group`     | A column inside a mega-menu panel — optional `title` heading + sub-items. |
+| `TopNav.SubItem`   | A single link inside a `Group`.                                           |
+| `TopNav.Separator` | A thin vertical divider between items.                                    |
+```
+
+```tsx
+<TopNav ariaLabel="Primary">
+  <TopNav.Item href="/" isActive>
+    Dashboard
+  </TopNav.Item>
+  <TopNav.Item href="/docs">Docs</TopNav.Item>
+  <TopNav.Separator />
+  <TopNav.Item href="/settings" icon="settings">
+    Settings
+  </TopNav.Item>
+</TopNav>
+```
+
+Fragments (`<>…</>`) are flattened, so you can group children freely.
+
+---
+
+## Mega-menu (submenu)
+
+A `TopNav.Item` accepts a `submenu` prop. When the item is _open_ and has
+submenu content, the panel appears below the bar.
+
+```tsx
+<TopNav.Item
+  isActive
+  submenu={
+    <>
+      <TopNav.Group title="Marriage">
+        <TopNav.SubItem href="/family/marriage">Get married</TopNav.SubItem>
+        <TopNav.SubItem href="/family/divorce">Divorce</TopNav.SubItem>
+      </TopNav.Group>
+      <TopNav.Group title="Documents">
+        <TopNav.SubItem href="/family/certificate">Certificate</TopNav.SubItem>
+      </TopNav.Group>
+    </>
+  }
+>
+  Family
+</TopNav.Item>
+```
+
+A chevron is added next to the label automatically when an item has a submenu.
+
+### Group titles are optional
+
+For single-column menus or compact link lists, omit `title` to skip the heading
+entirely:
+
+```tsx
+<TopNav.Group>
+  <TopNav.SubItem href="/a">Link A</TopNav.SubItem>
+  <TopNav.SubItem href="/b">Link B</TopNav.SubItem>
+</TopNav.Group>
+```
+
+---
+
+## Width control — `maxWidth`
+
+The blue `<nav>` background always spans **100%** of its container. `maxWidth`
+clamps the inner content (the item bar and the full-width submenu) and centers
+it inside that background.
+
+Accepted values:
+
+- A CSS length: `1440`, `'1440px'`, `'90rem'`, etc.
+- A TEDI breakpoint name: `'sm' | 'md' | 'lg' | 'xl' | 'xxl'` — resolves to the
+  breakpoint's `min-width` (36rem / 48rem / 62rem / 75rem / 87.5rem). Lets you
+  align the nav inner with the same breakpoint that drives your content
+  container.
+- `'none'` (or `0`) — disables the cap entirely.
+
+```tsx
+<TopNav ariaLabel="Primary" maxWidth="xl">…</TopNav>
+// or
+<TopNav ariaLabel="Primary" maxWidth={1200}>…</TopNav>
+// or
+<TopNav ariaLabel="Primary" maxWidth="none">…</TopNav>
+```
+
+**Default:** `'xxl'` (87.5rem).
+
+---
+
+## Item triggers — link vs button
+
+The element rendered for a `TopNav.Item` is chosen automatically:
+
+```
+| Item config              | Renders                        | Notes                                                                           |
+| ------------------------ | ------------------------------ | ------------------------------------------------------------------------------- |
+| `href` set               | `<a>`                          | Standard navigation link. Carries `aria-current="page"` when active.            |
+| No `href`, has `submenu` | `<button type="button">`       | Toggle-only mega-menu parent. Carries `aria-haspopup="menu"` + `aria-expanded`. |
+| `as` prop                | The provided element/component | Use when you need a router `NavLink`, etc.                                      |
+```
+
+The toggle-only button has **built-in open/close behavior**:
+
+- Clicking opens its submenu and closes any other open submenu.
+- Clicking outside the `<nav>` closes the open submenu.
+- Pressing **Escape** closes the open submenu.
+- If a button-trigger item starts with `isActive`, its submenu opens on mount.
+
+`isActive` always controls the _visual selected_ state and `aria-current` for
+links — it's independent of the toggle's open state for buttons (so a parent
+can stay "selected" while its panel is closed).
+
+---
+
+## Responsive behavior & mobile drawer
+
+Below `mobileBreakpoint` the bar collapses into the shared `MobileNav` drawer.
+All top-level items become drawer entries. Any `submenu` is converted to drill-down
+`subItemGroups`, so group structure and sub-links are preserved.
+
+Defaults: `mobileBreakpoint='md'`, `showMobileOverlay=true`.
+
+### Uncontrolled (simple)
+
+```tsx
+<TopNav ariaLabel="Primary">
+  <TopNav.Item href="/">Home</TopNav.Item>…
+</TopNav>
+```
+
+The drawer manages its own open state internally — fine for stand-alone usage.
+
+### Controlled — share state with a Header toggle
+
+In a real layout the drawer is usually opened from the responsive `Header` via
+`Header.toggle`. Use the controlled props to share state:
+
+```tsx
+import { useState } from 'react';
+import { Header, TopNav, SideNav } from '@tedi-design-system/react/tedi';
+
+const Page = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Header toggle={<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />}>
+        {/* Header.Logo, Actions, etc. */}
+      </Header>
+      <TopNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
+        <TopNav.Item href="/" isActive>
+          Home
+        </TopNav.Item>
+        <TopNav.Item href="/services">Services</TopNav.Item>
+      </TopNav>
+    </>
+  );
+};
+```
+
+`SideNav.Toggle` is the same component as `MobileNavToggle` — exported under both
+names. Either works:
+
+```tsx
+import { MobileNavToggle } from '@tedi-design-system/react/tedi';
+<MobileNavToggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />;
+```
+
+#### Toggle button with a visible label
+
+Set `showLabel` to render the icon stacked above its text. The label comes from
+the `header.toggle` i18n key by default — override with the `label` prop, either
+a static node or a function of `menuOpen`:
+
+```tsx
+<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />
+<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label={(o) => (o ? 'Sulge' : 'Ava')} />
+```
+
+The toggle hides itself at `lg`+ viewports via CSS, so the same `<Header>` works
+on both desktop and mobile.
+
+### Force mobile mode for a demo
+
+Pass a large `mobileBreakpoint` (e.g. `'xxl'`) to keep the nav in drawer mode on
+desktop — useful for previewing the mobile UI in Storybook:
+
+```tsx
+<TopNav ariaLabel="Primary" mobileBreakpoint="xxl" isMobileOpen>
+  …
+</TopNav>
+```
+
+To keep the nav in **desktop layout at every viewport** (e.g. for visual state
+grids), pass `mobileBreakpoint="xs"` — `xs` is the lowest breakpoint, so the
+mobile check is never satisfied.
+
+---
+
+## Sticky positioning
+
+`TopNav` has no built-in stickiness — it's a layout concern of the
+container.
+
+**Plain sticky** — wrap the nav in a sticky container:
+
+```tsx
+<div style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+  <TopNav ariaLabel="Primary">…</TopNav>
+</div>
+```
+
+**Sticky on scroll** — use the existing `Affix` component:
+
+```tsx
+import { Affix } from '@tedi-design-system/react/tedi';
+
+<Affix top={0}>
+  <TopNav ariaLabel="Primary">…</TopNav>
+</Affix>;
+```
+
+---
+
+## Composing with `Header`
+
+The full pattern in a real page:
+
+```tsx
+<Header toggle={<SideNav.Toggle menuOpen={open} toggleMenu={setOpen} showLabel label="Menüü" />}>
+  <Header.Logo logo={<img src="/logo.svg" alt="Logo" />} href="/" />
+  <Header.Center>{null}</Header.Center>
+  <Header.Actions>
+    <ShowAt lg>
+      <Header.Role representatives={…} label="Isikukood:" />
+      <Separator axis="vertical" />
+    </ShowAt>
+    <Header.Language languages={…} currentLanguage="EST" />
+    <ShowAt lg>
+      <Separator axis="vertical" />
+      <Header.Profile label="Minu profiil">…</Header.Profile>
+    </ShowAt>
+  </Header.Actions>
+</Header>
+<TopNav ariaLabel="Primary" isMobileOpen={open} onMenuToggle={setOpen}>
+  …
+</TopNav>
+```
+
+Wrap desktop-only header items in `<ShowAt lg>` so the header collapses cleanly
+into a logo + toggle at mobile widths.
+
+> See the **Default** story sidebar in Storybook for the full prop table of
+> `TopNav` and each subcomponent — they're auto-generated from the
+> TypeScript types.
+
+---
+
+## Tips
+
+- **Accessibility:** always pass `ariaLabel` — this becomes the landmark label
+  and is read by screen readers.
+- **Mobile drawer state:** for any UI where the same hamburger should drive
+  both the header and the nav drawer, use `isMobileOpen` + `onMenuToggle` and
+  share the state via your own `useState`.
+- **Don't pass an `<a>` parent to the `submenu` prop** — the mega-menu items
+  should be `TopNav.SubItem`s wrapped in `TopNav.Group`s so the
+  mobile drill-down works correctly.
+- **Polymorphic links:** use `as` to render a router `NavLink` (or any
+  component) without losing the styling.
+- **Visual state grids:** set `mobileBreakpoint="xs"` to lock the nav into
+  desktop layout regardless of viewport size — handy in Storybook state
+  showcase stories.

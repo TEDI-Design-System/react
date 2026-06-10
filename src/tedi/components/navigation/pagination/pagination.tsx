@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { forwardRef, useCallback, useId, useMemo, useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -52,6 +53,13 @@ export interface PaginationLabels {
    * @default 'Show per page'
    */
   pageSize: string;
+  /**
+   * Builds the message announced to screen readers (via a visually-hidden
+   * `aria-live="polite"` region) whenever the current page changes. Lets SR
+   * users know that the page transition happened without sighted feedback.
+   * @default (page, pageCount) => `Page ${page} of ${pageCount}`
+   */
+  pageStatus: (page: number, pageCount: number) => string;
 }
 export interface PaginationProps {
   /**
@@ -137,6 +145,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       currentPageAriaLabel: (pageNumber) => getLabel('pagination.page', pageNumber, true),
       results: (count) => getLabel('pagination.results', count),
       pageSize: getLabel('pagination.page-size'),
+      pageStatus: (pageNumber, total) => getLabel('pagination.page-status', pageNumber, total),
       ...labels,
     }),
     [getLabel, labels]
@@ -186,12 +195,74 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
 
   const rootClassName = cn(styles['tedi-pagination'], className);
 
+  const breakpoint = useBreakpoint();
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+
   const showResults = totalItems !== undefined;
-  const showPageSizeSelect = Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
+  const showPageSizeSelect = !isMobile && Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
+
+  const previousItem = items[0];
+  const nextItem = items[items.length - 1];
+  const pageItems = items.slice(1, -1);
+
+  const renderArrow = (item: PaginationItem) => {
+    const label = item.type === 'previous' ? mergedLabels.previous : mergedLabels.next;
+    const iconName = item.type === 'previous' ? 'arrow_back' : 'arrow_forward';
+
+    return (
+      <Button
+        type="button"
+        className={cn(
+          styles['tedi-pagination__button'],
+          styles['tedi-pagination__button--nav'],
+          styles[`tedi-pagination__button--nav-${item.type}`]
+        )}
+        aria-label={label}
+        disabled={item.disabled}
+        onClick={() => item.page !== null && handlePageChange(item.page)}
+        noStyle
+      >
+        <Icon name={iconName} size={18} color="brand" />
+      </Button>
+    );
+  };
+
+  // Dropdown options carry plain page numbers — "1", "2", "3" — so the open menu reads as
+  // a clean list of jump targets rather than repeating the total on every row.
+  const pageJumpOptions = useMemo<ISelectOption[]>(
+    () =>
+      Array.from({ length: pageCount }, (_, idx) => {
+        const pageNumber = idx + 1;
+        return { value: String(pageNumber), label: String(pageNumber) };
+      }),
+    [pageCount]
+  );
+
+  // The trigger (closed-state value) shows the current page in context — "1 / 10" — so the
+  // user can see at a glance where they are and how many pages exist. react-select picks
+  // the active option in the dropdown by `value` equality, so the divergent label is OK.
+  const currentPageJumpOption = useMemo<ISelectOption | null>(
+    () => ({ value: String(currentPage), label: `${currentPage} / ${pageCount}` }),
+    [currentPage, pageCount]
+  );
+
+  const handlePageJumpChange = useCallback(
+    (value: TSelectValue) => {
+      const option = Array.isArray(value) ? value[0] : value;
+      if (option && 'value' in option) {
+        handlePageChange(Number(option.value));
+      }
+    },
+    [handlePageChange]
+  );
 
   return (
     <div ref={ref} className={rootClassName} data-name="tedi-pagination">
-      <div className={styles['tedi-pagination__slot-start']}>
+      <span className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+        {pageCount > 1 ? mergedLabels.pageStatus(currentPage, pageCount) : ''}
+      </span>
+
+      <div className={styles['tedi-pagination__slot-start']} role="status" aria-live="polite" aria-atomic="true">
         {showResults && (
           <Text className={styles['tedi-pagination__results']} color="secondary" modifiers="small">
             {mergedLabels.results(totalItems)}
@@ -202,63 +273,78 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       <div className={styles['tedi-pagination__slot-center']}>
         {pageCount > 1 && (
           <nav aria-label={mergedLabels.ariaLabel} className={styles['tedi-pagination__nav']}>
-            <ul className={styles['tedi-pagination__list']}>
-              {items.map((item, index) => {
-                if (item.type === 'ellipsis') {
-                  return (
-                    <li
-                      key={`ellipsis-${index}`}
-                      className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
-                      aria-hidden="true"
-                    >
-                      …
-                    </li>
-                  );
-                }
+            {renderArrow(previousItem)}
 
-                if (item.type === 'previous' || item.type === 'next') {
-                  if (item.disabled) return null;
+            {!isMobile && (
+              <ul className={styles['tedi-pagination__list']}>
+                {pageItems.map((item, index) => {
+                  // Slot-based keys so React reuses the same `<li>` / `<button>` DOM across
+                  // renders. With page-number keys, every threshold crossing was
+                  // unmounting buttons and the `transition: all 250ms` on background /
+                  // colour never fired — the new buttons just rendered in their final state.
+                  // Reusing the DOM lets the `--selected` class change animate smoothly.
+                  const slotKey = `slot-${index}`;
+                  if (item.type === 'ellipsis') {
+                    return (
+                      <li
+                        key={slotKey}
+                        className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
+                        aria-hidden="true"
+                      >
+                        …
+                      </li>
+                    );
+                  }
 
-                  const label = item.type === 'previous' ? mergedLabels.previous : mergedLabels.next;
-                  const iconName = item.type === 'previous' ? 'arrow_back' : 'arrow_forward';
+                  const pageNumber = item.page as number;
                   return (
-                    <li key={item.type} className={styles['tedi-pagination__item']}>
+                    <li key={slotKey} className={styles['tedi-pagination__item']}>
                       <Button
                         type="button"
-                        className={cn(styles['tedi-pagination__button'], styles['tedi-pagination__button--nav'])}
-                        aria-label={label}
-                        onClick={() => item.page !== null && handlePageChange(item.page)}
+                        className={cn(styles['tedi-pagination__button'], {
+                          [styles['tedi-pagination__button--selected']]: item.selected,
+                        })}
+                        aria-label={
+                          item.selected
+                            ? mergedLabels.currentPageAriaLabel(pageNumber)
+                            : mergedLabels.pageAriaLabel(pageNumber)
+                        }
+                        aria-current={item.selected ? 'page' : undefined}
+                        onClick={() => handlePageChange(pageNumber)}
                         noStyle
                       >
-                        <Icon name={iconName} size={18} color="brand" />
+                        {/* Inner span keyed by page number — when the slot's label
+                            changes (e.g. "5" → "4" at a threshold crossing) the span
+                            remounts and CSS fades the new digit in over the slot's
+                            persistent surface colour. Avoids the instant-flip feel. */}
+                        <span key={pageNumber} className={styles['tedi-pagination__button-label']}>
+                          {pageNumber}
+                        </span>
                       </Button>
                     </li>
                   );
-                }
+                })}
+              </ul>
+            )}
 
-                const pageNumber = item.page as number;
-                return (
-                  <li key={pageNumber} className={styles['tedi-pagination__item']}>
-                    <Button
-                      type="button"
-                      className={cn(styles['tedi-pagination__button'], {
-                        [styles['tedi-pagination__button--selected']]: item.selected,
-                      })}
-                      aria-label={
-                        item.selected
-                          ? mergedLabels.currentPageAriaLabel(pageNumber)
-                          : mergedLabels.pageAriaLabel(pageNumber)
-                      }
-                      aria-current={item.selected ? 'page' : undefined}
-                      onClick={() => handlePageChange(pageNumber)}
-                      noStyle
-                    >
-                      {pageNumber}
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
+            {isMobile && (
+              <div className={styles['tedi-pagination__page-jump']}>
+                <Select
+                  id={`tedi-pagination-jump-${selectId}`}
+                  className={styles['tedi-pagination__page-jump-select']}
+                  label={mergedLabels.ariaLabel}
+                  hideLabel
+                  size="small"
+                  options={pageJumpOptions}
+                  value={currentPageJumpOption}
+                  onChange={handlePageJumpChange}
+                  isSearchable={false}
+                  isClearable={false}
+                />
+              </div>
+            )}
+
+            {renderArrow(nextItem)}
           </nav>
         )}
       </div>
