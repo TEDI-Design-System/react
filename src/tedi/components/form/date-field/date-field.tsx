@@ -596,7 +596,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const click = useClick(context);
   const interactions = useInteractions([
     ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' ? [click] : []),
-    useDismiss(context),
+    useDismiss(context, {
+      outsidePress: (event) => {
+        const target = event.target as Element | null;
+        return !target?.closest('[role="menu"], [role="listbox"]');
+      },
+    }),
     useRole(context, { role: 'dialog' }),
   ]);
 

@@ -445,7 +445,15 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     whileElementsMounted: autoUpdate,
   });
   const { refs, context, x, y, strategy } = floating;
-  const interactions = useInteractions([useDismiss(context), useRole(context, { role: 'dialog' })]);
+  const interactions = useInteractions([
+    useDismiss(context, {
+      outsidePress: (event) => {
+        const target = event.target as Element | null;
+        return !target?.closest('[role="menu"], [role="listbox"]');
+      },
+    }),
+    useRole(context, { role: 'dialog' }),
+  ]);
 
   const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
 
