@@ -91,6 +91,15 @@ jest.mock('../time-picker/time-picker', () => ({
   ),
 }));
 
+jest.mock('./time-picker-modal/time-picker-modal', () => ({
+  TimePickerModal: ({ open, onConfirm }: any) =>
+    open ? (
+      <div role="dialog">
+        <button onClick={() => onConfirm('12:30')}>modal-confirm</button>
+      </div>
+    ) : null,
+}));
+
 describe('TimeField', () => {
   it('renders with default value', () => {
     render(<TimeField id="t1" label="Time" defaultValue="10:00" />);
@@ -300,5 +309,34 @@ describe('TimeField', () => {
 
     expect(input).toHaveValue('9999');
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  describe('modal picker', () => {
+    it('opens the picker in a modal when `modal` is set (icon trigger)', async () => {
+      const user = userEvent.setup();
+      render(<TimeField id="t-modal" label="Time" modal />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByTestId('icon'));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('opens the modal from an input click when `modal` + input trigger', async () => {
+      const user = userEvent.setup();
+      render(<TimeField id="t-modal-input" label="Time" modal timePickerTrigger="input" />);
+
+      await user.click(screen.getByTestId('textfield-input'));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('commits the modal value on confirm', async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(<TimeField id="t-modal-confirm" label="Time" modal onChange={onChange} />);
+
+      await user.click(screen.getByTestId('icon'));
+      await user.click(screen.getByText('modal-confirm'));
+      expect(onChange).toHaveBeenCalledWith('12:30');
+    });
   });
 });
