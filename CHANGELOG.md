@@ -1,3 +1,10 @@
+# [18.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.9...react-18.0.0-rc.10) (2026-06-10)
+
+
+### Features
+
+* **pagination:** complete the component with modal, design fixes [#640](https://github.com/TEDI-Design-System/react/issues/640) ([#665](https://github.com/TEDI-Design-System/react/issues/665)) ([cac50d6](https://github.com/TEDI-Design-System/react/commit/cac50d60c77e5bb4570b01a7ed8bfdb905d49ebc)), closes [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75)
+
 # [18.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.8...react-18.0.0-rc.9) (2026-06-10)
 
 
