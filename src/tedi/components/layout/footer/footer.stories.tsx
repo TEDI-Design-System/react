@@ -132,6 +132,8 @@ const DeviceFrame = ({
     const poll = () => {
       const footer = getFooter();
       if (footer) {
+        const body = iframe.contentDocument?.body;
+        if (body) body.style.margin = '0';
         measure(footer);
         observer = new ResizeObserver(() => measure(footer));
         observer.observe(footer);
@@ -163,6 +165,7 @@ const DeviceFrame = ({
         <iframe
           ref={ref}
           title={label}
+          scrolling="no"
           src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
           style={{ display: 'block', width: '100%', height, border: 0, marginTop: '1rem' }}
         />
