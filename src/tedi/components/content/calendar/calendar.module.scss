@@ -73,7 +73,8 @@
       all: unset;
       display: block;
       width: 100%;
-      height: 100%;
+      width: var(--form-calendar-date-width);
+      height: var(--form-calendar-date-width);
       overflow: hidden;
       font-size: var(--body-regular-size);
       font-weight: var(--tedi-weight-02);

@@ -8,6 +8,9 @@ import MuiInputTransition from '../mui-input-transition/mui-input-transition';
 
 export type DatepickerValue = Dayjs | null;
 
+/**
+ * @deprecated Use `DateField` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface DatePickerProps extends Omit<TextFieldProps, 'defaultValue' | 'value' | 'onChange'> {
   /**
    * Datepicker initial value. Accepts a dayjs date object.
@@ -92,6 +95,9 @@ export interface DatePickerProps extends Omit<TextFieldProps, 'defaultValue' | '
   onClose?: () => void;
 }
 
+/**
+ * @deprecated Use `DateField` from `@tedi-design-system/react/tedi` instead.
+ */
 export const DatePicker = (props: DatePickerProps): JSX.Element => {
   const {
     value,
