@@ -1,3 +1,5 @@
+@use '../field-icon-button' as field-icon-button;
+
 .tedi-date-field__calendar {
   position: relative;
   z-index: var(--z-index-dropdown);
@@ -10,52 +12,14 @@
 }
 
 .tedi-date-field__textfield {
-  button:not([data-name='closing-button']):last-child {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--button-xs-icon-size);
-    min-height: var(--form-field-button-height-sm);
-    max-height: var(--form-field-button-height-sm);
-    border-radius: var(--button-radius-sm);
-
-    > span {
-      color: var(--button-main-neutral-text-default);
-    }
-
-    &:hover {
-      background-color: var(--form-datepicker-date-hover);
-    }
-  }
-
-  &[aria-expanded='true'] button:not([data-name='closing-button']):last-child {
-    background-color: var(--form-datepicker-date-hover);
-
-    > span {
-      color: var(--button-main-neutral-text-active);
-    }
-  }
+  @include field-icon-button.states;
 
   &--disabled {
-    button:not([data-name='closing-button']):last-child {
-      span {
-        color: var(--button-main-disabled-general-text);
-      }
-
-      &:hover {
-        background: none;
-      }
-    }
+    @include field-icon-button.disabled;
   }
 
   &.tedi-date-field__icon--disabled {
-    button:not([data-name='closing-button']):last-child {
-      &:hover,
-      &:focus {
-        cursor: auto;
-        background: none;
-      }
-    }
+    @include field-icon-button.icon-only-disabled;
   }
 
   input[type='date'] {

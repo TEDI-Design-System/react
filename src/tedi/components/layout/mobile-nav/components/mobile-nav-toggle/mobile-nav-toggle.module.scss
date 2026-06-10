@@ -1,0 +1,75 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
+$toggle-button-height: 3.5rem;
+$toggle-button-width: 3.5rem;
+
+.tedi-mobile-nav-toggle {
+  z-index: var(--z-index-sidenav);
+  width: $toggle-button-width;
+  height: $toggle-button-height;
+  padding: 1rem;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    display: none;
+  }
+
+  &.tedi-mobile-nav-toggle--collapse {
+    position: absolute;
+    top: calc(var(--navigation-vertical-item-min-height-medium) / 5.5);
+    right: calc(var(--button-sm-icon-size) / 2 * -1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--button-sm-icon-size);
+    height: var(--button-sm-icon-size);
+    min-height: var(--button-sm-icon-size);
+    border-radius: var(--tedi-radius-08);
+
+    @include breakpoints.media-breakpoint-down(md) {
+      display: none;
+    }
+  }
+
+  &.tedi-mobile-nav-toggle--with-label {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--tedi-spacing-04);
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: $toggle-button-width;
+    height: auto;
+    min-height: $toggle-button-height;
+    padding: var(--tedi-spacing-08);
+    color: var(--button-main-primary-text-default);
+    cursor: pointer;
+    background-color: var(--button-main-primary-background-default);
+    border: 0;
+
+    &:hover {
+      background-color: var(--button-main-primary-background-hover);
+    }
+
+    &:active {
+      background-color: var(--button-main-primary-background-active);
+    }
+
+    &:focus-visible {
+      outline: var(--tedi-borders-02) solid var(--tedi-primary-400);
+      outline-offset: -2px;
+    }
+
+    @include breakpoints.media-breakpoint-up(lg) {
+      display: none;
+    }
+  }
+}
+
+.tedi-mobile-nav-toggle__label {
+  font-size: var(--body-extra-small-regular-size);
+  font-weight: var(--body-extra-small-regular-weight);
+  line-height: 1;
+}

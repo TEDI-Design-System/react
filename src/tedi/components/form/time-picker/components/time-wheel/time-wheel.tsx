@@ -86,13 +86,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     if (isHour) isProgrammaticScrollHour.current = true;
     else isProgrammaticScrollMinute.current = true;
 
-    // 'instant' (not 'auto') so this jump is synchronous — the column's
-    // CSS `scroll-behavior: smooth` would otherwise turn this into a ~300ms
-    // animation, and the in-flight scroll events during that animation would
-    // get mis-classified as user scrolls (the rAF clears the programmatic
-    // flag after one frame, while the animation keeps firing for ~280ms more)
-    // and fire onChange with every intermediate index — which is how the
-    // wheel ended up snapping back to 00:00 on open.
     element.scrollTo({ top: target, behavior: 'instant' });
 
     requestAnimationFrame(() => {
@@ -119,9 +112,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     setActiveMinuteIndex(minuteIndex);
   }, [hours, minutes, selectedHour, selectedMinute]);
 
-  // Callback refs — updated every render so scrollend listeners always use fresh
-  // closure values without needing to re-register. This avoids the stale-closure
-  // problem that arises when event listeners are registered once in useEffect.
   const processHourScrollEnd = useRef<() => void>(() => {});
   processHourScrollEnd.current = () => {
     const el = hourRef.current;
@@ -177,10 +167,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     }
   };
 
-  // Primary path: scrollend fires once after the CSS snap animation completes,
-  // so scrollTop is always at a valid snap point when we read it. This prevents
-  // the flicker caused by the debounced scroll handler reading an intermediate
-  // scrollTop mid-snap-animation (most visible on high-refresh-rate trackpads).
   useEffect(() => {
     const hourEl = hourRef.current;
     const minuteEl = minuteRef.current;
@@ -198,14 +184,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
     };
   }, []);
 
-  // Fallback for browsers without scrollend support: debounce at 150ms so the
-  // handler fires well after the CSS snap animation has finished emitting scroll
-  // events. processScrollEnd clears this timer when scrollend fires first.
-  //
-  // The active-index state is updated on every scroll event so the highlight
-  // follows the wheel in real time — this gives instant visual feedback without
-  // waiting for scrollend. onChange is intentionally NOT called here; it fires
-  // only in processHourScrollEnd once the scroll has fully settled.
   const handleHourScroll = () => {
     if (!hourRef.current || isProgrammaticScrollHour.current) return;
 
@@ -269,9 +247,6 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
       if (currentIndex === -1) return;
 
       let nextIndex = -1;
-      // Track whether the new index wrapped around (e.g. 59 → 00 going down,
-      // 00 → 59 going up). When it does, animate the scroll instantly so we
-      // don't smooth-scroll across the entire wheel.
       let wrapped = false;
 
       switch (event.key) {
