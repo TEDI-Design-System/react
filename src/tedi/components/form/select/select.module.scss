@@ -37,6 +37,10 @@ div.tedi-select__control {
   }
 }
 
+.tedi-select__control :global(.select__single-value) {
+  color: var(--form-input-text-filled);
+}
+
 .tedi-select--invalid .tedi-select__control {
   border-color: var(--form-general-feedback-error-border);
 
@@ -191,6 +195,10 @@ div .tedi-select__menu {
   .tedi-select__input,
   .tedi-select__arrow {
     padding: 0;
+  }
+
+  .tedi-select__control .tedi-select__indicators-container {
+    align-items: center;
   }
 }
 
