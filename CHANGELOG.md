@@ -1,3 +1,10 @@
+# [18.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.7...react-18.0.0-rc.8) (2026-06-10)
+
+
+### Features
+
+* **top-nav:** TEDI-Ready component [#418](https://github.com/TEDI-Design-System/react/issues/418) ([#645](https://github.com/TEDI-Design-System/react/issues/645)) ([db4e8aa](https://github.com/TEDI-Design-System/react/commit/db4e8aa8e5f360791478ea8cf32caad7b9d8c8c1)), closes [#506](https://github.com/TEDI-Design-System/react/issues/506) [#506](https://github.com/TEDI-Design-System/react/issues/506) [#506](https://github.com/TEDI-Design-System/react/issues/506) [#506](https://github.com/TEDI-Design-System/react/issues/506)
+
 # [18.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.6...react-18.0.0-rc.7) (2026-06-09)
 
 
