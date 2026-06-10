@@ -81,6 +81,15 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
    */
   readOnly?: boolean;
   /**
+   * Disables the input and the picker. Equivalent of `<DateTimeField disabled>`
+   * — added so all three field siblings (`DateField`, `TimeField`,
+   * `DateTimeField`) share the same form-control idiom for "this field is
+   * fully unavailable". Forwards to the underlying `TextField`'s `disabled`
+   * attribute and short-circuits the picker open path.
+   * @default false
+   */
+  disabled?: boolean;
+  /**
    * Marks the input as required.
    */
   required?: boolean;
@@ -118,6 +127,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     defaultValue,
     onChange,
     readOnly = false,
+    disabled = false,
     required,
     placeholder,
     inputProps,
@@ -154,7 +164,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
-  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !shouldUseNativePicker;
+  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !disabled && !shouldUseNativePicker;
 
   const interactions = useInteractions([...(shouldUseCustomInputTrigger ? [click] : []), dismiss, role]);
 
@@ -168,15 +178,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     onChange?.(cleaned);
   };
 
-  // Normalise common typed shorthands on blur (e.g. "1155" → "11:55",
-  // "9:5" → "09:05"). Doesn't run while the user is still typing — we keep
-  // the raw value visible until they tab/click away so the field doesn't
-  // fight mid-keystroke. Invalid input is left as-is for the consumer's
-  // validation to flag.
   const handleInputBlur: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
-    // Read off the target BEFORE running consumer's onBlur — React pools
-    // SyntheticEvents and `currentTarget` is nulled after the listener
-    // returns, so we must capture upfront.
     const raw = (event.target as HTMLInputElement).value ?? '';
     (inputProps?.onBlur as React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined)?.(event);
     const normalised = normalizeTime(raw);
@@ -215,7 +217,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const openCustomPicker = () => setOpen((prev) => !prev);
 
   const handleIconClick = () => {
-    if (readOnly || !showPicker) return;
+    if (!showPicker || disabled) return;
 
     if (shouldUseNativePicker) {
       openNativePicker();
@@ -231,6 +233,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     value: currentValue,
     placeholder,
     readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
+    disabled: disabled || inputProps?.disabled,
     icon: 'schedule',
     isClearable: true,
     required,
@@ -239,8 +242,8 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     onBlur: handleInputBlur,
     className: cn(
       styles['tedi-time-field__textfield'],
-      { [styles['tedi-time-field__icon--disabled']]: !showPicker || readOnly },
-      { [styles['tedi-time-field__textfield--disabled']]: inputProps?.disabled },
+      { [styles['tedi-time-field__icon--disabled']]: !showPicker || disabled },
+      { [styles['tedi-time-field__textfield--disabled']]: disabled || inputProps?.disabled },
       { [styles['tedi-time-field--native']]: shouldUseNativePicker }
     ),
     input: {
@@ -252,7 +255,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const shouldUseDropdownPicker =
     !shouldUseNativePicker &&
     showPicker &&
-    !readOnly &&
+    !disabled &&
     availableTimesVariant === 'dropdown' &&
     !!availableTimes?.length;
 
@@ -294,9 +297,9 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         <TextField ref={textFieldRef} aria-expanded={showPicker ? open : undefined} {...textFieldProps} />
       </div>
 
-      {!shouldUseNativePicker && showPicker && (
+      {!shouldUseNativePicker && showPicker && !disabled && (
         <FloatingPortal>
-          {open && !readOnly && (
+          {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
                 ref={refs.setFloating}
