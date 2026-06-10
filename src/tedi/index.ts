@@ -22,6 +22,8 @@ export * from './components/buttons/button-group/button-group';
 export * from './components/buttons/collapse/collapse';
 export * from './components/layout/vertical-spacing';
 export * from './components/layout/grid';
+export * from './components/layout/top-nav';
+export * from './components/layout/mobile-nav';
 export * from './components/notifications/alert/alert';
 export * from './components/misc/empty-state';
 export * from './components/notifications/toast/toast';
