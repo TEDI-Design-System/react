@@ -56,7 +56,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
           <Col lg={3} md={6} className="d-flex">
-            <TimeField label="Time" id={`time-field-size--${value}`} inputProps={{ [property]: value }} />
+            <TimeField label="Kellaaeg" id={`time-field-size--${value}`} inputProps={{ [property]: value }} />
           </Col>
         </Row>
       ))}
@@ -67,7 +67,8 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
 export const Default: Story = {
   render: Template,
   args: {
-    label: 'Time',
+    label: 'Kellaaeg',
+    placeholder: 'tt:mm',
     required: true,
     stepMinutes: 1,
   },
@@ -93,7 +94,7 @@ export const States: StoryObj<TimeFieldProps> = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col md={4} xs={12} className="display-flex align-items-center">
-            <TimeField id={state} label="Time" inputProps={{ disabled: state === 'Disabled' }} />
+            <TimeField id={state} label="Kellaaeg" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
@@ -104,8 +105,8 @@ export const States: StoryObj<TimeFieldProps> = {
         <Col md={4} xs={12} className="display-flex align-items-center">
           <TimeField
             id="success-timefield"
-            label="Time"
-            inputProps={{ helper: { text: 'Feedback text', type: 'valid' } }}
+            label="Kellaaeg"
+            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'valid' } }}
           />
         </Col>
       </Row>
@@ -116,8 +117,8 @@ export const States: StoryObj<TimeFieldProps> = {
         <Col md={4} xs={12} className="display-flex align-items-center">
           <TimeField
             id="error-timefield"
-            label="Time"
-            inputProps={{ helper: { text: 'Feedback text', type: 'error' } }}
+            label="Kellaaeg"
+            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'error' } }}
           />
         </Col>
       </Row>
@@ -137,12 +138,13 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={3} md={6}>
         <div className="flex gap-4 flex-column">
-          <TimeField id="time-field-default" label="Default time field" />
+          <TimeField id="time-field-default" label="Vaikimisi kellaaja väli" placeholder="tt:mm" />
 
           <TimeField
             id="time-field-with-hint"
-            label="Time field with hint"
-            inputProps={{ helper: { text: 'Hint text' } }}
+            label="Kellaaja väli vihjega"
+            placeholder="tt:mm"
+            inputProps={{ helper: { text: 'Vihje tekst' } }}
           />
         </div>
       </Col>
@@ -155,9 +157,9 @@ export const ValueType: StoryFn = () => {
     <Row>
       <Col lg={3} md={6}>
         <div className="flex gap-3 flex-column">
-          <TimeField id="time-default" label="Label" />
-          <TimeField id="time-with-placeholder" label="Label" placeholder="hh:mm" />
-          <TimeField id="time-with-default-value" label="Label" defaultValue="13:00" />
+          <TimeField id="time-default" label="Silt" />
+          <TimeField id="time-with-placeholder" label="Silt" placeholder="tt:mm" />
+          <TimeField id="time-with-default-value" label="Silt" defaultValue="13:00" />
         </div>
       </Col>
     </Row>
@@ -171,13 +173,13 @@ export const OnClickType: Story = {
         <Row>
           <Col lg={3} md={6}>
             <Text>Clock button is clickable</Text>
-            <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="button" />
+            <TimeField label="Kellaaeg" placeholder="tt:mm" id="calendar-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
             <Text>Input is clickable</Text>
-            <TimeField label="Time" id="calendar-button-trigger" timePickerTrigger="input" />
+            <TimeField label="Kellaaeg" placeholder="tt:mm" id="calendar-input-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
       </VerticalSpacing>
@@ -211,10 +213,10 @@ export const PredefinedTimeSlots: Story = {
           <Col lg={3} md={6}>
             <TimeField
               id="time-dropdown"
-              label="Time"
+              label="Kellaaeg"
               value={times.dropdown}
               onChange={handleChange('dropdown')}
-              placeholder="Choose time"
+              placeholder="Vali kellaaeg"
               availableTimes={availableTimes}
               timePickerTrigger="input"
             />
@@ -225,10 +227,10 @@ export const PredefinedTimeSlots: Story = {
           <Col lg={3} md={6}>
             <TimeField
               id="time-grid"
-              label="Time"
+              label="Kellaaeg"
               value={times.grid}
               onChange={handleChange('grid')}
-              placeholder="Choose time"
+              placeholder="Vali kellaaeg"
               availableTimes={availableTimes}
               availableTimesVariant="grid-radio"
               timePickerTrigger="input"
@@ -250,10 +252,10 @@ export const Dropdown: Story = {
         <Col lg={3} md={6}>
           <TimeField
             id="available-times-dropdown"
-            label="Time"
+            label="Kellaaeg"
             value={time}
             onChange={setTime}
-            placeholder="Choose time"
+            placeholder="Vali kellaaeg"
             availableTimes={availableTimes}
             availableTimesVariant="dropdown"
           />
@@ -266,8 +268,8 @@ export const Dropdown: Story = {
 export const FieldWithoutPicker: Story = {
   render: Template,
   args: {
-    label: 'Time',
-    placeholder: 'hh:mm',
+    label: 'Kellaaeg',
+    placeholder: 'tt:mm',
     showPicker: false,
   },
   parameters: {
@@ -282,9 +284,9 @@ export const FieldWithoutPicker: Story = {
 export const CustomStep: Story = {
   render: Template,
   args: {
-    label: 'Time with 15-min steps',
+    label: 'Kellaaeg 15-min sammuga',
     stepMinutes: 15,
-    placeholder: 'hh:mm',
+    placeholder: 'tt:mm',
     defaultValue: '12:30',
   },
 };
@@ -299,8 +301,8 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
           {...args}
           value={time}
           onChange={(val) => setTime(val)}
-          label="Enter time manually"
-          placeholder="HH:mm"
+          label="Sisesta kellaaeg käsitsi"
+          placeholder="tt:mm"
         />
       </Col>
     </Row>
@@ -310,8 +312,8 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
 export const NativePicker: Story = {
   render: Template,
   args: {
-    label: 'Time',
-    placeholder: 'hh:mm',
+    label: 'Kellaaeg',
+    placeholder: 'tt:mm',
     useNativePicker: true,
   },
   parameters: {

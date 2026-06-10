@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { et } from 'react-day-picker/locale';
@@ -570,5 +570,58 @@ describe('DateField component', () => {
     await user.click(day);
 
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('rejects a typed past date when disablePast is set (single mode)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} disablePast onSelect={onSelect} />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.1999');
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('rejects a typed future date when disableFuture is set (single mode)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} disableFuture onSelect={onSelect} />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.2099');
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('rejects a typed past date in the native picker when disablePast is set', () => {
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} useNativePicker disablePast onSelect={onSelect} />);
+
+    const input = screen.getByLabelText('Birth date');
+    fireEvent.change(input, { target: { value: '1999-01-01' } });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('shows an error feedback message when the user types a disabled date', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} disablePast disabledDateErrorMessage="Date is in the past" />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.1999');
+    expect(screen.getByText('Date is in the past')).toBeInTheDocument();
+  });
+
+  it('clears the error feedback once the typed date becomes valid', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} disablePast disabledDateErrorMessage="Date is in the past" />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.1999');
+    expect(screen.getByText('Date is in the past')).toBeInTheDocument();
+    await user.clear(input);
+    expect(screen.queryByText('Date is in the past')).not.toBeInTheDocument();
   });
 });

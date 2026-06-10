@@ -2,8 +2,8 @@
   @if $border-color {
     &:focus,
     &:active {
-      border-color: $border-color;
       outline: none;
+      border-color: $border-color;
       box-shadow: inset 0 0 0 1px $border-color;
     }
   } @else {
