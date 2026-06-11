@@ -6,7 +6,7 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import FeedbackText, { FeedbackTextProps } from '../../form/feedback-text/feedback-text';
-import { ProgressBar } from '../progress-bar/progress-bar';
+import { ProgressBar } from '../../loaders/progress-bar/progress-bar';
 import styles from './attachment.module.scss';
 
 export type AttachmentFileSizeUnit = 'auto' | 'B' | 'KB' | 'MB' | 'GB';
