@@ -1,0 +1,252 @@
+.tedi-vertical-stepper {
+  --tedi-vertical-stepper-indicator-size: 1.5rem;
+  --tedi-vertical-stepper-gap: var(--layout-grid-gutters-16);
+  --tedi-vertical-stepper-row-gap: var(--layout-grid-gutters-12);
+
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-vertical-stepper__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tedi-vertical-stepper-indicator-size) auto;
+  column-gap: var(--tedi-vertical-stepper-gap);
+  padding-bottom: var(--tedi-vertical-stepper-row-gap);
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--tedi-vertical-stepper-indicator-size) / 2 - var(--tedi-borders-01));
+    width: var(--tedi-borders-02);
+    content: '';
+    background-color: var(--general-border-secondary);
+  }
+
+  &:last-child:not(.tedi-vertical-stepper__item--has-children)::before {
+    display: none;
+  }
+}
+
+.tedi-vertical-stepper__indicator {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tedi-vertical-stepper-indicator-size);
+  height: var(--tedi-vertical-stepper-indicator-size);
+  background-color: var(--stepper-step-default-bg);
+  border: var(--tedi-borders-01) solid var(--stepper-step-default-border);
+  border-radius: 50%;
+}
+
+.tedi-vertical-stepper__number {
+  font-size: var(--body-small-size);
+  line-height: 1;
+  color: var(--general-text-secondary);
+}
+
+.tedi-vertical-stepper__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-grid-gutters-04);
+  min-width: 0;
+  padding-top: calc((var(--tedi-vertical-stepper-indicator-size) - var(--body-regular-line-height)) / 2);
+}
+
+.tedi-vertical-stepper__link {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0;
+  font: inherit;
+  color: var(--general-text-primary);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: 0;
+
+  &:hover .tedi-vertical-stepper__label-text {
+    color: var(--stepper-item-vertical-text-hover);
+    text-decoration: underline;
+    text-decoration-thickness: var(--tedi-borders-01);
+  }
+
+  &:focus-visible {
+    outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+    outline-offset: var(--tedi-borders-02);
+  }
+}
+
+.tedi-vertical-stepper__toggle {
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tedi-vertical-stepper__chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease-in-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.tedi-vertical-stepper__chevron--open {
+  transform: rotate(180deg);
+}
+
+.tedi-vertical-stepper__label {
+  color: var(--general-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.tedi-vertical-stepper__label-icon {
+  margin-left: var(--layout-grid-gutters-04);
+}
+
+.tedi-vertical-stepper__description {
+  color: var(--general-text-secondary);
+}
+
+.tedi-vertical-stepper__info {
+  margin-top: var(--layout-grid-gutters-04);
+}
+
+.tedi-vertical-stepper__item--completed {
+  .tedi-vertical-stepper__indicator {
+    background-color: var(--stepper-step-completed-bg);
+    border-color: var(--stepper-step-completed-bg);
+  }
+
+  .tedi-vertical-stepper__number {
+    color: var(--general-text-white);
+  }
+}
+
+.tedi-vertical-stepper__item--error {
+  .tedi-vertical-stepper__indicator {
+    background-color: var(--stepper-step-danger-bg);
+    border-color: var(--stepper-step-danger-bg);
+  }
+
+  .tedi-vertical-stepper__number {
+    color: var(--general-text-white);
+  }
+}
+
+.tedi-vertical-stepper__item--disabled {
+  .tedi-vertical-stepper__indicator {
+    background-color: var(--stepper-step-disabled-bg);
+    border-color: var(--stepper-step-disabled-border);
+  }
+
+  .tedi-vertical-stepper__number,
+  .tedi-vertical-stepper__label {
+    color: var(--stepper-item-vertical-text-disabled);
+  }
+}
+
+.tedi-vertical-stepper__item--current {
+  .tedi-vertical-stepper__indicator {
+    background-color: var(--stepper-step-selected-bg);
+    border: var(--tedi-borders-02) solid var(--stepper-step-selected-border);
+  }
+
+  .tedi-vertical-stepper__number {
+    color: var(--stepper-item-vertical-text-selected);
+  }
+
+  .tedi-vertical-stepper__label {
+    font-weight: var(--body-bold-weight);
+    color: var(--stepper-item-vertical-text-selected);
+  }
+}
+
+.tedi-vertical-stepper__sub-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-grid-gutters-04);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-vertical-stepper__sub-item {
+  position: relative;
+  padding: var(--layout-grid-gutters-04) 0;
+}
+
+.tedi-vertical-stepper__sub-indicator {
+  position: absolute;
+  top: 50%;
+  left: calc(-1 * (var(--tedi-vertical-stepper-indicator-size) + var(--tedi-vertical-stepper-gap)));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tedi-vertical-stepper-indicator-size);
+  transform: translateY(-50%);
+}
+
+.tedi-vertical-stepper__sub-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  background-color: var(--stepper-step-default-bg);
+  border: var(--tedi-borders-01) solid var(--stepper-step-default-border);
+  border-radius: 50%;
+}
+
+.tedi-vertical-stepper__sub-item--completed .tedi-vertical-stepper__sub-dot {
+  background-color: var(--stepper-step-completed-bg);
+  border-color: var(--stepper-step-completed-bg);
+}
+
+.tedi-vertical-stepper__sub-item--error .tedi-vertical-stepper__sub-dot {
+  background-color: var(--stepper-step-danger-bg);
+  border-color: var(--stepper-step-danger-bg);
+}
+
+.tedi-vertical-stepper__sub-item--disabled {
+  .tedi-vertical-stepper__sub-dot {
+    background-color: var(--stepper-step-disabled-bg);
+    border-color: var(--stepper-step-disabled-border);
+  }
+
+  .tedi-vertical-stepper__label {
+    color: var(--stepper-item-vertical-text-disabled);
+  }
+}
+
+.tedi-vertical-stepper__sub-item--current {
+  .tedi-vertical-stepper__sub-dot {
+    background-color: var(--stepper-step-selected-bg);
+    border: var(--tedi-borders-02) solid var(--stepper-step-selected-border);
+  }
+
+  .tedi-vertical-stepper__label {
+    font-weight: var(--body-bold-weight);
+    color: var(--stepper-item-vertical-text-selected);
+  }
+}
+
+.tedi-vertical-stepper--compact {
+  --tedi-vertical-stepper-indicator-size: 1rem;
+
+  .tedi-vertical-stepper__sub-dot {
+    width: 0.5625rem;
+    height: 0.5625rem;
+  }
+}

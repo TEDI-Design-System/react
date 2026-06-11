@@ -1,0 +1,88 @@
+.tedi-card-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-grid-gutters-16);
+  padding: var(--card-padding-md-default);
+  background-color: var(--card-background-primary);
+  border: var(--tedi-borders-01) solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+}
+
+.tedi-card-stepper__main {
+  // Grid so the lead (arrow / number), title and trailing controls all sit on the
+  // title's row (centered on it), with the description dropping to its own row
+  // underneath the title — the controls never centre against the taller block.
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--layout-grid-gutters-04) var(--layout-grid-gutters-08);
+  align-items: center;
+}
+
+.tedi-card-stepper__lead {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.tedi-card-stepper__trail {
+  display: flex;
+  grid-row: 1;
+  grid-column: 3;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+}
+
+.tedi-card-stepper__indicator {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: var(--body-small-size);
+  line-height: 1;
+  color: var(--stepper-item-vertical-text-selected);
+  background-color: var(--stepper-step-selected-bg);
+  border: var(--tedi-borders-02) solid var(--stepper-step-selected-border);
+  border-radius: 50%;
+}
+
+.tedi-card-stepper__title {
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+  color: var(--general-text-brand);
+  overflow-wrap: anywhere;
+}
+
+.tedi-card-stepper__description {
+  grid-row: 2;
+  grid-column: 2;
+  min-width: 0;
+}
+
+.tedi-card-stepper__counter {
+  flex-shrink: 0;
+  font-size: var(--body-small-size);
+  line-height: var(--body-small-line-height);
+  color: var(--general-text-tertiary);
+  white-space: nowrap;
+}
+
+.tedi-card-stepper__progress {
+  display: flex;
+  gap: var(--layout-grid-gutters-04);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-card-stepper__segment {
+  flex: 1;
+  height: 0.25rem;
+  background-color: var(--tedi-neutral-400);
+  border-radius: var(--tedi-borders-02);
+}
+
+.tedi-card-stepper__segment--done {
+  background-color: var(--stepper-item-vertical-mobile-progressbar-completed);
+}
