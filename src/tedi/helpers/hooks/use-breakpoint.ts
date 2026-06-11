@@ -5,6 +5,21 @@ export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 export const breakpoints: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
 
 /**
+ * Minimum viewport width (as a CSS length string) at which each TEDI breakpoint
+ * activates. `xs` starts at 0 — i.e. anything below `sm`. Used by `useBreakpoint`
+ * for `matchMedia` checks and by other components (e.g. `TopNav`) that
+ * need to translate a breakpoint name into a pixel/rem width.
+ */
+export const BREAKPOINT_WIDTHS: Record<Breakpoint, string> = {
+  xs: '0',
+  sm: '36rem',
+  md: '48rem',
+  lg: '62rem',
+  xl: '75rem',
+  xxl: '87.5rem',
+};
+
+/**
  * @param defaultServerBreakpoint - Default breakpoint for SSR, the hook returns this breakpoint in the SSR.
  * @returns User's current breakpoint
  */
@@ -13,15 +28,15 @@ export const useBreakpoint = (defaultServerBreakpoint: Breakpoint = 'xs'): Break
 
   useLayoutEffect(() => {
     const getBreakpoint = (): Breakpoint => {
-      if (window.matchMedia('(min-width: 87.5rem)').matches) {
+      if (window.matchMedia(`(min-width: ${BREAKPOINT_WIDTHS.xxl})`).matches) {
         return 'xxl';
-      } else if (window.matchMedia('(min-width: 75rem)').matches) {
+      } else if (window.matchMedia(`(min-width: ${BREAKPOINT_WIDTHS.xl})`).matches) {
         return 'xl';
-      } else if (window.matchMedia('(min-width: 62rem)').matches) {
+      } else if (window.matchMedia(`(min-width: ${BREAKPOINT_WIDTHS.lg})`).matches) {
         return 'lg';
-      } else if (window.matchMedia('(min-width: 48rem)').matches) {
+      } else if (window.matchMedia(`(min-width: ${BREAKPOINT_WIDTHS.md})`).matches) {
         return 'md';
-      } else if (window.matchMedia('(min-width: 36rem)').matches) {
+      } else if (window.matchMedia(`(min-width: ${BREAKPOINT_WIDTHS.sm})`).matches) {
         return 'sm';
       } else {
         return 'xs';
