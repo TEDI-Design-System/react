@@ -6,7 +6,6 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import FeedbackText, { FeedbackTextProps } from '../../form/feedback-text/feedback-text';
-import { Link } from '../../navigation/link/link';
 import { ProgressBar } from '../progress-bar/progress-bar';
 import styles from './attachment.module.scss';
 
@@ -102,16 +101,13 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
    */
   icon?: string | null;
   /**
-   * If provided (and `onRemove` is not), renders the attachment as an `<a>`
-   * pointing to this URL — typical for already-uploaded files where the user
-   * downloads instead of removes. Falls back to a `<div>` wrapper otherwise.
+   * Extra action controls rendered in the right-hand action area, to the left
+   * of the remove button — drop in your own `Button`s / icons here (download,
+   * view, open in new tab, etc.). This is the supported way to make a file
+   * downloadable: the row itself is never a single clickable target, so each
+   * affordance is an explicit, individually focusable control.
    */
-  href?: string;
-  /**
-   * `target` forwarded to the anchor when `href` is set. Defaults to `_blank`
-   * with `rel="noopener noreferrer"` applied automatically for safety.
-   */
-  target?: string;
+  actions?: React.ReactNode;
   /**
    * Click handler for the remove action. When provided, renders the inline
    * delete button on the right. Stays visible during `isLoading` so the user
@@ -169,8 +165,7 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     fileSizeLocale = 'et-EE',
     formatFileSize,
     icon,
-    href,
-    target,
+    actions,
     onRemove,
     removeIcon = 'delete',
     removeLabel,
@@ -200,7 +195,6 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     styles['tedi-attachment'],
     {
       [styles['tedi-attachment--invalid']]: invalid,
-      [styles['tedi-attachment--clickable']]: !!href,
       [styles['tedi-attachment--multi-line']]: hasMultiLine,
     },
     className
@@ -230,6 +224,7 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
           <ProgressBar
             value={progress}
             ariaLabel={name}
+            valuePosition="bottom"
             helper={meta ? { text: meta } : undefined}
             className={styles['tedi-attachment__progress']}
           />
@@ -249,42 +244,24 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     </>
   );
 
-  const action = onRemove ? (
-    <Button
-      className={styles['tedi-attachment__remove']}
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        onRemove();
-      }}
-      title={removeLabel ?? `${getLabel('remove')} ${name}`}
-      aria-label={removeLabel ?? `${getLabel('remove')} ${name}`}
-      data-name="attachment-remove"
-      noStyle
-    >
-      <Icon name={removeIcon} size={18} color="inherit" />
+  const removeButton = onRemove ? (
+    <Button visualType="neutral" size="small" icon={removeIcon} onClick={onRemove} data-name="attachment-remove">
+      {removeLabel ?? `${getLabel('remove')} ${name}`}
     </Button>
   ) : null;
 
-  const card = href ? (
-    <Link
-      ref={ref as unknown as React.Ref<HTMLAnchorElement>}
-      id={rowId}
-      href={href}
-      target={target ?? '_blank'}
-      rel={!target || target === '_blank' ? 'noopener noreferrer' : undefined}
-      className={attachmentBEM}
-      aria-describedby={feedbackId}
-      noStyle
-      {...(rest as Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'color'>)}
-    >
-      {body}
-      {action}
-    </Link>
-  ) : (
+  const actionsSlot =
+    actions || removeButton ? (
+      <span className={styles['tedi-attachment__actions']} data-name="attachment-actions">
+        {actions}
+        {removeButton}
+      </span>
+    ) : null;
+
+  const card = (
     <div ref={ref} id={rowId} className={attachmentBEM} aria-describedby={feedbackId} {...rest}>
       {body}
-      {action}
+      {actionsSlot}
     </div>
   );
 

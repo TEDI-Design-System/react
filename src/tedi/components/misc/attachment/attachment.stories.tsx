@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { Button } from '../../buttons/button/button';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Attachment, AttachmentProps } from './attachment';
 
@@ -107,21 +108,51 @@ export const WithIcon: StoryFn<AttachmentProps> = () => (
 );
 
 /**
- * Setting `href` (without `onRemove`) turns the whole row into an anchor —
- * use for already-saved attachments that the user downloads instead of
- * removes. The row gets a hover background and a focus outline.
+ * The `actions` slot renders extra controls to the left of the remove button —
+ * use it to make a saved file downloadable / viewable without turning the whole
+ * row into one clickable target. Each affordance is its own focusable button
+ * with a discrete label. Combine with `onRemove`, or use it on its own.
  */
-export const AsDownloadLink: StoryFn<AttachmentProps> = () => (
+export const WithActions: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.5}>
-      <Attachment icon="download" name="aastaaruanne_2025.pdf" fileSize={5_400_000} href="#download-1" />
-      <Attachment icon="download" name="leping_täisversioon.docx" fileSize={2_100_000} href="#download-2" />
       <Attachment
-        icon="download"
+        icon="description"
+        name="aastaaruanne_2025.pdf"
+        fileSize={5_400_000}
+        actions={
+          <Button visualType="neutral" size="small" icon="download" onClick={() => null}>
+            Lae alla aastaaruanne_2025.pdf
+          </Button>
+        }
+        onRemove={() => null}
+      />
+      <Attachment
+        icon="description"
+        name="leping_täisversioon.docx"
+        fileSize={2_100_000}
+        actions={
+          <>
+            <Button visualType="neutral" size="small" icon="visibility" onClick={() => null}>
+              Vaata leping_täisversioon.docx
+            </Button>
+            <Button visualType="neutral" size="small" icon="download" onClick={() => null}>
+              Lae alla leping_täisversioon.docx
+            </Button>
+          </>
+        }
+        onRemove={() => null}
+      />
+      <Attachment
+        icon="image"
         name="profiilipilt.jpg"
         fileSize={840_000}
-        meta="Avaneb uuel vahekaardil"
-        href="#download-3"
+        meta="Üles laaditud 03.06.2026"
+        actions={
+          <Button visualType="neutral" size="small" icon="download" onClick={() => null}>
+            Lae alla profiilipilt.jpg
+          </Button>
+        }
       />
     </VerticalSpacing>
   </div>

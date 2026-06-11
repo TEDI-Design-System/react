@@ -681,16 +681,22 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 - `fileSizeLocale?: string = 'et-EE'` — `Intl.NumberFormat` locale
 - `formatFileSize?: (bytes: number) => string` — full override for the file-size string
 - `icon?: string | null = 'description'` — left file-type glyph; pass `null` to omit
-- `href?: string` — renders the card as `<a>` (download / open); `target?: string` (defaults to `_blank` with `rel="noopener noreferrer"`)
+- `actions?: ReactNode` — extra controls (download / view / open) rendered to the left of the remove button. The row is never a single clickable target — give each affordance its own focusable button here.
 - `onRemove?: () => void` — when set, shows the inline remove button (visible during loading so the upload can be cancelled)
 - `removeIcon?: string = 'delete'`, `removeLabel?: string` — falls back to `${label('remove')} ${name}`
 - `isLoading?: boolean = false` — swaps `meta` for an inline `ProgressBar`; `progress?: number = 0` (0..100)
 - `isValid?: boolean` — `false` flips to the danger surface and adds an error glyph next to the name
 
-`href` and `onRemove` are independent: a row can be both a download link and removable. The progress bar takes over the `meta` slot during loading so upload feedback stays grouped.
+`actions` and `onRemove` are independent and share the right-hand action area (`actions` first, remove last). The progress bar takes over the `meta` slot during loading so upload feedback stays grouped.
 
 ```tsx
-<Attachment name="contract.pdf" fileSize={1_240_000} href="/files/contract.pdf" />
+// Downloadable saved file — explicit download button, not a whole-row link
+<Attachment
+  name="contract.pdf"
+  fileSize={1_240_000}
+  actions={<Button visualType="neutral" size="small" icon="download" onClick={download}>Download contract.pdf</Button>}
+  onRemove={remove}
+/>
 
 // Upload in progress
 <Attachment name="scan.jpg" isLoading progress={42} onRemove={cancel} />

@@ -90,18 +90,28 @@ describe('Attachment component', () => {
     expect(container.firstChild).toHaveClass('tedi-attachment--invalid');
   });
 
-  it('renders as an `<a>` when `href` is provided', () => {
-    render(<Attachment name="invoice.pdf" href="/files/invoice.pdf" />);
-    const link = screen.getByRole('link', { name: /invoice\.pdf/ });
-    expect(link).toHaveAttribute('href', '/files/invoice.pdf');
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  it('never renders the row itself as a single clickable target', () => {
+    render(<Attachment name="invoice.pdf" onRemove={() => undefined} />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('skips rel="noopener" when target is not _blank', () => {
-    render(<Attachment name="invoice.pdf" href="/files/invoice.pdf" target="_self" />);
-    const link = screen.getByRole('link');
-    expect(link).not.toHaveAttribute('rel');
+  it('renders `actions` slot content alongside the remove button', () => {
+    render(
+      <Attachment
+        name="invoice.pdf"
+        actions={<button type="button">Download invoice.pdf</button>}
+        onRemove={() => undefined}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'Download invoice.pdf' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /remove invoice\.pdf/i })).toBeInTheDocument();
+  });
+
+  it('renders the `actions` slot even without a remove button', () => {
+    const { container } = render(<Attachment name="invoice.pdf" actions={<button type="button">View</button>} />);
+    const slot = container.querySelector('[data-name="attachment-actions"]');
+    expect(slot).toBeInTheDocument();
+    expect(slot).toContainElement(screen.getByRole('button', { name: 'View' }));
   });
 
   it('appends consumer className', () => {
