@@ -1,10 +1,22 @@
 import { render, screen } from '@testing-library/react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { ProgressBar } from './progress-bar';
 
 import '@testing-library/jest-dom';
 
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
+
 describe('ProgressBar', () => {
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn((props) => props),
+    });
+  });
+
   it('renders a progressbar with default value 0', () => {
     render(<ProgressBar />);
     const bar = screen.getByRole('progressbar');
@@ -83,5 +95,18 @@ describe('ProgressBar', () => {
   it('applies the small modifier when small=true', () => {
     const { container } = render(<ProgressBar value={10} small />);
     expect(container.querySelector('[data-name="progress-bar"]')).toHaveClass('tedi-progress-bar--small');
+  });
+
+  it('renders from the breakpoint-resolved props (not the raw props)', () => {
+    // Simulate getCurrentBreakpointProps merging an `md` override over the base props.
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn(() => ({ value: 80, ariaLabel: 'Resolved', valueLabel: '4 / 5' })),
+    });
+
+    render(<ProgressBar value={10} ariaLabel="Base" md={{ valueLabel: '4 / 5' }} />);
+
+    const bar = screen.getByRole('progressbar', { name: 'Resolved' });
+    expect(bar).toHaveAttribute('aria-valuenow', '80');
+    expect(screen.getByText('4 / 5')).toBeInTheDocument();
   });
 });

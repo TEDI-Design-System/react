@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { useId } from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { FeedbackText, FeedbackTextProps } from '../../form/feedback-text/feedback-text';
 import { FormLabel } from '../../form/form-label/form-label';
 import styles from './progress-bar.module.scss';
@@ -8,35 +9,17 @@ import styles from './progress-bar.module.scss';
 export type ProgressBarLabelPosition = 'top' | 'horizontal';
 export type ProgressBarValuePosition = 'horizontal' | 'bottom';
 
-export interface ProgressBarProps {
-  /**
-   * Id forwarded to the bar element so external `<label htmlFor>` can target it.
-   */
-  id?: string;
-  /**
-   * Progress value, clamped to `0..100`. `NaN` is treated as `0`.
-   * @default 0
-   */
-  value?: number;
+type ProgressBarBreakpointProps = {
   /**
    * Use the 4px bar height instead of the 8px default.
    * @default false
    */
   small?: boolean;
   /**
-   * Label rendered above or inline with the bar.
-   */
-  label?: string;
-  /**
    * Label placement. Ignored without `label`.
    * @default top
    */
   labelPosition?: ProgressBarLabelPosition;
-  /**
-   * Renders a required indicator on the label. Ignored without `label`.
-   * @default false
-   */
-  required?: boolean;
   /**
    * Show the percentage value.
    * @default true
@@ -52,15 +35,36 @@ export interface ProgressBarProps {
    */
   valueLabel?: string;
   /**
-   * Accessible name. Falls back to `label`.
-   */
-  ariaLabel?: string;
-  /**
    * Hint or error text rendered below the bar via `FeedbackText`.
    */
   helper?: FeedbackTextProps;
   /** Class on the root wrapper. */
   className?: string;
+};
+
+export interface ProgressBarProps extends BreakpointSupport<ProgressBarBreakpointProps> {
+  /**
+   * Id forwarded to the bar element so external `<label htmlFor>` can target it.
+   */
+  id?: string;
+  /**
+   * Progress value, clamped to `0..100`. `NaN` is treated as `0`.
+   * @default 0
+   */
+  value?: number;
+  /**
+   * Label rendered above or inline with the bar.
+   */
+  label?: string;
+  /**
+   * Renders a required indicator on the label. Ignored without `label`.
+   * @default false
+   */
+  required?: boolean;
+  /**
+   * Accessible name. Falls back to `label`.
+   */
+  ariaLabel?: string;
 }
 
 const clampValue = (raw: number | undefined): number => {
@@ -71,6 +75,7 @@ const clampValue = (raw: number | undefined): number => {
 };
 
 export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     id,
     value,
@@ -84,7 +89,7 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
     ariaLabel,
     helper,
     className,
-  } = props;
+  } = getCurrentBreakpointProps<ProgressBarProps>(props);
 
   const generatedId = useId();
   const resolvedId = id ?? `tedi-progress-bar-${generatedId.replace(/[^a-zA-Z0-9-]/g, '')}`;
@@ -126,37 +131,36 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
     </div>
   );
 
-  const isLabelInline = label && labelPosition === 'horizontal';
+  const hasValueBelow = showValue && valuePosition === 'bottom';
 
   const barRow = (
-    <div
-      className={cn(styles['tedi-progress-bar__row'], {
-        [styles['tedi-progress-bar__row--label-inline']]: isLabelInline,
-      })}
-    >
-      {isLabelInline ? <div id={labelId}>{renderLabel}</div> : null}
+    <div className={styles['tedi-progress-bar__row']}>
       {bar}
       {renderValue}
     </div>
   );
 
-  const hasValueBelow = showValue && valuePosition === 'bottom';
-
-  const helperContent =
+  // A lone bottom value left-aligns under the bar; paired with a hint it sits
+  // opposite the hint (space-between). Hint + bottom value always align under
+  // the bar, not the inline label, hence the bar + below-row share a column.
+  const belowRow =
     helper || hasValueBelow ? (
-      <div
-        className={cn(styles['tedi-progress-bar__hint-row'], {
-          [styles['tedi-progress-bar__hint-row--with-value']]: hasValueBelow,
-        })}
-      >
+      <div className={styles['tedi-progress-bar__hint-row']}>
         {helper ? (
           <FeedbackText {...helper} id={helperId} className={cn(styles['tedi-progress-bar__hint'], helper.className)} />
-        ) : (
-          <span />
-        )}
+        ) : null}
         {hasValueBelow ? <span className={styles['tedi-progress-bar__value']}>{displayValue}</span> : null}
       </div>
     ) : null;
+
+  const barGroup = (
+    <div className={styles['tedi-progress-bar__group']}>
+      {barRow}
+      {belowRow}
+    </div>
+  );
+
+  const isLabelInline = label && labelPosition === 'horizontal';
 
   return (
     <div
@@ -168,8 +172,16 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
           {renderLabel}
         </div>
       ) : null}
-      {barRow}
-      {helperContent}
+      {isLabelInline ? (
+        <div className={styles['tedi-progress-bar__main']}>
+          <div id={labelId} className={styles['tedi-progress-bar__inline-label']}>
+            {renderLabel}
+          </div>
+          {barGroup}
+        </div>
+      ) : (
+        barGroup
+      )}
     </div>
   );
 };

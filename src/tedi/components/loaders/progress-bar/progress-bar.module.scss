@@ -8,15 +8,28 @@
   margin-bottom: var(--layout-grid-gutters-08);
 }
 
-.tedi-progress-bar__row {
+.tedi-progress-bar__main {
+  display: flex;
+  gap: var(--layout-grid-gutters-16);
+  align-items: flex-start;
+}
+
+.tedi-progress-bar__inline-label {
+  flex-shrink: 0;
+}
+
+.tedi-progress-bar__group {
   display: flex;
   flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tedi-progress-bar__row {
+  display: flex;
   gap: var(--layout-grid-gutters-08);
   align-items: center;
-
-  &--label-inline {
-    gap: var(--layout-grid-gutters-16);
-  }
+  min-height: var(--body-regular-line-height);
 }
 
 .tedi-progress-bar__label {
@@ -57,10 +70,6 @@
   gap: var(--layout-grid-gutters-08);
   align-items: flex-start;
   justify-content: space-between;
-
-  &--with-value {
-    margin-top: var(--form-field-outer-spacing);
-  }
 
   .tedi-progress-bar__value {
     font-size: var(--body-small-size);
