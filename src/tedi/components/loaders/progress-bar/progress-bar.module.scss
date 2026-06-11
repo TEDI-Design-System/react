@@ -59,8 +59,8 @@
 }
 
 .tedi-progress-bar__value {
-  font-size: var(--body-regular-size);
-  line-height: var(--body-regular-line-height);
+  font-size: var(--body-small-regular-size);
+  line-height: var(--body-small-regular-line-height);
   color: var(--progress-bar-range-label-text);
 }
 
@@ -70,11 +70,6 @@
   gap: var(--layout-grid-gutters-08);
   align-items: flex-start;
   justify-content: space-between;
-
-  .tedi-progress-bar__value {
-    font-size: var(--body-small-size);
-    line-height: var(--body-small-line-height);
-  }
 }
 
 .tedi-progress-bar__hint {
