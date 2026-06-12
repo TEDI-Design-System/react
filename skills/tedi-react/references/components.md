@@ -131,6 +131,76 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 
 ## Content
 
+### Carousel
+A compound slide carousel with an infinite-looping track, drag / wheel / keyboard navigation and screen-reader announcements. Compose from `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`; drive it with `Carousel.Navigation` (prev/next arrows) and/or `Carousel.Indicators` (dots or counter). Each direct child of `Carousel.Content` is a slide.
+
+Sub-components: `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`, `Carousel.Navigation`, `Carousel.Indicators`
+
+**`Carousel`** | fRef — `children`, `className`
+
+**`Carousel.Content`** | fRef
+- `children` — each direct child is one slide
+- `slidesPerView?: number | { xs; sm?; md?; lg?; xl?; xxl? } = 1` — can be fractional (e.g. `1.25`) for peeking; per-breakpoint object supported
+- `gap?: number | BreakpointObject<number> = 16` — px gap between slides
+- `fade?: boolean = false` — fade edges (right edge for multi-view, both edges for single)
+- `transitionMs?: number = 400`
+- `loop?: boolean = true` — set `false` for a finite/bounded carousel: navigation stops at the first/last slide, prev/next disable at the bounds, and slides render once (no looping duplicates)
+- `centered?: boolean = false` — center the active slide so an equal peek of the previous/next slide shows on both edges (pair with a fractional `slidesPerView` and keep `loop` on)
+
+**`Carousel.Indicators`**
+- `variant?: 'dots' | 'numbers' = 'dots'`
+- `withArrows?: boolean = false` — inline prev/next (don't also use `Carousel.Navigation`); arrows disable at the bounds when `loop={false}`
+
+**`Carousel.Navigation`**
+- `overlay?: boolean = false` — pin the arrows to the left/right edges, overlaying the slides (use as a direct child of `Carousel` for a header/footer-less carousel). Arrows disable at the bounds when `loop={false}`.
+
+**`Carousel.Header`** / **`Carousel.Footer`** — layout slots (`children`, `className`, `style`)
+
+`slidesPerView`/`gap` are breakpoint-aware (pass a per-breakpoint object). To show **different controls per breakpoint** (e.g. dots on mobile, arrows on desktop), wrap `Carousel.Navigation` / `Carousel.Indicators` in the `ShowAt` / `HideAt` layout helpers — they are context consumers, and `ShowAt`/`HideAt` unmount the hidden control, so only one set is ever in the DOM (a11y tree stays clean). No dedicated prop needed.
+
+Accessibility: the viewport is a `region` with `aria-roledescription="carousel"`; visible slides are `group`s, off-screen ones `presentation`/`aria-hidden`; slide changes are announced via a polite live region. Labels come from the `LabelProvider` (`carousel`, `carousel.slide`, `carousel.move-back`, `carousel.move-forward`, `carousel.show-slide`).
+
+```tsx
+import { Carousel } from '@tedi-design-system/react/tedi';
+
+<Carousel>
+  <Carousel.Header>
+    <h2>Title</h2>
+    <Carousel.Navigation />
+  </Carousel.Header>
+  <Carousel.Content slidesPerView={{ xs: 1, md: 2.5, xl: 4 }}>
+    {items.map((item) => (
+      <MyCard key={item.id} {...item} />
+    ))}
+  </Carousel.Content>
+  <Carousel.Footer style={{ justifyContent: 'center' }}>
+    <Carousel.Indicators />
+  </Carousel.Footer>
+</Carousel>
+
+// Finite / bounded with edge-mounted overlay arrows (replaces the deprecated Community map carousel)
+<Carousel>
+  <Carousel.Content slidesPerView={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={10} loop={false}>
+    {items.map((item) => (
+      <MyCard key={item.id} {...item} />
+    ))}
+  </Carousel.Content>
+  <Carousel.Navigation overlay />
+</Carousel>
+
+// Responsive controls — dots on mobile, arrows on desktop
+<Carousel>
+  <Carousel.Header>
+    <h2>Title</h2>
+    <ShowAt md><Carousel.Navigation /></ShowAt>
+  </Carousel.Header>
+  <Carousel.Content slidesPerView={{ xs: 1.1, md: 3 }}>{slides}</Carousel.Content>
+  <Carousel.Footer style={{ justifyContent: 'center' }}>
+    <HideAt md><Carousel.Indicators /></HideAt>
+  </Carousel.Footer>
+</Carousel>
+```
+
 ### Label
 
 **Props:** `LabelProps` | fRef, poly, bp

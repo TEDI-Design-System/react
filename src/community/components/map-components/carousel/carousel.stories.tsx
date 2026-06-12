@@ -11,6 +11,11 @@ import { Carousel } from './carousel';
 const meta: Meta<typeof Carousel> = {
   component: Carousel,
   title: 'Community/Map components/Carousel',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;
