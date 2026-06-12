@@ -6,6 +6,9 @@ import { Icon } from '../../../../tedi/components/base/icon/icon';
 import Collapse from '../../../../tedi/components/buttons/collapse/collapse';
 import styles from '../vertical-stepper.module.scss';
 
+/**
+ * @deprecated Use `VerticalStepper.Item` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface StepItemProps {
   /**
    * SubItems
@@ -35,6 +38,9 @@ export interface StepItemProps {
   onToggle?: (isOpen: boolean) => void;
 }
 
+/**
+ * @deprecated Use `VerticalStepper.Item` from `@tedi-design-system/react/tedi` instead.
+ */
 export const StepItem = ({
   children,
   className,
