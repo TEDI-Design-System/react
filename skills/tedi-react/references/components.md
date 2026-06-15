@@ -1078,6 +1078,61 @@ Sub-components: `Dropdown.Trigger`, `Dropdown.Content`, `Dropdown.Item`, `Dropdo
 
 **Props:** `width`, `placement`, `divided`, `open?` (controlled), `modal?: boolean`
 
+### DropdownItemValue
+The shared **content row** for dropdown/select items — an optional selection indicator (checkbox/radio), an optional leading icon, a label and optional meta. **`Select` renders its options through this internally**, so menu items, select options and standalone rows are one source of truth. Use it inside `Dropdown`, standalone (e.g. search-result rows), or rely on it via `Select`.
+
+Sub-components: `DropdownItemValue.Label`, `DropdownItemValue.Meta`
+
+**Props:** `DropdownItemValueProps` | fRef
+- `children` — typically `DropdownItemValue.Label` + optional `DropdownItemValue.Meta`
+- `type?: 'default' | 'checkbox' | 'radio' = 'default'` — selection indicator
+- `layout?: 'horizontal' | 'vertical' = 'horizontal'` — meta beside the label, or stacked (title + description)
+- `selected?: boolean`, `indeterminate?: boolean` (checkbox only), `disabled?: boolean`
+- `icon?: string | IconProps` — leading icon
+- `indicatorSemantics?: 'presentation' | 'control' = 'presentation'` — how the indicator is exposed to assistive tech:
+  - `presentation` (menu, default) — indicator is `aria-hidden`; the interactive parent (`DropdownItem`) owns selection via `aria-checked`. The span is decorative, so it never interferes with `DropdownItem`'s click handling.
+  - `control` (listbox) — the indicator itself is `role="checkbox"`/`"radio"` + `aria-checked`, named via `aria-labelledby` from the `Label` (requires a `Label` child). This is what `Select` uses for its options.
+- `className?: string`
+
+`DropdownItem` accepts `role` (default `menuitem`) and arbitrary `aria-*` props, so pair the visual indicator with real semantics — `role="menuitemcheckbox"`/`"menuitemradio"` + `aria-checked` (or `role="option"` + `aria-selected`).
+
+```tsx
+// Inside a Dropdown (multi-select): DropdownItem owns the click + a11y; the value reflects state
+<Dropdown.Content>
+  {options.map((o, i) => (
+    <DropdownItem
+      key={o.id}
+      index={i}
+      role="menuitemcheckbox"
+      aria-checked={selected.includes(o.id)}
+      closeOnSelect={false}
+      onClick={() => toggle(o.id)}
+    >
+      <DropdownItemValue type="checkbox" selected={selected.includes(o.id)}>
+        <DropdownItemValue.Label>{o.name}</DropdownItemValue.Label>
+        <DropdownItemValue.Meta>{o.meta}</DropdownItemValue.Meta>
+      </DropdownItemValue>
+    </DropdownItem>
+  ))}
+</Dropdown.Content>
+
+// Standalone search result
+<DropdownItemValue icon="location_on">
+  <DropdownItemValue.Label>Tallinn</DropdownItemValue.Label>
+  <DropdownItemValue.Meta>Harjumaa</DropdownItemValue.Meta>
+</DropdownItemValue>
+
+// Inside Select — richer option content via the renderOption hook
+<Select id="city" label="Linn" options={options} renderOption={(p) => (
+  <DropdownItemValue icon="location_on">
+    <DropdownItemValue.Label>{p.data.label}</DropdownItemValue.Label>
+    <DropdownItemValue.Meta>{p.data.customData.county}</DropdownItemValue.Meta>
+  </DropdownItemValue>
+)} />
+```
+
+States: the `Label` uses `color: inherit`, so it follows the parent item's per-state text colour (default → hover → active → disabled) defined on `DropdownItem` / the Select option — both surfaces share the `--dropdown-item-*` and `--form-checkbox-radio-*` tokens. The leading icon and `Meta` keep their secondary/tertiary colours. `Select` renders its option content with `<DropdownItemValue indicatorSemantics="control">` internally, so a custom `renderOption` is only needed for *richer* content (icon/meta), not to match the default look.
+
 ### Popover
 
 Sub-components: `Popover.Trigger`, `Popover.Content`

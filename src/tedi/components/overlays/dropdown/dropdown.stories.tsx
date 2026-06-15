@@ -10,6 +10,7 @@ import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
 import Separator from '../../misc/separator/separator';
 import { Dropdown } from './dropdown';
+import { DropdownItemValue } from './dropdown-item-value/dropdown-item-value';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.58?node-id=40253-113444&m=dev" target="_BLANK">Dropdown Figma ↗</a><br/>
@@ -568,13 +569,13 @@ export const CustomContent: Story = {
             <Search id="dropdown-search" label="Otsi" value={query} onChange={(value) => setQuery(value)} />
           </Dropdown.Item>
 
-          {filtered.map((rep, i) => {
-            const index = i + 1;
-
-            return (
-              <Dropdown.Item key={rep.name} index={index}>
-                <Text>
-                  <strong>{rep.name}</strong>
+          {filtered.map((rep, i) => (
+            <Dropdown.Item key={rep.name} index={i + 1}>
+              <DropdownItemValue>
+                <DropdownItemValue.Label>
+                  <Text element="span" modifiers="bold">
+                    {rep.name}
+                  </Text>
                   <Separator
                     axis="vertical"
                     color="secondary"
@@ -585,10 +586,10 @@ export const CustomContent: Story = {
                     variant="dot-only"
                   />
                   {rep.code}
-                </Text>
-              </Dropdown.Item>
-            );
-          })}
+                </DropdownItemValue.Label>
+              </DropdownItemValue>
+            </Dropdown.Item>
+          ))}
         </Dropdown.Content>
       </Dropdown>
     );
