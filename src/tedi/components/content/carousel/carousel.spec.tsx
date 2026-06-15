@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
+import { FloatingButton } from '../../buttons/floating-button/floating-button';
 import { Carousel } from './carousel';
 
 beforeAll(() => {
@@ -262,6 +263,30 @@ describe('Carousel', () => {
       );
       fireEvent.click(screen.getAllByRole('button', { name: 'carousel.show-slide' })[2]);
       expect(activeDotIndex()).toBe(2);
+    });
+
+    it('renders custom navigation buttons via renderButton with the wiring intact', () => {
+      render(
+        <Carousel>
+          <Carousel.Content loop={false} slidesPerView={1}>
+            {Array.from({ length: 3 }, (_, i) => (
+              <div key={i}>Slide {i + 1}</div>
+            ))}
+          </Carousel.Content>
+          <Carousel.Navigation
+            overlay
+            renderButton={({ buttonProps }) => <FloatingButton {...buttonProps} position="static" />}
+          />
+        </Carousel>
+      );
+
+      const back = screen.getByRole('button', { name: 'carousel.move-back' });
+      const next = screen.getByRole('button', { name: 'carousel.move-forward' });
+      // Rendered as FloatingButton, with label / disabled wiring flowing through buttonProps.
+      expect(back).toHaveClass('tedi-floating-button');
+      expect(next).toHaveClass('tedi-floating-button');
+      expect(back).toBeDisabled();
+      expect(next).toBeEnabled();
     });
   });
 

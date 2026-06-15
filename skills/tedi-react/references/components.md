@@ -153,6 +153,7 @@ Sub-components: `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`, `Carou
 
 **`Carousel.Navigation`**
 - `overlay?: boolean = false` — pin the arrows to the left/right edges, overlaying the slides (use as a direct child of `Carousel` for a header/footer-less carousel). Arrows disable at the bounds when `loop={false}`.
+- `renderButton?: ({ direction, buttonProps }) => ReactNode` — render each arrow yourself (e.g. a `FloatingButton` or customised `Button`). Spread `buttonProps` (icon / disabled / onClick / accessible-label `children`) onto the control; the container still handles layout. Defaults to a secondary `Button`. Example: `renderButton={({ buttonProps }) => <FloatingButton {...buttonProps} position="static" />}`.
 
 **`Carousel.Header`** / **`Carousel.Footer`** — layout slots (`children`, `className`, `style`)
 

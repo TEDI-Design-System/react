@@ -2,10 +2,12 @@ import { Meta, StoryObj } from '@storybook/react';
 
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
+import { FloatingButton } from '../../buttons/floating-button/floating-button';
 import { Card } from '../../cards/card/card';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { StretchContent } from '../../misc/stretch-content/stretch-content';
 import { Link } from '../../navigation/link/link';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { Carousel } from './carousel';
@@ -359,7 +361,7 @@ const SERVICES: ServiceItem[] = [
 
 const ServiceCard = ({ icon, title, text }: ServiceItem): JSX.Element => (
   <Card>
-    <Card.Content>
+    <Card.Content style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <VerticalSpacing size={0.5}>
         <Icon name={icon} size={36} color="brand" />
         <Text element="p" modifiers="bold">
@@ -368,10 +370,12 @@ const ServiceCard = ({ icon, title, text }: ServiceItem): JSX.Element => (
         <Text element="p" modifiers="small" color="secondary">
           {text}
         </Text>
+      </VerticalSpacing>
+      <div style={{ marginTop: 'auto' }}>
         <Link href="#" iconRight="arrow_forward">
           Loe edasi
         </Link>
-      </VerticalSpacing>
+      </div>
     </Card.Content>
   </Card>
 );
@@ -382,9 +386,8 @@ export const Default: Story = {
       <Carousel.Header>
         <div>
           <Text element="h2" modifiers="h1">
-            Title
+            Pealkiri
           </Text>
-          <Text color="secondary">Description</Text>
         </div>
         <Carousel.Navigation />
       </Carousel.Header>
@@ -405,7 +408,7 @@ export const TopPaginationArrowsOnly: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
         <Carousel.Navigation />
       </Carousel.Header>
@@ -423,7 +426,7 @@ export const SeparatedBottomPaginationHasDots: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(5)}</Carousel.Content>
@@ -444,7 +447,7 @@ export const SeparatedBottomPaginationHasNumbers: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(10)}</Carousel.Content>
@@ -465,7 +468,7 @@ export const CenteredBottomPaginationHasDots: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(6)}</Carousel.Content>
@@ -485,7 +488,7 @@ export const CenteredBottomPaginationHasNumbers: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(6)}</Carousel.Content>
@@ -505,7 +508,7 @@ export const CombinationsTopNavigationBottomDots: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
         <Carousel.Navigation />
       </Carousel.Header>
@@ -527,7 +530,7 @@ export const CenteredHasDots: Story = {
       <Carousel>
         <Carousel.Header>
           <Text element="h2" modifiers="h1">
-            Title
+            Pealkiri
           </Text>
         </Carousel.Header>
         <Carousel.Content>{slides(3)}</Carousel.Content>
@@ -547,7 +550,7 @@ export const Faded: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
         <Carousel.Navigation />
       </Carousel.Header>
@@ -568,7 +571,7 @@ export const Peeking: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
         <Carousel.Navigation />
       </Carousel.Header>
@@ -591,7 +594,7 @@ export const PeekingBothSides: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
         <Carousel.Navigation />
       </Carousel.Header>
@@ -619,7 +622,7 @@ export const ResponsiveControls: Story = {
     <Carousel>
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
-          Title
+          Pealkiri
         </Text>
         <ShowAt md>
           <Carousel.Navigation />
@@ -637,9 +640,10 @@ export const ResponsiveControls: Story = {
 
 /**
  * A finite, bounded carousel (`loop={false}`) of small map-selection cards with
- * edge-mounted overlay arrows (`Carousel.Navigation overlay`). Many compact items
- * are shown at once; navigation stops at the first / last slide and the arrows
- * disable at the bounds.
+ * edge-mounted overlay arrows. Here the arrows are rendered as `FloatingButton`s
+ * via `Carousel.Navigation`'s `renderButton` prop (`position="static"` lets the
+ * overlay container place them). Many compact items are shown at once; navigation
+ * stops at the first / last slide and the arrows disable at the bounds.
  */
 export const BoundedOverlayNavigation: Story = {
   name: 'Bounded - overlay arrows (no loop)',
@@ -650,7 +654,10 @@ export const BoundedOverlayNavigation: Story = {
           <MapCard key={item.id} {...item} />
         ))}
       </Carousel.Content>
-      <Carousel.Navigation overlay />
+      <Carousel.Navigation
+        overlay
+        renderButton={({ buttonProps }) => <FloatingButton {...buttonProps} position="static" visualType="secondary" />}
+      />
     </Carousel>
   ),
 };
@@ -661,7 +668,9 @@ export const BoundedOverlayNavigation: Story = {
  *
  * - **News** (Uudised) — multi-up `Card` slides (image, category, title, excerpt).
  * - **Events** (Sündmused) — image cards with an overlaid badge and title.
- * - **Services** (Teenused) — icon + title + description + a "read more" link.
+ * - **Services** (Teenused) — icon + title + description + a "read more" link;
+ *   each card is wrapped in `StretchContent` so every card fills the slide and
+ *   they all share the tallest card's height.
  * - **Hero** — a single full-width banner per view (`slidesPerView={1}`).
  */
 export const Examples: Story = {
@@ -710,7 +719,9 @@ export const Examples: Story = {
         </Carousel.Header>
         <Carousel.Content slidesPerView={{ xs: 1, sm: 2, lg: 4 }}>
           {SERVICES.map((item) => (
-            <ServiceCard key={item.id} {...item} />
+            <StretchContent key={item.id}>
+              <ServiceCard {...item} />
+            </StretchContent>
           ))}
         </Carousel.Content>
         <Carousel.Footer style={{ justifyContent: 'center' }}>
