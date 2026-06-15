@@ -113,12 +113,18 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
     const labelId = useId();
     const control = indicatorSemantics === 'control';
 
+    const hasLabelChild =
+      control &&
+      type !== 'default' &&
+      Children.toArray(children).some((child) => isValidElement(child) && child.type === DropdownItemValueLabel);
+    const labelledBy = hasLabelChild ? labelId : undefined;
+
     const checkboxAria = control
       ? {
           role: 'checkbox' as const,
           'aria-checked': indeterminate ? ('mixed' as const) : selected,
           'aria-disabled': disabled || undefined,
-          'aria-labelledby': labelId,
+          'aria-labelledby': labelledBy,
         }
       : { 'aria-hidden': true };
 
@@ -127,18 +133,17 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
           role: 'radio' as const,
           'aria-checked': selected,
           'aria-disabled': disabled || undefined,
-          'aria-labelledby': labelId,
+          'aria-labelledby': labelledBy,
         }
       : { 'aria-hidden': true };
 
-    const content =
-      control && type !== 'default'
-        ? Children.map(children, (child) =>
-            isValidElement(child) && child.type === DropdownItemValueLabel
-              ? cloneElement(child as ReactElement<DropdownItemValueSlotProps>, { id: labelId })
-              : child
-          )
-        : children;
+    const content = hasLabelChild
+      ? Children.map(children, (child) =>
+          isValidElement(child) && child.type === DropdownItemValueLabel
+            ? cloneElement(child as ReactElement<DropdownItemValueSlotProps>, { id: labelId })
+            : child
+        )
+      : children;
 
     return (
       <div

@@ -313,9 +313,9 @@ export const WithResultAndActions: Story = {
 // `Dropdown` moves focus into the list when it opens (it is a menu, not a
 // combobox), which would interrupt typing — so these examples render results in
 // an inline region. `DropdownItem` only needs a `DropdownContext`, supplied here
-// without the floating overlay, so items keep their padding, hover and `divided`
+// without the floating overlay, so items keep their padding and `hover`.
 // separators while focus stays in the field. The surface matches `.tedi-dropdown`.
-const LiveResults = ({ children }: { children: React.ReactNode; divided?: boolean }): JSX.Element => (
+const LiveResults = ({ children }: { children: React.ReactNode }): JSX.Element => (
   <DropdownContext.Provider
     value={
       {
@@ -426,7 +426,7 @@ export const Typeahead: Story = {
           }}
         />
         {open && query.length > 0 && (
-          <LiveResults divided={matches.length > 0}>
+          <LiveResults>
             {matches.length > 0 ? (
               matches.map((name, i) => (
                 <DropdownItem key={name} index={i} closeOnSelect={false} onClick={() => select(name)}>
@@ -501,7 +501,7 @@ export const AsyncSuggestions: Story = {
           onChange={handleChange}
         />
         {open && query.length > 0 && (
-          <LiveResults divided={!loading && results.length > 0}>
+          <LiveResults>
             {loading ? (
               <StatusRow>
                 <Spinner size={16} />
