@@ -246,5 +246,40 @@ describe('Carousel', () => {
         jest.useRealTimers();
       }
     });
+
+    it('jumps to a clicked indicator, clamped to the bounds', () => {
+      render(
+        <Carousel>
+          <Carousel.Content loop={false} slidesPerView={1}>
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i}>Slide {i + 1}</div>
+            ))}
+          </Carousel.Content>
+          <Carousel.Footer>
+            <Carousel.Indicators />
+          </Carousel.Footer>
+        </Carousel>
+      );
+      fireEvent.click(screen.getAllByRole('button', { name: 'carousel.show-slide' })[2]);
+      expect(activeDotIndex()).toBe(2);
+    });
+  });
+
+  describe('with a measured viewport', () => {
+    let descriptor: PropertyDescriptor | undefined;
+    beforeEach(() => {
+      descriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => 1000 });
+    });
+    afterEach(() => {
+      if (descriptor) Object.defineProperty(HTMLElement.prototype, 'clientWidth', descriptor);
+    });
+
+    it('positions the track with a real (non-zero) transform once measured', () => {
+      const { container } = renderCarousel(4);
+      const track = container.querySelector('[class*="track"]') as HTMLElement;
+
+      expect(track.style.transform).toMatch(/translate3d\(-\d/);
+    });
   });
 });

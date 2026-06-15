@@ -23,6 +23,8 @@
   position: relative;
   width: 100%;
   overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: var(--tedi-borders-02);
   overscroll-behavior: contain;
   touch-action: pan-y;
   cursor: grab;
@@ -146,8 +148,6 @@
   &:focus-visible::after {
     background-color: var(--carousel-dot-background-focus);
     border-color: var(--carousel-dot-border-focus);
-
-    // Outset focus ring (Figma "Focus ring/Outset"): white inner + primary outer.
     box-shadow: 0 0 0 var(--tedi-borders-01) var(--tedi-neutral-100),
       0 0 0 var(--tedi-borders-03) var(--tedi-primary-500);
   }

@@ -83,6 +83,7 @@ export const useCarousel = (): CarouselApi => {
   const startIndexRef = useRef(0);
   const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const scrollDeltaRef = useRef(0);
+  const mountedRef = useRef(true);
 
   const trackIndexRef = useRef(trackIndex);
   const windowBaseRef = useRef(windowBase);
@@ -189,7 +190,7 @@ export const useCarousel = (): CarouselApi => {
 
   const announceSlideChange = useCallback((): void => {
     setTimeout(() => {
-      if (!slidesCount) return;
+      if (!mountedRef.current || !slidesCount) return;
       const current = loop
         ? mod(Math.floor(trackIndexRef.current), slidesCount)
         : Math.min(Math.max(Math.round(trackIndexRef.current), 0), slidesCount - 1);
@@ -404,8 +405,13 @@ export const useCarousel = (): CarouselApi => {
     return () => observer.disconnect();
   }, []);
 
-  // Clear the pending wheel-snap timer on unmount so it can't fire after teardown.
-  useEffect(() => () => clearTimeout(wheelTimeoutRef.current), []);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      clearTimeout(wheelTimeoutRef.current);
+    },
+    []
+  );
 
   return {
     viewportRef,
