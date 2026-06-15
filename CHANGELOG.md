@@ -1,3 +1,10 @@
+# [18.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.10...react-18.0.0-rc.11) (2026-06-15)
+
+
+### Bug Fixes
+
+* **input-group,empty-state:** design review fixes [#667](https://github.com/TEDI-Design-System/react/issues/667) ([#668](https://github.com/TEDI-Design-System/react/issues/668)) ([bd120ae](https://github.com/TEDI-Design-System/react/commit/bd120ae7c6540399c727e5e240c7842d8af02154))
+
 # [18.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.9...react-18.0.0-rc.10) (2026-06-10)
 
 
