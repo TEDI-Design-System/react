@@ -24,7 +24,7 @@ export interface InputProps {
 }
 
 export const Input = ({ children }: InputProps) => {
-  const { disabled, inputId } = useInputGroup();
+  const { disabled, invalid, inputId } = useInputGroup();
 
   if (!React.isValidElement(children)) return children;
 
@@ -34,9 +34,12 @@ export const Input = ({ children }: InputProps) => {
     disabled: disabled || children.props.disabled,
     id: children.props.id ?? inputId,
     className: classNames(children.props.className, styles['tedi-input-group__input']),
-    ...(!isIntrinsicChild && {
-      wrapperClassName: classNames(children.props.wrapperClassName, styles['tedi-input-group__input']),
-    }),
+    ...(isIntrinsicChild
+      ? { 'aria-invalid': invalid || children.props['aria-invalid'] || undefined }
+      : {
+          invalid: invalid || children.props.invalid,
+          wrapperClassName: classNames(children.props.wrapperClassName, styles['tedi-input-group__input']),
+        }),
   };
 
   return React.cloneElement(children, extraProps);

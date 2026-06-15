@@ -18,7 +18,6 @@ const meta: Meta<typeof EmptyState> = {
   component: EmptyState,
   title: 'TEDI-Ready/Components/Helpers/EmptyState',
   argTypes: {
-    icon: { control: false },
     heading: { control: false },
     actions: { control: false },
   },
@@ -137,5 +136,12 @@ export const CustomIcon: Story = {
   args: {
     children: 'No products in your cart',
     icon: { name: 'shopping_cart_off' },
+  },
+};
+
+export const DifferentIconColor: Story = {
+  args: {
+    children: 'You have no data to display',
+    icon: { name: 'spa', color: 'tertiary' },
   },
 };
