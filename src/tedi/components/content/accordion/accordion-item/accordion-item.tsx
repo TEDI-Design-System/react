@@ -110,8 +110,7 @@ const AccordionItemComponent = (props: AccordionItemProps): JSX.Element => {
       }
     };
     return accordion.register(baseId, setExpandedFromAccordion);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accordion, baseId, controlled]);
+  }, [accordion, baseId, controlled, onToggle]);
 
   const toggle = React.useCallback(() => {
     if (disabled) return;
@@ -144,7 +143,7 @@ const AccordionItemComponent = (props: AccordionItemProps): JSX.Element => {
     window.addEventListener('hashchange', expandIfHashMatches);
     return () => window.removeEventListener('hashchange', expandIfHashMatches);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openOnHashMatch, idProp, disabled, controlled]);
+  }, [openOnHashMatch, idProp, disabled, controlled, expandedProp, onToggle]);
 
   const contextValue = React.useMemo<React.ContextType<typeof AccordionItemContext>>(
     () => ({

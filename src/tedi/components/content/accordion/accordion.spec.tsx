@@ -2,10 +2,21 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { Accordion } from './accordion';
 import { AccordionItem } from './accordion-item/accordion-item';
 
 import '@testing-library/jest-dom';
+
+jest.mock('../../../helpers', () => ({
+  useBreakpointProps: jest.fn(),
+}));
+
+beforeEach(() => {
+  (useBreakpointProps as jest.Mock).mockReturnValue({
+    getCurrentBreakpointProps: jest.fn((props) => props),
+  });
+});
 
 const renderItem = (title: string, key?: React.Key) => (
   <AccordionItem key={key}>

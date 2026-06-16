@@ -28,7 +28,7 @@ export * from './components/notifications/alert/alert';
 export * from './components/misc/empty-state';
 export * from './components/notifications/toast/toast';
 export * from './components/cards/card';
-export * from './components/cards/accordion';
+export * from './components/content/accordion';
 export * from './components/navigation/breadcrumbs';
 export * from './components/navigation/hash-trigger/hash-trigger';
 export * from './components/navigation/link/link';

@@ -234,34 +234,35 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
     </>
   );
 
-  const headerRoot = headerClickable ? (
-    <div data-name="accordion-item-header" className={hostClasses}>
-      <button
-        type="button"
-        id={headerId}
-        className={styles['tedi-accordion-item-header__trigger']}
-        onClick={toggle}
-        disabled={disabled}
-        aria-expanded={expanded}
-        aria-controls={contentId}
-      >
-        {headerContent}
-      </button>
-    </div>
+  const trigger: React.ReactNode = headerClickable ? (
+    <button
+      type="button"
+      id={headerId}
+      className={styles['tedi-accordion-item-header__trigger']}
+      onClick={toggle}
+      disabled={disabled}
+      aria-expanded={expanded}
+      aria-controls={contentId}
+    >
+      {headerContent}
+    </button>
   ) : (
-    <div data-name="accordion-item-header" className={hostClasses}>
-      <div id={headerId} className={styles['tedi-accordion-item-header__trigger']}>
-        {headerContent}
-      </div>
+    <div id={headerId} className={styles['tedi-accordion-item-header__trigger']}>
+      {headerContent}
     </div>
   );
 
-  if (headingLevel) {
+  const triggerWithHeading: React.ReactNode = (() => {
+    if (!headingLevel) return trigger;
     const HeadingTag = `h${headingLevel}` as const;
-    return <HeadingTag className={styles['tedi-accordion-item-header__heading-wrapper']}>{headerRoot}</HeadingTag>;
-  }
+    return <HeadingTag className={styles['tedi-accordion-item-header__heading-wrapper']}>{trigger}</HeadingTag>;
+  })();
 
-  return headerRoot;
+  return (
+    <div data-name="accordion-item-header" className={hostClasses}>
+      {triggerWithHeading}
+    </div>
+  );
 };
 
 AccordionItemHeader.displayName = 'AccordionItemHeader';

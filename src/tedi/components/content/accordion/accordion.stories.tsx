@@ -20,27 +20,27 @@ import { AccordionItemHeaderProps } from './accordion-item-header/accordion-item
  */
 
 export default {
-  title: 'TEDI-Ready/Components/Cards/Accordion',
+  title: 'TEDI-Ready/Content/Accordion',
   component: Accordion,
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
     controls: {
-      // TODO:
-      exclude: [
-        // 'children',
-        // 'className',
-        // 'openOnHashMatch',
-        'sm',
-        'md',
-        'lg',
-        'xl',
-        'xxl',
-      ],
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
   },
   argTypes: {
+    children: {
+      control: false,
+      description: 'One or more `Accordion.Item` components.',
+      table: { category: 'Accordion', type: { summary: 'ReactNode' } },
+    },
+    className: {
+      control: 'text',
+      description: 'Extra class applied to the Accordion host element.',
+      table: { category: 'Accordion', type: { summary: 'string' } },
+    },
     allowMultiple: {
       control: 'boolean',
       description: 'Whether multiple accordion items can be opened at once.',
@@ -161,6 +161,15 @@ export default {
         'it adds semantic info for assistive technologies without affecting layout.',
       table: { category: 'Accordion Item Header' },
     },
+    openOnHashMatch: {
+      control: 'boolean',
+      description:
+        'Auto-expand the item when `window.location.hash` matches its `id`. ' +
+        'Requires an explicit `id` prop — no-op for items using the auto-generated React id. ' +
+        'See the **HashDeepLinking** story for a working demo (this Default story does not set `id`, ' +
+        'so toggling this control has no visible effect here).',
+      table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
+    },
     disabled: {
       control: 'boolean',
       description:
@@ -189,7 +198,7 @@ const iconCardTemplate = (
   <>
     <Icon name="business_center" color="secondary" size={24} />
     <Text element="span" color="secondary" modifiers="bold">
-      Töövõime
+      Category
     </Text>
   </>
 );
@@ -240,11 +249,17 @@ const DefaultTemplate: StoryFn<AccordionStoryArgs> = (args) => {
     headerClass,
     headingLevel,
     contentClass,
+    className,
   } = args;
   const [selected, setSelected] = React.useState<boolean>(!!initialSelected);
 
   return (
-    <Accordion allowMultiple={allowMultiple} itemGap={itemGap} defaultExpanded={accordionDefaultExpanded}>
+    <Accordion
+      allowMultiple={allowMultiple}
+      itemGap={itemGap}
+      defaultExpanded={accordionDefaultExpanded}
+      className={className}
+    >
       <Accordion.Item
         defaultExpanded={defaultExpanded}
         showIconCard={showIconCard}
@@ -971,9 +986,8 @@ export const HashDeepLinking: StoryObj = {
       description: {
         story: `
 Items with \`openOnHashMatch\` auto-expand when \`window.location.hash\`
-matches their \`id\`. Useful for citizen service portals, public-information
-FAQs, or any government page where a sharable link should open straight to a
-specific section.
+matches their \`id\`. Useful for FAQs, settings panels, documentation, or any
+page where a sharable link should open straight to a specific section.
 
 Click the links below to update the URL hash. The matching item expands
 automatically. The listener also reacts to \`hashchange\`, so users
@@ -1033,12 +1047,12 @@ element per the WAI-ARIA Accordion Pattern. The wrapper uses
 to the document outline that assistive technologies, table-of-contents
 generators, and SEO crawlers rely on.
 
-Use it whenever the accordion participates in a heading hierarchy: citizen
-service portals, policy documentation, public records — any government
-page where structured content must remain navigable for screen-reader
-users. Pick a level that fits the surrounding content (typically one level
-deeper than the section's own heading — \`<h2>\` section → \`<h3>\`
-accordion items).
+Use it whenever the accordion participates in a heading hierarchy: FAQs,
+documentation, policy pages, dashboards with sectioned content — anywhere
+the document outline matters for screen-reader navigation, table-of-contents
+generators, or SEO. Pick a level that fits the surrounding content
+(typically one level deeper than the section's own heading — \`<h2>\`
+section → \`<h3>\` accordion items).
 
 Inspect the DOM to confirm: each header is wrapped in a real \`<h3>\`,
 but the rendered look matches the surrounding accordion items exactly.

@@ -77,10 +77,10 @@ describe('AccordionItemHeader', () => {
       endAction: <span data-testid="end-action">end</span>,
     });
 
-    expect(screen.getByTestId('start-action')).toBeInTheDocument();
-    expect(screen.getByTestId('before-title')).toBeInTheDocument();
-    expect(screen.getByTestId('after-title')).toBeInTheDocument();
-    expect(screen.getByTestId('end-action')).toBeInTheDocument();
+    expect(screen.getByText('start')).toBeInTheDocument();
+    expect(screen.getByText('before')).toBeInTheDocument();
+    expect(screen.getByText('after')).toBeInTheDocument();
+    expect(screen.getByText('end')).toBeInTheDocument();
   });
 
   it('renders start and end description slots', () => {
@@ -89,8 +89,8 @@ describe('AccordionItemHeader', () => {
       endDescription: <span data-testid="end-desc">end-desc</span>,
     });
 
-    expect(screen.getByTestId('start-desc')).toBeInTheDocument();
-    expect(screen.getByTestId('end-desc')).toBeInTheDocument();
+    expect(screen.getByText('start-desc')).toBeInTheDocument();
+    expect(screen.getByText('end-desc')).toBeInTheDocument();
   });
 
   it('falls back to the LabelProvider open/close translations when labels are not set', async () => {

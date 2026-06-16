@@ -38,14 +38,15 @@ describe('AccordionItemContent', () => {
 
   it('toggles aria-hidden and inert with the expanded state', async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    render(
       <AccordionItem>
         <AccordionItem.Header title="Hello" />
         <AccordionItemContent>Body content</AccordionItemContent>
       </AccordionItem>
     );
 
-    const content = container.querySelector('[data-name="accordion-item-content"]') as HTMLElement;
+    const trigger = screen.getByRole('button');
+    const content = document.getElementById(trigger.getAttribute('aria-controls')!) as HTMLElement;
     expect(content.getAttribute('aria-hidden')).toBe('true');
     expect(content.hasAttribute('inert')).toBe(true);
     expect(content.getAttribute('role')).toBeNull();
@@ -58,27 +59,29 @@ describe('AccordionItemContent', () => {
   });
 
   it('applies a custom contentClass on the host', () => {
-    const { container } = render(
+    render(
       <AccordionItem>
         <AccordionItem.Header title="Hello" />
         <AccordionItemContent contentClass="custom-content">Body</AccordionItemContent>
       </AccordionItem>
     );
 
-    const content = container.querySelector('[data-name="accordion-item-content"]') as HTMLElement;
+    const trigger = screen.getByRole('button');
+    const content = document.getElementById(trigger.getAttribute('aria-controls')!) as HTMLElement;
     expect(content).toHaveClass('custom-content');
     expect(content.className).toMatch(/tedi-accordion-item-content/);
   });
 
   it('applies the with-icon-card modifier when the parent item enables the icon card', () => {
-    const { container } = render(
+    render(
       <AccordionItem showIconCard iconCard={<span>icon</span>}>
         <AccordionItem.Header title="Hello" />
         <AccordionItemContent>Body</AccordionItemContent>
       </AccordionItem>
     );
 
-    const content = container.querySelector('[data-name="accordion-item-content"]') as HTMLElement;
+    const trigger = screen.getByRole('button');
+    const content = document.getElementById(trigger.getAttribute('aria-controls')!) as HTMLElement;
     expect(content.className).toMatch(/with-icon-card/);
   });
 
