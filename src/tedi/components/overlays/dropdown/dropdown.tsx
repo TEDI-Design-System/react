@@ -131,9 +131,6 @@ export const Dropdown = (props: DropdownProps) => {
 
   const open = controlledOpen ?? uncontrolledOpen;
 
-  // Re-seed the active index every time the dropdown closes, so the next open
-  // starts with the caller-provided "current selection" pre-focused — not
-  // whatever activeIndex useListNavigation last left behind.
   React.useEffect(() => {
     if (!open) setActiveIndex(defaultActiveIndex ?? null);
   }, [open, defaultActiveIndex]);
@@ -168,9 +165,6 @@ export const Dropdown = (props: DropdownProps) => {
       activeIndex,
       onNavigate: setActiveIndex,
       loop: true,
-      // When the caller passes `defaultActiveIndex`, treat that item as the
-      // current selection and force focus to land on it when the dropdown
-      // opens — regardless of whether it was opened via click or keyboard.
       selectedIndex: defaultActiveIndex ?? null,
       focusItemOnOpen: defaultActiveIndex !== null ? true : 'auto',
     }),

@@ -9,6 +9,11 @@ import DateTimePicker, { DateTimePickerProps } from './datetimepicker';
 const meta: Meta<typeof DateTimePicker> = {
   component: DateTimePicker,
   title: 'Community/Form/Pickers/DateTimePicker',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -16,6 +16,12 @@
   border: var(--tedi-borders-01) solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
 
+  &--borderless {
+    background: none;
+    border: none;
+    border-radius: 0;
+  }
+
   table {
     width: 100%;
     border-spacing: 0;
@@ -67,7 +73,8 @@
       all: unset;
       display: block;
       width: 100%;
-      height: 100%;
+      width: var(--form-calendar-date-width);
+      height: var(--form-calendar-date-width);
       overflow: hidden;
       font-size: var(--body-regular-size);
       font-weight: var(--tedi-weight-02);
@@ -198,6 +205,12 @@
   max-width: 20rem;
   border: var(--tedi-borders-01) solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
+
+  &.tedi-calendar--borderless {
+    background: none;
+    border: none;
+    border-radius: 0;
+  }
 }
 
 .tedi-calendar__picker-grid-header {
