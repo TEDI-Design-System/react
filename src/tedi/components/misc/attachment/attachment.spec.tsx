@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { Button } from '../../buttons/button/button';
 import { Attachment } from './attachment';
 
 describe('Attachment component', () => {
@@ -112,6 +113,36 @@ describe('Attachment component', () => {
     const slot = container.querySelector('[data-name="attachment-actions"]');
     expect(slot).toBeInTheDocument();
     expect(slot).toContainElement(screen.getByRole('button', { name: 'View' }));
+  });
+
+  it('defaults action `Button`s to the neutral visual type', () => {
+    render(
+      <Attachment
+        name="invoice.pdf"
+        actions={
+          <Button icon="download" onClick={() => undefined}>
+            Download invoice.pdf
+          </Button>
+        }
+      />
+    );
+    expect(screen.getByRole('button', { name: 'Download invoice.pdf' })).toHaveClass('tedi-btn--neutral');
+  });
+
+  it('keeps an explicit `visualType` on an action `Button` (slot stays open)', () => {
+    render(
+      <Attachment
+        name="invoice.pdf"
+        actions={
+          <Button visualType="primary" icon="check" onClick={() => undefined}>
+            Confirm invoice.pdf
+          </Button>
+        }
+      />
+    );
+    const confirm = screen.getByRole('button', { name: 'Confirm invoice.pdf' });
+    expect(confirm).toHaveClass('tedi-btn--primary');
+    expect(confirm).not.toHaveClass('tedi-btn--neutral');
   });
 
   it('appends consumer className', () => {

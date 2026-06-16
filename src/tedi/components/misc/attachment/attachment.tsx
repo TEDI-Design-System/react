@@ -4,7 +4,7 @@ import React, { forwardRef } from 'react';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
-import { Button } from '../../buttons/button/button';
+import { Button, ButtonProps } from '../../buttons/button/button';
 import FeedbackText, { FeedbackTextProps } from '../../form/feedback-text/feedback-text';
 import { ProgressBar } from '../../loaders/progress-bar/progress-bar';
 import styles from './attachment.module.scss';
@@ -13,11 +13,6 @@ export type AttachmentFileSizeUnit = 'auto' | 'B' | 'KB' | 'MB' | 'GB';
 
 const FILE_SIZE_UNITS: AttachmentFileSizeUnit[] = ['B', 'KB', 'MB', 'GB'];
 
-/**
- * Format a byte count for display. Picks the largest unit ≤ value with one
- * fractional digit (e.g. `1.2 MB`). Pass `unit` to lock to a specific scale.
- * Pass `locale` to override the default `'et-EE'` number formatting.
- */
 const defaultFormatFileSize = (bytes: number, unit: AttachmentFileSizeUnit = 'auto', locale = 'et-EE'): string => {
   if (!Number.isFinite(bytes) || bytes < 0) return '';
 
@@ -53,7 +48,7 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
    * card. Pass a pre-formatted string (e.g. `'PDF'`, `'Uploaded by Anne'`) —
    * the component does no formatting of its own so the consumer keeps full
    * control over locale and units. Independent from `fileSize`: meta renders
-   * below the file name, file size renders inline before the remove button.
+   * below the file name, file size renders right-aligned on the file-name line.
    *
    * For error / validation feedback rendered **below** the card, use
    * `feedback` instead — it's a separate semantic slot bound to ARIA.
@@ -69,9 +64,9 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
    */
   feedback?: FeedbackTextProps;
   /**
-   * File size in bytes. When set, the formatted size is rendered inline to
-   * the left of the remove / loading slot — same row as the file name, not
-   * under it. Use the `fileSizeUnit` prop to lock the displayed unit, or
+   * File size in bytes. When set, the formatted size is rendered inside the
+   * card body, right-aligned on the same line as the file name (opposite the
+   * name). Use the `fileSizeUnit` prop to lock the displayed unit, or
    * `formatFileSize` for full control over the output string.
    */
   fileSize?: number;
@@ -102,10 +97,15 @@ export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   icon?: string | null;
   /**
    * Extra action controls rendered in the right-hand action area, to the left
-   * of the remove button — drop in your own `Button`s / icons here (download,
-   * view, open in new tab, etc.). This is the supported way to make a file
+   * of the remove button — drop in your own `Button`s here (download, view,
+   * open in new tab, etc.). This is the supported way to make a file
    * downloadable: the row itself is never a single clickable target, so each
    * affordance is an explicit, individually focusable control.
+   *
+   * `Button` children default to `visualType="neutral"` (matching the design),
+   * but the slot stays open — set any `visualType` explicitly on a button to
+   * override (e.g. a `primary` confirm or `danger` action). Non-`Button` nodes
+   * pass through untouched.
    */
   actions?: React.ReactNode;
   /**
@@ -209,7 +209,9 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
       )}
       <span className={styles['tedi-attachment__body']}>
         <span className={styles['tedi-attachment__name']}>
-          <Text element="span">{name}</Text>
+          <Text element="span" className={styles['tedi-attachment__name-text']}>
+            {name}
+          </Text>
           {invalid && (
             <Icon
               name="error"
@@ -218,6 +220,11 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
               size={16}
               className={styles['tedi-attachment__invalid-icon']}
             />
+          )}
+          {formattedFileSize && (
+            <Text element="span" modifiers="small" color="tertiary" className={styles['tedi-attachment__file-size']}>
+              {formattedFileSize}
+            </Text>
           )}
         </span>
         {isLoading ? (
@@ -236,24 +243,24 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
           )
         )}
       </span>
-      {formattedFileSize && (
-        <Text element="span" modifiers="small" color="tertiary" className={styles['tedi-attachment__file-size']}>
-          {formattedFileSize}
-        </Text>
-      )}
     </>
   );
 
   const removeButton = onRemove ? (
-    <Button visualType="neutral" size="small" icon={removeIcon} onClick={onRemove} data-name="attachment-remove">
+    <Button visualType="neutral" icon={removeIcon} onClick={onRemove} data-name="attachment-remove">
       {removeLabel ?? `${getLabel('remove')} ${name}`}
     </Button>
   ) : null;
 
+  const renderAction = (node: React.ReactNode): React.ReactNode =>
+    React.isValidElement(node) && node.type === Button && (node.props as ButtonProps).visualType === undefined
+      ? React.cloneElement(node as React.ReactElement<ButtonProps>, { visualType: 'neutral' })
+      : node;
+
   const actionsSlot =
     actions || removeButton ? (
       <span className={styles['tedi-attachment__actions']} data-name="attachment-actions">
-        {actions}
+        {React.Children.map(actions, renderAction)}
         {removeButton}
       </span>
     ) : null;

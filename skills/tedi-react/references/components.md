@@ -1210,7 +1210,7 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `fileSizeLocale?: string = 'et-EE'` — `Intl.NumberFormat` locale
 - `formatFileSize?: (bytes: number) => string` — full override for the file-size string
 - `icon?: string | null = 'description'` — left file-type glyph; pass `null` to omit
-- `actions?: ReactNode` — extra controls (download / view / open) rendered to the left of the remove button. The row is never a single clickable target — give each affordance its own focusable button here.
+- `actions?: ReactNode` — extra controls (download / view / open) rendered to the left of the remove button. The row is never a single clickable target — give each affordance its own focusable button here. Action `Button`s default to `visualType="neutral"` (per the design); the slot stays open, so set `visualType` explicitly to use any other type.
 - `onRemove?: () => void` — when set, shows the inline remove button (visible during loading so the upload can be cancelled)
 - `removeIcon?: string = 'delete'`, `removeLabel?: string` — falls back to `${label('remove')} ${name}`
 - `isLoading?: boolean = false` — swaps `meta` for an inline `ProgressBar`; `progress?: number = 0` (0..100)
@@ -1223,7 +1223,7 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 <Attachment
   name="contract.pdf"
   fileSize={1_240_000}
-  actions={<Button visualType="neutral" size="small" icon="download" onClick={download}>Download contract.pdf</Button>}
+  actions={<Button size="small" icon="download" onClick={download}>Download contract.pdf</Button>} // defaults to neutral
   onRemove={remove}
 />
 
