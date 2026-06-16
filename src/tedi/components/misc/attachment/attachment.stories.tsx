@@ -227,26 +227,6 @@ export const WithProgressBar: StoryFn<AttachmentProps> = () => (
 );
 
 /**
- * `isValid={false}` flips the row to the danger surface and shows an error glyph
- * next to the file name — for files that failed validation. Pair with `meta` or
- * `feedback` to explain why.
- */
-export const Invalid: StoryFn<AttachmentProps> = () => (
-  <div style={{ maxWidth: 480 }}>
-    <VerticalSpacing size={0.5}>
-      <Attachment
-        name="pilt_2026_06.heic"
-        fileSize={8_500_000}
-        meta="Fail on liiga suur"
-        isValid={false}
-        onRemove={() => null}
-      />
-      <Attachment name="dokument.exe" meta="Lubamatu failitüüp" isValid={false} onRemove={() => null} />
-    </VerticalSpacing>
-  </div>
-);
-
-/**
  * `feedback` renders a `FeedbackText` row **below** the card (validation error,
  * hint, success), wired to the row via `aria-describedby`. Distinct from `meta`,
  * which is secondary text **inside** the card under the file name.
