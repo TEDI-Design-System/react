@@ -129,6 +129,26 @@ describe('Attachment component', () => {
     expect(screen.getByRole('button', { name: 'Download invoice.pdf' })).toHaveClass('tedi-btn--neutral');
   });
 
+  it('defaults fragment-grouped action `Button`s to the neutral visual type', () => {
+    render(
+      <Attachment
+        name="invoice.pdf"
+        actions={
+          <>
+            <Button icon="visibility" onClick={() => undefined}>
+              View invoice.pdf
+            </Button>
+            <Button icon="download" onClick={() => undefined}>
+              Download invoice.pdf
+            </Button>
+          </>
+        }
+      />
+    );
+    expect(screen.getByRole('button', { name: 'View invoice.pdf' })).toHaveClass('tedi-btn--neutral');
+    expect(screen.getByRole('button', { name: 'Download invoice.pdf' })).toHaveClass('tedi-btn--neutral');
+  });
+
   it('keeps an explicit `visualType` on an action `Button` (slot stays open)', () => {
     render(
       <Attachment

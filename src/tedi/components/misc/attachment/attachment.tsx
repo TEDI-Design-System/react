@@ -252,10 +252,22 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     </Button>
   ) : null;
 
-  const renderAction = (node: React.ReactNode): React.ReactNode =>
-    React.isValidElement(node) && node.type === Button && (node.props as ButtonProps).visualType === undefined
-      ? React.cloneElement(node as React.ReactElement<ButtonProps>, { visualType: 'neutral' })
-      : node;
+  const renderAction = (node: React.ReactNode): React.ReactNode => {
+    if (!React.isValidElement(node)) {
+      return node;
+    }
+
+    if (node.type === React.Fragment) {
+      const children = (node.props as { children?: React.ReactNode }).children;
+      return React.cloneElement(node, undefined, React.Children.map(children, renderAction));
+    }
+
+    if (node.type === Button && (node.props as ButtonProps).visualType === undefined) {
+      return React.cloneElement(node as React.ReactElement<ButtonProps>, { visualType: 'neutral' });
+    }
+
+    return node;
+  };
 
   const actionsSlot =
     actions || removeButton ? (

@@ -113,7 +113,10 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           {innerFiles.map((file: FileUploadFile) => {
             const overrides = typeof attachmentProps === 'function' ? attachmentProps(file) : attachmentProps;
             return (
-              <List.Item key={file.id || file.name} className={styles['tedi-file-dropzone__file-list-item']}>
+              <List.Item
+                key={file.id ?? `${file.name ?? 'file'}-${file.size ?? ''}-${file.lastModified ?? ''}`}
+                className={styles['tedi-file-dropzone__file-list-item']}
+              >
                 <Attachment
                   {...overrides}
                   name={file.name ?? ''}
