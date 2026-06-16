@@ -92,8 +92,12 @@ export const VerticalStepperSubItem = (props: VerticalStepperSubItemProps): JSX.
     </Text>
   );
 
+  // `aria-current` goes on the focusable link/button when interactive (announced
+  // on focus), otherwise on the `<li>` (static / informative / disabled rows).
+  const ariaCurrent = current ? 'step' : undefined;
+
   return (
-    <li aria-current={current ? 'step' : undefined} className={subItemBEM}>
+    <li aria-current={isInteractive ? undefined : ariaCurrent} className={subItemBEM}>
       <span className={styles['tedi-vertical-stepper__sub-indicator']} aria-hidden="true">
         <span className={styles['tedi-vertical-stepper__sub-dot']} />
       </span>
@@ -103,6 +107,7 @@ export const VerticalStepperSubItem = (props: VerticalStepperSubItemProps): JSX.
             href={Element === 'a' ? href : undefined}
             type={Element === 'button' ? 'button' : undefined}
             onClick={onClick}
+            aria-current={ariaCurrent}
             className={styles['tedi-vertical-stepper__link']}
           >
             {label}

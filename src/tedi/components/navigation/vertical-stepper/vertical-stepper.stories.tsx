@@ -265,7 +265,7 @@ const StateMatrix = <T,>({
 );
 
 export const States: Story = {
-  parameters: { pseudo: { hover: '.vs-hover' } },
+  parameters: { pseudo: { hover: ['.vs-hover a', '.vs-hover button'] } },
   render: () => (
     <VerticalSpacing size={2}>
       <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(false, props)} />

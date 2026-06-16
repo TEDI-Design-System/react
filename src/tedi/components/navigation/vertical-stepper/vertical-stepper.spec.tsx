@@ -1,8 +1,11 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render as rtlRender, screen, within } from '@testing-library/react';
 
+import { PrintingProvider } from '../../../providers/printing-provider/printing-provider';
 import { VerticalStepper } from './vertical-stepper';
 
 import '@testing-library/jest-dom';
+
+const render = (ui: JSX.Element) => rtlRender(<PrintingProvider>{ui}</PrintingProvider>);
 
 describe('VerticalStepper', () => {
   it('renders a nav landmark with an accessible name', () => {
@@ -37,6 +40,19 @@ describe('VerticalStepper', () => {
     const current = container.querySelector('[aria-current="step"]');
     expect(current).toHaveTextContent('Second');
     expect(container.querySelectorAll('[aria-current="step"]')).toHaveLength(1);
+  });
+
+  it('puts aria-current on the focusable link for an interactive current step', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title="First" state="completed" href="#1" />
+        <VerticalStepper.Item title="Second" current href="#2" />
+      </VerticalStepper>
+    );
+    // Announced on focus: the marker is on the link itself, not the wrapping <li>.
+    const link = screen.getByRole('link', { name: /Second/ });
+    expect(link).toHaveAttribute('aria-current', 'step');
+    expect(link.closest('li')).not.toHaveAttribute('aria-current');
   });
 
   it('shows a completed check icon with a screen-reader label', () => {
@@ -87,7 +103,6 @@ describe('VerticalStepper', () => {
     expect(screen.queryByRole('button', { name: 'Disabled step' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Disabled step' })).not.toBeInTheDocument();
     expect(screen.getByText('Disabled step')).toBeInTheDocument();
-    // A visually-hidden cue conveys the disabled state to assistive tech.
     expect(screen.getByText(/stepper\.disabled/)).toBeInTheDocument();
   });
 
@@ -147,7 +162,6 @@ describe('VerticalStepper', () => {
       </VerticalStepper>
     );
     expect(container.querySelector('.tedi-vertical-stepper--compact')).toBeInTheDocument();
-    // No rendered step number in the indicator for a completed compact step.
     expect(container.querySelector('.tedi-vertical-stepper__number')).not.toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'stepper.completed' })).toBeInTheDocument();
   });

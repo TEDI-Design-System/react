@@ -4,6 +4,7 @@ import React, { useId, useState } from 'react';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
+import Collapse from '../../buttons/collapse/collapse';
 import styles from './vertical-stepper.module.scss';
 import { useVerticalStepperContext } from './vertical-stepper-context';
 
@@ -172,29 +173,30 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
 
   const info_ = info && <div className={styles['tedi-vertical-stepper__info']}>{info}</div>;
 
+  // Put `aria-current` on the focusable link/button when the step is interactive
+  // so it's announced on focus (Tab), not only in browse mode; otherwise keep it
+  // on the `<li>` (static steps, and expandable steps whose toggle is a `Collapse`).
+  const ariaCurrent = current ? 'step' : undefined;
+
   return (
-    <li aria-current={current ? 'step' : undefined} className={itemBEM}>
+    <li aria-current={isInteractive ? undefined : ariaCurrent} className={itemBEM}>
       {indicator}
       <div className={styles['tedi-vertical-stepper__content']}>
         {hasChildren ? (
           <>
-            <button
-              type="button"
-              className={cn(styles['tedi-vertical-stepper__link'], styles['tedi-vertical-stepper__toggle'])}
-              aria-expanded={isOpen}
-              aria-controls={subListId}
-              onClick={handleToggle}
-            >
+            <div className={styles['tedi-vertical-stepper__toggle']}>
               {titleNode}
-              <Icon
-                name="expand_more"
-                size={18}
-                aria-hidden="true"
-                className={cn(styles['tedi-vertical-stepper__chevron'], {
-                  [styles['tedi-vertical-stepper__chevron--open']]: isOpen,
-                })}
-              />
-            </button>
+              <Collapse
+                id={`${subListId}-toggle`}
+                iconOnly
+                controlsId={subListId}
+                open={isOpen}
+                onToggle={handleToggle}
+                toggleLabel={typeof title === 'string' ? title : undefined}
+              >
+                {null}
+              </Collapse>
+            </div>
             {description_}
             {info_}
             <ul id={subListId} hidden={!isOpen} className={styles['tedi-vertical-stepper__sub-list']}>
@@ -208,6 +210,7 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
                 href={Element === 'a' ? href : undefined}
                 type={Element === 'button' ? 'button' : undefined}
                 onClick={onClick}
+                aria-current={ariaCurrent}
                 className={styles['tedi-vertical-stepper__link']}
               >
                 {titleNode}
