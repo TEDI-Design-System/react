@@ -70,10 +70,10 @@
   margin: 0;
   appearance: none;
   cursor: pointer;
+  outline: none;
   background: transparent;
   border: 0;
   border-radius: inherit;
-  outline: none;
 
   &::-webkit-slider-runnable-track {
     width: 100%;

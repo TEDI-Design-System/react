@@ -63,8 +63,8 @@
 
 .tedi-table__cell {
   padding: var(--table-data-padding-y) var(--table-data-padding-x);
-  color: var(--general-text-primary);
   vertical-align: middle;
+  color: var(--general-text-primary);
 }
 
 .tedi-table__cell--align-left {
@@ -170,9 +170,9 @@
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+  clip: rect(0, 0, 0, 0);
 }
 
 .tedi-table__header-cell-inner {
@@ -208,9 +208,9 @@
 
   &:focus-visible {
     color: var(--button-main-primary-background-default);
-    background: var(--button-main-neutral-icon-only-background-hover);
     outline: var(--tedi-borders-02) solid var(--general-border-focus);
     outline-offset: 0;
+    background: var(--button-main-neutral-icon-only-background-hover);
   }
 
   &:disabled {
