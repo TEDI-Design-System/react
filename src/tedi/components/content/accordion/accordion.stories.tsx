@@ -161,13 +161,18 @@ export default {
         'it adds semantic info for assistive technologies without affecting layout.',
       table: { category: 'Accordion Item Header' },
     },
+    id: {
+      control: false,
+      description:
+        'Stable id used for hash-based deep-linking. Pair with `openOnHashMatch`. ' +
+        'Also seeds the auto-generated header/content ARIA ids when set.',
+      table: { category: 'Accordion Item', type: { summary: 'string' } },
+    },
     openOnHashMatch: {
-      control: 'boolean',
+      control: false,
       description:
         'Auto-expand the item when `window.location.hash` matches its `id`. ' +
-        'Requires an explicit `id` prop — no-op for items using the auto-generated React id. ' +
-        'See the **HashDeepLinking** story for a working demo (this Default story does not set `id`, ' +
-        'so toggling this control has no visible effect here).',
+        'Requires an explicit `id` prop — no-op for items using the auto-generated React id.',
       table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
     },
     disabled: {
@@ -848,7 +853,7 @@ export const Customized: StoryObj = {
               <Accordion.Item.Header
                 title="Title"
                 titleLayout="fill"
-                startAction={<StatusBadge color="success">Approved</StatusBadge>}
+                afterTitle={<StatusBadge color="success">Approved</StatusBadge>}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
