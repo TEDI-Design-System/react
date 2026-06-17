@@ -1050,11 +1050,15 @@ Sub-component: `CardStepper.Step` — declarative per-step config (compound API)
 
 **Props:** `CardStepperProps` | fRef
 - Steps — either as compound `CardStepper.Step` children **or** the `steps` data prop (one is required; children win when both are given):
-  - `<CardStepper.Step title state? description? id? disabled? />` — `CardStepperStepProps`
-  - `steps?: CardStepperStepProps[]` — `{ title, description?, state?, id?, disabled? }`
+  - `<CardStepper.Step title state? description? id? disabled? bottomSlot? />` — `CardStepperStepProps`
+  - `steps?: CardStepperStepProps[]` — `{ title, description?, state?, id?, disabled?, bottomSlot? }`
   - The active step shows on the card, all steps in the modal. `disabled` steps are skipped by the arrows and non-clickable in the list.
+  - `bottomSlot?: ReactNode` — custom content (e.g. an `Alert` or action button) rendered at the bottom of the card for the active step only
 - `activeStep?: number` (controlled, 0-based) + `onStepChange?: (index) => void`, or `defaultActiveStep?: number` (uncontrolled)
 - `showStepNumber?: boolean = true` — active step number in a ring indicator (ignored when `showNavigation`)
+- `showStatusIcon?: boolean = false` — status icon next to the active step's title: a success check when its `state` is `'completed'`, a danger icon when `'error'` (nothing otherwise)
+- `infoPosition?: 'top' | 'bottom' = 'bottom'` — places the active step's `description` above or below its title
+- `counterPosition?: 'inline' | 'top' = 'inline'` — `'top'` floats the `N / M` counter above the title (and removes it from the trailing controls)
 - `showProgress?: boolean = true` — segmented progress bar (one segment per step; filled up to and including the active step, so the green count equals the N in N / M)
 - `showNavigation?: boolean = false` — prev / next arrow buttons (sequential, skip `disabled` steps, disabled at the bounds)
 - `showStepList?: boolean = true` — the list button + step-list modal. Turn off for a read-only tracker / arrows-only flow.

@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React, { forwardRef, useId, useState } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
+import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Modal } from '../../overlays/modal/modal';
@@ -63,6 +64,31 @@ export interface CardStepperProps {
    */
   showStepNumber?: boolean;
   /**
+   * Show a status icon next to the active step's title — a success check when the
+   * step's `state` is `'completed'`, a danger icon when it's `'error'`. Nothing is
+   * shown for other states. Matches the Figma "with status icon" variant.
+   * @default false
+   */
+  showStatusIcon?: boolean;
+  /**
+   * Where the active step's `description` sits relative to its title:
+   * - `'bottom'` (default) — below the title.
+   * - `'top'` — above the title, as a small secondary line.
+   *
+   * Matches the Figma "with info top" / "with info bottom" variants.
+   * @default bottom
+   */
+  infoPosition?: 'top' | 'bottom';
+  /**
+   * Where the `N / M` step counter sits:
+   * - `'inline'` (default) — in the trailing controls, next to the list / next button.
+   * - `'top'` — above the title (and removed from the trailing controls).
+   *
+   * Matches the Figma "with info top" variant that floats the counter above the title.
+   * @default inline
+   */
+  counterPosition?: 'inline' | 'top';
+  /**
    * Show the segmented progress bar below the row.
    * @default true
    */
@@ -119,6 +145,9 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
     defaultActiveStep = 0,
     onStepChange,
     showStepNumber = true,
+    showStatusIcon = false,
+    infoPosition = 'bottom',
+    counterPosition = 'inline',
     showProgress = true,
     showNavigation = false,
     showStepList = true,
@@ -138,7 +167,6 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
     status: labels?.status ?? ((current, totalSteps) => getLabel('stepper.status', current, totalSteps)),
   };
 
-  // Prefer `CardStepper.Step` children (compound API); fall back to the `steps` data prop.
   const childSteps = React.Children.toArray(children)
     .filter(
       (child): child is React.ReactElement<CardStepperStepProps> =>
@@ -164,7 +192,6 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
     onStepChange?.(index);
   };
 
-  // Whether a step can be jumped to from the modal list.
   const isStepNavigable = (index: number): boolean => {
     const step = steps[index];
     if (!step || step.disabled) return false;
@@ -174,7 +201,6 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
     return step.state === 'completed' || index === active + 1;
   };
 
-  // Nearest non-disabled step in a direction (for the sequential arrows); -1 if none.
   const adjacentEnabled = (from: number, direction: -1 | 1): number => {
     for (let i = from; i >= 0 && i < total; i += direction) {
       if (!steps[i].disabled) return i;
@@ -185,6 +211,24 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
   const nextIndex = adjacentEnabled(active + 1, 1);
 
   if (!current) return <></>;
+
+  const counterNode = (
+    <span className={styles['tedi-card-stepper__counter']}>
+      <span aria-hidden="true">
+        {active + 1} / {total}
+      </span>
+      <span className="visually-hidden">{resolvedLabels.status(active + 1, total)}</span>
+    </span>
+  );
+
+  const descriptionNode = current.description ? (
+    <Text modifiers="small" color="tertiary" className={styles['tedi-card-stepper__description']}>
+      {current.description}
+    </Text>
+  ) : null;
+
+  const showTopDescription = infoPosition === 'top' && descriptionNode;
+  const showTopRow = counterPosition === 'top' || showTopDescription;
 
   return (
     <div ref={ref} role="group" aria-label={ariaLabel} className={cn(styles['tedi-card-stepper'], className)}>
@@ -211,23 +255,33 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
           </span>
         )}
 
+        {showTopRow && (
+          <div className={styles['tedi-card-stepper__top']}>
+            {counterPosition === 'top' && counterNode}
+            {showTopDescription && descriptionNode}
+          </div>
+        )}
+
         <Text element={headingElement} id={headingId} modifiers="h4" className={styles['tedi-card-stepper__title']}>
           {current.title}
+          {showStatusIcon && (current.state === 'completed' || current.state === 'error') && (
+            <Icon
+              name={current.state === 'completed' ? 'check' : 'error'}
+              color={current.state === 'completed' ? 'success' : 'danger'}
+              size={16}
+              display="inline"
+              label={getLabel(current.state === 'completed' ? 'stepper.completed' : 'stepper.error')}
+              className={styles['tedi-card-stepper__status-icon']}
+            />
+          )}
         </Text>
 
-        {current.description && (
-          <Text modifiers="small" color="tertiary" className={styles['tedi-card-stepper__description']}>
-            {current.description}
-          </Text>
+        {infoPosition === 'bottom' && descriptionNode && (
+          <div className={styles['tedi-card-stepper__description-bottom']}>{descriptionNode}</div>
         )}
 
         <div className={styles['tedi-card-stepper__trail']}>
-          <span className={styles['tedi-card-stepper__counter']}>
-            <span aria-hidden="true">
-              {active + 1} / {total}
-            </span>
-            <span className="visually-hidden">{resolvedLabels.status(active + 1, total)}</span>
-          </span>
+          {counterPosition === 'inline' && counterNode}
 
           {showStepList && (
             <Button
@@ -268,6 +322,8 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
           ))}
         </ol>
       )}
+
+      {current.bottomSlot && <div className={styles['tedi-card-stepper__bottom-slot']}>{current.bottomSlot}</div>}
 
       {showStepList && (
         <Modal open={modalOpen} onToggle={setModalOpen}>

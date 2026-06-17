@@ -169,4 +169,63 @@ describe('CardStepper', () => {
     expect(screen.getByRole('button', { name: 'Järgmine samm' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Ava sammud' })).toBeInTheDocument();
   });
+
+  it('shows a status icon for the active step only when showStatusIcon is set and the state warrants it', () => {
+    const { container, rerender } = render(
+      <CardStepper
+        steps={[{ title: 'One', state: 'completed' }, { title: 'Two' }]}
+        activeStep={0}
+        showStatusIcon
+        aria-label="Wizard"
+      />
+    );
+    expect(container.querySelector('.tedi-card-stepper__status-icon')).toHaveTextContent('check');
+
+    rerender(
+      <CardStepper steps={[{ title: 'One', state: 'error' }]} activeStep={0} showStatusIcon aria-label="Wizard" />
+    );
+    expect(container.querySelector('.tedi-card-stepper__status-icon')).toHaveTextContent('error');
+
+    rerender(<CardStepper steps={[{ title: 'One' }]} activeStep={0} showStatusIcon aria-label="Wizard" />);
+    expect(container.querySelector('.tedi-card-stepper__status-icon')).not.toBeInTheDocument();
+
+    rerender(<CardStepper steps={[{ title: 'One', state: 'completed' }]} activeStep={0} aria-label="Wizard" />);
+    expect(container.querySelector('.tedi-card-stepper__status-icon')).not.toBeInTheDocument();
+  });
+
+  it('places the description below the title by default and above it when infoPosition="top"', () => {
+    const steps: CardStepperStepProps[] = [{ title: 'One', description: 'Helper' }];
+    const { container, rerender } = render(<CardStepper steps={steps} activeStep={0} aria-label="Wizard" />);
+    expect(container.querySelector('.tedi-card-stepper__description-bottom')).toBeInTheDocument();
+    expect(container.querySelector('.tedi-card-stepper__top')).not.toBeInTheDocument();
+
+    rerender(<CardStepper steps={steps} activeStep={0} infoPosition="top" aria-label="Wizard" />);
+    const top = container.querySelector('.tedi-card-stepper__top');
+    expect(top).toBeInTheDocument();
+    expect(top).toHaveTextContent('Helper');
+    expect(container.querySelector('.tedi-card-stepper__description-bottom')).not.toBeInTheDocument();
+  });
+
+  it('moves the N / M counter above the title when counterPosition="top"', () => {
+    const steps: CardStepperStepProps[] = [{ title: 'One' }, { title: 'Two' }, { title: 'Three' }];
+    const { container } = render(
+      <CardStepper steps={steps} activeStep={1} counterPosition="top" aria-label="Wizard" />
+    );
+    const top = container.querySelector('.tedi-card-stepper__top');
+    expect(top).toHaveTextContent('2 / 3');
+    expect(container.querySelector('.tedi-card-stepper__trail')).not.toHaveTextContent('2 / 3');
+  });
+
+  it('renders only the active step bottomSlot', () => {
+    const steps: CardStepperStepProps[] = [
+      { title: 'One', bottomSlot: <span>slot-one</span> },
+      { title: 'Two', bottomSlot: <span>slot-two</span> },
+    ];
+    const { rerender } = render(<CardStepper steps={steps} activeStep={0} aria-label="Wizard" />);
+    expect(screen.getByText('slot-one')).toBeInTheDocument();
+    expect(screen.queryByText('slot-two')).not.toBeInTheDocument();
+
+    rerender(<CardStepper steps={steps} activeStep={1} aria-label="Wizard" />);
+    expect(screen.getByText('slot-two')).toBeInTheDocument();
+  });
 });

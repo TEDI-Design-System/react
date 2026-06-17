@@ -9,9 +9,6 @@
 }
 
 .tedi-card-stepper__main {
-  // Grid so the lead (arrow / number), title and trailing controls all sit on the
-  // title's row (centered on it), with the description dropping to its own row
-  // underneath the title — the controls never centre against the taller block.
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: var(--layout-grid-gutters-04) var(--layout-grid-gutters-08);
@@ -19,13 +16,13 @@
 }
 
 .tedi-card-stepper__lead {
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 1;
 }
 
 .tedi-card-stepper__trail {
   display: flex;
-  grid-row: 1;
+  grid-row: 2;
   grid-column: 3;
   gap: var(--layout-grid-gutters-08);
   align-items: center;
@@ -47,17 +44,43 @@
 }
 
 .tedi-card-stepper__title {
-  grid-row: 1;
+  display: flex;
+  grid-row: 2;
   grid-column: 2;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
   min-width: 0;
   color: var(--general-text-brand);
   overflow-wrap: anywhere;
 }
 
+.tedi-card-stepper__status-icon {
+  flex-shrink: 0;
+}
+
+.tedi-card-stepper__top {
+  display: flex;
+  flex-direction: column;
+  grid-row: 1;
+  grid-column: 2;
+  gap: var(--layout-grid-gutters-04);
+  min-width: 0;
+}
+
 .tedi-card-stepper__description {
-  grid-row: 2;
+  min-width: 0;
+}
+
+.tedi-card-stepper__description-bottom {
+  grid-row: 3;
   grid-column: 2;
   min-width: 0;
+}
+
+.tedi-card-stepper__bottom-slot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-grid-gutters-08);
 }
 
 .tedi-card-stepper__counter {

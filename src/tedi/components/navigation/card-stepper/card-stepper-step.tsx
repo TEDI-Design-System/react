@@ -26,6 +26,12 @@ export interface CardStepperStepProps {
    * list, and rendered as disabled in the modal.
    */
   disabled?: boolean;
+  /**
+   * Custom content rendered at the bottom of the card when this step is active —
+   * e.g. an inline `Alert`, a "read more" link or an action button. Only shown for
+   * the active step. Matches the Figma "with bottom slot" variant.
+   */
+  bottomSlot?: React.ReactNode;
 }
 
 /**
