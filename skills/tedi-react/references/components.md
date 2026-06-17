@@ -501,6 +501,7 @@ Same as Checkbox (without indeterminate)
 - `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
+- `initialView?: 'days' | 'months' | 'years' = selectionLevel` — grid the calendar opens on, independent of `selectionLevel`; e.g. `initialView="years"` with default `selectionLevel="days"` opens the year grid and drills year → month → day (pair with `monthYearSelectType="grid"`)
 - `showOutsideDays?: boolean = true`
 - **Disabling:** `disabled?: Matcher | Matcher[]`, `minDate?: Date`, `maxDate?: Date`, `disablePast?: boolean`, `disableFuture?: boolean`, `shouldDisableMonth?: (date) => boolean`, `shouldDisableYear?: (date) => boolean`
 - `availableDays?: Date[] | ((date) => boolean)` — opposite of `disabled`

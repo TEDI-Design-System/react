@@ -36,6 +36,7 @@ import {
   CALENDAR_POPOVER_OFFSET,
   CALENDAR_POPOVER_PADDING,
   getLocaleDateParts,
+  resolveRangeSelection,
 } from './date-field-helpers';
 import { DatePickerModal } from './date-picker-modal/date-picker-modal';
 
@@ -195,6 +196,16 @@ export interface DateFieldProps
    */
   selectionLevel?: CalendarView;
   /**
+   * **Initial grid** the calendar opens on, independent of `selectionLevel`.
+   * Use it to start the user on the year / month grid for fast year-first
+   * navigation while still letting them drill down and commit at the
+   * `selectionLevel` (e.g. `initialView="years"` with the default
+   * `selectionLevel="days"` opens the year grid → month grid → day grid).
+   * Pair with `monthYearSelectType="grid"` so the navigation stays grid-based.
+   * @default selectionLevel
+   */
+  initialView?: CalendarView;
+  /**
    * The locale object for the calendar, used by React DayPicker. Defaults to Estonian locale.
    */
   locale?: Locale;
@@ -325,6 +336,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     monthYearSelectType,
     showNavigation = true,
     selectionLevel = 'days',
+    initialView,
     locale = et,
     localeCode = 'et-EE',
     initialMonth,
@@ -366,7 +378,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [view, setView] = useState<CalendarView>(selectionLevel);
+  const [view, setView] = useState<CalendarView>(initialView ?? selectionLevel);
   const [inputValue, setInputValue] = useState('');
   const [hasDisabledDateError, setHasDisabledDateError] = useState(false);
 
@@ -426,9 +438,9 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   useEffect(() => {
     if (open) {
-      setView(selectionLevel);
+      setView(initialView ?? selectionLevel);
     }
-  }, [open, selectionLevel]);
+  }, [open, selectionLevel, initialView]);
 
   useEffect(() => {
     if (isControlled) {
@@ -508,11 +520,13 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   );
 
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
-    if (!isControlled) setInternalValue(date);
-    onSelect?.(date, selectedDay, modifiers, e);
+    const next = mode === 'range' ? resolveRangeSelection(date, value, selectedDay) : date;
 
-    if (date) {
-      const formatted = formatDate ? formatDate(date) : defaultFormatter(date);
+    if (!isControlled) setInternalValue(next);
+    onSelect?.(next, selectedDay, modifiers, e);
+
+    if (next) {
+      const formatted = formatDate ? formatDate(next) : defaultFormatter(next);
       setInputValue(formatted);
     } else {
       setInputValue('');
@@ -632,16 +646,18 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
         padding: CALENDAR_POPOVER_PADDING,
         apply({ availableWidth, elements }) {
           const el = elements.floating;
-          el.style.width = 'max-content';
+          el.style.width = '';
           el.style.maxWidth = '';
+          el.style.overflowX = '';
+
+          if (isMobile) return;
+
+          el.style.width = 'max-content';
           const naturalWidth = el.getBoundingClientRect().width;
 
           if (naturalWidth > availableWidth) {
             el.style.width = 'min-content';
             el.style.maxWidth = `${availableWidth}px`;
-          } else {
-            el.style.width = '';
-            el.style.maxWidth = '';
           }
         },
       }),
@@ -819,6 +835,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           monthYearSelectType={monthYearSelectType}
           showNavigation={showNavigation}
           selectionLevel={selectionLevel}
+          initialView={initialView}
           initialMonth={initialMonth}
           modalProps={modalProps}
           {...(dayPickerProps as UnknownType)}
@@ -832,11 +849,15 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
                 ref={refs.setFloating}
+                className={cn({
+                  [styles['tedi-date-field__calendar-popover--fullwidth']]: isMobile,
+                })}
                 {...interactions.getFloatingProps({
                   style: {
                     position: strategy,
                     top: y ?? 0,
-                    left: x ?? 0,
+                    left: isMobile ? 0 : x ?? 0,
+                    right: isMobile ? 0 : undefined,
                   },
                 })}
               >
@@ -861,7 +882,9 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   showNavigation={showNavigation}
                   handleSelect={handleSelect}
                   applyValue={applyValue}
-                  className={styles['tedi-date-field__calendar']}
+                  className={cn(styles['tedi-date-field__calendar'], {
+                    [styles['tedi-date-field__calendar--fullwidth']]: isMobile,
+                  })}
                 />
               </div>
             </FloatingFocusManager>

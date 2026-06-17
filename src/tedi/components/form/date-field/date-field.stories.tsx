@@ -434,6 +434,41 @@ export const YearGrid: Story = {
 };
 
 /**
+ * Both fields use `monthYearSelectType="grid"`, so every picker is a grid (no dropdown) —
+ * they only differ in the direction the user moves through year / month / day:
+ *
+ * - **Left (year → month → day):** `initialView="years"` opens straight on the year grid.
+ *   With the default `selectionLevel="days"`, picking a year drills into the month grid,
+ *   then the day grid, where the final date commits.
+ * - **Right (day → month → year):** the default `initialView` opens on the day grid; the
+ *   grid-style header lets the user step *up* — click the month to open the month grid,
+ *   click the year to open the year grid — before drilling back down to a day.
+ */
+export const GridPickerFirst: Story = {
+  render: () => {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
+        <DateField
+          id="date-grid-year-first"
+          mode="single"
+          label="Aasta → kuu → päev"
+          placeholder="pp.kk.aaaa"
+          initialView="years"
+          monthYearSelectType="grid"
+        />
+        <DateField
+          id="date-grid-day-first"
+          mode="single"
+          label="Päev → kuu → aasta"
+          placeholder="pp.kk.aaaa"
+          monthYearSelectType="grid"
+        />
+      </div>
+    );
+  },
+};
+
+/**
  * Month + year picker — no day grid. `selectionLevel="months"` makes the
  * calendar commit when the user clicks a month tile (the day grid is
  * skipped). The `formatDate` / `parseDate` overrides change the input

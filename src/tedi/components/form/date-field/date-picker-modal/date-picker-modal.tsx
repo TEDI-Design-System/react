@@ -10,6 +10,7 @@ import ClosingButton from '../../../buttons/closing-button/closing-button';
 import { Calendar } from '../../../content/calendar/calendar';
 import { Modal, ModalContentProps, useModal } from '../../../overlays/modal';
 import { CalendarView } from '../date-field';
+import { resolveRangeSelection } from '../date-field-helpers';
 import styles from './date-picker-modal.module.scss';
 
 type DateFieldMode = 'single' | 'multiple' | 'range';
@@ -41,6 +42,8 @@ export interface DatePickerModalProps
   monthYearSelectType?: 'dropdown' | 'grid';
   showNavigation?: boolean;
   selectionLevel?: CalendarView;
+  /** Grid the calendar opens on, independent of `selectionLevel`. Defaults to `selectionLevel`. */
+  initialView?: CalendarView;
   /** Initial month to display when the modal opens. Defaults to the selected date or today. */
   initialMonth?: Date;
   /**
@@ -92,6 +95,7 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
     monthYearSelectType,
     showNavigation,
     selectionLevel = 'days',
+    initialView,
     initialMonth,
     modalProps,
     title,
@@ -101,20 +105,27 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
   const { getLabel } = useLabels();
 
   const [draft, setDraft] = useState<DateValue>(value);
-  const [view, setView] = useState<CalendarView>(selectionLevel);
+  const [view, setView] = useState<CalendarView>(initialView ?? selectionLevel);
   const [currentMonth, setCurrentMonth] = useState<Date>(() => getInitialMonth(value, initialMonth));
 
   useEffect(() => {
     if (open) {
       setDraft(value);
-      setView(selectionLevel);
+      setView(initialView ?? selectionLevel);
       setCurrentMonth(getInitialMonth(value, initialMonth));
     }
-  }, [open, value, selectionLevel, initialMonth]);
+  }, [open, value, selectionLevel, initialView, initialMonth]);
 
-  const handleSelect: OnSelectHandler<DateValue> = useCallback((date) => {
-    setDraft(date);
-  }, []);
+  const handleSelect: OnSelectHandler<DateValue> = useCallback(
+    (date, selectedDay) => {
+      if (mode === 'range') {
+        setDraft((prev) => resolveRangeSelection(date, prev, selectedDay));
+      } else {
+        setDraft(date);
+      }
+    },
+    [mode]
+  );
 
   const applyValue = useCallback((date: Date) => {
     setDraft(date);

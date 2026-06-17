@@ -28,6 +28,8 @@
 .tedi-date-picker-modal__calendar {
   width: 100%;
 
+  --form-calendar-date-width: min(40px, calc((100vw - 5rem) / 7));
+
   [class*='tedi-calendar__months-container'] {
     justify-content: center;
   }
