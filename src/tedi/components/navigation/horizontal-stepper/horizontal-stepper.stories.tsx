@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Fragment, useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -60,40 +61,85 @@ const TYPE_COLS: { key: string; label: string; props: Partial<HorizontalStepperI
   { key: 'selected', label: 'Selected', props: { selected: true }, rows: ['default'] },
 ];
 
-const StatesMatrix = ({ compact }: { compact: boolean }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'auto repeat(4, max-content)',
-      gap: '1rem 2rem',
-      alignItems: 'center',
-      justifyContent: 'start',
-    }}
-  >
-    <span />
-    {TYPE_COLS.map((col) => (
-      <Text key={col.key} modifiers="bold">
-        {col.label}
-      </Text>
-    ))}
-    {STATE_ROWS.map((row) => (
-      <Fragment key={row.key}>
-        <Text modifiers="bold">{row.label}</Text>
-        {TYPE_COLS.map((col) =>
-          col.rows.includes(row.key) ? (
-            <div key={col.key} data-stepper-state={row.key}>
-              <HorizontalStepper aria-label={`${col.label} – ${row.label}`} background="transparent" compact={compact}>
-                <HorizontalStepper.Item label="Step" {...col.props} />
-              </HorizontalStepper>
+const StatesMatrix = ({ compact }: { compact: boolean }) => {
+  const breakpoint = useBreakpoint();
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+
+  if (isMobile) {
+    return (
+      <VerticalSpacing size={1.5}>
+        {TYPE_COLS.map((col) => (
+          <div key={col.key}>
+            <Text modifiers="bold">{col.label}</Text>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+              {STATE_ROWS.filter((row) => col.rows.includes(row.key)).map((row) => (
+                <div
+                  key={row.key}
+                  data-stepper-state={row.key}
+                  style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+                >
+                  <div style={{ minWidth: '4rem' }}>
+                    <Text modifiers="small" color="secondary" element="span">
+                      {row.label}
+                    </Text>
+                  </div>
+                  <div style={{ width: 'fit-content', maxWidth: '100%' }}>
+                    <HorizontalStepper
+                      aria-label={`${col.label} – ${row.label}`}
+                      background="transparent"
+                      compact={compact}
+                    >
+                      <HorizontalStepper.Item label="Step" {...col.props} />
+                    </HorizontalStepper>
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : (
-            <span key={col.key} />
-          )
-        )}
-      </Fragment>
-    ))}
-  </div>
-);
+          </div>
+        ))}
+      </VerticalSpacing>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto repeat(4, max-content)',
+        gap: '1rem 2rem',
+        alignItems: 'center',
+        justifyContent: 'start',
+      }}
+    >
+      <span />
+      {TYPE_COLS.map((col) => (
+        <Text key={col.key} modifiers="bold">
+          {col.label}
+        </Text>
+      ))}
+      {STATE_ROWS.map((row) => (
+        <Fragment key={row.key}>
+          <Text modifiers="bold">{row.label}</Text>
+          {TYPE_COLS.map((col) =>
+            col.rows.includes(row.key) ? (
+              <div key={col.key} data-stepper-state={row.key}>
+                <HorizontalStepper
+                  aria-label={`${col.label} – ${row.label}`}
+                  background="transparent"
+                  compact={compact}
+                >
+                  <HorizontalStepper.Item label="Step" {...col.props} />
+                </HorizontalStepper>
+              </div>
+            ) : (
+              <span key={col.key} />
+            )
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+};
 
 const statesPseudo = {
   pseudo: {
@@ -105,7 +151,7 @@ const statesPseudo = {
 
 export const SecondStep: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Form progress">
+    <HorizontalStepper aria-label="Form progress" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" selected />
       <HorizontalStepper.Item label="Geenianalüüs" />
@@ -116,7 +162,7 @@ export const SecondStep: Story = {
 
 export const ThirdStep: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Form progress">
+    <HorizontalStepper aria-label="Form progress" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" completed />
       <HorizontalStepper.Item label="Geenianalüüs" selected />
@@ -133,13 +179,13 @@ export const ThirdStep: Story = {
 export const WithErrors: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Form with errors">
+      <HorizontalStepper aria-label="Form with errors" compact="lg">
         <HorizontalStepper.Item label="Kutse" error />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" />
         <HorizontalStepper.Item label="Vastus" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Form with error description">
+      <HorizontalStepper aria-label="Form with error description" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" error description="Sammus esinevad vead" />
         <HorizontalStepper.Item label="Geenianalüüs" selected />
@@ -155,25 +201,25 @@ export const WithErrors: Story = {
 export const WithDescriptions: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Steps with descriptions">
+      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
         <HorizontalStepper.Item label="Kutse" selected />
         <HorizontalStepper.Item label="Tahteavaldus" />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions">
+      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions">
+      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions">
+      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />
@@ -189,7 +235,7 @@ export const WithDescriptions: Story = {
  */
 export const TransparentBackground: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Form progress" background="transparent">
+    <HorizontalStepper aria-label="Form progress" background="transparent" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" selected />
       <HorizontalStepper.Item label="Geenianalüüs" />
@@ -238,7 +284,7 @@ export const ClickToNavigate: Story = {
     const Demo = () => {
       const [current, setCurrent] = useState(1);
       return (
-        <HorizontalStepper aria-label="Form progress">
+        <HorizontalStepper aria-label="Form progress" compact="lg">
           {STEPS.map((label, index) => (
             <HorizontalStepper.Item
               key={label}
@@ -266,7 +312,7 @@ export const ExternalNavigation: Story = {
       const [current, setCurrent] = useState(0);
       return (
         <VerticalSpacing size={1.5}>
-          <HorizontalStepper aria-label="Form progress">
+          <HorizontalStepper aria-label="Form progress" compact="lg">
             {STEPS.map((label, index) => (
               <HorizontalStepper.Item
                 key={label}
