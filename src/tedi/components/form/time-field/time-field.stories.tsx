@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
+import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -202,7 +203,7 @@ export const PredefinedTimeSlots: Story = {
 
     return (
       <Row>
-        <Col lg={4} md={6}>
+        <Col lg={4} md={6} xs={12}>
           <Text modifiers={['small']}>Input trigger (recommended)</Text>
           <TimeField
             id="slots-input"
@@ -214,7 +215,7 @@ export const PredefinedTimeSlots: Story = {
             timePickerTrigger="input"
           />
         </Col>
-        <Col lg={4} md={6}>
+        <Col lg={4} md={6} xs={12}>
           <Text modifiers={['small']}>Radio buttons</Text>
           <TimeField
             id="slots-radio"
@@ -227,7 +228,7 @@ export const PredefinedTimeSlots: Story = {
             timePickerTrigger="input"
           />
         </Col>
-        <Col lg={4} md={6}>
+        <Col lg={4} md={6} xs={12}>
           <Text modifiers={['small']}>Button trigger</Text>
           <TimeField
             id="slots-button"
@@ -336,7 +337,11 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
  * Confirm — Cancel / Escape / backdrop dismiss discards it.
  */
 export const ModalPicker: Story = {
-  render: Template,
+  render: (args) => (
+    <LabelProvider locale="et">
+      <Template {...args} />
+    </LabelProvider>
+  ),
   args: {
     id: 'time-modal',
     label: 'Aeg',
@@ -352,7 +357,11 @@ export const ModalPicker: Story = {
  * canvas or pick a mobile preset to see the modal kick in.
  */
 export const ResponsiveModalPicker: Story = {
-  render: Template,
+  render: (args) => (
+    <LabelProvider locale="et">
+      <Template {...args} />
+    </LabelProvider>
+  ),
   args: {
     id: 'time-modal-responsive',
     label: 'Aeg',
