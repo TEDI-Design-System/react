@@ -801,6 +801,52 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
+### Footer
+**Props:** `FooterProps`
+- `children: ReactNode` — composition of `Footer.Side`, `Footer.Body` (with `Footer.Section` children), `Footer.Bottom`
+- `mobileBreakpoint?: Breakpoint = 'sm'` — viewport at and below which the entire footer flips to stacked mobile layout (sections become accordions, sides stack, bottom strip wraps). Propagated to every sub-slot via context so they all agree on the threshold.
+- `maxWidth?: number | string` — caps the inner content (the column row **and** the bottom strip's content) to a max width and centers it, while the dark backgrounds stay full-bleed. Pass any CSS length (`1280`, `'1280px'`, `'80rem'`). Read by `Footer.Bottom` via context so both align to the same width.
+- `className?: string`
+
+**Sub-components:**
+- `Footer.Side` — logo slot, `placement?: 'start' | 'end' = 'start'`, `position?: 'start' | 'center' | 'end' = 'center'`
+- `Footer.Body` — wraps `Footer.Section` columns; switches to stacked column layout below `mobileBreakpoint`. Accepts breakpoint-aware `columns?: number` — **mobile-first** (a value applies at that breakpoint and up), so raise the count as the viewport widens (e.g. `columns={2} lg={{ columns: 4 }}`). When set, lays the sections out as a CSS grid of that many equal-width tracks instead of the default content-sized `space-between` row; ignored below `mobileBreakpoint`, where the body always stacks into one column.
+- `Footer.Section` — section column with `heading`, optional `icon`, `collapsible?` (accordion below `mobileBreakpoint`), `defaultOpen?`, `iconBreakpoint?: Breakpoint = 'lg'` (separate threshold for icon hiding)
+- `Footer.Bottom` — bottom strip for legal / utility links; `separator?: boolean = false` inserts a dot between items (Figma "with separator" variant) instead of plain `gap` spacing
+- All three content slots (`Footer.Body`, `Footer.Side`, `Footer.Bottom`) accept arbitrary nodes — the footer is a layout shell, so you can drop social-icon links in a right-hand `Footer.Side`, a centered brand logo in `Footer.Bottom`, etc.
+
+```tsx
+// Default: flips to mobile at `sm` (≤ 576px)
+<Footer>
+  <Footer.Side placement="start"><img src="/logo.svg" alt="" /></Footer.Side>
+  <Footer.Body>
+    <Footer.Section heading="Contact" icon="phone" collapsible>
+      <Link href="/contact">Contact us</Link>
+      <Link href="/help">Help center</Link>
+    </Footer.Section>
+    <Footer.Section heading="Legal" collapsible>
+      <Link href="/privacy">Privacy</Link>
+    </Footer.Section>
+  </Footer.Body>
+  <Footer.Bottom>
+    <Link href="/terms">Terms</Link>
+  </Footer.Bottom>
+</Footer>
+
+// Tablet-first: flips to mobile at `md` so tablets get the stacked layout
+<Footer mobileBreakpoint="md">{/* … */}</Footer>
+
+// Hide section icons earlier (at `xl` instead of the default `lg`)
+<Footer.Section iconBreakpoint="xl" icon="mail" heading="Newsletter">…</Footer.Section>
+
+// Cap + center the content on wide screens; fixed 4-col grid that steps to 2 at `lg`
+<Footer maxWidth={1280}>
+  <Footer.Body columns={2} lg={{ columns: 4 }}>{/* … */}</Footer.Body>
+</Footer>
+```
+
+`mobileBreakpoint` is the single knob for layout flip — set it once on `<Footer>` and every sub-slot picks it up. `Footer.Section`'s `iconBreakpoint` is independent because design typically drops the section icons one tier earlier than the full mobile flip.
+
 ### TopNav
 
 **Props:** `TopNavProps`
@@ -1356,6 +1402,9 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 - Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
 - **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
+
+### Footer — **DEPRECATED** (use TEDI-Ready Footer)
+Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Responsive layout is hardcoded CSS — no consumer override of the mobile-switch breakpoint. Migrate to the composable TEDI-Ready `Footer` for `mobileBreakpoint` control, accordion sections, and slot-based sides.
 
 ## Misc
 
