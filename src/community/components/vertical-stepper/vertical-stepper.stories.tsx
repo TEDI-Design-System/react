@@ -1,4 +1,4 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-vite';
 
 import { StatusBadge, Text, VerticalSpacing } from '../../../tedi';
 import Separator from '../../../tedi/components/misc/separator/separator';

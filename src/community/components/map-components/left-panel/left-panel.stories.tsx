@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Card, Col, Icon, Row, Text } from '../../../../tedi';
 import Toggle from '../../form/toggle/toggle';

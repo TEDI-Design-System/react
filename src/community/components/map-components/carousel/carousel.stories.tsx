@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import BaseMapSelection from '../base-map-selection/base-map-selection';
 import { Carousel } from './carousel';

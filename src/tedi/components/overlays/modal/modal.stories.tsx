@@ -1,4 +1,4 @@
-import type { Meta, StoryFn, StoryObj } from '@storybook/react';
+import type { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';

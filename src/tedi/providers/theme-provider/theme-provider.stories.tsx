@@ -1,4 +1,4 @@
-import { Args, Meta } from '@storybook/react';
+import { Args, Meta } from '@storybook/react-vite';
 import { useGlobals } from 'storybook/internal/preview-api';
 
 import StorybookDecorator from '../../../../.storybook/storybook-decorator';

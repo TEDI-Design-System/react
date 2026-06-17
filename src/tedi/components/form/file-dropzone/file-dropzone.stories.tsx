@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Col, Row } from '../../layout/grid';
 import { FileDropzone, FileDropzoneProps } from './file-dropzone';
