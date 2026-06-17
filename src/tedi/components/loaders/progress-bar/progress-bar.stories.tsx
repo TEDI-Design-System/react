@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { useEffect, useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { ProgressBar, ProgressBarProps } from './progress-bar';
 
@@ -34,28 +35,39 @@ type Story = StoryObj<typeof ProgressBar>;
 
 type MatrixRow = { lines: string[]; props: ProgressBarProps };
 
-const MatrixTable = ({ rows }: { rows: MatrixRow[] }): JSX.Element => (
-  <div className="example-list">
-    {rows.map((row, index) => (
-      <div
-        key={row.lines.join('|')}
-        className={`${index === rows.length - 1 ? '' : 'border-bottom'} padding-14-16`}
-        style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px', alignItems: 'center' }}
-      >
-        <div style={{ flex: '1 1 140px', margin: 0 }}>
-          {row.lines.map((line) => (
-            <Text key={line} modifiers="small">
-              {line}
-            </Text>
-          ))}
+const MatrixTable = ({ rows }: { rows: MatrixRow[] }): JSX.Element => {
+  const breakpoint = useBreakpoint();
+  const isMobile = isBreakpointBelow(breakpoint, 'md');
+
+  return (
+    <div className="example-list">
+      {rows.map((row, index) => (
+        <div
+          key={row.lines.join('|')}
+          className={`${index === rows.length - 1 ? '' : 'border-bottom'} padding-14-16`}
+          style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            flexWrap: 'wrap',
+            gap: '8px 24px',
+            alignItems: isMobile ? 'stretch' : 'center',
+          }}
+        >
+          <div style={{ flex: isMobile ? '0 0 auto' : '1 1 140px', margin: 0 }}>
+            {row.lines.map((line) => (
+              <Text key={line} modifiers="small">
+                {line}
+              </Text>
+            ))}
+          </div>
+          <div style={{ flex: isMobile ? '0 0 auto' : '3 1 260px', minWidth: 0 }}>
+            <ProgressBar {...row.props} />
+          </div>
         </div>
-        <div style={{ flex: '3 1 260px', minWidth: 0 }}>
-          <ProgressBar {...row.props} />
-        </div>
-      </div>
-    ))}
-  </div>
-);
+      ))}
+    </div>
+  );
+};
 
 export const Default: Story = {
   args: { value: 60, ariaLabel: 'Edenemisriba pealkiri' },
@@ -107,9 +119,10 @@ const positionRows: MatrixRow[] = [
       value: 20,
       label: 'Edenemisriba pealkiri',
       required: true,
-      labelPosition: 'horizontal',
+      labelPosition: 'top',
       valuePosition: 'horizontal',
       helper: HINT,
+      md: { labelPosition: 'horizontal' },
     },
   },
   {
@@ -118,9 +131,10 @@ const positionRows: MatrixRow[] = [
       value: 20,
       label: 'Edenemisriba pealkiri',
       required: true,
-      labelPosition: 'horizontal',
+      labelPosition: 'top',
       valuePosition: 'bottom',
       helper: HINT,
+      md: { labelPosition: 'horizontal' },
     },
   },
 ];
@@ -132,8 +146,8 @@ export const Position: Story = {
       source: {
         code: `<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
 <ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="horizontal" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="horizontal" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />`,
+<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />
+<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />`,
       },
     },
   },
