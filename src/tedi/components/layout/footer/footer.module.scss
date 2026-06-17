@@ -29,6 +29,11 @@
 .tedi-footer-body--grid {
   display: grid;
   align-items: start;
+  justify-content: initial;
+}
+
+.tedi-footer-body--grid > * {
+  min-width: 0;
 }
 
 .tedi-footer-body--mobile {

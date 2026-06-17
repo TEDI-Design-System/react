@@ -110,14 +110,18 @@ const DeviceFrame = ({
   label,
   width,
   theme,
+  fluid = false,
 }: {
   storyId: string;
   label?: string;
   width: number;
   theme: string;
+  fluid?: boolean;
 }) => {
   const ref = useRef<HTMLIFrameElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(320);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const iframe = ref.current;
@@ -149,19 +153,25 @@ const DeviceFrame = ({
     };
   }, [storyId, theme]);
 
-  return (
-    <div style={{ flex: '0 0 auto' }}>
-      {label && (
-        <Text element="h5" color="secondary">
-          {label}
-        </Text>
-      )}
-      <div
-        style={{
-          width,
-          overflow: 'hidden',
-        }}
-      >
+  useEffect(() => {
+    if (fluid) return undefined;
+    const el = outerRef.current;
+    if (!el) return undefined;
+    const update = () => setScale(Math.min(1, el.clientWidth / width));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [width, fluid]);
+
+  if (fluid) {
+    return (
+      <div ref={outerRef} style={{ width: '100%', maxWidth: width }}>
+        {label && (
+          <Text element="h5" color="secondary">
+            {label}
+          </Text>
+        )}
         <iframe
           ref={ref}
           title={label}
@@ -170,6 +180,27 @@ const DeviceFrame = ({
           style={{ display: 'block', width: '100%', height, border: 0, marginTop: '1rem' }}
         />
       </div>
+    );
+  }
+
+  return (
+    <div ref={outerRef} style={{ width, maxWidth: '100%', flexShrink: 0 }}>
+      {label && (
+        <Text element="h5" color="secondary">
+          {label}
+        </Text>
+      )}
+      <div style={{ height: height * scale, overflow: 'hidden', marginTop: '1rem' }}>
+        <div style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+          <iframe
+            ref={ref}
+            title={label}
+            scrolling="no"
+            src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
+            style={{ display: 'block', width: '100%', height, border: 0 }}
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -177,10 +208,11 @@ const DeviceFrame = ({
 const DEVICE_FRAME_SOURCE_ID = 'tedi-ready-layout-footer--device-frame-source';
 const DEVICE_FRAME_SOURCE_ACCORDIONS_ID = 'tedi-ready-layout-footer--device-frame-source-accordions';
 const DEVICE_FRAME_SOURCE_ACCORDIONS_OPEN_ID = 'tedi-ready-layout-footer--device-frame-source-accordions-open';
+const LOGO_BREAKPOINT_SOURCE_ID = 'tedi-ready-layout-footer--logo-breakpoint-source';
 
 export const Default: Story = {
   render: () => (
-    <Footer>
+    <Footer mobileBreakpoint="lg">
       <Footer.Body>
         <StandardSections />
       </Footer.Body>
@@ -196,25 +228,19 @@ export const DeviceSize: Story = {
     const theme = (context.globals.theme as string) ?? 'default';
     return (
       <VerticalSpacing size={1}>
-        {/* `minWidth: 0` lets the fixed-width device frames overflow into their own scroll
-            containers instead of stretching the page when the canvas is narrower than the frame. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
           <Text element="h4" color="primary">
             Desktop
           </Text>
-          <div style={{ maxWidth: '100%', overflowX: 'auto' }}>
-            <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} />
-          </div>
+          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} fluid />
           <Text element="h4" color="primary">
             Tablet
           </Text>
-          <div style={{ maxWidth: '100%', overflowX: 'auto' }}>
-            <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} />
-          </div>
+          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} fluid />
           <Text element="h4" color="primary">
             Mobile
           </Text>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', maxWidth: '100%', overflowX: 'auto' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'flex-start' }}>
             <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} label="Default" width={360} theme={theme} />
             <DeviceFrame
               storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_ID}
@@ -236,7 +262,7 @@ export const DeviceSize: Story = {
 };
 
 const DeviceFrameFooter = ({ collapsible, firstOpen }: { collapsible?: boolean; firstOpen?: boolean }) => (
-  <Footer>
+  <Footer mobileBreakpoint="md">
     <Footer.Body>
       <StandardSections collapsible={collapsible} firstOpen={firstOpen} />
     </Footer.Body>
@@ -266,52 +292,104 @@ export const DeviceFrameSourceAccordionsOpen: Story = {
   render: () => <DeviceFrameFooter collapsible firstOpen />,
 };
 
-export const LogoPosition: Story = {
+export const LogoBreakpointSource: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: deviceFrameSourceParams,
   render: () => (
-    <VerticalSpacing size={2}>
-      <Footer>
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-      </Footer>
-
-      <Footer>
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-        <Footer.Side placement="end" position="start">
-          <LogoPlaceholder />
-        </Footer.Side>
-      </Footer>
-
-      <Footer>
-        <Footer.Side placement="start">
-          <LogoPlaceholder />
-        </Footer.Side>
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-      </Footer>
-
-      <Footer>
-        <Footer.Side placement="start" position="start">
-          <LogoPlaceholder />
-        </Footer.Side>
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-      </Footer>
-    </VerticalSpacing>
+    <Footer mobileBreakpoint="lg">
+      <Footer.Side placement="end" lg={{ placement: 'start' }}>
+        <LogoPlaceholder />
+      </Footer.Side>
+      <Footer.Body>
+        <StandardSections />
+      </Footer.Body>
+    </Footer>
   ),
+};
+
+/**
+ * The logo always drops to the **bottom of the footer from tablet down** and only sits on the
+ * side on desktop. Two props make that work together:
+ * - `mobileBreakpoint="lg"` collapses the footer to its stacked layout at `md` and below
+ *   (tablet + mobile), so the side slot lands below the sections.
+ * - `placement="end"` keeps the logo last (the bottom slot) while stacked; a `lg` breakpoint
+ *   override flips it to its desktop side — `lg={{ placement: 'start' }}` for a left logo, or no
+ *   override at all to keep it on the right.
+ *
+ * `position` sets the vertical alignment within the side slot on desktop. Both `placement` and
+ * `position` accept breakpoint props. The first example is shown in a resizable frame so you can
+ * watch the logo move; the rest reflow with the window.
+ */
+export const LogoPosition: Story = {
+  render: (_args, context) => {
+    const theme = (context.globals.theme as string) ?? 'default';
+    const Example = ({ label, children }: { label: string; children: React.ReactNode }) => (
+      <VerticalSpacing size={0.5}>
+        <Text element="h5" color="secondary">
+          {label}
+        </Text>
+        {children}
+      </VerticalSpacing>
+    );
+
+    return (
+      <VerticalSpacing size={2}>
+        <Example label="Responsive (breakpoint props) — logo on the left on desktop, drops to the bottom from tablet down. Resize to see.">
+          <DeviceFrame storyId={LOGO_BREAKPOINT_SOURCE_ID} width={1138} theme={theme} fluid />
+        </Example>
+
+        <Example label="Right on desktop · bottom on tablet and mobile (placement=end, mobileBreakpoint=lg)">
+          <Footer mobileBreakpoint="lg">
+            <Footer.Body>
+              <StandardSections />
+            </Footer.Body>
+            <Footer.Side placement="end">
+              <LogoPlaceholder />
+            </Footer.Side>
+          </Footer>
+        </Example>
+
+        <Example label="Right, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start)">
+          <Footer mobileBreakpoint="lg">
+            <Footer.Body>
+              <StandardSections />
+            </Footer.Body>
+            <Footer.Side placement="end" position="start">
+              <LogoPlaceholder />
+            </Footer.Side>
+          </Footer>
+        </Example>
+
+        <Example label="Left on desktop · bottom on tablet and mobile (placement=end, lg={ placement: start })">
+          <Footer mobileBreakpoint="lg">
+            <Footer.Side placement="end" lg={{ placement: 'start' }}>
+              <LogoPlaceholder />
+            </Footer.Side>
+            <Footer.Body>
+              <StandardSections />
+            </Footer.Body>
+          </Footer>
+        </Example>
+
+        <Example label="Left, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start, lg={ placement: start })">
+          <Footer mobileBreakpoint="lg">
+            <Footer.Side placement="end" position="start" lg={{ placement: 'start' }}>
+              <LogoPlaceholder />
+            </Footer.Side>
+            <Footer.Body>
+              <StandardSections />
+            </Footer.Body>
+          </Footer>
+        </Example>
+      </VerticalSpacing>
+    );
+  },
 };
 
 export const WithBottomSection: Story = {
   render: () => (
     <VerticalSpacing size={2}>
-      <Footer>
+      <Footer mobileBreakpoint="lg">
         <Footer.Body>
           <StandardSections />
         </Footer.Body>
@@ -330,7 +408,7 @@ export const WithBottomSection: Story = {
           </Link>
         </Footer.Bottom>
       </Footer>
-      <Footer>
+      <Footer mobileBreakpoint="lg">
         <Footer.Body>
           <StandardSections />
         </Footer.Body>
@@ -350,7 +428,7 @@ export const WithBottomSection: Story = {
         </Footer.Bottom>
       </Footer>
 
-      <Footer>
+      <Footer mobileBreakpoint="lg">
         <Footer.Body>
           <StandardSections />
         </Footer.Body>
@@ -377,10 +455,10 @@ export const CustomContent: Story = {
           </Footer.Section>
           <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'center' }}>
             <Link href="#" color="inverted" aria-label="Facebook">
-              <img src="custom_fb_logo.png" alt="" style={{ display: 'block', height: '40px' }} />
+              <img src="custom_fb_logo.png" alt="" style={{ display: 'block', height: '25px' }} />
             </Link>
             <Link href="#" color="inverted" aria-label="Instagram">
-              <img src="custom_instagram_logo.png" alt="" style={{ display: 'block', height: '40px' }} />
+              <img src="custom_instagram_logo.png" alt="" style={{ display: 'block', height: '25px' }} />
             </Link>
           </div>
         </Footer.Body>

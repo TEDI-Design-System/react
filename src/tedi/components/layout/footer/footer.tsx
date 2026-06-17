@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import { Children, isValidElement, ReactNode, useMemo } from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { Breakpoint, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
 import styles from './footer.module.scss';
 import { FooterBody } from './footer-body/footer-body';
 import { FooterBottom } from './footer-bottom/footer-bottom';
 import { FooterContext, FooterContextValue } from './footer-context';
 import { FooterSection } from './footer-section/footer-section';
-import { FooterSide } from './footer-side/footer-side';
+import { FooterSide, FooterSideBaseProps, FooterSideProps } from './footer-side/footer-side';
 
 export interface FooterProps {
   /**
@@ -45,6 +45,7 @@ export interface FooterProps {
 export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth }: FooterProps): JSX.Element => {
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
+  const { getCurrentBreakpointProps } = useBreakpointProps();
   const contextValue = useMemo<FooterContextValue>(
     () => ({ mobileBreakpoint, maxWidth }),
     [mobileBreakpoint, maxWidth]
@@ -63,7 +64,7 @@ export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth 
     }
     const type = child.type;
     if (type === FooterSide) {
-      const placement = (child.props as { placement?: 'start' | 'end' }).placement ?? 'start';
+      const { placement = 'start' } = getCurrentBreakpointProps<FooterSideBaseProps>(child.props as FooterSideProps);
       (placement === 'end' ? end : start).push(child);
       return;
     }

@@ -1,22 +1,27 @@
 import cn from 'classnames';
 import { ReactNode, useContext } from 'react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../../helpers';
+import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../helpers';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
 
 export type FooterSidePlacement = 'start' | 'end';
 export type FooterSidePosition = 'start' | 'center' | 'end';
 
-export interface FooterSideProps {
+export interface FooterSideBaseProps {
   /**
-   * Where the side slot sits relative to `<Footer.Body>`. `'start'` renders before the
-   * body (left on LTR), `'end'` renders after (right on LTR).
+   * Where the side slot sits relative to `<Footer.Body>`. `'start'` renders before the body
+   * (left on LTR, and first — above the sections — once the footer stacks on mobile); `'end'`
+   * renders after the body (right on LTR, and last — below the sections — when stacked).
+   *
+   * Accepts breakpoint props, so the logo can sit on the side on desktop and drop to the bottom
+   * on mobile — e.g. `placement="end" sm={{ placement: 'start' }}` keeps the logo on the left
+   * from `sm` up and moves it to the last position once the footer collapses to its stacked layout.
    * @default start
    */
   placement?: FooterSidePlacement;
   /**
-   * Vertical alignment of the contents inside the side slot.
+   * Vertical alignment of the contents inside the side slot. Accepts breakpoint props.
    * @default center
    */
   position?: FooterSidePosition;
@@ -30,15 +35,20 @@ export interface FooterSideProps {
   className?: string;
 }
 
-export const FooterSide = ({
-  placement = 'start',
-  position = 'center',
-  children,
-  className,
-}: FooterSideProps): JSX.Element => {
+export type FooterSideProps = BreakpointSupport<FooterSideBaseProps>;
+
+export const FooterSide = (props: FooterSideProps): JSX.Element => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const breakpoint = useBreakpoint();
   const { mobileBreakpoint } = useContext(FooterContext);
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
+
+  const {
+    placement = 'start',
+    position = 'center',
+    children,
+    className,
+  } = getCurrentBreakpointProps<FooterSideBaseProps>(props, { placement: 'start', position: 'center' });
 
   return (
     <div
