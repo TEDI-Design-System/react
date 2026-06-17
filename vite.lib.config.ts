@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import preserveDirectives from 'rollup-plugin-preserve-directives';
