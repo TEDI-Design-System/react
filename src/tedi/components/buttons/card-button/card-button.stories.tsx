@@ -70,22 +70,24 @@ const IconCard = ({ icon, title, description }: { icon: string; title: string; d
       <Col width="auto" style={{ display: 'flex' }}>
         <Separator axis="vertical" />
       </Col>
-      <Col>
-        <Card borderRadius={{ left: false }} borderless>
-          <Card.Content>
-            <div style={rowStyle}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <Text element="span" modifiers="bold">
-                  {title}
-                </Text>
-                <Text element="span" modifiers="small" color="tertiary">
-                  {description}
-                </Text>
+      <Col style={{ display: 'flex' }}>
+        <StretchContent>
+          <Card borderRadius={{ left: false }} borderless>
+            <Card.Content>
+              <div style={rowStyle}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <Text element="span" modifiers="bold">
+                    {title}
+                  </Text>
+                  <Text element="span" modifiers="small" color="tertiary">
+                    {description}
+                  </Text>
+                </div>
+                <Icon name="arrow_right_alt" color="secondary" />
               </div>
-              <Icon name="arrow_right_alt" color="secondary" />
-            </div>
-          </Card.Content>
-        </Card>
+            </Card.Content>
+          </Card>
+        </StretchContent>
       </Col>
     </Row>
   </Card>
