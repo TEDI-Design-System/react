@@ -2,7 +2,6 @@ import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
 import { PolymorphicComponentPropWithRef, PolymorphicRef } from '../../../helpers/polymorphic/types';
-import { UnknownType } from '../../../types/commonTypes';
 import styles from './card-button.module.scss';
 
 export interface CardButtonBaseProps {
@@ -25,15 +24,15 @@ export type CardButtonProps<C extends React.ElementType = 'button'> = Polymorphi
 
 const CardButtonInner = forwardRef(
   <C extends React.ElementType = 'button'>(props: CardButtonProps<C>, ref?: PolymorphicRef<C>): JSX.Element => {
-    const { as, children, className, type, ...rest } = props as CardButtonProps<'button'>;
-    const Component = as || 'button';
+    const { as, children, className, ...rest } = props as CardButtonProps<'button'>;
+    const Component: React.ElementType = as || 'button';
     const isButton = Component === 'button';
 
     return (
       <Component
         data-name="card-button"
-        {...(rest as UnknownType)}
-        {...(isButton ? { type: type ?? 'button' } : {})}
+        {...rest}
+        {...(isButton ? { type: rest.type ?? 'button' } : {})}
         ref={ref}
         className={cn(styles['tedi-card-button'], className)}
       >

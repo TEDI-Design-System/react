@@ -53,6 +53,6 @@ describe('CardButton', () => {
         <span>Card content</span>
       </CardButton>
     );
-    expect(screen.getByText('Card content')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Card content' })).toBeInTheDocument();
   });
 });
