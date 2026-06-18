@@ -142,7 +142,7 @@ Sub-components: `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`, `Carou
 - `children` — each direct child is one slide
 - `slidesPerView?: number | { xs; sm?; md?; lg?; xl?; xxl? } = 1` — can be fractional (e.g. `1.25`) for peeking; per-breakpoint object supported
 - `gap?: number | BreakpointObject<number> = 16` — px gap between slides
-- `fade?: boolean = false` — fade edges (right edge for multi-view, both edges for single)
+- `fade?: boolean | 'right' | 'both' = false` — fade edges. `true`: right edge for multi-view, both edges for single. `'right'`: always right. `'both'`: always both, regardless of slide count
 - `transitionMs?: number = 400`
 - `loop?: boolean = true` — set `false` for a finite/bounded carousel: navigation stops at the first/last slide, prev/next disable at the bounds, and slides render once (no looping duplicates)
 - `centered?: boolean = false` — center the active slide so an equal peek of the previous/next slide shows on both edges (pair with a fractional `slidesPerView` and keep `loop` on)

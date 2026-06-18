@@ -4,6 +4,7 @@ import React, { forwardRef, useEffect, useRef } from 'react';
 import styles from './carousel.module.scss';
 import { useCarouselContext } from './carousel-context';
 import { BreakpointInput, normalizeBreakpointInput } from './carousel-utils';
+import type { CarouselFade } from './use-carousel';
 
 export interface CarouselContentProps {
   /**
@@ -22,11 +23,13 @@ export interface CarouselContentProps {
    */
   gap?: BreakpointInput<number>;
   /**
-   * Fade the edges. With more than one slide per view only the right edge
-   * fades; with a single slide both edges fade.
+   * Fade the edges:
+   * - `true` — fades the right edge with more than one slide per view, or both edges for a single slide.
+   * - `'right'` — always fade only the right edge.
+   * - `'both'` — always fade both edges, regardless of slide count.
    * @default false
    */
-  fade?: boolean;
+  fade?: CarouselFade;
   /**
    * Transition duration in ms.
    * @default 400

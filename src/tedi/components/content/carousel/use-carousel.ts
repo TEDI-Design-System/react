@@ -4,10 +4,19 @@ import { useBreakpoint } from '../../../helpers/hooks/use-breakpoint';
 import { useLabels } from '../../../providers/label-provider';
 import { BreakpointObject, resolveBreakpointValue } from './carousel-utils';
 
+/**
+ * Edge-fade behaviour:
+ * - `false` — no fade.
+ * - `true` — fades the trailing edge with more than one slide per view, or both edges for a single slide.
+ * - `'right'` — always fade only the trailing edge.
+ * - `'both'` — always fade both edges, regardless of slide count.
+ */
+export type CarouselFade = boolean | 'right' | 'both';
+
 export interface CarouselConfig {
   slidesPerView: BreakpointObject<number>;
   gap: BreakpointObject<number>;
-  fade: boolean;
+  fade: CarouselFade;
   transitionMs: number;
   loop: boolean;
   centered: boolean;
@@ -81,6 +90,9 @@ export const useCarousel = (): CarouselApi => {
   const pendingFocusRef = useRef(false);
   const startXRef = useRef(0);
   const startIndexRef = useRef(0);
+  const startTimeRef = useRef(0);
+  const lastXRef = useRef(0);
+  const lastTimeRef = useRef(0);
   const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const scrollDeltaRef = useRef(0);
   const mountedRef = useRef(true);
@@ -177,8 +189,10 @@ export const useCarousel = (): CarouselApi => {
   const contentClassName = useCallback(
     (base: string, fadeModifier: string, fadeXModifier: string): string => {
       const classes = [base];
-      if (config.fade && currentSlidesPerView > 1) classes.push(fadeModifier);
-      else if (config.fade && currentSlidesPerView <= 1) classes.push(fadeXModifier);
+      if (config.fade) {
+        const both = config.fade === 'both' || (config.fade !== 'right' && currentSlidesPerView <= 1);
+        classes.push(both ? fadeXModifier : fadeModifier);
+      }
       return classes.join(' ');
     },
     [config.fade, currentSlidesPerView]
@@ -363,6 +377,9 @@ export const useCarousel = (): CarouselApi => {
       setAnimate(false);
       startXRef.current = event.clientX;
       startIndexRef.current = trackIndexRef.current;
+      startTimeRef.current = event.timeStamp;
+      lastXRef.current = event.clientX;
+      lastTimeRef.current = event.timeStamp;
       if (loop) setWindowBase(Math.floor(trackIndexRef.current));
     },
     [slidesCount, loop]
@@ -376,6 +393,8 @@ export const useCarousel = (): CarouselApi => {
 
       const dx = event.clientX - startXRef.current;
       if (Number.isNaN(dx)) return;
+      lastXRef.current = event.clientX;
+      lastTimeRef.current = event.timeStamp;
       const deltaSlides = dx / width;
       const targetIndex = startIndexRef.current - deltaSlides;
 
@@ -392,8 +411,21 @@ export const useCarousel = (): CarouselApi => {
     if (!draggingRef.current) return;
     draggingRef.current = false;
     setAnimate(true);
-    setTrackIndex(clampIndex(Math.round(trackIndexRef.current)));
-  }, [clampIndex]);
+
+    const width = cellWidth();
+    const rounded = Math.round(trackIndexRef.current);
+    let target = rounded;
+
+    const elapsed = lastTimeRef.current - startTimeRef.current;
+    const velocity = elapsed > 0 && width ? -(lastXRef.current - startXRef.current) / width / elapsed : 0;
+    const FLICK_VELOCITY = 0.0015;
+
+    if (Math.abs(velocity) > FLICK_VELOCITY && rounded === Math.round(startIndexRef.current)) {
+      target = Math.round(startIndexRef.current) + (velocity > 0 ? 1 : -1);
+    }
+
+    setTrackIndex(clampIndex(target));
+  }, [cellWidth, clampIndex]);
 
   useEffect(() => {
     const viewport = viewportRef.current;

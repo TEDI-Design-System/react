@@ -393,7 +393,12 @@ export const Default: Story = {
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(5)}</Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
-        <Carousel.Indicators />
+        <HideAt md>
+          <Carousel.Indicators variant="numbers" />
+        </HideAt>
+        <ShowAt md>
+          <Carousel.Indicators />
+        </ShowAt>
       </Carousel.Footer>
     </Carousel>
   ),
@@ -431,7 +436,12 @@ export const SeparatedBottomPaginationHasDots: Story = {
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(5)}</Carousel.Content>
       <Carousel.Footer>
-        <Carousel.Indicators />
+        <HideAt md>
+          <Carousel.Indicators variant="numbers" />
+        </HideAt>
+        <ShowAt md>
+          <Carousel.Indicators />
+        </ShowAt>
         <Carousel.Navigation />
       </Carousel.Footer>
     </Carousel>
@@ -473,7 +483,12 @@ export const CenteredBottomPaginationHasDots: Story = {
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(6)}</Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
-        <Carousel.Indicators withArrows />
+        <HideAt md>
+          <Carousel.Indicators variant="numbers" withArrows />
+        </HideAt>
+        <ShowAt md>
+          <Carousel.Indicators withArrows />
+        </ShowAt>
       </Carousel.Footer>
     </Carousel>
   ),
@@ -514,7 +529,12 @@ export const CombinationsTopNavigationBottomDots: Story = {
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(6)}</Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
-        <Carousel.Indicators />
+        <HideAt md>
+          <Carousel.Indicators variant="numbers" />
+        </HideAt>
+        <ShowAt md>
+          <Carousel.Indicators />
+        </ShowAt>
       </Carousel.Footer>
     </Carousel>
   ),
@@ -535,7 +555,35 @@ export const CenteredHasDots: Story = {
         </Carousel.Header>
         <Carousel.Content>{slides(3)}</Carousel.Content>
         <Carousel.Footer style={{ justifyContent: 'center' }}>
-          <Carousel.Indicators withArrows />
+          <HideAt md>
+            <Carousel.Indicators variant="numbers" withArrows />
+          </HideAt>
+          <ShowAt md>
+            <Carousel.Indicators withArrows />
+          </ShowAt>
+        </Carousel.Footer>
+      </Carousel>
+    </div>
+  ),
+};
+
+/**
+ * A single slide per view in a constrained width with a centered `N / M` counter
+ * and inline arrows (`variant="numbers"`).
+ */
+export const CenteredHasNumbers: Story = {
+  name: 'Centered - has numbers',
+  render: () => (
+    <div style={{ maxWidth: 400 }}>
+      <Carousel>
+        <Carousel.Header>
+          <Text element="h2" modifiers="h1">
+            Pealkiri
+          </Text>
+        </Carousel.Header>
+        <Carousel.Content>{slides(10)}</Carousel.Content>
+        <Carousel.Footer style={{ justifyContent: 'center' }}>
+          <Carousel.Indicators variant="numbers" withArrows />
         </Carousel.Footer>
       </Carousel>
     </div>
@@ -562,6 +610,29 @@ export const Faded: Story = {
 };
 
 /**
+ * `fade="both"` forces both edges to fade regardless of slide count — here with
+ * ~4 slides per view, `centered` so the active slide sits in the middle and an
+ * equal peek fades in on either side. (`fade` alone fades only the trailing edge
+ * once there is more than one slide per view.)
+ */
+export const FadedBothSides: Story = {
+  name: 'Faded - both sides',
+  render: () => (
+    <Carousel>
+      <Carousel.Header>
+        <Text element="h2" modifiers="h1">
+          Pealkiri
+        </Text>
+        <Carousel.Navigation />
+      </Carousel.Header>
+      <Carousel.Content slidesPerView={{ xs: 1.3, sm: 2.4, lg: 4.4 }} centered fade="both">
+        {slides(8)}
+      </Carousel.Content>
+    </Carousel>
+  ),
+};
+
+/**
  * Fractional `slidesPerView` lets the next slide "peek" in from the edge — a
  * common mobile pattern that signals there is more to swipe. Here
  * `slidesPerView={{ xs: 1.15, sm: 2.25, lg: 3.25 }}`.
@@ -577,7 +648,12 @@ export const Peeking: Story = {
       </Carousel.Header>
       <Carousel.Content slidesPerView={{ xs: 1.15, sm: 2.25, lg: 3.25 }}>{slides(8)}</Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
-        <Carousel.Indicators />
+        <HideAt md>
+          <Carousel.Indicators variant="numbers" />
+        </HideAt>
+        <ShowAt md>
+          <Carousel.Indicators />
+        </ShowAt>
       </Carousel.Footer>
     </Carousel>
   ),
@@ -602,37 +678,12 @@ export const PeekingBothSides: Story = {
         {slides(8)}
       </Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
-        <Carousel.Indicators />
-      </Carousel.Footer>
-    </Carousel>
-  ),
-};
-
-/**
- * Show different controls per breakpoint: swipe-first on mobile (dots only),
- * arrows on wider screens. `Carousel.Navigation` and `Carousel.Indicators` are
- * context consumers, so wrap them in the `ShowAt` / `HideAt` layout helpers —
- * these unmount the hidden control (rather than CSS-hiding it), so only one set
- * is ever in the DOM and the accessibility tree stays clean. Resize the canvas
- * to see them swap at `md`.
- */
-export const ResponsiveControls: Story = {
-  name: 'Responsive controls (dots on mobile, arrows on desktop)',
-  render: () => (
-    <Carousel>
-      <Carousel.Header>
-        <Text element="h2" modifiers="h1">
-          Pealkiri
-        </Text>
-        <ShowAt md>
-          <Carousel.Navigation />
-        </ShowAt>
-      </Carousel.Header>
-      <Carousel.Content slidesPerView={{ xs: 1.1, sm: 2, md: 3, lg: 4 }}>{slides(8)}</Carousel.Content>
-      <Carousel.Footer style={{ justifyContent: 'center' }}>
         <HideAt md>
-          <Carousel.Indicators />
+          <Carousel.Indicators variant="numbers" />
         </HideAt>
+        <ShowAt md>
+          <Carousel.Indicators />
+        </ShowAt>
       </Carousel.Footer>
     </Carousel>
   ),
@@ -689,7 +740,12 @@ export const Examples: Story = {
           ))}
         </Carousel.Content>
         <Carousel.Footer style={{ justifyContent: 'center' }}>
-          <Carousel.Indicators />
+          <HideAt md>
+            <Carousel.Indicators variant="numbers" />
+          </HideAt>
+          <ShowAt md>
+            <Carousel.Indicators />
+          </ShowAt>
         </Carousel.Footer>
       </Carousel>
 
@@ -725,7 +781,12 @@ export const Examples: Story = {
           ))}
         </Carousel.Content>
         <Carousel.Footer style={{ justifyContent: 'center' }}>
-          <Carousel.Indicators />
+          <HideAt md>
+            <Carousel.Indicators variant="numbers" />
+          </HideAt>
+          <ShowAt md>
+            <Carousel.Indicators />
+          </ShowAt>
         </Carousel.Footer>
       </Carousel>
 
@@ -736,7 +797,12 @@ export const Examples: Story = {
           ))}
         </Carousel.Content>
         <Carousel.Footer style={{ justifyContent: 'center' }}>
-          <Carousel.Indicators withArrows />
+          <HideAt md>
+            <Carousel.Indicators variant="numbers" withArrows />
+          </HideAt>
+          <ShowAt md>
+            <Carousel.Indicators withArrows />
+          </ShowAt>
         </Carousel.Footer>
       </Carousel>
     </VerticalSpacing>
