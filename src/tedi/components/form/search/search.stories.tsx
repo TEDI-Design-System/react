@@ -6,11 +6,11 @@ import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Spinner } from '../../loaders/spinner/spinner';
+import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
 import { Dropdown } from '../../overlays/dropdown/dropdown';
 import { DropdownContext, DropdownContextValue } from '../../overlays/dropdown/dropdown-context';
 import { DropdownItem } from '../../overlays/dropdown/dropdown-item/dropdown-item';
-import { DropdownItemValue } from '../../overlays/dropdown/dropdown-item-value/dropdown-item-value';
 import { Search, SearchProps } from './search';
 
 /**
@@ -209,7 +209,7 @@ export const Estonian: Story = {
 
 /**
  * Typeahead — matches rendered in a real `Dropdown` anchored to the field, each
- * row a `DropdownItemValue`. Closed by default; opening is left to the dropdown's
+ * row a `OptionContent`. Closed by default; opening is left to the dropdown's
  * own trigger / dismiss handlers (click the field to open, click away or Esc to
  * close). `Search` exposes an imperative ref, so it is wrapped in a `<div>` to
  * give `Dropdown.Trigger` a DOM element to anchor to.
@@ -243,7 +243,7 @@ export const WithSuggestions: Story = {
 };
 
 /**
- * A single matched result (`DropdownItemValue` with a name + code) followed by
+ * A single matched result (`OptionContent` with a name + code) followed by
  * fallback actions and a hint — e.g. a national-registry person lookup. Closed
  * by default; click the field to open.
  */
@@ -263,8 +263,8 @@ export const WithResultAndActions: Story = {
 
         <Dropdown.Content>
           <Dropdown.Item index={0} closeOnSelect={false}>
-            <DropdownItemValue>
-              <DropdownItemValue.Label>
+            <OptionContent>
+              <OptionContent.Label>
                 <Text element="span" modifiers="bold">
                   Laura Kassisaba
                 </Text>
@@ -278,8 +278,8 @@ export const WithResultAndActions: Story = {
                   variant="dot-only"
                 />
                 49504080254
-              </DropdownItemValue.Label>
-            </DropdownItemValue>
+              </OptionContent.Label>
+            </OptionContent>
           </Dropdown.Item>
 
           <Separator color="secondary" />
@@ -430,11 +430,11 @@ export const Typeahead: Story = {
             {matches.length > 0 ? (
               matches.map((name, i) => (
                 <DropdownItem key={name} index={i} closeOnSelect={false} onClick={() => select(name)}>
-                  <DropdownItemValue>
-                    <DropdownItemValue.Label>
+                  <OptionContent>
+                    <OptionContent.Label>
                       <Highlight text={name} query={query} />
-                    </DropdownItemValue.Label>
-                  </DropdownItemValue>
+                    </OptionContent.Label>
+                  </OptionContent>
                 </DropdownItem>
               ))
             ) : (
@@ -510,11 +510,11 @@ export const AsyncSuggestions: Story = {
             ) : results.length > 0 ? (
               results.map((name, i) => (
                 <DropdownItem key={name} index={i} closeOnSelect={false} onClick={() => select(name)}>
-                  <DropdownItemValue>
-                    <DropdownItemValue.Label>
+                  <OptionContent>
+                    <OptionContent.Label>
                       <Highlight text={name} query={query} />
-                    </DropdownItemValue.Label>
-                  </DropdownItemValue>
+                    </OptionContent.Label>
+                  </OptionContent>
                 </DropdownItem>
               ))
             ) : (

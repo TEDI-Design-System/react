@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react';
 
-import { DropdownItemValue } from './dropdown-item-value';
-import styles from './dropdown-item-value.module.scss';
+import { OptionContent } from './option-content';
+import styles from './option-content.module.scss';
 
-describe('DropdownItemValue', () => {
+describe('OptionContent', () => {
   it('renders the label and meta content', () => {
     render(
-      <DropdownItemValue>
-        <DropdownItemValue.Label>Tallinn</DropdownItemValue.Label>
-        <DropdownItemValue.Meta>4 results</DropdownItemValue.Meta>
-      </DropdownItemValue>
+      <OptionContent>
+        <OptionContent.Label>Tallinn</OptionContent.Label>
+        <OptionContent.Meta>4 results</OptionContent.Meta>
+      </OptionContent>
     );
     expect(screen.getByText('Tallinn')).toBeInTheDocument();
     expect(screen.getByText('4 results')).toBeInTheDocument();
@@ -17,9 +17,9 @@ describe('DropdownItemValue', () => {
 
   it('does not expose a selection control for the default type', () => {
     render(
-      <DropdownItemValue>
-        <DropdownItemValue.Label>Plain</DropdownItemValue.Label>
-      </DropdownItemValue>
+      <OptionContent>
+        <OptionContent.Label>Plain</OptionContent.Label>
+      </OptionContent>
     );
     expect(screen.getByText('Plain')).toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).toBeNull();
@@ -28,9 +28,9 @@ describe('DropdownItemValue', () => {
 
   it('shows a check glyph for a selected checkbox without exposing a control (presentation)', () => {
     render(
-      <DropdownItemValue type="checkbox" selected>
-        <DropdownItemValue.Label>Item</DropdownItemValue.Label>
-      </DropdownItemValue>
+      <OptionContent type="checkbox" selected>
+        <OptionContent.Label>Item</OptionContent.Label>
+      </OptionContent>
     );
     expect(screen.getByText('check')).toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).toBeNull();
@@ -38,9 +38,9 @@ describe('DropdownItemValue', () => {
 
   it('shows a dash glyph for an indeterminate checkbox (presentation)', () => {
     render(
-      <DropdownItemValue type="checkbox" indeterminate>
-        <DropdownItemValue.Label>Item</DropdownItemValue.Label>
-      </DropdownItemValue>
+      <OptionContent type="checkbox" indeterminate>
+        <OptionContent.Label>Item</OptionContent.Label>
+      </OptionContent>
     );
     expect(screen.getByText('remove')).toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).toBeNull();
@@ -48,19 +48,19 @@ describe('DropdownItemValue', () => {
 
   it('renders a selected radio without exposing a control (presentation)', () => {
     const { container } = render(
-      <DropdownItemValue type="radio" selected>
-        <DropdownItemValue.Label>Item</DropdownItemValue.Label>
-      </DropdownItemValue>
+      <OptionContent type="radio" selected>
+        <OptionContent.Label>Item</OptionContent.Label>
+      </OptionContent>
     );
     expect(screen.queryByRole('radio')).toBeNull();
-    expect(container.querySelector(`.${styles['tedi-dropdown-item-value__radio--checked']}`)).toBeInTheDocument();
+    expect(container.querySelector(`.${styles['tedi-option-content__radio--checked']}`)).toBeInTheDocument();
   });
 
   it('renders a leading icon', () => {
     render(
-      <DropdownItemValue icon="location_on">
-        <DropdownItemValue.Label>Tallinn</DropdownItemValue.Label>
-      </DropdownItemValue>
+      <OptionContent icon="location_on">
+        <OptionContent.Label>Tallinn</OptionContent.Label>
+      </OptionContent>
     );
     expect(screen.getByText('Tallinn')).toBeInTheDocument();
   });
@@ -68,9 +68,9 @@ describe('DropdownItemValue', () => {
   describe('indicatorSemantics="control" (listbox)', () => {
     it('exposes a radio with an accessible name from the label', () => {
       render(
-        <DropdownItemValue type="radio" indicatorSemantics="control" selected>
-          <DropdownItemValue.Label>Tartu</DropdownItemValue.Label>
-        </DropdownItemValue>
+        <OptionContent type="radio" indicatorSemantics="control" selected>
+          <OptionContent.Label>Tartu</OptionContent.Label>
+        </OptionContent>
       );
       const radio = screen.getByRole('radio', { name: 'Tartu' });
       expect(radio).toHaveAttribute('aria-checked', 'true');
@@ -78,18 +78,18 @@ describe('DropdownItemValue', () => {
 
     it('exposes a checkbox with an indeterminate (mixed) state', () => {
       render(
-        <DropdownItemValue type="checkbox" indicatorSemantics="control" indeterminate>
-          <DropdownItemValue.Label>All</DropdownItemValue.Label>
-        </DropdownItemValue>
+        <OptionContent type="checkbox" indicatorSemantics="control" indeterminate>
+          <OptionContent.Label>All</OptionContent.Label>
+        </OptionContent>
       );
       expect(screen.getByRole('checkbox', { name: 'All' })).toHaveAttribute('aria-checked', 'mixed');
     });
 
     it('does not set a dangling aria-labelledby when no Label child is present', () => {
       render(
-        <DropdownItemValue type="checkbox" indicatorSemantics="control" selected>
+        <OptionContent type="checkbox" indicatorSemantics="control" selected>
           <span>Bare text, not a Label</span>
-        </DropdownItemValue>
+        </OptionContent>
       );
       expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-labelledby');
     });

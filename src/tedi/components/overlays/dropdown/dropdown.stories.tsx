@@ -8,9 +8,9 @@ import Checkbox from '../../form/checkbox/checkbox';
 import Radio from '../../form/radio/radio';
 import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
+import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
 import { Dropdown } from './dropdown';
-import { DropdownItemValue } from './dropdown-item-value/dropdown-item-value';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.58?node-id=40253-113444&m=dev" target="_BLANK">Dropdown Figma ↗</a><br/>
@@ -571,8 +571,8 @@ export const CustomContent: Story = {
 
           {filtered.map((rep, i) => (
             <Dropdown.Item key={rep.name} index={i + 1}>
-              <DropdownItemValue>
-                <DropdownItemValue.Label>
+              <OptionContent>
+                <OptionContent.Label>
                   <Text element="span" modifiers="bold">
                     {rep.name}
                   </Text>
@@ -586,8 +586,8 @@ export const CustomContent: Story = {
                     variant="dot-only"
                   />
                   {rep.code}
-                </DropdownItemValue.Label>
-              </DropdownItemValue>
+                </OptionContent.Label>
+              </OptionContent>
             </Dropdown.Item>
           ))}
         </Dropdown.Content>

@@ -1,44 +1,42 @@
 import cn from 'classnames';
 import { Children, cloneElement, forwardRef, isValidElement, ReactElement, useId } from 'react';
 
-import { Icon, IconProps } from '../../../base/icon/icon';
-import styles from './dropdown-item-value.module.scss';
+import { Icon, IconProps } from '../../base/icon/icon';
+import styles from './option-content.module.scss';
 
-export type DropdownItemValueType = 'default' | 'checkbox' | 'radio';
-export type DropdownItemValueLayout = 'horizontal' | 'vertical';
+export type OptionContentType = 'default' | 'checkbox' | 'radio';
+export type OptionContentLayout = 'horizontal' | 'vertical';
 
-export interface DropdownItemValueSlotProps {
+export interface OptionContentSlotProps {
   children?: React.ReactNode;
   /** Additional class name. */
   className?: string;
-  /** @internal id wired up by `DropdownItemValue` to link the indicator's `aria-labelledby`. */
+  /** @internal id wired up by `OptionContent` to link the indicator's `aria-labelledby`. */
   id?: string;
 }
 
-export const DropdownItemValueLabel = forwardRef<HTMLSpanElement, DropdownItemValueSlotProps>(
+export const OptionContentLabel = forwardRef<HTMLSpanElement, OptionContentSlotProps>(
   ({ children, className, id }, ref) => (
-    <span ref={ref} id={id} className={cn(styles['tedi-dropdown-item-value__label'], className)}>
+    <span ref={ref} id={id} className={cn(styles['tedi-option-content__label'], className)}>
       {children}
     </span>
   )
 );
 
-DropdownItemValueLabel.displayName = 'DropdownItemValueLabel';
+OptionContentLabel.displayName = 'OptionContentLabel';
 
-export const DropdownItemValueMeta = forwardRef<HTMLSpanElement, DropdownItemValueSlotProps>(
-  ({ children, className }, ref) => (
-    <span ref={ref} className={cn(styles['tedi-dropdown-item-value__meta'], className)}>
-      {children}
-    </span>
-  )
-);
+export const OptionContentMeta = forwardRef<HTMLSpanElement, OptionContentSlotProps>(({ children, className }, ref) => (
+  <span ref={ref} className={cn(styles['tedi-option-content__meta'], className)}>
+    {children}
+  </span>
+));
 
-DropdownItemValueMeta.displayName = 'DropdownItemValueMeta';
+OptionContentMeta.displayName = 'OptionContentMeta';
 
-export interface DropdownItemValueProps {
+export interface OptionContentProps {
   /**
-   * Content of the value row — typically `DropdownItemValue.Label` and
-   * optionally `DropdownItemValue.Meta`, but any node is allowed.
+   * Content of the value row — typically `OptionContent.Label` and
+   * optionally `OptionContent.Meta`, but any node is allowed.
    */
   children?: React.ReactNode;
   /**
@@ -48,13 +46,13 @@ export interface DropdownItemValueProps {
    * - `radio` — radio indicator (single-select listbox)
    * @default default
    */
-  type?: DropdownItemValueType;
+  type?: OptionContentType;
   /**
    * Arrange the label and meta side-by-side (`horizontal`) or stacked
    * (`vertical`, e.g. a title with a description below).
    * @default horizontal
    */
-  layout?: DropdownItemValueLayout;
+  layout?: OptionContentLayout;
   /**
    * Whether the indicator renders as selected (checked).
    * @default false
@@ -79,7 +77,7 @@ export interface DropdownItemValueProps {
    * - `presentation` (default) — the indicator is `aria-hidden`; the interactive
    *   parent owns selection (menu pattern: `aria-checked` on the `DropdownItem`).
    * - `control` — the indicator itself carries `role="checkbox"`/`"radio"`,
-   *   `aria-checked` and is named via `aria-labelledby` from `DropdownItemValue.Label`
+   *   `aria-checked` and is named via `aria-labelledby` from `OptionContent.Label`
    *   (listbox pattern, e.g. inside a `Select` option). Requires a `Label` child.
    * @default presentation
    */
@@ -95,7 +93,7 @@ const renderIcon = (icon: string | IconProps, className: string): JSX.Element =>
   return <Icon size={18} {...props} className={cn(className, props.className)} />;
 };
 
-const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps>(
+const OptionContentInner = forwardRef<HTMLDivElement, OptionContentProps>(
   (
     {
       children,
@@ -116,7 +114,7 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
     const hasLabelChild =
       control &&
       type !== 'default' &&
-      Children.toArray(children).some((child) => isValidElement(child) && child.type === DropdownItemValueLabel);
+      Children.toArray(children).some((child) => isValidElement(child) && child.type === OptionContentLabel);
     const labelledBy = hasLabelChild ? labelId : undefined;
 
     const checkboxAria = control
@@ -139,8 +137,8 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
 
     const content = hasLabelChild
       ? Children.map(children, (child) =>
-          isValidElement(child) && child.type === DropdownItemValueLabel
-            ? cloneElement(child as ReactElement<DropdownItemValueSlotProps>, { id: labelId })
+          isValidElement(child) && child.type === OptionContentLabel
+            ? cloneElement(child as ReactElement<OptionContentSlotProps>, { id: labelId })
             : child
         )
       : children;
@@ -149,12 +147,12 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
       <div
         ref={ref}
         className={cn(
-          styles['tedi-dropdown-item-value'],
-          styles[`tedi-dropdown-item-value--${layout}`],
+          styles['tedi-option-content'],
+          styles[`tedi-option-content--${layout}`],
           {
-            [styles['tedi-dropdown-item-value--checkbox']]: type === 'checkbox',
-            [styles['tedi-dropdown-item-value--radio']]: type === 'radio',
-            [styles['tedi-dropdown-item-value--disabled']]: disabled,
+            [styles['tedi-option-content--checkbox']]: type === 'checkbox',
+            [styles['tedi-option-content--radio']]: type === 'radio',
+            [styles['tedi-option-content--disabled']]: disabled,
           },
           className
         )}
@@ -162,14 +160,14 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
         {type === 'checkbox' && (
           <span
             {...checkboxAria}
-            className={cn(styles['tedi-dropdown-item-value__indicator'], styles['tedi-dropdown-item-value__checkbox'], {
-              [styles['tedi-dropdown-item-value__checkbox--checked']]: selected || indeterminate,
+            className={cn(styles['tedi-option-content__indicator'], styles['tedi-option-content__checkbox'], {
+              [styles['tedi-option-content__checkbox--checked']]: selected || indeterminate,
             })}
           >
             {indeterminate ? (
-              <Icon name="remove" size={16} className={styles['tedi-dropdown-item-value__check-icon']} />
+              <Icon name="remove" size={16} className={styles['tedi-option-content__check-icon']} />
             ) : selected ? (
-              <Icon name="check" size={16} className={styles['tedi-dropdown-item-value__check-icon']} />
+              <Icon name="check" size={16} className={styles['tedi-option-content__check-icon']} />
             ) : null}
           </span>
         )}
@@ -177,25 +175,25 @@ const DropdownItemValueInner = forwardRef<HTMLDivElement, DropdownItemValueProps
         {type === 'radio' && (
           <span
             {...radioAria}
-            className={cn(styles['tedi-dropdown-item-value__indicator'], styles['tedi-dropdown-item-value__radio'], {
-              [styles['tedi-dropdown-item-value__radio--checked']]: selected,
+            className={cn(styles['tedi-option-content__indicator'], styles['tedi-option-content__radio'], {
+              [styles['tedi-option-content__radio--checked']]: selected,
             })}
           />
         )}
 
-        {icon && renderIcon(icon, styles['tedi-dropdown-item-value__icon'])}
+        {icon && renderIcon(icon, styles['tedi-option-content__icon'])}
 
-        <div className={styles['tedi-dropdown-item-value__content']}>{content}</div>
+        <div className={styles['tedi-option-content__content']}>{content}</div>
       </div>
     );
   }
 );
 
-DropdownItemValueInner.displayName = 'DropdownItemValue';
+OptionContentInner.displayName = 'OptionContent';
 
-export const DropdownItemValue = Object.assign(DropdownItemValueInner, {
-  Label: DropdownItemValueLabel,
-  Meta: DropdownItemValueMeta,
+export const OptionContent = Object.assign(OptionContentInner, {
+  Label: OptionContentLabel,
+  Meta: OptionContentMeta,
 });
 
-export default DropdownItemValue;
+export default OptionContent;

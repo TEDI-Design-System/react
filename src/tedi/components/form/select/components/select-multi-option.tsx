@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { components as ReactSelectComponents, OptionProps } from 'react-select';
 
-import { DropdownItemValue } from '../../../overlays/dropdown/dropdown-item-value/dropdown-item-value';
+import { OptionContent } from '../../../misc/option-content/option-content';
 import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
 import {
@@ -67,15 +67,15 @@ export const SelectMultiOption = ({ renderOption, ...props }: MultiOptionType): 
       {renderOption && !isSelectAll && !isGroup ? (
         renderOption(props)
       ) : (
-        <DropdownItemValue
+        <OptionContent
           type="checkbox"
           indicatorSemantics="control"
           selected={displayChecked}
           indeterminate={displayIndeterminate}
           disabled={props.isDisabled}
         >
-          <DropdownItemValue.Label>{props.children}</DropdownItemValue.Label>
-        </DropdownItemValue>
+          <OptionContent.Label>{props.children}</OptionContent.Label>
+        </OptionContent>
       )}
     </ReactSelectComponents.Option>
   );
