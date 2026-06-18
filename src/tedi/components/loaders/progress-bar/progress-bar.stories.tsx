@@ -163,14 +163,19 @@ export const WithLabel: Story = {
         valuePosition="bottom"
         helper={{ text: 'Üleslaadimine', type: 'hint' }}
       />
-      <ProgressBar value={40} label="Küsitluses osalenutest olid vanuses 15-18" labelPosition="horizontal" />
+      <ProgressBar
+        value={40}
+        label="Küsitluses osalenutest olid vanuses 15-18"
+        labelPosition="top"
+        md={{ labelPosition: 'horizontal' }}
+      />
     </div>
   ),
   parameters: {
     docs: {
       source: {
         code: `<ProgressBar value={40} label="Progress" required valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={40} label="Küsitluses osalenutest olid vanuses 15-18" labelPosition="horizontal" />`,
+<ProgressBar value={40} label="Küsitluses osalenutest olid vanuses 15-18" labelPosition="top" lg={{ labelPosition: 'top' }} />`,
       },
     },
   },
