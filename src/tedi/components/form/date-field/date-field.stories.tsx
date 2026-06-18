@@ -644,15 +644,9 @@ export const NativePicker: Story = {
 };
 
 /**
- * Pass `modal` (alone or `modal={true}`) to open the calendar inside a modal — with a
- * Cancel / Confirm footer — instead of the floating popover, on **every** viewport including
- * desktop. With `calendarTrigger="input"` the modal opens from clicking anywhere in the field.
- * The selection is held as a draft and only committed on Confirm — Cancel / Escape / backdrop
- * dismiss discards it.
- *
- * `modalProps` is breakpoint-aware, so `{ fullscreen: 'edge', md: { fullscreen: false } }` makes the
- * modal cover the full viewport below `md` (handy on phones) while staying a centered dialog from
- * `md` up.
+ * `modal` opens the calendar in a modal (Cancel / Confirm footer) instead of the popover. The
+ * selection is committed on Confirm; Cancel / Escape / backdrop discards it. `modalProps` is
+ * breakpoint-aware — here `fullscreen: 'edge'` below `md`, centered dialog from `md` up.
  */
 export const ModalPicker: Story = {
   render: () => {
@@ -673,9 +667,8 @@ export const ModalPicker: Story = {
 };
 
 /**
- * `modal="md"` opens the calendar in a modal only below `md` viewports and keeps the regular
- * popover calendar on desktop. Paired with `modalProps={{ fullscreen: 'edge' }}` the mobile modal
- * fills the viewport edge-to-edge. Resize the Storybook canvas to see it switch.
+ * `modal="md"` uses the modal below `md` and the popover from `md` up. Resize the canvas to see it
+ * switch.
  */
 export const ResponsiveModalPicker: Story = {
   render: () => {
@@ -696,14 +689,9 @@ export const ResponsiveModalPicker: Story = {
 };
 
 /**
- * Calendar modals (`modal` + `calendarTrigger="input"`): edge-fullscreen on mobile, centered on
- * desktop. `selectionLevel` restricts the picker to **month** or **year** — with
- * `monthYearSelectType="grid"` the navigation replaces the content in place instead of dropping down
- * — and `modalTitle` sets the heading. The **range** modal shows two months side by side on desktop
- * (`numberOfMonths={2}`): the dialog's `width: max-content` default auto-sizes to fit both, and on
- * narrow / mobile-fullscreen the calendar wraps them into a vertical stack. It also passes
- * `showNavigation={false}`, which locks it to the two shown months — no prev/next navigation and the
- * month/year header renders as a static (non-clickable) label.
+ * Month, year and range pickers in a modal. `selectionLevel` sets the picker level and `modalTitle`
+ * the heading; the range modal shows two months (`numberOfMonths={2}`) that stack vertically when
+ * the modal is narrow.
  */
 export const ModalPickers: Story = {
   render: () => {
