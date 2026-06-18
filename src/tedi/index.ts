@@ -31,6 +31,7 @@ export * from './components/notifications/toast/toast';
 export * from './components/cards/card';
 export * from './components/navigation/breadcrumbs';
 export * from './components/navigation/hash-trigger/hash-trigger';
+export * from './components/navigation/horizontal-stepper';
 export * from './components/navigation/link/link';
 export * from './components/navigation/pagination';
 export * from './components/navigation/tabs';
