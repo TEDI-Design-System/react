@@ -1,6 +1,10 @@
 .tedi-input-group {
-  display: inline-flex;
   width: 100%;
+
+  &__row {
+    display: inline-flex;
+    width: 100%;
+  }
 
   &__prefix,
   &__suffix,
@@ -122,6 +126,7 @@
   &--disabled {
     .tedi-input-group__prefix,
     .tedi-input-group__suffix {
+      color: var(--general-text-disabled);
       background-color: var(--form-general-background-disabled);
       border-color: var(--form-input-border-disabled);
     }
