@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { FileUploadFile, useFileUpload, UseFileUploadProps } from '../../../helpers/hooks/use-file-upload';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
+import { Button } from '../../buttons/button/button';
 import { List } from '../../content/list';
 import { Attachment, AttachmentProps } from '../../misc/attachment/attachment';
 import FeedbackText, { FeedbackTextProps } from '../feedback-text/feedback-text';
@@ -12,8 +13,8 @@ import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './file-dropzone.module.scss';
 
 export type FileDropzoneAttachmentProps =
-  | Partial<Omit<AttachmentProps, 'name' | 'onRemove'>>
-  | ((file: FileUploadFile) => Partial<Omit<AttachmentProps, 'name' | 'onRemove'>>);
+  | Partial<Omit<AttachmentProps, 'name'>>
+  | ((file: FileUploadFile) => Partial<Omit<AttachmentProps, 'name'>>);
 
 export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLabel'>, UseFileUploadProps {
   /*
@@ -37,11 +38,10 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
    */
   disabled?: boolean;
   /**
-   * Overrides forwarded to each rendered `Attachment` (e.g. `icon`,
-   * `fileSize`, `meta`, `progress`, `removeIcon`, `feedback`). Pass a
-   * function to vary per file. Defaults applied by `FileDropzone`
-   * (`name`, `isValid`, `isLoading`, `onRemove`) take precedence and
-   * cannot be overridden.
+   * Overrides forwarded to each rendered `Attachment` (e.g. `icon`, `fileSize`,
+   * `progress`, `feedback`). Pass a function to vary per file. `FileDropzone`
+   * sets `name`, `isValid` and `isLoading` itself, and always appends a remove
+   * button to the `actions` slot (after any `actions` you provide here).
    */
   attachmentProps?: FileDropzoneAttachmentProps;
 }
@@ -112,17 +112,25 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         >
           {innerFiles.map((file: FileUploadFile) => {
             const overrides = typeof attachmentProps === 'function' ? attachmentProps(file) : attachmentProps;
+            const { actions: overrideActions, ...attachmentOverrides } = overrides ?? {};
             return (
               <List.Item
                 key={file.id ?? `${file.name ?? 'file'}-${file.size ?? ''}-${file.lastModified ?? ''}`}
                 className={styles['tedi-file-dropzone__file-list-item']}
               >
                 <Attachment
-                  {...overrides}
+                  {...attachmentOverrides}
                   name={file.name ?? ''}
                   isValid={file.isValid ?? overrides?.isValid}
                   isLoading={file.isLoading ?? overrides?.isLoading}
-                  onRemove={() => onFileRemove(file)}
+                  actions={
+                    <>
+                      {overrideActions}
+                      <Button visualType="neutral" icon="delete" onClick={() => onFileRemove(file)}>
+                        {`${getLabel('remove')} ${file.name ?? ''}`}
+                      </Button>
+                    </>
+                  }
                 />
               </List.Item>
             );

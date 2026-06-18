@@ -19,6 +19,14 @@ const meta: Meta<typeof FileDropzone> = {
 export default meta;
 type Story = StoryObj<typeof FileDropzone>;
 
+const formatBytes = (bytes?: number): string | undefined => {
+  if (typeof bytes !== 'number') return undefined;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+  return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
+};
+
 export const Default: Story = {};
 
 const Template: StoryFn<FileDropzoneProps> = (args) => (
@@ -133,10 +141,8 @@ export const HasTooltip: Story = {
 
 /**
  * Combines per-file validation with `attachmentProps`. The function form
- * derives `fileSize`, `meta`, and per-file `feedback` from each
- * `FileUploadFile`, so the rejected file surfaces its own inline error
- * message under the attachment row while valid files show their upload
- * metadata.
+ * derives `fileSize` and per-file `feedback` from each `FileUploadFile`, so the
+ * rejected file surfaces its own inline error message under the attachment row.
  */
 export const MultipleWithIndividualValidationAndAttachmentProps: Story = {
   args: {
@@ -168,8 +174,7 @@ export const MultipleWithIndividualValidationAndAttachmentProps: Story = {
           }}
           attachmentProps={(file) => ({
             icon: 'picture_as_pdf',
-            fileSize: file.size,
-            meta: file.isValid === false ? undefined : 'PDF',
+            fileSize: formatBytes(file.size),
             feedback:
               file.isValid === false ? { text: 'Fail on liiga suur — lubatud kuni 1 KB', type: 'error' } : undefined,
           })}
@@ -180,12 +185,10 @@ export const MultipleWithIndividualValidationAndAttachmentProps: Story = {
 };
 
 /**
- * The new `attachmentProps` slot forwards extra props (e.g. `icon`,
- * `fileSize`, `meta`, `progress`, `removeIcon`, `feedback`) onto each
- * rendered `Attachment`. Pass a function to vary the props per file —
- * here the size and progress are sourced from each file's own state,
- * with the in-flight upload showing a `ProgressBar` in place of the
- * meta line.
+ * The `attachmentProps` slot forwards extra props (e.g. `icon`, `fileSize`,
+ * `progress`, `feedback`) onto each rendered `Attachment`. Pass a function to
+ * vary the props per file — here the size and progress are sourced from each
+ * file's own state, with the in-flight upload showing a `ProgressBar`.
  */
 export const WithAttachmentProps: Story = {
   args: {
@@ -203,11 +206,6 @@ export const WithAttachmentProps: Story = {
   },
   render: (args) => {
     const progressByFile: Record<string, number> = { '3': 64 };
-    const metaByFile: Record<string, string> = {
-      '1': 'Üles laaditud 03.06.2026',
-      '2': 'Üles laaditud Anne Tamme poolt',
-      '3': 'Üleslaadimine…',
-    };
     return (
       <Row>
         <Col md={6}>
@@ -215,8 +213,7 @@ export const WithAttachmentProps: Story = {
             {...args}
             attachmentProps={(file) => ({
               icon: 'description',
-              fileSize: file.size,
-              meta: file.id ? metaByFile[file.id] : undefined,
+              fileSize: formatBytes(file.size),
               progress: file.id ? progressByFile[file.id] : undefined,
             })}
           />

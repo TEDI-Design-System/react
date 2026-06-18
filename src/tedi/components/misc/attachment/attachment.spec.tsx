@@ -1,9 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { Breakpoint } from '../../../helpers';
 import { Button } from '../../buttons/button/button';
 import { Attachment } from './attachment';
 
+const mockUseBreakpoint = jest.fn<Breakpoint, []>(() => 'lg');
+
+jest.mock('../../../helpers', () => ({
+  __esModule: true,
+  ...jest.requireActual('../../../helpers'),
+  useBreakpoint: () => mockUseBreakpoint(),
+}));
+
 describe('Attachment component', () => {
+  beforeEach(() => {
+    mockUseBreakpoint.mockReturnValue('lg');
+  });
+
   it('renders the file name', () => {
     render(<Attachment name="invoice.pdf" />);
     expect(screen.getByText('invoice.pdf')).toBeInTheDocument();
@@ -19,66 +32,32 @@ describe('Attachment component', () => {
     expect(container.querySelector('.tedi-attachment__icon')).not.toBeInTheDocument();
   });
 
-  it('renders meta text below the name', () => {
-    render(<Attachment name="invoice.pdf" meta="1.2 MB" />);
-    expect(screen.getByText('1.2 MB')).toBeInTheDocument();
+  it('renders the pre-formatted fileSize string on the file-name line', () => {
+    const { container } = render(<Attachment name="invoice.pdf" fileSize="1,4 MB" />);
+    expect(container.querySelector('.tedi-attachment__file-size')).toHaveTextContent('1,4 MB');
   });
 
-  it('renders the inline remove button when `onRemove` is provided', () => {
+  it('keeps action buttons visible while loading so the upload can be cancelled', () => {
     const handleRemove = jest.fn();
-    render(<Attachment name="invoice.pdf" onRemove={handleRemove} />);
-
-    const removeButton = screen.getByRole('button', { name: /invoice\.pdf/ });
-    expect(removeButton).toHaveAttribute('data-name', 'attachment-remove');
-    fireEvent.click(removeButton);
-    expect(handleRemove).toHaveBeenCalledTimes(1);
-  });
-
-  it('formats fileSize using the default formatter', () => {
-    render(<Attachment name="invoice.pdf" fileSize={1_500_000} />);
-    expect(screen.getByText(/1,4\s+MB/)).toBeInTheDocument();
-  });
-
-  it('uses a fixed unit when `fileSizeUnit` is set', () => {
-    render(<Attachment name="invoice.pdf" fileSize={1_500_000} fileSizeUnit="KB" />);
-    expect(screen.getByText(/1\s?464,8\s+KB/)).toBeInTheDocument();
-  });
-
-  it('uses custom `formatFileSize` when provided', () => {
-    render(<Attachment name="invoice.pdf" fileSize={1_500_000} formatFileSize={(b) => `${b} bytes`} />);
-    expect(screen.getByText(/1500000 bytes/)).toBeInTheDocument();
-  });
-
-  it('renders fileSize next to the remove button (not inline with meta)', () => {
-    const { container } = render(<Attachment name="invoice.pdf" fileSize={1024} meta="PDF" />);
-    expect(container.querySelector('.tedi-attachment__file-size')).toHaveTextContent(/1,0\s+KB/);
-    expect(container.querySelector('.tedi-attachment__meta')).toHaveTextContent('PDF');
-    expect(container.querySelector('.tedi-attachment__meta')).not.toHaveTextContent('KB');
-  });
-
-  it('uses a custom `removeIcon`', () => {
-    const { container } = render(<Attachment name="invoice.pdf" onRemove={() => undefined} removeIcon="delete" />);
-    expect(container.querySelector('[data-name="icon"]')).toBeInTheDocument();
-  });
-
-  it('keeps the remove button visible while loading so the upload can be cancelled', () => {
-    const handleRemove = jest.fn();
-    render(<Attachment name="invoice.pdf" isLoading onRemove={handleRemove} />);
-    const removeButton = screen.getByRole('button', { name: /invoice\.pdf/ });
-    fireEvent.click(removeButton);
+    render(
+      <Attachment
+        name="invoice.pdf"
+        isLoading
+        actions={
+          <Button icon="delete" onClick={handleRemove}>
+            Eemalda invoice.pdf
+          </Button>
+        }
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Eemalda invoice.pdf' }));
     expect(handleRemove).toHaveBeenCalledTimes(1);
   });
 
   it('renders a progress bar while loading and reflects the progress value', () => {
-    render(<Attachment name="invoice.pdf" isLoading progress={42} onRemove={() => undefined} />);
+    render(<Attachment name="invoice.pdf" isLoading progress={42} />);
     const bar = screen.getByRole('progressbar', { name: 'invoice.pdf' });
     expect(bar).toHaveAttribute('aria-valuenow', '42');
-  });
-
-  it('uses meta as the progress bar feedback when both are provided while loading', () => {
-    render(<Attachment name="invoice.pdf" isLoading progress={10} meta="Üleslaadimine…" />);
-    expect(screen.getByText('Üleslaadimine…')).toBeInTheDocument();
-    expect(screen.queryByText('Üleslaadimine…')?.closest('.tedi-attachment__meta')).toBeNull();
   });
 
   it('does not render a progress bar when not loading', () => {
@@ -92,20 +71,24 @@ describe('Attachment component', () => {
   });
 
   it('never renders the row itself as a single clickable target', () => {
-    render(<Attachment name="invoice.pdf" onRemove={() => undefined} />);
+    render(<Attachment name="invoice.pdf" actions={<button type="button">Eemalda invoice.pdf</button>} />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders `actions` slot content alongside the remove button', () => {
+  it('renders multiple `actions` slot buttons', () => {
     render(
       <Attachment
         name="invoice.pdf"
-        actions={<button type="button">Download invoice.pdf</button>}
-        onRemove={() => undefined}
+        actions={
+          <>
+            <button type="button">Download invoice.pdf</button>
+            <button type="button">Eemalda invoice.pdf</button>
+          </>
+        }
       />
     );
     expect(screen.getByRole('button', { name: 'Download invoice.pdf' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /remove invoice\.pdf/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Eemalda invoice.pdf' })).toBeInTheDocument();
   });
 
   it('renders the `actions` slot even without a remove button', () => {
@@ -170,14 +153,38 @@ describe('Attachment component', () => {
     expect(container.firstChild).toHaveClass('tedi-attachment custom-class');
   });
 
-  it('applies the multi-line modifier when meta is set so the icon stays parallel with the name', () => {
-    const { container } = render(<Attachment name="invoice.pdf" meta="PDF" />);
+  it('applies the multi-line modifier while loading so the icon stays parallel with the name', () => {
+    const { container } = render(<Attachment name="invoice.pdf" isLoading progress={10} />);
     expect(container.firstChild).toHaveClass('tedi-attachment--multi-line');
   });
 
-  it('omits the multi-line modifier when there is no meta', () => {
+  it('omits the multi-line modifier when not loading', () => {
     const { container } = render(<Attachment name="invoice.pdf" />);
     expect(container.firstChild).not.toHaveClass('tedi-attachment--multi-line');
+  });
+
+  it('auto-switches to vertical below `verticalBelow` (default sm)', () => {
+    mockUseBreakpoint.mockReturnValue('xs');
+    const { container } = render(<Attachment name="invoice.pdf" />);
+    expect(container.firstChild).toHaveClass('tedi-attachment--vertical');
+  });
+
+  it('stays horizontal at or above the breakpoint, and honours a custom `verticalBelow`', () => {
+    const { container, rerender } = render(<Attachment name="invoice.pdf" />);
+    expect(container.firstChild).not.toHaveClass('tedi-attachment--vertical');
+
+    rerender(<Attachment name="invoice.pdf" verticalBelow="xl" />);
+    expect(container.firstChild).toHaveClass('tedi-attachment--vertical');
+  });
+
+  it('lets `direction` force the layout regardless of viewport', () => {
+    mockUseBreakpoint.mockReturnValue('lg');
+    const { container, rerender } = render(<Attachment name="invoice.pdf" direction="vertical" />);
+    expect(container.firstChild).toHaveClass('tedi-attachment--vertical');
+
+    mockUseBreakpoint.mockReturnValue('xs');
+    rerender(<Attachment name="invoice.pdf" direction="horizontal" />);
+    expect(container.firstChild).not.toHaveClass('tedi-attachment--vertical');
   });
 
   it('renders feedback below the card and wires aria-describedby', () => {

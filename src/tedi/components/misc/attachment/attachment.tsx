@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
-import { useLabels } from '../../../providers/label-provider';
+import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button, ButtonProps } from '../../buttons/button/button';
@@ -9,193 +9,97 @@ import FeedbackText, { FeedbackTextProps } from '../../form/feedback-text/feedba
 import { ProgressBar } from '../../loaders/progress-bar/progress-bar';
 import styles from './attachment.module.scss';
 
-export type AttachmentFileSizeUnit = 'auto' | 'B' | 'KB' | 'MB' | 'GB';
-
-const FILE_SIZE_UNITS: AttachmentFileSizeUnit[] = ['B', 'KB', 'MB', 'GB'];
-
-const defaultFormatFileSize = (bytes: number, unit: AttachmentFileSizeUnit = 'auto', locale = 'et-EE'): string => {
-  if (!Number.isFinite(bytes) || bytes < 0) return '';
-
-  const fixedUnit = unit === 'auto' ? null : unit;
-  let index = fixedUnit ? FILE_SIZE_UNITS.indexOf(fixedUnit) : 0;
-  if (index < 0) index = 0;
-
-  let value = bytes;
-  if (fixedUnit) {
-    value = bytes / 1024 ** index;
-  } else {
-    while (value >= 1024 && index < FILE_SIZE_UNITS.length - 1) {
-      value /= 1024;
-      index += 1;
-    }
-  }
-
-  const formatted = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: index === 0 ? 0 : 1,
-    maximumFractionDigits: index === 0 ? 0 : 1,
-  }).format(value);
-
-  return `${formatted} ${FILE_SIZE_UNITS[index]}`;
-};
+export type AttachmentDirection = 'horizontal' | 'vertical';
 
 export interface AttachmentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick' | 'color'> {
   /**
-   * File name shown as the primary label. Required.
+   * File name (required).
    */
   name: string;
   /**
-   * Optional secondary line shown under the name **inside** the attachment
-   * card. Pass a pre-formatted string (e.g. `'PDF'`, `'Uploaded by Anne'`) —
-   * the component does no formatting of its own so the consumer keeps full
-   * control over locale and units. Independent from `fileSize`: meta renders
-   * below the file name, file size renders right-aligned on the file-name line.
-   *
-   * For error / validation feedback rendered **below** the card, use
-   * `feedback` instead — it's a separate semantic slot bound to ARIA.
-   */
-  meta?: React.ReactNode;
-  /**
-   * Validation / hint message rendered below the attachment card. Mirrors
-   * the `helper` slot on form fields — supports `'hint' | 'valid' | 'error'`
-   * types and is wired to the row via `aria-describedby` for screen readers.
-   *
-   * Distinct from `meta`: meta is secondary text inside the card surface,
-   * `feedback` is the message that appears outside / under the card.
+   * Hint / error message shown below the card, wired via `aria-describedby`.
    */
   feedback?: FeedbackTextProps;
   /**
-   * File size in bytes. When set, the formatted size is rendered inside the
-   * card body, right-aligned on the same line as the file name (opposite the
-   * name). Use the `fileSizeUnit` prop to lock the displayed unit, or
-   * `formatFileSize` for full control over the output string.
+   * Pre-formatted file size (e.g. `'1.2 MB'`), shown after the name. Format it yourself.
    */
-  fileSize?: number;
+  fileSize?: string;
   /**
-   * Display unit for `fileSize`. `'auto'` (default) picks the largest unit
-   * ≤ value (`1.2 MB`, `512 B`, etc.). Override with a fixed unit when the
-   * row sits next to other rows that should share the same scale.
-   * @default auto
-   */
-  fileSizeUnit?: AttachmentFileSizeUnit;
-  /**
-   * Locale code passed to `Intl.NumberFormat` for the file-size number.
-   * @default et-EE
-   */
-  fileSizeLocale?: string;
-  /**
-   * Replaces the default file-size formatter entirely. Receives the raw byte
-   * count and returns the display string. Use when the consumer needs locale
-   * rules outside the `Intl` defaults or wants e.g. "less than 1 KB" copy
-   * for small files.
-   */
-  formatFileSize?: (bytes: number) => string;
-  /**
-   * Optional Material icon name for a file-type glyph rendered on the left.
-   * Omitted by default to match the Figma component (name-only row); opt in
-   * with e.g. `'description'`, `'picture_as_pdf'`, `'image'`.
+   * Material icon name for a leading file-type glyph.
    */
   icon?: string | null;
   /**
-   * Extra action controls rendered in the right-hand action area, to the left
-   * of the remove button — drop in your own `Button`s here (download, view,
-   * open in new tab, etc.). This is the supported way to make a file
-   * downloadable: the row itself is never a single clickable target, so each
-   * affordance is an explicit, individually focusable control.
-   *
-   * `Button` children default to `visualType="neutral"` (matching the design),
-   * but the slot stays open — set any `visualType` explicitly on a button to
-   * override (e.g. a `primary` confirm or `danger` action). Non-`Button` nodes
-   * pass through untouched.
+   * Action buttons (download, delete, …) shown on the right. `Button`s default to
+   * `visualType="neutral"`.
    */
   actions?: React.ReactNode;
   /**
-   * Click handler for the remove action. When provided, renders the inline
-   * delete button on the right. Stays visible during `isLoading` so the user
-   * can cancel an in-flight upload.
-   */
-  onRemove?: () => void;
-  /**
-   * Material icon name for the remove button. Defaults to `'delete'` (trash
-   * can), matching Figma. Override with e.g. `'close'` for a dismiss affordance.
-   * @default delete
-   */
-  removeIcon?: string;
-  /**
-   * Accessible label for the remove button. Falls back to
-   * `${label('remove')} ${name}` — override only when the file name doesn't
-   * read well in screen-reader announcements.
-   */
-  removeLabel?: string;
-  /**
-   * Shows an upload progress bar inside the card — use during async uploads.
-   * The progress value is controlled via the `progress` prop (defaults to
-   * `0`). When `meta` is also set, it's passed into the progress bar's
-   * feedback slot instead of rendering on its own row, so the two pieces of
-   * upload feedback stay grouped. The remove button stays visible during
-   * loading so the user can cancel the upload.
+   * Show an upload progress bar.
    * @default false
    */
   isLoading?: boolean;
   /**
-   * Upload progress as a percentage (0..100). Only rendered when `isLoading`
-   * is true. Out-of-range values are clamped by `ProgressBar`.
+   * Upload progress (0..100); only shown while `isLoading`.
    * @default 0
    */
   progress?: number;
   /**
-   * `false` flips the attachment into the danger surface variant and surfaces
-   * a warning glyph next to the file name. Use for files that failed
-   * validation (wrong extension, too large, server rejected, etc.).
+   * Hint text under the progress bar (e.g. `'Üleslaadimine'`); only shown while `isLoading`.
+   */
+  progressLabel?: string;
+  /**
+   * `false` switches the card to the error state (danger surface + warning glyph).
    */
   isValid?: boolean;
   /**
-   * Additional CSS class names appended to the root element.
+   * Force the layout: `'vertical'` stacks the content, `'horizontal'` keeps one row.
+   * When omitted, derived from the viewport via `verticalBelow`.
+   */
+  direction?: AttachmentDirection;
+  /**
+   * Breakpoint below which the layout auto-switches to vertical (when `direction` is unset).
+   * @default sm
+   */
+  verticalBelow?: Breakpoint;
+  /**
+   * Additional class name on the root element.
    */
   className?: string;
 }
 
 export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, ref) => {
-  const { getLabel } = useLabels();
   const {
     name,
-    meta,
     feedback,
     fileSize,
-    fileSizeUnit = 'auto',
-    fileSizeLocale = 'et-EE',
-    formatFileSize,
     icon,
     actions,
-    onRemove,
-    removeIcon = 'delete',
-    removeLabel,
     isLoading = false,
     progress,
+    progressLabel,
     isValid,
+    direction,
+    verticalBelow = 'sm',
     className,
     id,
     ...rest
   } = props;
 
-  const hasMultiLine = !!meta || isLoading;
+  const currentBreakpoint = useBreakpoint();
+  const isVertical = direction ? direction === 'vertical' : isBreakpointBelow(currentBreakpoint, verticalBelow);
+
   const reactId = React.useId();
   const rowId = id ?? `tedi-attachment-${reactId}`;
   const feedbackId = feedback ? feedback.id ?? `${rowId}-feedback` : undefined;
 
   const invalid = isValid === false;
 
-  const formattedFileSize =
-    typeof fileSize === 'number'
-      ? formatFileSize
-        ? formatFileSize(fileSize)
-        : defaultFormatFileSize(fileSize, fileSizeUnit, fileSizeLocale)
-      : null;
-
   const attachmentBEM = cn(
     styles['tedi-attachment'],
     {
       [styles['tedi-attachment--invalid']]: invalid,
-      [styles['tedi-attachment--multi-line']]: hasMultiLine,
+      [styles['tedi-attachment--multi-line']]: isLoading,
+      [styles['tedi-attachment--vertical']]: isVertical,
     },
     className
   );
@@ -211,46 +115,35 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
         <span className={styles['tedi-attachment__name']}>
           <Text element="span" className={styles['tedi-attachment__name-text']}>
             {name}
+
+            {invalid && (
+              <Icon
+                name="error"
+                color="danger"
+                display="inline"
+                size={18}
+                className={styles['tedi-attachment__invalid-icon']}
+              />
+            )}
           </Text>
-          {invalid && (
-            <Icon
-              name="error"
-              color="danger"
-              display="inline"
-              size={16}
-              className={styles['tedi-attachment__invalid-icon']}
-            />
-          )}
-          {formattedFileSize && (
+          {fileSize && (
             <Text element="span" modifiers="small" color="tertiary" className={styles['tedi-attachment__file-size']}>
-              {formattedFileSize}
+              {fileSize}
             </Text>
           )}
         </span>
-        {isLoading ? (
+        {isLoading && (
           <ProgressBar
             value={progress}
             ariaLabel={name}
             valuePosition="bottom"
-            helper={meta ? { text: meta } : undefined}
+            helper={progressLabel ? { text: progressLabel, type: 'hint' } : undefined}
             className={styles['tedi-attachment__progress']}
           />
-        ) : (
-          meta && (
-            <Text element="span" modifiers="small" color="tertiary" className={styles['tedi-attachment__meta']}>
-              {meta}
-            </Text>
-          )
         )}
       </span>
     </>
   );
-
-  const removeButton = onRemove ? (
-    <Button visualType="neutral" icon={removeIcon} onClick={onRemove} data-name="attachment-remove">
-      {removeLabel ?? `${getLabel('remove')} ${name}`}
-    </Button>
-  ) : null;
 
   const renderAction = (node: React.ReactNode): React.ReactNode => {
     if (!React.isValidElement(node)) {
@@ -269,13 +162,11 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
     return node;
   };
 
-  const actionsSlot =
-    actions || removeButton ? (
-      <span className={styles['tedi-attachment__actions']} data-name="attachment-actions">
-        {React.Children.map(actions, renderAction)}
-        {removeButton}
-      </span>
-    ) : null;
+  const actionsSlot = actions ? (
+    <span className={styles['tedi-attachment__actions']} data-name="attachment-actions">
+      {React.Children.map(actions, renderAction)}
+    </span>
+  ) : null;
 
   const card = (
     <div ref={ref} id={rowId} className={attachmentBEM} aria-describedby={feedbackId} {...rest}>

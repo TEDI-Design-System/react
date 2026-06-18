@@ -1,6 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
-
 .tedi-attachment-wrapper {
   display: block;
   width: 100%;
@@ -60,23 +57,18 @@
 
 .tedi-attachment__invalid-icon {
   flex-shrink: 0;
-}
-
-.tedi-attachment__meta {
-  display: inline-block;
+  margin-left: var(--layout-grid-gutters-08);
 }
 
 .tedi-attachment__progress {
   width: 100%;
 }
 
-@include breakpoints.media-breakpoint-down(md) {
-  .tedi-attachment {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: var(--layout-grid-gutters-02) var(--layout-grid-gutters-08);
-    align-items: center;
-  }
+.tedi-attachment--vertical {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--layout-grid-gutters-02) var(--layout-grid-gutters-08);
+  align-items: center;
 
   .tedi-attachment__icon {
     grid-column: 1;
@@ -108,10 +100,8 @@
   }
 }
 
-@include breakpoints.media-breakpoint-up(md) {
-  .tedi-attachment--multi-line .tedi-attachment__icon {
-    margin-top: calc(var(--layout-grid-gutters-08) + var(--layout-grid-gutters-02));
-  }
+.tedi-attachment--multi-line:not(.tedi-attachment--vertical) .tedi-attachment__icon {
+  margin-top: calc(var(--layout-grid-gutters-08) + var(--layout-grid-gutters-02));
 }
 
 .tedi-attachment__file-size {

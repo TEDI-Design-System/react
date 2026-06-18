@@ -1324,39 +1324,36 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 ### Attachment
 **Props:** `AttachmentProps` | fRef
 - `name: string` (required) — file label
-- `meta?: ReactNode` — secondary line inside the card (e.g. `'PDF'`, uploader)
 - `feedback?: FeedbackTextProps` — hint / error rendered below the card, wired via `aria-describedby`
-- `fileSize?: number` — bytes; rendered inline before the remove slot
-- `fileSizeUnit?: 'auto' | 'B' | 'KB' | 'MB' | 'GB' = 'auto'`
-- `fileSizeLocale?: string = 'et-EE'` — `Intl.NumberFormat` locale
-- `formatFileSize?: (bytes: number) => string` — full override for the file-size string
+- `fileSize?: string` — pre-formatted size string (e.g. `'1.2 MB'`); rendered inline before the action area. Format on the consumer side.
 - `icon?: string | null = 'description'` — left file-type glyph; pass `null` to omit
-- `actions?: ReactNode` — extra controls (download / view / open) rendered to the left of the remove button. The row is never a single clickable target — give each affordance its own focusable button here. Action `Button`s default to `visualType="neutral"` (per the design); the slot stays open, so set `visualType` explicitly to use any other type.
-- `onRemove?: () => void` — when set, shows the inline remove button (visible during loading so the upload can be cancelled)
-- `removeIcon?: string = 'delete'`, `removeLabel?: string` — falls back to `${label('remove')} ${name}`
-- `isLoading?: boolean = false` — swaps `meta` for an inline `ProgressBar`; `progress?: number = 0` (0..100)
+- `actions?: ReactNode` — all action controls (download / view / **delete** / …) in the right-hand action area. There's no dedicated remove prop — put a delete `Button` here. The row is never a single clickable target — give each affordance its own focusable button. Action `Button`s default to `visualType="neutral"` (per the design); the slot stays open, so set `visualType` explicitly to use any other type.
+- `isLoading?: boolean = false` — shows an inline `ProgressBar`; `progress?: number = 0` (0..100); `progressLabel?: string` — hint text under the bar
 - `isValid?: boolean` — `false` flips to the danger surface and adds an error glyph next to the name
-
-`actions` and `onRemove` are independent and share the right-hand action area (`actions` first, remove last). The progress bar takes over the `meta` slot during loading so upload feedback stays grouped.
+- `direction?: 'horizontal' | 'vertical'` — force the content layout; when omitted it's derived from the viewport via `verticalBelow`
+- `verticalBelow?: Breakpoint = 'sm'` — viewport breakpoint below which the layout auto-switches to vertical (only when `direction` is unset)
 
 ```tsx
-// Downloadable saved file — explicit download button, not a whole-row link
+// Saved file with download + delete — each its own button, not a whole-row link
 <Attachment
   name="contract.pdf"
-  fileSize={1_240_000}
-  actions={<Button size="small" icon="download" onClick={download}>Download contract.pdf</Button>} // defaults to neutral
-  onRemove={remove}
+  fileSize="1.2 MB"
+  actions={
+    <>
+      <Button icon="download" onClick={download}>Download contract.pdf</Button>
+      <Button icon="delete" onClick={remove}>Remove contract.pdf</Button>
+    </>
+  } // Buttons default to neutral
 />
 
 // Upload in progress
-<Attachment name="scan.jpg" isLoading progress={42} onRemove={cancel} />
+<Attachment name="scan.jpg" isLoading progress={42} />
 
 // Rejected by validation
 <Attachment
   name="too-big.zip"
   isValid={false}
   feedback={{ text: 'File exceeds 10 MB limit', type: 'error' }}
-  onRemove={remove}
 />
 ```
 
