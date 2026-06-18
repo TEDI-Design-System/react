@@ -1,3 +1,10 @@
+# [18.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.13...react-18.0.0-rc.14) (2026-06-18)
+
+
+### Features
+
+* **progress-bar:** new TEDI-Ready component [#32](https://github.com/TEDI-Design-System/react/issues/32) ([#670](https://github.com/TEDI-Design-System/react/issues/670)) ([bb63fbe](https://github.com/TEDI-Design-System/react/commit/bb63fbe8dad202abfd7e8d0113f21753e0c056d8))
+
 # [18.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.12...react-18.0.0-rc.13) (2026-06-18)
 
 
