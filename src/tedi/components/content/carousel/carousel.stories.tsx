@@ -404,9 +404,6 @@ export const Default: Story = {
   ),
 };
 
-/**
- * Navigation arrows in the header, no bottom pagination.
- */
 export const TopPaginationArrowsOnly: Story = {
   name: 'Top pagination - arrows only',
   render: () => (
@@ -422,9 +419,6 @@ export const TopPaginationArrowsOnly: Story = {
   ),
 };
 
-/**
- * Dots on the left, arrows on the right of the footer.
- */
 export const SeparatedBottomPaginationHasDots: Story = {
   name: 'Separated bottom pagination - has dots',
   render: () => (
@@ -448,9 +442,6 @@ export const SeparatedBottomPaginationHasDots: Story = {
   ),
 };
 
-/**
- * A `current / total` counter on the left, arrows on the right.
- */
 export const SeparatedBottomPaginationHasNumbers: Story = {
   name: 'Separated bottom pagination - has numbers',
   render: () => (
@@ -469,9 +460,6 @@ export const SeparatedBottomPaginationHasNumbers: Story = {
   ),
 };
 
-/**
- * Centered dots with inline arrows (`withArrows`).
- */
 export const CenteredBottomPaginationHasDots: Story = {
   name: 'Centered bottom pagination - has dots',
   render: () => (
@@ -494,9 +482,6 @@ export const CenteredBottomPaginationHasDots: Story = {
   ),
 };
 
-/**
- * Centered counter with inline arrows.
- */
 export const CenteredBottomPaginationHasNumbers: Story = {
   name: 'Centered bottom pagination - has numbers',
   render: () => (
@@ -514,9 +499,6 @@ export const CenteredBottomPaginationHasNumbers: Story = {
   ),
 };
 
-/**
- * Navigation in the header, centered dots in the footer.
- */
 export const CombinationsTopNavigationBottomDots: Story = {
   name: 'Combinations - top navigation, bottom dots',
   render: () => (
@@ -540,9 +522,6 @@ export const CombinationsTopNavigationBottomDots: Story = {
   ),
 };
 
-/**
- * A single slide per view (the default) in a constrained width.
- */
 export const CenteredHasDots: Story = {
   name: 'Centered - has dots',
   render: () => (
@@ -567,10 +546,6 @@ export const CenteredHasDots: Story = {
   ),
 };
 
-/**
- * A single slide per view in a constrained width with a centered `N / M` counter
- * and inline arrows (`variant="numbers"`).
- */
 export const CenteredHasNumbers: Story = {
   name: 'Centered - has numbers',
   render: () => (
@@ -590,9 +565,6 @@ export const CenteredHasNumbers: Story = {
   ),
 };
 
-/**
- * Faded edges (`fade`) hint at off-screen slides.
- */
 export const Faded: Story = {
   render: () => (
     <Carousel>
@@ -609,12 +581,6 @@ export const Faded: Story = {
   ),
 };
 
-/**
- * `fade="both"` forces both edges to fade regardless of slide count — here with
- * ~4 slides per view, `centered` so the active slide sits in the middle and an
- * equal peek fades in on either side. (`fade` alone fades only the trailing edge
- * once there is more than one slide per view.)
- */
 export const FadedBothSides: Story = {
   name: 'Faded - both sides',
   render: () => (
@@ -713,17 +679,6 @@ export const BoundedOverlayNavigation: Story = {
   ),
 };
 
-/**
- * Real-world compositions. Slides are arbitrary content — `Carousel.Content`
- * renders each direct child as a slide, so any node works:
- *
- * - **News** (Uudised) — multi-up `Card` slides (image, category, title, excerpt).
- * - **Events** (Sündmused) — image cards with an overlaid badge and title.
- * - **Services** (Teenused) — icon + title + description + a "read more" link;
- *   each card is wrapped in `StretchContent` so every card fills the slide and
- *   they all share the tallest card's height.
- * - **Hero** — a single full-width banner per view (`slidesPerView={1}`).
- */
 export const Examples: Story = {
   render: () => (
     <VerticalSpacing size={4}>
