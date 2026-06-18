@@ -1,3 +1,10 @@
+# [18.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.12...react-18.0.0-rc.13) (2026-06-18)
+
+
+### Bug Fixes
+
+* **button:** align icon vertically center on button with link style [#660](https://github.com/TEDI-Design-System/react/issues/660) ([#676](https://github.com/TEDI-Design-System/react/issues/676)) ([e65a12c](https://github.com/TEDI-Design-System/react/commit/e65a12c0b86b5c0088f98f62a0d6e2c8b44739df))
+
 # [18.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.11...react-18.0.0-rc.12) (2026-06-17)
 
 
