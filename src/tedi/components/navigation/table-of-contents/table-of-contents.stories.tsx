@@ -240,20 +240,40 @@ export const StickyInLayout: Story = {
     useEffect(() => {
       const root = scrollRef.current;
       if (!root || typeof IntersectionObserver === 'undefined') return undefined;
+
+      const ids = sections.map((_, index) => `sec-${index + 1}`);
+      const visibility = new Map<string, boolean>();
+      const atBottom = (): boolean => root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
+
+      const pickActive = (): void => {
+        if (atBottom()) {
+          setActiveId(ids[ids.length - 1]);
+          return;
+        }
+
+        const active = ids.filter((id) => visibility.get(id)).pop();
+        if (active) setActiveId(active);
+      };
+
       const observer = new IntersectionObserver(
         (entries) => {
-          const visible = entries
-            .filter((entry) => entry.isIntersecting)
-            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-          if (visible) setActiveId(visible.target.id);
+          entries.forEach((entry) => visibility.set(entry.target.id, entry.isIntersecting));
+          pickActive();
         },
         { root, rootMargin: '0px 0px -55% 0px' }
       );
-      sections.forEach((_, index) => {
-        const el = document.getElementById(`sec-${index + 1}`);
+
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
         if (el) observer.observe(el);
       });
-      return () => observer.disconnect();
+
+      root.addEventListener('scroll', pickActive, { passive: true });
+
+      return () => {
+        observer.disconnect();
+        root.removeEventListener('scroll', pickActive);
+      };
     }, []);
 
     return (
