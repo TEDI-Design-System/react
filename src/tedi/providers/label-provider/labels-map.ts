@@ -586,11 +586,11 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Не завершено',
   },
   'stepper.error': {
-    description: 'Label for screen-reader that this step has an error (visually hidden)',
+    description: 'Label for screen-reader that this step has errors (visually hidden)',
     components: ['StepperNav', 'VerticalStepper'],
-    et: 'Viga',
-    en: 'Error',
-    ru: 'Ошибка',
+    et: 'Vigane',
+    en: 'Has errors',
+    ru: 'Содержит ошибки',
   },
   'stepper.disabled': {
     description: 'Label for screen-reader that this step is disabled / not available (visually hidden)',

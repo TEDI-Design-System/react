@@ -435,6 +435,10 @@ $btn-width-large: 3.72rem;
   }
 }
 
+.tedi-btn--link[data-name='button'] {
+  display: inline;
+}
+
 .tedi-btn__text {
   padding-right: var(--button-md-inner-spacing);
   padding-left: var(--button-md-inner-spacing);
@@ -509,6 +513,11 @@ $btn-width-large: 3.72rem;
 
   .tedi-btn--link:not(.tedi-btn--is-loading) & {
     display: inline;
+  }
+
+  .tedi-btn--link[data-name='button']:not(.tedi-btn--is-loading) & {
+    display: inline-flex;
+    align-items: center;
   }
 }
 
