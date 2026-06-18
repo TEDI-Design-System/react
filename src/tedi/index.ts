@@ -11,6 +11,7 @@ export * from './components/content/text-group';
 export * from './components/content/calendar/calendar';
 export * from './components/loaders/spinner/spinner';
 export * from './components/loaders/skeleton';
+export * from './components/loaders/progress-bar';
 export * from './components/tags/tag/tag';
 export * from './components/tags/status-badge/status-badge';
 export * from './components/tags/status-indicator/status-indicator';
