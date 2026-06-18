@@ -141,10 +141,6 @@ export const Default: Story = {
   ),
 };
 
-/**
- * A vertical list of single-row cards — e.g. an appointment or record list. Each row is its own
- * `CardButton` wrapping a `Card.Content`.
- */
 export const CardRows: Story = {
   render: () => (
     <VerticalSpacing size={1}>
@@ -250,9 +246,6 @@ export const CardRows: Story = {
   ),
 };
 
-/**
- * A grid of navigation shortcuts — each card is its own `CardButton`.
- */
 export const CardShortcut: Story = {
   render: () => (
     <Row cols={1} md={{ cols: 2 }} gutter={3}>
@@ -283,10 +276,6 @@ export const CardShortcut: Story = {
   ),
 };
 
-/**
- * A two-toned card — an icon cell with a tinted background separated from the content. Reuses the
- * `Card` "two-toned" composition (nested borderless cards + vertical `Separator`).
- */
 export const WithIconCard: Story = {
   render: () => (
     <Row cols={1} lg={{ cols: 3 }} gutter={3}>
@@ -311,10 +300,6 @@ export const WithIconCard: Story = {
 
 const STATE_ROWS = ['Default', 'Hover', 'Active', 'Focus', 'Disabled'] as const;
 
-/**
- * Hover, active, focus and disabled states are driven by the host element — shown for a plain card
- * and a two-toned icon card. Only the button host supports `disabled`.
- */
 export const States: Story = {
   parameters: {
     pseudo: {
@@ -327,8 +312,6 @@ export const States: Story = {
     const breakpoint = useBreakpoint();
     const isMobile = isBreakpointBelow(breakpoint, 'md');
 
-    // Two card columns squash on narrow screens, so stack everything into a single
-    // column (label above each card) below `md`.
     return (
       <div
         style={{
