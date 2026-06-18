@@ -1,8 +1,21 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
+import { Breakpoint } from '../../../helpers';
 import { FloatingButton } from '../../buttons/floating-button/floating-button';
 import { Carousel } from './carousel';
+
+const mockUseBreakpoint = jest.fn<Breakpoint, []>(() => 'lg');
+
+jest.mock('../../../helpers/hooks/use-breakpoint', () => ({
+  __esModule: true,
+  ...jest.requireActual('../../../helpers/hooks/use-breakpoint'),
+  useBreakpoint: () => mockUseBreakpoint(),
+}));
+
+const originalResizeObserver = global.ResizeObserver;
+const originalSetPointerCapture = Element.prototype.setPointerCapture;
+const originalReleasePointerCapture = Element.prototype.releasePointerCapture;
 
 beforeAll(() => {
   class MockResizeObserver {
@@ -13,6 +26,16 @@ beforeAll(() => {
   global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
   Element.prototype.setPointerCapture = jest.fn();
   Element.prototype.releasePointerCapture = jest.fn();
+});
+
+afterAll(() => {
+  global.ResizeObserver = originalResizeObserver;
+  Element.prototype.setPointerCapture = originalSetPointerCapture;
+  Element.prototype.releasePointerCapture = originalReleasePointerCapture;
+});
+
+beforeEach(() => {
+  mockUseBreakpoint.mockReturnValue('lg');
 });
 
 const renderCarousel = (count = 3, props?: React.ComponentProps<typeof Carousel.Content>) =>
@@ -201,8 +224,11 @@ describe('Carousel', () => {
 
   it('throws when a sub-component is used outside Carousel', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    expect(() => render(<Carousel.Navigation />)).toThrow(/within a <Carousel>/);
-    spy.mockRestore();
+    try {
+      expect(() => render(<Carousel.Navigation />)).toThrow(/within a <Carousel>/);
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   describe('finite (loop={false})', () => {

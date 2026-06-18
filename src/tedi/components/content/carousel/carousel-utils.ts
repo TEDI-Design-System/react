@@ -15,9 +15,14 @@ export type BreakpointObject<T> = {
  */
 export type BreakpointInput<T> = T | BreakpointObject<T>;
 
-/** Normalizes a `BreakpointInput` into a `BreakpointObject` with at least `xs`. */
+/**
+ * Normalizes a `BreakpointInput` into a `BreakpointObject`. A breakpoint-shaped
+ * object — one that has at least one breakpoint key (`xs`/`sm`/`md`/…) — is returned
+ * as-is; any other value (including a plain object that isn't breakpoint-shaped) is
+ * wrapped as the base `xs` value.
+ */
 export const normalizeBreakpointInput = <T>(input: BreakpointInput<T>): BreakpointObject<T> =>
-  typeof input === 'object' && input !== null && 'xs' in (input as object)
+  typeof input === 'object' && input !== null && breakpoints.some((bp) => bp in (input as object))
     ? (input as BreakpointObject<T>)
     : ({ xs: input } as BreakpointObject<T>);
 

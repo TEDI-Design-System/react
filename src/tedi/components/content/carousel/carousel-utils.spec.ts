@@ -10,6 +10,11 @@ describe('carousel-utils', () => {
       const input = { xs: 1, md: 2.5, xl: 4 };
       expect(normalizeBreakpointInput(input)).toBe(input);
     });
+
+    it('passes a breakpoint object through even when `xs` is omitted', () => {
+      const input = { md: 2 };
+      expect(normalizeBreakpointInput(input)).toBe(input);
+    });
   });
 
   describe('resolveBreakpointValue', () => {
