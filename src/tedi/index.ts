@@ -11,6 +11,7 @@ export * from './components/content/text-group';
 export * from './components/content/calendar/calendar';
 export * from './components/loaders/spinner/spinner';
 export * from './components/loaders/skeleton';
+export * from './components/loaders/progress-bar';
 export * from './components/tags/tag/tag';
 export * from './components/tags/status-badge/status-badge';
 export * from './components/tags/status-indicator/status-indicator';
@@ -30,6 +31,7 @@ export * from './components/notifications/toast/toast';
 export * from './components/cards/card';
 export * from './components/navigation/breadcrumbs';
 export * from './components/navigation/hash-trigger/hash-trigger';
+export * from './components/navigation/horizontal-stepper';
 export * from './components/navigation/link/link';
 export * from './components/navigation/pagination';
 export * from './components/navigation/table-of-contents';
@@ -66,6 +68,7 @@ export * from './components/misc/scroll-fade/scroll-fade';
 export * from './components/misc/affix/affix';
 export * from './components/misc/ellipsis/ellipsis';
 export * from './components/layout/sidenav';
+export * from './components/layout/footer';
 
 export * from './helpers';
 

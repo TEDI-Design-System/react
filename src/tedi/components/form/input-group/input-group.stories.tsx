@@ -408,17 +408,17 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
-          <InputGroup label="Label" id="state-example" helper={{ text: 'Feedback text', type: 'error' }}>
+          <InputGroup label="Label" id="state-example" invalid helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Prefix>Street</InputGroup.Prefix>
             <InputGroup.Input>
-              <Field invalid />
+              <Field />
             </InputGroup.Input>
           </InputGroup>
         </Col>
         <Col>
-          <InputGroup label="Label" id="state-example" helper={{ text: 'Feedback text', type: 'error' }}>
+          <InputGroup label="Label" id="state-example" invalid helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Input>
-              <Field invalid />
+              <Field />
             </InputGroup.Input>
             <InputGroup.Suffix>EUR</InputGroup.Suffix>
           </InputGroup>
@@ -456,6 +456,42 @@ export const WithButtonAddons: Story = {
         <InputGroup.Suffix>
           <Button>Apply</Button>
         </InputGroup.Suffix>
+      </InputGroup>
+
+      <InputGroup {...args} disabled id="input-group-button-disabled" label="Promo code (disabled)">
+        <InputGroup.Input>
+          <Field placeholder="Enter promo code" />
+        </InputGroup.Input>
+        <InputGroup.Suffix>
+          <Button>Apply</Button>
+        </InputGroup.Suffix>
+      </InputGroup>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Feedback text is rendered below the group via the `helper` prop, which accepts the same
+ * shape as `FeedbackText` — a single message or an array. Use `type: 'hint'` for guidance and
+ * `type: 'error'` for validation messages. Pair an error message with the `invalid` prop so the
+ * whole group (addon borders + the inner control) reflects the error state — `invalid` is
+ * propagated to the wrapped control automatically, so you don't set it on the child too.
+ */
+export const WithFeedbackText: Story = {
+  render: () => (
+    <VerticalSpacing size={1}>
+      <InputGroup label="Amount" id="feedback-hint" helper={{ text: 'Enter the amount in euros', type: 'hint' }}>
+        <InputGroup.Input>
+          <Field placeholder="0.00" />
+        </InputGroup.Input>
+        <InputGroup.Suffix>EUR</InputGroup.Suffix>
+      </InputGroup>
+
+      <InputGroup label="Amount" id="feedback-error" invalid helper={{ text: 'This field is required', type: 'error' }}>
+        <InputGroup.Input>
+          <Field placeholder="0.00" />
+        </InputGroup.Input>
+        <InputGroup.Suffix>EUR</InputGroup.Suffix>
       </InputGroup>
     </VerticalSpacing>
   ),

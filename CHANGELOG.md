@@ -1,3 +1,31 @@
+# [18.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.13...react-18.0.0-rc.14) (2026-06-18)
+
+
+### Features
+
+* **progress-bar:** new TEDI-Ready component [#32](https://github.com/TEDI-Design-System/react/issues/32) ([#670](https://github.com/TEDI-Design-System/react/issues/670)) ([bb63fbe](https://github.com/TEDI-Design-System/react/commit/bb63fbe8dad202abfd7e8d0113f21753e0c056d8))
+
+# [18.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.12...react-18.0.0-rc.13) (2026-06-18)
+
+
+### Bug Fixes
+
+* **button:** align icon vertically center on button with link style [#660](https://github.com/TEDI-Design-System/react/issues/660) ([#676](https://github.com/TEDI-Design-System/react/issues/676)) ([e65a12c](https://github.com/TEDI-Design-System/react/commit/e65a12c0b86b5c0088f98f62a0d6e2c8b44739df))
+
+# [18.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.11...react-18.0.0-rc.12) (2026-06-17)
+
+
+### Features
+
+* **footer:** new TEDI-Ready component [#5](https://github.com/TEDI-Design-System/react/issues/5) ([#651](https://github.com/TEDI-Design-System/react/issues/651)) ([d246474](https://github.com/TEDI-Design-System/react/commit/d2464740d38e81f02618f1a8cad805c03333d686)), closes [#647](https://github.com/TEDI-Design-System/react/issues/647) [#647](https://github.com/TEDI-Design-System/react/issues/647)
+
+# [18.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.10...react-18.0.0-rc.11) (2026-06-15)
+
+
+### Bug Fixes
+
+* **input-group,empty-state:** design review fixes [#667](https://github.com/TEDI-Design-System/react/issues/667) ([#668](https://github.com/TEDI-Design-System/react/issues/668)) ([bd120ae](https://github.com/TEDI-Design-System/react/commit/bd120ae7c6540399c727e5e240c7842d8af02154))
+
 # [18.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.9...react-18.0.0-rc.10) (2026-06-10)
 
 

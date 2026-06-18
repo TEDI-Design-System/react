@@ -40,6 +40,13 @@ export interface InputGroupProps extends FormLabelProps {
    * to the input and any interactive prefix/suffix elements.
    */
   disabled?: boolean;
+  /**
+   * Marks the whole group as invalid. Applies the error border to the
+   * prefix/suffix addons and propagates `invalid` down to the inner form
+   * control, so you don't have to set it on the child as well. Pair with an
+   * error `helper` message.
+   */
+  invalid?: boolean;
 }
 
 export interface InputGroupForwardRef {
@@ -79,6 +86,12 @@ export type InputGroupContextValue = {
    * behavior and styling.
    */
   disabled?: boolean;
+  /**
+   * Invalid state inherited from InputGroup.
+   * Consumed by Input to propagate `invalid` (or `aria-invalid`) to the
+   * wrapped form control.
+   */
+  invalid?: boolean;
   /*
    * Indicates if the InputGroup has an external label (i.e. FormLabel rendered by InputGroup).
    * This is used by child components to determine if they should render their own label or not.
@@ -107,7 +120,7 @@ export const useOptionalInputGroup = () => {
 };
 
 export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
-  ({ className, addons = true, helper, label, children, disabled, id, ...labelProps }, ref) => {
+  ({ className, addons = true, helper, label, children, disabled, invalid, id, ...labelProps }, ref) => {
     const rootRef = React.useRef<HTMLDivElement>(null);
     const generatedId = React.useId();
 
@@ -127,6 +140,7 @@ export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
         hasPrefix,
         hasSuffix,
         disabled,
+        invalid,
         hasExternalLabel: !!label,
         inputId,
         registerPrefix: () => setHasPrefix(true),
@@ -134,7 +148,7 @@ export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
         registerSuffix: () => setHasSuffix(true),
         unregisterSuffix: () => setHasSuffix(false),
       }),
-      [inputId, hasPrefix, hasSuffix, disabled, label]
+      [inputId, hasPrefix, hasSuffix, disabled, invalid, label]
     );
 
     const groupClassName = cn(
@@ -144,6 +158,7 @@ export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
         [styles['tedi-input-group--has-prefix']]: hasPrefix,
         [styles['tedi-input-group--has-suffix']]: hasSuffix,
         [styles['tedi-input-group--disabled']]: disabled,
+        [styles['tedi-input-group--invalid']]: invalid,
       },
       className
     );
@@ -164,13 +179,13 @@ export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
 
     return (
       <InputGroupContext.Provider value={ctxValue}>
-        {label && <FormLabel {...labelProps} label={label} id={inputId} />}
-
         <div ref={rootRef} className={groupClassName} data-name="tedi-input-group" aria-disabled={disabled}>
-          {children}
-        </div>
+          {label && <FormLabel {...labelProps} label={label} id={inputId} />}
 
-        {renderFeedback()}
+          <div className={styles['tedi-input-group__row']}>{children}</div>
+
+          {renderFeedback()}
+        </div>
       </InputGroupContext.Provider>
     );
   }

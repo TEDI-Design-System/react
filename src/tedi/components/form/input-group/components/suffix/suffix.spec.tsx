@@ -49,6 +49,36 @@ describe('InputGroup.Suffix', () => {
     expect(suffix).toHaveAttribute('aria-disabled', 'true');
   });
 
+  it('propagates the disabled state to an interactive child element', () => {
+    const { getByRole } = render(
+      <InputGroup disabled id="test-group" label="Test Group">
+        <InputGroup.Input>
+          <input aria-label="plain" />
+        </InputGroup.Input>
+        <InputGroup.Suffix>
+          <button type="button">Apply</button>
+        </InputGroup.Suffix>
+      </InputGroup>
+    );
+
+    expect(getByRole('button', { name: 'Apply' })).toBeDisabled();
+  });
+
+  it('leaves an interactive child enabled when the group is not disabled', () => {
+    const { getByRole } = render(
+      <InputGroup id="test-group" label="Test Group">
+        <InputGroup.Input>
+          <input aria-label="plain" />
+        </InputGroup.Input>
+        <InputGroup.Suffix>
+          <button type="button">Apply</button>
+        </InputGroup.Suffix>
+      </InputGroup>
+    );
+
+    expect(getByRole('button', { name: 'Apply' })).toBeEnabled();
+  });
+
   it('unregisters from the InputGroup when it is removed', () => {
     const { container, rerender } = render(
       <InputGroup id="test-group" label="Test Group">

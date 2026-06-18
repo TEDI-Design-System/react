@@ -19,6 +19,9 @@ export type FooterCategory = {
   icon?: string | IconProps;
 };
 
+/**
+ * @deprecated Use `Footer` from `@tedi-design-system/react/tedi` instead.
+ */
 export type FooterProps = {
   /**
    * Footer Categorys
@@ -42,6 +45,9 @@ export type FooterProps = {
   bottomElement?: React.ReactNode;
 };
 
+/**
+ * @deprecated Use `Footer` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Footer = (props: FooterProps): JSX.Element => {
   const { logo, categories, className, bottomElement, ...rest } = props;
   const { getLabel } = useLabels();
