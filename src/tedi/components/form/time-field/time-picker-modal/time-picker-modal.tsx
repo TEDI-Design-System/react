@@ -25,8 +25,8 @@ export interface TimePickerModalProps {
   /** Forwarded to the inner `TimePicker`. */
   gridVariant?: TimePickerProps['gridVariant'];
   /**
-   * Extra props spread onto `Modal.Content`, overriding the `size="small"` / `width="xs"` defaults
-   * (including `fullscreen`). `className` is merged, not replaced, so the internal padding reset survives.
+   * Extra props spread onto `Modal.Content`, overriding the `size="small"` / `width="xs"` (capped to 312px)
+   * defaults (including `fullscreen`). `className` is merged, not replaced, so the internal padding reset survives.
    */
   modalProps?: Omit<ModalContentProps, 'children'>;
   /** Modal title text. Falls back to the `time-field.modal-title` i18n key. */
@@ -72,7 +72,6 @@ export const TimePickerModal = (props: TimePickerModalProps): JSX.Element => {
       <Modal.Content
         size="small"
         width="xs"
-        aria-label={resolvedTitle}
         {...modalProps}
         className={cn(styles['tedi-time-picker-modal'], modalProps?.className)}
       >

@@ -141,7 +141,7 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
   /**
    * Extra props forwarded to the picker modal's `Modal.Content` — e.g. `size`, `width`, `maxWidth`,
    * `position`, `fullscreen`, and per-breakpoint overrides. Lets the consumer tune the modal beyond
-   * its `size="small"` / `width="xs"` defaults. `className` is merged with the component's own (so
+   * its `size="small"` / `width="xs"` (capped to 312px) defaults. `className` is merged with the component's own (so
    * the internal padding reset is preserved). Only applies when the picker opens as a modal.
    */
   modalProps?: Omit<ModalContentProps, 'children'>;
@@ -189,6 +189,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     !shouldUseNativePicker &&
     showPicker &&
     !readOnly &&
+    !disabled &&
     (modal === true || (typeof modal === 'string' && isBreakpointBelow(breakpoint, modal)));
 
   const floating = useFloating({
