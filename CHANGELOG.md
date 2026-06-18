@@ -1,3 +1,45 @@
+# [18.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.13...react-18.0.0-rc.14) (2026-06-18)
+
+
+### Features
+
+* **progress-bar:** new TEDI-Ready component [#32](https://github.com/TEDI-Design-System/react/issues/32) ([#670](https://github.com/TEDI-Design-System/react/issues/670)) ([bb63fbe](https://github.com/TEDI-Design-System/react/commit/bb63fbe8dad202abfd7e8d0113f21753e0c056d8))
+
+# [18.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.12...react-18.0.0-rc.13) (2026-06-18)
+
+
+### Bug Fixes
+
+* **button:** align icon vertically center on button with link style [#660](https://github.com/TEDI-Design-System/react/issues/660) ([#676](https://github.com/TEDI-Design-System/react/issues/676)) ([e65a12c](https://github.com/TEDI-Design-System/react/commit/e65a12c0b86b5c0088f98f62a0d6e2c8b44739df))
+
+# [18.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.11...react-18.0.0-rc.12) (2026-06-17)
+
+
+### Features
+
+* **footer:** new TEDI-Ready component [#5](https://github.com/TEDI-Design-System/react/issues/5) ([#651](https://github.com/TEDI-Design-System/react/issues/651)) ([d246474](https://github.com/TEDI-Design-System/react/commit/d2464740d38e81f02618f1a8cad805c03333d686)), closes [#647](https://github.com/TEDI-Design-System/react/issues/647) [#647](https://github.com/TEDI-Design-System/react/issues/647)
+
+# [18.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.10...react-18.0.0-rc.11) (2026-06-15)
+
+
+### Bug Fixes
+
+* **input-group,empty-state:** design review fixes [#667](https://github.com/TEDI-Design-System/react/issues/667) ([#668](https://github.com/TEDI-Design-System/react/issues/668)) ([bd120ae](https://github.com/TEDI-Design-System/react/commit/bd120ae7c6540399c727e5e240c7842d8af02154))
+
+# [18.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.9...react-18.0.0-rc.10) (2026-06-10)
+
+
+### Features
+
+* **pagination:** complete the component with modal, design fixes [#640](https://github.com/TEDI-Design-System/react/issues/640) ([#665](https://github.com/TEDI-Design-System/react/issues/665)) ([cac50d6](https://github.com/TEDI-Design-System/react/commit/cac50d60c77e5bb4570b01a7ed8bfdb905d49ebc)), closes [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75)
+
+# [18.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.8...react-18.0.0-rc.9) (2026-06-10)
+
+
+### Features
+
+* **date-time-field:** TEDI-Ready DateTimeField component [#554](https://github.com/TEDI-Design-System/react/issues/554) ([#626](https://github.com/TEDI-Design-System/react/issues/626)) ([47b5be1](https://github.com/TEDI-Design-System/react/commit/47b5be19110108e0afdec9e8a8d03e0e068c9257)), closes [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#94](https://github.com/TEDI-Design-System/react/issues/94) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#24](https://github.com/TEDI-Design-System/react/issues/24) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25) [#25](https://github.com/TEDI-Design-System/react/issues/25)
+
 # [18.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.7...react-18.0.0-rc.8) (2026-06-10)
 
 

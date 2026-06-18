@@ -9,6 +9,11 @@ import Footer, { FooterProps } from './footer';
 const meta: Meta<typeof Footer> = {
   component: Footer,
   title: 'Community/Layout/Footer',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

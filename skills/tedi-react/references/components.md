@@ -801,6 +801,52 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
+### Footer
+**Props:** `FooterProps`
+- `children: ReactNode` — composition of `Footer.Side`, `Footer.Body` (with `Footer.Section` children), `Footer.Bottom`
+- `mobileBreakpoint?: Breakpoint = 'sm'` — viewport at and below which the entire footer flips to stacked mobile layout (sections become accordions, sides stack, bottom strip wraps). Propagated to every sub-slot via context so they all agree on the threshold.
+- `maxWidth?: number | string` — caps the inner content (the column row **and** the bottom strip's content) to a max width and centers it, while the dark backgrounds stay full-bleed. Pass any CSS length (`1280`, `'1280px'`, `'80rem'`). Read by `Footer.Bottom` via context so both align to the same width.
+- `className?: string`
+
+**Sub-components:**
+- `Footer.Side` — logo slot, `placement?: 'start' | 'end' = 'start'`, `position?: 'start' | 'center' | 'end' = 'center'`
+- `Footer.Body` — wraps `Footer.Section` columns; switches to stacked column layout below `mobileBreakpoint`. Accepts breakpoint-aware `columns?: number` — **mobile-first** (a value applies at that breakpoint and up), so raise the count as the viewport widens (e.g. `columns={2} lg={{ columns: 4 }}`). When set, lays the sections out as a CSS grid of that many equal-width tracks instead of the default content-sized `space-between` row; ignored below `mobileBreakpoint`, where the body always stacks into one column.
+- `Footer.Section` — section column with `heading`, optional `icon`, `collapsible?` (accordion below `mobileBreakpoint`), `defaultOpen?`, `iconBreakpoint?: Breakpoint = 'lg'` (separate threshold for icon hiding)
+- `Footer.Bottom` — bottom strip for legal / utility links; `separator?: boolean = false` inserts a dot between items (Figma "with separator" variant) instead of plain `gap` spacing
+- All three content slots (`Footer.Body`, `Footer.Side`, `Footer.Bottom`) accept arbitrary nodes — the footer is a layout shell, so you can drop social-icon links in a right-hand `Footer.Side`, a centered brand logo in `Footer.Bottom`, etc.
+
+```tsx
+// Default: flips to mobile at `sm` (≤ 576px)
+<Footer>
+  <Footer.Side placement="start"><img src="/logo.svg" alt="" /></Footer.Side>
+  <Footer.Body>
+    <Footer.Section heading="Contact" icon="phone" collapsible>
+      <Link href="/contact">Contact us</Link>
+      <Link href="/help">Help center</Link>
+    </Footer.Section>
+    <Footer.Section heading="Legal" collapsible>
+      <Link href="/privacy">Privacy</Link>
+    </Footer.Section>
+  </Footer.Body>
+  <Footer.Bottom>
+    <Link href="/terms">Terms</Link>
+  </Footer.Bottom>
+</Footer>
+
+// Tablet-first: flips to mobile at `md` so tablets get the stacked layout
+<Footer mobileBreakpoint="md">{/* … */}</Footer>
+
+// Hide section icons earlier (at `xl` instead of the default `lg`)
+<Footer.Section iconBreakpoint="xl" icon="mail" heading="Newsletter">…</Footer.Section>
+
+// Cap + center the content on wide screens; fixed 4-col grid that steps to 2 at `lg`
+<Footer maxWidth={1280}>
+  <Footer.Body columns={2} lg={{ columns: 4 }}>{/* … */}</Footer.Body>
+</Footer>
+```
+
+`mobileBreakpoint` is the single knob for layout flip — set it once on `<Footer>` and every sub-slot picks it up. `Footer.Section`'s `iconBreakpoint` is independent because design typically drops the section icons one tier earlier than the full mobile flip.
+
 ### TopNav
 
 **Props:** `TopNavProps`
@@ -996,6 +1042,77 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### HorizontalStepper
+**Props:** `HorizontalStepperProps` | fRef
+- `children: ReactNode` (required) — `HorizontalStepper.Item` elements; the parent auto-numbers the steps
+- `aria-label?: string` — accessible name for the `<nav>` landmark
+- `background?: 'default' | 'transparent' = 'default'`
+- `compact?: boolean | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' = 'sm'` — collapse to indicators + the selected label (`true` = always; a breakpoint = collapse below it)
+- `className?: string`
+
+**`HorizontalStepper.Item`** — `HorizontalStepperItemProps` | fRef
+- `label: string` (required), `description?: string`
+- `completed?: boolean`, `error?: boolean` (error wins over completed), `selected?: boolean`, `disabled?: boolean`
+- `onSelect?: () => void` — fires on click unless `selected` or `disabled`
+
+```tsx
+import { HorizontalStepper } from '@tedi-design-system/react/tedi';
+
+<HorizontalStepper aria-label="Form progress">
+  {steps.map((label, i) => (
+    <HorizontalStepper.Item
+      key={label}
+      label={label}
+      completed={i < current}
+      selected={i === current}
+      onSelect={() => setCurrent(i)}
+    />
+  ))}
+</HorizontalStepper>
+```
+
+### Pagination
+**Props:** `PaginationProps` | fRef | bp
+
+Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` **both** the number list **and** the page-size select collapse into compact triggers that open a mobile modal picker (radio-style list; opening it scrolls the active option to the top and focuses it).
+
+- `pageCount: number` (required), `page?` (controlled, 1-based) + `onPageChange?`, or `defaultPage?` (uncontrolled)
+- `totalItems?` → renders the results label; `pageSize?` + `pageSizeOptions?: (number | PaginationPageSizeOption)[]` + `onPageSizeChange?` → renders the page-size select. Options are plain numbers, or `{ value, label }` objects when the visible text should differ — most commonly a **"Show all"** entry `{ value: totalItems, label: 'Show all' }`. Selecting emits the option's numeric `value`; the consumer recomputes `pageCount` (a large value collapses it to 1, hiding the pager). Pass the label already translated.
+- `boundaryCount? = 1`, `siblingCount? = 1` — how many page numbers stay visible at the ends / around the active page before `…`
+- `background?: 'white' | 'transparent' = 'white'`, `borders?: 'top' | 'bottom' | 'both' | 'none' = 'top'`
+- `hideResults?`, `hidePageSize?`, `hidePager?: boolean | Breakpoint` — hide a slot entirely, or only below the given breakpoint
+- `labels?: Partial<PaginationLabels>` — override aria/text labels (`previous`, `next`, `results`, `pageSize`, `pageStatus`, …); otherwise sourced from `LabelProvider`
+
+**Arrow variants** (harmonized with Angular):
+- `showPrevNextButtons?: boolean = false` — keep the prev/next arrow visible-but-disabled at the first/last page instead of dropping it (stable footprint). Angular calls this `disableArrowsAtBoundary`.
+- `showEdgeNavLabels?: boolean = false` — render the arrows as **small text links** (label + icon, link colour, underline on hover) instead of icon-only circles.
+- `previousIcon? = 'arrow_back'`, `nextIcon? = 'arrow_forward'` — override the arrow glyphs (e.g. `'chevron_left'` / `'chevron_right'`).
+- `arrowVariant?: 'default' | 'primary' = 'default'` — `'primary'` renders the arrows as **primary small `Button`s with the label text + a leading/trailing arrow icon** (always shows the label, so `showEdgeNavLabels` has no effect in this mode).
+
+**Breakpoint support:** the visual props — `boundaryCount`, `siblingCount`, `background`, `borders`, `showPrevNextButtons`, `showEdgeNavLabels`, `previousIcon`, `nextIcon`, `arrowVariant` — accept per-breakpoint overrides via the `sm`/`md`/`lg`/`xl`/`xxl` keys (mobile-first: a bare value is the `xs` baseline; `defaultServerBreakpoint?` sets the SSR baseline). e.g. icon-only arrows on mobile, labelled primary buttons on desktop.
+
+```tsx
+const [page, setPage] = useState(1);
+<Pagination
+  pageCount={10} page={page} onPageChange={setPage}
+  totalItems={97} pageSize={10} pageSizeOptions={[10, 25, 50, 100]} onPageSizeChange={setSize}
+/>
+
+// "Show all" — a labelled page-size option; recompute pageCount so it collapses to one page
+<Pagination
+  pageCount={Math.max(1, Math.ceil(total / size))} page={page} onPageChange={setPage}
+  totalItems={total} pageSize={size}
+  pageSizeOptions={[10, 25, 50, { value: total, label: 'Show all' }]}
+  onPageSizeChange={setSize}
+/>
+
+// Prominent, labelled navigation
+<Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="primary" showPrevNextButtons />
+
+// Responsive: compact icon-only arrows below md, prominent labelled buttons from md up
+<Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="default" showPrevNextButtons md={{ arrowVariant: 'primary' }} />
+```
+
 ## Notifications
 
 ### Alert
@@ -1093,19 +1210,22 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `open?: boolean` + `onToggle?: (open: boolean) => void` — controlled mode
 - `closeOnBackdropClick: boolean = true`
 - `closeOnEscape: boolean = true`
+- `role: 'dialog' | 'alertdialog' = 'dialog'` — use `'alertdialog'` for destructive confirmations (higher SR urgency, requires explicit dismissal)
 
-**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`)
-- `width: ModalWidth = 'sm'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
-- `maxWidth?: string` — cap for custom widths
-- `size: 'default' | 'small' = 'default'` — header/body/footer padding density
-- `position: 'center' | 'top' | 'right' | 'left' = 'center'` — side positions render full-height drawers
-- `fullscreen: boolean | 'sm' | 'md' | 'lg' | 'xl' = false` — `true` = always, breakpoint string = below that breakpoint
+**`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`, `fullscreen`)
+- `width: ModalWidth = 'md'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
+- `maxWidth?: string` — cap for custom widths (lighter than overriding `width`)
+- `size: 'default' | 'small' = 'default'` — header/body/footer padding density (`'small'` ≈ 42px header)
+- `position: 'center' | 'top' | 'right' | 'left' | 'bottom' = 'center'` — side positions render drawers; flip per breakpoint, e.g. `position="right" md={{ position: 'center' }}` or `position="bottom"` for a mobile sheet
+- `fullscreen: boolean | 'edge' = false` — `true` = padded fullscreen (16px backdrop stays), `'edge'` = edge-to-edge (no padding/border/radius); combine with bp keys for responsive (e.g. `fullscreen md={{ fullscreen: false }}`)
 - `scrollBehavior: 'content' | 'page' = 'content'` — internal body scroll vs. overlay-level page scroll
 - `trapFocus: boolean = true`, `returnFocus: boolean = true`
+- `initialFocus?: number | RefObject<HTMLElement>` — element focused on open (tabbable index, `0` = first/default, `-1` = the dialog itself, or a ref to a specific element — e.g. focus the active option in a picker)
 - `showOverlay: boolean = true` — toggle the dimmed backdrop
 - `lockScroll: boolean = true`
 - `visuallyHiddenDismiss?: boolean` — adds SR-only dismiss buttons for touch screen readers
 - `aria-labelledby?`, `aria-describedby?` — usually wired automatically by `Modal.Header`
+- `aria-label?: string` — plain-text accessible name when there's no visible title (icon-only / list-only dialogs); ignored when `aria-labelledby` is set
 
 **`Modal.Header` props**
 - `title?: ReactNode` — rendered as `<h3>`, auto-registered as `aria-labelledby`
@@ -1116,6 +1236,7 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 
 **`Modal.Body` props**
 - `noScroll?: boolean` — disable internal scroll (pair with `scrollBehavior="page"` on Content)
+- Body padding is driven by the `--modal-body-padding` / `--modal-body-padding-sm` CSS custom properties — override them on `Modal.Content` (e.g. set to `0`) for an edge-to-edge body such as a full-bleed list or sheet
 
 **`Modal.Footer` props**
 - `children?: ReactNode` — right-aligned actions (default)
@@ -1376,6 +1497,9 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 - Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
 - **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
+
+### Footer — **DEPRECATED** (use TEDI-Ready Footer)
+Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Responsive layout is hardcoded CSS — no consumer override of the mobile-switch breakpoint. Migrate to the composable TEDI-Ready `Footer` for `mobileBreakpoint` control, accordion sections, and slot-based sides.
 
 ## Misc
 
