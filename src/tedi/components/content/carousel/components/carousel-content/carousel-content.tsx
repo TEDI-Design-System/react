@@ -1,10 +1,10 @@
 import cn from 'classnames';
 import React, { forwardRef, useEffect, useRef } from 'react';
 
-import styles from './carousel.module.scss';
-import { useCarouselContext } from './carousel-context';
-import { BreakpointInput, normalizeBreakpointInput } from './carousel-utils';
-import type { CarouselFade } from './use-carousel';
+import styles from '../../carousel.module.scss';
+import { useCarouselContext } from '../../carousel-context';
+import { BreakpointInput, normalizeBreakpointInput } from '../../carousel-utils';
+import type { CarouselFade } from '../../use-carousel';
 
 export interface CarouselContentProps {
   /**

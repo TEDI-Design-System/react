@@ -1,10 +1,10 @@
 import cn from 'classnames';
 import { forwardRef } from 'react';
 
-import { useLabels } from '../../../providers/label-provider';
-import { Button } from '../../buttons/button/button';
-import styles from './carousel.module.scss';
-import { useCarouselContext } from './carousel-context';
+import { useLabels } from '../../../../../providers/label-provider';
+import { Button } from '../../../../buttons/button/button';
+import styles from '../../carousel.module.scss';
+import { useCarouselContext } from '../../carousel-context';
 
 /**
  * Props for a single navigation arrow, ready to spread onto a `Button` /

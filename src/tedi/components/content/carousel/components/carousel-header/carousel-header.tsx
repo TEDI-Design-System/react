@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
-import styles from './carousel.module.scss';
+import styles from '../../carousel.module.scss';
 
 export interface CarouselHeaderProps {
   /**

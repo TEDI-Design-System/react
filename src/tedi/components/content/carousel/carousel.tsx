@@ -2,12 +2,12 @@ import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
 import styles from './carousel.module.scss';
-import { CarouselContent } from './carousel-content';
 import { CarouselContext } from './carousel-context';
-import { CarouselFooter } from './carousel-footer';
-import { CarouselHeader } from './carousel-header';
-import { CarouselIndicators } from './carousel-indicators';
-import { CarouselNavigation } from './carousel-navigation';
+import { CarouselContent } from './components/carousel-content/carousel-content';
+import { CarouselFooter } from './components/carousel-footer/carousel-footer';
+import { CarouselHeader } from './components/carousel-header/carousel-header';
+import { CarouselIndicators } from './components/carousel-indicators/carousel-indicators';
+import { CarouselNavigation } from './components/carousel-navigation/carousel-navigation';
 import { useCarousel } from './use-carousel';
 
 export interface CarouselProps {

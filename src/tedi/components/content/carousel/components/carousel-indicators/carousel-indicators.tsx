@@ -1,11 +1,11 @@
 import cn from 'classnames';
 import { forwardRef } from 'react';
 
-import { useLabels } from '../../../providers/label-provider';
-import { Text } from '../../base/typography/text/text';
-import { Button } from '../../buttons/button/button';
-import styles from './carousel.module.scss';
-import { useCarouselContext } from './carousel-context';
+import { useLabels } from '../../../../../providers/label-provider';
+import { Text } from '../../../../base/typography/text/text';
+import { Button } from '../../../../buttons/button/button';
+import styles from '../../carousel.module.scss';
+import { useCarouselContext } from '../../carousel-context';
 
 export type CarouselIndicatorsVariant = 'dots' | 'numbers';
 
