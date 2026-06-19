@@ -1,5 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Col, Row } from '../../layout/grid';
@@ -64,12 +69,6 @@ export interface CardStory {
 
 type Story = StoryObj<CardStory>;
 
-const Template: StoryFn<CardStory> = (args) => (
-  <Card {...args}>
-    <Card.Content>Description</Card.Content>
-  </Card>
-);
-
 const GeneralTemplate: StoryFn<CardStory> = (args) => {
   const getSplitContent = () => (
     <Card.Content padding={0}>
@@ -130,8 +129,29 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
   );
 };
 
-export const Default: Story = {
-  render: Template,
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * the subcomponents**, surfaced on the Docs page (autodocs binds its `<Controls />`
+ * block to this primary story).
+ *
+ * `Card.Header` and `Card.Content` props are flattened into namespaced controls
+ * (grouped under their own categories in the Controls panel) via the shared
+ * `subcomponentArgTypes` helper, then reassembled in `render` with
+ * `getSubcomponentProps`. The ungrouped controls are `Card`'s own props.
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Card.Header, { category: 'Card.Header', prefix: 'header', exclude: ['children'] }),
+    ...subcomponentArgTypes(Card.Content, { category: 'Card.Content', prefix: 'content', exclude: ['children'] }),
+  },
+  render: (args: Record<string, unknown>) => (
+    <Card {...getPrimaryComponentProps<CardProps>(args)}>
+      <Card.Header {...getSubcomponentProps(args, 'header')}>
+        <Heading element="h3">Card title</Heading>
+      </Card.Header>
+      <Card.Content {...getSubcomponentProps(args, 'content')}>Description</Card.Content>
+    </Card>
+  ),
 };
 
 export const HeaderTypes: Story = {

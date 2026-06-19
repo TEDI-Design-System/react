@@ -1,6 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -64,12 +69,31 @@ const TemplateWidth: StoryFn<SkeletonProps> = (args) => (
   </Skeleton>
 );
 
-export const Default: Story = {
-  render: Template,
-
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `Skeleton.Block`**. Its `width` and `height` are flattened into namespaced controls
+ * (grouped under their own category) via the shared `subcomponentArgTypes` helper, then
+ * reassembled in `render` with `getSubcomponentProps`. The ungrouped controls are
+ * `Skeleton`'s own props (`label`, `completedLabel`, …).
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Skeleton.Block, {
+      category: 'Skeleton.Block',
+      prefix: 'block',
+      exclude: ['children'],
+    }),
+  },
   args: {
     label: 'Loading something',
+    block__width: 50,
+    block__height: 'h2',
   },
+  render: (args: Record<string, unknown>) => (
+    <Skeleton {...getPrimaryComponentProps<SkeletonProps>(args)}>
+      <Skeleton.Block {...getSubcomponentProps(args, 'block')} />
+    </Skeleton>
+  ),
 };
 
 export const SkeletonHeight: Story = {

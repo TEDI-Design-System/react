@@ -1,6 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import Button from '../../buttons/button/button';
 import InfoButton from '../../buttons/info-button/info-button';
 import { Col, Row } from '../../layout/grid';
@@ -36,19 +41,6 @@ const meta: Meta<PopoverProps> = {
 
 export default meta;
 type Story = StoryObj<PopoverProps>;
-
-const DefaultTemplate: StoryFn<PopoverProps> = (args) => {
-  return (
-    <Popover {...args}>
-      <Popover.Trigger>
-        <Button>Popover Trigger</Button>
-      </Popover.Trigger>
-      <Popover.Content>
-        The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-      </Popover.Content>
-    </Popover>
-  );
-};
 
 const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
   const [firstOpen, setFirstOpen] = useState(false);
@@ -170,7 +162,7 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
             title="This popover is with smaller title and close button."
             titleProps={{ element: 'p' }}
             close
-            closeProps={{ size: 'medium' }}
+            closeProps={{ size: 'small' }}
           >
             <div className="display-flex justify-content-end gap-2">
               <Button visualType="secondary">Cancel</Button>
@@ -362,7 +354,7 @@ const ClosingButtonTemplate: StoryFn<PopoverProps> = (args) => {
       <Col>
         <Popover {...args}>
           <Popover.Trigger>Custom Button</Popover.Trigger>
-          <Popover.Content title="Heading" close closeProps={{ size: 'medium' }}>
+          <Popover.Content title="Heading" close closeProps={{ size: 'small' }}>
             The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
           </Popover.Content>
         </Popover>
@@ -394,9 +386,36 @@ const ScrollLockedTemplate: StoryFn<PopoverProps> = (args) => {
   );
 };
 
-export const Default: Story = {
-  render: DefaultTemplate,
-  args: {},
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `Popover.Content`**. Its `title`, `close` and `width` are flattened into namespaced
+ * controls (grouped under their own category) via the shared `subcomponentArgTypes`
+ * helper, then reassembled in `render` with `getSubcomponentProps`. The ungrouped
+ * controls are `Popover`'s own props (`placement`, `openWith`, `withBorder`, …).
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Popover.Content, {
+      category: 'Popover.Content',
+      prefix: 'content',
+      exclude: ['children', 'labelledBy', 'describedBy', 'titleProps', 'closeProps'],
+    }),
+  },
+  args: {
+    content__title: 'Heading',
+    content__close: true,
+    content__width: 'medium',
+  },
+  render: (args: Record<string, unknown>) => (
+    <Popover {...getPrimaryComponentProps<PopoverProps>(args)}>
+      <Popover.Trigger>
+        <Button>Popover Trigger</Button>
+      </Popover.Trigger>
+      <Popover.Content {...getSubcomponentProps(args, 'content')}>
+        The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
+      </Popover.Content>
+    </Popover>
+  ),
 };
 
 export const ContentExamples: Story = {
