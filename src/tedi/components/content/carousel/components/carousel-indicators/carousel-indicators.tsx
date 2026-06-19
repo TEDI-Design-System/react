@@ -42,22 +42,18 @@ export const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsP
         )}
 
         {variant === 'dots'
-          ? slidesCount > 0 && (
-              <div className={styles['tedi-carousel__dots']}>
-                {Array.from({ length: slidesCount }, (_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    aria-label={getLabel('carousel.show-slide', index + 1)}
-                    aria-current={index === slideIndex ? 'true' : undefined}
-                    className={cn(styles['tedi-carousel__indicator'], {
-                      [styles['tedi-carousel__indicator--active']]: index === slideIndex,
-                    })}
-                    onClick={() => carousel.goToIndex(index, { focusSlide: true })}
-                  />
-                ))}
-              </div>
-            )
+          ? Array.from({ length: slidesCount }, (_, index) => (
+              <button
+                key={index}
+                type="button"
+                aria-label={getLabel('carousel.show-slide', index + 1)}
+                aria-current={index === slideIndex ? 'true' : undefined}
+                className={cn(styles['tedi-carousel__indicator'], {
+                  [styles['tedi-carousel__indicator--active']]: index === slideIndex,
+                })}
+                onClick={() => carousel.goToIndex(index, { focusSlide: true })}
+              />
+            ))
           : slidesCount > 0 && (
               <div>
                 <Text element="span" modifiers="bold" color="brand">
