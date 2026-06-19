@@ -32,10 +32,15 @@ describe('AccordionItemHeader', () => {
   it('renders a non-button trigger when headerClickable is false', () => {
     const { container } = renderHeader({ headerClickable: false });
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    const headerTrigger = container.querySelector(
+      '[data-name="accordion-item-header"] > *:first-child'
+    ) as HTMLElement | null;
+    expect(headerTrigger).not.toBeNull();
+    expect(headerTrigger?.tagName).toBe('DIV');
 
     const toggle = container.querySelector('[aria-controls]');
     expect(toggle).not.toBeNull();
+    expect(toggle?.tagName).toBe('BUTTON');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
@@ -50,9 +55,9 @@ describe('AccordionItemHeader', () => {
     expect(button).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('shows the open label when collapsed and the close label when expanded', async () => {
+  it('shows the open text when collapsed and the close text when expanded', async () => {
     const user = userEvent.setup();
-    renderHeader({ openLabel: 'Show', closeLabel: 'Hide' });
+    renderHeader({ openText: 'Show', closeText: 'Hide' });
 
     expect(screen.getByText('Show')).toBeInTheDocument();
 

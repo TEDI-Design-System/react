@@ -117,19 +117,19 @@ export default {
         '`fill`: expands to available space and pushes trailing elements to the end.',
       table: { category: 'Accordion Item Header', defaultValue: { summary: 'hug' } },
     },
-    openLabel: {
+    openText: {
       control: 'text',
       description:
-        'Label shown when the accordion is collapsed. The default `open` is ' +
+        'Text shown when the accordion is collapsed. The default `open` is ' +
         'a translation key — `LabelProvider` resolves it to the active locale. ' +
         'Known translation keys are localised; ' +
         'custom strings are used as-is.',
       table: { category: 'Accordion Item Header', defaultValue: { summary: 'open' } },
     },
-    closeLabel: {
+    closeText: {
       control: 'text',
       description:
-        'Label shown when the accordion is expanded. The default `close` is ' +
+        'Text shown when the accordion is expanded. The default `close` is ' +
         'a translation key — `LabelProvider` resolves it to the active locale. ' +
         'Known translation keys are localised; ' +
         'custom strings are used as-is.',
@@ -137,19 +137,71 @@ export default {
     },
     showExpandLabel: {
       control: 'boolean',
+      description: 'Whether to show the expand/collapse labels.',
       table: { category: 'Accordion Item Header', defaultValue: { summary: 'true' } },
     },
     showDefaultExpandAction: {
       control: 'boolean',
+      description: 'Whether to render the built-in expand/collapse control.',
       table: { category: 'Accordion Item Header', defaultValue: { summary: 'true' } },
     },
     expandActionPosition: {
       control: 'radio',
       options: ['start', 'end'],
+      description: 'Position of the expand/collapse action.',
       table: { category: 'Accordion Item Header', defaultValue: { summary: 'end' } },
+    },
+    expandActionArrowType: {
+      control: 'radio',
+      options: ['default', 'secondary'],
+      description:
+        'Chevron style of the default expand action. Only effective when ' +
+        '`headerClickable` is `false` (otherwise the default expand action ' +
+        'is not a `CollapseButton`) and `showExpandLabel` is `false` (only ' +
+        'icon-only mode honours `arrowType`).',
+      table: {
+        category: 'Accordion Item Header',
+        defaultValue: { summary: 'default' },
+      },
+    },
+    expandActionSize: {
+      control: 'radio',
+      options: [undefined, 'default', 'small'],
+      description:
+        'Visual size of the default expand action. Only effective when ' +
+        '`headerClickable` is `false`. When omitted, the size is derived ' +
+        'from `showExpandLabel` — `true` → `default`, `false` → `small`. ' +
+        'Pass a value to override the derived default.',
+      table: {
+        category: 'Accordion Item Header',
+      },
+    },
+    expandActionInverted: {
+      control: 'boolean',
+      description:
+        'Use the inverted (light-on-dark) palette for the default expand ' +
+        'action, for placement on a dark or brand background. Only ' +
+        'effective when `headerClickable` is `false`.',
+      table: {
+        category: 'Accordion Item Header',
+        defaultValue: { summary: 'false' },
+      },
+    },
+    expandActionUnderline: {
+      control: 'boolean',
+      description:
+        'Whether to underline the label of the default expand action. ' +
+        'Defaults to `false` so the chevron stays the sole affordance. ' +
+        'Only effective when `headerClickable` is `false` and ' +
+        '`showExpandLabel` is `true` (icon-only mode never underlines).',
+      table: {
+        category: 'Accordion Item Header',
+        defaultValue: { summary: 'false' },
+      },
     },
     headerClass: {
       control: 'text',
+      description: 'Custom CSS class for the accordion header.',
       table: { category: 'Accordion Item Header' },
     },
     headingLevel: {
@@ -185,6 +237,7 @@ export default {
     },
     contentClass: {
       control: 'text',
+      description: 'Custom CSS class for the accordion content.',
       table: { category: 'Accordion Item Content' },
     },
   },
@@ -241,11 +294,15 @@ const DefaultTemplate: StoryFn<AccordionStoryArgs> = (args) => {
     accordionDefaultExpanded,
     headerClickable,
     titleLayout,
-    openLabel,
-    closeLabel,
+    openText,
+    closeText,
     showExpandLabel,
     showDefaultExpandAction,
     expandActionPosition,
+    expandActionArrowType,
+    expandActionSize,
+    expandActionInverted,
+    expandActionUnderline,
     defaultExpanded,
     showIconCard,
     selected: initialSelected,
@@ -276,11 +333,15 @@ const DefaultTemplate: StoryFn<AccordionStoryArgs> = (args) => {
         <Accordion.Item.Header
           headerClickable={headerClickable}
           titleLayout={titleLayout}
-          openLabel={openLabel}
-          closeLabel={closeLabel}
+          openText={openText}
+          closeText={closeText}
           showExpandLabel={showExpandLabel}
           showDefaultExpandAction={showDefaultExpandAction}
           expandActionPosition={expandActionPosition}
+          expandActionArrowType={expandActionArrowType}
+          expandActionSize={expandActionSize}
+          expandActionInverted={expandActionInverted}
+          expandActionUnderline={expandActionUnderline}
           headerClass={headerClass}
           headingLevel={headingLevel}
           title="Title"
@@ -290,7 +351,7 @@ const DefaultTemplate: StoryFn<AccordionStoryArgs> = (args) => {
         <Accordion.Item.Content contentClass={contentClass}>{contentExample}</Accordion.Item.Content>
       </Accordion.Item>
       <Accordion.Item>
-        <Accordion.Item.Header title="Title 2" openLabel="Open" closeLabel="Close" expandActionPosition="end" />
+        <Accordion.Item.Header title="Title 2" openText="Open" closeText="Close" expandActionPosition="end" />
         <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
       </Accordion.Item>
     </Accordion>
@@ -304,11 +365,15 @@ export const Default: Story = {
     accordionDefaultExpanded: false,
     headerClickable: true,
     titleLayout: 'hug',
-    openLabel: 'open',
-    closeLabel: 'close',
+    openText: 'open',
+    closeText: 'close',
     showExpandLabel: true,
     showDefaultExpandAction: true,
     expandActionPosition: 'end',
+    expandActionArrowType: 'default',
+    expandActionSize: undefined,
+    expandActionInverted: false,
+    expandActionUnderline: false,
     defaultExpanded: false,
     showIconCard: false,
     selected: false,
@@ -451,8 +516,8 @@ export const Variants: StoryObj = {
             <Accordion.Item.Header
               headerClickable={false}
               expandActionPosition="start"
-              openLabel="Title"
-              closeLabel="Title"
+              openText="Title"
+              closeText="Title"
               endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -464,8 +529,8 @@ export const Variants: StoryObj = {
             <Accordion.Item.Header
               headerClickable={false}
               expandActionPosition="start"
-              openLabel="Title"
-              closeLabel="Title"
+              openText="Title"
+              closeText="Title"
               endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -512,8 +577,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -523,8 +588,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -567,8 +632,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -580,8 +645,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -595,8 +660,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedC} onToggle={setSelectedC} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -608,8 +673,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedD} onToggle={setSelectedD} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -673,8 +738,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -686,8 +751,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -701,8 +766,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedC} onToggle={setSelectedC} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -714,8 +779,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openLabel="Title"
-                closeLabel="Title"
+                openText="Title"
+                closeText="Title"
                 endAction={<SelectActionButton selected={selectedD} onToggle={setSelectedD} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>

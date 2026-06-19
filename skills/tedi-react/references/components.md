@@ -92,6 +92,27 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 - `arrowType: 'default' | 'secondary' = 'default'`
 - `iconOnly?: boolean`
 
+### CollapseButton
+
+Standalone toggle button for expanding and collapsing content. Fully controlled — the parent owns `open` and listens to `onOpenChange`.
+
+**Props:** `CollapseButtonProps`
+
+- `open: boolean` (required) — current open state
+- `onOpenChange?: (next: boolean) => void` — fires after a click, receives the next open state
+- `openText?: string`, `closeText?: string` — labels shown next to the chevron. Defaults resolve via `LabelProvider` (`'open'` / `'close'` keys); known translation keys are localised, arbitrary strings are used literally
+- `hideText?: boolean = false` — icon-only mode
+- `arrowType?: 'default' | 'secondary' = 'default'` — chevron style (only takes effect in icon-only mode)
+- `size?: 'default' | 'small' = 'default'`
+- `inverted?: boolean = false` — light text + icon for dark / brand backgrounds (ignored when `arrowType === 'secondary'`)
+- `underline?: boolean = true` — underline the visible text label (no effect in icon-only mode)
+- `aria-label?: string` — required when `hideText` is `true`; falls back to the resolved open/close text
+
+```tsx
+const [open, setOpen] = useState(false);
+<CollapseButton open={open} onOpenChange={setOpen} openText="Show details" closeText="Hide details" />
+```
+
 ### FloatingButton
 
 **Props:** `FloatingButtonProps`
@@ -159,10 +180,14 @@ Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Conte
 - `title?: ReactNode` — title content (string or node)
 - `headerClickable?: boolean = true` — when `false`, the header is a non-interactive container and a separate `Link` is rendered as the toggle (use this when projecting interactive children like buttons or checkboxes into the header)
 - `titleLayout?: 'hug' | 'fill' = 'hug'` — `fill` pushes trailing elements to the end
-- `openLabel?: string = 'open'`, `closeLabel?: string = 'close'` — the defaults are translation **keys**, resolved through `LabelProvider` (`'open'` → `Ava` / `Open` / `Открыть` depending on locale, same for `close`). Pass a custom string to override per-instance — known translation keys are localised, arbitrary strings are used literally.
+- `openText?: string = 'open'`, `closeText?: string = 'close'` — the defaults are translation **keys**, resolved through `LabelProvider` (`'open'` → `Ava` / `Open` / `Открыть` depending on locale, same for `close`). Pass a custom string to override per-instance — known translation keys are localised, arbitrary strings are used literally.
 - `showExpandLabel?: boolean = true`
 - `showDefaultExpandAction?: boolean = true` — set `false` and provide a custom `endAction` to fully replace the default toggle
 - `expandActionPosition?: 'start' | 'end' = 'end'`
+- `expandActionArrowType?: 'default' | 'secondary' = 'default'` — chevron style passthrough to the underlying `CollapseButton`. Only effective when `headerClickable` is `false` and `showExpandLabel` is `false` (icon-only mode).
+- `expandActionSize?: 'default' | 'small'` — size passthrough to the underlying `CollapseButton`. Only effective when `headerClickable` is `false`. When omitted, derived from `showExpandLabel` (true → `default`, false → `small`).
+- `expandActionInverted?: boolean = false` — inverted palette passthrough. Only effective when `headerClickable` is `false`.
+- `expandActionUnderline?: boolean = false` — underline the default expand action's text. Only effective when `headerClickable` is `false` and `showExpandLabel` is `true`.
 - `headerClass?: string` — appended to the header host (useful for class-based theming via inherited properties like `font-weight`, `background`, etc.)
 - `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — wraps the trigger in a semantic `<h1>`–`<h6>` element per WAI-ARIA Accordion Pattern. Wrapper uses `display: contents` so it doesn't affect layout. Recommended for docs / FAQ pages where the accordion participates in the document outline.
 - **Slot props (`ReactNode`):** `beforeTitle`, `afterTitle`, `startAction`, `endAction`, `startDescription`, `endDescription`

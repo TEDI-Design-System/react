@@ -4,7 +4,11 @@ import React from 'react';
 import { labelsMap, useLabels } from '../../../../providers/label-provider';
 import { Icon } from '../../../base/icon/icon';
 import { Text } from '../../../base/typography/text/text';
-import Link from '../../../navigation/link/link';
+import {
+  CollapseButton,
+  CollapseButtonArrowType,
+  CollapseButtonSize,
+} from '../../../buttons/collapse-button/collapse-button';
 import styles from '../accordion.module.scss';
 import { useAccordionItemContext } from '../accordion-item/accordion-item-context';
 
@@ -30,7 +34,7 @@ export interface AccordionItemHeaderProps {
    */
   titleLayout?: AccordionItemHeaderTitleLayout;
   /**
-   * Label shown when the accordion is collapsed. The default value `open` is
+   * Text shown when the accordion is collapsed. The default value `open` is
    * a translation key resolved through the active `LabelProvider`.
    *
    * Passing another known label key (anything in `labelsMap`) also goes
@@ -38,9 +42,9 @@ export interface AccordionItemHeaderProps {
    * literally with no translation.
    * @default 'open'
    */
-  openLabel?: string;
+  openText?: string;
   /**
-   * Label shown when the accordion is expanded. The default value `close` is
+   * Text shown when the accordion is expanded. The default value `close` is
    * a translation key resolved through the active `LabelProvider`.
    *
    * Passing another known label key (anything in `labelsMap`) also goes
@@ -48,7 +52,7 @@ export interface AccordionItemHeaderProps {
    * literally with no translation.
    * @default 'close'
    */
-  closeLabel?: string;
+  closeText?: string;
   /**
    * Controls whether the expand/collapse label is shown.
    * @default true
@@ -64,6 +68,44 @@ export interface AccordionItemHeaderProps {
    * @default end
    */
   expandActionPosition?: AccordionItemHeaderExpandActionPosition;
+  /**
+   * Chevron style of the default expand action.
+   * Only effective when `headerClickable` is `false` (otherwise the
+   * default expand action isn't a `CollapseButton`) and `showExpandLabel`
+   * is `false` (only icon-only mode honours `arrowType` — see the
+   * `CollapseButton` docs).
+   * @default 'default'
+   */
+  expandActionArrowType?: CollapseButtonArrowType;
+  /**
+   * Visual size of the default expand action. Only effective when
+   * `headerClickable` is `false`.
+   *
+   * When omitted, the size is derived from `showExpandLabel`:
+   * - `showExpandLabel === true`  → `'default'`
+   * - `showExpandLabel === false` → `'small'` (icon-only mode reads
+   *   better at the smaller chevron size).
+   *
+   * Pass an explicit value to override the derived default.
+   */
+  expandActionSize?: CollapseButtonSize;
+  /**
+   * Use the inverted (light-on-dark) palette for the default expand
+   * action, for placement on a dark or brand background. Only effective
+   * when `headerClickable` is `false`.
+   * @default false
+   */
+  expandActionInverted?: boolean;
+  /**
+   * Whether the default expand action's label is underlined. Defaults to
+   * `false` so the chevron stays the sole affordance — an underlined
+   * label inside the accordion header reads as a stray link. Set to
+   * `true` for contexts that want link-style styling. Only effective
+   * when `headerClickable` is `false` and the expand action is not in
+   * icon-only mode (i.e. `showExpandLabel` is `true`).
+   * @default false
+   */
+  expandActionUnderline?: boolean;
   /**
    * Custom CSS class for the accordion header.
    */
@@ -111,11 +153,15 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
   const {
     headerClickable = true,
     titleLayout = 'hug',
-    openLabel = 'open',
-    closeLabel = 'close',
+    openText = 'open',
+    closeText = 'close',
     showExpandLabel = true,
     showDefaultExpandAction = true,
     expandActionPosition = 'end',
+    expandActionArrowType = 'default',
+    expandActionSize,
+    expandActionInverted = false,
+    expandActionUnderline = false,
     headerClass,
     title,
     beforeTitle,
@@ -133,11 +179,12 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
   const resolveLabel = (value: string): string =>
     value in labelsMap ? getLabel(value as Parameters<typeof getLabel>[0]) : value;
 
-  const resolvedOpenLabel = resolveLabel(openLabel);
-  const resolvedCloseLabel = resolveLabel(closeLabel);
-  const expandLabel = expanded ? resolvedCloseLabel : resolvedOpenLabel;
+  const resolvedOpenText = resolveLabel(openText);
+  const resolvedCloseText = resolveLabel(closeText);
+  const expandLabel = expanded ? resolvedCloseText : resolvedOpenText;
   const showStartExpandAction = showDefaultExpandAction && expandActionPosition === 'start';
   const showEndExpandAction = showDefaultExpandAction && expandActionPosition === 'end';
+  const resolvedExpandActionSize: CollapseButtonSize = expandActionSize ?? (showExpandLabel ? 'default' : 'small');
 
   const hostClasses = cn(
     styles['tedi-accordion-item-header'],
@@ -179,22 +226,21 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
     }
 
     return (
-      <Link
-        type="button"
-        className={styles['tedi-accordion-item-header__toggle-button']}
-        onClick={toggle}
-        aria-expanded={expanded}
+      <CollapseButton
+        open={expanded}
+        onOpenChange={() => toggle()}
+        openText={openText}
+        closeText={closeText}
+        hideText={!showExpandLabel}
+        arrowType={expandActionArrowType}
+        size={resolvedExpandActionSize}
+        inverted={expandActionInverted}
+        underline={expandActionUnderline}
+        disabled={disabled}
         aria-controls={contentId}
-        aria-label={!showExpandLabel ? expandLabel : undefined}
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : undefined}
-        underline={false}
-      >
-        <span className={styles['tedi-accordion-item-header__toggle-button-content']}>
-          {showExpandLabel ? expandLabel : null}
-          {renderExpandIcon()}
-        </span>
-      </Link>
+      />
     );
   };
 
@@ -203,7 +249,6 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
       <span className={styles['tedi-accordion-item-header__start']}>
         {startAction}
         {beforeTitle}
-
         <span
           className={cn(styles['tedi-accordion-item-header__title'], {
             [styles['tedi-accordion-item-header__title--grow']]: titleLayout === 'fill',
@@ -212,24 +257,18 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
         >
           <span className={styles['tedi-accordion-item-header__title-main']}>
             {showStartExpandAction && renderCollapseButton()}
-
             {title !== undefined && title !== null && (
               <Text element="span" color="secondary" modifiers="normal">
                 {title}
               </Text>
             )}
           </span>
-
           {startDescription}
         </span>
-
         {afterTitle}
       </span>
-
       {endDescription}
-
       {showEndExpandAction && renderCollapseButton()}
-
       {endAction}
     </>
   );
