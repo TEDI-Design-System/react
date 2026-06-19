@@ -393,12 +393,7 @@ export const Default: Story = {
       </Carousel.Header>
       <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(5)}</Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
-        <HideAt md>
-          <Carousel.Indicators variant="numbers" />
-        </HideAt>
-        <ShowAt md>
-          <Carousel.Indicators />
-        </ShowAt>
+        <Carousel.Indicators />
       </Carousel.Footer>
     </Carousel>
   ),

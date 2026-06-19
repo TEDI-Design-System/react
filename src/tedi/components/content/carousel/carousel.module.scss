@@ -107,12 +107,23 @@
   display: flex;
   gap: var(--layout-grid-gutters-04);
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
   min-height: var(--tedi-dimensions-13);
+}
+
+.tedi-carousel__dots {
+  display: flex;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
 }
 
 .tedi-carousel__indicator {
   position: relative;
   width: var(--tedi-dimensions-13);
+  min-width: var(--carousel-indicator-height);
   height: var(--tedi-dimensions-13);
   cursor: pointer;
   background: none;
@@ -127,7 +138,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: var(--carousel-indicator-width);
+    width: min(var(--carousel-indicator-width), 100%);
     height: var(--carousel-indicator-height);
     content: '';
     background: transparent;
