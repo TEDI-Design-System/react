@@ -1331,6 +1331,31 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
 
+### Timeline
+Vertical timeline for a sequence of events. **Compound API** — composed from `Timeline.Item` children, each with `Timeline.Title`, `Timeline.Description` and any extra content. Responsive: reflows below the `lg` breakpoint (timings stack above the marker on mobile). Mark the current step with `activeIndex` — earlier items render as completed (past), later ones as upcoming (future); the marker dot is filled for current/past, outlined for future, and the connecting line is accent up to the current item.
+
+- `<Timeline activeIndex? variant? cardPadding? className?>` props:
+  - `activeIndex?: number` — current item; omit for all-future.
+  - `variant?: 'default' | 'card' = 'default'` — `card` wraps the timeline in card chrome.
+  - `cardPadding?: number` — item padding in rem for the `card` variant (same scale as `Card`).
+- `<Timeline.Item timings? timingsBottom? children>`:
+  - `timings?: string[]` — timing labels (e.g. `['2024', '16. detsember']`); the first renders larger on desktop, inline on mobile.
+  - `timingsBottom?: ReactNode` — pinned to the bottom of the timings column on desktop, rendered after the content on mobile (e.g. a "last modified" note).
+  - Pass a leading icon by placing it inside `Timeline.Title`. Any non-title/description children render below the description (buttons, `Collapse`, etc.).
+- `<Timeline.Title>` / `<Timeline.Description>` — title (secondary, bold-small) and muted description; wrap a heading element inside the title for heading semantics.
+
+```tsx
+<Timeline activeIndex={1}>
+  <Timeline.Item timings={['2024', '16. detsember']}>
+    <Timeline.Title>Taotluse esitamine</Timeline.Title>
+    <Timeline.Description>Menetlemine võib võtta kuni 30 päeva.</Timeline.Description>
+  </Timeline.Item>
+  <Timeline.Item timings={['2025', '02. jaanuar']}>
+    <Timeline.Title>Otsus</Timeline.Title>
+  </Timeline.Item>
+</Timeline>
+```
+
 ---
 
 # Community Components

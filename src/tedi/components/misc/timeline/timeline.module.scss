@@ -1,0 +1,201 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
+.tedi-timeline {
+  --timeline-padding-y: 8px;
+  --timeline-text-min-height: 24px;
+
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  grid-auto-rows: auto;
+  grid-auto-flow: row dense;
+  column-gap: var(--layout-grid-gutters-12);
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    grid-template-columns: max-content max-content 1fr;
+    grid-auto-flow: row;
+    row-gap: 0;
+  }
+}
+
+.tedi-timeline--card {
+  --tedi-timeline-card-padding: var(--card-padding-md-default);
+
+  background: var(--card-background-primary);
+  border: 1px solid var(--card-border-primary);
+  border-radius: var(--card-radius-rounded);
+
+  .tedi-timeline-item {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    padding: var(--tedi-timeline-card-padding);
+    border-bottom: 1px solid var(--card-border-primary);
+  }
+
+  .tedi-timeline-item:last-child {
+    border-bottom: 0;
+  }
+
+  .tedi-timeline-item:not(:last-child) .tedi-timeline__marker {
+    margin-bottom: calc(-2 * var(--tedi-timeline-card-padding) - 10px);
+  }
+
+  .tedi-timeline__marker [class*='tedi-separator--dot-style-outlined']::before {
+    background-color: var(--card-background-primary);
+  }
+
+  @include breakpoints.media-breakpoint-down(lg) {
+    .tedi-timeline-item .tedi-timeline__marker {
+      grid-row: 1 / span 2;
+    }
+
+    .tedi-timeline-item.tedi-timeline__item--has-bottom .tedi-timeline__marker {
+      grid-row: 1 / span 3;
+    }
+  }
+}
+
+.tedi-timeline-item {
+  display: contents;
+}
+
+.tedi-timeline__timings {
+  display: flex;
+  grid-row: auto;
+  grid-column: 2;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    flex-direction: column;
+    grid-column: 1;
+    gap: 0;
+    align-items: end;
+    padding-bottom: var(--timeline-padding-y);
+  }
+}
+
+.tedi-timeline__timings > .tedi-timeline__timings-bottom {
+  @include breakpoints.media-breakpoint-up(lg) {
+    margin-top: auto;
+    text-align: right;
+  }
+}
+
+.tedi-timeline-item > .tedi-timeline__timings-bottom {
+  grid-row: auto;
+  grid-column: 2;
+  padding-bottom: var(--timeline-padding-y);
+}
+
+.tedi-timeline__time {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: var(--body-small-regular-size);
+  color: var(--general-text-tertiary);
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    min-height: var(--timeline-text-min-height);
+
+    &:first-child {
+      font-size: var(--body-regular-size);
+    }
+  }
+
+  @include breakpoints.media-breakpoint-down(lg) {
+    &::before {
+      display: none;
+      width: 4px;
+      height: 4px;
+      margin-inline: var(--layout-grid-gutters-04);
+      content: '';
+      background-color: var(--general-text-tertiary);
+      border-radius: 50%;
+    }
+
+    &:not(:first-child)::before {
+      display: inline-block;
+    }
+  }
+}
+
+.tedi-timeline__marker {
+  display: flex;
+  flex-direction: column;
+  grid-row: span 2;
+  grid-column: 1;
+  align-items: center;
+  align-self: stretch;
+  padding-top: 6px;
+
+  &:not(:last-child) {
+    margin-bottom: -6px;
+  }
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    grid-row: auto;
+    grid-column: 2;
+  }
+}
+
+.tedi-timeline__marker--large {
+  padding-top: 3px;
+}
+
+.tedi-timeline-item.tedi-timeline__item--has-bottom .tedi-timeline__marker {
+  grid-row: span 3;
+}
+
+.tedi-timeline__info {
+  display: flex;
+  flex-direction: column;
+  grid-row: auto;
+  grid-column: 2;
+  gap: var(--timeline-padding-y);
+  padding-bottom: var(--timeline-padding-y);
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    grid-column: 3;
+  }
+}
+
+.tedi-timeline__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--timeline-padding-y);
+}
+
+.tedi-timeline-title {
+  display: flex;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+  min-height: var(--timeline-text-min-height);
+  font-size: var(--body-small-bold-size);
+  font-weight: var(--body-bold-weight);
+  line-height: var(--body-small-bold-line-height);
+  color: var(--general-text-secondary);
+
+  > * {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+}
+
+.tedi-timeline-description {
+  display: flex;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+  min-height: var(--timeline-text-min-height);
+  font-size: var(--body-small-regular-size);
+  font-weight: var(--body-small-regular-weight);
+  line-height: var(--body-small-regular-line-height);
+  color: var(--general-text-tertiary);
+
+  > * {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+}

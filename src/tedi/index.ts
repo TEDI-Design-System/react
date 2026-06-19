@@ -66,6 +66,7 @@ export * from './components/misc/scroll-visibility/scroll-visibility';
 export * from './components/misc/scroll-fade/scroll-fade';
 export * from './components/misc/affix/affix';
 export * from './components/misc/ellipsis/ellipsis';
+export * from './components/misc/timeline/timeline';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
 
