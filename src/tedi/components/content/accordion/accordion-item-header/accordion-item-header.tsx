@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
-import { labelsMap, useLabels } from '../../../../providers/label-provider';
+import { useLabels } from '../../../../providers/label-provider';
 import { Icon } from '../../../base/icon/icon';
 import { Text } from '../../../base/typography/text/text';
 import {
@@ -34,23 +34,15 @@ export interface AccordionItemHeaderProps {
    */
   titleLayout?: AccordionItemHeaderTitleLayout;
   /**
-   * Text shown when the accordion is collapsed. The default value `open` is
-   * a translation key resolved through the active `LabelProvider`.
-   *
-   * Passing another known label key (anything in `labelsMap`) also goes
-   * through the translation lookup. Passing an arbitrary string uses it
-   * literally with no translation.
-   * @default 'open'
+   * Text shown when the accordion is collapsed. Rendered literally —
+   * translate at the call site if needed. When omitted, falls back to the
+   * `LabelProvider`'s translated `'open'` label.
    */
   openText?: string;
   /**
-   * Text shown when the accordion is expanded. The default value `close` is
-   * a translation key resolved through the active `LabelProvider`.
-   *
-   * Passing another known label key (anything in `labelsMap`) also goes
-   * through the translation lookup. Passing an arbitrary string uses it
-   * literally with no translation.
-   * @default 'close'
+   * Text shown when the accordion is expanded. Rendered literally —
+   * translate at the call site if needed. When omitted, falls back to the
+   * `LabelProvider`'s translated `'close'` label.
    */
   closeText?: string;
   /**
@@ -153,8 +145,8 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
   const {
     headerClickable = true,
     titleLayout = 'hug',
-    openText = 'open',
-    closeText = 'close',
+    openText,
+    closeText,
     showExpandLabel = true,
     showDefaultExpandAction = true,
     expandActionPosition = 'end',
@@ -176,11 +168,9 @@ export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Elemen
   const { headerId, contentId, expanded, toggle, showIconCard, disabled } =
     useAccordionItemContext('Accordion.Item.Header');
   const { getLabel } = useLabels();
-  const resolveLabel = (value: string): string =>
-    value in labelsMap ? getLabel(value as Parameters<typeof getLabel>[0]) : value;
 
-  const resolvedOpenText = resolveLabel(openText);
-  const resolvedCloseText = resolveLabel(closeText);
+  const resolvedOpenText = openText ?? getLabel('open');
+  const resolvedCloseText = closeText ?? getLabel('close');
   const expandLabel = expanded ? resolvedCloseText : resolvedOpenText;
   const showStartExpandAction = showDefaultExpandAction && expandActionPosition === 'start';
   const showEndExpandAction = showDefaultExpandAction && expandActionPosition === 'end';

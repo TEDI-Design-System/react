@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
-import { labelsMap, useLabels } from '../../../providers/label-provider';
+import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import styles from './collapse-button.module.scss';
 
@@ -21,16 +21,15 @@ export interface CollapseButtonProps
    */
   onOpenChange?: (next: boolean) => void;
   /**
-   * Label shown when collapsed. Defaults to the translated `'open'` label
-   * resolved through `LabelProvider`. Known translation keys are localised;
-   * arbitrary strings are used literally.
-   * @default open
+   * Label shown when collapsed. Rendered literally — translate at the call
+   * site if needed. When omitted, falls back to the `LabelProvider`'s
+   * translated `'open'` label.
    */
   openText?: string;
   /**
-   * Label shown when expanded. Defaults to the translated `'close'` label
-   * resolved through `LabelProvider`.
-   * @default close
+   * Label shown when expanded. Rendered literally — translate at the call
+   * site if needed. When omitted, falls back to the `LabelProvider`'s
+   * translated `'close'` label.
    */
   closeText?: string;
   /**
@@ -86,12 +85,7 @@ const CollapseButtonComponent = (props: CollapseButtonProps): JSX.Element => {
 
   const { getLabel } = useLabels();
 
-  const resolveLabel = (value: string | undefined, fallbackKey: Parameters<typeof getLabel>[0]): string => {
-    if (value === undefined) return getLabel(fallbackKey);
-    return value in labelsMap ? getLabel(value as Parameters<typeof getLabel>[0]) : value;
-  };
-
-  const label = open ? resolveLabel(closeText, 'close') : resolveLabel(openText, 'open');
+  const label = open ? closeText ?? getLabel('close') : openText ?? getLabel('open');
 
   const resolvedAriaLabel = hideText ? ariaLabelProp ?? label : ariaLabelProp;
 

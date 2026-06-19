@@ -120,20 +120,18 @@ export default {
     openText: {
       control: 'text',
       description:
-        'Text shown when the accordion is collapsed. The default `open` is ' +
-        'a translation key — `LabelProvider` resolves it to the active locale. ' +
-        'Known translation keys are localised; ' +
-        'custom strings are used as-is.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'open' } },
+        'Text shown when the accordion is collapsed. Rendered literally — ' +
+        'translate at the call site if needed. When omitted, falls back to the translated ' +
+        '`open` label from `LabelProvider`.',
+      table: { category: 'Accordion Item Header' },
     },
     closeText: {
       control: 'text',
       description:
-        'Text shown when the accordion is expanded. The default `close` is ' +
-        'a translation key — `LabelProvider` resolves it to the active locale. ' +
-        'Known translation keys are localised; ' +
-        'custom strings are used as-is.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'close' } },
+        'Text shown when the accordion is expanded. Rendered literally — ' +
+        'translate at the call site if needed. When omitted, falls back to the translated ' +
+        '`close` label from `LabelProvider`.',
+      table: { category: 'Accordion Item Header' },
     },
     showExpandLabel: {
       control: 'boolean',
@@ -365,8 +363,6 @@ export const Default: Story = {
     accordionDefaultExpanded: false,
     headerClickable: true,
     titleLayout: 'hug',
-    openText: 'open',
-    closeText: 'close',
     showExpandLabel: true,
     showDefaultExpandAction: true,
     expandActionPosition: 'end',

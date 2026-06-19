@@ -100,7 +100,7 @@ Standalone toggle button for expanding and collapsing content. Fully controlled 
 
 - `open: boolean` (required) — current open state
 - `onOpenChange?: (next: boolean) => void` — fires after a click, receives the next open state
-- `openText?: string`, `closeText?: string` — labels shown next to the chevron. Defaults resolve via `LabelProvider` (`'open'` / `'close'` keys); known translation keys are localised, arbitrary strings are used literally
+- `openText?: string`, `closeText?: string` — labels shown next to the chevron, rendered literally. When omitted, fall back to the `LabelProvider`'s translated `'open'` / `'close'` keys. Translate at the call site if you need a localised override.
 - `hideText?: boolean = false` — icon-only mode
 - `arrowType?: 'default' | 'secondary' = 'default'` — chevron style (only takes effect in icon-only mode)
 - `size?: 'default' | 'small' = 'default'`
@@ -180,7 +180,7 @@ Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Conte
 - `title?: ReactNode` — title content (string or node)
 - `headerClickable?: boolean = true` — when `false`, the header is a non-interactive container and a separate `Link` is rendered as the toggle (use this when projecting interactive children like buttons or checkboxes into the header)
 - `titleLayout?: 'hug' | 'fill' = 'hug'` — `fill` pushes trailing elements to the end
-- `openText?: string = 'open'`, `closeText?: string = 'close'` — the defaults are translation **keys**, resolved through `LabelProvider` (`'open'` → `Ava` / `Open` / `Открыть` depending on locale, same for `close`). Pass a custom string to override per-instance — known translation keys are localised, arbitrary strings are used literally.
+- `openText?: string`, `closeText?: string` — rendered literally. When omitted, the trigger falls back to the `LabelProvider`'s translated `'open'` / `'close'` keys. Translate at the call site if you need a localised override.
 - `showExpandLabel?: boolean = true`
 - `showDefaultExpandAction?: boolean = true` — set `false` and provide a custom `endAction` to fully replace the default toggle
 - `expandActionPosition?: 'start' | 'end' = 'end'`
