@@ -30,6 +30,6 @@ export interface TableOfContentsItemProps {
 
 export const TableOfContentsItem = (_props: TableOfContentsItemProps): JSX.Element | null => null;
 
-TableOfContentsItem.displayName = 'TableOfContents.Item';
+TableOfContentsItem.displayName = 'TableOfContentsItem';
 
 export default TableOfContentsItem;

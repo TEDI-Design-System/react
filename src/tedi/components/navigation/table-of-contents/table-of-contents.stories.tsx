@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
-import { Card, CardContent } from '../../cards/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=8469-72329&m=dev" target="_blank">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/467bb3-table-of-contents" target="_blank">Zeroheight ↗</a>
  */
 const meta: Meta<typeof TableOfContents> = {
   component: TableOfContents,
@@ -20,7 +20,7 @@ const meta: Meta<typeof TableOfContents> = {
     layout: 'padded',
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=8469-72329&m=dev',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
     },
   },
   decorators: [
@@ -48,16 +48,55 @@ const sectionItems = () =>
 
 export const Default: Story = {
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false}>
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
       {sectionItems()}
     </TableOfContents>
   ),
 };
 
-/**
- * Nest items by placing `TableOfContents.Item`s inside an `Item` (alongside its
- * link). The branch leading to `activeId` auto-expands; siblings stay collapsed.
- */
+export const Transparent: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="section-3">
+      {sectionItems()}
+    </TableOfContents>
+  ),
+};
+
+export const Headless: Story = {
+  render: () => (
+    <TableOfContents heading={null} sticky={false} numbered activeId="section-3">
+      {sectionItems()}
+    </TableOfContents>
+  ),
+};
+
+export const WithIcon: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      <TableOfContents.Item id="section-1">
+        <Link href="#section-1" underline={false}>
+          Sissejuhatus
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="section-2">
+        <Link href="#section-2" underline={false}>
+          Taust
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="section-3">
+        <Link href="#section-3" underline={false}>
+          Meetodid
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="section-6">
+        <Link href="#section-6" underline={false} iconLeft="description">
+          Kokkuvõte
+        </Link>
+      </TableOfContents.Item>
+    </TableOfContents>
+  ),
+};
+
 export const Nested: Story = {
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} activeId="methods-2">
@@ -95,10 +134,6 @@ export const Nested: Story = {
   ),
 };
 
-/**
- * `numbered` renders an ordered list with auto-generated hierarchical numbers
- * (`1.`, `2.`, `2.1`, …) right-aligned before each item.
- */
 export const Numbered: Story = {
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} numbered activeId="methods">
@@ -131,97 +166,78 @@ export const Numbered: Story = {
   ),
 };
 
-/**
- * `showIcons` turns the list into a multistep-form progress indicator: a check
- * for validated steps, a neutral check for untouched steps, and a warning for
- * invalid ones.
- */
-export const WithValidationIcons: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} showIcons activeId="step-3">
-      <TableOfContents.Item id="step-1" isValid>
-        <Link href="#step-1" underline={false}>
-          Isikuandmed
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="step-2" isValid={false}>
-        <Link href="#step-2" underline={false}>
-          Kontaktandmed
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="step-3">
-        <Link href="#step-3" underline={false}>
-          Tervisenäitajad
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="step-4">
-        <Link href="#step-4" underline={false}>
-          Kinnitus
-        </Link>
-      </TableOfContents.Item>
-    </TableOfContents>
-  ),
-};
-
 export const ItemStates: Story = {
   parameters: { fullWidth: true },
   render: () => {
+    const states = [
+      { label: 'Default', linkProps: {}, active: false },
+      { label: 'Hover', linkProps: { isHovered: true }, active: false },
+      { label: 'Active', linkProps: { isActive: true }, active: true },
+    ];
+
     const rowStyle = (active: boolean) => ({
       display: 'inline-flex',
+      alignItems: 'center',
+      gap: 'var(--layout-grid-gutters-04)',
       borderLeft: `var(--table-of-contents-active-item-border-width) solid ${
         active ? 'var(--general-border-brand)' : 'transparent'
       }`,
       paddingLeft: 'calc(var(--table-of-contents-padding-level-1) - var(--table-of-contents-active-item-border-width))',
     });
 
-    const states = [
+    const numberStyle = (active: boolean) => ({
+      minWidth: '1.5rem',
+      textAlign: 'right' as const,
+      color: active ? 'var(--link-primary-active)' : 'var(--link-primary-default)',
+    });
+
+    const link = (linkProps: object, iconLeft?: string) => (
+      <Link href="#" underline={false} iconLeft={iconLeft} {...linkProps}>
+        Pealkiri
+      </Link>
+    );
+
+    const columns = [
+      { header: 'Default', render: (s: (typeof states)[number]) => link(s.linkProps) },
       {
-        label: 'Default',
-        item: (
-          <Link href="#default" underline={false}>
-            Heading
-          </Link>
+        header: 'With number',
+        render: (s: (typeof states)[number]) => (
+          <>
+            <span aria-hidden="true" style={numberStyle(s.active)}>
+              1.
+            </span>
+            {link(s.linkProps)}
+          </>
         ),
-        active: false,
       },
       {
-        label: 'Hover',
-        item: (
-          <Link href="#hover" underline={false} isHovered>
-            Heading
-          </Link>
-        ),
-        active: false,
-      },
-      {
-        label: 'Active',
-        item: (
-          <Link href="#active" underline={false} isActive>
-            Heading
-          </Link>
-        ),
-        active: true,
+        header: 'With icon',
+        render: (s: (typeof states)[number]) => link(s.linkProps, 'mail'),
       },
     ];
 
     return (
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'auto auto',
-          justifyContent: 'start',
-          alignItems: 'center',
-          columnGap: '2rem',
-          rowGap: '0.75rem',
-        }}
-      >
-        {states.map(({ label, item, active }) => (
-          <Fragment key={label}>
-            <Text modifiers="bold">{label}</Text>
-            <span style={rowStyle(active)}>{item}</span>
-          </Fragment>
+      <Row gutterY={3}>
+        {columns.map((column) => (
+          <Col key={column.header} xs={12} sm={6} lg={4}>
+            <VerticalSpacing size={1}>
+              <Text modifiers="bold">{column.header}</Text>
+              <VerticalSpacing size={0.5}>
+                {states.map((state) => (
+                  <div key={state.label} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ minWidth: '3.5rem' }}>
+                      <Text element="span" color="secondary">
+                        {state.label}
+                      </Text>
+                    </div>
+                    <span style={rowStyle(state.active)}>{column.render(state)}</span>
+                  </div>
+                ))}
+              </VerticalSpacing>
+            </VerticalSpacing>
+          </Col>
         ))}
-      </div>
+      </Row>
     );
   },
 };
@@ -251,7 +267,7 @@ export const StickyInLayout: Story = {
           return;
         }
 
-        const active = ids.filter((id) => visibility.get(id)).pop();
+        const active = ids.find((id) => visibility.get(id));
         if (active) setActiveId(active);
       };
 
@@ -276,50 +292,56 @@ export const StickyInLayout: Story = {
       };
     }, []);
 
+    const selectSection = (id: string) => (event: React.MouseEvent) => {
+      event.preventDefault();
+      const root = scrollRef.current;
+      const target = document.getElementById(id);
+      if (!root || !target) return;
+
+      const paddingTop = parseFloat(getComputedStyle(root).paddingTop) || 0;
+      root.scrollTo({
+        top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - paddingTop,
+      });
+      setActiveId(id);
+    };
+
     return (
-      <div
-        ref={scrollRef}
-        style={{
-          maxHeight: '24rem',
-          overflowY: 'auto',
-          padding: '1rem',
-          border: '1px solid var(--general-border-primary)',
-          borderRadius: 'var(--card-radius-rounded)',
-        }}
-      >
-        <Row>
-          <Col md={8}>
+      <Row alignItems="start">
+        <Col md={8}>
+          <div
+            ref={scrollRef}
+            style={{
+              maxHeight: '24rem',
+              overflowY: 'auto',
+            }}
+          >
             <VerticalSpacing size={1.5}>
               {sections.map((label, index) => (
                 <section key={label} id={`sec-${index + 1}`} tabIndex={-1}>
-                  <Card>
-                    <CardContent>
-                      <VerticalSpacing size={0.5}>
-                        <Heading element="h2" modifiers="h3">
-                          {label}
-                        </Heading>
-                        <Text>{LOREM}</Text>
-                        <Text>{LOREM}</Text>
-                      </VerticalSpacing>
-                    </CardContent>
-                  </Card>
+                  <VerticalSpacing size={0.5}>
+                    <Heading element="h2" modifiers="h3">
+                      {label}
+                    </Heading>
+                    <Text>{LOREM}</Text>
+                    <Text>{LOREM}</Text>
+                  </VerticalSpacing>
                 </section>
               ))}
             </VerticalSpacing>
-          </Col>
-          <Col md={4}>
-            <TableOfContents heading="Sisukord" activeId={activeId}>
-              {sections.map((label, index) => (
-                <TableOfContents.Item key={label} id={`sec-${index + 1}`}>
-                  <Link href={`#sec-${index + 1}`} underline={false}>
-                    {label}
-                  </Link>
-                </TableOfContents.Item>
-              ))}
-            </TableOfContents>
-          </Col>
-        </Row>
-      </div>
+          </div>
+        </Col>
+        <Col md={4}>
+          <TableOfContents heading="Sisukord" sticky={false} activeId={activeId}>
+            {sections.map((label, index) => (
+              <TableOfContents.Item key={label} id={`sec-${index + 1}`}>
+                <Link href={`#sec-${index + 1}`} underline={false} onClick={selectSection(`sec-${index + 1}`)}>
+                  {label}
+                </Link>
+              </TableOfContents.Item>
+            ))}
+          </TableOfContents>
+        </Col>
+      </Row>
     );
   },
 };

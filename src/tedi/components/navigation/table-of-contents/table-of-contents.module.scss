@@ -1,10 +1,30 @@
+.tedi-table-of-contents {
+  --tedi-table-of-contents-padding: var(--card-padding-md-default);
+}
+
+.tedi-table-of-contents--transparent .tedi-table-of-contents__list {
+  position: relative;
+  padding-bottom: 0;
+  isolation: isolate;
+}
+
+.tedi-table-of-contents--transparent .tedi-table-of-contents__list::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: -1;
+  width: var(--tedi-borders-01);
+  content: '';
+  background: var(--card-border-primary);
+}
+
 .tedi-table-of-contents--sticky {
   max-height: calc(100dvh - 3rem);
   overflow-y: auto;
 }
 
 .tedi-table-of-contents__heading {
-  padding: var(--card-padding-md-default);
+  padding: var(--tedi-table-of-contents-padding);
 }
 
 .tedi-table-of-contents__list,
@@ -18,7 +38,11 @@
 }
 
 .tedi-table-of-contents__list {
-  padding-bottom: var(--card-padding-md-default);
+  padding-bottom: var(--tedi-table-of-contents-padding);
+}
+
+.tedi-table-of-contents__list--headless {
+  padding-top: var(--tedi-table-of-contents-padding);
 }
 
 .tedi-table-of-contents__item {
@@ -31,13 +55,17 @@
   display: flex;
   gap: var(--layout-grid-gutters-04);
   align-items: center;
-  padding-right: var(--table-of-contents-padding-level-1);
-  padding-left: calc(var(--table-of-contents-padding-level-1) - var(--table-of-contents-active-item-border-width));
+  padding-right: var(--tedi-table-of-contents-padding);
+  padding-left: calc(var(--tedi-table-of-contents-padding) - var(--table-of-contents-active-item-border-width));
   border-left: var(--table-of-contents-active-item-border-width) solid transparent;
 }
 
 .tedi-table-of-contents__row--level-2 {
-  padding-left: calc(var(--table-of-contents-padding-level-2) - var(--table-of-contents-active-item-border-width));
+  padding-left: calc(
+    var(--tedi-table-of-contents-padding) +
+      (var(--table-of-contents-padding-level-2) - var(--table-of-contents-padding-level-1)) -
+      var(--table-of-contents-active-item-border-width)
+  );
 }
 
 .tedi-table-of-contents__icon {

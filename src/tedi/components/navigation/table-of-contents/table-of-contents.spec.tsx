@@ -21,7 +21,7 @@ jest.mock('../../../providers/label-provider', () => ({
   }),
 }));
 
-const Tree = (props: { activeId?: string; numbered?: boolean }) => (
+const Tree = (props: { activeId?: string; numbered?: boolean; variant?: 'default' | 'transparent' }) => (
   <TableOfContents {...props}>
     <TableOfContents.Item id="a">
       <a href="#a">Alpha</a>
@@ -108,7 +108,7 @@ describe('TableOfContents', () => {
     );
 
     expect(screen.getByText('check')).toBeInTheDocument();
-    expect(screen.getByText('radio_button_unchecked')).toBeInTheDocument();
+    expect(screen.getByText('circle')).toBeInTheDocument();
     expect(screen.getByText('warning')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Valid' })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Invalid' })).toBeInTheDocument();
@@ -121,6 +121,29 @@ describe('TableOfContents', () => {
     expect(screen.getByText('1.')).toBeInTheDocument();
     expect(screen.getByText('2.')).toBeInTheDocument();
     expect(screen.getByText('1.1')).toBeInTheDocument();
+  });
+
+  it('omits the card chrome in the transparent variant while keeping the navigation and items', () => {
+    const { container, rerender } = render(<Tree />);
+    expect(container.querySelector('[data-name="card"]')).toBeInTheDocument();
+
+    rerender(<Tree variant="transparent" />);
+    expect(container.querySelector('[data-name="card"]')).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Alpha' })).toBeInTheDocument();
+    expect(container.querySelector('[class*="tedi-table-of-contents--transparent"]')).toBeInTheDocument();
+  });
+
+  it('renders headless (no heading) when heading is null, keeping the localized landmark name', () => {
+    render(
+      <TableOfContents heading={null}>
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
   });
 
   it('applies the sticky height-cap class only when sticky (so the last item stays reachable on zoom)', () => {

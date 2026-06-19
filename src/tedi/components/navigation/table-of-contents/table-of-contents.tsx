@@ -1,12 +1,23 @@
 import cn from 'classnames';
-import { Children, createContext, isValidElement, type ReactElement, type ReactNode, useMemo } from 'react';
+import {
+  Children,
+  createContext,
+  type CSSProperties,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  useMemo,
+} from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Card, CardContent } from '../../cards/card';
 import { Affix } from '../../misc/affix/affix';
+import {
+  TableOfContentsItem,
+  type TableOfContentsItemProps,
+} from './components/table-of-contents-item/table-of-contents-item';
+import { TableOfContentsList } from './components/table-of-contents-list/table-of-contents-list';
 import styles from './table-of-contents.module.scss';
-import { TableOfContentsItem, type TableOfContentsItemProps } from './table-of-contents-item';
-import { TableOfContentsList } from './table-of-contents-list';
 
 export interface TableOfContentsProps {
   /**
@@ -15,9 +26,25 @@ export interface TableOfContentsProps {
    */
   children: ReactNode;
   /**
-   * Heading rendered above the list.
+   * Heading rendered above the list. Defaults to the localised "Table of
+   * contents" label; pass `null` to render it headless (no visible heading —
+   * the navigation keeps an accessible name via `aria-label`).
    */
-  heading?: string;
+  heading?: string | null;
+  /**
+   * Visual variant:
+   * - `default` — rendered inside a bordered `Card`.
+   * - `transparent` — no card chrome (border / background); the list sits
+   *   directly on the page, with a continuous grey left rail (the active item's
+   *   segment turns blue).
+   * @default default
+   */
+  variant?: 'default' | 'transparent';
+  /**
+   * Inner padding of the container, in rem — the spacing between the card edge and the
+   * heading / items. Defaults to the card's medium padding token.
+   */
+  padding?: number;
   /**
    * Id of the currently active item. The active item gets the left accent bar
    * and active link colour; the branch leading to it auto-expands its nested
@@ -109,30 +136,21 @@ const buildActiveTrail = (nodes: TableOfContentsNode[], activeId?: string): Set<
   return trail;
 };
 
-/**
- * Navigational table of contents for long pages or multistep forms. Compose it
- * from `TableOfContents.Item` children; nest items by placing `Item`s inside an
- * `Item`. Mark the current section with `activeId` for the active accent bar, or
- * pass `showIcons` with per-item `isValid` for multistep-form progress.
- *
- * When linking to in-page sections, use the same `id` on the section element and
- * the item's anchor, and set `tabIndex={-1}` on the section so focus moves
- * correctly in screen readers.
- *
- * Note: a responsive mobile variant will be added once a TEDI-Ready `Accordion`
- * exists; for now the card renders at every breakpoint.
- */
 const TableOfContentsComponent = (props: TableOfContentsProps): JSX.Element => {
   const { getLabel } = useLabels();
   const {
     children,
-    heading = getLabel('table-of-contents.title'),
+    heading,
     activeId,
     showIcons = false,
     numbered = false,
     sticky = true,
+    variant = 'default',
+    padding,
     className,
   } = props;
+
+  const resolvedHeading = heading === undefined ? getLabel('table-of-contents.title') : heading;
 
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
@@ -142,22 +160,39 @@ const TableOfContentsComponent = (props: TableOfContentsProps): JSX.Element => {
     [activeId, showIcons, numbered, activeTrail]
   );
 
-  const card = (
-    <Card className={cn(sticky && styles['tedi-table-of-contents--sticky'], className)}>
-      <CardContent padding={0}>
-        <TableOfContentsList nodes={nodes} heading={heading} />
-      </CardContent>
-    </Card>
+  const rootStyle =
+    padding !== undefined ? ({ '--tedi-table-of-contents-padding': `${padding}rem` } as CSSProperties) : undefined;
+
+  const list = (
+    <div
+      className={cn(styles['tedi-table-of-contents'], {
+        [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
+      })}
+      style={rootStyle}
+    >
+      <TableOfContentsList nodes={nodes} heading={resolvedHeading} />
+    </div>
   );
+
+  const surfaceClassName = cn({ [styles['tedi-table-of-contents--sticky']]: sticky }, className);
+
+  const surface =
+    variant === 'transparent' ? (
+      <div className={surfaceClassName}>{list}</div>
+    ) : (
+      <Card className={surfaceClassName}>
+        <CardContent padding={0}>{list}</CardContent>
+      </Card>
+    );
 
   return (
     <TableOfContentsContext.Provider value={contextValue}>
       {sticky ? (
         <Affix position="sticky" top={1.5} bottom={1.5}>
-          {card}
+          {surface}
         </Affix>
       ) : (
-        card
+        surface
       )}
     </TableOfContentsContext.Provider>
   );

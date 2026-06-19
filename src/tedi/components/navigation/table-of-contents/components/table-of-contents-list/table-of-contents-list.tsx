@@ -1,14 +1,15 @@
+import cn from 'classnames';
 import { useContext, useId } from 'react';
 
-import { useLabels } from '../../../providers/label-provider';
-import { Heading } from '../../base/typography/heading/heading';
-import { TableOfContentsContext, type TableOfContentsNode } from './table-of-contents';
-import styles from './table-of-contents.module.scss';
-import { TableOfContentsRow } from './table-of-contents-row';
+import { useLabels } from '../../../../../providers/label-provider';
+import { Heading } from '../../../../base/typography/heading/heading';
+import { TableOfContentsContext, type TableOfContentsNode } from '../../table-of-contents';
+import styles from '../../table-of-contents.module.scss';
+import { TableOfContentsRow } from '../table-of-contents-row/table-of-contents-row';
 
 export interface TableOfContentsListProps {
   nodes: TableOfContentsNode[];
-  heading?: string;
+  heading?: string | null;
 }
 
 export const TableOfContentsList = ({ nodes, heading }: TableOfContentsListProps): JSX.Element => {
@@ -28,7 +29,11 @@ export const TableOfContentsList = ({ nodes, heading }: TableOfContentsListProps
         aria-labelledby={heading ? headingId : undefined}
         aria-label={heading ? undefined : getLabel('table-of-contents.title')}
       >
-        <List className={styles['tedi-table-of-contents__list']}>
+        <List
+          className={cn(styles['tedi-table-of-contents__list'], {
+            [styles['tedi-table-of-contents__list--headless']]: !heading,
+          })}
+        >
           {nodes.map((node, index) => (
             <TableOfContentsRow key={node.id ?? index} node={node} depth={1} index={index} />
           ))}
