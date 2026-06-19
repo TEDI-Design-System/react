@@ -951,6 +951,33 @@ import { TopNav } from '@tedi-design-system/react/tedi';
 
 Sub-component: `Skeleton.Block`
 
+### ProgressBar
+
+**Props:** `ProgressBarProps` | bp
+
+- `value?: number = 0` — clamped to `0..100`; `NaN` treated as `0`
+- `id?: string` — forwarded to the bar (auto-generated when omitted)
+- `small?: boolean = false` — 4px bar (default 8px)
+- `label?: string`, `labelPosition?: 'top' | 'horizontal' = 'top'`, `required?: boolean = false`
+- `showValue?: boolean = true`, `valuePosition?: 'horizontal' | 'bottom' = 'horizontal'`
+- `valueLabel?: string` — override the rendered % (e.g. `"1 / 5"`); also exposed via `aria-valuetext`
+- `ariaLabel?: string` — falls back to `label`
+- `helper?: FeedbackTextProps` — hint or error row rendered below the bar
+- `className?: string`
+
+Renders `role="progressbar"` with `aria-valuenow / aria-valuemin / aria-valuemax`. Pair with `label` (or `ariaLabel`) for the accessible name. Error / hint rows use the shared `FeedbackText` component.
+
+**Breakpoint support:** the layout props — `small`, `labelPosition`, `showValue`, `valuePosition`, `valueLabel`, `helper`, `className` — accept per-breakpoint overrides via `sm`/`md`/`lg`/`xl`/`xxl` (mobile-first: a bare value is the `xs` baseline; `defaultServerBreakpoint?` sets the SSR baseline). e.g. stack label/value below the bar on mobile, inline from `md` up. `value`, `label`, `required`, `ariaLabel`, `id` are not breakpoint-aware.
+
+```tsx
+<ProgressBar value={60} label="Upload progress" />
+<ProgressBar value={20} label="Step" valueLabel="1 / 5" />
+<ProgressBar value={50} label="Upload" helper={{ text: 'Upload failed', type: 'error' }} />
+
+// Responsive: stacked on mobile, inline from md up
+<ProgressBar value={40} label="Upload" valuePosition="bottom" md={{ labelPosition: 'horizontal', valuePosition: 'horizontal' }} />
+```
+
 ## Navigation
 
 ### Link
@@ -1013,6 +1040,35 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
   <Link href="/patients/anna/visits/2024-05-12">2024-05-12</Link>
   <span aria-current="page">Restrictions</span>
 </Breadcrumbs>
+```
+
+### HorizontalStepper
+**Props:** `HorizontalStepperProps` | fRef
+- `children: ReactNode` (required) — `HorizontalStepper.Item` elements; the parent auto-numbers the steps
+- `aria-label?: string` — accessible name for the `<nav>` landmark
+- `background?: 'default' | 'transparent' = 'default'`
+- `compact?: boolean | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' = 'sm'` — collapse to indicators + the selected label (`true` = always; a breakpoint = collapse below it)
+- `className?: string`
+
+**`HorizontalStepper.Item`** — `HorizontalStepperItemProps` | fRef
+- `label: string` (required), `description?: string`
+- `completed?: boolean`, `error?: boolean` (error wins over completed), `selected?: boolean`, `disabled?: boolean`
+- `onSelect?: () => void` — fires on click unless `selected` or `disabled`
+
+```tsx
+import { HorizontalStepper } from '@tedi-design-system/react/tedi';
+
+<HorizontalStepper aria-label="Form progress">
+  {steps.map((label, i) => (
+    <HorizontalStepper.Item
+      key={label}
+      label={label}
+      completed={i < current}
+      selected={i === current}
+      onSelect={() => setCurrent(i)}
+    />
+  ))}
+</HorizontalStepper>
 ```
 
 ### Pagination

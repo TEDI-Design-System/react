@@ -98,6 +98,11 @@ const meta: Meta<typeof Stepper> = {
   title: 'Community/Stepper',
   subcomponents: { Step } as never,
   render: Template,
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;
