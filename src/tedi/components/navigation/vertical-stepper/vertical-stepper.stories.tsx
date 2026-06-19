@@ -59,9 +59,6 @@ export const Default: Story = {
   ),
 };
 
-/**
- * Steps with a `description` line.
- */
 export const WithDescriptions: Story = {
   render: () => (
     <Frame>
@@ -85,9 +82,6 @@ export const WithDescriptions: Story = {
   ),
 };
 
-/**
- * Steps with an `info` slot holding a `StatusBadge`.
- */
 export const WithStatusBadges: Story = {
   render: () => (
     <Frame>
@@ -110,9 +104,6 @@ export const WithStatusBadges: Story = {
   ),
 };
 
-/**
- * An `info` slot can hold an action — e.g. a `Button`.
- */
 export const WithButton: Story = {
   render: () => (
     <Frame>
@@ -135,9 +126,6 @@ export const WithButton: Story = {
   ),
 };
 
-/**
- * An `info` slot can hold a `Link` for supplementary navigation.
- */
 export const WithLinks: Story = {
   render: () => (
     <Frame>
@@ -169,10 +157,6 @@ export const WithLinks: Story = {
   ),
 };
 
-/**
- * Compact density — smaller indicators and tighter rows. Completed / error
- * steps show their state icon inside the indicator instead of the number.
- */
 export const Compact: Story = {
   render: () => (
     <Frame>

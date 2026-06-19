@@ -57,10 +57,6 @@ export const Default: Story = {
   render: () => <CardStepper steps={STEPS_NO_DESC} activeStep={2} labels={ET_LABELS} aria-label="Taotluse sammud" />,
 };
 
-/**
- * `showStepNumber={false}` drops the step-number ring — the title sits on its own
- * with the counter and step-list button.
- */
 export const WithoutStepNumber: Story = {
   render: () => (
     <CardStepper
@@ -104,11 +100,6 @@ export const WithoutProgressbar: Story = {
   ),
 };
 
-/**
- * `showStatusIcon` adds a status icon next to the active step's title — a success
- * check when the step's `state` is `'completed'`, a danger icon when it's
- * `'error'`. Other states show no icon.
- */
 export const WithStatusIcon: Story = {
   render: () => (
     <VerticalSpacing size={1}>
@@ -140,11 +131,6 @@ export const WithStatusIcon: Story = {
   ),
 };
 
-/**
- * `infoPosition="bottom"` (the default) renders the active step's `description`
- * below its title. Shown with a plain layout, with navigation arrows and with the
- * number ring — matching the Figma "with info bottom" variants.
- */
 export const WithInfoBottom: Story = {
   render: () => {
     const INFO_BOTTOM_STEPS: CardStepperStepProps[] = [
@@ -181,13 +167,6 @@ export const WithInfoBottom: Story = {
   },
 };
 
-/**
- * `infoPosition="top"` renders the active step's `description` as a small line above
- * its title. The `N / M` counter can also float above the title with
- * `counterPosition="top"` (it then leaves the trailing controls). Both compose with
- * the number ring, navigation arrows or a plain layout — matching the Figma "with
- * info top" variants.
- */
 export const WithInfoTop: Story = {
   render: () => {
     const INFO_TOP_STEPS: CardStepperStepProps[] = [
@@ -235,13 +214,6 @@ export const WithInfoTop: Story = {
   },
 };
 
-/**
- * A per-step `bottomSlot` renders custom content at the bottom of the card for the
- * active step — only the active step's slot is shown. It composes with any other
- * variant (with or without the progress bar / navigation arrows). The Figma spec
- * shows four uses: a warning `Alert`, a success `Alert`, an expandable "read more"
- * (`Collapse`) and an action `Button`.
- */
 export const WithBottomSlot: Story = {
   render: () => {
     const slotSteps = (slot: ReactNode): CardStepperStepProps[] => [
