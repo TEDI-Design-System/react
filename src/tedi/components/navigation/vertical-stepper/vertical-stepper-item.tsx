@@ -33,18 +33,18 @@ export interface VerticalStepperItemProps {
    */
   current?: boolean;
   /**
-   * Navigates when set; renders the title as an anchor. Ignored when the step
-   * has sub-steps (`children`) — then the title toggles the sub-step list instead.
+   * Navigates when set; renders the title as an anchor. Works for steps with
+   * sub-steps too — the title navigates and a separate toggle expands the list.
    */
   href?: string;
   /**
-   * Click handler. Without `href` the title renders as a `<button>`. Ignored
-   * when the step has sub-steps.
+   * Click handler. Without `href` the title renders as a `<button>`. Works for
+   * steps with sub-steps too (alongside the expand toggle).
    */
   onClick?: (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
   /**
    * Element used for the interactive title. Defaults to `'a'` when `href` is set,
-   * otherwise `'button'`. Ignored for `disabled` steps and steps with sub-steps.
+   * otherwise `'button'`. Ignored for `disabled` steps.
    */
   as?: 'a' | 'button';
   /**
@@ -103,7 +103,7 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
   const subListId = `tedi-vertical-stepper-sublist-${generatedId}`;
   const hasChildren = React.Children.count(children) > 0;
   const isDisabled = state === 'disabled';
-  const isInteractive = !isDisabled && !hasChildren && (href !== undefined || onClick !== undefined);
+  const isInteractive = !isDisabled && (href !== undefined || onClick !== undefined);
   const Element: 'a' | 'button' = as ?? (href ? 'a' : 'button');
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen ?? false);
@@ -173,10 +173,21 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
 
   const info_ = info && <div className={styles['tedi-vertical-stepper__info']}>{info}</div>;
 
-  // Put `aria-current` on the focusable link/button when the step is interactive
-  // so it's announced on focus (Tab), not only in browse mode; otherwise keep it
-  // on the `<li>` (static steps, and expandable steps whose toggle is a `Collapse`).
   const ariaCurrent = current ? 'step' : undefined;
+
+  const interactiveTitle = isInteractive ? (
+    <Element
+      href={Element === 'a' ? href : undefined}
+      type={Element === 'button' ? 'button' : undefined}
+      onClick={onClick}
+      aria-current={ariaCurrent}
+      className={styles['tedi-vertical-stepper__link']}
+    >
+      {titleNode}
+    </Element>
+  ) : (
+    titleNode
+  );
 
   return (
     <li aria-current={isInteractive ? undefined : ariaCurrent} className={itemBEM}>
@@ -185,7 +196,7 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
         {hasChildren ? (
           <>
             <div className={styles['tedi-vertical-stepper__toggle']}>
-              {titleNode}
+              {interactiveTitle}
               <Collapse
                 id={`${subListId}-toggle`}
                 iconOnly
@@ -205,19 +216,7 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
           </>
         ) : (
           <>
-            {isInteractive ? (
-              <Element
-                href={Element === 'a' ? href : undefined}
-                type={Element === 'button' ? 'button' : undefined}
-                onClick={onClick}
-                aria-current={ariaCurrent}
-                className={styles['tedi-vertical-stepper__link']}
-              >
-                {titleNode}
-              </Element>
-            ) : (
-              titleNode
-            )}
+            {interactiveTitle}
             {description_}
             {info_}
           </>

@@ -57,6 +57,23 @@ export const Default: Story = {
   render: () => <CardStepper steps={STEPS_NO_DESC} activeStep={2} labels={ET_LABELS} aria-label="Taotluse sammud" />,
 };
 
+const MANY_STEPS: CardStepperStepProps[] = [
+  { title: 'Kutse', state: 'completed' },
+  { title: 'Tahteavaldus', state: 'completed' },
+  { title: 'Geenianalüüs' },
+  { title: 'Vastus' },
+  ...Array.from({ length: 8 }, (_, i) => ({ title: `Samm ${i + 5}` })),
+];
+
+/**
+ * A longer flow — open the step-list button to see the full numbered step list in the modal
+ * (completed steps show a check, the current step is highlighted).
+ */
+export const ManySteps: Story = {
+  name: 'Many steps (open the list)',
+  render: () => <CardStepper steps={MANY_STEPS} activeStep={2} labels={ET_LABELS} aria-label="Geeniuuringu sammud" />,
+};
+
 export const WithoutStepNumber: Story = {
   render: () => (
     <CardStepper

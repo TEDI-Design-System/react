@@ -1114,7 +1114,7 @@ const [page, setPage] = useState(1);
 ```
 
 ### VerticalStepper
-Compound vertical wizard / progress stepper. Sub-components: `VerticalStepper.Item` (auto-numbered) and `VerticalStepper.SubItem`. A step with sub-steps becomes an expandable disclosure (the title toggles the list); a leaf step is a link/button, or plain text when `disabled`.
+Compound vertical wizard / progress stepper. Sub-components: `VerticalStepper.Item` (auto-numbered) and `VerticalStepper.SubItem`. A step is a link/button when `href`/`onClick` is set (plain text when `disabled`); a step with sub-steps adds a separate expand toggle next to the title, so the title can still navigate.
 
 **`VerticalStepper`** — `VerticalStepperProps` | fRef (`<ol>`)
 - `children: ReactNode` (required) — `Item`s (+ optional `Separator`s)
@@ -1125,7 +1125,7 @@ Compound vertical wizard / progress stepper. Sub-components: `VerticalStepper.It
 - `title: ReactNode` (required), `description?: ReactNode`
 - `state?: 'default' | 'completed' | 'error' | 'disabled' = 'default'`
 - `current?: boolean` — active step (blue ring, `aria-current="step"`); independent from `state`
-- `href?` / `onClick?` / `as?: 'a' | 'button'` — leaf navigation (ignored when the step has sub-steps or is `disabled`)
+- `href?` / `onClick?` / `as?: 'a' | 'button'` — makes the title a link/button; works for steps with sub-steps too (title navigates, a separate toggle expands). Ignored when `disabled`.
 - `info?: ReactNode` — trailing asset under the title (`StatusBadge`, `Link`, `Button`, `Text`)
 - `children?: ReactNode` — `SubItem`s; makes the step expandable
 - `open?` / `defaultOpen?` / `onToggle?` — controlled / uncontrolled sub-step disclosure

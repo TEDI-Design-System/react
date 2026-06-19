@@ -8,7 +8,7 @@ import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Separator } from '../../misc/separator/separator';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
-import { CardStepper, CardStepperStepProps } from '../card-stepper/card-stepper';
+import { CardStepper, CardStepperStepProps } from '../card-stepper';
 import { Link } from '../link/link';
 import { VerticalStepper } from './vertical-stepper';
 import { VerticalStepperItem, VerticalStepperItemProps } from './vertical-stepper-item';

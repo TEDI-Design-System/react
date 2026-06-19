@@ -255,30 +255,32 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
           </span>
         )}
 
-        {showTopRow && (
-          <div className={styles['tedi-card-stepper__top']}>
-            {counterPosition === 'top' && counterNode}
-            {showTopDescription && descriptionNode}
-          </div>
-        )}
-
-        <Text element={headingElement} id={headingId} modifiers="h4" className={styles['tedi-card-stepper__title']}>
-          {current.title}
-          {showStatusIcon && (current.state === 'completed' || current.state === 'error') && (
-            <Icon
-              name={current.state === 'completed' ? 'check' : 'error'}
-              color={current.state === 'completed' ? 'success' : 'danger'}
-              size={16}
-              display="inline"
-              label={getLabel(current.state === 'completed' ? 'stepper.completed' : 'stepper.error')}
-              className={styles['tedi-card-stepper__status-icon']}
-            />
+        <div className={styles['tedi-card-stepper__body']}>
+          {showTopRow && (
+            <div className={styles['tedi-card-stepper__top']}>
+              {counterPosition === 'top' && counterNode}
+              {showTopDescription && descriptionNode}
+            </div>
           )}
-        </Text>
 
-        {infoPosition === 'bottom' && descriptionNode && (
-          <div className={styles['tedi-card-stepper__description-bottom']}>{descriptionNode}</div>
-        )}
+          <Text element={headingElement} id={headingId} modifiers="h4" className={styles['tedi-card-stepper__title']}>
+            {current.title}
+            {showStatusIcon && (current.state === 'completed' || current.state === 'error') && (
+              <Icon
+                name={current.state === 'completed' ? 'check' : 'error'}
+                color={current.state === 'completed' ? 'success' : 'danger'}
+                size={18}
+                display="inline"
+                label={getLabel(current.state === 'completed' ? 'stepper.completed' : 'stepper.error')}
+                className={styles['tedi-card-stepper__status-icon']}
+              />
+            )}
+          </Text>
+
+          {infoPosition === 'bottom' && descriptionNode && (
+            <div className={styles['tedi-card-stepper__description-bottom']}>{descriptionNode}</div>
+          )}
+        </div>
 
         <div className={styles['tedi-card-stepper__trail']}>
           {counterPosition === 'inline' && counterNode}

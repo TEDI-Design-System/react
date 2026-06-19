@@ -123,6 +123,23 @@ describe('VerticalStepper', () => {
     expect(screen.getByText('Child B')).toBeInTheDocument();
   });
 
+  it('lets a parent step be a link alongside its expand toggle', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title="Parent" href="/parent">
+          <VerticalStepper.SubItem title="Child A" />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    // The title navigates...
+    expect(screen.getByRole('link', { name: /Parent/ })).toHaveAttribute('href', '/parent');
+    // ...while a separate toggle expands the sub-steps.
+    const toggle = screen.getByRole('button', { name: /Parent/ });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggle);
+    expect(screen.getByText('Child A')).toBeInTheDocument();
+  });
+
   it('supports a controlled open sub-step list via open + onToggle', () => {
     const onToggle = jest.fn();
     render(
