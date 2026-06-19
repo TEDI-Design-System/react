@@ -66,7 +66,7 @@ export interface CollapseButtonProps
   'aria-label'?: string;
 }
 
-const CollapseButtonComponent = (props: CollapseButtonProps): JSX.Element => {
+const CollapseButtonComponent = React.forwardRef<HTMLButtonElement, CollapseButtonProps>((props, ref): JSX.Element => {
   const {
     open,
     onOpenChange,
@@ -111,6 +111,7 @@ const CollapseButtonComponent = (props: CollapseButtonProps): JSX.Element => {
 
   return (
     <button
+      ref={ref}
       type="button"
       {...rest}
       className={hostClass}
@@ -140,7 +141,7 @@ const CollapseButtonComponent = (props: CollapseButtonProps): JSX.Element => {
       )}
     </button>
   );
-};
+});
 
 CollapseButtonComponent.displayName = 'CollapseButton';
 
