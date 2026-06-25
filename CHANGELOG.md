@@ -1,3 +1,10 @@
+# [18.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.17...react-18.0.0-rc.18) (2026-06-25)
+
+
+### Features
+
+* **card-button:** new tedi-ready component [#21](https://github.com/TEDI-Design-System/react/issues/21) ([#686](https://github.com/TEDI-Design-System/react/issues/686)) ([7d98085](https://github.com/TEDI-Design-System/react/commit/7d980855ddcf3d4ad77c273465a543a62d8d5572))
+
 # [18.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.16...react-18.0.0-rc.17) (2026-06-25)
 
 
