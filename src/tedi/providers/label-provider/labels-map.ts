@@ -81,14 +81,14 @@ export const labelsMap = validateDefaultLabels({
   },
   close: {
     description: 'Used for closing',
-    components: ['CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
+    components: ['Accordion', 'CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
     et: 'Sulge',
     en: 'Close',
     ru: 'Закрыть',
   },
   open: {
     description: 'Used for opening',
-    components: ['Collapse'],
+    components: ['Accordion', 'Collapse'],
     et: 'Ava',
     en: 'Open',
     ru: 'Открыть',
@@ -106,6 +106,27 @@ export const labelsMap = validateDefaultLabels({
     et: 'Tühista',
     en: 'Cancel',
     ru: 'Отмена',
+  },
+  'time-field.modal-title': {
+    description: 'Title of the mobile time-picker modal opened by TimeField',
+    components: ['TimeField'],
+    et: 'Kellaaeg',
+    en: 'Time',
+    ru: 'Время',
+  },
+  'time-field.cancel': {
+    description: 'Cancel button label inside the time-picker modal',
+    components: ['TimeField'],
+    et: 'Tühista',
+    en: 'Cancel',
+    ru: 'Отмена',
+  },
+  'time-field.confirm': {
+    description: 'Confirm button label inside the time-picker modal',
+    components: ['TimeField'],
+    et: 'Kinnita',
+    en: 'Confirm',
+    ru: 'Подтвердить',
   },
   clear: {
     description: 'For clearing a value',
@@ -584,6 +605,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Lõpetamata',
     en: 'Not completed',
     ru: 'Не завершено',
+  },
+  'stepper.error': {
+    description: 'Label for screen-reader that this step has errors (visually hidden)',
+    components: ['StepperNav'],
+    et: 'Vigane',
+    en: 'Has errors',
+    ru: 'Содержит ошибки',
   },
   'skeleton.loading': {
     description: 'Announced by screen-readers when skeleton is loading',

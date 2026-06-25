@@ -233,7 +233,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof ComponentName> = {
   component: ComponentName,
-  title: 'TEDI-Ready/Components/Category/ComponentName',
+  title: 'TEDI-Ready/Components/Category/ComponentName', // Content/Layout/Base groups skip the Components/ segment
   parameters: {
     status: { type: [{ name: 'breakpointSupport', url: '...' }] },
     design: { type: 'figma', url: 'https://www.figma.com/...' },
