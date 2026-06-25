@@ -5,6 +5,7 @@
 
 .tedi-attachment {
   display: flex;
+  gap: var(--layout-grid-gutters-08);
   align-items: center;
   width: 100%;
   text-align: left;
@@ -55,9 +56,10 @@
   overflow-wrap: anywhere;
 }
 
-.tedi-attachment__invalid-icon {
+.tedi-attachment .tedi-attachment__invalid-icon {
   flex-shrink: 0;
   margin-left: var(--layout-grid-gutters-08);
+  color: var(--status-badge-text-danger);
 }
 
 .tedi-attachment__progress {

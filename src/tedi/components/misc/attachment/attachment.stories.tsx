@@ -9,7 +9,8 @@ import { Tooltip } from '../../overlays/tooltip';
 import { Attachment, AttachmentProps } from './attachment';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.59.78?node-id=30427-154342&m=dev" target="_blank">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.59.78?node-id=30427-154342&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/125c5a-attachment" target="_blank">Zeroheight ↗</a>
  *
  * A file-attachment row: a file name (with optional size, leading icon or upload
  * progress) on a tertiary surface. Action buttons (download, delete, …) are **not**
@@ -20,6 +21,15 @@ import { Attachment, AttachmentProps } from './attachment';
 const meta: Meta<AttachmentProps> = {
   component: Attachment,
   title: 'TEDI-Ready/Components/Helpers/Attachment',
+  args: {
+    name: 'Kodukülastusakt_Triin.pdf',
+  },
+  argTypes: {
+    // `icon` is a Material icon name (string). Force a text control so Storybook
+    // doesn't infer an object editor for the `string | null` union — picking `{}`
+    // there renders an object as a React child and throws.
+    icon: { control: 'text' },
+  },
   parameters: {
     design: {
       type: 'figma',
@@ -31,10 +41,10 @@ const meta: Meta<AttachmentProps> = {
 export default meta;
 type Story = StoryObj<AttachmentProps>;
 
-const action = (icon: string, label: string, size?: 'small'): JSX.Element => (
+const action = (icon: string, label: string): JSX.Element => (
   <Tooltip>
     <Tooltip.Trigger>
-      <Button visualType="neutral" size={size} icon={{ name: icon, size: 18 }}>
+      <Button visualType="neutral" icon={{ name: icon, size: 18 }}>
         {label}
       </Button>
     </Tooltip.Trigger>
@@ -47,7 +57,7 @@ const downloadAction = action('download', 'Laadi alla');
 
 const renderWithDelete: StoryFn<AttachmentProps> = (args) => (
   <div style={{ maxWidth: 480 }}>
-    <Attachment {...args} name="Kodukülastusakt_Triin.pdf" actions={deleteAction} />
+    <Attachment {...args} actions={deleteAction} />
   </div>
 );
 
@@ -137,8 +147,7 @@ export const WithoutDeleteButton: StoryFn<AttachmentProps> = () => (
 
 /**
  * Pass any combination of neutral icon buttons to the `actions` slot — view,
- * download, delete, or a mix. The last row uses `size="small"` buttons alongside a
- * progress bar.
+ * download, delete, or a mix. The last row pairs the actions with a progress bar.
  */
 export const WithDifferentActions: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
@@ -171,8 +180,8 @@ export const WithDifferentActions: StoryFn<AttachmentProps> = () => (
         progress={34}
         actions={
           <>
-            {action('download', 'Laadi alla', 'small')}
-            {action('delete', 'Kustuta', 'small')}
+            {downloadAction}
+            {deleteAction}
           </>
         }
       />

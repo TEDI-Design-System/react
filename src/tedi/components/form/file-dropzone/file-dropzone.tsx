@@ -17,23 +17,25 @@ export type FileDropzoneAttachmentProps =
   | ((file: FileUploadFile) => Partial<Omit<AttachmentProps, 'name'>>);
 
 export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLabel'>, UseFileUploadProps {
-  /*
+  /**
    * Additional CSS class names to apply to the dropzone for custom styling
    */
   className?: string;
-  /*
+  /**
    * The name attribute for the file input, used for form submission and identifying the field.
    */
   name: string;
-  /*
+  /**
    * The text label displayed for the file dropzone, providing context for users.
+   * Defaults to the `LabelProvider`'s localised `file-dropzone.label` (e.g. "Lohista
+   * failid siia või klõpsa, et sirvida" in Estonian).
    */
-  label: string;
-  /*
+  label?: string;
+  /**
    * Provides helper text or feedback (such as an error or instruction message) to guide the user.
    */
   helper?: FeedbackTextProps;
-  /*
+  /**
    * Disables the file dropzone, preventing user interaction.
    */
   disabled?: boolean;

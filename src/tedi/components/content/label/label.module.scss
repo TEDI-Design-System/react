@@ -23,4 +23,8 @@
     margin-left: var(--content-label-inner-spacing-x);
     color: var(--form-general-feedback-error-border);
   }
+
+  &__info {
+    margin-left: var(--layout-grid-gutters-08);
+  }
 }

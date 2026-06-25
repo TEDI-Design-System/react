@@ -4,7 +4,7 @@ import { Col, Row } from '../../layout/grid';
 import { FileDropzone, FileDropzoneProps } from './file-dropzone';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4536-78765&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.63.78?node-id=11335-185781&m=dev" target="_BLANK">Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/70876f-file-dropzone" target="_BLANK">Zeroheight ↗</a>
  */
 

@@ -119,7 +119,7 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>((props, re
             {invalid && (
               <Icon
                 name="error"
-                color="danger"
+                color="inherit"
                 display="inline"
                 size={18}
                 className={styles['tedi-attachment__invalid-icon']}

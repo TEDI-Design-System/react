@@ -688,8 +688,12 @@ Key props:
 
 **Props:** `FileDropzoneProps`
 
-- `label: string` (required)
-- `accept?: string`, `multiple?: boolean`, `maxSize?: number`
+- `name: string` (required) — input name for form submission
+- `label?: string` — defaults to the localised `file-dropzone.label` (`LabelProvider`)
+- `helper?: FeedbackTextProps`, `disabled?: boolean`
+- `accept?: string`, `multiple?: boolean`, `maxSize?: number` (MB), `validateIndividually?: boolean`
+- `defaultFiles?` / `files?` (controlled) `: FileUploadFile[]`, `onChange?`, `onDelete?`
+- `attachmentProps?: Partial<Omit<AttachmentProps, 'name'>> | ((file) => …)` — overrides forwarded to each rendered `Attachment` (e.g. `icon`, `fileSize`, `feedback`); pass a function to vary per file. `FileDropzone` sets `name`, `isValid`, `isLoading` and always appends the remove button to the `actions` slot itself.
 
 ## Layout
 
@@ -1326,7 +1330,7 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `name: string` (required) — file label
 - `feedback?: FeedbackTextProps` — hint / error rendered below the card, wired via `aria-describedby`
 - `fileSize?: string` — pre-formatted size string (e.g. `'1.2 MB'`); rendered inline before the action area. Format on the consumer side.
-- `icon?: string | null = 'description'` — left file-type glyph; pass `null` to omit
+- `icon?: string | null` — left file-type glyph (Material icon name); omitted → no icon
 - `actions?: ReactNode` — all action controls (download / view / **delete** / …) in the right-hand action area. There's no dedicated remove prop — put a delete `Button` here. The row is never a single clickable target — give each affordance its own focusable button. Action `Button`s default to `visualType="neutral"` (per the design); the slot stays open, so set `visualType` explicitly to use any other type.
 - `isLoading?: boolean = false` — shows an inline `ProgressBar`; `progress?: number = 0` (0..100); `progressLabel?: string` — hint text under the bar
 - `isValid?: boolean` — `false` flips to the danger surface and adds an error glyph next to the name
