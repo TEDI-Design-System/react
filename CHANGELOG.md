@@ -1,3 +1,10 @@
+# [18.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.16...react-18.0.0-rc.17) (2026-06-25)
+
+
+### Features
+
+* **accordion:** add new TEDI-Ready component [#74](https://github.com/TEDI-Design-System/react/issues/74) ([#666](https://github.com/TEDI-Design-System/react/issues/666)) ([69aa2ad](https://github.com/TEDI-Design-System/react/commit/69aa2ad3d9bfcc07de7a4bb29044c46dccfd08a6))
+
 # [18.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.15...react-18.0.0-rc.16) (2026-06-25)
 
 
