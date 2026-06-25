@@ -1,3 +1,17 @@
+# [18.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.15...react-18.0.0-rc.16) (2026-06-25)
+
+
+### Features
+
+* **time-field:** add modal opener functionality [#641](https://github.com/TEDI-Design-System/react/issues/641) ([#674](https://github.com/TEDI-Design-System/react/issues/674)) ([d040ffe](https://github.com/TEDI-Design-System/react/commit/d040ffe1f26544b14ca3223a024beb24891d569f)), closes [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75)
+
+# [18.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.14...react-18.0.0-rc.15) (2026-06-18)
+
+
+### Features
+
+* **horizontal-stepper:** new tedi-ready component [#15](https://github.com/TEDI-Design-System/react/issues/15) ([#671](https://github.com/TEDI-Design-System/react/issues/671)) ([0a92aff](https://github.com/TEDI-Design-System/react/commit/0a92affd3700303e9f7f6398615b49fee3f4b77c))
+
 # [18.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.13...react-18.0.0-rc.14) (2026-06-18)
 
 

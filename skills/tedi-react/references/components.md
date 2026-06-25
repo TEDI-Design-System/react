@@ -92,6 +92,27 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 - `arrowType: 'default' | 'secondary' = 'default'`
 - `iconOnly?: boolean`
 
+### CollapseButton
+
+Standalone toggle button for expanding and collapsing content. Fully controlled — the parent owns `open` and listens to `onOpenChange`.
+
+**Props:** `CollapseButtonProps`
+
+- `open: boolean` (required) — current open state
+- `onOpenChange?: (next: boolean) => void` — fires after a click, receives the next open state
+- `openText?: string`, `closeText?: string` — labels shown next to the chevron, rendered literally. When omitted, fall back to the `LabelProvider`'s translated `'open'` / `'close'` keys. Translate at the call site if you need a localised override.
+- `hideText?: boolean = false` — icon-only mode
+- `arrowType?: 'default' | 'secondary' = 'default'` — chevron style (only takes effect in icon-only mode)
+- `size?: 'default' | 'small' = 'default'`
+- `inverted?: boolean = false` — light text + icon for dark / brand backgrounds (ignored when `arrowType === 'secondary'`)
+- `underline?: boolean = true` — underline the visible text label (no effect in icon-only mode)
+- `aria-label?: string` — required when `hideText` is `true`; falls back to the resolved open/close text
+
+```tsx
+const [open, setOpen] = useState(false);
+<CollapseButton open={open} onOpenChange={setOpen} openText="Show details" closeText="Hide details" />
+```
+
 ### FloatingButton
 
 **Props:** `FloatingButtonProps`
@@ -127,6 +148,96 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
   <Card.Header>Title</Card.Header>
   <Card.Content>Body</Card.Content>
 </Card>
+```
+
+### Accordion
+Compound component for collapsible content. The item owns the expand state and the layout flags that affect both header and content (`selected`, `showIconCard`, `defaultExpanded`); the header and content sub-components own their own appearance.
+
+**Props:** `AccordionProps` | bp
+- `children?: ReactNode` — one or more `Accordion.Item` components
+- `allowMultiple?: boolean = false` — allow several items expanded simultaneously
+- `defaultExpanded?: boolean = false` — group-level default; per-item `defaultExpanded` (including explicit `false`) takes precedence
+- `itemGap?: number` — vertical gap between sibling items, in **rem** (matches TEDI's layout-spacing convention; scales with user font-size). Any number is accepted. Forwarded as the `--tedi-accordion-item-gap` CSS variable — consumers needing an exact-pixel override can set that variable directly on a class. Defaults to the design-token value `var(--layout-grid-gutters-08)` (0.5rem) when omitted.
+- `className?: string`
+
+Breakpoint-aware: `allowMultiple`, `defaultExpanded`, `itemGap`, and `className` can each be overridden per breakpoint via `sm`, `md`, `lg`, `xl`, `xxl` (e.g. `<Accordion allowMultiple lg={{ allowMultiple: false }}>`). `defaultServerBreakpoint?: Breakpoint` controls which variant renders during SSR before the real viewport size is known.
+
+Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Content`
+
+#### Accordion.Item
+**Props:** `AccordionItemProps`
+- `children?: ReactNode` — must include an `Accordion.Item.Header` and an `Accordion.Item.Content`
+- `defaultExpanded?: boolean` — falls back to the parent Accordion's `defaultExpanded`, then `false`
+- `expanded?: boolean`, `onToggle?: (expanded: boolean) => void` — controlled mode (omit for uncontrolled)
+- `showIconCard?: boolean = false`, `iconCard?: ReactNode` — left icon-card layout (only rendered when `showIconCard`)
+- `selected?: boolean = false` — visual 'selected' state
+- `disabled?: boolean = false` — header trigger becomes non-interactive (native `disabled`); current expanded state is preserved
+- `id?: string` — stable id for ARIA wiring (auto-generated via `React.useId()` if omitted). Also used by `openOnHashMatch`.
+- `openOnHashMatch?: boolean = false` — when `id` is set and `window.location.hash === '#<id>'`, auto-expands the item. Listens to `hashchange` so in-page navigation also opens the matching item. Requires an explicit `id`; no-op otherwise.
+
+#### Accordion.Item.Header
+**Props:** `AccordionItemHeaderProps`
+- `title?: ReactNode` — title content (string or node)
+- `headerClickable?: boolean = true` — when `false`, the header is a non-interactive container and a separate `Link` is rendered as the toggle (use this when projecting interactive children like buttons or checkboxes into the header)
+- `titleLayout?: 'hug' | 'fill' = 'hug'` — `fill` pushes trailing elements to the end
+- `openText?: string`, `closeText?: string` — rendered literally. When omitted, the trigger falls back to the `LabelProvider`'s translated `'open'` / `'close'` keys. Translate at the call site if you need a localised override.
+- `showExpandLabel?: boolean = true`
+- `showDefaultExpandAction?: boolean = true` — set `false` and provide a custom `endAction` to fully replace the default toggle
+- `expandActionPosition?: 'start' | 'end' = 'end'`
+- `expandActionArrowType?: 'default' | 'secondary' = 'default'` — chevron style passthrough to the underlying `CollapseButton`. Only effective when `headerClickable` is `false` and `showExpandLabel` is `false` (icon-only mode).
+- `expandActionSize?: 'default' | 'small'` — size passthrough to the underlying `CollapseButton`. Only effective when `headerClickable` is `false`. When omitted, derived from `showExpandLabel` (true → `default`, false → `small`).
+- `expandActionInverted?: boolean = false` — inverted palette passthrough. Only effective when `headerClickable` is `false`.
+- `expandActionUnderline?: boolean = false` — underline the default expand action's text. Only effective when `headerClickable` is `false` and `showExpandLabel` is `true`.
+- `headerClass?: string` — appended to the header host (useful for class-based theming via inherited properties like `font-weight`, `background`, etc.)
+- `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — wraps the trigger in a semantic `<h1>`–`<h6>` element per WAI-ARIA Accordion Pattern. Wrapper uses `display: contents` so it doesn't affect layout. Recommended for docs / FAQ pages where the accordion participates in the document outline.
+- **Slot props (`ReactNode`):** `beforeTitle`, `afterTitle`, `startAction`, `endAction`, `startDescription`, `endDescription`
+
+#### Accordion.Item.Content
+**Props:** `AccordionItemContentProps`
+- `children?: ReactNode` — collapsible body
+- `contentClass?: string` — appended to the content host
+
+**Mobile icon-card layout:** below the `md` breakpoint (`< 768px`), items with `showIconCard` stack the icon-card *above* the header instead of placing it in a left column — phone-sized viewports can't fit both side-by-side without truncating the icon-card text or the header content. Borders and corner radii are redistributed accordingly. No prop needed; the rule is applied via `media-breakpoint-down(md)`.
+
+**Print:** the accordion uses a `@media print` rule that forces every item to expand on paper so collapsed content isn't lost. No prop needed.
+
+```tsx
+<Accordion allowMultiple>
+  <Accordion.Item>
+    <Accordion.Item.Header
+      title="Section 1"
+      afterTitle={<StatusBadge color="success">New</StatusBadge>}
+    />
+    <Accordion.Item.Content>Body content for section 1.</Accordion.Item.Content>
+  </Accordion.Item>
+  <Accordion.Item>
+    <Accordion.Item.Header title="Section 2" />
+    <Accordion.Item.Content>Body content for section 2.</Accordion.Item.Content>
+  </Accordion.Item>
+</Accordion>
+
+// Open all items by default (per-item override still works)
+<Accordion allowMultiple defaultExpanded>
+  <Accordion.Item>...</Accordion.Item>
+  <Accordion.Item defaultExpanded={false}>...</Accordion.Item>  {/* stays closed */}
+</Accordion>
+
+// Custom toggle: external "Show more / Show less" via controlled mode
+const [expanded, setExpanded] = useState(false);
+
+<Accordion.Item expanded={expanded} onToggle={setExpanded}>
+  <Accordion.Item.Header
+    headerClickable={false}
+    showDefaultExpandAction={false}
+    title="Profile"
+    endAction={
+      <Button visualType="neutral" onClick={() => setExpanded((v) => !v)}>
+        {expanded ? 'Show less' : 'Show more'}
+      </Button>
+    }
+  />
+  <Accordion.Item.Content>...</Accordion.Item.Content>
+</Accordion.Item>
 ```
 
 ## Content
@@ -545,6 +656,8 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
+- `modal?: boolean | Breakpoint = false` — open the picker in a modal instead of the popover (`true` always, a breakpoint name → modal *below* that breakpoint)
+- `modalProps?: Omit<ModalContentProps, 'children'>` — escape hatch forwarded to the picker modal's `Modal.Content` (e.g. `size`, `width`, `maxWidth`, `position`, `fullscreen`, per-breakpoint overrides); overrides the `small`/`xs` defaults, `className` is merged. Only applies when the picker opens as a modal
 - `className?: string`
 - **Breakpoint-aware:** `useNativePicker?: boolean = false` (swap to `<input type="time">`; ignores `availableTimes`), `showPicker?: boolean = true`, `timePickerTrigger?: 'input' | 'button' = 'button'`, `availableTimesVariant?: 'grid-buttons' | 'grid-radio' | 'dropdown'` — which variant the picker renders when `availableTimes` is set
 
@@ -563,6 +676,15 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 
 // Native picker on mobile, custom wheel on desktop
 <TimeField id="alarm" label="Alarm" useNativePicker md={{ useNativePicker: false }} />
+
+// Open in a modal below `md`, and tune that modal via modalProps
+<TimeField
+  id="booking"
+  label="Time"
+  modal="md"
+  timePickerTrigger="input"
+  modalProps={{ size: 'small', width: 'sm', position: 'center', fullscreen: 'sm' }}
+/>
 ```
 
 ### TimePicker
@@ -1371,8 +1493,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ## Cards
 
-### Accordion
-
+### Accordion — **DEPRECATED** (use TEDI-Ready Accordion)
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
