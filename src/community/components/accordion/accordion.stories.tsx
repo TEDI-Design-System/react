@@ -15,6 +15,11 @@ const meta: Meta<typeof Accordion> = {
   component: Accordion,
   subcomponents: { AccordionItem, AccordionItemContent, AccordionItemHeader } as never,
   title: 'Community/Accordion',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 const ACCORDION_ITEM_CONTENT =

@@ -81,14 +81,14 @@ export const labelsMap = validateDefaultLabels({
   },
   close: {
     description: 'Used for closing',
-    components: ['CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
+    components: ['Accordion', 'CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
     et: 'Sulge',
     en: 'Close',
     ru: 'Закрыть',
   },
   open: {
     description: 'Used for opening',
-    components: ['Collapse'],
+    components: ['Accordion', 'Collapse'],
     et: 'Ava',
     en: 'Open',
     ru: 'Открыть',
