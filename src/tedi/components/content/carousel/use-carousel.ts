@@ -24,7 +24,7 @@ export interface CarouselConfig {
 
 const DEFAULT_CONFIG: CarouselConfig = {
   slidesPerView: { xs: 1 },
-  gap: { xs: 16 },
+  gap: { xs: 1 },
   fade: false,
   transitionMs: 400,
   loop: true,
@@ -79,6 +79,7 @@ export const useCarousel = (): CarouselApi => {
   const [windowBase, setWindowBase] = useState(0);
   const [animate, setAnimate] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
+  const [rootFontSize, setRootFontSize] = useState(16);
   const [announcement, setAnnouncement] = useState('');
 
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -111,6 +112,8 @@ export const useCarousel = (): CarouselApi => {
     [config.slidesPerView, breakpoint]
   );
   const currentGap = useMemo(() => resolveBreakpointValue(config.gap, breakpoint), [config.gap, breakpoint]);
+  // `currentGap` is in rem (used for CSS); `currentGapPx` is its px value for the layout math.
+  const currentGapPx = useMemo(() => currentGap * rootFontSize, [currentGap, rootFontSize]);
 
   const loop = config.loop;
 
@@ -146,28 +149,29 @@ export const useCarousel = (): CarouselApi => {
   }, [slidesCount, buffer, currentSlidesPerView, windowBase, loop]);
 
   const slideFlex = useMemo(
-    () => `0 0 calc((100% - ${(currentSlidesPerView - 1) * currentGap}px) / ${currentSlidesPerView})`,
+    () => `0 0 calc((100% - ${(currentSlidesPerView - 1) * currentGap}rem) / ${currentSlidesPerView})`,
     [currentSlidesPerView, currentGap]
   );
 
   const trackStyle = useMemo<CSSProperties>(() => {
     if (!viewportWidth) {
-      return { gap: `${currentGap}px`, transform: 'translate3d(0,0,0)', transition: 'none' };
+      return { gap: `${currentGap}rem`, transform: 'translate3d(0,0,0)', transition: 'none' };
     }
-    const totalGapWidth = currentGap * (currentSlidesPerView - 1);
+    const totalGapWidth = currentGapPx * (currentSlidesPerView - 1);
     const slideWidth = (viewportWidth - totalGapWidth) / currentSlidesPerView;
     const offsetSlides = loop ? trackIndex - windowBase + buffer : trackIndex;
     const peek = config.centered ? (viewportWidth - slideWidth) / 2 : 0;
-    const translateX = -offsetSlides * (slideWidth + currentGap) + peek;
+    const translateX = -offsetSlides * (slideWidth + currentGapPx) + peek;
 
     return {
-      gap: `${currentGap}px`,
+      gap: `${currentGap}rem`,
       transform: `translate3d(${translateX}px, 0, 0)`,
       transition: animate ? `transform ${config.transitionMs}ms ease` : 'none',
     };
   }, [
     viewportWidth,
     currentGap,
+    currentGapPx,
     currentSlidesPerView,
     trackIndex,
     windowBase,
@@ -291,8 +295,8 @@ export const useCarousel = (): CarouselApi => {
   }, []);
 
   const cellWidth = useCallback((): number => {
-    return (viewportWidth - currentGap * (currentSlidesPerView - 1)) / currentSlidesPerView + currentGap;
-  }, [viewportWidth, currentGap, currentSlidesPerView]);
+    return (viewportWidth - currentGapPx * (currentSlidesPerView - 1)) / currentSlidesPerView + currentGapPx;
+  }, [viewportWidth, currentGapPx, currentSlidesPerView]);
 
   const onWheel = useCallback(
     (event: React.WheelEvent<HTMLDivElement>): void => {
@@ -430,9 +434,14 @@ export const useCarousel = (): CarouselApi => {
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    setViewportWidth(viewport.clientWidth);
 
-    const observer = new ResizeObserver(() => setViewportWidth(viewport.clientWidth));
+    const measure = (): void => {
+      setViewportWidth(viewport.clientWidth);
+      setRootFontSize(parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+    };
+    measure();
+
+    const observer = new ResizeObserver(measure);
     observer.observe(viewport);
     return () => observer.disconnect();
   }, []);

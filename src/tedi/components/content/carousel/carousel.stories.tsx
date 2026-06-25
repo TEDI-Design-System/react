@@ -661,7 +661,7 @@ export const BoundedOverlayNavigation: Story = {
   name: 'Bounded - overlay arrows (no loop)',
   render: () => (
     <Carousel>
-      <Carousel.Content slidesPerView={{ xs: 2, sm: 3, md: 4, lg: 6 }} gap={8} loop={false}>
+      <Carousel.Content slidesPerView={{ xs: 2, sm: 3, md: 4, lg: 6 }} gap={0.5} loop={false}>
         {MAP_ITEMS.map((item) => (
           <MapCard key={item.id} {...item} />
         ))}

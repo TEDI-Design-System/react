@@ -60,8 +60,7 @@ export const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsP
                   {slideIndex + 1}
                 </Text>
                 <Text element="span" color="tertiary">
-                  {' '}
-                  / {slidesCount}
+                  {` / ${slidesCount}`}
                 </Text>
               </div>
             )}

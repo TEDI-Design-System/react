@@ -18,8 +18,8 @@ export interface CarouselContentProps {
    */
   slidesPerView?: BreakpointInput<number>;
   /**
-   * Gap between slides in px. Accepts a number or per-breakpoint object.
-   * @default 16
+   * Gap between slides in rem. Accepts a number or per-breakpoint object.
+   * @default 1
    */
   gap?: BreakpointInput<number>;
   /**
@@ -60,7 +60,7 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
     {
       children,
       slidesPerView = 1,
-      gap = 16,
+      gap = 1,
       fade = false,
       transitionMs = 400,
       loop = true,

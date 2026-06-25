@@ -141,7 +141,7 @@ Sub-components: `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`, `Carou
 **`Carousel.Content`** | fRef
 - `children` — each direct child is one slide
 - `slidesPerView?: number | { xs; sm?; md?; lg?; xl?; xxl? } = 1` — can be fractional (e.g. `1.25`) for peeking; per-breakpoint object supported
-- `gap?: number | BreakpointObject<number> = 16` — px gap between slides
+- `gap?: number | BreakpointObject<number> = 1` — gap between slides in rem
 - `fade?: boolean | 'right' | 'both' = false` — fade edges. `true`: right edge for multi-view, both edges for single. `'right'`: always right. `'both'`: always both, regardless of slide count
 - `transitionMs?: number = 400`
 - `loop?: boolean = true` — set `false` for a finite/bounded carousel: navigation stops at the first/last slide, prev/next disable at the bounds, and slides render once (no looping duplicates)
@@ -181,7 +181,7 @@ import { Carousel } from '@tedi-design-system/react/tedi';
 
 // Finite / bounded with edge-mounted overlay arrows (replaces the deprecated Community map carousel)
 <Carousel>
-  <Carousel.Content slidesPerView={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={10} loop={false}>
+  <Carousel.Content slidesPerView={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={0.5} loop={false}>
     {items.map((item) => (
       <MyCard key={item.id} {...item} />
     ))}
