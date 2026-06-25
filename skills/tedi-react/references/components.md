@@ -545,6 +545,8 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
+- `modal?: boolean | Breakpoint = false` — open the picker in a modal instead of the popover (`true` always, a breakpoint name → modal *below* that breakpoint)
+- `modalProps?: Omit<ModalContentProps, 'children'>` — escape hatch forwarded to the picker modal's `Modal.Content` (e.g. `size`, `width`, `maxWidth`, `position`, `fullscreen`, per-breakpoint overrides); overrides the `small`/`xs` defaults, `className` is merged. Only applies when the picker opens as a modal
 - `className?: string`
 - **Breakpoint-aware:** `useNativePicker?: boolean = false` (swap to `<input type="time">`; ignores `availableTimes`), `showPicker?: boolean = true`, `timePickerTrigger?: 'input' | 'button' = 'button'`, `availableTimesVariant?: 'grid-buttons' | 'grid-radio' | 'dropdown'` — which variant the picker renders when `availableTimes` is set
 
@@ -563,6 +565,15 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 
 // Native picker on mobile, custom wheel on desktop
 <TimeField id="alarm" label="Alarm" useNativePicker md={{ useNativePicker: false }} />
+
+// Open in a modal below `md`, and tune that modal via modalProps
+<TimeField
+  id="booking"
+  label="Time"
+  modal="md"
+  timePickerTrigger="input"
+  modalProps={{ size: 'small', width: 'sm', position: 'center', fullscreen: 'sm' }}
+/>
 ```
 
 ### TimePicker
