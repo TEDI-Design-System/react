@@ -1,16 +1,17 @@
 /* eslint-disable react/display-name */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { PropsWithChildren } from 'react';
 
 import { CardStepper, CardStepperStepProps } from './card-stepper';
 
 import '@testing-library/jest-dom';
 
 jest.mock('../../overlays/modal/modal', () => {
-  const Modal = ({ open, children }: any) => (open ? <div role="dialog">{children}</div> : null);
-  Modal.Content = ({ children }: any) => <div>{children}</div>;
-  Modal.Header = ({ children }: any) => <h2>{children}</h2>;
-  Modal.Body = ({ children }: any) => <div>{children}</div>;
+  const Modal = ({ open, children }: PropsWithChildren<{ open?: boolean }>) =>
+    open ? <div role="dialog">{children}</div> : null;
+  Modal.Content = ({ children }: PropsWithChildren) => <div>{children}</div>;
+  Modal.Header = ({ children }: PropsWithChildren) => <h2>{children}</h2>;
+  Modal.Body = ({ children }: PropsWithChildren) => <div>{children}</div>;
   return { Modal };
 });
 
@@ -69,6 +70,12 @@ describe('CardStepper', () => {
     );
     expect(screen.getByRole('button', { name: 'stepper.previous' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'stepper.next' }));
+    expect(onStepChange).toHaveBeenCalledWith(1);
+
+    rerender(
+      <CardStepper steps={STEPS} activeStep={2} showNavigation onStepChange={onStepChange} aria-label="Wizard" />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'stepper.previous' }));
     expect(onStepChange).toHaveBeenCalledWith(1);
 
     rerender(
@@ -134,6 +141,17 @@ describe('CardStepper', () => {
     expect(within(dialog).queryByRole('button', { name: /Done/ })).not.toBeInTheDocument();
   });
 
+  it('also allows the immediately-next step when allowJump="completed-or-next"', () => {
+    render(<CardStepper steps={STEPS} activeStep={1} allowJump="completed-or-next" aria-label="Wizard" />);
+    fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
+    const dialog = screen.getByRole('dialog');
+    // Completed step (index 0) and the step right after the active one (index 2) are clickable…
+    expect(within(dialog).getByRole('button', { name: /Personal data/ })).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: /Review/ })).toBeInTheDocument();
+    // …a later step is not.
+    expect(within(dialog).queryByRole('button', { name: /Done/ })).not.toBeInTheDocument();
+  });
+
   it('skips disabled steps with the arrows and disables them in the list', () => {
     const onStepChange = jest.fn();
     const steps: CardStepperStepProps[] = [
@@ -149,6 +167,19 @@ describe('CardStepper', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
     expect(within(screen.getByRole('dialog')).queryByRole('button', { name: /Two/ })).not.toBeInTheDocument();
+  });
+
+  it('makes no step clickable in the list when allowJump={false}', () => {
+    render(<CardStepper steps={STEPS} activeStep={1} allowJump={false} aria-label="Wizard" />);
+    fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).queryByRole('button', { name: /Personal data/ })).not.toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: /Review/ })).not.toBeInTheDocument();
+  });
+
+  it('renders nothing when there are no steps', () => {
+    const { container } = render(<CardStepper steps={[]} aria-label="Wizard" />);
+    expect(container.querySelector('.tedi-card-stepper')).not.toBeInTheDocument();
   });
 
   it('renders the title with the configured heading element', () => {

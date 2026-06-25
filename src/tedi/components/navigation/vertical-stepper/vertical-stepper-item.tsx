@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useId, useState } from 'react';
+import React, { forwardRef, useId, useState } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
@@ -79,7 +79,7 @@ export interface VerticalStepperItemProps {
   index?: number;
 }
 
-export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Element => {
+export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItemProps>((props, ref) => {
   const { getLabel } = useLabels();
   const { compact } = useVerticalStepperContext();
   const {
@@ -190,7 +190,7 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
   );
 
   return (
-    <li aria-current={isInteractive ? undefined : ariaCurrent} className={itemBEM}>
+    <li ref={ref} aria-current={isInteractive ? undefined : ariaCurrent} className={itemBEM}>
       {indicator}
       <div className={styles['tedi-vertical-stepper__content']}>
         {hasChildren ? (
@@ -224,7 +224,7 @@ export const VerticalStepperItem = (props: VerticalStepperItemProps): JSX.Elemen
       </div>
     </li>
   );
-};
+});
 
 VerticalStepperItem.displayName = 'VerticalStepperItem';
 

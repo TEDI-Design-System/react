@@ -1,4 +1,5 @@
 import { fireEvent, render as rtlRender, screen, within } from '@testing-library/react';
+import { createRef } from 'react';
 
 import { PrintingProvider } from '../../../providers/printing-provider/printing-provider';
 import { VerticalStepper } from './vertical-stepper';
@@ -31,15 +32,15 @@ describe('VerticalStepper', () => {
   });
 
   it('marks the active step with aria-current="step"', () => {
-    const { container } = render(
+    render(
       <VerticalStepper>
         <VerticalStepper.Item title="First" state="completed" />
         <VerticalStepper.Item title="Second" current />
       </VerticalStepper>
     );
-    const current = container.querySelector('[aria-current="step"]');
+    // getByRole enforces a single match, so this also asserts only one current step.
+    const current = screen.getByRole('listitem', { current: 'step' });
     expect(current).toHaveTextContent('Second');
-    expect(container.querySelectorAll('[aria-current="step"]')).toHaveLength(1);
   });
 
   it('puts aria-current on the focusable link for an interactive current step', () => {
@@ -194,5 +195,107 @@ describe('VerticalStepper', () => {
     const region = screen.getByText('Filled by official');
     expect(within(region.closest('li') as HTMLElement).queryByRole('button')).not.toBeInTheDocument();
     expect(within(region.closest('li') as HTMLElement).queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders an interactive sub-item as a link (href) or button (onClick) and marks current on the focusable element', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title="Parent" defaultOpen>
+          <VerticalStepper.SubItem title="Linked" href="/sub" current />
+          <VerticalStepper.SubItem title="Clicked" onClick={() => undefined} />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    const link = screen.getByRole('link', { name: /Linked/ });
+    expect(link).toHaveAttribute('href', '/sub');
+    expect(link).toHaveAttribute('aria-current', 'step');
+    expect(link.closest('li')).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('button', { name: /Clicked/ })).toBeInTheDocument();
+  });
+
+  it('shows the completed / error glyphs on sub-items and keeps a disabled sub-item non-interactive', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title="Parent" defaultOpen>
+          <VerticalStepper.SubItem title="Done sub" state="completed" onClick={() => undefined} />
+          <VerticalStepper.SubItem title="Error sub" state="error" onClick={() => undefined} />
+          <VerticalStepper.SubItem title="Off sub" state="disabled" onClick={() => undefined} />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    expect(screen.getByRole('img', { name: 'stepper.completed' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'stepper.error' })).toBeInTheDocument();
+    const off = screen.getByText('Off sub').closest('li') as HTMLElement;
+    expect(within(off).queryByRole('button')).not.toBeInTheDocument();
+    expect(within(off).getByText(/stepper\.disabled/)).toBeInTheDocument();
+  });
+
+  it('renders sub-item info slot content', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title="Parent" defaultOpen>
+          <VerticalStepper.SubItem title="Sub" info={<span>sub detail</span>} />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    expect(screen.getByText('sub detail')).toBeInTheDocument();
+  });
+
+  it('shows the error icon inside the indicator in compact mode', () => {
+    render(
+      <VerticalStepper compact>
+        <VerticalStepper.Item title="Err" state="error" />
+      </VerticalStepper>
+    );
+    expect(screen.getByRole('img', { name: 'stepper.error' })).toBeInTheDocument();
+  });
+
+  it('renders an empty indicator (no number, no glyph) for a default step in compact mode', () => {
+    const { container } = render(
+      <VerticalStepper compact>
+        <VerticalStepper.Item title="Plain" />
+      </VerticalStepper>
+    );
+    expect(container.querySelector('.tedi-vertical-stepper__number')).not.toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('passes non-Item children (e.g. a separator) through unchanged and only numbers items', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title="One" />
+        <hr />
+        <VerticalStepper.Item title="Two" />
+      </VerticalStepper>
+    );
+    expect(screen.getByRole('separator')).toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+  });
+
+  it('forwards refs to the underlying <li> of an item and a sub-item', () => {
+    const itemRef = createRef<HTMLLIElement>();
+    const subItemRef = createRef<HTMLLIElement>();
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item ref={itemRef} title="Parent" defaultOpen>
+          <VerticalStepper.SubItem ref={subItemRef} title="Child" />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    expect(itemRef.current).toBeInstanceOf(HTMLLIElement);
+    expect(subItemRef.current).toBeInstanceOf(HTMLLIElement);
+  });
+
+  it('supports a non-string parent title (the toggle derives no text label)', () => {
+    render(
+      <VerticalStepper>
+        <VerticalStepper.Item title={<span>Node title</span>} defaultOpen>
+          <VerticalStepper.SubItem title="Child" />
+        </VerticalStepper.Item>
+      </VerticalStepper>
+    );
+    expect(screen.getByText('Node title')).toBeInTheDocument();
+    expect(screen.getByText('Child')).toBeInTheDocument();
   });
 });
