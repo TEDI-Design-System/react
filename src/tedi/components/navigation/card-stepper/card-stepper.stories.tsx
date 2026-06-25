@@ -1,9 +1,13 @@
 import { Meta, StoryObj } from '@storybook/react';
-import { ReactNode, useState } from 'react';
+import { type CSSProperties, ReactNode, useState } from 'react';
 
+import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
+import { CardButton } from '../../buttons/card-button/card-button';
 import { Collapse } from '../../buttons/collapse/collapse';
+import { Card } from '../../cards/card/card';
+import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Alert } from '../../notifications/alert/alert';
 import { CardStepper } from './card-stepper';
@@ -26,8 +30,8 @@ const meta: Meta<typeof CardStepper> = {
     },
   },
   decorators: [
-    (Story) => (
-      <div style={{ maxWidth: 360 }}>
+    (Story, context) => (
+      <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 360 }}>
         <Story />
       </div>
     ),
@@ -308,4 +312,250 @@ export const Interactive: Story = {
       </CardStepper>
     );
   },
+};
+
+type ButtonStepState = 'completed' | 'current' | 'upcoming';
+
+const stepIndicatorStyle = (state: ButtonStepState): CSSProperties => {
+  const base: CSSProperties = {
+    display: 'flex',
+    flexShrink: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '1.5rem',
+    height: '1.5rem',
+    borderRadius: '50%',
+    fontSize: 'var(--body-small-size)',
+    lineHeight: 1,
+  };
+  if (state === 'completed') {
+    return {
+      ...base,
+      color: 'var(--general-text-white)',
+      backgroundColor: 'var(--stepper-step-completed-bg)',
+      border: 'var(--tedi-borders-01) solid var(--stepper-step-completed-bg)',
+    };
+  }
+  if (state === 'current') {
+    return {
+      ...base,
+      color: 'var(--stepper-item-vertical-text-selected)',
+      backgroundColor: 'var(--stepper-step-selected-bg)',
+      border: 'var(--tedi-borders-02) solid var(--stepper-step-selected-border)',
+    };
+  }
+  return {
+    ...base,
+    color: 'var(--stepper-item-vertical-text-disabled)',
+    backgroundColor: 'var(--stepper-step-disabled-bg)',
+    border: 'var(--tedi-borders-01) solid var(--stepper-step-disabled-border)',
+  };
+};
+
+const BUTTON_STEPS = [
+  { title: 'Minu andmed' },
+  { title: 'Tervise ajalugu' },
+  { title: 'Analüüside tulemused', description: 'Täidab meditsiini töötaja', trailing: '15p' },
+  { title: 'Harjumused' },
+  { title: 'Praegune terviseseisund' },
+  { title: 'Ülevaade' },
+];
+
+interface StepCardProps {
+  index: number;
+  state: ButtonStepState;
+  title: string;
+  description?: string;
+  trailing?: string;
+  onClick?: () => void;
+}
+
+const StepCard = ({ index, state, title, description, trailing, onClick }: StepCardProps): JSX.Element => (
+  <CardButton disabled={state === 'upcoming'} onClick={onClick} aria-current={state === 'current' ? 'step' : undefined}>
+    <Card>
+      <Card.Content>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--layout-grid-gutters-08)' }}>
+          {/* align the number with the title line (not centered against title + description) */}
+          <span aria-hidden="true" style={{ ...stepIndicatorStyle(state), alignSelf: 'flex-start' }}>
+            {index}
+          </span>
+          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--layout-grid-gutters-04)' }}>
+              <Text element="span" modifiers="bold">
+                {title}
+              </Text>
+              {state === 'completed' && <Icon name="check" color="success" size={18} display="inline" />}
+            </div>
+            {description && (
+              <Text element="span" modifiers="small" color="tertiary">
+                {description}
+              </Text>
+            )}
+          </div>
+          {trailing && (
+            <Text element="span" modifiers="small" color="tertiary">
+              {trailing}
+            </Text>
+          )}
+          <Icon name="arrow_right_alt" color="secondary" />
+        </div>
+      </Card.Content>
+    </Card>
+  </CardButton>
+);
+
+/**
+ * The "button cards" form of a stepper: instead of one compact `CardStepper` card, each step is its
+ * own clickable `CardButton` (step-number ring + title; completed steps show a check, the current
+ * step its description / timing, upcoming steps are disabled). Composed in the story — there's no
+ * built-in component for it.
+ */
+export const CardStepperButton: Story = {
+  name: 'Card stepper button',
+  render: function CardStepperButtonExample() {
+    const [active, setActive] = useState(2);
+
+    return (
+      <div style={{ maxWidth: 420 }}>
+        <VerticalSpacing size={0.5}>
+          {BUTTON_STEPS.map((step, index) => {
+            const state: ButtonStepState = index < active ? 'completed' : index === active ? 'current' : 'upcoming';
+            return (
+              <StepCard
+                key={step.title}
+                index={index + 1}
+                state={state}
+                title={step.title}
+                description={step.description}
+                trailing={step.trailing}
+                onClick={() => setActive(index)}
+              />
+            );
+          })}
+        </VerticalSpacing>
+      </div>
+    );
+  },
+};
+
+type ButtonStepSemantic = 'default' | 'error' | 'success';
+
+const semanticIndicatorStyle = (semantic: ButtonStepSemantic, disabled = false): CSSProperties => {
+  const base: CSSProperties = {
+    display: 'flex',
+    flexShrink: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '1.5rem',
+    height: '1.5rem',
+    borderRadius: '50%',
+    fontSize: 'var(--body-small-size)',
+    lineHeight: 1,
+  };
+  if (disabled) {
+    // Disabled overrides the semantic colour — the number ring goes muted/grey.
+    return {
+      ...base,
+      color: 'var(--stepper-item-vertical-text-disabled)',
+      backgroundColor: 'var(--stepper-step-disabled-bg)',
+      border: 'var(--tedi-borders-01) solid var(--stepper-step-disabled-border)',
+    };
+  }
+  if (semantic === 'error') {
+    return {
+      ...base,
+      color: 'var(--general-text-white)',
+      backgroundColor: 'var(--stepper-step-danger-bg)',
+      border: 'var(--tedi-borders-01) solid var(--stepper-step-danger-bg)',
+    };
+  }
+  if (semantic === 'success') {
+    return {
+      ...base,
+      color: 'var(--general-text-white)',
+      backgroundColor: 'var(--stepper-step-completed-bg)',
+      border: 'var(--tedi-borders-01) solid var(--stepper-step-completed-bg)',
+    };
+  }
+  return {
+    ...base,
+    color: 'var(--general-text-secondary)',
+    backgroundColor: 'var(--stepper-step-default-bg)',
+    border: 'var(--tedi-borders-01) solid var(--stepper-step-default-border)',
+  };
+};
+
+const SEMANTIC_COLUMNS: { key: ButtonStepSemantic; label: string }[] = [
+  { key: 'default', label: 'Default' },
+  { key: 'error', label: 'Has error' },
+  { key: 'success', label: 'Success' },
+];
+
+const BUTTON_STATE_ROWS = ['Default', 'Hover', 'Active', 'Focus', 'Disabled'] as const;
+
+const stateStepCard = (semantic: ButtonStepSemantic, row: (typeof BUTTON_STATE_ROWS)[number]): JSX.Element => (
+  <CardButton data-pseudo={row} disabled={row === 'Disabled'}>
+    <Card>
+      <Card.Content>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--layout-grid-gutters-08)' }}>
+          <span aria-hidden="true" style={semanticIndicatorStyle(semantic, row === 'Disabled')}>
+            1
+          </span>
+          <div
+            style={{
+              display: 'flex',
+              flex: 1,
+              alignItems: 'center',
+              gap: 'var(--layout-grid-gutters-04)',
+              minWidth: 0,
+            }}
+          >
+            <Text element="span" modifiers="bold">
+              Minu andmed
+            </Text>
+            {semantic === 'error' && <Icon name="error" color="danger" size={18} display="inline" />}
+            {semantic === 'success' && <Icon name="check" color="success" size={18} display="inline" />}
+          </div>
+          <Icon name="arrow_right_alt" color="secondary" />
+        </div>
+      </Card.Content>
+    </Card>
+  </CardButton>
+);
+
+export const CardStepperButtonStates: Story = {
+  name: 'Card stepper button states',
+  parameters: {
+    fullWidth: true,
+    pseudo: {
+      hover: '[data-pseudo="Hover"]',
+      active: '[data-pseudo="Active"]',
+      focusVisible: '[data-pseudo="Focus"]',
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={1}>
+      <Row alignItems="center">
+        <Col xs={12} md={2} />
+        {SEMANTIC_COLUMNS.map((column) => (
+          <Col key={column.key} xs={12} md={3}>
+            <Text modifiers="bold">{column.label}</Text>
+          </Col>
+        ))}
+      </Row>
+
+      {BUTTON_STATE_ROWS.map((row) => (
+        <Row key={row} alignItems="center">
+          <Col xs={12} md={2}>
+            <Text modifiers="bold">{row}</Text>
+          </Col>
+          {SEMANTIC_COLUMNS.map((column) => (
+            <Col key={column.key} xs={12} md={3}>
+              {stateStepCard(column.key, row)}
+            </Col>
+          ))}
+        </Row>
+      ))}
+    </VerticalSpacing>
+  ),
 };
