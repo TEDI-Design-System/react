@@ -16,7 +16,7 @@ export type FileDropzoneAttachmentProps =
   | Partial<Omit<AttachmentProps, 'name'>>
   | ((file: FileUploadFile) => Partial<Omit<AttachmentProps, 'name'>>);
 
-export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLabel'>, UseFileUploadProps {
+export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLabel' | 'label'>, UseFileUploadProps {
   /**
    * Additional CSS class names to apply to the dropzone for custom styling
    */
