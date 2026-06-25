@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 import React from 'react';
 
 import { FileUploadFile } from '../../../helpers';
+import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -22,6 +23,13 @@ const meta: Meta<typeof FileUpload> = {
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4536-78765&m=dev',
     },
   },
+  decorators: [
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
+  ],
 };
 
 export default meta;
@@ -50,14 +58,14 @@ export const Default: Story = {
   args: {
     id: 'file-upload',
     name: 'file',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
   },
 };
 
 export const Sizes: Story = {
   render: TemplateSizes,
   args: {
-    label: 'Label',
+    label: 'Silt',
   },
 };
 
@@ -65,9 +73,9 @@ export const WithHint: Story = {
   args: {
     id: 'file-upload',
     name: 'file',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     helper: {
-      text: 'JPG, PNG, PDF with size 0.001MB.',
+      text: 'JPG, PNG, PDF suurusega kuni 0.001 MB.',
     },
   },
 };
@@ -76,7 +84,7 @@ export const Disabled: Story = {
   args: {
     id: 'file-upload-disabled',
     name: 'file-loading',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     defaultFiles: [{ name: 'report.pdf' }],
     disabled: true,
   },
@@ -86,7 +94,7 @@ export const ValidationFailed: Story = {
   args: {
     id: 'file-upload-validation-failed',
     name: 'file-validation-failed',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     maxSize: 0.001,
     accept: '.pdf,.txt',
     multiple: true,
@@ -98,7 +106,7 @@ export const ValidationFailed: Story = {
       {...args}
       helper={{
         type: 'error',
-        text: 'Feedback text',
+        text: 'Tagasiside tekst',
       }}
     />
   ),
@@ -108,7 +116,7 @@ export const ValidationSuccess: Story = {
   args: {
     id: 'file-upload-validation-failed',
     name: 'file-validation-failed',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     maxSize: 0.001,
     accept: '.pdf,.txt',
     multiple: true,
@@ -120,7 +128,7 @@ export const ValidationSuccess: Story = {
       {...args}
       helper={{
         type: 'valid',
-        text: 'Feedback text',
+        text: 'Tagasiside tekst',
       }}
     />
   ),
@@ -130,7 +138,7 @@ export const MultipleWithIndividualValidation: Story = {
   args: {
     id: 'file-upload-multiple-individual-validation',
     name: 'file-multiple-individual-validation',
-    label: 'Upload files',
+    label: 'Laadi failid üles',
     multiple: true,
     maxSize: 0.01,
     accept: '.pdf,.txt',
@@ -144,7 +152,7 @@ export const MultipleWithIndividualValidation: Story = {
       { name: 'taotlus_scan_lk_5.pdf', isValid: false },
     ],
     helper: {
-      text: 'Only .pdf and .txt files under 1KB are allowed.',
+      text: 'Lubatud on ainult .pdf ja .txt failid suurusega kuni 1 KB.',
     },
   },
   render: (args) => (
@@ -155,7 +163,7 @@ export const MultipleWithIndividualValidation: Story = {
       }}
       helper={{
         type: 'error',
-        text: 'Invalid file uploaded. Only .pdf and .txt files are allowed, and must be under 1KB.',
+        text: 'Sobimatu fail. Lubatud on ainult .pdf ja .txt failid suurusega kuni 1 KB.',
       }}
     />
   ),
@@ -165,7 +173,7 @@ export const LoadingState: Story = {
   args: {
     id: 'file-upload-loading',
     name: 'file-loading',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     defaultFiles: [{ name: 'report.pdf', isLoading: true }, { name: 'report_1.pdf' }],
   },
 };
@@ -174,11 +182,11 @@ export const Multiple: Story = {
   args: {
     id: 'file-upload-MULTIPLE',
     name: 'file-multiple',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     multiple: true,
     defaultFiles: [{ name: 'report.pdf' }, { name: 'report_1.pdf' }, { name: 'report_2.pdf' }],
     helper: {
-      text: 'JPG, PNG, PDF with size 0.001MB.',
+      text: 'JPG, PNG, PDF suurusega kuni 0.001 MB.',
     },
   },
 };
@@ -188,7 +196,7 @@ export const MultipleHandled: Story = {
   args: {
     id: 'file-upload-handled',
     name: 'file-loading-handled',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     multiple: true,
     onDelete: (file) => {
       console.log(`Deleted - ${file.name}`);
@@ -200,7 +208,7 @@ export const ReadOnlyFiles: Story = {
   args: {
     id: 'file-upload-read-only',
     name: 'file-loading',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     defaultFiles: [{ name: 'report.pdf' }, { name: 'report_1.pdf' }, { name: 'report_2.pdf' }],
     onChange: (files) => {
       console.log(files);
@@ -213,7 +221,7 @@ export const PdfAndTxtOnly: Story = {
   args: {
     id: 'file-upload-accepts',
     name: 'file-accepts',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     accept: '.pdf,.txt',
   },
 };
@@ -222,7 +230,7 @@ export const SizeLimited: Story = {
   args: {
     id: 'file-upload-size-limited',
     name: 'file-size-limited',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     maxSize: 0.001,
     multiple: true,
   },
@@ -232,7 +240,7 @@ export const ExtensionAndSizeLimit: Story = {
   args: {
     id: 'file-upload-size-extension-limited',
     name: 'file-size-extension-limited',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     maxSize: 0.001,
     accept: '.pdf,.txt',
     multiple: true,
@@ -252,9 +260,9 @@ export const ControlledClearing: Story = {
         <FileUpload {...args} files={files} onChange={(f) => setFiles(f)} multiple />
 
         <div style={{ marginTop: '12px' }}>
-          <Button onClick={() => setFiles([])}>Save & Clear files</Button>
+          <Button onClick={() => setFiles([])}>Salvesta ja tühjenda failid</Button>
 
-          <pre>Files: {JSON.stringify(files, null, 2)}</pre>
+          <pre>Failid: {JSON.stringify(files, null, 2)}</pre>
         </div>
       </>
     );
@@ -262,7 +270,7 @@ export const ControlledClearing: Story = {
   args: {
     id: 'file-upload-clear-controlled',
     name: 'file-upload-clear-controlled',
-    label: 'Upload file',
+    label: 'Laadi fail üles',
     hasClearButton: true,
   },
 };
