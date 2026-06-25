@@ -92,6 +92,34 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 - `arrowType: 'default' | 'secondary' = 'default'`
 - `iconOnly?: boolean`
 
+### CardButton
+
+Import: `import { CardButton } from '@tedi-design-system/react/tedi';`
+
+Polymorphic interactive wrapper around a `Card`. Renders a `<button>` by default (`as="a"` with `href` for navigation) and applies hover / active / focus / disabled states to the projected card and its blocks. Keep it to one `Card` and avoid nested interactive elements.
+
+**Props:** `CardButtonProps<C>` (polymorphic) | fRef
+
+- `as?: React.ElementType = 'button'` — host element; use `'a'` for navigation
+- `children?: ReactNode` — a single `<Card>` (with `Card.Content`, icons, separators, badges)
+- `className?: string`
+- plus the host element's native props (`type` defaults to `'button'`; `disabled` only on the button host; `href` on the anchor host)
+
+```tsx
+<CardButton onClick={openWorkAbility}>
+  <Card>
+    <Card.Content>
+      <Text element="span" modifiers="bold">Töövõime</Text>
+      <Icon name="arrow_right_alt" color="secondary" />
+    </Card.Content>
+  </Card>
+</CardButton>
+
+<CardButton as="a" href="/profile">
+  <Card>…</Card>
+</CardButton>
+```
+
 ### CollapseButton
 
 Standalone toggle button for expanding and collapsing content. Fully controlled — the parent owns `open` and listens to `onOpenChange`.

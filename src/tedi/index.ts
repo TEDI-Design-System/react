@@ -17,6 +17,7 @@ export * from './components/tags/status-badge/status-badge';
 export * from './components/tags/status-indicator/status-indicator';
 export * from './components/buttons/closing-button/closing-button';
 export * from './components/buttons/button/button';
+export * from './components/buttons/card-button/card-button';
 export * from './components/buttons/info-button/info-button';
 export * from './components/buttons/floating-button/floating-button';
 export * from './components/buttons/button-group/button-group';
