@@ -37,6 +37,9 @@ const meta: Meta<typeof OptionContent> = {
     'OptionContent.Meta': OptionContent.Meta,
   } as never,
   parameters: {
+    status: {
+      type: [{ name: 'devComponent' }],
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.56.78?node-id=9542-70948&m=dev',
@@ -462,10 +465,7 @@ export const InsidePopover: Story = {
   name: 'Inside a popover',
   render: function InsidePopoverExample() {
     const [darkMode, setDarkMode] = useState(false);
-    const rowPadding: React.CSSProperties = {
-      textAlign: 'left',
-      padding: 'var(--dropdown-item-padding-y) 0',
-    };
+    const navItems = ['Minu profiil', 'Esindatavad', 'Kontaktid'];
 
     return (
       <Popover>
@@ -476,30 +476,33 @@ export const InsidePopover: Story = {
         </Popover.Trigger>
 
         <Popover.Content width="none">
-          <div role="menu" style={{ display: 'flex', flexDirection: 'column', minWidth: 220 }}>
-            {['Minu profiil', 'Esindatavad', 'Kontaktid'].map((label) => (
-              <div key={label}>
-                <Button noStyle fullWidth role="menuitem" onClick={noop} style={rowPadding}>
+          {/* `DropdownItem` needs a `DropdownContext`; the popover supplies a static one so the
+              rows get the dropdown hover / active styling that `OptionContent` inherits. */}
+          <DropdownContext.Provider value={showcaseContext('default')}>
+            <div role="menu" style={{ display: 'flex', flexDirection: 'column', minWidth: 220 }}>
+              {navItems.map((label, index) => (
+                <DropdownItem key={label} index={index} role="menuitem" onClick={noop}>
                   <OptionContent>
                     <OptionContent.Label>{label}</OptionContent.Label>
                   </OptionContent>
-                </Button>
-                <Separator />
+                </DropdownItem>
+              ))}
+
+              <Separator />
+
+              <div style={{ padding: 'var(--dropdown-item-padding-y) var(--dropdown-item-padding-x)' }}>
+                <Toggle id="option-content-dark-mode" label="Tume režiim" checked={darkMode} onChange={setDarkMode} />
               </div>
-            ))}
 
-            <div style={{ padding: 'var(--dropdown-item-padding-y) 0' }}>
-              <Toggle id="option-content-dark-mode" label="Tume režiim" checked={darkMode} onChange={setDarkMode} />
+              <Separator />
+
+              <DropdownItem index={navItems.length} role="menuitem" onClick={noop}>
+                <OptionContent icon={{ name: 'logout', size: 16 }}>
+                  <OptionContent.Label>Logi välja</OptionContent.Label>
+                </OptionContent>
+              </DropdownItem>
             </div>
-
-            <Separator />
-
-            <Button noStyle fullWidth role="menuitem" onClick={noop} style={rowPadding}>
-              <OptionContent icon={{ name: 'logout', size: 16 }}>
-                <OptionContent.Label>Logi välja</OptionContent.Label>
-              </OptionContent>
-            </Button>
-          </div>
+          </DropdownContext.Provider>
         </Popover.Content>
       </Popover>
     );

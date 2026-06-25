@@ -70,13 +70,13 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-icon`}
-                  button={{ icon: 'search', size: value, 'aria-label': 'Search' }}
+                  button={{ icon: 'search', size: value, 'aria-label': 'Otsi' }}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-button`}
-                  button={{ iconLeft: 'search', children: 'Search', size: value }}
+                  button={{ iconLeft: 'search', children: 'Otsi', size: value }}
                 />
               </VerticalSpacing>
             </Col>
@@ -112,7 +112,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col className="display-flex align-items-center">
-          <Search {...textFieldProps} id={`${id}-success`} helper={{ text: 'Feedback text', type: 'valid' }} />
+          <Search {...textFieldProps} id={`${id}-success`} helper={{ text: 'Tagasiside tekst', type: 'valid' }} />
         </Col>
       </Row>
 
@@ -121,7 +121,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col className="display-flex align-items-center">
-          <Search {...textFieldProps} id={`${id}-error`} helper={{ text: 'Feedback text', type: 'error' }} />
+          <Search {...textFieldProps} id={`${id}-error`} helper={{ text: 'Tagasiside tekst', type: 'error' }} />
         </Col>
       </Row>
     </div>
@@ -131,8 +131,8 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 export const Default: Story = {
   args: {
     id: 'search-default',
-    label: 'Search',
-    placeholder: 'Search by name or keyword',
+    label: 'Otsing',
+    placeholder: 'Otsi nime või märksõna järgi',
   },
 };
 
@@ -140,7 +140,7 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
   render: TemplateColumn,
   args: {
     id: 'search-sizes',
-    label: 'Search',
+    label: 'Otsing',
     property: 'size',
     array: sizeArray,
   },
@@ -150,14 +150,14 @@ export const States: StoryObj<TemplateStateProps> = {
   render: TemplateColumnWithStates,
   args: {
     array: stateArray,
-    label: 'Search',
+    label: 'Otsing',
     id: 'search-states',
   },
   parameters: {
     pseudo: {
-      hover: '#Hover',
-      focus: '#Focus',
-      active: '#Active',
+      hover: '#search-states-hover',
+      focus: '#search-states-focus',
+      active: '#search-states-active',
     },
   },
 };
@@ -165,45 +165,43 @@ export const States: StoryObj<TemplateStateProps> = {
 export const Placeholder: Story = {
   args: {
     id: 'search-placeholder',
-    label: 'Search',
-    placeholder: 'Type something...',
+    label: 'Otsing',
+    placeholder: 'Trüki midagi…',
   },
 };
 
+/**
+ * With `isClearable`, a clear (×) button appears once the field has a value and empties it on click.
+ * Uses `defaultValue` (uncontrolled), so the clear button works on its own.
+ */
 export const Clearable: Story = {
   args: {
     id: 'search-clearable',
-    label: 'Search',
+    label: 'Otsing',
     isClearable: true,
-    value: 'Lorem ipsum',
+    defaultValue: 'Lorem ipsum',
   },
 };
 
-export const ClearableButton: Story = {
+/**
+ * Clearable field paired with a search button — the clear (×) empties the field; the button runs the search.
+ */
+export const ClearableWithButton: Story = {
+  name: 'Clearable with button',
   args: {
     id: 'search-clearable-button',
-    label: 'Search',
+    label: 'Otsing',
     isClearable: true,
-    value: 'Lorem ipsum',
-    button: { iconLeft: 'search', children: 'Search' },
+    defaultValue: 'Lorem ipsum',
+    button: { iconLeft: 'search', children: 'Otsi' },
   },
 };
 
 export const WithHint: Story = {
   args: {
     id: 'search-with-hint',
-    label: 'Search',
-    helper: { text: 'Hint text' },
-  },
-};
-
-export const Estonian: Story = {
-  args: {
-    id: 'search-et',
     label: 'Otsing',
-    placeholder: 'Otsi tooteid, artikleid või abiinfot...',
-    ariaLabel: 'Otsi kogu saidilt',
-    button: { iconLeft: 'search', children: 'Otsi' },
+    helper: { text: 'Vihjetekst' },
   },
 };
 
