@@ -27,6 +27,9 @@ export interface AccordionItemHeaderProps extends Omit<CardHeaderProps, 'id' | '
   background?: 'primary' | 'white/primary' | 'muted/primary' | CardHeaderBackground;
 }
 
+/**
+ * @deprecated Use `<Accordion.Item.Header>` from the TEDI-Ready Accordion (`@tedi-design-system/react/tedi`) instead.
+ */
 export const AccordionItemHeader = (props: AccordionItemHeaderProps): JSX.Element => {
   const { children, className, background = 'white', openText, closeText, ...rest } = props;
   const [isHovered, setIsHovered] = React.useState(false);

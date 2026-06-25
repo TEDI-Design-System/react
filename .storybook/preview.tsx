@@ -35,14 +35,14 @@ export const decorators: Preview['decorators'] = [
     useEffect(() => {
       document.documentElement.classList.remove('tedi-theme--default', 'tedi-theme--dark');
       document.documentElement.classList.add(`tedi-theme--${theme}`);
-      
+
       updateAllCanvasBackgrounds(theme);
     }, [theme]);
 
     const updateAllCanvasBackgrounds = (currentTheme: string) => {
       const backgroundColor = getBackgroundColor(currentTheme);
       const canvases = document.querySelectorAll('.sb-show-main, .docs-story > div');
-      
+
       canvases.forEach((canvas) => {
         const element = canvas as HTMLElement;
         element.style.backgroundColor = backgroundColor;
@@ -60,7 +60,7 @@ export const decorators: Preview['decorators'] = [
 
     return (
       <ThemeProvider theme={theme}>
-        <PrintingProvider> 
+        <PrintingProvider>
           {context.componentId === 'components-labelprovider' ? (
             <Story />
           ) : (
@@ -73,7 +73,6 @@ export const decorators: Preview['decorators'] = [
     );
   },
 ];
-
 
 const preview: Preview = {
   parameters: {
@@ -99,6 +98,7 @@ const preview: Preview = {
           <Subtitle />
           <Description />
           <Primary />
+          <Description of="story" />
           <Controls />
           <Stories includePrimary={false} />
         </>
