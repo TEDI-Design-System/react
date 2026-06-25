@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react';
 
+import { LabelProvider } from '../../../providers/label-provider';
 import { Col, Row } from '../../layout/grid';
 import { FileDropzone, FileDropzoneProps } from './file-dropzone';
 
@@ -14,6 +15,13 @@ const meta: Meta<typeof FileDropzone> = {
   args: {
     name: 'file-dropzone',
   },
+  decorators: [
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
+  ],
 };
 
 export default meta;
@@ -42,7 +50,7 @@ export const WithHint: Story = {
   args: {
     name: 'file',
     helper: {
-      text: 'JPG, PNG, PDF with size 1MB.',
+      text: 'JPG, PNG, PDF suurusega kuni 1 MB.',
     },
   },
 };
@@ -52,7 +60,7 @@ export const Disabled: Story = {
   args: {
     id: 'file-dropzone-disabled',
     name: 'file-loading',
-    label: 'Drop files here',
+    label: 'Lohista failid siia',
     disabled: true,
   },
 };
@@ -65,7 +73,7 @@ export const Multiple: Story = {
     multiple: true,
     defaultFiles: [{ name: 'report.pdf' }, { name: 'report_1.pdf' }, { name: 'report_2.pdf' }],
     helper: {
-      text: 'JPG, PNG, PDF with size 1MB.',
+      text: 'JPG, PNG, PDF suurusega kuni 1 MB.',
     },
   },
 };
@@ -87,7 +95,7 @@ export const ValidationFailed: Story = {
           {...args}
           helper={{
             type: 'error',
-            text: 'Invalid file uploaded. Only .pdf and .txt files under 1MB are allowed.',
+            text: 'Sobimatu fail. Lubatud on ainult .pdf ja .txt failid suurusega kuni 1 MB.',
           }}
         />
       </Col>
@@ -111,7 +119,7 @@ export const MultipleWithIndividualValidation: Story = {
       { name: 'taotlus_scan_lk_5.pdf', isValid: false },
     ],
     helper: {
-      text: 'Only .pdf and .txt files under 1KB are allowed.',
+      text: 'Lubatud on ainult .pdf ja .txt failid suurusega kuni 1 KB.',
       type: 'error',
     },
   },
@@ -134,7 +142,7 @@ export const HasTooltip: Story = {
   args: {
     id: 'file-dropzone-tooltip',
     name: 'file-tooltip',
-    label: 'Drop files here',
+    label: 'Lohista failid siia',
     tooltip: 'Lorem ipsum',
   },
 };
@@ -160,7 +168,7 @@ export const MultipleWithIndividualValidationAndAttachmentProps: Story = {
       { id: '5', name: 'taotlus_scan_lk_5.pdf', size: 24_500, isValid: false },
     ],
     helper: {
-      text: 'Only .pdf and .txt files under 1KB are allowed.',
+      text: 'Lubatud on ainult .pdf ja .txt failid suurusega kuni 1 KB.',
       type: 'error',
     },
   },
