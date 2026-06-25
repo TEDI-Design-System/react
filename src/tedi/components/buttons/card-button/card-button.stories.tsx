@@ -14,7 +14,8 @@ import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { CardButton } from './card-button';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.76?node-id=4620-85618&m=dev" target="_blank">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.76?node-id=4620-85618&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/4191c7-card-button" target="_blank">Zeroheight ↗</a>
  *
  * `CardButton` is an interactive wrapper around a `Card`. It renders a `<button>` by default
  * (pass `as="a"` with `href` for navigation) and applies the hover, active, focus and disabled
@@ -98,11 +99,13 @@ const BookingCard = ({
   title,
   description,
   book,
+  disabled,
 }: {
   lead?: ReactNode;
   title: string;
   description?: string;
   book?: boolean;
+  disabled?: boolean;
 }): JSX.Element => (
   <Card>
     <Card.Content>
@@ -119,12 +122,20 @@ const BookingCard = ({
           )}
         </div>
         {book ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Text element="span" color="brand">
-              Broneerima
-            </Text>
-            <Icon name="arrow_right_alt" color="brand" />
-          </div>
+          // The "Broneerima" call to action uses the neutral button-link colour
+          // (brand in light mode, white in dark mode) — it can't be an actual `Button`,
+          // since the whole card is already the clickable `CardButton`.
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              color: disabled ? 'var(--general-text-disabled)' : 'var(--button-main-neutral-text-default)',
+            }}
+          >
+            <Text element="span">Broneerima</Text>
+            <Icon name="arrow_right_alt" color="inherit" />
+          </span>
         ) : (
           <Icon name="arrow_right_alt" color="secondary" />
         )}
@@ -323,9 +334,11 @@ export const States: Story = {
       >
         {STATE_ROWS.map((state) => (
           <Fragment key={state}>
-            <Text modifiers="bold">{state}</Text>
+            <Text modifiers="bold" color="primary">
+              {state}
+            </Text>
             <CardButton data-pseudo={state} disabled={state === 'Disabled'}>
-              <BookingCard title="Kardioloog" description="Valdkond" book />
+              <BookingCard title="Kardioloog" description="Valdkond" book disabled={state === 'Disabled'} />
             </CardButton>
             <CardButton data-pseudo={state} disabled={state === 'Disabled'}>
               <IconCard icon="monitor_heart" title="Kardioloog" description="Valdkond" />
@@ -360,7 +373,7 @@ export const ComplexCard: Story = {
         <Row gutter={0}>
           <Col width="auto" style={{ display: 'flex' }}>
             <StretchContent>
-              <Card borderRadius={{ right: false }} borderless>
+              <Card borderRadius={{ right: false, bottom: false }} borderless>
                 <Card.Content background="secondary">
                   <Icon name="prescriptions" color="secondary" />
                 </Card.Content>
@@ -371,7 +384,7 @@ export const ComplexCard: Story = {
             <Separator axis="vertical" />
           </Col>
           <Col>
-            <Card borderRadius={{ left: false }} borderless>
+            <Card borderRadius={{ left: false, bottom: false }} borderless>
               <Card.Content>
                 <div style={{ ...rowStyle, flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
