@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';

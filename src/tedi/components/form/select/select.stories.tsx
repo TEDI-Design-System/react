@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { OptionProps, OptionsOrGroups } from 'react-select';
 
 import { Icon } from '../../base/icon/icon';

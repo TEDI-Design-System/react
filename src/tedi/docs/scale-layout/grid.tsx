@@ -1,4 +1,4 @@
-import { Title } from '@storybook/blocks';
+import { Title } from '@storybook/addon-docs/blocks';
 
 import { Heading } from '../../components/base/typography/heading/heading';
 import { Col, Row } from '../../components/layout/grid';

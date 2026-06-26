@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Col, Row, Text, TextProps, VerticalSpacing } from '../../../../tedi';
 import BaseMapSelection, { BaseMapSelectionProps } from './base-map-selection';

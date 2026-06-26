@@ -1,4 +1,4 @@
-import { Decorator, Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Decorator, Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { createContext, useContext, useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';

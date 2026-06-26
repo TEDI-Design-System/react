@@ -1,5 +1,5 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { DateRange } from 'react-day-picker';

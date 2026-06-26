@@ -1,6 +1,11 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -10,7 +15,7 @@ import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
 import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
-import { Dropdown } from './dropdown';
+import { Dropdown, DropdownProps } from './dropdown';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.58?node-id=40253-113444&m=dev" target="_BLANK">Dropdown Figma ↗</a><br/>
@@ -43,9 +48,27 @@ export default {
 
 type Story = StoryObj;
 
-export const Default: Story = {
-  render: (args) => (
-    <Dropdown {...args}>
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `Dropdown.Item`**. The item knobs (`active`, `disabled`, `indent`, …) — flattened into
+ * namespaced controls via the shared `subcomponentArgTypes` helper — are applied to the
+ * **middle** item so their effect is visible next to unchanged neighbours. The ungrouped
+ * controls are `Dropdown`'s own props (`width`, `placement`, `variant`, `divided`, …).
+ * `index` is excluded so keyboard navigation keeps its sequential ordering.
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Dropdown.Item, {
+      category: 'Dropdown.Item',
+      prefix: 'item',
+      exclude: ['children', 'onClick', 'index'],
+    }),
+  },
+  args: {
+    item__active: true,
+  },
+  render: (args: Record<string, unknown>) => (
+    <Dropdown {...getPrimaryComponentProps<DropdownProps>(args)}>
       <Dropdown.Trigger>
         <Button visualType="secondary" iconRight="keyboard_arrow_down">
           Create
@@ -56,7 +79,7 @@ export const Default: Story = {
         <Dropdown.Item index={0} onClick={() => console.log('Lisa pöördumine')}>
           Access to health data
         </Dropdown.Item>
-        <Dropdown.Item index={1} onClick={() => console.log('Lisa toetus')}>
+        <Dropdown.Item index={1} {...getSubcomponentProps(args, 'item')} onClick={() => console.log('Lisa toetus')}>
           Declaration of intent
         </Dropdown.Item>
         <Dropdown.Item index={2}>Contacts</Dropdown.Item>

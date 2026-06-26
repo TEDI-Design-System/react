@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-vite';
 import { OptionProps } from 'react-select';
 
 import { Text } from '../../../base/typography/text/text';
