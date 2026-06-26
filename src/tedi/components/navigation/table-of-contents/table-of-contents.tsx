@@ -12,6 +12,7 @@ import {
 import { useLabels } from '../../../providers/label-provider';
 import { Card, CardContent } from '../../cards/card';
 import { Affix } from '../../misc/affix/affix';
+import { TableOfContentsCollapsible } from './components/table-of-contents-collapsible/table-of-contents-collapsible';
 import {
   TableOfContentsItem,
   type TableOfContentsItemProps,
@@ -99,7 +100,7 @@ export const TableOfContentsContext = createContext<TableOfContentsContextValue>
 const isItemElement = (child: ReactNode): child is ReactElement<TableOfContentsItemProps> =>
   isValidElement(child) && child.type === TableOfContentsItem;
 
-const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
+export const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
   Children.toArray(children)
     .filter(isItemElement)
     .map((element) => {
@@ -117,7 +118,7 @@ const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
       };
     });
 
-const buildActiveTrail = (nodes: TableOfContentsNode[], activeId?: string): Set<string> => {
+export const buildActiveTrail = (nodes: TableOfContentsNode[], activeId?: string): Set<string> => {
   const trail = new Set<string>();
   if (!activeId) return trail;
 
@@ -202,6 +203,7 @@ TableOfContentsComponent.displayName = 'TableOfContents';
 
 export const TableOfContents = Object.assign(TableOfContentsComponent, {
   Item: TableOfContentsItem,
+  Collapsible: TableOfContentsCollapsible,
 });
 
 export default TableOfContents;

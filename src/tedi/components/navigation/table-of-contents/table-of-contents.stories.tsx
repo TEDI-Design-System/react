@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { LabelProvider } from '../../../providers/label-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { HideAt } from '../../layout/hide-at/hide-at';
+import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
@@ -24,10 +27,14 @@ const meta: Meta<typeof TableOfContents> = {
     },
   },
   decorators: [
+    // The examples use Estonian content, so surface the Estonian labels (e.g. the collapsible
+    // variant's "Ava" / "Sulge" toggle) instead of the default English ones.
     (Story, context) => (
-      <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 320 }}>
-        <Story />
-      </div>
+      <LabelProvider locale="et">
+        <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 320 }}>
+          <Story />
+        </div>
+      </LabelProvider>
     ),
   ],
 };
@@ -305,43 +312,102 @@ export const StickyInLayout: Story = {
       setActiveId(id);
     };
 
+    const items = sections.map((label, index) => (
+      <TableOfContents.Item key={label} id={`sec-${index + 1}`}>
+        <Link href={`#sec-${index + 1}`} underline={false} onClick={selectSection(`sec-${index + 1}`)}>
+          {label}
+        </Link>
+      </TableOfContents.Item>
+    ));
+
     return (
-      <Row alignItems="start">
-        <Col md={8}>
-          <div
-            ref={scrollRef}
-            style={{
-              maxHeight: '24rem',
-              overflowY: 'auto',
-            }}
-          >
-            <VerticalSpacing size={1.5}>
-              {sections.map((label, index) => (
-                <section key={label} id={`sec-${index + 1}`} tabIndex={-1}>
-                  <VerticalSpacing size={0.5}>
-                    <Heading element="h2" modifiers="h3">
-                      {label}
-                    </Heading>
-                    <Text>{LOREM}</Text>
-                    <Text>{LOREM}</Text>
-                  </VerticalSpacing>
-                </section>
-              ))}
-            </VerticalSpacing>
-          </div>
-        </Col>
-        <Col md={4}>
-          <TableOfContents heading="Sisukord" sticky={false} activeId={activeId}>
-            {sections.map((label, index) => (
-              <TableOfContents.Item key={label} id={`sec-${index + 1}`}>
-                <Link href={`#sec-${index + 1}`} underline={false} onClick={selectSection(`sec-${index + 1}`)}>
-                  {label}
-                </Link>
-              </TableOfContents.Item>
-            ))}
-          </TableOfContents>
-        </Col>
-      </Row>
+      <>
+        <Row alignItems="start">
+          <Col xs={12} md={8}>
+            <div
+              ref={scrollRef}
+              style={{
+                maxHeight: '24rem',
+                overflowY: 'auto',
+              }}
+            >
+              <VerticalSpacing size={1.5}>
+                {sections.map((label, index) => (
+                  <section key={label} id={`sec-${index + 1}`} tabIndex={-1}>
+                    <VerticalSpacing size={0.5}>
+                      <Heading element="h2" modifiers="h3">
+                        {label}
+                      </Heading>
+                      <Text>{LOREM}</Text>
+                      <Text>{LOREM}</Text>
+                    </VerticalSpacing>
+                  </section>
+                ))}
+              </VerticalSpacing>
+            </div>
+          </Col>
+          <ShowAt md>
+            <Col md={4}>
+              <TableOfContents heading="Sisukord" sticky={false} activeId={activeId}>
+                {items}
+              </TableOfContents>
+            </Col>
+          </ShowAt>
+        </Row>
+
+        <HideAt md>
+          <TableOfContents.Collapsible heading="Sisukord" activeId={activeId}>
+            {items}
+          </TableOfContents.Collapsible>
+        </HideAt>
+      </>
     );
   },
+};
+
+/**
+ * Mobile variant: a bottom bar that opens the list in a bottom-sheet overlay. Same
+ * `TableOfContents.Item` children as the card. Uses `sticky={false}` to render inline in the
+ * canvas; in an app it's pinned to the bottom of the viewport by default.
+ */
+export const Collapsible: Story = {
+  render: () => (
+    <TableOfContents.Collapsible heading="Sisukord" activeId="methods" sticky={false}>
+      <TableOfContents.Item id="intro">
+        <Link href="#intro" underline={false}>
+          Sissejuhatus
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="methods">
+        <Link href="#methods" underline={false}>
+          Meetodid
+        </Link>
+        <TableOfContents.Item id="methods-1">
+          <Link href="#methods-1" underline={false}>
+            Andmete kogumine
+          </Link>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="methods-2">
+          <Link href="#methods-2" underline={false}>
+            Analüüs
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="results">
+        <Link href="#results" underline={false}>
+          Tulemused
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="discussion">
+        <Link href="#discussion" underline={false}>
+          Arutelu
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="summary">
+        <Link href="#summary" underline={false}>
+          Kokkuvõte
+        </Link>
+      </TableOfContents.Item>
+    </TableOfContents.Collapsible>
+  ),
 };

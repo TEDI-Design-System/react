@@ -96,3 +96,43 @@
     color: var(--link-primary-active);
   }
 }
+
+.tedi-table-of-contents__bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--z-index-fixed);
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--card-padding-md-default);
+  background: var(--card-background-primary);
+  border-top: var(--tedi-borders-01) solid var(--card-border-primary);
+
+  &--static {
+    position: static;
+  }
+}
+
+.tedi-table-of-contents__bar-title {
+  margin: 0;
+}
+
+.tedi-table-of-contents__sheet {
+  --modal-body-padding: 0;
+  --modal-body-padding-sm: 0;
+}
+
+.tedi-table-of-contents__sheet.tedi-table-of-contents__sheet {
+  height: auto;
+  max-height: 80dvh;
+}
+
+.tedi-table-of-contents__sheet-header {
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: space-between;
+}
