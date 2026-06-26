@@ -1,3 +1,10 @@
+# [18.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.18...react-18.0.0-rc.19) (2026-06-26)
+
+
+### Features
+
+* **option-content:** helper component, update search stories [#677](https://github.com/TEDI-Design-System/react/issues/677) ([#678](https://github.com/TEDI-Design-System/react/issues/678)) ([9fb0662](https://github.com/TEDI-Design-System/react/commit/9fb066204542c334db188bb3dca700b06a201472))
+
 # [18.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.17...react-18.0.0-rc.18) (2026-06-25)
 
 
