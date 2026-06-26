@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import BaseMapSelection from '../base-map-selection/base-map-selection';
 import { Carousel } from './carousel';
@@ -11,6 +11,11 @@ import { Carousel } from './carousel';
 const meta: Meta<typeof Carousel> = {
   component: Carousel,
   title: 'Community/Map components/Carousel',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

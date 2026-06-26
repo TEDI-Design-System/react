@@ -278,6 +278,77 @@ const [expanded, setExpanded] = useState(false);
 
 ## Content
 
+### Carousel
+A compound slide carousel with an infinite-looping track, drag / wheel / keyboard navigation and screen-reader announcements. Compose from `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`; drive it with `Carousel.Navigation` (prev/next arrows) and/or `Carousel.Indicators` (dots or counter). Each direct child of `Carousel.Content` is a slide.
+
+Sub-components: `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`, `Carousel.Navigation`, `Carousel.Indicators`
+
+**`Carousel`** | fRef — `children`, `className`
+
+**`Carousel.Content`** | fRef
+- `children` — each direct child is one slide
+- `slidesPerView?: number | { xs; sm?; md?; lg?; xl?; xxl? } = 1` — can be fractional (e.g. `1.25`) for peeking; per-breakpoint object supported
+- `gap?: number | BreakpointObject<number> = 1` — gap between slides in rem
+- `fade?: boolean | 'right' | 'both' = false` — fade edges. `true`: right edge for multi-view, both edges for single. `'right'`: always right. `'both'`: always both, regardless of slide count
+- `transitionMs?: number = 400`
+- `loop?: boolean = true` — set `false` for a finite/bounded carousel: navigation stops at the first/last slide, prev/next disable at the bounds, and slides render once (no looping duplicates)
+- `centered?: boolean = false` — center the active slide so an equal peek of the previous/next slide shows on both edges (pair with a fractional `slidesPerView` and keep `loop` on)
+
+**`Carousel.Indicators`**
+- `variant?: 'dots' | 'numbers' = 'dots'`
+- `withArrows?: boolean = false` — inline prev/next (don't also use `Carousel.Navigation`); arrows disable at the bounds when `loop={false}`
+
+**`Carousel.Navigation`**
+- `overlay?: boolean = false` — pin the arrows to the left/right edges, overlaying the slides (use as a direct child of `Carousel` for a header/footer-less carousel). Arrows disable at the bounds when `loop={false}`.
+- `renderButton?: ({ direction, buttonProps }) => ReactNode` — render each arrow yourself (e.g. a `FloatingButton` or customised `Button`). Spread `buttonProps` (icon / disabled / onClick / accessible-label `children`) onto the control; the container still handles layout. Defaults to a secondary `Button`. Example: `renderButton={({ buttonProps }) => <FloatingButton {...buttonProps} position="static" />}`.
+
+**`Carousel.Header`** / **`Carousel.Footer`** — layout slots (`children`, `className`, `style`)
+
+`slidesPerView`/`gap` are breakpoint-aware (pass a per-breakpoint object). To show **different controls per breakpoint** (e.g. dots on mobile, arrows on desktop), wrap `Carousel.Navigation` / `Carousel.Indicators` in the `ShowAt` / `HideAt` layout helpers — they are context consumers, and `ShowAt`/`HideAt` unmount the hidden control, so only one set is ever in the DOM (a11y tree stays clean). No dedicated prop needed.
+
+Accessibility: the viewport is a `region` with `aria-roledescription="carousel"`; visible slides are `group`s, off-screen ones `presentation`/`aria-hidden`; slide changes are announced via a polite live region. Labels come from the `LabelProvider` (`carousel`, `carousel.slide`, `carousel.move-back`, `carousel.move-forward`, `carousel.show-slide`).
+
+```tsx
+import { Carousel } from '@tedi-design-system/react/tedi';
+
+<Carousel>
+  <Carousel.Header>
+    <h2>Title</h2>
+    <Carousel.Navigation />
+  </Carousel.Header>
+  <Carousel.Content slidesPerView={{ xs: 1, md: 2.5, xl: 4 }}>
+    {items.map((item) => (
+      <MyCard key={item.id} {...item} />
+    ))}
+  </Carousel.Content>
+  <Carousel.Footer style={{ justifyContent: 'center' }}>
+    <Carousel.Indicators />
+  </Carousel.Footer>
+</Carousel>
+
+// Finite / bounded with edge-mounted overlay arrows (replaces the deprecated Community map carousel)
+<Carousel>
+  <Carousel.Content slidesPerView={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={0.5} loop={false}>
+    {items.map((item) => (
+      <MyCard key={item.id} {...item} />
+    ))}
+  </Carousel.Content>
+  <Carousel.Navigation overlay />
+</Carousel>
+
+// Responsive controls — dots on mobile, arrows on desktop
+<Carousel>
+  <Carousel.Header>
+    <h2>Title</h2>
+    <ShowAt md><Carousel.Navigation /></ShowAt>
+  </Carousel.Header>
+  <Carousel.Content slidesPerView={{ xs: 1.1, md: 3 }}>{slides}</Carousel.Content>
+  <Carousel.Footer style={{ justifyContent: 'center' }}>
+    <HideAt md><Carousel.Indicators /></HideAt>
+  </Carousel.Footer>
+</Carousel>
+```
+
 ### Label
 
 **Props:** `LabelProps` | fRef, poly, bp
@@ -1541,6 +1612,61 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `variant?: 'dotted' | 'dot-only'`
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
+
+### OptionContent
+A reusable **content template** for dropdown/select option rows — *not* an item itself and never interactive (no `role`, click or focus handling). Drop it inside an interactive parent (`DropdownItem`, a `Select` option) that owns the role, selection and keyboard handling. It lays out an optional selection indicator (checkbox/radio), an optional leading icon, a label and optional meta into one consistently-spaced row. **`Select` renders its options through this internally**, so menu items, select options and standalone rows share one source of truth.
+
+Sub-components: `OptionContent.Label`, `OptionContent.Meta`
+
+**Props:** `OptionContentProps` | fRef
+- `children` — typically `OptionContent.Label` + optional `OptionContent.Meta`
+- `type?: 'default' | 'checkbox' | 'radio' = 'default'` — selection indicator
+- `layout?: 'horizontal' | 'vertical' = 'horizontal'` — meta beside the label, or stacked (title + description)
+- `selected?: boolean`, `indeterminate?: boolean` (checkbox only), `disabled?: boolean`
+- `icon?: string | IconProps` — leading icon
+- `indicatorSemantics?: 'presentation' | 'control' = 'presentation'` — how the indicator is exposed to assistive tech:
+  - `presentation` (menu, default) — indicator is `aria-hidden`; the interactive parent (`DropdownItem`) owns selection via `aria-checked`. The span is decorative, so it never interferes with `DropdownItem`'s click handling.
+  - `control` (listbox) — the indicator itself is `role="checkbox"`/`"radio"` + `aria-checked`, named via `aria-labelledby` from the `Label` (requires a `Label` child). This is what `Select` uses for its options.
+- `className?: string`
+
+`DropdownItem` accepts `role` (default `menuitem`) and arbitrary `aria-*` props, so pair the visual indicator with real semantics — `role="menuitemcheckbox"`/`"menuitemradio"` + `aria-checked` (or `role="option"` + `aria-selected`).
+
+```tsx
+// Inside a Dropdown (multi-select): DropdownItem owns the click + a11y; the value reflects state
+<Dropdown.Content>
+  {options.map((o, i) => (
+    <DropdownItem
+      key={o.id}
+      index={i}
+      role="menuitemcheckbox"
+      aria-checked={selected.includes(o.id)}
+      closeOnSelect={false}
+      onClick={() => toggle(o.id)}
+    >
+      <OptionContent type="checkbox" selected={selected.includes(o.id)}>
+        <OptionContent.Label>{o.name}</OptionContent.Label>
+        <OptionContent.Meta>{o.meta}</OptionContent.Meta>
+      </OptionContent>
+    </DropdownItem>
+  ))}
+</Dropdown.Content>
+
+// Standalone search result
+<OptionContent icon="location_on">
+  <OptionContent.Label>Tallinn</OptionContent.Label>
+  <OptionContent.Meta>Harjumaa</OptionContent.Meta>
+</OptionContent>
+
+// Inside Select — richer option content via the renderOption hook
+<Select id="city" label="Linn" options={options} renderOption={(p) => (
+  <OptionContent icon="location_on">
+    <OptionContent.Label>{p.data.label}</OptionContent.Label>
+    <OptionContent.Meta>{p.data.customData.county}</OptionContent.Meta>
+  </OptionContent>
+)} />
+```
+
+States: the `Label` uses `color: inherit`, so it follows the parent item's per-state text colour (default → hover → active → disabled) defined on `DropdownItem` / the Select option — both surfaces share the `--dropdown-item-*` and `--form-checkbox-radio-*` tokens. The leading icon and `Meta` keep their secondary/tertiary colours. `Select` renders its option content with `<OptionContent indicatorSemantics="control">` internally, so a custom `renderOption` is only needed for *richer* content (icon/meta), not to match the default look.
 
 ---
 

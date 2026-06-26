@@ -41,6 +41,11 @@ testem.log
 Thumbs.db
 
 **/**/tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Stray tsc emit from .storybook/tsconfig.json (type-check only; should never emit)
+/.storybook/src/
+/.storybook/.storybook/
 
 # Local Netlify folder
 .netlify

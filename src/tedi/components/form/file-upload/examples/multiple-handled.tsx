@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-vite';
 import React from 'react';
 
 import { FileUploadFile } from '../../../../helpers/hooks/use-file-upload';

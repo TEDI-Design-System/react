@@ -1,3 +1,24 @@
+# [18.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.20...react-18.0.0-rc.21) (2026-06-26)
+
+
+### Features
+
+* updated storybook to v10 [#575](https://github.com/TEDI-Design-System/react/issues/575) ([#681](https://github.com/TEDI-Design-System/react/issues/681)) ([1bc5806](https://github.com/TEDI-Design-System/react/commit/1bc58064a0d1bd6e31fb87c455f0abac5e0304d9))
+
+# [18.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.19...react-18.0.0-rc.20) (2026-06-26)
+
+
+### Features
+
+* **carousel:** tedi-ready component [#358](https://github.com/TEDI-Design-System/react/issues/358) ([#684](https://github.com/TEDI-Design-System/react/issues/684)) ([c420d95](https://github.com/TEDI-Design-System/react/commit/c420d9531468f368e4e737ecdb4ae1d24abd9126))
+
+# [18.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.18...react-18.0.0-rc.19) (2026-06-26)
+
+
+### Features
+
+* **option-content:** helper component, update search stories [#677](https://github.com/TEDI-Design-System/react/issues/677) ([#678](https://github.com/TEDI-Design-System/react/issues/678)) ([9fb0662](https://github.com/TEDI-Design-System/react/commit/9fb066204542c334db188bb3dca700b06a201472))
+
 # [18.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.17...react-18.0.0-rc.18) (2026-06-25)
 
 

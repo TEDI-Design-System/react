@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, ReactNode } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';

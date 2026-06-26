@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Button, Card, Col, Link, List, Row, Search, Text, TextField, VerticalSpacing } from '../../../../tedi';
