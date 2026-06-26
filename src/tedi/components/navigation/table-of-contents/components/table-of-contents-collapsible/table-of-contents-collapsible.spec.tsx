@@ -74,6 +74,13 @@ describe('TableOfContents.Collapsible', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('closes the sheet when a list link is activated', () => {
+    render(<Tree />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('link', { name: 'Sissejuhatus' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('falls back to the localised title when no heading is provided', () => {
     render(
       <TableOfContents.Collapsible>

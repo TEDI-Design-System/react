@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
@@ -31,6 +31,19 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
   const { children, heading, activeId, showIcons = false, numbered = false, sticky = true, className } = props;
   const { getLabel } = useLabels();
   const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = listRef.current;
+    if (!open || !element) return undefined;
+
+    const handleNavigate = (event: MouseEvent) => {
+      if ((event.target as HTMLElement).closest('a, button')) setOpen(false);
+    };
+
+    element.addEventListener('click', handleNavigate);
+    return () => element.removeEventListener('click', handleNavigate);
+  }, [open]);
 
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
@@ -83,7 +96,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
             </div>
           </Modal.Header>
           <Modal.Body>
-            <div className={styles['tedi-table-of-contents']}>
+            <div ref={listRef} className={styles['tedi-table-of-contents']}>
               <TableOfContentsList nodes={nodes} heading={null} />
             </div>
           </Modal.Body>
