@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { LabelProvider } from '../../../providers/label-provider';
 import { Col, Row } from '../../layout/grid';

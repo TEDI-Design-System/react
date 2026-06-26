@@ -4,6 +4,11 @@ import React, { useState } from 'react';
 import { FloatingButton } from '../../../../tedi';
 import styles from './carousel.module.scss';
 
+/**
+ * @deprecated Use `Carousel` from `@tedi-design-system/react/tedi` instead — with
+ * `Carousel.Content loop={false}` and `Carousel.Navigation overlay` for the same
+ * bounded, edge-arrow pattern (plus keyboard and screen-reader support).
+ */
 export interface CarouselProps {
   /**
    * Number of items visible at once in the carousel viewport.
@@ -21,6 +26,11 @@ export interface CarouselProps {
   className?: string;
 }
 
+/**
+ * @deprecated Use `Carousel` from `@tedi-design-system/react/tedi` instead — with
+ * `Carousel.Content loop={false}` and `Carousel.Navigation overlay` for the same
+ * bounded, edge-arrow pattern (plus keyboard and screen-reader support).
+ */
 export const Carousel = (props: CarouselProps): JSX.Element => {
   const { itemCountShown, children, className } = props;
   const [scrollIndex, setScrollIndex] = useState(0);

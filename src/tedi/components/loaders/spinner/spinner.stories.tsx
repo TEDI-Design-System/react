@@ -1,4 +1,4 @@
-import { Meta, StoryContext, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryContext, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
 import { Col, Row } from '../../layout/grid';

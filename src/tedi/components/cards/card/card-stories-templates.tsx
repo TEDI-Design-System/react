@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-vite';
 
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';

@@ -163,16 +163,14 @@ div .tedi-select__menu {
   &--selected {
     p,
     span,
-    label,
-    :global(.tedi-radio) {
+    label {
       color: var(--dropdown-item-active-text);
     }
 
     &:hover:not(:disabled) {
       p,
       span,
-      label,
-      :global(.tedi-radio) {
+      label {
         color: var(--dropdown-item-hover-text);
       }
     }
@@ -206,10 +204,6 @@ div.tedi-select__multi-value-item {
   display: flex;
   flex-shrink: 0;
   align-items: baseline;
-}
-
-.tedi-select__checkbox {
-  pointer-events: none;
 }
 
 .tedi-select .tedi-select__group {
