@@ -97,8 +97,23 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
       >
         <input {...getInputProps()} disabled={disabled} />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
-          <Icon color={disabled ? 'tertiary' : 'secondary'} size={24} name="attach_file" />
-          <FormLabel {...rest} id={id} label={label} className={styles['tedi-file-dropzone__label']} />
+          <FormLabel
+            {...rest}
+            id={id}
+            label={
+              <>
+                <Icon
+                  color={disabled ? 'tertiary' : 'secondary'}
+                  size={24}
+                  name="attach_file"
+                  display="inline"
+                  className={styles['tedi-file-dropzone__label-icon']}
+                />
+                {label}
+              </>
+            }
+            className={styles['tedi-file-dropzone__label']}
+          />
         </div>
       </div>
       {helper ? (
