@@ -54,10 +54,6 @@
       }
     }
   }
-
-  &--disabled {
-    opacity: 0.6;
-  }
 }
 
 .tedi-accordion__icon-card {
@@ -119,7 +115,13 @@
   }
 
   &--disabled {
+    color: var(--general-text-disabled);
     cursor: not-allowed;
+
+    .tedi-accordion-item-header__title-main [class*='tedi-text'],
+    .tedi-accordion-item-header__expand-indicator {
+      color: inherit;
+    }
   }
 }
 

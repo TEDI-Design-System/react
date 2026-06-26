@@ -7,11 +7,14 @@ import {
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
 import { useBreakpointProps } from '../../../helpers';
+import { LabelProvider } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Checkbox } from '../../form/checkbox/checkbox';
+import TextField from '../../form/textfield/textfield';
+import Separator from '../../misc/separator/separator';
 import { Link } from '../../navigation/link/link';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { Accordion, AccordionProps } from './accordion';
@@ -27,6 +30,13 @@ import { AccordionItemHeaderProps } from './accordion-item-header/accordion-item
 export default {
   title: 'TEDI-Ready/Content/Accordion',
   component: Accordion,
+  decorators: [
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
+  ],
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -94,7 +104,7 @@ const iconCardTemplate = (
   <>
     <Icon name="business_center" color="secondary" size={24} />
     <Text element="span" color="secondary" modifiers="bold">
-      Category
+      Kategooria
     </Text>
   </>
 );
@@ -109,7 +119,7 @@ const SelectActionButton = (props: { selected: boolean; onToggle: (selected: boo
   >
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {props.selected && <Icon name="done" size={16} />}
-      <span style={{ padding: '0 var(--button-md-inner-spacing)' }}>{props.selected ? 'Selected' : 'Select'}</span>
+      <span style={{ padding: '0 var(--button-md-inner-spacing)' }}>{props.selected ? 'Valitud' : 'Vali'}</span>
     </div>
   </Button>
 );
@@ -127,8 +137,8 @@ const DefaultTemplate: StoryFn<Record<string, unknown>> = (args) => {
       <Accordion.Item {...itemProps} selected={selected} iconCard={iconCardTemplate}>
         <Accordion.Item.Header
           {...headerProps}
-          title="Title"
-          afterTitle={<StatusBadge color="success">Approved</StatusBadge>}
+          title="Pealkiri"
+          afterTitle={<StatusBadge color="success">Kinnitatud</StatusBadge>}
           endAction={
             headerProps.headerClickable ? undefined : <SelectActionButton selected={selected} onToggle={setSelected} />
           }
@@ -136,7 +146,7 @@ const DefaultTemplate: StoryFn<Record<string, unknown>> = (args) => {
         <Accordion.Item.Content {...contentProps}>{contentExample}</Accordion.Item.Content>
       </Accordion.Item>
       <Accordion.Item>
-        <Accordion.Item.Header title="Title 2" openText="Open" closeText="Close" expandActionPosition="end" />
+        <Accordion.Item.Header title="Pealkiri 2" expandActionPosition="end" />
         <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
       </Accordion.Item>
     </Accordion>
@@ -232,14 +242,7 @@ export const Variants: StoryObj = {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
         <Accordion>
           <Accordion.Item>
-            <Accordion.Item.Header title="Title" />
-            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
-          </Accordion.Item>
-        </Accordion>
-
-        <Accordion>
-          <Accordion.Item>
-            <Accordion.Item.Header title="Title" afterTitle={<StatusBadge color="success">Approved</StatusBadge>} />
+            <Accordion.Item.Header title="Pealkiri" />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
         </Accordion>
@@ -247,7 +250,17 @@ export const Variants: StoryObj = {
         <Accordion>
           <Accordion.Item>
             <Accordion.Item.Header
-              title="Title"
+              title="Pealkiri"
+              afterTitle={<StatusBadge color="success">Kinnitatud</StatusBadge>}
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
               beforeTitle={<Icon name="description" color="secondary" size={18} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -257,7 +270,7 @@ export const Variants: StoryObj = {
         <Accordion>
           <Accordion.Item>
             <Accordion.Item.Header
-              title="Title"
+              title="Pealkiri"
               beforeTitle={<Icon name="account_circle" color="brand" background="brand-secondary" size={16} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -266,14 +279,14 @@ export const Variants: StoryObj = {
 
         <Accordion>
           <Accordion.Item>
-            <Accordion.Item.Header title="Title" showExpandLabel={false} />
+            <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
         </Accordion>
 
         <Accordion>
           <Accordion.Item>
-            <Accordion.Item.Header title="Title" expandActionPosition="start" showExpandLabel={false} />
+            <Accordion.Item.Header title="Pealkiri" expandActionPosition="start" showExpandLabel={false} />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
         </Accordion>
@@ -281,11 +294,11 @@ export const Variants: StoryObj = {
         <Accordion>
           <Accordion.Item>
             <Accordion.Item.Header
-              title="Title"
+              title="Pealkiri"
               showExpandLabel={false}
               endDescription={
                 <Text element="span" color="tertiary" modifiers="small">
-                  Description
+                  Kirjeldus
                 </Text>
               }
             />
@@ -296,11 +309,11 @@ export const Variants: StoryObj = {
         <Accordion>
           <Accordion.Item>
             <Accordion.Item.Header
-              title="Title"
+              title="Pealkiri"
               showExpandLabel={false}
               startDescription={
                 <Text element="span" color="tertiary" modifiers="normal">
-                  Description
+                  Kirjeldus
                 </Text>
               }
             />
@@ -311,16 +324,16 @@ export const Variants: StoryObj = {
         <Accordion>
           <Accordion.Item>
             <Accordion.Item.Header
-              title="Title"
+              title="Pealkiri"
               showExpandLabel={false}
               startDescription={
                 <Text element="span" color="tertiary" modifiers="normal">
-                  Description
+                  Kirjeldus
                 </Text>
               }
               endDescription={
                 <Text element="span" color="tertiary" modifiers="small">
-                  Description
+                  Kirjeldus
                 </Text>
               }
             />
@@ -333,8 +346,8 @@ export const Variants: StoryObj = {
             <Accordion.Item.Header
               headerClickable={false}
               expandActionPosition="start"
-              openText="Title"
-              closeText="Title"
+              openText="Pealkiri"
+              closeText="Pealkiri"
               endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -346,8 +359,8 @@ export const Variants: StoryObj = {
             <Accordion.Item.Header
               headerClickable={false}
               expandActionPosition="start"
-              openText="Title"
-              closeText="Title"
+              openText="Pealkiri"
+              closeText="Pealkiri"
               endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
             />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -376,13 +389,13 @@ export const ActionTypes: StoryObj = {
         <div style={rowStyle}>
           <Accordion>
             <Accordion.Item>
-              <Accordion.Item.Header title="Title" />
+              <Accordion.Item.Header title="Pealkiri" />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
           <Accordion>
             <Accordion.Item defaultExpanded>
-              <Accordion.Item.Header title="Title" />
+              <Accordion.Item.Header title="Pealkiri" />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
@@ -394,8 +407,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -405,8 +418,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -416,13 +429,13 @@ export const ActionTypes: StoryObj = {
         <div style={rowStyle}>
           <Accordion>
             <Accordion.Item>
-              <Accordion.Item.Header title="Title" showExpandLabel={false} />
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
           <Accordion>
             <Accordion.Item defaultExpanded>
-              <Accordion.Item.Header title="Title" showExpandLabel={false} />
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
@@ -431,13 +444,13 @@ export const ActionTypes: StoryObj = {
         <div style={rowStyle}>
           <Accordion>
             <Accordion.Item>
-              <Accordion.Item.Header title="Title" showExpandLabel={false} expandActionPosition="start" />
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} expandActionPosition="start" />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
           <Accordion>
             <Accordion.Item defaultExpanded>
-              <Accordion.Item.Header title="Title" showExpandLabel={false} expandActionPosition="start" />
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} expandActionPosition="start" />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
@@ -449,8 +462,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -462,8 +475,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -477,8 +490,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedC} onToggle={setSelectedC} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -490,8 +503,8 @@ export const ActionTypes: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedD} onToggle={setSelectedD} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -522,13 +535,13 @@ export const WithIconCard: StoryObj = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-08)' }}>
           <Accordion>
             <Accordion.Item showIconCard iconCard={iconCardTemplate}>
-              <Accordion.Item.Header title="Title" />
+              <Accordion.Item.Header title="Pealkiri" />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
           <Accordion>
             <Accordion.Item defaultExpanded showIconCard iconCard={iconCardTemplate}>
-              <Accordion.Item.Header title="Title" />
+              <Accordion.Item.Header title="Pealkiri" />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
@@ -537,13 +550,13 @@ export const WithIconCard: StoryObj = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-08)' }}>
           <Accordion>
             <Accordion.Item showIconCard iconCard={iconCardTemplate}>
-              <Accordion.Item.Header title="Title" showExpandLabel={false} />
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
           <Accordion>
             <Accordion.Item defaultExpanded showIconCard iconCard={iconCardTemplate}>
-              <Accordion.Item.Header title="Title" showExpandLabel={false} />
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
           </Accordion>
@@ -555,8 +568,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -568,8 +581,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -583,8 +596,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedC} onToggle={setSelectedC} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -596,8 +609,8 @@ export const WithIconCard: StoryObj = {
               <Accordion.Item.Header
                 headerClickable={false}
                 expandActionPosition="start"
-                openText="Title"
-                closeText="Title"
+                openText="Pealkiri"
+                closeText="Pealkiri"
                 endAction={<SelectActionButton selected={selectedD} onToggle={setSelectedD} />}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
@@ -637,7 +650,7 @@ export const Customized: StoryObj = {
             mari.maasikas@gmail.com
           </Text>
         ),
-        badge: <StatusBadge color="success">Verified</StatusBadge>,
+        badge: <StatusBadge color="success">Kontrollitud</StatusBadge>,
         importantPhoto: <img src="custom_accordion_2.png" alt="Accordion example" />,
         importantDescription: (
           <Text element="span" color="tertiary" modifiers="normal" className="custom-description">
@@ -688,9 +701,9 @@ export const Customized: StoryObj = {
           <Accordion>
             <Accordion.Item>
               <Accordion.Item.Header
-                title="Title"
+                title="Pealkiri"
                 titleLayout="fill"
-                afterTitle={<StatusBadge color="brand">Public</StatusBadge>}
+                afterTitle={<StatusBadge color="brand">Avalik</StatusBadge>}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -699,10 +712,10 @@ export const Customized: StoryObj = {
           <Accordion>
             <Accordion.Item>
               <Accordion.Item.Header
-                title="Title"
+                title="Pealkiri"
                 titleLayout="fill"
                 beforeTitle={<Icon name="account_circle" color="brand" background="brand-secondary" size={16} />}
-                afterTitle={<StatusBadge color="neutral">New</StatusBadge>}
+                afterTitle={<StatusBadge color="neutral">Uus</StatusBadge>}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -714,11 +727,11 @@ export const Customized: StoryObj = {
                 headerClickable={false}
                 showExpandLabel={false}
                 expandActionPosition="start"
-                title="Title"
+                title="Pealkiri"
                 endAction={
                   <Checkbox
                     id="customized-select"
-                    label={selected ? 'Unselect this value' : 'Select this value'}
+                    label={selected ? 'Valitud' : 'Vali'}
                     checked={selected}
                     onChange={(_, nextChecked) => setSelected(nextChecked)}
                     value={selected ? 'unselect' : 'select'}
@@ -733,9 +746,9 @@ export const Customized: StoryObj = {
           <Accordion>
             <Accordion.Item>
               <Accordion.Item.Header
-                title="Title"
+                title="Pealkiri"
                 titleLayout="fill"
-                afterTitle={<StatusBadge color="success">Approved</StatusBadge>}
+                afterTitle={<StatusBadge color="success">Kinnitatud</StatusBadge>}
               />
               <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
             </Accordion.Item>
@@ -757,7 +770,7 @@ export const Customized: StoryObj = {
           <Accordion>
             <Accordion.Item>
               <Accordion.Item.Header
-                title={<Text modifiers="bold">Some important title</Text>}
+                title={<Text modifiers="bold">Mingi oluline pealkiri</Text>}
                 titleLayout="fill"
                 showExpandLabel={false}
                 headerClass="custom-title"
@@ -774,14 +787,14 @@ export const Customized: StoryObj = {
                 showDefaultExpandAction={false}
                 headerClickable={false}
                 headerClass="custom-header custom-title"
-                title={<Text modifiers="bold">Some important title</Text>}
+                title={<Text modifiers="bold">Mingi oluline pealkiri</Text>}
                 beforeTitle={responsive.showMorePhoto}
                 startDescription={responsive.showMoreDescription}
                 endAction={
                   <Button visualType="neutral" onClick={() => setExpanded((current) => !current)}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                       <Icon name={expanded ? 'arrow_upward' : 'arrow_downward'} size={16} />
-                      {expanded ? 'Show less' : 'Show more'}
+                      {expanded ? 'Näita vähem' : 'Näita rohkem'}
                     </div>
                   </Button>
                 }
@@ -804,11 +817,11 @@ export const AccordionBehavior: StoryObj = {
       <div style={{ marginBottom: 'var(--layout-grid-gutters-16)' }}>
         <Accordion>
           <Accordion.Item>
-            <Accordion.Item.Header title="Title 1" />
+            <Accordion.Item.Header title="Pealkiri 1" />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
           <Accordion.Item>
-            <Accordion.Item.Header title="Title 2" />
+            <Accordion.Item.Header title="Pealkiri 2" />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
         </Accordion>
@@ -819,11 +832,11 @@ export const AccordionBehavior: StoryObj = {
       </Heading>
       <Accordion allowMultiple>
         <Accordion.Item>
-          <Accordion.Item.Header title="Title 1" />
+          <Accordion.Item.Header title="Pealkiri 1" />
           <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
         </Accordion.Item>
         <Accordion.Item>
-          <Accordion.Item.Header title="Title 2" />
+          <Accordion.Item.Header title="Pealkiri 2" />
           <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
         </Accordion.Item>
       </Accordion>
@@ -848,22 +861,106 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
     },
   },
   render: () => (
-    <div>
-      <Accordion allowMultiple>
-        <Accordion.Item>
-          <Accordion.Item.Header title="Section 1" />
-          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+    <>
+      <style>{`
+        .step-number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: var(--button-sm-height);
+          height: var(--button-sm-height);
+          border: 1px solid var(--stepper-step-default-border);
+          border-radius: 100px;
+          background: var(--stepper-step-default-bg);
+        }
+
+        .step-number--disabled {
+          border-color: var(--stepper-step-disabled-border);
+          background: var(--stepper-step-disabled-bg);
+        }
+
+        .step-body {
+          display: flex;
+          flex-direction: column;
+          gap: var(--layout-grid-gutters-16);
+        }
+
+        .step-form {
+          display: flex;
+          flex-direction: column;
+          gap: var(--layout-grid-gutters-16);
+          width: 100%;
+          max-width: 400px;
+        }
+
+        .step-actions {
+          display: flex;
+          gap: var(--layout-grid-gutters-08);
+        }
+
+        @media (max-width: 480px) {
+          .step-actions > * {
+            flex: 1;
+          }
+        }
+      `}</style>
+      <Accordion>
+        <Accordion.Item defaultExpanded>
+          <Accordion.Item.Header
+            title="Minu andmed"
+            beforeTitle={
+              <span className="step-number">
+                <Text element="span" modifiers={['small', 'bold']} color="secondary">
+                  1
+                </Text>
+              </span>
+            }
+          />
+          <Accordion.Item.Content>
+            <div className="step-body">
+              <div className="step-form">
+                <TextField id="first-name" label="Eesnimi" required />
+                <TextField id="last-name" label="Perenimi" required />
+                <TextField id="id-code" label="Isikukood" required />
+              </div>
+              <Separator />
+              <div className="step-actions">
+                <Button visualType="secondary">Tühista</Button>
+                <Button visualType="primary">Jätka</Button>
+              </div>
+            </div>
+          </Accordion.Item.Content>
         </Accordion.Item>
-        <Accordion.Item>
-          <Accordion.Item.Header title="Section 2" />
-          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
-        </Accordion.Item>
+
         <Accordion.Item disabled>
-          <Accordion.Item.Header title="Section 3" />
+          <Accordion.Item.Header
+            title="Taotlus"
+            beforeTitle={
+              <span className="step-number step-number--disabled">
+                <Text element="span" modifiers={['small', 'bold']} color="disabled">
+                  2
+                </Text>
+              </span>
+            }
+          />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+
+        <Accordion.Item disabled>
+          <Accordion.Item.Header
+            title="Dokumendid"
+            beforeTitle={
+              <span className="step-number step-number--disabled">
+                <Text element="span" modifiers={['small', 'bold']} color="disabled">
+                  3
+                </Text>
+              </span>
+            }
+          />
           <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
         </Accordion.Item>
       </Accordion>
-    </div>
+    </>
   ),
 };
 
@@ -898,23 +995,23 @@ is a no-op for items relying on the auto-generated React id.
 
     return (
       <div>
-        <nav style={navStyle} aria-label="Jump to citizen-services FAQ section">
-          <Link href="#id-card">Jump to: ID card renewal</Link>
-          <Link href="#tax-return">Jump to: Filing taxes</Link>
-          <Link href="#parental-benefits">Jump to: Parental benefits</Link>
+        <nav style={navStyle} aria-label="Liigu kodanikuteenuste KKK-jaotise juurde">
+          <Link href="#id-card">ID-kaardi uuendamine</Link>
+          <Link href="#tax-return">Tuludeklaratsiooni esitamine</Link>
+          <Link href="#parental-benefits">Vanemahüvitis</Link>
         </nav>
 
         <Accordion allowMultiple>
           <Accordion.Item id="id-card" openOnHashMatch>
-            <Accordion.Item.Header title="How do I renew my ID card?" />
+            <Accordion.Item.Header title="Kuidas uuendada ID-kaarti?" />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
           <Accordion.Item id="tax-return" openOnHashMatch>
-            <Accordion.Item.Header title="How do I file my income tax return?" />
+            <Accordion.Item.Header title="Kuidas esitada tuludeklaratsiooni?" />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
           <Accordion.Item id="parental-benefits" openOnHashMatch>
-            <Accordion.Item.Header title="What parental benefits am I entitled to?" />
+            <Accordion.Item.Header title="Millistele vanemahüvitistele on mul õigus?" />
             <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
           </Accordion.Item>
         </Accordion>
@@ -951,7 +1048,7 @@ but the rendered look matches the surrounding accordion items exactly.
     <section>
       <div style={{ marginBottom: 'var(--layout-grid-gutters-16)' }}>
         <Heading element="h2" modifiers="h2">
-          Your active prescriptions
+          Sinu kehtivad retseptid
         </Heading>
       </div>
 
