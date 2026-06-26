@@ -1,6 +1,11 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
@@ -65,178 +70,13 @@ export default {
         'Defaults to the design-token value `var(--layout-grid-gutters-08)` (0.5rem) when omitted.',
       table: { category: 'Accordion', defaultValue: { summary: '0.5' } },
     },
-    // Internally keyed `accordionDefaultExpanded` to avoid colliding with the
-    // item-level `defaultExpanded` arg below — Storybook's args namespace is
-    // flat, so we'd otherwise wire one value into two unrelated props. The
-    // `name` field restores the displayed key to `defaultExpanded` in the
-    // controls/docs table so users see the real API name.
-    accordionDefaultExpanded: {
-      name: 'defaultExpanded',
+    defaultExpanded: {
       control: 'boolean',
       description:
         'Group-level default for the items initial expanded state. ' +
         'Items use this value when they do not specify their own `defaultExpanded`. ' +
         'Per-item overrides (including explicit `false`) take precedence.',
       table: { category: 'Accordion', defaultValue: { summary: 'false' } },
-    },
-    defaultExpanded: {
-      control: 'boolean',
-      description: 'Whether the accordion item is initially expanded or collapsed.',
-      table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
-    },
-    onToggle: {
-      action: 'onToggle',
-      description: 'Called whenever the user toggles the item. Receives the next expanded state.',
-      table: { category: 'Accordion Item' },
-    },
-    showIconCard: {
-      control: 'boolean',
-      description: 'Whether to show the icon card.',
-      table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
-    },
-    selected: {
-      control: 'boolean',
-      description: 'Marks the accordion item as selected.',
-      table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
-    },
-    headerClickable: {
-      control: 'boolean',
-      description:
-        'Defines whether the entire header acts as the toggle trigger.\n\n' +
-        '`true` (default): the header is rendered as a button.\n\n' +
-        '`false`: the header is rendered as a non-interactive container. The default expand action ' +
-        'is still rendered alongside it unless `showDefaultExpandAction` is also set to `false`.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'true' } },
-    },
-    titleLayout: {
-      control: 'radio',
-      options: ['hug', 'fill'],
-      description:
-        'Controls how the title stretches.\n\n' +
-        '`hug`: wraps tightly around content.\n\n' +
-        '`fill`: expands to available space and pushes trailing elements to the end.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'hug' } },
-    },
-    openText: {
-      control: 'text',
-      description:
-        'Text shown when the accordion is collapsed. Rendered literally — ' +
-        'translate at the call site if needed. When omitted, falls back to the translated ' +
-        '`open` label from `LabelProvider`.',
-      table: { category: 'Accordion Item Header' },
-    },
-    closeText: {
-      control: 'text',
-      description:
-        'Text shown when the accordion is expanded. Rendered literally — ' +
-        'translate at the call site if needed. When omitted, falls back to the translated ' +
-        '`close` label from `LabelProvider`.',
-      table: { category: 'Accordion Item Header' },
-    },
-    showExpandLabel: {
-      control: 'boolean',
-      description: 'Whether to show the expand/collapse labels.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'true' } },
-    },
-    showDefaultExpandAction: {
-      control: 'boolean',
-      description: 'Whether to render the built-in expand/collapse control.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'true' } },
-    },
-    expandActionPosition: {
-      control: 'radio',
-      options: ['start', 'end'],
-      description: 'Position of the expand/collapse action.',
-      table: { category: 'Accordion Item Header', defaultValue: { summary: 'end' } },
-    },
-    expandActionArrowType: {
-      control: 'radio',
-      options: ['default', 'secondary'],
-      description:
-        'Chevron style of the default expand action. Only effective when ' +
-        '`headerClickable` is `false` (otherwise the default expand action ' +
-        'is not a `CollapseButton`) and `showExpandLabel` is `false` (only ' +
-        'icon-only mode honours `arrowType`).',
-      table: {
-        category: 'Accordion Item Header',
-        defaultValue: { summary: 'default' },
-      },
-    },
-    expandActionSize: {
-      control: 'radio',
-      options: [undefined, 'default', 'small'],
-      description:
-        'Visual size of the default expand action. Only effective when ' +
-        '`headerClickable` is `false`. When omitted, the size is derived ' +
-        'from `showExpandLabel` — `true` → `default`, `false` → `small`. ' +
-        'Pass a value to override the derived default.',
-      table: {
-        category: 'Accordion Item Header',
-      },
-    },
-    expandActionInverted: {
-      control: 'boolean',
-      description:
-        'Use the inverted (light-on-dark) palette for the default expand ' +
-        'action, for placement on a dark or brand background. Only ' +
-        'effective when `headerClickable` is `false`.',
-      table: {
-        category: 'Accordion Item Header',
-        defaultValue: { summary: 'false' },
-      },
-    },
-    expandActionUnderline: {
-      control: 'boolean',
-      description:
-        'Whether to underline the label of the default expand action. ' +
-        'Defaults to `false` so the chevron stays the sole affordance. ' +
-        'Only effective when `headerClickable` is `false` and ' +
-        '`showExpandLabel` is `true` (icon-only mode never underlines).',
-      table: {
-        category: 'Accordion Item Header',
-        defaultValue: { summary: 'false' },
-      },
-    },
-    headerClass: {
-      control: 'text',
-      description: 'Custom CSS class for the accordion header.',
-      table: { category: 'Accordion Item Header' },
-    },
-    headingLevel: {
-      control: 'select',
-      options: [undefined, 1, 2, 3, 4, 5, 6],
-      description:
-        'Wraps the trigger in a semantic `<h1>`–`<h6>` element following the ' +
-        'WAI-ARIA Accordion Pattern. The wrapper uses `display: contents` so ' +
-        'it adds semantic info for assistive technologies without affecting layout.',
-      table: { category: 'Accordion Item Header' },
-    },
-    id: {
-      control: false,
-      description:
-        'Stable id used for hash-based deep-linking. Pair with `openOnHashMatch`. ' +
-        'Also seeds the auto-generated header/content ARIA ids when set.',
-      table: { category: 'Accordion Item', type: { summary: 'string' } },
-    },
-    openOnHashMatch: {
-      control: false,
-      description:
-        'Auto-expand the item when `window.location.hash` matches its `id`. ' +
-        'Requires an explicit `id` prop — no-op for items using the auto-generated React id.',
-      table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
-    },
-    disabled: {
-      control: 'boolean',
-      description:
-        'Disables the item — the header trigger becomes non-interactive and ' +
-        'the expanded state can no longer be toggled by user interaction. ' +
-        'The current state is preserved.',
-      table: { category: 'Accordion Item', defaultValue: { summary: 'false' } },
-    },
-    contentClass: {
-      control: 'text',
-      description: 'Custom CSS class for the accordion content.',
-      table: { category: 'Accordion Item Content' },
     },
   },
 } as Meta;
@@ -274,79 +114,26 @@ const SelectActionButton = (props: { selected: boolean; onToggle: (selected: boo
   </Button>
 );
 
-type AccordionStoryArgs = AccordionProps &
-  AccordionItemProps &
-  AccordionItemHeaderProps &
-  AccordionItemContentProps & {
-    // Separate key for the parent's group-level `defaultExpanded`, displayed
-    // as `defaultExpanded` in Storybook via the argType `name` field.
-    accordionDefaultExpanded?: boolean;
-  };
+const DefaultTemplate: StoryFn<Record<string, unknown>> = (args) => {
+  const primaryProps = getPrimaryComponentProps<AccordionProps>(args);
+  const itemProps = getSubcomponentProps<AccordionItemProps>(args, 'item');
+  const headerProps = getSubcomponentProps<AccordionItemHeaderProps>(args, 'header');
+  const contentProps = getSubcomponentProps<AccordionItemContentProps>(args, 'content');
 
-type Story = StoryObj<AccordionStoryArgs>;
-
-const DefaultTemplate: StoryFn<AccordionStoryArgs> = (args) => {
-  const {
-    allowMultiple,
-    itemGap,
-    accordionDefaultExpanded,
-    headerClickable,
-    titleLayout,
-    openText,
-    closeText,
-    showExpandLabel,
-    showDefaultExpandAction,
-    expandActionPosition,
-    expandActionArrowType,
-    expandActionSize,
-    expandActionInverted,
-    expandActionUnderline,
-    defaultExpanded,
-    showIconCard,
-    selected: initialSelected,
-    disabled,
-    onToggle,
-    headerClass,
-    headingLevel,
-    contentClass,
-    className,
-  } = args;
-  const [selected, setSelected] = React.useState<boolean>(!!initialSelected);
+  const [selected, setSelected] = React.useState<boolean>(!!itemProps.selected);
 
   return (
-    <Accordion
-      allowMultiple={allowMultiple}
-      itemGap={itemGap}
-      defaultExpanded={accordionDefaultExpanded}
-      className={className}
-    >
-      <Accordion.Item
-        defaultExpanded={defaultExpanded}
-        showIconCard={showIconCard}
-        selected={selected}
-        disabled={disabled}
-        onToggle={onToggle}
-        iconCard={iconCardTemplate}
-      >
+    <Accordion {...primaryProps}>
+      <Accordion.Item {...itemProps} selected={selected} iconCard={iconCardTemplate}>
         <Accordion.Item.Header
-          headerClickable={headerClickable}
-          titleLayout={titleLayout}
-          openText={openText}
-          closeText={closeText}
-          showExpandLabel={showExpandLabel}
-          showDefaultExpandAction={showDefaultExpandAction}
-          expandActionPosition={expandActionPosition}
-          expandActionArrowType={expandActionArrowType}
-          expandActionSize={expandActionSize}
-          expandActionInverted={expandActionInverted}
-          expandActionUnderline={expandActionUnderline}
-          headerClass={headerClass}
-          headingLevel={headingLevel}
+          {...headerProps}
           title="Title"
           afterTitle={<StatusBadge color="success">Approved</StatusBadge>}
-          endAction={headerClickable ? undefined : <SelectActionButton selected={selected} onToggle={setSelected} />}
+          endAction={
+            headerProps.headerClickable ? undefined : <SelectActionButton selected={selected} onToggle={setSelected} />
+          }
         />
-        <Accordion.Item.Content contentClass={contentClass}>{contentExample}</Accordion.Item.Content>
+        <Accordion.Item.Content {...contentProps}>{contentExample}</Accordion.Item.Content>
       </Accordion.Item>
       <Accordion.Item>
         <Accordion.Item.Header title="Title 2" openText="Open" closeText="Close" expandActionPosition="end" />
@@ -356,25 +143,59 @@ const DefaultTemplate: StoryFn<AccordionStoryArgs> = (args) => {
   );
 };
 
-export const Default: Story = {
+export const Default: StoryObj = {
   render: DefaultTemplate,
+  argTypes: {
+    ...subcomponentArgTypes(Accordion.Item, {
+      category: 'Accordion.Item',
+      prefix: 'item',
+      // ReactNode slots + deep-link/internal props don't make good knobs; onToggle is wired as an action below.
+      exclude: ['children', 'id', 'openOnHashMatch', 'iconCard', 'onToggle'],
+    }),
+    item__onToggle: {
+      action: 'onToggle',
+      name: 'onToggle',
+      description: 'Called whenever the user toggles the item. Receives the next expanded state.',
+      table: { category: 'Accordion.Item' },
+    },
+    ...subcomponentArgTypes(Accordion.Item.Header, {
+      category: 'Accordion.Item.Header',
+      prefix: 'header',
+      exclude: [
+        'children',
+        'title',
+        'beforeTitle',
+        'afterTitle',
+        'startAction',
+        'endAction',
+        'startDescription',
+        'endDescription',
+      ],
+    }),
+    ...subcomponentArgTypes(Accordion.Item.Content, {
+      category: 'Accordion.Item.Content',
+      prefix: 'content',
+      exclude: ['children'],
+    }),
+  },
   args: {
+    // Accordion (primary)
     allowMultiple: false,
-    accordionDefaultExpanded: false,
-    headerClickable: true,
-    titleLayout: 'hug',
-    showExpandLabel: true,
-    showDefaultExpandAction: true,
-    expandActionPosition: 'end',
-    expandActionArrowType: 'default',
-    expandActionSize: undefined,
-    expandActionInverted: false,
-    expandActionUnderline: false,
     defaultExpanded: false,
-    showIconCard: false,
-    selected: false,
-    disabled: false,
-    headingLevel: undefined,
+    // Accordion.Item
+    item__defaultExpanded: false,
+    item__showIconCard: false,
+    item__selected: false,
+    item__disabled: false,
+    // Accordion.Item.Header
+    header__headerClickable: true,
+    header__titleLayout: 'hug',
+    header__showExpandLabel: true,
+    header__showDefaultExpandAction: true,
+    header__expandActionPosition: 'end',
+    header__expandActionArrowType: 'default',
+    header__expandActionInverted: false,
+    header__expandActionUnderline: false,
   },
   parameters: {
     docs: {
