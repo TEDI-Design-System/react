@@ -1,3 +1,10 @@
+# [18.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.21...react-18.0.0-rc.22) (2026-06-26)
+
+
+### Features
+
+* **tabs:** design improvements, story enhancements based on design feedback [#688](https://github.com/TEDI-Design-System/react/issues/688) ([#691](https://github.com/TEDI-Design-System/react/issues/691)) ([1926026](https://github.com/TEDI-Design-System/react/commit/1926026047ca49109fffa67bea661dd09c37ee1f))
+
 # [18.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.20...react-18.0.0-rc.21) (2026-06-26)
 
 
