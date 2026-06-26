@@ -52,13 +52,41 @@ const positions: { label: string; above: boolean; below: boolean }[] = [
 
 const STUB_HEIGHT = 1.5;
 
-const PositionShowcase = ({ renderContent }: { renderContent: () => ReactNode }): JSX.Element => (
+// Mirrors the real `Timeline` timings styling: all lines tertiary (grey), the first at regular
+// size and the rest small.
+const renderTimings = (timings: string[]): ReactNode =>
+  timings.map((timing, index) => (
+    <Text key={`${timing}-${index}`} color="tertiary" modifiers={index === 0 ? undefined : 'small'}>
+      {timing}
+    </Text>
+  ));
+
+const PositionShowcase = ({
+  renderContent,
+  timings,
+}: {
+  renderContent: () => ReactNode;
+  timings?: string[];
+}): JSX.Element => (
   <Row>
     {positions.map(({ label, above, below }) => (
       <Col key={label} xs={12} sm={4}>
         <VerticalSpacing size={0.5}>
           <Text modifiers="bold">{label}</Text>
           <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-12)' }}>
+            {timings && (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  textAlign: 'right',
+                  paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0,
+                }}
+              >
+                {renderTimings(timings)}
+              </div>
+            )}
             <div
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: above ? 0 : '6px' }}
             >
@@ -103,31 +131,56 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * The three line positions a single item can take, shown as isolated rows like the Figma spec:
+ * **start** (line below), **middle** (line above and below) and **end** (line above). The label
+ * sits on the left, the timings are right-aligned against the marker, and the start row carries a
+ * "Näita rohkem" expander to show the line filling taller content.
+ */
 export const Position: Story = {
   render: () => (
-    <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-12)' }}>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {['Start', 'Middle', 'End'].map((label) => (
-          <div key={label} style={{ flex: 1 }}>
+    <VerticalSpacing size={1.5}>
+      {positions.map(({ label, above, below }) => (
+        <div key={label} style={{ display: 'flex', gap: 'var(--layout-grid-gutters-12)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', width: '4rem', flexShrink: 0 }}>
             <Text modifiers="bold">{label}</Text>
           </div>
-        ))}
-      </div>
-      <Timeline>
-        <Timeline.Item timings={['1990', '14. detsember']}>
-          <Timeline.Title>Taotluse esitamine</Timeline.Title>
-          <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-        </Timeline.Item>
-        <Timeline.Item timings={['1990', '14. detsember']}>
-          <Timeline.Title>Taotluse esitamine</Timeline.Title>
-          <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-        </Timeline.Item>
-        <Timeline.Item timings={['1990', '14. detsember']}>
-          <Timeline.Title>Taotluse esitamine</Timeline.Title>
-          <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-        </Timeline.Item>
-      </Timeline>
-    </div>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              textAlign: 'right',
+              minWidth: '6rem',
+              paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0,
+            }}
+          >
+            {renderTimings(['1990', '14. detsember'])}
+          </div>
+
+          <div
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: above ? 0 : '6px' }}
+          >
+            {above && <Separator axis="vertical" color="secondary" height={STUB_HEIGHT} />}
+            <Separator variant="dot-only" color="secondary" dotSize="medium" dotStyle="outlined" />
+            {below && <Separator axis="vertical" color="secondary" height={STUB_HEIGHT} />}
+          </div>
+
+          <div style={{ paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0 }}>
+            <Timeline.Title>Taotluse esitamine</Timeline.Title>
+            <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
+            {label === 'Start' && (
+              <Collapse id="timeline-position-collapse" openText="Näita rohkem" closeText="Näita vähem">
+                <Text element="span" modifiers="small" color="tertiary">
+                  Pärast otsuse teatavaks tegemist saab seda vajadusel vaidlustada.
+                </Text>
+              </Collapse>
+            )}
+          </div>
+        </div>
+      ))}
+    </VerticalSpacing>
   ),
 };
 
@@ -204,42 +257,30 @@ export const WithAction: Story = {
 };
 
 export const WithDate: Story = {
-  args: { activeIndex: 1 },
-  render: (args) => (
-    <Timeline {...args}>
-      <Timeline.Item timings={['1990']}>
-        <Timeline.Title>Taotluse esitamine</Timeline.Title>
-        <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-      </Timeline.Item>
-      <Timeline.Item timings={['1990']}>
-        <Timeline.Title>Taotluse esitamine</Timeline.Title>
-        <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-      </Timeline.Item>
-      <Timeline.Item timings={['1990']}>
-        <Timeline.Title>Taotluse esitamine</Timeline.Title>
-        <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-      </Timeline.Item>
-    </Timeline>
+  render: () => (
+    <PositionShowcase
+      timings={['1990']}
+      renderContent={() => (
+        <>
+          <Timeline.Title>Taotluse esitamine</Timeline.Title>
+          <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
+        </>
+      )}
+    />
   ),
 };
 
 export const WithDateDescription: Story = {
-  args: { activeIndex: 1 },
-  render: (args) => (
-    <Timeline {...args}>
-      <Timeline.Item timings={['1990', '14. detsember']}>
-        <Timeline.Title>Taotluse esitamine</Timeline.Title>
-        <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-      </Timeline.Item>
-      <Timeline.Item timings={['1990', '14. detsember']}>
-        <Timeline.Title>Taotluse esitamine</Timeline.Title>
-        <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-      </Timeline.Item>
-      <Timeline.Item timings={['1990', '14. detsember']}>
-        <Timeline.Title>Taotluse esitamine</Timeline.Title>
-        <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-      </Timeline.Item>
-    </Timeline>
+  render: () => (
+    <PositionShowcase
+      timings={['1990', '14. detsember']}
+      renderContent={() => (
+        <>
+          <Timeline.Title>Taotluse esitamine</Timeline.Title>
+          <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
+        </>
+      )}
+    />
   ),
 };
 
