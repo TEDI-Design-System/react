@@ -6,6 +6,10 @@ $btn-height-small: 2rem;
 $btn-height-large: 3.5rem;
 $btn-width-large: 3.72rem;
 
+:root {
+  --tedi-btn-text-padding-inline: var(--button-md-inner-spacing);
+}
+
 @mixin button-variant(
   $background,
   $border,
@@ -440,8 +444,8 @@ $btn-width-large: 3.72rem;
 }
 
 .tedi-btn__text {
-  padding-right: var(--button-md-inner-spacing);
-  padding-left: var(--button-md-inner-spacing);
+  padding-right: var(--tedi-btn-text-padding-inline);
+  padding-left: var(--tedi-btn-text-padding-inline);
 
   .tedi-btn--link.tedi-btn--is-hovered:not(:disabled) &,
   .tedi-btn--link.tedi-btn--is-active:not(:disabled) &,

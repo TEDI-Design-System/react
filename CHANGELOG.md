@@ -1,3 +1,38 @@
+# [18.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.19...react-18.0.0-rc.20) (2026-06-26)
+
+
+### Features
+
+* **carousel:** tedi-ready component [#358](https://github.com/TEDI-Design-System/react/issues/358) ([#684](https://github.com/TEDI-Design-System/react/issues/684)) ([c420d95](https://github.com/TEDI-Design-System/react/commit/c420d9531468f368e4e737ecdb4ae1d24abd9126))
+
+# [18.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.18...react-18.0.0-rc.19) (2026-06-26)
+
+
+### Features
+
+* **option-content:** helper component, update search stories [#677](https://github.com/TEDI-Design-System/react/issues/677) ([#678](https://github.com/TEDI-Design-System/react/issues/678)) ([9fb0662](https://github.com/TEDI-Design-System/react/commit/9fb066204542c334db188bb3dca700b06a201472))
+
+# [18.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.17...react-18.0.0-rc.18) (2026-06-25)
+
+
+### Features
+
+* **card-button:** new tedi-ready component [#21](https://github.com/TEDI-Design-System/react/issues/21) ([#686](https://github.com/TEDI-Design-System/react/issues/686)) ([7d98085](https://github.com/TEDI-Design-System/react/commit/7d980855ddcf3d4ad77c273465a543a62d8d5572))
+
+# [18.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.16...react-18.0.0-rc.17) (2026-06-25)
+
+
+### Features
+
+* **accordion:** add new TEDI-Ready component [#74](https://github.com/TEDI-Design-System/react/issues/74) ([#666](https://github.com/TEDI-Design-System/react/issues/666)) ([69aa2ad](https://github.com/TEDI-Design-System/react/commit/69aa2ad3d9bfcc07de7a4bb29044c46dccfd08a6))
+
+# [18.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.15...react-18.0.0-rc.16) (2026-06-25)
+
+
+### Features
+
+* **time-field:** add modal opener functionality [#641](https://github.com/TEDI-Design-System/react/issues/641) ([#674](https://github.com/TEDI-Design-System/react/issues/674)) ([d040ffe](https://github.com/TEDI-Design-System/react/commit/d040ffe1f26544b14ca3223a024beb24891d569f)), closes [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75) [#75](https://github.com/TEDI-Design-System/react/issues/75)
+
 # [18.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.14...react-18.0.0-rc.15) (2026-06-18)
 
 

@@ -13,6 +13,7 @@ import Checkbox from '../../form/checkbox/checkbox';
 import Radio from '../../form/radio/radio';
 import { Search } from '../../form/search/search';
 import { Col, Row } from '../../layout/grid';
+import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
 import { Dropdown, DropdownProps } from './dropdown';
 
@@ -591,13 +592,13 @@ export const CustomContent: Story = {
             <Search id="dropdown-search" label="Otsi" value={query} onChange={(value) => setQuery(value)} />
           </Dropdown.Item>
 
-          {filtered.map((rep, i) => {
-            const index = i + 1;
-
-            return (
-              <Dropdown.Item key={rep.name} index={index}>
-                <Text>
-                  <strong>{rep.name}</strong>
+          {filtered.map((rep, i) => (
+            <Dropdown.Item key={rep.name} index={i + 1}>
+              <OptionContent>
+                <OptionContent.Label>
+                  <Text element="span" modifiers="bold">
+                    {rep.name}
+                  </Text>
                   <Separator
                     axis="vertical"
                     color="secondary"
@@ -608,10 +609,10 @@ export const CustomContent: Story = {
                     variant="dot-only"
                   />
                   {rep.code}
-                </Text>
-              </Dropdown.Item>
-            );
-          })}
+                </OptionContent.Label>
+              </OptionContent>
+            </Dropdown.Item>
+          ))}
         </Dropdown.Content>
       </Dropdown>
     );

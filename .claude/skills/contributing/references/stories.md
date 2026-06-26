@@ -58,7 +58,12 @@ Map the component path to the Storybook title:
 | `src/tedi/components/buttons/` | `TEDI-Ready/Components/Buttons/` |
 | `src/tedi/components/overlays/` | `TEDI-Ready/Components/Overlays/` |
 | `src/tedi/components/navigation/` | `TEDI-Ready/Components/Navigation/` |
+| `src/tedi/components/content/` | `TEDI-Ready/Content/` (no `Components/` segment) |
+| `src/tedi/components/layout/` | `TEDI-Ready/Layout/` (no `Components/` segment) |
+| `src/tedi/components/base/` | `TEDI-Ready/Base/` (no `Components/` segment) |
 | Other category | `TEDI-Ready/Components/<Category>/` |
+
+**Note:** the `Content`, `Layout`, and `Base` groups sit directly under `TEDI-Ready/` — they skip the `Components/` segment. Check sibling stories in the same folder before picking a title.
 
 ### 4. Create the Stories File
 
@@ -72,7 +77,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
  */
 
 export default {
-  title: 'TEDI-Ready/Components/Category/ComponentName',
+  title: 'TEDI-Ready/Components/Category/ComponentName', // or 'TEDI-Ready/<Content|Layout|Base>/ComponentName' for those groups
   component: ComponentName,
   subcomponents: { /* sub-components if compound — also wire live controls, see §5 */ } as never,
   parameters: {

@@ -287,7 +287,7 @@ export const TimeWheel: React.FC<TimeWheelProps> = ({
       const el = container?.querySelector<HTMLElement>(`#${CSS.escape(`${uid}-${type}-${nextIndex}`)}`);
 
       el?.focus();
-      el?.scrollIntoView({ block: 'center', behavior: wrapped ? 'auto' : 'smooth' });
+      el?.scrollIntoView({ block: 'center', behavior: wrapped ? 'instant' : 'smooth' });
     };
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { components as ReactSelectComponents, OptionProps } from 'react-select';
 
-import Radio from '../../radio/radio';
+import { OptionContent } from '../../../misc/option-content/option-content';
 import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
 
@@ -30,19 +30,14 @@ export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }:
       className={OptionBEM}
     >
       {showRadioButtons ? (
-        <>
-          <span className="sr-only">{props.label}</span>
-          <Radio
-            label={props.label}
-            id={props.data.value}
-            name={props.data.value}
-            className={styles['tedi-select__radio']}
-            value={props.data.value}
-            checked={props.isSelected}
-            disabled={props.isDisabled}
-            onChange={() => null}
-          />
-        </>
+        <OptionContent
+          type="radio"
+          indicatorSemantics="control"
+          selected={props.isSelected}
+          disabled={props.isDisabled}
+        >
+          <OptionContent.Label>{props.children}</OptionContent.Label>
+        </OptionContent>
       ) : renderOption ? (
         renderOption(props)
       ) : (
