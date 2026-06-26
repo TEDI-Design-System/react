@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { Fragment } from 'react/jsx-runtime';
 
 import { Text } from '../../base/typography/text/text';

@@ -1,6 +1,7 @@
 export * from './components/base/typography/text/text';
 export * from './components/base/typography/heading/heading';
 export * from './components/base/icon/icon';
+export * from './components/content/carousel';
 export * from './components/content/list';
 export * from './components/content/label/label';
 export * from './components/content/section/section';
@@ -17,6 +18,7 @@ export * from './components/tags/status-badge/status-badge';
 export * from './components/tags/status-indicator/status-indicator';
 export * from './components/buttons/closing-button/closing-button';
 export * from './components/buttons/button/button';
+export * from './components/buttons/card-button/card-button';
 export * from './components/buttons/info-button/info-button';
 export * from './components/buttons/floating-button/floating-button';
 export * from './components/buttons/button-group/button-group';
@@ -69,6 +71,7 @@ export * from './components/misc/scroll-visibility/scroll-visibility';
 export * from './components/misc/scroll-fade/scroll-fade';
 export * from './components/misc/affix/affix';
 export * from './components/misc/ellipsis/ellipsis';
+export * from './components/misc/option-content/option-content';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
 

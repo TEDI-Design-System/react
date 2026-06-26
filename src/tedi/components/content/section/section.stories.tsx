@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { VerticalSpacing } from '../../layout/vertical-spacing';

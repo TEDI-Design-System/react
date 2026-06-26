@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';

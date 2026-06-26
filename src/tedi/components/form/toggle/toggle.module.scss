@@ -107,8 +107,8 @@
     }
 
     &:focus-visible {
-      outline: calc(2 * var(--borders-01)) solid var(--form-toggle-primary-active-default);
-      outline-offset: var(--borders-01);
+      outline: calc(2 * var(--tedi-borders-01)) solid var(--form-toggle-primary-active-default);
+      outline-offset: var(--tedi-borders-01);
     }
 
     &:checked + .tedi-toggle__slider {

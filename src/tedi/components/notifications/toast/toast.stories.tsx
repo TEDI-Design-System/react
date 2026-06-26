@@ -1,5 +1,5 @@
-import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/blocks';
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';

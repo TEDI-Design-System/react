@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ElementType } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
