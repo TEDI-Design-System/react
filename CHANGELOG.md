@@ -1,3 +1,10 @@
+# [18.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.20...react-18.0.0-rc.21) (2026-06-26)
+
+
+### Features
+
+* updated storybook to v10 [#575](https://github.com/TEDI-Design-System/react/issues/575) ([#681](https://github.com/TEDI-Design-System/react/issues/681)) ([1bc5806](https://github.com/TEDI-Design-System/react/commit/1bc58064a0d1bd6e31fb87c455f0abac5e0304d9))
+
 # [18.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.19...react-18.0.0-rc.20) (2026-06-26)
 
 
