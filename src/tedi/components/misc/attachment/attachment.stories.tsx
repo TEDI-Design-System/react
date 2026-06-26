@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Button } from '../../buttons/button/button';
 import { HideAt } from '../../layout/hide-at/hide-at';
@@ -11,12 +11,6 @@ import { Attachment, AttachmentProps } from './attachment';
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.59.78?node-id=30427-154342&m=dev" target="_blank">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/125c5a-attachment" target="_blank">Zeroheight ↗</a>
- *
- * A file-attachment row: a file name (with optional size, leading icon or upload
- * progress) on a tertiary surface. Action buttons (download, delete, …) are **not**
- * built in — pass your own neutral icon-only buttons to the `actions` slot, each
- * with an `aria-label` (wrap in a `Tooltip` to surface the label visually). The row
- * is never a single clickable target.
  */
 const meta: Meta<AttachmentProps> = {
   component: Attachment,
@@ -25,9 +19,6 @@ const meta: Meta<AttachmentProps> = {
     name: 'Kodukülastusakt_Triin.pdf',
   },
   argTypes: {
-    // `icon` is a Material icon name (string). Force a text control so Storybook
-    // doesn't infer an object editor for the `string | null` union — picking `{}`
-    // there renders an object as a React child and throws.
     icon: { control: 'text' },
   },
   parameters: {
@@ -65,9 +56,6 @@ export const Default: Story = {
   render: renderWithDelete,
 };
 
-/**
- * Read-only attachments expose only a download action — no delete button.
- */
 export const ReadOnly: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.5}>
@@ -78,11 +66,6 @@ export const ReadOnly: StoryFn<AttachmentProps> = () => (
   </div>
 );
 
-/**
- * Set `isLoading` to show upload progress as an inline `ProgressBar`; `progress`
- * (0..100) drives the value and `progressLabel` adds a hint under it. The remove
- * (or other) actions stay visible so the upload can be cancelled.
- */
 export const WithProgress: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.5}>
@@ -118,10 +101,6 @@ export const WithFileSize: Story = {
   },
 };
 
-/**
- * Pass a Material Symbol name to `icon` to show a leading file-type icon before
- * the file name.
- */
 export const WithIcon: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.5}>
@@ -133,9 +112,6 @@ export const WithIcon: StoryFn<AttachmentProps> = () => (
   </div>
 );
 
-/**
- * Leave the `actions` slot empty to render an attachment with no action buttons.
- */
 export const WithoutDeleteButton: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.5}>
@@ -188,13 +164,6 @@ export const WithDifferentActions: StoryFn<AttachmentProps> = () => (
     </VerticalSpacing>
   </div>
 );
-
-/**
- * `direction="vertical"` stacks the name, size and progress in a column with the
- * actions pinned top-right — useful on mobile or in narrow containers. Leave
- * `direction` unset to switch automatically below the `verticalBelow` breakpoint
- * (default `sm`).
- */
 export const Vertical: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 350 }}>
     <VerticalSpacing size={0.75}>
@@ -238,10 +207,6 @@ export const Vertical: StoryFn<AttachmentProps> = () => (
   </div>
 );
 
-/**
- * `isValid={false}` flips the card to the error surface (red, error glyph next to
- * the name); pair it with a `feedback` error message rendered below the card.
- */
 export const WithError: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <VerticalSpacing size={0.75}>
@@ -256,11 +221,6 @@ export const WithError: StoryFn<AttachmentProps> = () => (
   </div>
 );
 
-/**
- * Labeled neutral buttons (icon + text) on desktop that collapse to icon-only
- * buttons with tooltips on narrow screens — toggle the two action sets with
- * `ShowAt` / `HideAt` at the `sm` breakpoint. Resize the preview to see the switch.
- */
 export const LabeledActions: StoryFn<AttachmentProps> = () => (
   <div style={{ maxWidth: 480 }}>
     <Attachment

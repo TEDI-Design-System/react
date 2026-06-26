@@ -1,3 +1,5 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
 .tedi-attachment-wrapper {
   display: block;
   width: 100%;
@@ -39,9 +41,13 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--layout-grid-gutters-02);
   min-width: 0;
   padding: var(--layout-grid-gutters-08);
+  padding-right: 0;
+}
+
+.tedi-attachment__icon + .tedi-attachment__body {
+  padding-left: 0;
 }
 
 .tedi-attachment__name {
@@ -110,6 +116,12 @@
   flex-shrink: 0;
   margin-left: auto;
   white-space: nowrap;
+}
+
+@include breakpoints.media-breakpoint-down(md) {
+  .tedi-attachment__file-size {
+    margin-left: 0;
+  }
 }
 
 .tedi-attachment__actions {
