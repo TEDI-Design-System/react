@@ -1,3 +1,10 @@
+# [18.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.22...react-18.0.0-rc.23) (2026-06-26)
+
+
+### Features
+
+* **attachment:** tedi-ready component [#644](https://github.com/TEDI-Design-System/react/issues/644) ([#680](https://github.com/TEDI-Design-System/react/issues/680)) ([b54840f](https://github.com/TEDI-Design-System/react/commit/b54840f43d6cfe1890f3a40ecb0b55d9a0c64c4f)), closes [#32](https://github.com/TEDI-Design-System/react/issues/32) [#32](https://github.com/TEDI-Design-System/react/issues/32) [#32](https://github.com/TEDI-Design-System/react/issues/32)
+
 # [18.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.21...react-18.0.0-rc.22) (2026-06-26)
 
 
