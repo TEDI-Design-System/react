@@ -1605,6 +1605,30 @@ Sub-components: `OptionContent.Label`, `OptionContent.Meta`
 )} />
 ```
 
+### Rating
+
+Rating scale for collecting feedback. Rendered as a `radiogroup` of native radios (keyboard arrows move between items, form-submittable).
+
+**Props:** `RatingProps`
+- `label: string` (required) — accessible name for the group
+- `type?: 'star' | 'number' | 'icon' = 'star'` — `star`/`number` fill cumulatively (every item up to the value); `icon` highlights a single item
+- `count?: number` — items in the scale (default `5` for `star`/`icon`, `10` for `number`)
+- `value?: number`, `defaultValue?: number = 0` — selected value (1-based; `0` = no rating). Controlled with `value` + `onChange`
+- `onChange?: (value: number) => void`
+- `itemLabels?: string[]` — per-item labels (length = `count`); used as each radio's accessible name and shown as captions (`icon`: under each item; `number`: first/last as start/end; `star`: the selected item's label as a single caption)
+- `icons?: string[]` — glyph names for `type="icon"` (defaults to the five sentiment faces when `count` is 5)
+- `disabled?: boolean`, `readOnly?: boolean`, `name?: string`, `className?: string`
+
+```tsx
+<Rating
+  label="Hinnang"
+  type="star"
+  value={value}
+  onChange={setValue}
+  itemLabels={['Väga halb', 'Halb', 'Keskmine', 'Hea', 'Väga hea']}
+/>
+```
+
 States: the `Label` uses `color: inherit`, so it follows the parent item's per-state text colour (default → hover → active → disabled) defined on `DropdownItem` / the Select option — both surfaces share the `--dropdown-item-*` and `--form-checkbox-radio-*` tokens. The leading icon and `Meta` keep their secondary/tertiary colours. `Select` renders its option content with `<OptionContent indicatorSemantics="control">` internally, so a custom `renderOption` is only needed for *richer* content (icon/meta), not to match the default look.
 
 ---
