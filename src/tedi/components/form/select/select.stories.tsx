@@ -356,10 +356,8 @@ export const ValueType: Story = {
 };
 
 /**
- * Set `tagsEllipsis` to truncate selected-tag labels when the field is width-constrained;
- * the full label is shown in a popover on hover/focus. `end` truncates the tail, `start` the
- * front (keeping the most significant part — e.g. a date or ID — visible). `false` (default)
- * lets long labels wrap instead.
+ * `tagsEllipsis` truncates long tag labels: `end` → `Long label…`, `start` → `…label`. The full
+ * label shows in a popover on hover/focus.
  */
 export const EllipsisTags: Story = {
   render: () => {

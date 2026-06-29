@@ -303,6 +303,17 @@ describe('Select component', () => {
     expect(container.querySelectorAll('[data-name="ellipsis"]')).toHaveLength(2);
   });
 
+  it('marks the tag wrapper as shrinkable for ellipsis and handles mousedown', () => {
+    const { container } = render(
+      <Select {...defaultProps} multiple value={[basicOptions[0], basicOptions[1]]} tagsEllipsis="end" />
+    );
+    const wrapper = container.querySelector('[data-tedi-tag-index]');
+    expect(wrapper).toHaveClass('tedi-select__multi-value--ellipsis');
+
+    fireEvent.mouseDown(wrapper!);
+    expect(wrapper).toBeInTheDocument();
+  });
+
   it('renders tag closing button', () => {
     const { container } = render(
       <Select {...defaultProps} multiple value={[basicOptions[0], basicOptions[1]]} isTagRemovable />
