@@ -137,8 +137,8 @@ export const WithTextInverted = {
       active: '#Active__trigger',
       focusVisible: '#Focus__trigger',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const IconOnlyInverted = {
@@ -155,8 +155,8 @@ export const IconOnlyInverted = {
       active: '#Active__trigger',
       focusVisible: '#Focus__trigger',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const SecondaryButton = {

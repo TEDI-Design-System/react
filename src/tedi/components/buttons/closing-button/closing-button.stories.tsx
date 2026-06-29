@@ -145,6 +145,6 @@ export const ColorInverted: Story = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
