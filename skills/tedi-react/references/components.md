@@ -83,14 +83,21 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 
 ### Collapse
 
+Disclosure with an optional `title` and a chevron toggle. The toggle is a `CollapseButton` (a real `<button>`); **only the toggle expands/collapses — clicking the `title` does not** (the title sits outside the button, so it can hold its own interactive content).
+
 **Props:** `CollapseProps` | bp
 
 - `id: string` (required)
 - `children: ReactNode`
+- `title?: JSX.Element` — header content shown beside the toggle (not itself a toggle)
 - `open?: boolean` (controlled), `defaultOpen?: boolean`
 - `onToggle?: (open: boolean) => void`
-- `arrowType: 'default' | 'secondary' = 'default'`
-- `iconOnly?: boolean`
+- `openText? / closeText?` — toggle label per state (default LabelProvider `open` / `close`)
+- `toggleLabel?: string` — accessible name override (e.g. for icon-only)
+- `arrowType: 'default' | 'secondary' = 'default'`, `size: 'default' | 'small'`, `underline = true`, `inverted?`, `hideCollapseText?`
+- `iconOnly?: boolean` — chevron-only (only when no `title`)
+- `fullRowToggle?: boolean = false` — make the whole header row toggle on click (the chevron button stays the keyboard/SR control; clicks on links/buttons inside the title are ignored so they keep working)
+- `controlsId?: string` — toggle controls an external region instead of rendering its own panel
 
 ### CardButton
 
@@ -515,6 +522,8 @@ Give the sort/filter controls themselves a column-scoped accessible name. The bu
 ```tsx
 <Table<Person> id="people" data={rows} columns={columns} getSubRows={(r) => r.subRows} expandTrigger="row" />
 ```
+
+The row-expand toggle is a `CollapseButton`. Forward extra props to it via `collapseProps?: TableExpandCollapseProps` (`Omit<CollapseButtonProps, 'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls'>` — those are owned by Table). Use it to override `arrowType`, `size`, `inverted`, etc.
 
 #### Responsive — default is horizontal scroll; opt into a stacked layout
 

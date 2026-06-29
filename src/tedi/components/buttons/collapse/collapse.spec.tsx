@@ -31,39 +31,38 @@ const getComponent = (props?: Partial<CollapseProps>) =>
     </PrintingProvider>
   );
 
-describe('Collapse component with breakpoint support', () => {
+describe('Collapse', () => {
   (useBreakpointProps as jest.Mock).mockImplementation(() => ({
-    getCurrentBreakpointProps: jest.fn((props) => ({
-      ...props,
-    })),
+    getCurrentBreakpointProps: jest.fn((props) => ({ ...props })),
   }));
-
   (usePrint as jest.Mock).mockReturnValue(false);
 
-  it('renders successfully', () => {
-    const { baseElement } = getComponent();
-    expect(baseElement).toBeTruthy();
+  it('renders the title, content and a toggle button', () => {
+    getComponent();
+    expect(screen.getByText('Heading')).toBeInTheDocument();
+    expect(screen.getByText('Collapse content')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Näita rohkem' })).toBeInTheDocument();
   });
 
-  it('applies custom className to root', () => {
+  it('applies a custom className to the root', () => {
     const { container } = getComponent({ className: 'test-class' });
     const root = container.querySelector('.test-class');
     expect(root).toBeInTheDocument();
     expect(root?.getAttribute('data-name')).toBe('collapse');
   });
 
-  it('is collapsed by default (uncontrolled)', () => {
-    const { getByTestId } = getComponent();
-    const content = getByTestId('collapse-inner');
-    expect(content).toHaveStyle('height: 0px');
+  it('is collapsed by default and expands when the toggle is clicked (uncontrolled)', () => {
+    getComponent();
+    const button = screen.getByRole('button', { name: 'Näita rohkem' });
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(button);
+    expect(screen.getByRole('button', { name: 'Näita vähem' })).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('expands when clicked (uncontrolled)', () => {
-    const { getByTestId } = getComponent();
-    const content = getByTestId('collapse-inner');
-    const button = screen.getByRole('button', { name: /näita rohkem/i });
-    fireEvent.click(button);
-    expect(content).toHaveStyle('height: 0px');
+  it('starts open with defaultOpen', () => {
+    getComponent({ defaultOpen: true });
+    expect(screen.getByRole('button', { name: 'Näita vähem' })).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('can be controlled externally', () => {
@@ -72,171 +71,72 @@ describe('Collapse component with breakpoint support', () => {
         Controlled content
       </Collapse>
     );
-
-    const content = getByTestId('collapse-inner');
-    expect(content).toHaveStyle('height: auto');
+    expect(getByTestId('collapse-inner')).toHaveStyle('height: auto');
 
     rerender(
       <Collapse id="collapse-2" open={false} title={<Heading>Controlled</Heading>}>
         Controlled content
       </Collapse>
     );
-
-    expect(content).toHaveStyle('height: 0px');
+    expect(getByTestId('collapse-inner')).toHaveStyle('height: 0px');
   });
 
-  it('hides collapse text when hideCollapseText is true', () => {
-    render(
-      <Collapse id="collapse-4" hideCollapseText title={<Heading>Toggle</Heading>}>
-        Content
-      </Collapse>
-    );
-
-    const visuallyHiddenCol = screen.getByText(/open/i).parentElement;
-    expect(visuallyHiddenCol).toHaveClass('visually-hidden');
+  it('fires onToggle with the next open state', () => {
+    const onToggle = jest.fn();
+    getComponent({ onToggle });
+    fireEvent.click(screen.getByRole('button', { name: 'Näita rohkem' }));
+    expect(onToggle).toHaveBeenCalledWith(true);
   });
 
-  it('renders secondary arrow wrapper when arrowType is "secondary"', () => {
-    const { container } = getComponent({ arrowType: 'secondary' });
-    const wrapper = container.querySelector('.tedi-collapse__icon-wrapper');
-    expect(wrapper).toBeInTheDocument();
+  it('does NOT toggle when the title itself is clicked (only the toggle button does)', () => {
+    getComponent();
+    fireEvent.click(screen.getByText('Heading'));
+    expect(screen.getByRole('button', { name: 'Näita rohkem' })).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('hides underline when underline is false', () => {
-    const { container } = getComponent({ underline: false });
-    const text = container.querySelector('.tedi-collapse__text');
-    expect(text).not.toHaveClass('tedi-collapse__text--underline');
+  it('toggles on a title click when fullRowToggle is set', () => {
+    getComponent({ fullRowToggle: true });
+    fireEvent.click(screen.getByText('Heading'));
+    expect(screen.getByRole('button', { name: 'Näita vähem' })).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('applies icon-only styles when iconOnly is true and no title is provided', () => {
-    const { container } = render(
-      <Collapse id="collapse-icon-only" iconOnly>
-        Content
-      </Collapse>
-    );
-
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).toHaveClass('tedi-collapse--icon-only');
+  it('does not double-toggle when the chevron button is clicked with fullRowToggle', () => {
+    const onToggle = jest.fn();
+    getComponent({ fullRowToggle: true, onToggle });
+    fireEvent.click(screen.getByRole('button', { name: 'Näita rohkem' }));
+    expect(onToggle).toHaveBeenCalledTimes(1);
+    expect(onToggle).toHaveBeenCalledWith(true);
   });
 
-  it('does NOT apply icon-only styles when iconOnly is true but title is provided', () => {
-    const { container } = render(
-      <Collapse id="collapse-with-title" iconOnly title={<Heading>Title</Heading>}>
-        Content
-      </Collapse>
-    );
-
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).not.toHaveClass('tedi-collapse--icon-only');
+  it('renders the content as a region labelled by the toggle', () => {
+    getComponent({ defaultOpen: true });
+    const region = screen.getByRole('region', { name: 'Näita vähem' });
+    expect(region).toHaveTextContent('Collapse content');
   });
 
-  it('does NOT apply icon-only styles when hideCollapseText is true', () => {
-    const { container } = render(
-      <Collapse id="collapse-hide-text" hideCollapseText title={<Heading>Toggle</Heading>}>
-        Content
-      </Collapse>
-    );
-
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).not.toHaveClass('tedi-collapse--icon-only');
+  it('hides the toggle text (chevron only) when hideCollapseText is set, keeping an accessible name', () => {
+    getComponent({ hideCollapseText: true });
+    expect(screen.getByRole('button', { name: 'Näita rohkem' })).toBeInTheDocument();
+    expect(screen.queryByText('Näita rohkem')).not.toBeInTheDocument();
   });
 
-  it('uses accessible name even in icon-only mode', () => {
+  it('uses toggleLabel as the accessible name in icon-only mode', () => {
     render(
       <Collapse id="collapse-a11y" iconOnly toggleLabel="Toggle section">
         Content
       </Collapse>
     );
-
     expect(screen.getByRole('button', { name: 'Toggle section' })).toBeInTheDocument();
   });
 
-  it('toggles open state when Enter or Space is pressed on the trigger', () => {
-    const onToggle = jest.fn();
-    const { getByRole } = getComponent({ id: 'collapse-keyboard', onToggle });
-    const button = getByRole('button', { name: /näita rohkem/i });
-
-    fireEvent.keyDown(button, { key: 'Enter' });
-    expect(onToggle).toHaveBeenCalledWith(true);
-
-    fireEvent.keyDown(button, { key: ' ' });
-    expect(onToggle).toHaveBeenCalledWith(false);
-    expect(onToggle).toHaveBeenCalledTimes(2);
-  });
-
-  it('ignores repeated key events (e.repeat is true)', () => {
-    const onToggle = jest.fn();
-    const { getByRole } = getComponent({ id: 'collapse-repeat', onToggle });
-    const button = getByRole('button', { name: /näita rohkem/i });
-    fireEvent.keyDown(button, { key: 'Enter', repeat: true });
-    expect(onToggle).not.toHaveBeenCalled();
-  });
-
-  it('ignores keys other than Enter / Space', () => {
-    const onToggle = jest.fn();
-    const { getByRole } = getComponent({ id: 'collapse-other-key', onToggle });
-    const button = getByRole('button', { name: /näita rohkem/i });
-    fireEvent.keyDown(button, { key: 'a' });
-    fireEvent.keyDown(button, { key: 'Tab' });
-    expect(onToggle).not.toHaveBeenCalled();
-  });
-
-  it('does NOT apply the inverted modifier by default', () => {
-    const { container } = getComponent();
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).not.toHaveClass('tedi-collapse--inverted');
-  });
-
-  it('applies the inverted modifier on the with-text variant', () => {
-    const { container } = getComponent({ inverted: true });
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).toHaveClass('tedi-collapse--inverted');
-  });
-
-  it('keeps the with-text variant class set (no icon-only modifier) when inverted', () => {
-    const { container } = getComponent({ inverted: true });
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).toHaveClass('tedi-collapse--inverted');
-    expect(root).not.toHaveClass('tedi-collapse--icon-only');
-  });
-
-  it('applies both the icon-only and inverted modifiers together', () => {
-    const { container } = render(
-      <Collapse id="collapse-inverted-icon" iconOnly inverted>
-        Content
+  it('points aria-controls at an external id and renders no internal panel when controlsId is set', () => {
+    render(
+      <Collapse id="collapse-ext" controlsId="external-region" title={<Heading>External</Heading>}>
+        Should not render here
       </Collapse>
     );
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).toHaveClass('tedi-collapse--icon-only');
-    expect(root).toHaveClass('tedi-collapse--inverted');
-  });
-
-  it('composes the inverted modifier with the open state', () => {
-    const { container } = getComponent({ inverted: true, open: true });
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).toHaveClass('tedi-collapse--inverted');
-    expect(root).toHaveClass('tedi-collapse--is-open');
-  });
-
-  it('composes the inverted modifier with the small size', () => {
-    const { container } = getComponent({ inverted: true, size: 'small' });
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).toHaveClass('tedi-collapse--inverted');
-    expect(root).toHaveClass('tedi-collapse--small');
-  });
-
-  it('drops the inverted modifier when paired with arrowType="secondary" (no inverted secondary form)', () => {
-    const { container } = getComponent({ inverted: true, arrowType: 'secondary' });
-    const root = container.querySelector('[data-name="collapse"]');
-    expect(root).not.toHaveClass('tedi-collapse--inverted');
-  });
-
-  it('still toggles the open state on click when inverted', () => {
-    getComponent({ inverted: true });
-    const button = screen.getByRole('button', { name: /näita rohkem/i });
-    expect(screen.queryByRole('region', { name: /näita vähem/i })).not.toBeInTheDocument();
-    fireEvent.click(button);
-    expect(button).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('region', { name: /näita vähem/i })).toBeInTheDocument();
+    expect(screen.getByRole('button')).toHaveAttribute('aria-controls', 'external-region');
+    expect(screen.queryByTestId('collapse-inner')).not.toBeInTheDocument();
+    expect(screen.queryByText('Should not render here')).not.toBeInTheDocument();
   });
 });

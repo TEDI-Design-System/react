@@ -136,7 +136,12 @@ const CollapseButtonComponent = React.forwardRef<HTMLButtonElement, CollapseButt
         )
       ) : (
         <span className={styles['tedi-collapse-button__icon-pad']}>
-          <Icon className={styles['tedi-collapse-button__icon']} name="expand_more" color="inherit" size={16} />
+          <Icon
+            className={styles['tedi-collapse-button__icon']}
+            name="expand_more"
+            color="inherit"
+            size={size === 'small' ? 16 : 18}
+          />
         </span>
       )}
     </button>

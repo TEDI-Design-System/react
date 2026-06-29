@@ -1,22 +1,26 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
+import { LabelProvider } from '../../../providers/label-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
-import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import Collapse, { CollapseProps } from './collapse';
+import Collapse from './collapse';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.0.4-(work-in-progress)?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/9469bf-collapse" target="_BLANK">Zeroheight ↗</a>
+ *
+ * The toggle is a `CollapseButton`; clicking it (not the title) expands/collapses the content.
  */
-
 const meta: Meta<typeof Collapse> = {
   component: Collapse,
   title: 'Tedi-ready/Components/Buttons/Collapse',
   parameters: {
     status: {
-      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+      type: [
+        'devComponent',
+        { name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' },
+      ],
     },
     design: {
       type: 'figma',
@@ -26,159 +30,22 @@ const meta: Meta<typeof Collapse> = {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
   },
+  decorators: [
+    // Estonian examples → surface the Estonian "Ava" / "Sulge" toggle labels by default.
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
+  ],
 };
 
 export default meta;
 type Story = StoryObj<typeof Collapse>;
 
-export const Default: Story = {};
-const buttonStateArray = ['Default', 'Hover', 'Active', 'Focus'];
-type TemplateMultipleProps<Type = typeof buttonStateArray> = CollapseProps & {
-  array: Type;
-  hideSizes?: boolean;
-};
-
-const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, hideSizes, inverted, ...collapseProps } = args;
-  const labelColor = inverted ? 'white' : undefined;
-
-  return (
-    <>
-      <VerticalSpacing size={0}>
-        <Row>
-          <Col md={1}></Col>
-          <Col>
-            <Text modifiers="bold" color={labelColor}>
-              Default
-            </Text>
-          </Col>
-          {!hideSizes && (
-            <Col className="text-bold">
-              <Text modifiers="bold" color={labelColor}>
-                Small
-              </Text>
-            </Col>
-          )}
-        </Row>
-        <p>&nbsp;</p>
-        {array.map((value, key) => (
-          <Row key={key}>
-            <Col md={1} className="display-flex align-items-start">
-              <Text modifiers="bold" color={labelColor}>
-                {value}
-              </Text>
-            </Col>
-            <Col className="display-flex align-items-start gap-3">
-              <Collapse {...collapseProps} inverted={inverted} id={value}>
-                <>&nbsp;</>
-              </Collapse>
-              <Collapse {...collapseProps} inverted={inverted} id={value} open>
-                <>&nbsp;</>
-              </Collapse>
-            </Col>
-            {!hideSizes && (
-              <Col className="display-flex align-items-start gap-3">
-                <Collapse {...collapseProps} inverted={inverted} id={value} size="small">
-                  <>&nbsp;</>
-                </Collapse>
-                <Collapse {...collapseProps} inverted={inverted} id={value} open size="small">
-                  <>&nbsp;</>
-                </Collapse>
-              </Col>
-            )}
-          </Row>
-        ))}
-      </VerticalSpacing>
-    </>
-  );
-};
-
-export const WithText = {
-  render: TemplateColumn,
+export const Default: Story = {
   args: {
-    array: buttonStateArray,
-    visualType: 'primary',
-  },
-  parameters: {
-    pseudo: {
-      hover: '#Hover__trigger',
-      active: '#Active__trigger',
-      focusVisible: '#Focus__trigger',
-    },
-  },
-};
-
-export const IconOnly = {
-  render: TemplateColumn,
-  args: {
-    array: buttonStateArray,
-    visualType: 'primary',
-    iconOnly: true,
-  },
-  parameters: {
-    pseudo: {
-      hover: '#Hover__trigger',
-      active: '#Active__trigger',
-      focusVisible: '#Focus__trigger',
-    },
-  },
-};
-
-export const WithTextInverted = {
-  render: TemplateColumn,
-  args: {
-    array: buttonStateArray,
-    visualType: 'primary',
-    inverted: true,
-  },
-  parameters: {
-    pseudo: {
-      hover: '#Hover__trigger',
-      active: '#Active__trigger',
-      focusVisible: '#Focus__trigger',
-    },
-    backgrounds: { default: 'brand' },
-  },
-};
-
-export const IconOnlyInverted = {
-  render: TemplateColumn,
-  args: {
-    array: buttonStateArray,
-    visualType: 'primary',
-    iconOnly: true,
-    inverted: true,
-  },
-  parameters: {
-    pseudo: {
-      hover: '#Hover__trigger',
-      active: '#Active__trigger',
-      focusVisible: '#Focus__trigger',
-    },
-    backgrounds: { default: 'brand' },
-  },
-};
-
-export const SecondaryButton = {
-  render: TemplateColumn,
-  args: {
-    array: buttonStateArray,
-    arrowType: 'secondary',
-    iconOnly: true,
-    hideSizes: true,
-  },
-  parameters: {
-    pseudo: {
-      hover: '#Hover__trigger',
-      active: '#Active__trigger',
-      focusVisible: '#Focus__trigger',
-    },
-  },
-};
-
-export const TitleRow = {
-  args: {
-    id: 'collapse-1',
+    id: 'collapse-default',
     openText: 'Näita rohkem',
     closeText: 'Näita vähem',
     title: (
@@ -188,71 +55,86 @@ export const TitleRow = {
     ),
     children: (
       <VerticalSpacing>
-        <div>
-          <Text color="secondary">Laste osalus</Text>
-          <p>peretüli lapse osaluseta</p>
-        </div>
-        <div>
-          <Text color="secondary">Juhtumi liigid</Text>
-          <p>peretüli (lapsega)</p>
-        </div>
-        <div>
-          <Text color="secondary">Kannatanu seos vägivaldsega</Text>
-          <p>tütar</p>
-        </div>
+        <Text color="secondary">Laste osalus</Text>
+        <Text>Peretüli lapse osaluseta</Text>
       </VerticalSpacing>
     ),
   },
 };
 
-export const NestedCollapses: Story = {
+export const IconOnly: Story = {
+  args: {
+    id: 'collapse-icon-only',
+    iconOnly: true,
+    toggleLabel: 'Näita detaile',
+    children: <Text>Sisu ilma pealkirjata.</Text>,
+  },
+};
+
+export const SecondaryArrow: Story = {
+  args: {
+    id: 'collapse-secondary',
+    iconOnly: true,
+    arrowType: 'secondary',
+    toggleLabel: 'Näita detaile',
+    children: <Text>Sisu.</Text>,
+  },
+};
+
+export const Inverted: Story = {
+  globals: { backgrounds: { value: 'brand' } },
+  args: {
+    id: 'collapse-inverted',
+    inverted: true,
+    openText: 'Näita rohkem',
+    closeText: 'Näita vähem',
+    children: (
+      <Text color="white" element="span">
+        Sisu tumedal taustal.
+      </Text>
+    ),
+  },
+};
+
+export const WithoutUnderline: Story = {
+  args: {
+    ...Default.args,
+    id: 'collapse-no-underline',
+    underline: false,
+  },
+};
+
+/** Clicking anywhere on the header row toggles (the chevron stays the keyboard / SR control). */
+export const FullRowToggle: Story = {
+  args: {
+    ...Default.args,
+    id: 'collapse-full-row',
+    fullRowToggle: true,
+  },
+};
+
+export const Nested: Story = {
   args: {
     id: 'parent-collapse',
     title: (
       <Heading element="h5" color="secondary">
-        Parent Collapse
+        Ülemine plokk
       </Heading>
     ),
     children: (
       <VerticalSpacing>
-        <Text>Parent content above child collapse.</Text>
+        <Text>Ülemise ploki sisu enne alamplokki.</Text>
         <Collapse
           id="child-collapse"
           title={
             <Heading element="h6" color="secondary">
-              Child Collapse
+              Alamplokk
             </Heading>
           }
         >
-          <VerticalSpacing>
-            <Text>Child content above grandchild collapse.</Text>
-            <Collapse
-              id="grandchild-collapse"
-              title={
-                <Heading element="h6" color="brand">
-                  Grandchild Collapse
-                </Heading>
-              }
-            >
-              <VerticalSpacing>
-                <Text>This is nested inside the grandchild collapse.</Text>
-                <p>Open and close me to compare with parent and child states.</p>
-              </VerticalSpacing>
-            </Collapse>
-
-            <Text>Child content below grandchild collapse.</Text>
-          </VerticalSpacing>
+          <Text>Pesastatud alamploki sisu.</Text>
         </Collapse>
-
-        <Text>Parent content below child collapse.</Text>
       </VerticalSpacing>
     ),
-  },
-};
-
-export const TitleWithoutUnderline = {
-  args: {
-    ...Default.args,
-    underline: false,
   },
 };

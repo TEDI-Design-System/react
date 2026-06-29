@@ -96,6 +96,7 @@ export const FooterSection = ({
             size="small"
             inverted
             hideCollapseText
+            fullRowToggle
             defaultOpen={defaultOpen}
             toggleLabel={typeof heading === 'string' ? heading : undefined}
             className={styles['tedi-footer-section__collapse']}

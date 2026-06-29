@@ -36,7 +36,7 @@ import {
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
-import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
+import { CollapseButton, CollapseButtonProps } from '../../buttons/collapse-button/collapse-button';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { Radio, RadioProps } from '../../form/radio/radio';
 import { TextField, type TextFieldProps } from '../../form/textfield/textfield';
@@ -190,8 +190,8 @@ export type TableSelectionRadioProps = Omit<
 export type TableSelectionMode = 'multiple' | 'single';
 
 export type TableExpandCollapseProps = Omit<
-  CollapseProps,
-  'id' | 'controlsId' | 'children' | 'open' | 'onToggle' | 'openText' | 'closeText' | 'title'
+  CollapseButtonProps,
+  'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls'
 >;
 
 export interface TablePersistOptions {
@@ -507,10 +507,10 @@ export interface TableProps<TData> {
    */
   radioProps?: TableSelectionRadioProps;
   /**
-   * Props forwarded to the row-expand Collapse toggle. Use this to e.g.
-   * switch to `arrowType: 'default'`, change the icon size, or disable
-   * `iconOnly`. Wiring props (id, controlsId, open, onToggle, openText,
-   * closeText, children) are owned by Table and cannot be overridden.
+   * Props forwarded to the row-expand `CollapseButton` toggle. Use this to
+   * e.g. switch to `arrowType: 'default'` or change the `size`. Wiring props
+   * (id, open, onOpenChange, openText, closeText, aria-controls) are owned by
+   * Table and cannot be overridden.
    */
   collapseProps?: TableExpandCollapseProps;
   /**
@@ -1016,20 +1016,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
               }}
             >
-              <Collapse
-                iconOnly
+              <CollapseButton
+                hideText
                 arrowType={expandTrigger === 'row' ? 'default' : 'secondary'}
-                hideCollapseText
                 {...collapseProps}
                 id={`${resolvedId}-expand-${row.id}`}
-                controlsId={subRowId}
+                aria-controls={subRowId}
                 openText={getLabelRef.current('table.expand-row')}
                 closeText={getLabelRef.current('table.collapse-row')}
                 open={row.getIsExpanded()}
-                onToggle={() => row.toggleExpanded()}
-              >
-                {null}
-              </Collapse>
+                onOpenChange={() => row.toggleExpanded()}
+              />
             </span>
           );
         },
