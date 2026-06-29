@@ -25,6 +25,20 @@
       border-radius: var(--tedi-borders-04);
     }
   }
+
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--layout-grid-gutters-08);
+  }
+
+  &__transparency {
+    margin-top: var(--layout-grid-gutters-08);
+  }
+
+  &__transparency-field {
+    width: 5.5rem;
+  }
 }
 
 .tedi-base-map-selection--historical {
@@ -167,6 +181,19 @@
         outline-offset: 1px;
         border-color: var(--general-border-brand);
       }
+    }
+  }
+
+  &.tedi-base-map-selection--selected {
+    .tedi-base-map-selection__content {
+      outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+      outline-offset: 1px;
+      border-color: var(--general-border-brand);
+    }
+
+    .tedi-base-map-selection__title {
+      font-weight: 700;
+      color: var(--general-text-brand);
     }
   }
 }

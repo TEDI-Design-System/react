@@ -1,74 +1,145 @@
-import classNames from 'classnames';
+import cn from 'classnames';
 import { JSX } from 'react';
 
+import Button from '../../../../tedi/components/buttons/button/button';
+import { Field } from '../../../../tedi/components/form/field/field';
+import { Input, Suffix } from '../../../../tedi/components/form/input-group';
+import { InputGroupBase } from '../../../../tedi/components/form/input-group/input-group';
+import { Slider } from '../../../../tedi/components/form/slider/slider';
+import { Popover } from '../../../../tedi/components/overlays/popover';
+import BaseMapOption from './base-map-option';
 import styles from './base-map-selection.module.scss';
-
-type BaseMapSelectionType = 'button' | 'historical' | 'selection';
 
 export interface BaseMapSelectionProps {
   /**
-   * The title displayed within the component.
+   * Title of the trigger button and used as its accessible label.
    */
   title: string;
   /**
-   * The main content of the selection card. Can be any valid React node.
+   * Visual content (thumbnail) of the currently active base map, shown on the trigger button.
    */
   content: React.ReactNode;
   /**
-   * Indicates whether the current item is selected.
-   * Used to apply specific visual styles.
+   * Selectable base map options rendered inside the popover, typically `BaseMapSelection.Option` elements.
    */
-  selected?: boolean;
+  children: React.ReactNode;
   /**
-   * Callback function triggered when the selection is clicked
-   * or activated via keyboard (Enter or Space).
+   * Renders a "stacked" trigger, indicating that multiple base maps are available.
+   * @default false
    */
-  onSelect?: () => void;
+  multiple?: boolean;
   /**
-   * The type of the selection, which controls styling.
-   * - `'button'`: default interactive selection
-   * - `'historical'`: styled for historical context
-   * - `'selection'`: styled for multi-selection context
+   * When `true`, renders a transparency slider at the bottom of the popover.
+   * @default false
    */
-  type: BaseMapSelectionType;
+  showTransparency?: boolean;
   /**
-   * Optional custom class name to apply additional styles.
+   * Controlled transparency value (`0`-`100`). Use together with `onTransparencyChange`.
+   */
+  transparency?: number;
+  /**
+   * Callback fired when the transparency value changes.
+   */
+  onTransparencyChange?: (value: number) => void;
+  /**
+   * Label for the transparency slider.
+   */
+  transparencyLabel?: string;
+  /**
+   * Additional class name applied to the popover content.
    */
   className?: string;
   /**
-   * Optional HTML `id` attribute to identify the element.
+   * HTML `id` attribute applied to the trigger button.
    */
-  id?: string;
-  /**
-   * When `true`, indicates that multiple selections are allowed.
-   * Affects the visual style.
-   */
-  multiple?: boolean;
+  id: string;
 }
 
+const clampTransparency = (value: string | number): number => {
+  const next = Number(value);
+
+  if (Number.isNaN(next)) {
+    return 0;
+  }
+
+  return Math.min(100, Math.max(0, next));
+};
+
 export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
-  const { title, content, selected, onSelect, type = 'button', className, id, multiple } = props;
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onSelect?.();
-    }
+  const {
+    title,
+    content,
+    children,
+    multiple = false,
+    showTransparency = false,
+    transparency,
+    onTransparencyChange,
+    transparencyLabel = '',
+    className,
+    id,
+  } = props;
+
+  const transparencyValue = transparency ?? 0;
+
+  const handleTransparencyChange = (value: number) => {
+    onTransparencyChange?.(clampTransparency(value));
   };
 
-  const mapSelectionBEM = classNames(
+  const triggerBEM = cn(
     styles['tedi-base-map-selection__wrapper'],
-    selected && styles['tedi-base-map-selection--selected'],
-    type && styles[`tedi-base-map-selection--${type}`],
-    multiple && styles['tedi-base-map-selection--multiple'],
-    className
+    styles['tedi-base-map-selection__trigger'],
+    styles['tedi-base-map-selection--button'],
+    multiple && styles['tedi-base-map-selection--multiple']
   );
 
   return (
-    <div role="button" tabIndex={0} onClick={onSelect} onKeyDown={handleKeyDown} className={mapSelectionBEM} id={id}>
-      <div className={styles['tedi-base-map-selection__content']}>{content}</div>
-      <div className={styles['tedi-base-map-selection__title']}>{title}</div>
-    </div>
+    <Popover placement="top-end">
+      <Popover.Trigger>
+        <Button noStyle id={id} className={triggerBEM} aria-label={title}>
+          <div className={styles['tedi-base-map-selection__content']}>{content}</div>
+          <div className={styles['tedi-base-map-selection__title']}>{title}</div>
+        </Button>
+      </Popover.Trigger>
+      <Popover.Content width="medium" className={cn(styles['tedi-base-map-selection__popover'], className)}>
+        <div className={styles['tedi-base-map-selection__options']}>{children}</div>
+        {showTransparency && (
+          <div className={styles['tedi-base-map-selection__transparency']}>
+            <Slider
+              label={transparencyLabel}
+              aria-label={transparencyLabel ?? 'Transparency'}
+              min={0}
+              max={100}
+              value={transparencyValue}
+              onChange={handleTransparencyChange}
+              minLabel="0%"
+              maxLabel="100%"
+              addonRight={
+                <div className={styles['tedi-base-map-selection__transparency-field']}>
+                  <InputGroupBase id={`${id}-transparency`} label={transparencyLabel || 'Transparency'} hideLabel>
+                    <Input>
+                      <Field
+                        type="number"
+                        id={`${id}-transparency-field`}
+                        value={String(transparencyValue)}
+                        onChange={(value) => handleTransparencyChange(clampTransparency(value))}
+                      />
+                    </Input>
+                    <Suffix>%</Suffix>
+                  </InputGroupBase>
+                </div>
+              }
+            />
+          </div>
+        )}
+      </Popover.Content>
+    </Popover>
   );
 };
+
+BaseMapSelection.Option = BaseMapOption;
+BaseMapSelection.displayName = 'BaseMapSelection';
+
+export type { BaseMapOptionProps, BaseMapOptionType } from './base-map-option';
+export { BaseMapOption };
 
 export default BaseMapSelection;

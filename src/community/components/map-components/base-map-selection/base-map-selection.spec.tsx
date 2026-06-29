@@ -1,0 +1,90 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { BaseMapOption, BaseMapSelection } from './base-map-selection';
+
+const renderSelection = (props?: Partial<React.ComponentProps<typeof BaseMapSelection>>) =>
+  render(
+    <BaseMapSelection id="basemap" title="Active map" content={<img src="active.png" alt="Active map" />} {...props}>
+      <BaseMapSelection.Option id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />
+      <BaseMapSelection.Option id="satellite" title="Satellite" content={<img src="satellite.png" alt="Satellite" />} />
+    </BaseMapSelection>
+  );
+
+describe('BaseMapSelection', () => {
+  it('renders the trigger button labelled by its title', () => {
+    renderSelection();
+    expect(screen.getByRole('button', { name: 'Active map' })).toBeInTheDocument();
+  });
+
+  it('keeps the popover closed until the trigger is clicked', () => {
+    renderSelection();
+    expect(screen.queryByText('Streets')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+
+    expect(screen.getByText('Streets')).toBeInTheDocument();
+    expect(screen.getByText('Satellite')).toBeInTheDocument();
+  });
+
+  it('renders the transparency slider only when enabled', () => {
+    const { rerender } = renderSelection();
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+    expect(screen.queryByRole('slider')).not.toBeInTheDocument();
+
+    rerender(
+      <BaseMapSelection
+        id="basemap"
+        title="Active map"
+        content={<img src="active.png" alt="Active map" />}
+        showTransparency
+      >
+        <BaseMapSelection.Option id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />
+      </BaseMapSelection>
+    );
+
+    expect(screen.getByRole('slider')).toBeInTheDocument();
+  });
+
+  it('calls onTransparencyChange when the slider value changes', () => {
+    const onTransparencyChange = jest.fn();
+    renderSelection({ showTransparency: true, transparency: 50, onTransparencyChange });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '60' } });
+
+    expect(onTransparencyChange).toHaveBeenCalledWith(60);
+  });
+});
+
+describe('BaseMapOption', () => {
+  it('renders its title and is exposed as a button', () => {
+    render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
+    const option = screen.getByRole('button', { name: /Streets/ });
+    expect(option).toBeInTheDocument();
+    expect(option).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('reflects the selected state via aria-pressed', () => {
+    render(<BaseMapOption selected id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
+    expect(screen.getByRole('button', { name: /Streets/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('calls onSelect on click and on Enter/Space', () => {
+    const onSelect = jest.fn();
+    render(
+      <BaseMapOption
+        id="streets"
+        title="Streets"
+        onSelect={onSelect}
+        content={<img src="streets.png" alt="Streets" />}
+      />
+    );
+    const option = screen.getByRole('button', { name: /Streets/ });
+
+    fireEvent.click(option);
+    fireEvent.keyDown(option, { key: 'Enter' });
+    fireEvent.keyDown(option, { key: ' ' });
+
+    expect(onSelect).toHaveBeenCalledTimes(3);
+  });
+});
