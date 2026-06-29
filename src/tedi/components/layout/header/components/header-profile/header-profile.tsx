@@ -67,6 +67,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeRoleId, setActiveRoleId] = useState<string | null>(null);
+  const [headerOffset, setHeaderOffset] = useState<number | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const modalId = useId();
 
@@ -95,6 +96,29 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [modalOpen]);
+
+  // The modal/overlay are position: fixed, so they need the header's actual rendered
+  // bottom — which varies with the optional top/bottom bars — rather than a static token.
+  useEffect(() => {
+    if (!modalOpen) return;
+
+    const headerEl = triggerRef.current?.closest('header');
+    if (!headerEl) return;
+
+    const updateOffset = () => setHeaderOffset(headerEl.getBoundingClientRect().bottom);
+
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+    window.addEventListener('scroll', updateOffset, true);
+
+    return () => {
+      window.removeEventListener('resize', updateOffset);
+      window.removeEventListener('scroll', updateOffset, true);
+    };
+  }, [modalOpen]);
+
+  const modalOffsetStyle =
+    headerOffset !== null ? ({ '--header-profile-offset': `${headerOffset}px` } as React.CSSProperties) : undefined;
 
   const handleToggleModal = () => {
     setModalOpen((prev) => !prev);
@@ -166,6 +190,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
             <>
               <div
                 className={styles['tedi-header-profile__overlay']}
+                style={modalOffsetStyle}
                 onClick={() => {
                   setModalOpen(false);
                   triggerRef.current?.focus();
@@ -174,6 +199,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
               />
               <div
                 className={styles['tedi-header-profile__modal']}
+                style={modalOffsetStyle}
                 role="dialog"
                 aria-modal="true"
                 aria-label={resolvedLabel}

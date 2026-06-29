@@ -9,6 +9,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
+import Button from '../../buttons/button/button';
 import { Search } from '../../form/search/search';
 import { EmptyState } from '../../misc/empty-state/empty-state';
 import Link from '../../navigation/link/link';
@@ -93,6 +94,64 @@ const languages = [
   },
 ];
 
+const languagesWithHref = [
+  {
+    'aria-label': 'Estonian',
+    label: 'EST',
+    href: '#et',
+    isSelected: true,
+  },
+  {
+    'aria-label': 'English',
+    label: 'ENG',
+    href: '#en',
+  },
+  {
+    'aria-label': 'Russian',
+    label: 'RUS',
+    href: '#ru',
+  },
+];
+
+const languageLinks = [
+  {
+    'aria-label': 'Eesti keeles',
+    label: 'Eesti keeles',
+    locale: 'et' as const,
+  },
+  {
+    'aria-label': 'In English',
+    label: 'In English',
+    locale: 'en' as const,
+  },
+  {
+    'aria-label': 'На русском',
+    label: 'На русском',
+    locale: 'ru' as const,
+  },
+];
+
+const LanguageLinks = () => {
+  const { setLocale, locale } = useLabels();
+  const visibleLanguages = languageLinks.filter((language) => language.locale !== locale);
+
+  return (
+    <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-16)', alignItems: 'center' }}>
+      {visibleLanguages.map((language) => (
+        <Button
+          key={language.label}
+          visualType="link"
+          underline
+          aria-label={language['aria-label']}
+          onClick={() => setLocale(language.locale)}
+        >
+          {language.label}
+        </Button>
+      ))}
+    </div>
+  );
+};
+
 const representatives: Representative[] = [
   { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person' } },
   { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle' } },
@@ -176,7 +235,7 @@ const organizations2 = [{ id: 'org-2', name: 'Tartu Linnavalitsus' }];
 const logo = <img src="header-logo.svg" alt="Logo" />;
 const logoDark = <img src="header-logo-white.svg" alt="Logo (Dark Mode)" />;
 
-const profileTranslations = {
+const translations = {
   myData: { et: 'Minu andmed', en: 'My data', ru: 'Мои данные' },
   representatives: { et: 'Esindatavad', en: 'Representatives', ru: 'Представители' },
   contacts: { et: 'Kontaktid', en: 'Contacts', ru: 'Контакты' },
@@ -191,18 +250,43 @@ const profileTranslations = {
   personalCode: { et: 'Isikukood', en: 'Personal code', ru: 'Личный код' },
   role: { et: 'Roll', en: 'Role', ru: 'Роль' },
   representative: { et: 'Esindatav', en: 'Representative', ru: 'Представитель' },
+  individual: { et: 'Eraisik', en: 'Individual', ru: 'Частное лицо' },
+  business: { et: 'Ettevõtja', en: 'Business', ru: 'Предприниматель' },
 } as const;
 
-const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
+const DarkModeToggle = () => {
   const { theme, setTheme } = useTheme();
   const { locale = 'en' } = useLabels();
   const id = useId();
 
-  const t = (key: keyof typeof profileTranslations) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const label = translations.darkMode[locale] ?? translations.darkMode.et;
 
   const handleToggle = () => {
     setTheme(theme === 'dark' ? 'default' : 'dark');
   };
+
+  return (
+    <div>
+      <Toggle id={id} onChange={handleToggle} label={label} checked={theme === 'dark'} />
+    </div>
+  );
+};
+
+const ProfileExample = ({
+  showLogout = true,
+  darkModeSwitch = 'always',
+}: {
+  showLogout?: boolean;
+  /**
+   * Where the dark-mode toggle appears:
+   * - `always` — shown in the profile on every breakpoint
+   * - `mobile` — shown in the profile only below `lg` (e.g. when the toggle lives in the top bar on desktop)
+   */
+  darkModeSwitch?: 'always' | 'mobile';
+}) => {
+  const { locale = 'en' } = useLabels();
+
+  const t = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <>
@@ -226,12 +310,19 @@ const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
         </div>
       </Link>
 
-      <ShowAt lg>
-        <Separator axis="horizontal" />
-      </ShowAt>
-      <div>
-        <Toggle id={id} onChange={handleToggle} label={t('darkMode')} checked={theme === 'dark'} />
-      </div>
+      {darkModeSwitch === 'always' && (
+        <>
+          <ShowAt lg>
+            <Separator axis="horizontal" />
+          </ShowAt>
+          <DarkModeToggle />
+        </>
+      )}
+      {darkModeSwitch === 'mobile' && (
+        <HideAt lg>
+          <DarkModeToggle />
+        </HideAt>
+      )}
 
       <ShowAt lg>
         <Separator axis="horizontal" />
@@ -243,7 +334,7 @@ const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
 
 const AccessibilityLink = () => {
   const { locale = 'en' } = useLabels();
-  const label = profileTranslations.accessibility[locale] ?? profileTranslations.accessibility.et;
+  const label = translations.accessibility[locale] ?? translations.accessibility.et;
 
   return (
     <Link underline={false} href="#">
@@ -257,7 +348,7 @@ const AccessibilityLink = () => {
 
 const NavigationLinks = () => {
   const { locale = 'en' } = useLabels();
-  const pt = (key: keyof typeof profileTranslations) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const pt = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <>
@@ -279,7 +370,7 @@ const NavigationLinks = () => {
 
 const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
   const { locale = 'en' } = useLabels();
-  const pt = (key: keyof typeof profileTranslations) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const pt = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <SideNav
@@ -296,11 +387,11 @@ const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
   );
 };
 
-type StoryTranslateFn = (key: keyof typeof profileTranslations) => string;
+type StoryTranslateFn = (key: keyof typeof translations) => string;
 
 const WithTranslations = ({ children }: { children: (t: StoryTranslateFn) => React.ReactNode }) => {
   const { locale = 'en' } = useLabels();
-  const t: StoryTranslateFn = (key) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const t: StoryTranslateFn = (key) => translations[key][locale] ?? translations[key].et;
   return <>{children(t)}</>;
 };
 
@@ -926,6 +1017,158 @@ export const WithStandaloneLogoutButton: Story = {
   ),
 };
 
+export const WithTopHeader: Story = {
+  render: () => (
+    <WithTranslations>
+      {(t) => (
+        <Header
+          topAlignment="center"
+          lg={{ topAlignment: 'space-between' }}
+          top={
+            <>
+              <ShowAt lg>
+                <LanguageLinks />
+              </ShowAt>
+              <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-08)', alignItems: 'center' }}>
+                <Link
+                  underline={false}
+                  href="#"
+                  aria-current="page"
+                  style={{ color: 'var(--link-primary-active)', fontWeight: 'var(--body-bold-weight)' }}
+                >
+                  {t('individual')}
+                </Link>
+                <Link href="#">{t('business')}</Link>
+              </div>
+              <ShowAt lg>
+                <DarkModeToggle />
+              </ShowAt>
+            </>
+          }
+        >
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('personalCode')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <HideAt lg>
+              <Header.Language languages={languages} />
+              <Separator axis="vertical" />
+            </HideAt>
+            <Header.Profile showLabel>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('organization')}:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample darkModeSwitch="mobile" />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
+  ),
+};
+
+export const WithTopHeaderAndLanguageDropdown: Story = {
+  render: () => (
+    <WithTranslations>
+      {(t) => (
+        <Header
+          topAlignment="center"
+          lg={{ topAlignment: 'space-between' }}
+          top={
+            <>
+              <ShowAt lg>
+                <Header.Language languages={languages} labelPosition="left" />
+              </ShowAt>
+              <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-08)', alignItems: 'center' }}>
+                <Link
+                  underline={false}
+                  href="#"
+                  aria-current="page"
+                  style={{ color: 'var(--link-primary-active)', fontWeight: 'var(--body-bold-weight)' }}
+                >
+                  {t('individual')}
+                </Link>
+                <Link href="#">{t('business')}</Link>
+              </div>
+              <ShowAt lg>
+                <DarkModeToggle />
+              </ShowAt>
+            </>
+          }
+        >
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <HideAt lg>
+              <Header.Language languages={languages} />
+              <Separator axis="vertical" />
+            </HideAt>
+            <Header.Profile showLabel>
+              <ProfileExample darkModeSwitch="mobile" />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
+  ),
+};
+
 export const WithInlineSearch: Story = {
   render: () => (
     <WithTranslations>
@@ -1068,6 +1311,33 @@ export const WithCustomRoleContent: Story = {
         </Header>
       )}
     </WithTranslations>
+  ),
+};
+
+export const LanguageWithNavigationLinks: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+By default each language option calls \`setLocale\` for client-side i18n. For apps that switch
+language by navigating to a localized URL, give each language an \`href\` instead.
+The option then renders as a real \`<a href>\` anchor, so
+it keeps native link behavior — open in a new tab, middle-click, right-click, and working
+without JavaScript. \`href\` is ignored when a custom \`onClick\` is provided.
+
+This demo uses hash fragments (\`#et\`, \`#en\`, \`#ru\`) so selecting a language stays within Storybook;
+real apps would point these at localized URLs (e.g. \`/et\`, \`/en\`, \`/ru\`).
+`,
+      },
+    },
+  },
+  render: () => (
+    <Header>
+      <Header.Logo logoDark={logoDark} logo={logo} />
+      <Header.Actions>
+        <Header.Language languages={languagesWithHref} />
+      </Header.Actions>
+    </Header>
   ),
 };
 

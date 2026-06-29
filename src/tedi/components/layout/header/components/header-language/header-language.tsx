@@ -6,6 +6,7 @@ import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../.
 import { TediLanguage, useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
+import Link from '../../../../navigation/link/link';
 import Popover from '../../../../overlays/popover/popover';
 import styles from './header-language.module.scss';
 
@@ -23,6 +24,12 @@ export interface Language {
    * can decide when to close the popover.
    */
   onClick?: (props: { onToggle: (open: boolean) => void }) => void;
+  /**
+   * Optional URL. When provided, the language option renders as a navigation anchor (`<a href>`)
+   * and switching is handled by the browser instead of client-side `setLocale`.
+   * Ignored when `onClick` is provided (which takes full control).
+   */
+  href?: string;
   /** Whether this language is currently active. Used to set `aria-current` on the option. */
   isSelected?: boolean;
   /** Accessible label for screen readers (e.g. 'Estonian', 'English'). */
@@ -46,10 +53,17 @@ export interface HeaderLanguageProps {
    * Falls back to the default i18n label when not provided.
    **/
   selectLabel?: string;
+  /**
+   * Position of the select label relative to the popover trigger.
+   * - `top` — label sits above the trigger (default)
+   * - `left` — label sits inline, to the left of the trigger
+   * @default 'top'
+   */
+  labelPosition?: 'top' | 'left';
 }
 
 export const HeaderLanguage = (props: HeaderLanguageProps) => {
-  const { languages, currentLanguage, selectLabel } = props;
+  const { languages, currentLanguage, selectLabel, labelPosition = 'top' } = props;
   const [languageSelectionOpen, setLanguageSelectionOpen] = useState(false);
   const { getLabel, setLocale, locale } = useLabels();
   const { getCurrentBreakpointProps } = useBreakpointProps();
@@ -84,7 +98,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
 
   return (
     <div
-      className={cn(styles['tedi-header-language'], {
+      className={cn(styles['tedi-header-language'], styles[`tedi-header-language--label-${labelPosition}`], {
         [styles['tedi-header-language__mobile']]: isMobileView,
       })}
     >
@@ -119,18 +133,31 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
         </Popover.Trigger>
         <Popover.Content width="none">
           <div className={styles['tedi-header-language__list']}>
-            {languages.map((lang) => (
-              <Button
-                visualType="link"
-                aria-current={lang.isSelected}
-                aria-label={lang['aria-label']}
-                key={lang.label}
-                underline={false}
-                onClick={() => changeLanguage(lang)}
-              >
-                {lang.label}
-              </Button>
-            ))}
+            {languages.map((lang) =>
+              lang.href && !lang.onClick ? (
+                <Link
+                  visualType="link"
+                  aria-current={lang.isSelected}
+                  aria-label={lang['aria-label']}
+                  key={lang.label}
+                  underline={false}
+                  href={lang.href}
+                >
+                  {lang.label}
+                </Link>
+              ) : (
+                <Button
+                  visualType="link"
+                  aria-current={lang.isSelected}
+                  aria-label={lang['aria-label']}
+                  key={lang.label}
+                  underline={false}
+                  onClick={() => changeLanguage(lang)}
+                >
+                  {lang.label}
+                </Button>
+              )
+            )}
           </div>
         </Popover.Content>
       </Popover>

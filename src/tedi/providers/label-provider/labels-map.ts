@@ -187,9 +187,9 @@ export const labelsMap = validateDefaultLabels({
   'header.select-lang': {
     description: 'Label for HeaderLanguage label and Modal Heading',
     components: ['HeaderLanguage'],
-    et: 'Keel:',
-    en: 'Language:',
-    ru: 'Язык:',
+    et: 'Keel',
+    en: 'Language',
+    ru: 'Язык',
   },
   'header.role-label': {
     description: 'Label for Role selection',
