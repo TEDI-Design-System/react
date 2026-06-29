@@ -1,13 +1,18 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, ColProps, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
 import TextField from '../textfield/textfield';
-import ChoiceGroup from './choice-group';
+import ChoiceGroup, { ChoiceGroupProps } from './choice-group';
 import { ChoiceGroupValue } from './choice-group.types';
 import { ExtendedChoiceGroupItemProps } from './components/choice-group-item/choice-group-item';
 
@@ -184,14 +189,40 @@ const renderChoiceGroups = (inputType: 'radio' | 'checkbox', layout: 'segmented'
   </VerticalSpacing>
 );
 
-export const Radio: Story = {
+/**
+ * The primary story doubles as an interactive playground with **live controls for
+ * `ChoiceGroup.Item`**. Because `ChoiceGroup` is config-driven (items are passed as an
+ * array, not as JSX children), the item-level controls (`variant`, `color`, `layout`,
+ * `showIndicator`, …) — flattened into namespaced controls via the shared
+ * `subcomponentArgTypes` helper — are merged into every entry of the `items` array so
+ * their effect is visible. The ungrouped controls are `ChoiceGroup`'s own props.
+ */
+export const Radio: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(ChoiceGroup.Item, {
+      category: 'ChoiceGroup.Item',
+      prefix: 'item',
+      include: ['variant', 'color', 'layout', 'showIndicator', 'disabled', 'justifyContent', 'direction'],
+    }),
+  },
   args: {
     label: 'ChoiceGroup with radios:',
     id: 'example-1',
     defaultValue: [],
     inputType: 'radio',
     name: 'radio-1',
-    items: generateItems({ index: 0 }),
+    item__variant: 'card',
+    item__showIndicator: true,
+    item__layout: 'separated',
+  },
+  render: (args: Record<string, unknown>) => {
+    const itemProps = getSubcomponentProps<Partial<ExtendedChoiceGroupItemProps>>(args, 'item');
+    return (
+      <ChoiceGroup
+        {...getPrimaryComponentProps<ChoiceGroupProps>(args)}
+        items={generateItems({ index: 0 }).map((item) => ({ ...item, ...itemProps }))}
+      />
+    );
   },
 };
 

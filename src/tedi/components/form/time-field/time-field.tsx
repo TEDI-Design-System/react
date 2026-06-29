@@ -14,13 +14,23 @@ import {
 import cn from 'classnames';
 import React, { useEffect, useState } from 'react';
 
-import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import {
+  type Breakpoint,
+  BreakpointSupport,
+  isBreakpointBelow,
+  useBreakpoint,
+  useBreakpointProps,
+} from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
+import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import { TimePicker } from '../time-picker/time-picker';
 import styles from './time-field.module.scss';
 import { normalizeTime, TIMEPICKER_OFFSET } from './time-field-helpers';
+import { TimePickerModal } from './time-picker-modal/time-picker-modal';
+
+export type TimeFieldModal = boolean | Exclude<Breakpoint, 'xs'>;
 
 type TimeFieldBreakpointProps = {
   /**
@@ -115,6 +125,26 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
    * Array of available times to show in the picker or dropdown.
    */
   availableTimes?: string[];
+  /**
+   * Open the picker inside a modal instead of a floating popover. Useful on
+   * narrow viewports where a popover overlaps the input itself.
+   *
+   * - `true` always opens in a modal
+   * - `false` (default) always uses the popover
+   * - A breakpoint name (e.g. `'md'`) opens in a modal *below* that breakpoint
+   *   and falls back to the popover from that breakpoint up
+   *
+   * Ignored when `useNativePicker` resolves to `true`.
+   * @default false
+   */
+  modal?: TimeFieldModal;
+  /**
+   * Extra props forwarded to the picker modal's `Modal.Content` — e.g. `size`, `width`, `maxWidth`,
+   * `position`, `fullscreen`, and per-breakpoint overrides. Lets the consumer tune the modal beyond
+   * its `size="small"` / `width="xs"` (capped to 312px) defaults. `className` is merged with the component's own (so
+   * the internal padding reset is preserved). Only applies when the picker opens as a modal.
+   */
+  modalProps?: Omit<ModalContentProps, 'children'>;
 }
 
 export const TimeField: React.FC<TimeFieldProps> = (props) => {
@@ -134,6 +164,8 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     stepMinutes = 1,
     className,
     availableTimes,
+    modal = false,
+    modalProps,
   } = props;
 
   const {
@@ -148,8 +180,17 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
 
   const currentValue = isControlled ? value : internalValue;
   const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const isInputTrigger = timePickerTrigger === 'input';
   const shouldUseNativePicker = useNativePicker;
+
+  const breakpoint = useBreakpoint();
+  const useModalPicker =
+    !shouldUseNativePicker &&
+    showPicker &&
+    !readOnly &&
+    !disabled &&
+    (modal === true || (typeof modal === 'string' && isBreakpointBelow(breakpoint, modal)));
 
   const floating = useFloating({
     open,
@@ -164,7 +205,8 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'listbox' });
-  const shouldUseCustomInputTrigger = showPicker && isInputTrigger && !readOnly && !disabled && !shouldUseNativePicker;
+  const shouldUseCustomInputTrigger =
+    showPicker && isInputTrigger && !readOnly && !disabled && !shouldUseNativePicker && !useModalPicker;
 
   const interactions = useInteractions([...(shouldUseCustomInputTrigger ? [click] : []), dismiss, role]);
 
@@ -215,16 +257,26 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   };
 
   const openCustomPicker = () => setOpen((prev) => !prev);
+  const openModalPicker = () => setModalOpen(true);
 
   const handleIconClick = () => {
     if (!showPicker || disabled) return;
 
     if (shouldUseNativePicker) {
       openNativePicker();
+    } else if (useModalPicker) {
+      openModalPicker();
     } else if (timePickerTrigger === 'button') {
       openCustomPicker();
     }
   };
+
+  const inputClickFromTrigger =
+    useModalPicker && isInputTrigger && !readOnly
+      ? () => {
+          openModalPicker();
+        }
+      : undefined;
 
   const textFieldProps: TextFieldProps = {
     ...(inputProps as TextFieldProps),
@@ -234,10 +286,10 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     placeholder,
     readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
     disabled: disabled || inputProps?.disabled,
-    icon: 'schedule',
+    icon: showPicker ? 'schedule' : { name: 'schedule', color: 'inherit' },
     isClearable: true,
     required,
-    onIconClick: handleIconClick,
+    onIconClick: showPicker ? handleIconClick : undefined,
     onChange: updateTime,
     onBlur: handleInputBlur,
     className: cn(
@@ -249,6 +301,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     input: {
       ...(inputProps?.input as UnknownType),
       ...(shouldUseNativePicker && { type: 'time' }),
+      ...(inputClickFromTrigger && { onClick: inputClickFromTrigger }),
     },
   };
 
@@ -271,7 +324,18 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
               [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
             })}
           >
-            <TextField ref={textFieldRef} {...textFieldProps} />
+            <TextField
+              ref={textFieldRef}
+              {...textFieldProps}
+              input={
+                {
+                  ...textFieldProps.input,
+                  ...(!isInputTrigger && {
+                    onClick: (event: React.MouseEvent<HTMLInputElement>) => event.stopPropagation(),
+                  }),
+                } as UnknownType
+              }
+            />
           </div>
         </Dropdown.Trigger>
 
@@ -297,7 +361,20 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         <TextField ref={textFieldRef} aria-expanded={showPicker ? open : undefined} {...textFieldProps} />
       </div>
 
-      {!shouldUseNativePicker && showPicker && !disabled && (
+      {useModalPicker && (
+        <TimePickerModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          value={currentValue}
+          onConfirm={updateTime}
+          stepMinutes={stepMinutes}
+          availableTimes={availableTimes}
+          gridVariant={availableTimesVariant === 'grid-radio' ? 'radio' : 'button'}
+          modalProps={modalProps}
+        />
+      )}
+
+      {!shouldUseNativePicker && showPicker && !disabled && !useModalPicker && (
         <FloatingPortal>
           {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>

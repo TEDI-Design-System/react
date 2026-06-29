@@ -7,6 +7,9 @@ import styles from './stepper.module.scss';
 import { AllowStepLabelClick, StepperContext } from './stepper-context';
 import StepperNav, { StepperNavItem } from './stepper-nav';
 
+/**
+ * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface StepperProps {
   /**
    * The activeStep index that should be open by default (zero based index).
@@ -66,6 +69,9 @@ export interface StepperProps {
   card?: CardProps | boolean;
 }
 
+/**
+ * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Stepper = (props: StepperProps): JSX.Element => {
   const {
     activeStep,

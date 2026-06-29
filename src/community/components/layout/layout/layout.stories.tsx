@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Heading } from '../../../../tedi/components/base/typography/heading/heading';
@@ -60,8 +60,8 @@ const meta: Meta<typeof Layout> = {
       },
     },
     layout: 'fullscreen',
-    backgrounds: { default: 'subtle' },
   },
+  globals: { backgrounds: { value: 'subtle' } },
 };
 
 export default meta;

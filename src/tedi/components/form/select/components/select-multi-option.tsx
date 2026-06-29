@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { components as ReactSelectComponents, OptionProps } from 'react-select';
 
-import Checkbox from '../../checkbox/checkbox';
+import { OptionContent } from '../../../misc/option-content/option-content';
 import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
 import {
@@ -67,22 +67,15 @@ export const SelectMultiOption = ({ renderOption, ...props }: MultiOptionType): 
       {renderOption && !isSelectAll && !isGroup ? (
         renderOption(props)
       ) : (
-        <>
-          <span className="sr-only">{props.label}</span>
-          <Checkbox
-            id={props.data.value}
-            label={props.label}
-            aria-hidden={true}
-            className={styles['tedi-select__checkbox']}
-            value={props.data.value}
-            name={props.data.value}
-            checked={displayChecked}
-            indeterminate={displayIndeterminate}
-            onChange={() => null}
-            disabled={props.isDisabled}
-            hover={props.isFocused}
-          />
-        </>
+        <OptionContent
+          type="checkbox"
+          indicatorSemantics="control"
+          selected={displayChecked}
+          indeterminate={displayIndeterminate}
+          disabled={props.isDisabled}
+        >
+          <OptionContent.Label>{props.children}</OptionContent.Label>
+        </OptionContent>
       )}
     </ReactSelectComponents.Option>
   );

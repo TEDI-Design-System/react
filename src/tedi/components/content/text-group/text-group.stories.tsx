@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -169,8 +169,14 @@ const TemplateWithTypes: StoryFn<TextGroupProps> = (args) => {
   );
 };
 
+/**
+ * The default story is an interactive playground for a single `TextGroup` — its own props
+ * (`label`, `value`, `type`, `labelAlign`, `labelWidth`) are the live controls. The
+ * compound `TextGroup.List` is documented in the **With list** story and its autodocs prop
+ * table; it isn't given separate live controls because it shares every prop with
+ * `TextGroup`, so they would only duplicate these.
+ */
 export const Default: Story = {
-  render: TemplateWithLayouts,
   args: {
     label: 'Accessibility',
     value: <Text>Visible to doctor and representative</Text>,
