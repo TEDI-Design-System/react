@@ -33,30 +33,11 @@ export const decorators: Preview['decorators'] = [
     const theme = (context.globals.theme || 'default') as 'default' | 'dark';
 
     useEffect(() => {
+      // The dark surface itself is applied via CSS in preview-head.html, keyed
+      // off this class — that beats the backgrounds addon on direct story URLs.
       document.documentElement.classList.remove('tedi-theme--default', 'tedi-theme--dark');
       document.documentElement.classList.add(`tedi-theme--${theme}`);
-
-      updateAllCanvasBackgrounds(theme);
     }, [theme]);
-
-    const updateAllCanvasBackgrounds = (currentTheme: string) => {
-      const backgroundColor = getBackgroundColor(currentTheme);
-      const canvases = document.querySelectorAll('.sb-show-main, .docs-story > div');
-
-      canvases.forEach((canvas) => {
-        const element = canvas as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-        element.style.transition = 'background-color 0.3s ease';
-      });
-
-      const storyPreviews = document.querySelectorAll('[data-story="true"], .sbdocs-preview');
-      storyPreviews.forEach((preview) => {
-        const element = preview as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-      });
-    };
-
-    const getBackgroundColor = (currentTheme: string): string =>  currentTheme === 'dark' ? 'var(--color-bg-inverted)' : '';
 
     return (
       <ThemeProvider theme={theme}>
