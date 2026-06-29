@@ -355,6 +355,49 @@ export const ValueType: Story = {
   ),
 };
 
+/**
+ * Set `tagsEllipsis` to truncate selected-tag labels when the field is width-constrained;
+ * the full label is shown in a popover on hover/focus. `end` truncates the tail, `start` the
+ * front (keeping the most significant part — e.g. a date or ID — visible). `false` (default)
+ * lets long labels wrap instead.
+ */
+export const EllipsisTags: Story = {
+  render: () => {
+    const longOptions: ISelectOption[] = [
+      { value: 'a', label: 'A fairly long option label that does not fit' },
+      { value: 'b', label: 'Another rather long option label' },
+      { value: 'c', label: '2026-06-25 quarterly financial report' },
+    ];
+
+    return (
+      <div style={{ maxWidth: '20rem' }}>
+        <VerticalSpacing>
+          <Select
+            id="ellipsis-tags-end"
+            label="Truncate the end"
+            options={longOptions}
+            defaultValue={longOptions}
+            multiple
+            tagsEllipsis="end"
+            isTagRemovable
+            isClearable
+          />
+          <Select
+            id="ellipsis-tags-start"
+            label="Truncate the start"
+            options={longOptions}
+            defaultValue={longOptions}
+            multiple
+            tagsEllipsis="start"
+            isTagRemovable
+            isClearable
+          />
+        </VerticalSpacing>
+      </div>
+    );
+  },
+};
+
 const departmentOptions: ISelectOption[] = [
   'Emergency department',
   'Internal medicine',
