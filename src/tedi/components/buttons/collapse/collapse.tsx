@@ -169,19 +169,23 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     onToggle?.(next);
   };
 
+  const toggleRef = React.useRef(handleToggle);
+  toggleRef.current = handleToggle;
+  const isOpenRef = React.useRef(isOpen);
+  isOpenRef.current = isOpen;
+
   React.useEffect(() => {
     const element = headerRef.current;
     if (!fullRowToggle || !element) return undefined;
 
     const onClick = (event: MouseEvent): void => {
       if ((event.target as HTMLElement).closest('a, button, input, select, textarea, label')) return;
-      handleToggle(!isOpen);
+      toggleRef.current(!isOpenRef.current);
     };
 
     element.addEventListener('click', onClick);
     return () => element.removeEventListener('click', onClick);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullRowToggle, isOpen]);
+  }, [fullRowToggle]);
 
   const renderContent = (
     <div id={contentId} role="region" aria-labelledby={triggerId} className={styles['tedi-collapse__content']}>

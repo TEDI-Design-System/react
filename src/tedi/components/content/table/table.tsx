@@ -191,7 +191,7 @@ export type TableSelectionMode = 'multiple' | 'single';
 
 export type TableExpandCollapseProps = Omit<
   CollapseButtonProps,
-  'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls'
+  'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls' | 'hideText'
 >;
 
 export interface TablePersistOptions {
@@ -509,8 +509,8 @@ export interface TableProps<TData> {
   /**
    * Props forwarded to the row-expand `CollapseButton` toggle. Use this to
    * e.g. switch to `arrowType: 'default'` or change the `size`. Wiring props
-   * (id, open, onOpenChange, openText, closeText, aria-controls) are owned by
-   * Table and cannot be overridden.
+   * (id, open, onOpenChange, openText, closeText, aria-controls, hideText) are
+   * owned by Table and cannot be overridden.
    */
   collapseProps?: TableExpandCollapseProps;
   /**
@@ -1017,11 +1017,11 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               }}
             >
               <CollapseButton
-                hideText
                 arrowType={expandTrigger === 'row' ? 'default' : 'secondary'}
                 {...collapseProps}
+                hideText
                 id={`${resolvedId}-expand-${row.id}`}
-                aria-controls={subRowId}
+                aria-controls={renderSubComponent ? subRowId : undefined}
                 openText={getLabelRef.current('table.expand-row')}
                 closeText={getLabelRef.current('table.collapse-row')}
                 open={row.getIsExpanded()}
@@ -1039,6 +1039,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     hasSelection,
     selectionMode,
     hasExpansion,
+    renderSubComponent,
     expandTrigger,
     reorderableRows,
     resolvedId,
