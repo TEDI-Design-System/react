@@ -1,3 +1,10 @@
+# [18.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.24...react-18.0.0-rc.25) (2026-06-29)
+
+
+### Features
+
+* **select:** ability to wrap tags in smaller inputs [#685](https://github.com/TEDI-Design-System/react/issues/685) ([#697](https://github.com/TEDI-Design-System/react/issues/697)) ([ea9a96e](https://github.com/TEDI-Design-System/react/commit/ea9a96eb12c5e675f388a2c90fcd981681516b9f))
+
 # [18.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.23...react-18.0.0-rc.24) (2026-06-29)
 
 
