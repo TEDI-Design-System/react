@@ -861,9 +861,9 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
     },
   },
   render: () => (
-    <>
+    <div className="accordion-steps">
       <style>{`
-        .step-number {
+        .accordion-steps .step-number {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -874,18 +874,18 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
           background: var(--stepper-step-default-bg);
         }
 
-        .step-number--disabled {
+        .accordion-steps .step-number--disabled {
           border-color: var(--stepper-step-disabled-border);
           background: var(--stepper-step-disabled-bg);
         }
 
-        .step-body {
+        .accordion-steps .step-body {
           display: flex;
           flex-direction: column;
           gap: var(--layout-grid-gutters-16);
         }
 
-        .step-form {
+        .accordion-steps .step-form {
           display: flex;
           flex-direction: column;
           gap: var(--layout-grid-gutters-16);
@@ -893,13 +893,13 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
           max-width: 400px;
         }
 
-        .step-actions {
+        .accordion-steps .step-actions {
           display: flex;
           gap: var(--layout-grid-gutters-08);
         }
 
         @media (max-width: 480px) {
-          .step-actions > * {
+          .accordion-steps .step-actions > * {
             flex: 1;
           }
         }
@@ -960,7 +960,7 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
           <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
         </Accordion.Item>
       </Accordion>
-    </>
+    </div>
   ),
 };
 

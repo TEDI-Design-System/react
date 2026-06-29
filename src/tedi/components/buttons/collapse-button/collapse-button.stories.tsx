@@ -26,8 +26,6 @@ const meta: Meta<typeof CollapseButton> = {
     },
   },
   args: {
-    openText: 'open',
-    closeText: 'close',
     hideText: false,
     arrowType: 'default',
     size: 'default',
