@@ -47,7 +47,7 @@ export const Default: Story = {
   decorators: [wrapInCol],
   args: {
     id: 'slider-default',
-    label: 'Label',
+    label: 'Väärtus',
     min: 0,
     max: 100,
     step: 1,
@@ -68,7 +68,7 @@ const InputGroupTemplate = (args: SliderProps) => {
           onChange={setValue}
           addonRight={
             <div style={{ width: '100px' }}>
-              <InputGroup id="slider-input-group-field" label="Value" hideLabel>
+              <InputGroup id="slider-input-group-field" label="Väärtus" hideLabel>
                 <InputGroup.Input>
                   <Field
                     type="number"
@@ -93,7 +93,7 @@ export const WithInputGroup: Story = {
   render: (args) => <InputGroupTemplate {...args} />,
   args: {
     id: 'slider-input-group',
-    label: 'Label',
+    label: 'Väärtus',
     min: 0,
     max: 100,
     step: 1,
@@ -112,7 +112,7 @@ export const MinAndMaxValues: Story = {
     defaultValue: 50,
     minLabel: '0%',
     maxLabel: '100%',
-    'aria-label': 'Label',
+    'aria-label': 'Väärtus',
   },
 };
 
@@ -126,7 +126,7 @@ export const WithCurrentValue: Story = {
     defaultValue: 50,
     showCurrentValue: true,
     valueFormatter: (value) => `${value}%`,
-    'aria-label': 'Label',
+    'aria-label': 'Silt',
   },
 };
 
@@ -140,7 +140,7 @@ const CustomValueTemplate = (args: SliderProps) => {
         <Col lg={6} xs={12}>
           <Slider
             id="slider-custom-value-basic"
-            label="Label"
+            label="Väärtus"
             hideLabel
             min={0}
             max={100}
@@ -160,10 +160,10 @@ const CustomValueTemplate = (args: SliderProps) => {
             defaultValue={50}
             value={inputValue}
             onChange={setInputValue}
-            label="Label"
+            label="Väärtus"
             addonRight={
               <div style={{ width: '100px' }}>
-                <InputGroup id="slider-custom-value-input-group" label="Value" hideLabel>
+                <InputGroup id="slider-custom-value-input-group" label="Väärtus" hideLabel>
                   <InputGroup.Input>
                     <Field
                       type="number"
@@ -190,7 +190,7 @@ const CustomValueTemplate = (args: SliderProps) => {
             addonRight={
               <NumberField
                 id="slider-custom-value-number"
-                label="Value"
+                label="Väärtus"
                 hideLabel
                 min={args.min}
                 max={args.max}
@@ -210,7 +210,7 @@ export const CustomValue: Story = {
   render: (args) => <CustomValueTemplate {...args} />,
   args: {
     id: 'slider-custom-value',
-    label: 'Label',
+    label: 'Väärtus',
     min: 1,
     max: 10,
     step: 1,
@@ -237,7 +237,7 @@ export const States: Story = {
       step: 1,
       defaultValue: 50,
       tooltip: false,
-      'aria-label': 'Thumb',
+      'aria-label': 'Nupp',
     };
 
     const thumbColStyle = { width: '1.5rem' };
@@ -309,6 +309,24 @@ export const States: Story = {
             <Slider {...sharedArgs} id="Focus" className="slider-state-focus" />
           </Col>
         </Row>
+        <Row>
+          <Col lg={2} xs={12} className="display-flex align-items-center">
+            <Text modifiers="bold">Error</Text>
+          </Col>
+          <Col lg={1} xs={2} className="display-flex align-items-center">
+            <div style={thumbColStyle}>
+              <Slider {...thumbArgs} id="Error-thumb" invalid />
+            </div>
+          </Col>
+          <Col lg={6} xs={10}>
+            <Slider
+              {...sharedArgs}
+              id="slider-states-error"
+              invalid
+              helper={{ id: 'slider-states-error-helper', text: 'See väli on kohustuslik', type: 'error' }}
+            />
+          </Col>
+        </Row>
       </VerticalSpacing>
     );
   },
@@ -330,7 +348,7 @@ export const WithoutTooltip: Story = {
   decorators: [wrapInCol],
   args: {
     id: 'slider-no-tooltip',
-    label: 'Label',
+    label: 'Väärtus',
     min: 0,
     max: 100,
     defaultValue: 40,
@@ -347,12 +365,12 @@ export const WithHelper: Story = {
   decorators: [wrapInCol],
   args: {
     id: 'slider-helper',
-    label: 'Label',
+    label: 'Väärtus',
     min: 0,
     max: 100,
     defaultValue: 40,
     minLabel: '0%',
     maxLabel: '100%',
-    helper: { id: 'slider-helper-text', text: 'Drag the thumb to change the value', type: 'hint' },
+    helper: { id: 'slider-helper-text', text: 'Liiguta nuppu, et väärtust muuta', type: 'hint' },
   },
 };
