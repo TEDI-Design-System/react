@@ -1,3 +1,17 @@
+# [18.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.25...react-18.0.0-rc.26) (2026-06-29)
+
+
+### Bug Fixes
+
+* **slider:** fix invalid style, add example [#675](https://github.com/TEDI-Design-System/react/issues/675) ([#698](https://github.com/TEDI-Design-System/react/issues/698)) ([1e4e846](https://github.com/TEDI-Design-System/react/commit/1e4e8466d6d8330263f377cde4df659e302f35bc))
+
+# [18.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.24...react-18.0.0-rc.25) (2026-06-29)
+
+
+### Features
+
+* **select:** ability to wrap tags in smaller inputs [#685](https://github.com/TEDI-Design-System/react/issues/685) ([#697](https://github.com/TEDI-Design-System/react/issues/697)) ([ea9a96e](https://github.com/TEDI-Design-System/react/commit/ea9a96eb12c5e675f388a2c90fcd981681516b9f))
+
 # [18.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.23...react-18.0.0-rc.24) (2026-06-29)
 
 

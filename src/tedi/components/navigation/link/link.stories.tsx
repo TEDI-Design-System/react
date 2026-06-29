@@ -214,8 +214,8 @@ export const InvertedUnderline: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const InvertedNoUnderline: StoryObj<TemplateMultipleProps> = {
@@ -232,8 +232,8 @@ export const InvertedNoUnderline: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const AsPrimaryButton: StoryObj<TemplateMultipleProps> = {
