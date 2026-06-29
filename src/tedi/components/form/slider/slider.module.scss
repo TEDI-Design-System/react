@@ -213,9 +213,3 @@
     }
   }
 }
-
-.tedi-slider--invalid:not(.tedi-slider--disabled) {
-  .tedi-slider__track {
-    border-color: var(--form-general-feedback-error-border);
-  }
-}

@@ -26,8 +26,8 @@ const meta: Meta<TableOfContentsProps> = {
       },
     },
     layout: 'fullscreen',
-    backgrounds: { default: 'subtle' },
   },
+  globals: { backgrounds: { value: 'subtle' } },
 };
 
 export default meta;

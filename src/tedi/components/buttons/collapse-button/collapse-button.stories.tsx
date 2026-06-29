@@ -135,8 +135,8 @@ export const WithTextInverted: StoryObj<StatesArgs> = {
   },
   parameters: {
     ...PSEUDO_PARAMS,
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const IconOnlyInverted: StoryObj<StatesArgs> = {
@@ -149,6 +149,6 @@ export const IconOnlyInverted: StoryObj<StatesArgs> = {
   },
   parameters: {
     ...PSEUDO_PARAMS,
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
