@@ -4,15 +4,15 @@ import { FeedbackTextProps } from '../../components/form/feedback-text/feedback-
 import { ILabelContext, useLabels } from '../../providers/label-provider';
 
 export interface FileUploadFile extends Partial<File> {
-  /*
+  /**
    * A unique identifier for the file, useful for tracking files in a list.
    */
   id?: string;
-  /*
+  /**
    * Indicates if the file is currently being uploaded.
    */
   isLoading?: boolean;
-  /*
+  /**
    * Specifies whether the file passed validation checks (e.g., size, extension).
    */
   isValid?: boolean;
@@ -21,47 +21,47 @@ export interface FileUploadFile extends Partial<File> {
 export type FileRejectionType = 'size' | 'extension';
 
 export interface RejectedFile {
-  /*
+  /**
    * The reason the file was rejected (either 'size' or 'extension').
    */
   type: FileRejectionType;
-  /*
+  /**
    * The original file object that was rejected.
    */
   file: File;
 }
 
 export interface UseFileUploadProps {
-  /*
+  /**
    * Specifies the allowed file types (e.g., "image/png, image/jpeg").
    */
   accept?: string;
-  /*
+  /**
    * The maximum file size allowed for upload, in bytes.
    */
   maxSize?: number;
-  /*
+  /**
    * Determines if multiple files can be uploaded at once.
    * @default false
    */
   multiple?: boolean;
-  /*
+  /**
    * If true, each file is validated separately instead of rejecting all at once.
    */
   validateIndividually?: boolean;
-  /*
+  /**
    * An array of default files that are preloaded in the upload list.
    */
   defaultFiles?: FileUploadFile[];
-  /*
+  /**
    * Callback function triggered when files are added or changed.
    */
   onChange?: (files: FileUploadFile[]) => void;
-  /*
+  /**
    * Callback function triggered when a file is removed.
    */
   onDelete?: (file: FileUploadFile) => void;
-  /*
+  /**
    * An optional array of files to be used in controlled mode.
    When provided, the hook uses this array as the source of truth for the file list instead of its internal state. 
    The parent component is responsible for updating this prop in response to the `onChange` callback. 

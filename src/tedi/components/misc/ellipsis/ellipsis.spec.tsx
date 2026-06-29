@@ -70,4 +70,21 @@ describe('Ellipsis Component', () => {
 
     expect(screen.getByText('Ellipsis content')).toBeInTheDocument();
   });
+
+  it('does not apply a lineClamp style for the start position', () => {
+    const { container } = renderEllipsis({ position: 'start' });
+    const ellipsisElement = container.querySelector('[data-name="ellipsis"]');
+    expect(ellipsisElement).not.toHaveStyle({ 'line-clamp': '2' });
+  });
+
+  it('detects horizontal overflow (scrollWidth) for the start position', () => {
+    jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(200);
+    jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(100);
+
+    act(() => {
+      renderEllipsis({ position: 'start' });
+    });
+
+    expect(screen.getByText('Ellipsis content')).toBeInTheDocument();
+  });
 });

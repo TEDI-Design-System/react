@@ -1,11 +1,13 @@
+import cn from 'classnames';
 import { MultiValueProps } from 'react-select';
 
-import { Tag } from '../../../tags/tag/tag';
+import { Tag, TagEllipsis } from '../../../tags/tag/tag';
 import { ISelectOption } from '../select';
+import styles from '../select.module.scss';
 import { isGroupSentinel, SELECT_ALL_VALUE } from './select-bulk-helpers';
 import { useSelectTagsContext } from './select-tags-context';
 
-type MultiValueType = MultiValueProps<ISelectOption> & { isTagRemovable?: boolean };
+type MultiValueType = MultiValueProps<ISelectOption> & { isTagRemovable?: boolean; tagsEllipsis?: TagEllipsis };
 
 type RemoveProps = MultiValueProps<ISelectOption>['removeProps'];
 
@@ -40,6 +42,7 @@ export const createMultiValueCloseHandler =
 
 export const SelectMultiValue = ({
   isTagRemovable,
+  tagsEllipsis = false,
   children,
   removeProps,
   ...props
@@ -72,9 +75,14 @@ export const SelectMultiValue = ({
   if (isHidden) return null;
 
   return (
-    <div onMouseDown={(event) => event.stopPropagation()} data-tedi-tag-index={index}>
+    <div
+      onMouseDown={(event) => event.stopPropagation()}
+      data-tedi-tag-index={index}
+      className={cn({ [styles['tedi-select__multi-value--ellipsis']]: tagsEllipsis !== false })}
+    >
       <Tag
         color="primary"
+        ellipsis={tagsEllipsis}
         onClose={isTagRemovable ? handleCloseClick : undefined}
         closeButtonProps={
           isTagRemovable

@@ -206,6 +206,11 @@ div.tedi-select__multi-value-item {
   align-items: baseline;
 }
 
+.tedi-select__multi-value--ellipsis {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .tedi-select .tedi-select__group {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;

@@ -1,3 +1,24 @@
+# [18.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.24...react-18.0.0-rc.25) (2026-06-29)
+
+
+### Features
+
+* **select:** ability to wrap tags in smaller inputs [#685](https://github.com/TEDI-Design-System/react/issues/685) ([#697](https://github.com/TEDI-Design-System/react/issues/697)) ([ea9a96e](https://github.com/TEDI-Design-System/react/commit/ea9a96eb12c5e675f388a2c90fcd981681516b9f))
+
+# [18.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.23...react-18.0.0-rc.24) (2026-06-29)
+
+
+### Features
+
+* **ellipsis,tag:** new position prop for ellipsis, add ellipsis prop for tag [#679](https://github.com/TEDI-Design-System/react/issues/679) ([#693](https://github.com/TEDI-Design-System/react/issues/693)) ([ba52a59](https://github.com/TEDI-Design-System/react/commit/ba52a59596212041e015b2011622763ee5ae5da8))
+
+# [18.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.22...react-18.0.0-rc.23) (2026-06-26)
+
+
+### Features
+
+* **attachment:** tedi-ready component [#644](https://github.com/TEDI-Design-System/react/issues/644) ([#680](https://github.com/TEDI-Design-System/react/issues/680)) ([b54840f](https://github.com/TEDI-Design-System/react/commit/b54840f43d6cfe1890f3a40ecb0b55d9a0c64c4f)), closes [#32](https://github.com/TEDI-Design-System/react/issues/32) [#32](https://github.com/TEDI-Design-System/react/issues/32) [#32](https://github.com/TEDI-Design-System/react/issues/32)
+
 # [18.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.21...react-18.0.0-rc.22) (2026-06-26)
 
 
