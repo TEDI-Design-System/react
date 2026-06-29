@@ -37,7 +37,7 @@
   }
 
   &__transparency-field {
-    width: 5.5rem;
+    width: 6rem;
   }
 }
 
@@ -92,6 +92,14 @@
       width: 112px;
       height: 56px;
     }
+  }
+}
+
+.tedi-base-map-selection--disabled {
+  &.tedi-base-map-selection__wrapper {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 }
 

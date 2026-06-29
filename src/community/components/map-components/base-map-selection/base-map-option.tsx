@@ -44,10 +44,14 @@ export interface BaseMapOptionProps {
    * When `true`, renders a "stacked" visual indicating multiple maps.
    */
   multiple?: boolean;
+  /**
+   * Applies disabled style and makes item unclickable when true.
+   */
+  disabled?: boolean;
 }
 
 export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
-  const { title, content, selected, onSelect, type = 'selection', className, id, multiple } = props;
+  const { title, content, selected, onSelect, type = 'selection', className, id, multiple, disabled } = props;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -61,6 +65,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     selected && styles['tedi-base-map-selection--selected'],
     type && styles[`tedi-base-map-selection--${type}`],
     multiple && styles['tedi-base-map-selection--multiple'],
+    disabled && styles['tedi-base-map-selection--disabled'],
     className
   );
 

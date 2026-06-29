@@ -1,4 +1,4 @@
-import cn from 'classnames';
+import classNames from 'classnames';
 import { JSX } from 'react';
 
 import Button from '../../../../tedi/components/buttons/button/button';
@@ -34,7 +34,7 @@ export interface BaseMapSelectionProps {
    */
   showTransparency?: boolean;
   /**
-   * Controlled transparency value (`0`-`100`). Use together with `onTransparencyChange`.
+   * Controlled transparency value (0-100). Use together with `onTransparencyChange`.
    */
   transparency?: number;
   /**
@@ -45,10 +45,6 @@ export interface BaseMapSelectionProps {
    * Label for the transparency slider.
    */
   transparencyLabel?: string;
-  /**
-   * Additional class name applied to the popover content.
-   */
-  className?: string;
   /**
    * HTML `id` attribute applied to the trigger button.
    */
@@ -75,7 +71,6 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
     transparency,
     onTransparencyChange,
     transparencyLabel = '',
-    className,
     id,
   } = props;
 
@@ -85,7 +80,7 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
     onTransparencyChange?.(clampTransparency(value));
   };
 
-  const triggerBEM = cn(
+  const triggerBEM = classNames(
     styles['tedi-base-map-selection__wrapper'],
     styles['tedi-base-map-selection__trigger'],
     styles['tedi-base-map-selection--button'],
@@ -100,7 +95,7 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
           <div className={styles['tedi-base-map-selection__title']}>{title}</div>
         </Button>
       </Popover.Trigger>
-      <Popover.Content width="medium" className={cn(styles['tedi-base-map-selection__popover'], className)}>
+      <Popover.Content width="medium">
         <div className={styles['tedi-base-map-selection__options']}>{children}</div>
         {showTransparency && (
           <div className={styles['tedi-base-map-selection__transparency']}>

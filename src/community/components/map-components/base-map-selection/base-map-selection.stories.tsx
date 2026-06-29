@@ -33,7 +33,7 @@ const HISTORICAL_IMG = 'https://snazzy-maps-cdn.azureedge.net/assets/8097-wy.png
 const MAPS = [
   { id: 'streets', title: 'Kaart', src: MAP_IMG },
   { id: 'satellite', title: 'Satelliit', src: HISTORICAL_IMG },
-  { id: 'hybrid', title: 'Hübriid', src: MAP_IMG },
+  { id: 'hybrid', title: 'Hübriid', src: MAP_IMG, disabled: true },
 ];
 
 const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
@@ -44,7 +44,7 @@ const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
   return (
     <BaseMapSelection
       {...args}
-      title={activeMap.title}
+      title={args.title}
       content={<img src={activeMap.src} alt={activeMap.title} />}
       transparency={transparency}
       onTransparencyChange={setTransparency}
@@ -55,6 +55,7 @@ const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
           id={map.id}
           type="selection"
           title={map.title}
+          disabled={map.disabled ?? false}
           selected={map.id === active}
           onSelect={() => setActive(map.id)}
           content={<img src={map.src} alt={map.title} />}
@@ -109,7 +110,7 @@ const OptionStatesTemplate: StoryFn<OptionTemplateProps> = (args) => {
             </Text>
           </Col>
           <Col className="display-flex align-items-center gap-3">
-            <BaseMapOption {...args} selected={value === 'Selected'} id={value} />
+            <BaseMapOption {...args} selected={value === 'Selected'} disabled={value === 'Disabled'} id={value} />
           </Col>
         </Row>
       ))}
@@ -124,7 +125,7 @@ const OptionStatesTemplate: StoryFn<OptionTemplateProps> = (args) => {
 export const OptionStates: StoryObj<OptionTemplateProps> = {
   render: OptionStatesTemplate,
   args: {
-    array: ['Default', 'Hover', 'Focus', 'Selected'],
+    array: ['Default', 'Hover', 'Focus', 'Selected', 'Disabled'],
     type: 'selection',
     title: 'Aluskaart',
     content: <img src={MAP_IMG} alt="Base map" />,
