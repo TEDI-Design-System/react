@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import {
   Breakpoint,
@@ -99,7 +99,9 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
 
   // The modal/overlay are position: fixed, so they need the header's actual rendered
   // bottom — which varies with the optional top/bottom bars — rather than a static token.
-  useEffect(() => {
+  // useLayoutEffect measures and applies the offset before paint, so the modal never
+  // flashes at the fallback position on first open.
+  useLayoutEffect(() => {
     if (!modalOpen) return;
 
     const headerEl = triggerRef.current?.closest('header');

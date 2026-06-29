@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Header, HeaderActions, HeaderCenter, HeaderLogo } from './header';
 
@@ -10,6 +10,7 @@ jest.mock('../../../helpers', () => ({
   ...jest.requireActual('../../../helpers'),
   useBreakpoint: jest.fn(),
   isBreakpointBelow: jest.fn(),
+  useBreakpointProps: jest.fn(),
 }));
 
 jest.mock('../../../providers/theme-provider/theme-provider', () => ({
@@ -20,6 +21,9 @@ describe('Header component', () => {
   beforeEach(() => {
     (useBreakpoint as jest.Mock).mockReturnValue('lg');
     (isBreakpointBelow as jest.Mock).mockReturnValue(false);
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => props),
+    });
     (useTheme as jest.Mock).mockReturnValue({ theme: 'light' });
   });
 
@@ -62,6 +66,46 @@ describe('Header component', () => {
       );
 
       expect(screen.queryByRole('button', { name: 'Toggle' })).not.toBeInTheDocument();
+    });
+
+    it('renders the top bar content when top prop is provided', () => {
+      render(
+        <Header top={<div>Top bar</div>}>
+          <span>Content</span>
+        </Header>
+      );
+
+      expect(screen.getByText('Top bar')).toBeInTheDocument();
+    });
+
+    it('does not render the top section when top is not provided', () => {
+      const { container } = render(
+        <Header>
+          <span>Content</span>
+        </Header>
+      );
+
+      expect(container.querySelector('[class*="tedi-header__top"]')).not.toBeInTheDocument();
+    });
+
+    it('applies the default space-between top alignment modifier', () => {
+      const { container } = render(
+        <Header top={<div>Top bar</div>}>
+          <span>Content</span>
+        </Header>
+      );
+
+      expect(container.querySelector('[class*="tedi-header__top--space-between"]')).toBeInTheDocument();
+    });
+
+    it('applies the topAlignment modifier class on the top bar', () => {
+      const { container } = render(
+        <Header top={<div>Top bar</div>} topAlignment="center">
+          <span>Content</span>
+        </Header>
+      );
+
+      expect(container.querySelector('[class*="tedi-header__top--center"]')).toBeInTheDocument();
     });
 
     it('renders bottom content when bottom prop is provided', () => {
