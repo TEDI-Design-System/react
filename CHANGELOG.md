@@ -1,3 +1,10 @@
+# [18.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.23...react-18.0.0-rc.24) (2026-06-29)
+
+
+### Features
+
+* **ellipsis,tag:** new position prop for ellipsis, add ellipsis prop for tag [#679](https://github.com/TEDI-Design-System/react/issues/679) ([#693](https://github.com/TEDI-Design-System/react/issues/693)) ([ba52a59](https://github.com/TEDI-Design-System/react/commit/ba52a59596212041e015b2011622763ee5ae5da8))
+
 # [18.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.22...react-18.0.0-rc.23) (2026-06-26)
 
 
