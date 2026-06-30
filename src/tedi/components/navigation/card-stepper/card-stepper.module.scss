@@ -8,6 +8,13 @@
   border-radius: var(--card-radius-rounded);
 }
 
+.tedi-card-stepper--progress-flush {
+  padding-bottom: 0;
+  border-bottom: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .tedi-card-stepper__main {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -15,8 +22,28 @@
   align-items: center;
 }
 
+.tedi-card-stepper__main--no-lead {
+  grid-template-columns: 1fr auto;
+
+  .tedi-card-stepper__body {
+    grid-column: 1;
+  }
+
+  .tedi-card-stepper__trail {
+    grid-column: 2;
+  }
+}
+
 .tedi-card-stepper__lead {
   grid-column: 1;
+}
+
+.tedi-card-stepper__nav-prev {
+  margin-left: calc(var(--layout-grid-gutters-04) - var(--card-padding-md-default));
+}
+
+.tedi-card-stepper__nav-next {
+  margin-right: calc(var(--layout-grid-gutters-04) - var(--card-padding-md-default));
 }
 
 .tedi-card-stepper__body {
@@ -41,7 +68,8 @@
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  font-size: var(--body-small-size);
+  font-size: var(--body-small-regular-size);
+  font-weight: var(--body-bold-weight);
   line-height: 1;
   color: var(--stepper-item-vertical-text-selected);
   background-color: var(--stepper-step-selected-bg);
@@ -85,8 +113,9 @@
 
 .tedi-card-stepper__counter {
   flex-shrink: 0;
-  font-size: var(--body-extra-small-size);
-  line-height: var(--body-extra-small-line-height);
+  font-size: var(--body-small-regular-size);
+  font-weight: var(--body-small-regular-weight);
+  line-height: var(--body-small-regular-line-height);
   color: var(--general-text-tertiary);
   white-space: nowrap;
 }

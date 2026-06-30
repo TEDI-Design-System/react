@@ -200,6 +200,7 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
               <Collapse
                 id={`${subListId}-toggle`}
                 iconOnly
+                size="small"
                 controlsId={subListId}
                 open={isOpen}
                 onToggle={handleToggle}

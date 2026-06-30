@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -91,7 +91,7 @@ export const WithStatusBadges: Story = {
           state="completed"
           href="#i1"
           info={
-            <StatusBadge color="success" variant="filled">
+            <StatusBadge color="success" variant="bordered">
               Isik on tõestatud
             </StatusBadge>
           }

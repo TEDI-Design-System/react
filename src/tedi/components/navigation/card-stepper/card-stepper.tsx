@@ -185,6 +185,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
   const headingId = useId();
   const current = steps[active];
   const showIndicator = showStepNumber && !showNavigation;
+  const hasLead = showNavigation || showIndicator;
 
   const goTo = (index: number): void => {
     if (index < 0 || index >= total || index === active || steps[index]?.disabled) return;
@@ -212,6 +213,8 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
 
   if (!current) return <></>;
 
+  const progressFlush = showProgress && !current.bottomSlot;
+
   const counterNode = (
     <span className={styles['tedi-card-stepper__counter']}>
       <span aria-hidden="true">
@@ -231,14 +234,26 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
   const showTopRow = counterPosition === 'top' || showTopDescription;
 
   return (
-    <div ref={ref} role="group" aria-label={ariaLabel} className={cn(styles['tedi-card-stepper'], className)}>
-      <div className={styles['tedi-card-stepper__main']}>
+    <div
+      ref={ref}
+      role="group"
+      aria-label={ariaLabel}
+      className={cn(
+        styles['tedi-card-stepper'],
+        { [styles['tedi-card-stepper--progress-flush']]: progressFlush },
+        className
+      )}
+    >
+      <div
+        className={cn(styles['tedi-card-stepper__main'], {
+          [styles['tedi-card-stepper__main--no-lead']]: !hasLead,
+        })}
+      >
         {showNavigation && (
           <Button
             visualType="neutral"
-            size="small"
             icon="arrow_back"
-            className={styles['tedi-card-stepper__lead']}
+            className={cn(styles['tedi-card-stepper__lead'], styles['tedi-card-stepper__nav-prev'])}
             disabled={prevIndex === -1}
             onClick={() => goTo(prevIndex)}
           >
@@ -270,7 +285,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
                 name={current.state === 'completed' ? 'check' : 'error'}
                 color={current.state === 'completed' ? 'success' : 'danger'}
                 size={18}
-                display="inline"
+                display="block"
                 label={getLabel(current.state === 'completed' ? 'stepper.completed' : 'stepper.error')}
                 className={styles['tedi-card-stepper__status-icon']}
               />
@@ -288,7 +303,6 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
           {showStepList && (
             <Button
               visualType="neutral"
-              size="small"
               icon="list"
               aria-haspopup="dialog"
               aria-expanded={modalOpen}
@@ -301,8 +315,8 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
           {showNavigation && (
             <Button
               visualType="neutral"
-              size="small"
               icon="arrow_forward"
+              className={styles['tedi-card-stepper__nav-next']}
               disabled={nextIndex === -1}
               onClick={() => goTo(nextIndex)}
             >
@@ -335,6 +349,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
               <VerticalStepper aria-label={resolvedLabels.modalHeading}>
                 {steps.map((step, index) => {
                   const navigable = isStepNavigable(index);
+                  const subSteps = step.subSteps;
                   return (
                     <VerticalStepper.Item
                       key={step.id ?? index}
@@ -350,7 +365,26 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
                             }
                           : undefined
                       }
-                    />
+                      defaultOpen={subSteps ? step.defaultExpanded ?? index === active : undefined}
+                    >
+                      {subSteps?.map((subStep, subIndex) => (
+                        <VerticalStepper.SubItem
+                          key={subStep.id ?? subIndex}
+                          title={subStep.title}
+                          state={subStep.disabled ? 'disabled' : subStep.state}
+                          current={subStep.current}
+                          href={subStep.href}
+                          onClick={
+                            subStep.onClick
+                              ? (event) => {
+                                  subStep.onClick?.(event);
+                                  setModalOpen(false);
+                                }
+                              : undefined
+                          }
+                        />
+                      ))}
+                    </VerticalStepper.Item>
                   );
                 })}
               </VerticalStepper>

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { type CSSProperties, ReactNode, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
@@ -61,23 +61,6 @@ export const Default: Story = {
   render: () => <CardStepper steps={STEPS_NO_DESC} activeStep={2} labels={ET_LABELS} aria-label="Taotluse sammud" />,
 };
 
-const MANY_STEPS: CardStepperStepProps[] = [
-  { title: 'Kutse', state: 'completed' },
-  { title: 'Tahteavaldus', state: 'completed' },
-  { title: 'Geenianalüüs' },
-  { title: 'Vastus' },
-  ...Array.from({ length: 8 }, (_, i) => ({ title: `Samm ${i + 5}` })),
-];
-
-/**
- * A longer flow — open the step-list button to see the full numbered step list in the modal
- * (completed steps show a check, the current step is highlighted).
- */
-export const ManySteps: Story = {
-  name: 'Many steps (open the list)',
-  render: () => <CardStepper steps={MANY_STEPS} activeStep={2} labels={ET_LABELS} aria-label="Geeniuuringu sammud" />,
-};
-
 export const WithoutStepNumber: Story = {
   render: () => (
     <CardStepper
@@ -87,37 +70,6 @@ export const WithoutStepNumber: Story = {
       labels={ET_LABELS}
       aria-label="Taotluse sammud"
     />
-  ),
-};
-
-export const HasNavigation: Story = {
-  render: () => (
-    <VerticalSpacing size={1}>
-      <CardStepper steps={STEPS_NO_DESC} activeStep={1} showNavigation labels={ET_LABELS} aria-label="Navigatsioon" />
-    </VerticalSpacing>
-  ),
-};
-
-export const WithoutProgressbar: Story = {
-  render: () => (
-    <VerticalSpacing size={1}>
-      <CardStepper
-        steps={STEPS}
-        activeStep={2}
-        showNavigation
-        showProgress={false}
-        labels={ET_LABELS}
-        aria-label="Ilma edenemisribata + kirjeldus"
-      />
-      <CardStepper
-        steps={STEPS_NO_DESC}
-        activeStep={2}
-        showNavigation
-        showProgress={false}
-        labels={ET_LABELS}
-        aria-label="Ilma edenemisribata"
-      />
-    </VerticalSpacing>
   ),
 };
 
@@ -235,6 +187,37 @@ export const WithInfoTop: Story = {
   },
 };
 
+export const HasNavigation: Story = {
+  render: () => (
+    <VerticalSpacing size={1}>
+      <CardStepper steps={STEPS_NO_DESC} activeStep={1} showNavigation labels={ET_LABELS} aria-label="Navigatsioon" />
+    </VerticalSpacing>
+  ),
+};
+
+export const WithoutProgressbar: Story = {
+  render: () => (
+    <VerticalSpacing size={1}>
+      <CardStepper
+        steps={STEPS}
+        activeStep={2}
+        showNavigation
+        showProgress={false}
+        labels={ET_LABELS}
+        aria-label="Ilma edenemisribata + kirjeldus"
+      />
+      <CardStepper
+        steps={STEPS_NO_DESC}
+        activeStep={2}
+        showNavigation
+        showProgress={false}
+        labels={ET_LABELS}
+        aria-label="Ilma edenemisribata"
+      />
+    </VerticalSpacing>
+  ),
+};
+
 export const WithBottomSlot: Story = {
   render: () => {
     const slotSteps = (slot: ReactNode): CardStepperStepProps[] => [
@@ -289,6 +272,57 @@ export const WithBottomSlot: Story = {
   },
 };
 
+const MANY_STEPS: CardStepperStepProps[] = [
+  { title: 'Kutse', state: 'completed' },
+  { title: 'Tahteavaldus', state: 'completed' },
+  { title: 'Geenianalüüs' },
+  { title: 'Vastus' },
+  ...Array.from({ length: 8 }, (_, i) => ({ title: `Samm ${i + 5}` })),
+];
+
+/**
+ * A longer flow — open the step-list button to see the full numbered step list in the modal
+ * (completed steps show a check, the current step is highlighted).
+ */
+export const ManySteps: Story = {
+  name: 'Many steps (open the list)',
+  render: () => <CardStepper steps={MANY_STEPS} activeStep={2} labels={ET_LABELS} aria-label="Geeniuuringu sammud" />,
+};
+
+const SUB_STEP_FLOW: CardStepperStepProps[] = [
+  { title: 'Kutse', state: 'completed' },
+  {
+    title: 'Tahteavaldus',
+    state: 'completed',
+    subSteps: [
+      { title: 'Nõusolek', state: 'completed' },
+      { title: 'Allkiri', state: 'completed' },
+    ],
+  },
+  {
+    title: 'Geenianalüüs',
+    description: 'Kirjeldus',
+    subSteps: [
+      { title: 'Proovi andmine', state: 'completed' },
+      { title: 'Analüüs', current: true },
+      { title: 'Tulemused' },
+    ],
+  },
+  { title: 'Vastus' },
+];
+
+/**
+ * A step with `subSteps` becomes a collapsible parent in the step-list modal — open the list
+ * to see the active step expanded into its sub-steps. The parent title still navigates; a
+ * separate chevron toggles the sub-list.
+ */
+export const CollapsibleSubSteps: Story = {
+  name: 'Collapsible sub-steps (open the list)',
+  render: () => (
+    <CardStepper steps={SUB_STEP_FLOW} activeStep={2} labels={ET_LABELS} aria-label="Sammud alamsammudega" />
+  ),
+};
+
 /**
  * The compound API — declare steps as `CardStepper.Step` children instead of the
  * `steps` data prop. Equivalent in behaviour; pick whichever reads better for the
@@ -325,7 +359,7 @@ const stepIndicatorStyle = (state: ButtonStepState): CSSProperties => {
     width: '1.5rem',
     height: '1.5rem',
     borderRadius: '50%',
-    fontSize: 'var(--body-small-size)',
+    fontSize: 'var(--body-small-regular-size)',
     lineHeight: 1,
   };
   if (state === 'completed') {
@@ -449,7 +483,7 @@ const semanticIndicatorStyle = (semantic: ButtonStepSemantic, disabled = false):
     width: '1.5rem',
     height: '1.5rem',
     borderRadius: '50%',
-    fontSize: 'var(--body-small-size)',
+    fontSize: 'var(--body-small-regular-size)',
     lineHeight: 1,
   };
   if (disabled) {
@@ -513,8 +547,12 @@ const stateStepCard = (semantic: ButtonStepSemantic, row: (typeof BUTTON_STATE_R
             <Text element="span" modifiers="bold">
               Minu andmed
             </Text>
-            {semantic === 'error' && <Icon name="error" color="danger" size={18} display="inline" />}
-            {semantic === 'success' && <Icon name="check" color="success" size={18} display="inline" />}
+            {row !== 'Disabled' && semantic === 'error' && (
+              <Icon name="error" color="danger" size={18} display="inline" />
+            )}
+            {row !== 'Disabled' && semantic === 'success' && (
+              <Icon name="check" color="success" size={18} display="inline" />
+            )}
           </div>
           <Icon name="arrow_right_alt" color="secondary" />
         </div>
@@ -535,22 +573,22 @@ export const CardStepperButtonStates: Story = {
   },
   render: () => (
     <VerticalSpacing size={1}>
-      <Row alignItems="center">
-        <Col xs={12} md={2} />
+      <Row alignItems="center" gutterY={2} lg={{ gutterY: 0 }}>
+        <Col xs={12} lg={2} />
         {SEMANTIC_COLUMNS.map((column) => (
-          <Col key={column.key} xs={12} md={3}>
+          <Col key={column.key} xs={12} lg={3} grow={1}>
             <Text modifiers="bold">{column.label}</Text>
           </Col>
         ))}
       </Row>
 
       {BUTTON_STATE_ROWS.map((row) => (
-        <Row key={row} alignItems="center">
-          <Col xs={12} md={2}>
+        <Row key={row} alignItems="center" gutterY={2} lg={{ gutterY: 0 }}>
+          <Col xs={12} lg={2}>
             <Text modifiers="bold">{row}</Text>
           </Col>
           {SEMANTIC_COLUMNS.map((column) => (
-            <Col key={column.key} xs={12} md={3}>
+            <Col key={column.key} xs={12} lg={3} grow={1}>
               {stateStepCard(column.key, row)}
             </Col>
           ))}
