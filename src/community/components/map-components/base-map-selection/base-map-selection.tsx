@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { JSX } from 'react';
+import { JSX, useState } from 'react';
 
 import Button from '../../../../tedi/components/buttons/button/button';
 import { Field } from '../../../../tedi/components/form/field/field';
@@ -35,10 +35,16 @@ export interface BaseMapSelectionProps {
   showTransparency?: boolean;
   /**
    * Controlled transparency value (0-100). Use together with `onTransparencyChange`.
+   * Values outside the range are clamped. Omit for uncontrolled usage.
    */
   transparency?: number;
   /**
-   * Callback fired when the transparency value changes.
+   * Initial transparency value (0-100) for uncontrolled usage. Ignored when `transparency` is provided.
+   * @default 0
+   */
+  defaultTransparency?: number;
+  /**
+   * Callback fired when the transparency value changes. The reported value is always clamped to 0-100.
    */
   onTransparencyChange?: (value: number) => void;
   /**
@@ -61,7 +67,7 @@ const clampTransparency = (value: string | number): number => {
   return Math.min(100, Math.max(0, next));
 };
 
-export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
+export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
   const {
     title,
     content,
@@ -69,15 +75,27 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
     multiple = false,
     showTransparency = false,
     transparency,
+    defaultTransparency,
     onTransparencyChange,
     transparencyLabel = '',
     id,
   } = props;
 
-  const transparencyValue = transparency ?? 0;
+  const isControlled = transparency !== undefined;
+  const [uncontrolledTransparency, setUncontrolledTransparency] = useState(() =>
+    clampTransparency(defaultTransparency ?? 0)
+  );
 
-  const handleTransparencyChange = (value: number) => {
-    onTransparencyChange?.(clampTransparency(value));
+  const transparencyValue = clampTransparency(isControlled ? transparency : uncontrolledTransparency);
+
+  const handleTransparencyChange = (value: string | number) => {
+    const next = clampTransparency(value);
+
+    if (!isControlled) {
+      setUncontrolledTransparency(next);
+    }
+
+    onTransparencyChange?.(next);
   };
 
   const triggerBEM = classNames(
@@ -118,7 +136,7 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
                         type="number"
                         id={`${id}-transparency`}
                         value={String(transparencyValue)}
-                        onChange={(value) => handleTransparencyChange(clampTransparency(value))}
+                        onChange={handleTransparencyChange}
                       />
                     </Input>
                     <Suffix>%</Suffix>
@@ -131,7 +149,7 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
       </Popover.Content>
     </Popover>
   );
-};
+}
 
 BaseMapSelection.Option = BaseMapOption;
 BaseMapSelection.displayName = 'BaseMapSelection';

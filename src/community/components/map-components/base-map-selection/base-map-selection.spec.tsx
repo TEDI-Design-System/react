@@ -78,6 +78,53 @@ describe('BaseMapSelection', () => {
 
     expect(onTransparencyChange).toHaveBeenCalledWith(70);
   });
+
+  it('clamps an out-of-range transparency value consistently in the slider and the field', () => {
+    renderSelection({ showTransparency: true, transparency: 150, transparencyLabel: 'Map transparency' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+
+    expect(screen.getByRole('slider')).toHaveValue('100');
+    expect(screen.getByRole('spinbutton', { name: 'Map transparency' })).toHaveValue(100);
+  });
+
+  it('reports a clamped value when the numeric field exceeds the range', () => {
+    const onTransparencyChange = jest.fn();
+    renderSelection({
+      showTransparency: true,
+      transparency: 50,
+      transparencyLabel: 'Map transparency',
+      onTransparencyChange,
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Map transparency' }), { target: { value: '150' } });
+
+    expect(onTransparencyChange).toHaveBeenCalledWith(100);
+  });
+
+  it('keeps slider edits in uncontrolled mode (no transparency prop)', () => {
+    renderSelection({ showTransparency: true, transparencyLabel: 'Map transparency' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+
+    const slider = screen.getByRole('slider');
+    expect(slider).toHaveValue('0');
+
+    fireEvent.change(slider, { target: { value: '40' } });
+
+    expect(slider).toHaveValue('40');
+    expect(screen.getByRole('spinbutton', { name: 'Map transparency' })).toHaveValue(40);
+  });
+
+  it('seeds uncontrolled mode from defaultTransparency, clamped', () => {
+    renderSelection({ showTransparency: true, defaultTransparency: 150, transparencyLabel: 'Map transparency' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+
+    expect(screen.getByRole('slider')).toHaveValue('100');
+    expect(screen.getByRole('spinbutton', { name: 'Map transparency' })).toHaveValue(100);
+  });
 });
 
 describe('BaseMapOption', () => {
