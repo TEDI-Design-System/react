@@ -1,6 +1,11 @@
-import type { Meta, StoryFn, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
@@ -10,14 +15,13 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ScrollFade } from '../../misc/scroll-fade/scroll-fade';
 import Separator from '../../misc/separator/separator';
 import { Modal, ModalProps } from './modal';
-import { ModalContentProps, ModalFullscreen, ModalWidthPreset } from './modal-content/modal-content';
+import { ModalFullscreen, ModalWidthPreset } from './modal-content/modal-content';
 
-type ModalStoryArgs = ModalProps &
-  ModalContentProps & {
-    heading?: string;
-    description?: string;
-    closeButton?: boolean;
-  };
+type ModalStoryArgs = ModalProps & {
+  heading?: string;
+  description?: string;
+  closeButton?: boolean;
+};
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4624-83113&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -132,41 +136,46 @@ const DefaultFooter = () => (
   </Modal.Footer>
 );
 
-const DefaultTemplate: StoryFn<ModalStoryArgs> = ({
-  heading = 'Modal title',
-  description,
-  closeButton = true,
-  width,
-  maxWidth,
-  size,
-  position,
-  scrollBehavior,
-  fullscreen,
-  ...modalProps
-}) => (
-  <Modal {...modalProps}>
-    <Modal.Trigger>
-      <Button visualType="secondary">Open modal</Button>
-    </Modal.Trigger>
-    <Modal.Content
-      width={width}
-      maxWidth={maxWidth}
-      size={size}
-      position={position}
-      scrollBehavior={scrollBehavior}
-      fullscreen={fullscreen}
-    >
-      <Modal.Header title={heading} description={description} closeButton={closeButton} />
-      <Modal.Body>
-        <SampleForm />
-      </Modal.Body>
-      <DefaultFooter />
-    </Modal.Content>
-  </Modal>
-);
-
-export const Default: Story = {
-  render: DefaultTemplate,
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `Modal.Content`**, surfaced on the Docs page (autodocs binds its `<Controls />`
+ * block to this primary story).
+ *
+ * `Modal.Content`'s layout props (`width`, `position`, `fullscreen`, …) are flattened
+ * into namespaced controls (grouped under their own category in the Controls panel)
+ * via the shared `subcomponentArgTypes` helper, then reassembled in `render` with
+ * `getSubcomponentProps`. The ungrouped controls are `Modal`'s own props; the
+ * `heading` / `description` / `closeButton` knobs drive `Modal.Header`.
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Modal.Content, {
+      category: 'Modal.Content',
+      prefix: 'content',
+      exclude: ['children', 'initialFocus', 'aria-labelledby', 'aria-describedby', 'aria-label'],
+    }),
+  },
+  render: (args: Record<string, unknown>) => {
+    const { heading = 'Modal title', description, closeButton = true, ...rest } = args;
+    return (
+      <Modal {...getPrimaryComponentProps<ModalProps>(rest)}>
+        <Modal.Trigger>
+          <Button visualType="secondary">Open modal</Button>
+        </Modal.Trigger>
+        <Modal.Content {...getSubcomponentProps(args, 'content')}>
+          <Modal.Header
+            title={heading as string}
+            description={description as string | undefined}
+            closeButton={closeButton as boolean}
+          />
+          <Modal.Body>
+            <SampleForm />
+          </Modal.Body>
+          <DefaultFooter />
+        </Modal.Content>
+      </Modal>
+    );
+  },
 };
 
 export const Position: Story = {

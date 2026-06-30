@@ -1,6 +1,7 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -45,6 +46,8 @@ interface TemplateMultipleProps<Type = TextFieldProps['size']> extends TextField
   property: keyof TextFieldProps;
 }
 
+const sizeLabels: Record<string, string> = { default: 'Default', small: 'Small' };
+
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
   const { array, property } = args;
 
@@ -53,10 +56,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
           <Col md={2} sm={6}>
-            <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+            <Text modifiers="bold">{value ? sizeLabels[value] ?? value : ''}</Text>
           </Col>
           <Col lg={3} md={6} className="d-flex">
-            <TimeField label="Kellaaeg" id={`time-field-size--${value}`} inputProps={{ [property]: value }} />
+            <TimeField label="Aeg" id={`time-field-size--${value}`} inputProps={{ [property]: value }} />
           </Col>
         </Row>
       ))}
@@ -67,8 +70,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
 export const Default: Story = {
   render: Template,
   args: {
-    label: 'Kellaaeg',
-    placeholder: 'tt:mm',
+    label: 'Aeg',
     required: true,
     stepMinutes: 1,
   },
@@ -94,7 +96,7 @@ export const States: StoryObj<TimeFieldProps> = {
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col md={4} xs={12} className="display-flex align-items-center">
-            <TimeField id={state} label="Kellaaeg" inputProps={{ disabled: state === 'Disabled' }} />
+            <TimeField id={state} label="Aeg" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
@@ -105,8 +107,8 @@ export const States: StoryObj<TimeFieldProps> = {
         <Col md={4} xs={12} className="display-flex align-items-center">
           <TimeField
             id="success-timefield"
-            label="Kellaaeg"
-            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'valid' } }}
+            label="Aeg"
+            inputProps={{ helper: { text: 'Vihjetekst', type: 'valid' } }}
           />
         </Col>
       </Row>
@@ -115,11 +117,7 @@ export const States: StoryObj<TimeFieldProps> = {
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col md={4} xs={12} className="display-flex align-items-center">
-          <TimeField
-            id="error-timefield"
-            label="Kellaaeg"
-            inputProps={{ helper: { text: 'Tagasiside tekst', type: 'error' } }}
-          />
+          <TimeField id="error-timefield" label="Aeg" inputProps={{ helper: { text: 'Vihjetekst', type: 'error' } }} />
         </Col>
       </Row>
     </div>
@@ -138,14 +136,9 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={3} md={6}>
         <div className="flex gap-4 flex-column">
-          <TimeField id="time-field-default" label="Vaikimisi kellaaja väli" placeholder="tt:mm" />
+          <TimeField id="time-field-default" label="Aeg" />
 
-          <TimeField
-            id="time-field-with-hint"
-            label="Kellaaja väli vihjega"
-            placeholder="tt:mm"
-            inputProps={{ helper: { text: 'Vihje tekst' } }}
-          />
+          <TimeField id="time-field-with-hint" label="Aeg" inputProps={{ helper: { text: 'Vihjetekst' } }} />
         </div>
       </Col>
     </Row>
@@ -157,9 +150,9 @@ export const ValueType: StoryFn = () => {
     <Row>
       <Col lg={3} md={6}>
         <div className="flex gap-3 flex-column">
-          <TimeField id="time-default" label="Silt" />
-          <TimeField id="time-with-placeholder" label="Silt" placeholder="tt:mm" />
-          <TimeField id="time-with-default-value" label="Silt" defaultValue="13:00" />
+          <TimeField id="time-default" label="Aeg" />
+          <TimeField id="time-with-placeholder" label="Aeg" placeholder="tt:mm" />
+          <TimeField id="time-with-default-value" label="Aeg" defaultValue="13:00" />
         </div>
       </Col>
     </Row>
@@ -172,14 +165,14 @@ export const OnClickType: Story = {
       <VerticalSpacing>
         <Row>
           <Col lg={3} md={6}>
-            <Text>Clock button is clickable</Text>
-            <TimeField label="Kellaaeg" placeholder="tt:mm" id="calendar-button-trigger" timePickerTrigger="button" />
+            <Text modifiers="small">Clock button is clickable</Text>
+            <TimeField label="Aeg" id="calendar-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
-            <Text>Input is clickable</Text>
-            <TimeField label="Kellaaeg" placeholder="tt:mm" id="calendar-input-trigger" timePickerTrigger="input" />
+            <Text modifiers="small">Input is clickable</Text>
+            <TimeField label="Aeg" id="calendar-button-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
       </VerticalSpacing>
@@ -197,67 +190,99 @@ export const OnClickType: Story = {
 export const PredefinedTimeSlots: Story = {
   render: () => {
     const [times, setTimes] = useState({
-      dropdown: undefined as string | undefined,
-      grid: undefined as string | undefined,
+      input: '11:30' as string | undefined,
+      radio: '11:30' as string | undefined,
+      button: '11:30' as string | undefined,
     });
 
-    const availableTimes = ['08:00', '08:30', '09:00', '09:15', '09:30', '10:00', '10:30', '11:00', '12:00'];
+    const availableTimes = ['09:30', '10:00', '11:30', '15:30', '18:30', '20:30'];
 
-    const handleChange = (key: 'dropdown' | 'grid') => (newTime: string) => {
+    const handleChange = (key: keyof typeof times) => (newTime: string) => {
       setTimes((prev) => ({ ...prev, [key]: newTime }));
     };
 
     return (
-      <VerticalSpacing>
-        <Row>
-          <Col lg={3} md={6}>
-            <TimeField
-              id="time-dropdown"
-              label="Kellaaeg"
-              value={times.dropdown}
-              onChange={handleChange('dropdown')}
-              placeholder="Vali kellaaeg"
-              availableTimes={availableTimes}
-              timePickerTrigger="input"
-            />
-          </Col>
-        </Row>
-
-        <Row>
-          <Col lg={3} md={6}>
-            <TimeField
-              id="time-grid"
-              label="Kellaaeg"
-              value={times.grid}
-              onChange={handleChange('grid')}
-              placeholder="Vali kellaaeg"
-              availableTimes={availableTimes}
-              availableTimesVariant="grid-radio"
-              timePickerTrigger="input"
-            />
-          </Col>
-        </Row>
-      </VerticalSpacing>
+      <Row>
+        <Col lg={4} md={6} xs={12}>
+          <Text modifiers={['small']}>Input trigger (recommended)</Text>
+          <TimeField
+            id="slots-input"
+            label="Aeg"
+            value={times.input}
+            onChange={handleChange('input')}
+            placeholder="Vali aeg"
+            availableTimes={availableTimes}
+            timePickerTrigger="input"
+          />
+        </Col>
+        <Col lg={4} md={6} xs={12}>
+          <Text modifiers={['small']}>Radio buttons</Text>
+          <TimeField
+            id="slots-radio"
+            label="Aeg"
+            value={times.radio}
+            onChange={handleChange('radio')}
+            placeholder="Vali aeg"
+            availableTimes={availableTimes}
+            availableTimesVariant="grid-radio"
+            timePickerTrigger="input"
+          />
+        </Col>
+        <Col lg={4} md={6} xs={12}>
+          <Text modifiers={['small']}>Button trigger</Text>
+          <TimeField
+            id="slots-button"
+            label="Aeg"
+            value={times.button}
+            onChange={handleChange('button')}
+            placeholder="Vali aeg"
+            availableTimes={availableTimes}
+            timePickerTrigger="button"
+          />
+        </Col>
+      </Row>
     );
   },
 };
 
 export const Dropdown: Story = {
   render: () => {
-    const [time, setTime] = useState<string | undefined>();
-    const availableTimes = ['08:00', '08:30', '09:00', '09:15', '09:30', '10:00', '10:30', '11:00', '12:00'];
+    const [times, setTimes] = useState({
+      empty: undefined as string | undefined,
+      preselected: '13:30' as string | undefined,
+    });
+    const availableTimes = ['12:30', '13:00', '13:30', '14:00', '14:30'];
+
+    const handleChange = (key: keyof typeof times) => (newTime: string) => {
+      setTimes((prev) => ({ ...prev, [key]: newTime }));
+    };
 
     return (
       <Row>
-        <Col lg={3} md={6}>
+        <Col lg={6} md={12}>
+          <Text modifiers={['small']}>Button trigger</Text>
           <TimeField
-            id="available-times-dropdown"
-            label="Kellaaeg"
-            value={time}
-            onChange={setTime}
-            placeholder="Vali kellaaeg"
+            id="dropdown-empty"
+            label="Aeg"
+            value={times.empty}
+            onChange={handleChange('empty')}
+            placeholder="Vali aeg"
             availableTimes={availableTimes}
             availableTimesVariant="dropdown"
+            timePickerTrigger="button"
+          />
+        </Col>
+        <Col lg={6} md={12}>
+          <Text modifiers={['small']}>Input trigger</Text>
+          <TimeField
+            id="dropdown-preselected"
+            label="Aeg"
+            value={times.preselected}
+            onChange={handleChange('preselected')}
+            placeholder="Vali aeg"
+            availableTimes={availableTimes}
+            availableTimesVariant="dropdown"
+            timePickerTrigger="input"
           />
         </Col>
       </Row>
@@ -268,7 +293,7 @@ export const Dropdown: Story = {
 export const FieldWithoutPicker: Story = {
   render: Template,
   args: {
-    label: 'Kellaaeg',
+    label: 'Aeg',
     placeholder: 'tt:mm',
     showPicker: false,
   },
@@ -284,7 +309,7 @@ export const FieldWithoutPicker: Story = {
 export const CustomStep: Story = {
   render: Template,
   args: {
-    label: 'Kellaaeg 15-min sammuga',
+    label: 'Aeg 15-minutiliste sammudega',
     stepMinutes: 15,
     placeholder: 'tt:mm',
     defaultValue: '12:30',
@@ -297,25 +322,74 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
   return (
     <Row>
       <Col lg={3} md={6}>
-        <TimeField
-          {...args}
-          value={time}
-          onChange={(val) => setTime(val)}
-          label="Sisesta kellaaeg käsitsi"
-          placeholder="tt:mm"
-        />
+        <TimeField {...args} value={time} onChange={(val) => setTime(val)} label="Aeg" placeholder="tt:mm" />
       </Col>
     </Row>
   );
 };
 
-export const NativePicker: Story = {
-  render: Template,
+/**
+ * Pass `modal` to open the picker inside a centered modal (with Cancel / Confirm
+ * footer buttons) instead of the floating popover. The most common use is the
+ * mobile pattern — `modal="md"` opens in a modal below `md` and falls back to
+ * the popover from `md` up. Pass `modal` alone (or `modal={true}`) to always
+ * use the modal. The user's choice is held as a draft and only committed on
+ * Confirm — Cancel / Escape / backdrop dismiss discards it.
+ */
+export const ModalPicker: Story = {
+  render: (args) => (
+    <LabelProvider locale="et">
+      <Template {...args} />
+    </LabelProvider>
+  ),
   args: {
-    label: 'Kellaaeg',
+    id: 'time-modal',
+    label: 'Aeg',
     placeholder: 'tt:mm',
-    useNativePicker: true,
+    modal: true,
+    timePickerTrigger: 'input',
   },
+};
+
+/**
+ * `modal="md"` opens the picker in a modal only below `md` viewports and
+ * leaves the popover behavior unchanged on desktop. Resize the Storybook
+ * canvas or pick a mobile preset to see the modal kick in.
+ */
+export const ResponsiveModalPicker: Story = {
+  render: (args) => (
+    <LabelProvider locale="et">
+      <Template {...args} />
+    </LabelProvider>
+  ),
+  args: {
+    id: 'time-modal-responsive',
+    label: 'Aeg',
+    placeholder: 'tt:mm',
+    modal: 'md',
+    timePickerTrigger: 'input',
+  },
+};
+
+export const NativePicker: Story = {
+  render: () => (
+    <Row>
+      <Col lg={6} md={12}>
+        <Text modifiers={['small']}>Always native (useNativePicker=true)</Text>
+        <TimeField id="native-always" label="Aeg" defaultValue="09:30" useNativePicker />
+      </Col>
+      <Col lg={6} md={12}>
+        <Text modifiers={['small']}>Responsive</Text>
+        <TimeField
+          id="native-responsive"
+          label="Aeg"
+          defaultValue="09:30"
+          useNativePicker
+          md={{ useNativePicker: false }}
+        />
+      </Col>
+    </Row>
+  ),
   parameters: {
     docs: {
       description: {

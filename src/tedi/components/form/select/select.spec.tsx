@@ -289,6 +289,31 @@ describe('Select component', () => {
     expect(tags.length).toBe(2);
   });
 
+  it('does not ellipse tags by default', () => {
+    const { container } = render(<Select {...defaultProps} multiple value={[basicOptions[0], basicOptions[1]]} />);
+    expect(container.querySelectorAll('.tedi-tag--ellipsis')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-name="ellipsis"]')).toHaveLength(0);
+  });
+
+  it('forwards tagsEllipsis to each selected tag', () => {
+    const { container } = render(
+      <Select {...defaultProps} multiple value={[basicOptions[0], basicOptions[1]]} tagsEllipsis="end" />
+    );
+    expect(container.querySelectorAll('.tedi-tag--ellipsis')).toHaveLength(2);
+    expect(container.querySelectorAll('[data-name="ellipsis"]')).toHaveLength(2);
+  });
+
+  it('marks the tag wrapper as shrinkable for ellipsis and handles mousedown', () => {
+    const { container } = render(
+      <Select {...defaultProps} multiple value={[basicOptions[0], basicOptions[1]]} tagsEllipsis="end" />
+    );
+    const wrapper = container.querySelector('[data-tedi-tag-index]');
+    expect(wrapper).toHaveClass('tedi-select__multi-value--ellipsis');
+
+    fireEvent.mouseDown(wrapper!);
+    expect(wrapper).toBeInTheDocument();
+  });
+
   it('renders tag closing button', () => {
     const { container } = render(
       <Select {...defaultProps} multiple value={[basicOptions[0], basicOptions[1]]} isTagRemovable />

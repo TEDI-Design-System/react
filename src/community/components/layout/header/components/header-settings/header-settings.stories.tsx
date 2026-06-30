@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { VerticalSpacing } from '../../../../../../tedi/components/layout/vertical-spacing';
 import Separator from '../../../../../../tedi/components/misc/separator/separator';

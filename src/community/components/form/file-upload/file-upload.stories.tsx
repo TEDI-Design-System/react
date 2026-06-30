@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MultipleHandledTemplate } from './examples/multiple-handled';
 import FileUpload from './file-upload';

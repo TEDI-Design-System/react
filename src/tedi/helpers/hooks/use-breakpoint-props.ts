@@ -21,7 +21,7 @@ export const useBreakpointProps = (defaultServerBreakpoint: Breakpoint = 'xs') =
       defaultValues: Partial<T> = {}
     ): Omit<BreakpointSupport<T>, Exclude<Breakpoint, 'xs'> | 'defaultServerBreakpoint'> => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
-      const { sm, md, lg, xl, xxl, ...xs } = props;
+      const { sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs } = props;
       const propArray = [
         ...activeBreakpoints.map((bp) => pickBy(bp === 'xs' ? xs : props[bp], (value) => value !== undefined)), // filter out props that have undefined as value, so they don't override lower breakpoint values or default values
       ].filter(Boolean);

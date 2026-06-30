@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -137,8 +137,8 @@ export const WithTextInverted = {
       active: '#Active__trigger',
       focusVisible: '#Focus__trigger',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const IconOnlyInverted = {
@@ -155,8 +155,8 @@ export const IconOnlyInverted = {
       active: '#Active__trigger',
       focusVisible: '#Focus__trigger',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const SecondaryButton = {
