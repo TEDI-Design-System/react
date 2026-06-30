@@ -90,7 +90,9 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
       className={optionBEM}
       id={id}
     >
-      <div className={styles['tedi-base-map-selection__content']}>{content}</div>
+      <div aria-hidden className={styles['tedi-base-map-selection__content']}>
+        {content}
+      </div>
       <div className={styles['tedi-base-map-selection__title']}>{title}</div>
     </div>
   );

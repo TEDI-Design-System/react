@@ -133,7 +133,6 @@ export const OptionStates: StoryObj<OptionTemplateProps> = {
   parameters: {
     pseudo: {
       hover: '#Hover',
-      active: '#Active',
       focusVisible: '#Focus',
     },
   },
@@ -150,7 +149,6 @@ export const OptionButton: StoryObj<OptionTemplateProps> = {
   parameters: {
     pseudo: {
       hover: '#Hover',
-      active: '#Active',
       focusVisible: '#Focus',
     },
   },
@@ -168,7 +166,6 @@ export const OptionStack: StoryObj<OptionTemplateProps> = {
   parameters: {
     pseudo: {
       hover: '#Hover',
-      active: '#Active',
       focusVisible: '#Focus',
     },
   },
@@ -185,7 +182,6 @@ export const OptionHistorical: StoryObj<OptionTemplateProps> = {
   parameters: {
     pseudo: {
       hover: '#Hover',
-      active: '#Active',
       focusVisible: '#Focus',
     },
   },

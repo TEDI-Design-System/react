@@ -54,6 +54,30 @@ describe('BaseMapSelection', () => {
 
     expect(onTransparencyChange).toHaveBeenCalledWith(60);
   });
+
+  it('associates the transparency numeric field with its label', () => {
+    renderSelection({ showTransparency: true, transparency: 50, transparencyLabel: 'Map transparency' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+
+    const field = screen.getByRole('spinbutton', { name: 'Map transparency' });
+    expect(field).toHaveAttribute('id', 'basemap-transparency');
+  });
+
+  it('calls onTransparencyChange when the numeric field value changes', () => {
+    const onTransparencyChange = jest.fn();
+    renderSelection({
+      showTransparency: true,
+      transparency: 50,
+      transparencyLabel: 'Map transparency',
+      onTransparencyChange,
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Map transparency' }), { target: { value: '70' } });
+
+    expect(onTransparencyChange).toHaveBeenCalledWith(70);
+  });
 });
 
 describe('BaseMapOption', () => {

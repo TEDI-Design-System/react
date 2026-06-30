@@ -116,7 +116,7 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
                     <Input>
                       <Field
                         type="number"
-                        id={`${id}-transparency-field`}
+                        id={`${id}-transparency`}
                         value={String(transparencyValue)}
                         onChange={(value) => handleTransparencyChange(clampTransparency(value))}
                       />
