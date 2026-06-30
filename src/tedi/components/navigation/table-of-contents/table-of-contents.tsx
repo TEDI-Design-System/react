@@ -137,7 +137,7 @@ export const buildActiveTrail = (nodes: TableOfContentsNode[], activeId?: string
   return trail;
 };
 
-const TableOfContentsComponent = (props: TableOfContentsProps): JSX.Element => {
+export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const { getLabel } = useLabels();
   const {
     children,
@@ -197,13 +197,10 @@ const TableOfContentsComponent = (props: TableOfContentsProps): JSX.Element => {
       )}
     </TableOfContentsContext.Provider>
   );
-};
+}
 
-TableOfContentsComponent.displayName = 'TableOfContents';
-
-export const TableOfContents = Object.assign(TableOfContentsComponent, {
-  Item: TableOfContentsItem,
-  Collapsible: TableOfContentsCollapsible,
-});
+TableOfContents.displayName = 'TableOfContents';
+TableOfContents.Item = TableOfContentsItem;
+TableOfContents.Collapsible = TableOfContentsCollapsible;
 
 export default TableOfContents;

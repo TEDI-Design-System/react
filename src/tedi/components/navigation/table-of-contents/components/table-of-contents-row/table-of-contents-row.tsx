@@ -21,7 +21,7 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
   const { id, content, children, isValid, separator, hideIcon } = node;
 
   const hasChildren = !!children?.length;
-  const isActive = !!id && id === activeId;
+  const isSelected = !!id && id === activeId;
   const isOpen = hasChildren && !!id && activeTrail.has(id);
   const level = Math.min(depth, 2);
 
@@ -32,9 +32,9 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
 
   return (
     <li
-      aria-current={isActive ? 'true' : undefined}
+      aria-current={isSelected ? 'true' : undefined}
       className={cn(styles['tedi-table-of-contents__item'], {
-        [styles['tedi-table-of-contents__item--active']]: isActive,
+        [styles['tedi-table-of-contents__item--selected']]: isSelected,
       })}
     >
       <span

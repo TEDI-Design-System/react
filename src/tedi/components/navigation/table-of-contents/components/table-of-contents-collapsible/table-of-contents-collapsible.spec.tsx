@@ -70,7 +70,7 @@ describe('TableOfContents.Collapsible', () => {
   it('closes the sheet from the sheet header', () => {
     render(<Tree />);
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 

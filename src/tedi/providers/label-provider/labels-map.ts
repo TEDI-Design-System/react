@@ -887,14 +887,14 @@ export const labelsMap = validateDefaultLabels({
   'table-of-contents.step-valid': {
     description: 'Accessible label for the validation icon of a completed (valid) step',
     components: ['TableOfContents'],
-    et: 'Valiidne',
+    et: 'Korrektne',
     en: 'Valid',
     ru: 'Действительно',
   },
   'table-of-contents.step-invalid': {
     description: 'Accessible label for the validation icon of an invalid step',
     components: ['TableOfContents'],
-    et: 'Mitte valiidne',
+    et: 'Vajab parandamist',
     en: 'Invalid',
     ru: 'Неверный',
   },

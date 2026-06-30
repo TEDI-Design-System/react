@@ -1289,12 +1289,9 @@ Navigational TOC for long pages / multistep forms. **Compound API** — composed
     </TableOfContents.Item>
   </TableOfContents.Item>
 </TableOfContents>
-
-// Numbered: <TableOfContents numbered>…</TableOfContents>
-// Multistep form: <TableOfContents showIcons activeId="step-2">
-//   <TableOfContents.Item id="step-1" isValid><Link …>Step 1</Link></TableOfContents.Item> …
-// </TableOfContents>
 ```
+
+Variants: add `numbered` for an ordered list with auto hierarchical numbers (`1.` / `2.1`); for a multistep form, set `showIcons` and give each `TableOfContents.Item` an `isValid` for its per-step validation glyph (see the props above).
 
 ### HorizontalStepper
 **Props:** `HorizontalStepperProps` | fRef

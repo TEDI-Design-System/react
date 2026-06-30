@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { LabelProvider } from '../../../providers/label-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -17,7 +18,10 @@ import { TableOfContents, TableOfContentsProps } from './table-of-contents';
  */
 const meta: Meta<typeof TableOfContents> = {
   component: TableOfContents,
-  subcomponents: { 'TableOfContents.Item': TableOfContents.Item },
+  subcomponents: {
+    'TableOfContents.Item': TableOfContents.Item,
+    'TableOfContents.Collapsible': TableOfContents.Collapsible,
+  },
   title: 'TEDI-Ready/Components/Navigation/TableOfContents',
   parameters: {
     layout: 'padded',
@@ -27,8 +31,6 @@ const meta: Meta<typeof TableOfContents> = {
     },
   },
   decorators: [
-    // The examples use Estonian content, so surface the Estonian labels (e.g. the collapsible
-    // variant's "Ava" / "Sulge" toggle) instead of the default English ones.
     (Story, context) => (
       <LabelProvider locale="et">
         <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 320 }}>
@@ -179,10 +181,10 @@ export const ItemStates: Story = {
     const states = [
       { label: 'Default', linkProps: {}, active: false },
       { label: 'Hover', linkProps: { isHovered: true }, active: false },
-      { label: 'Active', linkProps: { isActive: true }, active: true },
+      { label: 'Selected', linkProps: {}, active: true },
     ];
 
-    const rowStyle = (active: boolean) => ({
+    const rowStyle = (active: boolean): CSSProperties => ({
       display: 'inline-flex',
       alignItems: 'center',
       gap: 'var(--layout-grid-gutters-04)',
@@ -190,6 +192,7 @@ export const ItemStates: Story = {
         active ? 'var(--general-border-brand)' : 'transparent'
       }`,
       paddingLeft: 'calc(var(--table-of-contents-padding-level-1) - var(--table-of-contents-active-item-border-width))',
+      ...(active ? ({ '--link-primary-default': 'var(--link-primary-active)' } as CSSProperties) : {}),
     });
 
     const numberStyle = (active: boolean) => ({
@@ -232,7 +235,7 @@ export const ItemStates: Story = {
               <VerticalSpacing size={0.5}>
                 {states.map((state) => (
                   <div key={state.label} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ minWidth: '3.5rem' }}>
+                    <div style={{ minWidth: '5rem' }}>
                       <Text element="span" color="secondary">
                         {state.label}
                       </Text>
@@ -259,14 +262,25 @@ export const StickyInLayout: Story = {
   render: function StickyInLayout() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [activeId, setActiveId] = useState('sec-1');
+    // On mobile the article reads as a full-screen page; on desktop it's a 24rem scroll box next
+    // to the sticky TOC card.
+    const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
 
     useEffect(() => {
-      const root = scrollRef.current;
-      if (!root || typeof IntersectionObserver === 'undefined') return undefined;
+      const container = scrollRef.current;
+      if (typeof IntersectionObserver === 'undefined') return undefined;
+      if (!isMobile && !container) return undefined;
+
+      // On mobile the article is the page itself (single scrollbar), so track against the viewport;
+      // on desktop it's a nested scroll box.
+      const observerRoot = isMobile ? null : container;
 
       const ids = sections.map((_, index) => `sec-${index + 1}`);
       const visibility = new Map<string, boolean>();
-      const atBottom = (): boolean => root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
+      const atBottom = (): boolean =>
+        isMobile
+          ? window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+          : !!container && container.scrollTop + container.clientHeight >= container.scrollHeight - 2;
 
       const pickActive = (): void => {
         if (atBottom()) {
@@ -283,7 +297,7 @@ export const StickyInLayout: Story = {
           entries.forEach((entry) => visibility.set(entry.target.id, entry.isIntersecting));
           pickActive();
         },
-        { root, rootMargin: '0px 0px -55% 0px' }
+        { root: observerRoot, rootMargin: '0px 0px -55% 0px' }
       );
 
       ids.forEach((id) => {
@@ -291,24 +305,30 @@ export const StickyInLayout: Story = {
         if (el) observer.observe(el);
       });
 
-      root.addEventListener('scroll', pickActive, { passive: true });
+      const scroller: HTMLElement | Window = isMobile ? window : (container as HTMLElement);
+      scroller.addEventListener('scroll', pickActive, { passive: true });
 
       return () => {
         observer.disconnect();
-        root.removeEventListener('scroll', pickActive);
+        scroller.removeEventListener('scroll', pickActive);
       };
-    }, []);
+    }, [isMobile]);
 
     const selectSection = (id: string) => (event: React.MouseEvent) => {
       event.preventDefault();
-      const root = scrollRef.current;
       const target = document.getElementById(id);
-      if (!root || !target) return;
+      if (!target) return;
 
-      const paddingTop = parseFloat(getComputedStyle(root).paddingTop) || 0;
-      root.scrollTo({
-        top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - paddingTop,
-      });
+      if (isMobile) {
+        target.scrollIntoView({ block: 'start' });
+      } else {
+        const root = scrollRef.current;
+        if (!root) return;
+        const paddingTop = parseFloat(getComputedStyle(root).paddingTop) || 0;
+        root.scrollTo({
+          top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - paddingTop,
+        });
+      }
       setActiveId(id);
     };
 
@@ -324,13 +344,7 @@ export const StickyInLayout: Story = {
       <>
         <Row alignItems="start">
           <Col xs={12} md={8}>
-            <div
-              ref={scrollRef}
-              style={{
-                maxHeight: '24rem',
-                overflowY: 'auto',
-              }}
-            >
+            <div ref={scrollRef} style={isMobile ? undefined : { maxHeight: '24rem', overflowY: 'auto' }}>
               <VerticalSpacing size={1.5}>
                 {sections.map((label, index) => (
                   <section key={label} id={`sec-${index + 1}`} tabIndex={-1}>

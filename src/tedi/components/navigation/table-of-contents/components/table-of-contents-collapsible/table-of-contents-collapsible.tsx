@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
-import { Button } from '../../../../buttons/button/button';
+import { CollapseButton } from '../../../../buttons/collapse-button/collapse-button';
 import { Modal } from '../../../../overlays/modal';
 import {
   buildActiveTrail,
@@ -67,15 +67,14 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         <Text modifiers="bold" className={styles['tedi-table-of-contents__bar-title']}>
           {title}
         </Text>
-        <Button
-          visualType="link"
-          iconRight="expand_more"
-          onClick={() => setOpen(true)}
+        <CollapseButton
+          open={open}
+          onOpenChange={setOpen}
+          openText={getLabel('open')}
+          closeText={getLabel('close')}
+          underline={false}
           aria-haspopup="dialog"
-          aria-expanded={open}
-        >
-          {getLabel('open')}
-        </Button>
+        />
       </div>
 
       <Modal open={open} onToggle={setOpen}>
@@ -90,9 +89,13 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
               <Text modifiers="bold" className={styles['tedi-table-of-contents__bar-title']}>
                 {title}
               </Text>
-              <Button visualType="link" iconRight="expand_less" onClick={() => setOpen(false)}>
-                {getLabel('close')}
-              </Button>
+              <CollapseButton
+                open={open}
+                onOpenChange={setOpen}
+                openText={getLabel('open')}
+                closeText={getLabel('close')}
+                underline={false}
+              />
             </div>
           </Modal.Header>
           <Modal.Body>

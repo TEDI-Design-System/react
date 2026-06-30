@@ -85,7 +85,7 @@
   overflow-wrap: anywhere;
 }
 
-.tedi-table-of-contents__item--active > .tedi-table-of-contents__row {
+.tedi-table-of-contents__item--selected > .tedi-table-of-contents__row {
   border-left-color: var(--general-border-brand);
 
   .tedi-table-of-contents__number {
@@ -109,6 +109,8 @@
   padding: var(--card-padding-md-default);
   background: var(--card-background-primary);
   border-top: var(--tedi-borders-01) solid var(--card-border-primary);
+  border-top-left-radius: var(--card-radius-rounded);
+  border-top-right-radius: var(--card-radius-rounded);
 
   &--static {
     position: static;
@@ -127,6 +129,9 @@
 .tedi-table-of-contents__sheet.tedi-table-of-contents__sheet {
   height: auto;
   max-height: 80dvh;
+  border-top: var(--tedi-borders-01) solid var(--card-border-primary);
+  border-top-left-radius: var(--modal-radius);
+  border-top-right-radius: var(--modal-radius);
 }
 
 .tedi-table-of-contents__sheet-header {
