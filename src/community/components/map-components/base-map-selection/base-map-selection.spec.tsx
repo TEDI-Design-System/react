@@ -87,4 +87,32 @@ describe('BaseMapOption', () => {
 
     expect(onSelect).toHaveBeenCalledTimes(3);
   });
+
+  it('exposes the disabled state and removes itself from the tab order', () => {
+    render(<BaseMapOption disabled id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
+    const option = screen.getByRole('button', { name: /Streets/ });
+
+    expect(option).toHaveAttribute('aria-disabled', 'true');
+    expect(option).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('does not call onSelect when disabled, on click or keyboard', () => {
+    const onSelect = jest.fn();
+    render(
+      <BaseMapOption
+        disabled
+        id="streets"
+        title="Streets"
+        onSelect={onSelect}
+        content={<img src="streets.png" alt="Streets" />}
+      />
+    );
+    const option = screen.getByRole('button', { name: /Streets/ });
+
+    fireEvent.click(option);
+    fireEvent.keyDown(option, { key: 'Enter' });
+    fireEvent.keyDown(option, { key: ' ' });
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
 });

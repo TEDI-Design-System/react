@@ -60,7 +60,7 @@
       outline-offset: 1px;
       border-color: var(--general-border-brand);
 
-      .tedi-map-selection__title {
+      .tedi-base-map-selection__title {
         font-weight: 700;
         color: var(--general-text-brand);
       }
@@ -98,7 +98,6 @@
 .tedi-base-map-selection--disabled {
   &.tedi-base-map-selection__wrapper {
     pointer-events: none;
-    cursor: not-allowed;
     opacity: 0.5;
   }
 }
@@ -153,6 +152,7 @@
 
   .tedi-base-map-selection__title {
     position: relative;
+    max-width: 76px;
     margin-top: 4px;
 
     @include breakpoints.media-breakpoint-down(md) {

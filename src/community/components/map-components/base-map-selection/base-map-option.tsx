@@ -45,7 +45,7 @@ export interface BaseMapOptionProps {
    */
   multiple?: boolean;
   /**
-   * Applies disabled style and makes item unclickable when true.
+   * Applies disabled style.
    */
   disabled?: boolean;
 }
@@ -53,7 +53,17 @@ export interface BaseMapOptionProps {
 export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   const { title, content, selected, onSelect, type = 'selection', className, id, multiple, disabled } = props;
 
+  const handleSelect = () => {
+    if (disabled) {
+      return;
+    }
+    onSelect?.();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) {
+      return;
+    }
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onSelect?.();
@@ -72,9 +82,10 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={disabled ? -1 : 0}
       aria-pressed={!!selected}
-      onClick={onSelect}
+      aria-disabled={disabled || undefined}
+      onClick={handleSelect}
       onKeyDown={handleKeyDown}
       className={optionBEM}
       id={id}

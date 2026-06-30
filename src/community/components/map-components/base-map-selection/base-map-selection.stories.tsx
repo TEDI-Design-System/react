@@ -177,7 +177,7 @@ export const OptionStack: StoryObj<OptionTemplateProps> = {
 export const OptionHistorical: StoryObj<OptionTemplateProps> = {
   render: OptionStatesTemplate,
   args: {
-    array: ['Default', 'Hover', 'Focus', 'Selected'],
+    array: ['Default', 'Hover', 'Focus', 'Selected', 'Disabled'],
     type: 'historical',
     title: 'Ajalooline kaart',
     content: <img src={HISTORICAL_IMG} alt="Historical map" />,

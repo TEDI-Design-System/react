@@ -101,7 +101,7 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
           <div className={styles['tedi-base-map-selection__transparency']}>
             <Slider
               label={transparencyLabel}
-              aria-label={transparencyLabel ?? 'Transparency'}
+              aria-label={transparencyLabel || 'Transparency'}
               min={0}
               max={100}
               value={transparencyValue}
