@@ -1,3 +1,10 @@
+# [18.0.0-rc.27](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.26...react-18.0.0-rc.27) (2026-06-30)
+
+
+### Bug Fixes
+
+* **attachment:** attachment without actions padding fix [#701](https://github.com/TEDI-Design-System/react/issues/701) ([#702](https://github.com/TEDI-Design-System/react/issues/702)) ([4072d42](https://github.com/TEDI-Design-System/react/commit/4072d42d473ec0c95ae172b6b6dde940be44f696))
+
 # [18.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.25...react-18.0.0-rc.26) (2026-06-29)
 
 
