@@ -192,8 +192,8 @@ export const PrimaryInverted: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focus: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const Secondary: StoryObj<TemplateMultipleProps> = {
@@ -225,8 +225,8 @@ export const SecondaryInverted: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focus: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const Neutral: StoryObj<TemplateMultipleProps> = {
@@ -258,8 +258,8 @@ export const NeutralInverted: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focus: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const Success: StoryObj<TemplateMultipleProps> = {

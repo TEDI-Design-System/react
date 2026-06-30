@@ -20,9 +20,7 @@ export const Default: Story = {
   args: {
     children: 'Eesti põhikaart 1:20 000 2016 Maa- ja Ruumiamet',
   },
-  parameters: {
-    backgrounds: { default: 'brand' },
-  },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const WithPopoverContent: Story = {
@@ -38,9 +36,7 @@ export const WithPopoverContent: Story = {
       ),
     },
   },
-  parameters: {
-    backgrounds: { default: 'brand' },
-  },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const LongerContent: Story = {
@@ -62,7 +58,5 @@ export const LongerContent: Story = {
       ),
     },
   },
-  parameters: {
-    backgrounds: { default: 'brand' },
-  },
+  globals: { backgrounds: { value: 'brand' } },
 };

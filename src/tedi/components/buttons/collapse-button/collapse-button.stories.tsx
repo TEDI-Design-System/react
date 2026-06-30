@@ -132,9 +132,7 @@ export const WithTextInverted: StoryObj<StatesArgs> = {
     titleColor: 'white',
   },
   parameters: PSEUDO_PARAMS,
-  globals: {
-    backgrounds: { value: 'brand' },
-  },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const IconOnlyInverted: StoryObj<StatesArgs> = {
@@ -146,7 +144,5 @@ export const IconOnlyInverted: StoryObj<StatesArgs> = {
     'aria-label': 'Toggle details',
   },
   parameters: PSEUDO_PARAMS,
-  globals: {
-    backgrounds: { value: 'brand' },
-  },
+  globals: { backgrounds: { value: 'brand' } },
 };

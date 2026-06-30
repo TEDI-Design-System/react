@@ -92,6 +92,6 @@ export const Inverted: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
