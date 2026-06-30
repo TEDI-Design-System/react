@@ -34,6 +34,7 @@
   &__list-wrapper {
     position: relative;
     display: flex;
+    overflow: hidden;
     background: var(--tab-background);
     border-top-left-radius: var(--tab-top-radius);
     border-top-right-radius: var(--tab-top-radius);
@@ -73,6 +74,7 @@
 
       .tedi-tabs__trigger--selected {
         flex-grow: 1;
+        min-width: 0;
       }
     }
 

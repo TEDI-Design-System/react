@@ -1,3 +1,59 @@
+# [18.0.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.25...react-18.0.0-rc.26) (2026-06-29)
+
+
+### Bug Fixes
+
+* **slider:** fix invalid style, add example [#675](https://github.com/TEDI-Design-System/react/issues/675) ([#698](https://github.com/TEDI-Design-System/react/issues/698)) ([1e4e846](https://github.com/TEDI-Design-System/react/commit/1e4e8466d6d8330263f377cde4df659e302f35bc))
+
+# [18.0.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.24...react-18.0.0-rc.25) (2026-06-29)
+
+
+### Features
+
+* **select:** ability to wrap tags in smaller inputs [#685](https://github.com/TEDI-Design-System/react/issues/685) ([#697](https://github.com/TEDI-Design-System/react/issues/697)) ([ea9a96e](https://github.com/TEDI-Design-System/react/commit/ea9a96eb12c5e675f388a2c90fcd981681516b9f))
+
+# [18.0.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.23...react-18.0.0-rc.24) (2026-06-29)
+
+
+### Features
+
+* **ellipsis,tag:** new position prop for ellipsis, add ellipsis prop for tag [#679](https://github.com/TEDI-Design-System/react/issues/679) ([#693](https://github.com/TEDI-Design-System/react/issues/693)) ([ba52a59](https://github.com/TEDI-Design-System/react/commit/ba52a59596212041e015b2011622763ee5ae5da8))
+
+# [18.0.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.22...react-18.0.0-rc.23) (2026-06-26)
+
+
+### Features
+
+* **attachment:** tedi-ready component [#644](https://github.com/TEDI-Design-System/react/issues/644) ([#680](https://github.com/TEDI-Design-System/react/issues/680)) ([b54840f](https://github.com/TEDI-Design-System/react/commit/b54840f43d6cfe1890f3a40ecb0b55d9a0c64c4f)), closes [#32](https://github.com/TEDI-Design-System/react/issues/32) [#32](https://github.com/TEDI-Design-System/react/issues/32) [#32](https://github.com/TEDI-Design-System/react/issues/32)
+
+# [18.0.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.21...react-18.0.0-rc.22) (2026-06-26)
+
+
+### Features
+
+* **tabs:** design improvements, story enhancements based on design feedback [#688](https://github.com/TEDI-Design-System/react/issues/688) ([#691](https://github.com/TEDI-Design-System/react/issues/691)) ([1926026](https://github.com/TEDI-Design-System/react/commit/1926026047ca49109fffa67bea661dd09c37ee1f))
+
+# [18.0.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.20...react-18.0.0-rc.21) (2026-06-26)
+
+
+### Features
+
+* updated storybook to v10 [#575](https://github.com/TEDI-Design-System/react/issues/575) ([#681](https://github.com/TEDI-Design-System/react/issues/681)) ([1bc5806](https://github.com/TEDI-Design-System/react/commit/1bc58064a0d1bd6e31fb87c455f0abac5e0304d9))
+
+# [18.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.19...react-18.0.0-rc.20) (2026-06-26)
+
+
+### Features
+
+* **carousel:** tedi-ready component [#358](https://github.com/TEDI-Design-System/react/issues/358) ([#684](https://github.com/TEDI-Design-System/react/issues/684)) ([c420d95](https://github.com/TEDI-Design-System/react/commit/c420d9531468f368e4e737ecdb4ae1d24abd9126))
+
+# [18.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.18...react-18.0.0-rc.19) (2026-06-26)
+
+
+### Features
+
+* **option-content:** helper component, update search stories [#677](https://github.com/TEDI-Design-System/react/issues/677) ([#678](https://github.com/TEDI-Design-System/react/issues/678)) ([9fb0662](https://github.com/TEDI-Design-System/react/commit/9fb066204542c334db188bb3dca700b06a201472))
+
 # [18.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.17...react-18.0.0-rc.18) (2026-06-25)
 
 

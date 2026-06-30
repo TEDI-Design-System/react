@@ -1,6 +1,6 @@
-import { useGlobals } from '@storybook/preview-api';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useId, useRef, useState } from 'react';
+import { useGlobals } from 'storybook/preview-api';
 
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';

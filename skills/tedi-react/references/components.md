@@ -138,7 +138,7 @@ Standalone toggle button for expanding and collapsing content. Fully controlled 
 
 ```tsx
 const [open, setOpen] = useState(false);
-<CollapseButton open={open} onOpenChange={setOpen} openText="Show details" closeText="Hide details" />
+<CollapseButton open={open} onOpenChange={setOpen} openText="Show details" closeText="Hide details" />;
 ```
 
 ### FloatingButton
@@ -179,9 +179,11 @@ Sub-components: `Card.Header`, `Card.Content`, `Card.Notification`
 ```
 
 ### Accordion
+
 Compound component for collapsible content. The item owns the expand state and the layout flags that affect both header and content (`selected`, `showIconCard`, `defaultExpanded`); the header and content sub-components own their own appearance.
 
 **Props:** `AccordionProps` | bp
+
 - `children?: ReactNode` — one or more `Accordion.Item` components
 - `allowMultiple?: boolean = false` — allow several items expanded simultaneously
 - `defaultExpanded?: boolean = false` — group-level default; per-item `defaultExpanded` (including explicit `false`) takes precedence
@@ -193,7 +195,9 @@ Breakpoint-aware: `allowMultiple`, `defaultExpanded`, `itemGap`, and `className`
 Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Content`
 
 #### Accordion.Item
+
 **Props:** `AccordionItemProps`
+
 - `children?: ReactNode` — must include an `Accordion.Item.Header` and an `Accordion.Item.Content`
 - `defaultExpanded?: boolean` — falls back to the parent Accordion's `defaultExpanded`, then `false`
 - `expanded?: boolean`, `onToggle?: (expanded: boolean) => void` — controlled mode (omit for uncontrolled)
@@ -204,7 +208,9 @@ Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Conte
 - `openOnHashMatch?: boolean = false` — when `id` is set and `window.location.hash === '#<id>'`, auto-expands the item. Listens to `hashchange` so in-page navigation also opens the matching item. Requires an explicit `id`; no-op otherwise.
 
 #### Accordion.Item.Header
+
 **Props:** `AccordionItemHeaderProps`
+
 - `title?: ReactNode` — title content (string or node)
 - `headerClickable?: boolean = true` — when `false`, the header is a non-interactive container and a separate `Link` is rendered as the toggle (use this when projecting interactive children like buttons or checkboxes into the header)
 - `titleLayout?: 'hug' | 'fill' = 'hug'` — `fill` pushes trailing elements to the end
@@ -221,11 +227,13 @@ Sub-components: `Accordion.Item`, `Accordion.Item.Header`, `Accordion.Item.Conte
 - **Slot props (`ReactNode`):** `beforeTitle`, `afterTitle`, `startAction`, `endAction`, `startDescription`, `endDescription`
 
 #### Accordion.Item.Content
+
 **Props:** `AccordionItemContentProps`
+
 - `children?: ReactNode` — collapsible body
 - `contentClass?: string` — appended to the content host
 
-**Mobile icon-card layout:** below the `md` breakpoint (`< 768px`), items with `showIconCard` stack the icon-card *above* the header instead of placing it in a left column — phone-sized viewports can't fit both side-by-side without truncating the icon-card text or the header content. Borders and corner radii are redistributed accordingly. No prop needed; the rule is applied via `media-breakpoint-down(md)`.
+**Mobile icon-card layout:** below the `md` breakpoint (`< 768px`), items with `showIconCard` stack the icon-card _above_ the header instead of placing it in a left column — phone-sized viewports can't fit both side-by-side without truncating the icon-card text or the header content. Borders and corner radii are redistributed accordingly. No prop needed; the rule is applied via `media-breakpoint-down(md)`.
 
 **Print:** the accordion uses a `@media print` rule that forces every item to expand on paper so collapsed content isn't lost. No prop needed.
 
@@ -269,6 +277,77 @@ const [expanded, setExpanded] = useState(false);
 ```
 
 ## Content
+
+### Carousel
+A compound slide carousel with an infinite-looping track, drag / wheel / keyboard navigation and screen-reader announcements. Compose from `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`; drive it with `Carousel.Navigation` (prev/next arrows) and/or `Carousel.Indicators` (dots or counter). Each direct child of `Carousel.Content` is a slide.
+
+Sub-components: `Carousel.Header`, `Carousel.Content`, `Carousel.Footer`, `Carousel.Navigation`, `Carousel.Indicators`
+
+**`Carousel`** | fRef — `children`, `className`
+
+**`Carousel.Content`** | fRef
+- `children` — each direct child is one slide
+- `slidesPerView?: number | { xs; sm?; md?; lg?; xl?; xxl? } = 1` — can be fractional (e.g. `1.25`) for peeking; per-breakpoint object supported
+- `gap?: number | BreakpointObject<number> = 1` — gap between slides in rem
+- `fade?: boolean | 'right' | 'both' = false` — fade edges. `true`: right edge for multi-view, both edges for single. `'right'`: always right. `'both'`: always both, regardless of slide count
+- `transitionMs?: number = 400`
+- `loop?: boolean = true` — set `false` for a finite/bounded carousel: navigation stops at the first/last slide, prev/next disable at the bounds, and slides render once (no looping duplicates)
+- `centered?: boolean = false` — center the active slide so an equal peek of the previous/next slide shows on both edges (pair with a fractional `slidesPerView` and keep `loop` on)
+
+**`Carousel.Indicators`**
+- `variant?: 'dots' | 'numbers' = 'dots'`
+- `withArrows?: boolean = false` — inline prev/next (don't also use `Carousel.Navigation`); arrows disable at the bounds when `loop={false}`
+
+**`Carousel.Navigation`**
+- `overlay?: boolean = false` — pin the arrows to the left/right edges, overlaying the slides (use as a direct child of `Carousel` for a header/footer-less carousel). Arrows disable at the bounds when `loop={false}`.
+- `renderButton?: ({ direction, buttonProps }) => ReactNode` — render each arrow yourself (e.g. a `FloatingButton` or customised `Button`). Spread `buttonProps` (icon / disabled / onClick / accessible-label `children`) onto the control; the container still handles layout. Defaults to a secondary `Button`. Example: `renderButton={({ buttonProps }) => <FloatingButton {...buttonProps} position="static" />}`.
+
+**`Carousel.Header`** / **`Carousel.Footer`** — layout slots (`children`, `className`, `style`)
+
+`slidesPerView`/`gap` are breakpoint-aware (pass a per-breakpoint object). To show **different controls per breakpoint** (e.g. dots on mobile, arrows on desktop), wrap `Carousel.Navigation` / `Carousel.Indicators` in the `ShowAt` / `HideAt` layout helpers — they are context consumers, and `ShowAt`/`HideAt` unmount the hidden control, so only one set is ever in the DOM (a11y tree stays clean). No dedicated prop needed.
+
+Accessibility: the viewport is a `region` with `aria-roledescription="carousel"`; visible slides are `group`s, off-screen ones `presentation`/`aria-hidden`; slide changes are announced via a polite live region. Labels come from the `LabelProvider` (`carousel`, `carousel.slide`, `carousel.move-back`, `carousel.move-forward`, `carousel.show-slide`).
+
+```tsx
+import { Carousel } from '@tedi-design-system/react/tedi';
+
+<Carousel>
+  <Carousel.Header>
+    <h2>Title</h2>
+    <Carousel.Navigation />
+  </Carousel.Header>
+  <Carousel.Content slidesPerView={{ xs: 1, md: 2.5, xl: 4 }}>
+    {items.map((item) => (
+      <MyCard key={item.id} {...item} />
+    ))}
+  </Carousel.Content>
+  <Carousel.Footer style={{ justifyContent: 'center' }}>
+    <Carousel.Indicators />
+  </Carousel.Footer>
+</Carousel>
+
+// Finite / bounded with edge-mounted overlay arrows (replaces the deprecated Community map carousel)
+<Carousel>
+  <Carousel.Content slidesPerView={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={0.5} loop={false}>
+    {items.map((item) => (
+      <MyCard key={item.id} {...item} />
+    ))}
+  </Carousel.Content>
+  <Carousel.Navigation overlay />
+</Carousel>
+
+// Responsive controls — dots on mobile, arrows on desktop
+<Carousel>
+  <Carousel.Header>
+    <h2>Title</h2>
+    <ShowAt md><Carousel.Navigation /></ShowAt>
+  </Carousel.Header>
+  <Carousel.Content slidesPerView={{ xs: 1.1, md: 3 }}>{slides}</Carousel.Content>
+  <Carousel.Footer style={{ justifyContent: 'center' }}>
+    <HideAt md><Carousel.Indicators /></HideAt>
+  </Carousel.Footer>
+</Carousel>
+```
 
 ### Label
 
@@ -367,6 +446,7 @@ const [date, setDate] = useState<Date | undefined>();
 ```
 
 ### Table
+
 TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filterable / selectable / pinnable / expandable. Built-in pagination announces both **page changes and the result count** via `aria-live`, so JAWS reports state changes (incl. filtering down to a single page) automatically.
 
 ```tsx
@@ -376,12 +456,18 @@ TanStack Table v8 wrapper. Sub-components: `Table.HeaderButton`. Sortable / filt
 **Props (selection):** `id`, `data`, `columns` (TanStack `ColumnDef<T>[]`), `pagination`, `sorting`, `rowSelection`, `columnPinning`, `expandedRows`, `activeRowId`, `rowHover`, `verticalBorders`, `striped`, `size: 'default' | 'small'`, `caption`, `emptyState`, `emptyStateRole`, `getSubRows`, `renderSubComponent`, `expandTrigger`, `autoResetPageIndex`, `getRowId` (stable row id — set it when using `rowSelection`/`activeRowId`/`reorderableRows` with data that has a key, else ids fall back to the row index).
 
 #### Pagination — `pageSize`, `pageSizeOptions`, and appearance
+
 `pagination` accepts `true` (defaults) or an options object: `{ pageSize?, pageSizeOptions?, paginationProps? }`. `pageSizeOptions` is the page-size selector list (`false` hides it). **`paginationProps`** forwards extra props to the built-in `Pagination` to change its appearance/behaviour (e.g. `background`, `borders`, `hideResults`, `showPrevNextButtons`, `arrowVariant`, `labels`); the data/state props the Table owns (`pageCount`, `page`, `totalItems`, `pageSize`, `pageSizeOptions`, change handlers) are managed internally and can't be overridden.
 
 ```tsx
 <Table
-  data={rows} columns={columns}
-  pagination={{ pageSize: 25, pageSizeOptions: [25, 50], paginationProps: { background: 'transparent', showPrevNextButtons: true } }}
+  data={rows}
+  columns={columns}
+  pagination={{
+    pageSize: 25,
+    pageSizeOptions: [25, 50],
+    paginationProps: { background: 'transparent', showPrevNextButtons: true },
+  }}
 />
 ```
 
@@ -422,6 +508,7 @@ Give the sort/filter controls themselves a column-scoped accessible name. The bu
 #### Row-click expansion — `expandTrigger`
 
 `expandTrigger?: 'button' | 'row'` (default `'button'`) controls how an expandable row (`getSubRows` / `renderSubComponent`) toggles:
+
 - `'button'` — only the chevron toggles; it renders in the bordered `secondary` arrow style.
 - `'row'` — a click anywhere on an **expandable** row toggles it (Enter / Space too); the chevron renders in the neutral `default` arrow style as a plain indicator. Only rows that can expand become clickable (get `role="button"`), so non-expandable rows stay inert.
 
@@ -437,31 +524,37 @@ The Table already wraps itself in an `overflow-x: auto` container, so **wide tab
 const belowMd = isBreakpointBelow(useBreakpoint(), 'md');
 const columnVisibility = { email: !belowMd, role: !belowMd, location: !belowMd };
 <Table<Person>
-  id="people" data={rows} columns={columns}
+  id="people"
+  data={rows}
+  columns={columns}
   state={{ columnVisibility }}
   getRowCanExpand={() => belowMd}
-  renderSubComponent={belowMd ? (row) => (
-    <VerticalSpacing size={0.5}>
-      <TextGroup type="horizontal" labelWidth="6rem" label="E-post" value={row.original.email} />
-      {/* …one per hidden column */}
-    </VerticalSpacing>
-  ) : undefined}
-/>
+  renderSubComponent={
+    belowMd
+      ? (row) => (
+          <VerticalSpacing size={0.5}>
+            <TextGroup type="horizontal" labelWidth="6rem" label="E-post" value={row.original.email} />
+            {/* …one per hidden column */}
+          </VerticalSpacing>
+        )
+      : undefined
+  }
+/>;
 ```
 
 When `renderSubComponent` is `undefined` (≥ md) the expand column isn't rendered at all — the full table shows. See the `Responsive` story.
 
 #### Nested rows + pagination — `paginateExpandedRows`
 
-`paginateExpandedRows` maps to TanStack's option but **defaults to `false`** (TanStack's own default is `true`), matching Angular: expanding a parent renders its children on the *same* page and only top-level rows count toward `pageSize`, so opening a row never pushes siblings to the next page or splits a parent's children across pages. Pass `true` to restore TanStack's behavior where sub-rows occupy page slots like any other row. Only relevant when the table is both expandable (`getSubRows`) and client-paginated.
+`paginateExpandedRows` maps to TanStack's option but **defaults to `false`** (TanStack's own default is `true`), matching Angular: expanding a parent renders its children on the _same_ page and only top-level rows count toward `pageSize`, so opening a row never pushes siblings to the next page or splits a parent's children across pages. Pass `true` to restore TanStack's behavior where sub-rows occupy page slots like any other row. Only relevant when the table is both expandable (`getSubRows`) and client-paginated.
 
 #### Accessibility — required for column headers with non-text content
 
-- **Icon-only `Table.HeaderButton` requires `aria-label`.** With visible `children` (sortable headers above) the text supplies the accessible name and `aria-label` is optional — keep it to give a richer name like "Sorteeri X järgi". An icon-only button (e.g. a filter trigger) has no text, so `aria-label` is mandatory. Always include the column name — JAWS otherwise reads only "Sorteeri kasvavalt, button" with no indication of *what* you're sorting:
+- **Icon-only `Table.HeaderButton` requires `aria-label`.** With visible `children` (sortable headers above) the text supplies the accessible name and `aria-label` is optional — keep it to give a richer name like "Sorteeri X järgi". An icon-only button (e.g. a filter trigger) has no text, so `aria-label` is mandatory. Always include the column name — JAWS otherwise reads only "Sorteeri kasvavalt, button" with no indication of _what_ you're sorting:
   ```tsx
   <Table.HeaderButton icon="filter_alt" aria-label={`Filtreeri ${columnLabel}`} />  {/* icon-only → aria-label required */}
   ```
-- **For columns with a function `header` (custom JSX containing sort / filter buttons, info icons, etc.), set `meta.label`**. The Table puts `aria-label={meta.label}` on the `<th>` so screen readers use the clean column name as the column header announcement for every cell. Without it, JAWS reads the full visible header text — including the button labels — for *every* data cell:
+- **For columns with a function `header` (custom JSX containing sort / filter buttons, info icons, etc.), set `meta.label`**. The Table puts `aria-label={meta.label}` on the `<th>` so screen readers use the clean column name as the column header announcement for every cell. Without it, JAWS reads the full visible header text — including the button labels — for _every_ data cell:
   ```tsx
   {
     id: 'teenus',
@@ -479,7 +572,10 @@ When `renderSubComponent` is `undefined` (≥ md) the expand column isn't render
 - **Filter popovers with validation must use `TextField`'s `invalid` + `helper` props**, not a custom red-bordered div. The Table doesn't ship built-in filter validation today, but if you add min-length / format checks, the only WCAG 3.3.1-compliant path is to wire the error through `TextField`. `invalid` sets `aria-invalid`; `helper` with `type: 'error'` renders the message via `<FeedbackText>` and auto-wires it into the input's `aria-describedby`. A red border + red helper text alone (the Angular bug) fails error identification because screen readers can't see colour:
   ```tsx
   <TextField
-    id={`filter-${column}`} label={column} value={draft} onChange={setDraft}
+    id={`filter-${column}`}
+    label={column}
+    value={draft}
+    onChange={setDraft}
     invalid={hasError}
     helper={hasError ? { type: 'error', text: getLabel('table.filter.validation.min-length', 3) } : undefined}
   />
@@ -490,7 +586,7 @@ When `renderSubComponent` is `undefined` (≥ md) the expand column isn't render
   const columns: ColumnDef<Row>[] = [
     { accessorKey: 'name', header: 'Name', meta: { filterProps: { input: { maxLength: 40 } } } },
   ];
-  <Table data={rows} columns={columns} enableColumnFilters />
+  <Table data={rows} columns={columns} enableColumnFilters />;
   ```
 - **For "no results after filter" announcements, set `emptyStateRole="status"` on the Table.** The Table wraps the empty state in `<div role={emptyStateRole}>` (an ARIA live region), so screen readers announce it when a filter empties the rows. `'status'` is polite (recommended); `'alert'` is assertive (interrupts the current SR utterance). Leave the prop undefined for tables that are empty on first mount and never change — otherwise the live region announces on every render. The empty-state content itself is the `emptyState` prop (a string or an `<EmptyState>` node).
   ```tsx
@@ -504,8 +600,13 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
 - **`reorderableColumns`** is self-contained — it reorders TanStack's `columnOrder` internally (flows through `onStateChange` / `persist`). No extra wiring. Built-in (`__select__`/`__expand__`/`__drag__`) and grouped columns are skipped.
 - **`reorderableRows`** emits **`onRowDrop({ fromId, toId, fromIndex, toIndex })`** on every move (keyboard too) — the consumer applies it to its data and passes the new array back. Stepping requires the consumer to apply each emit:
   ```tsx
-  <Table id="t" data={rows} columns={columns} reorderableRows
-    onRowDrop={({ fromIndex, toIndex }) => setRows((cur) => arrayMove(cur, fromIndex, toIndex))} />
+  <Table
+    id="t"
+    data={rows}
+    columns={columns}
+    reorderableRows
+    onRowDrop={({ fromIndex, toIndex }) => setRows((cur) => arrayMove(cur, fromIndex, toIndex))}
+  />
   ```
 
 ## Form
@@ -684,7 +785,7 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
-- `modal?: boolean | Breakpoint = false` — open the picker in a modal instead of the popover (`true` always, a breakpoint name → modal *below* that breakpoint)
+- `modal?: boolean | Breakpoint = false` — open the picker in a modal instead of the popover (`true` always, a breakpoint name → modal _below_ that breakpoint)
 - `modalProps?: Omit<ModalContentProps, 'children'>` — escape hatch forwarded to the picker modal's `Modal.Content` (e.g. `size`, `width`, `maxWidth`, `position`, `fullscreen`, per-breakpoint overrides); overrides the `small`/`xs` defaults, `className` is merged. Only applies when the picker opens as a modal
 - `className?: string`
 - **Breakpoint-aware:** `useNativePicker?: boolean = false` (swap to `<input type="time">`; ignores `availableTimes`), `showPicker?: boolean = true`, `timePickerTrigger?: 'input' | 'button' = 'button'`, `availableTimesVariant?: 'grid-buttons' | 'grid-radio' | 'dropdown'` — which variant the picker renders when `availableTimes` is set
@@ -746,6 +847,7 @@ import { TimePicker } from '@tedi-design-system/react/tedi';
 ```
 
 ### Filter / FilterGroup
+
 **Props:** `FilterProps`, `FilterGroupProps` | form
 
 Compact pill-shaped trigger used to refine result sets. Four modes — chosen at render time
@@ -818,11 +920,11 @@ Wrap related filters in `FilterGroup` to coordinate selection:
 ```
 
 Key props:
+
 - `variant?: 'primary' | 'secondary'`, `size?: 'default' | 'large'`
 - `prepend?: ReactNode`, `append?: ReactNode`, `hidePrependWhenSelected?: boolean`
 - `appendTo?: 'body' | HTMLElement` — portal target for the dropdown
 - `selectAllLabel?: string` (default `'Vali kõik'`), `clearLabel?: string` (default `'Tühjenda valik'`)
-
 
 ### FileUpload
 
@@ -838,8 +940,12 @@ Key props:
 
 **Props:** `FileDropzoneProps`
 
-- `label: string` (required)
-- `accept?: string`, `multiple?: boolean`, `maxSize?: number`
+- `name: string` (required) — input name for form submission
+- `label?: string` — defaults to the localised `file-dropzone.label` (`LabelProvider`)
+- `helper?: FeedbackTextProps`, `disabled?: boolean`
+- `accept?: string`, `multiple?: boolean`, `maxSize?: number` (MB), `validateIndividually?: boolean`
+- `defaultFiles?` / `files?` (controlled) `: FileUploadFile[]`, `onChange?`, `onDelete?`
+- `attachmentProps?: Partial<Omit<AttachmentProps, 'name'>> | ((file) => …)` — overrides forwarded to each rendered `Attachment` (e.g. `icon`, `fileSize`, `feedback`); pass a function to vary per file. `FileDropzone` sets `name`, `isValid`, `isLoading` and always appends the remove button to the `actions` slot itself.
 
 ## Layout
 
@@ -952,13 +1058,16 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
 ### Footer
+
 **Props:** `FooterProps`
+
 - `children: ReactNode` — composition of `Footer.Side`, `Footer.Body` (with `Footer.Section` children), `Footer.Bottom`
 - `mobileBreakpoint?: Breakpoint = 'sm'` — viewport at and below which the entire footer flips to stacked mobile layout (sections become accordions, sides stack, bottom strip wraps). Propagated to every sub-slot via context so they all agree on the threshold.
 - `maxWidth?: number | string` — caps the inner content (the column row **and** the bottom strip's content) to a max width and centers it, while the dark backgrounds stay full-bleed. Pass any CSS length (`1280`, `'1280px'`, `'80rem'`). Read by `Footer.Bottom` via context so both align to the same width.
 - `className?: string`
 
 **Sub-components:**
+
 - `Footer.Side` — logo slot, `placement?: 'start' | 'end' = 'start'`, `position?: 'start' | 'center' | 'end' = 'center'`
 - `Footer.Body` — wraps `Footer.Section` columns; switches to stacked column layout below `mobileBreakpoint`. Accepts breakpoint-aware `columns?: number` — **mobile-first** (a value applies at that breakpoint and up), so raise the count as the viewport widens (e.g. `columns={2} lg={{ columns: 4 }}`). When set, lays the sections out as a CSS grid of that many equal-width tracks instead of the default content-sized `space-between` row; ignored below `mobileBreakpoint`, where the body always stacks into one column.
 - `Footer.Section` — section column with `heading`, optional `icon`, `collapsible?` (accordion below `mobileBreakpoint`), `defaultOpen?`, `iconBreakpoint?: Breakpoint = 'lg'` (separate threshold for icon hiding)
@@ -1147,6 +1256,7 @@ Renders `role="progressbar"` with `aria-valuenow / aria-valuemin / aria-valuemax
 ```
 
 ### Breadcrumbs
+
 **Props:** `BreadcrumbsProps` | bp
 
 > The community `Breadcrumbs` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of this TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
@@ -1193,7 +1303,9 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 ```
 
 ### HorizontalStepper
+
 **Props:** `HorizontalStepperProps` | fRef
+
 - `children: ReactNode` (required) — `HorizontalStepper.Item` elements; the parent auto-numbers the steps
 - `aria-label?: string` — accessible name for the `<nav>` landmark
 - `background?: 'default' | 'transparent' = 'default'`
@@ -1201,6 +1313,7 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 - `className?: string`
 
 **`HorizontalStepper.Item`** — `HorizontalStepperItemProps` | fRef
+
 - `label: string` (required), `description?: string`
 - `completed?: boolean`, `error?: boolean` (error wins over completed), `selected?: boolean`, `disabled?: boolean`
 - `onSelect?: () => void` — fires on click unless `selected` or `disabled`
@@ -1218,10 +1331,11 @@ import { HorizontalStepper } from '@tedi-design-system/react/tedi';
       onSelect={() => setCurrent(i)}
     />
   ))}
-</HorizontalStepper>
+</HorizontalStepper>;
 ```
 
 ### Pagination
+
 **Props:** `PaginationProps` | fRef | bp
 
 Page-number list with prev/next arrows, an optional "X results" label, and an optional page-size `Select`. Announces page changes via a polite `aria-live` region. Below `md` **both** the number list **and** the page-size select collapse into compact triggers that open a mobile modal picker (radio-style list; opening it scrolls the active option to the top and focuses it).
@@ -1234,6 +1348,7 @@ Page-number list with prev/next arrows, an optional "X results" label, and an op
 - `labels?: Partial<PaginationLabels>` — override aria/text labels (`previous`, `next`, `results`, `pageSize`, `pageStatus`, …); otherwise sourced from `LabelProvider`
 
 **Arrow variants** (harmonized with Angular):
+
 - `showPrevNextButtons?: boolean = false` — keep the prev/next arrow visible-but-disabled at the first/last page instead of dropping it (stable footprint). Angular calls this `disableArrowsAtBoundary`.
 - `showEdgeNavLabels?: boolean = false` — render the arrows as **small text links** (label + icon, link colour, underline on hover) instead of icon-only circles.
 - `previousIcon? = 'arrow_back'`, `nextIcon? = 'arrow_forward'` — override the arrow glyphs (e.g. `'chevron_left'` / `'chevron_right'`).
@@ -1417,25 +1532,33 @@ Sub-components: `Popover.Trigger`, `Popover.Content`
 **Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`
 
 ### Modal
+
 Portalled dialog with focus trapping, backdrop, and scroll locking (built on floating-ui).
 
 Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, `Modal.Footer`, `Modal.Closer`
 
 ```tsx
 <Modal>
-  <Modal.Trigger><Button>Open</Button></Modal.Trigger>
+  <Modal.Trigger>
+    <Button>Open</Button>
+  </Modal.Trigger>
   <Modal.Content width="md" position="center">
     <Modal.Header title="Title" description="Optional supporting text" />
     <Modal.Body>{/* content */}</Modal.Body>
     <Modal.Footer>
-      <Modal.Closer><Button visualType="secondary">Cancel</Button></Modal.Closer>
-      <Modal.Closer><Button>Save</Button></Modal.Closer>
+      <Modal.Closer>
+        <Button visualType="secondary">Cancel</Button>
+      </Modal.Closer>
+      <Modal.Closer>
+        <Button>Save</Button>
+      </Modal.Closer>
     </Modal.Footer>
   </Modal.Content>
 </Modal>
 ```
 
 **`Modal` props (provider — open/close state)**
+
 - `defaultOpen?: boolean` — uncontrolled initial state
 - `open?: boolean` + `onToggle?: (open: boolean) => void` — controlled mode
 - `closeOnBackdropClick: boolean = true`
@@ -1443,6 +1566,7 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `role: 'dialog' | 'alertdialog' = 'dialog'` — use `'alertdialog'` for destructive confirmations (higher SR urgency, requires explicit dismissal)
 
 **`Modal.Content` props** | bp (on `width`, `maxWidth`, `position`, `fullscreen`)
+
 - `width: ModalWidth = 'md'` — preset (`xs|sm|md|lg|xl`) or any CSS length (`'800px'`, `'60vw'`)
 - `maxWidth?: string` — cap for custom widths (lighter than overriding `width`)
 - `size: 'default' | 'small' = 'default'` — header/body/footer padding density (`'small'` ≈ 42px header)
@@ -1458,6 +1582,7 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `aria-label?: string` — plain-text accessible name when there's no visible title (icon-only / list-only dialogs); ignored when `aria-labelledby` is set
 
 **`Modal.Header` props**
+
 - `title?: ReactNode` — rendered as `<h3>`, auto-registered as `aria-labelledby`
 - `description?: ReactNode` — auto-registered as `aria-describedby`
 - `closeButton: boolean = true`
@@ -1465,16 +1590,19 @@ Sub-components: `Modal.Trigger`, `Modal.Content`, `Modal.Header`, `Modal.Body`, 
 - `children?: ReactNode` — replaces the default title/description layout
 
 **`Modal.Body` props**
+
 - `noScroll?: boolean` — disable internal scroll (pair with `scrollBehavior="page"` on Content)
 - Body padding is driven by the `--modal-body-padding` / `--modal-body-padding-sm` CSS custom properties — override them on `Modal.Content` (e.g. set to `0`) for an edge-to-edge body such as a full-bleed list or sheet
 
 **`Modal.Footer` props**
+
 - `children?: ReactNode` — right-aligned actions (default)
 - `left?: ReactNode` — when set, footer splits into left + right halves
 
 **`Modal.Closer`** — wraps any clickable element to close the modal on click. Preserves the wrapped element's `onClick`.
 
 **`useModal()` hook** — read the public subset of Modal state from any descendant of `<Modal>`. **This is the hook to reach for as a consumer.** Returns:
+
 - `open: boolean`
 - `onOpenChange: (open: boolean) => void` — programmatically open / close
 - `labelId: string`, `descriptionId: string` — for manual `aria-labelledby` / `aria-describedby` wiring when you replace `Modal.Header`
@@ -1499,7 +1627,14 @@ function CustomHeader({ title }: { title: string }) {
 function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
   const { onOpenChange } = useModal();
   return (
-    <Button onClick={() => { onConfirm(); onOpenChange(false); }}>Confirm</Button>
+    <Button
+      onClick={() => {
+        onConfirm();
+        onOpenChange(false);
+      }}
+    >
+      Confirm
+    </Button>
   );
 }
 ```
@@ -1526,9 +1661,10 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `color: TagColor = 'primary'`
 - `onClose?: MouseEventHandler` — shows close button
 - `isLoading?: boolean`
+- `ellipsis?: 'start' | 'end' | false = false` — truncate the label when the Tag is width-constrained (full text in a popover on hover/focus); `end` truncates the tail, `start` the front
 
 ```tsx
-<Tag color="primary" onClose={remove}>
+<Tag color="primary" ellipsis="end" onClose={remove}>
   React
 </Tag>
 ```
@@ -1551,6 +1687,42 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 
 ## Misc
 
+### Attachment
+**Props:** `AttachmentProps` | fRef
+- `name: string` (required) — file label
+- `feedback?: FeedbackTextProps` — hint / error rendered below the card, wired via `aria-describedby`
+- `fileSize?: string` — pre-formatted size string (e.g. `'1.2 MB'`); rendered inline before the action area. Format on the consumer side.
+- `icon?: string | null` — left file-type glyph (Material icon name); omitted → no icon
+- `actions?: ReactNode` — all action controls (download / view / **delete** / …) in the right-hand action area. There's no dedicated remove prop — put a delete `Button` here. The row is never a single clickable target — give each affordance its own focusable button. Action `Button`s default to `visualType="neutral"` (per the design); the slot stays open, so set `visualType` explicitly to use any other type.
+- `isLoading?: boolean = false` — shows an inline `ProgressBar`; `progress?: number = 0` (0..100); `progressLabel?: string` — hint text under the bar
+- `isValid?: boolean` — `false` flips to the danger surface and adds an error glyph next to the name
+- `direction?: 'horizontal' | 'vertical'` — force the content layout; when omitted it's derived from the viewport via `verticalBelow`
+- `verticalBelow?: Breakpoint = 'sm'` — viewport breakpoint below which the layout auto-switches to vertical (only when `direction` is unset)
+
+```tsx
+// Saved file with download + delete — each its own button, not a whole-row link
+<Attachment
+  name="contract.pdf"
+  fileSize="1.2 MB"
+  actions={
+    <>
+      <Button icon="download" onClick={download}>Download contract.pdf</Button>
+      <Button icon="delete" onClick={remove}>Remove contract.pdf</Button>
+    </>
+  } // Buttons default to neutral
+/>
+
+// Upload in progress
+<Attachment name="scan.jpg" isLoading progress={42} />
+
+// Rejected by validation
+<Attachment
+  name="too-big.zip"
+  isValid={false}
+  feedback={{ text: 'File exceeds 10 MB limit', type: 'error' }}
+/>
+```
+
 ### Separator
 
 **Props:** `SeparatorProps` | bp
@@ -1561,6 +1733,61 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
 
+### OptionContent
+A reusable **content template** for dropdown/select option rows — *not* an item itself and never interactive (no `role`, click or focus handling). Drop it inside an interactive parent (`DropdownItem`, a `Select` option) that owns the role, selection and keyboard handling. It lays out an optional selection indicator (checkbox/radio), an optional leading icon, a label and optional meta into one consistently-spaced row. **`Select` renders its options through this internally**, so menu items, select options and standalone rows share one source of truth.
+
+Sub-components: `OptionContent.Label`, `OptionContent.Meta`
+
+**Props:** `OptionContentProps` | fRef
+- `children` — typically `OptionContent.Label` + optional `OptionContent.Meta`
+- `type?: 'default' | 'checkbox' | 'radio' = 'default'` — selection indicator
+- `layout?: 'horizontal' | 'vertical' = 'horizontal'` — meta beside the label, or stacked (title + description)
+- `selected?: boolean`, `indeterminate?: boolean` (checkbox only), `disabled?: boolean`
+- `icon?: string | IconProps` — leading icon
+- `indicatorSemantics?: 'presentation' | 'control' = 'presentation'` — how the indicator is exposed to assistive tech:
+  - `presentation` (menu, default) — indicator is `aria-hidden`; the interactive parent (`DropdownItem`) owns selection via `aria-checked`. The span is decorative, so it never interferes with `DropdownItem`'s click handling.
+  - `control` (listbox) — the indicator itself is `role="checkbox"`/`"radio"` + `aria-checked`, named via `aria-labelledby` from the `Label` (requires a `Label` child). This is what `Select` uses for its options.
+- `className?: string`
+
+`DropdownItem` accepts `role` (default `menuitem`) and arbitrary `aria-*` props, so pair the visual indicator with real semantics — `role="menuitemcheckbox"`/`"menuitemradio"` + `aria-checked` (or `role="option"` + `aria-selected`).
+
+```tsx
+// Inside a Dropdown (multi-select): DropdownItem owns the click + a11y; the value reflects state
+<Dropdown.Content>
+  {options.map((o, i) => (
+    <DropdownItem
+      key={o.id}
+      index={i}
+      role="menuitemcheckbox"
+      aria-checked={selected.includes(o.id)}
+      closeOnSelect={false}
+      onClick={() => toggle(o.id)}
+    >
+      <OptionContent type="checkbox" selected={selected.includes(o.id)}>
+        <OptionContent.Label>{o.name}</OptionContent.Label>
+        <OptionContent.Meta>{o.meta}</OptionContent.Meta>
+      </OptionContent>
+    </DropdownItem>
+  ))}
+</Dropdown.Content>
+
+// Standalone search result
+<OptionContent icon="location_on">
+  <OptionContent.Label>Tallinn</OptionContent.Label>
+  <OptionContent.Meta>Harjumaa</OptionContent.Meta>
+</OptionContent>
+
+// Inside Select — richer option content via the renderOption hook
+<Select id="city" label="Linn" options={options} renderOption={(p) => (
+  <OptionContent icon="location_on">
+    <OptionContent.Label>{p.data.label}</OptionContent.Label>
+    <OptionContent.Meta>{p.data.customData.county}</OptionContent.Meta>
+  </OptionContent>
+)} />
+```
+
+States: the `Label` uses `color: inherit`, so it follows the parent item's per-state text colour (default → hover → active → disabled) defined on `DropdownItem` / the Select option — both surfaces share the `--dropdown-item-*` and `--form-checkbox-radio-*` tokens. The leading icon and `Meta` keep their secondary/tertiary colours. `Select` renders its option content with `<OptionContent indicatorSemantics="control">` internally, so a custom `renderOption` is only needed for *richer* content (icon/meta), not to match the default look.
+
 ---
 
 # Community Components
@@ -1570,6 +1797,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 ## Cards
 
 ### Accordion — **DEPRECATED** (use TEDI-Ready Accordion)
+
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
@@ -1689,6 +1917,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
 
 ### Footer — **DEPRECATED** (use TEDI-Ready Footer)
+
 Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Responsive layout is hardcoded CSS — no consumer override of the mobile-switch breakpoint. Migrate to the composable TEDI-Ready `Footer` for `mobileBreakpoint` control, accordion sections, and slot-based sides.
 
 ## Misc

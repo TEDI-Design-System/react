@@ -1,6 +1,7 @@
 export * from './components/base/typography/text/text';
 export * from './components/base/typography/heading/heading';
 export * from './components/base/icon/icon';
+export * from './components/content/carousel';
 export * from './components/content/list';
 export * from './components/content/label/label';
 export * from './components/content/section/section';
@@ -70,7 +71,9 @@ export * from './components/misc/stretch-content/stretch-content';
 export * from './components/misc/scroll-visibility/scroll-visibility';
 export * from './components/misc/scroll-fade/scroll-fade';
 export * from './components/misc/affix/affix';
+export * from './components/misc/attachment';
 export * from './components/misc/ellipsis/ellipsis';
+export * from './components/misc/option-content/option-content';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
 

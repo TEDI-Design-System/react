@@ -1,0 +1,137 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
+.tedi-attachment-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.tedi-attachment {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background-color: var(--card-background-tertiary);
+  border: 0;
+  border-radius: var(--card-radius-rounded);
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.tedi-attachment--multi-line {
+  align-items: flex-start;
+}
+
+.tedi-attachment--invalid {
+  background-color: var(--card-background-danger);
+}
+
+.tedi-attachment__feedback {
+  padding-top: var(--layout-grid-gutters-04);
+}
+
+.tedi-attachment__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--layout-grid-gutters-08);
+}
+
+.tedi-attachment__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--layout-grid-gutters-08);
+  padding-right: 0;
+}
+
+.tedi-attachment__icon + .tedi-attachment__body {
+  padding-left: 0;
+}
+
+.tedi-attachment__name {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: baseline;
+  width: 100%;
+}
+
+.tedi-attachment__name-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tedi-attachment .tedi-attachment__invalid-icon {
+  flex-shrink: 0;
+  margin-left: var(--layout-grid-gutters-08);
+  color: var(--status-badge-text-danger);
+}
+
+.tedi-attachment__progress {
+  width: 100%;
+}
+
+.tedi-attachment--vertical {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--layout-grid-gutters-02) var(--layout-grid-gutters-08);
+  align-items: center;
+
+  .tedi-attachment__icon {
+    grid-column: 1;
+    align-self: start;
+    order: 1;
+    margin-top: calc(var(--layout-grid-gutters-08) + var(--layout-grid-gutters-02));
+  }
+
+  .tedi-attachment__body {
+    grid-column: 2;
+    order: 2;
+    padding-left: 0;
+  }
+
+  .tedi-attachment__name {
+    flex-wrap: wrap;
+    gap: var(--layout-grid-gutters-02);
+  }
+
+  .tedi-attachment__file-size {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .tedi-attachment__actions {
+    grid-column: 3;
+    align-self: start;
+    order: 6;
+  }
+}
+
+.tedi-attachment--multi-line:not(.tedi-attachment--vertical) .tedi-attachment__icon {
+  margin-top: calc(var(--layout-grid-gutters-08) + var(--layout-grid-gutters-02));
+}
+
+.tedi-attachment__file-size {
+  flex-shrink: 0;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+@include breakpoints.media-breakpoint-down(md) {
+  .tedi-attachment__file-size {
+    margin-left: 0;
+  }
+}
+
+.tedi-attachment__actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  align-self: flex-start;
+  justify-content: center;
+
+  > button {
+    border-radius: var(--tedi-radius-02-default);
+  }
+}

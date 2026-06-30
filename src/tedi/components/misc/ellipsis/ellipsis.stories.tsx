@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import Popover from '../../overlays/popover/popover';
 import Ellipsis, { EllipsisProps } from './ellipsis';
@@ -51,6 +51,19 @@ export const ResponsiveExample: Story = {
         <span className="text-small"> and dont fit in x number of rows</span>
       </span>
     ),
+  },
+};
+
+/**
+ * With `position="start"` the text is truncated on a single line with a **leading**
+ * ellipsis, keeping the end of the string visible. Useful for file paths, URLs or IDs
+ * where the tail is the most distinguishing part. `lineClamp` does not apply here.
+ */
+export const LeadingStart: Story = {
+  render: Template,
+  args: {
+    position: 'start',
+    children: 'https://www.tedi.ee/some/very/long/path/to/a/specific-resource-identifier.pdf',
   },
 };
 

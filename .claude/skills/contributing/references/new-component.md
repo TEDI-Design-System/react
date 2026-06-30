@@ -26,7 +26,9 @@ Enter plan mode and create a detailed plan covering:
 - **Dependencies** — existing TEDI components to reuse, third-party libraries if needed
 - **File list** — every file to create
 - **Test plan** — what to test (props, callbacks, states, keyboard, a11y)
-- **Stories plan** — which stories to create (match all Figma variants)
+- **Stories plan** — which stories to create (match all Figma variants). If the component uses
+  composition (dot-notation sub-components), plan to expose the sub-components' props as live
+  controls on the primary story via `subcomponentArgTypes` — see [stories.md](stories.md) §5.
 
 If a new dependency is needed, stop and ask the user for permission.
 

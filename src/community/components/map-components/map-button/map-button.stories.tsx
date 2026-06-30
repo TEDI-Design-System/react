@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Col, Icon, Row, Text, TextProps, VerticalSpacing } from '../../../../tedi';
 import ButtonGroup, { ButtonGroupProps } from '../button-group/button-group';

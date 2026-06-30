@@ -1,5 +1,5 @@
-import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/blocks';
-import { Preview, StoryContext } from '@storybook/react';
+import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
+import { Preview, StoryContext } from '@storybook/react-vite';
 
 import StorybookDecorator from './storybook-decorator';
 
@@ -33,30 +33,11 @@ export const decorators: Preview['decorators'] = [
     const theme = (context.globals.theme || 'default') as 'default' | 'dark';
 
     useEffect(() => {
+      // The dark surface itself is applied via CSS in preview-head.html, keyed
+      // off this class — that beats the backgrounds addon on direct story URLs.
       document.documentElement.classList.remove('tedi-theme--default', 'tedi-theme--dark');
       document.documentElement.classList.add(`tedi-theme--${theme}`);
-
-      updateAllCanvasBackgrounds(theme);
     }, [theme]);
-
-    const updateAllCanvasBackgrounds = (currentTheme: string) => {
-      const backgroundColor = getBackgroundColor(currentTheme);
-      const canvases = document.querySelectorAll('.sb-show-main, .docs-story > div');
-
-      canvases.forEach((canvas) => {
-        const element = canvas as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-        element.style.transition = 'background-color 0.3s ease';
-      });
-
-      const storyPreviews = document.querySelectorAll('[data-story="true"], .sbdocs-preview');
-      storyPreviews.forEach((preview) => {
-        const element = preview as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-      });
-    };
-
-    const getBackgroundColor = (currentTheme: string): string =>  currentTheme === 'dark' ? 'var(--color-bg-inverted)' : '';
 
     return (
       <ThemeProvider theme={theme}>
@@ -75,22 +56,26 @@ export const decorators: Preview['decorators'] = [
 ];
 
 const preview: Preview = {
+  tags: ['autodocs'],
+  initialGlobals: {
+    backgrounds: { value: 'default' },
+  },
   parameters: {
     viewMode: 'docs',
     backgrounds: {
-      default: 'default',
-      values: [
-        { name: 'default', value: 'var(--color-bg-default)' },
-        { name: 'muted', value: 'var(--color-bg-muted)' },
-        { name: 'subtle', value: 'var(--color-bg-subtle)' },
-        { name: 'disabled', value: 'var(--color-bg-disabled)' },
-        { name: 'black', value: 'var(--color-black)' },
-        { name: 'inverted', value: 'var(--color-bg-inverted)' },
-        { name: 'inverted-contrast', value: 'var(--color-bg-inverted-contrast)' },
-        { name: 'brand', value: 'var(--tedi-primary-600)' },
-      ],
+      options: {
+        default: { name: 'default', value: 'var(--color-bg-default)' },
+        muted: { name: 'muted', value: 'var(--color-bg-muted)' },
+        subtle: { name: 'subtle', value: 'var(--color-bg-subtle)' },
+        disabled: { name: 'disabled', value: 'var(--color-bg-disabled)' },
+        black: { name: 'black', value: 'var(--color-black)' },
+        inverted: { name: 'inverted', value: 'var(--color-bg-inverted)' },
+        'inverted-contrast': { name: 'inverted-contrast', value: 'var(--color-bg-inverted-contrast)' },
+        brand: { name: 'brand', value: 'var(--tedi-primary-600)' },
+      },
     },
     docs: {
+      codePanel: true,
       toc: true,
       page: () => (
         <>

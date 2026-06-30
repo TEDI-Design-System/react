@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import Link from 'next/link';
 import React, { ComponentProps, forwardRef } from 'react';
 
@@ -93,9 +93,7 @@ export const Inverted: Story = {
     color: 'inverted',
   },
 
-  parameters: {
-    backgrounds: { default: 'inverted' },
-  },
+  globals: { backgrounds: { value: 'inverted' } },
 };
 
 export const TextColor: Story = {

@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';
@@ -8,6 +8,7 @@ import { ButtonGroup } from '../../buttons/button-group/button-group';
 import { CardContent } from '../../cards/card/card-content/card-content';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Ellipsis } from '../../misc/ellipsis/ellipsis';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { StatusIndicator } from '../../tags/status-indicator/status-indicator';
 import { Tabs, TabsProps } from './tabs';
@@ -38,8 +39,19 @@ const meta: Meta<typeof Tabs> = {
 export default meta;
 type Story = StoryObj<typeof Tabs>;
 
-const contentText =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas turpis odio, iaculis quis sodales at, placerat vitae risus. Integer hendrerit ex eget nisl euismod pharetra.';
+const content = {
+  healthTimeline:
+    'Kronoloogiline ülevaade teie tervisesündmustest – visiidid, analüüsid ja diagnoosid on koondatud ühele ajateljele.',
+  diseaseCourse: 'Diagnoositud haiguste ülevaade ja nende areng ajas koos ravi- ning jälgimismärkmetega.',
+  medication: 'Teile välja kirjutatud ja väljastatud ravimite loetelu koos annuste ja manustamisperioodidega.',
+  table: 'Andmed on kuvatud tabelina – sobib täpseks võrdluseks ja veergude kaupa sorteerimiseks.',
+  grid: 'Andmed on kuvatud ruudustikuna – sobib visuaalseks sirvimiseks ja kiireks ülevaateks.',
+  unreadMessages: 'Teil on uusi lugemata teateid tervishoiuteenuse osutajatelt. Avage teade üksikasjade nägemiseks.',
+  declarations: 'Teie tahteavaldused, näiteks elundidoonorluse ja ravisoovide kohta.',
+  proceduresInProgress: 'Hetkel töös olevad menetlused ja nende seis.',
+  proceduresInPlanning: 'Menetlused, mis on planeeritud, kuid pole veel alanud.',
+  calendar: 'Kalendrivaade teie eelseisvatest visiitidest ja tähtaegadest.',
+};
 
 const stateArray = ['Default', 'Hover', 'Active', 'Focus', 'Selected'];
 
@@ -66,7 +78,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
             <Col className="display-flex align-items-center">
               <TabsContext.Provider value={{ currentTab, setCurrentTab: noop }}>
                 <div role="tablist">
-                  <TabsTrigger id={triggerId}>Health timeline</TabsTrigger>
+                  <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>
                 </div>
               </TabsContext.Provider>
             </Col>
@@ -80,24 +92,24 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 export const Default: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Health tabs">
-        <Tabs.Trigger id="tab-1">Health timeline</Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">Course of diseases</Tabs.Trigger>
-        <Tabs.Trigger id="tab-3">Medication history</Tabs.Trigger>
+      <Tabs.List aria-label="Tervise sakid">
+        <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
+        <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
+        <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.healthTimeline}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.diseaseCourse}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-3">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.medication}</Text>
         </CardContent>
       </Tabs.Content>
     </Tabs>
@@ -107,22 +119,22 @@ export const Default: Story = {
 export const WithIcons: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tabs with icons">
+      <Tabs.List aria-label="Ikoonidega sakid">
         <Tabs.Trigger id="tab-1" icon="table_chart">
-          Table
+          Tabel
         </Tabs.Trigger>
         <Tabs.Trigger id="tab-2" icon="grid_on">
-          Grid
+          Ruudustik
         </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.table}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.grid}</Text>
         </CardContent>
       </Tabs.Content>
     </Tabs>
@@ -132,31 +144,34 @@ export const WithIcons: Story = {
 export const WithStatusBadge: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tabs with status badge">
+      <Tabs.List aria-label="Olekumärgisega sakid">
         <Tabs.Trigger id="tab-1">
-          Health timeline <StatusBadge color="brand">Submitted</StatusBadge>
+          <Ellipsis lineClamp={1} popover={true}>
+            Terviseteekond
+          </Ellipsis>{' '}
+          <StatusBadge color="brand">Esitatud</StatusBadge>
         </Tabs.Trigger>
         <Tabs.Trigger id="tab-2">
           <span style={{ position: 'relative' }}>
-            Unread messages&nbsp;
+            Lugemata teated&nbsp;
             <StatusIndicator type="danger" position="top-right" />
           </span>
         </Tabs.Trigger>
-        <Tabs.Trigger id="tab-3">Medication history</Tabs.Trigger>
+        <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.healthTimeline}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.unreadMessages}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-3">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.medication}</Text>
         </CardContent>
       </Tabs.Content>
     </Tabs>
@@ -187,19 +202,19 @@ export const Controlled: Story = {
           Current tab: <strong>{currentTab}</strong>
         </p>
         <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tabs.List aria-label="Controlled tabs">
-            <Tabs.Trigger id="tab-1">Health timeline</Tabs.Trigger>
-            <Tabs.Trigger id="tab-2">Course of diseases</Tabs.Trigger>
-            <Tabs.Trigger id="tab-3">Medication history</Tabs.Trigger>
+          <Tabs.List aria-label="Juhitavad sakid">
+            <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
+            <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
+            <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content id="tab-1">
-            <Text>{contentText}</Text>
+            <Text>{content.healthTimeline}</Text>
           </Tabs.Content>
           <Tabs.Content id="tab-2">
-            <Text>{contentText}</Text>
+            <Text>{content.diseaseCourse}</Text>
           </Tabs.Content>
           <Tabs.Content id="tab-3">
-            <Text>{contentText}</Text>
+            <Text>{content.medication}</Text>
           </Tabs.Content>
         </Tabs>
       </VerticalSpacing>
@@ -210,26 +225,26 @@ export const Controlled: Story = {
 export const WithDisabledTab: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tabs with disabled">
-        <Tabs.Trigger id="tab-1">Health timeline</Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">Course of diseases</Tabs.Trigger>
+      <Tabs.List aria-label="Keelatud sakiga sakid">
+        <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
+        <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
         <Tabs.Trigger id="tab-3" disabled>
-          Medication history
+          Ravimite ajalugu
         </Tabs.Trigger>
       </Tabs.List>
       <Tabs.Content id="tab-1">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.healthTimeline}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-2">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.diseaseCourse}</Text>
         </CardContent>
       </Tabs.Content>
       <Tabs.Content id="tab-3">
         <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{contentText}</Text>
+          <Text>{content.medication}</Text>
         </CardContent>
       </Tabs.Content>
     </Tabs>
@@ -242,30 +257,30 @@ export const OverflowBehavior: Story = {
       <Text modifiers="bold">Dropdown (default)</Text>
       <div style={{ maxWidth: 400 }}>
         <Tabs defaultValue="more-1">
-          <Tabs.List aria-label="Overflow tabs with dropdown">
-            <Tabs.Trigger id="more-1">Health timeline</Tabs.Trigger>
-            <Tabs.Trigger id="more-2">Course of diseases</Tabs.Trigger>
-            <Tabs.Trigger id="more-3">Medication history</Tabs.Trigger>
-            <Tabs.Trigger id="more-4">Declarations of intent</Tabs.Trigger>
+          <Tabs.List aria-label="Ületäituvad sakid rippmenüüga">
+            <Tabs.Trigger id="more-1">Terviseteekond</Tabs.Trigger>
+            <Tabs.Trigger id="more-2">Haiguste kulg</Tabs.Trigger>
+            <Tabs.Trigger id="more-3">Ravimite ajalugu</Tabs.Trigger>
+            <Tabs.Trigger id="more-4">Tahteavaldused</Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content id="more-1">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.healthTimeline}</Text>
             </CardContent>
           </Tabs.Content>
           <Tabs.Content id="more-2">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.diseaseCourse}</Text>
             </CardContent>
           </Tabs.Content>
           <Tabs.Content id="more-3">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.medication}</Text>
             </CardContent>
           </Tabs.Content>
           <Tabs.Content id="more-4">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.declarations}</Text>
             </CardContent>
           </Tabs.Content>
         </Tabs>
@@ -273,30 +288,30 @@ export const OverflowBehavior: Story = {
       <Text modifiers="bold">Horizontal scroll</Text>
       <div style={{ maxWidth: 400 }}>
         <Tabs defaultValue="scroll-1">
-          <Tabs.List aria-label="Overflow tabs with scroll" overflowMode="scroll">
-            <Tabs.Trigger id="scroll-1">Health timeline</Tabs.Trigger>
-            <Tabs.Trigger id="scroll-2">Course of diseases</Tabs.Trigger>
-            <Tabs.Trigger id="scroll-3">Medication history</Tabs.Trigger>
-            <Tabs.Trigger id="scroll-4">Declarations of intent</Tabs.Trigger>
+          <Tabs.List aria-label="Ületäituvad sakid kerimisega" overflowMode="scroll">
+            <Tabs.Trigger id="scroll-1">Terviseteekond</Tabs.Trigger>
+            <Tabs.Trigger id="scroll-2">Haiguste kulg</Tabs.Trigger>
+            <Tabs.Trigger id="scroll-3">Ravimite ajalugu</Tabs.Trigger>
+            <Tabs.Trigger id="scroll-4">Tahteavaldused</Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content id="scroll-1">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.healthTimeline}</Text>
             </CardContent>
           </Tabs.Content>
           <Tabs.Content id="scroll-2">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.diseaseCourse}</Text>
             </CardContent>
           </Tabs.Content>
           <Tabs.Content id="scroll-3">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.medication}</Text>
             </CardContent>
           </Tabs.Content>
           <Tabs.Content id="scroll-4">
             <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-              <Text>{contentText}</Text>
+              <Text>{content.declarations}</Text>
             </CardContent>
           </Tabs.Content>
         </Tabs>
@@ -309,28 +324,34 @@ export const WithSubTabs: Story = {
   render: () => {
     const [activeSubTab, setActiveSubTab] = useState('work-accidents');
 
+    const subTabLabels: Record<string, string> = {
+      'work-accidents': 'Tööõnnetused',
+      'occupational-diseases': 'Kutsehaigused',
+      'work-related-illnesses': 'Tööga seotud haigused',
+    };
+
     const subTabContent: Record<string, string> = {
-      'work-accidents': 'Displaying work accident cases and their review statuses.',
-      'occupational-diseases': 'Displaying occupational disease records and diagnoses.',
-      'work-related-illnesses': 'Displaying work-related illness reports and outcomes.',
+      'work-accidents': 'Tööõnnetuste juhtumid ja nende menetluse seis.',
+      'occupational-diseases': 'Kutsehaiguste kirjed ja diagnoosid.',
+      'work-related-illnesses': 'Tööga seotud haiguste teated ja tulemused.',
     };
 
     return (
       <Tabs defaultValue="tab-3">
-        <Tabs.List aria-label="Health and safety tabs">
-          <Tabs.Trigger id="tab-1">Procedures in Progress</Tabs.Trigger>
-          <Tabs.Trigger id="tab-2">Procedures in Planning</Tabs.Trigger>
-          <Tabs.Trigger id="tab-3">Accidents and Illnesses</Tabs.Trigger>
-          <Tabs.Trigger id="tab-4">Calendar</Tabs.Trigger>
+        <Tabs.List aria-label="Töötervishoiu ja -ohutuse sakid">
+          <Tabs.Trigger id="tab-1">Käimasolevad menetlused</Tabs.Trigger>
+          <Tabs.Trigger id="tab-2">Planeeritavad menetlused</Tabs.Trigger>
+          <Tabs.Trigger id="tab-3">Õnnetused ja haigused</Tabs.Trigger>
+          <Tabs.Trigger id="tab-4">Kalender</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content id="tab-1">
           <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <Text>{contentText}</Text>
+            <Text>{content.proceduresInProgress}</Text>
           </CardContent>
         </Tabs.Content>
         <Tabs.Content id="tab-2">
           <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <Text>{contentText}</Text>
+            <Text>{content.proceduresInPlanning}</Text>
           </CardContent>
         </Tabs.Content>
         <Tabs.Content id="tab-3">
@@ -338,27 +359,28 @@ export const WithSubTabs: Story = {
             <VerticalSpacing size={1.5}>
               <ButtonGroup
                 type="secondary"
-                ariaLabel="Accidents and illnesses sub-navigation"
+                ariaLabel="Õnnetuste ja haiguste alamnavigatsioon"
+                enableMobileDropdown
                 onSelectionChange={setActiveSubTab}
               >
                 <Button id="work-accidents" isActive={activeSubTab === 'work-accidents'}>
-                  Work Accidents
+                  Tööõnnetused
                 </Button>
                 <Button id="occupational-diseases" isActive={activeSubTab === 'occupational-diseases'}>
-                  Occupational Diseases
+                  Kutsehaigused
                 </Button>
                 <Button id="work-related-illnesses" isActive={activeSubTab === 'work-related-illnesses'}>
-                  Work-related Illnesses
+                  Tööga seotud haigused
                 </Button>
               </ButtonGroup>
-              <Heading element="h2">{activeSubTab.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</Heading>
+              <Heading element="h2">{subTabLabels[activeSubTab]}</Heading>
               <Text>{subTabContent[activeSubTab]}</Text>
             </VerticalSpacing>
           </CardContent>
         </Tabs.Content>
         <Tabs.Content id="tab-4">
           <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <Text>{contentText}</Text>
+            <Text>{content.calendar}</Text>
           </CardContent>
         </Tabs.Content>
       </Tabs>

@@ -16,7 +16,16 @@ import { useOptionalInputGroup } from '../input-group/input-group';
 import styles from './file-upload.module.scss';
 
 export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
+  /**
+   * Unique HTML id for the file input, also used to associate the label and
+   * helper/error text for accessibility. When omitted, falls back to the
+   * surrounding `InputGroup`'s id or a generated one.
+   */
   id?: string;
+  /**
+   * Visible label for the field. May be omitted when the surrounding
+   * `InputGroup` provides its own label.
+   */
   label?: string;
   /**
    * Additional class names appended to the inner dropzone element

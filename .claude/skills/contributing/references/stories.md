@@ -79,7 +79,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react';
 export default {
   title: 'TEDI-Ready/Components/Category/ComponentName', // or 'TEDI-Ready/<Content|Layout|Base>/ComponentName' for those groups
   component: ComponentName,
-  subcomponents: { /* sub-components if compound */ } as never,
+  subcomponents: { /* sub-components if compound — also wire live controls, see §5 */ } as never,
   parameters: {
     status: { type: [{ name: 'breakpointSupport', url: '...' }] },
     design: { type: 'figma', url: 'https://www.figma.com/...' },
@@ -90,18 +90,78 @@ export default {
 type Story = StoryObj;
 ```
 
-### 5. Story Checklist
+### 5. Compound Components — Live Subcomponent Controls
+
+Storybook's Controls panel only binds live controls to the story's primary `component`.
+Sub-components declared via `subcomponents` render a **documentation table** in autodocs but
+get **no interactive controls**. For any compound/composition component (`Card.Header`,
+`Modal.Content`, `Dropdown.Item`, …) use the shared helper at
+`.storybook/subcomponent-controls.ts` so the sub-component's props become real controls.
+
+**Use it whenever a new component uses composition** (a primary that renders dot-notation
+sub-components) **and the sub-component exposes props the parent does not.**
+
+Three exports:
+- `subcomponentArgTypes(Component, { category, prefix, exclude?, include? })` — reads the
+  sub-component's `__docgenInfo` and returns namespaced `argTypes` (keys like `content__width`)
+  that render as live controls grouped under `category`.
+- `getSubcomponentProps(args, prefix)` — in `render`, collects the namespaced values back into a
+  props object to spread onto the sub-component.
+- `getPrimaryComponentProps(args)` — returns the non-namespaced args (the primary component's own props).
+
+**Always fold these controls into the primary/`Default` story — never create a separate
+`Playground` story.** The primary story is what autodocs binds its `<Controls>` block to.
+
+```tsx
+import { getPrimaryComponentProps, getSubcomponentProps, subcomponentArgTypes } from '../../../../../.storybook/subcomponent-controls';
+
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Card.Header, { category: 'Card.Header', prefix: 'header', exclude: ['children'] }),
+    ...subcomponentArgTypes(Card.Content, { category: 'Card.Content', prefix: 'content', exclude: ['children'] }),
+  },
+  render: (args: Record<string, unknown>) => (
+    <Card {...getPrimaryComponentProps<CardProps>(args)}>
+      <Card.Header {...getSubcomponentProps(args, 'header')}>
+        <Heading element="h3">Card title</Heading>
+      </Card.Header>
+      <Card.Content {...getSubcomponentProps(args, 'content')}>Description</Card.Content>
+    </Card>
+  ),
+};
+```
+
+Rules:
+- **One unique `prefix` per sub-component** in a story (it namespaces the args).
+- **Exclude noise** — always exclude `children`; also exclude raw passthroughs and complex/internal
+  props that don't make good knobs (`aria-*`, `initialFocus`, ref-like or object props such as
+  `titleProps`/`closeProps`). Use `include: [...]` instead when only a few props are worth surfacing.
+  Breakpoint keys (`xs`–`xxl`, `defaultServerBreakpoint`) and `style`/`ref`/`key` are excluded automatically.
+- **Config/array-driven components** (a primary that takes an `items` array rather than JSX children,
+  e.g. `ChoiceGroup`, or a repeated child like `Dropdown.Item`) still work: surface the sub-component's
+  controls, then merge the flattened props into one representative item so the effect is visible:
+  ```tsx
+  const itemProps = getSubcomponentProps<Partial<ItemProps>>(args, 'item');
+  // ...spread onto the middle item / every items[] entry
+  ```
+- **Skip it when the sub-component shares its entire prop surface with the parent.** If the
+  sub-component has no distinct props (e.g. `TextGroup.List` exposes the same `type`/`labelAlign`/
+  `labelWidth` as `TextGroup`), the generated controls only duplicate the parent's and render dead
+  when the parent isn't on screen — make `Default` a plain single-component playground instead.
+
+### 6. Story Checklist
 
 - [ ] Every Figma section has a corresponding story export, in the same order
 - [ ] Example content (labels, data, item count) matches Figma exactly
 - [ ] `Default` story has all controls wired up via `args`
+- [ ] Compound component? Sub-component props are live controls on the primary story via `subcomponentArgTypes` (not a separate `Playground`)
 - [ ] States story covers all visual states shown in Figma (default, hover, active, focus, disabled)
 - [ ] Controlled example included if the component is a form control
 - [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts
 - [ ] Use `CardContent` with `padding` prop to add content padding in story examples (components should not hardcode content padding)
 
-### 6. Parameters Convention
+### 7. Parameters Convention
 
 ```tsx
 parameters: {
@@ -112,7 +172,7 @@ parameters: {
 }
 ```
 
-### 7. Verify
+### 8. Verify
 
 Run Storybook to visually confirm stories render correctly:
 ```

@@ -1,5 +1,5 @@
-import { useArgs } from '@storybook/preview-api';
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { useArgs } from 'storybook/preview-api';
 
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -135,8 +135,8 @@ export const WithTextInverted: StoryObj<StatesArgs> = {
   },
   parameters: {
     ...PSEUDO_PARAMS,
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const IconOnlyInverted: StoryObj<StatesArgs> = {
@@ -149,6 +149,6 @@ export const IconOnlyInverted: StoryObj<StatesArgs> = {
   },
   parameters: {
     ...PSEUDO_PARAMS,
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };

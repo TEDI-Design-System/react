@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import HeadingWithIcon, { HeadingWithIconProps } from './heading-with-icon';
