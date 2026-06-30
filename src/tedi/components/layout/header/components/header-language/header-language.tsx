@@ -57,7 +57,7 @@ export interface HeaderLanguageProps {
    * Position of the select label relative to the popover trigger.
    * - `top` — label sits above the trigger (default)
    * - `left` — label sits inline, to the left of the trigger
-   * @default 'top'
+   * @default top
    */
   labelPosition?: 'top' | 'left';
 }

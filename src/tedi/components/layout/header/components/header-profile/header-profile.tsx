@@ -102,7 +102,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
   // useLayoutEffect measures and applies the offset before paint, so the modal never
   // flashes at the fallback position on first open.
   useLayoutEffect(() => {
-    if (!modalOpen) return;
+    if (!modalOpen || usePopover) return;
 
     const headerEl = triggerRef.current?.closest('header');
     if (!headerEl) return;
@@ -117,7 +117,7 @@ export const HeaderProfile = (props: HeaderProfileProps) => {
       window.removeEventListener('resize', updateOffset);
       window.removeEventListener('scroll', updateOffset, true);
     };
-  }, [modalOpen]);
+  }, [modalOpen, usePopover]);
 
   const modalOffsetStyle =
     headerOffset !== null ? ({ '--header-profile-offset': `${headerOffset}px` } as React.CSSProperties) : undefined;

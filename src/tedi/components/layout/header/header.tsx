@@ -14,6 +14,16 @@ import styles from './header.module.scss';
 
 export type HeaderAlignment = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
 
+/** Maps a `HeaderAlignment` value to the global `justify-content-*` utility class. */
+const alignmentUtility: Record<HeaderAlignment, string> = {
+  'flex-start': 'justify-content-start',
+  center: 'justify-content-center',
+  'flex-end': 'justify-content-end',
+  'space-between': 'justify-content-between',
+  'space-around': 'justify-content-around',
+  'space-evenly': 'justify-content-evenly',
+};
+
 interface HeaderBreakpointProps {
   /**
    * Horizontal alignment (`justify-content`) of the top bar content.
@@ -54,9 +64,7 @@ export const Header = (props: HeaderProps) => {
   return (
     <Print visibility="hide">
       <header className={cn(styles['tedi-header'], className)}>
-        {top && (
-          <div className={cn(styles['tedi-header__top'], styles[`tedi-header__top--${topAlignment}`])}>{top}</div>
-        )}
+        {top && <div className={cn(styles['tedi-header__top'], alignmentUtility[topAlignment])}>{top}</div>}
         <div className={styles['tedi-header__main']}>
           {toggle}
           <div className={styles['tedi-header__main--content']}>{children}</div>
@@ -127,11 +135,7 @@ export interface HeaderCenterProps {
 export const HeaderCenter = (props: HeaderCenterProps) => {
   const { children, className, alignment = 'center' } = props;
 
-  return (
-    <div className={cn(styles['tedi-header__center'], styles[`tedi-header__center--${alignment}`], className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn(styles['tedi-header__center'], alignmentUtility[alignment], className)}>{children}</div>;
 };
 
 HeaderCenter.displayName = 'Header.Center';

@@ -977,7 +977,9 @@ Sub-component: `VerticalSpacing.Item`
 
 - `children: ReactNode` (required)
 - `toggle?: ReactNode` — mobile side navigation toggle
+- `top?: ReactNode` — content in the top bar above the main header (e.g. language picker, top-level links, dark-mode toggle)
 - `bottom?: ReactNode` — content below header on mobile
+- bp `topAlignment?: HeaderAlignment = 'space-between'` — `justify-content` of the top bar content. `HeaderAlignment` = `'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly'`. Breakpoint-aware, e.g. `topAlignment="center" lg={{ topAlignment: 'space-between' }}` to center on mobile and spread on desktop.
 
 Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Language`, `Header.Login`, `Header.Logout`, `Header.Profile`, `Header.Role`, `Header.Search`
 
@@ -985,7 +987,7 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 - `showLogo` is a simple boolean for feature flags or custom media queries. For responsive hiding at standard breakpoints, wrap with `<ShowAt>`/`<HideAt>` instead (e.g. `<ShowAt md><Header.Logo ... /></ShowAt>`).
 
-**Header.Center:** `children: ReactNode`, `alignment?: 'flex-start' | 'center' | 'space-between' = 'center'`
+**Header.Center:** `children: ReactNode`, `alignment?: HeaderAlignment = 'center'` (`'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly'`)
 **Header.Actions:** `children: ReactNode`
 
 **Header.Role:** `HeaderRoleProps`
@@ -1010,9 +1012,11 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 **Header.Language:** `HeaderLanguageProps`
 
-- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `isSelected?: boolean`, `aria-label?: string`
+- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `href?: string`, `isSelected?: boolean`, `aria-label?: string`
+  - `href` renders the option as a navigation anchor (`<a href>`) instead of triggering client-side `setLocale`; ignored when `onClick` is provided.
 - `currentLanguage?: string` — initially displayed label (falls back to matching locale or first item)
 - `selectLabel?: string` — label for the selector (falls back to i18n)
+- `labelPosition?: 'top' | 'left' = 'top'` — position of the select label relative to the trigger
 
 **Header.Login:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
 **Header.Logout:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`

@@ -88,24 +88,26 @@ describe('Header component', () => {
       expect(container.querySelector('[class*="tedi-header__top"]')).not.toBeInTheDocument();
     });
 
-    it('applies the default space-between top alignment modifier', () => {
-      const { container } = render(
+    it('applies the default space-between justify-content utility on the top bar', () => {
+      render(
         <Header top={<div>Top bar</div>}>
           <span>Content</span>
         </Header>
       );
 
-      expect(container.querySelector('[class*="tedi-header__top--space-between"]')).toBeInTheDocument();
+      const topBar = screen.getByText('Top bar').parentElement;
+      expect(topBar).toHaveClass('tedi-header__top', 'justify-content-between');
     });
 
-    it('applies the topAlignment modifier class on the top bar', () => {
-      const { container } = render(
+    it('applies the topAlignment justify-content utility on the top bar', () => {
+      render(
         <Header top={<div>Top bar</div>} topAlignment="center">
           <span>Content</span>
         </Header>
       );
 
-      expect(container.querySelector('[class*="tedi-header__top--center"]')).toBeInTheDocument();
+      const topBar = screen.getByText('Top bar').parentElement;
+      expect(topBar).toHaveClass('justify-content-center');
     });
 
     it('renders bottom content when bottom prop is provided', () => {

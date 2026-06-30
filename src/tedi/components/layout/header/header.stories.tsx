@@ -2,10 +2,11 @@ import { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useGlobals } from 'storybook/preview-api';
 
+import { getSubcomponentProps, subcomponentArgTypes } from '../../../../../.storybook/subcomponent-controls';
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
-import { useLabels } from '../../../providers/label-provider';
+import { LabelProvider, useLabels } from '../../../providers/label-provider';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -18,7 +19,7 @@ import { HideAt } from '../hide-at/hide-at';
 import { ShowAt } from '../show-at/show-at';
 import { SideNav } from '../sidenav';
 import { Representative } from './components/header-role/header-role-representatives';
-import { Header, HeaderActions, HeaderCenter, HeaderLogo, HeaderLogoProps } from './header';
+import { Header, HeaderActions, HeaderAlignment, HeaderCenter, HeaderLogo, HeaderLogoProps } from './header';
 
 const STORAGE_KEY = 'tedi-theme';
 
@@ -41,6 +42,11 @@ const meta: Meta<typeof Header> = {
     'Header.Search': Header.Search,
   } as never,
   decorators: [
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
     (Story) => {
       const [globals, updateGlobals] = useGlobals();
       const originalThemeRef = useRef<string | null>(null);
@@ -65,10 +71,23 @@ const meta: Meta<typeof Header> = {
   ],
   parameters: {
     layout: 'fullscreen',
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?m=dev&node-id=6380-53060',
     },
+  },
+  argTypes: {
+    bottom: { control: false },
+    children: { control: false },
+    toggle: { control: false },
+    top: { control: false },
+    topAlignment: { control: false },
   },
 };
 
@@ -435,15 +454,52 @@ const ResponsiveLogo = (props: HeaderLogoProps) => {
   return <Header.Logo {...props} showLogo={show} />;
 };
 
-export const Default: Story = {
-  render: () => (
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(HeaderLogo, {
+      category: 'Header.Logo',
+      prefix: 'logo',
+      exclude: ['logo', 'logoDark', 'className'],
+    }),
+    ...subcomponentArgTypes(HeaderCenter, {
+      category: 'Header.Center',
+      prefix: 'center',
+      exclude: ['children', 'className'],
+    }),
+    ...subcomponentArgTypes(Header.Language, {
+      category: 'Header.Language',
+      prefix: 'language',
+      exclude: ['languages', 'className'],
+    }),
+    ...subcomponentArgTypes(Header.Login, {
+      category: 'Header.Login',
+      prefix: 'login',
+      exclude: ['onClick', 'className'],
+    }),
+  },
+  args: {
+    logo__href: '#',
+    login__href: '#',
+  },
+  parameters: {
+    docs: {
+      source: {
+        type: 'code',
+      },
+    },
+  },
+  render: (args: Record<string, unknown>) => (
     <StoryWrapper>
       {({ isOpen, setIsOpen }) => (
         <div style={{ display: 'flex', flexDirection: 'column', ...(isOpen && { height: '100vh' }) }}>
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
-            <Header.Logo logoDark={logoDark} logo={logo} href="#" />
+            <Header.Logo
+              logoDark={logoDark}
+              logo={logo}
+              {...getSubcomponentProps<{ showLogo?: boolean; href?: string }>(args, 'logo')}
+            />
             <ShowAt lg>
-              <Header.Center>
+              <Header.Center {...getSubcomponentProps<{ alignment?: HeaderAlignment }>(args, 'center')}>
                 <Link underline={false} href="#">
                   Link text
                 </Link>
@@ -456,9 +512,18 @@ export const Default: Story = {
               </Header.Center>
             </ShowAt>
             <Header.Actions>
-              <Header.Language languages={languages} currentLanguage={languages[0].label} />
+              <Header.Language
+                languages={languages}
+                {...getSubcomponentProps<{
+                  currentLanguage?: string;
+                  selectLabel?: string;
+                  labelPosition?: 'top' | 'left';
+                }>(args, 'language')}
+              />
               <Separator axis="vertical" />
-              <Header.Login href="#" />
+              <Header.Login
+                {...getSubcomponentProps<{ size?: 'default' | 'small'; label?: string; href?: string }>(args, 'login')}
+              />
             </Header.Actions>
           </Header>
 
