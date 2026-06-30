@@ -90,8 +90,10 @@ export const BaseMapSelection = (props: BaseMapSelectionProps): JSX.Element => {
   return (
     <Popover placement="top-end">
       <Popover.Trigger>
-        <Button noStyle id={id} className={triggerBEM} aria-label={title}>
-          <div className={styles['tedi-base-map-selection__content']}>{content}</div>
+        <Button noStyle id={id} className={triggerBEM}>
+          <div className={styles['tedi-base-map-selection__content']} aria-hidden>
+            {content}
+          </div>
           <div className={styles['tedi-base-map-selection__title']}>{title}</div>
         </Button>
       </Popover.Trigger>

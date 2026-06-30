@@ -1,5 +1,16 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
+@mixin selection-content-active {
+  outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+  outline-offset: 1px;
+  border-color: var(--general-border-brand);
+}
+
+@mixin brand-title {
+  font-weight: 700;
+  color: var(--general-text-brand);
+}
+
 .tedi-base-map-selection {
   &__wrapper {
     position: relative;
@@ -61,8 +72,7 @@
       border-color: var(--general-border-brand);
 
       .tedi-base-map-selection__title {
-        font-weight: 700;
-        color: var(--general-text-brand);
+        @include brand-title;
       }
     }
 
@@ -185,23 +195,18 @@
     &:hover,
     &:focus-visible {
       .tedi-base-map-selection__content {
-        outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
-        outline-offset: 1px;
-        border-color: var(--general-border-brand);
+        @include selection-content-active;
       }
     }
   }
 
   &.tedi-base-map-selection--selected {
     .tedi-base-map-selection__content {
-      outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
-      outline-offset: 1px;
-      border-color: var(--general-border-brand);
+      @include selection-content-active;
     }
 
     .tedi-base-map-selection__title {
-      font-weight: 700;
-      color: var(--general-text-brand);
+      @include brand-title;
     }
   }
 }
