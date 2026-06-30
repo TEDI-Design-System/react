@@ -51,7 +51,10 @@ export interface DatePickerModalProps
    * defaults (including `fullscreen`). `className` is merged, not replaced, so the internal layout survives.
    */
   modalProps?: Omit<ModalContentProps, 'children'>;
-  /** Modal title text. Falls back to the `date-field.modal-title` i18n key. */
+  /**
+   * Modal title text. Falls back to a mode-aware i18n key —
+   * `date-field.modal-title` / `-range` / `-multiple`.
+   */
   title?: string;
 }
 
@@ -127,16 +130,37 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
     [mode]
   );
 
-  const applyValue = useCallback((date: Date) => {
-    setDraft(date);
-  }, []);
+  const applyValue = useCallback(
+    (date: Date) => {
+      setDraft((prev) => {
+        if (mode === 'range') return { from: date, to: undefined };
+        if (mode === 'multiple') return [...(Array.isArray(prev) ? prev : []), date];
+        return date;
+      });
+    },
+    [mode]
+  );
+
+  const hasSelection = (() => {
+    if (mode === 'multiple') return Array.isArray(draft) && draft.length > 0;
+    if (mode === 'range') return !!draft && typeof draft === 'object' && 'from' in draft && draft.from instanceof Date;
+    return draft instanceof Date;
+  })();
+  const confirmDisabled = required === true && !hasSelection;
 
   const handleConfirm = () => {
+    if (confirmDisabled) return;
     onConfirm(draft);
     onOpenChange(false);
   };
 
-  const resolvedTitle = title ?? getLabel('date-field.modal-title');
+  const modalTitleKey =
+    mode === 'range'
+      ? 'date-field.modal-title-range'
+      : mode === 'multiple'
+      ? 'date-field.modal-title-multiple'
+      : 'date-field.modal-title';
+  const resolvedTitle = title ?? getLabel(modalTitleKey);
 
   return (
     <Modal open={open} onToggle={onOpenChange}>
@@ -181,7 +205,9 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
           <Button visualType="secondary" onClick={() => onOpenChange(false)}>
             {getLabel('date-field.cancel')}
           </Button>
-          <Button onClick={handleConfirm}>{getLabel('date-field.confirm')}</Button>
+          <Button onClick={handleConfirm} disabled={confirmDisabled}>
+            {getLabel('date-field.confirm')}
+          </Button>
         </Modal.Footer>
       </Modal.Content>
     </Modal>

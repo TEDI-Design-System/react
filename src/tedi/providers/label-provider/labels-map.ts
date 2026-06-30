@@ -108,11 +108,25 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Отмена',
   },
   'date-field.modal-title': {
-    description: 'Title of the mobile date-picker modal opened by DateField',
+    description: 'Title of the mobile date-picker modal opened by DateField (single mode)',
     components: ['DateField'],
     et: 'Vali kuupäev',
     en: 'Pick a date',
     ru: 'Выберите дату',
+  },
+  'date-field.modal-title-range': {
+    description: 'Title of the mobile date-picker modal opened by DateField in range mode',
+    components: ['DateField'],
+    et: 'Vali vahemik',
+    en: 'Pick a date range',
+    ru: 'Выберите период',
+  },
+  'date-field.modal-title-multiple': {
+    description: 'Title of the mobile date-picker modal opened by DateField in multiple mode',
+    components: ['DateField'],
+    et: 'Vali kuupäevad',
+    en: 'Pick dates',
+    ru: 'Выберите даты',
   },
   'date-field.cancel': {
     description: 'Cancel button label inside the date-picker modal',

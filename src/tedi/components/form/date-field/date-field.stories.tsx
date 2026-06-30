@@ -702,7 +702,6 @@ export const ModalPickers: Story = {
     return (
       <Row gutterY={2}>
         <Col lg={4} xs={12}>
-          <Text modifiers="small">Kuu</Text>
           <DateField
             id="date-field-modal-month"
             mode="single"
@@ -718,7 +717,6 @@ export const ModalPickers: Story = {
           />
         </Col>
         <Col lg={4} xs={12}>
-          <Text modifiers="small">Aasta</Text>
           <DateField
             id="date-field-modal-year"
             mode="single"
@@ -734,7 +732,6 @@ export const ModalPickers: Story = {
           />
         </Col>
         <Col lg={4} xs={12}>
-          <Text modifiers="small">Vahemik (2 kuud)</Text>
           <DateField
             id="date-field-modal-range"
             mode="range"

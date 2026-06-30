@@ -522,6 +522,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
     const next = mode === 'range' ? resolveRangeSelection(date, value, selectedDay) : date;
 
+    setHasDisabledDateError(false);
     if (!isControlled) setInternalValue(next);
     onSelect?.(next, selectedDay, modifiers, e);
 
@@ -538,10 +539,18 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const applyValue = (date: Date) => {
     if (isDateDisabled(date)) return;
 
-    if (!isControlled) setInternalValue(date);
-    onSelect?.(date, date as UnknownType, {}, {} as UnknownType);
+    const next: Date | Date[] | DateRange =
+      mode === 'range'
+        ? { from: date, to: undefined }
+        : mode === 'multiple'
+        ? [...(Array.isArray(value) ? value : []), date]
+        : date;
 
-    const formatted = formatDate ? formatDate(date) : defaultFormatter(date);
+    setHasDisabledDateError(false);
+    if (!isControlled) setInternalValue(next);
+    onSelect?.(next, date as UnknownType, {}, {} as UnknownType);
+
+    const formatted = formatDate ? formatDate(next) : defaultFormatter(next);
     setInputValue(formatted);
 
     if (shouldCloseOnSelect) setOpen(false);
@@ -705,6 +714,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   };
 
   const handleModalConfirm = (next: Date | Date[] | DateRange | undefined) => {
+    setHasDisabledDateError(false);
     if (!isControlled) setInternalValue(next);
     onSelect?.(next, next as UnknownType, {}, {} as UnknownType);
     if (next) {
@@ -740,7 +750,9 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     <>
       <div
         className={cn(styles['tedi-date-field__container'], className)}
-        {...interactions.getReferenceProps()}
+        {...interactions.getReferenceProps(
+          useModalPicker && calendarTrigger === 'input' ? { onClick: () => openCalendar() } : undefined
+        )}
         ref={refs.setReference}
       >
         {mode === 'multiple' ? (

@@ -9,6 +9,7 @@ jest.mock('../../../../providers/label-provider', () => ({
 }));
 
 const JUNE_15 = new Date(2026, 5, 15);
+const monthLabel = (date: Date): string => date.toLocaleString('et-EE', { month: 'long' });
 
 const setup = (overrides: Partial<DatePickerModalProps> = {}) => {
   const onOpenChange = jest.fn();
@@ -47,6 +48,15 @@ describe('DatePickerModal', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
+  it('disables confirm and blocks closing when required with no selection', () => {
+    const { onConfirm, onOpenChange } = setup({ required: true, value: undefined });
+    const confirm = screen.getByRole('button', { name: 'date-field.confirm' });
+    expect(confirm).toBeDisabled();
+    fireEvent.click(confirm);
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   it('cancel closes without confirming (draft discarded)', () => {
     const { onConfirm, onOpenChange } = setup();
     fireEvent.click(screen.getByRole('button', { name: 'date-field.cancel' }));
@@ -64,18 +74,21 @@ describe('DatePickerModal', () => {
     expect(picked.getMonth()).toBe(5);
   });
 
-  it('seeds the initial month from a range value', () => {
+  it('seeds the initial month from a range value (the `from` date)', () => {
     setup({ mode: 'range', value: { from: new Date(2026, 2, 3), to: new Date(2026, 2, 20) } });
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(monthLabel(new Date(2026, 2, 1)))).toBeInTheDocument();
+    expect(screen.getByText('2026')).toBeInTheDocument();
   });
 
-  it('seeds the initial month from an array value', () => {
+  it('seeds the initial month from the earliest date in an array value', () => {
     setup({ mode: 'multiple', value: [new Date(2026, 1, 20), new Date(2026, 1, 4)] });
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(monthLabel(new Date(2026, 1, 1)))).toBeInTheDocument();
+    expect(screen.getByText('2026')).toBeInTheDocument();
   });
 
   it('falls back to initialMonth when there is no value', () => {
     setup({ value: undefined, initialMonth: new Date(2025, 0, 1) });
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(monthLabel(new Date(2025, 0, 1)))).toBeInTheDocument();
+    expect(screen.getByText('2025')).toBeInTheDocument();
   });
 });
