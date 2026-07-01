@@ -374,6 +374,10 @@ $btn-width-large: 3.72rem;
       var(--button-main-neutral-inverted-background-default),
       var(--button-main-neutral-inverted-background-default)
     );
+
+    &:focus-visible:not(:disabled, [aria-disabled='true']) {
+      outline-color: var(--tedi-neutral-100);
+    }
   }
 
   &.tedi-btn--link {

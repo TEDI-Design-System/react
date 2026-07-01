@@ -1,8 +1,14 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
+import { Label } from '../../content/label/label';
+import { TextGroup } from '../../content/text-group/text-group';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import Separator from '../../misc/separator/separator';
+import { Link } from '../../navigation/link/link';
+import Popover from '../../overlays/popover/popover';
+import Tooltip from '../../overlays/tooltip/tooltip';
 import InfoButton from './info-button';
 
 /**
@@ -18,6 +24,10 @@ const meta: Meta<typeof InfoButton> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4514-72997&m=dev',
     },
+    controls: { include: ['isSmall', 'color', 'disabled', 'aria-label'] },
+  },
+  args: {
+    'aria-label': 'Rohkem infot',
   },
 };
 
@@ -44,15 +54,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             </Text>
           </Col>
           <Col width={1} className="text-center">
-            <InfoButton
-              title={`Info button ${state}`}
-              color={color}
-              {...buttonProps}
-              aria-label={`Info button ${state}`}
-              id={state}
-            >
-              Info button
-            </InfoButton>
+            <InfoButton color={color} {...buttonProps} aria-label={`Info button ${state}`} id={state} />
           </Col>
         </Row>
       ))}
@@ -60,11 +62,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
   );
 };
 
-export const Default: Story = {
-  args: {
-    title: 'Info button',
-  },
-};
+export const Default: Story = {};
 
 export const States: StoryObj<TemplateMultipleProps> = {
   render: TemplateColumn,
@@ -94,4 +92,64 @@ export const Inverted: StoryObj<TemplateMultipleProps> = {
     },
   },
   globals: { backgrounds: { value: 'brand' } },
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 'var(--layout-grid-gutters-04)',
+};
+
+export const UsageWithTooltipAndPopover: Story = {
+  name: 'Usage with tooltip and popover',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div style={{ display: 'flex', gap: '1.5rem' }}>
+      <TextGroup
+        type="vertical"
+        label={
+          <span style={labelStyle}>
+            <Label>Veregrupp</Label>
+            <Tooltip>
+              <Tooltip.Trigger>
+                <InfoButton aria-label="Rohkem infot veregrupi kohta" />
+              </Tooltip.Trigger>
+              <Tooltip.Content>Veregrupp määratakse vereanalüüsiga ning see ei muutu elu jooksul.</Tooltip.Content>
+            </Tooltip>
+          </span>
+        }
+        value="AB-"
+      />
+
+      <Separator axis="vertical" isStretched />
+
+      <TextGroup
+        type="vertical"
+        label={
+          <span style={labelStyle}>
+            <Label>Hambaravihüvitise jääk</Label>
+            <Popover>
+              <Popover.Trigger>
+                <InfoButton aria-label="Rohkem infot hüvitise kohta" />
+              </Popover.Trigger>
+              <Popover.Content width="medium">
+                <VerticalSpacing size={0.5}>
+                  <Text>
+                    Hambaravihüvitist saab kasutada jooksva kalendriaasta jooksul. Kasutamata jääk järgmisesse aastasse
+                    ei kandu.
+                  </Text>
+                  <div style={{ textAlign: 'right' }}>
+                    <Link href="#" underline={false} iconRight="arrow_forward">
+                      Loe rohkem
+                    </Link>
+                  </div>
+                </VerticalSpacing>
+              </Popover.Content>
+            </Popover>
+          </span>
+        }
+        value="24€"
+      />
+    </div>
+  ),
 };
