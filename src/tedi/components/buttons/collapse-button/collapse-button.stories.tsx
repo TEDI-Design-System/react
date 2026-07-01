@@ -26,8 +26,6 @@ const meta: Meta<typeof CollapseButton> = {
     },
   },
   args: {
-    openText: 'open',
-    closeText: 'close',
     hideText: false,
     arrowType: 'default',
     size: 'default',
@@ -133,9 +131,7 @@ export const WithTextInverted: StoryObj<StatesArgs> = {
     inverted: true,
     titleColor: 'white',
   },
-  parameters: {
-    ...PSEUDO_PARAMS,
-  },
+  parameters: PSEUDO_PARAMS,
   globals: { backgrounds: { value: 'brand' } },
 };
 
@@ -147,8 +143,6 @@ export const IconOnlyInverted: StoryObj<StatesArgs> = {
     titleColor: 'white',
     'aria-label': 'Toggle details',
   },
-  parameters: {
-    ...PSEUDO_PARAMS,
-  },
+  parameters: PSEUDO_PARAMS,
   globals: { backgrounds: { value: 'brand' } },
 };
