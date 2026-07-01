@@ -24,7 +24,7 @@
 
     body {
       margin: 0;
-      background: var(--general-surface-secondary);
+      background: var(--general-surface-tertiary);
       color: var(--general-text-primary);
       font-family: var(--family-default), system-ui, sans-serif;
       font-size: var(--body-regular-size);
@@ -32,11 +32,14 @@
       font-variation-settings: "wdth" 100;
     }
     /* Core's index.css sets `html,body{height:100%;background-color:…}` (specificity 0,0,2).
-       Override both so body grows with content and the page background fills the full scroll height. */
+       Override so body grows with content, fills the viewport, and lays out header/main/footer
+       in a column so the footer sits at the bottom even on short pages. */
     html body {
+      display: flex;
+      flex-direction: column;
       height: auto;
       min-height: 100dvh;
-      background: var(--general-surface-secondary);
+      background: var(--general-surface-tertiary);
     }
 
     a { color: inherit; }
@@ -45,15 +48,34 @@
     .tsb-header {
       display: flex;
       align-items: center;
+      flex: none;
       min-height: 84px;
       padding: 16px 24px;
       background: var(--header-background);
-      border-bottom: 1px solid var(--general-border-primary);
+      box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
     }
     .tsb-header__logo { height: 44px; width: auto; display: block; }
 
+    /* ---- Footer ---------------------------------------------------------- */
+    .tsb-footer {
+      flex: none;
+      display: flex;
+      justify-content: center;
+      padding: 8px 40px;
+      background: var(--footer-bottom-background);
+      color: var(--general-text-white);
+      font-size: var(--body-link-size-regular);
+      line-height: var(--body-regular-line-height);
+    }
+    .tsb-footer a {
+      color: var(--general-text-white);
+      text-decoration: underline;
+    }
+
     /* ---- Layout ---------------------------------------------------------- */
     .tsb-main {
+      flex: 1 0 auto;
+      width: 100%;
       max-width: 1000px;
       margin: 0 auto;
       padding: 48px 24px 80px;
@@ -102,8 +124,7 @@
 
     /* ---- Callout (brand card) ------------------------------------------- */
     .tsb-callout {
-      background: var(--card-background-brand-quaternary);
-      border: 1px solid var(--card-border-primary);
+      background: var(--card-background-brand-tertiary);
       border-radius: var(--card-radius-rounded);
       padding: 16px;
     }
@@ -148,11 +169,22 @@
       height: 2px;
       /* align with the vertical center of the 24px step number (8px step padding + 12px) */
       margin-top: 19px;
-      background: var(--general-border-primary);
+      background: var(--general-border-secondary);
     }
     @media (max-width: 720px) {
-      .tsb-stepper { flex-direction: column; align-items: stretch; }
+      .tsb-stepper { flex-direction: column; align-items: stretch; gap: 0; }
+      /* Hide the horizontal connectors and draw vertical ones between stacked circles. */
       .tsb-stepper__line { display: none; }
+      .tsb-step { position: relative; }
+      .tsb-step:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 27.5px; /* circle centre: 16px step padding + 12px − 0.5px (half of 1px line) */
+        top: 32px; /* just below the 24px circle (8px padding + 24px) */
+        width: 1px;
+        height: calc(100% - 24px); /* reaches the next circle's top */
+        background: var(--general-border-secondary);
+      }
     }
 
     /* ---- Card button (row) ---------------------------------------------- */
@@ -350,6 +382,10 @@
       </section>
     </div>
   </main>
+
+  <footer class="tsb-footer">
+    <span>Maintained by <a href="https://www.tedi.ee/" target="_blank" rel="noopener">TEDI</a></span>
+  </footer>
 
   <script type="text/javascript">
     // --- SVG icons ------------------------------------------------------------
