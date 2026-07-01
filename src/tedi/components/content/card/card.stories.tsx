@@ -76,7 +76,7 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
         <Col>
           <Card borderless={true}>
             <Card.Content>
-              <p>Vasak</p>
+              <p>Left</p>
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. In convallis mollis augue, vitae aliquet elit
                 congue a. Donec vitae sagittis odio, et maximus nulla. Quisque metus augue, euismod non auctor sed,
@@ -90,7 +90,7 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
         <Col>
           <StretchContent>
             <Card borderless={true}>
-              <Card.Content background="secondary">Parem</Card.Content>
+              <Card.Content background="secondary">Right</Card.Content>
             </Card>
           </StretchContent>
         </Col>
@@ -199,7 +199,7 @@ const SplitCard: StoryFn = () => (
       <Col>
         <Card borderless={true} borderRadius={{ right: false }}>
           <Card.Content>
-            <p>Vasak</p>
+            <p>Left</p>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. In convallis mollis augue, vitae aliquet elit
               congue a. Donec vitae sagittis odio, et maximus nulla. Quisque metus augue, euismod non auctor sed,
@@ -213,7 +213,7 @@ const SplitCard: StoryFn = () => (
       <Col>
         <StretchContent>
           <Card borderless={true} borderRadius={{ left: false }}>
-            <Card.Content background="secondary">Parem</Card.Content>
+            <Card.Content background="secondary">Right</Card.Content>
           </Card>
         </StretchContent>
       </Col>
