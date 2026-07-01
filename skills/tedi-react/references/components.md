@@ -1383,6 +1383,86 @@ const [page, setPage] = useState(1);
 <Pagination pageCount={10} page={page} onPageChange={setPage} arrowVariant="default" showPrevNextButtons md={{ arrowVariant: 'primary' }} />
 ```
 
+### VerticalStepper
+Compound vertical wizard / progress stepper. Sub-components: `VerticalStepper.Item` (auto-numbered) and `VerticalStepper.SubItem`. A step is a link/button when `href`/`onClick` is set (plain text when `disabled`); a step with sub-steps adds a separate expand toggle next to the title, so the title can still navigate.
+
+**`VerticalStepper`** — `VerticalStepperProps` | fRef (`<ol>`)
+- `children: ReactNode` (required) — `Item`s (+ optional `Separator`s)
+- `compact?: boolean = false` — smaller indicators; completed/error show the state icon in the indicator instead of the number
+- `aria-label?: string` — names the `<nav>` landmark
+
+**`VerticalStepper.Item`** — `VerticalStepperItemProps`
+- `title: ReactNode` (required), `description?: ReactNode`
+- `state?: 'default' | 'completed' | 'error' | 'disabled' = 'default'`
+- `current?: boolean` — active step (blue ring, `aria-current="step"`); independent from `state`
+- `href?` / `onClick?` / `as?: 'a' | 'button'` — makes the title a link/button; works for steps with sub-steps too (title navigates, a separate toggle expands). Ignored when `disabled`.
+- `info?: ReactNode` — trailing asset under the title (`StatusBadge`, `Link`, `Button`, `Text`)
+- `children?: ReactNode` — `SubItem`s; makes the step expandable
+- `open?` / `defaultOpen?` / `onToggle?` — controlled / uncontrolled sub-step disclosure
+
+**`VerticalStepper.SubItem`** — `VerticalStepperSubItemProps`
+- `title: ReactNode` (required), `state?: 'default' | 'completed' | 'error' | 'disabled' | 'informative'`
+- `current?`, `href?` / `onClick?` / `as?`, `info?`
+
+```tsx
+<VerticalStepper aria-label="Application progress">
+  <VerticalStepper.Item title="Personal data" state="completed" href="#step-1" />
+  <VerticalStepper.Item title="Contacts" current defaultOpen>
+    <VerticalStepper.SubItem title="Phone" state="completed" onClick={goPhone} />
+    <VerticalStepper.SubItem title="Email" current onClick={goEmail} />
+  </VerticalStepper.Item>
+  <VerticalStepper.Item title="Review" />
+</VerticalStepper>
+```
+
+### CardStepper
+The mobile / compact form of a stepper — a single card showing the active step, a `N / M` counter, a segmented progress bar, optional prev/next arrows, and a list button that opens the full step list in a `Modal` (rendered as a `VerticalStepper`). Pair it with `VerticalStepper` on wider screens (swap on a breakpoint via `useBreakpoint`), or use standalone.
+
+Sub-component: `CardStepper.Step` — declarative per-step config (compound API).
+
+**Props:** `CardStepperProps` | fRef
+- Steps — either as compound `CardStepper.Step` children **or** the `steps` data prop (one is required; children win when both are given):
+  - `<CardStepper.Step title state? description? id? disabled? bottomSlot? />` — `CardStepperStepProps`
+  - `steps?: CardStepperStepProps[]` — `{ title, description?, state?, id?, disabled?, bottomSlot? }`
+  - The active step shows on the card, all steps in the modal. `disabled` steps are skipped by the arrows and non-clickable in the list.
+  - `bottomSlot?: ReactNode` — custom content (e.g. an `Alert` or action button) rendered at the bottom of the card for the active step only
+- `activeStep?: number` (controlled, 0-based) + `onStepChange?: (index) => void`, or `defaultActiveStep?: number` (uncontrolled)
+- `showStepNumber?: boolean = true` — active step number in a ring indicator (ignored when `showNavigation`)
+- `showStatusIcon?: boolean = false` — status icon next to the active step's title: a success check when its `state` is `'completed'`, a danger icon when `'error'` (nothing otherwise)
+- `infoPosition?: 'top' | 'bottom' = 'bottom'` — places the active step's `description` above or below its title
+- `counterPosition?: 'inline' | 'top' = 'inline'` — `'top'` floats the `N / M` counter above the title (and removes it from the trailing controls)
+- `showProgress?: boolean = true` — segmented progress bar (one segment per step; filled up to and including the active step, so the green count equals the N in N / M)
+- `showNavigation?: boolean = false` — prev / next arrow buttons (sequential, skip `disabled` steps, disabled at the bounds)
+- `showStepList?: boolean = true` — the list button + step-list modal. Turn off for a read-only tracker / arrows-only flow.
+- `allowJump?: boolean | 'completed' | 'completed-or-next' = true` — which steps the modal list can jump to (`false` = read-only list; per-step `disabled` always wins). Arrows are not gated by this.
+- `headingElement?: 'h2'..'h6' = 'h4'` — semantic level of the title (visual size unchanged)
+- `labels?: { previous?, next?, openSteps?, modalHeading?, status? }` — per-instance label overrides; otherwise sourced from the `LabelProvider` (`stepper.previous`, `stepper.next`, `stepper.open-steps`, `stepper.steps`, `stepper.status`). `status: (current, total) => string` is the screen-reader phrasing for the `N / M` counter
+- `aria-label?: string`, `className?: string`
+
+```tsx
+const [step, setStep] = useState(0);
+
+// Compound API
+<CardStepper aria-label="Application steps" activeStep={step} onStepChange={setStep} showNavigation>
+  <CardStepper.Step title="Personal data" state="completed" />
+  <CardStepper.Step title="Contacts" description="Phone and email" />
+  <CardStepper.Step title="Review" />
+</CardStepper>
+
+// Data API (equivalent)
+<CardStepper
+  aria-label="Application steps"
+  steps={[
+    { title: 'Personal data', state: 'completed' },
+    { title: 'Contacts', description: 'Phone and email' },
+    { title: 'Review' },
+  ]}
+  activeStep={step}
+  onStepChange={setStep}
+  showNavigation
+/>
+```
+
 ## Notifications
 
 ### Alert

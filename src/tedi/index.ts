@@ -39,6 +39,8 @@ export * from './components/navigation/horizontal-stepper';
 export * from './components/navigation/link/link';
 export * from './components/navigation/pagination';
 export * from './components/navigation/tabs';
+export * from './components/navigation/vertical-stepper';
+export * from './components/navigation/card-stepper';
 export * from './components/form/textfield/textfield';
 export * from './components/form/textarea/textarea';
 export * from './components/form/number-field/number-field';
