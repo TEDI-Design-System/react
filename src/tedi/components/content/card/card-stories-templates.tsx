@@ -19,28 +19,28 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
   <VerticalSpacing>
     <Card>
       <Card.Header background="primary">
-        <Heading element="h3">Title</Heading>
+        <Heading element="h3">Pealkiri</Heading>
       </Card.Header>
     </Card>
     <Card>
       <Card.Header background="primary">
-        <Heading element="h3">Title</Heading>
-        <Text color="secondary">Description</Text>
+        <Heading element="h3">Pealkiri</Heading>
+        <Text color="secondary">Kirjeldus</Text>
       </Card.Header>
     </Card>
     <Card>
       <Card.Header background="primary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
-            <Button>Create</Button>
+            <Button>Loo</Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -49,20 +49,20 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="primary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto" style={{ display: 'flex', gap: 10 }}>
             <Button visualType="secondary" iconLeft={{ name: 'share' }}>
-              Share
+              Jaga
             </Button>
             <Button visualType="secondary" iconLeft={{ name: 'print' }}>
-              Print
+              Prindi
             </Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -71,17 +71,17 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="primary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
             <Link id="card-link" iconRight={{ name: 'arrow_right_alt' }} href="#">
-              View result
+              Vaata tulemust
             </Link>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -90,15 +90,15 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="primary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
-            <StatusBadge color="brand">Approved</StatusBadge>
+            <StatusBadge color="brand">Kinnitatud</StatusBadge>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -107,15 +107,15 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="secondary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
-            <Button>Create</Button>
+            <Button>Loo</Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -124,15 +124,15 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="tertiary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
-            <Button>Create</Button>
+            <Button>Loo</Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -141,15 +141,15 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="brand-primary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
-            <Button visualType="secondary">Create</Button>
+            <Button visualType="secondary">Loo</Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text>Description</Text>
+            <Text>Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -158,15 +158,15 @@ export const HeaderTypesTemplate: StoryFn<CardStory> = (_args) => (
       <Card.Header background="brand-secondary">
         <Row>
           <Col>
-            <Heading element="h3">Title</Heading>
+            <Heading element="h3">Pealkiri</Heading>
           </Col>
           <Col width="auto">
-            <Button visualType="secondary">Create</Button>
+            <Button visualType="secondary">Loo</Button>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Text>Description</Text>
+            <Text>Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Header>
@@ -178,30 +178,30 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
   <VerticalSpacing>
     <Card>
       <Card.Content>
-        <Text color="secondary">Description</Text>
+        <Text color="secondary">Kirjeldus</Text>
       </Card.Content>
     </Card>
     <Card>
       <Card.Content>
-        <Text color="secondary">Description</Text>
-        <StatusBadge color="brand">Approved</StatusBadge>
+        <Text color="secondary">Kirjeldus</Text>
+        <StatusBadge color="brand">Kinnitatud</StatusBadge>
       </Card.Content>
     </Card>
     <Card>
       <Card.Content>
-        <Text modifiers="bold">Title</Text>
-        <Text color="secondary">Description</Text>
+        <Text modifiers="bold">Pealkiri</Text>
+        <Text color="secondary">Kirjeldus</Text>
       </Card.Content>
     </Card>
     <Card>
       <Card.Content>
-        <Text modifiers="bold">Title</Text>
+        <Text modifiers="bold">Pealkiri</Text>
         <Row>
           <Col>
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
           <Col width="auto">
-            <StatusBadge color="brand">Approved</StatusBadge>
+            <StatusBadge color="brand">Kinnitatud</StatusBadge>
           </Col>
         </Row>
       </Card.Content>
@@ -211,7 +211,7 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
         <Row>
           <Col className="display-flex align-items-center gap-3">
             <Icon name="monitor_heart" />
-            <Text color="secondary">Description</Text>
+            <Text color="secondary">Kirjeldus</Text>
           </Col>
         </Row>
       </Card.Content>
@@ -222,8 +222,8 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
           <Col className="display-flex align-items-center gap-3">
             <Icon name="monitor_heart" />
             <VerticalSpacing size={0}>
-              <Text modifiers="bold">Title</Text>
-              <Text color="secondary">Description</Text>
+              <Text modifiers="bold">Pealkiri</Text>
+              <Text color="secondary">Kirjeldus</Text>
             </VerticalSpacing>
           </Col>
         </Row>
@@ -235,12 +235,12 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
           <Col className="display-flex align-items-center gap-3">
             <Icon name="monitor_heart" />
             <VerticalSpacing size={0}>
-              <Text modifiers="bold">Title</Text>
-              <Text color="secondary">Description</Text>
+              <Text modifiers="bold">Pealkiri</Text>
+              <Text color="secondary">Kirjeldus</Text>
             </VerticalSpacing>
           </Col>
           <Col width="auto" className="display-flex align-items-center">
-            <Button>Create</Button>
+            <Button>Loo</Button>
           </Col>
         </Row>
       </Card.Content>
@@ -251,12 +251,12 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
           <Card.Content>
             <Row>
               <Col>
-                <Text modifiers="bold">Title</Text>
-                <Text color="secondary">Description</Text>
+                <Text modifiers="bold">Pealkiri</Text>
+                <Text color="secondary">Kirjeldus</Text>
                 <Separator spacing={1.5} />
                 <Row justifyContent="center">
                   <Col width="auto">
-                    <Button>Create</Button>
+                    <Button>Loo</Button>
                   </Col>
                 </Row>
               </Col>
@@ -276,8 +276,8 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
           <Col width="auto" className="display-flex align-items-center gap-3">
             <Icon background="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
-              <Text modifiers="bold">Title</Text>
-              <Text color="secondary">Description</Text>
+              <Text modifiers="bold">Pealkiri</Text>
+              <Text color="secondary">Kirjeldus</Text>
             </VerticalSpacing>
           </Col>
         </Row>
@@ -295,8 +295,8 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
           <Col width="auto" className="display-flex align-items-center gap-3">
             <Icon background="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
-              <Text modifiers="bold">Title</Text>
-              <Text color="secondary">Description</Text>
+              <Text modifiers="bold">Pealkiri</Text>
+              <Text color="secondary">Kirjeldus</Text>
             </VerticalSpacing>
           </Col>
         </Row>
@@ -308,8 +308,8 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
           <Col width="auto" className="display-flex align-items-center gap-3">
             <Icon background="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
-              <Text modifiers="bold">Title</Text>
-              <Text color="secondary">Description</Text>
+              <Text modifiers="bold">Pealkiri</Text>
+              <Text color="secondary">Kirjeldus</Text>
             </VerticalSpacing>
           </Col>
         </Row>
@@ -337,15 +337,15 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
         <Card>
           <Card.Header background="primary">
             <HeadingWithIcon name="assignment_ind" headingColor="brand" iconColor="brand">
-              My statement of intention
+              Minu tahteavaldus
             </HeadingWithIcon>
           </Card.Header>
           <Card.Content padding={{ top: 0, right: 1, bottom: 1, left: 1 }}>
             <Row>
               <Col>
-                <Text color="secondary">For example organ donation and blood transfusion</Text>
+                <Text color="secondary">Näiteks elundidoonorlus ja vereülekanne</Text>
                 <Separator spacing={1.5} />
-                <Button visualType="secondary">View statements of intention</Button>
+                <Button visualType="secondary">Vaata tahteavaldusi</Button>
               </Col>
             </Row>
           </Card.Content>
@@ -356,10 +356,10 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
           <Card.Content>
             <Row>
               <Col>
-                <Text modifiers="bold">Title</Text>
-                <Text color="secondary">For example organ donation and blood transfusion</Text>
+                <Text modifiers="bold">Pealkiri</Text>
+                <Text color="secondary">Näiteks elundidoonorlus ja vereüekanne</Text>
                 <Separator spacing={1.5} />
-                <Button visualType="secondary">View statements of intention</Button>
+                <Button visualType="secondary">Vaata tahteavaldusi</Button>
               </Col>
             </Row>
           </Card.Content>
@@ -371,15 +371,15 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
         <Card>
           <Card.Header background="brand-primary">
             <Heading element="h3" color="white">
-              Short title
+              Lühike pealkiri
             </Heading>
           </Card.Header>
           <Card.Content>
             <Row>
               <Col>
                 <VerticalSpacing>
-                  <Text color="secondary">For example organ donation and blood transfusion</Text>
-                  <Button visualType="secondary">View statements of intention</Button>
+                  <Text color="secondary">Näiteks elundidoonorlus ja vereülekanne</Text>
+                  <Button visualType="secondary">Vaata tahteavaldusi</Button>
                 </VerticalSpacing>
               </Col>
             </Row>
@@ -389,7 +389,7 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
       <Col lg={6} sm={12}>
         <Card>
           <Card.Content>
-            <Text color="secondary">For example organ donation and blood transfusion</Text>
+            <Text color="secondary">Näiteks elundidoonorlus ja vereülekanne</Text>
           </Card.Content>
         </Card>
       </Col>
@@ -398,7 +398,7 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
       <Col>
         <Card border="left-danger-secondary">
           <Card.Content>
-            <Text>Card important</Text>
+            <Text>Oluline kaart</Text>
           </Card.Content>
         </Card>
       </Col>

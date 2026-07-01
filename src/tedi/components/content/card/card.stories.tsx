@@ -27,7 +27,7 @@ import { Card, CardContentProps, CardNotificationProps, CardProps } from './inde
  */
 
 export default {
-  title: 'TEDI-Ready/Components/Cards/Card',
+  title: 'TEDI-Ready/Content/Card',
   component: Card,
   subcomponents: {
     'Card.Content': Card.Content,
@@ -76,7 +76,7 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
         <Col>
           <Card borderless={true}>
             <Card.Content>
-              <p>Left</p>
+              <p>Vasak</p>
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. In convallis mollis augue, vitae aliquet elit
                 congue a. Donec vitae sagittis odio, et maximus nulla. Quisque metus augue, euismod non auctor sed,
@@ -90,7 +90,7 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
         <Col>
           <StretchContent>
             <Card borderless={true}>
-              <Card.Content background="secondary">Right</Card.Content>
+              <Card.Content background="secondary">Parem</Card.Content>
             </Card>
           </StretchContent>
         </Col>
@@ -100,13 +100,13 @@ const GeneralTemplate: StoryFn<CardStory> = (args) => {
 
   const getDefaultContent = (cardContent: CardContentProps) => (
     <Card.Content {...cardContent}>
-      <p>Description</p>
+      <p>Kirjeldus</p>
     </Card.Content>
   );
 
   const getNotification = (notification: CardNotificationProps) => (
     <Card.Notification {...notification}>
-      <p>Card notification</p>
+      <p>Kaardi teavitus</p>
     </Card.Notification>
   );
 
@@ -147,9 +147,9 @@ export const Default: StoryObj = {
   render: (args: Record<string, unknown>) => (
     <Card {...getPrimaryComponentProps<CardProps>(args)}>
       <Card.Header {...getSubcomponentProps(args, 'header')}>
-        <Heading element="h3">Card title</Heading>
+        <Heading element="h3">Kaardi pealkiri</Heading>
       </Card.Header>
-      <Card.Content {...getSubcomponentProps(args, 'content')}>Description</Card.Content>
+      <Card.Content {...getSubcomponentProps(args, 'content')}>Kirjeldus</Card.Content>
     </Card>
   ),
 };
@@ -187,7 +187,7 @@ export const MultipleContent: Story = {
       hasSeparator: true,
     },
     cardContent2: {
-      children: <p>Description 2</p>,
+      children: <p>Kirjeldus 2</p>,
     },
     cardHeader: false,
   },
@@ -199,7 +199,7 @@ const SplitCard: StoryFn = () => (
       <Col>
         <Card borderless={true} borderRadius={{ right: false }}>
           <Card.Content>
-            <p>Left</p>
+            <p>Vasak</p>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. In convallis mollis augue, vitae aliquet elit
               congue a. Donec vitae sagittis odio, et maximus nulla. Quisque metus augue, euismod non auctor sed,
@@ -213,7 +213,7 @@ const SplitCard: StoryFn = () => (
       <Col>
         <StretchContent>
           <Card borderless={true} borderRadius={{ left: false }}>
-            <Card.Content background="secondary">Right</Card.Content>
+            <Card.Content background="secondary">Parem</Card.Content>
           </Card>
         </StretchContent>
       </Col>
@@ -334,7 +334,7 @@ export const WithNotification: Story = {
     },
     cardHeader: {
       background: 'primary',
-      children: <Heading element="h3">Card title</Heading>,
+      children: <Heading element="h3">Kaardi pealkiri</Heading>,
     },
     cardNotification: true,
   },
@@ -345,13 +345,13 @@ const Timeline: StoryFn<CardProps> = (args) => (
     <Card.Content>
       <Row>
         <Col width={3}>
-          <p>Card content</p>
+          <p>Kaardi sisu</p>
         </Col>
         <Col width="auto">
           <Separator axis="vertical" color="accent" variant="dotted" dotPosition="center" isStretched />
         </Col>
         <Col>
-          <p>Card content</p>
+          <p>Kaardi sisu</p>
         </Col>
       </Row>
     </Card.Content>
@@ -381,8 +381,8 @@ const TwoToned: StoryFn<CardProps> = (_args) => (
       <Col width="auto">
         <Card borderRadius={{ left: false }} borderless>
           <Card.Content>
-            <p className="text-bold">Some statistic: x kg</p>
-            <p>Some description</p>
+            <p className="text-bold">Mingi statistika: x kg</p>
+            <p>Mingi kirjeldus</p>
           </Card.Content>
         </Card>
       </Col>
