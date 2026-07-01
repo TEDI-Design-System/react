@@ -1,3 +1,10 @@
+# [18.0.0-rc.29](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.28...react-18.0.0-rc.29) (2026-07-01)
+
+
+### Features
+
+* **accordion:** update Disabled story, change content to Estonian [#695](https://github.com/TEDI-Design-System/react/issues/695) ([#696](https://github.com/TEDI-Design-System/react/issues/696)) ([daaa8f6](https://github.com/TEDI-Design-System/react/commit/daaa8f62dc609da2dc91395ee077417752531174))
+
 # [18.0.0-rc.28](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.27...react-18.0.0-rc.28) (2026-06-30)
 
 
