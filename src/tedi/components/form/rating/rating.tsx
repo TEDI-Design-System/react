@@ -116,8 +116,6 @@ export const Rating = (props: RatingProps): JSX.Element => {
   const isItemActive = (position: number): boolean =>
     type === 'icon' ? position === displayValue : position <= displayValue;
 
-  // `||` (not `??`) so sparse label arrays — e.g. only the number scale's endpoints — still give
-  // every radio a non-empty accessible name.
   const itemLabel = (position: number): string => itemLabels?.[position - 1] || `${position} of ${total}`;
 
   const renderVisual = (position: number, active: boolean): React.ReactNode => {
@@ -198,8 +196,10 @@ export const Rating = (props: RatingProps): JSX.Element => {
         </div>
       )}
 
-      {type === 'star' && displayValue > 0 && itemLabels?.[displayValue - 1] && (
-        <div className={styles['tedi-rating__star-caption']}>{itemLabels[displayValue - 1]}</div>
+      {type === 'star' && itemLabels?.some(Boolean) && (
+        <div className={styles['tedi-rating__star-caption']}>
+          {displayValue > 0 ? itemLabels[displayValue - 1] : null}
+        </div>
       )}
     </div>
   );

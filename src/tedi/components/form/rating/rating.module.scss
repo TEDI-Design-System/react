@@ -1,8 +1,11 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
 .tedi-rating {
   display: flex;
   flex-direction: column;
   gap: var(--layout-grid-gutters-04);
   align-items: flex-start;
+  width: fit-content;
 }
 
 .tedi-rating__items {
@@ -67,21 +70,28 @@
   background-color: var(--feedback-indicator);
 }
 
-.tedi-rating__caption,
-.tedi-rating__endpoints,
-.tedi-rating__star-caption {
+.tedi-rating__caption {
   font-size: var(--body-small-regular-size);
   color: var(--general-text-secondary);
+  text-align: center;
 }
 
-.tedi-rating__caption {
+.tedi-rating__star-caption {
+  align-self: stretch;
+  min-height: var(--body-extra-small-line-height);
+  font-size: var(--body-extra-small-size);
+  line-height: var(--body-extra-small-line-height);
+  color: var(--general-text-secondary);
   text-align: center;
 }
 
 .tedi-rating__endpoints {
   display: flex;
+  align-self: stretch;
   justify-content: space-between;
-  width: 100%;
+  font-size: var(--body-extra-small-size);
+  line-height: var(--body-extra-small-line-height);
+  color: var(--general-text-secondary);
 }
 
 .tedi-rating--disabled {
@@ -93,5 +103,19 @@
   .tedi-rating__item--active .tedi-rating__circle {
     color: var(--general-text-white);
     background-color: var(--general-text-disabled);
+  }
+}
+
+@include breakpoints.media-breakpoint-down(md) {
+  .tedi-rating--number {
+    .tedi-rating__items {
+      display: grid;
+      grid-template-columns: repeat(5, auto);
+    }
+
+    .tedi-rating__circle {
+      width: var(--button-md-height);
+      height: var(--button-md-height);
+    }
   }
 }
