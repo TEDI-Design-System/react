@@ -121,6 +121,13 @@
     }
     .tsb-lead { margin: 0; color: var(--general-text-primary); }
     .tsb-muted { color: var(--general-text-secondary); }
+    .tsb-note {
+      margin: 0;
+      font-size: var(--body-small-regular-size);
+      line-height: var(--body-small-regular-line-height);
+      font-style: italic;
+      color: var(--general-text-secondary);
+    }
 
     /* ---- Callout (brand card) ------------------------------------------- */
     .tsb-callout {
@@ -157,7 +164,7 @@
       font-weight: var(--body-small-bold-weight);
       color: var(--general-text-secondary);
     }
-    .tsb-step__title { color: var(--general-text-secondary); }
+    .tsb-step__title { color: var(--general-text-primary); }
     .tsb-step__sub {
       font-size: var(--body-small-regular-size);
       line-height: var(--body-small-regular-line-height);
@@ -238,6 +245,8 @@
     .tsb-card__grow { flex: 1 1 auto; min-width: 0; }
     .tsb-card__meta {
       color: var(--general-text-secondary);
+      font-size: var(--body-small-regular-size);
+      line-height: var(--body-small-regular-line-height);
       white-space: nowrap;
     }
     /* Always at the end, vertically centered against the (possibly multi-line) body */
@@ -326,15 +335,14 @@
 
     <div class="tsb-stack tsb-stack--24">
       <!-- Intro -->
-      <div class="tsb-stack tsb-stack--16">
+      <div class="tsb-stack tsb-stack--8">
         <h1 class="tsb-h1" data-tsb="framework-label">TEDI</h1>
         <p class="tsb-lead">Live Storybook builds for <span data-tsb="framework-label">TEDI</span>: the Main and RC releases, plus every branch still in development.</p>
       </div>
 
       <!-- Callout: how a component reaches you -->
-      <section class="tsb-callout tsb-stack tsb-stack--16">
-        <h2 class="tsb-h3">How a component reaches you</h2>
-        <p class="tsb-lead">New components are published to Release candidate (RC) first so teams can try them early. Once a month they graduate to Main.</p>
+      <section class="tsb-callout tsb-stack tsb-stack--8">
+        <p class="tsb-lead"><b>Development cycle</b></p>
         <div class="tsb-stepper">
           <div class="tsb-step">
             <span class="tsb-step__num">1</span>
@@ -365,15 +373,15 @@
       <!-- Main -->
       <section class="tsb-stack tsb-stack--8">
         <h2 class="tsb-h3">Main</h2>
-        <p class="tsb-lead">Everything here is final and won't change unexpectedly &mdash; the safe default to build against in production. It's updated every month on the last Thursday, when everything in RC is merged in.
-        <br /><b>PS:</b> the release day is subject to change (e.g. lands on a public holiday)</p>
+        <p class="tsb-lead">Everything here is final and won't change unexpectedly &mdash; the safe default to build against in production. It's updated every month on the last Thursday, when everything in RC is merged in.</p>
+        <p class="tsb-note"><b>PS:</b> the release day is subject to change (e.g. lands on a public holiday)</p>
         <div id="tsb-main-card"></div>
       </section>
 
       <!-- Release candidate -->
       <section class="tsb-stack tsb-stack--8">
         <h2 class="tsb-h3">Release candidate</h2>
-        <p class="tsb-lead">Components are ready to use, but the API can still change before release. Ideal for trying new components early and sending feedback.</p>
+        <p class="tsb-lead">Components are ready to use, but the API can still change before release. Ideal for trying new components early and sending feedback. Once a month, everything in RC graduates to Main.</p>
         <div id="tsb-rc-card"></div>
       </section>
 
