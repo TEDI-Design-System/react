@@ -72,6 +72,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - uses: actions/download-artifact@v4
@@ -102,7 +105,12 @@ jobs:
             fi
           done
           valid_branches="[${valid_branches::-1}]"
-          echo "$valid_branches" >> index.html
+          # Inject the data object the page renders: framework + main/rc versions &
+          # publish timestamps (from npm) + the valid branch list. Change "React" and the
+          # package name in the Angular repo; index.html / index_suffix.html stay identical.
+          node ../.github/workflows/pages-release-info.mjs "React" "@tedi-design-system/react" \
+            | jq -c --argjson branches "$valid_branches" '. + {branches: $branches}' \
+            >> index.html
           cat ../.github/workflows/index_suffix.html >> index.html
 
       - name: Upload artifact
