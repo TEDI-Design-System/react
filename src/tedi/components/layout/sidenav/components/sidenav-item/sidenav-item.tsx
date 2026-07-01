@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
-import Collapse from '../../../../buttons/collapse/collapse';
+import Collapse from '../../../../content/collapse/collapse';
 import Link, { LinkProps } from '../../../../navigation/link/link';
 import { Tooltip } from '../../../../overlays/tooltip';
 import { SideNavItemSize } from '../../sidenav';
@@ -116,17 +116,6 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     setIsCollapsedInternal(isOpen);
   };
 
-  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setIsCollapsedInternal((v) => {
-        const next = !v;
-        handleCollapseToggle(next);
-        return next;
-      });
-    }
-  };
-
   const isLinkedParent = hasChildren && (rest.href || rest.to);
 
   const linkProps = {
@@ -203,6 +192,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
               <Collapse
                 id={collapseId}
                 hideCollapseText
+                inverted
                 open={isCollapsedInternal}
                 onToggle={handleCollapseToggle}
                 toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
@@ -210,6 +200,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                   children,
                 })}
                 className={styles['tedi-sidenav__collapse']}
+                titleRowProps={{ element: 'span' }}
               >
                 {renderChildren()}
               </Collapse>
@@ -219,9 +210,12 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
           <Collapse
             id={collapseId}
             hideCollapseText
+            inverted
+            fullRowToggle
             open={isCollapsedInternal}
             onToggle={handleCollapseToggle}
             className={styles['tedi-sidenav__collapse']}
+            titleRowProps={{ element: 'span' }}
             toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
               isCollapsedInternal,
               children,
@@ -232,11 +226,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                   styles['tedi-sidenav__link'],
                   isCollapsedInternal && styles['tedi-sidenav__link--active']
                 )}
-                role="button"
-                aria-expanded={isCollapsedInternal}
-                aria-controls={collapseId}
                 aria-current={isActive ? 'page' : undefined}
-                onKeyDown={handleTitleKeyDown}
               >
                 {icon && getIcon(icon)}
                 <span className={styles['tedi-sidenav__title']}>{children}</span>

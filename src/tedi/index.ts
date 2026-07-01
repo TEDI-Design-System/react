@@ -22,7 +22,7 @@ export * from './components/buttons/card-button/card-button';
 export * from './components/buttons/info-button/info-button';
 export * from './components/buttons/floating-button/floating-button';
 export * from './components/buttons/button-group/button-group';
-export * from './components/buttons/collapse/collapse';
+export * from './components/content/collapse/collapse';
 export * from './components/buttons/collapse-button/collapse-button';
 export * from './components/layout/vertical-spacing';
 export * from './components/layout/grid';

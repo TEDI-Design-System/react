@@ -1,0 +1,13 @@
+.tedi-collapse__content {
+  min-height: 0;
+  margin-top: var(--tedi-dimensions-05);
+}
+
+.tedi-collapse__header--clickable {
+  cursor: pointer;
+}
+
+.tedi-collapse__header [data-name='col']:last-child {
+  display: flex;
+  align-items: center;
+}

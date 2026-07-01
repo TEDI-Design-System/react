@@ -3,10 +3,8 @@ import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
-import { useLabels } from '../../../providers/label-provider';
 import { usePrint } from '../../../providers/printing-provider/printing-provider';
-import { Icon } from '../../base/icon/icon';
-import { Text } from '../../base/typography/text/text';
+import { CollapseButton } from '../../buttons/collapse-button/collapse-button';
 import { Col, Row, RowProps } from '../../layout/grid';
 import Print from '../../misc/print/print';
 import styles from './collapse.module.scss';
@@ -37,8 +35,10 @@ type CollapseBreakpointProps = {
    * Custom class name for the root element
    */
   className?: string;
-  /*
-   * Display toggle arrow as default or secondary button style
+  /**
+   * Visual style of the toggle chevron, intended for icon-only toggles:
+   * `secondary` wraps the chevron in a bordered secondary button, `default` renders a plain arrow.
+   * @default default
    */
   arrowType?: 'default' | 'secondary';
   /**
@@ -46,7 +46,7 @@ type CollapseBreakpointProps = {
    * @default default
    */
   size?: 'default' | 'small';
-  /*
+  /**
    * Display underline below the title
    * @default true
    */
@@ -65,6 +65,14 @@ type CollapseBreakpointProps = {
    * @default false
    */
   inverted?: boolean;
+  /**
+   * Make the whole header row (title included) toggle on click, not just the chevron button.
+   * The chevron button stays the keyboard / screen-reader control; this only adds a mouse click
+   * target across the row. Clicks on interactive elements inside the title (links, buttons) are
+   * ignored, so they keep working.
+   * @default false
+   */
+  fullRowToggle?: boolean;
 };
 
 export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps> {
@@ -121,13 +129,12 @@ export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps
 
 export const Collapse = (props: CollapseProps): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { getLabel } = useLabels();
   const {
     id,
     children,
     className,
-    openText = getLabel('open'),
-    closeText = getLabel('close'),
+    openText,
+    closeText,
     hideCollapseText = false,
     title,
     titleRowProps,
@@ -141,6 +148,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     iconOnly = false,
     controlsId,
     inverted = false,
+    fullRowToggle = false,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -150,104 +158,73 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
   const contentId = `${id}__content`;
   const animateId = `${id}__animate`;
 
-  const [isOpenState, setIsOpen] = React.useState(() => defaultOpen);
+  const [isOpenState, setIsOpen] = React.useState(() => defaultOpen ?? false);
   const isPrint = usePrint();
-
-  const isOpen = React.useMemo(
-    () => isPrint || (open !== undefined ? open : isOpenState),
-    [isPrint, open, isOpenState]
-  );
+  const isOpen = isPrint || (open !== undefined ? open : isOpenState);
 
   const isIconOnly = iconOnly === true && !title;
-  const isInverted = inverted && arrowType !== 'secondary';
 
-  const CollapseBEM = cn(
-    styles['tedi-collapse'],
-    size === 'small' && styles['tedi-collapse--small'],
-    isOpen && styles['tedi-collapse--is-open'],
-    isIconOnly && styles['tedi-collapse--icon-only'],
-    isInverted && styles['tedi-collapse--inverted'],
-    styles[`tedi-collapse--arrow-${arrowType}`],
-    className
-  );
+  const headerRef = React.useRef<HTMLDivElement>(null);
 
-  const handleClick = () => {
-    const newOpenState = !isOpen;
-    setIsOpen(newOpenState);
-    onToggle?.(newOpenState);
+  const handleToggle = (next: boolean): void => {
+    setIsOpen(next);
+    onToggle?.(next);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
-      e.preventDefault();
-      handleClick();
-    }
-  };
+  const toggleRef = React.useRef(handleToggle);
+  toggleRef.current = handleToggle;
+  const isOpenRef = React.useRef(isOpen);
+  isOpenRef.current = isOpen;
 
-  const accessibleName = toggleLabel ? toggleLabel : isOpen ? closeText : openText;
+  React.useEffect(() => {
+    const element = headerRef.current;
+    if (!fullRowToggle || !element) return undefined;
 
-  const renderContent = React.useMemo(
-    () => (
-      <div id={contentId} role="region" aria-labelledby={triggerId} className={styles['tedi-collapse__content']}>
-        {children}
-      </div>
-    ),
-    [children, contentId, triggerId]
+    const onClick = (event: MouseEvent): void => {
+      if ((event.target as HTMLElement).closest('a, button, input, select, textarea, label')) return;
+      toggleRef.current(!isOpenRef.current);
+    };
+
+    element.addEventListener('click', onClick);
+    return () => element.removeEventListener('click', onClick);
+  }, [fullRowToggle]);
+
+  const renderContent = (
+    <div id={contentId} role="region" aria-labelledby={triggerId} className={styles['tedi-collapse__content']}>
+      {children}
+    </div>
   );
 
   return (
-    <div data-name="collapse" {...rest} className={CollapseBEM}>
-      <button
-        id={triggerId}
-        type="button"
-        data-name="collapse-trigger"
-        className={styles['tedi-collapse__title']}
-        aria-label={accessibleName}
-        aria-expanded={isOpen}
-        aria-controls={isExternallyControlled ? controlsId : contentId}
-        onKeyDown={handleKeyDown}
-        onClick={handleClick}
+    <div data-name="collapse" {...rest} className={cn(styles['tedi-collapse'], className)}>
+      <div
+        ref={headerRef}
+        className={cn(styles['tedi-collapse__header'], {
+          [styles['tedi-collapse__header--clickable']]: fullRowToggle,
+        })}
       >
-        <Row justifyContent="between" alignItems="center" wrap="nowrap" {...titleRowProps} element="span">
-          {title && <Col aria-hidden="true">{title}</Col>}
+        <Row justifyContent="between" alignItems="center" wrap="nowrap" {...titleRowProps}>
+          {title && <Col>{title}</Col>}
           <Col width="auto">
-            <Row element="span" alignItems="center" gutter={0} wrap="nowrap">
-              <Print visibility="hide">
-                <Col width="auto" className={cn({ 'visually-hidden': hideCollapseText })}>
-                  <Text
-                    element="span"
-                    className={cn(styles['tedi-collapse__text'], {
-                      [styles['tedi-collapse__text--underline']]: underline,
-                    })}
-                  >
-                    {isOpen ? closeText : openText}
-                  </Text>
-                </Col>
-              </Print>
-              <Col width="auto">
-                <div
-                  className={cn(
-                    styles['tedi-collapse__icon-wrapper'],
-                    styles[`tedi-collapse__icon-wrapper--${arrowType}`],
-                    size === 'small' && styles['tedi-collapse__icon-wrapper--small']
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      styles['tedi-collapse__icon'],
-                      styles[`tedi-collapse__icon--${arrowType}`],
-                      size === 'small' && styles['tedi-collapse__icon--small']
-                    )}
-                    name="expand_more"
-                    color="inherit"
-                    size={size === 'small' || arrowType === 'secondary' ? 18 : 24}
-                  />
-                </div>
-              </Col>
-            </Row>
+            <Print visibility="hide">
+              <CollapseButton
+                id={triggerId}
+                open={isOpen}
+                onOpenChange={handleToggle}
+                openText={openText}
+                closeText={closeText}
+                hideText={hideCollapseText || isIconOnly}
+                arrowType={arrowType}
+                size={size}
+                inverted={inverted}
+                underline={underline}
+                aria-controls={isExternallyControlled ? controlsId : contentId}
+                {...(toggleLabel ? { 'aria-label': toggleLabel } : {})}
+              />
+            </Print>
           </Col>
         </Row>
-      </button>
+      </div>
 
       {!isExternallyControlled &&
         (isPrint ? (
