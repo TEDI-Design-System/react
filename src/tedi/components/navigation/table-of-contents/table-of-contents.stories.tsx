@@ -344,7 +344,10 @@ export const StickyInLayout: Story = {
       <>
         <Row alignItems="start">
           <Col xs={12} md={8}>
-            <div ref={scrollRef} style={isMobile ? undefined : { maxHeight: '24rem', overflowY: 'auto' }}>
+            <div
+              ref={scrollRef}
+              style={isMobile ? { paddingBottom: '5rem' } : { maxHeight: '24rem', overflowY: 'auto' }}
+            >
               <VerticalSpacing size={1.5}>
                 {sections.map((label, index) => (
                   <section key={label} id={`sec-${index + 1}`} tabIndex={-1}>
