@@ -1,3 +1,15 @@
+# [18.0.0-rc.31](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.30...react-18.0.0-rc.31) (2026-07-01)
+
+
+### Features
+
+* **collapse:** use CollapseButton, title no longer toggles, refactor Footer, Sidenav and Table [#122](https://github.com/TEDI-Design-System/react/issues/122) ([#700](https://github.com/TEDI-Design-System/react/issues/700)) ([8105575](https://github.com/TEDI-Design-System/react/commit/8105575cfa7a4bde8f87b62cd2fb56b53a5d8c30)), closes [#687](https://github.com/TEDI-Design-System/react/issues/687) [#687](https://github.com/TEDI-Design-System/react/issues/687) [#687](https://github.com/TEDI-Design-System/react/issues/687)
+
+
+### BREAKING CHANGES
+
+* **collapse:** Collapse title no longer toggles; use `fullRowToggle` for whole-row click.
+
 # [18.0.0-rc.30](https://github.com/TEDI-Design-System/react/compare/react-18.0.0-rc.29...react-18.0.0-rc.30) (2026-07-01)
 
 
