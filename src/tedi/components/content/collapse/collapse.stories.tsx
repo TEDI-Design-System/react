@@ -6,15 +6,9 @@ import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Collapse from './collapse';
 
-/**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.0.4-(work-in-progress)?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/9469bf-collapse" target="_BLANK">Zeroheight ↗</a>
- *
- * The toggle is a `CollapseButton`; clicking it (not the title) expands/collapses the content.
- */
 const meta: Meta<typeof Collapse> = {
   component: Collapse,
-  title: 'Tedi-ready/Components/Buttons/Collapse',
+  title: 'TEDI-Ready/Content/Collapse',
   parameters: {
     status: {
       type: [
@@ -31,13 +25,16 @@ const meta: Meta<typeof Collapse> = {
     },
   },
   decorators: [
-    // Estonian examples → surface the Estonian "Ava" / "Sulge" toggle labels by default.
     (Story) => (
       <LabelProvider locale="et">
         <Story />
       </LabelProvider>
     ),
   ],
+  argTypes: {
+    title: { control: false },
+    children: { control: false },
+  },
 };
 
 export default meta;

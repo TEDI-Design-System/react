@@ -4,9 +4,9 @@ import AnimateHeight from 'react-animate-height';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { usePrint } from '../../../providers/printing-provider/printing-provider';
+import { CollapseButton } from '../../buttons/collapse-button/collapse-button';
 import { Col, Row, RowProps } from '../../layout/grid';
 import Print from '../../misc/print/print';
-import { CollapseButton } from '../collapse-button/collapse-button';
 import styles from './collapse.module.scss';
 
 type CollapseBreakpointProps = {
@@ -35,8 +35,10 @@ type CollapseBreakpointProps = {
    * Custom class name for the root element
    */
   className?: string;
-  /*
-   * Display toggle arrow as default or secondary button style
+  /**
+   * Visual style of the toggle chevron, intended for icon-only toggles:
+   * `secondary` wraps the chevron in a bordered secondary button, `default` renders a plain arrow.
+   * @default default
    */
   arrowType?: 'default' | 'secondary';
   /**
@@ -44,7 +46,7 @@ type CollapseBreakpointProps = {
    * @default default
    */
   size?: 'default' | 'small';
-  /*
+  /**
    * Display underline below the title
    * @default true
    */

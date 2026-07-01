@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
-import Collapse from '../../../../buttons/collapse/collapse';
+import Collapse from '../../../../content/collapse/collapse';
 import Link, { LinkProps } from '../../../../navigation/link/link';
 import { Tooltip } from '../../../../overlays/tooltip';
 import { SideNavItemSize } from '../../sidenav';
