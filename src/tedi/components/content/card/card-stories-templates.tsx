@@ -357,7 +357,7 @@ export const AlternativeCardsTemplate: StoryFn<CardStory> = (_args) => (
             <Row>
               <Col>
                 <Text modifiers="bold">Pealkiri</Text>
-                <Text color="secondary">Näiteks elundidoonorlus ja vereüekanne</Text>
+                <Text color="secondary">Näiteks elundidoonorlus ja vereülekanne</Text>
                 <Separator spacing={1.5} />
                 <Button visualType="secondary">Vaata tahteavaldusi</Button>
               </Col>
