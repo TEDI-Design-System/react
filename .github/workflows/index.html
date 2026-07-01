@@ -288,6 +288,11 @@
       border-color: var(--status-badge-border-warning);
       color: var(--status-badge-text-warning);
     }
+    .tsb-badge--neutral {
+      background: var(--status-badge-background-neutral);
+      border-color: var(--status-badge-border-neutral);
+      color: var(--status-badge-text-neutral);
+    }
 
     /* ---- Separator ------------------------------------------------------- */
     .tsb-separator {
@@ -476,12 +481,23 @@
     }
 
     // In-development card: branch name + "In progress" badge
-    function branchCard(name) {
+    // Badge derived from the branch prefix. Colours are provisional pending design sign-off.
+    function branchBadge(name) {
+      var n = String(name).toLowerCase();
+      if (n.indexOf("feat/") === 0 || n.indexOf("feature/") === 0) return { label: "Feature", variant: "brand" };
+      if (n.indexOf("fix/") === 0 || n.indexOf("bugfix/") === 0 || n.indexOf("hotfix/") === 0) return { label: "Bugfix", variant: "warning" };
+      return { label: "Other", variant: "neutral" };
+    }
+
+    function branchCard(name, updated) {
+      var meta = updated ? '<span class="tsb-card__meta">Last update: ' + esc(updated) + "</span>" : "";
+      var badge = branchBadge(name);
       return el(
         '<a class="tsb-card" href="./' + esc(name) + '/">' +
           '<span class="tsb-card__body">' +
             '<span class="tsb-card__title tsb-card__grow">' + esc(name) + "</span>" +
-            '<span class="tsb-badge tsb-badge--warning">In progress</span>' +
+            meta +
+            '<span class="tsb-badge tsb-badge--' + badge.variant + '">' + esc(badge.label) + "</span>" +
           "</span>" +
           '<span class="tsb-card__arrow">' + ICON_ARROW + "</span>" +
         "</a>"
@@ -522,11 +538,12 @@
 
       var devRoot = document.getElementById("tsb-dev-list");
       if (devRoot) {
+        var updatedMap = data.branchUpdated || {};
         var dev = branches.filter(function (b) { return b !== "main" && b !== "rc"; });
         if (dev.length === 0) {
           devRoot.appendChild(el('<p class="tsb-empty">No feature or fix branches are currently in development.</p>'));
         } else {
-          dev.forEach(function (name) { devRoot.appendChild(branchCard(name)); });
+          dev.forEach(function (name) { devRoot.appendChild(branchCard(name, updatedMap[name])); });
         }
       }
 
