@@ -1307,6 +1307,36 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### TableOfContents
+Navigational TOC for long pages / multistep forms. **Compound API** — composed from `TableOfContents.Item` children; nest items by placing `Item`s inside an `Item` (alongside its link). Renders a (optionally sticky) card. Mark the current section with `activeId` for the left accent bar + active link colour; the active branch auto-expands its nested items. For small viewports there's a separate `TableOfContents.Collapsible` (bottom bar + bottom-sheet overlay) — render it instead of the card on mobile (e.g. via `ShowAt`/`HideAt`).
+
+- `<TableOfContents>` props: `heading?: string | null` (default LabelProvider `table-of-contents.title`; pass `null` for a **headless** list — no visible heading, `nav` still gets the localised `aria-label`), `variant?: 'default' | 'transparent' = 'default'` (`transparent` drops the card border/background and shows a continuous grey left rail — the active item's segment turns blue), `padding?: number` (inner container padding in rem; defaults to the card's medium padding token), `activeId?`, `numbered?` (ordered list with auto hierarchical numbers `1.` / `2.` / `2.1`), `showIcons?` (multistep-form validation glyphs — see below), `sticky?: boolean = true`, `className?`. Children must be `TableOfContents.Item` elements (direct children — don't wrap them in another component).
+- `<TableOfContents.Collapsible heading? activeId? showIcons? numbered? sticky? className>` — mobile variant. A bar (`heading` + an "open" link) that reveals the same list in a bottom-sheet `Modal` (dimmed backdrop, Escape / backdrop to dismiss). Takes the same `TableOfContents.Item` children. `sticky?: boolean = true` pins the bar to the bottom of the viewport (`position: fixed`); set `false` to render it inline in normal flow. No `variant`/`padding` (it's not a card). Show it only on small screens; keep the desktop `<TableOfContents>` card for wider ones.
+- `<TableOfContents.Item id? isValid? separator? hideIcon?>` — its non-`Item` children are the link / label; nested `TableOfContents.Item` children become its sub-items.
+  - For a **leading icon**, put it on the item's `Link` (`<Link iconLeft="…">`) so it shares the link's colour and hover / active states — there is no separate item-level icon prop.
+  - `isValid?: boolean` — with `showIcons`, drives the per-item glyph (`true` → valid check, `false` → warning, omitted → not-completed).
+  - `separator?: boolean = false` — render a `Separator` line below the item, e.g. to group sections.
+  - `hideIcon?: boolean = false` — hide this item's validation glyph even when `showIcons` is on (e.g. for a heading-only row).
+- `showIcons` glyphs are distinguished by **shape, not colour alone** (WCAG 1.4.1) and carry a localised text alternative (1.1.1): `isValid === true` → `check` (success) "Valid"; `isValid === false` → `warning` (danger) "Invalid"; `isValid === undefined` → `radio_button_unchecked` (tertiary) "Not completed".
+- Semantics: `<nav aria-labelledby>` (or `aria-label` from `table-of-contents.title` when headingless) + `<ul>`/`<ol>` + `<li>`, active item `aria-current="true"`. **Never uses `role="tree"`/`treeitem`.** Provide the item link/button yourself; pass **`underline={false}` on the `Link`** so it matches the design (no underline at rest, underline on hover). Use matching `id`s on the in-page sections (and `tabIndex={-1}` on them for SR focus).
+- When `sticky` (default), the card is capped to the viewport (`max-height: calc(100dvh - 3rem)`) and scrolls internally, so every item stays reachable when it's taller than the viewport (e.g. narrow widths at high zoom — WCAG 1.4.10 Reflow).
+
+```tsx
+<TableOfContents activeId="analysis" heading="Contents">
+  <TableOfContents.Item id="intro">
+    <Link href="#intro" underline={false}>Intro</Link>
+  </TableOfContents.Item>
+  <TableOfContents.Item id="methods">
+    <Link href="#methods" underline={false}>Methods</Link>
+    <TableOfContents.Item id="analysis">
+      <Link href="#analysis" underline={false}>Analysis</Link>
+    </TableOfContents.Item>
+  </TableOfContents.Item>
+</TableOfContents>
+```
+
+Variants: add `numbered` for an ordered list with auto hierarchical numbers (`1.` / `2.1`); for a multistep form, set `showIcons` and give each `TableOfContents.Item` an `isValid` for its per-step validation glyph (see the props above).
+
 ### HorizontalStepper
 
 **Props:** `HorizontalStepperProps` | fRef
@@ -1790,10 +1820,10 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
 
-### TableOfContents
-
+### TableOfContents — **⚠️ DEPRECATED** (use TEDI-Ready `TableOfContents`)
+- Superseded by the TEDI-Ready component (import from `/tedi`), which adds `activeId` active-section highlighting and hierarchical `numbered` lists. (The TEDI-Ready version is desktop-only for now — its responsive mobile variant is pending a TEDI-Ready `Accordion`; this community one still uses a mobile Modal.)
 - `items: TableOfContentsItemProps[]`, `heading?`, `open?`, `defaultOpen?`
-- `showIcons?: boolean`, `breakToMobile?: boolean`
+- `showIcons?: boolean`, `breakToMobile?: Layouts`
 
 ## Overlay
 

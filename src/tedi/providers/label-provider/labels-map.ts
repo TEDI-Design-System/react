@@ -919,6 +919,27 @@ export const labelsMap = validateDefaultLabels({
     en: (count: string | number) => `${count} invalid`,
     ru: (count: string | number) => `${count} неверный`,
   },
+  'table-of-contents.step-valid': {
+    description: 'Accessible label for the validation icon of a completed (valid) step',
+    components: ['TableOfContents'],
+    et: 'Korrektne',
+    en: 'Valid',
+    ru: 'Действительно',
+  },
+  'table-of-contents.step-invalid': {
+    description: 'Accessible label for the validation icon of an invalid step',
+    components: ['TableOfContents'],
+    et: 'Vajab parandamist',
+    en: 'Invalid',
+    ru: 'Неверный',
+  },
+  'table-of-contents.step-incomplete': {
+    description: 'Accessible label for the validation icon of a step that has not been completed yet',
+    components: ['TableOfContents'],
+    et: 'Täitmata',
+    en: 'Not completed',
+    ru: 'Не заполнено',
+  },
   'truncate.see-more': {
     description: 'See more button label',
     components: ['Truncate'],
