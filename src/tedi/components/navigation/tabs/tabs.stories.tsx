@@ -5,7 +5,7 @@ import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { ButtonGroup } from '../../buttons/button-group/button-group';
-import { CardContent } from '../../cards/card/card-content/card-content';
+import { CardContent } from '../../content/card/card-content/card-content';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Ellipsis } from '../../misc/ellipsis/ellipsis';

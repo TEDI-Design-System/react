@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
-import { Card, CardContent } from '../../cards/card';
+import { Card, CardContent } from '../../content/card';
 import { Affix } from '../../misc/affix/affix';
 import { TableOfContentsCollapsible } from './components/table-of-contents-collapsible/table-of-contents-collapsible';
 import {
