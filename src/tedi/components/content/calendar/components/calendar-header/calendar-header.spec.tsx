@@ -153,6 +153,23 @@ describe('CalendarHeader', () => {
     expect(onOpenYearGrid).toHaveBeenCalledTimes(1);
   });
 
+  it('renders a static, non-clickable month/year label when monthYearSelectType = "static"', () => {
+    render(<CalendarHeader {...defaultProps} monthYearSelectType="static" showNavigation localeCode="et" />);
+
+    expect(screen.getByText(/juuli/i)).toBeInTheDocument();
+    expect(screen.getByText('2025')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /juuli/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /2025/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('tedi-icon-arrow_drop_down')).not.toBeInTheDocument();
+  });
+
+  it('keeps prev/next navigation buttons in "static" mode', () => {
+    render(<CalendarHeader {...defaultProps} monthYearSelectType="static" showNavigation />);
+
+    expect(screen.getByRole('button', { name: /eelmine/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /järgmine/i })).toBeInTheDocument();
+  });
+
   it('shows correct Estonian month name', () => {
     render(
       <CalendarHeader

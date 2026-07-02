@@ -50,6 +50,7 @@
 .tedi-calendar__month-year-label {
   display: flex;
   gap: var(--layout-grid-gutters-08);
+  font-weight: 500;
   color: var(--general-text-primary);
   text-transform: capitalize;
 }

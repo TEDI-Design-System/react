@@ -2,10 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { et } from 'react-day-picker/locale';
 
+import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { CalendarView } from '../../form/date-field/date-field';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { StatusIndicator } from '../../tags/status-indicator';
 import { Calendar, CalendarProps } from './calendar';
 
 /**
@@ -268,6 +270,84 @@ export const WithWeeksCount: Story = {
       <CalendarTemplate showWeekNumber numberOfMonths={2} />
     </VerticalSpacing>
   ),
+};
+
+/**
+ * Set `fullWidth` and wrap the calendar in a sized container — it fills that
+ * width and scales its cells (and rows) to match. The container's width drives
+ * the size.
+ */
+export const FullWidthSizes: Story = {
+  render: () => {
+    const sizes = [
+      { label: 'Medium — 480px', width: 480 },
+      { label: 'Large — 640px', width: 640 },
+      { label: 'Extra large — 800px', width: 800 },
+    ];
+
+    return (
+      <VerticalSpacing size={2}>
+        {sizes.map(({ label, width }) => (
+          <VerticalSpacing size={0.5} key={width}>
+            <Text color="secondary" modifiers="small">
+              {label}
+            </Text>
+            <div style={{ width: '100%', maxWidth: `${width}px` }}>
+              <CalendarTemplate fullWidth monthYearSelectType="static" showNavigation={false} />
+            </div>
+          </VerticalSpacing>
+        ))}
+      </VerticalSpacing>
+    );
+  },
+};
+
+/**
+ * Set `monthYearSelectType="static"` to disable month/year selection: the header
+ * shows the month and year as a plain, non-clickable label. The user can only
+ * change the month via the prev/next navigation buttons — there is no dropdown
+ * or drill-down grid.
+ */
+export const StaticMonthYear: Story = {
+  render: () => <CalendarTemplate monthYearSelectType="static" />,
+};
+
+/**
+ * Pass a `dayStatus` function `(date) => { type, label }` to overlay a
+ * `StatusIndicator` dot on specific days. The `label` is folded into the day
+ * button's `aria-label` so screen readers announce the status alongside the date
+ * (the dot itself stays `aria-hidden`, satisfying WCAG 1.1.1). Pair the calendar
+ * with a legend in the footer so colourblind users can decode the indicator
+ * colours (WCAG 1.4.1 — colour is not the only cue).
+ */
+export const WithDayStatus: Story = {
+  render: () => {
+    const today = new Date();
+    const day = (offset: number) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
+
+    const statusByDate = new Map(
+      [day(-2), day(4), day(10)].map((date) => [date.toDateString(), 'Confirmed appointment'])
+    );
+
+    const dayStatus: CalendarProps['dayStatus'] = (date) => {
+      const label = statusByDate.get(date.toDateString());
+      return label ? { type: 'success', label } : null;
+    };
+
+    return (
+      <CalendarTemplate
+        dayStatus={dayStatus}
+        footer={
+          <Row>
+            <Col width="auto" className="flex align-items-center gap-2">
+              <StatusIndicator type="success" size="sm" hasBorder />
+              Confirmed
+            </Col>
+          </Row>
+        }
+      />
+    );
+  },
 };
 
 export const MonthView: Story = {

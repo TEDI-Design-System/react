@@ -22,6 +22,52 @@
     border-radius: 0;
   }
 
+  &--full-width {
+    width: 100%;
+
+    .tedi-calendar__month {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .tedi-calendar__weekday,
+    .tedi-calendar__week-number,
+    .tedi-calendar__day {
+      width: auto;
+      height: auto;
+    }
+
+    .tedi-calendar__day button,
+    .tedi-calendar__weekday-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: var(--form-calendar-date-width);
+      height: auto;
+      min-height: var(--form-calendar-date-width);
+      aspect-ratio: 1 / 1;
+      margin: 0;
+    }
+
+    .tedi-calendar__today button {
+      position: relative;
+      border: none;
+
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: var(--form-calendar-date-width);
+        height: var(--form-calendar-date-width);
+        content: '';
+        border: var(--tedi-borders-01) solid var(--form-datepicker-today-border);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+
   table {
     width: 100%;
     border-spacing: 0;
@@ -71,11 +117,11 @@
 
     button {
       all: unset;
+      position: relative;
       display: block;
       width: 100%;
       width: var(--form-calendar-date-width);
       height: var(--form-calendar-date-width);
-      overflow: hidden;
       font-size: var(--body-regular-size);
       font-weight: var(--tedi-weight-02);
       color: var(--general-text-primary);
@@ -97,6 +143,13 @@
       cursor: auto;
       background: unset;
     }
+  }
+
+  &__day-status {
+    position: absolute;
+    top: var(--tedi-borders-02);
+    right: 0;
+    pointer-events: none;
   }
 
   &__today {
@@ -210,6 +263,11 @@
     background: none;
     border: none;
     border-radius: 0;
+  }
+
+  &.tedi-calendar--full-width {
+    width: 100%;
+    max-width: none;
   }
 }
 

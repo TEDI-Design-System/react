@@ -8,6 +8,7 @@ import '@testing-library/jest-dom';
 const mockDayPickerProps: { current: any } = { current: null };
 
 jest.mock('react-day-picker', () => ({
+  ...jest.requireActual('react-day-picker'),
   DayPicker: (props: any) => {
     mockDayPickerProps.current = props;
     const MonthCaption = props.components?.MonthCaption;
@@ -189,6 +190,18 @@ describe('Calendar', () => {
     expect(dayPicker).toHaveClass('custom-class');
   });
 
+  it('does not apply the full-width modifier by default', () => {
+    render(<Calendar {...baseProps} />);
+
+    expect(screen.getByTestId('day-picker')).not.toHaveClass('tedi-calendar--full-width');
+  });
+
+  it('applies the full-width modifier class when fullWidth is set', () => {
+    render(<Calendar {...baseProps} fullWidth />);
+
+    expect(screen.getByTestId('day-picker')).toHaveClass('tedi-calendar--full-width');
+  });
+
   it('applies disabled matchers when provided', () => {
     const disabledMatchers = [(date: Date) => true];
 
@@ -330,6 +343,44 @@ describe('Calendar', () => {
 
       expect(mockDayPickerProps.current.mode).toBe('single');
       expect(mockDayPickerProps.current.selected).toBeUndefined();
+    });
+  });
+
+  describe('dayStatus', () => {
+    const dayStatus = (date: Date) => (date.getDate() === 15 ? { type: 'success' as const, label: 'Available' } : null);
+
+    it('does not register a custom DayButton when dayStatus is omitted', () => {
+      render(<Calendar {...baseProps} />);
+
+      expect(mockDayPickerProps.current.components.DayButton).toBeUndefined();
+    });
+
+    it('overlays a StatusIndicator and appends the status label to aria-label for matching days', () => {
+      render(<Calendar {...baseProps} dayStatus={dayStatus} />);
+
+      const DayButton = mockDayPickerProps.current.components.DayButton;
+      const { container } = render(
+        <DayButton day={{ date: new Date(2025, 0, 15) }} modifiers={{}} aria-label="15 January 2025">
+          15
+        </DayButton>
+      );
+
+      expect(container.querySelector('[data-name="status-indicator"]')).toBeInTheDocument();
+      expect(container.querySelector('button')).toHaveAttribute('aria-label', '15 January 2025, Available');
+    });
+
+    it('renders a plain day button without an indicator for days that have no status', () => {
+      render(<Calendar {...baseProps} dayStatus={dayStatus} />);
+
+      const DayButton = mockDayPickerProps.current.components.DayButton;
+      const { container } = render(
+        <DayButton day={{ date: new Date(2025, 0, 16) }} modifiers={{}} aria-label="16 January 2025">
+          16
+        </DayButton>
+      );
+
+      expect(container.querySelector('[data-name="status-indicator"]')).not.toBeInTheDocument();
+      expect(container.querySelector('button')).toHaveAttribute('aria-label', '16 January 2025');
     });
   });
 
