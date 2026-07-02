@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { LinkBehaviour } from '../../anchor/anchor-helpers';
 import { Breadcrumbs } from './breadcrumbs';
@@ -6,6 +6,11 @@ import { Breadcrumbs } from './breadcrumbs';
 const meta: Meta<typeof Breadcrumbs> = {
   component: Breadcrumbs,
   title: 'Community/Layout/Breadcrumbs',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
   argTypes: {
     linkAs: {
       type: 'function',

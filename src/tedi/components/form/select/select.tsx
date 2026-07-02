@@ -18,6 +18,7 @@ import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form
 import { useLabels } from '../../../../tedi/providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { TextProps } from '../../base/typography/text/text';
+import { TagEllipsis } from '../../tags/tag/tag';
 import { useOptionalInputGroup } from '../input-group/input-group';
 import inputGroupStyles from '../input-group/input-group.module.scss';
 import {
@@ -185,6 +186,14 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    * @default 'stack'
    */
   tagsDirection?: 'stack' | 'row';
+  /**
+   * Truncate each selected tag's label when it is width-constrained, revealing
+   * the full text in a popover on hover/focus. `end` shows a trailing ellipsis
+   * (`Long label…`); `start` a leading one (`…label`). `false` never truncates —
+   * long labels wrap. Forwarded to each tag's `ellipsis` prop.
+   * @default false
+   */
+  tagsEllipsis?: TagEllipsis;
   /**
    * Layout for the dropdown menu.
    * - `"menu"` (default): vertical list of options.
@@ -451,6 +460,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       onBlur,
       inputIsHidden,
       isTagRemovable = false,
+      tagsEllipsis = false,
       backspaceRemovesValue = false,
       optionGroupHeadingText = { modifiers: 'small', color: 'tertiary' },
       cacheOptions = true,
@@ -655,7 +665,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
         Option: (props) => SelectOption({ renderOption, multiple, showRadioButtons, ...props }),
         Control: SelectControl,
         Input: SelectInput,
-        MultiValue: (props) => SelectMultiValue({ isTagRemovable, ...props }),
+        MultiValue: (props) => SelectMultiValue({ isTagRemovable, tagsEllipsis, ...props }),
         MultiValueRemove: SelectMultiValueRemove,
         SingleValue: SelectSingleValue,
         Group: SelectGroup,

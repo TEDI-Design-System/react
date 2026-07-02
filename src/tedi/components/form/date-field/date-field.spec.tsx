@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { et } from 'react-day-picker/locale';
@@ -570,5 +570,97 @@ describe('DateField component', () => {
     await user.click(day);
 
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('rejects a typed past date when disablePast is set (single mode)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} disablePast onSelect={onSelect} />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.1999');
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('rejects a typed future date when disableFuture is set (single mode)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} disableFuture onSelect={onSelect} />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.2099');
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('rejects a typed past date in the native picker when disablePast is set', () => {
+    const onSelect = jest.fn();
+    render(<DateField {...defaultProps} useNativePicker disablePast onSelect={onSelect} />);
+
+    const input = screen.getByLabelText('Birth date');
+    fireEvent.change(input, { target: { value: '1999-01-01' } });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('shows an error feedback message when the user types a disabled date', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} disablePast disabledDateErrorMessage="Date is in the past" />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.1999');
+    expect(screen.getByText('Date is in the past')).toBeInTheDocument();
+  });
+
+  it('clears the error feedback once the typed date becomes valid', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} disablePast disabledDateErrorMessage="Date is in the past" />);
+
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, '01.01.1999');
+    expect(screen.getByText('Date is in the past')).toBeInTheDocument();
+    await user.clear(input);
+    expect(screen.queryByText('Date is in the past')).not.toBeInTheDocument();
+  });
+
+  describe('modal picker', () => {
+    it('opens the calendar in a modal when `modal` is set (no popover)', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} modal initialMonth={new Date(2025, 5, 1)} />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button'));
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('commits the picked date on Confirm and closes the modal', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(<DateField {...defaultProps} modal onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByText('15'));
+      await user.click(within(dialog).getByRole('button', { name: 'date-field.confirm' }));
+
+      expect(onSelect).toHaveBeenCalled();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('discards the draft when the modal is cancelled', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(<DateField {...defaultProps} modal onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByText('15'));
+      await user.click(within(dialog).getByRole('button', { name: 'date-field.cancel' }));
+
+      expect(onSelect).not.toHaveBeenCalled();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
   });
 });

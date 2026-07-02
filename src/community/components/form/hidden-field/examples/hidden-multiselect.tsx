@@ -1,4 +1,4 @@
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-vite';
 import React from 'react';
 
 import { Col, Row } from '../../../../../tedi/components/layout/grid';

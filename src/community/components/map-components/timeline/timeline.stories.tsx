@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Link, VerticalSpacing } from '../../../../tedi';
 import Timeline from './timeline';

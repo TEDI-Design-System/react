@@ -81,14 +81,14 @@ export const labelsMap = validateDefaultLabels({
   },
   close: {
     description: 'Used for closing',
-    components: ['CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
+    components: ['Accordion', 'CloseButton', 'Collapse', 'Notification', 'FileUpload', 'Dropdown', 'Tooltip', 'Tabs'],
     et: 'Sulge',
     en: 'Close',
     ru: 'Закрыть',
   },
   open: {
     description: 'Used for opening',
-    components: ['Collapse'],
+    components: ['Accordion', 'Collapse'],
     et: 'Ava',
     en: 'Open',
     ru: 'Открыть',
@@ -107,12 +107,82 @@ export const labelsMap = validateDefaultLabels({
     en: 'Cancel',
     ru: 'Отмена',
   },
+  'date-field.modal-title': {
+    description: 'Title of the mobile date-picker modal opened by DateField (single mode)',
+    components: ['DateField'],
+    et: 'Vali kuupäev',
+    en: 'Pick a date',
+    ru: 'Выберите дату',
+  },
+  'date-field.modal-title-range': {
+    description: 'Title of the mobile date-picker modal opened by DateField in range mode',
+    components: ['DateField'],
+    et: 'Vali vahemik',
+    en: 'Pick a date range',
+    ru: 'Выберите период',
+  },
+  'date-field.modal-title-multiple': {
+    description: 'Title of the mobile date-picker modal opened by DateField in multiple mode',
+    components: ['DateField'],
+    et: 'Vali kuupäevad',
+    en: 'Pick dates',
+    ru: 'Выберите даты',
+  },
+  'date-field.cancel': {
+    description: 'Cancel button label inside the date-picker modal',
+    components: ['DateField'],
+    et: 'Tühista',
+    en: 'Cancel',
+    ru: 'Отмена',
+  },
+  'date-field.confirm': {
+    description: 'Confirm button label inside the date-picker modal',
+    components: ['DateField'],
+    et: 'Kinnita',
+    en: 'Confirm',
+    ru: 'Подтвердить',
+  },
+  'time-field.modal-title': {
+    description: 'Title of the mobile time-picker modal opened by TimeField',
+    components: ['TimeField'],
+    et: 'Kellaaeg',
+    en: 'Time',
+    ru: 'Время',
+  },
+  'time-field.cancel': {
+    description: 'Cancel button label inside the time-picker modal',
+    components: ['TimeField'],
+    et: 'Tühista',
+    en: 'Cancel',
+    ru: 'Отмена',
+  },
+  'time-field.confirm': {
+    description: 'Confirm button label inside the time-picker modal',
+    components: ['TimeField'],
+    et: 'Kinnita',
+    en: 'Confirm',
+    ru: 'Подтвердить',
+  },
   clear: {
     description: 'For clearing a value',
     components: ['TableFilter', 'TextField'],
     et: 'Tühjenda',
     en: 'Clear',
     ru: 'Очистить',
+  },
+  'filter.clear-selection': {
+    description: 'Clear-selection action shown in the Filter dropdown',
+    components: ['Filter'],
+    et: 'Tühjenda valik',
+    en: 'Clear selection',
+    ru: 'Очистить выбор',
+  },
+  'filter.select-all': {
+    description: 'Select-all checkbox shown in the multi-select Filter dropdown',
+    components: ['Filter'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
   },
   search: {
     description: 'For searching',
@@ -142,12 +212,54 @@ export const labelsMap = validateDefaultLabels({
     en: 'Breadcrumbs',
     ru: 'Навигационная цепочка',
   },
+  'breadcrumbs.show-more': {
+    description: 'Accessible label for the collapsed-crumbs ellipsis button',
+    components: ['Breadcrumbs'],
+    et: 'Näita peidetud lehti',
+    en: 'Show hidden pages',
+    ru: 'Показать скрытые страницы',
+  },
   'anchor.new-tab': {
     description: 'Label for when anchor opens in new tab',
     components: ['Anchor'],
     et: 'Avaneb uuel vahelehel',
     en: 'Opens in new tab',
     ru: 'Открывается в новой вкладке',
+  },
+  carousel: {
+    description: 'Accessible label for the carousel region',
+    components: ['Carousel'],
+    et: 'Karussell',
+    en: 'Carousel',
+    ru: 'Карусель',
+  },
+  'carousel.slide': {
+    description: 'Accessible label / live announcement for a slide, e.g. "Slide 2 of 5"',
+    components: ['Carousel'],
+    et: (current: number, total: number) => `Slaid ${current} / ${total}`,
+    en: (current: number, total: number) => `Slide ${current} of ${total}`,
+    ru: (current: number, total: number) => `Слайд ${current} из ${total}`,
+  },
+  'carousel.move-back': {
+    description: 'Accessible label for the previous-slide button',
+    components: ['Carousel'],
+    et: 'Eelmine slaid',
+    en: 'Previous slide',
+    ru: 'Предыдущий слайд',
+  },
+  'carousel.move-forward': {
+    description: 'Accessible label for the next-slide button',
+    components: ['Carousel'],
+    et: 'Järgmine slaid',
+    en: 'Next slide',
+    ru: 'Следующий слайд',
+  },
+  'carousel.show-slide': {
+    description: 'Accessible label for a slide indicator button, e.g. "Show slide 3"',
+    components: ['Carousel'],
+    et: (slide: number) => `Näita slaidi ${slide}`,
+    en: (slide: number) => `Show slide ${slide}`,
+    ru: (slide: number) => `Показать слайд ${slide}`,
   },
   'header.toggle': {
     description: 'Label for header toggle on mobile',
@@ -376,6 +488,35 @@ export const labelsMap = validateDefaultLabels({
     en: 'Close modal',
     ru: 'Закрыть модальное окно',
   },
+  'dateField.disabledDateError': {
+    description:
+      'Inline error shown when the user types a date that fails the disable matchers (`disablePast`, `disableFuture`, `minDate`, `maxDate`, `disabledMatchers`).',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Valitud kuupäev pole saadaval',
+    en: 'Selected date is not available',
+    ru: 'Выбранная дата недоступна',
+  },
+  'dateTimeField.timeHeading': {
+    description: 'Heading rendered above the time picker in DateTimeField',
+    components: ['DateTimeField'],
+    et: 'Kellaaeg',
+    en: 'Time',
+    ru: 'Время',
+  },
+  'dateTimeField.selectTime': {
+    description: 'Footer link in the multi-step DateTimeField calendar that advances to the time picker',
+    components: ['DateTimeField'],
+    et: 'Vali kellaaeg',
+    en: 'Select time',
+    ru: 'Выбрать время',
+  },
+  'dateTimeField.back': {
+    description: 'Back link in the multi-step DateTimeField time picker that returns to the calendar',
+    components: ['DateTimeField'],
+    et: 'Tagasi',
+    en: 'Back',
+    ru: 'Назад',
+  },
   'select.loading': {
     description: 'Text when select options are loading',
     components: ['select'],
@@ -389,6 +530,130 @@ export const labelsMap = validateDefaultLabels({
     et: 'Valikud puuduvad',
     en: 'No options',
     ru: 'Нет вариантов',
+  },
+  'table.no-data': {
+    description: 'Default placeholder shown in the Table body when `data` is empty.',
+    components: ['Table'],
+    et: 'Andmed puuduvad',
+    en: 'No data',
+    ru: 'Нет данных',
+  },
+  'table.expand-row': {
+    description: 'Accessible label on the expand toggle in expandable rows.',
+    components: ['Table'],
+    et: 'Laienda rida',
+    en: 'Expand row',
+    ru: 'Развернуть строку',
+  },
+  'table.collapse-row': {
+    description: 'Accessible label on the collapse toggle in expandable rows.',
+    components: ['Table'],
+    et: 'Ahenda rida',
+    en: 'Collapse row',
+    ru: 'Свернуть строку',
+  },
+  'table.filter-placeholder': {
+    description: 'Placeholder for the per-column filter inputs rendered under the header.',
+    components: ['Table'],
+    et: 'Filtreeri…',
+    en: 'Filter…',
+    ru: 'Фильтр…',
+  },
+  'table.filter-input': {
+    description: 'Accessible label for the per-column filter input. Receives the column label.',
+    components: ['Table'],
+    et: (columnLabel?: string) => `Filtreeri veergu ${columnLabel ?? ''}`.trim(),
+    en: (columnLabel?: string) => `Filter ${columnLabel ?? 'column'}`.trim(),
+    ru: (columnLabel?: string) => `Фильтр ${columnLabel ?? ''}`.trim(),
+  },
+  'table.row-details': {
+    description: 'Accessible label for the sub-component / disclosure panel of an expanded row.',
+    components: ['Table'],
+    et: 'Rea üksikasjad',
+    en: 'Row details',
+    ru: 'Сведения о строке',
+  },
+  'table.drag-row': {
+    description: 'Accessible label for the drag-handle button when `reorderableRows` is on.',
+    components: ['Table'],
+    et: 'Lohista rida',
+    en: 'Drag row',
+    ru: 'Перетащить строку',
+  },
+  'table.drag-column': {
+    description: 'Accessible label for the column drag-handle button when `reorderableColumns` is on.',
+    components: ['Table'],
+    et: (columnLabel: string) => `Lohista veergu ${columnLabel}`,
+    en: (columnLabel: string) => `Drag column ${columnLabel}`,
+    ru: (columnLabel: string) => `Перетащить столбец ${columnLabel}`,
+  },
+  'table.reorder.pickup': {
+    description: 'Live-region message when a column is picked up for keyboard reordering.',
+    components: ['Table'],
+    et: (columnLabel: string) =>
+      `Veerg ${columnLabel} on valitud. Kasuta vasak-/paremnoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
+    en: (columnLabel: string) =>
+      `Column ${columnLabel} picked up. Use Left/Right arrow to move, Space or Enter to drop.`,
+    ru: (columnLabel: string) =>
+      `Столбец ${columnLabel} взят. Используйте стрелки влево/вправо для перемещения, Пробел или Enter для подтверждения.`,
+  },
+  'table.reorder.move': {
+    description: 'Live-region message while a picked-up column is moved between positions.',
+    components: ['Table'],
+    et: (columnLabel: string, position: number) => `Veerg ${columnLabel} positsioonil ${position}.`,
+    en: (columnLabel: string, position: number) => `Column ${columnLabel} at position ${position}.`,
+    ru: (columnLabel: string, position: number) => `Столбец ${columnLabel} на позиции ${position}.`,
+  },
+  'table.reorder.drop': {
+    description: 'Live-region message when a column is dropped at its new position.',
+    components: ['Table'],
+    et: (columnLabel: string, position: number) => `Veerg ${columnLabel} paigutatud positsioonile ${position}.`,
+    en: (columnLabel: string, position: number) => `Column ${columnLabel} moved to position ${position}.`,
+    ru: (columnLabel: string, position: number) => `Столбец ${columnLabel} перемещён на позицию ${position}.`,
+  },
+  'table.reorder.cancel': {
+    description: 'Live-region message when column reordering is cancelled.',
+    components: ['Table'],
+    et: 'Veeru ümberjärjestamine tühistatud.',
+    en: 'Column reordering cancelled.',
+    ru: 'Перестановка столбцов отменена.',
+  },
+  'table.row-reorder.pickup': {
+    description: 'Live-region message when a row is picked up for keyboard reordering.',
+    components: ['Table'],
+    et: (position: number) =>
+      `Rida ${position} on valitud. Kasuta üles-/allanoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
+    en: (position: number) => `Row ${position} picked up. Use Up/Down arrow to move, Space or Enter to drop.`,
+    ru: (position: number) =>
+      `Строка ${position} взята. Используйте стрелки вверх/вниз для перемещения, Пробел или Enter для подтверждения.`,
+  },
+  'table.row-reorder.move': {
+    description: 'Live-region message while a picked-up row is moved between positions.',
+    components: ['Table'],
+    et: (position: number) => `Rida liigutatud positsioonile ${position}.`,
+    en: (position: number) => `Row moved to position ${position}.`,
+    ru: (position: number) => `Строка перемещена на позицию ${position}.`,
+  },
+  'table.row-reorder.drop': {
+    description: 'Live-region message when a row is dropped at its new position.',
+    components: ['Table'],
+    et: (position: number) => `Rida paigutatud positsioonile ${position}.`,
+    en: (position: number) => `Row dropped at position ${position}.`,
+    ru: (position: number) => `Строка размещена на позиции ${position}.`,
+  },
+  'table.row-reorder.cancel': {
+    description: 'Live-region message when row reordering is cancelled.',
+    components: ['Table'],
+    et: 'Ridade ümberjärjestamine tühistatud.',
+    en: 'Row reordering cancelled.',
+    ru: 'Перестановка строк отменена.',
+  },
+  'table.columns': {
+    description: 'Default label on the `Table.ColumnsMenu` trigger (column-visibility menu).',
+    components: ['TableColumnsMenu'],
+    et: 'Kohanda',
+    en: 'Customize',
+    ru: 'Настроить',
   },
   'select.select-all': {
     description: 'Label for the "Select all" toggle inside multi-select dropdown',
@@ -410,6 +675,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Lõpetamata',
     en: 'Not completed',
     ru: 'Не завершено',
+  },
+  'stepper.error': {
+    description: 'Label for screen-reader that this step has errors (visually hidden)',
+    components: ['StepperNav'],
+    et: 'Vigane',
+    en: 'Has errors',
+    ru: 'Содержит ошибки',
   },
   'skeleton.loading': {
     description: 'Announced by screen-readers when skeleton is loading',
@@ -454,11 +726,12 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Произошла ошибка при получении данных таблицы',
   },
   'table.filter': {
-    description: 'Label for filter toggle',
+    description:
+      'Label for a filter toggle / trigger. Optionally receives the column label so screen readers announce which column is filtered (e.g. "Filter Name"); called with no argument it returns the bare "Filter".',
     components: ['Table', 'TableFilter'],
-    et: 'Filtreeri',
-    en: 'Filter',
-    ru: 'Фильтровать',
+    et: (columnLabel?: string) => `Filtreeri${columnLabel ? ` veergu ${columnLabel}` : ''}`,
+    en: (columnLabel?: string) => `Filter${columnLabel ? ` ${columnLabel}` : ''}`,
+    ru: (columnLabel?: string) => `Фильтровать${columnLabel ? ` ${columnLabel}` : ''}`,
   },
   'table.filter.select-all': {
     description: 'Label for selecting all',
@@ -538,22 +811,33 @@ export const labelsMap = validateDefaultLabels({
     ru: (isSelected: boolean) => (isSelected ? 'Отменить выбор строки' : 'Выбрать ряд'),
   },
   'table.sort': {
-    description: 'Label for sort button',
+    description:
+      'Accessible label for a column sort button. Receives the current sort direction and, optionally, the column label so screen readers announce which column is sorted.',
     components: ['Table'],
-    et: (direction: 'asc' | 'desc' | false) =>
-      direction === 'asc'
-        ? 'Sorteeri kahanevalt'
+    et: (direction: 'asc' | 'desc' | false, columnLabel?: string) => {
+      const col = columnLabel ? ` veergu ${columnLabel}` : '';
+      return direction === 'asc'
+        ? `Sorteeri${col} kahanevalt`
         : direction === 'desc'
-        ? 'Eemalda sorteerimine'
-        : 'Sorteeri kasvavalt',
-    en: (direction: 'asc' | 'desc' | false) =>
-      direction === 'asc' ? 'Sort decending' : direction === 'desc' ? 'Remove sorting' : 'Sort ascending',
-    ru: (direction: 'asc' | 'desc' | false) =>
-      direction === 'asc'
-        ? 'Сортировать по убыванию'
+        ? `Eemalda${col} sorteerimine`
+        : `Sorteeri${col} kasvavalt`;
+    },
+    en: (direction: 'asc' | 'desc' | false, columnLabel?: string) => {
+      const by = columnLabel ? ` by ${columnLabel}` : '';
+      return direction === 'asc'
+        ? `Sort${by} descending`
         : direction === 'desc'
-        ? 'Отменить сортировку'
-        : 'Сортировать по возрастанию',
+        ? `Remove sorting${by}`
+        : `Sort${by} ascending`;
+    },
+    ru: (direction: 'asc' | 'desc' | false, columnLabel?: string) => {
+      const col = columnLabel ? ` по столбцу ${columnLabel}` : '';
+      return direction === 'asc'
+        ? `Сортировать${col} по убыванию`
+        : direction === 'desc'
+        ? `Отменить сортировку${col}`
+        : `Сортировать${col} по возрастанию`;
+    },
   },
   'tooltip.icon-trigger': {
     description: 'Label we use for icons that are tooltip triggers',
@@ -602,9 +886,17 @@ export const labelsMap = validateDefaultLabels({
   'pagination.page-size': {
     description: 'Label of page size select',
     components: ['Table', 'Pagination'],
-    et: 'Lehe suurus',
-    en: 'Page size',
-    ru: 'Размер страницы',
+    et: 'Kuva korraga',
+    en: 'Show per page',
+    ru: 'Показывать по',
+  },
+  'pagination.page-status': {
+    description:
+      'Status message announced to screen readers via an aria-live region when the page changes. Receives the current page number and total page count.',
+    components: ['Pagination'],
+    et: (page?: number, total?: number) => `Lehekülg ${page ?? 0} / ${total ?? 0}`,
+    en: (page?: number, total?: number) => `Page ${page ?? 0} of ${total ?? 0}`,
+    ru: (page?: number, total?: number) => `Страница ${page ?? 0} из ${total ?? 0}`,
   },
   'table-of-contents.title': {
     description: 'Title of the table of contents',
@@ -626,6 +918,27 @@ export const labelsMap = validateDefaultLabels({
     et: (count: string | number) => `${count} mitte valiidne`,
     en: (count: string | number) => `${count} invalid`,
     ru: (count: string | number) => `${count} неверный`,
+  },
+  'table-of-contents.step-valid': {
+    description: 'Accessible label for the validation icon of a completed (valid) step',
+    components: ['TableOfContents'],
+    et: 'Korrektne',
+    en: 'Valid',
+    ru: 'Действительно',
+  },
+  'table-of-contents.step-invalid': {
+    description: 'Accessible label for the validation icon of an invalid step',
+    components: ['TableOfContents'],
+    et: 'Vajab parandamist',
+    en: 'Invalid',
+    ru: 'Неверный',
+  },
+  'table-of-contents.step-incomplete': {
+    description: 'Accessible label for the validation icon of a step that has not been completed yet',
+    components: ['TableOfContents'],
+    et: 'Täitmata',
+    en: 'Not completed',
+    ru: 'Не заполнено',
   },
   'truncate.see-more': {
     description: 'See more button label',

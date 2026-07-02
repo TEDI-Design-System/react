@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
 
@@ -9,6 +9,11 @@ import DateTimePicker, { DateTimePickerProps } from './datetimepicker';
 const meta: Meta<typeof DateTimePicker> = {
   component: DateTimePicker,
   title: 'Community/Form/Pickers/DateTimePicker',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

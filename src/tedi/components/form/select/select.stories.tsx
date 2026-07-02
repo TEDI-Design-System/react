@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { OptionProps, OptionsOrGroups } from 'react-select';
 
 import { Icon } from '../../base/icon/icon';
@@ -194,9 +194,8 @@ export const States: Story = {
 };
 
 /**
- * Mirrors the Angular `ValueType` frame: no value, default, placeholder,
- * multi-row multiselect, and **single-row multiselect** with overflow `+N`
- * counter (the `tagsDirection="row"` handling).
+ * Value states: no value, default, placeholder, multi-row multiselect, and
+ * **single-row multiselect** with overflow `+N` counter (the `tagsDirection="row"` handling).
  */
 const longTagOptions: ISelectOption[] = [
   { value: 'longer-text', label: 'Longer text' },
@@ -354,6 +353,47 @@ export const ValueType: Story = {
       </div>
     </VerticalSpacing>
   ),
+};
+
+/**
+ * `tagsEllipsis` truncates long tag labels: `end` → `Long label…`, `start` → `…label`. The full
+ * label shows in a popover on hover/focus.
+ */
+export const EllipsisTags: Story = {
+  render: () => {
+    const longOptions: ISelectOption[] = [
+      { value: 'a', label: 'A fairly long option label that does not fit' },
+      { value: 'b', label: 'Another rather long option label' },
+      { value: 'c', label: '2026-06-25 quarterly financial report' },
+    ];
+
+    return (
+      <div style={{ maxWidth: '20rem' }}>
+        <VerticalSpacing>
+          <Select
+            id="ellipsis-tags-end"
+            label="Truncate the end"
+            options={longOptions}
+            defaultValue={longOptions}
+            multiple
+            tagsEllipsis="end"
+            isTagRemovable
+            isClearable
+          />
+          <Select
+            id="ellipsis-tags-start"
+            label="Truncate the start"
+            options={longOptions}
+            defaultValue={longOptions}
+            multiple
+            tagsEllipsis="start"
+            isTagRemovable
+            isClearable
+          />
+        </VerticalSpacing>
+      </div>
+    );
+  },
 };
 
 const departmentOptions: ISelectOption[] = [

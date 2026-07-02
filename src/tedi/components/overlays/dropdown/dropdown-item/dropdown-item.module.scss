@@ -31,7 +31,8 @@
     background-color: var(--dropdown-item-active-background);
 
     p,
-    label {
+    label,
+    div > span {
       color: var(--dropdown-item-active-text);
     }
   }
@@ -104,11 +105,12 @@
   &:hover {
     color: var(--dropdown-item-hover-text);
     cursor: pointer;
-    background-color: var(--dropdown-item-hover-background);
     outline: 0;
+    background-color: var(--dropdown-item-hover-background);
 
     p,
-    label {
+    label,
+    div > span {
       color: var(--dropdown-item-hover-text);
     }
   }

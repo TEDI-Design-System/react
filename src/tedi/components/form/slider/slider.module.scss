@@ -70,10 +70,10 @@
   margin: 0;
   appearance: none;
   cursor: pointer;
+  outline: none;
   background: transparent;
   border: 0;
   border-radius: inherit;
-  outline: none;
 
   &::-webkit-slider-runnable-track {
     width: 100%;
@@ -211,11 +211,5 @@
       background: var(--form-slider-thumb-background-disabled);
       border-color: var(--form-slider-thumb-border-disabled);
     }
-  }
-}
-
-.tedi-slider--invalid:not(.tedi-slider--disabled) {
-  .tedi-slider__track {
-    border-color: var(--form-general-feedback-error-border);
   }
 }

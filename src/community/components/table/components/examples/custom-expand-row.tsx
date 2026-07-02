@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { StoryFn, StoryObj } from '@storybook/react';
+import { StoryFn, StoryObj } from '@storybook/react-vite';
 import { ColumnDef, createColumnHelper, Row as TSRow } from '@tanstack/react-table';
 
 import { Text } from '../../../../../tedi/components/base/typography/text/text';

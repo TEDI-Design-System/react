@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -46,18 +46,31 @@ export interface NumberFieldProps extends BreakpointSupport<NumberFieldBreakpoin
    */
   value?: number;
   /**
-   * Callback fired when the input value changes.
+   * Callback fired when the input value changes. Emits `undefined` when the
+   * field is cleared so consumers can distinguish *"user explicitly entered
+   * zero"* from *"field is empty"* — important for required-field validation
+   * and for fields where `0` is a meaningful selection.
    */
-  onChange?: (value: number) => void;
+  onChange?: (value: number | undefined) => void;
   /**
    * Specifies the input mode for the field (e.g., numeric or decimal).
-   * @default numeric
+   * Defaults to `'decimal'` when `decimalPlaces > 0` or `decimalSeparator === ','`,
+   * otherwise numeric.
    */
   inputMode?: 'numeric' | 'decimal';
   /**
    * Number of decimal places for rounding calculations.
    */
   decimalPlaces?: number;
+  /**
+   * Character used as the decimal separator when displaying the value.
+   * Both `.` and `,` are always accepted as input regardless of this setting.
+   *
+   * Defaults are derived from `<LabelProvider locale>`: `en` → `.`, `et` / `ru`
+   * → `,`. Pass the prop explicitly to override the locale-derived default for
+   * a single field.
+   */
+  decimalSeparator?: '.' | ',';
   /**
    * Minimum allowed value. Disables decrementing below this value and restricts manual input.
    */
@@ -78,6 +91,8 @@ export interface NumberFieldProps extends BreakpointSupport<NumberFieldBreakpoin
 
 export const NumberField = (props: NumberFieldProps) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getLabel, locale } = useLabels();
+  const localeDecimalSeparator: '.' | ',' = locale === 'en' ? '.' : ',';
   const {
     id,
     label,
@@ -85,8 +100,9 @@ export const NumberField = (props: NumberFieldProps) => {
     required,
     className,
     size,
-    inputMode = 'numeric',
+    inputMode,
     decimalPlaces,
+    decimalSeparator = localeDecimalSeparator,
     min,
     max,
     step = 1,
@@ -101,22 +117,39 @@ export const NumberField = (props: NumberFieldProps) => {
     input,
   } = getCurrentBreakpointProps<NumberFieldProps>(props);
 
-  const { getLabel } = useLabels();
+  const resolvedInputMode =
+    inputMode ?? ((decimalPlaces && decimalPlaces > 0) || decimalSeparator === ',' ? 'decimal' : 'numeric');
+
+  const formatNumber = useCallback(
+    (num: number | undefined): string => {
+      if (num === undefined) return '';
+      return decimalSeparator === ',' ? String(num).replace('.', ',') : String(num);
+    },
+    [decimalSeparator]
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const isFocusedRef = useRef(false);
 
   const [inputUpdated, setInputUpdated] = useState<string>('');
-  const [inputInnerValue, setInputInnerValue] = useState<number>(defaultValue ?? 0);
+  const [inputInnerValue, setInputInnerValue] = useState<number | undefined>(defaultValue);
+  const [displayValue, setDisplayValue] = useState<string>(() => formatNumber(value ?? defaultValue));
 
-  const getCurrentValue = useMemo(
-    (): number => (onChange && typeof value !== 'undefined' ? value : inputInnerValue),
-    [onChange, value, inputInnerValue]
-  );
+  const currentValue: number | undefined = onChange && typeof value !== 'undefined' ? value : inputInnerValue;
+
+  useEffect(() => {
+    if (!isFocusedRef.current && typeof value !== 'undefined') {
+      setDisplayValue(formatNumber(value));
+    }
+  }, [value, formatNumber]);
 
   const helperId = helper ? `${id}-helper` : undefined;
 
   const isInvalid = useCallback(
-    (currentValue: number): boolean => {
+    (currentValue: number | undefined): boolean => {
+      if (currentValue === undefined) {
+        return invalid || helper?.type === 'error';
+      }
       const isBelowMinValue = Boolean(min !== undefined && currentValue < min);
       const isAboveMaxValue = Boolean(max !== undefined && currentValue > max);
       return invalid || isBelowMinValue || isAboveMaxValue || helper?.type === 'error';
@@ -142,7 +175,7 @@ export const NumberField = (props: NumberFieldProps) => {
   };
 
   const handleButtonClick = (direction: TDirection) => {
-    let returnValue = getCurrentValue;
+    let returnValue = currentValue ?? 0;
 
     if (direction === 'increment') {
       returnValue = returnValue + step;
@@ -157,18 +190,51 @@ export const NumberField = (props: NumberFieldProps) => {
     updateValueUpdatedLabel(returnValue);
     onChange?.(returnValue);
     setInputInnerValue(returnValue);
+    setDisplayValue(formatNumber(returnValue));
   };
 
-  const handleInputChange = ({ currentTarget: { value } }: ChangeEvent<HTMLInputElement>) => {
-    onChange?.(forceToLimits(+value));
-    setInputInnerValue(forceToLimits(+value));
+  const handleInputChange = ({ currentTarget: { value: rawValue } }: ChangeEvent<HTMLInputElement>) => {
+    setDisplayValue(rawValue);
+
+    if (rawValue === '') {
+      if (currentValue !== undefined) {
+        onChange?.(undefined);
+        setInputInnerValue(undefined);
+      }
+      return;
+    }
+
+    const normalized = rawValue.replace(',', '.');
+
+    if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(normalized)) {
+      return;
+    }
+
+    const parsed = parseFloat(normalized);
+    if (Number.isNaN(parsed)) return;
+
+    const clamped = forceToLimits(parsed);
+    const rounded = roundValue(clamped);
+
+    if (rounded !== currentValue) {
+      onChange?.(rounded);
+      setInputInnerValue(rounded);
+    }
+  };
+
+  const handleFocus = () => {
+    isFocusedRef.current = true;
+  };
+
+  const handleBlur = () => {
+    isFocusedRef.current = false;
+    setDisplayValue(formatNumber(currentValue));
   };
 
   const renderButton = (direction: TDirection) => {
     const isOnOrOutOfBounds =
-      direction === 'increment'
-        ? max !== undefined && getCurrentValue >= max
-        : min !== undefined && getCurrentValue <= min;
+      currentValue !== undefined &&
+      (direction === 'increment' ? max !== undefined && currentValue >= max : min !== undefined && currentValue <= min);
 
     const ButtonBEM = cn(styles['tedi-number-field__button'], styles[`tedi-number-field__button--${direction}`], {
       [styles['tedi-number-field__button--disabled']]: isOnOrOutOfBounds || disabled,
@@ -205,17 +271,20 @@ export const NumberField = (props: NumberFieldProps) => {
         <input
           ref={inputRef}
           id={id}
+          role="spinbutton"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={currentValue}
           aria-describedby={helperId}
-          aria-invalid={isInvalid(getCurrentValue) ? 'true' : 'false'}
-          type="number"
-          inputMode={inputMode}
-          value={getCurrentValue}
-          min={min}
-          max={max}
+          aria-invalid={isInvalid(currentValue) ? 'true' : 'false'}
+          type="text"
+          inputMode={resolvedInputMode}
+          value={displayValue}
           required={required}
-          step={step}
           disabled={disabled}
           onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           className={InputBEM}
           {...input}
         />
@@ -230,7 +299,7 @@ export const NumberField = (props: NumberFieldProps) => {
 
   const NumberFieldBem = cn(
     styles['tedi-number-field'],
-    { [styles['tedi-number-field--invalid']]: isInvalid(getCurrentValue) },
+    { [styles['tedi-number-field--invalid']]: isInvalid(currentValue) },
     { [styles['tedi-number-field--disabled']]: disabled },
     { [styles['tedi-number-field--small']]: size === 'small' },
     className

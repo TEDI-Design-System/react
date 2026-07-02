@@ -107,8 +107,8 @@
     }
 
     &:focus-visible {
-      outline: calc(2 * var(--borders-01)) solid var(--form-toggle-primary-active-default);
-      outline-offset: var(--borders-01);
+      outline: calc(2 * var(--tedi-borders-01)) solid var(--form-toggle-primary-active-default);
+      outline-offset: var(--tedi-borders-01);
     }
 
     &:checked + .tedi-toggle__slider {
@@ -134,8 +134,8 @@
     pointer-events: none;
     background-color: var(--toggle-indicator-default);
     border-radius: 50%;
-    transition: left 0.17s ease-out, background 0.15s ease;
     transform: translateY(-50%);
+    transition: left 0.17s ease-out, background 0.15s ease;
 
     .tedi-toggle__icon {
       stroke: var(--toggle-icon-default);

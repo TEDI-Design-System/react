@@ -1,6 +1,6 @@
-import { useGlobals } from '@storybook/preview-api';
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useId, useRef, useState } from 'react';
+import { useGlobals } from 'storybook/preview-api';
 
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
@@ -9,8 +9,8 @@ import { useLabels } from '../../../providers/label-provider';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
+import { EmptyState } from '../../content/empty-state/empty-state';
 import { Search } from '../../form/search/search';
-import { EmptyState } from '../../misc/empty-state/empty-state';
 import Link from '../../navigation/link/link';
 import { Tag } from '../../tags/tag/tag';
 import { HideAt } from '../hide-at/hide-at';

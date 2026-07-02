@@ -1,0 +1,1087 @@
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import React from 'react';
+
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
+import { useBreakpointProps } from '../../../helpers';
+import { LabelProvider } from '../../../providers/label-provider';
+import { Icon } from '../../base/icon/icon';
+import { Heading } from '../../base/typography/heading/heading';
+import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
+import { Checkbox } from '../../form/checkbox/checkbox';
+import TextField from '../../form/textfield/textfield';
+import Separator from '../../misc/separator/separator';
+import { Link } from '../../navigation/link/link';
+import { StatusBadge } from '../../tags/status-badge/status-badge';
+import { Accordion, AccordionProps } from './accordion';
+import { AccordionItemProps } from './accordion-item/accordion-item';
+import { AccordionItemContentProps } from './accordion-item-content/accordion-item-content';
+import { AccordionItemHeaderProps } from './accordion-item-header/accordion-item-header';
+
+/**
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.30.43?node-id=8048-69789" target="_blank">Figma ↗</a><br />
+ * <a href="https://www.tedi.ee/1ee8444b7/p/00e937-accordion" target="_blank">Zeroheight ↗</a><br /><br />
+ */
+
+export default {
+  title: 'TEDI-Ready/Content/Accordion',
+  component: Accordion,
+  decorators: [
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
+  ],
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+  },
+  argTypes: {
+    children: {
+      control: false,
+      description: 'One or more `Accordion.Item` components.',
+      table: { category: 'Accordion', type: { summary: 'ReactNode' } },
+    },
+    className: {
+      control: 'text',
+      description: 'Extra class applied to the Accordion host element.',
+      table: { category: 'Accordion', type: { summary: 'string' } },
+    },
+    allowMultiple: {
+      control: 'boolean',
+      description: 'Whether multiple accordion items can be opened at once.',
+      table: { category: 'Accordion', defaultValue: { summary: 'false' } },
+    },
+    defaultServerBreakpoint: {
+      control: 'select',
+      options: [undefined, 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'],
+      description:
+        'Default breakpoint used during server-side rendering, before the ' +
+        'real viewport size is known. Only matters if you ship the Accordion ' +
+        'through SSR and want a specific breakpoint variant to render in the ' +
+        'initial HTML. Has no effect after hydration — once the browser knows ' +
+        'the viewport size, the actual breakpoint takes over.',
+      table: { category: 'Accordion' },
+    },
+    itemGap: {
+      control: { type: 'number', min: 0, step: 0.25 },
+      description:
+        'Vertical gap between sibling Accordion items in rem. ' +
+        'Forwarded as the `--tedi-accordion-item-gap` CSS variable. ' +
+        'Defaults to the design-token value `var(--layout-grid-gutters-08)` (0.5rem) when omitted.',
+      table: { category: 'Accordion', defaultValue: { summary: '0.5' } },
+    },
+    defaultExpanded: {
+      control: 'boolean',
+      description:
+        'Group-level default for the items initial expanded state. ' +
+        'Items use this value when they do not specify their own `defaultExpanded`. ' +
+        'Per-item overrides (including explicit `false`) take precedence.',
+      table: { category: 'Accordion', defaultValue: { summary: 'false' } },
+    },
+  },
+} as Meta;
+
+const contentExample = (
+  <>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
+    sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </>
+);
+
+const iconCardTemplate = (
+  <>
+    <Icon name="business_center" color="secondary" size={24} />
+    <Text element="span" color="secondary" modifiers="bold">
+      Kategooria
+    </Text>
+  </>
+);
+
+const SelectActionButton = (props: { selected: boolean; onToggle: (selected: boolean) => void }) => (
+  <Button
+    visualType={props.selected ? 'primary' : 'secondary'}
+    onClick={(e: React.MouseEvent) => {
+      e.stopPropagation();
+      props.onToggle(!props.selected);
+    }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      {props.selected && <Icon name="done" size={16} />}
+      <span style={{ padding: '0 var(--button-md-inner-spacing)' }}>{props.selected ? 'Valitud' : 'Vali'}</span>
+    </div>
+  </Button>
+);
+
+const DefaultTemplate: StoryFn<Record<string, unknown>> = (args) => {
+  const primaryProps = getPrimaryComponentProps<AccordionProps>(args);
+  const itemProps = getSubcomponentProps<AccordionItemProps>(args, 'item');
+  const headerProps = getSubcomponentProps<AccordionItemHeaderProps>(args, 'header');
+  const contentProps = getSubcomponentProps<AccordionItemContentProps>(args, 'content');
+
+  const [selected, setSelected] = React.useState<boolean>(!!itemProps.selected);
+
+  return (
+    <Accordion {...primaryProps}>
+      <Accordion.Item {...itemProps} selected={selected} iconCard={iconCardTemplate}>
+        <Accordion.Item.Header
+          {...headerProps}
+          title="Pealkiri"
+          afterTitle={<StatusBadge color="success">Kinnitatud</StatusBadge>}
+          endAction={
+            headerProps.headerClickable ? undefined : <SelectActionButton selected={selected} onToggle={setSelected} />
+          }
+        />
+        <Accordion.Item.Content {...contentProps}>{contentExample}</Accordion.Item.Content>
+      </Accordion.Item>
+      <Accordion.Item>
+        <Accordion.Item.Header title="Pealkiri 2" expandActionPosition="end" />
+        <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+      </Accordion.Item>
+    </Accordion>
+  );
+};
+
+export const Default: StoryObj = {
+  render: DefaultTemplate,
+  argTypes: {
+    ...subcomponentArgTypes(Accordion.Item, {
+      category: 'Accordion.Item',
+      prefix: 'item',
+      // ReactNode slots + deep-link/internal props don't make good knobs; onToggle is wired as an action below.
+      exclude: ['children', 'id', 'openOnHashMatch', 'iconCard', 'onToggle'],
+    }),
+    item__onToggle: {
+      action: 'onToggle',
+      name: 'onToggle',
+      description: 'Called whenever the user toggles the item. Receives the next expanded state.',
+      table: { category: 'Accordion.Item' },
+    },
+    ...subcomponentArgTypes(Accordion.Item.Header, {
+      category: 'Accordion.Item.Header',
+      prefix: 'header',
+      exclude: [
+        'children',
+        'title',
+        'beforeTitle',
+        'afterTitle',
+        'startAction',
+        'endAction',
+        'startDescription',
+        'endDescription',
+      ],
+    }),
+    ...subcomponentArgTypes(Accordion.Item.Content, {
+      category: 'Accordion.Item.Content',
+      prefix: 'content',
+      exclude: ['children'],
+    }),
+  },
+  args: {
+    // Accordion (primary)
+    allowMultiple: false,
+    defaultExpanded: false,
+    // Accordion.Item
+    item__defaultExpanded: false,
+    item__showIconCard: false,
+    item__selected: false,
+    item__disabled: false,
+    // Accordion.Item.Header
+    header__headerClickable: true,
+    header__titleLayout: 'hug',
+    header__showExpandLabel: true,
+    header__showDefaultExpandAction: true,
+    header__expandActionPosition: 'end',
+    header__expandActionArrowType: 'default',
+    header__expandActionInverted: false,
+    header__expandActionUnderline: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+ The accordion item is composed of three parts:
+
+- \`Accordion.Item\`: owns the item's state (\`expanded\`) and the inputs shared by header and content (\`selected\`, \`showIconCard\`, \`defaultExpanded\`).
+- \`Accordion.Item.Header\`: owns header appearance and interaction (\`titleLayout\`, \`headerClickable\`, expand labels, \`headerClass\`, slot props for badges/actions/etc).
+- \`Accordion.Item.Content\`: owns content styling (\`contentClass\`) and the collapsible body.
+
+| Slot prop | Description |
+|----------|------------|
+| \`title\` | The accordion title (passed to \`Accordion.Item.Header\`). |
+| \`beforeTitle\` | Custom elements before the title. |
+| \`afterTitle\` | Custom elements after the title. |
+| \`startAction\` | Custom actions at the start of the header. |
+| \`endAction\` | Custom actions at the end of the header. |
+| \`startDescription\` | Description rendered below the title. |
+| \`endDescription\` | Description rendered at the end of the header. |
+| \`iconCard\` | Icon card content (passed to \`Accordion.Item\`). |
+      `,
+      },
+    },
+  },
+};
+
+export const Variants: StoryObj = {
+  render: () => {
+    const [selectedA, setSelectedA] = React.useState(false);
+    const [selectedB, setSelectedB] = React.useState(true);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header title="Pealkiri" />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
+              afterTitle={<StatusBadge color="success">Kinnitatud</StatusBadge>}
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
+              beforeTitle={<Icon name="description" color="secondary" size={18} />}
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
+              beforeTitle={<Icon name="account_circle" color="brand" background="brand-secondary" size={16} />}
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header title="Pealkiri" expandActionPosition="start" showExpandLabel={false} />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
+              showExpandLabel={false}
+              endDescription={
+                <Text element="span" color="tertiary" modifiers="small">
+                  Kirjeldus
+                </Text>
+              }
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
+              showExpandLabel={false}
+              startDescription={
+                <Text element="span" color="tertiary" modifiers="normal">
+                  Kirjeldus
+                </Text>
+              }
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header
+              title="Pealkiri"
+              showExpandLabel={false}
+              startDescription={
+                <Text element="span" color="tertiary" modifiers="normal">
+                  Kirjeldus
+                </Text>
+              }
+              endDescription={
+                <Text element="span" color="tertiary" modifiers="small">
+                  Kirjeldus
+                </Text>
+              }
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item selected={selectedA}>
+            <Accordion.Item.Header
+              headerClickable={false}
+              expandActionPosition="start"
+              openText="Pealkiri"
+              closeText="Pealkiri"
+              endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion>
+          <Accordion.Item selected={selectedB}>
+            <Accordion.Item.Header
+              headerClickable={false}
+              expandActionPosition="start"
+              openText="Pealkiri"
+              closeText="Pealkiri"
+              endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
+            />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+      </div>
+    );
+  },
+};
+
+export const ActionTypes: StoryObj = {
+  render: () => {
+    const [selectedA, setSelectedA] = React.useState(false);
+    const [selectedB, setSelectedB] = React.useState(false);
+    const [selectedC, setSelectedC] = React.useState(true);
+    const [selectedD, setSelectedD] = React.useState(true);
+
+    const rowStyle: React.CSSProperties = {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 'var(--layout-grid-gutters-08)',
+    };
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
+        <div style={rowStyle}>
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header title="Pealkiri" />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+          <Accordion>
+            <Accordion.Item defaultExpanded>
+              <Accordion.Item.Header title="Pealkiri" />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={rowStyle}>
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+          <Accordion>
+            <Accordion.Item defaultExpanded>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={rowStyle}>
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+          <Accordion>
+            <Accordion.Item defaultExpanded>
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={rowStyle}>
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} expandActionPosition="start" />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+          <Accordion>
+            <Accordion.Item defaultExpanded>
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} expandActionPosition="start" />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={rowStyle}>
+          <Accordion>
+            <Accordion.Item selected={selectedA}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item defaultExpanded selected={selectedB}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={rowStyle}>
+          <Accordion>
+            <Accordion.Item selected={selectedC}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedC} onToggle={setSelectedC} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item defaultExpanded selected={selectedD}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedD} onToggle={setSelectedD} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    a11y: {
+      config: {
+        rules: [{ id: 'landmark-unique', enabled: false }],
+      },
+    },
+  },
+};
+
+export const WithIconCard: StoryObj = {
+  render: () => {
+    const [selectedA, setSelectedA] = React.useState(false);
+    const [selectedB, setSelectedB] = React.useState(false);
+    const [selectedC, setSelectedC] = React.useState(true);
+    const [selectedD, setSelectedD] = React.useState(true);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-08)' }}>
+          <Accordion>
+            <Accordion.Item showIconCard iconCard={iconCardTemplate}>
+              <Accordion.Item.Header title="Pealkiri" />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+          <Accordion>
+            <Accordion.Item defaultExpanded showIconCard iconCard={iconCardTemplate}>
+              <Accordion.Item.Header title="Pealkiri" />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-08)' }}>
+          <Accordion>
+            <Accordion.Item showIconCard iconCard={iconCardTemplate}>
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+          <Accordion>
+            <Accordion.Item defaultExpanded showIconCard iconCard={iconCardTemplate}>
+              <Accordion.Item.Header title="Pealkiri" showExpandLabel={false} />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-08)' }}>
+          <Accordion>
+            <Accordion.Item showIconCard iconCard={iconCardTemplate} selected={selectedA}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedA} onToggle={setSelectedA} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item defaultExpanded showIconCard iconCard={iconCardTemplate} selected={selectedB}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedB} onToggle={setSelectedB} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-08)' }}>
+          <Accordion>
+            <Accordion.Item showIconCard iconCard={iconCardTemplate} selected={selectedC}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedC} onToggle={setSelectedC} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item defaultExpanded showIconCard iconCard={iconCardTemplate} selected={selectedD}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                expandActionPosition="start"
+                openText="Pealkiri"
+                closeText="Pealkiri"
+                endAction={<SelectActionButton selected={selectedD} onToggle={setSelectedD} />}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+      </div>
+    );
+  },
+};
+
+export const Customized: StoryObj = {
+  render: () => {
+    const [selected, setSelected] = React.useState(false);
+    const [expanded, setExpanded] = React.useState(false);
+    const { getCurrentBreakpointProps } = useBreakpointProps();
+    const responsive = getCurrentBreakpointProps<{
+      avatar: React.ReactNode;
+      email: React.ReactNode;
+      badge: React.ReactNode;
+      importantPhoto: React.ReactNode;
+      importantDescription: React.ReactNode;
+      showMorePhoto: React.ReactNode;
+      showMoreDescription: React.ReactNode;
+    }>({
+      avatar: null,
+      email: null,
+      badge: null,
+      importantPhoto: null,
+      importantDescription: null,
+      showMorePhoto: null,
+      showMoreDescription: null,
+      md: {
+        avatar: <img src="custom_accordion_1.png" alt="Mari Maasikas" />,
+        email: (
+          <Text element="span" color="tertiary" modifiers="normal">
+            mari.maasikas@gmail.com
+          </Text>
+        ),
+        badge: <StatusBadge color="success">Kontrollitud</StatusBadge>,
+        importantPhoto: <img src="custom_accordion_2.png" alt="Accordion example" />,
+        importantDescription: (
+          <Text element="span" color="tertiary" modifiers="normal" className="custom-description">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat.
+          </Text>
+        ),
+        showMorePhoto: <img src="custom_accordion_2.png" alt="Accordion example" />,
+        showMoreDescription: (
+          <Text element="span" color="primary" modifiers="normal" className="custom-description">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat.
+          </Text>
+        ),
+      },
+    });
+
+    return (
+      <>
+        <style>{`
+          .custom-header,
+          .custom-content {
+            background: var(--card-background-brand-quaternary);
+          }
+
+          .custom-header {
+            --tedi-accordion-header-start-gap: var(--layout-grid-gutters-16);
+          }
+
+          .custom-title {
+            font-weight: var(--heading-h6-weight);
+          }
+
+          .custom-description {
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            align-self: stretch;
+            text-align: left;
+            text-overflow: ellipsis;
+          }
+        `}</style>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header
+                title="Pealkiri"
+                titleLayout="fill"
+                afterTitle={<StatusBadge color="brand">Avalik</StatusBadge>}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header
+                title="Pealkiri"
+                titleLayout="fill"
+                beforeTitle={<Icon name="account_circle" color="brand" background="brand-secondary" size={16} />}
+                afterTitle={<StatusBadge color="neutral">Uus</StatusBadge>}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item selected={selected}>
+              <Accordion.Item.Header
+                headerClickable={false}
+                showExpandLabel={false}
+                expandActionPosition="start"
+                title="Pealkiri"
+                endAction={
+                  <Checkbox
+                    id="customized-select"
+                    label={selected ? 'Valitud' : 'Vali'}
+                    checked={selected}
+                    onChange={(_, nextChecked) => setSelected(nextChecked)}
+                    value={selected ? 'unselect' : 'select'}
+                    name="customized-select"
+                  />
+                }
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header
+                title="Pealkiri"
+                titleLayout="fill"
+                afterTitle={<StatusBadge color="success">Kinnitatud</StatusBadge>}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header
+                title={<Text modifiers="bold">Mari Maasikas</Text>}
+                headerClass="custom-title"
+                beforeTitle={responsive.avatar}
+                startDescription={responsive.email}
+                endDescription={responsive.badge}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item>
+              <Accordion.Item.Header
+                title={<Text modifiers="bold">Mingi oluline pealkiri</Text>}
+                titleLayout="fill"
+                showExpandLabel={false}
+                headerClass="custom-title"
+                afterTitle={responsive.importantPhoto}
+                startDescription={responsive.importantDescription}
+              />
+              <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion>
+            <Accordion.Item expanded={expanded} onToggle={setExpanded}>
+              <Accordion.Item.Header
+                showDefaultExpandAction={false}
+                headerClickable={false}
+                headerClass="custom-header custom-title"
+                title={<Text modifiers="bold">Mingi oluline pealkiri</Text>}
+                beforeTitle={responsive.showMorePhoto}
+                startDescription={responsive.showMoreDescription}
+                endAction={
+                  <Button visualType="neutral" onClick={() => setExpanded((current) => !current)}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                      <Icon name={expanded ? 'arrow_upward' : 'arrow_downward'} size={16} />
+                      {expanded ? 'Näita vähem' : 'Näita rohkem'}
+                    </div>
+                  </Button>
+                }
+              />
+              <Accordion.Item.Content contentClass="custom-content">{contentExample}</Accordion.Item.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+      </>
+    );
+  },
+};
+
+export const AccordionBehavior: StoryObj = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-16)' }}>
+      <Heading element="h4" modifiers="h4">
+        Single-expand accordion
+      </Heading>
+      <div style={{ marginBottom: 'var(--layout-grid-gutters-16)' }}>
+        <Accordion>
+          <Accordion.Item>
+            <Accordion.Item.Header title="Pealkiri 1" />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+          <Accordion.Item>
+            <Accordion.Item.Header title="Pealkiri 2" />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+      </div>
+
+      <Heading element="h4" modifiers="h4">
+        Multi-expand accordion
+      </Heading>
+      <Accordion allowMultiple>
+        <Accordion.Item>
+          <Accordion.Item.Header title="Pealkiri 1" />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+        <Accordion.Item>
+          <Accordion.Item.Header title="Pealkiri 2" />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+      </Accordion>
+    </div>
+  ),
+};
+
+export const Disabled: StoryObj = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Disabled items keep their current expanded state but reject user interaction.
+The header trigger renders as a native \`<button disabled>\` (or with
+\`aria-disabled\` for the non-clickable-header variant), so browsers handle
+focus, keyboard, and screen-reader announcements for free.
+
+Use \`disabled\` for items whose content is locked behind a state the user
+hasn't met yet (incomplete prerequisites, missing permissions, etc.).
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div className="accordion-steps">
+      <style>{`
+        .accordion-steps .step-number {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: var(--button-sm-height);
+          height: var(--button-sm-height);
+          border: 1px solid var(--stepper-step-default-border);
+          border-radius: 100px;
+          background: var(--stepper-step-default-bg);
+        }
+
+        .accordion-steps .step-number--disabled {
+          border-color: var(--stepper-step-disabled-border);
+          background: var(--stepper-step-disabled-bg);
+        }
+
+        .accordion-steps .step-body {
+          display: flex;
+          flex-direction: column;
+          gap: var(--layout-grid-gutters-16);
+        }
+
+        .accordion-steps .step-form {
+          display: flex;
+          flex-direction: column;
+          gap: var(--layout-grid-gutters-16);
+          width: 100%;
+          max-width: 400px;
+        }
+
+        .accordion-steps .step-actions {
+          display: flex;
+          gap: var(--layout-grid-gutters-08);
+        }
+
+        @media (max-width: 480px) {
+          .accordion-steps .step-actions > * {
+            flex: 1;
+          }
+        }
+      `}</style>
+      <Accordion>
+        <Accordion.Item defaultExpanded>
+          <Accordion.Item.Header
+            title="Minu andmed"
+            beforeTitle={
+              <span className="step-number">
+                <Text element="span" modifiers={['small', 'bold']} color="secondary">
+                  1
+                </Text>
+              </span>
+            }
+          />
+          <Accordion.Item.Content>
+            <div className="step-body">
+              <div className="step-form">
+                <TextField id="first-name" label="Eesnimi" required />
+                <TextField id="last-name" label="Perenimi" required />
+                <TextField id="id-code" label="Isikukood" required />
+              </div>
+              <Separator />
+              <div className="step-actions">
+                <Button visualType="secondary">Tühista</Button>
+                <Button visualType="primary">Jätka</Button>
+              </div>
+            </div>
+          </Accordion.Item.Content>
+        </Accordion.Item>
+
+        <Accordion.Item disabled>
+          <Accordion.Item.Header
+            title="Taotlus"
+            beforeTitle={
+              <span className="step-number step-number--disabled">
+                <Text element="span" modifiers={['small', 'bold']} color="disabled">
+                  2
+                </Text>
+              </span>
+            }
+          />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+
+        <Accordion.Item disabled>
+          <Accordion.Item.Header
+            title="Dokumendid"
+            beforeTitle={
+              <span className="step-number step-number--disabled">
+                <Text element="span" modifiers={['small', 'bold']} color="disabled">
+                  3
+                </Text>
+              </span>
+            }
+          />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+      </Accordion>
+    </div>
+  ),
+};
+
+export const HashDeepLinking: StoryObj = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Items with \`openOnHashMatch\` auto-expand when \`window.location.hash\`
+matches their \`id\`. Useful for FAQs, settings panels, documentation, or any
+page where a sharable link should open straight to a specific section.
+
+Click the links below to update the URL hash. The matching item expands
+automatically. The listener also reacts to \`hashchange\`, so users
+navigating between in-page links will see the corresponding item open as
+they go. Combine with \`allowMultiple\` if you want previously opened items
+to stay open.
+
+**Note:** the \`id\` prop must be set explicitly — \`openOnHashMatch\`
+is a no-op for items relying on the auto-generated React id.
+        `,
+      },
+    },
+  },
+  render: () => {
+    const navStyle: React.CSSProperties = {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 'var(--layout-grid-gutters-16)',
+      marginBottom: 'var(--layout-grid-gutters-16)',
+    };
+
+    return (
+      <div>
+        <nav style={navStyle} aria-label="Liigu kodanikuteenuste KKK-jaotise juurde">
+          <Link href="#id-card">ID-kaardi uuendamine</Link>
+          <Link href="#tax-return">Tuludeklaratsiooni esitamine</Link>
+          <Link href="#parental-benefits">Vanemahüvitis</Link>
+        </nav>
+
+        <Accordion allowMultiple>
+          <Accordion.Item id="id-card" openOnHashMatch>
+            <Accordion.Item.Header title="Kuidas uuendada ID-kaarti?" />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+          <Accordion.Item id="tax-return" openOnHashMatch>
+            <Accordion.Item.Header title="Kuidas esitada tuludeklaratsiooni?" />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+          <Accordion.Item id="parental-benefits" openOnHashMatch>
+            <Accordion.Item.Header title="Millistele vanemahüvitistele on mul õigus?" />
+            <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+          </Accordion.Item>
+        </Accordion>
+      </div>
+    );
+  },
+};
+
+export const SemanticHeadings: StoryObj = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+\`headingLevel\` wraps the header trigger in a semantic \`<h1>\`–\`<h6>\`
+element per the WAI-ARIA Accordion Pattern. The wrapper uses
+\`display: contents\` so it adds *no* visual change — it only contributes
+to the document outline that assistive technologies, table-of-contents
+generators, and SEO crawlers rely on.
+
+Use it whenever the accordion participates in a heading hierarchy: FAQs,
+documentation, policy pages, dashboards with sectioned content — anywhere
+the document outline matters for screen-reader navigation, table-of-contents
+generators, or SEO. Pick a level that fits the surrounding content
+(typically one level deeper than the section's own heading — \`<h2>\`
+section → \`<h3>\` accordion items).
+
+Inspect the DOM to confirm: each header is wrapped in a real \`<h3>\`,
+but the rendered look matches the surrounding accordion items exactly.
+        `,
+      },
+    },
+  },
+  render: () => (
+    <section>
+      <div style={{ marginBottom: 'var(--layout-grid-gutters-16)' }}>
+        <Heading element="h2" modifiers="h2">
+          Sinu kehtivad retseptid
+        </Heading>
+      </div>
+
+      <Accordion allowMultiple>
+        <Accordion.Item>
+          <Accordion.Item.Header headingLevel={3} title="HJERTEMAGNYL TBL 150MG+21MG N100" />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+        <Accordion.Item>
+          <Accordion.Item.Header
+            headingLevel={3}
+            title="AMLODIPINE ACTAVIS"
+            startDescription={
+              <Text element="span" color="tertiary" modifiers="normal">
+                Amlodipiin 5mg
+              </Text>
+            }
+          />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+        <Accordion.Item>
+          <Accordion.Item.Header
+            headingLevel={3}
+            title="ATORVASTATIN KRKA"
+            startDescription={
+              <Text element="span" color="tertiary" modifiers="normal">
+                Atorvastatiin 20mg
+              </Text>
+            }
+          />
+          <Accordion.Item.Content>{contentExample}</Accordion.Item.Content>
+        </Accordion.Item>
+      </Accordion>
+    </section>
+  ),
+};
