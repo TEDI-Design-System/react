@@ -35,7 +35,7 @@ $popover-width: (
       background: var(--popover-background);
       border-right: var(--popover-border-width-lg) solid var(--popover-border-prominent);
       border-bottom: var(--popover-border-width-lg) solid var(--popover-border-prominent);
-      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      clip-path: polygon(75% 0, 100% 0, 100% 100%, 0 100%, 0 75%);
       fill: transparent;
     }
   }
@@ -56,7 +56,7 @@ $popover-width: (
       border-top-right-radius: var(--popover-radius-sharp);
 
       &::before {
-        top: calc(-1 * var(--popover-border-width-lg));
+        top: calc(-1 * var(--popover-border-width-md));
         right: calc(-1 * var(--popover-border-width-md));
         left: calc(-1 * var(--popover-border-width-md));
         height: var(--popover-border-width-lg);
@@ -64,8 +64,8 @@ $popover-width: (
     }
 
     .tedi-popover__arrow--border {
-      top: -0.75rem;
-      transform: rotate(-135deg) !important;
+      top: -1rem;
+      transform: translateY(var(--popover-border-width-lg)) rotate(-135deg) !important;
     }
   }
 
@@ -76,7 +76,7 @@ $popover-width: (
 
       &::before {
         right: calc(-1 * var(--popover-border-width-md));
-        bottom: calc(-1 * var(--popover-border-width-lg));
+        bottom: calc(-1 * var(--popover-border-width-md));
         left: calc(-1 * var(--popover-border-width-md));
         height: var(--popover-border-width-lg);
       }
@@ -84,8 +84,8 @@ $popover-width: (
 
     .tedi-popover__arrow--border {
       top: auto !important;
-      bottom: -0.75rem;
-      transform: rotate(45deg) !important;
+      bottom: -1rem;
+      transform: translateY(calc(-1 * var(--popover-border-width-lg))) rotate(45deg) !important;
     }
   }
 
@@ -97,14 +97,14 @@ $popover-width: (
       &::before {
         top: calc(-1 * var(--popover-border-width-md));
         bottom: calc(-1 * var(--popover-border-width-md));
-        left: calc(-1 * var(--popover-border-width-lg));
+        left: calc(-1 * var(--popover-border-width-md));
         width: var(--popover-border-width-lg);
       }
     }
 
     .tedi-popover__arrow--border {
-      left: -0.75rem;
-      transform: rotate(135deg) !important;
+      left: -1rem;
+      transform: translateX(var(--popover-border-width-lg)) rotate(135deg) !important;
     }
   }
 
@@ -115,16 +115,16 @@ $popover-width: (
 
       &::before {
         top: calc(-1 * var(--popover-border-width-md));
-        right: calc(-1 * var(--popover-border-width-lg));
+        right: calc(-1 * var(--popover-border-width-md));
         bottom: calc(-1 * var(--popover-border-width-md));
         width: var(--popover-border-width-lg);
       }
     }
 
     .tedi-popover__arrow--border {
-      right: -0.75rem;
+      right: -1rem;
       left: auto !important;
-      transform: rotate(-45deg) !important;
+      transform: translateX(calc(-1 * var(--popover-border-width-lg))) rotate(-45deg) !important;
     }
   }
 
