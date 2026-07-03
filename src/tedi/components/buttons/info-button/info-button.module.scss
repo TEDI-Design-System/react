@@ -4,6 +4,14 @@
   min-height: var(--button-xs-icon-size);
   vertical-align: bottom;
 
+  // Small icon button: inset the focus ring so it stays within the button's
+  // bounds instead of the base button's +1px outset. The extra `[data-name]`
+  // (already set by the component) matches the base `.tedi-btn--default
+  // .tedi-btn--neutral:focus-visible` specificity so this override wins.
+  &[data-name='info-button']:focus-visible:not(:disabled, [aria-disabled='true']) {
+    outline-offset: calc(-1 * var(--tedi-borders-02));
+  }
+
   &[data-variant='inverted']:hover:not(:disabled) {
     background-color: var(--button-main-neutral-inverted-icon-only-background-hover);
   }
