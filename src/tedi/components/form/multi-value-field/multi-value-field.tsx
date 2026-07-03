@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
@@ -8,6 +8,11 @@ import Separator from '../../misc/separator/separator';
 import { Tag } from '../../tags/tag/tag';
 import FormLabel from '../form-label/form-label';
 import styles from './multi-value-field.module.scss';
+
+// Gap between tags (matches `--layout-grid-gutters-04`) and the width reserved
+// for the `+N` overflow counter when measuring how many tags fit on one row.
+const TAG_GAP_PX = 4;
+const COUNTER_RESERVE_PX = 44;
 
 export interface MultiValueFieldProps {
   /**
@@ -38,6 +43,14 @@ export interface MultiValueFieldProps {
    * @default 'primary'
    */
   tagColor?: 'primary' | 'secondary' | 'danger';
+  /**
+   * Layout for the value tags.
+   * - `'stack'` (default) — tags wrap onto multiple rows; the field grows in height.
+   * - `'row'` — tags stay on a single row; any that don't fit collapse into a
+   *   `+N` counter (the count is measured from the available width).
+   * @default stack
+   */
+  tagsDirection?: 'stack' | 'row';
   /**
    * Additional CSS class names applied to the root element.
    */
@@ -88,6 +101,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
     values: externalValues,
     onChange,
     tagColor = 'primary',
+    tagsDirection = 'stack',
     className,
     icon,
     onIconClick,
@@ -100,7 +114,75 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   const { getLabel } = useLabels();
   const [internalValues, setInternalValues] = useState<string[]>(externalValues ?? []);
 
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const hiddenInputRef = useRef<HTMLInputElement | null>(null);
+
+  useImperativeHandle(ref, () => ({ input: hiddenInputRef.current, wrapper: innerRef.current }), []);
+
   const values = externalValues ?? internalValues;
+
+  const isRow = tagsDirection === 'row';
+  const tagsRef = useRef<HTMLDivElement | null>(null);
+  const lastMeasuredWidthRef = useRef(0);
+  const [visibleCount, setVisibleCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isRow) setVisibleCount(null);
+  }, [values.length, isRow]);
+
+  useEffect(() => {
+    if (!isRow) return;
+    const el = tagsRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      if (width > 0 && width !== lastMeasuredWidthRef.current) setVisibleCount(null);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isRow]);
+
+  useLayoutEffect(() => {
+    if (!isRow || visibleCount !== null) return;
+    const el = tagsRef.current;
+    if (!el) return;
+
+    const containerWidth = el.clientWidth;
+    if (containerWidth === 0) return;
+
+    const tagEls = el.querySelectorAll<HTMLElement>('[data-tedi-tag-index]');
+    if (tagEls.length === 0) return;
+
+    let totalWidth = 0;
+    for (let i = 0; i < tagEls.length; i++) {
+      totalWidth += tagEls[i].offsetWidth + (i > 0 ? TAG_GAP_PX : 0);
+    }
+    if (totalWidth <= containerWidth) {
+      lastMeasuredWidthRef.current = containerWidth;
+      setVisibleCount(tagEls.length);
+      return;
+    }
+
+    let usedWidth = 0;
+    let visible = 0;
+    for (let i = 0; i < tagEls.length; i++) {
+      const tagWidth = tagEls[i].offsetWidth;
+      const hasMore = i < tagEls.length - 1;
+      const reserved = hasMore ? COUNTER_RESERVE_PX + TAG_GAP_PX : 0;
+      const needed = usedWidth + tagWidth + (visible > 0 ? TAG_GAP_PX : 0);
+      if (needed + reserved <= containerWidth) {
+        usedWidth = needed;
+        visible++;
+      } else {
+        break;
+      }
+    }
+    if (visible === 0) visible = 1;
+
+    lastMeasuredWidthRef.current = containerWidth;
+    setVisibleCount(visible);
+  }, [isRow, visibleCount, values]);
 
   const updateValues = (newValues: string[]) => {
     setInternalValues(newValues);
@@ -117,6 +199,8 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   const clearAll = () => {
     updateValues([]);
   };
+
+  const hiddenCount = isRow && visibleCount !== null ? Math.max(0, values.length - visibleCount) : 0;
 
   const renderIcon = () => {
     if (!icon) return null;
@@ -146,14 +230,37 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   return (
     <div className={classNames(styles['tedi-multi-value-field'], className)}>
       {label && <FormLabel id={id} label={label} required={required} />}
-      <div className={styles['tedi-multi-value-field__inner']}>
+      <div
+        ref={innerRef}
+        className={classNames(styles['tedi-multi-value-field__inner'], {
+          [styles['tedi-multi-value-field__inner--row']]: isRow,
+        })}
+      >
         {values.length > 0 && (
-          <div className={styles['tedi-multi-value-field__tags']}>
-            {values.map((value, index) => (
-              <Tag key={`${value}-${index}`} color={tagColor} onClose={disabled ? undefined : () => removeValue(index)}>
-                {value}
+          <div
+            ref={tagsRef}
+            className={classNames(styles['tedi-multi-value-field__tags'], {
+              [styles['tedi-multi-value-field__tags--row']]: isRow,
+            })}
+          >
+            {values.map((value, index) => {
+              if (isRow && visibleCount !== null && index >= visibleCount) return null;
+              return (
+                <Tag
+                  key={`${value}-${index}`}
+                  color={tagColor}
+                  data-tedi-tag-index={index}
+                  onClose={disabled ? undefined : () => removeValue(index)}
+                >
+                  {value}
+                </Tag>
+              );
+            })}
+            {hiddenCount > 0 && (
+              <Tag color={tagColor} className={styles['tedi-multi-value-field__overflow-tag']}>
+                +{hiddenCount}
               </Tag>
-            ))}
+            )}
           </div>
         )}
 
@@ -175,6 +282,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
 
       {name && (
         <input
+          ref={hiddenInputRef}
           type="hidden"
           name={name}
           value={values.length ? JSON.stringify(values) : ''}

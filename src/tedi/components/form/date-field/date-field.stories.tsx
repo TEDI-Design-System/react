@@ -316,6 +316,62 @@ export const MultipleValues: Story = {
   },
 };
 
+/**
+ * `tagsDirection` controls how the selected-date tags lay out in `mode="multiple"`.
+ * `'stack'` (default) wraps them onto multiple rows and grows the field height;
+ * `'row'` keeps them on a single row and collapses the overflow into a `+N`
+ * counter (measured from the available width, like `Select`).
+ */
+export const MultipleTagLayout: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => {
+    const preset = Array.from({ length: 8 }, (_, i) => new Date(2025, 0, i + 1));
+    const [rowValue, setRowValue] = useState<Date[]>(preset);
+    const [stackValue, setStackValue] = useState<Date[]>(preset);
+
+    const formatDate = (date: Date | Date[] | DateRange | undefined): string => {
+      const fmt = new Intl.DateTimeFormat('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      if (!date) return '';
+      if (date instanceof Date) return fmt.format(date);
+      if (Array.isArray(date)) return date.map((d) => fmt.format(d)).join(', ');
+      if ('from' in date && date.from) {
+        return date.to ? `${fmt.format(date.from)} – ${fmt.format(date.to)}` : fmt.format(date.from);
+      }
+      return '';
+    };
+
+    const toDates = (selected: Date | Date[] | DateRange | undefined): Date[] =>
+      Array.isArray(selected) ? selected : selected instanceof Date ? [selected] : [];
+
+    return (
+      <Row gutterY={3}>
+        <Col xs={12} md={6}>
+          <DateField
+            mode="multiple"
+            label="Üherealine (+N)"
+            placeholder="pp.kk.aaaa"
+            tagsDirection="row"
+            selected={rowValue}
+            onSelect={(selected) => setRowValue(toDates(selected))}
+            formatDate={formatDate}
+          />
+        </Col>
+        <Col xs={12} md={6}>
+          <DateField
+            mode="multiple"
+            label="Mitmerealine (vaikimisi)"
+            placeholder="pp.kk.aaaa"
+            tagsDirection="stack"
+            selected={stackValue}
+            onSelect={(selected) => setStackValue(toDates(selected))}
+            formatDate={formatDate}
+          />
+        </Col>
+      </Row>
+    );
+  },
+};
+
 export const Range: Story = {
   render: () => {
     const [defaultRange, setDefaultRange] = useState<DateRange | undefined>();

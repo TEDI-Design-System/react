@@ -130,6 +130,52 @@ describe('DateField component', () => {
     expect(onSelect).toHaveBeenCalled();
   });
 
+  it('shows an invalid-date error on blur and keeps the typed value visible', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} />);
+    const input = screen.getByLabelText('Birth date');
+
+    await user.type(input, '33.33.3333');
+    await user.tab();
+
+    expect(screen.getByText('dateField.invalidDateError')).toBeInTheDocument();
+    expect(input).toHaveValue('33.33.3333');
+  });
+
+  it('does not show the invalid-date error for a parseable date', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} />);
+    const input = screen.getByLabelText('Birth date');
+
+    await user.type(input, '15.06.2024');
+    await user.tab();
+
+    expect(screen.queryByText('dateField.invalidDateError')).not.toBeInTheDocument();
+  });
+
+  it('clears the invalid-date error once the user edits the input again', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} />);
+    const input = screen.getByLabelText('Birth date');
+
+    await user.type(input, '33.33.3333');
+    await user.tab();
+    expect(screen.getByText('dateField.invalidDateError')).toBeInTheDocument();
+
+    await user.type(input, '1');
+    expect(screen.queryByText('dateField.invalidDateError')).not.toBeInTheDocument();
+  });
+
+  it('gives the calendar toggle button an accessible name (single mode)', () => {
+    render(<DateField {...defaultProps} />);
+    expect(screen.getByRole('button', { name: 'dateField.openCalendar' })).toBeInTheDocument();
+  });
+
+  it('gives the calendar toggle button an accessible name (multiple mode)', () => {
+    render(<DateField {...defaultProps} mode="multiple" />);
+    expect(screen.getByRole('button', { name: 'dateField.openCalendar' })).toBeInTheDocument();
+  });
+
   it('updates when controlled value changes', () => {
     const { rerender } = render(<DateField {...defaultProps} selected={undefined} />);
     rerender(<DateField {...defaultProps} selected={new Date(2024, 5, 15)} />);
