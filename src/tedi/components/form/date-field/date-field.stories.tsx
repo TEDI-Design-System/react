@@ -2,7 +2,6 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -18,15 +17,6 @@ import { DateField, DateFieldProps } from './date-field';
 export default {
   title: 'Tedi-Ready/Components/Form/DateField',
   component: DateField,
-  // The examples use Estonian content, so surface the Estonian modal labels (title, Cancel/Confirm,
-  // month-nav aria-labels) by overriding the Storybook default `LabelProvider locale="en"`.
-  decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
-  ],
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],

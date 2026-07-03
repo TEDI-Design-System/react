@@ -1,7 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -337,11 +336,7 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
  * Confirm — Cancel / Escape / backdrop dismiss discards it.
  */
 export const ModalPicker: Story = {
-  render: (args) => (
-    <LabelProvider locale="et">
-      <Template {...args} />
-    </LabelProvider>
-  ),
+  render: (args) => <Template {...args} />,
   args: {
     id: 'time-modal',
     label: 'Aeg',
@@ -357,11 +352,7 @@ export const ModalPicker: Story = {
  * canvas or pick a mobile preset to see the modal kick in.
  */
 export const ResponsiveModalPicker: Story = {
-  render: (args) => (
-    <LabelProvider locale="et">
-      <Template {...args} />
-    </LabelProvider>
-  ),
+  render: (args) => <Template {...args} />,
   args: {
     id: 'time-modal-responsive',
     label: 'Aeg',
