@@ -29,15 +29,17 @@
   }
 
   &__modal {
+    --header-profile-offset: var(--layout-header-height);
+
     position: fixed;
-    top: var(--layout-header-height);
+    top: var(--header-profile-offset);
     right: 0;
     z-index: var(--z-index-header);
     display: flex;
     flex-direction: column;
     width: var(--navigation-vertical-item-width-default);
     max-width: 100%;
-    height: calc(100dvh - var(--layout-header-height));
+    height: calc(100dvh - var(--header-profile-offset));
     overflow-y: auto;
     background: var(--general-surface-primary);
     border-top: 1px solid var(--general-border-primary);
@@ -70,12 +72,14 @@
   }
 
   &__overlay {
+    --header-profile-offset: var(--layout-header-height);
+
     position: fixed;
-    top: var(--layout-header-height);
+    top: var(--header-profile-offset);
     left: 0;
     z-index: calc(var(--z-index-header) - 1);
     width: 100%;
-    height: calc(100dvh - var(--layout-header-height));
+    height: calc(100dvh - var(--header-profile-offset));
     background: var(--general-surface-overlay);
   }
 

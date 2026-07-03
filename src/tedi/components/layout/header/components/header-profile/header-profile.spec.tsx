@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
@@ -247,6 +247,109 @@ describe('HeaderProfile component', () => {
       fireEvent.keyDown(document, { key: 'Escape' });
 
       expect(document.activeElement).toBe(button);
+    });
+  });
+
+  describe('header offset for the fixed modal/overlay', () => {
+    let headerEl: HTMLElement;
+
+    const rectWithBottom = (bottom: number): DOMRect => ({
+      bottom,
+      top: 0,
+      left: 0,
+      right: 0,
+      width: 0,
+      height: bottom,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+
+    beforeEach(() => {
+      setMobileView();
+      headerEl = document.createElement('header');
+      document.body.appendChild(headerEl);
+    });
+
+    afterEach(() => {
+      headerEl.remove();
+    });
+
+    it('sets --header-profile-offset from the header bottom when the modal opens', () => {
+      headerEl.getBoundingClientRect = jest.fn(() => rectWithBottom(120));
+
+      const { container } = render(
+        <HeaderProfile>
+          <span>Profile content</span>
+        </HeaderProfile>,
+        { container: headerEl }
+      );
+
+      fireEvent.click(screen.getByRole('button'));
+
+      const modal = container.querySelector('[class*="header-profile__modal"]') as HTMLElement;
+      const overlay = container.querySelector('[class*="header-profile__overlay"]') as HTMLElement;
+
+      expect(modal.style.getPropertyValue('--header-profile-offset')).toBe('120px');
+      expect(overlay.style.getPropertyValue('--header-profile-offset')).toBe('120px');
+    });
+
+    it('updates the offset when the window is resized', () => {
+      let bottom = 100;
+      headerEl.getBoundingClientRect = jest.fn(() => rectWithBottom(bottom));
+
+      const { container } = render(
+        <HeaderProfile>
+          <span>Profile content</span>
+        </HeaderProfile>,
+        { container: headerEl }
+      );
+
+      fireEvent.click(screen.getByRole('button'));
+
+      const getModal = () => container.querySelector('[class*="header-profile__modal"]') as HTMLElement;
+      expect(getModal().style.getPropertyValue('--header-profile-offset')).toBe('100px');
+
+      bottom = 64;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      expect(getModal().style.getPropertyValue('--header-profile-offset')).toBe('64px');
+    });
+
+    it('removes the resize and scroll listeners when the modal closes', () => {
+      headerEl.getBoundingClientRect = jest.fn(() => rectWithBottom(80));
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+
+      render(
+        <HeaderProfile>
+          <span>Profile content</span>
+        </HeaderProfile>,
+        { container: headerEl }
+      );
+
+      const button = screen.getByRole('button');
+      fireEvent.click(button);
+      fireEvent.click(button);
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function), true);
+
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('does not set the offset when there is no ancestor header', () => {
+      const { container } = render(
+        <HeaderProfile>
+          <span>Profile content</span>
+        </HeaderProfile>
+      );
+
+      fireEvent.click(screen.getByRole('button'));
+
+      const modal = container.querySelector('[class*="header-profile__modal"]') as HTMLElement;
+      expect(modal.style.getPropertyValue('--header-profile-offset')).toBe('');
     });
   });
 });

@@ -124,6 +124,47 @@ describe('HeaderLanguage component', () => {
     expect(mockSetLocale).not.toHaveBeenCalled();
   });
 
+  it('applies the left label modifier when labelPosition is "left"', () => {
+    const { container } = render(<HeaderLanguage languages={mockLanguages} labelPosition="left" />);
+
+    expect(container.querySelector('[class*="tedi-header-language--label-left"]')).toBeInTheDocument();
+  });
+
+  it('renders a language option as an anchor with href instead of calling setLocale', () => {
+    const languagesWithHref: Language[] = [
+      { label: 'EST', locale: 'et' as never, isSelected: true, 'aria-label': 'Estonian' },
+      { label: 'ENG', href: '/en', 'aria-label': 'English' },
+    ];
+
+    render(<HeaderLanguage languages={languagesWithHref} />);
+
+    fireEvent.click(screen.getByRole('button', { expanded: false }));
+
+    const link = screen.getByRole('link', { name: 'English' });
+    expect(link).toHaveAttribute('href', '/en');
+
+    fireEvent.click(link);
+    expect(mockSetLocale).not.toHaveBeenCalled();
+  });
+
+  it('prefers a custom onClick over href when both are provided', () => {
+    const mockOnClick = jest.fn();
+    const languagesWithBoth: Language[] = [
+      { label: 'EST', locale: 'et' as never, isSelected: true, 'aria-label': 'Estonian' },
+      { label: 'ENG', href: '/en', onClick: mockOnClick, 'aria-label': 'English' },
+    ];
+
+    render(<HeaderLanguage languages={languagesWithBoth} />);
+
+    fireEvent.click(screen.getByRole('button', { expanded: false }));
+
+    const option = screen.getByRole('button', { name: 'English' });
+    fireEvent.click(option);
+
+    expect(mockOnClick).toHaveBeenCalledWith(expect.objectContaining({ onToggle: expect.any(Function) }));
+    expect(mockSetLocale).not.toHaveBeenCalled();
+  });
+
   it('renders expand icon', () => {
     const { container } = render(<HeaderLanguage languages={mockLanguages} />);
 
