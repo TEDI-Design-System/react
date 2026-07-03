@@ -19,6 +19,9 @@ const meta: Meta<TableOfContentsProps> = {
   component: TableOfContents,
   title: 'Community/TableOfContents',
   parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
     docs: {
       story: {
         inline: false,

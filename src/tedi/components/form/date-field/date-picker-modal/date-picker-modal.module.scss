@@ -1,0 +1,36 @@
+.tedi-date-picker-modal {
+  --modal-body-padding: 0;
+  --modal-body-padding-sm: 0;
+}
+
+.tedi-date-picker-modal__header {
+  display: flex;
+  gap: var(--tedi-dimensions-05);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tedi-date-picker-modal__title {
+  flex: 1 0 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.tedi-date-picker-modal__body {
+  display: flex;
+  justify-content: center;
+
+  > div {
+    width: 100%;
+  }
+}
+
+.tedi-date-picker-modal__calendar {
+  width: 100%;
+
+  --form-calendar-date-width: min(40px, calc((100vw - 5rem) / 7));
+
+  [class*='tedi-calendar__months-container'] {
+    justify-content: center;
+  }
+}
