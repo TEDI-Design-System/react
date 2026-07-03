@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
-import { LabelProvider } from '../../../providers/label-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -32,11 +31,9 @@ const meta: Meta<typeof TableOfContents> = {
   },
   decorators: [
     (Story, context) => (
-      <LabelProvider locale="et">
-        <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 320 }}>
-          <Story />
-        </div>
-      </LabelProvider>
+      <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 320 }}>
+        <Story />
+      </div>
     ),
   ],
 };

@@ -7,7 +7,6 @@ import {
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
 import { useBreakpointProps } from '../../../helpers';
-import { LabelProvider } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -30,13 +29,6 @@ import { AccordionItemHeaderProps } from './accordion-item-header/accordion-item
 export default {
   title: 'TEDI-Ready/Content/Accordion',
   component: Accordion,
-  decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
-  ],
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],

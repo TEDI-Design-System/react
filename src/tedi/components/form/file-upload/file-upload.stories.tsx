@@ -2,7 +2,6 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
 import { FileUploadFile } from '../../../helpers';
-import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -23,13 +22,6 @@ const meta: Meta<typeof FileUpload> = {
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4536-78765&m=dev',
     },
   },
-  decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
-  ],
 };
 
 export default meta;

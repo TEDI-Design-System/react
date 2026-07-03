@@ -1,6 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { LabelProvider } from '../../../providers/label-provider';
 import { Col, Row } from '../../layout/grid';
 import { FileDropzone, FileDropzoneProps } from './file-dropzone';
 
@@ -15,13 +14,6 @@ const meta: Meta<typeof FileDropzone> = {
   args: {
     name: 'file-dropzone',
   },
-  decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
-  ],
 };
 
 export default meta;
