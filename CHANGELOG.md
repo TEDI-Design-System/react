@@ -1,3 +1,10 @@
+# [18.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.2...react-18.1.0-rc.3) (2026-07-03)
+
+
+### Features
+
+* **label-provider:** turn default locale to "et", remove decorations from stories [#683](https://github.com/TEDI-Design-System/react/issues/683) ([#725](https://github.com/TEDI-Design-System/react/issues/725)) ([fbab5a9](https://github.com/TEDI-Design-System/react/commit/fbab5a989c5dc0d5ae9ae077ada924cc0f00e203))
+
 # [18.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.1...react-18.1.0-rc.2) (2026-07-03)
 
 
