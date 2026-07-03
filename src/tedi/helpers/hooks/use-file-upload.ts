@@ -227,6 +227,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
         }
       }, announcementTimeout);
 
+      event.target.value = '';
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

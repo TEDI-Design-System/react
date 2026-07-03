@@ -138,9 +138,10 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const generatedId = React.useId();
   const inputGroup = useOptionalInputGroup?.();
   const shouldHideLabel = inputGroup?.hasExternalLabel;
-  const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+  const resolvedId = id ?? inputGroup?.inputId ?? generatedId;
 
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const addButtonRef = React.useRef<HTMLButtonElement>(null);
 
   const fileUploadBEM = cn(styles['tedi-file-upload'], { [styles['tedi-file-upload--disabled']]: disabled }, className);
   const helperId = helper?.id ?? (helper || uploadErrorHelper ? `${resolvedId}-helper` : undefined);
@@ -149,18 +150,31 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     return !!files && !!onChange ? files : innerFiles;
   }, [files, innerFiles, onChange]);
 
+  const focusAddButton = () => addButtonRef.current?.focus();
+
+  const handleFileRemove = (file: FileUploadFile) => {
+    onFileRemove(file);
+    focusAddButton();
+  };
+
+  const handleClearAndFocus = () => {
+    handleClear();
+    focusAddButton();
+  };
+
   const getFileElement = (file: FileUploadFile, index: number) => {
-    const fileLabel = file.isValid === false ? `${file.name} (${getLabel('file-upload.failed')})` : file.name;
+    const isFailed = file.isValid === false;
 
     return (
-      <li key={index}>
+      <li key={file.id ?? index}>
         <Tag
-          color={file.isValid === false ? 'danger' : 'primary'}
-          onClose={!file.isLoading && !disabled && !readOnly ? () => onFileRemove(file) : undefined}
+          color={isFailed ? 'danger' : 'primary'}
+          onClose={!file.isLoading && !disabled && !readOnly ? () => handleFileRemove(file) : undefined}
           isLoading={file.isLoading}
-          aria-label={fileLabel}
+          closeButtonProps={{ title: `${getLabel('remove')} ${file.name}` }}
         >
           {file.name}
+          {isFailed && <span className="sr-only"> ({getLabel('file-upload.failed')})</span>}
         </Tag>
       </li>
     );
@@ -169,21 +183,18 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const showFiles = () => {
     if (getFiles.length > 1) {
       return (
-        <ul className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__truncate-list'])}>
+        <ul className={styles['tedi-file-upload__items']}>
           {getFiles.map((file, index) => getFileElement(file, index))}
         </ul>
       );
     } else if (getFiles.length === 1) {
       const singleFile = getFiles[0];
-      const singleLabel =
-        singleFile.isValid === false ? `${singleFile.name} (${getLabel('file-upload.failed')})` : singleFile.name;
+      const isFailed = singleFile.isValid === false;
 
       return (
-        <Text
-          aria-label={singleLabel}
-          className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__truncate'])}
-        >
+        <Text className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__items--truncate'])}>
           {singleFile.name}
+          {isFailed && <span className="sr-only"> ({getLabel('file-upload.failed')})</span>}
         </Text>
       );
     }
@@ -248,24 +259,26 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                           visualType="neutral"
                           iconLeft="close"
                           disabled={disabled}
-                          onClick={handleClear}
+                          onClick={handleClearAndFocus}
                           className={styles['tedi-file-upload__button']}
                         >
                           {getLabel('clear')}
                         </Button>
                       ) : (
-                        <ClosingButton onClick={handleClear} iconSize={18} title={getLabel('clear')} />
+                        <ClosingButton onClick={handleClearAndFocus} iconSize={18} title={getLabel('clear')} />
                       )}
                       <Separator axis="vertical" height={1.5} spacing={0.5} color="primary" />
                     </>
                   )}
                   <Button
+                    ref={addButtonRef}
                     visualType="neutral"
                     iconLeft="file_upload"
                     disabled={disabled}
                     onClick={() => inputRef.current?.click()}
                     className={styles['tedi-file-upload__button']}
                     size={size}
+                    aria-describedby={helperId}
                   >
                     {getLabel('file-upload.add')}
                   </Button>

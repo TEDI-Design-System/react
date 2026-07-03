@@ -1797,7 +1797,9 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
 - `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`
 
-### FileUpload
+### FileUpload — **DEPRECATED** (use TEDI-Ready FileUpload)
+
+> The community `FileUpload` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of the TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
 
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
 - `files?`, `defaultFiles?`, `onChange?`, `onDelete?`
