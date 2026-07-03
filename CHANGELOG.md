@@ -1,3 +1,10 @@
+# [18.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.0.0...react-18.1.0-rc.1) (2026-07-03)
+
+
+### Features
+
+* **header:** add Header top [#489](https://github.com/TEDI-Design-System/react/issues/489) ([#703](https://github.com/TEDI-Design-System/react/issues/703)) ([26e55aa](https://github.com/TEDI-Design-System/react/commit/26e55aa124137fe03a2f524689a6887526383c4a))
+
 # [18.0.0](https://github.com/TEDI-Design-System/react/compare/react-17.1.0...react-18.0.0) (2026-07-02)
 
 
