@@ -10,10 +10,10 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import InfoButton from '../../buttons/info-button/info-button';
+import { EmptyState } from '../../content/empty-state';
 import { Search } from '../../form/search/search';
 import Toggle from '../../form/toggle/toggle';
 import { Col, Row } from '../../layout/grid';
-import { EmptyState } from '../../misc/empty-state/empty-state';
 import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
 import Link from '../../navigation/link/link';
@@ -427,7 +427,7 @@ const menuItemStyle: CSSProperties = {
   borderBottom: '1px solid var(--general-border-primary)',
 };
 
-const HeaderPopoverTemplate: StoryFn<PopoverProps> = (args) => {
+const WithProminentBorderTemplate: StoryFn<PopoverProps> = (args) => {
   const [darkMode, setDarkMode] = useState(false);
 
   return (
@@ -436,12 +436,15 @@ const HeaderPopoverTemplate: StoryFn<PopoverProps> = (args) => {
           .story-popover-content--no-padding {
             padding: 0;
           }
+          .story-popover-content--menu {
+            padding: var(--card-padding-xxs) 0;
+          }
         `}</style>
       <Row gutterY={3}>
         <Col xs={12} lg={6} xxl={4}>
           <Popover {...args} withBorder placement="bottom">
             <Popover.Trigger>Profile menu</Popover.Trigger>
-            <Popover.Content width="small" className="story-popover-content--no-padding">
+            <Popover.Content width="small" className="story-popover-content--menu">
               <div className="display-flex flex-column">
                 <div style={menuItemStyle}>
                   <OptionContent>
@@ -618,7 +621,7 @@ export const ArrowPosition: Story = {
 };
 
 export const WithProminentBorder: Story = {
-  render: HeaderPopoverTemplate,
+  render: WithProminentBorderTemplate,
   args: {},
 };
 
