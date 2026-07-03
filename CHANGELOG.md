@@ -1,3 +1,10 @@
+# [18.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.1...react-18.1.0-rc.2) (2026-07-03)
+
+
+### Bug Fixes
+
+* **button,info-button:** fix neutral button dark mode outline, add InfoButton examples [#694](https://github.com/TEDI-Design-System/react/issues/694) ([#720](https://github.com/TEDI-Design-System/react/issues/720)) ([1f6dc51](https://github.com/TEDI-Design-System/react/commit/1f6dc510067bba1220d4dbc6cf4b859bb150aef5))
+
 # [18.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.0.0...react-18.1.0-rc.1) (2026-07-03)
 
 
