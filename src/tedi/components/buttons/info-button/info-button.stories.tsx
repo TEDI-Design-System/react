@@ -4,6 +4,8 @@ import { Text } from '../../base/typography/text/text';
 import { Label } from '../../content/label/label';
 import { TextGroup } from '../../content/text-group/text-group';
 import { Col, Row } from '../../layout/grid';
+import { HideAt } from '../../layout/hide-at/hide-at';
+import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
 import { Link } from '../../navigation/link/link';
@@ -24,7 +26,7 @@ const meta: Meta<typeof InfoButton> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4514-72997&m=dev',
     },
-    controls: { include: ['isSmall', 'color', 'disabled', 'aria-label'] },
+    controls: { include: ['isSmall', 'color', 'aria-label'] },
   },
   args: {
     'aria-label': 'Rohkem infot',
@@ -48,12 +50,12 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <VerticalSpacing>
       {array.map((state, index) => (
         <Row key={index}>
-          <Col width={1} className="display-flex align-items-center">
+          <Col xs={4} md={1} className="display-flex align-items-center">
             <Text modifiers="bold" color={color === 'inverted' ? 'white' : 'primary'}>
               {state}
             </Text>
           </Col>
-          <Col width={1} className="text-center">
+          <Col xs={2} md={1} className="text-center">
             <InfoButton color={color} {...buttonProps} aria-label={`Info button ${state}`} id={state} />
           </Col>
         </Row>
@@ -103,8 +105,8 @@ const labelStyle: React.CSSProperties = {
 export const UsageWithTooltipAndPopover: Story = {
   name: 'Usage with tooltip and popover',
   parameters: { controls: { disable: true } },
-  render: () => (
-    <div style={{ display: 'flex', gap: '1.5rem' }}>
+  render: () => {
+    const bloodGroup = (
       <TextGroup
         type="vertical"
         label={
@@ -120,9 +122,9 @@ export const UsageWithTooltipAndPopover: Story = {
         }
         value="AB-"
       />
+    );
 
-      <Separator axis="vertical" isStretched />
-
+    const dentalBenefit = (
       <TextGroup
         type="vertical"
         label={
@@ -150,6 +152,24 @@ export const UsageWithTooltipAndPopover: Story = {
         }
         value="24€"
       />
-    </div>
-  ),
+    );
+
+    return (
+      <>
+        <ShowAt md>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            {bloodGroup}
+            <Separator axis="vertical" isStretched />
+            {dentalBenefit}
+          </div>
+        </ShowAt>
+        <HideAt md>
+          <VerticalSpacing size={1}>
+            {bloodGroup}
+            {dentalBenefit}
+          </VerticalSpacing>
+        </HideAt>
+      </>
+    );
+  },
 };
