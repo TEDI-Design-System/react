@@ -9,7 +9,7 @@ import { StatusIndicator } from './status-indicator';
  */
 const meta: Meta<typeof StatusIndicator> = {
   component: StatusIndicator,
-  title: 'TEDI-Ready/Components/Tag/StatusIndicator',
+  title: 'TEDI-Ready/Components/Helpers/StatusIndicator',
   parameters: {
     design: {
       type: 'figma',

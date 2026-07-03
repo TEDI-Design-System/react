@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Text } from '../../../../../../tedi/components/base/typography/text/text';
-import { Collapse } from '../../../../../../tedi/components/buttons/collapse/collapse';
+import { Collapse } from '../../../../../../tedi/components/content/collapse/collapse';
 import ScrollFade from '../../../../../../tedi/components/misc/scroll-fade/scroll-fade';
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
 import { Card, CardContent } from '../../../../card';

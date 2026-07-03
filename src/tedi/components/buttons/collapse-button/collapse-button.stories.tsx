@@ -7,27 +7,22 @@ import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { CollapseButton, CollapseButtonProps } from './collapse-button';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a>
- *
- * Standalone button that toggles between open and closed states.
- * The parent owns the `open` state and listens to `onOpenChange`.
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=15433-138256&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/9469bf-collapse-button" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof CollapseButton> = {
   component: CollapseButton,
   title: 'TEDI-Ready/Components/Buttons/CollapseButton',
   parameters: {
-    status: {
-      type: ['devComponent'],
-    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=15433-138256&m=dev',
     },
   },
   args: {
-    openText: 'open',
-    closeText: 'close',
+    openText: 'Ava',
+    closeText: 'Sulge',
     hideText: false,
     arrowType: 'default',
     size: 'default',
@@ -112,7 +107,7 @@ export const IconOnly: StoryObj<StatesArgs> = {
   render: StatesTemplate,
   args: {
     hideText: true,
-    'aria-label': 'Toggle details',
+    'aria-label': 'Näita detaile',
   },
   parameters: PSEUDO_PARAMS,
 };
@@ -122,7 +117,9 @@ export const SecondaryButton: StoryObj<StatesArgs> = {
   args: {
     hideText: true,
     arrowType: 'secondary',
-    'aria-label': 'Toggle details',
+    'aria-label': 'Näita detaile',
+    // The secondary style has no small variant in the design.
+    hideSizes: true,
   },
   parameters: PSEUDO_PARAMS,
 };
@@ -133,9 +130,7 @@ export const WithTextInverted: StoryObj<StatesArgs> = {
     inverted: true,
     titleColor: 'white',
   },
-  parameters: {
-    ...PSEUDO_PARAMS,
-  },
+  parameters: PSEUDO_PARAMS,
   globals: { backgrounds: { value: 'brand' } },
 };
 
@@ -145,10 +140,8 @@ export const IconOnlyInverted: StoryObj<StatesArgs> = {
     hideText: true,
     inverted: true,
     titleColor: 'white',
-    'aria-label': 'Toggle details',
+    'aria-label': 'Näita detaile',
   },
-  parameters: {
-    ...PSEUDO_PARAMS,
-  },
+  parameters: PSEUDO_PARAMS,
   globals: { backgrounds: { value: 'brand' } },
 };

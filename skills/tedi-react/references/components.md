@@ -83,14 +83,21 @@ All components are TypeScript, use CSS Modules with BEM naming (`tedi-` prefix).
 
 ### Collapse
 
+Disclosure with an optional `title` and a chevron toggle. The toggle is a `CollapseButton` (a real `<button>`); **only the toggle expands/collapses — clicking the `title` does not** (the title sits outside the button, so it can hold its own interactive content).
+
 **Props:** `CollapseProps` | bp
 
 - `id: string` (required)
 - `children: ReactNode`
+- `title?: JSX.Element` — header content shown beside the toggle (not itself a toggle)
 - `open?: boolean` (controlled), `defaultOpen?: boolean`
 - `onToggle?: (open: boolean) => void`
-- `arrowType: 'default' | 'secondary' = 'default'`
-- `iconOnly?: boolean`
+- `openText? / closeText?` — toggle label per state (default LabelProvider `open` / `close`)
+- `toggleLabel?: string` — accessible name override (e.g. for icon-only)
+- `arrowType: 'default' | 'secondary' = 'default'`, `size: 'default' | 'small'`, `underline = true`, `inverted?`, `hideCollapseText?`
+- `iconOnly?: boolean` — chevron-only (only when no `title`)
+- `fullRowToggle?: boolean = false` — make the whole header row toggle on click (the chevron button stays the keyboard/SR control; clicks on links/buttons inside the title are ignored so they keep working)
+- `controlsId?: string` — toggle controls an external region instead of rendering its own panel
 
 ### CardButton
 
@@ -516,6 +523,8 @@ Give the sort/filter controls themselves a column-scoped accessible name. The bu
 <Table<Person> id="people" data={rows} columns={columns} getSubRows={(r) => r.subRows} expandTrigger="row" />
 ```
 
+The row-expand toggle is a `CollapseButton`. Forward extra props to it via `collapseProps?: TableExpandCollapseProps` (`Omit<CollapseButtonProps, 'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls'>` — those are owned by Table). Use it to override `arrowType`, `size`, `inverted`, etc.
+
 #### Responsive — default is horizontal scroll; opt into a stacked layout
 
 The Table already wraps itself in an `overflow-x: auto` container, so **wide tables scroll horizontally by default** with no props. There's no built-in "responsive" prop (parity with Angular, which composes the pattern in its story). To opt into a stacked layout, drive it at the call site with primitives the Table already has: hide secondary columns below a breakpoint via controlled `columnVisibility`, then re-surface them inside the expandable detail row (`renderSubComponent` + `getRowCanExpand`, both gated on the breakpoint). Use `useBreakpoint()` + `isBreakpointBelow(bp, 'md')` for the breakpoint, and `TextGroup` (`type="horizontal"`) for the label/value pairs. Only `columnVisibility` is controlled — expansion state stays internal:
@@ -739,12 +748,17 @@ Same as Checkbox (without indeterminate)
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
 - `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
+- `initialView?: 'days' | 'months' | 'years' = selectionLevel` — grid the calendar opens on, independent of `selectionLevel`; e.g. `initialView="years"` with default `selectionLevel="days"` opens the year grid and drills year → month → day (pair with `monthYearSelectType="grid"`)
 - `showOutsideDays?: boolean = true`
 - **Disabling:** `disabled?: Matcher | Matcher[]`, `minDate?: Date`, `maxDate?: Date`, `disablePast?: boolean`, `disableFuture?: boolean`, `shouldDisableMonth?: (date) => boolean`, `shouldDisableYear?: (date) => boolean`
 - `availableDays?: Date[] | ((date) => boolean)` — opposite of `disabled`
 - `inputProps?: Omit<TextFieldProps | MultiValueFieldProps, 'label' | 'id'>` — pass-through to the underlying input
-- **Breakpoint-aware:** `enableCalendar?: boolean = true`, `calendarTrigger?: 'input' | 'button' = 'button'`, `useNativePicker?: boolean = false` (`'single'` mode only — swaps to `<input type="date">`), `numberOfMonths?: number` (clamped to 1 below `md`)
+- `modal?: boolean | Breakpoint = false` — open the calendar in a modal instead of the popover (`true` always, a breakpoint name → modal *below* that breakpoint)
+- `modalProps?: Omit<ModalContentProps, 'children'>` — escape hatch forwarded to the calendar modal's `Modal.Content` (e.g. `size`, `width`, `maxWidth`, `position`, `fullscreen`, per-breakpoint overrides); overrides the responsive-width defaults, `className` is merged. Only applies when the calendar opens as a modal
+- `modalTitle?: string` — heading for the calendar modal (falls back to the `date-field.modal-title` label); handy for month/year-only pickers (`"Vali kuu"` / `"Vali aasta"`). Only applies when the calendar opens as a modal
+- **Breakpoint-aware:** `enableCalendar?: boolean = true`, `calendarTrigger?: 'input' | 'button' = 'button'`, `useNativePicker?: boolean = false` (`'single'` mode only — swaps to `<input type="date">`), `numberOfMonths?: number` (clamped to 1 below `md` **in the popover**; kept in a modal, where months stack vertically and scroll)
 
 The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the underlying control is `MultiValueField`, so `ref.current.input` is `null` there. The calendar trigger button carries `aria-haspopup="dialog"` + `aria-expanded`; when `calendarTrigger="input"` those land on the `<input>` instead.
 
@@ -1306,6 +1320,36 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 </Breadcrumbs>
 ```
 
+### TableOfContents
+Navigational TOC for long pages / multistep forms. **Compound API** — composed from `TableOfContents.Item` children; nest items by placing `Item`s inside an `Item` (alongside its link). Renders a (optionally sticky) card. Mark the current section with `activeId` for the left accent bar + active link colour; the active branch auto-expands its nested items. For small viewports there's a separate `TableOfContents.Collapsible` (bottom bar + bottom-sheet overlay) — render it instead of the card on mobile (e.g. via `ShowAt`/`HideAt`).
+
+- `<TableOfContents>` props: `heading?: string | null` (default LabelProvider `table-of-contents.title`; pass `null` for a **headless** list — no visible heading, `nav` still gets the localised `aria-label`), `variant?: 'default' | 'transparent' = 'default'` (`transparent` drops the card border/background and shows a continuous grey left rail — the active item's segment turns blue), `padding?: number` (inner container padding in rem; defaults to the card's medium padding token), `activeId?`, `numbered?` (ordered list with auto hierarchical numbers `1.` / `2.` / `2.1`), `showIcons?` (multistep-form validation glyphs — see below), `sticky?: boolean = true`, `className?`. Children must be `TableOfContents.Item` elements (direct children — don't wrap them in another component).
+- `<TableOfContents.Collapsible heading? activeId? showIcons? numbered? sticky? className>` — mobile variant. A bar (`heading` + an "open" link) that reveals the same list in a bottom-sheet `Modal` (dimmed backdrop, Escape / backdrop to dismiss). Takes the same `TableOfContents.Item` children. `sticky?: boolean = true` pins the bar to the bottom of the viewport (`position: fixed`); set `false` to render it inline in normal flow. No `variant`/`padding` (it's not a card). Show it only on small screens; keep the desktop `<TableOfContents>` card for wider ones.
+- `<TableOfContents.Item id? isValid? separator? hideIcon?>` — its non-`Item` children are the link / label; nested `TableOfContents.Item` children become its sub-items.
+  - For a **leading icon**, put it on the item's `Link` (`<Link iconLeft="…">`) so it shares the link's colour and hover / active states — there is no separate item-level icon prop.
+  - `isValid?: boolean` — with `showIcons`, drives the per-item glyph (`true` → valid check, `false` → warning, omitted → not-completed).
+  - `separator?: boolean = false` — render a `Separator` line below the item, e.g. to group sections.
+  - `hideIcon?: boolean = false` — hide this item's validation glyph even when `showIcons` is on (e.g. for a heading-only row).
+- `showIcons` glyphs are distinguished by **shape, not colour alone** (WCAG 1.4.1) and carry a localised text alternative (1.1.1): `isValid === true` → `check` (success) "Valid"; `isValid === false` → `warning` (danger) "Invalid"; `isValid === undefined` → `radio_button_unchecked` (tertiary) "Not completed".
+- Semantics: `<nav aria-labelledby>` (or `aria-label` from `table-of-contents.title` when headingless) + `<ul>`/`<ol>` + `<li>`, active item `aria-current="true"`. **Never uses `role="tree"`/`treeitem`.** Provide the item link/button yourself; pass **`underline={false}` on the `Link`** so it matches the design (no underline at rest, underline on hover). Use matching `id`s on the in-page sections (and `tabIndex={-1}` on them for SR focus).
+- When `sticky` (default), the card is capped to the viewport (`max-height: calc(100dvh - 3rem)`) and scrolls internally, so every item stays reachable when it's taller than the viewport (e.g. narrow widths at high zoom — WCAG 1.4.10 Reflow).
+
+```tsx
+<TableOfContents activeId="analysis" heading="Contents">
+  <TableOfContents.Item id="intro">
+    <Link href="#intro" underline={false}>Intro</Link>
+  </TableOfContents.Item>
+  <TableOfContents.Item id="methods">
+    <Link href="#methods" underline={false}>Methods</Link>
+    <TableOfContents.Item id="analysis">
+      <Link href="#analysis" underline={false}>Analysis</Link>
+    </TableOfContents.Item>
+  </TableOfContents.Item>
+</TableOfContents>
+```
+
+Variants: add `numbered` for an ordered list with auto hierarchical numbers (`1.` / `2.1`); for a multistep form, set `showIcons` and give each `TableOfContents.Item` an `isValid` for its per-step validation glyph (see the props above).
+
 ### HorizontalStepper
 
 **Props:** `HorizontalStepperProps` | fRef
@@ -1789,10 +1833,10 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
 
-### TableOfContents
-
+### TableOfContents — **⚠️ DEPRECATED** (use TEDI-Ready `TableOfContents`)
+- Superseded by the TEDI-Ready component (import from `/tedi`), which adds `activeId` active-section highlighting and hierarchical `numbered` lists. (The TEDI-Ready version is desktop-only for now — its responsive mobile variant is pending a TEDI-Ready `Accordion`; this community one still uses a mobile Modal.)
 - `items: TableOfContentsItemProps[]`, `heading?`, `open?`, `defaultOpen?`
-- `showIcons?: boolean`, `breakToMobile?: boolean`
+- `showIcons?: boolean`, `breakToMobile?: Layouts`
 
 ## Overlay
 

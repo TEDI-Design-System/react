@@ -11,6 +11,9 @@ import { TableOfContentsItemProps } from './table-of-contents-item';
 import { TableOfContentsItems } from './table-of-contents-items';
 import { TableOfContentsModal } from './table-of-contents-modal';
 
+/**
+ * @deprecated Use TableOfContents from `@tedi-design-system/react/tedi` instead.
+ */
 export interface TableOfContentsProps {
   /**
    * List of items to be shown in the table of contents
@@ -85,6 +88,8 @@ export const TableOfContentsContext = React.createContext<TableOfContentsContext
  * More info <a href="https://github.com/gettalong/kramdown/issues/215" target="_blank">here</a> and <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=262171" target="_blank">here</a>.<br /><br />
  * When used to keep track of multistep form progress, usage on `showIcons={true}` is recommended. Keep in mind that `isValid` property is optional and can be undefined to show not validated steps. <br />
  * Also it is possible to use disabled-text as item content, to show that user can't skip to next step. <br /><br />
+ *
+ * @deprecated Use TableOfContents from `@tedi-design-system/react/tedi` instead.
  */
 export const TableOfContents = (props: TableOfContentsProps) => {
   const { getLabel } = useLabels();
