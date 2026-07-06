@@ -54,14 +54,15 @@
     box-shadow: 0 4px 10px 0 var(--tedi-alpha-14);
     transform: translate(-50%, -50%);
 
-    .tedi-split-pane--vertical & > span {
-      transform: rotate(90deg);
+    > span {
+      color: inherit;
     }
   }
 
   &__close {
     position: absolute;
     z-index: 13;
+    width: max-content;
 
     .tedi-split-pane--horizontal & {
       top: 10%;

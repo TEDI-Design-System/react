@@ -175,16 +175,17 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
         </span>
 
         {onClose && (
-          <Button
-            data-testid="split-pane-close"
-            visualType="secondary"
-            icon="close"
-            className={styles['tedi-split-pane__close']}
-            onClick={onClose}
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            {getLabel('close')}
-          </Button>
+          <div className={styles['tedi-split-pane__close']}>
+            <Button
+              data-testid="split-pane-close"
+              visualType="secondary"
+              icon="close"
+              onClick={onClose}
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              {getLabel('close')}
+            </Button>
+          </div>
         )}
       </div>
 
