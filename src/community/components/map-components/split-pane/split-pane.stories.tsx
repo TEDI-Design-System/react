@@ -4,12 +4,20 @@ import { JSX } from 'react';
 import SplitPane, { SplitPaneProps } from './split-pane';
 
 /**
+ * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/TEDI-Map-Components-1.1.1?node-id=347-72394&t=UN6CIlRIfpadwwCZ-0" target="_BLANK">Figma ↗</a>
+ *
  * `SplitPane` renders two panes separated by a draggable divider. Dragging the divider (mouse, touch,
  * or keyboard) reallocates the size ratio between the panes, clamped to 20–80%.
  */
 const meta: Meta<typeof SplitPane> = {
   component: SplitPane,
   title: 'Community/Map components/SplitPane',
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/TEDI-Map-Components-1.1.1?node-id=347-72394&t=UN6CIlRIfpadwwCZ-0',
+    },
+  },
 };
 
 export default meta;
