@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { JSX, ReactNode, useRef, useState } from 'react';
+import React, { JSX, ReactNode, useEffect, useRef, useState } from 'react';
 
 import { Button, Icon, useLabels } from '../../../../tedi';
 import styles from './split-pane.module.scss';
@@ -66,6 +66,7 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
   const [ratio, setRatio] = useState<number>(() => clampRatio(initialRatio));
   const ratioRef = useRef<number>(ratio);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dragCleanupRef = useRef<(() => void) | null>(null);
 
   const isHorizontal = direction === 'horizontal';
 
@@ -81,7 +82,12 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
     }
 
     const rect = containerRef.current.getBoundingClientRect();
-    const raw = isHorizontal ? ((x - rect.left) / rect.width) * 100 : ((y - rect.top) / rect.height) * 100;
+    const size = isHorizontal ? rect.width : rect.height;
+    if (size <= 0) {
+      return;
+    }
+
+    const raw = isHorizontal ? ((x - rect.left) / size) * 100 : ((y - rect.top) / size) * 100;
 
     applyRatio(raw);
   };
@@ -99,11 +105,16 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
       }
     };
     const onEnd = (): void => {
+      dragCleanupRef.current?.();
+      commitRatio();
+    };
+
+    dragCleanupRef.current = (): void => {
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onEnd);
       document.removeEventListener('touchmove', onTouchMove);
       document.removeEventListener('touchend', onEnd);
-      commitRatio();
+      dragCleanupRef.current = null;
     };
 
     document.addEventListener('mousemove', onMouseMove);
@@ -111,6 +122,12 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
     document.addEventListener('touchmove', onTouchMove);
     document.addEventListener('touchend', onEnd);
   };
+
+  useEffect(() => {
+    return () => {
+      dragCleanupRef.current?.();
+    };
+  }, []);
 
   const handleMouseDown = (event: React.MouseEvent): void => {
     event.preventDefault();

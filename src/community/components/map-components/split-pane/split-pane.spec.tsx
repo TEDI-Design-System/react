@@ -84,14 +84,14 @@ describe('SplitPane', () => {
       const onClose = jest.fn();
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" onClose={onClose} />);
 
-      fireEvent.click(screen.getByTestId('split-pane-close'));
+      fireEvent.click(screen.getByRole('button'));
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('does not render a close button without onClose', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" />);
 
-      expect(screen.queryByTestId('split-pane-close')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
   });
 
@@ -113,9 +113,20 @@ describe('SplitPane', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" />);
       mockContainerRect();
 
-      fireEvent.mouseDown(screen.getByTestId('split-pane-divider'), { clientX: 500, clientY: 250 });
+      fireEvent.mouseDown(screen.getByRole('separator'), { clientX: 500, clientY: 250 });
       fireEvent.mouseMove(document, { clientX: 700, clientY: 250 });
       fireEvent.mouseUp(document);
+
+      expect(screen.getByTestId('split-pane-first').style.flexGrow).toBe('70');
+    });
+
+    it('updates pane sizes on divider touch drag', () => {
+      render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" />);
+      mockContainerRect();
+
+      fireEvent.touchStart(screen.getByRole('separator'), { touches: [{ clientX: 500, clientY: 250 }] });
+      fireEvent.touchMove(document, { touches: [{ clientX: 700, clientY: 250 }] });
+      fireEvent.touchEnd(document);
 
       expect(screen.getByTestId('split-pane-first').style.flexGrow).toBe('70');
     });
@@ -124,7 +135,7 @@ describe('SplitPane', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" />);
       mockContainerRect();
 
-      fireEvent.mouseDown(screen.getByTestId('split-pane-divider'), { clientX: 500, clientY: 250 });
+      fireEvent.mouseDown(screen.getByRole('separator'), { clientX: 500, clientY: 250 });
       fireEvent.mouseMove(document, { clientX: 50, clientY: 250 });
       fireEvent.mouseUp(document);
 
@@ -135,7 +146,7 @@ describe('SplitPane', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" />);
       mockContainerRect();
 
-      fireEvent.mouseDown(screen.getByTestId('split-pane-divider'), { clientX: 500, clientY: 250 });
+      fireEvent.mouseDown(screen.getByRole('separator'), { clientX: 500, clientY: 250 });
       fireEvent.mouseMove(document, { clientX: 950, clientY: 250 });
       fireEvent.mouseUp(document);
 
@@ -146,7 +157,7 @@ describe('SplitPane', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="vertical" />);
       mockContainerRect({ width: 500, height: 1000, right: 500, bottom: 1000 });
 
-      fireEvent.mouseDown(screen.getByTestId('split-pane-divider'), { clientX: 250, clientY: 500 });
+      fireEvent.mouseDown(screen.getByRole('separator'), { clientX: 250, clientY: 500 });
       fireEvent.mouseMove(document, { clientX: 250, clientY: 600 });
       fireEvent.mouseUp(document);
 
@@ -167,7 +178,7 @@ describe('SplitPane', () => {
       render(<SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" onClose={onClose} />);
       mockContainerRect();
 
-      fireEvent.mouseDown(screen.getByTestId('split-pane-close'), { clientX: 500, clientY: 250 });
+      fireEvent.mouseDown(screen.getByRole('button'), { clientX: 500, clientY: 250 });
       fireEvent.mouseMove(document, { clientX: 800, clientY: 250 });
       fireEvent.mouseUp(document);
 
@@ -195,7 +206,7 @@ describe('SplitPane', () => {
       );
       mockContainerRect();
 
-      fireEvent.mouseDown(screen.getByTestId('split-pane-divider'), { clientX: 500, clientY: 250 });
+      fireEvent.mouseDown(screen.getByRole('separator'), { clientX: 500, clientY: 250 });
       fireEvent.mouseMove(document, { clientX: 700, clientY: 250 });
       fireEvent.mouseUp(document);
 

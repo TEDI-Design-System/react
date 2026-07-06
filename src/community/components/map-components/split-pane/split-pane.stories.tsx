@@ -33,7 +33,7 @@ const Template = (args: SplitPaneProps): JSX.Element => (
   </div>
 );
 
-export const Horizontal: Story = {
+export const Default: Story = {
   render: Template,
   args: {
     direction: 'horizontal',
@@ -44,20 +44,20 @@ export const Horizontal: Story = {
 
 export const Vertical: Story = {
   render: Template,
-  args: { ...Horizontal.args, direction: 'vertical' },
+  args: { ...Default.args, direction: 'vertical' },
 };
 
 export const WithHighlightedSide: Story = {
   render: Template,
-  args: { ...Horizontal.args, highlightedSide: 'first' },
+  args: { ...Default.args, highlightedSide: 'first' },
 };
 
 export const WithCloseButton: Story = {
   render: Template,
-  args: { ...Horizontal.args, onClose: () => undefined },
+  args: { ...Default.args, onClose: () => undefined },
 };
 
 export const CustomInitialRatio: Story = {
   render: Template,
-  args: { ...Horizontal.args, initialRatio: 70 },
+  args: { ...Default.args, initialRatio: 70 },
 };
