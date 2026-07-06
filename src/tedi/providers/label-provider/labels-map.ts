@@ -86,6 +86,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Close',
     ru: 'Закрыть',
   },
+  splitPaneResize: {
+    description: 'Accessible label for the SplitPane resize divider',
+    components: ['SplitPane'],
+    et: 'Muuda paanide suurust',
+    en: 'Resize panes',
+    ru: 'Изменить размер панелей',
+  },
   open: {
     description: 'Used for opening',
     components: ['Accordion', 'Collapse'],
