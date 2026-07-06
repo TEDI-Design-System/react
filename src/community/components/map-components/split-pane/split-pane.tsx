@@ -24,7 +24,7 @@ export interface SplitPaneProps {
    * @default 50
    */
   initialRatio?: number;
-  /** Called with the final ratio (%) when a drag or keyboard adjustment ends. */
+  /** Called with the final ratio (%) when a drag or keyboard adjustment event ends. */
   onRatioChange?: (ratio: number) => void;
 }
 
