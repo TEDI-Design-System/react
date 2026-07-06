@@ -1,3 +1,10 @@
+# [18.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.3...react-18.1.0-rc.4) (2026-07-06)
+
+
+### Features
+
+* **info-button:** focus ring offset reduced [#719](https://github.com/TEDI-Design-System/react/issues/719) ([#724](https://github.com/TEDI-Design-System/react/issues/724)) ([cabb7eb](https://github.com/TEDI-Design-System/react/commit/cabb7eb71e6bf775c0cf51612f90da443d580ae1))
+
 # [18.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.2...react-18.1.0-rc.3) (2026-07-03)
 
 
