@@ -1,3 +1,19 @@
+# [18.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.5...react-18.1.0-rc.6) (2026-07-07)
+
+
+### Bug Fixes
+
+* **split-pane:** Added Figma link to storybook [#727](https://github.com/TEDI-Design-System/react/issues/727) ([ff18e02](https://github.com/TEDI-Design-System/react/commit/ff18e0223eae183c88c59e9e42e75e4ee026fefd))
+* **split-pane:** Adjusted comment [#727](https://github.com/TEDI-Design-System/react/issues/727) ([afb73d7](https://github.com/TEDI-Design-System/react/commit/afb73d7c7b50064178301f883e4315deb06cf5f7))
+* **split-pane:** coderabbit feedback fixes [#727](https://github.com/TEDI-Design-System/react/issues/727) ([c53b7d0](https://github.com/TEDI-Design-System/react/commit/c53b7d0b96f370669ac6511716a871c5bdea3c28))
+* **split-pane:** Design tweaks to the SplitPane buttons [#727](https://github.com/TEDI-Design-System/react/issues/727) ([c5f9e3f](https://github.com/TEDI-Design-System/react/commit/c5f9e3f37a231eb82929483b454669949f482756))
+* **split-pane:** min-max ratio props + SB example fix [#727](https://github.com/TEDI-Design-System/react/issues/727) ([02974e8](https://github.com/TEDI-Design-System/react/commit/02974e8187c93a950e70bbb91496bf470074cd30))
+
+
+### Features
+
+* **split-pane:** Added SplitPane component [#727](https://github.com/TEDI-Design-System/react/issues/727) ([edec900](https://github.com/TEDI-Design-System/react/commit/edec900758dff03d7a311bd505fd580d30c0c2dc))
+
 # [18.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.4...react-18.1.0-rc.5) (2026-07-07)
 
 
