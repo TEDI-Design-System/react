@@ -1493,7 +1493,7 @@ Sub-components: `Dropdown.Trigger`, `Dropdown.Content`, `Dropdown.Item`, `Dropdo
 
 Sub-components: `Popover.Trigger`, `Popover.Content`
 
-**Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`
+**Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`, `withBorder?: boolean = false` — illustrative prominent border on the arrow side
 
 ### Modal
 
