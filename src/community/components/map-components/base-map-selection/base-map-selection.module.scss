@@ -1,5 +1,16 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
+@mixin selection-content-active {
+  outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+  outline-offset: 1px;
+  border-color: var(--general-border-brand);
+}
+
+@mixin brand-title {
+  font-weight: 700;
+  color: var(--general-text-brand);
+}
+
 .tedi-base-map-selection {
   &__wrapper {
     position: relative;
@@ -25,6 +36,20 @@
       border-radius: var(--tedi-borders-04);
     }
   }
+
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--layout-grid-gutters-08);
+  }
+
+  &__transparency {
+    margin-top: var(--layout-grid-gutters-08);
+  }
+
+  &__transparency-field {
+    width: 6rem;
+  }
 }
 
 .tedi-base-map-selection--historical {
@@ -46,9 +71,8 @@
       outline-offset: 1px;
       border-color: var(--general-border-brand);
 
-      .tedi-map-selection__title {
-        font-weight: 700;
-        color: var(--general-text-brand);
+      .tedi-base-map-selection__title {
+        @include brand-title;
       }
     }
 
@@ -78,6 +102,13 @@
       width: 112px;
       height: 56px;
     }
+  }
+}
+
+.tedi-base-map-selection--disabled {
+  &.tedi-base-map-selection__wrapper {
+    pointer-events: none;
+    opacity: 0.5;
   }
 }
 
@@ -131,6 +162,7 @@
 
   .tedi-base-map-selection__title {
     position: relative;
+    max-width: 76px;
     margin-top: 4px;
 
     @include breakpoints.media-breakpoint-down(md) {
@@ -163,10 +195,18 @@
     &:hover,
     &:focus-visible {
       .tedi-base-map-selection__content {
-        outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
-        outline-offset: 1px;
-        border-color: var(--general-border-brand);
+        @include selection-content-active;
       }
+    }
+  }
+
+  &.tedi-base-map-selection--selected {
+    .tedi-base-map-selection__content {
+      @include selection-content-active;
+    }
+
+    .tedi-base-map-selection__title {
+      @include brand-title;
     }
   }
 }
