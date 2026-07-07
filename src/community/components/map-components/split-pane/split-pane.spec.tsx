@@ -199,6 +199,23 @@ describe('SplitPane', () => {
       expect(screen.getByTestId('split-pane-first').style.flexGrow).toBe('80');
     });
 
+    it('honours custom minRatio/maxRatio bounds', () => {
+      render(
+        <SplitPane first={<div>A</div>} second={<div>B</div>} direction="horizontal" minRatio={30} maxRatio={70} />
+      );
+      mockContainerRect();
+
+      const divider = screen.getByRole('separator');
+      expect(divider).toHaveAttribute('aria-valuemin', '30');
+      expect(divider).toHaveAttribute('aria-valuemax', '70');
+
+      fireEvent.mouseDown(divider, { clientX: 500, clientY: 250 });
+      fireEvent.mouseMove(document, { clientX: 950, clientY: 250 });
+      fireEvent.mouseUp(document);
+
+      expect(screen.getByTestId('split-pane-first').style.flexGrow).toBe('70');
+    });
+
     it('reports the final ratio via onRatioChange on drag end', () => {
       const onRatioChange = jest.fn();
       render(

@@ -20,19 +20,29 @@ export interface SplitPaneProps {
   /** When provided, renders a close button on the divider. */
   onClose?: () => void;
   /**
-   * Initial size of the first pane as a percentage of the container, clamped to 20–80.
+   * Initial size of the first pane as a percentage of the container, clamped to `minRatio`–`maxRatio`.
    * @default 50
    */
   initialRatio?: number;
+  /**
+   * Minimum size of the first pane, as a percentage of the container.
+   * @default 20
+   */
+  minRatio?: number;
+  /**
+   * Maximum size of the first pane, as a percentage of the container.
+   * @default 80
+   */
+  maxRatio?: number;
   /** Called with the final ratio (%) when a drag or keyboard adjustment event ends. */
   onRatioChange?: (ratio: number) => void;
 }
 
-const MIN_RATIO = 20;
-const MAX_RATIO = 80;
+const DEFAULT_MIN_RATIO = 20;
+const DEFAULT_MAX_RATIO = 80;
 const KEYBOARD_STEP = 2;
 
-const clampRatio = (value: number): number => Math.max(MIN_RATIO, Math.min(MAX_RATIO, value));
+const clampRatio = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
 
 const getOmittedEdge = (isHorizontal: boolean, side: PaneSide): PaneEdge => {
   if (isHorizontal) {
@@ -60,10 +70,20 @@ const SplitPaneRing = ({ direction, side }: SplitPaneRingProps): JSX.Element => 
 };
 
 export const SplitPane = (props: SplitPaneProps): JSX.Element => {
-  const { first, second, direction, highlightedSide, onClose, initialRatio = 50, onRatioChange } = props;
+  const {
+    first,
+    second,
+    direction,
+    highlightedSide,
+    onClose,
+    initialRatio = 50,
+    minRatio = DEFAULT_MIN_RATIO,
+    maxRatio = DEFAULT_MAX_RATIO,
+    onRatioChange,
+  } = props;
   const { getLabel } = useLabels();
 
-  const [ratio, setRatio] = useState<number>(() => clampRatio(initialRatio));
+  const [ratio, setRatio] = useState<number>(() => clampRatio(initialRatio, minRatio, maxRatio));
   const ratioRef = useRef<number>(ratio);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragCleanupRef = useRef<(() => void) | null>(null);
@@ -71,7 +91,7 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
   const isHorizontal = direction === 'horizontal';
 
   const applyRatio = (next: number): void => {
-    const clamped = clampRatio(next);
+    const clamped = clampRatio(next, minRatio, maxRatio);
     ratioRef.current = clamped;
     setRatio(clamped);
   };
@@ -148,9 +168,9 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
     } else if (event.key === increaseKey) {
       next = ratioRef.current + KEYBOARD_STEP;
     } else if (event.key === 'Home') {
-      next = MIN_RATIO;
+      next = minRatio;
     } else if (event.key === 'End') {
-      next = MAX_RATIO;
+      next = maxRatio;
     }
 
     if (next === null) {
@@ -177,8 +197,8 @@ export const SplitPane = (props: SplitPaneProps): JSX.Element => {
         role="separator"
         tabIndex={0}
         aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
-        aria-valuemin={MIN_RATIO}
-        aria-valuemax={MAX_RATIO}
+        aria-valuemin={minRatio}
+        aria-valuemax={maxRatio}
         aria-valuenow={Math.round(ratio)}
         aria-label={getLabel('splitPaneResize')}
         data-testid="split-pane-divider"

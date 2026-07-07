@@ -28,7 +28,7 @@ const demoPane = (label: string, background: string): JSX.Element => (
 );
 
 const Template = (args: SplitPaneProps): JSX.Element => (
-  <div style={{ width: '800px', height: '400px' }}>
+  <div style={{ width: '100%', maxWidth: '800px', height: '400px' }}>
     <SplitPane {...args} />
   </div>
 );
