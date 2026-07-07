@@ -1,3 +1,19 @@
+# [18.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.4...react-18.1.0-rc.5) (2026-07-07)
+
+
+### Bug Fixes
+
+* WCAG fixes [#699](https://github.com/TEDI-Design-System/react/issues/699) ([183bbc4](https://github.com/TEDI-Design-System/react/commit/183bbc45b9e276f9805f4e8ade86d4d1c96fa6aa))
+
+
+### Features
+
+* **basemap option:** add disabled state to option [#699](https://github.com/TEDI-Design-System/react/issues/699) ([38937b3](https://github.com/TEDI-Design-System/react/commit/38937b38a183378f92ba22364fb28c6804c6d80b))
+* BaseMapSelection uses popover, handles transparency. Selected works for non historical. [#699](https://github.com/TEDI-Design-System/react/issues/699) ([209535a](https://github.com/TEDI-Design-System/react/commit/209535aca099844d2570a60a57ebe2085b71e420))
+* **basemapselection:** add uncontrolled transparency value [#699](https://github.com/TEDI-Design-System/react/issues/699) ([2cace0e](https://github.com/TEDI-Design-System/react/commit/2cace0e00377cb39159614bba9020f6df4a2576f))
+* **basemapselection:** coderabbit fixes [#699](https://github.com/TEDI-Design-System/react/issues/699) ([a7b14c3](https://github.com/TEDI-Design-System/react/commit/a7b14c3adf7acceef065e29db0c8687cde96bb41))
+* **BaseMapSelection:** review fixes [#699](https://github.com/TEDI-Design-System/react/issues/699) ([216a394](https://github.com/TEDI-Design-System/react/commit/216a39431016cafeb93b49f44f44f4fd1d80bdac))
+
 # [18.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.3...react-18.1.0-rc.4) (2026-07-06)
 
 
