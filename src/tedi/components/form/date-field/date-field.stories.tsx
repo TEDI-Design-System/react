@@ -5,6 +5,7 @@ import { DateRange } from 'react-day-picker';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { TextFieldProps } from '../textfield/textfield';
 import { DateField, DateFieldProps } from './date-field';
 
@@ -90,22 +91,22 @@ const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
 
 export const States: Story = {
   render: () => (
-    <div className="state-example">
+    <VerticalSpacing>
       {stateArray.map((state) => (
-        <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+        <Row key={state}>
+          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
+          <Col>
             <DateField id={state} mode="single" label="Kuupäev" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col>
           <DateField
             id="success-datefield"
             mode="single"
@@ -114,11 +115,11 @@ export const States: Story = {
           />
         </Col>
       </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col>
           <DateField
             id="error-datefield"
             mode="single"
@@ -127,7 +128,7 @@ export const States: Story = {
           />
         </Col>
       </Row>
-    </div>
+    </VerticalSpacing>
   ),
   parameters: {
     pseudo: {

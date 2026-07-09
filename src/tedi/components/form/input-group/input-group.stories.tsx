@@ -379,13 +379,13 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
   const { array } = args;
 
   return (
-    <div className="state-example">
+    <VerticalSpacing>
       {array.map((state, index) => (
-        <Row key={index} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+        <Row key={index} gutterY={2}>
+          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col>
+          <Col xs={12} lg={5}>
             <InputGroup label="Label" id="state-example" disabled={state === 'Disabled'}>
               <InputGroup.Prefix>Street</InputGroup.Prefix>
               <InputGroup.Input>
@@ -393,7 +393,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
               </InputGroup.Input>
             </InputGroup>
           </Col>
-          <Col>
+          <Col xs={12} lg={5}>
             <InputGroup label="Label" id="state-example" disabled={state === 'Disabled'}>
               <InputGroup.Input>
                 <Field id={state} />
@@ -403,11 +403,11 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row gutterY={2}>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col>
+        <Col xs={12} lg={5}>
           <InputGroup label="Label" id="state-example" invalid helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Prefix>Street</InputGroup.Prefix>
             <InputGroup.Input>
@@ -415,7 +415,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
             </InputGroup.Input>
           </InputGroup>
         </Col>
-        <Col>
+        <Col xs={12} lg={5}>
           <InputGroup label="Label" id="state-example" invalid helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Input>
               <Field />
@@ -424,7 +424,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           </InputGroup>
         </Col>
       </Row>
-    </div>
+    </VerticalSpacing>
   );
 };
 

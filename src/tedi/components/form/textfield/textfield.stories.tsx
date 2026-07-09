@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import TextField, { TextFieldProps } from './textfield';
 
 /**
@@ -49,19 +50,19 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col width={2}>
+          <Col width={12} sm={2}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="d-flex">
-            <TextField {...textFieldProps} id={`${textFieldProps.id}-${key}-1`} {...{ [property]: value }} />
-          </Col>
-          <Col className="d-flex">
-            <TextField
-              icon={{ name: 'person' }}
-              {...textFieldProps}
-              id={`${textFieldProps.id}-${key}-2`}
-              {...{ [property]: value }}
-            />
+          <Col width={12} sm={10}>
+            <VerticalSpacing>
+              <TextField {...textFieldProps} id={`${textFieldProps.id}-${key}-1`} {...{ [property]: value }} />
+              <TextField
+                icon={{ name: 'person' }}
+                {...textFieldProps}
+                id={`${textFieldProps.id}-${key}-2`}
+                {...{ [property]: value }}
+              />
+            </VerticalSpacing>
           </Col>
         </Row>
       ))}
@@ -73,22 +74,22 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
   const { array, ...textFieldProps } = args;
 
   return (
-    <div className="state-example">
+    <VerticalSpacing>
       {array.map((state, index) => (
-        <Row key={index} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+        <Row key={index}>
+          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col className="display-flex align-items-center">
+          <Col>
             <TextField disabled={state === 'Disabled'} {...textFieldProps} id={state} />
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col>
           <TextField
             {...textFieldProps}
             id="success-textfield"
@@ -99,11 +100,11 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           />
         </Col>
       </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col>
           <TextField
             {...textFieldProps}
             id="error-textfield"
@@ -114,7 +115,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           />
         </Col>
       </Row>
-    </div>
+    </VerticalSpacing>
   );
 };
 
