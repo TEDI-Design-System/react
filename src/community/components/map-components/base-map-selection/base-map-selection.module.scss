@@ -233,10 +233,12 @@
     }
   }
 
-  &:not(.tedi-base-map-selection--multiple, .tedi-base-map-selection--selected) {
-    &:not(.tedi-base-map-selection--disabled):hover {
-      .tedi-base-map-selection__content {
-        @include selection-content-hover;
+  &:not(.tedi-base-map-selection--multiple) {
+    &:not(.tedi-base-map-selection--selected) {
+      &:not(.tedi-base-map-selection--disabled):hover {
+        .tedi-base-map-selection__content {
+          @include selection-content-hover;
+        }
       }
     }
 
@@ -371,6 +373,10 @@
         background-color: var(--tedi-neutral-100);
         border-color: var(--tedi-neutral-100);
         opacity: 1;
+      }
+
+      &:focus-visible > .tedi-base-map-selection__content {
+        @include selection-content-focus;
       }
     }
   }

@@ -1,8 +1,9 @@
 import classNames from 'classnames';
-import { JSX, useCallback, useRef, useState } from 'react';
+import { JSX, useEffect, useRef, useState } from 'react';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Tooltip } from '../../../../tedi/components/overlays/tooltip';
+import { useElementSize } from '../../../../tedi/helpers';
 import styles from './base-map-selection.module.scss';
 
 export type BaseMapOptionType = 'button' | 'historical' | 'selection';
@@ -80,26 +81,17 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     tooltipType = 'info',
   } = props;
 
+  const titleRef = useRef<HTMLDivElement>(null);
+  const titleSize = useElementSize(titleRef);
   const [isTruncated, setIsTruncated] = useState(false);
-  const observerRef = useRef<ResizeObserver>();
 
-  const titleRef = useCallback((node: HTMLDivElement | null) => {
-    observerRef.current?.disconnect();
+  useEffect(() => {
+    const node = titleRef.current;
 
-    if (!node) {
-      return;
+    if (node) {
+      setIsTruncated(node.scrollWidth > node.clientWidth);
     }
-
-    const measure = () => setIsTruncated(node.scrollWidth > node.clientWidth);
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return;
-    }
-
-    observerRef.current = new ResizeObserver(measure);
-    observerRef.current.observe(node);
-  }, []);
+  }, [titleSize, title]);
 
   const handleSelect = () => {
     if (disabled) {
