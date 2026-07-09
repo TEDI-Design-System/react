@@ -36,13 +36,14 @@
 
     .tedi-button-group__prefix {
       border-right: 0;
-      border-bottom-right-radius: var(--button-radius-sm);
+      border-top-left-radius: var(--button-radius-sm);
       border-bottom-left-radius: var(--button-radius-sm);
     }
   }
 
   &--vertical {
     flex-direction: column;
+    width: fit-content;
 
     .tedi-button-group__item {
       &:first-child {
@@ -67,7 +68,8 @@
 
     .tedi-button-group__suffix,
     .tedi-button-group__prefix {
-      width: var(--tedi-dimensions-16);
+      align-self: stretch;
+      min-width: 0;
 
       > span {
         overflow: hidden;
