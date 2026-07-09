@@ -33,7 +33,7 @@
     border: 1px solid var(--general-border-primary);
     border-radius: var(--tedi-borders-04);
 
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):hover {
       cursor: pointer;
     }
   }
@@ -82,7 +82,7 @@
     max-width: 144px;
     height: 80px;
 
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):hover {
       border-color: var(--general-border-brand);
 
       .tedi-base-map-selection__title {
@@ -111,7 +111,7 @@
         background-color: var(--map-historical-text-background-selected);
       }
 
-      &:hover {
+      &:not(.tedi-base-map-selection--disabled):hover {
         .tedi-base-map-selection__title {
           color: var(--map-historical-text-selected);
         }
@@ -133,7 +133,16 @@
 .tedi-base-map-selection--disabled {
   &.tedi-base-map-selection__wrapper {
     pointer-events: none;
-    opacity: 0.25;
+
+    .tedi-base-map-selection__content,
+    .tedi-base-map-selection__title {
+      opacity: 0.25;
+    }
+
+    .tedi-base-map-selection__info,
+    .tedi-base-map-selection__title {
+      pointer-events: auto;
+    }
   }
 }
 
@@ -161,7 +170,7 @@
     background: linear-gradient(180deg, rgb(217 217 217 / 0%) 0%, rgb(0 0 0 / 70%) 100%);
   }
 
-  &:hover {
+  &:not(.tedi-base-map-selection--disabled):hover {
     outline: var(--tedi-borders-01) solid var(--tedi-primary-500);
     border-color: var(--tedi-neutral-100);
   }
@@ -203,7 +212,7 @@
     }
   }
 
-  &:hover {
+  &:not(.tedi-base-map-selection--disabled):hover {
     font-weight: 700;
     color: var(--general-text-brand);
     border: 0;
@@ -225,7 +234,7 @@
   }
 
   &:not(.tedi-base-map-selection--multiple, .tedi-base-map-selection--selected) {
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):hover {
       .tedi-base-map-selection__content {
         @include selection-content-hover;
       }
@@ -265,8 +274,8 @@
       opacity: 0.7;
     }
 
-    &:active,
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):active,
+    &:not(.tedi-base-map-selection--disabled):hover {
       &::after {
         outline: var(--tedi-borders-01) solid var(--tedi-primary-500);
         border: 1px solid var(--tedi-neutral-100);
@@ -326,7 +335,7 @@
     }
 
     &:not(.tedi-base-map-selection--selected) {
-      &:hover {
+      &:not(.tedi-base-map-selection--disabled):hover {
         > .tedi-base-map-selection__content {
           @include selection-content-hover;
 
