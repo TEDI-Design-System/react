@@ -1,9 +1,24 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-@mixin selection-content-active {
+@mixin selection-content-focus {
+  padding: 3px;
+  outline: var(--tedi-borders-01) solid var(--tedi-primary-400);
+  outline-offset: calc(-1 * var(--tedi-borders-01));
+  border-color: var(--tedi-primary-400);
+}
+
+@mixin selection-content-hover {
+  padding: 3px;
   outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
-  outline-offset: 1px;
-  border-color: var(--general-border-brand);
+  outline-offset: calc(-1 * var(--tedi-borders-02));
+  border-color: var(--tedi-primary-600);
+}
+
+@mixin selection-content-selected {
+  padding: 4px;
+  outline: var(--tedi-borders-03) solid var(--tedi-primary-600);
+  outline-offset: calc(-1 * var(--tedi-borders-03));
+  border-color: var(--tedi-primary-600);
 }
 
 @mixin brand-title {
@@ -18,7 +33,7 @@
     border: 1px solid var(--general-border-primary);
     border-radius: var(--tedi-borders-04);
 
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):hover {
       cursor: pointer;
     }
   }
@@ -27,14 +42,24 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: var(--tedi-borders-04);
+    border-radius: calc(var(--tedi-borders-04) - 1px);
 
     & > * {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: var(--tedi-borders-04);
+      border-radius: calc(var(--tedi-borders-04) - 1px);
     }
+  }
+
+  &__info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    transform: translate(-50%, -50%);
   }
 
   &__options {
@@ -57,7 +82,7 @@
     max-width: 144px;
     height: 80px;
 
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):hover {
       border-color: var(--general-border-brand);
 
       .tedi-base-map-selection__title {
@@ -86,7 +111,7 @@
         background-color: var(--map-historical-text-background-selected);
       }
 
-      &:hover {
+      &:not(.tedi-base-map-selection--disabled):hover {
         .tedi-base-map-selection__title {
           color: var(--map-historical-text-selected);
         }
@@ -108,7 +133,16 @@
 .tedi-base-map-selection--disabled {
   &.tedi-base-map-selection__wrapper {
     pointer-events: none;
-    opacity: 0.5;
+
+    .tedi-base-map-selection__content,
+    .tedi-base-map-selection__title {
+      opacity: 0.25;
+    }
+
+    .tedi-base-map-selection__info,
+    .tedi-base-map-selection__title {
+      pointer-events: auto;
+    }
   }
 }
 
@@ -136,7 +170,7 @@
     background: linear-gradient(180deg, rgb(217 217 217 / 0%) 0%, rgb(0 0 0 / 70%) 100%);
   }
 
-  &:hover {
+  &:not(.tedi-base-map-selection--disabled):hover {
     outline: var(--tedi-borders-01) solid var(--tedi-primary-500);
     border-color: var(--tedi-neutral-100);
   }
@@ -160,6 +194,14 @@
   flex-direction: column;
   border: 0;
 
+  .tedi-base-map-selection__info {
+    top: 38px;
+
+    @include breakpoints.media-breakpoint-down(md) {
+      top: 28px;
+    }
+  }
+
   .tedi-base-map-selection__title {
     position: relative;
     max-width: 76px;
@@ -170,10 +212,9 @@
     }
   }
 
-  &:hover,
-  &:focus-visible {
+  &:not(.tedi-base-map-selection--disabled):hover {
     font-weight: 700;
-    color: var(--general-border-brand);
+    color: var(--general-text-brand);
     border: 0;
   }
 
@@ -181,8 +222,9 @@
     position: relative;
     display: grid;
     place-items: center;
-    width: 76px;
-    height: 76px;
+    width: 80px;
+    height: 80px;
+    background-color: var(--general-surface-primary);
     border: 1px solid var(--general-border-primary);
 
     @include breakpoints.media-breakpoint-down(md) {
@@ -192,17 +234,24 @@
   }
 
   &:not(.tedi-base-map-selection--multiple) {
-    &:hover,
+    &:not(.tedi-base-map-selection--selected) {
+      &:not(.tedi-base-map-selection--disabled):hover {
+        .tedi-base-map-selection__content {
+          @include selection-content-hover;
+        }
+      }
+    }
+
     &:focus-visible {
       .tedi-base-map-selection__content {
-        @include selection-content-active;
+        @include selection-content-focus;
       }
     }
   }
 
   &.tedi-base-map-selection--selected {
     .tedi-base-map-selection__content {
-      @include selection-content-active;
+      @include selection-content-selected;
     }
 
     .tedi-base-map-selection__title {
@@ -222,13 +271,13 @@
       height: 100%;
       content: '';
       background-color: var(--tedi-neutral-900);
-      border: 1px solid var(--tedi-neutral-900);
+      border: 1px solid var(--general-border-primary);
       border-radius: 4px;
       opacity: 0.7;
     }
 
-    &:active,
-    &:hover {
+    &:not(.tedi-base-map-selection--disabled):active,
+    &:not(.tedi-base-map-selection--disabled):hover {
       &::after {
         outline: var(--tedi-borders-01) solid var(--tedi-primary-500);
         border: 1px solid var(--tedi-neutral-100);
@@ -244,49 +293,90 @@
     }
   }
 
+  &.tedi-base-map-selection__wrapper {
+    width: 80px;
+
+    @include breakpoints.media-breakpoint-down(md) {
+      width: 56px;
+    }
+  }
+
   &.tedi-base-map-selection--selection {
+    .tedi-base-map-selection__title {
+      margin-top: 8px;
+    }
+
     .tedi-base-map-selection__content {
       width: 76px;
       height: 76px;
       overflow: visible;
 
+      @include breakpoints.media-breakpoint-down(md) {
+        width: 52px;
+        height: 52px;
+      }
+
       &::after {
         position: absolute;
-        top: 2px;
-        left: 2px;
+        top: 4px;
+        left: 4px;
         z-index: -1;
         width: 76px;
         height: 76px;
         content: '';
         background-color: var(--tedi-neutral-900);
-        border: 1px solid var(--tedi-neutral-900);
+        border: 1px solid var(--general-border-primary);
         border-radius: 4px;
         opacity: 0.7;
-      }
-    }
 
-    &:hover {
-      > .tedi-base-map-selection__content {
-        outline: var(--tedi-borders-01) solid var(--tedi-primary-500);
-        border: 1px solid var(--tedi-neutral-100);
-
-        &::after {
-          outline: var(--tedi-borders-01) solid var(--tedi-primary-500);
-          border: 1px solid var(--tedi-neutral-100);
+        @include breakpoints.media-breakpoint-down(md) {
+          width: 52px;
+          height: 52px;
         }
       }
     }
 
-    &:focus-visible {
-      > .tedi-base-map-selection__content {
-        outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
-        border: 1px solid var(--general-border-white);
+    &:not(.tedi-base-map-selection--selected) {
+      &:not(.tedi-base-map-selection--disabled):hover {
+        > .tedi-base-map-selection__content {
+          @include selection-content-hover;
 
-        &::after {
-          outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
-          background-color: var(--tedi-neutral-100);
-          border: 1px solid var(--tedi-neutral-100);
+          &::after {
+            outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+            outline-offset: calc(-1 * var(--tedi-borders-02));
+            background-color: var(--tedi-neutral-100);
+            border-color: var(--tedi-neutral-100);
+            opacity: 1;
+          }
         }
+      }
+
+      &:focus-visible {
+        > .tedi-base-map-selection__content {
+          @include selection-content-focus;
+
+          &::after {
+            outline: var(--tedi-borders-01) solid var(--tedi-primary-400);
+            outline-offset: calc(-1 * var(--tedi-borders-01));
+            background-color: var(--tedi-neutral-100);
+            border-color: var(--tedi-neutral-100);
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    &.tedi-base-map-selection--selected {
+      > .tedi-base-map-selection__content::after {
+        outline: var(--tedi-borders-03) solid var(--tedi-primary-600);
+        outline-offset: calc(-1 * var(--tedi-borders-03));
+        background-color: var(--tedi-neutral-100);
+        border-color: var(--tedi-neutral-100);
+        opacity: 1;
+      }
+
+      &:focus-visible > .tedi-base-map-selection__content {
+        @include selection-content-focus;
       }
     }
   }

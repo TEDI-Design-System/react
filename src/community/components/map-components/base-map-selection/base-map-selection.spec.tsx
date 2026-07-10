@@ -186,4 +186,102 @@ describe('BaseMapOption', () => {
 
     expect(onSelect).not.toHaveBeenCalled();
   });
+
+  describe('title truncation tooltip', () => {
+    const stubTitleWidths = (scrollWidth: number, clientWidth: number) => {
+      Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, value: scrollWidth });
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, value: clientWidth });
+    };
+
+    afterEach(() => {
+      stubTitleWidths(0, 0);
+    });
+
+    it('shows the full title in a tooltip on hover when the title is truncated', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+
+      expect(screen.getAllByText(title)).toHaveLength(1);
+
+      fireEvent.mouseEnter(screen.getByText(title));
+
+      expect(screen.getAllByText(title)).toHaveLength(2);
+    });
+
+    it('does not render a tooltip when the title fits', () => {
+      stubTitleWidths(100, 100);
+      render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
+
+      fireEvent.mouseEnter(screen.getByText('Streets'));
+
+      expect(screen.getAllByText('Streets')).toHaveLength(1);
+    });
+  });
+
+  describe('info tooltip', () => {
+    it('renders no icon when tooltipText is not set', () => {
+      render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
+
+      expect(screen.queryByText('info')).not.toBeInTheDocument();
+      expect(screen.queryByText('error')).not.toBeInTheDocument();
+    });
+
+    it('renders an info icon that reveals the tooltip text on hover', () => {
+      render(
+        <BaseMapOption
+          id="streets"
+          title="Streets"
+          tooltipText="Additional information"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      const trigger = screen.getByText('info').closest('span[class*="__info"]');
+      expect(trigger).not.toBeNull();
+      expect(screen.queryByText('Additional information')).not.toBeInTheDocument();
+
+      fireEvent.mouseEnter(trigger as HTMLElement);
+
+      expect(screen.getByText('Additional information')).toBeInTheDocument();
+    });
+
+    it('keeps the info tooltip available when the option is disabled', () => {
+      render(
+        <BaseMapOption
+          disabled
+          id="streets"
+          title="Streets"
+          tooltipText="Additional information"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      const trigger = screen.getByText('info').closest('span[class*="__info"]');
+      expect(trigger).not.toBeNull();
+
+      fireEvent.mouseEnter(trigger as HTMLElement);
+
+      expect(screen.getByText('Additional information')).toBeInTheDocument();
+    });
+
+    it('renders the error icon variant when tooltipType is "error"', () => {
+      render(
+        <BaseMapOption
+          id="streets"
+          title="Streets"
+          tooltipText="This layer is unavailable"
+          tooltipType="error"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      const trigger = screen.getByText('error').closest('span[class*="__info"]');
+      expect(trigger).not.toBeNull();
+
+      fireEvent.mouseEnter(trigger as HTMLElement);
+
+      expect(screen.getByText('This layer is unavailable')).toBeInTheDocument();
+    });
+  });
 });

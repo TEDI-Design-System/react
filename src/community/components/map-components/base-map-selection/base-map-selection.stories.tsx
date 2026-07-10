@@ -32,8 +32,10 @@ const HISTORICAL_IMG = 'https://snazzy-maps-cdn.azureedge.net/assets/8097-wy.png
 
 const MAPS = [
   { id: 'streets', title: 'Kaart', src: MAP_IMG },
-  { id: 'satellite', title: 'Satelliit', src: HISTORICAL_IMG },
+  { id: 'satellite', title: 'Satelliit', src: HISTORICAL_IMG, multiple: true },
   { id: 'hybrid', title: 'Hübriid', src: MAP_IMG, disabled: true },
+  { id: 'test2', title: 'Test 2', src: MAP_IMG },
+  { id: 'test3', title: 'Test 3', src: MAP_IMG },
 ];
 
 const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
@@ -44,6 +46,7 @@ const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
   return (
     <BaseMapSelection
       {...args}
+      multiple
       title={args.title}
       content={<img src={activeMap.src} alt={activeMap.title} />}
       transparency={transparency}
@@ -55,6 +58,7 @@ const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
           id={map.id}
           type="selection"
           title={map.title}
+          multiple={map.multiple}
           disabled={map.disabled ?? false}
           selected={map.id === active}
           onSelect={() => setActive(map.id)}
@@ -136,6 +140,50 @@ export const OptionStates: StoryObj<OptionTemplateProps> = {
       focusVisible: '#Focus',
     },
   },
+};
+
+export const OptionLongTitle: StoryObj<OptionTemplateProps> = {
+  render: OptionStatesTemplate,
+  args: {
+    array: ['Default', 'Selected'],
+    type: 'selection',
+    title: 'Väga pikk aluskaardi pealkiri, mis ei mahu ära',
+    content: <img src={MAP_IMG} alt="Base map" />,
+  },
+};
+
+export const OptionWithInfo: StoryObj<OptionTemplateProps> = {
+  args: {
+    type: 'selection',
+    title: 'Aluskaart',
+    content: <img src={MAP_IMG} alt="Base map" />,
+  },
+  render: (args) => (
+    <VerticalSpacing size={0.5}>
+      <Row>
+        <Col md={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Info</Text>
+        </Col>
+        <Col className="display-flex align-items-center gap-3">
+          <BaseMapOption {...args} id="info" tooltipText="See kaart uueneb igal aastal." tooltipType="info" />
+        </Col>
+      </Row>
+      <Row>
+        <Col md={2} className="display-flex align-items-center">
+          <Text modifiers="bold">Error</Text>
+        </Col>
+        <Col className="display-flex align-items-center gap-3">
+          <BaseMapOption
+            {...args}
+            id="error"
+            disabled
+            tooltipText="Kaardikiht ei ole hetkel saadaval."
+            tooltipType="error"
+          />
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
 };
 
 export const OptionButton: StoryObj<OptionTemplateProps> = {

@@ -154,7 +154,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
 BaseMapSelection.Option = BaseMapOption;
 BaseMapSelection.displayName = 'BaseMapSelection';
 
-export type { BaseMapOptionProps, BaseMapOptionType } from './base-map-option';
+export type { BaseMapOptionProps, BaseMapOptionTooltipType, BaseMapOptionType } from './base-map-option';
 export { BaseMapOption };
 
 export default BaseMapSelection;
