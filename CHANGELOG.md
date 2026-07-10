@@ -1,3 +1,10 @@
+# [18.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.8...react-18.1.0-rc.9) (2026-07-10)
+
+
+### Features
+
+* **popover:** add Header popover variant under Popover [#635](https://github.com/TEDI-Design-System/react/issues/635) ([#726](https://github.com/TEDI-Design-System/react/issues/726)) ([ca42dba](https://github.com/TEDI-Design-System/react/commit/ca42dba2954291c9d4e34dd91751927c0f4e5b73))
+
 # [18.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.7...react-18.1.0-rc.8) (2026-07-10)
 
 
