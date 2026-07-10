@@ -123,7 +123,7 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
               {displayedLanguage}
               <Icon
                 name="expand_more"
-                size={16}
+                size={18}
                 className={cn(styles['tedi-header-language__icon'], {
                   [styles['tedi-header-language__icon--open']]: languageSelectionOpen,
                 })}
