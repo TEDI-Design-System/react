@@ -42,13 +42,13 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: var(--tedi-borders-04);
+    border-radius: calc(var(--tedi-borders-04) - 1px);
 
     & > * {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: var(--tedi-borders-04);
+      border-radius: calc(var(--tedi-borders-04) - 1px);
     }
   }
 
@@ -271,7 +271,7 @@
       height: 100%;
       content: '';
       background-color: var(--tedi-neutral-900);
-      border: 1px solid var(--tedi-neutral-900);
+      border: 1px solid var(--general-border-primary);
       border-radius: 4px;
       opacity: 0.7;
     }
@@ -325,7 +325,7 @@
         height: 76px;
         content: '';
         background-color: var(--tedi-neutral-900);
-        border: 1px solid var(--tedi-neutral-900);
+        border: 1px solid var(--general-border-primary);
         border-radius: 4px;
         opacity: 0.7;
 
