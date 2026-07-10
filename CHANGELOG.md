@@ -1,3 +1,13 @@
+# [18.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.6...react-18.1.0-rc.7) (2026-07-10)
+
+
+### Features
+
+* **BaseMapSelection:** Add options to display a tooltip [#738](https://github.com/TEDI-Design-System/react/issues/738) ([e3ea862](https://github.com/TEDI-Design-System/react/commit/e3ea8623332084628c138390b859d77187d5f94b))
+* **BaseMapSelection:** adjust border style [#738](https://github.com/TEDI-Design-System/react/issues/738) ([54a33c4](https://github.com/TEDI-Design-System/react/commit/54a33c42339b89b6056105e57abcf91bb2af41c4))
+* **BaseMapSelection:** adjust focus, hover and selected styles [#738](https://github.com/TEDI-Design-System/react/issues/738) ([89f071d](https://github.com/TEDI-Design-System/react/commit/89f071dd22cccfe3046233810315f1ae2eba5dce))
+* **BaseMapSelection:** Use existing element size hook [#738](https://github.com/TEDI-Design-System/react/issues/738) ([0c678ca](https://github.com/TEDI-Design-System/react/commit/0c678ca7c196373c0387e8c9768b8a4a96cdbcc6))
+
 # [18.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.5...react-18.1.0-rc.6) (2026-07-07)
 
 
