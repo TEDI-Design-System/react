@@ -1,3 +1,10 @@
+# [18.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.7...react-18.1.0-rc.8) (2026-07-10)
+
+
+### Bug Fixes
+
+* **top-nav:** fix nav toggle label styles [#730](https://github.com/TEDI-Design-System/react/issues/730) ([#731](https://github.com/TEDI-Design-System/react/issues/731)) ([73e0928](https://github.com/TEDI-Design-System/react/commit/73e0928b21ad38d6e1cecec214a35b2618cfa6e7))
+
 # [18.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.6...react-18.1.0-rc.7) (2026-07-10)
 
 
