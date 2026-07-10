@@ -1,3 +1,12 @@
+# [18.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.9...react-18.1.0-rc.10) (2026-07-10)
+
+
+### Bug Fixes
+
+* **map-button:** Added prop functionalities to map-button [#740](https://github.com/TEDI-Design-System/react/issues/740) ([0c0bfef](https://github.com/TEDI-Design-System/react/commit/0c0bfef1a44b21a0fa34dbbed1fe96fcbf909c83))
+* **map-component:** keyboard accessibility fixes + design issues addressed [#740](https://github.com/TEDI-Design-System/react/issues/740) ([cd71fb0](https://github.com/TEDI-Design-System/react/commit/cd71fb06a483947bcfa1f2a94033a25331291d1c))
+* **map-components:** css class naming tweaks [#740](https://github.com/TEDI-Design-System/react/issues/740) ([adfcef7](https://github.com/TEDI-Design-System/react/commit/adfcef79d95da49121e185f155a1a49baa65a47d))
+
 # [18.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.8...react-18.1.0-rc.9) (2026-07-10)
 
 
