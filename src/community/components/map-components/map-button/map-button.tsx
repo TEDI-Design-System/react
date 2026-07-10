@@ -79,7 +79,7 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
     styles[`tedi-map-button--${size}`],
     isSelected && styles['tedi-map-button--selected'],
     dropdownItems && styles['tedi-map-button--dropdown'],
-    isActive && styles['tedi-map-button--active'],
+    isActive && styles['tedi-map-button--is-active'],
     isHovered && styles['tedi-map-button--is-hovered'],
     underline && styles['tedi-map-button--underline'],
     isLoading && styles['tedi-map-button--loading'],

@@ -188,6 +188,25 @@ const TemplateGroup: StoryFn<ButtonGroupProps> = (args) => {
   );
 };
 
+const TemplateGroupSmall: StoryFn<ButtonGroupProps> = (args) => {
+  return (
+    <ButtonGroup {...args}>
+      <MapButton size="small" icon="explore">
+        Kompass
+      </MapButton>
+      <MapButton size="small" icon="straighten">
+        Mõõda
+      </MapButton>
+      <MapButton size="small" icon="compare">
+        Võrdle
+      </MapButton>
+      <MapButton size="small" icon="history">
+        Ajajoon
+      </MapButton>
+    </ButtonGroup>
+  );
+};
+
 // meta.component is MapButton, so Storybook infers MapButton's controls. For the ButtonGroup
 // stories we declare ButtonGroup's argTypes explicitly and restrict the Controls panel to them.
 const buttonGroupArgTypes: Meta<typeof ButtonGroup>['argTypes'] = {
@@ -234,6 +253,18 @@ export const ButtonGroupHorizontalWithPrefixAndSuffix: StoryObj<ButtonGroupProps
 
 export const ButtonGroupVerticalWithPrefixAndSuffix: StoryObj<ButtonGroupProps> = {
   render: TemplateGroup,
+  argTypes: buttonGroupArgTypes,
+  parameters: buttonGroupParameters,
+  args: {
+    direction: 'vertical',
+    prefix: '360°',
+    suffix: '360°',
+    ariaLabel: 'Example button group',
+  },
+};
+
+export const ButtonGroupVerticalSmallWithPrefixAndSuffix: StoryObj<ButtonGroupProps> = {
+  render: TemplateGroupSmall,
   argTypes: buttonGroupArgTypes,
   parameters: buttonGroupParameters,
   args: {

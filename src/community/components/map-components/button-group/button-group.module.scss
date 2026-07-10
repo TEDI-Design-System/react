@@ -3,7 +3,8 @@
 .tedi-button-group {
   display: flex;
   gap: 0;
-  overflow: hidden;
+  width: fit-content;
+  overflow: visible;
 
   &--horizontal {
     flex-direction: row;
@@ -43,7 +44,6 @@
 
   &--vertical {
     flex-direction: column;
-    width: fit-content;
 
     .tedi-button-group__item {
       &:first-child {
@@ -70,6 +70,7 @@
     .tedi-button-group__prefix {
       align-self: stretch;
       min-width: 0;
+      padding: 0;
 
       > span {
         overflow: hidden;
@@ -91,6 +92,7 @@
   }
 
   .tedi-button-group__item {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -99,12 +101,20 @@
     cursor: pointer;
     border-radius: 0;
 
+    &:hover,
+    &:focus-visible,
+    &--active {
+      z-index: 1;
+    }
+
     @include breakpoints.media-breakpoint-down(md) {
       flex: 1;
     }
   }
 
   &--stretch {
+    width: 100%;
+
     .tedi-button-group__item {
       flex: 1;
     }

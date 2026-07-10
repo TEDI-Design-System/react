@@ -37,11 +37,14 @@ describe('MapButton', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('applies the underline / is-hovered modifier classes', () => {
+  it('applies the underline / is-hovered / active modifier classes', () => {
     const { rerender } = render(<MapButton underline>Text</MapButton>);
     expect(screen.getByRole('button').className).toContain('tedi-map-button--underline');
 
     rerender(<MapButton isHovered>Text</MapButton>);
     expect(screen.getByRole('button').className).toContain('tedi-map-button--is-hovered');
+
+    rerender(<MapButton isActive>Text</MapButton>);
+    expect(screen.getByRole('button').className).toContain('tedi-map-button--is-active');
   });
 });
