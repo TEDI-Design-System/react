@@ -56,9 +56,9 @@
   }
 
   &__wrapper--large &__button--icon-only {
-    width: var(--button-lg-icon-size);
-    height: var(--button-lg-icon-size);
-    min-height: var(--button-lg-icon-size);
+    width: var(--form-field-height-lg);
+    height: var(--form-field-height-lg);
+    min-height: var(--form-field-height-lg);
     padding: var(--button-lg-icon-padding);
   }
 }
