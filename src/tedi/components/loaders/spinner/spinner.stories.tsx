@@ -4,11 +4,6 @@ import { useEffect } from 'react';
 import { Col, Row } from '../../layout/grid';
 import { Spinner, SpinnerProps } from './spinner';
 
-/**
- * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2768-42334&mode=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/13d6ac-spinner" target="_BLANK">Zeroheight ↗</a>
- */
-
 const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) => {
   const { color } = context.args;
 
@@ -33,6 +28,11 @@ const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) 
 
   return <Story />;
 };
+
+/**
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.65.83?node-id=2080-33175&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/13d6ac-spinner" target="_BLANK">Zeroheight ↗</a>
+ */
 
 const meta: Meta<typeof Spinner> = {
   component: Spinner,
