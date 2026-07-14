@@ -1,208 +1,222 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
+import { JSX, useState } from 'react';
 
-import { Card, Col, Icon, Row, Text } from '../../../../tedi';
-import Toggle from '../../form/toggle/toggle';
+import { Button, Card, Checkbox, Col, ISelectOption, Link, Row, Select, Text, TSelectValue } from '../../../../tedi';
 import MapAccordion from '../map-accordion/map-accordion';
-import MapAccordionItem from '../map-accordion/map-accordion-item';
-import MapAccordionItemContent from '../map-accordion/map-accordion-item-content';
-import MapAccordionItemHeader from '../map-accordion/map-accordion-item-header';
-import MapLayer, { LayerOption } from '../map-layer/map-layer';
-import Select from '../map-select/map-select';
-import LeftPanel from './left-panel';
+import { LeftPanel } from './left-panel';
+
+const logo = (
+  <img
+    src="/logo.svg"
+    alt="Maa- ja Ruumiamet logo"
+    style={{ filter: 'brightness(0) saturate(100%) invert(100%)', height: '40px' }}
+  />
+);
 
 /**
- * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/Veera-Map-Design-System?node-id=427-91631&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/8053d6-left-panel" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.figma.com/design/3DIVbgDcC0R4qgqWhZMfvw/TEDI-Map-Components-1.1.1?node-id=830-141920&m=dev" target="_BLANK">Figma ↗</a>
  */
 
 const meta: Meta<typeof LeftPanel> = {
   component: LeftPanel,
   title: 'Community/Map components/LeftPanel',
+  parameters: {
+    layout: 'fullscreen',
+  },
+  args: {
+    icon: logo,
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof LeftPanel>;
 
-const mapOptions = [
-  { value: 'maainfo', label: 'Maainfo' },
-  { value: 'mahekaart', label: 'Mahekaart' },
-  { value: 'merekaart', label: 'Merekaart' },
-  { value: 'murakaart', label: 'Mürakaart' },
-  { value: 'ajaloolised kaardid', label: 'Ajaloolised kaardid' },
-  { value: 'aluskaardid', label: 'Aluskaardid' },
+interface MapLayer {
+  id: string;
+  visible: boolean;
+}
+
+const MOCK_LAYERS: MapLayer[] = [
+  { id: 'Katastripiirid', visible: true },
+  { id: 'Aadressandmed', visible: false },
+  { id: 'Ortofoto', visible: true },
 ];
 
-const mapLayers = [
-  { id: 'katastrikaart', label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Katastrikaart</Text>} /> },
-  { id: 'maakorralduskavad', label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Maakorralduskavad</Text>} /> },
-  {
-    id: 'hinna-ja-viljakutsoonid',
-    label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Hinna- ja viljakustsoonid</Text>} />,
-  },
-  { id: 'koordinaatvõrgud', label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Koordinaatvõrgud</Text>} /> },
-  { id: 'kaardilehtede-jaotus', label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Kaardilehtede jaotus</Text>} /> },
-  { id: 'korgusandmed', label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Kõrgusandmed</Text>} /> },
-  { id: 'huvipunktid', label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Huvipunktid</Text>} /> },
-  {
-    id: 'haldus-ja-asustuspiirid',
-    label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Haldus- ja asustuspiirid</Text>} />,
-  },
-  {
-    id: 'eesti-topograafia-andmekogu',
-    label: <Toggle ariaLabel="Lorem ipsum" label={<Text>Eesti topograafia andmekogu</Text>} />,
-  },
+const MANY_LAYERS: MapLayer[] = Array.from({ length: 50 }, (_, index) => ({
+  id: `Kaardikiht ${index + 1}`,
+  visible: index % 3 === 0,
+}));
+
+const MOCK_TOPICS: ISelectOption[] = [
+  { value: 'yldkaart', label: 'Üldkaart' },
+  { value: 'kataster', label: 'Kataster' },
+  { value: 'planeeringud', label: 'Planeeringud' },
 ];
 
-const LayerPanelItems: LayerOption[] = [
-  {
-    defaultChecked: true,
-    id: 'boundary',
-    label: 'KÜ piiripunktid',
-    name: 'boundary',
-    type: 'checkbox' as const,
-    value: 'boundary',
-  },
-  {
-    children: [
-      {
-        defaultValue: {
-          label: 'Tunnus',
-          value: 'tunnus',
-        },
-        id: 'select-tunnus',
-        label: '',
-        options: [
-          {
-            label: 'Tunnus',
-            value: 'tunnus',
-          },
-          {
-            label: 'Koordinaat',
-            value: 'koordinaat',
-          },
-          {
-            label: 'Piir',
-            value: 'piir',
-          },
-        ],
-        placeholder: 'Tunnus',
-        type: 'select',
-      },
-    ],
-    id: 'show-on-map',
-    label: 'Kuva kaardil',
-    name: 'show-on-map',
-    type: 'checkbox',
-    value: 'show-on-map',
-  },
-  {
-    defaultChecked: true,
-    id: 'ownership',
-    label: 'KÜ omandivorm',
-    name: 'ownership',
-    type: 'checkbox',
-    value: 'ownership',
-  },
-  {
-    id: 'purpose',
-    label: 'KÜ sihtotstarbe järgi',
-    name: 'purpose',
-    type: 'checkbox',
-    value: 'purpose',
-  },
-];
+const TopicList = (): JSX.Element => {
+  const [selected, setSelected] = useState<ISelectOption | null>(MOCK_TOPICS[0]);
 
-const dropdownContent = [
-  {
-    children: (
-      <>
-        <Icon name="add" display="inline" size={24} /> Lisa kiht
-      </>
-    ),
-    onClick: () => console.log('Lisa kiht'),
-  },
-  {
-    children: (
-      <>
-        <Icon name="folder" display="inline" size={24} /> Lisa grupp
-      </>
-    ),
-    onClick: () => console.log('Lisa grupp'),
-  },
-  {
-    children: (
-      <>
-        <Icon name="my_location" display="inline" size={24} /> Jälgi teekonda
-      </>
-    ),
-    onClick: () => console.log('Jälgi teekonda'),
-  },
-  {
-    children: (
-      <>
-        <Icon name="download" display="inline" size={24} /> Laadi alla
-      </>
-    ),
-    onClick: () => console.log('Laadi alla'),
-  },
-];
+  const handleChange = (value: TSelectValue): void => {
+    if (!value || Array.isArray(value)) {
+      return;
+    }
+
+    setSelected(value as ISelectOption);
+  };
+
+  return (
+    <Card borderless>
+      <Card.Content padding={0.5}>
+        <Row gutterY={2}>
+          <Col>
+            <Select id="topic-list" label="Teemakaart" value={selected} options={MOCK_TOPICS} onChange={handleChange} />
+          </Col>
+        </Row>
+      </Card.Content>
+    </Card>
+  );
+};
+
+const LayersContent = ({ initialLayers = MOCK_LAYERS }: { initialLayers?: MapLayer[] }): JSX.Element => {
+  const [layers, setLayers] = useState<MapLayer[]>(initialLayers);
+
+  const setLayerVisibility = (id: string, checked: boolean): void => {
+    setLayers((prev) => prev.map((layer) => (layer.id === id ? { ...layer, visible: checked } : layer)));
+  };
+
+  return (
+    <>
+      <TopicList />
+      <MapAccordion defaultOpenItem={['kihid']}>
+        <MapAccordion.Item id="kihid">
+          <MapAccordion.Header title="Kihid" />
+          <MapAccordion.Content>
+            {layers.map((layer) => (
+              <div key={layer.id} data-layer-id={layer.id}>
+                <Checkbox
+                  id={layer.id}
+                  label={layer.id}
+                  name={layer.id}
+                  value={layer.id}
+                  checked={layer.visible}
+                  onChange={(_value: string, checked: boolean) => {
+                    setLayerVisibility(layer.id, checked);
+                  }}
+                />
+              </div>
+            ))}
+          </MapAccordion.Content>
+        </MapAccordion.Item>
+      </MapAccordion>
+    </>
+  );
+};
+
+const sampleHeader = (
+  <Button visualType="link" color="inverted" iconLeft="logout">
+    Logi sisse
+  </Button>
+);
+
+const sampleFooter = (
+  <>
+    <Row>
+      <Col width="auto">
+        <Text color="secondary" modifiers="small">
+          Tehniline tugi
+        </Text>
+      </Col>
+      <Col>
+        <Link href="#" size="small">
+          kaardirakendus@maaruum.ee
+        </Link>
+      </Col>
+    </Row>
+    <Row>
+      <Col width="auto">
+        <Text color="secondary" modifiers="small">
+          Telefon
+        </Text>
+      </Col>
+      <Col>
+        <Link href="#" size="small">
+          6 650 600
+        </Link>
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+        <Text color="secondary" modifiers="small">
+          Maa- ja Ruumiamet. Kõik õigused kaitstud.
+        </Text>
+      </Col>
+    </Row>
+  </>
+);
 
 export const Default: Story = {
-  render: () => (
-    <LeftPanel show2D3DButtons={false} showAlert={false}>
-      <Card borderless>
-        <Card.Content padding={0.5}>
-          <Row gutterY={2}>
-            <Col>
-              <Text color="secondary">Teemakaardid</Text>
-              <Select options={mapOptions} id="" label="" defaultValue={{ label: 'Maainfo', value: 'maainfo' }} />
-            </Col>
-          </Row>
-        </Card.Content>
-      </Card>
+  args: {
+    header: sampleHeader,
+    footer: sampleFooter,
+    children: <LayersContent />,
+  },
+};
 
-      <MapAccordion defaultOpenItem={['first']}>
-        <MapAccordionItem id="first">
-          <MapAccordionItemHeader
-            title="Maainfo"
-            dropdownContent={[
-              { children: 'Lisa pöördumine', onClick: () => console.log('Lisa pöördumine') },
-              { children: 'Lisa toetus', onClick: () => console.log('Lisa toetus') },
-            ]}
-            actions={
-              <div className="flex align-items-center gap-2">
-                <Icon name="history" color="white" size={18} />
-                <Text modifiers={['small']}>Taasta algseis</Text>
-              </div>
-            }
-          />
-          <MapAccordionItemContent>
-            <MapAccordion>
-              {mapLayers.map(({ id, label }) => (
-                <MapAccordionItem key={id} id={id}>
-                  <MapAccordionItemHeader backgroundColor="secondary" hasSeparator title={label} />
-                  <MapAccordionItemContent padding={0}>
-                    <Card borderRadius={false} borderless>
-                      <Card.Content padding={0}>
-                        <MapLayer items={LayerPanelItems} />
-                      </Card.Content>
-                    </Card>
-                  </MapAccordionItemContent>
-                </MapAccordionItem>
-              ))}
-            </MapAccordion>
-          </MapAccordionItemContent>
-        </MapAccordionItem>
+export const WithoutFooter: Story = {
+  args: {
+    header: sampleHeader,
+    children: <LayersContent />,
+  },
+};
 
-        <MapAccordionItem id="second">
-          <MapAccordionItemHeader title="Minu kihid" dropdownContent={dropdownContent} />
-          <MapAccordionItemContent>
-            <Card borderRadius={false} borderless>
-              <Card.Content padding={1}>Lorem ipsum</Card.Content>
-            </Card>
-          </MapAccordionItemContent>
-        </MapAccordionItem>
-      </MapAccordion>
-    </LeftPanel>
-  ),
+export const FixedWidth: Story = {
+  args: {
+    resizable: false,
+    width: 400,
+    header: sampleHeader,
+    footer: sampleFooter,
+    children: <LayersContent />,
+  },
+};
+
+export const Scrollable: Story = {
+  args: {
+    header: sampleHeader,
+    footer: sampleFooter,
+    children: <LayersContent initialLayers={MANY_LAYERS} />,
+  },
+};
+
+export const NoIcon: Story = {
+  args: {
+    header: sampleHeader,
+    footer: sampleFooter,
+    icon: undefined,
+    children: <LayersContent />,
+  },
+};
+
+const ControlledExternallyDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1rem' }}>
+      <LeftPanel
+        icon={logo}
+        open={open}
+        onOpenChange={setOpen}
+        hideCloseButton
+        hideOpenButton
+        header={sampleHeader}
+        footer={sampleFooter}
+      >
+        <LayersContent />
+      </LeftPanel>
+      <Button onClick={() => setOpen((prev) => !prev)}>{open ? 'Peida paneel' : 'Näita paneeli'}</Button>
+    </div>
+  );
+};
+
+export const ControlledExternally: Story = {
+  render: () => <ControlledExternallyDemo />,
 };
