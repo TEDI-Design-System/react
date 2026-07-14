@@ -82,10 +82,13 @@ export const LeftPanel = ({
 
     if (isOpen) {
       closeButtonRef.current?.focus();
-    } else {
+      return;
+    }
+
+    if (!hideOpenButton) {
       expanderRef.current?.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, hideOpenButton]);
 
   if (!isOpen && hideOpenButton) {
     return null;
