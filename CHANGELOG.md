@@ -1,3 +1,10 @@
+# [18.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.10...react-18.1.0-rc.11) (2026-07-14)
+
+
+### Bug Fixes
+
+* **search:** fix Search component styles [#739](https://github.com/TEDI-Design-System/react/issues/739) ([#745](https://github.com/TEDI-Design-System/react/issues/745)) ([a4571d5](https://github.com/TEDI-Design-System/react/commit/a4571d59b20b6f40ed13ee71418ac82c7c836872))
+
 # [18.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.9...react-18.1.0-rc.10) (2026-07-10)
 
 
