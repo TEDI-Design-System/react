@@ -25,6 +25,8 @@
     "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
     "test": "jest --config ./jest.config.ts --passWithNoTests",
     "test:coverage": "jest --config ./jest.config.ts --coverage",
+    "test-storybook": "test-storybook",
+    "test-storybook:ci": "npx -y concurrently -k -s first -n \"SB,A11Y\" -c \"magenta,blue\" \"npx -y http-server dist/storybook-static --port 6006 --silent\" \"npx -y wait-on tcp:127.0.0.1:6006 && test-storybook --index-json --url http://127.0.0.1:6006 --junit\"",
     "release": "npx semantic-release",
     "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
@@ -64,7 +66,6 @@
     "react-dom": "18.3.1 || ^19.0.0"
   },
   "devDependencies": {
-    "@etchteam/storybook-addon-status": "^8.1.0",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
@@ -74,6 +75,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@etchteam/storybook-addon-status": "^8.1.0",
     "@faker-js/faker": "^10.3.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
@@ -85,6 +87,7 @@
     "@storybook/builder-vite": "^10.4.6",
     "@storybook/react": "^10.4.6",
     "@storybook/react-vite": "^10.4.6",
+    "@storybook/test-runner": "^0.24.4",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "15.0.6",
