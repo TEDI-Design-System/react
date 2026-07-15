@@ -362,6 +362,26 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Lead Designer' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
     });
+
+    it('resets the scroll container to the top on page change', () => {
+      const { container } = render(
+        <Table<Person>
+          id="t-scroll-reset"
+          data={data}
+          columns={columns}
+          maxHeight={200}
+          pagination={{ pageSize: 1, pageSizeOptions: [1, 2] }}
+        />
+      );
+
+      const scroll = container.querySelector('.tedi-table__scroll') as HTMLElement;
+      scroll.scrollTop = 120;
+      expect(scroll.scrollTop).toBe(120);
+
+      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+
+      expect(scroll.scrollTop).toBe(0);
+    });
   });
 
   describe('persistence', () => {
