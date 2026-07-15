@@ -26,7 +26,7 @@
     "test": "jest --config ./jest.config.ts --passWithNoTests",
     "test:coverage": "jest --config ./jest.config.ts --coverage",
     "test-storybook": "test-storybook",
-    "test-storybook:ci": "npx -y concurrently -k -s first -n \"SB,A11Y\" -c \"magenta,blue\" \"npx -y http-server dist/storybook-static --port 6006 --silent\" \"npx -y wait-on tcp:127.0.0.1:6006 && test-storybook --index-json --url http://127.0.0.1:6006 --junit\"",
+    "test-storybook:ci": "concurrently -k -s first -n \"SB,A11Y\" -c \"magenta,blue\" \"http-server dist/storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --index-json --url http://127.0.0.1:6006 --junit\"",
     "release": "npx semantic-release",
     "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
@@ -105,6 +105,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.3.4",
     "chromatic": "^13.3.4",
+    "concurrently": "^10.0.3",
     "dompurify": "^3.3.0",
     "eslint": "8.48.0",
     "eslint-config-next": "^13.4.6",
@@ -117,6 +118,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-storybook": "^10.4.6",
     "eslint-plugin-unused-imports": "^4.1.4",
+    "http-server": "^14.1.1",
     "husky": "^9.0.11",
     "identity-obj-proxy": "^3.0.0",
     "jest": "29.7.0",
@@ -146,7 +148,8 @@
     "vite": "^5.4.11",
     "vite-plugin-checker": "^0.6.4",
     "vite-plugin-dts": "4.5.4",
-    "vite-plugin-static-copy": "^2.2.0"
+    "vite-plugin-static-copy": "^2.2.0",
+    "wait-on": "^9.0.10"
   },
   "commitlint": {
     "extends": "@commitlint/config-conventional",
