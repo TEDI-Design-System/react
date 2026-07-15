@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { CSSProperties, JSX, ReactNode, useEffect, useId, useRef, useState } from 'react';
 
-import { Button, Icon, useLabels } from '../../../../tedi';
+import { Button, ClosingButton, Icon, useLabels } from '../../../../tedi';
 import { Resizer } from '../resizer/resizer';
 import styles from './left-panel.module.scss';
 
@@ -60,7 +60,6 @@ export const LeftPanel = ({
   const isOpen = isControlled ? open : internalOpen;
 
   const userToggledRef = useRef(false);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const expanderRef = useRef<HTMLButtonElement>(null);
 
   const setOpen = (next: boolean): void => {
@@ -80,12 +79,7 @@ export const LeftPanel = ({
 
     userToggledRef.current = false;
 
-    if (isOpen) {
-      closeButtonRef.current?.focus();
-      return;
-    }
-
-    if (!hideOpenButton) {
+    if (!isOpen && !hideOpenButton) {
       expanderRef.current?.focus();
     }
   }, [isOpen, hideOpenButton]);
@@ -118,17 +112,14 @@ export const LeftPanel = ({
         <div className={styles['tedi-left-panel__header']}>
           {icon}
           {!hideCloseButton && (
-            <Button
-              ref={closeButtonRef}
+            <ClosingButton
               className={styles['tedi-left-panel__close']}
+              color="white"
               onClick={() => setOpen(false)}
-              visualType="link"
-              aria-label={getLabel('leftPanelClose')}
+              title={getLabel('leftPanelClose')}
               aria-controls={panelId}
               aria-expanded={true}
-            >
-              <Icon name="close" color="white" size={36} />
-            </Button>
+            />
           )}
         </div>
         <div className={styles['tedi-left-panel__header-controls']}>{header}</div>
