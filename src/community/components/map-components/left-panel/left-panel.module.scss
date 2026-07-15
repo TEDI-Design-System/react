@@ -36,7 +36,7 @@
   line-height: var(--body-small-regular-line-height);
   word-break: break-all;
   background: var(--general-surface-secondary);
-  border-top: 1px solid var(--general-border-primary);
+  border-top: var(--tedi-borders-01) solid var(--general-border-primary);
 }
 
 .tedi-left-panel__header-controls {
