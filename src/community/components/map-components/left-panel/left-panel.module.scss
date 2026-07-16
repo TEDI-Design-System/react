@@ -73,11 +73,20 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--button-md-icon-size);
-  height: var(--button-md-icon-size);
+  width: var(--tedi-dimensions-14);
+  height: var(--tedi-dimensions-22);
   cursor: pointer;
   background-color: var(--general-surface-primary);
   border: var(--tedi-borders-01) solid var(--general-border-primary);
   border-radius: var(--sidepanel-header-radius-bottom);
   box-shadow: 0 2px 4px var(--tedi-alpha-14);
+
+  &:hover {
+    background-color: var(--general-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--general-border-brand);
+    background-color: var(--general-surface-primary);
+  }
 }
