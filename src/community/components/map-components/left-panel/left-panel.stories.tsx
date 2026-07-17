@@ -20,6 +20,11 @@ const logo = (
 const meta: Meta<typeof LeftPanel> = {
   component: LeftPanel,
   title: 'Community/Map components/LeftPanel',
+  subcomponents: {
+    'LeftPanel.Header': LeftPanel.Header,
+    'LeftPanel.Content': LeftPanel.Content,
+    'LeftPanel.Footer': LeftPanel.Footer,
+  } as never,
   parameters: {
     layout: 'fullscreen',
   },
@@ -155,45 +160,69 @@ const sampleFooter = (
 );
 
 export const Default: Story = {
-  args: {
-    header: sampleHeader,
-    footer: sampleFooter,
-    children: <LayersContent />,
-  },
+  render: (args) => (
+    <LeftPanel {...args}>
+      <LeftPanel.Header>{sampleHeader}</LeftPanel.Header>
+      <LeftPanel.Content>
+        <LayersContent />
+      </LeftPanel.Content>
+      <LeftPanel.Footer>{sampleFooter}</LeftPanel.Footer>
+    </LeftPanel>
+  ),
 };
 
 export const WithoutFooter: Story = {
-  args: {
-    header: sampleHeader,
-    children: <LayersContent />,
-  },
+  render: (args) => (
+    <LeftPanel {...args}>
+      <LeftPanel.Header>{sampleHeader}</LeftPanel.Header>
+      <LeftPanel.Content>
+        <LayersContent />
+      </LeftPanel.Content>
+    </LeftPanel>
+  ),
 };
 
 export const FixedWidth: Story = {
   args: {
     resizable: false,
     width: 400,
-    header: sampleHeader,
-    footer: sampleFooter,
-    children: <LayersContent />,
   },
+  render: (args) => (
+    <LeftPanel {...args}>
+      <LeftPanel.Header>{sampleHeader}</LeftPanel.Header>
+      <LeftPanel.Content>
+        <LayersContent />
+      </LeftPanel.Content>
+      <LeftPanel.Footer>{sampleFooter}</LeftPanel.Footer>
+    </LeftPanel>
+  ),
 };
 
 export const Scrollable: Story = {
-  args: {
-    header: sampleHeader,
-    footer: sampleFooter,
-    children: <LayersContent initialLayers={MANY_LAYERS} />,
-  },
+  render: (args) => (
+    <LeftPanel {...args}>
+      <LeftPanel.Header>{sampleHeader}</LeftPanel.Header>
+      <LeftPanel.Content>
+        <LayersContent initialLayers={MANY_LAYERS} />
+      </LeftPanel.Content>
+      <LeftPanel.Footer>{sampleFooter}</LeftPanel.Footer>
+    </LeftPanel>
+  ),
 };
 
 export const NoIcon: Story = {
   args: {
-    header: sampleHeader,
-    footer: sampleFooter,
     icon: undefined,
-    children: <LayersContent />,
   },
+  render: (args) => (
+    <LeftPanel {...args}>
+      <LeftPanel.Header>{sampleHeader}</LeftPanel.Header>
+      <LeftPanel.Content>
+        <LayersContent />
+      </LeftPanel.Content>
+      <LeftPanel.Footer>{sampleFooter}</LeftPanel.Footer>
+    </LeftPanel>
+  ),
 };
 
 const ControlledExternallyDemo = (): JSX.Element => {
@@ -201,16 +230,12 @@ const ControlledExternallyDemo = (): JSX.Element => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', padding: '1rem' }}>
-      <LeftPanel
-        icon={logo}
-        open={open}
-        onOpenChange={setOpen}
-        hideCloseButton
-        hideOpenButton
-        header={sampleHeader}
-        footer={sampleFooter}
-      >
-        <LayersContent />
+      <LeftPanel icon={logo} open={open} onOpenChange={setOpen} hideCloseButton hideOpenButton>
+        <LeftPanel.Header>{sampleHeader}</LeftPanel.Header>
+        <LeftPanel.Content>
+          <LayersContent />
+        </LeftPanel.Content>
+        <LeftPanel.Footer>{sampleFooter}</LeftPanel.Footer>
       </LeftPanel>
       <Button onClick={() => setOpen((prev) => !prev)}>{open ? 'Peida paneel' : 'Näita paneeli'}</Button>
     </div>

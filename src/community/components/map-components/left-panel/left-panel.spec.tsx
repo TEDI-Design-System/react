@@ -12,10 +12,12 @@ const renderWithLabels = (ui: ReactElement): RenderResult => render(<LabelProvid
 
 describe('LeftPanel', () => {
   describe('rendering', () => {
-    it('renders header, footer and children when open', () => {
+    it('renders header, footer and content when open', () => {
       renderWithLabels(
-        <LeftPanel header={<span>Header</span>} footer={<span>Footer</span>}>
-          <span>Body</span>
+        <LeftPanel>
+          <LeftPanel.Header>Header</LeftPanel.Header>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+          <LeftPanel.Footer>Footer</LeftPanel.Footer>
         </LeftPanel>
       );
 
@@ -24,20 +26,32 @@ describe('LeftPanel', () => {
       expect(screen.getByText('Body')).toBeInTheDocument();
     });
 
-    it('does not render the footer wrapper when no footer is provided', () => {
-      renderWithLabels(<LeftPanel>Body</LeftPanel>);
+    it('does not render the footer when no footer is provided', () => {
+      renderWithLabels(
+        <LeftPanel>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       expect(screen.queryByText('Footer')).not.toBeInTheDocument();
     });
 
     it('renders a close button with the default accessible label', () => {
-      renderWithLabels(<LeftPanel>Body</LeftPanel>);
+      renderWithLabels(
+        <LeftPanel>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       expect(screen.getByRole('button', { name: 'Sulge paneel' })).toBeInTheDocument();
     });
 
     it('hides the close button when hideCloseButton is set', () => {
-      renderWithLabels(<LeftPanel hideCloseButton>Body</LeftPanel>);
+      renderWithLabels(
+        <LeftPanel hideCloseButton>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       expect(screen.queryByRole('button', { name: 'Sulge paneel' })).not.toBeInTheDocument();
     });
@@ -45,7 +59,7 @@ describe('LeftPanel', () => {
     it('applies a fixed width and skips the resizer when resizable is false', () => {
       renderWithLabels(
         <LeftPanel resizable={false} width={420}>
-          Body
+          <LeftPanel.Content>Body</LeftPanel.Content>
         </LeftPanel>
       );
 
@@ -53,7 +67,11 @@ describe('LeftPanel', () => {
     });
 
     it('exposes the panel as a labelled complementary landmark linked to its close button', () => {
-      renderWithLabels(<LeftPanel>Body</LeftPanel>);
+      renderWithLabels(
+        <LeftPanel>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       const panel = screen.getByRole('complementary', { name: 'Külgpaneel' });
       const closeButton = screen.getByRole('button', { name: 'Sulge paneel' });
@@ -63,7 +81,11 @@ describe('LeftPanel', () => {
 
   describe('uncontrolled open state', () => {
     it('collapses to the expander button when the close button is clicked', () => {
-      renderWithLabels(<LeftPanel>Body</LeftPanel>);
+      renderWithLabels(
+        <LeftPanel>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       fireEvent.click(screen.getByRole('button', { name: 'Sulge paneel' }));
 
@@ -72,7 +94,11 @@ describe('LeftPanel', () => {
     });
 
     it('reopens the panel when the expander button is clicked', () => {
-      renderWithLabels(<LeftPanel defaultOpen={false}>Body</LeftPanel>);
+      renderWithLabels(
+        <LeftPanel defaultOpen={false}>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       fireEvent.click(screen.getByRole('button', { name: 'Ava paneel' }));
 
@@ -82,7 +108,7 @@ describe('LeftPanel', () => {
     it('renders nothing when collapsed and hideOpenButton is set', () => {
       const { container } = renderWithLabels(
         <LeftPanel defaultOpen={false} hideOpenButton>
-          Body
+          <LeftPanel.Content>Body</LeftPanel.Content>
         </LeftPanel>
       );
 
@@ -95,7 +121,7 @@ describe('LeftPanel', () => {
       const onOpenChange = jest.fn();
       renderWithLabels(
         <LeftPanel open onOpenChange={onOpenChange}>
-          Body
+          <LeftPanel.Content>Body</LeftPanel.Content>
         </LeftPanel>
       );
 
@@ -106,12 +132,18 @@ describe('LeftPanel', () => {
     });
 
     it('reflects the open prop from the parent', () => {
-      const { rerender } = renderWithLabels(<LeftPanel open>Body</LeftPanel>);
+      const { rerender } = renderWithLabels(
+        <LeftPanel open>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
       expect(screen.getByText('Body')).toBeInTheDocument();
 
       rerender(
         <LabelProvider>
-          <LeftPanel open={false}>Body</LeftPanel>
+          <LeftPanel open={false}>
+            <LeftPanel.Content>Body</LeftPanel.Content>
+          </LeftPanel>
         </LabelProvider>
       );
       expect(screen.queryByText('Body')).not.toBeInTheDocument();
@@ -121,7 +153,11 @@ describe('LeftPanel', () => {
 
   describe('accessible labels', () => {
     it('labels the reopen button from LabelProvider when collapsed', () => {
-      renderWithLabels(<LeftPanel defaultOpen={false}>Body</LeftPanel>);
+      renderWithLabels(
+        <LeftPanel defaultOpen={false}>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
 
       expect(screen.getByRole('button', { name: 'Ava paneel' })).toBeInTheDocument();
     });

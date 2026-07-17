@@ -1,9 +1,37 @@
 import cn from 'classnames';
-import { CSSProperties, JSX, ReactNode, useEffect, useId, useRef, useState } from 'react';
+import {
+  Children,
+  CSSProperties,
+  ElementType,
+  isValidElement,
+  JSX,
+  ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 import { Button, ClosingButton, Icon, useLabels } from '../../../../tedi';
 import { Resizer } from '../resizer/resizer';
 import styles from './left-panel.module.scss';
+import LeftPanelContent, { LeftPanelContentProps } from './left-panel-content';
+import LeftPanelFooter, { LeftPanelFooterProps } from './left-panel-footer';
+import LeftPanelHeader, { LeftPanelHeaderProps } from './left-panel-header';
+
+export type { LeftPanelContentProps, LeftPanelFooterProps, LeftPanelHeaderProps };
+
+const findSlot = (children: ReactNode, type: ElementType): ReactNode => {
+  let slot: ReactNode = null;
+
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === type) {
+      slot = child;
+    }
+  });
+
+  return slot;
+};
 
 export interface LeftPanelProps {
   /** Additional class name applied to the panel root. */
@@ -22,11 +50,7 @@ export interface LeftPanelProps {
   onOpenChange?: (open: boolean) => void;
   /** Allow the user to drag-resize the panel width. */
   resizable?: boolean;
-  /** Content placed in the blue header area, under the icon. */
-  header?: ReactNode;
-  /** Content placed in the gray footer area. */
-  footer?: ReactNode;
-  /** Main scrollable content. */
+  /** `LeftPanel.Header`, `LeftPanel.Content` and `LeftPanel.Footer`. */
   children?: ReactNode;
   /** Panel width in pixels. Initial width when resizable, fixed width otherwise. */
   width?: number;
@@ -36,7 +60,7 @@ export interface LeftPanelProps {
   minWidth?: number;
 }
 
-export const LeftPanel = ({
+const LeftPanelComponent = ({
   className,
   icon,
   hideCloseButton = false,
@@ -45,8 +69,6 @@ export const LeftPanel = ({
   open,
   onOpenChange,
   resizable = true,
-  header,
-  footer,
   children,
   width = 350,
   minWidth = 350,
@@ -106,10 +128,18 @@ export const LeftPanel = ({
   const rootClassName = cn(styles['tedi-left-panel'], className);
   const rootStyle: CSSProperties | undefined = resizable ? undefined : { width };
 
+  const headerSlot = findSlot(children, LeftPanelHeader);
+  const contentSlot = findSlot(children, LeftPanelContent);
+  const footerSlot = findSlot(children, LeftPanelFooter);
+
+  const headerClassName = cn(styles['tedi-left-panel__header'], {
+    [styles['tedi-left-panel__header--rounded']]: !headerSlot,
+  });
+
   const panel = (
     <aside id={panelId} aria-label={getLabel('leftPanel')} className={rootClassName} style={rootStyle}>
       <div className={styles['tedi-left-panel__actions']}>
-        <div className={styles['tedi-left-panel__header']}>
+        <div className={headerClassName}>
           {icon}
           {!hideCloseButton && (
             <ClosingButton
@@ -122,10 +152,10 @@ export const LeftPanel = ({
             />
           )}
         </div>
-        <div className={styles['tedi-left-panel__header-controls']}>{header}</div>
-        <div className={styles['tedi-left-panel__content-wrapper']}>{children}</div>
+        {headerSlot}
+        {contentSlot}
       </div>
-      {footer && <div className={styles['tedi-left-panel__footer']}>{footer}</div>}
+      {footerSlot}
     </aside>
   );
 
@@ -140,6 +170,12 @@ export const LeftPanel = ({
   );
 };
 
-LeftPanel.displayName = 'LeftPanel';
+LeftPanelComponent.displayName = 'LeftPanel';
+
+export const LeftPanel = Object.assign(LeftPanelComponent, {
+  Header: LeftPanelHeader,
+  Content: LeftPanelContent,
+  Footer: LeftPanelFooter,
+});
 
 export default LeftPanel;
