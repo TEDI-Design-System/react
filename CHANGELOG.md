@@ -1,3 +1,10 @@
+# [18.1.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.11...react-18.1.0-rc.12) (2026-07-17)
+
+
+### Bug Fixes
+
+* **table:** scrollable table now scrolls top on page change [#750](https://github.com/TEDI-Design-System/react/issues/750) ([#751](https://github.com/TEDI-Design-System/react/issues/751)) ([6154172](https://github.com/TEDI-Design-System/react/commit/6154172ae0f208fd3077d61c9c5f7233036e15c1))
+
 # [18.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.10...react-18.1.0-rc.11) (2026-07-14)
 
 
