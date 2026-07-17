@@ -115,6 +115,7 @@ const LeftPanelComponent = ({
       <Button
         ref={expanderRef}
         aria-label={getLabel('leftPanelOpen')}
+        aria-controls={panelId}
         aria-expanded={false}
         noStyle
         onClick={() => setOpen(true)}

@@ -93,6 +93,21 @@ describe('LeftPanel', () => {
       expect(screen.getByRole('button', { name: 'Ava paneel' })).toBeInTheDocument();
     });
 
+    it('links the expander button to the panel it controls', () => {
+      renderWithLabels(
+        <LeftPanel>
+          <LeftPanel.Content>Body</LeftPanel.Content>
+        </LeftPanel>
+      );
+
+      const panelId = screen.getByRole('complementary').getAttribute('id');
+      fireEvent.click(screen.getByRole('button', { name: 'Sulge paneel' }));
+
+      const expander = screen.getByRole('button', { name: 'Ava paneel' });
+      expect(expander).toHaveAttribute('aria-controls', panelId);
+      expect(expander).toHaveAttribute('aria-expanded', 'false');
+    });
+
     it('reopens the panel when the expander button is clicked', () => {
       renderWithLabels(
         <LeftPanel defaultOpen={false}>
