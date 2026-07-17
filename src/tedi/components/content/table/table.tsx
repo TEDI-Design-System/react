@@ -1104,8 +1104,26 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     [table, size, resolvedId, tableState]
   );
 
-  const handlePaginationPageChange = useCallback((nextPage: number) => table.setPageIndex(nextPage - 1), [table]);
-  const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const resetScrollTop = useCallback(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, []);
+
+  const handlePaginationPageChange = useCallback(
+    (nextPage: number) => {
+      table.setPageIndex(nextPage - 1);
+      resetScrollTop();
+    },
+    [table, resetScrollTop]
+  );
+  const handlePaginationPageSizeChange = useCallback(
+    (nextSize: number) => {
+      table.setPageSize(nextSize);
+      resetScrollTop();
+    },
+    [table, resetScrollTop]
+  );
 
   const hasGroupedHeaders = table.getHeaderGroups().length > 1;
   const rowExpandsOnClick = expandTrigger === 'row' && hasExpansion;
@@ -1541,6 +1559,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           </div>
         )}
         <div
+          ref={scrollRef}
           className={styles['tedi-table__scroll']}
           style={maxHeight !== undefined ? { maxHeight, overflowY: 'auto' } : undefined}
         >

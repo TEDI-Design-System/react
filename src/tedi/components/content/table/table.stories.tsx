@@ -1964,6 +1964,7 @@ export const ReorderableColumnsStickyHeader: Story = {
         reorderableColumns
         stickyHeader
         maxHeight={280}
+        pagination={{ pageSize: 10 }}
       />
     </VerticalSpacing>
   ),
