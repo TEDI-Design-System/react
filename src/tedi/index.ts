@@ -76,6 +76,8 @@ export * from './components/misc/option-content/option-content';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
 export * from './components/layout/header';
+export * from './components/layout/show-at/show-at';
+export * from './components/layout/hide-at/hide-at';
 
 export * from './helpers';
 
