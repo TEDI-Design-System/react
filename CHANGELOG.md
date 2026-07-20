@@ -1,3 +1,10 @@
+# [18.1.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.13...react-18.1.0-rc.14) (2026-07-20)
+
+
+### Bug Fixes
+
+* **layout:** export ShowAt and HideAt from public entry point [#755](https://github.com/TEDI-Design-System/react/issues/755) ([#756](https://github.com/TEDI-Design-System/react/issues/756)) ([57b8ae2](https://github.com/TEDI-Design-System/react/commit/57b8ae2ff148553850e7d4cd6c7b8a43c3bd7fb4))
+
 # [18.1.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.12...react-18.1.0-rc.13) (2026-07-20)
 
 
