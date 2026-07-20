@@ -75,6 +75,7 @@ export * from './components/misc/ellipsis/ellipsis';
 export * from './components/misc/option-content/option-content';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
+export * from './components/layout/header';
 
 export * from './helpers';
 
