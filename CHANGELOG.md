@@ -1,3 +1,10 @@
+# [18.1.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.12...react-18.1.0-rc.13) (2026-07-20)
+
+
+### Bug Fixes
+
+* **header:** export Header from public entry point [#753](https://github.com/TEDI-Design-System/react/issues/753) ([#754](https://github.com/TEDI-Design-System/react/issues/754)) ([083f9d7](https://github.com/TEDI-Design-System/react/commit/083f9d7c91d6d5af03b40a1fc2fc6837a0dda0d4))
+
 # [18.1.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.11...react-18.1.0-rc.12) (2026-07-17)
 
 
