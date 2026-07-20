@@ -93,6 +93,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'Resize panes',
     ru: 'Изменить размер панелей',
   },
+  leftPanel: {
+    description: 'Accessible landmark label for the LeftPanel region',
+    components: ['LeftPanel'],
+    et: 'Külgpaneel',
+    en: 'Side panel',
+    ru: 'Боковая панель',
+  },
+  leftPanelOpen: {
+    description: 'Accessible label for the LeftPanel reopen button shown when collapsed',
+    components: ['LeftPanel'],
+    et: 'Ava paneel',
+    en: 'Open panel',
+    ru: 'Открыть панель',
+  },
+  leftPanelClose: {
+    description: 'Accessible label for the LeftPanel close button',
+    components: ['LeftPanel'],
+    et: 'Sulge paneel',
+    en: 'Close panel',
+    ru: 'Закрыть панель',
+  },
   open: {
     description: 'Used for opening',
     components: ['Accordion', 'Collapse'],
