@@ -72,7 +72,8 @@ describe('SkeletonBlock Component', () => {
   });
 
   test('applies custom styles', () => {
-    const customStyles = { backgroundColor: 'red' };
+    // jsdom 30's getComputedStyle normalizes named colors to rgb(), so assert against the rgb form.
+    const customStyles = { backgroundColor: 'rgb(255, 0, 0)' };
     mockGetCurrentBreakpointProps.mockReturnValue({ width: 100, height: 'p', style: customStyles });
     const { container } = renderSkeletonBlock({ style: customStyles });
     expect(container.firstChild).toHaveStyle(customStyles);

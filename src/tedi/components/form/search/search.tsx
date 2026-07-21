@@ -38,6 +38,7 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       button,
       ariaLabel,
       className,
+      input,
       ...rest
     },
     ref
@@ -53,6 +54,13 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       onSearch?.(rest.value as string);
     };
 
+    const iconBase: IconWithoutBackgroundProps = typeof searchIcon === 'string' ? { name: searchIcon } : searchIcon;
+    const resolvedSearchIcon: IconWithoutBackgroundProps = {
+      color: 'secondary',
+      ...iconBase,
+      className: cn(iconBase.className, rest.disabled && styles['tedi-search__icon--disabled']),
+    };
+
     const textFieldProps = {
       ...rest,
       ref,
@@ -61,20 +69,33 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       isClearable,
       onKeyDown: handleKeyDown,
       onChange,
-      ...(button ? {} : { icon: searchIcon }),
+      input: { ...input, role: 'searchbox' as const },
+      ...(button ? {} : { icon: resolvedSearchIcon }),
     };
 
     const defaultAriaLabel = placeholder || getLabel('search');
     const searchAriaLabel = ariaLabel ?? defaultAriaLabel;
 
     return (
-      <div className={cn(styles['tedi-search__wrapper'])} role="search" aria-label={searchAriaLabel}>
+      <div
+        className={cn(
+          styles['tedi-search__wrapper'],
+          rest.size === 'small' && styles['tedi-search__wrapper--small'],
+          rest.size === 'large' && styles['tedi-search__wrapper--large']
+        )}
+        role="search"
+        aria-label={searchAriaLabel}
+      >
         <TextField {...textFieldProps} />
         {button && (
           <Button
             {...button}
             onClick={handleButtonClick}
-            className={cn(styles['tedi-search__button'], button.className)}
+            className={cn(
+              styles['tedi-search__button'],
+              !button.children && styles['tedi-search__button--icon-only'],
+              button.className
+            )}
             aria-label={button.children ? undefined : getLabel('search')}
           >
             {button.children ?? getLabel('search')}

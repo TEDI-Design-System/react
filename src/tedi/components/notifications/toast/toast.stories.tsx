@@ -1,5 +1,5 @@
-import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/blocks';
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -10,7 +10,7 @@ import { sendNotification, ToastContainer } from './toast';
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4281-58105&m=dev" target="_blank">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/35370f-toast" target="_blank">Zeroheight ↗</a><br/>
- * <a href="?path=/docs/tedi-ready-components-notifications-toast-documentation--docs">Documentation ↗</a> <br/>
+ * <a href="?path=/docs/tedi-ready-components-notifications-toast--documentation">Documentation ↗</a> <br/>
  * <a href="https://fkhadra.github.io/react-toastify/introduction" target="_blank">React-Toastify ↗</a>
  */
 

@@ -225,4 +225,19 @@ describe('DropdownItem', () => {
 
     expect(handle).toHaveBeenCalledTimes(1);
   });
+
+  it('defaults to the menuitem role', () => {
+    render(<DropdownItem index={0}>Item</DropdownItem>);
+    expect(screen.getByRole('menuitem', { name: 'Item' })).toBeInTheDocument();
+  });
+
+  it('forwards a custom role and aria-checked for selection semantics', () => {
+    render(
+      <DropdownItem index={0} role="menuitemcheckbox" aria-checked>
+        Item
+      </DropdownItem>
+    );
+    const item = screen.getByRole('menuitemcheckbox', { name: 'Item' });
+    expect(item).toHaveAttribute('aria-checked', 'true');
+  });
 });

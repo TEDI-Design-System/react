@@ -1,9 +1,21 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { CSSProperties, useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
+import { Icon } from '../../base/icon/icon';
+import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import InfoButton from '../../buttons/info-button/info-button';
+import { EmptyState } from '../../content/empty-state';
+import { Search } from '../../form/search/search';
+import Toggle from '../../form/toggle/toggle';
 import { Col, Row } from '../../layout/grid';
+import { OptionContent } from '../../misc/option-content/option-content';
+import Separator from '../../misc/separator/separator';
 import Link from '../../navigation/link/link';
 import Popover, { PopoverProps } from './popover';
 
@@ -37,18 +49,7 @@ const meta: Meta<PopoverProps> = {
 export default meta;
 type Story = StoryObj<PopoverProps>;
 
-const DefaultTemplate: StoryFn<PopoverProps> = (args) => {
-  return (
-    <Popover {...args}>
-      <Popover.Trigger>
-        <Button>Popover Trigger</Button>
-      </Popover.Trigger>
-      <Popover.Content>
-        The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-      </Popover.Content>
-    </Popover>
-  );
-};
+const POLAR_BEAR_TEXT = 'Jääkaru (Ursus maritimus) on suur karu, kes elab Arktikas ja selle lähialadel.';
 
 const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
   const [firstOpen, setFirstOpen] = useState(false);
@@ -61,11 +62,11 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
           <Popover.Trigger>
             <Button>Buttons & heading</Button>
           </Popover.Trigger>
-          <Popover.Content title="Heading" close>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-            <div className="display-flex gap-2">
+          <Popover.Content title="Pealkiri" close>
+            {POLAR_BEAR_TEXT}
+            <div className="display-flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
               <Button visualType="secondary" onClick={() => setFirstOpen(false)}>
-                Cancel
+                Tühista
               </Button>
               <Button
                 onClick={() => {
@@ -73,7 +74,7 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
                   setFirstOpen(false);
                 }}
               >
-                Submit
+                Esita
               </Button>
             </div>
           </Popover.Content>
@@ -85,10 +86,10 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
             <Button>Buttons</Button>
           </Popover.Trigger>
           <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-            <div className="display-flex gap-2">
+            {POLAR_BEAR_TEXT}
+            <div className="display-flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
               <Button visualType="secondary" onClick={() => setSecondOpen(false)}>
-                Cancel
+                Tühista
               </Button>
               <Button
                 onClick={() => {
@@ -96,7 +97,7 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
                   setSecondOpen(false);
                 }}
               >
-                Submit
+                Esita
               </Button>
             </div>
           </Popover.Content>
@@ -108,9 +109,9 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
             <Button>Link</Button>
           </Popover.Trigger>
           <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
+            {POLAR_BEAR_TEXT}
             <Link href="#" underline={false} iconRight="north_east" className="align-self-end">
-              Read more
+              Loe rohkem
             </Link>
           </Popover.Content>
         </Popover>
@@ -120,9 +121,7 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
           <Popover.Trigger>
             <Button>Text</Button>
           </Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
     </Row>
@@ -137,11 +136,14 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
           <Popover.Trigger>
             <Button visualType="secondary">Heading & close</Button>
           </Popover.Trigger>
-          <Popover.Content width="medium" title="Heading" close>
+          <Popover.Content width="medium" title="Pealkiri" close>
             This popover is with title and close button.
-            <div className="display-flex justify-content-end gap-2">
-              <Button visualType="secondary">Cancel</Button>
-              <Button>Submit</Button>
+            <div
+              className="display-flex justify-content-end gap-2"
+              style={{ marginTop: 'var(--layout-grid-gutters-08)' }}
+            >
+              <Button visualType="secondary">Tühista</Button>
+              <Button>Esita</Button>
             </div>
           </Popover.Content>
         </Popover>
@@ -151,11 +153,11 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
           <Popover.Trigger>
             <Button visualType="secondary">Heading</Button>
           </Popover.Trigger>
-          <Popover.Content width="medium" title="Heading">
+          <Popover.Content width="medium" title="Pealkiri">
             This popover is with title.
             <div className="display-flex justify-content-end gap-2">
-              <Button visualType="secondary">Cancel</Button>
-              <Button>Submit</Button>
+              <Button visualType="secondary">Tühista</Button>
+              <Button>Esita</Button>
             </div>
           </Popover.Content>
         </Popover>
@@ -170,11 +172,11 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
             title="This popover is with smaller title and close button."
             titleProps={{ element: 'p' }}
             close
-            closeProps={{ size: 'medium' }}
+            closeProps={{ size: 'small' }}
           >
             <div className="display-flex justify-content-end gap-2">
-              <Button visualType="secondary">Cancel</Button>
-              <Button>Submit</Button>
+              <Button visualType="secondary">Tühista</Button>
+              <Button>Esita</Button>
             </div>
           </Popover.Content>
         </Popover>
@@ -186,9 +188,12 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content width="medium">
             This popover does not have title and close button.
-            <div className="display-flex justify-content-end gap-2">
-              <Button visualType="secondary">Cancel</Button>
-              <Button>Submit</Button>
+            <div
+              className="display-flex justify-content-end gap-2"
+              style={{ marginTop: 'var(--layout-grid-gutters-08)' }}
+            >
+              <Button visualType="secondary">Tühista</Button>
+              <Button>Esita</Button>
             </div>
           </Popover.Content>
         </Popover>
@@ -232,97 +237,73 @@ const ArrowPositionTemplate: StoryFn<PopoverProps> = (args) => {
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="top-start">
           <Popover.Trigger>Top start</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="top">
           <Popover.Trigger>Top center</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="top-end">
           <Popover.Trigger>Top end</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="bottom-start">
           <Popover.Trigger>Bottom start</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="bottom">
           <Popover.Trigger>Bottom center</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="bottom-end">
           <Popover.Trigger>Bottom end</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="left-start">
           <Popover.Trigger>Left start</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="left">
           <Popover.Trigger>Left center</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="left-end">
           <Popover.Trigger>Left end</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="right-start">
           <Popover.Trigger>Right start</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="right">
           <Popover.Trigger>Right center</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
       <Col xs={12} lg={4} className="display-flex justify-content-center">
         <Popover {...args} placement="right-end">
           <Popover.Trigger>Right end</Popover.Trigger>
-          <Popover.Content>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-          </Popover.Content>
+          <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
     </Row>
@@ -330,17 +311,15 @@ const ArrowPositionTemplate: StoryFn<PopoverProps> = (args) => {
 };
 
 const SizeTemplate: StoryFn<PopoverProps> = (args) => {
-  const sizes = ['small', 'medium', 'large'] as const;
+  const sizes = ['none', 'small', 'medium', 'large'] as const;
 
   return (
     <Row gutterY={3}>
       {sizes.map((size) => (
         <Col xs={3} key={size}>
           <Popover {...args}>
-            <Popover.Trigger>{size}</Popover.Trigger>
-            <Popover.Content width={size}>
-              The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
-            </Popover.Content>
+            <Popover.Trigger>{size.charAt(0).toUpperCase() + size.slice(1)}</Popover.Trigger>
+            <Popover.Content width={size}>{POLAR_BEAR_TEXT}</Popover.Content>
           </Popover>
         </Col>
       ))}
@@ -354,16 +333,16 @@ const ClosingButtonTemplate: StoryFn<PopoverProps> = (args) => {
       <Col>
         <Popover {...args}>
           <Popover.Trigger>Default Button</Popover.Trigger>
-          <Popover.Content title="Heading" close>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
+          <Popover.Content title="Pealkiri" close>
+            {POLAR_BEAR_TEXT}
           </Popover.Content>
         </Popover>
       </Col>
       <Col>
         <Popover {...args}>
           <Popover.Trigger>Custom Button</Popover.Trigger>
-          <Popover.Content title="Heading" close closeProps={{ size: 'medium' }}>
-            The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
+          <Popover.Content title="Pealkiri" close closeProps={{ size: 'small', iconSize: 18 }}>
+            {POLAR_BEAR_TEXT}
           </Popover.Content>
         </Popover>
       </Col>
@@ -383,6 +362,181 @@ const NotDismissibleTemplate: StoryFn<PopoverProps> = (args) => {
   );
 };
 
+const HeaderPopoverItem = ({
+  name,
+  code,
+  icon = 'supervised_user_circle',
+  selected = false,
+}: {
+  name: string;
+  code: string;
+  icon?: string;
+  selected?: boolean;
+}) => (
+  <button
+    type="button"
+    className="display-flex align-items-center gap-2 w-100"
+    style={{
+      padding: 'var(--card-padding-xs)',
+      borderRadius: 'var(--card-radius-rounded)',
+      border: 0,
+      cursor: 'pointer',
+      textAlign: 'left',
+      background: selected ? 'var(--header-popover-item-selected)' : 'transparent',
+    }}
+  >
+    <Icon name={icon} size={24} color={selected ? 'white' : 'secondary'} />
+    <span className="flex flex-column">
+      <Text color={selected ? 'white' : 'secondary'} modifiers="normal">
+        {name}
+      </Text>
+      <Text modifiers="small" color={selected ? 'white' : 'secondary'}>
+        {code}
+      </Text>
+    </span>
+  </button>
+);
+
+const menuItemBaseStyle: CSSProperties = {
+  width: '100%',
+  padding: 'var(--dropdown-item-padding-y) var(--dropdown-item-padding-x)',
+};
+
+const menuItemStyle: CSSProperties = {
+  ...menuItemBaseStyle,
+  borderBottom: '1px solid var(--general-border-primary)',
+};
+
+const WithProminentBorderTemplate: StoryFn<PopoverProps> = (args) => {
+  const [darkMode, setDarkMode] = useState(false);
+
+  return (
+    <>
+      <style>{`
+          .story-popover-content--no-padding {
+            padding: 0;
+          }
+          .story-popover-content--menu {
+            padding: var(--card-padding-xxs) 0;
+          }
+        `}</style>
+      <Row gutterY={3}>
+        <Col xs={12} lg={6} xxl={4}>
+          <Popover {...args} withBorder placement="bottom">
+            <Popover.Trigger>Profile menu</Popover.Trigger>
+            <Popover.Content width="small" className="story-popover-content--menu">
+              <div className="display-flex flex-column">
+                <div style={menuItemStyle}>
+                  <OptionContent>
+                    <OptionContent.Label>Minu profiil</OptionContent.Label>
+                  </OptionContent>
+                </div>
+                <div style={menuItemStyle}>
+                  <OptionContent>
+                    <OptionContent.Label>Esindatavad</OptionContent.Label>
+                  </OptionContent>
+                </div>
+                <div style={menuItemStyle}>
+                  <OptionContent>
+                    <OptionContent.Label>Kontaktid</OptionContent.Label>
+                  </OptionContent>
+                </div>
+                <div style={menuItemStyle}>
+                  <Toggle
+                    id="header-popover-dark-mode"
+                    label="Tume režiim"
+                    checked={darkMode}
+                    onChange={() => setDarkMode((prev) => !prev)}
+                  />
+                </div>
+                <div style={menuItemBaseStyle}>
+                  <OptionContent icon="logout">
+                    <OptionContent.Label>Logi välja</OptionContent.Label>
+                  </OptionContent>
+                </div>
+              </div>
+            </Popover.Content>
+          </Popover>
+        </Col>
+        <Col xs={12} lg={6} xxl={4}>
+          <Popover {...args} withBorder placement="bottom">
+            <Popover.Trigger>Links menu</Popover.Trigger>
+            <Popover.Content width="small">
+              <div className="flex flex-column gap-2">
+                <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
+                  Minu andmed
+                </Link>
+                <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
+                  Esindatavad
+                </Link>
+                <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
+                  Kontaktid
+                </Link>
+                <Separator axis="horizontal" />
+                <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
+                  <span className="display-flex gap-1">
+                    <Icon name="notifications" size={16} />
+                    Riiklikud teated
+                  </span>
+                </Link>
+                <Separator axis="horizontal" />
+                <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
+                  <span className="display-flex gap-1">
+                    <Icon name="logout" size={16} />
+                    Logi välja
+                  </span>
+                </Link>
+              </div>
+            </Popover.Content>
+          </Popover>
+        </Col>
+        <Col xs={12} lg={6} xxl={4}>
+          <Popover {...args} withBorder placement="bottom">
+            <Popover.Trigger>Representatives</Popover.Trigger>
+            <Popover.Content width="small">
+              <div className="flex flex-column gap-2">
+                <Search id="header-popover-search" label="Otsi isikut" onSearch={() => undefined} />
+                <Separator axis="horizontal" />
+                <HeaderPopoverItem name="Juulia Sarapuu" code="62004122984" icon="person" selected />
+                <Separator axis="horizontal" />
+                <HeaderPopoverItem name="Marta Sarapuu" code="62004122984" />
+                <Separator axis="horizontal" />
+                <HeaderPopoverItem name="Helgi Sarapuu" code="62004122984" />
+              </div>
+            </Popover.Content>
+          </Popover>
+        </Col>
+        <Col xs={12} lg={6} xxl={4}>
+          <Popover {...args} withBorder placement="bottom">
+            <Popover.Trigger>Empty state</Popover.Trigger>
+            <Popover.Content width="small" className="story-popover-content--no-padding">
+              <EmptyState type="inside" icon="heart_check" size="small">
+                Sul puuduvad esindatavad
+              </EmptyState>
+            </Popover.Content>
+          </Popover>
+        </Col>
+        <Col xs={12} lg={6} xxl={4}>
+          <Popover {...args} withBorder placement="right">
+            <Popover.Trigger>Right center</Popover.Trigger>
+            <Popover.Content width="small" title="Pealkiri" close>
+              {POLAR_BEAR_TEXT}
+            </Popover.Content>
+          </Popover>
+        </Col>
+        <Col xs={12} lg={6} xxl={4}>
+          <Popover {...args} withBorder placement="top">
+            <Popover.Trigger>Top center</Popover.Trigger>
+            <Popover.Content width="small" title="Pealkiri" close>
+              {POLAR_BEAR_TEXT}
+            </Popover.Content>
+          </Popover>
+        </Col>
+      </Row>
+    </>
+  );
+};
+
 const ScrollLockedTemplate: StoryFn<PopoverProps> = (args) => {
   return (
     <Popover {...args}>
@@ -394,9 +548,34 @@ const ScrollLockedTemplate: StoryFn<PopoverProps> = (args) => {
   );
 };
 
-export const Default: Story = {
-  render: DefaultTemplate,
-  args: {},
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `Popover.Content`**. Its `title`, `close` and `width` are flattened into namespaced
+ * controls (grouped under their own category) via the shared `subcomponentArgTypes`
+ * helper, then reassembled in `render` with `getSubcomponentProps`. The ungrouped
+ * controls are `Popover`'s own props (`placement`, `openWith`, `withBorder`, …).
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Popover.Content, {
+      category: 'Popover.Content',
+      prefix: 'content',
+      exclude: ['children', 'labelledBy', 'describedBy', 'titleProps', 'closeProps'],
+    }),
+  },
+  args: {
+    content__title: 'Pealkiri',
+    content__close: true,
+    content__width: 'medium',
+  },
+  render: (args: Record<string, unknown>) => (
+    <Popover {...getPrimaryComponentProps<PopoverProps>(args)}>
+      <Popover.Trigger>
+        <Button>Popover Trigger</Button>
+      </Popover.Trigger>
+      <Popover.Content {...getSubcomponentProps(args, 'content')}>{POLAR_BEAR_TEXT}</Popover.Content>
+    </Popover>
+  ),
 };
 
 export const ContentExamples: Story = {
@@ -416,6 +595,11 @@ export const Trigger: Story = {
 
 export const ArrowPosition: Story = {
   render: ArrowPositionTemplate,
+  args: {},
+};
+
+export const WithProminentBorder: Story = {
+  render: WithProminentBorderTemplate,
   args: {},
 };
 
@@ -473,11 +657,14 @@ export const FocusLocked: Story = {
         <Popover.Trigger>
           <Button>Modal Popover</Button>
         </Popover.Trigger>
-        <Popover.Content title="Modal Dialog" width="medium" close>
-          The polar bear (Ursus maritimus) is a large bear native to the Arctic.
-          <div className="display-flex justify-content-end gap-2">
+        <Popover.Content title="Pealkiri" width="medium" close>
+          {POLAR_BEAR_TEXT}
+          <div
+            className="display-flex justify-content-end gap-2"
+            style={{ marginTop: 'var(--layout-grid-gutters-08)' }}
+          >
             <Button visualType="secondary" onClick={() => setOpen(false)} id="cancelButton">
-              Cancel
+              Tühista
             </Button>
             <Button
               onClick={() => {
@@ -486,7 +673,7 @@ export const FocusLocked: Story = {
               }}
               id="submitButton"
             >
-              Submit
+              Esita
             </Button>
           </div>
         </Popover.Content>
@@ -497,7 +684,7 @@ export const FocusLocked: Story = {
     docs: {
       description: {
         story: `
-          This story demonstrates a Popover with a “locked” focus behavior, where keyboard navigation (Tab) is confined 
+          This story demonstrates a Popover with a “locked” focus behavior, where keyboard navigation (Tab) is confined
           to the Popover content until the user clicks an action like "Cancel" or "Submit".
 
           Key points:
@@ -517,16 +704,16 @@ export const AccessibilityBaseline: Story = {
       <Popover.Trigger>
         <Button>Open popover</Button>
       </Popover.Trigger>
-      <Popover.Content title="Popover title" close>
+      <Popover.Content title="Pealkiri" close>
         <p id="popover-description">
           This popover contains text, a link, and buttons. Screen readers should announce roles correctly.
         </p>
 
-        <Link href="#">Read more</Link>
+        <Link href="#">Loe rohkem</Link>
 
-        <div className="display-flex gap-2">
-          <Button visualType="secondary">Cancel</Button>
-          <Button>Confirm</Button>
+        <div className="display-flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
+          <Button visualType="secondary">Tühista</Button>
+          <Button>Kinnita</Button>
         </div>
       </Popover.Content>
     </Popover>
@@ -558,7 +745,7 @@ export const NoTitleAccessibleName: Story = {
       </Popover.Trigger>
       <Popover.Content>
         <p>This popover has no title. The accessible name will fall back to the trigger label.</p>
-        <Button>Action</Button>
+        <Button style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>Action</Button>
       </Popover.Content>
     </Popover>
   ),
@@ -591,7 +778,7 @@ export const ReadAllStressTest: Story = {
         <p>
           Paragraph two with a <Link href="#">link</Link>.
         </p>
-        <Button>Primary action</Button>
+        <Button style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>Primary action</Button>
       </Popover.Content>
     </Popover>
   ),

@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-vite';
 import React from 'react';
 
 import { Col, Row } from '../../../layout/grid';
@@ -31,7 +31,13 @@ export const MultipleHandledTemplate: StoryFn<typeof Select> = (args) => {
   return (
     <Row>
       <Col lg={4} sm={12}>
-        <Select options={colourOptions} onChange={(value) => handleInputChange(value)} value={inputValue} {...args} />
+        <Select
+          tagsDirection="stack"
+          options={colourOptions}
+          onChange={(value) => handleInputChange(value)}
+          value={inputValue}
+          {...args}
+        />
       </Col>
     </Row>
   );

@@ -1,0 +1,93 @@
+.tedi-header-profile {
+  &__button {
+    [class*='tedi-btn__text'] {
+      padding-right: 0;
+    }
+  }
+
+  &__button-inner {
+    display: flex;
+    gap: var(--button-md-inner-spacing);
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--layout-grid-gutters-08);
+    align-items: flex-start;
+
+    [data-name='separator'] {
+      align-self: stretch;
+      width: 100%;
+    }
+
+    [class*='tedi-header-logout'] [class*='tedi-icon'] {
+      font-size: var(--icon-02);
+    }
+  }
+
+  &__modal {
+    --header-profile-offset: var(--layout-header-height);
+
+    position: fixed;
+    top: var(--header-profile-offset);
+    right: 0;
+    z-index: var(--z-index-header);
+    display: flex;
+    flex-direction: column;
+    width: var(--navigation-vertical-item-width-default);
+    max-width: 100%;
+    height: calc(100dvh - var(--header-profile-offset));
+    overflow-y: auto;
+    background: var(--general-surface-primary);
+    border-top: 1px solid var(--general-border-primary);
+
+    &--content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      border-radius: 0;
+
+      [class*='tedi-header-role__selection-body'] {
+        padding: 0 var(--card-padding-md-default) var(--card-padding-md-default) var(--card-padding-md-default);
+      }
+
+      &-styled > * {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        padding: var(--layout-header-modal-item-padding);
+        background: var(--header-modal-item-default-background);
+        border-bottom: 1px solid var(--general-border-primary);
+        border-radius: unset;
+      }
+    }
+
+    [class*='tedi-header-logout'] [class*='tedi-icon'] {
+      font-size: var(--icon-02);
+    }
+  }
+
+  &__overlay {
+    --header-profile-offset: var(--layout-header-height);
+
+    position: fixed;
+    top: var(--header-profile-offset);
+    left: 0;
+    z-index: calc(var(--z-index-header) - 1);
+    width: 100%;
+    height: calc(100dvh - var(--header-profile-offset));
+    background: var(--general-surface-overlay);
+  }
+
+  &__icon {
+    transition: transform 0.2s ease-in-out;
+
+    &--open {
+      transform: rotate(-180deg);
+    }
+  }
+}

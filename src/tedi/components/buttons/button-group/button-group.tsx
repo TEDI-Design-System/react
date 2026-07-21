@@ -157,6 +157,7 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
                   color="inherit"
                 />
               )}
+              {btn.props.isActive && <span className="sr-only">{getLabel('button-group.selected')}</span>}
             </Dropdown.Item>
           ))}
         </Dropdown.Content>
@@ -187,13 +188,14 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
             child.props.className
           ),
           size,
+          'aria-pressed': Boolean(child.props.isActive),
           onClick: (event) => {
             child.props.onClick?.(event);
             if (child.props.id) {
               onSelectionChange?.(child.props.id);
             }
           },
-        })
+        } as Partial<ButtonProps> & { 'aria-pressed': boolean })
       )}
     </div>
   );

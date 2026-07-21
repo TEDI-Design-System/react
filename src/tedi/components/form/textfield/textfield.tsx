@@ -81,7 +81,7 @@ export interface TextFieldProps
    * Also used to generate `aria-describedby` and helper IDs automatically.
    */
   id?: string;
-  /*
+  /**
    * The text or React node that serves as the label for the text field.
    * If `hideLabel` is `true`, the label will be visually hidden but still accessible to screen readers.
    * If `hideLabel` is `'keep-space'`, the label will be hidden but the space it occupies will be preserved.
@@ -125,7 +125,13 @@ export interface TextFieldProps
    * Note: These are **not** attached to the input/textarea directly, but to the surrounding container.
    */
   onKeyPress?: React.KeyboardEventHandler<HTMLDivElement>;
+  /**
+   * Key-down handler attached to the field's surrounding container (not the input directly).
+   */
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+  /**
+   * Key-up handler attached to the field's surrounding container (not the input directly).
+   */
   onKeyUp?: React.KeyboardEventHandler<HTMLDivElement>;
   /**
    * Default value for **uncontrolled** usage.
@@ -149,6 +155,17 @@ export interface TextFieldProps
    * @param event - Mouse event from the icon wrapper
    */
   onIconClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
+  /**
+   * Extra HTML attributes spread on the icon `<button>` element.
+   *
+   * Use this to wire ARIA state (e.g. `aria-expanded`, `aria-controls`,
+   * `aria-haspopup`) directly to the icon trigger, so screen readers announce
+   * disclosure state correctly when the icon opens a popover / dialog.
+   *
+   * Only applied when `onIconClick` is set (i.e. the icon is rendered as a
+   * `<button>`).
+   */
+  iconButtonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
   /**
    * Click handler for the entire inner container (the area around the input).
    *
@@ -219,6 +236,14 @@ export interface TextFieldProps
    * Additional attributes for the input element.
    */
   input?: React.InputHTMLAttributes<HTMLInputElement> | React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+  /**
+   * Optional start slot element to render inside the input container, before the input field.
+   */
+  startSlot?: React.ReactNode;
+  /**
+   * Optional end slot element to render inside the input container, after the input field.
+   */
+  endSlot?: React.ReactNode;
 }
 
 export interface TextFieldForwardRef {
@@ -241,6 +266,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     readOnly,
     icon,
     onIconClick,
+    iconButtonProps,
     size = 'default',
     placeholder,
     isArrowsHidden = true,
@@ -260,6 +286,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     input,
     name,
     isTextArea,
+    startSlot,
+    endSlot,
     ...rest
   } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
 
@@ -322,8 +350,10 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   const renderIcon = useCallback(() => {
     if (!icon) return null;
 
+    const isInteractiveIcon = Boolean(onIconClick);
+    const smallIconSize = isInteractiveIcon ? 18 : 16;
     const defaultIconProps: Partial<IconWithoutBackgroundProps> = {
-      size: size === 'large' ? 24 : size === 'small' ? 16 : 18,
+      size: size === 'large' ? 24 : size === 'small' ? smallIconSize : 18,
       className: styles['tedi-textfield__icon'],
     };
 
@@ -336,7 +366,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       return (
         <button
           type="button"
-          className={styles['tedi-textfield__icon-wrapper']}
+          {...iconButtonProps}
+          className={cn(styles['tedi-textfield__icon-wrapper'], iconButtonProps?.className)}
           onClick={disabled ? undefined : onIconClick}
           disabled={disabled}
         >
@@ -350,7 +381,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         <Icon {...iconProps} />
       </div>
     );
-  }, [icon, size, onIconClick, disabled]);
+  }, [icon, size, onIconClick, iconButtonProps, disabled]);
 
   const renderClearButton = useMemo(() => {
     if (!showClearButton) return null;
@@ -379,6 +410,44 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       </div>
     );
   }, [showClearButton, icon, renderClearButton, renderIcon]);
+
+  const renderInputElement = (
+    <Field
+      {...input}
+      id={resolvedId}
+      name={name}
+      value={value}
+      defaultValue={defaultValue}
+      onChange={handleChange}
+      onChangeEvent={onChangeEvent}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      invalid={isInvalid}
+      placeholder={placeholder}
+      className={cn(styles['tedi-textfield__input'], inputClassName, {
+        [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
+      })}
+      onFocus={(e) => {
+        (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+        onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        (input?.onBlur as React.FocusEventHandler<FieldElement> | undefined)?.(e);
+        onBlur?.(e);
+      }}
+      isTextArea={isTextArea}
+      aria-describedby={
+        !helper || (Array.isArray(helper) && helper.length === 0)
+          ? undefined
+          : Array.isArray(helper)
+          ? helper.map((_, index) => `${resolvedId}-helper-${index}`).join(' ')
+          : `${resolvedId}-helper`
+      }
+      aria-label={hideLabel && typeof label === 'string' ? label : undefined}
+      ref={fieldRef}
+    />
+  );
 
   const TextFieldBEM = cn(
     styles['tedi-textfield'],
@@ -418,42 +487,9 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         onClick={onClick}
         ref={innerRef}
       >
-        <Field
-          {...input}
-          id={resolvedId}
-          name={name}
-          value={value}
-          defaultValue={defaultValue}
-          onChange={handleChange}
-          onChangeEvent={onChangeEvent}
-          disabled={disabled}
-          readOnly={readOnly}
-          required={required}
-          invalid={isInvalid}
-          placeholder={placeholder}
-          className={cn(styles['tedi-textfield__input'], inputClassName, {
-            [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
-          })}
-          onFocus={(e) => {
-            (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
-            onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            (input?.onBlur as React.FocusEventHandler<FieldElement> | undefined)?.(e);
-            onBlur?.(e);
-          }}
-          isTextArea={isTextArea}
-          aria-describedby={
-            !helper || (Array.isArray(helper) && helper.length === 0)
-              ? undefined
-              : Array.isArray(helper)
-              ? helper.map((_, index) => `${resolvedId}-helper-${index}`).join(' ')
-              : `${resolvedId}-helper`
-          }
-          aria-label={hideLabel && typeof label === 'string' ? label : undefined}
-          ref={fieldRef}
-        />
-
+        {startSlot}
+        {renderInputElement}
+        {endSlot}
         {(isClearable || icon) && renderRightArea}
       </div>
 

@@ -17,7 +17,6 @@
   color: var(--dropdown-item-default-text);
   text-align: left;
   border-radius: 0;
-  transition: all 0.2s ease;
 
   &:first-child {
     border-radius: var(--form-select-area-radius) var(--form-select-area-radius) 0 0;
@@ -32,7 +31,8 @@
     background-color: var(--dropdown-item-active-background);
 
     p,
-    label {
+    label,
+    div > span {
       color: var(--dropdown-item-active-text);
     }
   }
@@ -105,11 +105,12 @@
   &:hover {
     color: var(--dropdown-item-hover-text);
     cursor: pointer;
-    background-color: var(--dropdown-item-hover-background);
     outline: 0;
+    background-color: var(--dropdown-item-hover-background);
 
     p,
-    label {
+    label,
+    div > span {
       color: var(--dropdown-item-hover-text);
     }
   }
@@ -117,8 +118,8 @@
   &:focus-visible {
     &:not(.tedi-dropdown__item--disabled) {
       cursor: pointer;
-      outline: 0;
-      box-shadow: 0 0 0 1px var(--tedi-neutral-100), 0 0 0 3px var(--general-surface-selected);
+      outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+      outline-offset: -2px;
     }
   }
 

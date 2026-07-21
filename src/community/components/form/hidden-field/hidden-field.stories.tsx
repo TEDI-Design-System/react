@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/react';
+import { Meta } from '@storybook/react-vite';
 
 import { HiddenMultiselect } from './examples/hidden-multiselect';
 import { HiddenSelect } from './examples/hidden-select';

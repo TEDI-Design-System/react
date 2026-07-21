@@ -36,6 +36,20 @@ $tag-colors: (
     min-height: var(--button-xs-icon-size);
   }
 
+  &--ellipsis {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  &--ellipsis &__content {
+    min-width: 0;
+  }
+
+  &--ellipsis &__icon-wrapper,
+  &--ellipsis > button {
+    flex-shrink: 0;
+  }
+
   &__icon-wrapper {
     display: flex;
     align-items: center;
@@ -58,6 +72,12 @@ $tag-colors: (
       flex-shrink: 0;
       border-top-right-radius: var(--button-radius-sm);
       border-bottom-right-radius: var(--button-radius-sm);
+
+      &:focus-visible {
+        color: inherit;
+        outline: 2px solid var(--button-main-primary-border-focus);
+        outline-offset: -2px;
+      }
     }
   }
 

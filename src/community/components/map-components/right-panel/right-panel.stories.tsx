@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Button, Card, Text, VerticalSpacing } from '../../../../tedi';
 import { measurementContent } from './examples';

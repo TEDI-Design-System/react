@@ -73,7 +73,7 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
         </span>
       )}
       {tooltip && (
-        <span aria-hidden="true">
+        <span aria-hidden="true" className={styles['tedi-label__info']}>
           <Tooltip>
             <Tooltip.Trigger>
               <InfoButton isSmall={isSmall} aria-label={getLabel('infoButton.moreInformation')} />

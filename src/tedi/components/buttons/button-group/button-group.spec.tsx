@@ -38,6 +38,21 @@ describe('ButtonGroup Component', () => {
     expect(buttons[1]).toHaveTextContent('Button 2');
   });
 
+  it('exposes aria-pressed on each grouped button so screen readers can read selection state', () => {
+    render(
+      <ButtonGroup>
+        <Button id="b1" isActive>
+          One
+        </Button>
+        <Button id="b2">Two</Button>
+        <Button id="b3">Three</Button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole('button', { name: 'One', pressed: true })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Two', pressed: false })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Three', pressed: false })).toBeInTheDocument();
+  });
+
   it('renders dropdown trigger with dropdownLabel on mobile', () => {
     (useBreakpoint as jest.Mock).mockReturnValue('sm');
     render(

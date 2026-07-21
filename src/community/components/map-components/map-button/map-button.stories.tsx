@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Col, Icon, Row, Text, TextProps, VerticalSpacing } from '../../../../tedi';
 import ButtonGroup, { ButtonGroupProps } from '../button-group/button-group';
@@ -53,7 +53,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
               <MapButton id={value} {...buttonProps} selected={value === 'Selected'}>
                 Text
               </MapButton>
-              <MapButton id={value} {...buttonProps} iconRight="straighten" selected={value === 'Selected'}>
+              <MapButton id={value} {...buttonProps} icon="straighten" selected={value === 'Selected'}>
                 Text
               </MapButton>
               <MapButton id={value} {...buttonProps} selected={value === 'Selected'}>
@@ -67,16 +67,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
               <MapButton id={value} size="small" {...buttonProps} selected={value === 'Selected'}>
                 Text
               </MapButton>
-              <MapButton
-                id={value}
-                size="small"
-                {...buttonProps}
-                iconRight="straighten"
-                selected={value === 'Selected'}
-              >
+              <MapButton id={value} size="small" {...buttonProps} icon="straighten" selected={value === 'Selected'}>
                 Text
               </MapButton>
-              <MapButton id={value} size="small" {...buttonProps} iconLeft="edit" selected={value === 'Selected'}>
+              <MapButton id={value} size="small" {...buttonProps} icon="edit" selected={value === 'Selected'}>
                 Text
               </MapButton>
               <MapButton
@@ -109,6 +103,29 @@ export const HideLabel: Story = {
     hideLabel: true,
     icon: 'straighten',
     size: 'small',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    children: 'Text',
+    icon: 'straighten',
+    disabled: true,
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    children: 'Text',
+    icon: 'straighten',
+    isLoading: true,
+  },
+};
+
+export const Underline: Story = {
+  args: {
+    children: 'Text',
+    underline: true,
   },
 };
 
@@ -163,7 +180,7 @@ export const States: StoryObj<TemplateMultipleProps> = {
 const TemplateGroup: StoryFn<ButtonGroupProps> = (args) => {
   return (
     <ButtonGroup {...args}>
-      <MapButton icon="location_on">Punkt</MapButton>
+      <MapButton icon="explore">Kompass</MapButton>
       <MapButton icon="straighten">Mõõda</MapButton>
       <MapButton icon="compare">Võrdle</MapButton>
       <MapButton icon="history">Ajajoon</MapButton>
@@ -171,8 +188,43 @@ const TemplateGroup: StoryFn<ButtonGroupProps> = (args) => {
   );
 };
 
+const TemplateGroupSmall: StoryFn<ButtonGroupProps> = (args) => {
+  return (
+    <ButtonGroup {...args}>
+      <MapButton size="small" icon="explore">
+        Kompass
+      </MapButton>
+      <MapButton size="small" icon="straighten">
+        Mõõda
+      </MapButton>
+      <MapButton size="small" icon="compare">
+        Võrdle
+      </MapButton>
+      <MapButton size="small" icon="history">
+        Ajajoon
+      </MapButton>
+    </ButtonGroup>
+  );
+};
+
+// meta.component is MapButton, so Storybook infers MapButton's controls. For the ButtonGroup
+// stories we declare ButtonGroup's argTypes explicitly and restrict the Controls panel to them.
+const buttonGroupArgTypes: Meta<typeof ButtonGroup>['argTypes'] = {
+  direction: { control: 'radio', options: ['horizontal', 'vertical'] },
+  stretch: { control: 'boolean' },
+  prefix: { control: 'text' },
+  suffix: { control: 'text' },
+  ariaLabel: { control: 'text' },
+};
+
+const buttonGroupParameters: Meta<typeof ButtonGroup>['parameters'] = {
+  controls: { include: ['direction', 'stretch', 'prefix', 'suffix', 'ariaLabel'] },
+};
+
 export const ButtonGroupHorizontal: StoryObj<ButtonGroupProps> = {
   render: TemplateGroup,
+  argTypes: buttonGroupArgTypes,
+  parameters: buttonGroupParameters,
   args: {
     direction: 'horizontal',
   },
@@ -180,53 +232,45 @@ export const ButtonGroupHorizontal: StoryObj<ButtonGroupProps> = {
 
 export const ButtonGroupVertical: StoryObj<ButtonGroupProps> = {
   render: TemplateGroup,
+  argTypes: buttonGroupArgTypes,
+  parameters: buttonGroupParameters,
   args: {
     direction: 'vertical',
   },
 };
 
-export const ButtonGroupHorizontalSuffixAndPrefix: StoryFn<ButtonGroupProps> = (args) => {
-  return (
-    <VerticalSpacing>
-      <ButtonGroup suffix="Suffix" ariaLabel="Example button group">
-        <MapButton id="btn1" size="small" icon="location_on">
-          Button 1
-        </MapButton>
-        <MapButton id="btn2" size="small" icon="history">
-          Button 2
-        </MapButton>
-      </ButtonGroup>
-      <ButtonGroup prefix="Prefix" ariaLabel="Example button group">
-        <MapButton id="btn1" size="small" icon="location_on">
-          Button 1
-        </MapButton>
-        <MapButton id="btn2" size="small" icon="history">
-          Button 2
-        </MapButton>
-      </ButtonGroup>
-    </VerticalSpacing>
-  );
+export const ButtonGroupHorizontalWithPrefixAndSuffix: StoryObj<ButtonGroupProps> = {
+  render: TemplateGroup,
+  argTypes: buttonGroupArgTypes,
+  parameters: buttonGroupParameters,
+  args: {
+    direction: 'horizontal',
+    prefix: 'Prefix',
+    suffix: 'Suffix',
+    ariaLabel: 'Example button group',
+  },
 };
 
-export const ButtonGroupHVerticalSuffixAndPrefix: StoryFn<ButtonGroupProps> = (args) => {
-  return (
-    <VerticalSpacing>
-      <ButtonGroup suffix="0" ariaLabel="Example button group" direction="vertical">
-        <MapButton id="btn1" size="small" icon="location_on">
-          Button 1
-        </MapButton>
-        <MapButton id="btn2" size="small" icon="history">
-          Button 2
-        </MapButton>
-      </ButtonGroup>
-      <ButtonGroup prefix="0" ariaLabel="Example button group" direction="vertical">
-        <MapButton id="btn1" size="small" icon="location_on">
-          Button 1
-        </MapButton>
-        <MapButton id="btn2" size="small" icon="history">
-          Button 2
-        </MapButton>
-      </ButtonGroup>
-    </VerticalSpacing>
-  );
+export const ButtonGroupVerticalWithPrefixAndSuffix: StoryObj<ButtonGroupProps> = {
+  render: TemplateGroup,
+  argTypes: buttonGroupArgTypes,
+  parameters: buttonGroupParameters,
+  args: {
+    direction: 'vertical',
+    prefix: '360°',
+    suffix: '360°',
+    ariaLabel: 'Example button group',
+  },
+};
+
+export const ButtonGroupVerticalSmallWithPrefixAndSuffix: StoryObj<ButtonGroupProps> = {
+  render: TemplateGroupSmall,
+  argTypes: buttonGroupArgTypes,
+  parameters: buttonGroupParameters,
+  args: {
+    direction: 'vertical',
+    prefix: '360°',
+    suffix: '360°',
+    ariaLabel: 'Example button group',
+  },
 };

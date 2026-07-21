@@ -3,8 +3,26 @@
 
   // Fallback for unsupported browsers
   overflow: hidden;
-  hyphens: auto;
   text-overflow: ellipsis;
+  hyphens: auto;
   word-break: break-word;
   -webkit-box-orient: vertical;
+
+  &--start {
+    display: block;
+    text-align: left;
+    hyphens: none;
+    word-break: normal;
+    white-space: nowrap;
+    user-select: none;
+    direction: rtl;
+  }
+}
+
+.tedi-ellipsis__inner {
+  unicode-bidi: plaintext;
+}
+
+.tedi-ellipsis__overlay {
+  overflow-wrap: anywhere;
 }

@@ -1,0 +1,36 @@
+.tedi-breadcrumbs {
+  display: flex;
+}
+
+.tedi-breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--breadcrumb-inner-spacing);
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-breadcrumbs__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tedi-breadcrumbs__separator {
+  display: inline-flex;
+  align-items: center;
+  color: var(--link-primary-default);
+}
+
+.tedi-breadcrumbs__current {
+  color: var(--general-text-secondary);
+}
+
+.tedi-breadcrumbs__ellipsis {
+  color: var(--link-primary-default);
+
+  &:hover {
+    color: var(--link-primary-hover);
+  }
+}

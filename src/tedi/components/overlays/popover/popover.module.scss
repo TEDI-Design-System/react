@@ -3,6 +3,7 @@ $popover-width: (
   'medium': 30rem,
   'large': 52.5rem,
 );
+$arrow-offset: -1rem;
 
 .tedi-popover {
   z-index: var(--z-index-tooltip);
@@ -12,21 +13,120 @@ $popover-width: (
   padding: var(--popover-padding-sm);
   color: var(--popover-text);
   background: var(--popover-background);
-  border: 1px solid var(--popover-border);
+  border: var(--popover-border-width-md) solid var(--popover-border-default);
   border-radius: var(--popover-radius-rounded);
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
   @each $name, $width in $popover-width {
     &--#{$name} {
-      width: min(#{$width}, calc(100vw - 1rem));
+      width: min(#{$width}, calc(100% - 1rem));
     }
   }
 
   &__arrow {
     z-index: 1;
-    clip-path: inset(0 -5px -5px -5px);
     filter: drop-shadow(0 0 5px var(--tedi-alpha-20));
+    clip-path: inset(0 -5px -5px -5px);
     fill: var(--popover-background);
+
+    &--border {
+      box-sizing: border-box;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--popover-background);
+      border-right: var(--popover-border-width-lg) solid var(--popover-border-prominent);
+      border-bottom: var(--popover-border-width-lg) solid var(--popover-border-prominent);
+      clip-path: polygon(75% 0, 100% 0, 100% 100%, 0 100%, 0 75%);
+      fill: transparent;
+    }
+  }
+
+  &--border {
+    position: relative;
+
+    &::before {
+      position: absolute;
+      content: '';
+      background: var(--popover-border-prominent);
+    }
+  }
+
+  &[data-placement^='bottom'] {
+    &.tedi-popover--border {
+      border-top-left-radius: var(--popover-radius-sharp);
+      border-top-right-radius: var(--popover-radius-sharp);
+
+      &::before {
+        top: calc(-1 * var(--popover-border-width-md));
+        right: calc(-1 * var(--popover-border-width-md));
+        left: calc(-1 * var(--popover-border-width-md));
+        height: var(--popover-border-width-lg);
+      }
+    }
+
+    .tedi-popover__arrow--border {
+      top: $arrow-offset;
+      transform: translateY(var(--popover-border-width-lg)) rotate(-135deg) !important;
+    }
+  }
+
+  &[data-placement^='top'] {
+    &.tedi-popover--border {
+      border-bottom-right-radius: var(--popover-radius-sharp);
+      border-bottom-left-radius: var(--popover-radius-sharp);
+
+      &::before {
+        right: calc(-1 * var(--popover-border-width-md));
+        bottom: calc(-1 * var(--popover-border-width-md));
+        left: calc(-1 * var(--popover-border-width-md));
+        height: var(--popover-border-width-lg);
+      }
+    }
+
+    .tedi-popover__arrow--border {
+      top: auto !important;
+      bottom: $arrow-offset;
+      transform: translateY(calc(-1 * var(--popover-border-width-lg))) rotate(45deg) !important;
+    }
+  }
+
+  &[data-placement^='right'] {
+    &.tedi-popover--border {
+      border-top-left-radius: var(--popover-radius-sharp);
+      border-bottom-left-radius: var(--popover-radius-sharp);
+
+      &::before {
+        top: calc(-1 * var(--popover-border-width-md));
+        bottom: calc(-1 * var(--popover-border-width-md));
+        left: calc(-1 * var(--popover-border-width-md));
+        width: var(--popover-border-width-lg);
+      }
+    }
+
+    .tedi-popover__arrow--border {
+      left: $arrow-offset;
+      transform: translateX(var(--popover-border-width-lg)) rotate(135deg) !important;
+    }
+  }
+
+  &[data-placement^='left'] {
+    &.tedi-popover--border {
+      border-top-right-radius: var(--popover-radius-sharp);
+      border-bottom-right-radius: var(--popover-radius-sharp);
+
+      &::before {
+        top: calc(-1 * var(--popover-border-width-md));
+        right: calc(-1 * var(--popover-border-width-md));
+        bottom: calc(-1 * var(--popover-border-width-md));
+        width: var(--popover-border-width-lg);
+      }
+    }
+
+    .tedi-popover__arrow--border {
+      right: $arrow-offset;
+      left: auto !important;
+      transform: translateX(calc(-1 * var(--popover-border-width-lg))) rotate(-45deg) !important;
+    }
   }
 
   &__header {

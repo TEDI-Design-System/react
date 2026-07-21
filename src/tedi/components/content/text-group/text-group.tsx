@@ -4,6 +4,7 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Label } from '../label/label';
 import styles from './text-group.module.scss';
+import { TextGroupList } from './text-group-list/text-group-list';
 
 type TextAlign = 'left' | 'right';
 
@@ -56,7 +57,13 @@ export type TextGroupProps = BreakpointSupport<TextGroupBreakpointProps> & {
   className?: string;
 };
 
-export const TextGroup = (props: TextGroupProps): JSX.Element => {
+const renderLabelContent = (label: React.ReactNode): React.ReactNode =>
+  typeof label === 'string' ? <Label>{label}</Label> : label;
+
+const resolveLabelWidth = (labelWidth: string | number): string =>
+  typeof labelWidth === 'number' ? `${labelWidth}%` : labelWidth;
+
+const TextGroupBase = (props: TextGroupProps): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     label,
@@ -68,14 +75,20 @@ export const TextGroup = (props: TextGroupProps): JSX.Element => {
   } = getCurrentBreakpointProps<TextGroupProps>(props);
 
   const textGroupBEM = cn(styles['tedi-text-group'], styles[`tedi-text-group--${type}`], className);
-  const labelWidthStyle = typeof labelWidth === 'number' ? `${labelWidth}%` : labelWidth;
+  const labelWidthStyle = resolveLabelWidth(labelWidth);
 
   return (
-    <dl className={textGroupBEM} style={{ '--label-width': labelWidthStyle }}>
+    <dl className={textGroupBEM} style={{ '--label-width': labelWidthStyle } as React.CSSProperties}>
       <dt className={cn(styles['tedi-text-group__label'], styles[`tedi-text-group--align-${labelAlign}`])}>
-        {typeof label === 'string' ? <Label>{label}</Label> : label}
+        {renderLabelContent(label)}
       </dt>
       <dd className={cn(styles['tedi-text-group__value'])}>{value}</dd>
     </dl>
   );
 };
+
+TextGroupBase.displayName = 'TextGroup';
+
+export const TextGroup = Object.assign(TextGroupBase, {
+  List: TextGroupList,
+});

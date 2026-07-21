@@ -33,6 +33,21 @@ describe('Search component', () => {
     expect(defaultProps.onSearch).toHaveBeenCalledWith('');
   });
 
+  it('calls onSearch with the current value when Enter is pressed in the input', () => {
+    const onSearch = jest.fn();
+    render(<Search {...defaultProps} onSearch={onSearch} value="query" />);
+    fireEvent.keyDown(screen.getByPlaceholderText('Search...'), { key: 'Enter' });
+    expect(onSearch).toHaveBeenCalledTimes(1);
+    expect(onSearch).toHaveBeenCalledWith('query');
+  });
+
+  it('does not call onSearch for non-Enter keys', () => {
+    const onSearch = jest.fn();
+    render(<Search {...defaultProps} onSearch={onSearch} value="query" />);
+    fireEvent.keyDown(screen.getByPlaceholderText('Search...'), { key: 'a' });
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+
   it('renders with a search icon by default', () => {
     render(<Search {...defaultProps} />);
     const icon = screen.getByText('search');
