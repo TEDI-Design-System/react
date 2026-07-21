@@ -2,23 +2,27 @@
 
 TEDI form controls support both **controlled** and **uncontrolled** modes, following standard React patterns.
 
+> The prop names, defaults, value shapes, and enum members in this file are **illustrative** — they teach the integration idiom, not the exact current API. Verify against the control's `.tsx` JSDoc / Storybook before relying on a specific prop (see SKILL.md → Authoritative Sources).
+
 ## Available Form Controls
 
-| Component | Value Type | Key Features |
-|-----------|-----------|--------------|
-| TextField | `string` | Icon, clearable, size variants |
-| TextArea | `string` | Character limit counter |
-| NumberField | `number` | Min/max, step, suffix, increment buttons |
-| Select | `ISelectOption \| ISelectOption[] \| null` | Async, multi-select, searchable |
-| Checkbox | `boolean` (via onChange) | Indeterminate state |
-| Radio | `boolean` (via onChange) | Used in ChoiceGroup |
-| ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
-| Search | `string` | Search button, onSearch callback |
-| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
-| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
-| Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
-| FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
-| FileDropzone | `FileUploadFile[]` | Drag-and-drop |
+Orientation only — verify the current roster against the barrel export (`src/tedi/index.ts`):
+
+| Component | Purpose |
+|-----------|---------|
+| TextField | Single-line text; icon, clearable, size variants |
+| TextArea | Multi-line text; character-limit counter |
+| NumberField | Numeric input; min/max, step, suffix, increment buttons |
+| Select | Dropdown; async, multi-select, searchable |
+| Checkbox | Boolean toggle; indeterminate state |
+| Radio | Single choice; used within ChoiceGroup |
+| ChoiceGroup | Radio/checkbox groups; segmented and card variants |
+| Search | Text with a search button / onSearch callback |
+| DateField | Date picker; single/multiple/range, manual input, native picker, breakpoint-aware |
+| TimeField | Time picker; wheel / grid picker, native fallback |
+| Filter | Pill-shaped toggle / dropdown filter; pairs with `FilterGroup` |
+| FileUpload | Button-based multi-file upload; validation, loading states |
+| FileDropzone | Drag-and-drop file upload |
 
 ## Controlled vs Uncontrolled
 
@@ -50,8 +54,6 @@ import { TextField } from '@tedi-design-system/react/tedi';
   required
 />
 ```
-
-Key props: `icon`, `isClearable`, `onClear`, `size` ('default' | 'small' | 'large'), `helper` (FeedbackTextProps), `hideLabel`, `readOnly`.
 
 ## Select
 
@@ -287,12 +289,7 @@ A `FilterGroup` without any of `value` / `defaultValue` / `values` / `defaultVal
 `onValueChange` / `onValuesChange` / `label` / `multiselect` is **unmanaged** — children
 behave as standalone toggles and the wrapper exists only for visual grouping.
 
-Variants and customisation:
-- `variant?: 'primary' | 'secondary'`, `size?: 'default' | 'large'`
-- `prepend` / `append` for icons or badges. `hidePrependWhenSelected` (default `true`) swaps
-  the prepend slot for the check icon when the filter becomes selected.
-- `appendTo: 'body' | HTMLElement` portals the dropdown out of the trigger's stacking context.
-- Estonian copy by default: `selectAllLabel='Vali kõik'`, `clearLabel='Tühjenda valik'`.
+Variants and customisation (concepts — check the Filter source/story for exact prop names, enum members, and defaults): primary/secondary visual variants and size options; `prepend` / `append` slots for icons or badges; the dropdown can be portalled out of the trigger's stacking context; and select-all / clear labels default to Estonian copy and are overridable.
 
 
 ## Checkbox & Radio
@@ -407,12 +404,14 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 
 ## Event Handler Conventions
 
-- **Text inputs:** `onChange?: (value: string) => void` + `onChangeEvent?: React.ChangeEventHandler`
-- **Choice inputs:** `onChange?: (value: string, checked: boolean) => void`
-- **Select:** `onChange?: (value: ISelectOption | ISelectOption[] | null) => void`
-- **NumberField:** `onChange?: (value: number) => void`
-- **DateField:** `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>` — value shape depends on `mode` (`'single'` → `Date`, `'multiple'` → `Date[]`, `'range'` → `DateRange`)
-- **TimeField / TimePicker:** `onChange?: (time: string) => void` — value is always `"HH:mm"` 24-hour format (empty string when cleared)
+TEDI form controls hand you the **parsed value**, not the raw DOM event. The convention across controls (confirm the exact signature for any control against its `.tsx` / Storybook):
+
+- **Text-like inputs** (TextField, TextArea, Search) call `onChange` with the string value; a raw-event variant (`onChangeEvent`) is also available.
+- **NumberField** calls `onChange` with a number.
+- **Choice inputs** (Checkbox, Radio, ChoiceGroup) call `onChange` with the value and its checked state.
+- **Select** calls `onChange` with the selected option object(s), or `null` when cleared.
+- **DateField** uses `onSelect`; the value shape follows the active `mode` (single `Date`, `Date[]`, or a range).
+- **TimeField / TimePicker** call `onChange` with a `"HH:mm"` 24-hour string (empty when cleared).
 
 ## Disabled State
 

@@ -197,7 +197,7 @@ const [email, setEmail] = useState('');
 <Checkbox id="agree" label="I agree" value="agree" onChange={(val, checked) => setAgreed(checked)} />
 ```
 
-Form controls: `TextField`, `Select`, `TextArea`, `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`.
+TEDI ships a full set of form controls (text, number, select, choice, date/time, filter, file upload, etc.). For the current roster and per-control usage, see [references/forms.md](references/forms.md) and the barrel export (`src/tedi/index.ts`).
 
 ## Theming
 
@@ -234,7 +234,7 @@ sendNotification({ type: 'success', title: 'Done', children: 'Task completed' })
 A handful of mistakes account for most TEDI integration issues. Avoid them up front:
 
 - **Import from `/tedi` or `/community`, never the package root.** `@tedi-design-system/react` is not a valid import path — the package has explicit entry points (`@tedi-design-system/react/tedi`, `@tedi-design-system/react/community`, `@tedi-design-system/react/index.css`). Importing from the root will fail or silently miss types.
-- **Prefer TEDI-Ready over Community whenever possible.** Several Community components (`Button`, `Anchor`, `Check`, `Radio`, `Tabs`, `Toggle`, `Tooltip`, `Dropdown`, `Tag`) are deprecated in favor of TEDI-Ready equivalents. Reach into Community only when no TEDI-Ready alternative exists (e.g. `Modal`, `Stepper`, `Table`, `DateTimePicker`).
+- **Prefer TEDI-Ready over Community whenever possible.** Several Community components are deprecated in favor of TEDI-Ready equivalents, and the set with no TEDI-Ready alternative yet shifts over time — check the barrel exports / component JSDoc / Storybook for the current deprecation status and whether a TEDI-Ready alternative exists before reaching into Community. See [references/components.md](references/components.md).
 - **Always pass `id` to form controls.** `TextField`, `Select`, `Checkbox`, `Radio`, etc. require it — it's how the label/helper/aria wiring works. There is no auto-generated fallback.
 - **Use design tokens, not hardcoded colors.** Reach for `var(--tedi-color-*)`, `var(--tedi-spacing-*)`, etc. from `@tedi-design-system/core` instead of hex codes. This is what makes theme switching and brand overrides work.
 - **Do not add CSS `var()` fallbacks.** Write `var(--tedi-spacing-4)`, not `var(--tedi-spacing-4, 16px)` — fallbacks defeat token-driven theming.
@@ -245,6 +245,6 @@ A handful of mistakes account for most TEDI integration issues. Avoid them up fr
 
 Load based on your task — **do not load all at once**:
 
-- [references/components.md](references/components.md) — All components by category with props and usage
+- [references/components.md](references/components.md) — How to discover the current components and read their real props from the authoritative sources (barrel exports, source JSDoc, Storybook)
 - [references/theming.md](references/theming.md) — Design tokens, SCSS customization, theme provider
 - [references/forms.md](references/forms.md) — Form controls, controlled/uncontrolled modes, validation
