@@ -28,21 +28,23 @@ import { ThemeProvider } from '@tedi-design-system/react/tedi';
 
 ## Theme Switching
 
-Themes are applied as a CSS class on `<html>`: `tedi-theme--default`, `tedi-theme--dark`.
+Themes are applied as a CSS class on `<html>` (e.g. `tedi-theme--default`, `tedi-theme--dark`). The ThemeProvider manages theme state and persists the selected theme across reloads — in both `localStorage` and a cookie, with `localStorage` taking precedence on read.
 
-The ThemeProvider manages theme state and persistence (via cookie `tedi-theme`).
+The available theme names and cookie name are implementation details — verify the current set against the `ThemeProvider` source / Storybook (see SKILL.md → Authoritative Sources).
 
 ## Design Tokens
 
 Tokens follow the naming pattern `--tedi-{category}-{name}`:
 
-| Category | Examples |
-|----------|---------|
-| Color | `--tedi-color-primary`, `--tedi-color-bg-default`, `--tedi-color-text-secondary` |
-| Spacing | `--tedi-spacing-1`, `--tedi-spacing-2`, `--tedi-spacing-4` |
-| Typography | `--tedi-font-size-sm`, `--tedi-font-weight-bold`, `--tedi-line-height-default` |
-| Border | `--tedi-border-radius-sm`, `--tedi-border-width-default` |
-| Shadow | `--tedi-shadow-sm`, `--tedi-shadow-md` |
+| Category | Example (illustrative) |
+|----------|------------------------|
+| Color | `--tedi-color-primary` |
+| Spacing | `--tedi-spacing-4` |
+| Typography | `--tedi-font-size-sm` |
+| Border | `--tedi-border-radius-sm` |
+| Shadow | `--tedi-shadow-sm` |
+
+The examples above illustrate the **pattern** — they are not the full set. The authoritative list of token names lives in `@tedi-design-system/core`; look them up there (or via a browser devtools inspection of the rendered CSS custom properties) rather than assuming a specific token exists.
 
 Use tokens in your own SCSS:
 

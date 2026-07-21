@@ -25,6 +25,33 @@ The Storybook documentation covers:
 
 ---
 
+## AI Agent Skills
+
+This repository ships an **integration skill** for AI coding agents that consume `@tedi-design-system/react` in a downstream application. The skill lives at [`skills/tedi-react/`](./skills/tedi-react) and conforms to the [skill.sh](https://skill.sh) standard, so it works with any modern AI tool that supports skills.
+
+It teaches an agent:
+
+- The canonical import paths (`/tedi` vs `/community`), required providers, and setup snippet
+- Component APIs, props, polymorphic and breakpoint patterns
+- Form control conventions (controlled/uncontrolled, helpers, validation)
+- Theming with design tokens from `@tedi-design-system/core`
+- Common pitfalls to avoid (deprecated Community components, hardcoded colors, `var()` fallbacks, etc.)
+- Pointers back to this repo and the [live Storybook](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started) as authoritative sources
+
+### Install
+
+Use the [skills.sh](https://skills.sh) CLI from your project root:
+
+```bash
+npx skills add TEDI-Design-System/react
+```
+
+The CLI auto-discovers the `tedi-react` skill under [`skills/`](./skills) and registers it for any compatible agent. Once installed, the agent will trigger the skill whenever you work with TEDI React components.
+
+> Skills for **contributing to** the TEDI Design System (contributor skills, standards validation, etc.) live in a separate repo: [TEDI-Design-System/ai-skills](https://github.com/TEDI-Design-System/ai-skills).
+
+---
+
 ## Repository Development Guide (Contributors)
 
 The following instructions apply only if you are working on this repository itself
