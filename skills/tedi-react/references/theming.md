@@ -28,7 +28,7 @@ import { ThemeProvider } from '@tedi-design-system/react/tedi';
 
 ## Theme Switching
 
-Themes are applied as a CSS class on `<html>` (e.g. `tedi-theme--default`, `tedi-theme--dark`). The ThemeProvider manages theme state and persistence via a cookie.
+Themes are applied as a CSS class on `<html>` (e.g. `tedi-theme--default`, `tedi-theme--dark`). The ThemeProvider manages theme state and persists the selected theme across reloads — in both `localStorage` and a cookie, with `localStorage` taking precedence on read.
 
 The available theme names and cookie name are implementation details — verify the current set against the `ThemeProvider` source / Storybook (see SKILL.md → Authoritative Sources).
 

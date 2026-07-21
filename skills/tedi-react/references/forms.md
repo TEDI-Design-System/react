@@ -408,7 +408,8 @@ TEDI form controls hand you the **parsed value**, not the raw DOM event. The con
 
 - **Text-like inputs** (TextField, TextArea, Search) call `onChange` with the string value; a raw-event variant (`onChangeEvent`) is also available.
 - **NumberField** calls `onChange` with a number.
-- **Choice inputs** (Checkbox, Radio, ChoiceGroup) call `onChange` with the value and its checked state.
+- **Checkbox / Radio** call `onChange` with the value and its checked state.
+- **ChoiceGroup** calls `onChange` with the whole group's parsed value (`string | string[] | null`) — not the `(value, checked)` pair.
 - **Select** calls `onChange` with the selected option object(s), or `null` when cleared.
 - **DateField** uses `onSelect`; the value shape follows the active `mode` (single `Date`, `Date[]`, or a range).
 - **TimeField / TimePicker** call `onChange` with a `"HH:mm"` 24-hour string (empty when cleared).
