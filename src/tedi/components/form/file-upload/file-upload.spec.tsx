@@ -40,6 +40,54 @@ describe('FileUpload component', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith([expect.objectContaining({ name: 'test.jpg' })]);
   });
 
+  it('clears the input value after selection so the same file can be re-selected', () => {
+    render(<FileUpload {...defaultProps} />);
+    const input = screen.getByLabelText(/Upload files/i) as HTMLInputElement;
+    const file = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
+
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(input.value).toBe('');
+  });
+
+  it('associates the helper text with the add button as a description', () => {
+    render(<FileUpload {...defaultProps} helper={{ text: 'Some hint', id: 'my-helper' }} />);
+    const addButton = screen.getByRole('button', { name: /file-upload.add/i });
+    expect(addButton).toHaveAttribute('aria-describedby', 'my-helper');
+  });
+
+  it('gives each file remove button an accessible name including the file name', () => {
+    render(
+      <FileUpload
+        {...defaultProps}
+        defaultFiles={[
+          { name: 'a.jpg', id: '1' },
+          { name: 'b.png', id: '2' },
+        ]}
+      />
+    );
+    expect(screen.getByRole('button', { name: /remove a.jpg/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /remove b.png/i })).toBeInTheDocument();
+  });
+
+  it('exposes a failed file to screen readers, not by colour alone', () => {
+    render(<FileUpload {...defaultProps} defaultFiles={[{ name: 'bad.txt', id: '1', isValid: false }]} />);
+    expect(screen.getByText(/file-upload.failed/i)).toBeInTheDocument();
+  });
+
+  it('moves focus to the add button after removing a file', () => {
+    render(
+      <FileUpload
+        {...defaultProps}
+        defaultFiles={[
+          { name: 'a.jpg', id: '1' },
+          { name: 'b.png', id: '2' },
+        ]}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: /remove a.jpg/i }));
+    expect(screen.getByRole('button', { name: /file-upload.add/i })).toHaveFocus();
+  });
+
   it('rejects files with invalid extensions', async () => {
     render(<FileUpload {...defaultProps} />);
     const input = screen.getByLabelText(/Upload files/i);

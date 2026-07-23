@@ -25,6 +25,9 @@ export interface RejectedFile {
   file: File;
 }
 
+/**
+ * @deprecated Use FileUpload from `@tedi-design-system/react/tedi` instead.
+ */
 export interface FileUploadProps extends FormLabelProps {
   /**
    * Additional classes.
@@ -113,6 +116,9 @@ const getUploadErrorHelperText = (rejectedFiles: RejectedFile[], getLabel: ILabe
     .join('. ');
 };
 
+/**
+ * @deprecated Use FileUpload from `@tedi-design-system/react/tedi` instead.
+ */
 export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const { getLabel } = useLabels();
   const {
