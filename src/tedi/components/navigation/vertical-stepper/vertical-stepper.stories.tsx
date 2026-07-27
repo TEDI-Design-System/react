@@ -199,7 +199,7 @@ const SUB_STATES: StateDef<VerticalStepperSubItemProps>[] = [
 const itemCell = (compact: boolean, props: Partial<VerticalStepperItemProps>) => (
   <VerticalStepper aria-label="Stepper state example" compact={compact}>
     <VerticalStepper.Item title="Text" onClick={noop} {...props} />
-    <VerticalStepper.Item title="Text" onClick={noop} {...props} />
+    <VerticalStepper.Item title="Text" onClick={noop} {...props} current={undefined} />
   </VerticalStepper>
 );
 
@@ -207,7 +207,7 @@ const subCell = (props: Partial<VerticalStepperSubItemProps>) => (
   <VerticalStepper aria-label="Sub-step state example">
     <VerticalStepper.Item title="Text" defaultOpen>
       <VerticalStepper.SubItem title="Text" onClick={noop} {...props} />
-      <VerticalStepper.SubItem title="Text" onClick={noop} {...props} />
+      <VerticalStepper.SubItem title="Text" onClick={noop} {...props} current={undefined} />
     </VerticalStepper.Item>
   </VerticalStepper>
 );

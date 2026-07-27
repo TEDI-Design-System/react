@@ -126,14 +126,6 @@
   --modal-body-padding-sm: 0;
 }
 
-.tedi-table-of-contents__sheet.tedi-table-of-contents__sheet {
-  height: auto;
-  max-height: 80dvh;
-  border-top: var(--tedi-borders-01) solid var(--card-border-primary);
-  border-top-left-radius: var(--modal-radius);
-  border-top-right-radius: var(--modal-radius);
-}
-
 .tedi-table-of-contents__sheet-header {
   display: flex;
   flex: 1 1 auto;

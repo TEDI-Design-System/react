@@ -206,12 +206,14 @@
   display: flex;
   flex-direction: column;
   padding: 0;
-  margin: var(--layout-grid-gutters-04) 0 0;
+  margin: var(--layout-grid-gutters-08) 0 0;
   list-style: none;
 }
 
 .tedi-vertical-stepper__sub-item {
   position: relative;
+  display: flex;
+  min-height: 1.75rem;
   padding: var(--layout-grid-gutters-02) 0;
 }
 

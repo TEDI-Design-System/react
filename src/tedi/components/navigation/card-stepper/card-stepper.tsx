@@ -5,7 +5,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
-import { Modal } from '../../overlays/modal/modal';
+import { Sheet } from '../../overlays/sheet/sheet';
 import { VerticalStepper } from '../vertical-stepper/vertical-stepper';
 import styles from './card-stepper.module.scss';
 import { CardStepperStep, CardStepperStepProps } from './card-stepper-step';
@@ -342,55 +342,51 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
       {current.bottomSlot && <div className={styles['tedi-card-stepper__bottom-slot']}>{current.bottomSlot}</div>}
 
       {showStepList && (
-        <Modal open={modalOpen} onToggle={setModalOpen}>
-          <Modal.Content position="bottom">
-            <Modal.Header>{resolvedLabels.modalHeading}</Modal.Header>
-            <Modal.Body>
-              <VerticalStepper aria-label={resolvedLabels.modalHeading}>
-                {steps.map((step, index) => {
-                  const navigable = isStepNavigable(index);
-                  const subSteps = step.subSteps;
-                  return (
-                    <VerticalStepper.Item
-                      key={step.id ?? index}
-                      title={step.title}
-                      description={step.description}
-                      state={step.disabled ? 'disabled' : step.state}
-                      current={index === active}
+        <Sheet open={modalOpen} onToggle={setModalOpen} title={resolvedLabels.modalHeading}>
+          <VerticalStepper aria-label={resolvedLabels.modalHeading}>
+            {steps.map((step, index) => {
+              const navigable = isStepNavigable(index);
+              const subSteps = step.subSteps;
+              const hasCurrentSubStep = !!subSteps?.some((sub) => sub.current);
+              return (
+                <VerticalStepper.Item
+                  key={step.id ?? index}
+                  title={step.title}
+                  description={step.description}
+                  state={step.disabled ? 'disabled' : step.state}
+                  current={index === active && !hasCurrentSubStep}
+                  onClick={
+                    navigable
+                      ? () => {
+                          goTo(index);
+                          setModalOpen(false);
+                        }
+                      : undefined
+                  }
+                  defaultOpen={subSteps ? step.defaultExpanded ?? index === active : undefined}
+                >
+                  {subSteps?.map((subStep, subIndex) => (
+                    <VerticalStepper.SubItem
+                      key={subStep.id ?? subIndex}
+                      title={subStep.title}
+                      state={subStep.disabled ? 'disabled' : subStep.state}
+                      current={subStep.current}
+                      href={subStep.href}
                       onClick={
-                        navigable
-                          ? () => {
-                              goTo(index);
+                        subStep.onClick
+                          ? (event) => {
+                              subStep.onClick?.(event);
                               setModalOpen(false);
                             }
                           : undefined
                       }
-                      defaultOpen={subSteps ? step.defaultExpanded ?? index === active : undefined}
-                    >
-                      {subSteps?.map((subStep, subIndex) => (
-                        <VerticalStepper.SubItem
-                          key={subStep.id ?? subIndex}
-                          title={subStep.title}
-                          state={subStep.disabled ? 'disabled' : subStep.state}
-                          current={subStep.current}
-                          href={subStep.href}
-                          onClick={
-                            subStep.onClick
-                              ? (event) => {
-                                  subStep.onClick?.(event);
-                                  setModalOpen(false);
-                                }
-                              : undefined
-                          }
-                        />
-                      ))}
-                    </VerticalStepper.Item>
-                  );
-                })}
-              </VerticalStepper>
-            </Modal.Body>
-          </Modal.Content>
-        </Modal>
+                    />
+                  ))}
+                </VerticalStepper.Item>
+              );
+            })}
+          </VerticalStepper>
+        </Sheet>
       )}
     </div>
   );

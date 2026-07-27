@@ -5,8 +5,8 @@ import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { CardButton } from '../../buttons/card-button/card-button';
-import { Collapse } from '../../buttons/collapse/collapse';
-import { Card } from '../../cards/card/card';
+import { Card } from '../../content/card';
+import { Collapse } from '../../content/collapse/collapse';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Alert } from '../../notifications/alert/alert';
@@ -143,10 +143,10 @@ export const WithInfoBottom: Story = {
 export const WithInfoTop: Story = {
   render: () => {
     const INFO_TOP_STEPS: CardStepperStepProps[] = [
-      { title: 'Isikuandmed', description: 'Minu andmed', state: 'completed' },
-      { title: 'Dokumendid', description: 'Minu andmed', state: 'completed' },
-      { title: 'Elukoht', description: 'Minu andmed' },
-      { title: 'Ülevaade', description: 'Minu andmed' },
+      { title: 'Isikuandmed', description: 'Nimi ja kontakt', state: 'completed' },
+      { title: 'Dokumendid', description: 'Üleslaaditud failid', state: 'completed' },
+      { title: 'Elukoht', description: 'Aadress' },
+      { title: 'Ülevaade', description: 'Kokkuvõte' },
     ];
 
     return (
@@ -572,28 +572,22 @@ export const CardStepperButtonStates: Story = {
     },
   },
   render: () => (
-    <VerticalSpacing size={1}>
-      <Row alignItems="center" gutterY={2} lg={{ gutterY: 0 }}>
-        <Col xs={12} lg={2} />
-        {SEMANTIC_COLUMNS.map((column) => (
-          <Col key={column.key} xs={12} lg={3} grow={1}>
+    <Row gutterY={5}>
+      {SEMANTIC_COLUMNS.map((column) => (
+        <Col key={column.key} xs={12} md={4}>
+          <VerticalSpacing size={1}>
             <Text modifiers="bold">{column.label}</Text>
-          </Col>
-        ))}
-      </Row>
-
-      {BUTTON_STATE_ROWS.map((row) => (
-        <Row key={row} alignItems="center" gutterY={2} lg={{ gutterY: 0 }}>
-          <Col xs={12} lg={2}>
-            <Text modifiers="bold">{row}</Text>
-          </Col>
-          {SEMANTIC_COLUMNS.map((column) => (
-            <Col key={column.key} xs={12} lg={3} grow={1}>
-              {stateStepCard(column.key, row)}
-            </Col>
-          ))}
-        </Row>
+            {BUTTON_STATE_ROWS.map((row) => (
+              <VerticalSpacing key={row} size={0.5}>
+                <Text modifiers={['small', 'bold']} color="secondary">
+                  {row}
+                </Text>
+                {stateStepCard(column.key, row)}
+              </VerticalSpacing>
+            ))}
+          </VerticalSpacing>
+        </Col>
       ))}
-    </VerticalSpacing>
+    </Row>
   ),
 };

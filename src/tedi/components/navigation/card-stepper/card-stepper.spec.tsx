@@ -2,6 +2,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 
+import { PrintingProvider } from '../../../providers/printing-provider/printing-provider';
 import { CardStepper, CardStepperStepProps } from './card-stepper';
 
 import '@testing-library/jest-dom';
@@ -12,6 +13,7 @@ jest.mock('../../overlays/modal/modal', () => {
   Modal.Content = ({ children }: PropsWithChildren) => <div>{children}</div>;
   Modal.Header = ({ children }: PropsWithChildren) => <h2>{children}</h2>;
   Modal.Body = ({ children }: PropsWithChildren) => <div>{children}</div>;
+  Modal.Closer = ({ children }: PropsWithChildren) => <>{children}</>;
   return { Modal };
 });
 
@@ -117,6 +119,32 @@ describe('CardStepper', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('keeps the parent open but not current when one of its sub-steps is current', () => {
+    const steps: CardStepperStepProps[] = [
+      { title: 'Kutse', state: 'completed' },
+      {
+        title: 'Geenianalüüs',
+        subSteps: [
+          { title: 'Proovi andmine', state: 'completed', onClick: () => undefined },
+          { title: 'Analüüs', current: true, onClick: () => undefined },
+        ],
+      },
+      { title: 'Vastus' },
+    ];
+    render(
+      <PrintingProvider>
+        <CardStepper steps={steps} activeStep={1} aria-label="Wizard" />
+      </PrintingProvider>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
+
+    const dialog = screen.getByRole('dialog');
+    const active = within(dialog).getAllByRole('button', { current: 'step' });
+    expect(active).toHaveLength(1);
+    expect(active[0]).toHaveAccessibleName(/Analüüs/);
+    expect(within(dialog).getByRole('button', { name: /Proovi andmine/ })).toBeInTheDocument();
+  });
+
   it('exposes a screen-reader step status and dialog semantics on the list button', () => {
     render(<CardStepper steps={STEPS} activeStep={1} aria-label="Wizard" />);
     // "2 / 4" is hidden from AT; an unambiguous phrasing is exposed instead.
@@ -145,7 +173,6 @@ describe('CardStepper', () => {
     render(<CardStepper steps={STEPS} activeStep={1} allowJump="completed-or-next" aria-label="Wizard" />);
     fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
     const dialog = screen.getByRole('dialog');
-    // Completed step (index 0) and the step right after the active one (index 2) are clickable…
     expect(within(dialog).getByRole('button', { name: /Personal data/ })).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: /Review/ })).toBeInTheDocument();
     // …a later step is not.
@@ -161,7 +188,6 @@ describe('CardStepper', () => {
     ];
     render(<CardStepper steps={steps} activeStep={0} showNavigation onStepChange={onStepChange} aria-label="Wizard" />);
 
-    // Next skips the disabled step and lands on index 2.
     fireEvent.click(screen.getByRole('button', { name: 'stepper.next' }));
     expect(onStepChange).toHaveBeenCalledWith(2);
 
