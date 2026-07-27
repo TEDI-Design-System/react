@@ -316,12 +316,7 @@ export const Calendar = ({
                     return (
                       <DayButton {...dayButtonProps} aria-label={ariaLabel}>
                         {dayButtonProps.children}
-                        <StatusIndicator
-                          type={status.type}
-                          size="sm"
-                          hasBorder
-                          className={styles['tedi-calendar__day-status']}
-                        />
+                        <StatusIndicator type={status.type} size="sm" className={styles['tedi-calendar__day-status']} />
                       </DayButton>
                     );
                   },

@@ -56,14 +56,10 @@
 
       &::before {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: var(--form-calendar-date-width);
-        height: var(--form-calendar-date-width);
+        inset: 0;
         content: '';
         border: var(--tedi-borders-01) solid var(--form-datepicker-today-border);
         border-radius: 50%;
-        transform: translate(-50%, -50%);
       }
     }
   }

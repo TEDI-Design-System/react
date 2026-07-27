@@ -326,7 +326,7 @@ export const WithDayStatus: Story = {
     const day = (offset: number) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
 
     const statusByDate = new Map(
-      [day(-2), day(4), day(10)].map((date) => [date.toDateString(), 'Confirmed appointment'])
+      [day(-2), day(4), day(10)].map((date) => [date.toDateString(), 'Kinnitatud vastuvõtt'])
     );
 
     const dayStatus: CalendarProps['dayStatus'] = (date) => {
@@ -340,8 +340,8 @@ export const WithDayStatus: Story = {
         footer={
           <Row>
             <Col width="auto" className="flex align-items-center gap-2">
-              <StatusIndicator type="success" size="sm" hasBorder />
-              Confirmed
+              <StatusIndicator type="success" size="sm" />
+              Kinnitatud
             </Col>
           </Row>
         }
