@@ -93,6 +93,8 @@ const getDefaultHelpers = (
 
 const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+const ANNOUNCEMENT_RESET_DELAY = 100;
+
 export const useFileUpload = (props: UseFileUploadProps) => {
   const { getLabel } = useLabels();
   const {
@@ -117,23 +119,30 @@ export const useFileUpload = (props: UseFileUploadProps) => {
 
   const [announcement, setAnnouncement] = React.useState<string>('');
   const isMounted = React.useRef(true);
-  const announcementTimer = React.useRef<ReturnType<typeof setTimeout>>();
+  const announceShowTimer = React.useRef<ReturnType<typeof setTimeout>>();
+  const announceHideTimer = React.useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     return () => {
       isMounted.current = false;
-      if (announcementTimer.current) clearTimeout(announcementTimer.current);
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
     };
   }, []);
 
   const announce = React.useCallback(
     (message: string) => {
       if (!message || !isMounted.current) return;
-      setAnnouncement(message);
-      if (announcementTimer.current) clearTimeout(announcementTimer.current);
-      announcementTimer.current = setTimeout(() => {
-        if (isMounted.current) setAnnouncement('');
-      }, announcementTimeout);
+      setAnnouncement('');
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
+      announceShowTimer.current = setTimeout(() => {
+        if (!isMounted.current) return;
+        setAnnouncement(message);
+        announceHideTimer.current = setTimeout(() => {
+          if (isMounted.current) setAnnouncement('');
+        }, announcementTimeout);
+      }, ANNOUNCEMENT_RESET_DELAY);
     },
     [announcementTimeout]
   );
@@ -221,7 +230,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
         setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
 
         if (newFiles.length > 0) {
-          const count = newFiles.length - actualFiles.length;
+          const count = newFiles.filter((file) => !actualFiles.includes(file)).length;
           announce(getLabel('file-upload.success-added', count.toString()));
         }
       }

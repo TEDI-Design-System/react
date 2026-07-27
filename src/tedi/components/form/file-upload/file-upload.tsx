@@ -300,4 +300,6 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   );
 };
 
+FileUpload.displayName = 'FileUpload';
+
 export default FileUpload;

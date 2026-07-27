@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { FileUploadFile } from '../../../helpers';
@@ -398,5 +398,30 @@ describe('FileUpload component', () => {
       expect(screen.queryByText('initial.jpg')).not.toBeInTheDocument();
       expect(screen.queryByText('new.jpg')).not.toBeInTheDocument();
     });
+  });
+
+  it('resets the live region so an identical consecutive announcement is re-announced', () => {
+    jest.useFakeTimers();
+    try {
+      render(<FileUpload {...defaultProps} />);
+      const input = screen.getByLabelText(/Upload files/i);
+      const liveRegion = screen.getByRole('status');
+
+      fireEvent.change(input, { target: { files: [new File(['a'], 'a.jpg', { type: 'image/jpeg' })] } });
+      expect(liveRegion).toBeEmptyDOMElement();
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      expect(liveRegion).toHaveTextContent('file-upload.success-added');
+
+      fireEvent.change(input, { target: { files: [new File(['b'], 'b.jpg', { type: 'image/jpeg' })] } });
+      expect(liveRegion).toBeEmptyDOMElement();
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      expect(liveRegion).toHaveTextContent('file-upload.success-added');
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
