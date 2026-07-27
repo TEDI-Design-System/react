@@ -46,3 +46,10 @@
 .tedi-calendar__month-year-caret {
   font-size: var(--tedi-size-09);
 }
+
+.tedi-calendar__month-year-label {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  color: var(--general-text-primary);
+  text-transform: capitalize;
+}

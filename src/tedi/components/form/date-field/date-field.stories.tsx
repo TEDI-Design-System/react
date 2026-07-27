@@ -5,6 +5,7 @@ import { DateRange } from 'react-day-picker';
 import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { TextFieldProps } from '../textfield/textfield';
 import { DateField, DateFieldProps } from './date-field';
 
@@ -90,22 +91,22 @@ const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
 
 export const States: Story = {
   render: () => (
-    <div className="state-example">
+    <VerticalSpacing>
       {stateArray.map((state) => (
-        <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+        <Row key={state}>
+          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
+          <Col>
             <DateField id={state} mode="single" label="Kuupäev" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col>
           <DateField
             id="success-datefield"
             mode="single"
@@ -114,11 +115,11 @@ export const States: Story = {
           />
         </Col>
       </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col>
           <DateField
             id="error-datefield"
             mode="single"
@@ -127,7 +128,7 @@ export const States: Story = {
           />
         </Col>
       </Row>
-    </div>
+    </VerticalSpacing>
   ),
   parameters: {
     pseudo: {
@@ -424,6 +425,41 @@ export const YearGrid: Story = {
 };
 
 /**
+ * Both fields use `monthYearSelectType="grid"`, so every picker is a grid (no dropdown) —
+ * they only differ in the direction the user moves through year / month / day:
+ *
+ * - **Left (year → month → day):** `initialView="years"` opens straight on the year grid.
+ *   With the default `selectionLevel="days"`, picking a year drills into the month grid,
+ *   then the day grid, where the final date commits.
+ * - **Right (day → month → year):** the default `initialView` opens on the day grid; the
+ *   grid-style header lets the user step *up* — click the month to open the month grid,
+ *   click the year to open the year grid — before drilling back down to a day.
+ */
+export const GridPickerFirst: Story = {
+  render: () => {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
+        <DateField
+          id="date-grid-year-first"
+          mode="single"
+          label="Aasta → kuu → päev"
+          placeholder="pp.kk.aaaa"
+          initialView="years"
+          monthYearSelectType="grid"
+        />
+        <DateField
+          id="date-grid-day-first"
+          mode="single"
+          label="Päev → kuu → aasta"
+          placeholder="pp.kk.aaaa"
+          monthYearSelectType="grid"
+        />
+      </div>
+    );
+  },
+};
+
+/**
  * Month + year picker — no day grid. `selectionLevel="months"` makes the
  * calendar commit when the user clicks a month tile (the day grid is
  * skipped). The `formatDate` / `parseDate` overrides change the input
@@ -509,7 +545,7 @@ export const WithFooter: Story = {
       <Row gutterY={3}>
         <Col lg={6} xs={12}>
           <DateField
-            label="Kellaaeg"
+            label="Kuupäev"
             placeholder="pp.kk.aaaa"
             id="calendar-with-footer"
             footer={
@@ -584,7 +620,6 @@ export const AvailableDays: Story = {
 export const NativePicker: Story = {
   render: () => {
     const [selected, setSelected] = useState<Date | undefined>();
-
     return (
       <DateField
         id="date-field-native-picker"
@@ -595,6 +630,115 @@ export const NativePicker: Story = {
         selected={selected}
         onSelect={(date) => setSelected(date as Date)}
       />
+    );
+  },
+};
+
+/**
+ * `modal` opens the calendar in a modal (Cancel / Confirm footer) instead of the popover. The
+ * selection is committed on Confirm; Cancel / Escape / backdrop discards it. `modalProps` is
+ * breakpoint-aware — here `fullscreen: 'edge'` below `md`, centered dialog from `md` up.
+ */
+export const ModalPicker: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+    return (
+      <DateField
+        id="date-field-modal"
+        mode="single"
+        label="Kuupäev"
+        modal
+        calendarTrigger="input"
+        modalProps={{ fullscreen: 'edge', md: { fullscreen: false } }}
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+      />
+    );
+  },
+};
+
+/**
+ * `modal="md"` uses the modal below `md` and the popover from `md` up. Resize the canvas to see it
+ * switch.
+ */
+export const ResponsiveModalPicker: Story = {
+  render: () => {
+    const [selected, setSelected] = useState<Date | undefined>();
+    return (
+      <DateField
+        id="date-field-modal-responsive"
+        mode="single"
+        label="Kuupäev"
+        modal="md"
+        calendarTrigger="input"
+        modalProps={{ fullscreen: 'edge' }}
+        selected={selected}
+        onSelect={(date) => setSelected(date as Date)}
+      />
+    );
+  },
+};
+
+/**
+ * Month, year and range pickers in a modal. `selectionLevel` sets the picker level and `modalTitle`
+ * the heading; the range modal shows two months (`numberOfMonths={2}`) that stack vertically when
+ * the modal is narrow.
+ */
+export const ModalPickers: Story = {
+  render: () => {
+    const [month, setMonth] = useState<Date | undefined>();
+    const [year, setYear] = useState<Date | undefined>();
+    const [range, setRange] = useState<DateRange | undefined>();
+
+    return (
+      <Row gutterY={2}>
+        <Col lg={4} xs={12}>
+          <DateField
+            id="date-field-modal-month"
+            mode="single"
+            label="Kuu"
+            modal
+            calendarTrigger="input"
+            selectionLevel="months"
+            monthYearSelectType="grid"
+            modalTitle="Vali kuu"
+            modalProps={{ fullscreen: 'edge', md: { fullscreen: false } }}
+            selected={month}
+            onSelect={(date) => setMonth(date as Date)}
+          />
+        </Col>
+        <Col lg={4} xs={12}>
+          <DateField
+            id="date-field-modal-year"
+            mode="single"
+            label="Aasta"
+            modal
+            calendarTrigger="input"
+            selectionLevel="years"
+            monthYearSelectType="grid"
+            modalTitle="Vali aasta"
+            modalProps={{ fullscreen: 'edge', md: { fullscreen: false } }}
+            selected={year}
+            onSelect={(date) => setYear(date as Date)}
+          />
+        </Col>
+        <Col lg={4} xs={12}>
+          <DateField
+            id="date-field-modal-range"
+            mode="range"
+            label="Vahemik"
+            modal
+            calendarTrigger="input"
+            numberOfMonths={2}
+            monthYearSelectType="grid"
+            modalTitle="Vali vahemik"
+            showNavigation={false}
+            modalProps={{ fullscreen: 'edge', md: { fullscreen: false } }}
+            selected={range}
+            onSelect={(date) => setRange(date as DateRange)}
+          />
+        </Col>
+      </Row>
     );
   },
 };

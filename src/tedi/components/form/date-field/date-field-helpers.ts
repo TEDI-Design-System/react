@@ -16,6 +16,35 @@ export const CALENDAR_POPOVER_PADDING = 8;
 
 export type SelectedValueLike = Date | Date[] | DateRange | undefined;
 
+const isDateRange = (val: SelectedValueLike): val is DateRange =>
+  !!val && !Array.isArray(val) && !(val instanceof Date) && 'from' in val;
+
+/**
+ * Range-selection click resolver. react-day-picker's default `addToRange`
+ * keeps a completed `{ from, to }` range and only moves one of its ends when
+ * the user clicks again — so after picking a start and an end, clicking a new
+ * start instead drags the existing end. That surprises users who expect a
+ * fresh click to begin a new range.
+ *
+ * This normalises that: once a range is complete, the next click starts over
+ * with `from` set to the clicked day and `to` cleared. While the range is
+ * still being built (or empty), DayPicker's own result is passed through.
+ *
+ * @param computed - the range react-day-picker derived from the click
+ * @param previous - the range that was selected before this click
+ * @param clickedDay - the day the user just clicked
+ */
+export const resolveRangeSelection = (
+  computed: SelectedValueLike,
+  previous: SelectedValueLike,
+  clickedDay: Date | undefined
+): DateRange | undefined => {
+  if (clickedDay && isDateRange(previous) && previous.from && previous.to) {
+    return { from: clickedDay, to: undefined };
+  }
+  return isDateRange(computed) ? computed : undefined;
+};
+
 /**
  * Resolves the month the calendar should start on for any selection
  * shape. Used by both `DateField` (single / multiple / range Date(s)) and

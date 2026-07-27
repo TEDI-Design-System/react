@@ -50,6 +50,10 @@
   padding-left: 0;
 }
 
+.tedi-attachment:not(:has(.tedi-attachment__actions)) .tedi-attachment__body {
+  padding-right: var(--layout-grid-gutters-08);
+}
+
 .tedi-attachment__name {
   display: flex;
   gap: var(--layout-grid-gutters-08);

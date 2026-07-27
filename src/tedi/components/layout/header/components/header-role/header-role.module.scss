@@ -149,20 +149,6 @@
     gap: var(--layout-grid-gutters-04);
   }
 
-  &__content--toggle {
-    display: flex;
-    gap: var(--link-inner-spacing-x);
-    align-items: center;
-
-    &-icon {
-      transition: transform 0.2s ease-in-out;
-
-      &--open {
-        transform: rotate(-180deg);
-      }
-    }
-  }
-
   &__collapse {
     display: grid;
     visibility: hidden;

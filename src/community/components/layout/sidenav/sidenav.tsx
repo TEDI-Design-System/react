@@ -3,7 +3,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon, IconProps } from '../../../../tedi/components/base/icon/icon';
-import { Collapse } from '../../../../tedi/components/buttons/collapse/collapse';
+import { Collapse } from '../../../../tedi/components/content/collapse/collapse';
 import Print from '../../../../tedi/components/misc/print/print';
 import useLayout, { Layouts } from '../../../helpers/hooks/use-layout';
 import { AllowedHTMLTags } from '../../../helpers/polymorphic/types';

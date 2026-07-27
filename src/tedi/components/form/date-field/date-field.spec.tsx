@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { et } from 'react-day-picker/locale';
@@ -623,5 +623,44 @@ describe('DateField component', () => {
     expect(screen.getByText('Date is in the past')).toBeInTheDocument();
     await user.clear(input);
     expect(screen.queryByText('Date is in the past')).not.toBeInTheDocument();
+  });
+
+  describe('modal picker', () => {
+    it('opens the calendar in a modal when `modal` is set (no popover)', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} modal initialMonth={new Date(2025, 5, 1)} />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button'));
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('commits the picked date on Confirm and closes the modal', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(<DateField {...defaultProps} modal onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByText('15'));
+      await user.click(within(dialog).getByRole('button', { name: 'date-field.confirm' }));
+
+      expect(onSelect).toHaveBeenCalled();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('discards the draft when the modal is cancelled', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(<DateField {...defaultProps} modal onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByText('15'));
+      await user.click(within(dialog).getByRole('button', { name: 'date-field.cancel' }));
+
+      expect(onSelect).not.toHaveBeenCalled();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
   });
 });

@@ -8,8 +8,18 @@ import { CardContext } from '../card-context';
 import { getPaddingCssVariables } from '../utility';
 
 export interface CardContentProps extends BreakpointSupport<SharedCardProps> {
+  /**
+   * Content rendered inside the card section.
+   */
   children?: React.ReactNode;
+  /**
+   * Renders the content section as an interactive `<button>` element instead of a `<div>`.
+   * Use when the whole section should be clickable.
+   */
   role?: 'button';
+  /**
+   * Inline styles applied to the content element.
+   */
   style?: CSSProperties;
 }
 

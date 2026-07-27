@@ -11,6 +11,20 @@
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 }
 
+.tedi-date-field__calendar-popover--fullwidth {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-inline: var(--layout-grid-gutters-08);
+}
+
+.tedi-date-field__calendar--fullwidth {
+  min-width: 0;
+  max-width: 100%;
+
+  --form-calendar-date-width: min(40px, calc((100vw - 5rem) / 7));
+}
+
 .tedi-date-field__textfield {
   @include field-icon-button.states;
 

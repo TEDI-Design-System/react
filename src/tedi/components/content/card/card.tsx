@@ -60,7 +60,9 @@ export interface SharedCardProps {
    */
   backgroundRepeat?: CSSProperties['backgroundRepeat'];
   /**
-   * Separator.
+   * Renders a separator line between this section and the adjacent card content.
+   * Useful for visually dividing stacked `Card.Header`, `Card.Content` and `Card.Notification` sections.
+   * @default false
    */
   hasSeparator?: boolean;
 }
@@ -86,11 +88,12 @@ type CardBreakpointProps = {
    */
   borderRadius?: BorderRadius;
   /**
-   * Remove border from card
+   * Removes the card's border entirely.
+   * @default false
    */
   borderless?: boolean;
   /**
-   * Type of border
+   * Adds a colored accent border to the top or left of the card (e.g. `top-success-primary`, `left-danger-primary`).
    */
   border?: CardBorderType;
 } & Pick<CardContentProps, 'padding' | 'background'>;

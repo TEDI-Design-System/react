@@ -141,11 +141,6 @@ $transition-duration: 300ms;
     }
   }
 
-  &--secondary.tedi-collapse-button--small .tedi-collapse-button__icon-wrapper {
-    width: var(--tedi-dimensions-13);
-    height: var(--tedi-dimensions-13);
-  }
-
   &--inverted {
     color: var(--link-inverted-default);
 

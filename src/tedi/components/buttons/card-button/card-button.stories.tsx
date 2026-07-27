@@ -4,7 +4,7 @@ import { Fragment, ReactNode } from 'react';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
-import { Card } from '../../cards/card/card';
+import { Card } from '../../content/card/card';
 import { TextGroup } from '../../content/text-group/text-group';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';

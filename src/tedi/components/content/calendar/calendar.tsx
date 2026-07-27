@@ -117,9 +117,10 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
   className?: string;
   /**
    * Whether to render the surrounding card (border, background, radius).
-   * Set to `false` when embedding inside a parent that already provides
-   * its own surface — e.g. alongside a calendar inside `DateTimeField`.
-   * The inner gradient masks and column separators are preserved either way.
+   * Set to `false` when embedding inside a parent that already provides its
+   * own surface — e.g. inside `DatePickerModal`, or alongside a calendar in
+   * `DateTimeField`. The inner gradient masks and column separators are
+   * preserved either way.
    * @default true
    */
   bordered?: boolean;

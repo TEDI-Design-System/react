@@ -2,7 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from '../../../tedi/components/base/icon/icon';
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
-import { Collapse } from '../../../tedi/components/buttons/collapse/collapse';
+import { Collapse } from '../../../tedi/components/content/collapse/collapse';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Separator from '../../../tedi/components/misc/separator/separator';

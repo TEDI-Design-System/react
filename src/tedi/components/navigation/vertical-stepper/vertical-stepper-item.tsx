@@ -4,7 +4,7 @@ import React, { forwardRef, useId, useState } from 'react';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
-import Collapse from '../../buttons/collapse/collapse';
+import { Collapse } from '../../content/collapse/collapse';
 import styles from './vertical-stepper.module.scss';
 import { useVerticalStepperContext } from './vertical-stepper-context';
 
