@@ -113,6 +113,9 @@ const getUploadErrorHelperText = (rejectedFiles: RejectedFile[], getLabel: ILabe
     .join('. ');
 };
 
+/**
+ * @deprecated Use `FileUpload` from `@tedi-design-system/react/tedi` instead.
+ */
 export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const { getLabel } = useLabels();
   const {
