@@ -38,25 +38,46 @@ export interface LeftPanelProps {
   className?: string;
   /** Icon shown on the left of the (blue) header. */
   icon?: ReactNode;
-  /** Hide the close button that collapses the panel. */
+  /**
+   * Hide the close button that collapses the panel.
+   * @default false
+   */
   hideCloseButton?: boolean;
-  /** Hide the reopen button shown when collapsed. */
+  /**
+   * Hide the reopen button shown when collapsed.
+   * @default false
+   */
   hideOpenButton?: boolean;
-  /** Uncontrolled initial open state. Ignored when `open` is provided. */
+  /**
+   * Uncontrolled initial open state. Ignored when `open` is provided.
+   * @default true
+   */
   defaultOpen?: boolean;
   /** Controlled open state. When set, the component does not manage its own state. */
   open?: boolean;
   /** Notified whenever the panel wants to open or close. */
   onOpenChange?: (open: boolean) => void;
-  /** Allow the user to drag-resize the panel width. */
+  /**
+   * Allow the user to drag-resize the panel width.
+   * @default true
+   */
   resizable?: boolean;
   /** `LeftPanel.Header`, `LeftPanel.Content` and `LeftPanel.Footer`. */
   children?: ReactNode;
-  /** Panel width in pixels. Initial width when resizable, fixed width otherwise. */
+  /**
+   * Panel width in pixels. Initial width when resizable, fixed width otherwise.
+   * @default 350
+   */
   width?: number;
-  /** Maximum resize width in pixels. Only applies when resizable. */
+  /**
+   * Maximum resize width in pixels. Only applies when resizable.
+   * @default 600
+   */
   maxWidth?: number;
-  /** Minimum resize width in pixels. Only applies when resizable. */
+  /**
+   * Minimum resize width in pixels. Only applies when resizable.
+   * @default 350
+   */
   minWidth?: number;
 }
 
