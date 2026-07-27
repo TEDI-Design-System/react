@@ -25,8 +25,10 @@ export interface TimelineProps {
    */
   variant?: TimelineVariant;
   /**
-   * Item padding in rem for the `card` variant (same scale as `Card`).
-   * @default 1
+   * Vertical padding of each item in the `card` variant, in rem (same scale as
+   * `Card`). Both the gaps between items and the card's top/bottom edges resolve
+   * to twice this value. Horizontal item padding is fixed at the card default.
+   * @default 0.5
    */
   cardPadding?: number;
   /**

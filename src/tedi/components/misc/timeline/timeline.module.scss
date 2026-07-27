@@ -18,8 +18,9 @@
 }
 
 .tedi-timeline--card {
-  --tedi-timeline-card-padding: var(--card-padding-md-default);
+  --tedi-timeline-card-padding: var(--card-padding-xs);
 
+  padding-block: var(--tedi-timeline-card-padding);
   background: var(--card-background-primary);
   border: 1px solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
@@ -28,12 +29,19 @@
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
-    padding: var(--tedi-timeline-card-padding);
+    padding: var(--tedi-timeline-card-padding) var(--card-padding-md-default);
     border-bottom: 1px solid var(--card-border-primary);
   }
 
   .tedi-timeline-item:last-child {
     border-bottom: 0;
+  }
+
+  .tedi-timeline__timings,
+  .tedi-timeline__info,
+  .tedi-timeline__timings-bottom {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .tedi-timeline-item:not(:last-child) .tedi-timeline__marker {
