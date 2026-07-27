@@ -793,9 +793,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     role: _role,
     'aria-expanded': _ariaExpanded,
     'aria-haspopup': _ariaHaspopup,
-    'aria-controls': _ariaControls,
+    'aria-controls': floatingAriaControls,
     ...containerInteractionProps
   } = referenceProps;
+
+  const triggerAriaControls = !useModalPicker ? (floatingAriaControls as string | undefined) : undefined;
 
   return (
     <>
@@ -820,6 +822,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                     'aria-label': getLabel('dateField.openCalendar'),
                     'aria-expanded': useModalPicker ? modalOpen : open,
                     'aria-haspopup': 'dialog',
+                    'aria-controls': triggerAriaControls,
                   }
                 : undefined
             }
@@ -858,6 +861,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                     'aria-label': getLabel('dateField.openCalendar'),
                     'aria-expanded': useModalPicker ? modalOpen : open,
                     'aria-haspopup': 'dialog',
+                    'aria-controls': triggerAriaControls,
                   }
                 : undefined
             }
@@ -888,7 +892,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
               ...((inputProps as TextFieldProps)?.input as UnknownType),
               ...(shouldUseNativePicker && { type: 'date' }),
               ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
-                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open }
+                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open, 'aria-controls': triggerAriaControls }
                 : {}),
             }}
           />

@@ -55,6 +55,37 @@ describe('MultiValueField', () => {
       expect(screen.getByText('one')).toBeInTheDocument();
       expect(screen.queryByText('three')).not.toBeInTheDocument();
     });
+
+    it('gives the overflow counter an accessible label', async () => {
+      const { container } = render(
+        <MultiValueField {...defaultProps} tagsDirection="row" values={['one', 'two', 'three']} />
+      );
+
+      await waitFor(() => expect(screen.getByText('+2')).toBeInTheDocument());
+      const counter = container.querySelector('.tedi-multi-value-field__overflow-tag');
+      expect(counter).toHaveAttribute('aria-label');
+      expect(counter?.getAttribute('aria-label')).toBeTruthy();
+    });
+
+    it('attaches the ResizeObserver once the tags container mounts (starting empty)', () => {
+      const observe = jest.fn();
+      class MockResizeObserver {
+        observe = observe;
+        unobserve = jest.fn();
+        disconnect = jest.fn();
+      }
+      const original = global.ResizeObserver;
+      global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+      try {
+        const { rerender } = render(<MultiValueField {...defaultProps} tagsDirection="row" values={[]} />);
+        expect(observe).not.toHaveBeenCalled();
+        rerender(<MultiValueField {...defaultProps} tagsDirection="row" values={['one', 'two']} />);
+        expect(observe).toHaveBeenCalledTimes(1);
+      } finally {
+        global.ResizeObserver = original;
+      }
+    });
   });
 
   it('calls onChange when removing a value', () => {

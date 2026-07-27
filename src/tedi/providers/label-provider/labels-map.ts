@@ -100,6 +100,14 @@ export const labelsMap = validateDefaultLabels({
     en: 'Remove',
     ru: 'Удалить',
   },
+  'multi-value-field.hidden-count': {
+    description:
+      'Accessible label for the overflow counter shown in single-row (`tagsDirection="row"`) mode, announcing how many selected values are hidden.',
+    components: ['MultiValueField', 'DateField'],
+    et: (count: number) => `Veel ${count}`,
+    en: (count: number) => `${count} more`,
+    ru: (count: number) => `Ещё ${count}`,
+  },
   cancel: {
     description: 'For canceling an action',
     components: ['TableFilter'],

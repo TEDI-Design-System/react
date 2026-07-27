@@ -1,5 +1,13 @@
 import classNames from 'classnames';
-import React, { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
@@ -122,7 +130,8 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   const values = externalValues ?? internalValues;
 
   const isRow = tagsDirection === 'row';
-  const tagsRef = useRef<HTMLDivElement | null>(null);
+  const [tagsNode, setTagsNode] = useState<HTMLDivElement | null>(null);
+  const tagsRef = useCallback((node: HTMLDivElement | null) => setTagsNode(node), []);
   const lastMeasuredWidthRef = useRef(0);
   const [visibleCount, setVisibleCount] = useState<number | null>(null);
 
@@ -131,21 +140,19 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   }, [values.length, isRow]);
 
   useEffect(() => {
-    if (!isRow) return;
-    const el = tagsRef.current;
-    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    if (!isRow || !tagsNode || typeof ResizeObserver === 'undefined') return undefined;
 
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? 0;
       if (width > 0 && width !== lastMeasuredWidthRef.current) setVisibleCount(null);
     });
-    observer.observe(el);
+    observer.observe(tagsNode);
     return () => observer.disconnect();
-  }, [isRow]);
+  }, [isRow, tagsNode]);
 
   useLayoutEffect(() => {
     if (!isRow || visibleCount !== null) return;
-    const el = tagsRef.current;
+    const el = tagsNode;
     if (!el) return;
 
     const containerWidth = el.clientWidth;
@@ -182,7 +189,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
 
     lastMeasuredWidthRef.current = containerWidth;
     setVisibleCount(visible);
-  }, [isRow, visibleCount, values]);
+  }, [isRow, visibleCount, values, tagsNode]);
 
   const updateValues = (newValues: string[]) => {
     setInternalValues(newValues);
@@ -257,7 +264,11 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
               );
             })}
             {hiddenCount > 0 && (
-              <Tag color={tagColor} className={styles['tedi-multi-value-field__overflow-tag']}>
+              <Tag
+                color={tagColor}
+                className={styles['tedi-multi-value-field__overflow-tag']}
+                aria-label={getLabel('multi-value-field.hidden-count', hiddenCount)}
+              >
                 +{hiddenCount}
               </Tag>
             )}

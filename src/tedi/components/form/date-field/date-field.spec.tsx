@@ -351,6 +351,19 @@ describe('DateField component', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
+  it('links the calendar trigger to the popover via aria-controls when open', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} />);
+
+    const button = screen.getByRole('button', { name: 'dateField.openCalendar' });
+    await user.click(button);
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.id).toBeTruthy();
+    expect(button).toHaveAttribute('aria-controls', dialog.id);
+  });
+
   it('closes calendar when clicking icon again (button trigger toggle)', async () => {
     const user = userEvent.setup();
 
