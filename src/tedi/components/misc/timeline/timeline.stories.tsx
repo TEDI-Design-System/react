@@ -39,11 +39,6 @@ const meta: Meta<typeof Timeline> = {
 export default meta;
 type Story = StoryObj<typeof Timeline>;
 
-/**
- * Shows a single item at each position in a timeline — start (line below), middle (line above
- * and below) and end (line above) — side by side, like the Figma spec's columns. `renderContent`
- * returns the item's `Timeline.Title` / `Timeline.Description` content for every column.
- */
 const positions: { label: string; above: boolean; below: boolean }[] = [
   { label: 'Start', above: false, below: true },
   { label: 'Middle', above: true, below: true },
@@ -51,9 +46,8 @@ const positions: { label: string; above: boolean; below: boolean }[] = [
 ];
 
 const STUB_HEIGHT = 1.5;
+const DOT_OFFSET = 'calc((1.5rem - 9px) / 2)';
 
-// Mirrors the real `Timeline` timings styling: all lines tertiary (grey), the first at regular
-// size and the rest small.
 const renderTimings = (timings: string[]): ReactNode =>
   timings.map((timing, index) => (
     <Text key={`${timing}-${index}`} color="tertiary" modifiers={index === 0 ? undefined : 'small'}>
@@ -81,24 +75,33 @@ const PositionShowcase = ({
                   flexDirection: 'column',
                   alignItems: 'flex-end',
                   textAlign: 'right',
-                  paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0,
+                  paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
                 }}
               >
                 {renderTimings(timings)}
               </div>
             )}
             <div
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: above ? 0 : '6px' }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                paddingTop: above ? 0 : DOT_OFFSET,
+              }}
             >
               {above && <Separator axis="vertical" color="accent" height={STUB_HEIGHT} />}
               <Separator variant="dot-only" color="accent" dotSize="medium" dotStyle="filled" />
-              {below && <Separator axis="vertical" color="accent" height={STUB_HEIGHT} />}
+              {below && (
+                <div style={{ display: 'flex', flex: 1, minHeight: `${STUB_HEIGHT}rem` }}>
+                  <Separator axis="vertical" color="accent" />
+                </div>
+              )}
             </div>
             <div
               style={
                 {
                   '--timeline-text-min-height': '1.5rem',
-                  paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0,
+                  paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
                 } as CSSProperties
               }
             >
@@ -153,21 +156,37 @@ export const Position: Story = {
               alignItems: 'flex-end',
               textAlign: 'right',
               minWidth: '6rem',
-              paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0,
+              paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
             }}
           >
             {renderTimings(['1990', '14. detsember'])}
           </div>
 
           <div
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: above ? 0 : '6px' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              paddingTop: above ? 0 : DOT_OFFSET,
+            }}
           >
             {above && <Separator axis="vertical" color="secondary" height={STUB_HEIGHT} />}
             <Separator variant="dot-only" color="secondary" dotSize="medium" dotStyle="outlined" />
-            {below && <Separator axis="vertical" color="secondary" height={STUB_HEIGHT} />}
+            {below && (
+              <div style={{ display: 'flex', flex: 1, minHeight: `${STUB_HEIGHT}rem` }}>
+                <Separator axis="vertical" color="secondary" />
+              </div>
+            )}
           </div>
 
-          <div style={{ paddingTop: above ? `calc(${STUB_HEIGHT}rem - 6px)` : 0 }}>
+          <div
+            style={
+              {
+                '--timeline-text-min-height': '1.5rem',
+                paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
+              } as CSSProperties
+            }
+          >
             <Timeline.Title>Taotluse esitamine</Timeline.Title>
             <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
             {label === 'Start' && (
