@@ -1,3 +1,21 @@
+# [18.1.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.14...react-18.1.0-rc.15) (2026-07-27)
+
+
+### Bug Fixes
+
+* **LeftPanel:** default added [#746](https://github.com/TEDI-Design-System/react/issues/746) ([afc0acf](https://github.com/TEDI-Design-System/react/commit/afc0acffff0a05974a3e19bc8ec3f368d834e963))
+* **LeftPanel:** expander button aria-controls [#746](https://github.com/TEDI-Design-System/react/issues/746) ([cfe1481](https://github.com/TEDI-Design-System/react/commit/cfe1481b970a1c61fa61c075036c092e3251aaf9))
+* **LeftPanel:** expander button style [#746](https://github.com/TEDI-Design-System/react/issues/746) ([dcecbea](https://github.com/TEDI-Design-System/react/commit/dcecbea1849c0f4991f79be6b2fb07f779bd4c64))
+* **LeftPanel:** focus fix when hideOpenButton [#746](https://github.com/TEDI-Design-System/react/issues/746) ([8b99ad9](https://github.com/TEDI-Design-System/react/commit/8b99ad929c8cadcdb251921cfe4e99e77de0fd18))
+* **LeftPanel:** left-panel component composition [#746](https://github.com/TEDI-Design-System/react/issues/746) ([08fe779](https://github.com/TEDI-Design-System/react/commit/08fe779f04d87ee9be11bc284d290b7a49dc3cce))
+* **LeftPanel:** use ClosingButton and design tokens [#746](https://github.com/TEDI-Design-System/react/issues/746) ([af97cae](https://github.com/TEDI-Design-System/react/commit/af97cae6b71b60c36641214c617cf8d3d49864b9))
+* **LeftPanel:** use design tokens [#746](https://github.com/TEDI-Design-System/react/issues/746) ([2c18efa](https://github.com/TEDI-Design-System/react/commit/2c18efa72af1b5f9c0c40d202194fb57a0e5afa4))
+
+
+### Features
+
+* **left-panel:** Replace LeftPanel Component [#746](https://github.com/TEDI-Design-System/react/issues/746) ([97e71c1](https://github.com/TEDI-Design-System/react/commit/97e71c1654ab6d8a5dda9eef43cf9dfd28b05d47))
+
 # [18.1.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.13...react-18.1.0-rc.14) (2026-07-20)
 
 
