@@ -651,8 +651,6 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (shouldCloseOnSelect) setOpen(false);
   };
 
-  // Flag unparseable input on blur (kept visible) so the user gets feedback
-  // instead of the text silently failing to commit.
   const handleInputBlur = () => {
     if (inputValue.trim() === '') {
       setHasInvalidDateError(false);
@@ -720,10 +718,6 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     useRole(context, { role: 'dialog' }),
   ]);
 
-  // Anchor the popover to the input element itself rather than the container
-  // `<div>` (which also holds the label), so an upward flip aligns to the input.
-  // In multiple mode (no single text input) fall back to the container reference —
-  // passing `null` would clear the anchor entirely and mis-position the popover.
   React.useEffect(() => {
     const anchorNode =
       mode === 'multiple'

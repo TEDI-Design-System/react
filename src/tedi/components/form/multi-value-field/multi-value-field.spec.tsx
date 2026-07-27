@@ -23,8 +23,6 @@ describe('MultiValueField', () => {
   });
 
   it('renders every value tag in row layout when width cannot be measured', () => {
-    // jsdom reports 0 layout width, so the overflow measurement is skipped and
-    // all tags render — this guards the tagsDirection="row" plumbing/no-crash.
     render(<MultiValueField {...defaultProps} tagsDirection="row" values={['apple', 'banana', 'cherry']} />);
 
     expect(screen.getByText('apple')).toBeInTheDocument();
@@ -103,8 +101,6 @@ describe('MultiValueField', () => {
 
   it('renders icon when provided', () => {
     render(<MultiValueField {...defaultProps} icon="add" />);
-
-    // Icon renders as span[data-name="icon"] in your setup
     expect(document.querySelector('[data-name="icon"]')).toBeInTheDocument();
   });
 
