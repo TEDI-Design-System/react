@@ -95,7 +95,7 @@ describe('FileUpload component', () => {
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
       expect(defaultProps.onChange).not.toHaveBeenCalled();
-      expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
     });
   });
 
@@ -106,7 +106,7 @@ describe('FileUpload component', () => {
     Object.defineProperty(file, 'size', { value: 6 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [file] } });
     expect(defaultProps.onChange).not.toHaveBeenCalled();
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('does not render close button when there is only one file', () => {
@@ -158,7 +158,7 @@ describe('FileUpload component', () => {
     const input = screen.getByLabelText(/Upload files/i);
     const file = new File(['dummy content'], 'test.txt', { type: 'text/plain' });
     fireEvent.change(input, { target: { files: [file] } });
-    expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('should display error message for files exceeding max size', () => {
@@ -167,7 +167,7 @@ describe('FileUpload component', () => {
     const file = new File(['a'.repeat(6 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' });
     Object.defineProperty(file, 'size', { value: 6 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [file] } });
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('handles empty accept prop', () => {
@@ -204,8 +204,8 @@ describe('FileUpload component', () => {
     ];
 
     fireEvent.change(input, { target: { files: invalidFiles } });
-    expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('calls handleClear when clicked', () => {
@@ -283,7 +283,7 @@ describe('FileUpload component', () => {
     fireEvent.change(input, { target: { files: [largeFile] } });
 
     expect(defaultProps.onChange).not.toHaveBeenCalled();
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('should update innerFiles when files prop is not provided', () => {
@@ -389,7 +389,7 @@ describe('FileUpload component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('new.jpg')).toBeInTheDocument();
-      expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
     });
 
     const clearButton = screen.getByRole('button', { name: /clear/i });

@@ -438,6 +438,23 @@ export const labelsMap = validateDefaultLabels({
     en: (files: string) => `File(s) ${files} have the wrong extension`,
     ru: (files: string) => `Файл(ы) ${files} имеют неправильное расширение`,
   },
+
+  'file-upload.removed': {
+    description: 'Announced to screen readers when a file is removed',
+    components: ['FileUpload'],
+    et: (file: string) => `Fail ${file} eemaldatud`,
+    en: (file: string) => `File ${file} removed`,
+    ru: (file: string) => `Файл ${file} удалён`,
+  },
+
+  'file-upload.cleared': {
+    description: 'Announced to screen readers when all files are removed',
+    components: ['FileUpload'],
+    et: 'Kõik failid eemaldatud',
+    en: 'All files removed',
+    ru: 'Все файлы удалены',
+  },
+
   'file-dropzone.label': {
     description: 'Default label for dropzone',
     components: ['FileDropzone'],
