@@ -86,6 +86,34 @@ export const labelsMap = validateDefaultLabels({
     en: 'Close',
     ru: 'Закрыть',
   },
+  splitPaneResize: {
+    description: 'Accessible label for the SplitPane resize divider',
+    components: ['SplitPane'],
+    et: 'Muuda paanide suurust',
+    en: 'Resize panes',
+    ru: 'Изменить размер панелей',
+  },
+  leftPanel: {
+    description: 'Accessible landmark label for the LeftPanel region',
+    components: ['LeftPanel'],
+    et: 'Külgpaneel',
+    en: 'Side panel',
+    ru: 'Боковая панель',
+  },
+  leftPanelOpen: {
+    description: 'Accessible label for the LeftPanel reopen button shown when collapsed',
+    components: ['LeftPanel'],
+    et: 'Ava paneel',
+    en: 'Open panel',
+    ru: 'Открыть панель',
+  },
+  leftPanelClose: {
+    description: 'Accessible label for the LeftPanel close button',
+    components: ['LeftPanel'],
+    et: 'Sulge paneel',
+    en: 'Close panel',
+    ru: 'Закрыть панель',
+  },
   open: {
     description: 'Used for opening',
     components: ['Accordion', 'Collapse'],
@@ -278,9 +306,9 @@ export const labelsMap = validateDefaultLabels({
   'header.select-lang': {
     description: 'Label for HeaderLanguage label and Modal Heading',
     components: ['HeaderLanguage'],
-    et: 'Keel:',
-    en: 'Language:',
-    ru: 'Язык:',
+    et: 'Keel',
+    en: 'Language',
+    ru: 'Язык',
   },
   'header.role-label': {
     description: 'Label for Role selection',

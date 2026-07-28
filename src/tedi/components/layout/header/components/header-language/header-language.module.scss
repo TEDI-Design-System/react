@@ -1,5 +1,6 @@
 @mixin header-language-button {
-  [data-name='button'] {
+  [data-name='button'],
+  [data-name='link'] {
     color: var(--header-dropdown-default);
 
     &:hover {
@@ -24,6 +25,12 @@
   height: 100%;
 
   @include header-language-button;
+
+  &--label-left {
+    flex-direction: row;
+    gap: var(--layout-grid-gutters-08);
+    align-items: center;
+  }
 
   &__icon {
     transition: transform 0.2s ease-in-out;

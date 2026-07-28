@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
-import BaseMapSelection from '../base-map-selection/base-map-selection';
+import { BaseMapOption } from '../base-map-selection/base-map-selection';
 import { Carousel } from './carousel';
 
 /**
@@ -22,7 +22,7 @@ export default meta;
 type Story = StoryObj<typeof Carousel>;
 
 const mockChildren = Array.from({ length: 10 }, (_, i) => (
-  <BaseMapSelection
+  <BaseMapOption
     key={i}
     id={`map-${i}`}
     type="historical"

@@ -46,6 +46,9 @@ export interface CardContentProps extends BreakpointSupport<CardContentBreakpoin
   children?: React.ReactNode;
 }
 
+/**
+ * @deprecated Use `CardContent` from `@tedi-design-system/react/tedi` instead.
+ */
 export const CardContent = (props: CardContentProps): JSX.Element => {
   const { padding: rootPadding, background: rootBackground } = React.useContext(CardContext);
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);

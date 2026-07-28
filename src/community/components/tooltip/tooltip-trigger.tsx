@@ -14,6 +14,9 @@ export interface TooltipTriggerProps {
   children: JSX.Element;
 }
 
+/**
+ * @deprecated Use `TooltipTrigger` from `@tedi-design-system/react/tedi` instead.
+ */
 export const TooltipTrigger = (props: TooltipTriggerProps): JSX.Element => {
   const { children } = props;
   const { getLabel } = useLabels();

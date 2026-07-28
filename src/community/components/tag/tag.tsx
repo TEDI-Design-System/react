@@ -72,6 +72,9 @@ export interface TagProps {
   id?: string;
 }
 
+/**
+ * @deprecated Use `Tag` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Tag = forwardRef<HTMLDivElement, TagProps>((props, ref): JSX.Element => {
   const {
     children,

@@ -3,7 +3,8 @@
 .tedi-button-group {
   display: flex;
   gap: 0;
-  overflow: hidden;
+  width: fit-content;
+  overflow: visible;
 
   &--horizontal {
     flex-direction: row;
@@ -36,7 +37,7 @@
 
     .tedi-button-group__prefix {
       border-right: 0;
-      border-bottom-right-radius: var(--button-radius-sm);
+      border-top-left-radius: var(--button-radius-sm);
       border-bottom-left-radius: var(--button-radius-sm);
     }
   }
@@ -67,7 +68,9 @@
 
     .tedi-button-group__suffix,
     .tedi-button-group__prefix {
-      width: var(--tedi-dimensions-16);
+      align-self: stretch;
+      min-width: 0;
+      padding: 0;
 
       > span {
         overflow: hidden;
@@ -89,6 +92,7 @@
   }
 
   .tedi-button-group__item {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -97,12 +101,20 @@
     cursor: pointer;
     border-radius: 0;
 
+    &:hover,
+    &:focus-visible,
+    &--active {
+      z-index: 1;
+    }
+
     @include breakpoints.media-breakpoint-down(md) {
       flex: 1;
     }
   }
 
   &--stretch {
+    width: 100%;
+
     .tedi-button-group__item {
       flex: 1;
     }

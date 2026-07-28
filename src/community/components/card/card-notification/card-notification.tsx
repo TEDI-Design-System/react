@@ -6,6 +6,9 @@ import style from './card-notification.module.scss';
 
 export type CardNotificationProps = AlertProps & Pick<CardContentProps, 'padding'>;
 
+/**
+ * @deprecated Use `CardNotification` from `@tedi-design-system/react/tedi` instead.
+ */
 export const CardNotification = (props: CardNotificationProps): JSX.Element => {
   const { children, padding, className, ...rest } = props;
 

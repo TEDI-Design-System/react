@@ -57,4 +57,5 @@ export * from './components/map-components/right-panel/right-panel';
 export * from './components/map-components/scale-bar/scale-bar';
 export * from './components/map-components/map-select/map-select';
 export * from './components/map-components/sheet/sheet';
+export * from './components/map-components/split-pane/split-pane';
 export * from './components/map-components/timeline/timeline';
