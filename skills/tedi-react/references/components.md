@@ -1803,6 +1803,8 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### FileUpload — **DEPRECATED** (use TEDI-Ready FileUpload)
 
+> The community `FileUpload` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of the TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
+
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
 - `files?`, `defaultFiles?`, `onChange?`, `onDelete?`
 

@@ -93,6 +93,8 @@ const getDefaultHelpers = (
 
 const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+const ANNOUNCEMENT_RESET_DELAY = 100;
+
 export const useFileUpload = (props: UseFileUploadProps) => {
   const { getLabel } = useLabels();
   const {
@@ -117,12 +119,33 @@ export const useFileUpload = (props: UseFileUploadProps) => {
 
   const [announcement, setAnnouncement] = React.useState<string>('');
   const isMounted = React.useRef(true);
+  const announceShowTimer = React.useRef<ReturnType<typeof setTimeout>>();
+  const announceHideTimer = React.useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     return () => {
       isMounted.current = false;
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
     };
   }, []);
+
+  const announce = React.useCallback(
+    (message: string) => {
+      if (!message || !isMounted.current) return;
+      setAnnouncement('');
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
+      announceShowTimer.current = setTimeout(() => {
+        if (!isMounted.current) return;
+        setAnnouncement(message);
+        announceHideTimer.current = setTimeout(() => {
+          if (isMounted.current) setAnnouncement('');
+        }, announcementTimeout);
+      }, ANNOUNCEMENT_RESET_DELAY);
+    },
+    [announcementTimeout]
+  );
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -197,36 +220,22 @@ export const useFileUpload = (props: UseFileUploadProps) => {
           setInnerFiles(newFiles);
         }
         onChange?.(newFiles);
-
-        if (rejectedFiles.length === 0) {
-          const count = newFiles.length - actualFiles.length;
-          const message =
-            getLabel('file-upload.success-added', count.toString()) || `${count} file(s) added successfully`;
-
-          if (isMounted.current) {
-            setAnnouncement(message);
-          }
-        }
       }
 
       if (rejectedFiles.length) {
-        const failedNames = rejectedFiles.map((r) => r.file.name).join(', ');
-        const errorMessage = getLabel('file-upload.failed-some', failedNames) || `Upload failed for: ${failedNames}`;
-
-        if (isMounted.current) {
-          setAnnouncement(errorMessage);
-        }
-        setUploadErrorHelper({ type: 'error', text: getUploadErrorHelperText(rejectedFiles) });
+        const errorText = getUploadErrorHelperText(rejectedFiles);
+        setUploadErrorHelper({ type: 'error', text: errorText });
+        announce(errorText);
       } else {
         setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
+
+        if (newFiles.length > 0) {
+          const count = newFiles.filter((file) => !actualFiles.includes(file)).length;
+          announce(getLabel('file-upload.success-added', count.toString()));
+        }
       }
 
-      setTimeout(() => {
-        if (isMounted.current) {
-          setAnnouncement('');
-        }
-      }, announcementTimeout);
-
+      event.target.value = '';
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -246,6 +255,8 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
     }
 
+    announce(getLabel('file-upload.removed', file.name ?? ''));
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -260,6 +271,8 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     }
     onChange?.([]);
     setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
+
+    announce(getLabel('file-upload.cleared'));
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

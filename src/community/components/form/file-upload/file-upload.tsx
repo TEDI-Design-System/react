@@ -25,6 +25,9 @@ export interface RejectedFile {
   file: File;
 }
 
+/**
+ * @deprecated Use FileUpload from `@tedi-design-system/react/tedi` instead.
+ */
 export interface FileUploadProps extends FormLabelProps {
   /**
    * Additional classes.
