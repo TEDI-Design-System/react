@@ -76,6 +76,8 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
               onChange={onChangeHandler}
               className={styles['tedi-checkbox__input']}
               aria-describedby={[helperId, tooltipId].filter(Boolean).join(' ')}
+              aria-required={required || undefined}
+              aria-invalid={invalid || undefined}
             />
             <div
               aria-hidden="true"

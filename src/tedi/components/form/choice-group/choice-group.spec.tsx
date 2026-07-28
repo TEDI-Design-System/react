@@ -153,6 +153,30 @@ describe('ChoiceGroup Component', () => {
     expect(screen.getByText(/table.filter.select-all/i)).toBeInTheDocument();
   });
 
+  it('exposes required and invalid state on the radiogroup, not on individual radios', () => {
+    render(
+      <ChoiceGroup {...defaultProps} inputType="radio" required helper={{ text: 'Please choose one', type: 'error' }} />
+    );
+
+    const group = screen.getByRole('radiogroup');
+    expect(group).toHaveAttribute('aria-required', 'true');
+    expect(group).toHaveAttribute('aria-invalid', 'true');
+
+    // The state lives on the group; the individual radios must not carry it.
+    screen.getAllByRole('radio').forEach((radio) => {
+      expect(radio).not.toHaveAttribute('aria-required');
+      expect(radio).not.toHaveAttribute('aria-invalid');
+    });
+  });
+
+  it('does not set aria-required or aria-invalid on the radiogroup by default', () => {
+    render(<ChoiceGroup {...defaultProps} inputType="radio" />);
+
+    const group = screen.getByRole('radiogroup');
+    expect(group).not.toHaveAttribute('aria-required');
+    expect(group).not.toHaveAttribute('aria-invalid');
+  });
+
   it('handles indeterminate checkbox change correctly', () => {
     const onChangeMock = jest.fn();
 

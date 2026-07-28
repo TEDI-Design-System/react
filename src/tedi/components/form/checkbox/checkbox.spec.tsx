@@ -216,4 +216,28 @@ describe('Checkbox component', () => {
 
     expect(screen.getByText('*')).toBeInTheDocument();
   });
+
+  it('exposes the required state programmatically via aria-required', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" required />);
+
+    expect(screen.getByRole('checkbox')).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('does not set aria-required when not required', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
+
+    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-required');
+  });
+
+  it('exposes the invalid state programmatically via aria-invalid', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" invalid />);
+
+    expect(screen.getByRole('checkbox')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('does not set aria-invalid when valid', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
+
+    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
+  });
 });

@@ -68,6 +68,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
               onChange={onChangeHandler}
               className={styles['tedi-radio__input']}
               aria-describedby={[helperId, tooltipId].filter(Boolean).join(' ')}
+              required={required}
             />
             <div
               aria-hidden="true"

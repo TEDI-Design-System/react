@@ -203,6 +203,8 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
                   className={CheckGroupBEM}
                   role={inputType === 'radio' ? 'radiogroup' : undefined}
                   aria-labelledby={inputType === 'radio' ? id : undefined}
+                  aria-required={inputType === 'radio' && required ? true : undefined}
+                  aria-invalid={inputType === 'radio' && helper?.type === 'error' ? true : undefined}
                 >
                   {items.map((item) => (
                     <ChoiceGroupItem
