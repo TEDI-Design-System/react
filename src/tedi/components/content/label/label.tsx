@@ -64,7 +64,7 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
     className
   );
 
-  return (
+  const labelElement = (
     <Element ref={ref} className={labelBEM} {...rest}>
       {children}
       {required && (
@@ -72,17 +72,25 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
           *
         </span>
       )}
-      {tooltip && (
-        <span aria-hidden="true" className={styles['tedi-label__info']}>
-          <Tooltip>
-            <Tooltip.Trigger>
-              <InfoButton isSmall={isSmall} aria-label={getLabel('infoButton.moreInformation')} />
-            </Tooltip.Trigger>
-            <Tooltip.Content>{tooltip}</Tooltip.Content>
-          </Tooltip>
-        </span>
-      )}
     </Element>
+  );
+
+  if (!tooltip) {
+    return labelElement;
+  }
+
+  return (
+    <span className={styles['tedi-label__wrapper']}>
+      {labelElement}
+      <span className={styles['tedi-label__info']}>
+        <Tooltip>
+          <Tooltip.Trigger>
+            <InfoButton isSmall={isSmall} aria-label={getLabel('infoButton.moreInformation')} />
+          </Tooltip.Trigger>
+          <Tooltip.Content>{tooltip}</Tooltip.Content>
+        </Tooltip>
+      </span>
+    </span>
   );
 });
 
