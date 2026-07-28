@@ -7,6 +7,9 @@ const meta: Meta<typeof Sidenav> = {
   title: 'Community/Layout/Sidenav',
   parameters: {
     layout: 'fullscreen',
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
   },
 };
 

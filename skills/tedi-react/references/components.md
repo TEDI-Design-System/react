@@ -1769,10 +1769,10 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
-### Card
+### Card — **DEPRECATED** (use TEDI-Ready Card)
 
 - `border?: CardBorderType`, `borderless?: boolean`, `padding?: number`, `background?: CardBackground`
-- Sub-components: Card.Header, Card.Content, Card.Notification
+- Sub-components: Card.Header, Card.Content, Card.Notification (all deprecated — use the TEDI-Ready equivalents)
 
 ## Buttons
 
@@ -1786,22 +1786,22 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Radio — **DEPRECATED** (use TEDI-Ready Radio via ChoiceGroup)
 
-### Select
+### Select — **DEPRECATED** (use TEDI-Ready Select)
 
 - `id: string`, `options`, `value?`, `defaultValue?`, `onChange?`
 - `multiple?: boolean`, `async?: boolean`, `isSearchable?: boolean`, `isClearable?: boolean`
 
-### Toggle
+### Toggle — **DEPRECATED** (use TEDI-Ready Toggle)
 
 - `ariaLabel: string`, `label?`, `checked?`, `defaultChecked?`, `onChange?`
 - `size?: 'medium' | 'large'`, `color?: 'default' | 'alternative'`, `icon?`, `disabled?`
 
-### ChoiceGroup
+### ChoiceGroup — **DEPRECATED** (use TEDI-Ready ChoiceGroup)
 
 - `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
 - `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`
 
-### FileUpload
+### FileUpload — **DEPRECATED** (use TEDI-Ready FileUpload)
 
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
 - `files?`, `defaultFiles?`, `onChange?`, `onDelete?`
@@ -1817,18 +1817,18 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `fieldOptions: TextFieldProps | SelectProps | DateTimePickerProps`
 - `content: ReactNode`
 
-### DateTimePicker
+### DateTimePicker — **DEPRECATED** (use TEDI-Ready DateTimeField)
 
 - Date/time picker using MUI x-date-pickers
 
 ## Navigation
 
-### Stepper
+### Stepper — **DEPRECATED** (use TEDI-Ready HorizontalStepper)
 
 - `activeStep?`, `defaultActiveStep?: number`, `onActiveStepChange?`
 - `allowStepLabelClick?: boolean`, `ariaLabel: string`, `card?: CardProps | boolean`
 
-### Tabs
+### Tabs — **DEPRECATED** (use TEDI-Ready Tabs)
 
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
@@ -1842,7 +1842,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Dropdown — **DEPRECATED** (use TEDI-Ready Dropdown)
 
-### Modal
+### Modal — **DEPRECATED** (use TEDI-Ready Modal)
 
 - `size?: 12 | 10 | 8 | 6`, `position?: 'center' | 'right' | 'bottom'`
 - `lockScroll?: boolean`, `trapFocus?: boolean`, `returnFocus?: boolean`
@@ -1858,14 +1858,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Tag — **DEPRECATED** (use TEDI-Ready Tag)
 
-### Status
+### Status — **DEPRECATED** (use TEDI-Ready StatusIndicator)
 
 - `type: 'error' | 'success' | 'inactive' | 'warning'`
 - `tooltipContent?: ReactNode`
 
 ## Table
 
-### Table (TanStack React Table wrapper)
+### Table (TanStack React Table wrapper) — **DEPRECATED** (use TEDI-Ready Table)
 
 - `data: TData[]`, `columns: ColumnDef[]`
 - `pagination?`, `sorting?`, `rowSelection?`, `columnPinning?`
@@ -1879,10 +1879,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ## Layout
 
-### Header
+### Header — **DEPRECATED** (use TEDI-Ready Header)
 
 - Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
-- **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
+- **Note:** The TEDI-Ready Header is available with a different sub-component API. `HeaderLanguage` and `HeaderRole` are deprecated too — prefer the TEDI-Ready equivalents.
+
+### SideNav — **DEPRECATED** (use TEDI-Ready SideNav)
+
+- Sub-components: SideNavItem (also `SidenavToggle`, deprecated — use the TEDI-Ready equivalents)
 
 ### Footer — **DEPRECATED** (use TEDI-Ready Footer)
 
@@ -1890,7 +1894,7 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 
 ## Misc
 
-### Placeholder (empty state)
+### Placeholder (empty state) — **DEPRECATED** (use TEDI-Ready EmptyState)
 
 - `icon?: string | IconProps | ReactNode`, `cardProps?`, `isNested?: boolean`
 
@@ -1903,7 +1907,7 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 
 - `children: ReactNode`, `onItemOpen: (index: number) => void`
 
-### ToggleOpen
+### ToggleOpen — **DEPRECATED** (use TEDI-Ready CollapseButton)
 
 - `openText: string`, `closeText: string`, `isOpen: boolean`
 

@@ -30,6 +30,9 @@ export interface TooltipProps {
   maxWidth?: 'none' | 'small' | 'medium' | 'large';
 }
 
+/**
+ * @deprecated Use `Tooltip` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Tooltip = (props: TooltipProps): JSX.Element | null => {
   const { children, maxWidth = 'medium', cardProps, className } = props;
   const { open, x, y, strategy, focusManager, floating, arrowRef, getFloatingProps, placement, context } =

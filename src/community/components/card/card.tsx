@@ -43,6 +43,9 @@ export interface CardProps extends BreakpointSupport<CardBreakpointProps> {
     | React.ReactNode;
 }
 
+/**
+ * @deprecated Use `Card` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Card = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
