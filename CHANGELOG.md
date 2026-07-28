@@ -1,3 +1,10 @@
+# [18.1.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.15...react-18.1.0-rc.16) (2026-07-28)
+
+
+### Bug Fixes
+
+* **community:** add typescript annotations and missing tags to deprecated community components [#563](https://github.com/TEDI-Design-System/react/issues/563) ([#760](https://github.com/TEDI-Design-System/react/issues/760)) ([66466c5](https://github.com/TEDI-Design-System/react/commit/66466c544afc5f8d9be02fcd3fdbf0b3356d5d23))
+
 # [18.1.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.14...react-18.1.0-rc.15) (2026-07-27)
 
 
