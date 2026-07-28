@@ -1,3 +1,10 @@
+# [18.1.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.16...react-18.1.0-rc.17) (2026-07-28)
+
+
+### Bug Fixes
+
+* **file-upload:** re-upload same file and A11y improvements [#722](https://github.com/TEDI-Design-System/react/issues/722) ([#723](https://github.com/TEDI-Design-System/react/issues/723)) ([70ab410](https://github.com/TEDI-Design-System/react/commit/70ab410965af8ca8699d84f7c20ee76bde9c98e4))
+
 # [18.1.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.15...react-18.1.0-rc.16) (2026-07-28)
 
 
