@@ -50,11 +50,17 @@ describe('ButtonContent component', () => {
     expect(button).toHaveClass('tedi-btn--underline');
   });
 
-  it('renders in loading state with spinner', () => {
+  it('renders in loading state with a decorative spinner and conveys loading via aria-busy', () => {
     render(<ButtonContent {...defaultProps} isLoading />);
-    const spinner = screen.getByRole('status');
+
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    const spinner = screen.getByTestId('tedi-spinner');
     expect(spinner).toBeInTheDocument();
     expect(spinner).toHaveClass('tedi-btn__spinner');
+    expect(spinner).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(button).toHaveAccessibleName('Click Me');
   });
 
   it('renders with full width when fullWidth is true', () => {
@@ -111,5 +117,12 @@ describe('ButtonContent component', () => {
     const button = screen.getByRole('button');
     fireEvent.mouseEnter(button);
     expect(document.querySelector('.tedi-overlay__content')).not.toBeInTheDocument();
+  });
+
+  it('exposes the icon-only label once as the accessible name (visual-only tooltip)', () => {
+    render(<ButtonContent icon="delete">Delete</ButtonContent>);
+    const button = screen.getByRole('button');
+    expect(button).toHaveAccessibleName('Delete');
+    expect(button).not.toHaveAttribute('aria-describedby');
   });
 });

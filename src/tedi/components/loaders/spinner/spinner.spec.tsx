@@ -61,6 +61,15 @@ describe('Spinner component with breakpoint support', () => {
     expect(hiddenText).toHaveClass('sr-only');
   });
 
+  it('renders as purely decorative when decorative is set (no status role or label)', () => {
+    const { container, queryByRole, queryByText } = render(<Spinner decorative label="Loading..." />);
+    const spinner = container.querySelector('.tedi-spinner');
+
+    expect(spinner).toHaveAttribute('aria-hidden', 'true');
+    expect(queryByRole('status')).not.toBeInTheDocument();
+    expect(queryByText('Loading...')).not.toBeInTheDocument();
+  });
+
   it('uses different size and color based on breakpoint props', () => {
     (useBreakpointProps as jest.Mock).mockReturnValue({
       getCurrentBreakpointProps: jest.fn(() => ({
