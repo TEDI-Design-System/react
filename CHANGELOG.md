@@ -1,3 +1,10 @@
+# [18.1.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.18...react-18.1.0-rc.19) (2026-07-29)
+
+
+### Bug Fixes
+
+* **table:** prevent update loop on server side pagination [#733](https://github.com/TEDI-Design-System/react/issues/733) ([#761](https://github.com/TEDI-Design-System/react/issues/761)) ([febec64](https://github.com/TEDI-Design-System/react/commit/febec64277eb1f0cbd5d6327e438b61c7790afa9))
+
 # [18.1.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.17...react-18.1.0-rc.18) (2026-07-29)
 
 
