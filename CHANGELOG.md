@@ -1,3 +1,10 @@
+# [18.1.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.17...react-18.1.0-rc.18) (2026-07-29)
+
+
+### Bug Fixes
+
+* **search:** stop using placeholder as Search region name [#57](https://github.com/TEDI-Design-System/react/issues/57) ([#764](https://github.com/TEDI-Design-System/react/issues/764)) ([3e0bbc6](https://github.com/TEDI-Design-System/react/commit/3e0bbc647dfe43c27a257ba71e3919efda285ba0))
+
 # [18.1.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.16...react-18.1.0-rc.17) (2026-07-28)
 
 
