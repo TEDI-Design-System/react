@@ -515,8 +515,11 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       if (openKeyboardOnTouch || !isSearchable) return;
       if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
 
+      const targetEl = event.target as HTMLElement;
+      if (!targetEl.closest?.(`.${styles['tedi-select__control']}`)) return;
+
       const inputEl = element.current?.inputRef;
-      const tappedInput = !!inputEl && (event.target === inputEl || inputEl.contains(event.target as Node));
+      const tappedInput = !!inputEl && (event.target === inputEl || inputEl.contains(targetEl));
       setSuppressSoftKeyboard(!tappedInput);
     };
 
@@ -753,7 +756,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           filterOption={showSelectAllMode || selectableGroupsMode ? filterOption : undefined}
           onInputChange={onInputChange}
           onBlur={handleBlur}
-          softKeyboardSuppressed={suppressSoftKeyboard}
+          softKeyboardSuppressed={!openKeyboardOnTouch && isSearchable && suppressSoftKeyboard}
           inputValue={inputValue}
           inputId={inputId}
           loadOptions={loadOptions}

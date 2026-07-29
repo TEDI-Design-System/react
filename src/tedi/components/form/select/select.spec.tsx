@@ -807,5 +807,30 @@ describe('Select component', () => {
       fireEvent.blur(combobox);
       expect(combobox).not.toHaveAttribute('inputmode', 'none');
     });
+
+    it('does not suppress the keyboard when the label or helper text is tapped', () => {
+      const { container } = render(
+        <Select {...defaultProps} openKeyboardOnTouch={false} helper={{ text: 'Pick a fruit', type: 'hint' }} />
+      );
+      const combobox = screen.getByRole('combobox');
+
+      const label = container.querySelector('label') as HTMLElement;
+      firePointerDown(label, 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+
+      firePointerDown(screen.getByText('Pick a fruit'), 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('stops forwarding inputMode="none" once the feature is turned off, even if still suppressed', () => {
+      const { rerender } = render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+
+      rerender(<Select {...defaultProps} openKeyboardOnTouch={true} />);
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
   });
 });
