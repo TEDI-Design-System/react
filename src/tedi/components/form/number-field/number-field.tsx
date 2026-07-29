@@ -138,7 +138,8 @@ export const NumberField = (props: NumberFieldProps) => {
   const [inputInnerValue, setInputInnerValue] = useState<number | undefined>(defaultValue);
   const [displayValue, setDisplayValue] = useState<string>(() => formatNumber(value ?? defaultValue));
 
-  const currentValue: number | undefined = onChange && typeof value !== 'undefined' ? value : inputInnerValue;
+  const isControlled = value !== undefined;
+  const currentValue: number | undefined = isControlled ? value : inputInnerValue;
 
   const announceShowTimer = useRef<ReturnType<typeof setTimeout>>();
   const announceHideTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -219,7 +220,7 @@ export const NumberField = (props: NumberFieldProps) => {
     returnValue = roundValue(returnValue);
 
     onChange?.(returnValue);
-    setInputInnerValue(returnValue);
+    if (!isControlled) setInputInnerValue(returnValue);
     setDisplayValue(formatNumber(returnValue));
   };
 
@@ -229,7 +230,7 @@ export const NumberField = (props: NumberFieldProps) => {
     if (rawValue === '') {
       if (currentValue !== undefined) {
         onChange?.(undefined);
-        setInputInnerValue(undefined);
+        if (!isControlled) setInputInnerValue(undefined);
       }
       return;
     }
@@ -248,7 +249,7 @@ export const NumberField = (props: NumberFieldProps) => {
 
     if (rounded !== currentValue) {
       onChange?.(rounded);
-      setInputInnerValue(rounded);
+      if (!isControlled) setInputInnerValue(rounded);
     }
   };
 
