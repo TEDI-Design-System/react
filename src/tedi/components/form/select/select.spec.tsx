@@ -752,4 +752,60 @@ describe('Select component', () => {
       expect(combobox).toHaveAttribute('id', 'fruit-group');
     });
   });
+
+  describe('openKeyboardOnTouch (mobile soft keyboard)', () => {
+    const getControl = (combobox: HTMLElement) => combobox.closest('.tedi-select__control') as HTMLElement;
+
+    // jsdom's synthetic PointerEvent doesn't reliably carry `pointerType`, so set
+    // it explicitly on the native event React reads from.
+    const firePointerDown = (el: Element, pointerType: 'touch' | 'pen' | 'mouse') => {
+      const event = new Event('pointerdown', { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'pointerType', { value: pointerType });
+      fireEvent(el, event);
+    };
+
+    it('does not suppress the soft keyboard by default', () => {
+      render(<Select {...defaultProps} />);
+      const combobox = screen.getByRole('combobox');
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('suppresses the soft keyboard when opened by touch and openKeyboardOnTouch is false', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+      firePointerDown(getControl(combobox), 'touch');
+      // inputMode="none" keeps the on-screen keyboard down while browsing.
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+    });
+
+    it('raises the keyboard again once the user taps the search input directly', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+
+      firePointerDown(combobox, 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('never suppresses the keyboard for mouse users, even when openKeyboardOnTouch is false', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+      firePointerDown(getControl(combobox), 'mouse');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('resets the suppression when the field loses focus', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+
+      fireEvent.blur(combobox);
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+  });
 });

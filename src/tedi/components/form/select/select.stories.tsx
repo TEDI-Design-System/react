@@ -726,3 +726,26 @@ export const EditableSelect: Story = {
     label: 'Editable label',
   },
 };
+
+/**
+ * **Mobile keyboard deferral.** For quick-pick searchable selects, the on-screen
+ * keyboard popping up the instant the menu opens can cover most of the screen.
+ * With `openKeyboardOnTouch={false}`, tapping the field on a touch/pen device
+ * opens the menu for browsing **without** raising the keyboard — the input is
+ * rendered with `inputMode="none"`. The keyboard appears only when the user
+ * taps the search input directly.
+ *
+ * This is touch-only: mouse and keyboard users are unaffected, and hardware
+ * typing is never blocked, so the combobox stays fully operable (WCAG 2.1.1).
+ * Best viewed on a real device or the Storybook mobile viewport.
+ */
+export const DeferKeyboardOnTouch: Story = {
+  args: {
+    id: 'defer-keyboard-example',
+    label: 'Address',
+    placeholder: 'Vali...',
+    options: options,
+    openKeyboardOnTouch: false,
+    isSearchable: true,
+  },
+};

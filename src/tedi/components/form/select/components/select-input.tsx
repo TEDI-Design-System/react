@@ -27,6 +27,7 @@ export const SelectInput = (props: InputProps<ISelectOption, boolean>): JSX.Elem
       aria-required={props.selectProps.required}
       required={props.selectProps.required}
       aria-describedby={describedBy}
+      inputMode={props.selectProps.softKeyboardSuppressed ? 'none' : undefined}
     />
   );
 };
