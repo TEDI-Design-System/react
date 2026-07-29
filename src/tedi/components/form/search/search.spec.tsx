@@ -37,6 +37,11 @@ describe('Search component', () => {
     expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'Search products');
   });
 
+  it('falls back to the generic label when ariaLabel is an empty string', () => {
+    render(<Search {...defaultProps} ariaLabel="" />);
+    expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'search');
+  });
+
   it('calls onSearch when the search button is clicked', () => {
     render(<Search {...defaultProps} button={{ children: 'Search' }} />);
     const button = screen.getByRole('button', { name: /search/i });

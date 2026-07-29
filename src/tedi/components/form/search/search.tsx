@@ -77,7 +77,9 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
     // placeholder. The input already surfaces the placeholder, so reusing it as
     // the region name makes screen readers announce it twice. Consumers should
     // set `ariaLabel` to give the region a distinct name (e.g. "Search products").
-    const searchAriaLabel = ariaLabel ?? getLabel('search');
+    // `||` (not `??`) so an empty-string `ariaLabel` also falls back — otherwise
+    // the landmark would render with an empty accessible name.
+    const searchAriaLabel = ariaLabel || getLabel('search');
 
     return (
       <div
