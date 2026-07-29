@@ -66,6 +66,7 @@ describe('Spinner component with breakpoint support', () => {
     const spinner = container.querySelector('.tedi-spinner');
 
     expect(spinner).toHaveAttribute('aria-hidden', 'true');
+    expect(spinner).not.toHaveAttribute('aria-live');
     expect(queryByRole('status')).not.toBeInTheDocument();
     expect(queryByText('Loading...')).not.toBeInTheDocument();
   });

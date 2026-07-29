@@ -119,10 +119,19 @@ describe('ButtonContent component', () => {
     expect(document.querySelector('.tedi-overlay__content')).not.toBeInTheDocument();
   });
 
-  it('exposes the icon-only label once as the accessible name (visual-only tooltip)', () => {
-    render(<ButtonContent icon="delete">Delete</ButtonContent>);
+  it('renders the icon-only tooltip as visual-only so the name is not duplicated', async () => {
+    render(
+      <ButtonContent icon="delete" showTooltip>
+        Delete
+      </ButtonContent>
+    );
     const button = screen.getByRole('button');
+    // Name comes from the visually-hidden label — announced once.
     expect(button).toHaveAccessibleName('Delete');
+
+    fireEvent.mouseEnter(button);
+    const content = await screen.findByTestId('overlay-content');
+    expect(content).toHaveAttribute('aria-hidden', 'true');
     expect(button).not.toHaveAttribute('aria-describedby');
   });
 });
