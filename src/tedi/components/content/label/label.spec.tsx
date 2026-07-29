@@ -92,6 +92,24 @@ describe('Label component', () => {
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 
+  it('accepts rich (non-string) tooltip content', () => {
+    render(
+      <Label
+        tooltip={
+          <>
+            <strong>Bold</strong> and a <a href="#more">link</a>
+          </>
+        }
+      >
+        Label
+      </Label>
+    );
+
+    fireEvent.mouseEnter(screen.getByRole('button'));
+    expect(screen.getByText('Bold').tagName).toBe('STRONG');
+    expect(screen.getByRole('link', { name: 'link' })).toBeInTheDocument();
+  });
+
   it('renders the tooltip trigger outside the label element', () => {
     render(
       <Label tooltip="This is a tooltip" htmlFor="field">

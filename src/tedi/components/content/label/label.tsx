@@ -1,10 +1,8 @@
 import cn from 'classnames';
-import { ElementType, forwardRef, LabelHTMLAttributes } from 'react';
+import { ElementType, forwardRef, LabelHTMLAttributes, ReactNode } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
-import { useLabels } from '../../../providers/label-provider';
-import InfoButton from '../../buttons/info-button/info-button';
-import Tooltip from '../../overlays/tooltip/tooltip';
+import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
 import styles from './label.module.scss';
 
 type LabelBreakpointProps = {
@@ -37,10 +35,11 @@ export interface LabelProps
    */
   required?: boolean;
   /**
-   * Tooltip content to display when hovering over the info button.
+   * Tooltip content to display when hovering over the info button. Accepts rich
+   * content (e.g. bold text, links), not just a plain string.
    * If provided, an info button with a tooltip will be rendered.
    */
-  tooltip?: string;
+  tooltip?: ReactNode;
 }
 
 export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>((props, ref) => {
@@ -55,7 +54,6 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
     tooltip,
     ...rest
   } = getCurrentBreakpointProps<LabelProps>(props);
-  const { getLabel } = useLabels();
 
   const labelBEM = cn(
     styles['tedi-label'],
@@ -83,12 +81,7 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
     <span className={styles['tedi-label__wrapper']}>
       {labelElement}
       <span className={styles['tedi-label__info']}>
-        <Tooltip>
-          <Tooltip.Trigger>
-            <InfoButton isSmall={isSmall} aria-label={getLabel('infoButton.moreInformation')} />
-          </Tooltip.Trigger>
-          <Tooltip.Content>{tooltip}</Tooltip.Content>
-        </Tooltip>
+        <InfoTooltip isSmall={isSmall}>{tooltip}</InfoTooltip>
       </span>
     </span>
   );
