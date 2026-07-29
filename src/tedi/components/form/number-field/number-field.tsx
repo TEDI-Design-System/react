@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -117,6 +117,9 @@ export const NumberField = (props: NumberFieldProps) => {
     input,
   } = getCurrentBreakpointProps<NumberFieldProps>(props);
 
+  const generatedId = useId();
+  const resolvedId = id ?? generatedId;
+
   const resolvedInputMode =
     inputMode ?? ((decimalPlaces && decimalPlaces > 0) || decimalSeparator === ',' ? 'decimal' : 'numeric');
 
@@ -131,11 +134,15 @@ export const NumberField = (props: NumberFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const isFocusedRef = useRef(false);
 
-  const [inputUpdated, setInputUpdated] = useState<string>('');
+  const [announcement, setAnnouncement] = useState<string>('');
   const [inputInnerValue, setInputInnerValue] = useState<number | undefined>(defaultValue);
   const [displayValue, setDisplayValue] = useState<string>(() => formatNumber(value ?? defaultValue));
 
   const currentValue: number | undefined = onChange && typeof value !== 'undefined' ? value : inputInnerValue;
+
+  const announceShowTimer = useRef<ReturnType<typeof setTimeout>>();
+  const announceHideTimer = useRef<ReturnType<typeof setTimeout>>();
+  const prevValueRef = useRef<number | undefined>(currentValue);
 
   useEffect(() => {
     if (!isFocusedRef.current && typeof value !== 'undefined') {
@@ -143,7 +150,7 @@ export const NumberField = (props: NumberFieldProps) => {
     }
   }, [value, formatNumber]);
 
-  const helperId = helper ? `${id}-helper` : undefined;
+  const helperId = helper ? `${resolvedId}-helper` : undefined;
 
   const isInvalid = useCallback(
     (currentValue: number | undefined): boolean => {
@@ -161,14 +168,38 @@ export const NumberField = (props: NumberFieldProps) => {
     return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, currentValue));
   };
 
-  const updateValueUpdatedLabel = (newValue: number) => {
-    const valueUpdated = getLabel('numberField.quantityUpdated', newValue);
+  // Announce into a persistent live region. Reset to '' first, then set the
+  // message on the next tick so rapid or identical consecutive values are still
+  // re-announced (screen readers ignore a live region that keeps the same text).
+  const announce = useCallback((message: string) => {
+    if (!message) return;
+    setAnnouncement('');
+    if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+    if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
+    announceShowTimer.current = setTimeout(() => {
+      setAnnouncement(message);
+      announceHideTimer.current = setTimeout(() => setAnnouncement(''), 5000);
+    }, 100);
+  }, []);
 
-    setInputUpdated(valueUpdated);
-    setTimeout(() => {
-      setInputUpdated('');
-    }, 5000);
-  };
+  useEffect(() => {
+    return () => {
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
+    };
+  }, []);
+
+  // Announce every value change consistently — from the +/- buttons *and* from
+  // controlled/external updates. Stay silent while the user types, since the
+  // screen reader already echoes keystrokes in the focused field.
+  useEffect(() => {
+    if (prevValueRef.current !== currentValue) {
+      if (!isFocusedRef.current && currentValue !== undefined) {
+        announce(getLabel('numberField.quantityUpdated', currentValue));
+      }
+      prevValueRef.current = currentValue;
+    }
+  }, [currentValue, announce, getLabel]);
 
   const roundValue = (currentValue: number) => {
     return decimalPlaces !== undefined ? parseFloat(currentValue.toFixed(decimalPlaces)) : currentValue;
@@ -187,7 +218,6 @@ export const NumberField = (props: NumberFieldProps) => {
     returnValue = forceToLimits(returnValue);
     returnValue = roundValue(returnValue);
 
-    updateValueUpdatedLabel(returnValue);
     onChange?.(returnValue);
     setInputInnerValue(returnValue);
     setDisplayValue(formatNumber(returnValue));
@@ -240,7 +270,10 @@ export const NumberField = (props: NumberFieldProps) => {
       [styles['tedi-number-field__button--disabled']]: isOnOrOutOfBounds || disabled,
     });
 
-    const changeValue = getLabel(`numberField.${direction}`, step);
+    // Include the field's name so the button is self-describing out of context,
+    // e.g. "Decrease Label by 1" rather than a bare "Decrease by 1".
+    const fieldName = typeof label === 'string' ? label : undefined;
+    const changeValue = getLabel(`numberField.${direction}`, step, fieldName);
 
     return (
       <Button
@@ -270,7 +303,7 @@ export const NumberField = (props: NumberFieldProps) => {
       <div className={InputWrapperBEM} onClick={focusInput}>
         <input
           ref={inputRef}
-          id={id}
+          id={resolvedId}
           role="spinbutton"
           aria-valuemin={min}
           aria-valuemax={max}
@@ -307,18 +340,16 @@ export const NumberField = (props: NumberFieldProps) => {
 
   return (
     <div data-name="number-field" className={className}>
-      <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} size={size} />
+      <FormLabel id={resolvedId} label={label} required={required} hideLabel={hideLabel} size={size} />
       <div className={NumberFieldBem}>
         {renderButton('decrement')}
         {renderInputElement()}
         {renderButton('increment')}
       </div>
       {helper && <FeedbackText className={styles['tedi-number-field__feedback']} {...helper} id={helperId} />}
-      {inputUpdated && (
-        <div aria-live="polite" className="sr-only">
-          {inputUpdated}
-        </div>
-      )}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {announcement}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpointProps } from '../../../helpers';
+import { LabelProvider } from '../../../providers/label-provider';
 import NumberField, { NumberFieldProps } from './number-field';
 
 import '@testing-library/jest-dom';
@@ -191,5 +192,55 @@ describe('NumberField component', () => {
     render(<NumberField {...defaultProps} decimalSeparator="," />);
     const input = screen.getByRole('spinbutton');
     expect(input).toHaveAttribute('inputmode', 'decimal');
+  });
+
+  describe('accessibility', () => {
+    it('associates the label with the spinbutton even without an explicit id', () => {
+      render(<NumberField label="Amount" onChange={jest.fn()} />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleName('Amount');
+    });
+
+    it('gives each field a unique id so labels never cross-associate', () => {
+      render(
+        <>
+          <NumberField label="First" onChange={jest.fn()} />
+          <NumberField label="Second" onChange={jest.fn()} />
+        </>
+      );
+
+      const [first, second] = screen.getAllByRole('spinbutton');
+      expect(first.id).not.toBe(second.id);
+      expect(first).toHaveAccessibleName('First');
+      expect(second).toHaveAccessibleName('Second');
+    });
+
+    it('names the +/- buttons with the field context', () => {
+      render(
+        <LabelProvider locale="en">
+          <NumberField label="Amount" step={2} onChange={jest.fn()} />
+        </LabelProvider>
+      );
+
+      expect(screen.getByRole('button', { name: 'Decrease Amount by 2' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Increase Amount by 2' })).toBeInTheDocument();
+    });
+
+    it('announces value changes driven by an external/controlled update', () => {
+      jest.useFakeTimers();
+      try {
+        const { rerender } = render(<NumberField label="Amount" value={1} onChange={jest.fn()} />);
+        const status = screen.getByRole('status');
+        expect(status).toHaveTextContent('');
+
+        rerender(<NumberField label="Amount" value={2} onChange={jest.fn()} />);
+        act(() => {
+          jest.advanceTimersByTime(150);
+        });
+
+        expect(status).toHaveTextContent('numberField.quantityUpdated');
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 });
