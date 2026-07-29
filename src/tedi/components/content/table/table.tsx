@@ -410,11 +410,14 @@ export interface TableProps<TData> {
   pagination?: boolean | TablePaginationOptions;
   /**
    * Whether the current page resets to the first page whenever `data` changes
-   * (TanStack's `autoResetPageIndex`). Defaults to `true`, which keeps the user
-   * on a valid page after filtering or sorting. Set to `false` for tables that
-   * mutate `data` in place — e.g. inline row editing — so saving a row doesn't
-   * yank the user back to page 1.
-   * @default true
+   * (TanStack's `autoResetPageIndex`). Defaults to `true` for client-side
+   * pagination (keeps the user on a valid page after filtering or sorting) and
+   * to `false` when `manualPagination` is set — in server-side mode `data` is
+   * replaced on every page/sort change, so auto-resetting would bounce the user
+   * back to page 1 and trigger an update loop. Set to `false` for client-side
+   * tables that mutate `data` in place (e.g. inline row editing), or override
+   * explicitly in either mode.
+   * @default true (client-side) / false (manualPagination)
    */
   autoResetPageIndex?: boolean;
   /**
@@ -783,7 +786,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     expandTrigger = 'button',
     paginateExpandedRows = false,
     pagination: paginationProp,
-    autoResetPageIndex = true,
+    autoResetPageIndex,
     manualPagination = false,
     manualSorting = false,
     manualFiltering = false,
@@ -1073,7 +1076,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
     enableColumnFilters,
-    autoResetPageIndex,
+    autoResetPageIndex: autoResetPageIndex ?? !manualPagination,
     paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
     manualSorting,
