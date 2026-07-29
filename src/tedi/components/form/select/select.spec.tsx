@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { UnknownType } from '../../../types/commonTypes';
+import InputGroup from '../input-group/input-group';
 import { SelectMultiValueRemove } from './components/select-multi-value-remove';
 import { ISelectOption, Select, SelectProps } from './select';
 
@@ -735,6 +736,20 @@ describe('Select component', () => {
     it('gives each tag remove button an accessible name including the option label', () => {
       render(<Select {...defaultProps} multiple value={[{ value: 'apple', label: 'Apple' }]} isTagRemovable />);
       expect(screen.getByRole('button', { name: /remove Apple/i })).toBeInTheDocument();
+    });
+
+    it('keeps the combobox named by the label of a surrounding labeled InputGroup', () => {
+      // Regression: the group renders <label htmlFor={inputGroup.inputId}> and Select
+      // hides its own label, so the combobox input (not the container) must own that id.
+      render(
+        <InputGroup id="fruit-group" label="Choose a fruit">
+          <Select options={basicOptions} onChange={jest.fn()} />
+        </InputGroup>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox).toHaveAccessibleName('Choose a fruit');
+      expect(combobox).toHaveAttribute('id', 'fruit-group');
     });
   });
 });

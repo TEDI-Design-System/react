@@ -33,23 +33,6 @@ const options = [
   { value: 'haapsalu', label: 'Haapsalu' },
 ];
 
-const groupedOptions: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOption>> = [
-  {
-    label: 'American cities',
-    options: [
-      { value: 'new-york', label: 'New York' },
-      { value: 'dallas', label: 'Dallas' },
-    ],
-  },
-  {
-    label: 'Estonian cities',
-    options: [
-      { value: 'tallinn', label: 'Tallinn' },
-      { value: 'tartu', label: 'Tartu' },
-    ],
-  },
-];
-
 const TemplateSizes: StoryFn = (args) => (
   <Row>
     <Col lg={12} xs={12} className="example-list">
@@ -58,7 +41,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} {...args} id="select-size-default" />
+          <Select {...args} id="select-size-default" />
         </Col>
       </Row>
       <Row className="padding-14-16">
@@ -66,7 +49,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Small</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} size="small" {...args} id="select-size-small" />
+          <Select {...args} size="small" id="select-size-small" />
         </Col>
       </Row>
     </Col>

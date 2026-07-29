@@ -473,6 +473,14 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const shouldHideLabel = inputGroup?.hasExternalLabel;
     const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
 
+    // The visible <label> that names the combobox is rendered either by Select
+    // itself (own FormLabel, targeting `${resolvedId}-input`) or, when nested in
+    // a labeled InputGroup, by the group (targeting `inputGroup.inputId`). The
+    // focusable input must own whichever id the label's `htmlFor` points at, and
+    // react-select's container needs a *different* id so the two never collide.
+    const inputId = shouldHideLabel ? inputGroup?.inputId ?? resolvedId : `${resolvedId}-input`;
+    const containerId = shouldHideLabel ? `${resolvedId}-container` : resolvedId;
+
     const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
     const { getLabel } = useLabels();
@@ -692,7 +700,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           keyboardMode={keyboardMode}
           exitKeyboardMode={exitKeyboardMode}
           onKeyDown={handleSelectKeyDown}
-          id={resolvedId}
+          id={containerId}
           aria-describedby={helperId}
           autoFocus={autoFocus}
           ref={element}
@@ -709,7 +717,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           onInputChange={onInputChange}
           onBlur={onBlur}
           inputValue={inputValue}
-          inputId={`${resolvedId}-input`}
+          inputId={inputId}
           loadOptions={loadOptions}
           isLoading={isLoading}
           noOptionsMessage={noOptionsMessage || getNoOptionsMessage}
