@@ -414,7 +414,6 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const {
       options,
       defaultOptions,
-      id,
       name,
       iconName = 'arrow_drop_down',
       label,
@@ -697,7 +696,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           aria-describedby={helperId}
           autoFocus={autoFocus}
           ref={element}
-          instanceId={id}
+          instanceId={resolvedId}
           className="tedi-select__wrapper"
           name={name}
           options={optionsForReactSelect}
@@ -710,7 +709,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           onInputChange={onInputChange}
           onBlur={onBlur}
           inputValue={inputValue}
-          inputId={`${id}-input`}
+          inputId={`${resolvedId}-input`}
           loadOptions={loadOptions}
           isLoading={isLoading}
           noOptionsMessage={noOptionsMessage || getNoOptionsMessage}

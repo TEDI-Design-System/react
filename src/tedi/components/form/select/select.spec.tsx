@@ -341,7 +341,7 @@ describe('Select component', () => {
   it('stops event propagation on mouse down when closing a removable tag', () => {
     const stopPropagationSpy = jest.spyOn(Event.prototype, 'stopPropagation');
     render(<Select {...defaultProps} multiple value={[basicOptions[0]]} isTagRemovable />);
-    const closeButton = screen.getByRole('button', { name: /close/i });
+    const closeButton = screen.getByRole('button', { name: /remove/i });
 
     fireEvent.mouseDown(closeButton);
     expect(stopPropagationSpy).toHaveBeenCalled();
@@ -567,7 +567,7 @@ describe('Select component', () => {
       />
     );
 
-    const closeButtons = screen.getAllByRole('button', { name: /close/i });
+    const closeButtons = screen.getAllByRole('button', { name: /remove/i });
     await act(async () => {
       await userEvent.click(closeButtons[0]);
     });
@@ -706,6 +706,35 @@ describe('Select component', () => {
       await waitFor(() => {
         expect(screen.getByText(/^\+\d+$/)).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('accessibility', () => {
+    it('associates the label with the combobox even without an explicit id', () => {
+      // Regression: `inputId`/`instanceId` used the raw `id` prop, so with no id
+      // the input became "undefined-input" and no longer matched the label.
+      render(<Select label="Choose a fruit" options={basicOptions} onChange={jest.fn()} />);
+      expect(screen.getByRole('combobox')).toHaveAccessibleName('Choose a fruit');
+    });
+
+    it('describes the combobox with the helper text, not the placeholder', () => {
+      render(
+        <Select
+          {...defaultProps}
+          placeholder="Pick one"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox).toHaveAccessibleDescription('Only ripe fruit');
+      // react-select's placeholder must not describe the field.
+      expect(combobox.getAttribute('aria-describedby') ?? '').not.toMatch(/-placeholder/);
+    });
+
+    it('gives each tag remove button an accessible name including the option label', () => {
+      render(<Select {...defaultProps} multiple value={[{ value: 'apple', label: 'Apple' }]} isTagRemovable />);
+      expect(screen.getByRole('button', { name: /remove Apple/i })).toBeInTheDocument();
     });
   });
 });

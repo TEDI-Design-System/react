@@ -58,7 +58,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} id="select-size-default" {...args} />
+          <Select label={args.label} {...args} id="select-size-default" />
         </Col>
       </Row>
       <Row className="padding-14-16">
@@ -66,7 +66,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Small</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} size="small" id="select-size-default" {...args} />
+          <Select label={args.label} size="small" {...args} id="select-size-small" />
         </Col>
       </Row>
     </Col>
