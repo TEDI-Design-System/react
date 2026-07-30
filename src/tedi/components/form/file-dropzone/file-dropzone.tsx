@@ -61,6 +61,9 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
   } = props;
   const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload(props);
 
+  const generatedId = React.useId();
+  const resolvedId = id ?? generatedId;
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled,
     accept: props.accept ? { 'application/*': [props.accept] } : undefined,
@@ -69,7 +72,15 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     onDrop: (acceptedFiles, fileRejections = []) => {
       if (disabled) return;
 
-      const files = [...acceptedFiles, ...fileRejections.map((rejection) => rejection.file)];
+      const revalidatableRejections = fileRejections
+        .filter((rejection) =>
+          rejection.errors.some((error) => error.code === 'file-too-large' || error.code === 'file-invalid-type')
+        )
+        .map((rejection) => rejection.file);
+
+      const files = [...acceptedFiles, ...revalidatableRejections];
+      if (files.length === 0) return;
+
       const event = {
         target: { files },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -77,17 +88,19 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     },
   });
 
+  const feedback = uploadErrorHelper?.type === 'error' ? uploadErrorHelper : helper ?? uploadErrorHelper;
+  const helperId = feedback ? feedback.id ?? `${resolvedId}-helper` : undefined;
+
   const fileDropzoneBEM = cn(
     styles['tedi-file-dropzone'],
     { [styles['tedi-file-dropzone--disabled']]: disabled },
-    { [styles['tedi-file-dropzone--invalid']]: (uploadErrorHelper?.type || helper?.type) === 'error' },
-    { [styles['tedi-file-dropzone--valid']]: (uploadErrorHelper?.type || helper?.type) === 'valid' },
+    // Drive the visual state from the same `feedback` that is rendered, so the
+    // invalid/valid styling never diverges from the message shown.
+    { [styles['tedi-file-dropzone--invalid']]: feedback?.type === 'error' },
+    { [styles['tedi-file-dropzone--valid']]: feedback?.type === 'valid' },
     { [styles['tedi-file-dropzone--drop-over']]: isDragActive },
     className
   );
-
-  const feedback = uploadErrorHelper?.type === 'error' ? uploadErrorHelper : helper ?? uploadErrorHelper;
-  const helperId = feedback ? feedback.id ?? `${id}-helper` : undefined;
 
   return (
     <>
@@ -104,7 +117,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}
-            id={id}
+            id={resolvedId}
             label={
               <>
                 <Icon
