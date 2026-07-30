@@ -59,17 +59,19 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     attachmentProps,
     ...rest
   } = props;
-  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove } = useFileUpload(props);
+  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload(props);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled,
     accept: props.accept ? { 'application/*': [props.accept] } : undefined,
     multiple: props.multiple,
     maxSize: props.maxSize ? props.maxSize * 1024 ** 2 : undefined,
-    onDrop: (acceptedFiles) => {
+    onDrop: (acceptedFiles, fileRejections = []) => {
       if (disabled) return;
+
+      const files = [...acceptedFiles, ...fileRejections.map((rejection) => rejection.file)];
       const event = {
-        target: { files: acceptedFiles },
+        target: { files },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
       onFileChange(event);
     },
@@ -83,12 +85,15 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     { [styles['tedi-file-dropzone--drop-over']]: isDragActive },
     className
   );
-  const helperId = helper ? helper?.id ?? `${id}-helper` : undefined;
+
+  const feedback = uploadErrorHelper?.type === 'error' ? uploadErrorHelper : helper ?? uploadErrorHelper;
+  const helperId = feedback ? feedback.id ?? `${id}-helper` : undefined;
 
   return (
     <>
       <div
         {...getRootProps({
+          role: 'button',
           tabIndex: disabled ? -1 : 0,
           'aria-disabled': disabled,
           'aria-describedby': helperId,
@@ -116,11 +121,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           />
         </div>
       </div>
-      {helper ? (
-        <FeedbackText {...helper} id={helperId} />
-      ) : uploadErrorHelper ? (
-        <FeedbackText {...uploadErrorHelper} id={helperId} />
-      ) : null}
+      {feedback && <FeedbackText {...feedback} id={helperId} />}
       {!!innerFiles.length && (
         <List
           className={styles['tedi-file-dropzone__file-list']}
@@ -149,15 +150,17 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
                     </>
                   }
                 />
+                {file.isValid === false && (
+                  <span className="sr-only">{`${getLabel('file-dropzone.failed')} ${file.name ?? ''}`}</span>
+                )}
               </List.Item>
             );
           })}
         </List>
       )}
+
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {innerFiles.length === 0
-          ? getLabel('file-dropzone.no-file')
-          : getLabel('file-dropzone.files-selected', innerFiles.length)}
+        {announcement}
       </div>
     </>
   );

@@ -34,8 +34,9 @@ describe('FileDropzone', () => {
 
     mockUseDropzone.mockImplementation((props) => {
       return {
-        getRootProps: jest.fn(() => ({
+        getRootProps: jest.fn((rootProps) => ({
           className: 'tedi-file-dropzone',
+          ...rootProps,
         })),
         getInputProps: jest.fn(() => ({
           type: 'file',
@@ -95,11 +96,50 @@ describe('FileDropzone', () => {
     expect(dropzoneProps.maxSize).toBe(5 * 1024 ** 2);
 
     const file = new File(['file content'], 'file.png', { type: 'image/png' });
-    dropzoneProps.onDrop([file]);
+    const rejectedFile = new File(['too big'], 'big.pdf', { type: 'application/pdf' });
+    // react-dropzone passes rejected files separately; they must still reach the
+    // hook so it validates them and surfaces feedback (WCAG 9.1.3.1 #3).
+    dropzoneProps.onDrop([file], [{ file: rejectedFile, errors: [] }]);
 
     expect(onFileChange).toHaveBeenCalledWith({
-      target: { files: [file] },
+      target: { files: [file, rejectedFile] },
     } as unknown as React.ChangeEvent<HTMLInputElement>);
+  });
+
+  it('exposes the dropzone as a button whose description is wired to the helper', () => {
+    render(<FileDropzone id="role-test" name="file" label="Upload File" helper={{ text: 'PDF only' }} />);
+    const dropzone = screen.getByRole('button');
+    expect(dropzone).toHaveAttribute('aria-describedby', 'role-test-helper');
+    expect(screen.getByText('PDF only')).toHaveAttribute('id', 'role-test-helper');
+  });
+
+  it('exposes an invalid file status to screen readers', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [{ id: '1', name: 'big.pdf', isValid: false }],
+      uploadErrorHelper: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(<FileDropzone id="invalid" name="file" label="Upload File" />);
+    expect(screen.getByText('file-dropzone.failed big.pdf')).toBeInTheDocument();
+  });
+
+  it('drives the status live region from the hook announcement', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [],
+      uploadErrorHelper: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+      announcement: 'file-upload.success-added',
+    });
+
+    render(<FileDropzone id="ann" name="file" label="Upload File" />);
+    expect(screen.getByRole('status')).toHaveTextContent('file-upload.success-added');
   });
 
   it('renders uploaded files', () => {

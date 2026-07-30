@@ -490,6 +490,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },
+  'file-dropzone.failed': {
+    description: 'Screen-reader status announced next to an invalid file in FileDropzone',
+    components: ['FileDropzone'],
+    et: 'Faili üleslaadimine ebaõnnestus',
+    en: 'File upload failed',
+    ru: 'Загрузка файла не удалась',
+  },
   'file-dropzone.no-file': {
     description: 'No file selected label for FileUpload or FileDropzone',
     components: ['FileDropzone', 'FileUpload'],
