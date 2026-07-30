@@ -10,9 +10,9 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | TextArea | `string` | Character limit counter |
 | NumberField | `number` | Min/max, step, suffix, increment buttons |
 | Select | `ISelectOption \| ISelectOption[] \| null` | Async, multi-select, searchable |
-| Checkbox | `boolean` (via onChange) | Indeterminate state |
-| Radio | `boolean` (via onChange) | Used in ChoiceGroup |
-| ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
+| Checkbox | `boolean` (via onChange) | Indeterminate, `Checkbox.Group` (multi-select, select-all), card variant |
+| Radio | `boolean` (via onChange) | `Radio.Group`, card variant, segmented layout |
+| ChoiceGroup | `ChoiceGroupValue` | **Deprecated** — use `Radio.Group` / `Checkbox.Group` |
 | Search | `string` | Search button, onSearch callback |
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
 | TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
@@ -262,8 +262,11 @@ import { Filter, FilterGroup } from '@tedi-design-system/react/tedi';
 
 // Custom dropdown content
 <Filter text={periodLabel} selected={!!period} showClear onClear={() => setPeriod('')}>
-  <ChoiceGroup id="period" label="Period" inputType="radio" items={periodItems}
-    value={period} onChange={setPeriod} />
+  <Radio.Group label="Period" value={period} onChange={setPeriod}>
+    {periodItems.map((item) => (
+      <Radio key={item.value} value={item.value} label={item.label} />
+    ))}
+  </Radio.Group>
 </Filter>
 ```
 
@@ -298,7 +301,7 @@ Variants and customisation:
 ## Checkbox & Radio
 
 ```tsx
-import { Checkbox, Radio, ChoiceGroup } from '@tedi-design-system/react/tedi';
+import { Checkbox, Radio } from '@tedi-design-system/react/tedi';
 
 // Single checkbox
 <Checkbox
@@ -311,34 +314,49 @@ import { Checkbox, Radio, ChoiceGroup } from '@tedi-design-system/react/tedi';
 
 // Checkbox with indeterminate
 <Checkbox id="all" label="Select all" value="all" indeterminate={someSelected} />
-
-// Choice group (radio)
-<ChoiceGroup
-  id="size"
-  name="size"
-  label="Size"
-  inputType="radio"
-  items={[
-    { id: 'sm', label: 'Small', value: 'sm' },
-    { id: 'md', label: 'Medium', value: 'md' },
-    { id: 'lg', label: 'Large', value: 'lg' },
-  ]}
-  value={size}
-  onChange={setSize}
-/>
-
-// Segmented choice group
-<ChoiceGroup
-  id="view"
-  name="view"
-  label="View"
-  variant="segmented"
-  layout="segmented"
-  items={viewOptions}
-  value={view}
-  onChange={setView}
-/>
 ```
+
+### Groups — `Radio.Group` / `Checkbox.Group`
+
+Use the compound `Radio.Group` / `Checkbox.Group` for grouped inputs. The group owns
+selection and shared props (`disabled`, `invalid`, `required`, `size`, `variant`, …);
+children are composable `<Radio>` / `<Checkbox>` elements.
+
+```tsx
+// Radio group
+<Radio.Group label="Size" value={size} onChange={setSize} helper={{ text: 'Choose one.' }}>
+  <Radio value="sm" label="Small" />
+  <Radio value="md" label="Medium" />
+  <Radio value="lg" label="Large" />
+</Radio.Group>
+
+// Checkbox group (multi-select) with select-all
+<Checkbox.Group label="Toppings" value={values} onChange={setValues} indeterminateCheck>
+  <Checkbox value="cheese" label="Cheese" />
+  <Checkbox value="ham" label="Ham" />
+</Checkbox.Group>
+
+// Card variant (primary/secondary) with icon + description
+<Radio.Group label="Plan" variant="card" cardVariant="secondary" defaultValue="a">
+  <Radio value="a" label="Basic" description="For individuals" icon="person" />
+  <Radio value="b" label="Team" description="For teams" icon="group" />
+</Radio.Group>
+
+// Segmented cards (side-by-side, joined surface)
+<Radio.Group label="View" variant="card" cardVariant="primary" layout="segmented" defaultValue="grid">
+  <Radio value="grid" label="Grid" />
+  <Radio value="list" label="List" />
+</Radio.Group>
+
+// Breakpoint-aware: cards on mobile, regular radios from md up
+<Radio.Group label="Plan" variant="card" md={{ variant: 'default' }} defaultValue="a">
+  <Radio value="a" label="Basic" />
+  <Radio value="b" label="Pro" />
+</Radio.Group>
+```
+
+> **Deprecated:** `ChoiceGroup` (item-array API) is deprecated in favour of `Radio.Group` /
+> `Checkbox.Group`. Prefer the compound API for new code.
 
 ## Validation & Helper Text
 

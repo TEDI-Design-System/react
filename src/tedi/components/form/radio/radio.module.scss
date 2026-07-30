@@ -106,3 +106,201 @@
     margin-left: var(--form-checkbox-radio-inner-spacing);
   }
 }
+
+.tedi-radio--card {
+  --_card-bg: transparent;
+  --_card-text: inherit;
+  --_card-border: transparent;
+
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: var(--form-field-height);
+  padding: calc(var(--form-checkbox-radio-card-radio-padding-y) - var(--tedi-borders-01))
+    var(--form-checkbox-radio-card-radio-padding-x);
+  color: var(--_card-text);
+  cursor: pointer;
+  background-color: var(--_card-bg);
+  border: 1px solid var(--_card-border);
+  border-radius: var(--form-checkbox-radio-card-radius);
+
+  .tedi-radio__card-control {
+    display: flex;
+    gap: var(--form-checkbox-radio-card-inner-spacing);
+    align-items: center;
+  }
+
+  .tedi-radio__indicator {
+    flex-shrink: 0;
+    margin-right: 0;
+
+    &::after {
+      inset: 0;
+      margin: auto;
+      transform: none;
+    }
+  }
+
+  .tedi-radio__card-icon {
+    flex-shrink: 0;
+    color: inherit;
+  }
+
+  .tedi-radio__card-description {
+    padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing));
+    font-size: var(--body-small-regular-size);
+    line-height: var(--body-small-regular-line-height);
+    color: inherit;
+  }
+
+  &.tedi-radio--card-with-icon .tedi-radio__card-description {
+    padding-left: calc(
+      (var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing)) * 2
+    );
+  }
+
+  .tedi-radio__helper {
+    padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing));
+    margin-left: 0;
+    color: inherit;
+  }
+
+  &.tedi-radio--disabled {
+    cursor: not-allowed;
+  }
+
+  &:has(.tedi-radio__input:focus-visible) {
+    outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+    outline-offset: var(--tedi-borders-01);
+  }
+
+  .tedi-radio__input:focus + .tedi-radio__indicator,
+  .tedi-radio__input:focus-visible + .tedi-radio__indicator {
+    outline: none;
+  }
+}
+
+.tedi-radio--card-primary {
+  --_card-bg: var(--form-checkbox-radio-card-primary-default-background);
+  --_card-text: var(--form-checkbox-radio-card-primary-default-text);
+  --_card-border: var(--form-checkbox-radio-card-primary-default-border-separate);
+
+  &:has(.tedi-radio__input:hover:not(:disabled)) {
+    --_card-bg: var(--form-checkbox-radio-card-primary-hover-background);
+    --_card-text: var(--form-checkbox-radio-card-primary-hover-text);
+    --_card-border: var(--form-checkbox-radio-card-primary-hover-border);
+  }
+
+  &:has(.tedi-radio__input:checked) {
+    --_card-bg: var(--form-checkbox-radio-card-primary-selected-background);
+    --_card-text: var(--form-checkbox-radio-card-primary-selected-text);
+    --_card-border: var(--form-checkbox-radio-card-primary-selected-border-separate);
+
+    .tedi-radio__input:not(:disabled) + .tedi-radio__indicator {
+      background-color: transparent;
+      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
+
+      &::after {
+        background: var(--form-checkbox-radio-default-border-selected-inverted);
+        border-color: var(--form-checkbox-radio-default-border-selected-inverted);
+      }
+    }
+  }
+
+  &:has(.tedi-radio__input:disabled:not(:checked)) {
+    --_card-bg: var(--form-checkbox-radio-card-primary-disabled-default-background);
+    --_card-text: var(--form-checkbox-radio-card-primary-disabled-default-text);
+    --_card-border: var(--form-checkbox-radio-card-primary-disabled-default-background);
+  }
+
+  &:has(.tedi-radio__input:disabled:checked) {
+    --_card-bg: var(--form-checkbox-radio-card-primary-disabled-selected-background);
+    --_card-text: var(--form-checkbox-radio-card-primary-disabled-selected-text);
+    --_card-border: var(--form-checkbox-radio-card-primary-disabled-selected-background);
+  }
+}
+
+[data-layout='segmented'] {
+  .tedi-radio--card {
+    border-radius: 0;
+  }
+
+  .tedi-radio--card-primary {
+    --_card-border: var(--form-checkbox-radio-card-primary-default-border-group);
+  }
+
+  .tedi-radio--card:has(.tedi-radio__input:checked),
+  .tedi-radio--card:has(.tedi-radio__input:hover:not(:disabled)),
+  .tedi-radio--card:has(.tedi-radio__input:focus-visible) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+[data-layout='segmented'][data-direction='row'] {
+  .tedi-radio--card:not(:first-child) {
+    margin-left: calc(var(--tedi-borders-01) * -1);
+  }
+
+  .tedi-radio--card:first-child {
+    border-top-left-radius: var(--form-checkbox-radio-card-radius);
+    border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
+  }
+
+  .tedi-radio--card:last-child {
+    border-top-right-radius: var(--form-checkbox-radio-card-radius);
+    border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
+  }
+}
+
+[data-layout='segmented'][data-direction='column'] {
+  .tedi-radio--card:not(:first-child) {
+    margin-top: calc(var(--tedi-borders-01) * -1);
+  }
+
+  .tedi-radio--card:first-child {
+    border-top-left-radius: var(--form-checkbox-radio-card-radius);
+    border-top-right-radius: var(--form-checkbox-radio-card-radius);
+  }
+
+  .tedi-radio--card:last-child {
+    border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
+    border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
+  }
+}
+
+.tedi-radio--card-secondary {
+  --_card-bg: var(--form-checkbox-radio-card-secondary-default-background);
+  --_card-text: var(--form-checkbox-radio-card-secondary-default-text);
+  --_card-border: var(--form-checkbox-radio-card-secondary-default-border);
+
+  &:has(.tedi-radio__input:hover:not(:disabled)) {
+    --_card-bg: var(--form-checkbox-radio-card-secondary-hover-background);
+    --_card-text: var(--form-checkbox-radio-card-secondary-hover-text);
+    --_card-border: var(--form-checkbox-radio-card-secondary-hover-border);
+  }
+
+  &:has(.tedi-radio__input:checked) {
+    --_card-bg: var(--form-checkbox-radio-card-secondary-selected-background);
+    --_card-text: var(--form-checkbox-radio-card-secondary-selected-text);
+    --_card-border: var(--form-checkbox-radio-card-secondary-selected-border);
+
+    box-shadow: inset 0 0 0 var(--tedi-borders-01) var(--_card-border);
+  }
+
+  &:has(.tedi-radio__input:disabled:not(:checked)) {
+    --_card-bg: var(--form-checkbox-radio-card-secondary-disabled-default-background);
+    --_card-text: var(--form-checkbox-radio-card-secondary-disabled-default-text);
+    --_card-border: var(--form-checkbox-radio-card-secondary-disabled-default-border);
+  }
+
+  &:has(.tedi-radio__input:disabled:checked) {
+    --_card-bg: var(--form-checkbox-radio-card-secondary-disabled-selected-background);
+    --_card-text: var(--form-checkbox-radio-card-secondary-disabled-selected-text);
+    --_card-border: var(--form-checkbox-radio-card-secondary-disabled-selected-border);
+
+    box-shadow: inset 0 0 0 var(--tedi-borders-01) var(--_card-border);
+  }
+}

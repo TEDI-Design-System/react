@@ -5,17 +5,25 @@ import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Checkbox, { CheckboxProps } from './checkbox';
+import Checkbox, { CheckboxGroup, CheckboxProps } from './checkbox';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4228-72934&m=dev" target="_BLANK">Figma ↗</a><br />
- * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Zeroheight ↗</a><br/><hr/>
- * In most cases, you should use the `ChoiceGroup` component. However, we also provide a standalone `Check` component for custom use cases.
+ * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Checkbox> = {
   component: Checkbox,
+  subcomponents: { 'Checkbox.Group': CheckboxGroup },
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/Checkbox',
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+  },
 };
 
 export default meta;
@@ -268,4 +276,112 @@ export const CheckWithLongTitle = () => {
       </Col>
     </Row>
   );
+};
+
+/** Compose checkboxes inside `Checkbox.Group`, which owns the selected values. */
+export const Group: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>(['cheese']);
+    return (
+      <Checkbox.Group label="Toppings" value={values} onChange={setValues} helper={{ text: 'Pick any.' }}>
+        <Checkbox value="cheese" label="Cheese" />
+        <Checkbox value="ham" label="Ham" />
+        <Checkbox value="mushroom" label="Mushroom" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/**
+ * `indeterminateCheck` adds a "select all" checkbox: checked when all children are
+ * selected, indeterminate when some are, unchecked when none — toggling it selects
+ * or clears them all.
+ */
+export const WithSelectAll: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>(['sms']);
+    return (
+      <Checkbox.Group label="Notifications" indeterminateCheck value={values} onChange={setValues}>
+        <Checkbox value="email" label="Email" />
+        <Checkbox value="sms" label="SMS" />
+        <Checkbox value="push" label="Push" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/** `variant="card"` renders each checkbox as a card. `cardVariant` sets primary / secondary. */
+export const Cards: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
+        <Checkbox value="a" label="Text" />
+        <Checkbox value="b" label="Text" />
+        <Checkbox value="c" label="Text" />
+      </Checkbox.Group>
+      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
+        <Checkbox value="a" label="Text" />
+        <Checkbox value="b" label="Text" />
+        <Checkbox value="c" label="Text" />
+      </Checkbox.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/** Add a `description` for a two-line card. */
+export const CardsWithDescription: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
+        <Checkbox value="a" label="Text" description="Description" />
+        <Checkbox value="b" label="Text" description="Description" />
+        <Checkbox value="c" label="Text" description="Description" />
+      </Checkbox.Group>
+      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
+        <Checkbox value="a" label="Text" description="Description" />
+        <Checkbox value="b" label="Text" description="Description" />
+        <Checkbox value="c" label="Text" description="Description" />
+      </Checkbox.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Add a leading `icon` (Material icon name), optionally with a `description`.
+ */
+export const CardsWithIcons: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['desktop']}>
+        <Checkbox value="desktop" label="Text" icon="computer" />
+        <Checkbox value="phone" label="Text" icon="smartphone" />
+        <Checkbox value="tablet" label="Text" icon="tablet_mac" />
+      </Checkbox.Group>
+      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['desktop']}>
+        <Checkbox value="desktop" label="Text" description="Description" icon="computer" />
+        <Checkbox value="phone" label="Text" description="Description" icon="smartphone" />
+        <Checkbox value="tablet" label="Text" description="Description" icon="tablet_mac" />
+      </Checkbox.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Group props are breakpoint-aware (mobile-first). Here it's cards by default and
+ * regular checkboxes from `md` up — resize the canvas to see it switch.
+ */
+export const ResponsiveVariant: StoryObj = {
+  render: () => (
+    <Checkbox.Group
+      label="Toppings"
+      defaultValue={['cheese']}
+      variant="card"
+      cardVariant="secondary"
+      md={{ variant: 'default', direction: 'column' }}
+    >
+      <Checkbox value="cheese" label="Cheese" />
+      <Checkbox value="ham" label="Ham" />
+      <Checkbox value="mushroom" label="Mushroom" />
+    </Checkbox.Group>
+  ),
 };

@@ -127,7 +127,7 @@ import { Card, Dropdown, Tooltip } from '@tedi-design-system/react/tedi';
 TEDI form controls support both **controlled** and **uncontrolled** modes:
 
 ```tsx
-import { TextField, Select, Checkbox, ChoiceGroup } from '@tedi-design-system/react/tedi';
+import { TextField, Select, Checkbox, Radio } from '@tedi-design-system/react/tedi';
 
 // Controlled
 const [email, setEmail] = useState('');
@@ -152,9 +152,15 @@ const [email, setEmail] = useState('');
 
 // Checkbox
 <Checkbox id="agree" label="I agree" value="agree" onChange={(val, checked) => setAgreed(checked)} />
+
+// Grouped inputs — compound Radio.Group / Checkbox.Group (supports variant="card")
+<Radio.Group label="Size" value={size} onChange={setSize}>
+  <Radio value="sm" label="Small" />
+  <Radio value="lg" label="Large" />
+</Radio.Group>
 ```
 
-Form controls: `TextField`, `Select`, `TextArea`, `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`.
+Form controls: `TextField`, `Select`, `TextArea`, `NumberField`, `Checkbox` (+ `Checkbox.Group`), `Radio` (+ `Radio.Group`), `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`. `ChoiceGroup` is **deprecated** — use `Radio.Group` / `Checkbox.Group`.
 
 ## Theming
 

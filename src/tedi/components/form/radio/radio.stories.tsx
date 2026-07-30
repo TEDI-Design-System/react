@@ -5,16 +5,24 @@ import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Radio, { RadioProps } from './radio';
+import Radio, { RadioGroup, RadioProps } from './radio';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4598-78103&m=dev" target="_BLANK">Figma ↗</a><br />
- * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Zeroheight ↗</a><br/><hr/>
- * In most cases, you should use the `ChoiceGroup` component. However, we also provide a standalone `Radio` component for custom use cases.
+ * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Radio> = {
   component: Radio,
+  subcomponents: { 'Radio.Group': RadioGroup },
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/Radio',
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+  },
 };
 
 export default meta;
@@ -232,4 +240,112 @@ export const RadioWithLongTitle = () => {
       </Col>
     </Row>
   );
+};
+
+/** Compose radios inside `Radio.Group`, which owns the selection and shared props. */
+export const Group: StoryObj = {
+  render: () => {
+    const [value, setValue] = useState('email');
+    return (
+      <Radio.Group label="Contact method" value={value} onChange={setValue} helper={{ text: 'Choose one.' }}>
+        <Radio value="email" label="Email" />
+        <Radio value="phone" label="Phone" />
+        <Radio value="post" label="Post" />
+      </Radio.Group>
+    );
+  },
+};
+
+/** `variant="card"` renders each radio as a card. `cardVariant` sets primary / secondary. */
+export const Cards: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="a">
+        <Radio value="a" label="Text" />
+        <Radio value="b" label="Text" />
+        <Radio value="c" label="Text" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="a">
+        <Radio value="a" label="Text" />
+        <Radio value="b" label="Text" />
+        <Radio value="c" label="Text" />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/** Add a `description` for a two-line card. */
+export const CardsWithDescription: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="a">
+        <Radio value="a" label="Text" description="Description" />
+        <Radio value="b" label="Text" description="Description" />
+        <Radio value="c" label="Text" description="Description" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="a">
+        <Radio value="a" label="Text" description="Description" />
+        <Radio value="b" label="Text" description="Description" />
+        <Radio value="c" label="Text" description="Description" />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Add a leading `icon` (Material icon name), optionally with a `description`.
+ */
+export const CardsWithIcons: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="desktop">
+        <Radio value="desktop" label="Text" icon="computer" />
+        <Radio value="phone" label="Text" icon="smartphone" />
+        <Radio value="tablet" label="Text" icon="tablet_mac" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="desktop">
+        <Radio value="desktop" label="Text" description="Description" icon="computer" />
+        <Radio value="phone" label="Text" description="Description" icon="smartphone" />
+        <Radio value="tablet" label="Text" description="Description" icon="tablet_mac" />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/** `layout="segmented"` joins the cards into one button-group surface (Figma "Grouped"). */
+export const CardsSegmented: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="a">
+        <Radio value="a" label="Text" />
+        <Radio value="b" label="Text" />
+        <Radio value="c" label="Text" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="a">
+        <Radio value="a" label="Text" />
+        <Radio value="b" label="Text" />
+        <Radio value="c" label="Text" />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Group props are breakpoint-aware (mobile-first). Here it's cards by default and
+ * regular radios from `md` up — resize the canvas to see it switch.
+ */
+export const ResponsiveVariant: StoryObj = {
+  render: () => (
+    <Radio.Group
+      label="Plan"
+      defaultValue="a"
+      variant="card"
+      cardVariant="secondary"
+      md={{ variant: 'default', direction: 'column' }}
+    >
+      <Radio value="a" label="Basic" />
+      <Radio value="b" label="Pro" />
+      <Radio value="c" label="Team" />
+    </Radio.Group>
+  ),
 };

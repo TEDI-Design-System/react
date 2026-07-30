@@ -1,0 +1,35 @@
+.tedi-radio-group {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.tedi-radio-group__legend {
+  padding: 0;
+  margin-bottom: var(--tedi-dimensions-05);
+  font-family: var(--family-default);
+  font-size: var(--body-regular-size);
+  font-weight: var(--body-regular-weight);
+  line-height: var(--body-regular-line-height);
+  color: var(--general-text-secondary);
+}
+
+.tedi-radio-group__items {
+  display: flex;
+  gap: var(--form-checkbox-radio-gutter-y);
+}
+
+.tedi-radio-group--column .tedi-radio-group__items {
+  flex-direction: column;
+}
+
+.tedi-radio-group--row .tedi-radio-group__items {
+  flex-flow: row wrap;
+  align-items: stretch;
+}
+
+.tedi-radio-group--segmented .tedi-radio-group__items {
+  flex-wrap: nowrap;
+  gap: 0;
+}
