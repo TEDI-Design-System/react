@@ -19,6 +19,12 @@ import { Calendar, CalendarProps } from './calendar';
 const meta: Meta<typeof Calendar> = {
   title: 'TEDI-Ready/Content/Calendar',
   component: Calendar,
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: { exclude: ['sm', 'md', 'lg', 'xl', 'xxl'] },
+  },
 };
 
 export default meta;

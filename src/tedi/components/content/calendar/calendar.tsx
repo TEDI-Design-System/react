@@ -3,6 +3,7 @@ import React from 'react';
 import { DateRange, DayButton, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { CalendarView, DateFieldMode } from '../../form/date-field/date-field';
 import { StatusIndicator, StatusIndicatorType } from '../../tags/status-indicator';
 import styles from './calendar.module.scss';
@@ -28,7 +29,7 @@ export interface DayStatus {
  */
 export type DayStatusFn = (date: Date) => DayStatus | null | undefined;
 
-export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
+interface CalendarBreakpointProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
   /**
    * Current view of the calendar. Can be `'days'`, `'months'`, or `'years'`.
    * Controls which calendar grid is displayed.
@@ -154,43 +155,43 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    */
   bordered?: boolean;
   /**
-   * Let the calendar grow to fill the width of its container instead of using a
-   * fixed width. The seven columns distribute evenly and each cell keeps a
-   * square aspect ratio, so the day rows and the weekday row scale vertically
-   * with the width. The selected day fills its cell; the "today" ring stays a
-   * fixed size, centred. Wrap the calendar in a sized container to control how
-   * large it scales.
+   * Grow to fill the container's width instead of a fixed width; cells keep a
+   * square aspect ratio. Wrap in a sized container to control the scale.
    * @default false
    */
   fullWidth?: boolean;
 }
 
-export const Calendar = ({
-  view = 'days',
-  selectionLevel = 'days',
-  currentMonth,
-  setCurrentMonth,
-  setView = () => 'days',
-  mode = 'single',
-  value,
-  locale = et,
-  localeCode = 'et-EE',
-  showOutsideDays = true,
-  disabledMatchers,
-  required,
-  availableDays,
-  unavailableDays,
-  footer,
-  monthYearSelectType,
-  dayStatus,
-  handleSelect,
-  applyValue,
-  showNavigation = true,
-  className,
-  bordered = true,
-  fullWidth = false,
-  ...dayPickerProps
-}: CalendarProps) => {
+export type CalendarProps = BreakpointSupport<CalendarBreakpointProps>;
+
+export const Calendar = (props: CalendarProps) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const {
+    view = 'days',
+    selectionLevel = 'days',
+    currentMonth,
+    setCurrentMonth,
+    setView = () => 'days',
+    mode = 'single',
+    value,
+    locale = et,
+    localeCode = 'et-EE',
+    showOutsideDays = true,
+    disabledMatchers,
+    required,
+    availableDays,
+    unavailableDays,
+    footer,
+    monthYearSelectType,
+    dayStatus,
+    handleSelect,
+    applyValue,
+    showNavigation = true,
+    className,
+    bordered = true,
+    fullWidth = false,
+    ...dayPickerProps
+  } = getCurrentBreakpointProps<CalendarBreakpointProps>(props);
   const borderlessClass = !bordered ? styles['tedi-calendar--borderless'] : undefined;
   const fullWidthClass = fullWidth ? styles['tedi-calendar--full-width'] : undefined;
   const containerClassName = classNames(borderlessClass, fullWidthClass, className);

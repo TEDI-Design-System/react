@@ -305,6 +305,30 @@ describe('DateField component', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
+  describe('dayStatus (popover path)', () => {
+    const markDay15 = (date: Date) =>
+      date.getDate() === 15 ? ({ type: 'success', label: 'Kinnitatud vastuvõtt' } as const) : null;
+
+    it('renders no day-status indicator by default', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      await screen.findByRole('dialog');
+      expect(document.querySelector('.tedi-calendar__day-status')).not.toBeInTheDocument();
+    });
+
+    it('forwards dayStatus to the popover calendar (dot + folded aria-label)', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} initialMonth={new Date(2025, 5, 1)} dayStatus={markDay15} />);
+
+      await user.click(screen.getByRole('button'));
+      await screen.findByRole('dialog');
+      expect(document.querySelector('.tedi-calendar__day-status')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
+    });
+  });
+
   it('closes calendar when clicking icon again (button trigger toggle)', async () => {
     const user = userEvent.setup();
 

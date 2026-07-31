@@ -854,6 +854,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           availableDays={availableDays}
           footer={footer}
           monthYearSelectType={monthYearSelectType}
+          dayStatus={dayStatus}
           showNavigation={showNavigation}
           selectionLevel={selectionLevel}
           initialView={initialView}

@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { Calendar, CalendarProps } from './calendar';
 
 import '@testing-library/jest-dom';
+
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
 
 const mockDayPickerProps: { current: any } = { current: null };
 
@@ -58,6 +64,13 @@ describe('Calendar', () => {
     handleSelect: jest.fn(),
     applyValue: jest.fn(),
   };
+
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => xs,
+    });
+  });
 
   it('renders DayPicker in default (days) view', () => {
     render(<Calendar {...baseProps} />);
@@ -198,6 +211,17 @@ describe('Calendar', () => {
 
   it('applies the full-width modifier class when fullWidth is set', () => {
     render(<Calendar {...baseProps} fullWidth />);
+
+    expect(screen.getByTestId('day-picker')).toHaveClass('tedi-calendar--full-width');
+  });
+
+  it('resolves per-breakpoint overrides (e.g. fullWidth at md)', () => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => ({ ...xs, ...md }),
+    });
+
+    render(<Calendar {...baseProps} fullWidth={false} md={{ fullWidth: true }} />);
 
     expect(screen.getByTestId('day-picker')).toHaveClass('tedi-calendar--full-width');
   });
