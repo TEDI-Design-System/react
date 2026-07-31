@@ -1,3 +1,10 @@
+# [18.1.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.19...react-18.1.0-rc.20) (2026-07-31)
+
+
+### Bug Fixes
+
+* **file-dropzone:** wcag fixes [#54](https://github.com/TEDI-Design-System/react/issues/54) ([#770](https://github.com/TEDI-Design-System/react/issues/770)) ([a0996f5](https://github.com/TEDI-Design-System/react/commit/a0996f516b41f32b238fe62fe41aa8d733fdfc78))
+
 # [18.1.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.18...react-18.1.0-rc.19) (2026-07-29)
 
 
