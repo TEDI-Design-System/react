@@ -1,3 +1,10 @@
+# [18.1.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.21...react-18.1.0-rc.22) (2026-07-31)
+
+
+### Bug Fixes
+
+* **button:** announce loading once and fix icon-only name duplication [#70](https://github.com/TEDI-Design-System/react/issues/70) ([#763](https://github.com/TEDI-Design-System/react/issues/763)) ([38724d9](https://github.com/TEDI-Design-System/react/commit/38724d9e19ac4ffb0292e97189a5a7b7d0a6301f))
+
 # [18.1.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.20...react-18.1.0-rc.21) (2026-07-31)
 
 
