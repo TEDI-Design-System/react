@@ -83,4 +83,26 @@ describe('Tooltip component', () => {
     const button = screen.getByTestId('test-button');
     expect(button).toHaveAttribute('aria-label', 'test button');
   });
+
+  it('wires aria-describedby to the trigger when open (default)', () => {
+    renderTooltip({ children: 'Trigger content' }, { children: 'Tooltip content' });
+
+    const trigger = screen.getByText('Trigger content');
+    fireEvent.mouseEnter(trigger);
+
+    expect(screen.getByText('Tooltip content')).toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-describedby');
+  });
+
+  it('is visual-only when ariaHidden: no aria-describedby on the trigger, content is aria-hidden', () => {
+    renderTooltip({ children: 'Trigger content' }, { children: 'Tooltip content' }, { ariaHidden: true });
+
+    const trigger = screen.getByText('Trigger content');
+    fireEvent.mouseEnter(trigger);
+
+    const content = screen.getByText('Tooltip content');
+    expect(content).toBeInTheDocument();
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+    expect(content.closest('[data-testid="overlay-content"]')).toHaveAttribute('aria-hidden', 'true');
+  });
 });
