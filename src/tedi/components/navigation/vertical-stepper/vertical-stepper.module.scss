@@ -26,6 +26,7 @@
   padding-bottom: var(--tedi-vertical-stepper-row-gap);
 
   &:last-child {
+    min-height: 0;
     padding-bottom: 0;
   }
 
@@ -144,6 +145,7 @@
 }
 
 .tedi-vertical-stepper__description {
+  margin-top: calc((var(--body-regular-line-height) - var(--body-regular-size)) / -2);
   color: var(--general-text-secondary);
 }
 

@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
+import { Col, Row } from '../../layout/grid';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -212,6 +213,9 @@ const subCell = (props: Partial<VerticalStepperSubItemProps>) => (
   </VerticalStepper>
 );
 
+// Each state is a self-contained column (label + Default / Hover cells), laid out
+// with the responsive grid. Columns reflow per breakpoint instead of forcing a
+// single wide row: two per row on mobile, three from md, all in one row from lg.
 const StateMatrix = <T,>({
   states,
   renderCell,
@@ -219,33 +223,31 @@ const StateMatrix = <T,>({
   states: StateDef<T>[];
   renderCell: (props: Partial<T>) => JSX.Element;
 }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: `5rem repeat(${states.length}, minmax(140px, 1fr))`,
-      gap: '24px 16px',
-      alignItems: 'start',
-    }}
-  >
-    <span />
+  <Row gutterX={2} gutterY={3}>
     {states.map((s) => (
-      <Text key={s.label} modifiers="bold">
-        {s.label}
-      </Text>
+      <Col key={s.label} xs={6} md={4} lg={2}>
+        <VerticalSpacing size={1}>
+          <Text modifiers="bold">{s.label}</Text>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="small" color="tertiary">
+              Default
+            </Text>
+            {renderCell(s.props)}
+          </VerticalSpacing>
+          {!s.noHover && (
+            <div className="vs-hover">
+              <VerticalSpacing size={0.5}>
+                <Text modifiers="small" color="tertiary">
+                  Hover
+                </Text>
+                {renderCell(s.props)}
+              </VerticalSpacing>
+            </div>
+          )}
+        </VerticalSpacing>
+      </Col>
     ))}
-
-    <Text modifiers="bold">Default</Text>
-    {states.map((s) => (
-      <div key={s.label}>{renderCell(s.props)}</div>
-    ))}
-
-    <Text modifiers="bold">Hover</Text>
-    {states.map((s) => (
-      <div key={s.label} className={s.noHover ? undefined : 'vs-hover'}>
-        {s.noHover ? null : renderCell(s.props)}
-      </div>
-    ))}
-  </div>
+  </Row>
 );
 
 export const States: Story = {

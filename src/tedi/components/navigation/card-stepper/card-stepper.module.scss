@@ -39,10 +39,14 @@
 }
 
 .tedi-card-stepper__nav-prev {
+  flex-shrink: 0;
+  min-width: var(--button-md-height);
   margin-left: calc(var(--layout-grid-gutters-04) - var(--card-padding-md-default));
 }
 
 .tedi-card-stepper__nav-next {
+  flex-shrink: 0;
+  min-width: var(--button-md-height);
   margin-right: calc(var(--layout-grid-gutters-04) - var(--card-padding-md-default));
 }
 
