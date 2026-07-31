@@ -55,7 +55,6 @@ const TemplateSizes: StoryFn<NumberFieldProps> = (args) => {
 
 export const Default: Story = {
   args: {
-    id: 'example-1',
     label: 'Label',
     defaultValue: 1,
     step: 1,
@@ -140,10 +139,8 @@ export const States: Story = {
 
 export const WithHint: Story = {
   args: {
-    id: 'example-1',
     label: 'Label',
     helper: {
-      id: 'example-3',
       text: 'Hint text',
       type: 'hint',
     },
@@ -151,7 +148,6 @@ export const WithHint: Story = {
 };
 export const Decimal: Story = {
   args: {
-    id: 'example-1',
     label: 'Label',
     defaultValue: 1.5,
     step: 0.25,
@@ -162,7 +158,6 @@ export const Decimal: Story = {
 
 export const WithUnit: Story = {
   args: {
-    id: 'example-2',
     label: 'Label',
     defaultValue: 2,
     step: 1,
@@ -174,7 +169,6 @@ export const WithUnit: Story = {
 
 export const FullWidth: Story = {
   args: {
-    id: 'example-3',
     label: 'Label',
     value: 2,
     step: 1,
