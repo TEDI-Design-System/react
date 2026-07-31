@@ -72,9 +72,11 @@ const PositionShowcase = ({
               <div
                 style={{
                   display: 'flex',
+                  flexShrink: 0,
                   flexDirection: 'column',
                   alignItems: 'flex-end',
                   textAlign: 'right',
+                  whiteSpace: 'nowrap',
                   paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
                 }}
               >
@@ -190,7 +192,7 @@ export const Position: Story = {
             <Timeline.Title>Taotluse esitamine</Timeline.Title>
             <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
             {label === 'Start' && (
-              <Collapse id="timeline-position-collapse" openText="Näita rohkem" closeText="Näita vähem">
+              <Collapse id="timeline-position-collapse" size="small" openText="Näita rohkem" closeText="Näita vähem">
                 <Text element="span" modifiers="small" color="tertiary">
                   Pärast otsuse teatavaks tegemist saab seda vajadusel vaidlustada.
                 </Text>
@@ -217,6 +219,26 @@ export const WithDescription: Story = {
         </>
       )}
     />
+  ),
+};
+
+/**
+ * The title and description default to `secondary` / `tertiary` text colours. Pass a `color`
+ * (any typography colour) to override them — e.g. to highlight the current step.
+ */
+export const CustomTextColor: Story = {
+  args: { activeIndex: 0 },
+  render: (args) => (
+    <Timeline {...args}>
+      <Timeline.Item timings={['2024', '16. detsember']}>
+        <Timeline.Title color="primary">Taotluse esitamine</Timeline.Title>
+        <Timeline.Description color="brand">Pärast taotluse esitamist võetakse see menetlusse.</Timeline.Description>
+      </Timeline.Item>
+      <Timeline.Item timings={['2025', '15. jaanuar']}>
+        <Timeline.Title>Menetlemine</Timeline.Title>
+        <Timeline.Description>Menetlemine võib võtta kuni 30 päeva.</Timeline.Description>
+      </Timeline.Item>
+    </Timeline>
   ),
 };
 

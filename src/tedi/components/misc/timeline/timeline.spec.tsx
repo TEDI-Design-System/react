@@ -56,6 +56,26 @@ describe('Timeline', () => {
     expect(container.querySelector('[class*="tedi-timeline--card"]')).toBeInTheDocument();
   });
 
+  it('defaults the title to secondary and the description to tertiary text colour', () => {
+    render(<Tree activeIndex={0} />);
+    expect(screen.getByText('First')).toHaveClass('tedi-text--secondary');
+    expect(screen.getByText('First description')).toHaveClass('tedi-text--tertiary');
+  });
+
+  it('lets the title / description text colour be overridden via the color prop', () => {
+    render(
+      <Timeline activeIndex={0}>
+        <Timeline.Item timings={['2020']}>
+          <Timeline.Title color="primary">Coloured title</Timeline.Title>
+          <Timeline.Description color="brand">Coloured description</Timeline.Description>
+        </Timeline.Item>
+      </Timeline>
+    );
+    expect(screen.getByText('Coloured title')).toHaveClass('tedi-text--primary');
+    expect(screen.getByText('Coloured title')).not.toHaveClass('tedi-text--secondary');
+    expect(screen.getByText('Coloured description')).toHaveClass('tedi-text--brand');
+  });
+
   it('renders timingsBottom content', () => {
     render(
       <Timeline activeIndex={0}>
