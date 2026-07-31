@@ -75,7 +75,7 @@ export const WithFooter: Story = {
               <Row>
                 <Col width={12} className="text-center">
                   <Button visualType="link" size="small" iconRight="schedule">
-                    Select time
+                    Vali kellaaeg
                   </Button>
                 </Col>
               </Row>
@@ -87,7 +87,7 @@ export const WithFooter: Story = {
             footer={
               <Row>
                 <Col width={12} className="text-center">
-                  <Button iconRight="arrow_forward">Search times</Button>
+                  <Button iconRight="arrow_forward">Otsi aegu</Button>
                 </Col>
               </Row>
             }
@@ -101,7 +101,7 @@ export const WithFooter: Story = {
               <Row>
                 <Col width={12} className="text-center">
                   <Button visualType="secondary" size="small">
-                    Cancel selection
+                    Tühista valik
                   </Button>
                 </Col>
               </Row>
@@ -115,10 +115,10 @@ export const WithFooter: Story = {
                 <Col width={12}>
                   <div className="flex gap-3">
                     <Button visualType="secondary" fullWidth size="small">
-                      Cancel
+                      Tühista
                     </Button>
                     <Button visualType="primary" fullWidth size="small">
-                      Save
+                      Salvesta
                     </Button>
                   </div>
                 </Col>
@@ -163,7 +163,7 @@ export const WithLegend: Story = {
                       borderRadius: '4px',
                     }}
                   ></div>{' '}
-                  Selected
+                  Valitud
                 </Col>
                 <Col width="auto" className="flex align-items-center gap-2">
                   <div
@@ -175,7 +175,7 @@ export const WithLegend: Story = {
                       borderRadius: '4px',
                     }}
                   ></div>{' '}
-                  Available
+                  Saadaval
                 </Col>
               </Row>
             }
@@ -243,14 +243,22 @@ export const Range: Story = {
       from: today,
       to: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 12),
     };
+    // Two-month range with `showOutsideDays={false}` so the second month has one
+    // clean start/end instead of the range restarting on its leading outside days.
+    const rangeAcrossMonths = {
+      from: new Date(2026, 6, 24),
+      to: new Date(2026, 7, 6),
+    };
 
     return (
       <VerticalSpacing>
         <CalendarTemplate mode="range" value={defaultRange} handleSelect={(d) => console.log('Range selected:', d)} />
         <CalendarTemplate
           mode="range"
-          value={defaultRange}
+          value={rangeAcrossMonths}
+          currentMonth={new Date(2026, 6, 1)}
           numberOfMonths={2}
+          showOutsideDays={false}
           handleSelect={(d) => console.log('Range selected:', d)}
           showNavigation={false}
         />
@@ -273,9 +281,7 @@ export const WithWeeksCount: Story = {
 };
 
 /**
- * Set `fullWidth` and wrap the calendar in a sized container — it fills that
- * width and scales its cells (and rows) to match. The container's width drives
- * the size.
+ * `fullWidth` fills the parent container, scaling cells to match its width.
  */
 export const FullWidthSizes: Story = {
   render: () => {
@@ -303,22 +309,17 @@ export const FullWidthSizes: Story = {
 };
 
 /**
- * Set `monthYearSelectType="static"` to disable month/year selection: the header
- * shows the month and year as a plain, non-clickable label. The user can only
- * change the month via the prev/next navigation buttons — there is no dropdown
- * or drill-down grid.
+ * `monthYearSelectType="static"` shows the month/year as a plain label — only
+ * the prev/next buttons change the month.
  */
 export const StaticMonthYear: Story = {
   render: () => <CalendarTemplate monthYearSelectType="static" />,
 };
 
 /**
- * Pass a `dayStatus` function `(date) => { type, label }` to overlay a
- * `StatusIndicator` dot on specific days. The `label` is folded into the day
- * button's `aria-label` so screen readers announce the status alongside the date
- * (the dot itself stays `aria-hidden`, satisfying WCAG 1.1.1). Pair the calendar
- * with a legend in the footer so colourblind users can decode the indicator
- * colours (WCAG 1.4.1 — colour is not the only cue).
+ * `dayStatus: (date) => { type, label }` overlays a `StatusIndicator` dot on a
+ * day; the `label` is added to its `aria-label`. Pair with a footer legend so
+ * colour isn't the only cue.
  */
 export const WithDayStatus: Story = {
   render: () => {

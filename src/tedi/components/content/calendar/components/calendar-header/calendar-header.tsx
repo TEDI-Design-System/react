@@ -127,7 +127,7 @@ export function CalendarHeader({
           <Text>{displayYear}</Text>
         </div>
       ) : isGridSelect ? (
-        <>
+        <div className={styles['tedi-calendar__title']}>
           <Button
             noStyle
             className={styles['tedi-calendar__month-year-selector']}
@@ -146,9 +146,9 @@ export function CalendarHeader({
             {displayMonth.getFullYear()}
             <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>
-        </>
+        </div>
       ) : (
-        <>
+        <div className={styles['tedi-calendar__title']}>
           <Dropdown
             className={classNames(styles['tedi-calendar__month-year-dropdown'], {
               [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
@@ -217,7 +217,7 @@ export function CalendarHeader({
               ))}
             </Dropdown.Content>
           </Dropdown>
-        </>
+        </div>
       )}
 
       {showNavigation && (
