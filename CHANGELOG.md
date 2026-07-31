@@ -1,3 +1,10 @@
+# [18.1.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.20...react-18.1.0-rc.21) (2026-07-31)
+
+
+### Bug Fixes
+
+* **number-field:** wcag fixes [#59](https://github.com/TEDI-Design-System/react/issues/59) ([#768](https://github.com/TEDI-Design-System/react/issues/768)) ([5a8f550](https://github.com/TEDI-Design-System/react/commit/5a8f550dbd12ef726d75a3d46dfc8b6faca5bbb2))
+
 # [18.1.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.19...react-18.1.0-rc.20) (2026-07-31)
 
 
