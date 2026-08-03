@@ -33,23 +33,6 @@ const options = [
   { value: 'haapsalu', label: 'Haapsalu' },
 ];
 
-const groupedOptions: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOption>> = [
-  {
-    label: 'American cities',
-    options: [
-      { value: 'new-york', label: 'New York' },
-      { value: 'dallas', label: 'Dallas' },
-    ],
-  },
-  {
-    label: 'Estonian cities',
-    options: [
-      { value: 'tallinn', label: 'Tallinn' },
-      { value: 'tartu', label: 'Tartu' },
-    ],
-  },
-];
-
 const TemplateSizes: StoryFn = (args) => (
   <Row>
     <Col lg={12} xs={12} className="example-list">
@@ -58,7 +41,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} id="select-size-default" {...args} />
+          <Select {...args} id="select-size-default" />
         </Col>
       </Row>
       <Row className="padding-14-16">
@@ -66,7 +49,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Small</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} size="small" id="select-size-default" {...args} />
+          <Select {...args} size="small" id="select-size-small" />
         </Col>
       </Row>
     </Col>
@@ -741,5 +724,28 @@ export const EditableSelect: Story = {
   args: {
     id: 'editable-example',
     label: 'Editable label',
+  },
+};
+
+/**
+ * **Mobile keyboard deferral.** For quick-pick searchable selects, the on-screen
+ * keyboard popping up the instant the menu opens can cover most of the screen.
+ * With `openKeyboardOnTouch={false}`, tapping the field on a touch/pen device
+ * opens the menu for browsing **without** raising the keyboard — the input is
+ * rendered with `inputMode="none"`. The keyboard appears only when the user
+ * taps the search input directly.
+ *
+ * This is touch-only: mouse and keyboard users are unaffected, and hardware
+ * typing is never blocked, so the combobox stays fully operable (WCAG 2.1.1).
+ * Best viewed on a real device or the Storybook mobile viewport.
+ */
+export const DeferKeyboardOnTouch: Story = {
+  args: {
+    id: 'defer-keyboard-example',
+    label: 'Address',
+    placeholder: 'Vali...',
+    options: options,
+    openKeyboardOnTouch: false,
+    isSearchable: true,
   },
 };
