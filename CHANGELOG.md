@@ -1,3 +1,10 @@
+# [18.1.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.23...react-18.1.0-rc.24) (2026-08-03)
+
+
+### Bug Fixes
+
+* **label:** move tooltip out of native label element [#729](https://github.com/TEDI-Design-System/react/issues/729) ([#762](https://github.com/TEDI-Design-System/react/issues/762)) ([8bb9568](https://github.com/TEDI-Design-System/react/commit/8bb9568e3c175c614eadac8170d843ea88634116))
+
 # [18.1.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.22...react-18.1.0-rc.23) (2026-08-03)
 
 
