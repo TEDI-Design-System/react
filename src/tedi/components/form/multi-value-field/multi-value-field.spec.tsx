@@ -57,14 +57,11 @@ describe('MultiValueField', () => {
     });
 
     it('gives the overflow counter an accessible label', async () => {
-      const { container } = render(
-        <MultiValueField {...defaultProps} tagsDirection="row" values={['one', 'two', 'three']} />
-      );
+      render(<MultiValueField {...defaultProps} tagsDirection="row" values={['one', 'two', 'three']} />);
 
-      await waitFor(() => expect(screen.getByText('+2')).toBeInTheDocument());
-      const counter = container.querySelector('.tedi-multi-value-field__overflow-tag');
-      expect(counter).toHaveAttribute('aria-label');
-      expect(counter?.getAttribute('aria-label')).toBeTruthy();
+      const counter = (await screen.findByText('+2')).closest('[role="status"]');
+      expect(counter).toHaveAccessibleName();
+      expect(counter).not.toHaveAccessibleName('+2');
     });
 
     it('attaches the ResizeObserver once the tags container mounts (starting empty)', () => {

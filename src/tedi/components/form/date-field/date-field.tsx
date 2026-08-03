@@ -799,8 +799,10 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   const triggerAriaControls = !useModalPicker ? (floatingAriaControls as string | undefined) : undefined;
 
+  const openCalendarLabel = getLabel('dateField.openCalendar');
+
   const calendarTriggerProps: React.ButtonHTMLAttributes<HTMLButtonElement> = {
-    'aria-label': getLabel('dateField.openCalendar'),
+    'aria-label': openCalendarLabel,
     'aria-expanded': useModalPicker ? modalOpen : open,
     'aria-haspopup': 'dialog',
     'aria-controls': triggerAriaControls,
@@ -823,7 +825,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
             onIconClick={openCalendar}
-            iconButtonProps={enableCalendar ? calendarTriggerProps : undefined}
+            iconButtonProps={enableCalendar ? calendarTriggerProps : { 'aria-label': openCalendarLabel }}
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -850,10 +852,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
-            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
             isClearable
             onIconClick={openCalendar}
-            iconButtonProps={enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : undefined}
+            iconButtonProps={
+              enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : { 'aria-label': openCalendarLabel }
+            }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             onBlur={(e) => {
               if (!shouldUseNativePicker) handleInputBlur();
@@ -881,7 +884,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
               ...((inputProps as TextFieldProps)?.input as UnknownType),
               ...(shouldUseNativePicker && { type: 'date' }),
               ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
-                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open, 'aria-controls': triggerAriaControls }
+                ? {
+                    role: 'combobox',
+                    'aria-haspopup': 'dialog',
+                    'aria-expanded': useModalPicker ? modalOpen : open,
+                    'aria-controls': triggerAriaControls,
+                  }
                 : {}),
             }}
           />
