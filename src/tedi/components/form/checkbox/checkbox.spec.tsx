@@ -161,8 +161,9 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(input).not.toHaveAttribute('aria-checked');
+    expect(input?.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
 
     const indeterminateIcon = container.querySelector('.tedi-checkbox__indicator--indeterminate');
@@ -174,8 +175,8 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" checked indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(input?.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
   });
 
@@ -184,8 +185,8 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(input?.indeterminate).toBe(true);
 
     if (input) {
       fireEvent.click(input);
@@ -193,7 +194,7 @@ describe('Checkbox component', () => {
 
     rerender(<Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" />);
 
-    expect(input).not.toHaveAttribute('aria-checked', 'mixed');
+    expect(input?.indeterminate).toBe(false);
   });
 
   it('calls labelRef.current.click() when clicked', () => {
@@ -217,16 +218,18 @@ describe('Checkbox component', () => {
     expect(screen.getByText('*')).toBeInTheDocument();
   });
 
-  it('exposes the required state programmatically via aria-required', () => {
+  it('exposes the required state via the native required attribute', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" required />);
 
-    expect(screen.getByRole('checkbox')).toHaveAttribute('aria-required', 'true');
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toBeRequired();
+    expect(checkbox).not.toHaveAttribute('aria-required');
   });
 
-  it('does not set aria-required when not required', () => {
+  it('is not required by default', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
 
-    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-required');
+    expect(screen.getByRole('checkbox')).not.toBeRequired();
   });
 
   it('exposes the invalid state programmatically via aria-invalid', () => {

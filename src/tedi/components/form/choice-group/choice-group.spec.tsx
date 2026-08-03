@@ -1,9 +1,15 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { useBreakpointProps } from '../../../helpers';
 import ChoiceGroup, { ChoiceGroupProps } from './choice-group';
 import { ChoiceGroupContext } from './choice-group-context';
 
 import '@testing-library/jest-dom';
+
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
 
 const defaultProps: ChoiceGroupProps = {
   id: 'test-choice-group',
@@ -20,6 +26,13 @@ const defaultProps: ChoiceGroupProps = {
 };
 
 describe('ChoiceGroup Component', () => {
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars, @typescript-eslint/no-explicit-any
+      getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => xs,
+    });
+  });
+
   it('renders correctly with required props', () => {
     render(
       <ChoiceGroupContext.Provider
@@ -161,6 +174,7 @@ describe('ChoiceGroup Component', () => {
     const group = screen.getByRole('radiogroup');
     expect(group).toHaveAttribute('aria-required', 'true');
     expect(group).toHaveAttribute('aria-invalid', 'true');
+    expect(group).toHaveAccessibleDescription('Please choose one');
 
     // The state lives on the group; the individual radios must not carry it.
     screen.getAllByRole('radio').forEach((radio) => {
