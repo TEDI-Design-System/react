@@ -161,9 +161,9 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    const input = screen.getByRole('checkbox') as HTMLInputElement;
     expect(input).not.toHaveAttribute('aria-checked');
-    expect(input?.indeterminate).toBe(true);
+    expect(input.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
 
     const indeterminateIcon = container.querySelector('.tedi-checkbox__indicator--indeterminate');
@@ -171,30 +171,26 @@ describe('Checkbox component', () => {
   });
 
   it('renders with indeterminate state and ignores checked', () => {
-    const { container } = render(
-      <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" checked indeterminate />
-    );
+    render(<Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" checked indeterminate />);
 
-    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
-    expect(input?.indeterminate).toBe(true);
+    const input = screen.getByRole('checkbox') as HTMLInputElement;
+    expect(input.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
   });
 
-  it('removes indeterminate state when clicked', () => {
-    const { container, rerender } = render(
+  it('clears the indeterminate state when the prop is removed', () => {
+    const { rerender } = render(
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
-    expect(input?.indeterminate).toBe(true);
+    const input = screen.getByRole('checkbox') as HTMLInputElement;
+    expect(input.indeterminate).toBe(true);
 
-    if (input) {
-      fireEvent.click(input);
-    }
-
+    // Rerender without the click so this asserts the prop-driven effect, not the
+    // native reset a checkbox click performs on `indeterminate`.
     rerender(<Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" />);
 
-    expect(input?.indeterminate).toBe(false);
+    expect(input.indeterminate).toBe(false);
   });
 
   it('calls labelRef.current.click() when clicked', () => {
