@@ -490,6 +490,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },
+  'file-dropzone.failed': {
+    description: 'Screen-reader status announced next to an invalid file in FileDropzone',
+    components: ['FileDropzone'],
+    et: 'Faili üleslaadimine ebaõnnestus',
+    en: 'File upload failed',
+    ru: 'Загрузка файла не удалась',
+  },
   'file-dropzone.no-file': {
     description: 'No file selected label for FileUpload or FileDropzone',
     components: ['FileDropzone', 'FileUpload'],
@@ -1259,25 +1266,29 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Нижний колонтитул',
   },
   'numberField.decrement': {
-    description: 'Label for screen-reader for number field decrease button',
+    description: 'Label for screen-reader for number field decrease button. Second argument is the field label.',
     components: ['NumberField'],
-    et: (count: string | number) => `Vähenda ${count} võrra`,
-    en: (count: string | number) => `Decrease by ${count}`,
-    ru: (count: string | number) => `Уменьшить на ${count}`,
+    et: (count: string | number, field?: string) =>
+      field ? `Vähenda välja "${field}" ${count} võrra` : `Vähenda ${count} võrra`,
+    en: (count: string | number, field?: string) => (field ? `Decrease ${field} by ${count}` : `Decrease by ${count}`),
+    ru: (count: string | number, field?: string) =>
+      field ? `Уменьшить «${field}» на ${count}` : `Уменьшить на ${count}`,
   },
   'numberField.increment': {
-    description: 'Label for screen-reader for number field increase button',
+    description: 'Label for screen-reader for number field increase button. Second argument is the field label.',
     components: ['NumberField'],
-    et: (count: string | number) => `Suurenda ${count} võrra`,
-    en: (count: string | number) => `Increase by ${count}`,
-    ru: (count: string | number) => `Увеличить на ${count}`,
+    et: (count: string | number, field?: string) =>
+      field ? `Suurenda välja "${field}" ${count} võrra` : `Suurenda ${count} võrra`,
+    en: (count: string | number, field?: string) => (field ? `Increase ${field} by ${count}` : `Increase by ${count}`),
+    ru: (count: string | number, field?: string) =>
+      field ? `Увеличить «${field}» на ${count}` : `Увеличить на ${count}`,
   },
   'numberField.quantityUpdated': {
     description: 'Label for screen-reader when quantity get updated by button click',
     components: ['NumberField'],
     et: (count: string | number) => `Uuendatud. Uus väärtus ${count}`,
     en: (count: string | number) => `Updated. New value ${count}`,
-    ru: (count: string | number) => `Ууэндатуд. Уус вяэртус ${count}`,
+    ru: (count: string | number) => `Обновлено. Новое значение ${count}`,
   },
   'sidenav.backToMainMenu': {
     description: 'Side navigation label',

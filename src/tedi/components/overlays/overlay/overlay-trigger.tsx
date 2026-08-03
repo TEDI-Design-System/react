@@ -21,11 +21,11 @@ export interface OverlayTriggerProps {
 export const OverlayTrigger = (props: OverlayTriggerProps) => {
   const { children, className } = props;
   const { getLabel } = useLabels();
-  const { getReferenceProps, reference, openWith, open, role, contentId } = useContext(OverlayContext);
+  const { getReferenceProps, reference, openWith, open, role, ariaHidden, contentId } = useContext(OverlayContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const refs = useMergeRefs([reference, (children as React.ComponentPropsWithRef<any>).ref]);
   const extraProps =
-    role === 'tooltip'
+    role === 'tooltip' && !ariaHidden
       ? {
           'aria-describedby': open ? contentId : undefined,
         }

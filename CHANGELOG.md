@@ -1,3 +1,45 @@
+# [18.1.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.22...react-18.1.0-rc.23) (2026-08-03)
+
+
+### Bug Fixes
+
+* **select:** wcag fixes [#58](https://github.com/TEDI-Design-System/react/issues/58) ([#767](https://github.com/TEDI-Design-System/react/issues/767)) ([6a58b71](https://github.com/TEDI-Design-System/react/commit/6a58b718f5306800b23b6d084f1e70d32fa7bda0)), closes [#551](https://github.com/TEDI-Design-System/react/issues/551)
+
+# [18.1.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.21...react-18.1.0-rc.22) (2026-07-31)
+
+
+### Bug Fixes
+
+* **button:** announce loading once and fix icon-only name duplication [#70](https://github.com/TEDI-Design-System/react/issues/70) ([#763](https://github.com/TEDI-Design-System/react/issues/763)) ([38724d9](https://github.com/TEDI-Design-System/react/commit/38724d9e19ac4ffb0292e97189a5a7b7d0a6301f))
+
+# [18.1.0-rc.21](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.20...react-18.1.0-rc.21) (2026-07-31)
+
+
+### Bug Fixes
+
+* **number-field:** wcag fixes [#59](https://github.com/TEDI-Design-System/react/issues/59) ([#768](https://github.com/TEDI-Design-System/react/issues/768)) ([5a8f550](https://github.com/TEDI-Design-System/react/commit/5a8f550dbd12ef726d75a3d46dfc8b6faca5bbb2))
+
+# [18.1.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.19...react-18.1.0-rc.20) (2026-07-31)
+
+
+### Bug Fixes
+
+* **file-dropzone:** wcag fixes [#54](https://github.com/TEDI-Design-System/react/issues/54) ([#770](https://github.com/TEDI-Design-System/react/issues/770)) ([a0996f5](https://github.com/TEDI-Design-System/react/commit/a0996f516b41f32b238fe62fe41aa8d733fdfc78))
+
+# [18.1.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.18...react-18.1.0-rc.19) (2026-07-29)
+
+
+### Bug Fixes
+
+* **table:** prevent update loop on server side pagination [#733](https://github.com/TEDI-Design-System/react/issues/733) ([#761](https://github.com/TEDI-Design-System/react/issues/761)) ([febec64](https://github.com/TEDI-Design-System/react/commit/febec64277eb1f0cbd5d6327e438b61c7790afa9))
+
+# [18.1.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.17...react-18.1.0-rc.18) (2026-07-29)
+
+
+### Bug Fixes
+
+* **search:** stop using placeholder as Search region name [#57](https://github.com/TEDI-Design-System/react/issues/57) ([#764](https://github.com/TEDI-Design-System/react/issues/764)) ([3e0bbc6](https://github.com/TEDI-Design-System/react/commit/3e0bbc647dfe43c27a257ba71e3919efda285ba0))
+
 # [18.1.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.16...react-18.1.0-rc.17) (2026-07-28)
 
 
