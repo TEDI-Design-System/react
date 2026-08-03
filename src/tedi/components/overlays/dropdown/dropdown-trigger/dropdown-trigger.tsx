@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import { cloneElement, ReactElement } from 'react';
+import { cloneElement, ReactElement, Ref } from 'react';
 
 import { useDropdownContext } from '../dropdown-context';
 
@@ -12,7 +12,10 @@ export type DropdownTriggerProps = {
 
 export const DropdownTrigger = ({ children }: DropdownTriggerProps) => {
   const { refs, getReferenceProps } = useDropdownContext();
-  const childRef = (children as ReactElement & { ref?: React.Ref<HTMLElement> }).ref ?? null;
+  const childRef =
+    (children.props as { ref?: Ref<HTMLElement> }).ref ??
+    (children as ReactElement & { ref?: Ref<HTMLElement> }).ref ??
+    null;
   const mergedRef = useMergeRefs([refs.setReference, childRef]);
 
   return cloneElement(

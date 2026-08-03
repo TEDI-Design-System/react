@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { ComponentProps } from 'react';
+import { ComponentProps, createRef } from 'react';
 
 import Tooltip, { TooltipProps } from './tooltip';
 
@@ -27,6 +27,25 @@ describe('Tooltip component', () => {
     const trigger = screen.getByText('Trigger content');
     expect(trigger.tagName).toBe('SPAN');
     expect(trigger).toHaveAttribute('tabIndex', '0');
+  });
+
+  it('preserves a consumer ref on the trigger child (merged, not clobbered by the props spread)', () => {
+    // Regression for #779: the merged floating-ui + consumer ref must be applied
+    // after `...children.props`, so a trigger child that carries its own ref still
+    // receives the DOM node (and floating-ui keeps its reference).
+    const ref = createRef<HTMLButtonElement>();
+    render(
+      <Tooltip>
+        <Tooltip.Trigger>
+          <button type="button" ref={ref}>
+            Open
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Tip</Tooltip.Content>
+      </Tooltip>
+    );
+
+    expect(ref.current).toBe(screen.getByRole('button', { name: 'Open' }));
   });
 
   it('shows tooltip content on hover', async () => {

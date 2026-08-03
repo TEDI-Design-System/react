@@ -22,12 +22,13 @@ export const TooltipTrigger = (props: TooltipTriggerProps): JSX.Element => {
   const { getLabel } = useLabels();
   const { getReferenceProps, reference, openWith } = React.useContext(TooltipContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const refs = useMergeRefs([reference, (children as React.ComponentPropsWithRef<any>).ref]);
+  const childElement = children as any;
+  const childRef = childElement?.props?.ref ?? childElement?.ref;
+  const refs = useMergeRefs([reference, childRef]);
 
   return React.cloneElement(
     children,
     getReferenceProps({
-      ref: refs,
       tabIndex: 0,
       label: children.type === Icon ? getLabel('tooltip.icon-trigger') : undefined,
       ...children.props,
@@ -36,6 +37,7 @@ export const TooltipTrigger = (props: TooltipTriggerProps): JSX.Element => {
         { [styles['tooltip__trigger--click']]: openWith === 'click' },
         children.props.className
       ),
+      ref: refs,
     })
   );
 };

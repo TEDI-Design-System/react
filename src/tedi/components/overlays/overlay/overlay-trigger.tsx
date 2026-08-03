@@ -22,8 +22,11 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
   const { children, className } = props;
   const { getLabel } = useLabels();
   const { getReferenceProps, reference, openWith, open, role, ariaHidden, contentId } = useContext(OverlayContext);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const refs = useMergeRefs([reference, (children as React.ComponentPropsWithRef<any>).ref]);
+  const childElement = children as any;
+  const childRef = childElement?.props?.ref ?? childElement?.ref;
+  const refs = useMergeRefs([reference, childRef]);
   const extraProps =
     role === 'tooltip' && !ariaHidden
       ? {
@@ -35,11 +38,11 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
     return cloneElement(
       children,
       getReferenceProps({
-        ref: refs,
         tabIndex: 0,
         ...extraProps,
         label: children.type === Icon ? getLabel('tooltip.icon-trigger') : undefined,
         ...children.props,
+        ref: refs,
       })
     );
   }
