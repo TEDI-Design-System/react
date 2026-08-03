@@ -238,6 +238,23 @@ describe('Checkbox component', () => {
     expect(screen.getByRole('checkbox')).toHaveAttribute('aria-invalid', 'true');
   });
 
+  it('associates the error helper text as the accessible description when invalid', () => {
+    render(
+      <Checkbox
+        id="checkbox-id"
+        label="Checkbox Label"
+        value="checkbox-value"
+        name="checkbox-group"
+        invalid
+        helper={{ text: 'This field is required', type: 'error' }}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toHaveAttribute('aria-invalid', 'true');
+    expect(checkbox).toHaveAccessibleDescription('This field is required');
+  });
+
   it('does not set aria-invalid when valid', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
 
