@@ -11,7 +11,10 @@ const meta: Meta<typeof InfoTooltip> = {
   title: 'TEDI-Ready/Components/Overlay/InfoTooltip',
   parameters: {
     status: {
-      type: ['devComponent'],
+      type: [
+        'devComponent',
+        { name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' },
+      ],
     },
   },
 };
