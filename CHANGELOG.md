@@ -1,3 +1,10 @@
+# [18.1.0-rc.23](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.22...react-18.1.0-rc.23) (2026-08-03)
+
+
+### Bug Fixes
+
+* **select:** wcag fixes [#58](https://github.com/TEDI-Design-System/react/issues/58) ([#767](https://github.com/TEDI-Design-System/react/issues/767)) ([6a58b71](https://github.com/TEDI-Design-System/react/commit/6a58b718f5306800b23b6d084f1e70d32fa7bda0)), closes [#551](https://github.com/TEDI-Design-System/react/issues/551)
+
 # [18.1.0-rc.22](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.21...react-18.1.0-rc.22) (2026-07-31)
 
 
