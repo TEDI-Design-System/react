@@ -799,6 +799,13 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   const triggerAriaControls = !useModalPicker ? (floatingAriaControls as string | undefined) : undefined;
 
+  const calendarTriggerProps: React.ButtonHTMLAttributes<HTMLButtonElement> = {
+    'aria-label': getLabel('dateField.openCalendar'),
+    'aria-expanded': useModalPicker ? modalOpen : open,
+    'aria-haspopup': 'dialog',
+    'aria-controls': triggerAriaControls,
+  };
+
   return (
     <>
       <div
@@ -816,16 +823,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
             onIconClick={openCalendar}
-            iconButtonProps={
-              enableCalendar
-                ? {
-                    'aria-label': getLabel('dateField.openCalendar'),
-                    'aria-expanded': useModalPicker ? modalOpen : open,
-                    'aria-haspopup': 'dialog',
-                    'aria-controls': triggerAriaControls,
-                  }
-                : undefined
-            }
+            iconButtonProps={enableCalendar ? calendarTriggerProps : undefined}
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -855,16 +853,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
             isClearable
             onIconClick={openCalendar}
-            iconButtonProps={
-              enableCalendar && !shouldUseNativePicker
-                ? {
-                    'aria-label': getLabel('dateField.openCalendar'),
-                    'aria-expanded': useModalPicker ? modalOpen : open,
-                    'aria-haspopup': 'dialog',
-                    'aria-controls': triggerAriaControls,
-                  }
-                : undefined
-            }
+            iconButtonProps={enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : undefined}
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
             onBlur={(e) => {
               if (!shouldUseNativePicker) handleInputBlur();
