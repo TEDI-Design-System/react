@@ -4,6 +4,15 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const excludeCommunity = process.env.STORYBOOK_EXCLUDE_COMMUNITY === 'true';
+
+const communityStories = [
+  '../src/community/docs/scale-layout/spacing.mdx',
+  '../src/community/docs/scale-layout/grid.mdx',
+  '../src/community/**/**/*.stories.tsx',
+  '../src/community/**/**/*.mdx',
+];
+
 const config: StorybookConfig = {
   stories: [
     '../src/tedi/docs/_welcome.mdx',
@@ -11,12 +20,9 @@ const config: StorybookConfig = {
     '../src/tedi/docs/changelog.mdx',
     '../src/tedi/docs/_badges.mdx',
     '../src/tedi/docs/colors/tedi-colors.mdx',
-    '../src/community/docs/scale-layout/spacing.mdx',
-    '../src/community/docs/scale-layout/grid.mdx',
     '../src/tedi/**/**/*.stories.tsx',
     '../src/tedi/**/**/*.mdx',
-    '../src/community/**/**/*.stories.tsx',
-    '../src/community/**/**/*.mdx',
+    ...(excludeCommunity ? [] : communityStories),
   ],
   addons: [
     '@storybook/addon-docs',

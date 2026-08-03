@@ -62,6 +62,9 @@ const preview: Preview = {
   },
   parameters: {
     viewMode: 'docs',
+    a11y: {
+      test: 'error',
+    },
     backgrounds: {
       options: {
         default: { name: 'default', value: 'var(--color-bg-default)' },
