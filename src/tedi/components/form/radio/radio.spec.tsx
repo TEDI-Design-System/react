@@ -228,4 +228,42 @@ describe('Radio component', () => {
 
     expect(screen.getByText('*')).toBeInTheDocument();
   });
+
+  it('exposes the required state via the native required attribute', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" required />);
+
+    expect(screen.getByRole('radio')).toBeRequired();
+  });
+
+  it('is not required by default', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" />);
+
+    expect(screen.getByRole('radio')).not.toBeRequired();
+  });
+
+  // `aria-required`/`aria-invalid` are not supported on the `radio` role — they
+  // belong on the radiogroup — so they must not be set on the input.
+  it('does not put aria-required or aria-invalid on the radio input', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" required invalid />);
+
+    const radio = screen.getByRole('radio');
+    expect(radio).not.toHaveAttribute('aria-required');
+    expect(radio).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('associates the error message with the radio when invalid', () => {
+    render(
+      <Radio
+        id="radio-id"
+        label="Radio Label"
+        value="radio-value"
+        name="radio-group"
+        invalid
+        helper={{ text: 'Something is wrong', type: 'error' }}
+      />
+    );
+
+    const radio = screen.getByRole('radio');
+    expect(radio).toHaveAccessibleDescription('Something is wrong');
+  });
 });

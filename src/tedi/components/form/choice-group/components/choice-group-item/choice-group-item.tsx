@@ -121,7 +121,6 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
             }
             tooltip={tooltip}
             data-testid="choice-group-item-indicator"
-            aria-checked={isChecked}
           />
         ) : (
           <>
