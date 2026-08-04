@@ -1,3 +1,10 @@
+# [18.1.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.25...react-18.1.0-rc.26) (2026-08-04)
+
+
+### Bug Fixes
+
+* **overlay:** fix floating element positioning on react 19 [#779](https://github.com/TEDI-Design-System/react/issues/779) ([#780](https://github.com/TEDI-Design-System/react/issues/780)) ([cecdeba](https://github.com/TEDI-Design-System/react/commit/cecdebacb65a06364e449dcd6bac36db20546328))
+
 # [18.1.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.24...react-18.1.0-rc.25) (2026-08-04)
 
 
