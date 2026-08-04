@@ -100,7 +100,7 @@
     }
   }
 
-  &:hover:not(.tedi-dropdown__item--active) {
+  &:hover:not(.tedi-dropdown__item--active, .tedi-dropdown__item--disabled) {
     color: var(--dropdown-item-hover-text);
     cursor: pointer;
     outline: 0;
