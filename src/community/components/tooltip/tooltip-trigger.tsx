@@ -3,6 +3,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon } from '../../../tedi/components/base/icon/icon';
+import { getElementRef } from '../../../tedi/helpers';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import styles from './tooltip.module.scss';
 import { TooltipContext } from './tooltip-provider';
@@ -21,9 +22,7 @@ export const TooltipTrigger = (props: TooltipTriggerProps): JSX.Element => {
   const { children } = props;
   const { getLabel } = useLabels();
   const { getReferenceProps, reference, openWith } = React.useContext(TooltipContext);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const childElement = children as any;
-  const childRef = childElement?.props?.ref ?? childElement?.ref;
+  const childRef = getElementRef(children);
   const refs = useMergeRefs([reference, childRef]);
 
   return React.cloneElement(

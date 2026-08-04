@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
 import { cloneElement, isValidElement, ReactNode, useContext } from 'react';
 
+import { getElementRef } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { OverlayContext } from './overlay';
@@ -23,9 +24,7 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
   const { getLabel } = useLabels();
   const { getReferenceProps, reference, openWith, open, role, ariaHidden, contentId } = useContext(OverlayContext);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const childElement = children as any;
-  const childRef = childElement?.props?.ref ?? childElement?.ref;
+  const childRef = isValidElement(children) ? getElementRef(children) : undefined;
   const refs = useMergeRefs([reference, childRef]);
   const extraProps =
     role === 'tooltip' && !ariaHidden

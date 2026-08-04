@@ -1,5 +1,6 @@
 import { cloneElement, JSX, MutableRefObject, Ref } from 'react';
 
+import { getElementRef } from '../../../../helpers';
 import { useModalContext } from '../modal-context';
 
 type AnyRef<T> = Ref<T> | undefined | null;
@@ -28,10 +29,10 @@ export interface ModalTriggerProps {
 export const ModalTrigger = ({ children }: ModalTriggerProps): JSX.Element => {
   const { getReferenceProps, reference } = useModalContext();
 
-  const existingRef =
-    (children as unknown as { ref?: Ref<unknown> }).ref ?? (children.props as { ref?: Ref<unknown> }).ref;
+  const existingRef = getElementRef(children);
   const mergedRef = mergeRefs(reference, existingRef as AnyRef<unknown>);
-  return cloneElement(children, getReferenceProps({ ref: mergedRef, ...children.props }));
+
+  return cloneElement(children, getReferenceProps({ ...children.props, ref: mergedRef }));
 };
 
 ModalTrigger.displayName = 'Modal.Trigger';
