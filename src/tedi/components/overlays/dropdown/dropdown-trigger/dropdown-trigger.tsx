@@ -1,7 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import { cloneElement, ReactElement } from 'react';
 
-import { getElementRef } from '../../../../helpers';
+import { getElementRef } from '../../../../helpers/get-element-ref';
 import { useDropdownContext } from '../dropdown-context';
 
 export type DropdownTriggerProps = {

@@ -1,6 +1,6 @@
 import { cloneElement, JSX, MutableRefObject, Ref } from 'react';
 
-import { getElementRef } from '../../../../helpers';
+import { getElementRef } from '../../../../helpers/get-element-ref';
 import { useModalContext } from '../modal-context';
 
 type AnyRef<T> = Ref<T> | undefined | null;

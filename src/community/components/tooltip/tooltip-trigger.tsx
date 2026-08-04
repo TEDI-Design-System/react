@@ -3,7 +3,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon } from '../../../tedi/components/base/icon/icon';
-import { getElementRef } from '../../../tedi/helpers';
+import { getElementRef } from '../../../tedi/helpers/get-element-ref';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import styles from './tooltip.module.scss';
 import { TooltipContext } from './tooltip-provider';

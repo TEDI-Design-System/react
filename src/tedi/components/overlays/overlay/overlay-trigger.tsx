@@ -2,7 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
 import { cloneElement, isValidElement, ReactNode, useContext } from 'react';
 
-import { getElementRef } from '../../../helpers';
+import { getElementRef } from '../../../helpers/get-element-ref';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { OverlayContext } from './overlay';
