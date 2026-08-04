@@ -73,10 +73,10 @@
     border-color: var(--form-checkbox-radio-default-border-active);
   }
 
-  .tedi-checkbox__input:not(:disabled) + &--hover,
-  .tedi-checkbox__input:hover:not(:disabled) + &,
-  .tedi-checkbox__input:not(:disabled) + &:hover,
-  .tedi-checkbox__input:focus:not(:disabled) + & {
+  .tedi-checkbox__input:not(:disabled, :checked) + &--hover:not(#{&}--indeterminate),
+  .tedi-checkbox__input:hover:not(:disabled, :checked) + &:not(#{&}--indeterminate),
+  .tedi-checkbox__input:not(:disabled, :checked) + &:not(#{&}--indeterminate):hover,
+  .tedi-checkbox__input:focus:not(:disabled, :checked) + &:not(#{&}--indeterminate) {
     cursor: pointer;
     outline: 1px solid var(--form-checkbox-radio-default-border-selected);
     border-color: var(--form-checkbox-radio-default-border-selected);

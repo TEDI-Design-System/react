@@ -145,7 +145,7 @@ div .tedi-select__menu {
   cursor: pointer;
   background-color: var(--form-input-background-default);
 
-  &:hover:not(.tedi-select__option--disabled) {
+  &:hover:not(.tedi-select__option--disabled, .tedi-select__option--selected) {
     background-color: var(--dropdown-item-hover-background);
   }
 
@@ -157,11 +157,6 @@ div .tedi-select__menu {
   &--selected {
     color: var(--dropdown-item-active-text);
     background-color: var(--dropdown-item-active-background);
-
-    &:hover:not(:disabled) {
-      color: var(--dropdown-item-hover-text);
-      background-color: var(--dropdown-item-hover-background);
-    }
   }
 
   &--selected {
@@ -169,14 +164,6 @@ div .tedi-select__menu {
     span,
     label {
       color: var(--dropdown-item-active-text);
-    }
-
-    &:hover:not(:disabled) {
-      p,
-      span,
-      label {
-        color: var(--dropdown-item-hover-text);
-      }
     }
   }
 
