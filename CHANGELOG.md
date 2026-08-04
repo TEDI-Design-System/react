@@ -1,3 +1,10 @@
+# [18.1.0-rc.25](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.24...react-18.1.0-rc.25) (2026-08-04)
+
+
+### Bug Fixes
+
+* **radio,checkbox,choice-group:** wcag criteria 9.4.1.2 fixes [#56](https://github.com/TEDI-Design-System/react/issues/56) ([#778](https://github.com/TEDI-Design-System/react/issues/778)) ([dbc4456](https://github.com/TEDI-Design-System/react/commit/dbc445613dbd3f17ce3a0da38c71a88610f1a576))
+
 # [18.1.0-rc.24](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.23...react-18.1.0-rc.24) (2026-08-03)
 
 
