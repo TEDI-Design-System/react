@@ -40,6 +40,10 @@ export interface DatePickerModalProps
   availableDays?: Date[] | ((date: Date) => boolean);
   footer?: React.ReactNode;
   monthYearSelectType?: 'dropdown' | 'grid';
+  /** Earliest year offered in the calendar header's year dropdown. @default currentYear - 100 */
+  minYear?: number;
+  /** Latest year offered in the calendar header's year dropdown. @default currentYear + 20 */
+  maxYear?: number;
   showNavigation?: boolean;
   selectionLevel?: CalendarView;
   /** Grid the calendar opens on, independent of `selectionLevel`. Defaults to `selectionLevel`. */
@@ -96,6 +100,8 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
     availableDays,
     footer,
     monthYearSelectType,
+    minYear,
+    maxYear,
     showNavigation,
     selectionLevel = 'days',
     initialView,
@@ -194,6 +200,8 @@ export const DatePickerModal = (props: DatePickerModalProps): JSX.Element => {
             availableDays={availableDays}
             footer={footer}
             monthYearSelectType={monthYearSelectType}
+            minYear={minYear}
+            maxYear={maxYear}
             showNavigation={showNavigation}
             handleSelect={handleSelect}
             applyValue={applyValue}

@@ -99,6 +99,18 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    */
   monthYearSelectType?: 'dropdown' | 'grid';
   /**
+   * Earliest year offered in the calendar header's year dropdown.
+   * Forwarded to the internal `CalendarHeader`.
+   * @default currentYear - 100
+   */
+  minYear?: number;
+  /**
+   * Latest year offered in the calendar header's year dropdown.
+   * Forwarded to the internal `CalendarHeader`.
+   * @default currentYear + 20
+   */
+  maxYear?: number;
+  /**
    * Callback fired when a date or date range is selected. Receives the selected value, day, modifiers, and event.
    */
   handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined>;
@@ -143,6 +155,8 @@ export const Calendar = ({
   unavailableDays,
   footer,
   monthYearSelectType,
+  minYear,
+  maxYear,
   handleSelect,
   applyValue,
   showNavigation = true,
@@ -257,6 +271,8 @@ export const Calendar = ({
                 showNavigation={showNavigation}
                 localeCode={localeCode}
                 disabledMatchers={computedDisabled.length ? computedDisabled : undefined}
+                minYear={minYear}
+                maxYear={maxYear}
               />
             ),
             Nav: () => <></>,

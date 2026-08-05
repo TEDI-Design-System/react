@@ -429,6 +429,7 @@ Sub-component: `List.Item`
 - `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
 - `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
 - `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header picker style
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown
 - `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
 - `required?: boolean`, `footer?: ReactNode`, `className?: string`
@@ -748,6 +749,7 @@ Same as Checkbox (without indeterminate)
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
 - `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown (defaults span 100 years back, 20 forward)
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
 - `initialView?: 'days' | 'months' | 'years' = selectionLevel` — grid the calendar opens on, independent of `selectionLevel`; e.g. `initialView="years"` with default `selectionLevel="days"` opens the year grid and drills year → month → day (pair with `monthYearSelectType="grid"`)
@@ -769,6 +771,8 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
   defaultValue={new Date(1990, 0, 1)}
   onSelect={(date) => console.log(date)}
   minDate={new Date(1900, 0, 1)}
+  minYear={1900}
+  maxYear={2010}
   disableFuture
 />
 

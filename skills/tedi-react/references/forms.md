@@ -148,6 +148,11 @@ const [date, setDate] = useState<Date>();
 />
 ```
 
+**Year dropdown range** — the header's year dropdown spans **100 years back and 20 forward** by default. Override with `minYear` / `maxYear` (e.g. a date-of-birth field):
+```tsx
+<DateField id="dob" label="Date of birth" minYear={1900} maxYear={2010} />
+```
+
 **Native picker on small screens** — uses `<input type="date">` below `md`, custom calendar from `md` up. Only valid with `mode="single"`:
 ```tsx
 <DateField id="dob" label="Date of birth" useNativePicker md={{ useNativePicker: false }} />
