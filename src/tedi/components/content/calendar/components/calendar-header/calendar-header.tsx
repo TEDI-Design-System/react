@@ -41,6 +41,14 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    * that has no selectable dates.
    */
   disabledMatchers?: Matcher[];
+  /**
+   * First year offered in the year dropdown. Defaults to the current year − 10.
+   */
+  minYear?: number;
+  /**
+   * Last year offered in the year dropdown. Defaults to the current year + 10.
+   */
+  maxYear?: number;
 }
 
 export function CalendarHeader({
@@ -51,6 +59,8 @@ export function CalendarHeader({
   showNavigation = true,
   localeCode,
   disabledMatchers,
+  minYear,
+  maxYear,
 }: CalendarHeaderProps) {
   const isGridSelect = monthYearSelectType === 'grid';
   const { getLabel } = useLabels();
@@ -63,7 +73,9 @@ export function CalendarHeader({
     new Date(displayYear, i, 1).toLocaleString(localeCode, { month: 'long' })
   );
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
+  const startYear = minYear ?? currentYear - 10;
+  const endYear = maxYear ?? currentYear + 10;
+  const years = Array.from({ length: Math.max(0, endYear - startYear + 1) }, (_, i) => startYear + i);
 
   const isRangeFullyDisabled = useCallback(
     (start: Date, end: Date): boolean => {
@@ -184,9 +196,9 @@ export function CalendarHeader({
               [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
             })}
             width="auto"
-            // Year list spans `currentYear ± 10`. When the visible year sits
-            // outside that window we omit the default so the dropdown opens
-            // at the top instead of trying to focus a non-existent index.
+            // Year list spans `minYear … maxYear` (default `currentYear ± 10`).
+            // When the visible year sits outside that window we omit the default
+            // so the dropdown opens at the top instead of focusing a non-existent index.
             defaultActiveIndex={years.indexOf(displayYear) === -1 ? undefined : years.indexOf(displayYear)}
           >
             <Dropdown.Trigger>

@@ -663,4 +663,16 @@ describe('DateField component', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
   });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
+    });
+  });
 });

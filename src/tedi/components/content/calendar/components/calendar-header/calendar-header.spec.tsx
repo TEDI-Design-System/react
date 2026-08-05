@@ -210,6 +210,19 @@ describe('CalendarHeader', () => {
     expect(called.getMonth()).toBe(defaultProps.calendarMonth.date.getMonth());
   });
 
+  it('limits the year dropdown to the minYear…maxYear range', async () => {
+    const user = userEvent.setup();
+
+    render(<CalendarHeader {...defaultProps} localeCode="et" minYear={1990} maxYear={1995} />);
+
+    await user.click(screen.getByRole('button', { name: /2025/i }));
+
+    expect(await screen.findByRole('menuitem', { name: '1990' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: '1995' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: '1989' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: '1996' })).not.toBeInTheDocument();
+  });
+
   it('disables month items whose entire month is unavailable via disabledMatchers', async () => {
     const user = userEvent.setup();
 

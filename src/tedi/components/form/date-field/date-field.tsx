@@ -75,6 +75,12 @@ type DateFieldBreakpointProps = {
    * count is kept: the months wrap to a vertical stack and the modal body scrolls.
    */
   numberOfMonths?: number;
+  /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
 };
 
 export interface DateFieldProps
@@ -171,6 +177,17 @@ export interface DateFieldProps
    * @default dropdown
    */
   monthYearSelectType?: 'dropdown' | 'grid';
+  /**
+   * First year offered in the calendar header's year dropdown. Use with `maxYear` to control how far
+   * the year dropdown reaches (e.g. a birthdate field going back further than the default 10 years).
+   * @default currentYear - 10
+   */
+  minYear?: number;
+  /**
+   * Last year offered in the calendar header's year dropdown.
+   * @default currentYear + 10
+   */
+  maxYear?: number;
   /**
    * Show or hide the calendar header's previous/next navigation. When hidden, the month/year header
    * also becomes a static, non-interactive label (no dropdown / grid jumping) — so the calendar is
@@ -317,6 +334,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     enableCalendar = true,
     calendarTrigger = 'button',
     numberOfMonths,
+    clearable = true,
   } = getCurrentBreakpointProps<DateFieldBreakpointProps>(props);
 
   const {
@@ -334,6 +352,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     showOutsideDays = true,
     parseDate,
     monthYearSelectType,
+    minYear,
+    maxYear,
     showNavigation = true,
     selectionLevel = 'days',
     initialView,
@@ -768,7 +788,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                 ? { 'aria-expanded': useModalPicker ? modalOpen : open, 'aria-haspopup': 'dialog' }
                 : undefined
             }
-            isClearable
+            isClearable={clearable}
             required={required}
             onChange={(newLabels) => {
               if (!Array.isArray(value)) return;
@@ -795,7 +815,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             placeholder={placeholder}
             icon="calendar_today"
             aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
-            isClearable
+            isClearable={clearable}
             onIconClick={openCalendar}
             iconButtonProps={
               enableCalendar && !shouldUseNativePicker
@@ -845,6 +865,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           availableDays={availableDays}
           footer={footer}
           monthYearSelectType={monthYearSelectType}
+          minYear={minYear}
+          maxYear={maxYear}
           showNavigation={showNavigation}
           selectionLevel={selectionLevel}
           initialView={initialView}
@@ -891,6 +913,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   availableDays={availableDays}
                   footer={footer}
                   monthYearSelectType={monthYearSelectType}
+                  minYear={minYear}
+                  maxYear={maxYear}
                   showNavigation={showNavigation}
                   handleSelect={handleSelect}
                   applyValue={applyValue}
