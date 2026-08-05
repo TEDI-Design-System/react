@@ -162,20 +162,27 @@ export const FieldOptions: StoryFn = () => {
     <Row>
       <Col lg={6} xs={12}>
         <div className="flex gap-4 flex-column">
-          <DateField id="date-default" label="Kuupäeva väli vaikimisi" placeholder="pp.kk.aaaa" mode="single" />
-
-          <DateField
-            id="date-with-hint"
-            label="Kuupäeva väli vihjega"
-            placeholder="pp.kk.aaaa"
-            mode="single"
-            inputProps={{ helper: { text: 'pp.kk.aaaa' } }}
-          />
+          <div>
+            <p style={{ marginBottom: '8px', display: 'block' }}>Default date field</p>
+            <DateField id="date-default" label="Kuupäev" placeholder="pp.kk.aaaa" mode="single" />
+          </div>
 
           <div>
+            <p style={{ marginBottom: '8px', display: 'block' }}>Date field with helper text</p>
+            <DateField
+              id="date-with-hint"
+              label="Kuupäev"
+              placeholder="pp.kk.aaaa"
+              mode="single"
+              inputProps={{ helper: { text: 'pp.kk.aaaa' } }}
+            />
+          </div>
+
+          <div>
+            <p style={{ marginBottom: '8px', display: 'block' }}>Date field with quick-select shortcuts</p>
             <DateField
               id="date-with-shortcuts"
-              label="Kuupäeva väli kiirvalikutega"
+              label="Kuupäev"
               placeholder="pp.kk.aaaa"
               mode="single"
               selected={shortcutValue}
@@ -346,9 +353,10 @@ export const MultipleTagLayout: Story = {
     return (
       <Row gutterY={3}>
         <Col xs={12} md={6}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Single row — overflow collapses into a +N counter</p>
           <DateField
             mode="multiple"
-            label="Üherealine (+N)"
+            label="Kuupäevad"
             placeholder="pp.kk.aaaa"
             tagsDirection="row"
             selected={rowValue}
@@ -357,9 +365,10 @@ export const MultipleTagLayout: Story = {
           />
         </Col>
         <Col xs={12} md={6}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Multiple rows (default) — the field grows in height</p>
           <DateField
             mode="multiple"
-            label="Mitmerealine (vaikimisi)"
+            label="Kuupäevad"
             placeholder="pp.kk.aaaa"
             tagsDirection="stack"
             selected={stackValue}
@@ -386,9 +395,10 @@ export const Range: Story = {
     return (
       <Row gutterY={3}>
         <Col lg={6} xs={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Default range</p>
           <DateField
             mode="range"
-            label="Vaikimisi vahemik"
+            label="Vahemik"
             placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={defaultRange}
             onSelect={(range) => setDefaultRange(range as DateRange)}
@@ -397,9 +407,10 @@ export const Range: Story = {
         </Col>
 
         <Col lg={6} xs={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Future dates disabled (min/max)</p>
           <DateField
             mode="range"
-            label="Vahemik keelatud tulevikuga"
+            label="Vahemik"
             placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={rangeWithLimits}
             onSelect={(range) => setRangeWithLimits(range as DateRange)}
@@ -410,9 +421,10 @@ export const Range: Story = {
         </Col>
 
         <Col lg={6} xs={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Start date only (no end selected)</p>
           <DateField
             mode="range"
-            label="Ainult alguskuupäev"
+            label="Vahemik"
             placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={startOnly}
             onSelect={(range) => setStartOnly(range as DateRange)}
@@ -421,9 +433,10 @@ export const Range: Story = {
         </Col>
 
         <Col lg={6} xs={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Past dates disabled</p>
           <DateField
             mode="range"
-            label="Vahemik keelatud minevikuga"
+            label="Vahemik"
             placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={disablePastRange}
             onSelect={(range) => setDisablePastRange(range as DateRange)}
@@ -432,9 +445,10 @@ export const Range: Story = {
           />
         </Col>
         <Col width={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Two months shown</p>
           <DateField
             mode="range"
-            label="Vahemik mitme kuuga"
+            label="Vahemik"
             placeholder="pp.kk.aaaa – pp.kk.aaaa"
             selected={defaultRange}
             onSelect={(range) => setDefaultRange(range as DateRange)}
@@ -503,23 +517,29 @@ export const YearGrid: Story = {
 export const GridPickerFirst: Story = {
   render: () => {
     return (
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-        <DateField
-          id="date-grid-year-first"
-          mode="single"
-          label="Aasta → kuu → päev"
-          placeholder="pp.kk.aaaa"
-          initialView="years"
-          monthYearSelectType="grid"
-        />
-        <DateField
-          id="date-grid-day-first"
-          mode="single"
-          label="Päev → kuu → aasta"
-          placeholder="pp.kk.aaaa"
-          monthYearSelectType="grid"
-        />
-      </div>
+      <Row>
+        <Col lg={6} xs={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Year → month → day</p>
+          <DateField
+            id="date-grid-year-first"
+            mode="single"
+            label="Kuupäev"
+            placeholder="pp.kk.aaaa"
+            initialView="years"
+            monthYearSelectType="grid"
+          />
+        </Col>
+        <Col lg={6} xs={12}>
+          <p style={{ marginBottom: '8px', display: 'block' }}>Day → month → year</p>
+          <DateField
+            id="date-grid-day-first"
+            mode="single"
+            label="Kuupäev"
+            placeholder="pp.kk.aaaa"
+            monthYearSelectType="grid"
+          />
+        </Col>
+      </Row>
     );
   },
 };
