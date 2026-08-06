@@ -48,6 +48,30 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
   attachmentProps?: FileDropzoneAttachmentProps;
 }
 
+/**
+ * Maps a comma-separated `accept` string to react-dropzone's accept-object shape
+ * (`{ [mime]: string[] }`) so the rendered input's `accept` attribute matches the
+ * prop exactly. Extensions are grouped under a wildcard key that react-dropzone
+ * drops from the attribute (it is not a valid MIME type) so only the extensions
+ * surface, while explicit MIME types stay as their own keys. Avoids the old
+ * hardcoded key that leaked the whole `application` wildcard family into the
+ * native picker and drag validation (#783).
+ */
+export const toDropzoneAccept = (accept?: string): Record<string, string[]> | undefined => {
+  if (!accept) return undefined;
+  return accept.split(',').reduce<Record<string, string[]>>((acc, token) => {
+    const value = token.trim();
+    if (!value) return acc;
+    if (value.startsWith('.')) {
+      acc['*/*'] = acc['*/*'] ?? [];
+      acc['*/*'].push(value);
+    } else {
+      acc[value] = acc[value] ?? [];
+    }
+    return acc;
+  }, {});
+};
+
 export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
   const { getLabel } = useLabels();
   const {
@@ -66,7 +90,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled,
-    accept: props.accept ? { 'application/*': [props.accept] } : undefined,
+    accept: toDropzoneAccept(props.accept),
     multiple: props.multiple,
     maxSize: props.maxSize ? props.maxSize * 1024 ** 2 : undefined,
     onDrop: (acceptedFiles, fileRejections = []) => {
@@ -113,7 +137,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         })}
         className={fileDropzoneBEM}
       >
-        <input {...getInputProps()} disabled={disabled} />
+        <input {...getInputProps()} style={{ display: 'none' }} disabled={disabled} />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}

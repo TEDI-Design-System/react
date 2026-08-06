@@ -134,14 +134,13 @@ describe('FileDropzone', () => {
     const useDropzoneMock = useDropzone as jest.Mock;
     const dropzoneProps = useDropzoneMock.mock.calls[0][0];
 
-    expect(dropzoneProps.accept).toEqual({ 'application/*': ['image/png'] });
+    expect(dropzoneProps.accept).toEqual({ 'image/png': [] });
     expect(dropzoneProps.multiple).toBe(true);
     expect(dropzoneProps.maxSize).toBe(5 * 1024 ** 2);
 
     const file = new File(['file content'], 'file.png', { type: 'image/png' });
     const rejectedFile = new File(['too big'], 'big.pdf', { type: 'application/pdf' });
-    // Oversize / wrong-type rejections must still reach the hook so it validates
-    // them and surfaces feedback (WCAG 9.1.3.1 #3).
+
     dropzoneProps.onDrop([file], [{ file: rejectedFile, errors: [{ code: 'file-too-large', message: 'too large' }] }]);
 
     expect(onFileChange).toHaveBeenCalledWith({
