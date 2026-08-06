@@ -436,6 +436,14 @@ describe('FileUpload component', () => {
       expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
     });
 
+    it('updates the hint live when showRestrictions changes on a mounted field', () => {
+      const { rerender } = render(<FileUpload {...defaultProps} showRestrictions />);
+      expect(screen.getByText(/file-upload\.accept/)).toBeInTheDocument();
+
+      rerender(<FileUpload {...defaultProps} showRestrictions={false} />);
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+
     it('still renders rejection errors when the hint is hidden', async () => {
       render(<FileUpload {...defaultProps} showRestrictions={false} />);
       const input = screen.getByLabelText(/Upload files/i);

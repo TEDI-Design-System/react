@@ -124,7 +124,8 @@ export const useFileUpload = (props: UseFileUploadProps) => {
 
   const restrictionsHint = showRestrictions ? getDefaultHelpers({ accept, maxSize }, getLabel) : undefined;
 
-  const [uploadErrorHelper, setUploadErrorHelper] = React.useState<FeedbackTextProps | undefined>(restrictionsHint);
+  const [errorHelper, setErrorHelper] = React.useState<FeedbackTextProps | undefined>(undefined);
+  const uploadErrorHelper = errorHelper ?? restrictionsHint;
 
   const [announcement, setAnnouncement] = React.useState<string>('');
   const isMounted = React.useRef(true);
@@ -229,10 +230,10 @@ export const useFileUpload = (props: UseFileUploadProps) => {
 
       if (rejectedFiles.length) {
         const errorText = getUploadErrorHelperText(rejectedFiles);
-        setUploadErrorHelper({ type: 'error', text: errorText });
+        setErrorHelper({ type: 'error', text: errorText });
         announce(errorText);
       } else {
-        setUploadErrorHelper(restrictionsHint);
+        setErrorHelper(undefined);
 
         if (addedCount > 0) {
           announce(getLabel('file-upload.success-added', addedCount.toString()));
@@ -256,7 +257,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onChange?.(newFiles);
 
     if (newFiles.length === 0) {
-      setUploadErrorHelper(restrictionsHint);
+      setErrorHelper(undefined);
     }
 
     announce(getLabel('file-upload.removed', file.name ?? ''));
@@ -274,7 +275,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       setInnerFiles([]);
     }
     onChange?.([]);
-    setUploadErrorHelper(restrictionsHint);
+    setErrorHelper(undefined);
 
     announce(getLabel('file-upload.cleared'));
 
