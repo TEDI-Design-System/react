@@ -55,6 +55,30 @@ Report issues or contribute via [GitHub Issues](https://github.com/TEDI-Design-S
 
 ---
 
+## AI Skills
+
+This project ships with AI agent skills to help both contributors and consumers work with TEDI components.
+
+### For consumers — `tedi-react`
+
+Helps you build UIs with `@tedi-design-system/react`: component usage, forms integration, and theming. Lives in [`skills/tedi-react`](./skills/tedi-react).
+
+Install it into your agent (Claude Code, Cursor, Codex, and others) with the [`skills`](https://www.skills.sh/tedi-design-system/react/tedi-react) CLI:
+
+```bash
+npx skills add https://github.com/tedi-design-system/react --skill tedi-react
+```
+
+### For contributors — `contributing`
+
+Guides development inside this repo: creating new components, running tests/lint, WCAG audits, refactoring, and Storybook stories. Available as `/contributing` when working in this repository.
+
+### For AI-driven design & UI generation — `DESIGN.md`
+
+[`DESIGN.md`](./DESIGN.md) is a machine-readable representation of the design system (semantic tokens + tedi-ready component rules) that AI coding agents read to ground generated UI in real TEDI tokens and components. It is paired with [`design-system-spec.json`](./design-system-spec.json), the manifest the Claude Design product uses to import and index the system. Both are generated from `@tedi-design-system/core` via `npm run design:build`, and the `update-design-docs` skill keeps their prose and the component manifest current.
+
+---
+
 ## Visual Testing
 
 <a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>

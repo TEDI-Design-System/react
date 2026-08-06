@@ -1,0 +1,1158 @@
+{
+  "import": "@tedi-design-system/react/tedi",
+  "components": [
+    {
+      "id": "base/typography/text/text",
+      "name": "Text",
+      "category": "base",
+      "sourcePath": "src/tedi/components/base/typography/text/text",
+      "status": [],
+      "description": "Render inline or block body text with a semantic element, size/weight modifiers, and a color token.",
+      "keyProps": [
+        "element",
+        "modifiers",
+        "color"
+      ]
+    },
+    {
+      "id": "base/typography/heading/heading",
+      "name": "Heading",
+      "category": "base",
+      "sourcePath": "src/tedi/components/base/typography/heading/heading",
+      "status": [],
+      "description": "Render a semantic h1-h6 heading styled via Text-style modifiers, decoupling heading level from visual size.",
+      "keyProps": [
+        "element",
+        "modifiers",
+        "color"
+      ]
+    },
+    {
+      "id": "base/icon/icon",
+      "name": "Icon",
+      "category": "base",
+      "sourcePath": "src/tedi/components/base/icon/icon",
+      "status": [],
+      "description": "Render a Material icon glyph by name with configurable size, color, fill, and an optional screen-reader label.",
+      "keyProps": [
+        "name",
+        "size",
+        "color",
+        "filled",
+        "label"
+      ]
+    },
+    {
+      "id": "content/carousel",
+      "name": "Carousel",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/carousel",
+      "status": [],
+      "description": "Compound slide carousel with an infinite-looping track, drag/wheel/keyboard navigation, and screen-reader announcements.",
+      "keyProps": [
+        "slidesPerView",
+        "gap",
+        "loop",
+        "centered",
+        "fade"
+      ]
+    },
+    {
+      "id": "content/list",
+      "name": "List",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/list",
+      "status": [],
+      "description": "Render an ordered or unordered list of List.Item children with an optional bullet style and color.",
+      "keyProps": [
+        "element",
+        "style",
+        "color"
+      ]
+    },
+    {
+      "id": "content/label/label",
+      "name": "Label",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/label/label",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render a form field label with optional required marker, bold/small styling, and a help tooltip.",
+      "keyProps": [
+        "children",
+        "required",
+        "isBold",
+        "tooltip",
+        "htmlFor"
+      ]
+    },
+    {
+      "id": "content/section/section",
+      "name": "Section",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/section/section",
+      "status": [],
+      "description": "Semantic landmark wrapper that renders as a section, article, aside, or div.",
+      "keyProps": [
+        "as"
+      ]
+    },
+    {
+      "id": "content/heading-with-icon/heading-with-icon",
+      "name": "HeadingWithIcon",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/heading-with-icon/heading-with-icon",
+      "status": [],
+      "description": "Render a heading paired with a leading icon as one composed unit.",
+      "keyProps": [
+        "name",
+        "element",
+        "children"
+      ]
+    },
+    {
+      "id": "content/truncate/truncate",
+      "name": "Truncate",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/truncate/truncate",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Clamp long text to a maximum length with an optional expand/collapse toggle to reveal the rest.",
+      "keyProps": [
+        "maxLength",
+        "expandable"
+      ]
+    },
+    {
+      "id": "content/table",
+      "name": "Table",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/table",
+      "status": [],
+      "description": "TanStack Table v8 wrapper supporting sorting, filtering, selection, pinning, expansion, reordering, and built-in pagination.",
+      "keyProps": [
+        "data",
+        "columns",
+        "pagination",
+        "sorting",
+        "rowSelection"
+      ]
+    },
+    {
+      "id": "content/text-group",
+      "name": "TextGroup",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/text-group",
+      "status": [],
+      "description": "Render a label/value pair, stacked vertically or inline horizontally with a configurable label width.",
+      "keyProps": [
+        "label",
+        "value",
+        "type",
+        "labelWidth"
+      ]
+    },
+    {
+      "id": "content/calendar/calendar",
+      "name": "Calendar",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/calendar/calendar",
+      "status": [],
+      "description": "Lower-level always-visible inline calendar primitive for scheduling grids or custom date controls; use DateField for plain date inputs.",
+      "keyProps": [
+        "mode",
+        "value",
+        "handleSelect",
+        "currentMonth",
+        "selectionLevel"
+      ]
+    },
+    {
+      "id": "loaders/spinner/spinner",
+      "name": "Spinner",
+      "category": "loaders",
+      "sourcePath": "src/tedi/components/loaders/spinner/spinner",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render an animated loading indicator with a configurable size and color.",
+      "keyProps": [
+        "size",
+        "color",
+        "label"
+      ]
+    },
+    {
+      "id": "loaders/skeleton",
+      "name": "Skeleton",
+      "category": "loaders",
+      "sourcePath": "src/tedi/components/loaders/skeleton",
+      "status": [],
+      "description": "Render placeholder blocks that mimic loading content shape before real content is ready.",
+      "keyProps": [
+        "children",
+        "label"
+      ]
+    },
+    {
+      "id": "loaders/progress-bar",
+      "name": "ProgressBar",
+      "category": "loaders",
+      "sourcePath": "src/tedi/components/loaders/progress-bar",
+      "status": [],
+      "description": "Render a labeled progress bar reporting a 0-100 value with accessible aria-valuenow semantics.",
+      "keyProps": [
+        "value",
+        "label",
+        "showValue",
+        "helper"
+      ]
+    },
+    {
+      "id": "tags/tag/tag",
+      "name": "Tag",
+      "category": "tags",
+      "sourcePath": "src/tedi/components/tags/tag/tag",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render a compact colored label, optionally closable and truncated with a hover popover for the full text.",
+      "keyProps": [
+        "color",
+        "onClose",
+        "ellipsis",
+        "isLoading"
+      ]
+    },
+    {
+      "id": "tags/status-badge/status-badge",
+      "name": "StatusBadge",
+      "category": "tags",
+      "sourcePath": "src/tedi/components/tags/status-badge/status-badge",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render a colored status pill with an optional icon and filled/bordered visual variant.",
+      "keyProps": [
+        "color",
+        "variant",
+        "status",
+        "icon"
+      ]
+    },
+    {
+      "id": "tags/status-indicator/status-indicator",
+      "name": "StatusIndicator",
+      "category": "tags",
+      "sourcePath": "src/tedi/components/tags/status-indicator/status-indicator",
+      "status": [],
+      "description": "Render a small decorative colored dot indicating a status (success, danger, warning, inactive), optionally positioned at a corner.",
+      "keyProps": [
+        "type",
+        "size",
+        "position",
+        "hasBorder"
+      ]
+    },
+    {
+      "id": "buttons/closing-button/closing-button",
+      "name": "ClosingButton",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/closing-button/closing-button",
+      "status": [],
+      "description": "Render an icon-only close (X) button used to dismiss modals, cards, or other dismissible surfaces.",
+      "keyProps": [
+        "size",
+        "color"
+      ]
+    },
+    {
+      "id": "buttons/button/button",
+      "name": "Button",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/button/button",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render a clickable action button with visual type/color variants, optional icons, loading state, and full-width layout.",
+      "keyProps": [
+        "visualType",
+        "color",
+        "size",
+        "iconLeft",
+        "isLoading"
+      ]
+    },
+    {
+      "id": "buttons/card-button/card-button",
+      "name": "CardButton",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/card-button/card-button",
+      "status": [],
+      "description": "Polymorphic interactive wrapper that turns a single Card into a clickable button or navigation link.",
+      "keyProps": [
+        "as",
+        "children",
+        "onClick"
+      ]
+    },
+    {
+      "id": "buttons/info-button/info-button",
+      "name": "InfoButton",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/info-button/info-button",
+      "status": [],
+      "description": "Render a small circular info-icon button, typically used to open supplementary help content.",
+      "keyProps": [
+        "isSmall",
+        "color"
+      ]
+    },
+    {
+      "id": "buttons/floating-button/floating-button",
+      "name": "FloatingButton",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/floating-button/floating-button",
+      "status": [],
+      "description": "Render a floating action button positioned over content, with configurable axis, size, and placement.",
+      "keyProps": [
+        "axis",
+        "size",
+        "position",
+        "placement"
+      ]
+    },
+    {
+      "id": "buttons/button-group/button-group",
+      "name": "ButtonGroup",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/button-group/button-group",
+      "status": [],
+      "description": "Group related buttons together with shared visual styling and single-selection tracking.",
+      "keyProps": [
+        "type",
+        "stretch",
+        "onSelectionChange"
+      ]
+    },
+    {
+      "id": "content/collapse/collapse",
+      "name": "Collapse",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/collapse/collapse",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Disclosure component with an optional title and a chevron toggle button that expands/collapses its content.",
+      "keyProps": [
+        "open",
+        "defaultOpen",
+        "title",
+        "onToggle",
+        "fullRowToggle"
+      ]
+    },
+    {
+      "id": "buttons/collapse-button/collapse-button",
+      "name": "CollapseButton",
+      "category": "buttons",
+      "sourcePath": "src/tedi/components/buttons/collapse-button/collapse-button",
+      "status": [],
+      "description": "Standalone, fully-controlled toggle button for expanding and collapsing external content.",
+      "keyProps": [
+        "open",
+        "onOpenChange",
+        "openText",
+        "closeText",
+        "hideText"
+      ]
+    },
+    {
+      "id": "layout/vertical-spacing",
+      "name": "VerticalSpacing",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/vertical-spacing",
+      "status": [],
+      "description": "Apply consistent vertical gaps between stacked child elements.",
+      "keyProps": [
+        "size",
+        "element"
+      ]
+    },
+    {
+      "id": "layout/grid",
+      "name": "Grid",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/grid",
+      "status": [],
+      "description": "Row/Col 12-column responsive grid layout primitives for arranging content, with breakpoint-aware width, gutter, and alignment props.",
+      "keyProps": [
+        "cols",
+        "gutter",
+        "width",
+        "offset",
+        "alignItems"
+      ]
+    },
+    {
+      "id": "layout/top-nav",
+      "name": "TopNav",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/top-nav",
+      "status": [],
+      "description": "Top navigation bar with flat links and mega-menu submenus that collapses into a mobile drawer below a breakpoint.",
+      "keyProps": [
+        "ariaLabel",
+        "mobileBreakpoint",
+        "submenuFit",
+        "maxWidth"
+      ]
+    },
+    {
+      "id": "layout/mobile-nav",
+      "name": "MobileNav",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/mobile-nav",
+      "status": [],
+      "description": "Full-screen drawer navigation for mobile viewports with drill-down levels for nested nav items.",
+      "keyProps": [
+        "navItems",
+        "ariaLabel",
+        "isOpen",
+        "onClose"
+      ]
+    },
+    {
+      "id": "notifications/alert/alert",
+      "name": "Alert",
+      "category": "notifications",
+      "sourcePath": "src/tedi/components/notifications/alert/alert",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render an inline banner message communicating info, success, warning, or danger, with an optional dismiss button.",
+      "keyProps": [
+        "type",
+        "title",
+        "onClose",
+        "icon"
+      ]
+    },
+    {
+      "id": "content/empty-state",
+      "name": "EmptyState",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/empty-state",
+      "status": [],
+      "description": "Render a placeholder block (icon, heading, description, and actions) shown when there is no content to display.",
+      "keyProps": [
+        "type",
+        "icon",
+        "heading",
+        "actions"
+      ]
+    },
+    {
+      "id": "notifications/toast/toast",
+      "name": "Toast",
+      "category": "notifications",
+      "sourcePath": "src/tedi/components/notifications/toast/toast",
+      "status": [],
+      "description": "Trigger transient toast notifications via sendNotification, rendered by a root-level ToastContainer.",
+      "keyProps": [
+        "type",
+        "title",
+        "children"
+      ]
+    },
+    {
+      "id": "content/card",
+      "name": "Card",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/card",
+      "status": [],
+      "description": "Render a bordered content surface composed from Card.Header, Card.Content, and Card.Notification sub-components.",
+      "keyProps": [
+        "padding",
+        "background",
+        "borderless"
+      ]
+    },
+    {
+      "id": "content/accordion",
+      "name": "Accordion",
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/accordion",
+      "status": [],
+      "description": "Compound collapsible-content component with one or more Accordion.Item entries, supporting single or multiple expansion.",
+      "keyProps": [
+        "allowMultiple",
+        "defaultExpanded",
+        "itemGap"
+      ]
+    },
+    {
+      "id": "navigation/breadcrumbs",
+      "name": "Breadcrumbs",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/breadcrumbs",
+      "status": [],
+      "description": "Render a trail of navigational crumbs with automatic separators, a mobile back-link variant, and collapsing for long trails.",
+      "keyProps": [
+        "children",
+        "variant",
+        "maxItems",
+        "ariaLabel"
+      ]
+    },
+    {
+      "id": "navigation/hash-trigger/hash-trigger",
+      "name": "HashTrigger",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/hash-trigger/hash-trigger",
+      "status": [],
+      "description": "Wrap content with an id so it can be located, optionally auto-scrolled to, and reported on when the URL hash matches it.",
+      "keyProps": [
+        "id",
+        "onMatch",
+        "scrollOnMatch"
+      ]
+    },
+    {
+      "id": "navigation/horizontal-stepper",
+      "name": "HorizontalStepper",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/horizontal-stepper",
+      "status": [],
+      "description": "Render a horizontal multi-step progress indicator with auto-numbered, selectable HorizontalStepper.Item steps.",
+      "keyProps": [
+        "children",
+        "compact",
+        "background"
+      ]
+    },
+    {
+      "id": "navigation/link/link",
+      "name": "Link",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/link/link",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render a styled navigational anchor with optional underline and leading/trailing icons; polymorphic for router link components.",
+      "keyProps": [
+        "href",
+        "underline",
+        "icon",
+        "iconLeft",
+        "as"
+      ]
+    },
+    {
+      "id": "navigation/pagination",
+      "name": "Pagination",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/pagination",
+      "status": [],
+      "description": "Render a page-number list with prev/next arrows, a results count, and an optional page-size selector; collapses to a mobile modal picker.",
+      "keyProps": [
+        "pageCount",
+        "page",
+        "onPageChange",
+        "totalItems",
+        "pageSize"
+      ]
+    },
+    {
+      "id": "navigation/table-of-contents",
+      "name": "TableOfContents",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/table-of-contents",
+      "status": [],
+      "description": "Navigational table of contents for long pages or multistep forms, composed from nestable TableOfContents.Item entries.",
+      "keyProps": [
+        "activeId",
+        "numbered",
+        "showIcons",
+        "sticky"
+      ]
+    },
+    {
+      "id": "navigation/tabs",
+      "name": "Tabs",
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/tabs",
+      "status": [],
+      "description": "Compound tabbed-navigation component composed from Tabs.List, Tabs.Trigger, and Tabs.Content, supporting controlled and uncontrolled active tab.",
+      "keyProps": [
+        "value",
+        "defaultValue",
+        "onChange"
+      ]
+    },
+    {
+      "id": "form/textfield/textfield",
+      "name": "TextField",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/textfield/textfield",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Single-line text input with a label, optional icon, clear button, size variants, and validation helper text.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "onChange",
+        "icon"
+      ]
+    },
+    {
+      "id": "form/textarea/textarea",
+      "name": "TextArea",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/textarea/textarea",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Multi-line text input extending TextField with an optional character-limit counter.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "onChange",
+        "characterLimit"
+      ]
+    },
+    {
+      "id": "form/number-field/number-field",
+      "name": "NumberField",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/number-field/number-field",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Numeric input with min/max/step constraints, an optional suffix, and increment controls.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "onChange",
+        "min"
+      ]
+    },
+    {
+      "id": "form/toggle/toggle",
+      "name": "Toggle",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/toggle/toggle",
+      "status": [],
+      "description": "Render an on/off switch control with a label, size, color, and optional lock icon or loading state.",
+      "keyProps": [
+        "id",
+        "label",
+        "checked",
+        "onChange",
+        "size"
+      ]
+    },
+    {
+      "id": "form/feedback-text/feedback-text",
+      "name": "FeedbackText",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/feedback-text/feedback-text",
+      "status": [],
+      "description": "Render hint, error, or valid feedback text below a form control, wired for aria-describedby association.",
+      "keyProps": [
+        "text",
+        "type",
+        "id",
+        "position"
+      ]
+    },
+    {
+      "id": "form/search/search",
+      "name": "Search",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/search/search",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "TextField variant with a built-in search button and onSearch callback for triggering a search action.",
+      "keyProps": [
+        "id",
+        "label",
+        "onSearch",
+        "button"
+      ]
+    },
+    {
+      "id": "form/radio/radio",
+      "name": "Radio",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/radio/radio",
+      "status": [],
+      "description": "Single radio input control, typically used within a ChoiceGroup for mutually-exclusive selection.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "checked",
+        "onChange"
+      ]
+    },
+    {
+      "id": "form/choice-group",
+      "name": "ChoiceGroup",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/choice-group",
+      "status": [],
+      "description": "Render a group of radio or checkbox items with a shared label, supporting a default or segmented visual variant.",
+      "keyProps": [
+        "items",
+        "inputType",
+        "value",
+        "onChange",
+        "variant"
+      ]
+    },
+    {
+      "id": "form/file-upload/file-upload",
+      "name": "FileUpload",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/file-upload/file-upload",
+      "status": [],
+      "description": "Button-triggered multi-file upload control with validation, size limits, and per-file progress/loading states.",
+      "keyProps": [
+        "id",
+        "name",
+        "accept",
+        "multiple",
+        "maxSize"
+      ]
+    },
+    {
+      "id": "form/file-dropzone/file-dropzone",
+      "name": "FileDropzone",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/file-dropzone/file-dropzone",
+      "status": [],
+      "description": "Drag-and-drop file upload area with validation, size limits, and per-file feedback via Attachment rows.",
+      "keyProps": [
+        "name",
+        "label",
+        "accept",
+        "multiple",
+        "maxSize"
+      ]
+    },
+    {
+      "id": "form/select/select",
+      "name": "Select",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/select/select",
+      "status": [],
+      "description": "Searchable dropdown select supporting single or multi-select, async option loading, and clearable selection.",
+      "keyProps": [
+        "id",
+        "label",
+        "options",
+        "value",
+        "onChange"
+      ]
+    },
+    {
+      "id": "form/time-field/time-field",
+      "name": "TimeField",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/time-field/time-field",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Time input with a wheel or fixed-slot grid picker popover, 24-hour \"HH:mm\" value, and a native-picker fallback.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "onChange",
+        "stepMinutes"
+      ]
+    },
+    {
+      "id": "form/time-picker/time-picker",
+      "name": "TimePicker",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/time-picker/time-picker",
+      "status": [],
+      "description": "Lower-level always-visible time-picker primitive (scroll-wheel or fixed-slot grid); use TimeField for plain time inputs.",
+      "keyProps": [
+        "value",
+        "onChange",
+        "stepMinutes",
+        "availableTimes"
+      ]
+    },
+    {
+      "id": "form/checkbox/checkbox",
+      "name": "Checkbox",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/checkbox/checkbox",
+      "status": [],
+      "description": "Single checkbox input control supporting a checked, unchecked, and indeterminate state.",
+      "keyProps": [
+        "id",
+        "label",
+        "checked",
+        "onChange",
+        "indeterminate"
+      ]
+    },
+    {
+      "id": "form/slider/slider",
+      "name": "Slider",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/slider/slider",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Range-input slider control with min/max/step, value tooltip, and optional companion input slot.",
+      "keyProps": [
+        "min",
+        "max",
+        "step",
+        "value",
+        "onChange"
+      ]
+    },
+    {
+      "id": "form/date-field/date-field",
+      "name": "DateField",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/date-field/date-field",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Date input with a calendar popover supporting single, multiple, and range selection, manual text entry, and a native-picker fallback.",
+      "keyProps": [
+        "id",
+        "label",
+        "mode",
+        "selected",
+        "onSelect"
+      ]
+    },
+    {
+      "id": "filter/filter",
+      "name": "Filter",
+      "category": "filter",
+      "sourcePath": "src/tedi/components/filter/filter",
+      "status": [],
+      "description": "Compact pill-shaped trigger for refining result sets, rendering as a toggle, single- or multi-select dropdown, or custom panel.",
+      "keyProps": [
+        "text",
+        "options",
+        "multiselect",
+        "selectedValue",
+        "selectedValues"
+      ]
+    },
+    {
+      "id": "form/date-time-field/date-time-field",
+      "name": "DateTimeField",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/date-time-field/date-time-field",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Combined date-and-time input with a calendar and time picker in one popover, supporting single or range selection.",
+      "keyProps": [
+        "id",
+        "label",
+        "mode",
+        "value",
+        "onChange"
+      ]
+    },
+    {
+      "id": "form/input-group",
+      "name": "InputGroup",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/input-group",
+      "status": [],
+      "description": "Compose an input with prefix/suffix addon slots that visually merge into a single control.",
+      "keyProps": [
+        "addons",
+        "helper",
+        "disabled",
+        "invalid"
+      ]
+    },
+    {
+      "id": "form/field/field",
+      "name": "Field",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/field/field",
+      "status": [],
+      "description": "Low-level controlled/uncontrolled input or textarea primitive used to build higher-level form controls.",
+      "keyProps": [
+        "id",
+        "value",
+        "onChange",
+        "isTextArea",
+        "invalid"
+      ]
+    },
+    {
+      "id": "overlays/tooltip",
+      "name": "Tooltip",
+      "category": "overlays",
+      "sourcePath": "src/tedi/components/overlays/tooltip",
+      "status": [],
+      "description": "Show contextual help text anchored to a trigger element on hover, click, or focus.",
+      "keyProps": [
+        "openWith"
+      ]
+    },
+    {
+      "id": "overlays/popover",
+      "name": "Popover",
+      "category": "overlays",
+      "sourcePath": "src/tedi/components/overlays/popover",
+      "status": [],
+      "description": "Show a floating panel of content anchored to a trigger element, opened by click.",
+      "keyProps": [
+        "openWith",
+        "dismissible",
+        "role",
+        "withBorder"
+      ]
+    },
+    {
+      "id": "overlays/dropdown",
+      "name": "Dropdown",
+      "category": "overlays",
+      "sourcePath": "src/tedi/components/overlays/dropdown",
+      "status": [],
+      "description": "Render a floating menu of Dropdown.Item actions anchored to a trigger element.",
+      "keyProps": [
+        "width",
+        "placement",
+        "divided",
+        "open"
+      ]
+    },
+    {
+      "id": "overlays/modal",
+      "name": "Modal",
+      "category": "overlays",
+      "sourcePath": "src/tedi/components/overlays/modal",
+      "status": [],
+      "description": "Portalled dialog with focus trapping, backdrop, and scroll locking, composed from Modal.Trigger, Modal.Content, Modal.Header, Modal.Body, and Modal.Footer.",
+      "keyProps": [
+        "open",
+        "defaultOpen",
+        "onToggle",
+        "role"
+      ]
+    },
+    {
+      "id": "misc/separator/separator",
+      "name": "Separator",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/separator/separator",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Render a horizontal or vertical divider line between content sections.",
+      "keyProps": [
+        "axis",
+        "color",
+        "variant",
+        "thickness"
+      ]
+    },
+    {
+      "id": "misc/print/print",
+      "name": "Print",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/print/print",
+      "status": [],
+      "description": "Control print-only visibility and CSS page/column break behavior for its child element(s).",
+      "keyProps": [
+        "visibility",
+        "breakBefore",
+        "breakAfter",
+        "breakInside"
+      ]
+    },
+    {
+      "id": "misc/stretch-content/stretch-content",
+      "name": "StretchContent",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/stretch-content/stretch-content",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": "Stretch a single child element to fill its container horizontally, vertically, or both.",
+      "keyProps": [
+        "direction",
+        "children"
+      ]
+    },
+    {
+      "id": "misc/scroll-visibility/scroll-visibility",
+      "name": "ScrollVisibility",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/scroll-visibility/scroll-visibility",
+      "status": [],
+      "description": "Show or hide (with animation) its child based on scroll position past a configurable distance/direction.",
+      "keyProps": [
+        "visibility",
+        "scrollDistance",
+        "scrollDirection",
+        "toggleVisibility"
+      ]
+    },
+    {
+      "id": "misc/scroll-fade/scroll-fade",
+      "name": "ScrollFade",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/scroll-fade/scroll-fade",
+      "status": [],
+      "description": "Wrap scrollable content with fade-edge overlays that appear when there is more content to scroll to.",
+      "keyProps": [
+        "fadePosition",
+        "fadeSize",
+        "scrollBar"
+      ]
+    },
+    {
+      "id": "misc/affix/affix",
+      "name": "Affix",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/affix/affix",
+      "status": [],
+      "description": "Pin content to the viewport via sticky or fixed positioning, offset relative to the page header.",
+      "keyProps": [
+        "position",
+        "top",
+        "bottom",
+        "relative"
+      ]
+    },
+    {
+      "id": "misc/attachment",
+      "name": "Attachment",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/attachment",
+      "status": [],
+      "description": "Render a file row with name, size, an optional icon and progress bar, and a slot for download/delete actions.",
+      "keyProps": [
+        "name",
+        "fileSize",
+        "actions",
+        "isLoading",
+        "isValid"
+      ]
+    },
+    {
+      "id": "misc/ellipsis/ellipsis",
+      "name": "Ellipsis",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/ellipsis/ellipsis",
+      "status": [],
+      "description": "Detect and truncate overflowing single-line text, exposing the full text via a tooltip.",
+      "keyProps": [
+        "children"
+      ]
+    },
+    {
+      "id": "misc/option-content/option-content",
+      "name": "OptionContent",
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/option-content/option-content",
+      "status": [
+        "devComponent"
+      ],
+      "description": "Reusable, non-interactive content template that lays out a selection indicator, icon, label, and meta for dropdown/select option rows.",
+      "keyProps": [
+        "type",
+        "layout",
+        "selected",
+        "icon",
+        "indicatorSemantics"
+      ]
+    },
+    {
+      "id": "layout/sidenav",
+      "name": "SideNav",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/sidenav",
+      "status": [],
+      "description": "Render a vertical side navigation menu with collapsible items and a mobile drawer toggle.",
+      "keyProps": [
+        "ariaLabel",
+        "navItems",
+        "collapsible",
+        "mobileBreakpoint"
+      ]
+    },
+    {
+      "id": "layout/footer",
+      "name": "Footer",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/footer",
+      "status": [],
+      "description": "Composable page footer built from Footer.Side, Footer.Body/Footer.Section, and Footer.Bottom slots, with a mobile-collapsed layout.",
+      "keyProps": [
+        "mobileBreakpoint",
+        "maxWidth",
+        "children"
+      ]
+    },
+    {
+      "id": "layout/header",
+      "name": "Header",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/header",
+      "status": [],
+      "description": "Composable site header built from Header.Logo, Header.Center, Header.Actions, and related sub-components, with mobile toggle support.",
+      "keyProps": [
+        "toggle",
+        "top",
+        "bottom",
+        "topAlignment"
+      ]
+    },
+    {
+      "id": "layout/show-at/show-at",
+      "name": "ShowAt",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/show-at/show-at",
+      "status": [],
+      "description": "Render children only at or above the given breakpoint(s), unmounting them otherwise.",
+      "keyProps": [
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ]
+    },
+    {
+      "id": "layout/hide-at/hide-at",
+      "name": "HideAt",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/hide-at/hide-at",
+      "status": [],
+      "description": "Hide (unmount) children at or above the given breakpoint(s), rendering them otherwise.",
+      "keyProps": [
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ]
+    }
+  ]
+}
