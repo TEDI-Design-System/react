@@ -128,6 +128,14 @@ export const labelsMap = validateDefaultLabels({
     en: 'Remove',
     ru: 'Удалить',
   },
+  'multi-value-field.hidden-count': {
+    description:
+      'Accessible label for the overflow counter shown in single-row (`tagsDirection="row"`) mode, announcing how many selected values are hidden.',
+    components: ['MultiValueField', 'DateField'],
+    et: (count: number) => `Veel ${count}`,
+    en: (count: number) => `${count} more`,
+    ru: (count: number) => `Ещё ${count}`,
+  },
   cancel: {
     description: 'For canceling an action',
     components: ['TableFilter'],
@@ -547,6 +555,21 @@ export const labelsMap = validateDefaultLabels({
     et: 'Valitud kuupäev pole saadaval',
     en: 'Selected date is not available',
     ru: 'Выбранная дата недоступна',
+  },
+  'dateField.invalidDateError': {
+    description:
+      'Inline error shown when the user types text that cannot be parsed into a valid date for the current mode.',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Vigane kuupäev',
+    en: 'Invalid date',
+    ru: 'Неверная дата',
+  },
+  'dateField.openCalendar': {
+    description: 'Accessible name for the calendar toggle button in the DateField input.',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Ava kalender',
+    en: 'Open calendar',
+    ru: 'Открыть календарь',
   },
   'dateTimeField.timeHeading': {
     description: 'Heading rendered above the time picker in DateTimeField',
