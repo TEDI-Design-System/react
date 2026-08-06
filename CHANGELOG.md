@@ -1,3 +1,10 @@
+# [18.1.0-rc.27](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.26...react-18.1.0-rc.27) (2026-08-06)
+
+
+### Features
+
+* **date-field:** multiple-tag layout, invalid-date error and a11y fixes [#721](https://github.com/TEDI-Design-System/react/issues/721) ([#759](https://github.com/TEDI-Design-System/react/issues/759)) ([a006f28](https://github.com/TEDI-Design-System/react/commit/a006f2813a28596c0e1f0b35a5f1d5a99ca76601))
+
 # [18.1.0-rc.26](https://github.com/TEDI-Design-System/react/compare/react-18.1.0-rc.25...react-18.1.0-rc.26) (2026-08-04)
 
 
