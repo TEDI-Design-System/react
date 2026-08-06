@@ -1,6 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
-import { LabelProvider } from '../../../providers/label-provider';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -24,13 +23,6 @@ const meta: Meta<typeof Collapse> = {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
   },
-  decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
-  ],
   argTypes: {
     title: { control: false },
     children: { control: false },

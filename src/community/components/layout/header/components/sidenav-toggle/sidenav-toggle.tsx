@@ -6,6 +6,9 @@ import Button from '../../../../button/button';
 import { LayoutContext } from '../../../layout-context';
 import styles from './sidenav-toggle.module.scss';
 
+/**
+ * @deprecated Use `SidenavToggle` from `@tedi-design-system/react/tedi` instead.
+ */
 export const SidenavToggle = () => {
   const { menuOpen, toggleMenu, reference, getReferenceProps, sideNavProps, onHeaderSidenavToggle } =
     React.useContext(LayoutContext);

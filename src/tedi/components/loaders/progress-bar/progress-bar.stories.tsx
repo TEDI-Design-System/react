@@ -8,8 +8,10 @@ import { ProgressBar, ProgressBarProps } from './progress-bar';
 const HINT = { text: 'Üleslaadimine', type: 'hint' } as const;
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=25616-189000&m=dev" target="_BLANK">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.49.74?node-id=25616-189000&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.tedi.ee/1ee8444b7/p/649f97-progress-bar" target="_BLANK">Zeroheight ↗</a>
  */
+
 const meta: Meta<typeof ProgressBar> = {
   component: ProgressBar,
   title: 'TEDI-Ready/Components/Loader/ProgressBar',

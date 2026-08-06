@@ -991,7 +991,9 @@ Sub-component: `VerticalSpacing.Item`
 
 - `children: ReactNode` (required)
 - `toggle?: ReactNode` — mobile side navigation toggle
+- `top?: ReactNode` — content in the top bar above the main header (e.g. language picker, top-level links, dark-mode toggle)
 - `bottom?: ReactNode` — content below header on mobile
+- bp `topAlignment?: HeaderAlignment = 'space-between'` — `justify-content` of the top bar content. `HeaderAlignment` = `'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly'`. Breakpoint-aware, e.g. `topAlignment="center" lg={{ topAlignment: 'space-between' }}` to center on mobile and spread on desktop.
 
 Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Language`, `Header.Login`, `Header.Logout`, `Header.Profile`, `Header.Role`, `Header.Search`
 
@@ -999,7 +1001,7 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 - `showLogo` is a simple boolean for feature flags or custom media queries. For responsive hiding at standard breakpoints, wrap with `<ShowAt>`/`<HideAt>` instead (e.g. `<ShowAt md><Header.Logo ... /></ShowAt>`).
 
-**Header.Center:** `children: ReactNode`, `alignment?: 'flex-start' | 'center' | 'space-between' = 'center'`
+**Header.Center:** `children: ReactNode`, `alignment?: HeaderAlignment = 'center'` (`'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly'`)
 **Header.Actions:** `children: ReactNode`
 
 **Header.Role:** `HeaderRoleProps`
@@ -1024,9 +1026,11 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 **Header.Language:** `HeaderLanguageProps`
 
-- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `isSelected?: boolean`, `aria-label?: string`
+- `languages: Language[]` (required) — `Language` has `label: string`, `locale?: TediLanguage`, `onClick?: (props: { onToggle }) => void`, `href?: string`, `isSelected?: boolean`, `aria-label?: string`
+  - `href` renders the option as a navigation anchor (`<a href>`) instead of triggering client-side `setLocale`; ignored when `onClick` is provided.
 - `currentLanguage?: string` — initially displayed label (falls back to matching locale or first item)
 - `selectLabel?: string` — label for the selector (falls back to i18n)
+- `labelPosition?: 'top' | 'left' = 'top'` — position of the select label relative to the trigger
 
 **Header.Login:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
 **Header.Logout:** bp — `size?: 'default' | 'small'` (auto `'small'` on mobile), `label?: string`, `onClick?: () => void`, `href?: string`
@@ -1493,7 +1497,7 @@ Sub-components: `Dropdown.Trigger`, `Dropdown.Content`, `Dropdown.Item`, `Dropdo
 
 Sub-components: `Popover.Trigger`, `Popover.Content`
 
-**Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`
+**Props:** `openWith?: 'click'`, `dismissible`, `role?: 'dialog'`, `withBorder?: boolean = false` — illustrative prominent border on the arrow side
 
 ### Modal
 
@@ -1765,10 +1769,10 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
-### Card
+### Card — **DEPRECATED** (use TEDI-Ready Card)
 
 - `border?: CardBorderType`, `borderless?: boolean`, `padding?: number`, `background?: CardBackground`
-- Sub-components: Card.Header, Card.Content, Card.Notification
+- Sub-components: Card.Header, Card.Content, Card.Notification (all deprecated — use the TEDI-Ready equivalents)
 
 ## Buttons
 
@@ -1782,22 +1786,24 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Radio — **DEPRECATED** (use TEDI-Ready Radio via ChoiceGroup)
 
-### Select
+### Select — **DEPRECATED** (use TEDI-Ready Select)
 
 - `id: string`, `options`, `value?`, `defaultValue?`, `onChange?`
 - `multiple?: boolean`, `async?: boolean`, `isSearchable?: boolean`, `isClearable?: boolean`
 
-### Toggle
+### Toggle — **DEPRECATED** (use TEDI-Ready Toggle)
 
 - `ariaLabel: string`, `label?`, `checked?`, `defaultChecked?`, `onChange?`
 - `size?: 'medium' | 'large'`, `color?: 'default' | 'alternative'`, `icon?`, `disabled?`
 
-### ChoiceGroup
+### ChoiceGroup — **DEPRECATED** (use TEDI-Ready ChoiceGroup)
 
 - `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
 - `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`
 
-### FileUpload
+### FileUpload — **DEPRECATED** (use TEDI-Ready FileUpload)
+
+> The community `FileUpload` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of the TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
 
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
 - `files?`, `defaultFiles?`, `onChange?`, `onDelete?`
@@ -1813,18 +1819,18 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `fieldOptions: TextFieldProps | SelectProps | DateTimePickerProps`
 - `content: ReactNode`
 
-### DateTimePicker
+### DateTimePicker — **DEPRECATED** (use TEDI-Ready DateTimeField)
 
 - Date/time picker using MUI x-date-pickers
 
 ## Navigation
 
-### Stepper
+### Stepper — **DEPRECATED** (use TEDI-Ready HorizontalStepper)
 
 - `activeStep?`, `defaultActiveStep?: number`, `onActiveStepChange?`
 - `allowStepLabelClick?: boolean`, `ariaLabel: string`, `card?: CardProps | boolean`
 
-### Tabs
+### Tabs — **DEPRECATED** (use TEDI-Ready Tabs)
 
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
@@ -1838,7 +1844,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Dropdown — **DEPRECATED** (use TEDI-Ready Dropdown)
 
-### Modal
+### Modal — **DEPRECATED** (use TEDI-Ready Modal)
 
 - `size?: 12 | 10 | 8 | 6`, `position?: 'center' | 'right' | 'bottom'`
 - `lockScroll?: boolean`, `trapFocus?: boolean`, `returnFocus?: boolean`
@@ -1854,14 +1860,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Tag — **DEPRECATED** (use TEDI-Ready Tag)
 
-### Status
+### Status — **DEPRECATED** (use TEDI-Ready StatusIndicator)
 
 - `type: 'error' | 'success' | 'inactive' | 'warning'`
 - `tooltipContent?: ReactNode`
 
 ## Table
 
-### Table (TanStack React Table wrapper)
+### Table (TanStack React Table wrapper) — **DEPRECATED** (use TEDI-Ready Table)
 
 - `data: TData[]`, `columns: ColumnDef[]`
 - `pagination?`, `sorting?`, `rowSelection?`, `columnPinning?`
@@ -1875,10 +1881,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ## Layout
 
-### Header
+### Header — **DEPRECATED** (use TEDI-Ready Header)
 
 - Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
-- **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
+- **Note:** The TEDI-Ready Header is available with a different sub-component API. `HeaderLanguage` and `HeaderRole` are deprecated too — prefer the TEDI-Ready equivalents.
+
+### SideNav — **DEPRECATED** (use TEDI-Ready SideNav)
+
+- Sub-components: SideNavItem (also `SidenavToggle`, deprecated — use the TEDI-Ready equivalents)
 
 ### Footer — **DEPRECATED** (use TEDI-Ready Footer)
 
@@ -1886,7 +1896,7 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 
 ## Misc
 
-### Placeholder (empty state)
+### Placeholder (empty state) — **DEPRECATED** (use TEDI-Ready EmptyState)
 
 - `icon?: string | IconProps | ReactNode`, `cardProps?`, `isNested?: boolean`
 
@@ -1899,7 +1909,7 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 
 - `children: ReactNode`, `onItemOpen: (index: number) => void`
 
-### ToggleOpen
+### ToggleOpen — **DEPRECATED** (use TEDI-Ready CollapseButton)
 
 - `openText: string`, `closeText: string`, `isOpen: boolean`
 

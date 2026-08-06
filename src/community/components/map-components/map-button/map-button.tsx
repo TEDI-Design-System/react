@@ -1,11 +1,27 @@
 import cn from 'classnames';
 import { JSX, useState } from 'react';
 
-import { Button, ButtonProps, Icon, Tooltip } from '../../../../tedi';
+import { Button, ButtonProps, Icon, Spinner, Tooltip } from '../../../../tedi';
 import MapDropdown, { MapDropdownItem } from '../map-dropdown/map-dropdown';
 import styles from './map-button.module.scss';
 
-export interface MapButtonProps extends Omit<ButtonProps, 'size'> {
+/**
+ * Button props that don't apply to MapButton because it renders `<Button noStyle>` with its own
+ * fixed styling. Omitted so the public API only advertises props that actually work here.
+ */
+type OmittedButtonProps =
+  | 'size'
+  | 'icon'
+  | 'iconLeft'
+  | 'iconRight'
+  | 'visualType'
+  | 'color'
+  | 'fullWidth'
+  | 'showTooltip'
+  | 'noStyle'
+  | 'renderWrapperElement';
+
+export interface MapButtonProps extends Omit<ButtonProps, OmittedButtonProps> {
   /**
    * Size of the button. Can be:
    * - `'default'` – standard size.
@@ -13,8 +29,8 @@ export interface MapButtonProps extends Omit<ButtonProps, 'size'> {
    */
   size?: 'default' | 'small';
   /**
-   * Name of the icon to display inside the button (e.g., Material Symbols name).
-   * If set, the icon appears alongside or instead of the label.
+   * Name of the icon to display above the label (e.g., Material Symbols name).
+   * Replaced by a spinner while `isLoading` is `true`.
    */
   icon?: string;
   /**
@@ -49,6 +65,10 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
     hideLabel = false,
     tooltipContent = children,
     dropdownItems,
+    isActive,
+    isHovered,
+    underline,
+    isLoading,
     ...rest
   } = props;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -59,18 +79,26 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
     styles[`tedi-map-button--${size}`],
     isSelected && styles['tedi-map-button--selected'],
     dropdownItems && styles['tedi-map-button--dropdown'],
+    isActive && styles['tedi-map-button--is-active'],
+    isHovered && styles['tedi-map-button--is-hovered'],
+    underline && styles['tedi-map-button--underline'],
+    isLoading && styles['tedi-map-button--loading'],
     className
   );
 
   const buttonContent = (
     <>
-      {icon && <Icon name={icon} className={styles['tedi-map-button__icon']} size={size === 'small' ? 24 : 18} />}
+      {isLoading ? (
+        <Spinner size={size === 'small' ? 16 : 18} className={styles['tedi-map-button__icon']} />
+      ) : (
+        icon && <Icon name={icon} className={styles['tedi-map-button__icon']} size={size === 'small' ? 24 : 18} />
+      )}
       {!hideLabel && <div className={cn(styles['tedi-map-button__text'])}>{children}</div>}
     </>
   );
 
   const buttonElement = (
-    <Button noStyle className={mapButtonBEM} size={size} {...rest}>
+    <Button noStyle isLoading={isLoading} className={mapButtonBEM} size={size} {...rest}>
       {buttonContent}
     </Button>
   );

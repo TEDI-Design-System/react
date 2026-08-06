@@ -161,8 +161,9 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = screen.getByRole('checkbox') as HTMLInputElement;
+    expect(input).not.toHaveAttribute('aria-checked');
+    expect(input.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
 
     const indeterminateIcon = container.querySelector('.tedi-checkbox__indicator--indeterminate');
@@ -170,30 +171,26 @@ describe('Checkbox component', () => {
   });
 
   it('renders with indeterminate state and ignores checked', () => {
-    const { container } = render(
-      <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" checked indeterminate />
-    );
+    render(<Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" checked indeterminate />);
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = screen.getByRole('checkbox') as HTMLInputElement;
+    expect(input.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
   });
 
-  it('removes indeterminate state when clicked', () => {
-    const { container, rerender } = render(
+  it('clears the indeterminate state when the prop is removed', () => {
+    const { rerender } = render(
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = screen.getByRole('checkbox') as HTMLInputElement;
+    expect(input.indeterminate).toBe(true);
 
-    if (input) {
-      fireEvent.click(input);
-    }
-
+    // Rerender without the click so this asserts the prop-driven effect, not the
+    // native reset a checkbox click performs on `indeterminate`.
     rerender(<Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" />);
 
-    expect(input).not.toHaveAttribute('aria-checked', 'mixed');
+    expect(input.indeterminate).toBe(false);
   });
 
   it('calls labelRef.current.click() when clicked', () => {
@@ -215,5 +212,48 @@ describe('Checkbox component', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" required />);
 
     expect(screen.getByText('*')).toBeInTheDocument();
+  });
+
+  it('exposes the required state via the native required attribute', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" required />);
+
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toBeRequired();
+    expect(checkbox).not.toHaveAttribute('aria-required');
+  });
+
+  it('is not required by default', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
+
+    expect(screen.getByRole('checkbox')).not.toBeRequired();
+  });
+
+  it('exposes the invalid state programmatically via aria-invalid', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" invalid />);
+
+    expect(screen.getByRole('checkbox')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('associates the error helper text as the accessible description when invalid', () => {
+    render(
+      <Checkbox
+        id="checkbox-id"
+        label="Checkbox Label"
+        value="checkbox-value"
+        name="checkbox-group"
+        invalid
+        helper={{ text: 'This field is required', type: 'error' }}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toHaveAttribute('aria-invalid', 'true');
+    expect(checkbox).toHaveAccessibleDescription('This field is required');
+  });
+
+  it('does not set aria-invalid when valid', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
+
+    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
   });
 });

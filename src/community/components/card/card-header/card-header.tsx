@@ -48,6 +48,9 @@ export interface CardHeaderAsButton extends Partial<React.ButtonHTMLAttributes<H
   role: 'button';
 }
 
+/**
+ * @deprecated Use `CardHeader` from `@tedi-design-system/react/tedi` instead.
+ */
 export const CardHeader = (props: CardHeaderProps): JSX.Element => {
   const { variant, ...restOfProps } = props;
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);

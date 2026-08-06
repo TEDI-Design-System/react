@@ -6,6 +6,11 @@ import FileUpload from './file-upload';
 const meta: Meta<typeof FileUpload> = {
   component: FileUpload,
   title: 'Community/Form/FileUpload',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -164,7 +164,13 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
 
   return (
     <ChoiceGroupContext.Provider value={ContextValue}>
-      <fieldset {...rest} className={FieldSetBEM} id={id} name={name} aria-describedby={helperId}>
+      <fieldset
+        {...rest}
+        className={FieldSetBEM}
+        id={id}
+        name={name}
+        aria-describedby={helper && inputType !== 'radio' ? helperId : undefined}
+      >
         {label && typeof label === 'string' ? (
           <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} renderWithoutLabel={true} />
         ) : (
@@ -203,6 +209,9 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
                   className={CheckGroupBEM}
                   role={inputType === 'radio' ? 'radiogroup' : undefined}
                   aria-labelledby={inputType === 'radio' ? id : undefined}
+                  aria-describedby={inputType === 'radio' && helper ? helperId : undefined}
+                  aria-required={inputType === 'radio' && required ? true : undefined}
+                  aria-invalid={inputType === 'radio' && helper?.type === 'error' ? true : undefined}
                 >
                   {items.map((item) => (
                     <ChoiceGroupItem

@@ -25,6 +25,9 @@ export interface ToggleOpenProps extends Omit<ButtonProps, 'children' | 'iconRig
   iconRight?: Partial<IconProps>;
 }
 
+/**
+ * @deprecated Use `CollapseButton` from `@tedi-design-system/react/tedi` instead.
+ */
 export const ToggleOpen = ({ openText, closeText, isOpen, iconRight, ...rest }: ToggleOpenProps): JSX.Element => {
   const ToggleOpenBEM = cn(
     { [styles['toggle--open']]: isOpen },

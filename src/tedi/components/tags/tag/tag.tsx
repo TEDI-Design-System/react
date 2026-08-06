@@ -57,6 +57,15 @@ export interface TagProps extends BreakpointSupport<TagBreakpointProps> {
    * @default false
    */
   isLoading?: boolean;
+  /**
+   * Overrides the Tag's implicit live-region role. Tags default to `role="status"`
+   * so they are announced by assistive tech. When a Tag is rendered as static
+   * content inside a list — and additions/removals are announced elsewhere — pass
+   * e.g. `role="presentation"` so it is not read as a live status, which otherwise
+   * makes some screen readers (e.g. JAWS) announce the content twice on focus.
+   * @default 'status'
+   */
+  role?: React.AriaRole;
 }
 
 export const Tag = (props: TagProps): JSX.Element => {
@@ -69,6 +78,7 @@ export const Tag = (props: TagProps): JSX.Element => {
     isLoading = false,
     color = 'primary',
     ellipsis = false,
+    role = 'status',
     ...rest
   } = getCurrentBreakpointProps<TagProps>(props);
 
@@ -81,7 +91,7 @@ export const Tag = (props: TagProps): JSX.Element => {
   );
 
   return (
-    <div className={tagBEM} role="status" aria-live={isLoading ? 'polite' : undefined} {...rest}>
+    <div className={tagBEM} role={role} aria-live={isLoading ? 'polite' : undefined} {...rest}>
       {color === 'danger' && (
         <div className={styles['tedi-tag__icon-wrapper']}>
           <Icon name="info" color="danger" size={16} className={styles['tedi-tag__icon--error']} />

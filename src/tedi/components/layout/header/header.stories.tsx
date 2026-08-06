@@ -2,13 +2,15 @@ import { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useGlobals } from 'storybook/preview-api';
 
+import { getSubcomponentProps, subcomponentArgTypes } from '../../../../../.storybook/subcomponent-controls';
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
-import { useLabels } from '../../../providers/label-provider';
+import { LabelProvider, useLabels } from '../../../providers/label-provider';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
+import Button from '../../buttons/button/button';
 import { EmptyState } from '../../content/empty-state/empty-state';
 import { Search } from '../../form/search/search';
 import Link from '../../navigation/link/link';
@@ -17,7 +19,7 @@ import { HideAt } from '../hide-at/hide-at';
 import { ShowAt } from '../show-at/show-at';
 import { SideNav } from '../sidenav';
 import { Representative } from './components/header-role/header-role-representatives';
-import { Header, HeaderActions, HeaderCenter, HeaderLogo, HeaderLogoProps } from './header';
+import { Header, HeaderActions, HeaderAlignment, HeaderCenter, HeaderLogo, HeaderLogoProps } from './header';
 
 const STORAGE_KEY = 'tedi-theme';
 
@@ -40,6 +42,11 @@ const meta: Meta<typeof Header> = {
     'Header.Search': Header.Search,
   } as never,
   decorators: [
+    (Story) => (
+      <LabelProvider locale="et">
+        <Story />
+      </LabelProvider>
+    ),
     (Story) => {
       const [globals, updateGlobals] = useGlobals();
       const originalThemeRef = useRef<string | null>(null);
@@ -64,10 +71,23 @@ const meta: Meta<typeof Header> = {
   ],
   parameters: {
     layout: 'fullscreen',
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?m=dev&node-id=6380-53060',
     },
+  },
+  argTypes: {
+    bottom: { control: false },
+    children: { control: false },
+    toggle: { control: false },
+    top: { control: false },
+    topAlignment: { control: false },
   },
 };
 
@@ -92,6 +112,64 @@ const languages = [
     locale: 'ru' as const,
   },
 ];
+
+const languagesWithHref = [
+  {
+    'aria-label': 'Estonian',
+    label: 'EST',
+    href: '#et',
+    isSelected: true,
+  },
+  {
+    'aria-label': 'English',
+    label: 'ENG',
+    href: '#en',
+  },
+  {
+    'aria-label': 'Russian',
+    label: 'RUS',
+    href: '#ru',
+  },
+];
+
+const languageLinks = [
+  {
+    'aria-label': 'Eesti keeles',
+    label: 'Eesti keeles',
+    locale: 'et' as const,
+  },
+  {
+    'aria-label': 'In English',
+    label: 'In English',
+    locale: 'en' as const,
+  },
+  {
+    'aria-label': 'На русском',
+    label: 'На русском',
+    locale: 'ru' as const,
+  },
+];
+
+const LanguageLinks = () => {
+  const { setLocale, locale } = useLabels();
+  const visibleLanguages = languageLinks.filter((language) => language.locale !== locale);
+
+  return (
+    <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-16)', alignItems: 'center' }}>
+      {visibleLanguages.map((language) => (
+        <Button
+          key={language.label}
+          visualType="link"
+          underline
+          aria-label={language['aria-label']}
+          onClick={() => setLocale(language.locale)}
+        >
+          {language.label}
+        </Button>
+      ))}
+    </div>
+  );
+};
 
 const representatives: Representative[] = [
   { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person' } },
@@ -176,7 +254,7 @@ const organizations2 = [{ id: 'org-2', name: 'Tartu Linnavalitsus' }];
 const logo = <img src="header-logo.svg" alt="Logo" />;
 const logoDark = <img src="header-logo-white.svg" alt="Logo (Dark Mode)" />;
 
-const profileTranslations = {
+const translations = {
   myData: { et: 'Minu andmed', en: 'My data', ru: 'Мои данные' },
   representatives: { et: 'Esindatavad', en: 'Representatives', ru: 'Представители' },
   contacts: { et: 'Kontaktid', en: 'Contacts', ru: 'Контакты' },
@@ -191,18 +269,43 @@ const profileTranslations = {
   personalCode: { et: 'Isikukood', en: 'Personal code', ru: 'Личный код' },
   role: { et: 'Roll', en: 'Role', ru: 'Роль' },
   representative: { et: 'Esindatav', en: 'Representative', ru: 'Представитель' },
+  individual: { et: 'Eraisik', en: 'Individual', ru: 'Частное лицо' },
+  business: { et: 'Ettevõtja', en: 'Business', ru: 'Предприниматель' },
 } as const;
 
-const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
+const DarkModeToggle = () => {
   const { theme, setTheme } = useTheme();
   const { locale = 'en' } = useLabels();
   const id = useId();
 
-  const t = (key: keyof typeof profileTranslations) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const label = translations.darkMode[locale] ?? translations.darkMode.et;
 
   const handleToggle = () => {
     setTheme(theme === 'dark' ? 'default' : 'dark');
   };
+
+  return (
+    <div>
+      <Toggle id={id} onChange={handleToggle} label={label} checked={theme === 'dark'} />
+    </div>
+  );
+};
+
+const ProfileExample = ({
+  showLogout = true,
+  darkModeSwitch = 'always',
+}: {
+  showLogout?: boolean;
+  /**
+   * Where the dark-mode toggle appears:
+   * - `always` — shown in the profile on every breakpoint
+   * - `mobile` — shown in the profile only below `lg` (e.g. when the toggle lives in the top bar on desktop)
+   */
+  darkModeSwitch?: 'always' | 'mobile';
+}) => {
+  const { locale = 'en' } = useLabels();
+
+  const t = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <>
@@ -226,12 +329,19 @@ const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
         </div>
       </Link>
 
-      <ShowAt lg>
-        <Separator axis="horizontal" />
-      </ShowAt>
-      <div>
-        <Toggle id={id} onChange={handleToggle} label={t('darkMode')} checked={theme === 'dark'} />
-      </div>
+      {darkModeSwitch === 'always' && (
+        <>
+          <ShowAt lg>
+            <Separator axis="horizontal" />
+          </ShowAt>
+          <DarkModeToggle />
+        </>
+      )}
+      {darkModeSwitch === 'mobile' && (
+        <HideAt lg>
+          <DarkModeToggle />
+        </HideAt>
+      )}
 
       <ShowAt lg>
         <Separator axis="horizontal" />
@@ -243,7 +353,7 @@ const ProfileExample = ({ showLogout = true }: { showLogout?: boolean }) => {
 
 const AccessibilityLink = () => {
   const { locale = 'en' } = useLabels();
-  const label = profileTranslations.accessibility[locale] ?? profileTranslations.accessibility.et;
+  const label = translations.accessibility[locale] ?? translations.accessibility.et;
 
   return (
     <Link underline={false} href="#">
@@ -257,7 +367,7 @@ const AccessibilityLink = () => {
 
 const NavigationLinks = () => {
   const { locale = 'en' } = useLabels();
-  const pt = (key: keyof typeof profileTranslations) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const pt = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <>
@@ -279,7 +389,7 @@ const NavigationLinks = () => {
 
 const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
   const { locale = 'en' } = useLabels();
-  const pt = (key: keyof typeof profileTranslations) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const pt = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
   return (
     <SideNav
@@ -296,11 +406,11 @@ const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
   );
 };
 
-type StoryTranslateFn = (key: keyof typeof profileTranslations) => string;
+type StoryTranslateFn = (key: keyof typeof translations) => string;
 
 const WithTranslations = ({ children }: { children: (t: StoryTranslateFn) => React.ReactNode }) => {
   const { locale = 'en' } = useLabels();
-  const t: StoryTranslateFn = (key) => profileTranslations[key][locale] ?? profileTranslations[key].et;
+  const t: StoryTranslateFn = (key) => translations[key][locale] ?? translations[key].et;
   return <>{children(t)}</>;
 };
 
@@ -344,15 +454,52 @@ const ResponsiveLogo = (props: HeaderLogoProps) => {
   return <Header.Logo {...props} showLogo={show} />;
 };
 
-export const Default: Story = {
-  render: () => (
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(HeaderLogo, {
+      category: 'Header.Logo',
+      prefix: 'logo',
+      exclude: ['logo', 'logoDark', 'className'],
+    }),
+    ...subcomponentArgTypes(HeaderCenter, {
+      category: 'Header.Center',
+      prefix: 'center',
+      exclude: ['children', 'className'],
+    }),
+    ...subcomponentArgTypes(Header.Language, {
+      category: 'Header.Language',
+      prefix: 'language',
+      exclude: ['languages', 'className'],
+    }),
+    ...subcomponentArgTypes(Header.Login, {
+      category: 'Header.Login',
+      prefix: 'login',
+      exclude: ['onClick', 'className'],
+    }),
+  },
+  args: {
+    logo__href: '#',
+    login__href: '#',
+  },
+  parameters: {
+    docs: {
+      source: {
+        type: 'code',
+      },
+    },
+  },
+  render: (args: Record<string, unknown>) => (
     <StoryWrapper>
       {({ isOpen, setIsOpen }) => (
         <div style={{ display: 'flex', flexDirection: 'column', ...(isOpen && { height: '100vh' }) }}>
           <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
-            <Header.Logo logoDark={logoDark} logo={logo} href="#" />
+            <Header.Logo
+              logoDark={logoDark}
+              logo={logo}
+              {...getSubcomponentProps<{ showLogo?: boolean; href?: string }>(args, 'logo')}
+            />
             <ShowAt lg>
-              <Header.Center>
+              <Header.Center {...getSubcomponentProps<{ alignment?: HeaderAlignment }>(args, 'center')}>
                 <Link underline={false} href="#">
                   Link text
                 </Link>
@@ -365,9 +512,18 @@ export const Default: Story = {
               </Header.Center>
             </ShowAt>
             <Header.Actions>
-              <Header.Language languages={languages} currentLanguage={languages[0].label} />
+              <Header.Language
+                languages={languages}
+                {...getSubcomponentProps<{
+                  currentLanguage?: string;
+                  selectLabel?: string;
+                  labelPosition?: 'top' | 'left';
+                }>(args, 'language')}
+              />
               <Separator axis="vertical" />
-              <Header.Login href="#" />
+              <Header.Login
+                {...getSubcomponentProps<{ size?: 'default' | 'small'; label?: string; href?: string }>(args, 'login')}
+              />
             </Header.Actions>
           </Header>
 
@@ -926,6 +1082,158 @@ export const WithStandaloneLogoutButton: Story = {
   ),
 };
 
+export const WithTopHeader: Story = {
+  render: () => (
+    <WithTranslations>
+      {(t) => (
+        <Header
+          topAlignment="center"
+          lg={{ topAlignment: 'space-between' }}
+          top={
+            <>
+              <ShowAt lg>
+                <LanguageLinks />
+              </ShowAt>
+              <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-08)', alignItems: 'center' }}>
+                <Link
+                  underline={false}
+                  href="#"
+                  aria-current="page"
+                  style={{ color: 'var(--link-primary-active)', fontWeight: 'var(--body-bold-weight)' }}
+                >
+                  {t('individual')}
+                </Link>
+                <Link href="#">{t('business')}</Link>
+              </div>
+              <ShowAt lg>
+                <DarkModeToggle />
+              </ShowAt>
+            </>
+          }
+        >
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('personalCode')}:
+                  </Text>
+                }
+                representatives={representatives}
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <HideAt lg>
+              <Header.Language languages={languages} />
+              <Separator axis="vertical" />
+            </HideAt>
+            <Header.Profile showLabel>
+              <HideAt lg>
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('organization')}:
+                    </Text>
+                  }
+                  representatives={organizations}
+                  isOrganization
+                />
+                <Header.Role
+                  showSearch
+                  label={
+                    <Text modifiers="bold" color="secondary">
+                      {t('role')}:
+                    </Text>
+                  }
+                  representatives={representatives}
+                />
+                <AccessibilityLink />
+              </HideAt>
+              <ProfileExample darkModeSwitch="mobile" />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
+  ),
+};
+
+export const WithTopHeaderAndLanguageDropdown: Story = {
+  render: () => (
+    <WithTranslations>
+      {(t) => (
+        <Header
+          topAlignment="center"
+          lg={{ topAlignment: 'space-between' }}
+          top={
+            <>
+              <ShowAt lg>
+                <Header.Language languages={languages} labelPosition="left" />
+              </ShowAt>
+              <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-08)', alignItems: 'center' }}>
+                <Link
+                  underline={false}
+                  href="#"
+                  aria-current="page"
+                  style={{ color: 'var(--link-primary-active)', fontWeight: 'var(--body-bold-weight)' }}
+                >
+                  {t('individual')}
+                </Link>
+                <Link href="#">{t('business')}</Link>
+              </div>
+              <ShowAt lg>
+                <DarkModeToggle />
+              </ShowAt>
+            </>
+          }
+        >
+          <Header.Logo logoDark={logoDark} logo={logo} />
+          <Header.Actions>
+            <ShowAt lg>
+              <AccessibilityLink />
+              <Separator axis="vertical" />
+              <Header.Role
+                showSearch
+                label={
+                  <Text modifiers={['small', 'bold']} color="secondary">
+                    {t('organization')}
+                  </Text>
+                }
+                representatives={organizations}
+                isOrganization
+              />
+              <Separator axis="vertical" />
+            </ShowAt>
+            <HideAt lg>
+              <Header.Language languages={languages} />
+              <Separator axis="vertical" />
+            </HideAt>
+            <Header.Profile showLabel>
+              <ProfileExample darkModeSwitch="mobile" />
+            </Header.Profile>
+          </Header.Actions>
+        </Header>
+      )}
+    </WithTranslations>
+  ),
+};
+
 export const WithInlineSearch: Story = {
   render: () => (
     <WithTranslations>
@@ -1068,6 +1376,33 @@ export const WithCustomRoleContent: Story = {
         </Header>
       )}
     </WithTranslations>
+  ),
+};
+
+export const LanguageWithNavigationLinks: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: `
+By default each language option calls \`setLocale\` for client-side i18n. For apps that switch
+language by navigating to a localized URL, give each language an \`href\` instead.
+The option then renders as a real \`<a href>\` anchor, so
+it keeps native link behavior — open in a new tab, middle-click, right-click, and working
+without JavaScript. \`href\` is ignored when a custom \`onClick\` is provided.
+
+This demo uses hash fragments (\`#et\`, \`#en\`, \`#ru\`) so selecting a language stays within Storybook;
+real apps would point these at localized URLs (e.g. \`/et\`, \`/en\`, \`/ru\`).
+`,
+      },
+    },
+  },
+  render: () => (
+    <Header>
+      <Header.Logo logoDark={logoDark} logo={logo} />
+      <Header.Actions>
+        <Header.Language languages={languagesWithHref} />
+      </Header.Actions>
+    </Header>
   ),
 };
 

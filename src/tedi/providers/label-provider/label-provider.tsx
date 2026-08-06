@@ -63,13 +63,13 @@ export const LabelContext = React.createContext<ILabelContext>({
       console.error('LabelProvider missing! Application must be wrapped with <LabelProvider>');
     }
   },
-  locale: 'en',
+  locale: 'et',
 });
 
 export interface LabelProviderProps<TRecord extends TediLabelEntryRecord<TRecord> = Record<string, never>> {
   /**
    * Global labels that are use in components. If omitted then default labels are used based on `locale` prop.
-   * If both props are omitted then English translations are used by default
+   * If both props are omitted then Estonian translations are used by default
    */
   labels?: TRecord | TediLabelValuesRecord;
   /**
@@ -77,7 +77,7 @@ export interface LabelProviderProps<TRecord extends TediLabelEntryRecord<TRecord
    * et - Estonian<br />
    * en - English<br />
    * ru - Russian
-   * @default en
+   * @default et
    */
   locale?: TediLanguage;
   /**
@@ -89,7 +89,7 @@ export interface LabelProviderProps<TRecord extends TediLabelEntryRecord<TRecord
 export const LabelProvider = <TRecord extends TediLabelEntryRecord<TRecord>>(
   props: LabelProviderProps<TRecord>
 ): JSX.Element => {
-  const { labels = {}, children, locale = 'en' } = props;
+  const { labels = {}, children, locale = 'et' } = props;
 
   const [currentLocale, setCurrentLocale] = React.useState<TediLanguage>(locale);
 

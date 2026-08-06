@@ -84,12 +84,44 @@ describe('Label component', () => {
   it('renders an InfoButton when tooltip is provided', () => {
     render(<Label tooltip="This is a tooltip">Label</Label>);
 
-    const infoButton = screen.getByRole('button', { hidden: true });
+    const infoButton = screen.getByRole('button');
     expect(infoButton).toBeInTheDocument();
 
     fireEvent.mouseEnter(infoButton);
 
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
+  });
+
+  it('accepts rich (non-string) tooltip content', () => {
+    render(
+      <Label
+        tooltip={
+          <>
+            <strong>Bold</strong> and a <a href="#more">link</a>
+          </>
+        }
+      >
+        Label
+      </Label>
+    );
+
+    fireEvent.mouseEnter(screen.getByRole('button'));
+    expect(screen.getByText('Bold').tagName).toBe('STRONG');
+    expect(screen.getByRole('link', { name: 'link' })).toBeInTheDocument();
+  });
+
+  it('renders the tooltip trigger outside the label element', () => {
+    render(
+      <Label tooltip="This is a tooltip" htmlFor="field">
+        Label
+      </Label>
+    );
+
+    const labelElement = screen.getByText('Label').closest('label');
+    const infoButton = screen.getByRole('button');
+
+    expect(labelElement).toBeInTheDocument();
+    expect(labelElement).not.toContainElement(infoButton);
   });
 
   it('does not render InfoButton if tooltip is not provided', () => {
