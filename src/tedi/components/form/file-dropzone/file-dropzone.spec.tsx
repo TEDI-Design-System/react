@@ -250,4 +250,29 @@ describe('FileDropzone', () => {
     const dropzone = screen.getByText('Upload File').closest('.tedi-file-dropzone');
     expect(dropzone).toHaveClass('tedi-file-dropzone--disabled');
   });
+
+  it('does not leak upload props onto the <label>, and puts name on the input', () => {
+    const { container } = render(
+      <FileDropzone
+        id="upload"
+        name="docs"
+        label="Label"
+        accept=".pdf,.txt"
+        maxSize={100}
+        multiple
+        validateIndividually
+        files={[]}
+        defaultFiles={[]}
+        onChange={() => undefined}
+        onDelete={() => undefined}
+        announcementTimeout={5000}
+      />
+    );
+
+    const label = container.querySelector('label');
+    ['accept', 'maxsize', 'files', 'name', 'defaultfiles', 'announcementtimeout', 'validateindividually'].forEach(
+      (attr) => expect(label).not.toHaveAttribute(attr)
+    );
+    expect(container.querySelector('input[type="file"]')).toHaveAttribute('name', 'docs');
+  });
 });

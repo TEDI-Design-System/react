@@ -82,19 +82,41 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     disabled = false,
     helper,
     id,
+    name,
     attachmentProps,
+    accept,
+    maxSize,
+    multiple,
+    validateIndividually,
+    defaultFiles,
+    files,
+    onChange,
+    onDelete,
+    announcementTimeout,
+    showRestrictions,
     ...rest
   } = props;
-  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload(props);
+  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload({
+    accept,
+    maxSize,
+    multiple,
+    validateIndividually,
+    defaultFiles,
+    files,
+    onChange,
+    onDelete,
+    announcementTimeout,
+    showRestrictions,
+  });
 
   const generatedId = React.useId();
   const resolvedId = id ?? generatedId;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled,
-    accept: toDropzoneAccept(props.accept),
-    multiple: props.multiple,
-    maxSize: props.maxSize ? props.maxSize * 1024 ** 2 : undefined,
+    accept: toDropzoneAccept(accept),
+    multiple,
+    maxSize: maxSize ? maxSize * 1024 ** 2 : undefined,
     onDrop: (acceptedFiles, fileRejections = []) => {
       if (disabled) return;
 
@@ -139,7 +161,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         })}
         className={fileDropzoneBEM}
       >
-        <input {...getInputProps()} className={styles['tedi-file-dropzone__input']} disabled={disabled} />
+        <input {...getInputProps()} name={name} className={styles['tedi-file-dropzone__input']} disabled={disabled} />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}
