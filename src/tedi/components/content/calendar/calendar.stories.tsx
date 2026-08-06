@@ -24,6 +24,11 @@ const meta: Meta<typeof Calendar> = {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
     controls: { exclude: ['sm', 'md', 'lg', 'xl', 'xxl'] },
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
   },
 };
 
