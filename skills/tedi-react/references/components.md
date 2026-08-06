@@ -945,10 +945,10 @@ Key props:
 **Props:** `FileUploadProps` | form
 
 - `id: string` (required), `name: string` (required)
-- `accept?: string`
-- `multiple?: boolean`
-- `files?: FileUploadFile[]`, `defaultFiles?: FileUploadFile[]`
-- `maxSize?: number`
+- `accept?: string`, `maxSize?: number` (MB), `multiple?: boolean`, `validateIndividually?: boolean`
+- `files?: FileUploadFile[]`, `defaultFiles?: FileUploadFile[]`, `onChange?: (files: FileUploadFile[]) => void`
+- `showRestrictions?: boolean = true` — show the auto-generated restrictions hint (allowed types / max size) below the field. Set `false` when the same info is shown elsewhere (e.g. a `tooltip`) to avoid a duplicate; **rejection error messages still render**.
+- Rejections are observable: `onChange` fires even when a drop/pick is fully rejected (with the unchanged list) — including single-file rejections — so a parent can react without re-implementing validation.
 
 ### FileDropzone
 
@@ -959,6 +959,8 @@ Key props:
 - `helper?: FeedbackTextProps`, `disabled?: boolean`
 - `accept?: string`, `multiple?: boolean`, `maxSize?: number` (MB), `validateIndividually?: boolean`
 - `defaultFiles?` / `files?` (controlled) `: FileUploadFile[]`, `onChange?`, `onDelete?`
+- `showRestrictions?: boolean = true` — show the auto-generated restrictions hint (allowed types / max size) below the dropzone. Set `false` to hide it (e.g. when duplicated in a `tooltip`); **rejection error messages still render**.
+- Rejections are observable: a **dragged** file failing `accept`/`maxSize` is reported exactly like a picked one (message + `onChange`), and `onChange` fires even for a fully-rejected drop (unchanged list) so single-file rejections aren't silent.
 - `attachmentProps?: Partial<Omit<AttachmentProps, 'name'>> | ((file) => …)` — overrides forwarded to each rendered `Attachment` (e.g. `icon`, `fileSize`, `feedback`); pass a function to vary per file. `FileDropzone` sets `name`, `isValid`, `isLoading` and always appends the remove button to the `actions` slot itself.
 
 ## Layout
