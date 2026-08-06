@@ -167,6 +167,17 @@ const [date, setDate] = useState<Date>();
 <DateField id="year" label="Year" selectionLevel="years" />
 ```
 
+**Static header** — `monthYearSelectType="static"` renders the month/year as a plain, non-clickable label so users can only move via the prev/next nav (disables the month/year jump pickers). `'dropdown'` (default) and `'grid'` are the interactive options.
+
+**Per-day status** — `dayStatus` overlays a `StatusIndicator` dot on matching days (e.g. availability). Return `{ type, label }` per day (or `null`); the `label` is folded into the day's `aria-label` since the dot is decorative:
+```tsx
+<DateField
+  id="appointments"
+  label="Appointment"
+  dayStatus={(date) => (isBooked(date) ? { type: 'error', label: 'Fully booked' } : null)}
+/>
+```
+
 **Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`, `isClearable`):
 ```tsx
 <DateField

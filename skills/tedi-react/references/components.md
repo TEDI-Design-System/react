@@ -428,7 +428,8 @@ Sub-component: `List.Item`
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level: `'years'` selects Jan 1 of the picked year, `'months'` selects day 1
 - `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
 - `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
-- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header picker style
+- `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header picker style; `'static'` makes the month/year a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status; return a `{ type, label }` to overlay a `StatusIndicator` dot on that day (the `label` is folded into the day's `aria-label`; the dot itself is `aria-hidden`)
 - `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
 - `required?: boolean`, `footer?: ReactNode`, `className?: string`
@@ -747,7 +748,8 @@ Same as Checkbox (without indeterminate)
 - `initialMonth?: Date`
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
-- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header pickers; `'static'` renders the month/year as a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status forwarded to the calendar; overlays a `StatusIndicator` dot on matching days (label folded into the day's `aria-label`)
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
 - `initialView?: 'days' | 'months' | 'years' = selectionLevel` — grid the calendar opens on, independent of `selectionLevel`; e.g. `initialView="years"` with default `selectionLevel="days"` opens the year grid and drills year → month → day (pair with `monthYearSelectType="grid"`)
