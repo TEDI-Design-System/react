@@ -182,6 +182,32 @@ describe('DateField component', () => {
     expect(screen.getByLabelText('Birth date')).toHaveValue('15.06.2024');
   });
 
+  it('clears the calendar highlight when the input is cleared (#789)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(
+      <DateField
+        {...defaultProps}
+        defaultValue={new Date(2025, 5, 15)}
+        initialMonth={new Date(2025, 5, 1)}
+        onSelect={onSelect}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    await screen.findByRole('dialog');
+    expect(document.querySelector('.tedi-calendar__day--selected')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByLabelText('Birth date')).toHaveValue('');
+    expect(onSelect).toHaveBeenLastCalledWith(undefined, undefined, {}, {});
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    await screen.findByRole('dialog');
+    expect(document.querySelector('.tedi-calendar__day--selected')).not.toBeInTheDocument();
+  });
+
   it('removes value from MultiValueField in multiple mode', async () => {
     const user = userEvent.setup();
     const onSelect = jest.fn();

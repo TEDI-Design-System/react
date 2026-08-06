@@ -619,6 +619,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
     if (val.trim() === '') {
       setHasDisabledDateError(false);
+
+      if (value !== undefined) {
+        if (!isControlled) setInternalValue(undefined);
+        onSelect?.(undefined as UnknownType, undefined as UnknownType, {}, {} as UnknownType);
+      }
       return;
     }
 
