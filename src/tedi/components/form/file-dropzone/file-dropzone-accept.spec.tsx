@@ -41,15 +41,22 @@ describe('FileDropzone accept mapping (#783)', () => {
       expect(toDropzoneAccept('.pdf, image/png')).toEqual({ '*/*': ['.pdf'], 'image/png': [] });
     });
 
-    it('returns undefined for missing/empty accept', () => {
+    it('returns undefined for missing/empty/whitespace-only accept', () => {
       expect(toDropzoneAccept(undefined)).toBeUndefined();
       expect(toDropzoneAccept('')).toBeUndefined();
+      expect(toDropzoneAccept(' , ')).toBeUndefined();
     });
   });
 
   it('has no unnamed-input or nested-interactive a11y violations', async () => {
     const { container } = render(<FileDropzone id="fd" name="file" label="Upload files" accept=".pdf,.txt" multiple />);
+    // The input is hidden via the SCSS-module class `.tedi-file-dropzone__input`, which jsdom
+    // doesn't apply — inject the rule so axe evaluates the real (display:none) state.
+    const style = document.createElement('style');
+    style.textContent = '.tedi-file-dropzone__input { display: none; }';
+    document.head.appendChild(style);
     const res = await run(container, { runOnly: ['label', 'nested-interactive', 'aria-hidden-focus'] });
+    document.head.removeChild(style);
     expect(res.violations).toEqual([]);
   });
 });

@@ -59,7 +59,7 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
  */
 export const toDropzoneAccept = (accept?: string): Record<string, string[]> | undefined => {
   if (!accept) return undefined;
-  return accept.split(',').reduce<Record<string, string[]>>((acc, token) => {
+  const mapped = accept.split(',').reduce<Record<string, string[]>>((acc, token) => {
     const value = token.trim();
     if (!value) return acc;
     if (value.startsWith('.')) {
@@ -70,6 +70,8 @@ export const toDropzoneAccept = (accept?: string): Record<string, string[]> | un
     }
     return acc;
   }, {});
+
+  return Object.keys(mapped).length ? mapped : undefined;
 };
 
 export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
@@ -137,7 +139,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         })}
         className={fileDropzoneBEM}
       >
-        <input {...getInputProps()} style={{ display: 'none' }} disabled={disabled} />
+        <input {...getInputProps()} className={styles['tedi-file-dropzone__input']} disabled={disabled} />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}
