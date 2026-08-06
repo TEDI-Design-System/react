@@ -93,7 +93,6 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     onChange,
     onDelete,
     announcementTimeout,
-    showRestrictions,
     ...rest
   } = props;
   const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload({
@@ -106,7 +105,6 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     onChange,
     onDelete,
     announcementTimeout,
-    showRestrictions,
   });
 
   const generatedId = React.useId();
@@ -161,7 +159,13 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         })}
         className={fileDropzoneBEM}
       >
-        <input {...getInputProps()} name={name} className={styles['tedi-file-dropzone__input']} disabled={disabled} />
+        <input
+          {...getInputProps()}
+          id={resolvedId}
+          name={name}
+          className={styles['tedi-file-dropzone__input']}
+          disabled={disabled}
+        />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}
@@ -226,5 +230,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     </>
   );
 };
+
+FileDropzone.displayName = 'FileDropzone';
 
 export default FileDropzone;

@@ -275,4 +275,10 @@ describe('FileDropzone', () => {
     );
     expect(container.querySelector('input[type="file"]')).toHaveAttribute('name', 'docs');
   });
+
+  it('associates the label with the input via the generated id fallback', () => {
+    render(<FileDropzone name="file" label="Upload File" />);
+
+    expect(screen.getByLabelText(/Upload File/)).toBe(screen.getByRole('button').querySelector('input'));
+  });
 });
