@@ -69,6 +69,9 @@ export interface HeaderProps<H extends React.ElementType> {
   notification?: HeaderNotificationProps;
 }
 
+/**
+ * @deprecated Use `Header` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Header = <H extends React.ElementType = 'a'>(props: HeaderProps<H>) => {
   const {
     skipLinks,

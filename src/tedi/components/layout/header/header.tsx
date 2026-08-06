@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import Print from '../../misc/print/print';
 import HeaderLanguage from './components/header-language/header-language';
@@ -11,7 +12,28 @@ import HeaderRole from './components/header-role/header-role';
 import HeaderSearch from './components/header-search/header-search';
 import styles from './header.module.scss';
 
-export interface HeaderProps {
+export type HeaderAlignment = 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
+
+/** Maps a `HeaderAlignment` value to the global `justify-content-*` utility class. */
+const alignmentUtility: Record<HeaderAlignment, string> = {
+  'flex-start': 'justify-content-start',
+  center: 'justify-content-center',
+  'flex-end': 'justify-content-end',
+  'space-between': 'justify-content-between',
+  'space-around': 'justify-content-around',
+  'space-evenly': 'justify-content-evenly',
+};
+
+interface HeaderBreakpointProps {
+  /**
+   * Horizontal alignment (`justify-content`) of the top bar content.
+   * Supports per-breakpoint overrides, e.g. `topAlignment="center"` with `lg={{ topAlignment: 'space-between' }}`.
+   * @default space-between
+   */
+  topAlignment?: HeaderAlignment;
+}
+
+export interface HeaderProps extends BreakpointSupport<HeaderBreakpointProps> {
   /**
    * Content rendered inside the header, typically Header.Logo, Header.Center, and Header.Actions subcomponents.
    */
@@ -22,6 +44,10 @@ export interface HeaderProps {
    */
   toggle?: React.ReactNode;
   /**
+   * Content rendered in the top bar above the main header.
+   */
+  top?: React.ReactNode;
+  /**
    * Content rendered below the main header bar on mobile viewports (below `md` breakpoint).
    * Commonly used for a mobile-specific search bar or other compact navigation elements.
    */
@@ -31,11 +57,14 @@ export interface HeaderProps {
 }
 
 export const Header = (props: HeaderProps) => {
-  const { children, toggle, bottom, className } = props;
+  const { children, toggle, top, bottom, className } = props;
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { topAlignment = 'space-between' } = getCurrentBreakpointProps<HeaderBreakpointProps>(props);
 
   return (
     <Print visibility="hide">
       <header className={cn(styles['tedi-header'], className)}>
+        {top && <div className={cn(styles['tedi-header__top'], alignmentUtility[topAlignment])}>{top}</div>}
         <div className={styles['tedi-header__main']}>
           {toggle}
           <div className={styles['tedi-header__main--content']}>{children}</div>
@@ -95,10 +124,10 @@ export interface HeaderCenterProps {
   /** Content rendered in the center area of the header, typically navigation links or a search bar. */
   children: React.ReactNode;
   /**
-   * Controls the horizontal alignment of center content.
+   * Controls the horizontal alignment (`justify-content`) of center content.
    * @default center
    */
-  alignment?: 'flex-start' | 'center' | 'space-between';
+  alignment?: HeaderAlignment;
   /** Additional CSS class name applied to the center content area. */
   className?: string;
 }
@@ -106,11 +135,7 @@ export interface HeaderCenterProps {
 export const HeaderCenter = (props: HeaderCenterProps) => {
   const { children, className, alignment = 'center' } = props;
 
-  return (
-    <div className={cn(styles['tedi-header__center'], styles[`tedi-header__center--${alignment}`], className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn(styles['tedi-header__center'], alignmentUtility[alignment], className)}>{children}</div>;
 };
 
 HeaderCenter.displayName = 'Header.Center';

@@ -75,6 +75,15 @@ export interface OverlayProps {
    */
   role?: UseRoleProps['role'];
   /**
+   * Renders the overlay purely visually: no `useRole` aria wiring on the trigger
+   * (so no `aria-describedby`) and the content is `aria-hidden`. Use when the
+   * trigger already conveys the same text through its accessible name — e.g. an
+   * icon-only button whose visible tooltip merely mirrors its label — so screen
+   * readers don't announce it twice.
+   * @default false
+   */
+  ariaHidden?: boolean;
+  /**
    * Content overlay arrow dimensions.
    */
   arrowDimensions?: {
@@ -137,6 +146,7 @@ export interface OverlayContextType {
   context: FloatingContext<ReferenceType>;
   scrollLock?: boolean;
   role?: UseRoleProps['role'];
+  ariaHidden?: boolean;
   contentId: string;
 }
 
@@ -178,6 +188,7 @@ export const Overlay = (props: OverlayProps) => {
     open: externalOpen,
     onToggle,
     role = 'tooltip',
+    ariaHidden = false,
     arrowDimensions,
     offset: offsetOptions = GAP + (arrowDimensions?.height ?? 0),
     arrowPadding = 4,
@@ -239,7 +250,7 @@ export const Overlay = (props: OverlayProps) => {
     useFocus(context, {
       enabled: openWith === 'hover',
     }),
-    useRole(context, { role }),
+    useRole(context, { role, enabled: !ariaHidden }),
     useDismiss(context, {
       enabled: dismissible,
       outsidePressEvent: openWith === 'click' ? 'mousedown' : 'pointerdown',
@@ -278,6 +289,7 @@ export const Overlay = (props: OverlayProps) => {
       placement,
       scrollLock,
       role,
+      ariaHidden,
       contentId,
     }),
     [
@@ -301,6 +313,7 @@ export const Overlay = (props: OverlayProps) => {
       placement,
       scrollLock,
       role,
+      ariaHidden,
       contentId,
       modal,
       order,

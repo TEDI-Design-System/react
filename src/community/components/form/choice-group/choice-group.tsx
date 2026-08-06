@@ -91,6 +91,9 @@ export interface ChoiceGroupProps extends FormLabelProps {
   >;
 }
 
+/**
+ * @deprecated Use `ChoiceGroup` from `@tedi-design-system/react/tedi` instead.
+ */
 export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
   const { getLabel } = useLabels();
   const {

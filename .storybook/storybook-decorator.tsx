@@ -14,7 +14,7 @@ interface StorybookDecoratorProps {
   locale?: LabelProviderProps['locale'];
 }
 
-const StorybookDecorator = ({ children, locale = 'en', ...rest }: StorybookDecoratorProps) => (
+const StorybookDecorator = ({ children, locale = 'et', ...rest }: StorybookDecoratorProps) => (
   <LabelProvider locale={locale} {...rest}>
     <AccessibilityProvider>{children}</AccessibilityProvider>
   </LabelProvider>

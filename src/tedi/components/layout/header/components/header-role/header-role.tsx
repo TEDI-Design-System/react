@@ -6,6 +6,7 @@ import { isBreakpointBelow, useBreakpoint } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
+import CollapseButton from '../../../../buttons/collapse-button/collapse-button';
 import Separator from '../../../../misc/separator/separator';
 import Popover from '../../../../overlays/popover/popover';
 import { useHeaderProfile } from '../header-profile/header-profile';
@@ -216,25 +217,15 @@ export const HeaderRole = (props: HeaderRoleProps) => {
           </div>
 
           {hasRoleSelection && (
-            <Button
+            <CollapseButton
               id={toggleId}
-              visualType="link"
+              open={isRoleSelectionOpen}
+              onOpenChange={() => handleToggle()}
+              openText={openLabel}
+              closeText={closeLabel}
               underline={false}
-              onClick={() => handleToggle()}
-              aria-expanded={isRoleSelectionOpen}
               aria-controls={panelId}
-            >
-              <span className={styles['tedi-header-role__content--toggle']}>
-                {isRoleSelectionOpen ? closeLabel : openLabel}
-                <Icon
-                  name="expand_more"
-                  size={16}
-                  className={cn(styles['tedi-header-role__content--toggle-icon'], {
-                    [styles['tedi-header-role__content--toggle-icon--open']]: isRoleSelectionOpen,
-                  })}
-                />
-              </span>
-            </Button>
+            />
           )}
         </div>
 

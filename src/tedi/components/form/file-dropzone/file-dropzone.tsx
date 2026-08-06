@@ -59,36 +59,54 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     attachmentProps,
     ...rest
   } = props;
-  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove } = useFileUpload(props);
+  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload(props);
+
+  const generatedId = React.useId();
+  const resolvedId = id ?? generatedId;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled,
     accept: props.accept ? { 'application/*': [props.accept] } : undefined,
     multiple: props.multiple,
     maxSize: props.maxSize ? props.maxSize * 1024 ** 2 : undefined,
-    onDrop: (acceptedFiles) => {
+    onDrop: (acceptedFiles, fileRejections = []) => {
       if (disabled) return;
+
+      const revalidatableRejections = fileRejections
+        .filter((rejection) =>
+          rejection.errors.some((error) => error.code === 'file-too-large' || error.code === 'file-invalid-type')
+        )
+        .map((rejection) => rejection.file);
+
+      const files = [...acceptedFiles, ...revalidatableRejections];
+      if (files.length === 0) return;
+
       const event = {
-        target: { files: acceptedFiles },
+        target: { files },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
       onFileChange(event);
     },
   });
 
+  const feedback = uploadErrorHelper?.type === 'error' ? uploadErrorHelper : helper ?? uploadErrorHelper;
+  const helperId = feedback ? feedback.id ?? `${resolvedId}-helper` : undefined;
+
   const fileDropzoneBEM = cn(
     styles['tedi-file-dropzone'],
     { [styles['tedi-file-dropzone--disabled']]: disabled },
-    { [styles['tedi-file-dropzone--invalid']]: (uploadErrorHelper?.type || helper?.type) === 'error' },
-    { [styles['tedi-file-dropzone--valid']]: (uploadErrorHelper?.type || helper?.type) === 'valid' },
+    // Drive the visual state from the same `feedback` that is rendered, so the
+    // invalid/valid styling never diverges from the message shown.
+    { [styles['tedi-file-dropzone--invalid']]: feedback?.type === 'error' },
+    { [styles['tedi-file-dropzone--valid']]: feedback?.type === 'valid' },
     { [styles['tedi-file-dropzone--drop-over']]: isDragActive },
     className
   );
-  const helperId = helper ? helper?.id ?? `${id}-helper` : undefined;
 
   return (
     <>
       <div
         {...getRootProps({
+          role: 'button',
           tabIndex: disabled ? -1 : 0,
           'aria-disabled': disabled,
           'aria-describedby': helperId,
@@ -99,7 +117,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}
-            id={id}
+            id={resolvedId}
             label={
               <>
                 <Icon
@@ -116,11 +134,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           />
         </div>
       </div>
-      {helper ? (
-        <FeedbackText {...helper} id={helperId} />
-      ) : uploadErrorHelper ? (
-        <FeedbackText {...uploadErrorHelper} id={helperId} />
-      ) : null}
+      {feedback && <FeedbackText {...feedback} id={helperId} />}
       {!!innerFiles.length && (
         <List
           className={styles['tedi-file-dropzone__file-list']}
@@ -149,15 +163,17 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
                     </>
                   }
                 />
+                {file.isValid === false && (
+                  <span className="sr-only">{`${getLabel('file-dropzone.failed')} ${file.name ?? ''}`}</span>
+                )}
               </List.Item>
             );
           })}
         </List>
       )}
+
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {innerFiles.length === 0
-          ? getLabel('file-dropzone.no-file')
-          : getLabel('file-dropzone.files-selected', innerFiles.length)}
+        {announcement}
       </div>
     </>
   );

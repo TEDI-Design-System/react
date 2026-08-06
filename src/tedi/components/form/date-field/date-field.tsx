@@ -28,7 +28,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar, DayStatusFn } from '../../content/calendar/calendar';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
-import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
+import MultiValueField, { MultiValueFieldProps, MultiValueFieldRef } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
 import {
@@ -280,6 +280,14 @@ export interface DateFieldProps
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
   /**
+   * Layout for the selected-date tags in `'multiple'` mode.
+   * - `'stack'` (default) — tags wrap onto multiple rows; the field grows in height.
+   * - `'row'` — tags stay on a single row; any that don't fit collapse into a
+   *   `+N` counter (measured from the available width).
+   * @default stack
+   */
+  tagsDirection?: 'stack' | 'row';
+  /**
    * Open the calendar inside a modal instead of a floating popover. Useful
    * on narrow viewports where a popover overlaps the input itself. Mirrors
    * `TimeField`'s `modal` prop.
@@ -315,6 +323,13 @@ export interface DateFieldProps
    * label.
    */
   disabledDateErrorMessage?: string;
+  /**
+   * Error message rendered below the input when the typed text cannot be parsed
+   * into a valid date for the current `mode`. Validation runs on blur so
+   * partially-typed input isn't flagged mid-typing. Falls back to the localised
+   * `dateField.invalidDateError` label.
+   */
+  invalidDateErrorMessage?: string;
 }
 
 export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
@@ -343,6 +358,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     parseDate,
     monthYearSelectType,
     dayStatus,
+    tagsDirection,
     showNavigation = true,
     selectionLevel = 'days',
     initialView,
@@ -365,6 +381,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     modalProps,
     modalTitle,
     disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
+    invalidDateErrorMessage = getLabel('dateField.invalidDateError'),
     useNativePicker: _useNativePicker,
     enableCalendar: _enableCalendar,
     calendarTrigger: _calendarTrigger,
@@ -390,6 +407,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const [view, setView] = useState<CalendarView>(initialView ?? selectionLevel);
   const [inputValue, setInputValue] = useState('');
   const [hasDisabledDateError, setHasDisabledDateError] = useState(false);
+  const [hasInvalidDateError, setHasInvalidDateError] = useState(false);
 
   const useModalPicker =
     enableCalendar &&
@@ -404,6 +422,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const value = isControlled ? selected : internalValue;
 
   const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
+  const multiValueRef = React.useRef<MultiValueFieldRef | null>(null);
 
   const setTextFieldRef = React.useCallback(
     (node: TextFieldForwardRef | null) => {
@@ -595,21 +614,25 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     };
   }, [dateFormatter]);
 
+  const parseInputValue = (val: string): Date | Date[] | DateRange | undefined =>
+    (parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined))(val);
+
+  const isParsedValidForMode = (parsed: Date | Date[] | DateRange | undefined): boolean =>
+    (mode === 'single' && parsed instanceof Date) ||
+    (mode === 'multiple' && Array.isArray(parsed)) ||
+    (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
+
   const handleInputChange = (val: string) => {
     setInputValue(val);
+    setHasInvalidDateError(false);
 
     if (val.trim() === '') {
       setHasDisabledDateError(false);
       return;
     }
 
-    const parser = parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined);
-    const parsed = parser(val);
-
-    const isValidForMode =
-      (mode === 'single' && parsed instanceof Date) ||
-      (mode === 'multiple' && Array.isArray(parsed)) ||
-      (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
+    const parsed = parseInputValue(val);
+    const isValidForMode = isParsedValidForMode(parsed);
 
     if (!isValidForMode) {
       setHasDisabledDateError(false);
@@ -635,6 +658,14 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (parsed instanceof Date) setCurrentMonth(parsed);
 
     if (shouldCloseOnSelect) setOpen(false);
+  };
+
+  const handleInputBlur = () => {
+    if (inputValue.trim() === '') {
+      setHasInvalidDateError(false);
+      return;
+    }
+    setHasInvalidDateError(!isParsedValidForMode(parseInputValue(inputValue)));
   };
 
   useEffect(() => {
@@ -696,6 +727,14 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     useRole(context, { role: 'dialog' }),
   ]);
 
+  React.useEffect(() => {
+    const anchorNode =
+      mode === 'multiple'
+        ? multiValueRef.current?.wrapper ?? null
+        : (textFieldRef.current?.input as HTMLElement | undefined) ?? null;
+    refs.setPositionReference(anchorNode ?? refs.reference.current);
+  }, [mode, open, refs]);
+
   const openNativePicker = () => {
     const input = textFieldRef.current?.input as HTMLInputElement | undefined;
     if (!input) return;
@@ -755,28 +794,47 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
   };
 
+  const referenceProps = interactions.getReferenceProps(
+    useModalPicker && calendarTrigger === 'input' ? { onClick: () => openCalendar() } : undefined
+  );
+
+  const {
+    role: _role,
+    'aria-expanded': _ariaExpanded,
+    'aria-haspopup': _ariaHaspopup,
+    'aria-controls': floatingAriaControls,
+    ...containerInteractionProps
+  } = referenceProps;
+
+  const triggerAriaControls = !useModalPicker ? (floatingAriaControls as string | undefined) : undefined;
+
+  const openCalendarLabel = getLabel('dateField.openCalendar');
+
+  const calendarTriggerProps: React.ButtonHTMLAttributes<HTMLButtonElement> = {
+    'aria-label': openCalendarLabel,
+    'aria-expanded': useModalPicker ? modalOpen : open,
+    'aria-haspopup': 'dialog',
+    'aria-controls': triggerAriaControls,
+  };
+
   return (
     <>
       <div
         className={cn(styles['tedi-date-field__container'], className)}
-        {...interactions.getReferenceProps(
-          useModalPicker && calendarTrigger === 'input' ? { onClick: () => openCalendar() } : undefined
-        )}
+        {...containerInteractionProps}
         ref={refs.setReference}
       >
         {mode === 'multiple' ? (
           <MultiValueField
             {...(inputProps as MultiValueFieldProps)}
+            ref={multiValueRef}
             id={id}
             label={label}
+            tagsDirection={tagsDirection}
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
             onIconClick={openCalendar}
-            iconButtonProps={
-              enableCalendar
-                ? { 'aria-expanded': useModalPicker ? modalOpen : open, 'aria-haspopup': 'dialog' }
-                : undefined
-            }
+            iconButtonProps={enableCalendar ? calendarTriggerProps : { 'aria-label': openCalendarLabel }}
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -803,22 +861,26 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
-            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
             isClearable
             onIconClick={openCalendar}
             iconButtonProps={
-              enableCalendar && !shouldUseNativePicker
-                ? { 'aria-expanded': useModalPicker ? modalOpen : open, 'aria-haspopup': 'dialog' }
-                : undefined
+              enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : { 'aria-label': openCalendarLabel }
             }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
+            onBlur={(e) => {
+              if (!shouldUseNativePicker) handleInputBlur();
+              (inputProps as TextFieldProps)?.onBlur?.(e);
+            }}
             required={required}
-            invalid={hasDisabledDateError || (inputProps as TextFieldProps)?.invalid}
+            invalid={hasDisabledDateError || hasInvalidDateError || (inputProps as TextFieldProps)?.invalid}
             helper={(() => {
               const consumerHelper = (inputProps as TextFieldProps)?.helper;
-              const errorHelper = hasDisabledDateError
-                ? { text: disabledDateErrorMessage, type: 'error' as const }
+              const errorText = hasDisabledDateError
+                ? disabledDateErrorMessage
+                : hasInvalidDateError
+                ? invalidDateErrorMessage
                 : null;
+              const errorHelper = errorText ? { text: errorText, type: 'error' as const } : null;
               if (!errorHelper) return consumerHelper;
               if (!consumerHelper) return errorHelper;
               return Array.isArray(consumerHelper) ? [...consumerHelper, errorHelper] : [consumerHelper, errorHelper];
@@ -831,7 +893,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
               ...((inputProps as TextFieldProps)?.input as UnknownType),
               ...(shouldUseNativePicker && { type: 'date' }),
               ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
-                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open }
+                ? {
+                    role: 'combobox',
+                    'aria-haspopup': 'dialog',
+                    'aria-expanded': useModalPicker ? modalOpen : open,
+                    'aria-controls': triggerAriaControls,
+                  }
                 : {}),
             }}
           />

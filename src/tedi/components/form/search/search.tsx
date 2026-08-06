@@ -54,6 +54,13 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       onSearch?.(rest.value as string);
     };
 
+    const iconBase: IconWithoutBackgroundProps = typeof searchIcon === 'string' ? { name: searchIcon } : searchIcon;
+    const resolvedSearchIcon: IconWithoutBackgroundProps = {
+      color: 'secondary',
+      ...iconBase,
+      className: cn(iconBase.className, rest.disabled && styles['tedi-search__icon--disabled']),
+    };
+
     const textFieldProps = {
       ...rest,
       ref,
@@ -63,20 +70,37 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
       onKeyDown: handleKeyDown,
       onChange,
       input: { ...input, role: 'searchbox' as const },
-      ...(button ? {} : { icon: searchIcon }),
+      ...(button ? {} : { icon: resolvedSearchIcon }),
     };
 
-    const defaultAriaLabel = placeholder || getLabel('search');
-    const searchAriaLabel = ariaLabel ?? defaultAriaLabel;
+    // Name the search landmark with the generic "search" label rather than the
+    // placeholder. The input already surfaces the placeholder, so reusing it as
+    // the region name makes screen readers announce it twice. Consumers should
+    // set `ariaLabel` to give the region a distinct name (e.g. "Search products").
+    // `||` (not `??`) so an empty-string `ariaLabel` also falls back — otherwise
+    // the landmark would render with an empty accessible name.
+    const searchAriaLabel = ariaLabel || getLabel('search');
 
     return (
-      <div className={cn(styles['tedi-search__wrapper'])} role="search" aria-label={searchAriaLabel}>
+      <div
+        className={cn(
+          styles['tedi-search__wrapper'],
+          rest.size === 'small' && styles['tedi-search__wrapper--small'],
+          rest.size === 'large' && styles['tedi-search__wrapper--large']
+        )}
+        role="search"
+        aria-label={searchAriaLabel}
+      >
         <TextField {...textFieldProps} />
         {button && (
           <Button
             {...button}
             onClick={handleButtonClick}
-            className={cn(styles['tedi-search__button'], button.className)}
+            className={cn(
+              styles['tedi-search__button'],
+              !button.children && styles['tedi-search__button--icon-only'],
+              button.className
+            )}
             aria-label={button.children ? undefined : getLabel('search')}
           >
             {button.children ?? getLabel('search')}

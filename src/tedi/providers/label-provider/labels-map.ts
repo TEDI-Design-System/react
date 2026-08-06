@@ -86,6 +86,34 @@ export const labelsMap = validateDefaultLabels({
     en: 'Close',
     ru: 'Закрыть',
   },
+  splitPaneResize: {
+    description: 'Accessible label for the SplitPane resize divider',
+    components: ['SplitPane'],
+    et: 'Muuda paanide suurust',
+    en: 'Resize panes',
+    ru: 'Изменить размер панелей',
+  },
+  leftPanel: {
+    description: 'Accessible landmark label for the LeftPanel region',
+    components: ['LeftPanel'],
+    et: 'Külgpaneel',
+    en: 'Side panel',
+    ru: 'Боковая панель',
+  },
+  leftPanelOpen: {
+    description: 'Accessible label for the LeftPanel reopen button shown when collapsed',
+    components: ['LeftPanel'],
+    et: 'Ava paneel',
+    en: 'Open panel',
+    ru: 'Открыть панель',
+  },
+  leftPanelClose: {
+    description: 'Accessible label for the LeftPanel close button',
+    components: ['LeftPanel'],
+    et: 'Sulge paneel',
+    en: 'Close panel',
+    ru: 'Закрыть панель',
+  },
   open: {
     description: 'Used for opening',
     components: ['Accordion', 'Collapse'],
@@ -99,6 +127,14 @@ export const labelsMap = validateDefaultLabels({
     et: 'Eemalda',
     en: 'Remove',
     ru: 'Удалить',
+  },
+  'multi-value-field.hidden-count': {
+    description:
+      'Accessible label for the overflow counter shown in single-row (`tagsDirection="row"`) mode, announcing how many selected values are hidden.',
+    components: ['MultiValueField', 'DateField'],
+    et: (count: number) => `Veel ${count}`,
+    en: (count: number) => `${count} more`,
+    ru: (count: number) => `Ещё ${count}`,
   },
   cancel: {
     description: 'For canceling an action',
@@ -278,9 +314,9 @@ export const labelsMap = validateDefaultLabels({
   'header.select-lang': {
     description: 'Label for HeaderLanguage label and Modal Heading',
     components: ['HeaderLanguage'],
-    et: 'Keel:',
-    en: 'Language:',
-    ru: 'Язык:',
+    et: 'Keel',
+    en: 'Language',
+    ru: 'Язык',
   },
   'header.role-label': {
     description: 'Label for Role selection',
@@ -438,12 +474,36 @@ export const labelsMap = validateDefaultLabels({
     en: (files: string) => `File(s) ${files} have the wrong extension`,
     ru: (files: string) => `Файл(ы) ${files} имеют неправильное расширение`,
   },
+
+  'file-upload.removed': {
+    description: 'Announced to screen readers when a file is removed',
+    components: ['FileUpload'],
+    et: (file: string) => `Fail ${file} eemaldatud`,
+    en: (file: string) => `File ${file} removed`,
+    ru: (file: string) => `Файл ${file} удалён`,
+  },
+
+  'file-upload.cleared': {
+    description: 'Announced to screen readers when all files are removed',
+    components: ['FileUpload'],
+    et: 'Kõik failid eemaldatud',
+    en: 'All files removed',
+    ru: 'Все файлы удалены',
+  },
+
   'file-dropzone.label': {
     description: 'Default label for dropzone',
     components: ['FileDropzone'],
     et: 'Lohista failid siia või klõpsa, et sirvida',
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
+  },
+  'file-dropzone.failed': {
+    description: 'Screen-reader status announced next to an invalid file in FileDropzone',
+    components: ['FileDropzone'],
+    et: 'Faili üleslaadimine ebaõnnestus',
+    en: 'File upload failed',
+    ru: 'Загрузка файла не удалась',
   },
   'file-dropzone.no-file': {
     description: 'No file selected label for FileUpload or FileDropzone',
@@ -495,6 +555,21 @@ export const labelsMap = validateDefaultLabels({
     et: 'Valitud kuupäev pole saadaval',
     en: 'Selected date is not available',
     ru: 'Выбранная дата недоступна',
+  },
+  'dateField.invalidDateError': {
+    description:
+      'Inline error shown when the user types text that cannot be parsed into a valid date for the current mode.',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Vigane kuupäev',
+    en: 'Invalid date',
+    ru: 'Неверная дата',
+  },
+  'dateField.openCalendar': {
+    description: 'Accessible name for the calendar toggle button in the DateField input.',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Ava kalender',
+    en: 'Open calendar',
+    ru: 'Открыть календарь',
   },
   'dateTimeField.timeHeading': {
     description: 'Heading rendered above the time picker in DateTimeField',
@@ -1214,25 +1289,29 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Нижний колонтитул',
   },
   'numberField.decrement': {
-    description: 'Label for screen-reader for number field decrease button',
+    description: 'Label for screen-reader for number field decrease button. Second argument is the field label.',
     components: ['NumberField'],
-    et: (count: string | number) => `Vähenda ${count} võrra`,
-    en: (count: string | number) => `Decrease by ${count}`,
-    ru: (count: string | number) => `Уменьшить на ${count}`,
+    et: (count: string | number, field?: string) =>
+      field ? `Vähenda välja "${field}" ${count} võrra` : `Vähenda ${count} võrra`,
+    en: (count: string | number, field?: string) => (field ? `Decrease ${field} by ${count}` : `Decrease by ${count}`),
+    ru: (count: string | number, field?: string) =>
+      field ? `Уменьшить «${field}» на ${count}` : `Уменьшить на ${count}`,
   },
   'numberField.increment': {
-    description: 'Label for screen-reader for number field increase button',
+    description: 'Label for screen-reader for number field increase button. Second argument is the field label.',
     components: ['NumberField'],
-    et: (count: string | number) => `Suurenda ${count} võrra`,
-    en: (count: string | number) => `Increase by ${count}`,
-    ru: (count: string | number) => `Увеличить на ${count}`,
+    et: (count: string | number, field?: string) =>
+      field ? `Suurenda välja "${field}" ${count} võrra` : `Suurenda ${count} võrra`,
+    en: (count: string | number, field?: string) => (field ? `Increase ${field} by ${count}` : `Increase by ${count}`),
+    ru: (count: string | number, field?: string) =>
+      field ? `Увеличить «${field}» на ${count}` : `Увеличить на ${count}`,
   },
   'numberField.quantityUpdated': {
     description: 'Label for screen-reader when quantity get updated by button click',
     components: ['NumberField'],
     et: (count: string | number) => `Uuendatud. Uus väärtus ${count}`,
     en: (count: string | number) => `Updated. New value ${count}`,
-    ru: (count: string | number) => `Ууэндатуд. Уус вяэртус ${count}`,
+    ru: (count: string | number) => `Обновлено. Новое значение ${count}`,
   },
   'sidenav.backToMainMenu': {
     description: 'Side navigation label',
