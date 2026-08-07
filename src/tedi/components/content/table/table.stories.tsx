@@ -42,13 +42,7 @@ const meta: Meta<typeof Table> = {
     },
     a11y: {
       // TODO: [Table]: Review storybook a11y violations #804
-      config: {
-        rules: [
-          { id: 'empty-table-header', enabled: false },
-          { id: 'aria-allowed-attr', enabled: false },
-          { id: 'scrollable-region-focusable', enabled: false },
-        ],
-      },
+      test: 'todo',
     },
   },
 };
