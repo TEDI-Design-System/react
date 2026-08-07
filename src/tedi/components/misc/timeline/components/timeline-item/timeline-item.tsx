@@ -55,14 +55,15 @@ export const TimelineItem = ({
   const dotColor = state === 'future' ? 'secondary' : 'accent';
   const lineColor = state === 'past' ? 'accent' : 'secondary';
 
-  const timingsBottomNode = timingsBottom && (
+  const hasTimingsBottom = timingsBottom !== null && timingsBottom !== undefined && typeof timingsBottom !== 'boolean';
+  const timingsBottomNode = hasTimingsBottom && (
     <div className={styles['tedi-timeline__timings-bottom']}>{timingsBottom}</div>
   );
 
   return (
     <div
       className={cn(styles['tedi-timeline-item'], {
-        [styles['tedi-timeline__item--has-bottom']]: isMobile && !!timingsBottom,
+        [styles['tedi-timeline__item--has-bottom']]: isMobile && hasTimingsBottom,
       })}
     >
       <div className={styles['tedi-timeline__timings']}>

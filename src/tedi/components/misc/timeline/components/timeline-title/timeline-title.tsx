@@ -12,10 +12,10 @@ export interface TimelineTitleProps {
   children?: ReactNode;
   /**
    * Text color, using the shared typography colors. Defaults to `secondary`.
-   * Pass `undefined` to inherit the surrounding color instead.
+   * Pass `null` to inherit the surrounding color instead.
    * @default secondary
    */
-  color?: TextColor;
+  color?: TextColor | null;
   /**
    * Additional class name.
    */

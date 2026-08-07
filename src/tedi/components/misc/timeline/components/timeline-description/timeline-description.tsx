@@ -11,10 +11,10 @@ export interface TimelineDescriptionProps {
   children?: ReactNode;
   /**
    * Text color, using the shared typography colors. Defaults to `tertiary`.
-   * Pass `undefined` to inherit the surrounding color instead.
+   * Pass `null` to inherit the surrounding color instead.
    * @default tertiary
    */
-  color?: TextColor;
+  color?: TextColor | null;
   /**
    * Additional class name.
    */
