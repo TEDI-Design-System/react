@@ -243,7 +243,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         >
           <div className={styles['tedi-file-upload__content']}>
             <Row>
-              <Col className="display-flex">{showFiles()}</Col>
+              <Col className="flex">{showFiles()}</Col>
               <Col xs={12} md="auto">
                 <div className={fileUploadBEM}>
                   <input
