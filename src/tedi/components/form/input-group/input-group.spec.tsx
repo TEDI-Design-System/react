@@ -1,6 +1,7 @@
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 
+import * as InputGroupBarrel from './index';
 import InputGroup, { InputGroupForwardRef, useInputGroup, useOptionalInputGroup } from './input-group';
 
 import '@testing-library/jest-dom';
@@ -200,5 +201,15 @@ describe('useInputGroup / useOptionalInputGroup', () => {
     expect(typeof result.current?.registerSuffix).toBe('function');
     expect(typeof result.current?.unregisterPrefix).toBe('function');
     expect(typeof result.current?.unregisterSuffix).toBe('function');
+  });
+
+  it('is importable by name from the barrel, with its compound sub-components', () => {
+    // Regression: InputGroup is a default-only export and `export *` does not forward
+    // defaults, so `import { InputGroup }` used to resolve to undefined.
+    expect(InputGroupBarrel.InputGroup).toBeDefined();
+    expect(InputGroupBarrel.InputGroup).toBe(InputGroup);
+    expect(InputGroupBarrel.InputGroup.Input).toBeDefined();
+    expect(InputGroupBarrel.InputGroup.Prefix).toBeDefined();
+    expect(InputGroupBarrel.InputGroup.Suffix).toBeDefined();
   });
 });
