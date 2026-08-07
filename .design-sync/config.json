@@ -1,5 +1,6 @@
 {
   "pkg": "@tedi-design-system/react",
+  "projectId": "d10e8d07-6086-4ddd-970c-090a49feaa2f",
   "globalName": "Tedi",
   "shape": "storybook",
   "storybookConfigDir": ".storybook",

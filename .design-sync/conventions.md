@@ -3,6 +3,35 @@
 TEDI is the Estonian health-and-social-services design system. Everything below is
 verified against this build — every class, token, prop and component named here exists.
 
+## 0. Package, version and sources
+
+```
+npm install @tedi-design-system/react
+```
+
+| | |
+|---|---|
+| Package | [`@tedi-design-system/react`](https://www.npmjs.com/package/@tedi-design-system/react) |
+| This bundle corresponds to | **18.1.1-rc.1** (npm `rc` tag) |
+| Also published | **18.1.0** (npm `latest`) |
+| Source | https://github.com/TEDI-Design-System/react |
+| Design source of truth | [Figma — TEDI Design System](https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/) |
+| Human docs | https://www.tedi.ee/1ee8444b7/ (Zeroheight) |
+
+**Ignore the `@0.0.0-semantic-version` in the generated title below.** That is a
+placeholder committed in `package.json`; semantic-release substitutes the real version
+only when publishing to npm, so any locally-built bundle carries the placeholder. The
+table above is authoritative.
+
+**One version-sensitive API:** `InputGroup` became a named export in **18.1.1-rc.1**
+(before that it was default-only and `export *` did not forward it, so
+`import { InputGroup }` was `undefined`). If the target app is pinned to **18.1.0 or
+earlier**, use `TextField` / `NumberField` inside `Field` instead of `InputGroup`.
+
+Only the **`/tedi`** namespace (TEDI-Ready, production-grade) is included here. The
+package also ships `/community`, which is deliberately excluded — it is community-
+contributed and not a reference for TEDI patterns.
+
 ## 1. Wrap the app in the provider chain — without it components are unstyled or throw
 
 ```jsx

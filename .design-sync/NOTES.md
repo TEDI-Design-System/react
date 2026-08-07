@@ -1,10 +1,25 @@
 # design-sync notes — @tedi-design-system/react
 
-## ✅ RUN COMPLETE (2026-08-07) — read this first
+## ✅ RUN COMPLETE + UPLOADED (2026-08-07) — read this first
 
-**LOCAL-ONLY: no claude.ai/design project was created and nothing was uploaded.**
-No `projectId` in config, no `_ds_sync.json` anchor anywhere — the documented safe
-state. A future sync simply re-verifies. Output is `ds-bundle/` (82 components).
+**Synced to claude.ai/design.** Project **`TEDI Design System`**,
+`projectId: d10e8d07-6086-4ddd-970c-090a49feaa2f` (pinned in `config.json`).
+URL: https://claude.ai/design/p/d10e8d07-6086-4ddd-970c-090a49feaa2f
+
+447 files uploaded, then an 11-file delta re-upload after merging `origin/rc`
+(README with the corrected header, the rebuilt bundle/css/styles, InputGroup's 4
+artifacts + preview, anchor last). **The bundle corresponds to npm `18.1.1-rc.1`.**
+A hashed manifest is kept at `.design-sync/upload-manifest.sha256` so the next
+re-sync can diff content instead of re-reasoning from inputs. The project now carries an
+**`_ds_sync.json` anchor**, so the next re-sync diffs against it and skips unchanged
+components instead of re-verifying everything. The app's self-check has run
+(`_ds_manifest.json` and `_adherence.oxlintrc.json` exist remotely = cards registered).
+Upload order followed the contract: sentinel → content → (no deletes; project was
+empty) → sentinel re-arm → `_ds_sync.json` absolutely last.
+
+Two other design-system projects exist in the org and were deliberately left alone:
+`TEDI Design System (deprecated)` (owner Silver) and `Design System` (owner Märt).
+This new project supersedes the deprecated one.
 
 Final state: `package-build.mjs` and `package-validate.mjs` both exit 0, **82/82
 previews render cleanly**, zero `[GRID_OVERFLOW]`, one non-blocking warning
@@ -434,6 +449,30 @@ tail with no rebuild and no loss of existing verdicts.
 - Two of the 23 `[TOKENS_MISSING]` entries — `--separator-dot-position` and
   `--separator-dotted-dot-sm` — are exposed ONLY by Separator's uncaptured dotted
   stories, so they remain untested. `--separator-thickness` WAS verified correct.
+
+## Card labels are PascalCase, not humanized — accepted, converter gap
+
+In claude.ai/design the variant labels on a component card read
+`LongTextButtonThatWrapsIntoMultipleLines`, where storybook shows
+`Long Text Button That Wraps Into Multiple Lines`.
+
+**Cause (not fixable from config):** the card template builds each cell label as
+`'<h4>' + exportKey + '</h4>'` — the JS **export identifier** of the compiled preview,
+which cannot contain spaces. The humanized name is available (it is `name` in
+`ds-bundle/.stories-map.json`, alongside `exportKey` and `emitted`) but nothing carries
+it into the card. The template lives in `.ds-sync/lib/emit.mjs`, which is app-contract
+surface the skill forbids forking (it owns the `@dsCard` header, the stylesheet links and
+the `window.__dsCells` protocol the app's self-check reads).
+
+**Decision (DS team, 2026-08-07): accept — purely visual.** Do NOT fork `emit.mjs` for
+it; that would trade a permanent loss of upstream card-contract fixes for cosmetics.
+The proper fix is upstream, one line in that template: humanize the key for display, or
+read the label from the stories map. Worth reporting — any storybook-shaped DS hits it.
+
+**Note this does NOT affect the design agent.** `<Name>.prompt.md` — what the agent
+actually reads — already lists variants with spaces
+("Long Text Button That Wraps Into Multiple Lines"). The gap is human-facing only, in
+the component picker.
 
 ## Known render warns (triaged — a warn NOT listed here is new)
 
