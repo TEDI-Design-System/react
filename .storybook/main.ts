@@ -36,7 +36,7 @@ const config: StorybookConfig = {
     builder: '@storybook/builder-vite',
     disableTelemetry: true,
   },
-  staticDirs: ['../public'],
+  staticDirs: ['../public', { from: '../node_modules/@tedi-design-system/core/fonts', to: '/fonts' }],
   framework: {
     name: '@storybook/react-vite',
     options: {},
