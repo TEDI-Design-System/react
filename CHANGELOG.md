@@ -1,3 +1,10 @@
+## [18.1.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.1.1-rc.1...react-18.1.1-rc.2) (2026-08-07)
+
+
+### Bug Fixes
+
+* **table:** fix invalid variable [#801](https://github.com/TEDI-Design-System/react/issues/801) ([#802](https://github.com/TEDI-Design-System/react/issues/802)) ([e1f2b48](https://github.com/TEDI-Design-System/react/commit/e1f2b48df7e389a83a980c0d35904ac815c11da5))
+
 ## [18.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.1.0...react-18.1.1-rc.1) (2026-08-07)
 
 
