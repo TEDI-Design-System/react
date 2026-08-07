@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
-import { Collapse } from '../../buttons/collapse/collapse';
-import { InfoButton } from '../../buttons/info-button/info-button';
+import { Collapse } from '../../content/collapse/collapse';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { InfoTooltip } from '../../overlays/tooltip';
 import Separator from '../separator/separator';
 import { Timeline } from './timeline';
 
@@ -242,14 +242,16 @@ export const CustomTextColor: Story = {
   ),
 };
 
-export const WithInfoButton: Story = {
+export const WithInfoTooltip: Story = {
   render: () => (
     <PositionShowcase
       renderContent={() => (
         <>
           <Timeline.Title>
             Taotluse esitamine
-            <InfoButton isSmall aria-label="Taotluse esitamine info" />
+            <InfoTooltip isSmall ariaLabel="Taotluse esitamine info">
+              Taotluse esitamise järel võetakse see menetlusse.
+            </InfoTooltip>
           </Timeline.Title>
           <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
         </>
@@ -273,7 +275,7 @@ export const WithAction: Story = {
       <Timeline.Item>
         <Timeline.Title>Taotluse esitamine</Timeline.Title>
         <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-        <Collapse id="timeline-action-collapse" openText="Näita rohkem" closeText="Näita vähem">
+        <Collapse id="timeline-action-collapse" openText="Näita rohkem" closeText="Näita vähem" size="small">
           <Text element="span" modifiers="small" color="tertiary">
             Pärast otsuse teatavaks tegemist saab seda vajadusel vaidlustada.
           </Text>
