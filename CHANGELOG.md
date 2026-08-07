@@ -1,3 +1,10 @@
+## [18.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.1.0...react-18.1.1-rc.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* **input-group:** export InputGroup by name from barrel [#798](https://github.com/TEDI-Design-System/react/issues/798) ([#799](https://github.com/TEDI-Design-System/react/issues/799)) ([f8a99c6](https://github.com/TEDI-Design-System/react/commit/f8a99c6e4261c4c44eb259fd5b7b376d8063acfe))
+
 # [18.1.0](https://github.com/TEDI-Design-System/react/compare/react-18.0.0...react-18.1.0) (2026-08-06)
 
 
