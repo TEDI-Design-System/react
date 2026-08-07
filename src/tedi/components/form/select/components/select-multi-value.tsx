@@ -1,11 +1,14 @@
+import cn from 'classnames';
 import { MultiValueProps } from 'react-select';
 
-import { Tag } from '../../../tags/tag/tag';
+import { useLabels } from '../../../../providers/label-provider';
+import { Tag, TagEllipsis } from '../../../tags/tag/tag';
 import { ISelectOption } from '../select';
+import styles from '../select.module.scss';
 import { isGroupSentinel, SELECT_ALL_VALUE } from './select-bulk-helpers';
 import { useSelectTagsContext } from './select-tags-context';
 
-type MultiValueType = MultiValueProps<ISelectOption> & { isTagRemovable?: boolean };
+type MultiValueType = MultiValueProps<ISelectOption> & { isTagRemovable?: boolean; tagsEllipsis?: TagEllipsis };
 
 type RemoveProps = MultiValueProps<ISelectOption>['removeProps'];
 
@@ -40,10 +43,12 @@ export const createMultiValueCloseHandler =
 
 export const SelectMultiValue = ({
   isTagRemovable,
+  tagsEllipsis = false,
   children,
   removeProps,
   ...props
 }: MultiValueType): JSX.Element | null => {
+  const { getLabel } = useLabels();
   const { isSingleRow, visibleCount } = useSelectTagsContext();
 
   if (props.data.value === SELECT_ALL_VALUE || isGroupSentinel(props.data)) {
@@ -72,14 +77,24 @@ export const SelectMultiValue = ({
   if (isHidden) return null;
 
   return (
-    <div onMouseDown={(event) => event.stopPropagation()} data-tedi-tag-index={index}>
+    <div
+      onMouseDown={(event) => event.stopPropagation()}
+      data-tedi-tag-index={index}
+      className={cn({ [styles['tedi-select__multi-value--ellipsis']]: tagsEllipsis !== false })}
+    >
       <Tag
         color="primary"
+        ellipsis={tagsEllipsis}
         onClose={isTagRemovable ? handleCloseClick : undefined}
         closeButtonProps={
           isTagRemovable
             ? {
                 tabIndex: 0,
+                // Name the button "Remove <option>" so screen readers say which
+                // tag is removed, instead of a bare "Close".
+                title: `${getLabel('remove')} ${
+                  typeof props.data.label === 'string' ? props.data.label : props.data.value
+                }`,
                 onMouseDown: (event) => event.stopPropagation(),
                 onKeyDown: handleCloseKeyDown,
               }

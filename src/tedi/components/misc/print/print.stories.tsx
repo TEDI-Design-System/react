@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import Button from '../../buttons/button/button';
 import { VerticalSpacing } from '../../layout/vertical-spacing';

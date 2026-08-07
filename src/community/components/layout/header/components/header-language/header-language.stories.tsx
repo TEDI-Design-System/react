@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import HeaderLanguage from './header-language';
 
@@ -10,6 +10,11 @@ positioned. <br />
 const meta: Meta<typeof HeaderLanguage> = {
   component: HeaderLanguage,
   title: 'Community/Layout/Header/HeaderLanguage',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

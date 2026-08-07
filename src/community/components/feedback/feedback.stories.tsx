@@ -1,4 +1,4 @@
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Section } from '../../../tedi/components/content/section/section';

@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -44,19 +44,19 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
     <VerticalSpacing>
       {array.map((state, index) => (
         <Row key={index}>
-          <Col width={2} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col className="display-flex align-items-center">
+          <Col>
             <TextArea disabled={state === 'Disabled'} {...textFieldProps} id={state} />
           </Col>
         </Row>
       ))}
       <Row>
-        <Col width={2} className="display-flex align-items-center">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col>
           <TextArea
             {...textFieldProps}
             id="success-textarea"
@@ -68,10 +68,10 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
         </Col>
       </Row>
       <Row>
-        <Col width={2} className="display-flex align-items-center">
+        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col>
           <TextArea
             {...textFieldProps}
             id="error-textarea"
@@ -93,10 +93,10 @@ const TemplateSizes: StoryFn<TextAreaProps> = (args) => {
     <div className="example-list">
       {sizesArray.map((size, key) => (
         <Row className={`${key === sizesArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col>
+          <Col width={12} sm={2}>
             <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
           </Col>
-          <Col>
+          <Col width={12} sm={10}>
             <TextArea {...args} size={size} id={`textarea-size-${size}`} />
           </Col>
         </Row>

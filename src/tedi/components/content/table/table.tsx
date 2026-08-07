@@ -36,7 +36,7 @@ import {
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
-import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
+import { CollapseButton, CollapseButtonProps } from '../../buttons/collapse-button/collapse-button';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { Radio, RadioProps } from '../../form/radio/radio';
 import { TextField, type TextFieldProps } from '../../form/textfield/textfield';
@@ -190,8 +190,8 @@ export type TableSelectionRadioProps = Omit<
 export type TableSelectionMode = 'multiple' | 'single';
 
 export type TableExpandCollapseProps = Omit<
-  CollapseProps,
-  'id' | 'controlsId' | 'children' | 'open' | 'onToggle' | 'openText' | 'closeText' | 'title'
+  CollapseButtonProps,
+  'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls' | 'hideText'
 >;
 
 export interface TablePersistOptions {
@@ -410,11 +410,14 @@ export interface TableProps<TData> {
   pagination?: boolean | TablePaginationOptions;
   /**
    * Whether the current page resets to the first page whenever `data` changes
-   * (TanStack's `autoResetPageIndex`). Defaults to `true`, which keeps the user
-   * on a valid page after filtering or sorting. Set to `false` for tables that
-   * mutate `data` in place — e.g. inline row editing — so saving a row doesn't
-   * yank the user back to page 1.
-   * @default true
+   * (TanStack's `autoResetPageIndex`). Defaults to `true` for client-side
+   * pagination (keeps the user on a valid page after filtering or sorting) and
+   * to `false` when `manualPagination` is set — in server-side mode `data` is
+   * replaced on every page/sort change, so auto-resetting would bounce the user
+   * back to page 1 and trigger an update loop. Set to `false` for client-side
+   * tables that mutate `data` in place (e.g. inline row editing), or override
+   * explicitly in either mode.
+   * @default true (client-side) / false (manualPagination)
    */
   autoResetPageIndex?: boolean;
   /**
@@ -507,10 +510,10 @@ export interface TableProps<TData> {
    */
   radioProps?: TableSelectionRadioProps;
   /**
-   * Props forwarded to the row-expand Collapse toggle. Use this to e.g.
-   * switch to `arrowType: 'default'`, change the icon size, or disable
-   * `iconOnly`. Wiring props (id, controlsId, open, onToggle, openText,
-   * closeText, children) are owned by Table and cannot be overridden.
+   * Props forwarded to the row-expand `CollapseButton` toggle. Use this to
+   * e.g. switch to `arrowType: 'default'` or change the `size`. Wiring props
+   * (id, open, onOpenChange, openText, closeText, aria-controls, hideText) are
+   * owned by Table and cannot be overridden.
    */
   collapseProps?: TableExpandCollapseProps;
   /**
@@ -783,7 +786,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     expandTrigger = 'button',
     paginateExpandedRows = false,
     pagination: paginationProp,
-    autoResetPageIndex = true,
+    autoResetPageIndex,
     manualPagination = false,
     manualSorting = false,
     manualFiltering = false,
@@ -1016,20 +1019,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
               }}
             >
-              <Collapse
-                iconOnly
+              <CollapseButton
                 arrowType={expandTrigger === 'row' ? 'default' : 'secondary'}
-                hideCollapseText
                 {...collapseProps}
+                hideText
                 id={`${resolvedId}-expand-${row.id}`}
-                controlsId={subRowId}
+                aria-controls={renderSubComponent ? subRowId : undefined}
                 openText={getLabelRef.current('table.expand-row')}
                 closeText={getLabelRef.current('table.collapse-row')}
                 open={row.getIsExpanded()}
-                onToggle={() => row.toggleExpanded()}
-              >
-                {null}
-              </Collapse>
+                onOpenChange={() => row.toggleExpanded()}
+              />
             </span>
           );
         },
@@ -1042,6 +1042,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     hasSelection,
     selectionMode,
     hasExpansion,
+    renderSubComponent,
     expandTrigger,
     reorderableRows,
     resolvedId,
@@ -1075,7 +1076,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
     enableColumnFilters,
-    autoResetPageIndex,
+    autoResetPageIndex: autoResetPageIndex ?? !manualPagination,
     paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
     manualSorting,
@@ -1106,8 +1107,26 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     [table, size, resolvedId, tableState]
   );
 
-  const handlePaginationPageChange = useCallback((nextPage: number) => table.setPageIndex(nextPage - 1), [table]);
-  const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const resetScrollTop = useCallback(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, []);
+
+  const handlePaginationPageChange = useCallback(
+    (nextPage: number) => {
+      table.setPageIndex(nextPage - 1);
+      resetScrollTop();
+    },
+    [table, resetScrollTop]
+  );
+  const handlePaginationPageSizeChange = useCallback(
+    (nextSize: number) => {
+      table.setPageSize(nextSize);
+      resetScrollTop();
+    },
+    [table, resetScrollTop]
+  );
 
   const hasGroupedHeaders = table.getHeaderGroups().length > 1;
   const rowExpandsOnClick = expandTrigger === 'row' && hasExpansion;
@@ -1543,6 +1562,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           </div>
         )}
         <div
+          ref={scrollRef}
           className={styles['tedi-table__scroll']}
           style={maxHeight !== undefined ? { maxHeight, overflowY: 'auto' } : undefined}
         >

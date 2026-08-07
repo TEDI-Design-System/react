@@ -1,0 +1,81 @@
+.tedi-card-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+
+  > [data-name='card'] {
+    height: 100%;
+  }
+
+  &:hover:not(:disabled) {
+    > [data-name='card'] {
+      border-color: var(--button-card-hover-border);
+    }
+
+    [data-name='card-content'] {
+      background-color: var(--button-card-hover-background);
+    }
+
+    [data-name='icon'] {
+      color: var(--button-card-icon-hover);
+    }
+
+    [data-name='separator'] {
+      border-color: var(--button-card-hover-border);
+    }
+  }
+
+  &:active:not(:disabled) {
+    > [data-name='card'] {
+      border-color: var(--button-card-active-border);
+    }
+
+    [data-name='card-content'] {
+      background-color: var(--button-card-active-background);
+    }
+
+    [data-name='icon'] {
+      color: var(--button-card-icon-hover);
+    }
+
+    [data-name='separator'] {
+      border-color: var(--button-card-active-border);
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-radius: var(--card-radius-rounded);
+    box-shadow: 0 0 0 1px var(--tedi-neutral-100), 0 0 0 3px var(--tedi-primary-500);
+  }
+
+  &:disabled {
+    cursor: default;
+
+    > [data-name='card'] {
+      color: var(--general-text-disabled);
+      border-color: var(--button-card-disabled-border);
+    }
+
+    [data-name='card-content'] {
+      background-color: var(--button-card-disabled-background);
+    }
+
+    [class*='tedi-text--'],
+    [data-name='icon'] {
+      color: var(--general-text-disabled);
+    }
+
+    [data-name='separator'] {
+      border-color: var(--button-card-disabled-border);
+    }
+  }
+}

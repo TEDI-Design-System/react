@@ -1,6 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -31,15 +36,32 @@ const meta: Meta<typeof HorizontalStepper> = {
 export default meta;
 type Story = StoryObj<HorizontalStepperProps>;
 
-export const Default: Story = {
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `HorizontalStepper.Item`**. The item knobs (`selected`, `completed`, `error`,
+ * `disabled`, `description`, …) — flattened into namespaced controls via the shared
+ * `subcomponentArgTypes` helper — drive the **first** step (current by default) so their
+ * effect is visible next to the unchanged later steps. The ungrouped controls are
+ * `HorizontalStepper`'s own props (`background`, `compact`, …); `label` is excluded since
+ * each step sets its own.
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(HorizontalStepper.Item, {
+      category: 'HorizontalStepper.Item',
+      prefix: 'item',
+      exclude: ['label', 'onSelect'],
+    }),
+  },
   args: {
     'aria-label': 'Form progress',
     background: 'default',
     compact: 'sm',
+    item__selected: true,
   },
-  render: (args) => (
-    <HorizontalStepper {...args}>
-      <HorizontalStepper.Item label="Kutse" selected />
+  render: (args: Record<string, unknown>) => (
+    <HorizontalStepper {...getPrimaryComponentProps<HorizontalStepperProps>(args)}>
+      <HorizontalStepper.Item {...getSubcomponentProps(args, 'item')} label="Kutse" />
       <HorizontalStepper.Item label="Tahteavaldus" />
       <HorizontalStepper.Item label="Geenianalüüs" />
       <HorizontalStepper.Item label="Vastus" />

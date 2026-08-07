@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';

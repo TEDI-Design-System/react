@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 export const ITEM_HEIGHT = 40;
-export const TIMEPICKER_OFFSET = 6;
+export const TIMEPICKER_OFFSET = 2;
 
 /**
  * Generates an array of hours (00–23)

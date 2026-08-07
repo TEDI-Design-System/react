@@ -17,11 +17,18 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { dateMatchModifiers, DateRange, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
+import {
+  type Breakpoint,
+  BreakpointSupport,
+  isBreakpointBelow,
+  useBreakpoint,
+  useBreakpointProps,
+} from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Calendar } from '../../content/calendar/calendar';
-import MultiValueField, { MultiValueFieldProps } from '../multi-value-field/multi-value-field';
+import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
+import MultiValueField, { MultiValueFieldProps, MultiValueFieldRef } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './date-field.module.scss';
 import {
@@ -29,7 +36,11 @@ import {
   CALENDAR_POPOVER_OFFSET,
   CALENDAR_POPOVER_PADDING,
   getLocaleDateParts,
+  resolveRangeSelection,
 } from './date-field-helpers';
+import { DatePickerModal } from './date-picker-modal/date-picker-modal';
+
+export type DateFieldModal = boolean | Exclude<Breakpoint, 'xs'>;
 
 export type DateFieldMode = 'single' | 'multiple' | 'range';
 export type CalendarView = 'days' | 'months' | 'years';
@@ -59,9 +70,9 @@ type DateFieldBreakpointProps = {
    */
   useNativePicker?: boolean;
   /**
-   * Number of months shown side-by-side. On mobile (`< md`) values > 1 are
-   * automatically clamped to 1 — the popover would otherwise be unscrollable
-   * on a phone viewport.
+   * Number of months shown side-by-side. In the **popover** on mobile (`< md`) values > 1 are
+   * clamped to 1 — a multi-month popover gets unscrollable on a phone viewport. In a **modal** the
+   * count is kept: the months wrap to a vertical stack and the modal body scrolls.
    */
   numberOfMonths?: number;
 };
@@ -161,6 +172,13 @@ export interface DateFieldProps
    */
   monthYearSelectType?: 'dropdown' | 'grid';
   /**
+   * Show or hide the calendar header's previous/next navigation. When hidden, the month/year header
+   * also becomes a static, non-interactive label (no dropdown / grid jumping) — so the calendar is
+   * locked to the visible month(s): a clean "pick from these" view for a fixed month or range.
+   * @default true
+   */
+  showNavigation?: boolean;
+  /**
    * **Selection granularity** — controls the level at which a click finalises
    * the date selection rather than drilling further into days. Use a coarser
    * level when the consumer only needs to pick a year or a month.
@@ -177,6 +195,16 @@ export interface DateFieldProps
    * @default 'days'
    */
   selectionLevel?: CalendarView;
+  /**
+   * **Initial grid** the calendar opens on, independent of `selectionLevel`.
+   * Use it to start the user on the year / month grid for fast year-first
+   * navigation while still letting them drill down and commit at the
+   * `selectionLevel` (e.g. `initialView="years"` with the default
+   * `selectionLevel="days"` opens the year grid → month grid → day grid).
+   * Pair with `monthYearSelectType="grid"` so the navigation stays grid-based.
+   * @default selectionLevel
+   */
+  initialView?: CalendarView;
   /**
    * The locale object for the calendar, used by React DayPicker. Defaults to Estonian locale.
    */
@@ -244,6 +272,42 @@ export interface DateFieldProps
    */
   inputProps?: DateTextFieldProps | DateMultiValueFieldProps;
   /**
+   * Layout for the selected-date tags in `'multiple'` mode.
+   * - `'stack'` (default) — tags wrap onto multiple rows; the field grows in height.
+   * - `'row'` — tags stay on a single row; any that don't fit collapse into a
+   *   `+N` counter (measured from the available width).
+   * @default stack
+   */
+  tagsDirection?: 'stack' | 'row';
+  /**
+   * Open the calendar inside a modal instead of a floating popover. Useful
+   * on narrow viewports where a popover overlaps the input itself. Mirrors
+   * `TimeField`'s `modal` prop.
+   *
+   * - `true` always opens in a modal
+   * - `false` (default) always uses the popover
+   * - A breakpoint name (e.g. `'md'`) opens in a modal *below* that breakpoint
+   *   and falls back to the popover from that breakpoint up
+   *
+   * Ignored when `useNativePicker` resolves to `true` (the native picker is
+   * already handled by the OS).
+   * @default false
+   */
+  modal?: DateFieldModal;
+  /**
+   * Extra props forwarded to the calendar modal's `Modal.Content` — e.g. `size`, `width`, `maxWidth`,
+   * `position`, `fullscreen`, and per-breakpoint overrides. Lets the consumer tune the modal beyond
+   * its responsive-width defaults. `className` is merged with the component's own (so the internal
+   * layout is preserved). Only applies when the calendar opens as a modal.
+   */
+  modalProps?: Omit<ModalContentProps, 'children'>;
+  /**
+   * Heading shown at the top of the calendar modal. Falls back to the `date-field.modal-title`
+   * label. Handy for month/year-only pickers (e.g. `"Vali kuu"` / `"Vali aasta"`). Only applies when
+   * the calendar opens as a modal.
+   */
+  modalTitle?: string;
+  /**
    * Error message rendered below the input when the user types a date that
    * matches one of the disable matchers (`disablePast`, `disableFuture`,
    * `minDate`, `maxDate`, `disabledMatchers`, or the deprecated `disabled`
@@ -251,6 +315,13 @@ export interface DateFieldProps
    * label.
    */
   disabledDateErrorMessage?: string;
+  /**
+   * Error message rendered below the input when the typed text cannot be parsed
+   * into a valid date for the current `mode`. Validation runs on blur so
+   * partially-typed input isn't flagged mid-typing. Falls back to the localised
+   * `dateField.invalidDateError` label.
+   */
+  invalidDateErrorMessage?: string;
 }
 
 export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((props, ref) => {
@@ -278,7 +349,10 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     showOutsideDays = true,
     parseDate,
     monthYearSelectType,
+    tagsDirection,
+    showNavigation = true,
     selectionLevel = 'days',
+    initialView,
     locale = et,
     localeCode = 'et-EE',
     initialMonth,
@@ -294,7 +368,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     readOnly,
     availableDays,
     inputProps,
+    modal = false,
+    modalProps,
+    modalTitle,
     disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
+    invalidDateErrorMessage = getLabel('dateField.invalidDateError'),
     useNativePicker: _useNativePicker,
     enableCalendar: _enableCalendar,
     calendarTrigger: _calendarTrigger,
@@ -312,20 +390,30 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   const breakpoint = useBreakpoint(props.defaultServerBreakpoint);
   const isMobile = isBreakpointBelow(breakpoint, 'md');
-  const effectiveNumberOfMonths =
-    isMobile && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
   const [internalValue, setInternalValue] = useState<Date | Date[] | DateRange | undefined>(selected ?? defaultValue);
 
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<CalendarView>(selectionLevel);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [view, setView] = useState<CalendarView>(initialView ?? selectionLevel);
   const [inputValue, setInputValue] = useState('');
   const [hasDisabledDateError, setHasDisabledDateError] = useState(false);
+  const [hasInvalidDateError, setHasInvalidDateError] = useState(false);
+
+  const useModalPicker =
+    enableCalendar &&
+    !shouldUseNativePicker &&
+    !readOnly &&
+    (modal === true || (typeof modal === 'string' && isBreakpointBelow(breakpoint, modal)));
+
+  const effectiveNumberOfMonths =
+    isMobile && !useModalPicker && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
   const isControlled = selected !== undefined;
   const value = isControlled ? selected : internalValue;
 
   const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
+  const multiValueRef = React.useRef<MultiValueFieldRef | null>(null);
 
   const setTextFieldRef = React.useCallback(
     (node: TextFieldForwardRef | null) => {
@@ -369,9 +457,9 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
   useEffect(() => {
     if (open) {
-      setView(selectionLevel);
+      setView(initialView ?? selectionLevel);
     }
-  }, [open, selectionLevel]);
+  }, [open, selectionLevel, initialView]);
 
   useEffect(() => {
     if (isControlled) {
@@ -451,11 +539,14 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   );
 
   const handleSelect: OnSelectHandler<Date | Date[] | DateRange | undefined> = (date, selectedDay, modifiers, e) => {
-    if (!isControlled) setInternalValue(date);
-    onSelect?.(date, selectedDay, modifiers, e);
+    const next = mode === 'range' ? resolveRangeSelection(date, value, selectedDay) : date;
 
-    if (date) {
-      const formatted = formatDate ? formatDate(date) : defaultFormatter(date);
+    setHasDisabledDateError(false);
+    if (!isControlled) setInternalValue(next);
+    onSelect?.(next, selectedDay, modifiers, e);
+
+    if (next) {
+      const formatted = formatDate ? formatDate(next) : defaultFormatter(next);
       setInputValue(formatted);
     } else {
       setInputValue('');
@@ -467,10 +558,18 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const applyValue = (date: Date) => {
     if (isDateDisabled(date)) return;
 
-    if (!isControlled) setInternalValue(date);
-    onSelect?.(date, date as UnknownType, {}, {} as UnknownType);
+    const next: Date | Date[] | DateRange =
+      mode === 'range'
+        ? { from: date, to: undefined }
+        : mode === 'multiple'
+        ? [...(Array.isArray(value) ? value : []), date]
+        : date;
 
-    const formatted = formatDate ? formatDate(date) : defaultFormatter(date);
+    setHasDisabledDateError(false);
+    if (!isControlled) setInternalValue(next);
+    onSelect?.(next, date as UnknownType, {}, {} as UnknownType);
+
+    const formatted = formatDate ? formatDate(next) : defaultFormatter(next);
     setInputValue(formatted);
 
     if (shouldCloseOnSelect) setOpen(false);
@@ -506,21 +605,25 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     };
   }, [dateFormatter]);
 
+  const parseInputValue = (val: string): Date | Date[] | DateRange | undefined =>
+    (parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined))(val);
+
+  const isParsedValidForMode = (parsed: Date | Date[] | DateRange | undefined): boolean =>
+    (mode === 'single' && parsed instanceof Date) ||
+    (mode === 'multiple' && Array.isArray(parsed)) ||
+    (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
+
   const handleInputChange = (val: string) => {
     setInputValue(val);
+    setHasInvalidDateError(false);
 
     if (val.trim() === '') {
       setHasDisabledDateError(false);
       return;
     }
 
-    const parser = parseDate ?? (mode === 'single' ? defaultParseDate : () => undefined);
-    const parsed = parser(val);
-
-    const isValidForMode =
-      (mode === 'single' && parsed instanceof Date) ||
-      (mode === 'multiple' && Array.isArray(parsed)) ||
-      (mode === 'range' && !!parsed && !Array.isArray(parsed) && 'from' in parsed);
+    const parsed = parseInputValue(val);
+    const isValidForMode = isParsedValidForMode(parsed);
 
     if (!isValidForMode) {
       setHasDisabledDateError(false);
@@ -546,6 +649,14 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     if (parsed instanceof Date) setCurrentMonth(parsed);
 
     if (shouldCloseOnSelect) setOpen(false);
+  };
+
+  const handleInputBlur = () => {
+    if (inputValue.trim() === '') {
+      setHasInvalidDateError(false);
+      return;
+    }
+    setHasInvalidDateError(!isParsedValidForMode(parseInputValue(inputValue)));
   };
 
   useEffect(() => {
@@ -575,16 +686,18 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
         padding: CALENDAR_POPOVER_PADDING,
         apply({ availableWidth, elements }) {
           const el = elements.floating;
-          el.style.width = 'max-content';
+          el.style.width = '';
           el.style.maxWidth = '';
+          el.style.overflowX = '';
+
+          if (isMobile) return;
+
+          el.style.width = 'max-content';
           const naturalWidth = el.getBoundingClientRect().width;
 
           if (naturalWidth > availableWidth) {
             el.style.width = 'min-content';
             el.style.maxWidth = `${availableWidth}px`;
-          } else {
-            el.style.width = '';
-            el.style.maxWidth = '';
           }
         },
       }),
@@ -595,7 +708,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const { refs, context, x, y, strategy } = floating;
   const click = useClick(context);
   const interactions = useInteractions([
-    ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' ? [click] : []),
+    ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input' && !useModalPicker ? [click] : []),
     useDismiss(context, {
       outsidePress: (event) => {
         const target = event.target as Element | null;
@@ -604,6 +717,14 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     }),
     useRole(context, { role: 'dialog' }),
   ]);
+
+  React.useEffect(() => {
+    const anchorNode =
+      mode === 'multiple'
+        ? multiValueRef.current?.wrapper ?? null
+        : (textFieldRef.current?.input as HTMLElement | undefined) ?? null;
+    refs.setPositionReference(anchorNode ?? refs.reference.current);
+  }, [mode, open, refs]);
 
   const openNativePicker = () => {
     const input = textFieldRef.current?.input as HTMLInputElement | undefined;
@@ -618,6 +739,29 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       }
     }
     input.focus();
+  };
+
+  const openCalendar = () => {
+    if (!enableCalendar || readOnly) return;
+    if (shouldUseNativePicker) {
+      openNativePicker();
+    } else if (useModalPicker) {
+      setModalOpen(true);
+    } else {
+      setOpen((prev) => !prev);
+    }
+  };
+
+  const handleModalConfirm = (next: Date | Date[] | DateRange | undefined) => {
+    setHasDisabledDateError(false);
+    if (!isControlled) setInternalValue(next);
+    onSelect?.(next, next as UnknownType, {}, {} as UnknownType);
+    if (next) {
+      const formatted = formatDate ? formatDate(next) : defaultFormatter(next);
+      setInputValue(formatted);
+    } else {
+      setInputValue('');
+    }
   };
 
   const handleNativeInputChange = (val: string) => {
@@ -641,22 +785,47 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     onSelect?.(parsed, parsed as UnknownType, {}, {} as UnknownType);
   };
 
+  const referenceProps = interactions.getReferenceProps(
+    useModalPicker && calendarTrigger === 'input' ? { onClick: () => openCalendar() } : undefined
+  );
+
+  const {
+    role: _role,
+    'aria-expanded': _ariaExpanded,
+    'aria-haspopup': _ariaHaspopup,
+    'aria-controls': floatingAriaControls,
+    ...containerInteractionProps
+  } = referenceProps;
+
+  const triggerAriaControls = !useModalPicker ? (floatingAriaControls as string | undefined) : undefined;
+
+  const openCalendarLabel = getLabel('dateField.openCalendar');
+
+  const calendarTriggerProps: React.ButtonHTMLAttributes<HTMLButtonElement> = {
+    'aria-label': openCalendarLabel,
+    'aria-expanded': useModalPicker ? modalOpen : open,
+    'aria-haspopup': 'dialog',
+    'aria-controls': triggerAriaControls,
+  };
+
   return (
     <>
       <div
         className={cn(styles['tedi-date-field__container'], className)}
-        {...interactions.getReferenceProps()}
+        {...containerInteractionProps}
         ref={refs.setReference}
       >
         {mode === 'multiple' ? (
           <MultiValueField
             {...(inputProps as MultiValueFieldProps)}
+            ref={multiValueRef}
             id={id}
             label={label}
+            tagsDirection={tagsDirection}
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
-            onIconClick={() => enableCalendar && setOpen((prev) => !prev)}
-            iconButtonProps={enableCalendar ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' } : undefined}
+            onIconClick={openCalendar}
+            iconButtonProps={enableCalendar ? calendarTriggerProps : { 'aria-label': openCalendarLabel }}
             isClearable
             required={required}
             onChange={(newLabels) => {
@@ -683,29 +852,26 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
-            aria-expanded={enableCalendar && !shouldUseNativePicker ? open : undefined}
             isClearable
-            onIconClick={() => {
-              if (!enableCalendar) return;
-              if (shouldUseNativePicker) {
-                openNativePicker();
-              } else {
-                setOpen((prev) => !prev);
-              }
-            }}
+            onIconClick={openCalendar}
             iconButtonProps={
-              enableCalendar && !shouldUseNativePicker
-                ? { 'aria-expanded': open, 'aria-haspopup': 'dialog' }
-                : undefined
+              enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : { 'aria-label': openCalendarLabel }
             }
             onChange={(val) => (shouldUseNativePicker ? handleNativeInputChange(val) : handleInputChange(val))}
+            onBlur={(e) => {
+              if (!shouldUseNativePicker) handleInputBlur();
+              (inputProps as TextFieldProps)?.onBlur?.(e);
+            }}
             required={required}
-            invalid={hasDisabledDateError || (inputProps as TextFieldProps)?.invalid}
+            invalid={hasDisabledDateError || hasInvalidDateError || (inputProps as TextFieldProps)?.invalid}
             helper={(() => {
               const consumerHelper = (inputProps as TextFieldProps)?.helper;
-              const errorHelper = hasDisabledDateError
-                ? { text: disabledDateErrorMessage, type: 'error' as const }
+              const errorText = hasDisabledDateError
+                ? disabledDateErrorMessage
+                : hasInvalidDateError
+                ? invalidDateErrorMessage
                 : null;
+              const errorHelper = errorText ? { text: errorText, type: 'error' as const } : null;
               if (!errorHelper) return consumerHelper;
               if (!consumerHelper) return errorHelper;
               return Array.isArray(consumerHelper) ? [...consumerHelper, errorHelper] : [consumerHelper, errorHelper];
@@ -718,24 +884,59 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
               ...((inputProps as TextFieldProps)?.input as UnknownType),
               ...(shouldUseNativePicker && { type: 'date' }),
               ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
-                ? { 'aria-haspopup': 'dialog', 'aria-expanded': open }
+                ? {
+                    role: 'combobox',
+                    'aria-haspopup': 'dialog',
+                    'aria-expanded': useModalPicker ? modalOpen : open,
+                    'aria-controls': triggerAriaControls,
+                  }
                 : {}),
             }}
           />
         )}
       </div>
 
-      {enableCalendar && !shouldUseNativePicker && (
+      {useModalPicker && (
+        <DatePickerModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          value={value}
+          onConfirm={handleModalConfirm}
+          mode={mode}
+          numberOfMonths={effectiveNumberOfMonths}
+          locale={locale}
+          localeCode={localeCode}
+          showOutsideDays={showOutsideDays}
+          disabledMatchers={disabledMatchers}
+          required={required}
+          availableDays={availableDays}
+          footer={footer}
+          monthYearSelectType={monthYearSelectType}
+          showNavigation={showNavigation}
+          selectionLevel={selectionLevel}
+          initialView={initialView}
+          initialMonth={initialMonth}
+          modalProps={modalProps}
+          {...(dayPickerProps as UnknownType)}
+          title={modalTitle}
+        />
+      )}
+
+      {enableCalendar && !shouldUseNativePicker && !useModalPicker && (
         <FloatingPortal>
           {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
                 ref={refs.setFloating}
+                className={cn({
+                  [styles['tedi-date-field__calendar-popover--fullwidth']]: isMobile,
+                })}
                 {...interactions.getFloatingProps({
                   style: {
                     position: strategy,
                     top: y ?? 0,
-                    left: x ?? 0,
+                    left: isMobile ? 0 : x ?? 0,
+                    right: isMobile ? 0 : undefined,
                   },
                 })}
               >
@@ -757,9 +958,12 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   availableDays={availableDays}
                   footer={footer}
                   monthYearSelectType={monthYearSelectType}
+                  showNavigation={showNavigation}
                   handleSelect={handleSelect}
                   applyValue={applyValue}
-                  className={styles['tedi-date-field__calendar']}
+                  className={cn(styles['tedi-date-field__calendar'], {
+                    [styles['tedi-date-field__calendar--fullwidth']]: isMobile,
+                  })}
                 />
               </div>
             </FloatingFocusManager>

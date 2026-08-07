@@ -1,5 +1,5 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
@@ -10,12 +10,12 @@ import { Text } from '../../base/typography/text/text';
 import Button from '../../buttons/button/button';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import InfoButton from '../../buttons/info-button/info-button';
+import { EmptyState } from '../../content/empty-state';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { DateField } from '../../form/date-field/date-field';
 import { TextField } from '../../form/textfield/textfield';
 import { TimeField } from '../../form/time-field/time-field';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import { EmptyState } from '../../misc/empty-state';
 import Separator from '../../misc/separator/separator';
 import { Alert } from '../../notifications/alert/alert';
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger } from '../../overlays/dropdown';
@@ -30,7 +30,7 @@ import { groupRowSpan, Table } from './table';
 /**
  * <a href="https://tanstack.com/table" target="_BLANK">@tanstack/react-table ↗</a><br/>
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/557b9f-table" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/557b9f-table" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Table> = {
   component: Table,
@@ -1964,6 +1964,7 @@ export const ReorderableColumnsStickyHeader: Story = {
         reorderableColumns
         stickyHeader
         maxHeight={280}
+        pagination={{ pageSize: 10 }}
       />
     </VerticalSpacing>
   ),

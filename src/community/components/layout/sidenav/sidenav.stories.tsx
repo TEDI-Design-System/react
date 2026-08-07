@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import Sidenav, { SideNavItem } from './sidenav';
 
@@ -7,6 +7,9 @@ const meta: Meta<typeof Sidenav> = {
   title: 'Community/Layout/Sidenav',
   parameters: {
     layout: 'fullscreen',
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
   },
 };
 

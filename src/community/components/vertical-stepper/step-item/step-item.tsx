@@ -3,7 +3,7 @@ import React from 'react';
 
 import { Col, Row, Text } from '../../../../tedi';
 import { Icon } from '../../../../tedi/components/base/icon/icon';
-import Collapse from '../../../../tedi/components/buttons/collapse/collapse';
+import Collapse from '../../../../tedi/components/content/collapse/collapse';
 import styles from '../vertical-stepper.module.scss';
 
 export interface StepItemProps {

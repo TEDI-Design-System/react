@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -41,7 +41,13 @@ const TemplateSizes: StoryFn<RadioProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Radio {...args} size={size} id={`radio-size-${size}`} />
+              <Radio
+                {...args}
+                size={size}
+                id={`radio-size-${size}`}
+                label={`${size.charAt(0).toUpperCase() + size.slice(1)} size`}
+                hideLabel
+              />
             </Col>
           </Row>
         ))}

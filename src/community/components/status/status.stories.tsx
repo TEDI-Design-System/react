@@ -1,10 +1,15 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import Status from './status';
 
 const meta: Meta<typeof Status> = {
   component: Status,
   title: 'Community/Status',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -42,7 +42,13 @@ const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Checkbox {...args} size={size} id={`checkbox-size-${size}`} />
+              <Checkbox
+                {...args}
+                size={size}
+                id={`checkbox-size-${size}`}
+                label={`${size.charAt(0).toUpperCase() + size.slice(1)} size`}
+                hideLabel
+              />
             </Col>
           </Row>
         ))}

@@ -4,6 +4,10 @@
   min-height: var(--button-xs-icon-size);
   vertical-align: bottom;
 
+  &[data-name='info-button']:focus-visible:not(:disabled, [aria-disabled='true']) {
+    outline-offset: calc(-1 * var(--tedi-borders-02));
+  }
+
   &[data-variant='inverted']:hover:not(:disabled) {
     background-color: var(--button-main-neutral-inverted-icon-only-background-hover);
   }

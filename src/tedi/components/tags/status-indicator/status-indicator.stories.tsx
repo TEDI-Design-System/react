@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -9,7 +9,7 @@ import { StatusIndicator } from './status-indicator';
  */
 const meta: Meta<typeof StatusIndicator> = {
   component: StatusIndicator,
-  title: 'TEDI-Ready/Components/Tag/StatusIndicator',
+  title: 'TEDI-Ready/Components/Helpers/StatusIndicator',
   parameters: {
     design: {
       type: 'figma',

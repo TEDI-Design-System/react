@@ -67,6 +67,7 @@ jest.mock('../textfield/textfield', () => {
     return (
       <div>
         <input
+          {...props.input}
           ref={inputRef}
           data-testid="textfield-input"
           value={props.value || ''}
@@ -88,6 +89,15 @@ jest.mock('../time-picker/time-picker', () => ({
       <button onClick={() => onChange('12:30')}>pick</button>
     </div>
   ),
+}));
+
+jest.mock('./time-picker-modal/time-picker-modal', () => ({
+  TimePickerModal: ({ open, onConfirm }: any) =>
+    open ? (
+      <div role="dialog">
+        <button onClick={() => onConfirm('12:30')}>modal-confirm</button>
+      </div>
+    ) : null,
 }));
 
 describe('TimeField', () => {
@@ -214,6 +224,47 @@ describe('TimeField', () => {
     expect(onChange).toHaveBeenCalledWith('10:00');
   });
 
+  it('button-trigger dropdown does not open from an input click (stops propagation to the trigger)', async () => {
+    const user = userEvent.setup();
+    const parentClick = jest.fn();
+
+    render(
+      <div onClick={parentClick}>
+        <TimeField
+          id="t1"
+          label="Time"
+          availableTimes={['09:00', '10:00']}
+          availableTimesVariant="dropdown"
+          timePickerTrigger="button"
+        />
+      </div>
+    );
+
+    await user.click(screen.getByTestId('textfield-input'));
+    // Input click must not bubble to the Dropdown trigger — only the icon opens a button-trigger dropdown.
+    expect(parentClick).not.toHaveBeenCalled();
+  });
+
+  it('input-trigger dropdown opens from an input click (click reaches the trigger)', async () => {
+    const user = userEvent.setup();
+    const parentClick = jest.fn();
+
+    render(
+      <div onClick={parentClick}>
+        <TimeField
+          id="t2"
+          label="Time"
+          availableTimes={['09:00', '10:00']}
+          availableTimesVariant="dropdown"
+          timePickerTrigger="input"
+        />
+      </div>
+    );
+
+    await user.click(screen.getByTestId('textfield-input'));
+    expect(parentClick).toHaveBeenCalled();
+  });
+
   it('uses native picker path (focus/showPicker)', async () => {
     const user = userEvent.setup();
     const showPicker = jest.fn();
@@ -258,5 +309,34 @@ describe('TimeField', () => {
 
     expect(input).toHaveValue('9999');
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  describe('modal picker', () => {
+    it('opens the picker in a modal when `modal` is set (icon trigger)', async () => {
+      const user = userEvent.setup();
+      render(<TimeField id="t-modal" label="Time" modal />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByTestId('icon'));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('opens the modal from an input click when `modal` + input trigger', async () => {
+      const user = userEvent.setup();
+      render(<TimeField id="t-modal-input" label="Time" modal timePickerTrigger="input" />);
+
+      await user.click(screen.getByTestId('textfield-input'));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('commits the modal value on confirm', async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      render(<TimeField id="t-modal-confirm" label="Time" modal onChange={onChange} />);
+
+      await user.click(screen.getByTestId('icon'));
+      await user.click(screen.getByText('modal-confirm'));
+      expect(onChange).toHaveBeenCalledWith('12:30');
+    });
   });
 });

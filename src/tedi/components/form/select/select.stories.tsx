@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { OptionProps, OptionsOrGroups } from 'react-select';
 
 import { Icon } from '../../base/icon/icon';
@@ -33,23 +33,6 @@ const options = [
   { value: 'haapsalu', label: 'Haapsalu' },
 ];
 
-const groupedOptions: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOption>> = [
-  {
-    label: 'American cities',
-    options: [
-      { value: 'new-york', label: 'New York' },
-      { value: 'dallas', label: 'Dallas' },
-    ],
-  },
-  {
-    label: 'Estonian cities',
-    options: [
-      { value: 'tallinn', label: 'Tallinn' },
-      { value: 'tartu', label: 'Tartu' },
-    ],
-  },
-];
-
 const TemplateSizes: StoryFn = (args) => (
   <Row>
     <Col lg={12} xs={12} className="example-list">
@@ -58,7 +41,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} id="select-size-default" {...args} />
+          <Select {...args} id="select-size-default" />
         </Col>
       </Row>
       <Row className="padding-14-16">
@@ -66,7 +49,7 @@ const TemplateSizes: StoryFn = (args) => (
           <Text modifiers="bold">Small</Text>
         </Col>
         <Col lg={10} xs={12}>
-          <Select label={args.label} size="small" id="select-size-default" {...args} />
+          <Select {...args} size="small" id="select-size-small" />
         </Col>
       </Row>
     </Col>
@@ -353,6 +336,47 @@ export const ValueType: Story = {
       </div>
     </VerticalSpacing>
   ),
+};
+
+/**
+ * `tagsEllipsis` truncates long tag labels: `end` → `Long label…`, `start` → `…label`. The full
+ * label shows in a popover on hover/focus.
+ */
+export const EllipsisTags: Story = {
+  render: () => {
+    const longOptions: ISelectOption[] = [
+      { value: 'a', label: 'A fairly long option label that does not fit' },
+      { value: 'b', label: 'Another rather long option label' },
+      { value: 'c', label: '2026-06-25 quarterly financial report' },
+    ];
+
+    return (
+      <div style={{ maxWidth: '20rem' }}>
+        <VerticalSpacing>
+          <Select
+            id="ellipsis-tags-end"
+            label="Truncate the end"
+            options={longOptions}
+            defaultValue={longOptions}
+            multiple
+            tagsEllipsis="end"
+            isTagRemovable
+            isClearable
+          />
+          <Select
+            id="ellipsis-tags-start"
+            label="Truncate the start"
+            options={longOptions}
+            defaultValue={longOptions}
+            multiple
+            tagsEllipsis="start"
+            isTagRemovable
+            isClearable
+          />
+        </VerticalSpacing>
+      </div>
+    );
+  },
 };
 
 const departmentOptions: ISelectOption[] = [
@@ -700,5 +724,28 @@ export const EditableSelect: Story = {
   args: {
     id: 'editable-example',
     label: 'Editable label',
+  },
+};
+
+/**
+ * **Mobile keyboard deferral.** For quick-pick searchable selects, the on-screen
+ * keyboard popping up the instant the menu opens can cover most of the screen.
+ * With `openKeyboardOnTouch={false}`, tapping the field on a touch/pen device
+ * opens the menu for browsing **without** raising the keyboard — the input is
+ * rendered with `inputMode="none"`. The keyboard appears only when the user
+ * taps the search input directly.
+ *
+ * This is touch-only: mouse and keyboard users are unaffected, and hardware
+ * typing is never blocked, so the combobox stays fully operable (WCAG 2.1.1).
+ * Best viewed on a real device or the Storybook mobile viewport.
+ */
+export const DeferKeyboardOnTouch: Story = {
+  args: {
+    id: 'defer-keyboard-example',
+    label: 'Address',
+    placeholder: 'Vali...',
+    options: options,
+    openKeyboardOnTouch: false,
+    isSearchable: true,
   },
 };

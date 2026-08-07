@@ -44,6 +44,9 @@ export const AccordionContext = React.createContext<IAccordionContext>({
   onToggle: () => null,
 });
 
+/**
+ * @deprecated Use the TEDI-Ready `Accordion` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Accordion = (props: AccordionProps): JSX.Element => {
   const { children, className, openItem, gutter = 0.5, onToggleItem, defaultOpenItem = [], ...rest } = props;
   const openValues = openItem ? openItem : defaultOpenItem;

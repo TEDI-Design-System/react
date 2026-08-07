@@ -1,7 +1,7 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
-import { Card, CardContent } from '../../cards/card';
+import { Card, CardContent } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator, { DotSize, SeparatorProps } from './separator';

@@ -72,7 +72,14 @@ export type DropdownItemProps = {
    * @default undefined
    */
   className?: string;
-};
+  /**
+   * ARIA role for the item. Defaults to `menuitem`; override to convey selection
+   * semantics (e.g. `menuitemcheckbox` / `menuitemradio` / `option`) and pair it
+   * with the matching `aria-checked` / `aria-selected`.
+   * @default menuitem
+   */
+  role?: React.AriaRole;
+} & React.AriaAttributes;
 
 export const DropdownItem = ({
   children,
@@ -85,13 +92,17 @@ export const DropdownItem = ({
   closeOnSelect = true,
   isParent = false,
   className,
+  role,
+  ...aria
 }: DropdownItemProps) => {
   const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
 
   const getCssVars = (indent?: number): React.CSSProperties => {
-    if (typeof indent !== 'number') return {};
+    // indent <= 0 means no indentation — leave `--dropdown-indent` unset so the
+    // base left padding applies (setting it to 0 would zero out the padding).
+    if (typeof indent !== 'number' || indent <= 0) return {};
     return {
       '--dropdown-indent-level': indent,
       '--dropdown-indent': `${indent}rem`,
@@ -160,13 +171,14 @@ export const DropdownItem = ({
     style: getCssVars(indent),
     onClick: handleClick,
     onKeyDown: handleKeyDown,
+    ...aria,
   };
 
   const itemProps =
     asChild && closeOnSelect === false
-      ? baseProps
+      ? { ...baseProps, role }
       : getItemProps({
-          role: 'menuitem',
+          role: role ?? 'menuitem',
           disabled: !asChild ? disabled : undefined,
           ...baseProps,
         });

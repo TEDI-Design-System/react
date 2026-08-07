@@ -5,6 +5,7 @@ import {
   CALENDAR_POPOVER_PADDING,
   getInitialMonth,
   getLocaleDateParts,
+  resolveRangeSelection,
   SelectedValueLike,
 } from './date-field-helpers';
 
@@ -21,6 +22,39 @@ describe('date-field-helpers', () => {
     });
   });
 
+  describe('resolveRangeSelection', () => {
+    const from = new Date(2024, 2, 10);
+    const to = new Date(2024, 2, 20);
+
+    it('starts a new range from the clicked day when the previous range is complete', () => {
+      const clicked = new Date(2024, 2, 25);
+      const computed = { from, to: clicked };
+      expect(resolveRangeSelection(computed, { from, to }, clicked)).toEqual({ from: clicked, to: undefined });
+    });
+
+    it('also restarts when the clicked day falls before the existing range', () => {
+      const clicked = new Date(2024, 2, 1);
+      const computed = { from: clicked, to };
+      expect(resolveRangeSelection(computed, { from, to }, clicked)).toEqual({ from: clicked, to: undefined });
+    });
+
+    it('passes the computed range through while the range is still being built', () => {
+      const clicked = new Date(2024, 2, 20);
+      const computed = { from, to: clicked };
+      expect(resolveRangeSelection(computed, { from, to: undefined }, clicked)).toEqual(computed);
+    });
+
+    it('passes the computed range through when there is no previous selection', () => {
+      const clicked = from;
+      const computed = { from, to: undefined };
+      expect(resolveRangeSelection(computed, undefined, clicked)).toEqual(computed);
+    });
+
+    it('returns undefined when the computed value is not a range and no restart applies', () => {
+      expect(resolveRangeSelection(undefined, undefined, from)).toBeUndefined();
+    });
+  });
+
   describe('getInitialMonth', () => {
     it('returns the date itself when value is a single Date', () => {
       const date = new Date(2024, 5, 15);
@@ -31,7 +65,6 @@ describe('date-field-helpers', () => {
       const earliest = new Date(2024, 0, 1);
       const middle = new Date(2024, 3, 1);
       const latest = new Date(2024, 11, 31);
-      // Pass deliberately out of order — the helper must sort.
       expect(getInitialMonth([latest, earliest, middle])).toBe(earliest);
     });
 

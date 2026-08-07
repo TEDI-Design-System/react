@@ -26,6 +26,11 @@
         cursor: pointer;
       }
     }
+
+    .tedi-file-dropzone__label-icon {
+      font-size: 1.5rem;
+      vertical-align: bottom;
+    }
   }
 
   &--disabled {

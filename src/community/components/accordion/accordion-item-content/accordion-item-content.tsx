@@ -10,6 +10,9 @@ import { AccordionItemContext } from '../accordion-item/accordion-item';
 
 export type AccordionItemContentProps = CardContentProps;
 
+/**
+ * @deprecated Use `<Accordion.Item.Content>` from the TEDI-Ready Accordion (`@tedi-design-system/react/tedi`) instead.
+ */
 export const AccordionItemContent = (props: AccordionItemContentProps): JSX.Element => {
   const { children, className, ...rest } = props;
   const { isOpen } = React.useContext(AccordionContext);

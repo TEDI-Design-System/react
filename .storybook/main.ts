@@ -1,6 +1,17 @@
 import { StorybookConfig } from '@storybook/react-vite';
-import { join } from 'path';
-import { withoutVitePlugins } from '@storybook/builder-vite';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const excludeCommunity = process.env.STORYBOOK_EXCLUDE_COMMUNITY === 'true';
+
+const communityStories = [
+  '../src/community/docs/scale-layout/spacing.mdx',
+  '../src/community/docs/scale-layout/grid.mdx',
+  '../src/community/**/**/*.stories.tsx',
+  '../src/community/**/**/*.mdx',
+];
 
 const config: StorybookConfig = {
   stories: [
@@ -9,18 +20,15 @@ const config: StorybookConfig = {
     '../src/tedi/docs/changelog.mdx',
     '../src/tedi/docs/_badges.mdx',
     '../src/tedi/docs/colors/tedi-colors.mdx',
-    '../src/community/docs/scale-layout/spacing.mdx',
-    '../src/community/docs/scale-layout/grid.mdx',
     '../src/tedi/**/**/*.stories.tsx',
     '../src/tedi/**/**/*.mdx',
-    '../src/community/**/**/*.stories.tsx',
-    '../src/community/**/**/*.mdx',
+    ...(excludeCommunity ? [] : communityStories),
   ],
   addons: [
-    '@storybook/addon-essentials',
+    '@storybook/addon-docs',
     '@storybook/addon-a11y',
     '@storybook/addon-designs',
-    '@avalane/storybook-addon-status',
+    '@etchteam/storybook-addon-status',
     'storybook-addon-pseudo-states',
     '@chromatic-com/storybook',
   ],
@@ -33,28 +41,38 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
-  docs: {
-    autodocs: true,
-  },
   typescript: {
     reactDocgen: 'react-docgen-typescript',
     reactDocgenTypescriptOptions: {
+      tsconfigPath: 'tsconfig.lib.json',
       shouldExtractLiteralValuesFromEnum: true,
       shouldRemoveUndefinedFromOptional: true,
     },
   },
-  async viteFinal(config, { configType }) {
+  async viteFinal(config) {
+    // Workaround for storybookjs/storybook#33537: with .storybook in a subdirectory,
+    // @storybook/addon-docs resolves its MDX provider via import.meta.resolve(), which
+    // returns a `file://` URL. Vite's import analysis can't resolve `file://` specifiers,
+    // so MDX docs fail to build. Convert them back to plain filesystem paths.
+    const fileUrlResolveFix = {
+      name: 'tedi-storybook-mdx-file-url-fix',
+      enforce: 'pre' as const,
+      resolveId(id: string) {
+        return id.startsWith('file://') ? fileURLToPath(id) : null;
+      },
+    };
+
+    // Components read process.env at runtime (e.g. JEST_WORKER_ID to detect the test
+    // environment); define them so the browser bundle doesn't hit `process is not defined`.
     return {
       ...config,
       define: {
+        ...config.define,
         'process.env.JEST_WORKER_ID': JSON.stringify(process.env.JEST_WORKER_ID),
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       },
       publicDir: join(__dirname, '../public'),
-      plugins: await withoutVitePlugins(
-        config.plugins ?? [],
-        ['vite:dts']
-      ),
+      plugins: [fileUrlResolveFix, ...(config.plugins ?? [])],
     };
   },
 };

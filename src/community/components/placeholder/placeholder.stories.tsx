@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import Anchor from '../anchor/anchor';

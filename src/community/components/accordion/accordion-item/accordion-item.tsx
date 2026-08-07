@@ -48,6 +48,9 @@ export const AccordionItemContext = React.createContext<IAccordionItemContext>({
   disabled: false,
 });
 
+/**
+ * @deprecated Use `<Accordion.Item>` from the TEDI-Ready Accordion (`@tedi-design-system/react/tedi`) instead.
+ */
 export const AccordionItem = (props: AccordionItemProps): JSX.Element => {
   const {
     children,

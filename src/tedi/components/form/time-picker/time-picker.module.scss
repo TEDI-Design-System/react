@@ -123,34 +123,16 @@
     border: 0;
     border-radius: 0;
   }
+}
 
-  .tedi-time-picker__grid-item {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 2.5rem;
-    padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
-    font-size: var(--button-text-size-default);
-    color: var(--form-checkbox-radio-card-primary-default-text);
-    text-align: center;
-    border: 1px solid var(--form-checkbox-radio-card-secondary-default-border);
-    border-radius: var(--form-checkbox-radio-card-radius);
+.tedi-time-picker__slot-label {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
 
-    &:hover {
-      color: var(--form-checkbox-radio-card-secondary-hover-text);
-      cursor: pointer;
-      border-color: var(--form-checkbox-radio-card-secondary-hover-border);
-    }
-
-    &--selected {
-      color: var(--form-checkbox-radio-card-secondary-selected-text);
-      border-color: var(--form-checkbox-radio-card-secondary-selected-border);
-      box-shadow: 0 0 0 1px var(--form-checkbox-radio-card-secondary-selected-border);
-
-      &:hover {
-        box-shadow: 0 0 0 1px var(--form-checkbox-radio-card-secondary-selected-border);
-      }
-    }
-  }
+.tedi-time-picker__grid label:has(> .tedi-time-picker__slot-label) {
+  flex: 1 0 auto;
+  justify-content: center;
+  text-align: center;
 }

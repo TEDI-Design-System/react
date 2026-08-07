@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import Affix from './affix';
 
@@ -20,8 +20,8 @@ const meta: Meta<typeof Affix> = {
       },
     },
     layout: 'fullscreen',
-    backgrounds: { default: 'subtle' },
   },
+  globals: { backgrounds: { value: 'subtle' } },
 };
 
 export default meta;

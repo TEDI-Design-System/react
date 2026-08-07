@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -40,10 +40,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col width={2}>
+          <Col width={12} sm={2}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="d-flex">
+          <Col width={12} sm={10} className="d-flex">
             <Toggle id="toggle-column-1" label="Toggle" size={value as ToggleProps['size']} hideLabel />
           </Col>
         </Row>

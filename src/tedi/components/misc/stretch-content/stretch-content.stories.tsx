@@ -1,8 +1,8 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Button } from '../../buttons/button/button';
-import { Card, CardContent, CardHeader } from '../../cards/card';
+import { Card, CardContent, CardHeader } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import StretchContent, { StretchContentProps } from './stretch-content';

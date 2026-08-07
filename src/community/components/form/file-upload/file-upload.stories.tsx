@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MultipleHandledTemplate } from './examples/multiple-handled';
 import FileUpload from './file-upload';
@@ -6,6 +6,11 @@ import FileUpload from './file-upload';
 const meta: Meta<typeof FileUpload> = {
   component: FileUpload,
   title: 'Community/Form/FileUpload',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -25,12 +25,44 @@ describe('Search component', () => {
     expect(input).toBeInTheDocument();
   });
 
+  it('does not name the search region with the placeholder (avoids double announcement)', () => {
+    render(<Search {...defaultProps} placeholder="Search by name or keyword" />);
+    const region = screen.getByRole('search');
+    expect(region).toHaveAttribute('aria-label', 'search');
+    expect(region.getAttribute('aria-label')).not.toBe('Search by name or keyword');
+  });
+
+  it('uses the provided ariaLabel as the search region name', () => {
+    render(<Search {...defaultProps} ariaLabel="Search products" />);
+    expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'Search products');
+  });
+
+  it('falls back to the generic label when ariaLabel is an empty string', () => {
+    render(<Search {...defaultProps} ariaLabel="" />);
+    expect(screen.getByRole('search')).toHaveAttribute('aria-label', 'search');
+  });
+
   it('calls onSearch when the search button is clicked', () => {
     render(<Search {...defaultProps} button={{ children: 'Search' }} />);
     const button = screen.getByRole('button', { name: /search/i });
     fireEvent.click(button);
     expect(defaultProps.onSearch).toHaveBeenCalledTimes(1);
     expect(defaultProps.onSearch).toHaveBeenCalledWith('');
+  });
+
+  it('calls onSearch with the current value when Enter is pressed in the input', () => {
+    const onSearch = jest.fn();
+    render(<Search {...defaultProps} onSearch={onSearch} value="query" />);
+    fireEvent.keyDown(screen.getByPlaceholderText('Search...'), { key: 'Enter' });
+    expect(onSearch).toHaveBeenCalledTimes(1);
+    expect(onSearch).toHaveBeenCalledWith('query');
+  });
+
+  it('does not call onSearch for non-Enter keys', () => {
+    const onSearch = jest.fn();
+    render(<Search {...defaultProps} onSearch={onSearch} value="query" />);
+    fireEvent.keyDown(screen.getByPlaceholderText('Search...'), { key: 'a' });
+    expect(onSearch).not.toHaveBeenCalled();
   });
 
   it('renders with a search icon by default', () => {

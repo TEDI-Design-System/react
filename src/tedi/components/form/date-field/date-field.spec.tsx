@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { et } from 'react-day-picker/locale';
@@ -128,6 +128,52 @@ describe('DateField component', () => {
     render(<DateField {...defaultProps} parseDate={(v) => new Date(2024, 0, 1)} onSelect={onSelect} />);
     await user.type(screen.getByLabelText('Birth date'), '01.01.2024');
     expect(onSelect).toHaveBeenCalled();
+  });
+
+  it('shows an invalid-date error on blur and keeps the typed value visible', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} />);
+    const input = screen.getByLabelText('Birth date');
+
+    await user.type(input, '33.33.3333');
+    await user.tab();
+
+    expect(screen.getByText('dateField.invalidDateError')).toBeInTheDocument();
+    expect(input).toHaveValue('33.33.3333');
+  });
+
+  it('does not show the invalid-date error for a parseable date', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} />);
+    const input = screen.getByLabelText('Birth date');
+
+    await user.type(input, '15.06.2024');
+    await user.tab();
+
+    expect(screen.queryByText('dateField.invalidDateError')).not.toBeInTheDocument();
+  });
+
+  it('clears the invalid-date error once the user edits the input again', async () => {
+    const user = userEvent.setup();
+    render(<DateField {...defaultProps} />);
+    const input = screen.getByLabelText('Birth date');
+
+    await user.type(input, '33.33.3333');
+    await user.tab();
+    expect(screen.getByText('dateField.invalidDateError')).toBeInTheDocument();
+
+    await user.type(input, '1');
+    expect(screen.queryByText('dateField.invalidDateError')).not.toBeInTheDocument();
+  });
+
+  it('gives the calendar toggle button an accessible name (single mode)', () => {
+    render(<DateField {...defaultProps} />);
+    expect(screen.getByRole('button', { name: 'dateField.openCalendar' })).toBeInTheDocument();
+  });
+
+  it('gives the calendar toggle button an accessible name (multiple mode)', () => {
+    render(<DateField {...defaultProps} mode="multiple" />);
+    expect(screen.getByRole('button', { name: 'dateField.openCalendar' })).toBeInTheDocument();
   });
 
   it('updates when controlled value changes', () => {
@@ -303,6 +349,19 @@ describe('DateField component', () => {
     await user.click(button);
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('links the calendar trigger to the popover via aria-controls when open', async () => {
+    const user = userEvent.setup();
+
+    render(<DateField {...defaultProps} />);
+
+    const button = screen.getByRole('button', { name: 'dateField.openCalendar' });
+    await user.click(button);
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.id).toBeTruthy();
+    expect(button).toHaveAttribute('aria-controls', dialog.id);
   });
 
   it('closes calendar when clicking icon again (button trigger toggle)', async () => {
@@ -623,5 +682,44 @@ describe('DateField component', () => {
     expect(screen.getByText('Date is in the past')).toBeInTheDocument();
     await user.clear(input);
     expect(screen.queryByText('Date is in the past')).not.toBeInTheDocument();
+  });
+
+  describe('modal picker', () => {
+    it('opens the calendar in a modal when `modal` is set (no popover)', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} modal initialMonth={new Date(2025, 5, 1)} />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button'));
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('commits the picked date on Confirm and closes the modal', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(<DateField {...defaultProps} modal onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByText('15'));
+      await user.click(within(dialog).getByRole('button', { name: 'date-field.confirm' }));
+
+      expect(onSelect).toHaveBeenCalled();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('discards the draft when the modal is cancelled', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(<DateField {...defaultProps} modal onSelect={onSelect} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByText('15'));
+      await user.click(within(dialog).getByRole('button', { name: 'date-field.cancel' }));
+
+      expect(onSelect).not.toHaveBeenCalled();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
   });
 });

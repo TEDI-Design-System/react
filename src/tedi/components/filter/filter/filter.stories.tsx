@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
@@ -73,7 +73,8 @@ const RangeFilter = ({
 };
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6562-159554&m=dev" target="_BLANK">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6562-159554&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.tedi.ee/1ee8444b7/p/3914a2-filter" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Filter> = {

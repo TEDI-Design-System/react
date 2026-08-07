@@ -81,7 +81,7 @@ export interface TextFieldProps
    * Also used to generate `aria-describedby` and helper IDs automatically.
    */
   id?: string;
-  /*
+  /**
    * The text or React node that serves as the label for the text field.
    * If `hideLabel` is `true`, the label will be visually hidden but still accessible to screen readers.
    * If `hideLabel` is `'keep-space'`, the label will be hidden but the space it occupies will be preserved.
@@ -125,7 +125,13 @@ export interface TextFieldProps
    * Note: These are **not** attached to the input/textarea directly, but to the surrounding container.
    */
   onKeyPress?: React.KeyboardEventHandler<HTMLDivElement>;
+  /**
+   * Key-down handler attached to the field's surrounding container (not the input directly).
+   */
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+  /**
+   * Key-up handler attached to the field's surrounding container (not the input directly).
+   */
   onKeyUp?: React.KeyboardEventHandler<HTMLDivElement>;
   /**
    * Default value for **uncontrolled** usage.
@@ -230,7 +236,7 @@ export interface TextFieldProps
    * Additional attributes for the input element.
    */
   input?: React.InputHTMLAttributes<HTMLInputElement> | React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-  /*
+  /**
    * Optional start slot element to render inside the input container, before the input field.
    */
   startSlot?: React.ReactNode;

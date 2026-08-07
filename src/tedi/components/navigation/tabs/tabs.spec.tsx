@@ -295,6 +295,23 @@ describe('Tabs overflow (more mode)', () => {
     simulateNoOverflow();
     expect(screen.queryByText('More')).not.toBeInTheDocument();
   });
+
+  it('keeps the More button when content grows while already overflowing', () => {
+    renderTabs();
+    simulateOverflow();
+    expect(screen.getByText('More')).toBeInTheDocument();
+
+    // Content grows to 800 while overflowing; wrapper grows to 600 — still doesn't fit.
+    const listEl = screen.getByRole('tablist');
+    Object.defineProperty(listEl, 'scrollWidth', { value: 800, configurable: true });
+    const wrapper = listEl.parentElement!;
+    Object.defineProperty(wrapper, 'clientWidth', { value: 600, configurable: true });
+    act(() => {
+      resizeCallback?.();
+    });
+
+    expect(screen.getByText('More')).toBeInTheDocument();
+  });
 });
 
 describe('Tabs overflow (scroll mode)', () => {

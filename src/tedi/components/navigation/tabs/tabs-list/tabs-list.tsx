@@ -38,6 +38,10 @@ export interface TabsListProps {
    * @default 'dropdown'
    */
   overflowMode?: 'dropdown' | 'scroll';
+  /**
+   * Label for the overflow dropdown trigger. Defaults to the `tabs.more` label.
+   */
+  dropdownLabel?: string;
 }
 
 interface OverflowItem {
@@ -54,6 +58,7 @@ export const TabsList = (props: TabsListProps) => {
     'aria-labelledby': ariaLabelledBy,
     printVisibility = 'show',
     overflowMode = 'dropdown',
+    dropdownLabel,
   } = props;
 
   const { getLabel } = useLabels();
@@ -62,10 +67,6 @@ export const TabsList = (props: TabsListProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
-  const isOverflowingRef = useRef(false);
-  const naturalWidthRef = useRef(0);
-
-  isOverflowingRef.current = isOverflowing;
 
   const {
     scrollRef,
@@ -106,42 +107,41 @@ export const TabsList = (props: TabsListProps) => {
     }
   };
 
-  // Capture natural width when all tabs are visible and check for overflow synchronously
+  // Measure the true natural width on every check. While overflowing, the
+  // non-selected triggers are display:none, which collapses the live scrollWidth.
+  // Temporarily remove the collapse class (a synchronous reflow, no paint → no
+  // flicker) to read the real width, then restore it.
+  const checkOverflow = useCallback(() => {
+    const wrapper = wrapperRef.current;
+    const list = listRef.current;
+    if (!wrapper || !list || list.clientWidth === 0) return;
+
+    const overflowClass = styles['tedi-tabs__list--overflow'];
+    const wasCollapsed = list.classList.contains(overflowClass);
+    if (wasCollapsed) list.classList.remove(overflowClass);
+    const naturalWidth = list.scrollWidth;
+    if (wasCollapsed) list.classList.add(overflowClass);
+
+    setIsOverflowing(naturalWidth > wrapper.clientWidth);
+  }, []);
+
+  // Initial synchronous check. Re-runs when the set of triggers changes
+  // (childArray) so adding/removing tabs recalculates without a resize.
   useLayoutEffect(() => {
     if (overflowMode !== 'dropdown') return;
-    const list = listRef.current;
-    if (!list || isOverflowingRef.current) return;
-
-    naturalWidthRef.current = list.scrollWidth;
-    if (list.scrollWidth > list.clientWidth && list.clientWidth > 0) {
-      setIsOverflowing(true);
-    }
-  }, [overflowMode, isOverflowing, childArray]);
+    checkOverflow();
+  }, [overflowMode, checkOverflow, childArray]);
 
   // ResizeObserver for "dropdown" mode overflow detection
   useEffect(() => {
     if (overflowMode !== 'dropdown') return;
     const wrapper = wrapperRef.current;
-    const list = listRef.current;
-    if (!wrapper || !list) return;
-
-    const checkOverflow = () => {
-      if (isOverflowingRef.current) {
-        if (naturalWidthRef.current <= wrapper.clientWidth) {
-          setIsOverflowing(false);
-        }
-      } else {
-        if (list.scrollWidth > list.clientWidth && list.clientWidth > 0) {
-          naturalWidthRef.current = list.scrollWidth;
-          setIsOverflowing(true);
-        }
-      }
-    };
+    if (!wrapper) return;
 
     const ro = new ResizeObserver(checkOverflow);
     ro.observe(wrapper);
     return () => ro.disconnect();
-  }, [overflowMode]);
+  }, [overflowMode, checkOverflow]);
 
   return (
     <Print visibility={printVisibility}>
@@ -173,7 +173,7 @@ export const TabsList = (props: TabsListProps) => {
             <Dropdown placement="bottom-end">
               <Dropdown.Trigger>
                 <button data-name="tabs-more-btn" type="button" className={styles['tedi-tabs__more-btn']}>
-                  {getLabel('tabs.more')}
+                  {dropdownLabel ?? getLabel('tabs.more')}
                   <Icon name="expand_more" size={18} />
                 </button>
               </Dropdown.Trigger>

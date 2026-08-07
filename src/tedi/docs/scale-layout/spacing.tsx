@@ -1,4 +1,4 @@
-import { Title } from '@storybook/blocks';
+import { Title } from '@storybook/addon-docs/blocks';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 
 import { Table } from '../../../community/index';

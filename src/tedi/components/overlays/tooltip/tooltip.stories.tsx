@@ -1,6 +1,11 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import Toggle from '../../../../community/components/form/toggle/toggle';
 import Button from '../../buttons/button/button';
 import InfoButton from '../../buttons/info-button/info-button';
@@ -217,9 +222,34 @@ const ControlledTemplate: StoryFn<TooltipProps> = (args) => {
   );
 };
 
-export const Default: Story = {
-  render: Template,
-  args: {},
+/**
+ * The default story doubles as an interactive playground with **live controls for
+ * `Tooltip.Content`**. Its `maxWidth` is flattened into a namespaced control (grouped
+ * under its own category) via the shared `subcomponentArgTypes` helper, then reassembled
+ * in `render` with `getSubcomponentProps`. The ungrouped controls are `Tooltip`'s own
+ * props (`placement`, `openWith`, …). Hover the trigger to reveal the content.
+ */
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Tooltip.Content, {
+      category: 'Tooltip.Content',
+      prefix: 'content',
+      exclude: ['children', 'labelledBy', 'describedBy'],
+    }),
+  },
+  args: {
+    content__maxWidth: 'medium',
+  },
+  render: (args: Record<string, unknown>) => (
+    <Tooltip {...getPrimaryComponentProps<TooltipProps>(args)}>
+      <Tooltip.Trigger>
+        <InfoButton>Info</InfoButton>
+      </Tooltip.Trigger>
+      <Tooltip.Content {...getSubcomponentProps(args, 'content')}>
+        The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
+      </Tooltip.Content>
+    </Tooltip>
+  ),
 };
 
 export const ArrowPosition: Story = {
