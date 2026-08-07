@@ -72,10 +72,10 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 
         return (
           <Row key={index} className="padding-14-16">
-            <Col width={2} className="display-flex align-items-center">
+            <Col width={2} className="flex align-items-center">
               <Text modifiers="bold">{state}</Text>
             </Col>
-            <Col className="display-flex align-items-center">
+            <Col className="flex align-items-center">
               <TabsContext.Provider value={{ currentTab, setCurrentTab: noop }}>
                 <div role="tablist">
                   <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>
