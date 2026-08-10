@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { et } from 'react-day-picker/locale';
 
 import { Text } from '../../base/typography/text/text';
@@ -24,6 +24,7 @@ const meta: Meta<typeof Calendar> = {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
     controls: { exclude: ['sm', 'md', 'lg', 'xl', 'xxl'] },
+
     a11y: {
       config: {
         rules: [{ id: 'color-contrast', enabled: false }],
@@ -43,6 +44,13 @@ const CalendarTemplate: React.FC<Partial<CalendarProps>> = (props) => {
   const defaultValue = props.mode === 'multiple' ? [] : props.mode === 'range' ? { from: new Date() } : undefined;
 
   const [value, setValue] = useState(props.value ?? defaultValue);
+
+  const prevMode = useRef(props.mode);
+  useEffect(() => {
+    if (prevMode.current === props.mode) return;
+    prevMode.current = props.mode;
+    setValue(props.mode === 'multiple' ? [] : props.mode === 'range' ? { from: new Date() } : undefined);
+  }, [props.mode]);
 
   const handleSelect: CalendarProps['handleSelect'] = (selected, day, modifiers, event) => {
     setValue(selected);
@@ -73,7 +81,7 @@ const CalendarTemplate: React.FC<Partial<CalendarProps>> = (props) => {
 };
 
 export const Default: Story = {
-  render: () => <CalendarTemplate />,
+  render: (args) => <CalendarTemplate {...args} />,
 };
 
 export const WithFooter: Story = {
@@ -158,43 +166,54 @@ export const MultipleSelectedDates: Story = {
 };
 
 export const WithLegend: Story = {
-  render: () => (
-    <VerticalSpacing>
-      <Row>
-        <Col width="auto">
-          <CalendarTemplate
-            footer={
-              <Row>
-                <Col width="auto" className="flex align-items-center gap-2">
-                  <div
-                    style={{
-                      backgroundColor: 'var(--form-datepicker-date-selected)',
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '4px',
-                    }}
-                  ></div>{' '}
-                  Valitud
-                </Col>
-                <Col width="auto" className="flex align-items-center gap-2">
-                  <div
-                    style={{
-                      backgroundColor: 'var(--form-datepicker-date-available)',
-                      border: '1px solid var(--green-200)',
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '4px',
-                    }}
-                  ></div>{' '}
-                  Saadaval
-                </Col>
-              </Row>
-            }
-          />
-        </Col>
-      </Row>
-    </VerticalSpacing>
-  ),
+  render: () => {
+    const today = new Date();
+    const availableDays = [
+      new Date(today.getFullYear(), today.getMonth(), 9),
+      new Date(today.getFullYear(), today.getMonth(), 10),
+      new Date(today.getFullYear(), today.getMonth(), 16),
+      new Date(today.getFullYear(), today.getMonth(), 17),
+    ];
+
+    return (
+      <VerticalSpacing>
+        <Row>
+          <Col width="auto">
+            <CalendarTemplate
+              availableDays={availableDays}
+              footer={
+                <Row>
+                  <Col width="auto" className="flex align-items-center gap-2">
+                    <div
+                      style={{
+                        backgroundColor: 'var(--form-datepicker-date-selected)',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '4px',
+                      }}
+                    ></div>{' '}
+                    Valitud
+                  </Col>
+                  <Col width="auto" className="flex align-items-center gap-2">
+                    <div
+                      style={{
+                        backgroundColor: 'var(--form-datepicker-date-available)',
+                        border: '1px solid var(--green-200)',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '4px',
+                      }}
+                    ></div>{' '}
+                    Vabad ajad
+                  </Col>
+                </Row>
+              }
+            />
+          </Col>
+        </Row>
+      </VerticalSpacing>
+    );
+  },
 };
 
 export const Availability: Story = {

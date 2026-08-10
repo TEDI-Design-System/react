@@ -13,6 +13,7 @@
 .tedi-calendar {
   width: fit-content;
   max-width: none;
+  background: var(--card-background-primary);
   border: var(--tedi-borders-01) solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
 
@@ -129,7 +130,7 @@
       }
     }
 
-    &:hover:not(.tedi-calendar__disabled) {
+    &:hover:not(.tedi-calendar__disabled, .tedi-calendar__day--selected) {
       color: var(--general-text-primary);
       cursor: pointer;
       background-color: var(--form-datepicker-date-hover);
