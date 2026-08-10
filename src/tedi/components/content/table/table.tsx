@@ -292,6 +292,12 @@ export interface TableProps<TData> {
    */
   stickyFirstColumn?: boolean;
   /**
+   * Freezes the last column during horizontal scroll — typically a trailing
+   * actions column that should stay reachable while a wide table scrolls.
+   * @default false
+   */
+  stickyLastColumn?: boolean;
+  /**
    * Pins the `<thead>` row(s) to the top during vertical scroll. Requires
    * `maxHeight` so the table's internal scroll container becomes the sticky
    * anchor — wrapping the Table in an external scrollable div will NOT work,
@@ -770,6 +776,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     verticalBorders = false,
     borderless = false,
     stickyFirstColumn = false,
+    stickyLastColumn = false,
     stickyHeader = false,
     maxHeight,
     onRowClick,
@@ -1140,6 +1147,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--vertical-borders']]: verticalBorders,
       [styles['tedi-table--borderless']]: borderless,
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
+      [styles['tedi-table--sticky-last-column']]: stickyLastColumn,
       [styles['tedi-table--sticky-header']]: stickyHeader,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick) || rowExpandsOnClick,
       [styles['tedi-table--row-hover']]: hoverEnabled,
