@@ -1116,6 +1116,32 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const [scrollOverflow, setScrollOverflow] = useState({ left: false, right: false });
+  const stickyColumnsEnabled = stickyFirstColumn || stickyLastColumn;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !stickyColumnsEnabled) return;
+
+    const update = () => {
+      const left = el.scrollLeft > 0;
+      const right = Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth;
+      setScrollOverflow((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
+    };
+
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+
+    return () => {
+      el.removeEventListener('scroll', update);
+      observer.disconnect();
+    };
+  }, [stickyColumnsEnabled]);
+
   const resetScrollTop = useCallback(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, []);
@@ -1148,6 +1174,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--borderless']]: borderless,
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
       [styles['tedi-table--sticky-last-column']]: stickyLastColumn,
+      [styles['tedi-table--overflow-left']]: stickyFirstColumn && scrollOverflow.left,
+      [styles['tedi-table--overflow-right']]: stickyLastColumn && scrollOverflow.right,
       [styles['tedi-table--sticky-header']]: stickyHeader,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick) || rowExpandsOnClick,
       [styles['tedi-table--row-hover']]: hoverEnabled,

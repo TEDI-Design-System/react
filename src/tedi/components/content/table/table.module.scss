@@ -1,4 +1,9 @@
 .tedi-table {
+  --table-sticky-divider-first: inset -1px 0 0 var(--table-border);
+  --table-sticky-divider-last: inset 1px 0 0 var(--table-border);
+  --table-sticky-shadow-first-opacity: 0;
+  --table-sticky-shadow-last-opacity: 0;
+
   display: flex;
   flex-direction: column;
   gap: var(--tedi-dimensions-10);
@@ -315,7 +320,7 @@
     left: 0;
     z-index: 2;
     background: var(--table-default);
-    box-shadow: inset -1px 0 0 var(--table-border);
+    box-shadow: var(--table-sticky-divider-first);
   }
 
   .tedi-table__row > .tedi-table__cell:first-child {
@@ -323,7 +328,24 @@
     left: 0;
     z-index: 1;
     background: var(--table-default);
-    box-shadow: inset -1px 0 0 var(--table-border);
+    box-shadow: var(--table-sticky-divider-first);
+  }
+
+  // Elevation shadow (Figma "Elevation/General/Primary") cast into the scrolling content,
+  // drawn as a soft gradient overlay — a box-shadow on the collapsed-border table cell
+  // itself is painted over by adjacent cells and never shows.
+  .tedi-table__row > .tedi-table__header-cell:first-child::after,
+  .tedi-table__row > .tedi-table__cell:first-child::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 8px;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(to right, var(--tedi-alpha-10), transparent);
+    opacity: var(--table-sticky-shadow-first-opacity);
+    transition: opacity 0.15s ease;
   }
 
   &.tedi-table--striped .tedi-table__body .tedi-table__row:nth-of-type(even) > .tedi-table__cell:first-child {
@@ -348,7 +370,7 @@
     right: 0;
     z-index: 2;
     background: var(--table-default);
-    box-shadow: inset 1px 0 0 var(--table-border);
+    box-shadow: var(--table-sticky-divider-last);
   }
 
   .tedi-table__row > .tedi-table__cell:last-child {
@@ -356,7 +378,22 @@
     right: 0;
     z-index: 1;
     background: var(--table-default);
-    box-shadow: inset 1px 0 0 var(--table-border);
+    box-shadow: var(--table-sticky-divider-last);
+  }
+
+  .tedi-table__head .tedi-table__row:first-child > .tedi-table__header-cell:last-child::after,
+  .tedi-table__row--filter > .tedi-table__header-cell:last-child::after,
+  .tedi-table__row > .tedi-table__cell:last-child::after {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    bottom: 0;
+    width: 8px;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(to left, var(--tedi-alpha-10), transparent);
+    opacity: var(--table-sticky-shadow-last-opacity);
+    transition: opacity 0.15s ease;
   }
 
   &.tedi-table--striped .tedi-table__body .tedi-table__row:nth-of-type(even) > .tedi-table__cell:last-child {
@@ -385,6 +422,14 @@
   }
 }
 
+.tedi-table--overflow-left {
+  --table-sticky-shadow-first-opacity: 0.7;
+}
+
+.tedi-table--overflow-right {
+  --table-sticky-shadow-last-opacity: 0.7;
+}
+
 .tedi-table--sticky-header {
   .tedi-table__head {
     border-bottom: 0;
@@ -404,12 +449,12 @@
 
   &.tedi-table--sticky-first-column .tedi-table__head .tedi-table__header-cell:first-child {
     z-index: 3;
-    box-shadow: inset -1px 0 0 var(--table-border), inset 0 -1px 0 var(--table-border-th);
+    box-shadow: var(--table-sticky-divider-first), inset 0 -1px 0 var(--table-border-th);
   }
 
   &.tedi-table--sticky-last-column .tedi-table__head .tedi-table__row:first-child > .tedi-table__header-cell:last-child,
   &.tedi-table--sticky-last-column .tedi-table__row--filter > .tedi-table__header-cell:last-child {
     z-index: 3;
-    box-shadow: inset 1px 0 0 var(--table-border), inset 0 -1px 0 var(--table-border-th);
+    box-shadow: var(--table-sticky-divider-last), inset 0 -1px 0 var(--table-border-th);
   }
 }
