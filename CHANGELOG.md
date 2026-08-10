@@ -1,3 +1,10 @@
+# [18.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.1...react-18.2.0-rc.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* **file-dropzone:** map accept prop and fix input accessibility [#783](https://github.com/TEDI-Design-System/react/issues/783) ([#791](https://github.com/TEDI-Design-System/react/issues/791)) ([24d29cd](https://github.com/TEDI-Design-System/react/commit/24d29cda02f7a62946320a756787ac262868383e)), closes [#784](https://github.com/TEDI-Design-System/react/issues/784) [#784](https://github.com/TEDI-Design-System/react/issues/784)
+
 # [18.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.1.1-rc.2...react-18.2.0-rc.1) (2026-08-10)
 
 
