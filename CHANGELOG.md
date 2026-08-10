@@ -1,3 +1,10 @@
+# [18.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.2...react-18.2.0-rc.3) (2026-08-10)
+
+
+### Features
+
+* **calendar:** add dayStatus, fullWidth props, ability to make month/year picker static [#632](https://github.com/TEDI-Design-System/react/issues/632) ([#771](https://github.com/TEDI-Design-System/react/issues/771)) ([0de2560](https://github.com/TEDI-Design-System/react/commit/0de2560b4334c3d373f30008b2950648e0166d59))
+
 # [18.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.1...react-18.2.0-rc.2) (2026-08-10)
 
 
