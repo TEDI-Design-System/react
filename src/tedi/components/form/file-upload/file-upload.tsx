@@ -86,7 +86,7 @@ export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   disabled?: boolean;
   /**
-   * Maximum allowed file size in bytes.
+   * Maximum allowed file size in megabytes (MB).
    */
   maxSize?: number;
   /**

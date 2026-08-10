@@ -37,7 +37,7 @@ export interface UseFileUploadProps {
    */
   accept?: string;
   /**
-   * The maximum file size allowed for upload, in bytes.
+   * The maximum file size allowed for upload, in megabytes (MB).
    */
   maxSize?: number;
   /**

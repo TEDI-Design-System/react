@@ -134,14 +134,13 @@ describe('FileDropzone', () => {
     const useDropzoneMock = useDropzone as jest.Mock;
     const dropzoneProps = useDropzoneMock.mock.calls[0][0];
 
-    expect(dropzoneProps.accept).toEqual({ 'application/*': ['image/png'] });
+    expect(dropzoneProps.accept).toEqual({ 'image/png': [] });
     expect(dropzoneProps.multiple).toBe(true);
     expect(dropzoneProps.maxSize).toBe(5 * 1024 ** 2);
 
     const file = new File(['file content'], 'file.png', { type: 'image/png' });
     const rejectedFile = new File(['too big'], 'big.pdf', { type: 'application/pdf' });
-    // Oversize / wrong-type rejections must still reach the hook so it validates
-    // them and surfaces feedback (WCAG 9.1.3.1 #3).
+
     dropzoneProps.onDrop([file], [{ file: rejectedFile, errors: [{ code: 'file-too-large', message: 'too large' }] }]);
 
     expect(onFileChange).toHaveBeenCalledWith({
@@ -250,5 +249,36 @@ describe('FileDropzone', () => {
     render(<FileDropzone id="7" name="file" label="Upload File" disabled />);
     const dropzone = screen.getByText('Upload File').closest('.tedi-file-dropzone');
     expect(dropzone).toHaveClass('tedi-file-dropzone--disabled');
+  });
+
+  it('does not leak upload props onto the <label>, and puts name on the input', () => {
+    const { container } = render(
+      <FileDropzone
+        id="upload"
+        name="docs"
+        label="Label"
+        accept=".pdf,.txt"
+        maxSize={100}
+        multiple
+        validateIndividually
+        files={[]}
+        defaultFiles={[]}
+        onChange={() => undefined}
+        onDelete={() => undefined}
+        announcementTimeout={5000}
+      />
+    );
+
+    const label = container.querySelector('label');
+    ['accept', 'maxsize', 'files', 'name', 'defaultfiles', 'announcementtimeout', 'validateindividually'].forEach(
+      (attr) => expect(label).not.toHaveAttribute(attr)
+    );
+    expect(container.querySelector('input[type="file"]')).toHaveAttribute('name', 'docs');
+  });
+
+  it('associates the label with the input via the generated id fallback', () => {
+    render(<FileDropzone name="file" label="Upload File" />);
+
+    expect(screen.getByLabelText(/Upload File/)).toBe(screen.getByRole('button').querySelector('input'));
   });
 });
