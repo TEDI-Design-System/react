@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { Calendar, CalendarProps } from './calendar';
 
 import '@testing-library/jest-dom';
 
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
+
 const mockDayPickerProps: { current: any } = { current: null };
 
 jest.mock('react-day-picker', () => ({
+  ...jest.requireActual('react-day-picker'),
   DayPicker: (props: any) => {
     mockDayPickerProps.current = props;
     const MonthCaption = props.components?.MonthCaption;
@@ -57,6 +64,13 @@ describe('Calendar', () => {
     handleSelect: jest.fn(),
     applyValue: jest.fn(),
   };
+
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => xs,
+    });
+  });
 
   it('renders DayPicker in default (days) view', () => {
     render(<Calendar {...baseProps} />);
@@ -187,6 +201,29 @@ describe('Calendar', () => {
 
     const dayPicker = screen.getByTestId('day-picker');
     expect(dayPicker).toHaveClass('custom-class');
+  });
+
+  it('does not apply the full-width modifier by default', () => {
+    render(<Calendar {...baseProps} />);
+
+    expect(screen.getByTestId('day-picker')).not.toHaveClass('tedi-calendar--full-width');
+  });
+
+  it('applies the full-width modifier class when fullWidth is set', () => {
+    render(<Calendar {...baseProps} fullWidth />);
+
+    expect(screen.getByTestId('day-picker')).toHaveClass('tedi-calendar--full-width');
+  });
+
+  it('resolves per-breakpoint overrides (e.g. fullWidth at md)', () => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+      getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => ({ ...xs, ...md }),
+    });
+
+    render(<Calendar {...baseProps} fullWidth={false} md={{ fullWidth: true }} />);
+
+    expect(screen.getByTestId('day-picker')).toHaveClass('tedi-calendar--full-width');
   });
 
   it('applies disabled matchers when provided', () => {
@@ -330,6 +367,44 @@ describe('Calendar', () => {
 
       expect(mockDayPickerProps.current.mode).toBe('single');
       expect(mockDayPickerProps.current.selected).toBeUndefined();
+    });
+  });
+
+  describe('dayStatus', () => {
+    const dayStatus = (date: Date) => (date.getDate() === 15 ? { type: 'success' as const, label: 'Available' } : null);
+
+    it('does not register a custom DayButton when dayStatus is omitted', () => {
+      render(<Calendar {...baseProps} />);
+
+      expect(mockDayPickerProps.current.components.DayButton).toBeUndefined();
+    });
+
+    it('overlays a StatusIndicator and appends the status label to aria-label for matching days', () => {
+      render(<Calendar {...baseProps} dayStatus={dayStatus} />);
+
+      const DayButton = mockDayPickerProps.current.components.DayButton;
+      const { container } = render(
+        <DayButton day={{ date: new Date(2025, 0, 15) }} modifiers={{}} aria-label="15 January 2025">
+          15
+        </DayButton>
+      );
+
+      expect(container.querySelector('[data-name="status-indicator"]')).toBeInTheDocument();
+      expect(container.querySelector('button')).toHaveAttribute('aria-label', '15 January 2025, Available');
+    });
+
+    it('renders a plain day button without an indicator for days that have no status', () => {
+      render(<Calendar {...baseProps} dayStatus={dayStatus} />);
+
+      const DayButton = mockDayPickerProps.current.components.DayButton;
+      const { container } = render(
+        <DayButton day={{ date: new Date(2025, 0, 16) }} modifiers={{}} aria-label="16 January 2025">
+          16
+        </DayButton>
+      );
+
+      expect(container.querySelector('[data-name="status-indicator"]')).not.toBeInTheDocument();
+      expect(container.querySelector('button')).toHaveAttribute('aria-label', '16 January 2025');
     });
   });
 

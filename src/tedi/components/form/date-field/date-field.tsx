@@ -26,7 +26,7 @@ import {
 } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
-import { Calendar } from '../../content/calendar/calendar';
+import { Calendar, DayStatusFn } from '../../content/calendar/calendar';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
 import MultiValueField, { MultiValueFieldProps, MultiValueFieldRef } from '../multi-value-field/multi-value-field';
 import TextField, { TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
@@ -168,9 +168,17 @@ export interface DateFieldProps
    * Forwarded to the internal `Calendar` / `CalendarHeader`.
    * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
    * - `'grid'` — each picker opens a full grid of options.
+   * - `'static'` — the month/year is a plain, non-clickable label; only the
+   *   prev/next navigation buttons can change the month (disables month/year selection).
    * @default dropdown
    */
-  monthYearSelectType?: 'dropdown' | 'grid';
+  monthYearSelectType?: 'dropdown' | 'grid' | 'static';
+  /**
+   * Optional per-day status forwarded to the calendar. Return a `{ type, label }`
+   * to overlay a `StatusIndicator` dot on that day (the `label` is folded into the
+   * day's `aria-label`), or `null` / `undefined` for no status.
+   */
+  dayStatus?: DayStatusFn;
   /**
    * Show or hide the calendar header's previous/next navigation. When hidden, the month/year header
    * also becomes a static, non-interactive label (no dropdown / grid jumping) — so the calendar is
@@ -349,6 +357,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     showOutsideDays = true,
     parseDate,
     monthYearSelectType,
+    dayStatus,
     tagsDirection,
     showNavigation = true,
     selectionLevel = 'days',
@@ -912,6 +921,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           availableDays={availableDays}
           footer={footer}
           monthYearSelectType={monthYearSelectType}
+          dayStatus={dayStatus}
           showNavigation={showNavigation}
           selectionLevel={selectionLevel}
           initialView={initialView}
@@ -958,6 +968,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   availableDays={availableDays}
                   footer={footer}
                   monthYearSelectType={monthYearSelectType}
+                  dayStatus={dayStatus}
                   showNavigation={showNavigation}
                   handleSelect={handleSelect}
                   applyValue={applyValue}
