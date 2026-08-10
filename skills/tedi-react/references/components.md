@@ -660,7 +660,7 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
 
 ### Textarea
 
-**Props:** `TextAreaProps` extends TextFieldProps | fRef, bp, form
+**Props:** `TextareaProps` extends TextFieldProps | fRef, bp, form
 
 - `characterLimit?: number`
 
