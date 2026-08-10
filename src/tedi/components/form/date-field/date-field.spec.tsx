@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import { et } from 'react-day-picker/locale';
 
 import { TextFieldForwardRef } from '../textfield/textfield';
@@ -180,6 +180,62 @@ describe('DateField component', () => {
     const { rerender } = render(<DateField {...defaultProps} selected={undefined} />);
     rerender(<DateField {...defaultProps} selected={new Date(2024, 5, 15)} />);
     expect(screen.getByLabelText('Birth date')).toHaveValue('15.06.2024');
+  });
+
+  it('clears the calendar highlight when the input is cleared (#789)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(
+      <DateField
+        {...defaultProps}
+        defaultValue={new Date(2025, 5, 15)}
+        initialMonth={new Date(2025, 5, 1)}
+        onSelect={onSelect}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('gridcell', { selected: true })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByLabelText('Birth date')).toHaveValue('');
+    expect(onSelect).toHaveBeenLastCalledWith(undefined, undefined, {}, {});
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).queryByRole('gridcell', { selected: true })).not.toBeInTheDocument();
+  });
+
+  it('clears the calendar highlight in controlled mode when the parent clears selected (#789)', async () => {
+    const user = userEvent.setup();
+
+    const ControlledDateField = () => {
+      const [selected, setSelected] = useState<DateFieldProps['selected']>(new Date(2025, 5, 15));
+      return (
+        <DateField
+          {...defaultProps}
+          selected={selected}
+          initialMonth={new Date(2025, 5, 1)}
+          onSelect={(next) => setSelected(next)}
+        />
+      );
+    };
+
+    render(<ControlledDateField />);
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('gridcell', { selected: true })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByLabelText('Birth date')).toHaveValue('');
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).queryByRole('gridcell', { selected: true })).not.toBeInTheDocument();
   });
 
   it('removes value from MultiValueField in multiple mode', async () => {

@@ -418,7 +418,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
   const effectiveNumberOfMonths =
     isMobile && !useModalPicker && typeof numberOfMonths === 'number' && numberOfMonths > 1 ? 1 : numberOfMonths;
 
-  const isControlled = selected !== undefined;
+  const { current: isControlled } = React.useRef('selected' in props);
   const value = isControlled ? selected : internalValue;
 
   const textFieldRef = React.useRef<TextFieldForwardRef | null>(null);
@@ -628,6 +628,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
 
     if (val.trim() === '') {
       setHasDisabledDateError(false);
+
+      if (value !== undefined) {
+        if (!isControlled) setInternalValue(undefined);
+        onSelect?.(undefined as UnknownType, undefined as UnknownType, {}, {} as UnknownType);
+      }
       return;
     }
 
