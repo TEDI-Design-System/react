@@ -1,3 +1,10 @@
+# [18.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.1.1-rc.2...react-18.2.0-rc.1) (2026-08-10)
+
+
+### Features
+
+* **file-upload:** add showRestrictions and report empty-result rejections [#786](https://github.com/TEDI-Design-System/react/issues/786) ([#793](https://github.com/TEDI-Design-System/react/issues/793)) ([fc207bf](https://github.com/TEDI-Design-System/react/commit/fc207bf29af77c1ed3698eb0b32b42c0d72e5769))
+
 ## [18.1.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.1.1-rc.1...react-18.1.1-rc.2) (2026-08-07)
 
 
