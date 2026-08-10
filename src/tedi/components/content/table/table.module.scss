@@ -342,7 +342,8 @@
 }
 
 .tedi-table--sticky-last-column {
-  .tedi-table__row > .tedi-table__header-cell:last-child {
+  .tedi-table__head .tedi-table__row:first-child > .tedi-table__header-cell:last-child,
+  .tedi-table__row--filter > .tedi-table__header-cell:last-child {
     position: sticky;
     right: 0;
     z-index: 2;
@@ -362,8 +363,19 @@
     background: var(--table-striped);
   }
 
-  .tedi-table__body .tedi-table__row.tedi-table__row--selected > .tedi-table__cell:last-child {
+  .tedi-table__body .tedi-table__row--sub-row > .tedi-table__cell:last-child,
+  .tedi-table__body .tedi-table__row--sub-component > .tedi-table__cell:last-child {
+    background: var(--table-striped);
+  }
+
+  .tedi-table__body .tedi-table__row.tedi-table__row--selected > .tedi-table__cell:last-child,
+  .tedi-table__body .tedi-table__row--dragging > .tedi-table__cell:last-child,
+  .tedi-table__body .tedi-table__row--picked-up > .tedi-table__cell:last-child {
     background: var(--table-active);
+  }
+
+  .tedi-table__row--filter > .tedi-table__header-cell:last-child {
+    background: var(--general-surface-primary);
   }
 
   &.tedi-table--row-hover .tedi-table__body .tedi-table__row:hover > .tedi-table__cell:last-child,
@@ -395,7 +407,8 @@
     box-shadow: inset -1px 0 0 var(--table-border), inset 0 -1px 0 var(--table-border-th);
   }
 
-  &.tedi-table--sticky-last-column .tedi-table__head .tedi-table__header-cell:last-child {
+  &.tedi-table--sticky-last-column .tedi-table__head .tedi-table__row:first-child > .tedi-table__header-cell:last-child,
+  &.tedi-table--sticky-last-column .tedi-table__row--filter > .tedi-table__header-cell:last-child {
     z-index: 3;
     box-shadow: inset 1px 0 0 var(--table-border), inset 0 -1px 0 var(--table-border-th);
   }
