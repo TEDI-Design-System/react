@@ -11,10 +11,10 @@ export interface TimelineDescriptionProps {
   children?: ReactNode;
   /**
    * Text color, using the shared typography colors. Defaults to `tertiary`.
-   * Pass `null` to inherit the surrounding color instead.
+   * Pass `'inherit'` to inherit the surrounding color instead.
    * @default tertiary
    */
-  color?: TextColor | null;
+  color?: TextColor | 'inherit';
   /**
    * Additional class name.
    */
@@ -26,7 +26,7 @@ export const TimelineDescription = ({
   color = 'tertiary',
   className,
 }: TimelineDescriptionProps): JSX.Element => (
-  <div className={cn(styles['tedi-timeline-description'], { [`tedi-text--${color}`]: color }, className)}>
+  <div className={cn(styles['tedi-timeline-description'], { [`tedi-text--${color}`]: color !== 'inherit' }, className)}>
     {children}
   </div>
 );

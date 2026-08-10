@@ -23,7 +23,6 @@ const meta: Meta<typeof Timeline> = {
   } as never,
   title: 'TEDI-Ready/Components/Helpers/Timeline',
   parameters: {
-    layout: 'padded',
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=11335-186480&m=dev',
@@ -139,67 +138,79 @@ export const Default: Story = {
 /**
  * The three line positions a single item can take, shown as isolated rows like the Figma spec:
  * **start** (line below), **middle** (line above and below) and **end** (line above). The label
- * sits on the left, the timings are right-aligned against the marker, and the start row carries a
- * "Näita rohkem" expander to show the line filling taller content.
+ * sits to the left of the example on desktop and moves above it on mobile, the timings are
+ * right-aligned against the marker, and the start row carries a "Näita rohkem" expander to show
+ * the line filling taller content.
  */
 export const Position: Story = {
   render: () => (
     <VerticalSpacing size={1.5}>
       {positions.map(({ label, above, below }) => (
-        <div key={label} style={{ display: 'flex', gap: 'var(--layout-grid-gutters-12)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', width: '4rem', flexShrink: 0 }}>
-            <Text modifiers="bold">{label}</Text>
-          </div>
+        <Row key={label} gutterY={1} className="align-items-center">
+          <Col xs={12} md="auto">
+            <div style={{ minWidth: '4rem' }}>
+              <Text modifiers="bold">{label}</Text>
+            </div>
+          </Col>
 
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              textAlign: 'right',
-              minWidth: '6rem',
-              paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
-            }}
-          >
-            {renderTimings(['1990', '14. detsember'])}
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              paddingTop: above ? 0 : DOT_OFFSET,
-            }}
-          >
-            {above && <Separator axis="vertical" color="secondary" height={STUB_HEIGHT} />}
-            <Separator variant="dot-only" color="secondary" dotSize="medium" dotStyle="outlined" />
-            {below && (
-              <div style={{ display: 'flex', flex: 1, minHeight: `${STUB_HEIGHT}rem` }}>
-                <Separator axis="vertical" color="secondary" />
+          <Col xs={12} md="auto">
+            <div style={{ display: 'flex', gap: 'var(--layout-grid-gutters-12)' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  textAlign: 'right',
+                  minWidth: '6rem',
+                  paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
+                }}
+              >
+                {renderTimings(['1990', '14. detsember'])}
               </div>
-            )}
-          </div>
 
-          <div
-            style={
-              {
-                '--timeline-text-min-height': '1.5rem',
-                paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
-              } as CSSProperties
-            }
-          >
-            <Timeline.Title>Taotluse esitamine</Timeline.Title>
-            <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
-            {label === 'Start' && (
-              <Collapse id="timeline-position-collapse" size="small" openText="Näita rohkem" closeText="Näita vähem">
-                <Text element="span" modifiers="small" color="tertiary">
-                  Pärast otsuse teatavaks tegemist saab seda vajadusel vaidlustada.
-                </Text>
-              </Collapse>
-            )}
-          </div>
-        </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  paddingTop: above ? 0 : DOT_OFFSET,
+                }}
+              >
+                {above && <Separator axis="vertical" color="secondary" height={STUB_HEIGHT} />}
+                <Separator variant="dot-only" color="secondary" dotSize="medium" dotStyle="outlined" />
+                {below && (
+                  <div style={{ display: 'flex', flex: 1, minHeight: `${STUB_HEIGHT}rem` }}>
+                    <Separator axis="vertical" color="secondary" />
+                  </div>
+                )}
+              </div>
+
+              <div
+                style={
+                  {
+                    '--timeline-text-min-height': '1.5rem',
+                    paddingTop: above ? `calc(${STUB_HEIGHT}rem - ${DOT_OFFSET})` : 0,
+                  } as CSSProperties
+                }
+              >
+                <Timeline.Title>Taotluse esitamine</Timeline.Title>
+                <Timeline.Description>Menetlemine võib võtta kuni 30 p</Timeline.Description>
+                {label === 'Start' && (
+                  <Collapse
+                    id="timeline-position-collapse"
+                    size="small"
+                    openText="Näita rohkem"
+                    closeText="Näita vähem"
+                  >
+                    <Text element="span" modifiers="small" color="tertiary">
+                      Pärast otsuse teatavaks tegemist saab seda vajadusel vaidlustada.
+                    </Text>
+                  </Collapse>
+                )}
+              </div>
+            </div>
+          </Col>
+        </Row>
       ))}
     </VerticalSpacing>
   ),

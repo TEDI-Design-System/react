@@ -1,15 +1,8 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 .tedi-timeline {
-  --timeline-padding-y: 8px;
-  --timeline-text-min-height: 24px;
   --timeline-dot-offset-md: calc((var(--timeline-text-min-height) - var(--separator-dot-size-md)) / 2);
   --timeline-dot-offset-lg: calc((var(--timeline-text-min-height) - var(--separator-dot-size-lg)) / 2);
-
-  // Breathing above each item's first row. Together with the row's padding-bottom
-  // it makes the gap between items 16px (8px top + 8px bottom), per the Figma spec.
-  // The marker adds the same offset so the dot stays centred on the date. The card
-  // variant manages its own spacing, so it resets this to 0.
   --timeline-item-top: var(--timeline-padding-y);
 
   display: grid;
@@ -27,14 +20,11 @@
 
 .tedi-timeline--card {
   --tedi-timeline-card-padding: var(--card-padding-xs);
-
-  // The card variant spaces items with its own row padding, so drop the per-item
-  // top breathing (the marker then only carries the dot-centring offset).
   --timeline-item-top: 0;
 
   padding-block: var(--tedi-timeline-card-padding);
   background: var(--card-background-primary);
-  border: 1px solid var(--card-border-primary);
+  border: var(--tedi-borders-01) solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
 
   .tedi-timeline-item {
@@ -42,7 +32,7 @@
     grid-template-columns: subgrid;
     grid-column: 1 / -1;
     padding: var(--tedi-timeline-card-padding) var(--card-padding-md-default);
-    border-bottom: 1px solid var(--card-border-primary);
+    border-bottom: var(--tedi-borders-01) solid var(--card-border-primary);
   }
 
   .tedi-timeline-item:last-child {
@@ -57,7 +47,7 @@
   }
 
   .tedi-timeline-item:not(:last-child) .tedi-timeline__marker {
-    margin-bottom: calc(-2 * var(--tedi-timeline-card-padding) - 10px);
+    margin-bottom: calc(-2 * var(--tedi-timeline-card-padding) - var(--tedi-dimensions-06));
   }
 
   .tedi-timeline__marker [class*='tedi-separator--dot-style-outlined']::before {
@@ -125,14 +115,12 @@
   }
 
   @include breakpoints.media-breakpoint-down(lg) {
-    // Match the marker: the timing sits in the same 24px slot so its centre lines
-    // up with the dot's centre (both at min-height / 2) on mobile.
     min-height: var(--timeline-text-min-height);
 
     &::before {
       display: none;
-      width: 4px;
-      height: 4px;
+      width: var(--separator-dot-size-sm);
+      height: var(--separator-dot-size-sm);
       margin-inline: var(--layout-grid-gutters-04);
       content: '';
       background-color: var(--general-text-tertiary);
@@ -152,14 +140,10 @@
   grid-column: 1;
   align-items: center;
   align-self: stretch;
-
-  // Dot-centring offset plus the item's top breathing, so the dot lines up with the
-  // date after it has been pushed down by `--timeline-item-top`.
+  width: var(--separator-dot-size-lg);
   padding-top: calc(var(--timeline-item-top) + var(--timeline-dot-offset-md));
 
   &:not(:last-child) {
-    // Overshoot the connecting line down to the next item's dot (which sits the same
-    // distance below its row's top).
     margin-bottom: calc(-1 * (var(--timeline-item-top) + var(--timeline-dot-offset-md)));
   }
 
@@ -187,10 +171,6 @@
 
   @include breakpoints.media-breakpoint-up(lg) {
     grid-column: 3;
-
-    // On desktop the info shares the row with the timings, so it takes the same top
-    // breathing to stay aligned. On mobile it is the second row and must not, or a
-    // gap would open between the date and the title.
     padding-top: var(--timeline-item-top);
   }
 }

@@ -12,10 +12,10 @@ export interface TimelineTitleProps {
   children?: ReactNode;
   /**
    * Text color, using the shared typography colors. Defaults to `secondary`.
-   * Pass `null` to inherit the surrounding color instead.
+   * Pass `'inherit'` to inherit the surrounding color instead.
    * @default secondary
    */
-  color?: TextColor | null;
+  color?: TextColor | 'inherit';
   /**
    * Additional class name.
    */
@@ -23,7 +23,9 @@ export interface TimelineTitleProps {
 }
 
 export const TimelineTitle = ({ children, color = 'secondary', className }: TimelineTitleProps): JSX.Element => (
-  <div className={cn(styles['tedi-timeline-title'], { [`tedi-text--${color}`]: color }, className)}>{children}</div>
+  <div className={cn(styles['tedi-timeline-title'], { [`tedi-text--${color}`]: color !== 'inherit' }, className)}>
+    {children}
+  </div>
 );
 
 TimelineTitle.displayName = 'TimelineTitle';

@@ -46,7 +46,7 @@ const resolveState = (index: number, activeIndex?: number): TimelineItemState =>
   return index < activeIndex ? 'past' : 'future';
 };
 
-const TimelineComponent = ({
+export const Timeline = ({
   children,
   activeIndex,
   variant = 'default',
@@ -78,12 +78,10 @@ const TimelineComponent = ({
   );
 };
 
-TimelineComponent.displayName = 'Timeline';
+Timeline.displayName = 'Timeline';
 
-export const Timeline = Object.assign(TimelineComponent, {
-  Item: TimelineItem,
-  Title: TimelineTitle,
-  Description: TimelineDescription,
-});
+Timeline.Item = TimelineItem;
+Timeline.Title = TimelineTitle;
+Timeline.Description = TimelineDescription;
 
 export default Timeline;
