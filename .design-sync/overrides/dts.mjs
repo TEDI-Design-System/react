@@ -427,16 +427,76 @@ export function propsBodyFor(name, ctx) {
     const sig = exp.getType().getCallSignatures()[0];
     const p0 = sig?.getParameters()[0];
     if (!p0) return null;
-    return emitBody(p0.getTypeAtLocation(exp), exp, '', pkgDir);
+    return emitBody(p0.getTypeAtLocation(exp), exp, '', pkgDir, project, name);
   }
   const generics = decl.getTypeParameters?.().length
     ? `<${decl.getTypeParameters().map((p) => p.getText()).join(', ')}>`
     : '';
-  return emitBody(decl.getType(), decl, generics, pkgDir);
+  return emitBody(decl.getType(), decl, generics, pkgDir, project, name);
 }
 
+// ── FORK: referenced-type expansion (prelude) ─────────────────────────────
+// Props reference types that are defined nowhere in the emitted .d.ts —
+// measured on TEDI: 118 distinct names, e.g. FeedbackTextProps (the `helper`
+// shape, 15 components), IconWithoutBackgroundProps (10), ISelectOption
+// (whose `customData` field is the whole mechanism for custom Select option
+// rendering). Without them the reader sees a name and no shape.
+// emit.mjs already emits `prelude` after the Props interface for exactly this
+// ("inlined type refs"); upstream just never populated it. Depth 1 only.
+const DTS_BUILTINS = new Set(
+  ('string number boolean any unknown void null undefined never object symbol bigint true false ' +
+   'React JSX Array ReadonlyArray Record Partial Pick Omit Readonly Required Promise Date Map Set WeakMap ' +
+   'Function Exclude Extract NonNullable Parameters ReturnType InstanceType Capitalize Uppercase Lowercase ' +
+   'Iterable Iterator Error RegExp Math JSON Intl Element Event Node CSSProperties ReactNode ReactElement').split(' '));
+
+function preludeFor(body, project, pkgDir, selfName) {
+  if (!project) return '';
+  // Drop JSDoc FIRST — its prose contains apostrophes ("TanStack's", "doesn't"),
+  // and a naive quote-strip would then span from one apostrophe to the next,
+  // deleting the prop lines (and type names) in between. Then drop string-literal
+  // unions, bounded to a single line so an unbalanced quote can't run away.
+  const scan = body
+    .replace(/\/\*\*[\s\S]*?\*\//g, ' ')
+    .replace(/'[^'\n]*'/g, ' ')
+    .replace(/"[^"\n]*"/g, ' ');
+  const wanted = new Set();
+  for (const m of scan.matchAll(/\b([A-Z][A-Za-z0-9_]*)\b/g)) {
+    const id = m[1];
+    if (DTS_BUILTINS.has(id) || id === `${selfName}Props` || id.startsWith('HTML')) continue;
+    if (id.length < 3) continue; // single/two-letter generic params (C, T)
+    wanted.add(id);
+  }
+  if (!wanted.size) return '';
+  const out = [];
+  let budget = 4000;
+  for (const id of [...wanted].sort()) {
+    if (out.length >= 12 || budget <= 0) break;
+    let decl = null;
+    for (const sf of project.getSourceFiles()) {
+      const fp = sf.getFilePath();
+      // Skip the TS/DOM/React libs — dumping those is noise, not information.
+      if (/\/(typescript\/lib|@types\/react)\//.test(fp)) continue;
+      decl = sf.getInterface(id) ?? sf.getTypeAlias(id) ?? sf.getEnum(id);
+      if (decl) break;
+    }
+    if (!decl) continue;
+    let text = decl.getText().trim();
+    if (text.length > 900) continue; // pathological — leave it to the source
+    // Local declarations are emitted verbatim; `export` would re-export them.
+    text = text.replace(/^export\s+(declare\s+)?/, '');
+    const lineCount = text.split('\n').length;
+    if (lineCount > 40) continue;
+    out.push(text);
+    budget -= text.length;
+  }
+  if (!out.length) return '';
+  return `// Referenced types, resolved one level deep (see the story source for the rest).\n${out.join('\n\n')}\n\n`;
+}
+
+const DOC_CAP = 1200;
+
 let loggedStyleSystemDirs;
-function emitBody(type, at, generics, pkgDir) {
+function emitBody(type, at, generics, pkgDir, project, selfName) {
   const lines = [];
   const props = type.getApparentType().getProperties();
   // `at` is the component's own Props declaration site — its file is exempt
@@ -473,14 +533,30 @@ function emitBody(type, at, generics, pkgDir) {
     // Leading JSDoc on the prop declaration, if any.
     const d = p.getDeclarations()[0];
     const doc = d?.getJsDocs?.()?.[0]?.getDescription()?.trim();
-    if (doc) lines.push(`  /** ${doc.replace(/\s+/g, ' ').slice(0, 120)} */`);
+    // FORK: upstream sliced every description at 120 chars, which truncated 35%
+    // of all props (508 of 1451 measured on TEDI) — and because JSDoc puts the
+    // summary first and the capability second, the cut consistently removed the
+    // useful half ("…may return any React n|ode — useful for color swatches").
+    // Longest real description here is 971 chars, so DOC_CAP=1200 truncates
+    // nothing; the sentence-boundary trim is a safety valve, not the norm.
+    if (doc) {
+      // `*/` inside a description would close the comment early.
+      const full = doc.replace(/\s+/g, ' ').replace(/\*\//g, '*\\/');
+      let text = full;
+      if (full.length > DOC_CAP) {
+        const cut = full.lastIndexOf('. ', DOC_CAP);
+        text = (cut > DOC_CAP / 2 ? full.slice(0, cut + 1) : full.slice(0, DOC_CAP)) + ' …';
+      }
+      lines.push(`  /** ${text} */`);
+    }
     const pn = p.getName();
     // Hyphenated/index-signature names (`data-*`, `aria-*`) must be quoted.
     const key = /^[a-zA-Z_$][\w$]*$/.test(pn) ? pn : JSON.stringify(pn);
     lines.push(`  ${key}${optional}: ${tt};`);
   }
   if (!lines.length) return null;
-  return { body: lines.join('\n'), generics, extendsClause: '', prelude: '' };
+  const body = lines.join('\n');
+  return { body, generics, extendsClause: '', prelude: preludeFor(body, project, pkgDir, selfName) };
 }
 
 // Scaffold-preview defaults from the resolved props body. Conservative: fill

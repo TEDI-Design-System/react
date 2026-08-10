@@ -15,8 +15,16 @@ npm install @tedi-design-system/react
 | This bundle corresponds to | **18.1.1-rc.1** (npm `rc` tag) |
 | Also published | **18.1.0** (npm `latest`) |
 | Source | https://github.com/TEDI-Design-System/react |
+| **Live Storybook (React)** | **https://storybook.tedi.ee/react/rc** — rendered examples + prop tables |
 | Design source of truth | [Figma — TEDI Design System](https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/) |
 | Human docs | https://www.tedi.ee/1ee8444b7/ (Zeroheight) |
+
+> Always use the **`/react/rc/`** build — this bundle is built from `rc`. The bare
+> `storybook.tedi.ee` is a framework picker, and `/react/main/` is the stable line, which
+> can lag this bundle. Deep links follow
+> `https://storybook.tedi.ee/react/rc/?path=/docs/tedi-ready-<group>-<component>--docs`
+> (verified: `…-layout-sidenav--docs`, `…-layout-header--docs`, `…-layout-footer--docs`,
+> `…-content-table--docs`, `…-components-navigation-link--docs`).
 
 **Ignore the `@0.0.0-semantic-version` in the generated title below.** That is a
 placeholder committed in `package.json`; semantic-release substitutes the real version
@@ -131,14 +139,30 @@ Real families, in rough order of usefulness:
 Prefer `--general-*` and per-component tokens over raw `--tedi-*` scales: the semantic
 ones re-theme correctly in dark mode, raw palette values do not.
 
-## 5. Where the truth lives
+## 5. Where to look things up — in priority order
 
-Read these before styling anything — they beat this summary:
+When this summary, your memory, and the generated per-component docs disagree,
+**the story source wins.** Generated summaries are lossy: prop descriptions are truncated
+at 120 characters and referenced types are not expanded (see §8, §9).
 
+1. **Story source** — `src/tedi/components/**/<name>.stories.tsx` in the repo. Real,
+   compiling usage code; authoritative and readable.
+2. **`<Name>.d.ts`** — the prop contract, here in this bundle.
+3. **Live Storybook** — https://storybook.tedi.ee/react/rc — for a **human** to look at
+   rendered output.
+
+> **Do not fetch Storybook URLs as a reference.** It is a client-rendered app: fetching
+> `?path=/docs/…` returns an empty shell with no props and no examples (verified). The
+> deep links in this bundle are for humans. The one machine-readable part is
+> `/react/rc/index.json`, which lists story ids and titles — useful for finding a story,
+> not for reading one.
+
+Within this bundle specifically:
+
+- `components/<group>/<Name>/<Name>.d.ts` — the prop contract (`<Name>Props`).
+- `components/<group>/<Name>/<Name>.prompt.md` — per-component usage and gotchas.
 - `_ds/<folder>/styles.css` and its `@import` closure (`tokens/index.css` for every
   token, `fonts/fonts.css`, `_ds_bundle.css` for component CSS).
-- `components/<group>/<Name>/<Name>.d.ts` — the real prop contract (`<Name>Props`).
-- `components/<group>/<Name>/<Name>.prompt.md` — per-component usage.
 
 Fonts ship with the bundle: **Roboto** (body/headings) and **Material Symbols** for
 icons. `<Icon name="arrow_forward" />` takes a Material Symbols ligature name.
@@ -172,7 +196,262 @@ import { Card, Heading, Text, Button, TextField, Row, Col, VerticalSpacing }
 Use `Row`/`Col` (12-column, breakpoint props) for page grids and `VerticalSpacing` for
 vertical rhythm rather than ad-hoc margins.
 
-## 7. Notes
+## 7. Custom rendering — capabilities the per-component docs cut off
+
+Each component's `.d.ts` / `.prompt.md` truncates every prop description at ~110
+characters and never expands referenced types (`ISelectOption`, `ColumnDef`). Two
+capabilities lose their key sentence that way. Both are supported — do not hand-roll
+replacements for them.
+
+### Select options are arbitrary React — `renderOption` + `renderValue`
+
+`ISelectOption` has a fourth field the generated props block never shows:
+
+```ts
+interface ISelectOption<CustomData = unknown> {
+  value: string;
+  label: string | React.ReactNode;
+  isDisabled?: boolean;
+  customData?: CustomData;   // typed escape hatch, read back inside the renderers
+}
+```
+
+So a colour chip, icon, status dot or two-line option is one prop away:
+
+```jsx
+const chip = (v) => ({ width: 14, height: 14, borderRadius: 2, flexShrink: 0, background: `var(${v})` });
+
+<Select
+  id="category" label="Kategooria" options={levelOptions}
+  renderOption={({ data }) => (
+    <span className="flex align-items-center gap-2">
+      <span style={chip(data.customData.colorVar)} aria-hidden="true" />
+      {data.label}
+    </span>
+  )}
+  renderValue={(option) => (/* same shape — renders inside the closed trigger */)}
+/>
+```
+
+- Both renderers **replace** the option / trigger body rather than composing with the
+  default label, so render the label yourself.
+- `renderValue` is **single-select only**; under `multiple` use `renderOption` for tags.
+- Keep `label` a **string** when the select is searchable — a React-node label renders
+  as-is but is not matched by search. Put the visuals in `customData`.
+- `dropdownType="grid"` turns the menu into a swatch grid for colour / icon pickers,
+  sized by `--tedi-swatch-size`, `--tedi-swatch-gap`, `--tedi-swatch-columns`.
+- Reference: the `ValueType` story (colour and icon pickers).
+
+### Table cells are arbitrary React — including form controls
+
+`Table` is TanStack-backed and renders every cell through
+`flexRender(columnDef.cell, …)`, so a column's `cell` may return anything, form controls
+included. **Editable rows do not need a hand-built CSS grid of inputs:**
+
+```jsx
+const columns = [
+  { accessorKey: 'name', header: 'Nimi',
+    cell: ({ row }) => <EditableTextCell row={row.original} field="nimi" label="Nimi" /> },
+];
+```
+
+where the cell renders plain text normally and swaps to
+`<TextField id={…} label={…} hideLabel value={…} onChange={…} />` (or `Select`,
+`DatePicker`, a remove `Button`) for the row currently being edited. Staying inside real
+`<td>`s keeps header association and per-cell labelling that a `div` grid throws away.
+
+> `useEditableRows` and `EditableRowsProvider` appear in Table's generated examples but
+> are **story-local helpers, not library exports** — importing them from the package
+> fails. They are a small `useState` row-draft hook (rows / editingId / draft /
+> beginEdit / cancelEdit / commitEdit); write your own.
+
+Adding and removing rows is your own state on the array passed as `data`. Reference: the
+`EditableValues` story.
+
+## 8. Shared shapes the per-component docs reference but never define
+
+These type names appear in many components' props with no definition anywhere in the
+bundle. Their real shapes:
+
+```ts
+// `helper` — 15 components
+interface FeedbackTextProps {
+  text: React.ReactNode | React.ReactNode[];
+  type?: 'hint' | 'valid' | 'error';   // 'error' / 'valid' also flip the field's styling
+  position?: 'left' | 'right';
+  id?: string; className?: string;
+}
+
+// object form of `icon` / `iconLeft` / `iconRight` — 10 components
+interface IconWithoutBackgroundProps {
+  name: string;                        // Material Symbols ligature
+  size?: IconSize; color?: IconColor; type?: IconType;
+  filled?: boolean; label?: string; className?: string;
+}
+```
+
+**Only `TextField`, `TextArea`, `Search` and `InputGroup` accept an array** of
+`FeedbackTextProps` (several messages at once, e.g. an error plus a hint). On `Select`,
+`NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Toggle`, `Slider`, `FileUpload`,
+`FileDropzone` and `ProgressBar`, `helper` takes a single object only.
+
+Date components (`Calendar`, `DateField`, `DateTimeField`) type `disabled`,
+`disabledMatchers`, `hidden` and `modifiers` as a react-day-picker matcher union. The
+union is spelled out in the props, but these object forms are not:
+
+```ts
+{ before: Date }                    // DateBefore — everything earlier
+{ after: Date }                     // DateAfter
+{ before: Date, after: Date }       // DateInterval — strictly between
+{ from: Date, to?: Date }           // DateRange — inclusive
+{ dayOfWeek: number | number[] }    // DayOfWeek — 0 = Sunday, e.g. weekends: [0, 6]
+```
+
+So `disabled={{ before: new Date() }}` blocks past dates and
+`disabled={{ dayOfWeek: [0, 6] }}` blocks weekends — no per-day predicate needed (though
+`(date) => boolean` and `Matcher[]` are also accepted).
+
+## 9. Capabilities cut off past the 120-character mark
+
+Prop descriptions are truncated at 120 characters, which hides the second half of ~400
+props. The ones most likely to cause you to hand-roll a workaround:
+
+| Prop | What the cut-off half says |
+|---|---|
+| `Collapse.controlsId` | Points the trigger at **your** element id and does **not** render the internal panel — for a disclosed region that must live outside Collapse's DOM subtree (e.g. details in a sibling `<tr>`). |
+| `DateTimeField.availableTimes` | Accepts a static array **or a function** `(date: Date) => string[]`, evaluated per selected date — for slot lists that differ by day. |
+| `Calendar/DateField.selectionLevel` | `'years'` / `'months'` / `'days'` — a year- or month-only picker, opening straight on that grid. |
+| `DateField.modal` | `true` / `false` / **a breakpoint name** — modal below that breakpoint, popover above it. |
+| `DateField.footer` | Renders your node inside the calendar popover, below the grid. |
+| `Table.activeRowId` | Master-detail anchoring with `aria-current="true"` — distinct from checkbox selection and from `:hover`. |
+| `Table.expandTrigger` | `'row'` makes a click (and Enter/Space) anywhere on an expandable row toggle it. |
+| `Table.rowProps` / `columnProps` | Per-row / per-column `className` **and** `style`, for conditional tinting or drop indicators. Row event handlers are **not** accepted — Table owns row click/keyboard. |
+| `Table.reorderableRows` / `reorderableColumns` | Full keyboard drag-and-drop (Space/Enter to lift, arrows to move, Escape to cancel) with live-region announcements — not mouse-only. |
+| `Table.emptyStateRole` | `'status'` (polite) or `'alert'` (assertive); omit when the empty state never changes. |
+| `Alert.action` | A reserved, aligned action slot that replaces the close button — use it **instead of** squeezing buttons into `children`. |
+| `Footer.children` | An ordered contract: `Footer.Side placement="start"` → exactly one `Footer.Body` → `Footer.Side placement="end"` → optional `Footer.Bottom`. |
+| `SideNav.isMobileOpen` | Pair with `SideNav.Toggle` (`menuOpen` / `toggleMenu`) to drive the mobile menu from your own state. |
+| `Breadcrumbs.maxItems` | Collapses overflow crumbs into a dropdown (`'long'` variant only); `variant="short"` renders a single back link. |
+| `Pagination.showEdgeNavLabels` | Renders the arrows as labelled text links instead of circular icon buttons (`arrowVariant` is then ignored). |
+| `TextField/TextArea.onKeyPress` | Bound to the **surrounding container**, not the input element. |
+| `*.iconButtonProps` | Forwards `aria-expanded` / `aria-controls` / `aria-haspopup` to the icon trigger — only applies when `onIconClick` is set, which is also what turns the icon into a `<button>`. |
+| `Tag.role` | Defaults to `'status'`; pass `role="presentation"` for static tags in a list, or some screen readers announce them twice. |
+| `TopNav.submenuFit` | `'full'` (mega-menu width) vs `'content'` (shrink to content). |
+| `Select.openKeyboardOnTouch` | `false` opens the menu on touch **without** raising the on-screen keyboard. |
+
+When a prop's description ends mid-sentence, assume there is more and check
+`src/tedi/**` or Storybook before building around it.
+
+## 10. Page shell / app layout — read this before building any page
+
+There is **no `Layout` component**, and `SideNav` is deliberately decoupled: it does not
+position itself. You own the shell. Every mistake below produces a wrong-looking page
+with **no error and no console warning**, so it is worth copying the structure exactly.
+
+### The canonical shell
+
+Header full width → a row holding the sidenav column and main → footer.
+
+```jsx
+import { Header, SideNav, Footer, Link, Text,
+         useBreakpoint, isBreakpointBelow } from '@tedi-design-system/react/tedi';
+
+function AppShell({ navItems, children }) {
+  const [navOpen, setNavOpen] = useState(false);
+  const isMobile = isBreakpointBelow(useBreakpoint(), 'lg');
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Header toggle={<SideNav.Toggle menuOpen={navOpen} toggleMenu={() => setNavOpen(!navOpen)} />}>
+        <Header.Logo logo={<Text modifiers="bold">Minu rakendus</Text>} />
+        <Header.Actions>
+          <Header.Language languages={languages} />
+          <Header.Profile>…</Header.Profile>
+        </Header.Actions>
+      </Header>
+
+      {/* THE ROW: must stretch, must not be padded */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, alignItems: 'stretch' }}>
+        {/* Sidenav column: no padding, no align-self, no sticky */}
+        <div style={{ display: 'flex' }}>
+          <SideNav
+            ariaLabel="Peamenüü"
+            navItems={navItems}
+            mobileBreakpoint="mobile"
+            isMobileOpen={navOpen}
+          />
+        </div>
+
+        {/* Main: owns its own scrolling and padding */}
+        <main style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '1.5rem' }}>
+          {children}
+        </main>
+      </div>
+
+      <Footer>…</Footer>
+    </div>
+  );
+}
+```
+
+### Why each rule exists
+
+`SideNav` is `height: 100%` — **its parent decides how tall it is.** That single fact
+explains every failure mode below.
+
+| Rule | If you break it |
+|---|---|
+| The row is `display: flex` with `align-items: stretch` (the default — do not override) | The sidenav column collapses to content height; white gap below the nav down to the footer |
+| The sidenav column has **no padding** | A coloured strip of page background appears around the nav |
+| The sidenav column is not `align-self: flex-start` | Same as above — the column stops at content height |
+| The row is `flex: 1` | The shell does not reach the footer; both nav and main end early |
+| `main` owns `overflow-y: auto`, not the row or body | The whole page scrolls, taking the header and nav with it |
+| `main` has `min-width: 0` | Wide content (tables!) forces the row wider and breaks the layout |
+
+### Wrong / right
+
+```jsx
+// ✗ padded wrapper — background strip around the nav
+<div style={{ padding: '1rem' }}><SideNav … /></div>
+// ✓
+<div style={{ display: 'flex' }}><SideNav … /></div>
+
+// ✗ content-height column — nav stops short, white gap to the footer
+<div style={{ alignSelf: 'flex-start' }}><SideNav … /></div>
+// ✓ let it stretch (default)
+<div style={{ display: 'flex' }}><SideNav … /></div>
+
+// ✗ sticky wrapper — nav detaches, leaves a gap and scrolls oddly
+<div style={{ position: 'sticky', top: 0 }}><SideNav … /></div>
+// ✓ make the ROW full height and let main scroll instead
+<div style={{ display: 'flex', flex: 1, minHeight: 0 }}>…</div>
+```
+
+### No positioning utilities ship
+
+`fixed`, `absolute`, `relative`, `sticky`, `top-0`, `h-full`, `w-full`, `z-50` are **not**
+in the TEDI stylesheet — only the flex / gap / align / justify / text / order families in
+§2. Use inline styles or your own CSS for the shell. (The SideNav Storybook page shows
+`className="fixed left-0 top-0 h-full z-50"`; those classes do nothing here.)
+
+### Don't do this — app-level element resets break DS components
+
+TEDI components rely on **inherited colour** in places, and their own class names are
+hashed. A bare element selector in your app therefore beats them:
+
+```css
+/* ✗ turns SideNav item hover black and makes footer links dark-on-dark */
+a:hover { color: #000; }
+```
+
+Scope such rules to your own container (`.my-content a:hover`), or set colours through
+component props (`<Link color="inverted">`) instead. This class of bug is invisible in
+Storybook and only appears once the design system is dropped into a real app.
+
+`Header` and `SideNav` are internally wrapped in `Print visibility="hide"`, so they drop
+out of print output on their own. **`Footer` is not** — wrap it yourself in
+`<Print visibility="hide">` if it should not print.
+## 11. Notes
 
 - `InputGroup` is a compound: `InputGroup.Prefix`, `InputGroup.Input`,
   `InputGroup.Suffix`. Use it for inputs with attached addons (currency, country code,

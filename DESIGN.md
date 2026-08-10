@@ -373,3 +373,76 @@ paths) is `design-tokens/component.manifest.json`; all of them import from
 - Don't hand-roll inputs, dropdowns, modals or date/time pickers that TEDI already provides.
 - Don't skip the providers or the stylesheet import — components render unstyled or without theming.
 <!-- /prose:dosdonts -->
+
+## Where to look things up
+
+In priority order. **Story source wins** when this file, an agent's memory, and generated
+summaries disagree:
+
+1. **Story source** — `src/tedi/components/**/<name>.stories.tsx`. Real, compiling usage
+   code; authoritative, and readable by both humans and agents.
+2. **`*.d.ts`** — the prop contract.
+3. **Live Storybook** — for a **human** to look at rendered output:
+   - `rc` (current development line): https://storybook.tedi.ee/react/rc/
+   - `main` (latest stable release): https://storybook.tedi.ee/react/main/
+   - Deep links: `?path=/docs/tedi-ready-<group>-<component>--docs`, e.g.
+     [SideNav](https://storybook.tedi.ee/react/rc/?path=/docs/tedi-ready-layout-sidenav--docs).
+   - The bare `https://storybook.tedi.ee` is a framework picker, not the React build.
+
+> **AI agents: do not fetch Storybook URLs as a reference.** Storybook is a
+> client-rendered app — fetching a `?path=/docs/…` URL returns an empty shell with no
+> props and no examples. Read the story source instead. The only machine-readable
+> endpoint is `/react/rc/index.json` (story ids and titles), which helps you *find* a
+> story, not read one.
+
+Generated summaries are lossy in two specific ways worth knowing: prop descriptions are
+truncated in some tooling, and types referenced by props are often not expanded. When a
+description ends mid-sentence, assume there is more and go to the source.
+
+## Using TEDI in Claude Design
+
+[claude.ai/design](https://claude.ai/design) can host TEDI as a design system, so
+prototypes are built from real TEDI components rather than approximations.
+
+**You cannot be given access to the TEHIK-owned project.** Design-system projects are
+org-scoped — sharing is `invited` or `org`, and neither crosses an organisation boundary.
+Each organisation runs its own. That is also the better outcome: you own a project you can
+refresh on your own schedule rather than waiting on someone else.
+
+### The flow
+
+```bash
+git clone https://github.com/TEDI-Design-System/react.git
+cd react
+nvm use            # Node >= 24, npm >= 11
+npm ci
+```
+
+Then, in Claude Code inside the repo:
+
+```
+/design-sync
+```
+
+The skill runs the library build, builds the reference Storybook, converts, renders and
+grades every component, and uploads — you do not run those steps yourself.
+
+### What you get
+
+**82 TEDI-Ready components**, each with its real TypeScript prop contract (including the
+shapes of referenced types), a live preview rendering the actual compiled component, and
+per-component usage docs with the silent-failure gotchas. Designs the agent produces are
+made of real TEDI parts and map to code your engineers can ship.
+
+Everything repo-specific is already committed under `.design-sync/` — converter config,
+provider chain, per-component overrides, adapter forks, the conventions header and
+per-component docs — so you inherit the setup rather than rediscovering it. This is
+verified, not assumed: rebuilding `dist/` and the reference Storybook from source and
+re-running the converter reproduces a byte-identical result.
+
+### Timing
+
+The mechanical pipeline is about **two minutes** (library build ~1–1.5 min, Storybook
+~1 min, converter ~35 s). The rest of a first run is the verification pass — every
+component rendered and compared against Storybook — which is the part to budget for.
+Later refreshes only touch what changed.

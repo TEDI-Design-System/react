@@ -9,8 +9,7 @@ URL: https://claude.ai/design/p/d10e8d07-6086-4ddd-970c-090a49feaa2f
 447 files uploaded, then an 11-file delta re-upload after merging `origin/rc`
 (README with the corrected header, the rebuilt bundle/css/styles, InputGroup's 4
 artifacts + preview, anchor last). **The bundle corresponds to npm `18.1.1-rc.1`.**
-A hashed manifest is kept at `.design-sync/upload-manifest.sha256` so the next
-re-sync can diff content instead of re-reasoning from inputs. The project now carries an
+The project now carries an
 **`_ds_sync.json` anchor**, so the next re-sync diffs against it and skips unchanged
 components instead of re-verifying everything. The app's self-check has run
 (`_ds_manifest.json` and `_adherence.oxlintrc.json` exist remotely = cards registered).
@@ -29,6 +28,11 @@ owned previews were ever needed** (`.design-sync/previews/` is empty) — the co
 bundle reproduces the storybook oracle on its own for every component.
 
 ### ⚠ Grade provenance — 79 of 82 carry PRE-FIX verdicts
+
+> **Superseded 2026-08-10.** The `dts.mjs` fork reset every grade on the same technicality
+> (fork bytes are a global config slice), so the 3-vs-79 split below is now moot — all 82
+> read as churned. Read **Re-sync risks** first: `renderHashes` are byte-identical, so
+> that reset is a false alarm and the grades should be carried, not re-earned.
 
 The final `InputGroup` fix changed `cfg.titleMap` and `cfg.storyImports`, which are
 **global** config slices, so it cleared every grade on a technicality even though only
@@ -78,11 +82,12 @@ the step-2 sb-reference build, and
 `ts-morph`/`esbuild`). Chromium lives at `~/Library/Caches/ms-playwright` on macOS,
 **not** `~/.cache/ms-playwright`.
 
-**To upload to claude.ai/design later:** there is no project yet. Create one, record its
-`projectId` in `.design-sync/config.json`, then follow the skill's upload sequence
-(sentinel → content → deletes → sentinel → `_ds_sync.json` last). Because there is no
-anchor, that run re-verifies everything — which also closes the 79-component provenance
-gap noted above.
+**The project exists and is current** (see the top of this section) — the paragraph that
+used to sit here said otherwise and was left over from before the first upload. It was
+last updated 2026-08-10 with the docs work; the anchor on disk matches the remote one.
+Sharing is `scope: "org"` with `link_permission: "edit"`, so anyone in the TEHIK
+organisation can clone the repo and re-sync against the pinned `projectId`. A *different*
+organisation cannot be granted access — see the adoption flow in the repo README.
 
 ## Scope
 
@@ -96,6 +101,42 @@ gap noted above.
   - `STORYBOOK_EXCLUDE_COMMUNITY=true` when building the reference storybook — the repo's
     own `.storybook/main.ts` reads that env var and drops the `../src/community/**` story
     globs. Without it the reference carries ~64 community stories the bundle can't render.
+
+## Reproducing this sync from scratch
+
+Read this first if you are syncing a fresh clone, or re-syncing after the Claude Design
+project was deleted. **Everything the sync needs is committed under `.design-sync/`** —
+`config.json`, `conventions.md` (the README header), `docs/` (per-component gotchas),
+`overrides/` (the four lib forks) and this file. Two inputs are NOT committed and must be
+rebuilt, in this order:
+
+```bash
+nvm use                       # Node >= 24, npm >= 11
+npm ci
+npm run build                 # → dist/   NEVER `vite build` directly (see Build below)
+STORYBOOK_EXCLUDE_COMMUNITY=true \
+  npx storybook build -c .storybook -o .design-sync/sb-reference
+```
+
+The two builds are **independent** — Storybook compiles from `src/`, not from `dist/` —
+so run them concurrently if you want the ~1 min back. It is not where the time goes:
+measured, the whole mechanical pipeline is ~2 min (storybook ~1 min, `npm run build`
+~1–1.5 min, converter 35 s). A first sync's real cost is the capture/compare/grade
+fan-out over 403 stories.
+
+**`npm run build:sb` is the wrong command here** — it writes to `dist/storybook-static`,
+but `cfg.storybookStatic` points at `.design-sync/sb-reference`. Build straight to that
+path (as above) or copy it across. Omitting `STORYBOOK_EXCLUDE_COMMUNITY=true` silently
+adds community stories, which then read as unpaired components against a tedi-only bundle.
+
+Given those two, the run reproduces the same design system without further judgement:
+the README header, the per-component gotcha docs, the uncapped prop descriptions and the
+referenced-type shapes all come from committed files, not from anything a previous agent
+remembered.
+
+**If the project was deleted:** `cfg.projectId` still points at the dead id and the
+target router will try to use it. Clear `projectId` from `config.json` first so the skill
+creates a new project, then let it record the new id after the upload verifies.
 
 ## Build
 
@@ -124,9 +165,22 @@ gap noted above.
 
 ## Lib forks (`.design-sync/overrides/`)
 
-Both are declared in `cfg.libOverrides` and both are **narrow**: one added helper /
-one added define, everything else upstream verbatim. On re-sync, diff each against
+All four are declared in `cfg.libOverrides` and each is **narrow** — an added helper, an
+added define, everything else upstream verbatim. On re-sync, diff each against
 `.ds-sync/lib/<same-name>` and merge upstream changes.
+
+**⚠ `dts.mjs` deliberately diverges from upstream — do NOT revert it when merging.**
+A diff against `.ds-sync/lib/dts.mjs` will show the doc-cap raise (120 → 1200) and the
+`preludeFor()` addition as differences. They are intentional improvements, not drift.
+Reverting them silently re-truncates 508 JSDoc blocks and removes 99 referenced-type
+declarations, and costs another full grade reset to undo. Merge upstream's *other*
+changes around them; keep these two. Details in the `dts.mjs` entry below.
+
+**Cost of touching any of them:** `configSlicesFor()` hashes fork file bytes into the
+global config slice, so editing a fork re-keys **every** component's `sourceKey` and
+resets all grades. Prose and consumer guidance belong in `conventions.md` (`readmeHeader`
+is deliberately *not* keyed) or `.design-sync/docs/` (`docsDir`, also not keyed) — never
+in a fork.
 
 - **`dts.mjs`** — `[GENERAL]` symptom: build exited 0 but emitted **0 components**, and
   reported all 84 storybook titles as `[TITLE_UNMAPPED]`. Root cause: the misleading
@@ -137,6 +191,30 @@ one added define, everything else upstream verbatim. On re-sync, diff each again
   at **both** entry-resolution sites — `findTypesRoot` *and* `projectFor`, which
   computes `entry` independently, so patching one is not enough.
   The subpath is pinned to `'./tedi'`, which makes the tedi-only scope structural.
+
+  **Second change (2026-08-10) — documentation quality, not correctness.** Two additions,
+  both measured before and after:
+  1. **Doc cap 120 → 1200** (`DOC_CAP`, sentence-boundary trim + ` …` marker as a safety
+     valve). Upstream sliced every prop description at 120 chars, truncating **508 of
+     1451** JSDoc blocks (35%). Because JSDoc puts the summary first and the capability
+     second, the cut removed the useful half — `Select.renderValue` ended at *"may return
+     any React n"*, one word before *"ode — useful for color swatches"*, which is why two
+     consumers hand-rolled workarounds for shipped features. Longest real description in
+     this repo is **971** chars, so 1200 truncates **nothing** (verified: 0 of 1185 props
+     now carry the marker).
+  2. **`preludeFor()` populates `prelude`** — emit.mjs already emits it after the Props
+     interface for "inlined type refs"; upstream just never filled it. **118** distinct
+     type names were referenced with no definition anywhere in the bundle. Now **99 type
+     declarations across 46 components**, depth 1, capped at 12 types / 4000 chars /
+     900 chars per decl. This is what finally exposes `ISelectOption.customData`,
+     `FeedbackTextProps` (11 components) and `TablePaginationOptions`.
+
+  **Gotcha if you touch `preludeFor`:** strip JSDoc **before** stripping quoted strings.
+  The first version stripped quotes first, and JSDoc prose is full of apostrophes
+  (`TanStack's`, `doesn't`), so `'[^']*'` spanned from one apostrophe to the next and
+  deleted the prop lines in between — Table silently resolved 1 type instead of 7.
+  Types from `node_modules` (`@tanstack` `ColumnDef`/`Row`, react-day-picker `Matcher`)
+  are still unresolved: the DTS project only parses `dist/src/tedi/**`.
 - **`story-imports.mjs`** — `[GENERAL]` **the most important fork; read this one before
   changing anything about previews.** Symptom: all 81 previews rendered *completely
   unstyled* — default browser buttons instead of TEDI components — while
@@ -248,7 +326,7 @@ This bit once already and cost a full re-grade:
 
 ## Excluded components (`cfg.titleMap` → `null`)
 
-Three storybook titles have no matching public export and are excluded on purpose:
+Storybook titles with no matching public export, excluded on purpose:
 
 - **`FormLabel`** — the repo's own story tags it `status: internalComponent`
   ("only used to build other components and not being exported from library").
@@ -256,6 +334,13 @@ Three storybook titles have no matching public export and are excluded on purpos
 - **`Toast`** — there is no `Toast` component; the API is `sendNotification()` plus
   `ToastContainer`. The stories are click-driven, so nothing renders statically.
   No coverage lost: the thing a toast *looks* like is `Alert`, which is synced.
+- **`Applicationshell`** (added 2026-08-10) — `TEDI-Ready/Layout/Application shell` is a
+  documentation-only story added that day; it composes Header + SideNav + main + Footer
+  and has no export of its own. Note the key: `titleParts()` strips whitespace, so the
+  key is `Applicationshell`, **not** `"Application shell"`. Without the entry the title
+  reports `[TITLE_UNMAPPED]` on every sync and the next agent has to re-decide what to
+  do with it. The shell guidance itself lives in `conventions.md` §10, which is where
+  consumers read it — the story is for Storybook.
 - ~~**`InputGroup`**~~ — **✅ FIXED IN THE REPO 2026-08-07; no longer excluded.**
   It was a real library defect: `input-group.tsx` had `export default InputGroup` only
   (a bare `const`, no named export) while `index.ts` used `export * from './input-group'`
@@ -415,6 +500,27 @@ design system never actually applies, which is worse than the honest delta.
 
 ## Affirmatively verified (don't re-audit these without a reason)
 
+**End-to-end reproducibility (2026-08-10).** Rebuilt `dist/` (`npm run build`, font
+rewrite confirmed) *and* `sb-reference` (`STORYBOOK_EXCLUDE_COMMUNITY=true storybook
+build`) from source, then ran the converter against committed `.design-sync/`. The
+resulting `_ds_sync.json` is **byte-identical** to the uploaded one: `styleSha`,
+`bundleSha12`, `auxSha`, `scriptsSha` all match, and 0 differences across 82
+`renderHashes`, 82 `sourceKeys` and 246 `sourceHashes`. A from-scratch sync therefore
+reproduces this exact design system — the conventions header, per-component gotcha docs,
+uncapped prop descriptions and referenced-type shapes all derive from committed files,
+not from any previous agent's reasoning.
+
+**Storybook is not agent-readable (2026-08-10).** Fetching a docs deep link returns a
+client-rendered shell: the entire text content of
+`https://storybook.tedi.ee/react/rc/?path=/docs/tedi-ready-layout-sidenav--docs` is
+`"storybook - Storybook"` — no props, no examples. This is why `conventions.md` §5 ranks
+**story source first**, `.d.ts` second and live Storybook third (for a human to look at),
+and why it warns agents off fetching those URLs. Do not "helpfully" promote Storybook back
+to the primary reference. The one machine-readable endpoint is
+`<storybook>/index.json` — story ids and titles, good for *finding* a story and for
+verifying deep-link slugs instead of guessing them (that is how the five slugs in
+`.design-sync/docs/` were checked).
+
 The compare loop is structurally blind to a missing font — both panels would fall back
 identically — so these were checked deliberately rather than inferred:
 
@@ -474,6 +580,37 @@ actually reads — already lists variants with spaces
 ("Long Text Button That Wraps Into Multiple Lines"). The gap is human-facing only, in
 the component picker.
 
+## Known converter gaps (upstream behaviour — don't chase these as bugs here)
+
+Measured 2026-08-10. Two of them are already worked around; both workarounds are in the
+durable set, so they survive a re-sync.
+
+- **Emitted `## Examples` reference story-local identifiers that are not library
+  exports.** `emit.mjs` lifts a story export's own source and nothing else, so any
+  module-level helper the story depends on arrives undefined. `Table.prompt.md` shipped
+  `useEditableRows(...)`, `EditableRowsProvider` and `bookingShowcaseColumns`; `Header`'s
+  would ship `SidenavLayout`. An agent following those writes an import that fails —
+  worse than no example, because it reads as authoritative.
+  **Worked around** for `Table`, `SideNav`, `Header`, `Footer` and `Link` by authoring
+  `.design-sync/docs/<Name>.md` (`cfg.docsDir`), which *replaces* the synthesised body —
+  `## Props` is re-appended automatically, but Variants / Examples / Related are not, so
+  restate what you need. The other 77 components still carry the raw behaviour.
+- **Examples are the first three stories in declaration order**
+  (`emit.mjs` `visibleStoryIds.slice(0, 3)`), which by convention means
+  `Default`, `Sizes`, `Type` — the least informative ones. The stories that answer real
+  questions sit late in the file (`EditableValues` is 8 of 30; `LoggedInWithSidenav` is
+  18 of 18) and contribute no source, appearing only as opaque `compose(S, "…")` lines.
+  Nothing to do about it short of authoring a doc for that component.
+- **`emit.mjs` and `bundle.mjs` are app-contract surface and must never be forked**, which
+  is why the two above are worked around rather than fixed. `dts.mjs` is forkable, which
+  is why the prop-doc and referenced-type problems *were* fixed (see Lib forks).
+- **Class names that read as real but resolve to nothing** have bitten this repo twice:
+  the Storybook-only `display-flex` helper, and Tailwind classes
+  (`fixed left-0 top-0 h-full z-50`) in `sidenav/documentation.mdx`. Nothing validates
+  class names against the compiled stylesheet, and the failure is invisible at render
+  time — the element simply has no styling. When repo docs tell a consumer to write a
+  `className`, check it against `dist/index.css` first.
+
 ## Known render warns (triaged — a warn NOT listed here is new)
 
 - **`[TOKENS_MISSING]` — 23 CSS custom properties** (`--separator-thickness`,
@@ -488,6 +625,16 @@ the component picker.
 
 ## Re-sync risks
 
+- **⚠ READ FIRST (2026-08-10): all 82 grades will read as churned, and it is a false
+  alarm.** `dts.mjs` was forked that day (doc-cap 120 → 1200, plus a `prelude` of
+  referenced types). `configSlicesFor()` hashes fork file bytes into the global config
+  slice, which feeds every component's `sourceKey` — so every component lands in
+  `pendingGrade` on the next re-sync. **`renderHashes` are byte-identical** (spot-checked
+  Accordion `44711f1b7314f4d6` before and after): the fork only changes `.d.ts` /
+  `.prompt.md` text and touches no rendering path. Confirm renderHashes match, spot-check
+  a couple of sheets, and carry the grades forward rather than re-grading 82 components.
+  `package-validate.mjs` passed clean after the change (82/82 `.d.ts` parse, 12/12 sampled
+  previews render).
 - **Theme coverage is partial by design.** Only the `default` theme was verified.
   The repo exposes `dark` as a storybook toolbar global; dark-theme renders were never
   compared. A regression in dark-theme tokens would not have been caught.

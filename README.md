@@ -3,7 +3,7 @@
 `@tedi-design-system/react` is a library of React components implementing the TEDI Design System.
 It provides reusable, accessible, and consistent UI components to streamline building React applications.
 
-Usage instructions and detailed documentation for using the components in your application are available in [Storybook](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started).
+Usage instructions and detailed documentation for using the components in your application are available in [Storybook](https://storybook.tedi.ee/react/rc/?path=/docs/documentation-get-started--get-started).
 
 [![codecov](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)
 [![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
@@ -75,7 +75,9 @@ Guides development inside this repo: creating new components, running tests/lint
 
 ### For AI-driven design & UI generation — `DESIGN.md`
 
-[`DESIGN.md`](./DESIGN.md) is a machine-readable representation of the design system (semantic tokens + tedi-ready component rules) that AI coding agents read to ground generated UI in real TEDI tokens and components. It is paired with [`design-system-spec.json`](./design-system-spec.json), the manifest the Claude Design product uses to import and index the system. Both are generated from `@tedi-design-system/core` via `npm run design:build`, and the `update-design-docs` skill keeps their prose and the component manifest current.
+[`DESIGN.md`](./DESIGN.md) is the machine-readable representation of the design system — semantic tokens plus tedi-ready component rules — that AI agents read to ground generated UI in real TEDI tokens and components. It also covers where to look things up, and how to use TEDI as a design system in [claude.ai/design](https://claude.ai/design) (each organisation runs its own; design-system projects cannot be shared across organisations).
+
+Its token table and [`design-tokens/component.manifest.json`](./design-tokens/component.manifest.json) are generated from `@tedi-design-system/core` via `npm run design:build`; the surrounding prose is hand-maintained, with the `update-design-docs` skill keeping it current. [`design-system-spec.json`](./design-system-spec.json) is a descriptor pointing at those files, intended for repository-URL import.
 
 ---
 

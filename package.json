@@ -1,6 +1,7 @@
 {
   "name": "@tedi-design-system/react",
   "version": "0.0.0-semantic-version",
+  "description": "TEDI Design System React component library — accessible, reusable UI components. Docs & live examples: https://storybook.tedi.ee/react/rc/",
   "type": "module",
   "sideEffects": false,
   "exports": {
