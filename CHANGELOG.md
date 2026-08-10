@@ -1,3 +1,10 @@
+# [18.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.3...react-18.2.0-rc.4) (2026-08-10)
+
+
+### Bug Fixes
+
+* **date-field:** deselect date from calendar after clearing input [#789](https://github.com/TEDI-Design-System/react/issues/789) ([#807](https://github.com/TEDI-Design-System/react/issues/807)) ([f032d95](https://github.com/TEDI-Design-System/react/commit/f032d9506fb5b487d3fae4144dc0d16bcec3eb0d))
+
 # [18.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.2...react-18.2.0-rc.3) (2026-08-10)
 
 
