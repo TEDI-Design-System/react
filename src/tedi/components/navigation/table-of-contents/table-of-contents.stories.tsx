@@ -344,6 +344,7 @@ export const StickyInLayout: Story = {
             <div
               ref={scrollRef}
               style={isMobile ? { paddingBottom: '5rem' } : { maxHeight: '24rem', overflowY: 'auto' }}
+              {...(isMobile ? {} : { tabIndex: 0, role: 'region' as const, 'aria-label': 'Artikli sisu' })}
             >
               <VerticalSpacing size={1.5}>
                 {sections.map((label, index) => (

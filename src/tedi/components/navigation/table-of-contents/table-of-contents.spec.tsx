@@ -134,6 +134,20 @@ describe('TableOfContents', () => {
     expect(nav).not.toHaveAttribute('aria-label');
   });
 
+  it('labels the headless navigation with the localized title when heading is null', () => {
+    render(
+      <TableOfContents heading={null}>
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Table of contents' });
+    expect(nav).toHaveAttribute('aria-label', 'Table of contents');
+    expect(nav).not.toHaveAttribute('aria-labelledby');
+  });
+
   it('renders an ordered list with auto hierarchical numbers when numbered', () => {
     const { container } = render(<Tree numbered activeId="a" />);
     expect(container.querySelector('ol')).toBeInTheDocument();
