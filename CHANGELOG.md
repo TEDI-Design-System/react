@@ -1,3 +1,15 @@
+# [19.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.4...react-19.0.0-rc.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **textarea:** rename TextArea to Textarea and fix screen reader bugs [#758](https://github.com/TEDI-Design-System/react/issues/758) ([#806](https://github.com/TEDI-Design-System/react/issues/806)) ([d61bffe](https://github.com/TEDI-Design-System/react/commit/d61bffe50c10293ecedba321e0bf49296df75bc9))
+
+
+### BREAKING CHANGES
+
+* **textarea:** TextArea is renamed to Textarea
+
 # [18.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.3...react-18.2.0-rc.4) (2026-08-10)
 
 
