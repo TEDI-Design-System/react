@@ -21,6 +21,10 @@
     }
   }
 
+  &__message {
+    margin-top: var(--layout-grid-gutters-04);
+  }
+
   &--size-default {
     padding: var(--alert-default-padding-y) var(--alert-default-padding-x);
     font-size: var(--body-regular-size);
