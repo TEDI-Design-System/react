@@ -1,3 +1,10 @@
+# [19.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.1...react-19.0.0-rc.2) (2026-08-11)
+
+
+### Features
+
+* **timeline:** new tedi-ready component [#33](https://github.com/TEDI-Design-System/react/issues/33) ([#800](https://github.com/TEDI-Design-System/react/issues/800)) ([f8ec342](https://github.com/TEDI-Design-System/react/commit/f8ec34218bcd3efe63b813c3b613cf5626f82df9))
+
 # [19.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.4...react-19.0.0-rc.1) (2026-08-11)
 
 
