@@ -148,11 +148,10 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     <div
       role={role}
       data-name="alert"
+      {...rest}
       aria-live={isPresentational ? undefined : ariaLive}
       aria-labelledby={!isPresentational && title ? headingId : undefined}
       aria-label={!isPresentational && !title ? `${type} alert` : undefined}
-      {...rest}
-      {...(isPresentational ? { 'aria-live': undefined, 'aria-labelledby': undefined, 'aria-label': undefined } : {})}
       className={alertBEM}
     >
       <Row gutterX={2} alignItems="start">
