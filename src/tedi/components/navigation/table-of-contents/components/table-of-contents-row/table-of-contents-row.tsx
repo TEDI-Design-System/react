@@ -1,8 +1,6 @@
 import cn from 'classnames';
 import { useContext } from 'react';
 
-import { useLabels } from '../../../../../providers/label-provider';
-import { Icon } from '../../../../base/icon/icon';
 import Separator from '../../../../misc/separator/separator';
 import { TableOfContentsContext, type TableOfContentsNode } from '../../table-of-contents';
 import styles from '../../table-of-contents.module.scss';
@@ -16,9 +14,8 @@ interface TableOfContentsRowProps {
 }
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
-  const { activeId, showIcons, numbered, activeTrail } = useContext(TableOfContentsContext);
-  const { getLabel } = useLabels();
-  const { id, content, children, isValid, separator, hideIcon } = node;
+  const { activeId, numbered, activeTrail } = useContext(TableOfContentsContext);
+  const { id, content, children, separator } = node;
 
   const hasChildren = !!children?.length;
   const isSelected = !!id && id === activeId;
@@ -40,21 +37,6 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
       <span
         className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}
       >
-        {showIcons && !hideIcon && (
-          <Icon
-            className={styles['tedi-table-of-contents__icon']}
-            name={isValid === false ? 'warning' : isValid === true ? 'check' : 'circle'}
-            color={isValid === false ? 'danger' : isValid === true ? 'success' : 'tertiary'}
-            label={getLabel(
-              isValid === false
-                ? 'table-of-contents.step-invalid'
-                : isValid === true
-                ? 'table-of-contents.step-valid'
-                : 'table-of-contents.step-incomplete'
-            )}
-            size={18}
-          />
-        )}
         {numbered && (
           <span className={styles['tedi-table-of-contents__number']} aria-hidden="true">
             {ordinal}

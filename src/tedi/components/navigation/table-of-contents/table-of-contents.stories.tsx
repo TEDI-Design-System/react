@@ -95,7 +95,7 @@ export const WithIcon: Story = {
         </Link>
       </TableOfContents.Item>
       <TableOfContents.Item id="section-6">
-        <Link href="#section-6" underline={false} iconLeft="description">
+        <Link href="#section-6" underline={false} iconLeft="mail" iconStandalone>
           Kokkuvõte
         </Link>
       </TableOfContents.Item>
@@ -380,19 +380,22 @@ export const StickyInLayout: Story = {
 };
 
 /**
- * Mobile variant: a bottom bar that opens the list in a bottom-sheet overlay. Same
- * `TableOfContents.Item` children as the card. Uses `sticky={false}` to render inline in the
- * canvas; in an app it's pinned to the bottom of the viewport by default.
+ * On desktop (`md` and up) the
+ * table of contents is a sidebar card next to the page content; below `md` it collapses into
+ * `TableOfContents.Collapsible` — a bottom bar that opens the list in a bottom-sheet overlay.
+ * `ShowAt` / `HideAt` mount only the matching variant, so ids never duplicate. Resize the canvas
+ * to switch between the two.
  */
 export const Collapsible: Story = {
-  render: () => (
-    <TableOfContents.Collapsible heading="Sisukord" activeId="methods" sticky={false}>
-      <TableOfContents.Item id="intro">
+  parameters: { layout: 'fullscreen', fullWidth: true },
+  render: () => {
+    const items = [
+      <TableOfContents.Item key="intro" id="intro">
         <Link href="#intro" underline={false}>
           Sissejuhatus
         </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="methods">
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="methods" id="methods">
         <Link href="#methods" underline={false}>
           Meetodid
         </Link>
@@ -406,22 +409,105 @@ export const Collapsible: Story = {
             Analüüs
           </Link>
         </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="results">
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="results" id="results">
         <Link href="#results" underline={false}>
           Tulemused
         </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="discussion">
+        <TableOfContents.Item id="results-1">
+          <Link href="#results-1" underline={false}>
+            Joonised
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="discussion" id="discussion">
         <Link href="#discussion" underline={false}>
           Arutelu
         </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="summary">
-        <Link href="#summary" underline={false}>
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="conclusion" id="conclusion">
+        <Link href="#conclusion" underline={false}>
           Kokkuvõte
         </Link>
-      </TableOfContents.Item>
-    </TableOfContents.Collapsible>
-  ),
+      </TableOfContents.Item>,
+    ];
+
+    const intro = (
+      <VerticalSpacing size={0.5}>
+        <Heading element="h2" modifiers="h1">
+          Tervisedeklaratsioon
+        </Heading>
+        <Text color="secondary">
+          Tervisedeklaratsioon koosneb 22 kohustuslikust küsimusest. Alusta või jätka selle koostamisega allpool.
+        </Text>
+      </VerticalSpacing>
+    );
+
+    const placeholder = (extraStyle: CSSProperties) => (
+      <div
+        style={{
+          background: 'var(--general-surface-primary)',
+          border: '1px solid var(--general-border-primary)',
+          borderRadius: 'var(--card-radius-rounded)',
+          ...extraStyle,
+        }}
+      />
+    );
+
+    return (
+      <>
+        <ShowAt md>
+          <div style={{ background: 'var(--general-surface-primary)', padding: '2rem' }}>
+            {intro}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) 340px',
+                gap: '1.5rem',
+                alignItems: 'start',
+                marginTop: '1.5rem',
+              }}
+            >
+              {placeholder({ minHeight: '35rem' })}
+              <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+                {items}
+              </TableOfContents>
+            </div>
+          </div>
+        </ShowAt>
+
+        <HideAt md>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+              gap: '3px',
+              background: 'var(--general-surface-tertiary)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flex: '1 1 auto',
+                flexDirection: 'column',
+                padding: 'var(--layout-page-spacing-top) var(--layout-page-spacing-x) 0 var(--layout-page-spacing-x)',
+              }}
+            >
+              <VerticalSpacing size={1}>
+                <Link href="#" underline={false} iconLeft="arrow_back">
+                  Tervisetõendid ja -deklaratsioonid
+                </Link>
+                {intro}
+              </VerticalSpacing>
+              {placeholder({ flex: '1 1 auto', marginTop: '1rem' })}
+            </div>
+            <TableOfContents.Collapsible heading="Sisukord" activeId="methods" sticky={false}>
+              {items}
+            </TableOfContents.Collapsible>
+          </div>
+        </HideAt>
+      </>
+    );
+  },
 };
