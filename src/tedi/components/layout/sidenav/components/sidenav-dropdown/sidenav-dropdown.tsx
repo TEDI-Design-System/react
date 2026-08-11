@@ -19,14 +19,30 @@ import { SideNavItemProps } from '../sidenav-item/sidenav-item';
 import styles from './sidenav-dropdown.module.scss';
 
 type SideNavDropdownProps<C extends React.ElementType = 'a'> = {
+  /**
+   * The element that opens the dropdown on click (the collapsed sidenav item). Rendered as the
+   * floating popup's anchor and trigger.
+   */
   trigger: React.ReactNode;
+  /**
+   * Groups of submenu items shown in the popup. Each group renders its optional `subHeading`
+   * followed by its `subItems`.
+   */
   groups: Group<C>[];
+  /**
+   * Called whenever the dropdown opens or closes, with the new open state.
+   */
   onOpenChange?: (isOpen: boolean) => void;
+  /**
+   * Element type rendered for each item link (e.g. a router `Link`). Defaults to `a`.
+   */
   as?: C;
 };
 
 type Group<C extends React.ElementType> = {
+  /** Optional heading rendered above the group's items. */
   subHeading?: React.ReactNode;
+  /** Items shown in the group. */
   subItems: SideNavItemProps<C>[];
 };
 

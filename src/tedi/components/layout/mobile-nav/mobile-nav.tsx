@@ -23,6 +23,16 @@ export type MobileNavProps<C extends React.ElementType = 'a'> = {
   showOverlay?: boolean;
   id?: string;
   className?: string;
+  /**
+   * Overrides the "back to main menu" text on the top-level back button.
+   * Falls back to the localised `sidenav.backToMainMenu` label.
+   */
+  backToMainMenuText?: string;
+  /**
+   * Overrides the "back to menu" suffix on the per-level back button (shown after the parent's
+   * name). Falls back to the localised `sidenav.backtoMenu` label.
+   */
+  backToMenuText?: string;
 };
 
 export const MobileNav = <C extends React.ElementType = 'a'>({
@@ -34,6 +44,8 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
   showOverlay = true,
   id,
   className,
+  backToMainMenuText,
+  backToMenuText,
 }: MobileNavProps<C>) => {
   const { getLabel } = useLabels();
   const [navigationStack, setNavigationStack] = useState<NavigationLevel<C>[]>([{ items: navItems }]);
@@ -164,8 +176,8 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
                 onClick={handleBackToRoot}
                 className={classNames(styles['tedi-sidenav__link'], styles['tedi-sidenav__back-button'])}
               >
-                <Icon name="arrow_back" size={16} color="white" />
-                <span>{getLabel('sidenav.backToMainMenu')}</span>
+                <Icon name="arrow_back" size={18} color="white" />
+                <span>{backToMainMenuText ?? getLabel('sidenav.backToMainMenu')}</span>
               </Button>
             )}
 
@@ -175,9 +187,11 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
                 onClick={handleBackClick}
                 className={classNames(styles['tedi-sidenav__link'], styles['tedi-sidenav__back-button'])}
               >
-                <Icon name="arrow_back" size={16} color="white" />
+                <Icon name="arrow_back" size={18} color="white" />
                 <span>
-                  {navigationStack[navigationStack.length - 1]?.parent?.children + ' ' + getLabel('sidenav.backtoMenu')}
+                  {navigationStack[navigationStack.length - 1]?.parent?.children +
+                    ' ' +
+                    (backToMenuText ?? getLabel('sidenav.backtoMenu'))}
                 </span>
               </Button>
             )}
@@ -189,7 +203,7 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
           {currentLevel.parent?.children}
         </div>
       )}
-      <ul className={styles['tedi-sidenav__list']} role="menubar">
+      <ul className={styles['tedi-sidenav__list']}>
         {currentLevel.renderParentLink && currentLevel.parent && (
           <li className={styles['tedi-sidenav__list-item']}>
             <div className={classNames(styles['tedi-sidenav__collapse'])}>

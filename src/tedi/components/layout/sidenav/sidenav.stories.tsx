@@ -12,6 +12,7 @@ import {
   exampleThirdLevelMenuItems,
   exampleThirdLevelMenuItemsLinks,
   exampleThirdLevelMenuItemsLinksWithSubTitles,
+  exampleWithGroupTitle,
 } from './examples';
 import { SideNav } from './sidenav';
 
@@ -32,6 +33,9 @@ const meta: Meta<typeof SideNav> = {
     'SideNav.Mobile': SideNav.Mobile,
   },
   parameters: {
+    // The sidenav (and its mobile menu) sits flush to the viewport edge, so render stories
+    // full-bleed — otherwise the mobile menu is inset by the canvas padding (issue #757.7).
+    layout: 'fullscreen',
     docs: {
       source: {
         transform: (code: string) => {
@@ -117,9 +121,9 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
             <SideNavItem
               {...sideNavItemProps}
               isDefaultOpen
-              subItems={[{ children: 'Sub Item 1' }, { children: 'Sub Item 2', isActive: true }]}
+              subItems={[{ children: 'Alamüksus 1' }, { children: 'Alamüksus 2', isActive: true }]}
             >
-              Parent item
+              Vanemüksus
             </SideNavItem>
           </ul>
         </Col>
@@ -133,9 +137,9 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
             <SideNavItem
               href="#"
               isDefaultOpen
-              subItems={[{ children: 'Sub Item 1' }, { children: 'Sub Item 2', isActive: true }]}
+              subItems={[{ children: 'Alamüksus 1' }, { children: 'Alamüksus 2', isActive: true }]}
             >
-              Parent item
+              Vanemüksus
             </SideNavItem>
           </ul>
         </Col>
@@ -149,12 +153,12 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
             <SideNavItem
               isDefaultOpen
               subItems={[
-                { children: 'Second level' },
-                { children: 'Second level' },
-                { children: 'Second level parent', isActive: true, subItems: [{ children: 'Third level' }] },
+                { children: 'Teine tase' },
+                { children: 'Teine tase' },
+                { children: 'Teise taseme vanem', isActive: true, subItems: [{ children: 'Kolmas tase' }] },
               ]}
             >
-              First level
+              Esimene tase
             </SideNavItem>
           </ul>
         </Col>
@@ -167,14 +171,23 @@ export const SidenavItemStates: StoryObj<TemplateStateProps> = {
   render: TemplateWithStates,
   args: {
     states: stateArray,
-    children: 'Text',
+    children: 'Tekst',
     icon: 'dashboard',
   },
   parameters: {
+    layout: 'padded',
     pseudo: {
       hover: '#Hover',
       focusVisible: '#Focus',
       active: '#Active',
+    },
+    a11y: {
+      config: {
+        rules: [
+          { id: 'region', enabled: false },
+          { id: 'landmark-unique', enabled: false },
+        ],
+      },
     },
   },
 };
@@ -285,4 +298,26 @@ export const SubTitles: Story = {
   args: {
     navItems: exampleThirdLevelMenuItemsLinksWithSubTitles,
   },
+};
+
+/**
+ * A `subHeading` on a top-level item starts a new group with that title (e.g. "Tervis",
+ * "Üldine"). When the sidenav is collapsed (`isCollapsed`) each group title is replaced by a
+ * divider line — see the `CollapsibleToggle` story for the collapsed rail.
+ */
+export const WithGroupTitle: Story = {
+  render: Template,
+  args: {
+    navItems: exampleWithGroupTitle,
+    ariaLabel: 'Menu title',
+    showDividers: false,
+    sideNavItemSize: 'medium',
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ height: '1024px' }}>
+        <Story />
+      </div>
+    ),
+  ],
 };

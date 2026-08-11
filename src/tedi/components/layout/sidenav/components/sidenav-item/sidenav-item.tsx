@@ -27,6 +27,16 @@ export type SideNavItemProps<C extends React.ElementType = 'a'> = LinkProps<C> &
     subItems: SideNavItemProps<C>[];
   }[];
   /**
+   * Group title rendered above this item, marking the start of a new group. When the sidenav is
+   * collapsed the title text is replaced by a divider line (there is no room for a heading).
+   */
+  subHeading?: React.ReactNode;
+  /**
+   * Shorter label shown in place of `children` while the sidenav is collapsed. Falls back to
+   * `children` when omitted; the full `children` text is always kept in the hover tooltip.
+   */
+  collapsedText?: string;
+  /**
    * Whether the sidenav is currently collapsed
    */
   isCollapsed?: boolean;
@@ -59,6 +69,8 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     as,
     onItemClick,
     className,
+    subHeading,
+    collapsedText,
     level = 1,
     isCollapsed = false,
     isDefaultOpen = false,
@@ -70,6 +82,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
   const [isCollapsedInternal, setIsCollapsedInternal] = useState(isDefaultOpen ?? false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const collapseId = React.useId();
+  const displayTitle = isCollapsed && collapsedText ? collapsedText : children;
 
   const groupsToRender = subItemGroups ?? (subItems ? [{ subItems }] : null);
   const hasChildren = !!groupsToRender;
@@ -124,16 +137,8 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     onClick: handleClick,
     className: cn(styles['tedi-sidenav__link'], isLinkedParent && styles['tedi-sidenav__link--has-children-link']),
     noStyle: true,
-    role: 'menuitem',
     'aria-current': isActive ? 'page' : undefined,
     'aria-label': isCollapsed && typeof children === 'string' ? children : undefined,
-    ...(hasChildren
-      ? {
-          'aria-haspopup': 'true',
-          'aria-expanded': isCollapsedInternal,
-          'aria-controls': collapseId,
-        }
-      : {}),
   } as unknown as LinkProps<C>;
 
   const renderChildren = () =>
@@ -141,7 +146,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     groupsToRender?.map((group, index) => (
       <div key={index}>
         {group?.subHeading && <div className={styles['tedi-sidenav__subheading']}>{group.subHeading}</div>}
-        <ul className={styles['tedi-sidenav__list']} role="menu">
+        <ul className={styles['tedi-sidenav__list']}>
           {group.subItems?.map((item, key) => (
             <SideNavItem
               as={as}
@@ -167,13 +172,8 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 className={cn(styles['tedi-sidenav__link'], isDropdownOpen && styles['tedi-sidenav__link--active'])}
               >
                 {icon && getIcon(icon)}
-                <Icon
-                  name={!isDropdownOpen ? 'expand_more' : 'chevron_right'}
-                  color="white"
-                  className={styles['tedi-sidenav__toggle-icon']}
-                  size={18}
-                />
-                <span className={styles['tedi-sidenav__title']}>{children}</span>
+                <Icon name="expand_more" color="white" className={styles['tedi-sidenav__toggle-icon']} size={18} />
+                <span className={styles['tedi-sidenav__title']}>{displayTitle}</span>
               </span>
             </Tooltip.Trigger>
           }
@@ -186,7 +186,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
           <>
             <Link {...linkProps}>
               {icon && getIcon(icon)}
-              <span className={styles['tedi-sidenav__title']}>{children}</span>
+              <span className={styles['tedi-sidenav__title']}>{displayTitle}</span>
             </Link>
             <div className={styles['tedi-sidenav__link-collapse-wrapper']}>
               <Collapse
@@ -229,7 +229,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 aria-current={isActive ? 'page' : undefined}
               >
                 {icon && getIcon(icon)}
-                <span className={styles['tedi-sidenav__title']}>{children}</span>
+                <span className={styles['tedi-sidenav__title']}>{displayTitle}</span>
               </span>
             }
           >
@@ -240,7 +240,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
         <>
           <Link {...linkProps}>
             {icon && getIcon(icon)}
-            <span className={styles['tedi-sidenav__title']}>{children}</span>
+            <span className={styles['tedi-sidenav__title']}>{displayTitle}</span>
             <i className={styles['tedi-sidenav__bullet']} />
           </Link>
           {renderChildren()}
@@ -249,19 +249,33 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
         <Tooltip.Trigger>
           <Link {...linkProps}>
             {icon && getIcon(icon)}
-            <span className={styles['tedi-sidenav__title']}>{children}</span>
+            <span className={styles['tedi-sidenav__title']}>{displayTitle}</span>
           </Link>
         </Tooltip.Trigger>
       )}
     </li>
   );
 
-  return level === 1 && isCollapsed ? (
-    <Tooltip placement="right" focusManager={undefined}>
-      <Tooltip.Content maxWidth="medium">{children}</Tooltip.Content>
-      {content}
-    </Tooltip>
-  ) : (
-    content
-  );
+  const wrapped =
+    level === 1 && isCollapsed ? (
+      <Tooltip placement="right" focusManager={undefined}>
+        <Tooltip.Content maxWidth="medium">{children}</Tooltip.Content>
+        {content}
+      </Tooltip>
+    ) : (
+      content
+    );
+
+  if (subHeading) {
+    return (
+      <>
+        <li className={styles['tedi-sidenav__group-heading']}>
+          <span className={styles['tedi-sidenav__subheading']}>{subHeading}</span>
+        </li>
+        {wrapped}
+      </>
+    );
+  }
+
+  return wrapped;
 };

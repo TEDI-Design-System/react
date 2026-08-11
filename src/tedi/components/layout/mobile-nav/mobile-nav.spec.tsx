@@ -66,6 +66,28 @@ describe('MobileNav', () => {
     expect(screen.getByText('label:sidenav.backToMainMenu')).toBeInTheDocument();
   });
 
+  test('overrides the back-to-main-menu text with backToMainMenuText', () => {
+    render(<MobileNav {...baseProps} navItems={navItems} backToMainMenuText="Tagasi avalehele" />);
+    fireEvent.click(screen.getByText('Services'));
+    expect(screen.getByText('Tagasi avalehele')).toBeInTheDocument();
+    expect(screen.queryByText('label:sidenav.backToMainMenu')).not.toBeInTheDocument();
+  });
+
+  test('overrides the back-to-menu suffix with backToMenuText', () => {
+    const deepItems = [
+      { children: 'Home', href: '/home' },
+      {
+        children: 'Services',
+        subItems: [{ children: 'Consulting', subItems: [{ children: 'Strategy', href: '/s' }] }],
+      },
+    ];
+    render(<MobileNav {...baseProps} navItems={deepItems} backToMenuText="tagasi" />);
+    fireEvent.click(screen.getByText('Services'));
+    fireEvent.click(screen.getByText('Consulting'));
+    expect(screen.getByText(/tagasi/)).toBeInTheDocument();
+    expect(screen.queryByText(/label:sidenav\.backtoMenu/)).not.toBeInTheDocument();
+  });
+
   test('navigates back to root when clicking "Back to main menu"', () => {
     render(<MobileNav {...baseProps} navItems={navItems} />);
     fireEvent.click(screen.getByText('Services'));

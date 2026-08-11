@@ -101,6 +101,20 @@
   .tedi-sidenav__link:hover {
     background: transparent;
   }
+
+  @media (hover: hover) {
+    .tedi-sidenav__sub-item .tedi-sidenav__link:hover {
+      background-color: var(--navigation-vertical-item-background-hover);
+    }
+  }
+}
+
+@include breakpoints.media-breakpoint-down(md) {
+  .tedi-sidenav__collapse .tedi-sidenav__item::before,
+  .tedi-sidenav__collapse .tedi-sidenav__item::after,
+  .tedi-sidenav__collapse .tedi-sidenav__bullet {
+    display: none;
+  }
 }
 
 .tedi-sidenav--collapsed {
@@ -145,7 +159,7 @@
 
 .tedi-sidenav__overlay {
   z-index: calc(var(--z-index-header) - 1);
-  background: var(--tedi-alpha-20);
+  background: var(--general-surface-overlay);
 
   .tedi-sidenav__item--level-2 {
     @include breakpoints.media-breakpoint-down(lg) {
@@ -269,6 +283,10 @@
   background-color: var(--navigation-vertical-item-background-active);
 }
 
+.tedi-sidenav__item--current > .tedi-sidenav__link:hover {
+  background-color: var(--navigation-vertical-item-background-active);
+}
+
 .tedi-sidenav__item--medium {
   .tedi-sidenav__link {
     min-height: var(--navigation-vertical-item-min-height-medium);
@@ -363,13 +381,44 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
   transition: 200ms ease;
   transition-property: background-color, color;
 
-  &:hover {
-    background-color: var(--navigation-vertical-item-background-hover);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--navigation-vertical-item-background-hover);
+    }
   }
 
   &:focus-visible {
     outline: 1px solid var(--navigation-vertical-item-background-focus);
     border: 1px solid var(--tedi-neutral-100);
+  }
+}
+
+.tedi-sidenav__group-heading {
+  margin-top: var(--layout-grid-gutters-16);
+  list-style: none;
+}
+
+.tedi-sidenav__item:has(+ .tedi-sidenav__group-heading) {
+  border-bottom: 0;
+}
+
+.tedi-sidenav--collapsed .tedi-sidenav__group-heading {
+  padding: var(--layout-grid-gutters-02) var(--navigation-vertical-item-padding-x-sm);
+  margin-top: 0;
+
+  .tedi-sidenav__subheading {
+    display: none;
+  }
+
+  &::before {
+    display: block;
+    height: var(--tedi-borders-01);
+    content: '';
+    background: var(--navigation-vertical-item-border);
+  }
+
+  &:first-child {
+    display: none;
   }
 }
 
@@ -454,7 +503,13 @@ button.tedi-sidenav__link.tedi-sidenav__back-button {
 }
 
 .tedi-sidenav__toggle-icon {
+  transition: transform 0.2s ease-in-out;
+
   @include breakpoints.media-breakpoint-down(lg) {
     margin-left: auto;
   }
+}
+
+.tedi-sidenav__link--active .tedi-sidenav__toggle-icon {
+  transform: rotate(-180deg);
 }

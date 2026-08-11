@@ -91,6 +91,16 @@ export type SideNavProps<C extends React.ElementType = 'a'> = ConditionalTypes<C
    * @default default
    */
   sideNavItemSize?: SideNavItemSize;
+  /**
+   * Overrides the mobile menu's "back to main menu" text. Falls back to the localised
+   * `sidenav.backToMainMenu` label. Only applies in the mobile view.
+   */
+  backToMainMenuText?: string;
+  /**
+   * Overrides the mobile menu's "back to menu" suffix (shown after the parent's name). Falls back
+   * to the localised `sidenav.backtoMenu` label. Only applies in the mobile view.
+   */
+  backToMenuText?: string;
 };
 
 const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<C>) => React.ReactElement | null = (
@@ -109,6 +119,8 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
     onMenuToggle,
     onCollapseToggle,
     sideNavItemSize = 'default',
+    backToMainMenuText,
+    backToMenuText,
     ...rest
   } = props;
 
@@ -170,6 +182,8 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
         onClose={() => setMenuOpen(false)}
         showOverlay={showMobileOverlay}
         className={className}
+        backToMainMenuText={backToMainMenuText}
+        backToMenuText={backToMenuText}
         {...rest}
       />
     );
@@ -179,7 +193,7 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
     <Print visibility="hide">
       <nav id={props.id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
         {isCollapsible && <MobileNavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
-        <ul className={styles['tedi-sidenav__list']} role="menubar" aria-label={ariaLabel}>
+        <ul className={styles['tedi-sidenav__list']}>
           {navItems.map((item, key) => (
             <SideNavItem
               as={linkAs}

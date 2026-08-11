@@ -1,298 +1,302 @@
 /* istanbul ignore file */
 import { Text } from '../../base/typography/text/text';
-import { InfoButton } from '../../buttons/info-button/info-button';
+import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
 import { SideNavItemProps } from './components/sidenav-item/sidenav-item';
 
 export const exampleNavItems: SideNavItemProps[] = [
-  { href: '#', children: 'Home', icon: 'home' },
-  { href: '#', children: 'Clients', icon: 'account_box' },
-  { href: '/', children: 'Children', icon: 'child_care', isActive: true },
-  { href: '#', children: 'Some very long text that doest fit anything and wraps', icon: 'assignment' },
-  { href: '#', children: 'Assignments', icon: 'assignment' },
-  { href: '#', children: 'Assignment that is a long text', icon: 'assignment' },
-  { href: '#', children: 'Assignments', icon: 'assignment' },
+  { href: '#', children: 'Avaleht', icon: 'home' },
+  { href: '#', children: 'Kliendid', icon: 'account_box' },
+  { href: '/', children: 'Lapsed', icon: 'child_care', isActive: true },
+  { href: '#', children: 'Väga pikk tekst, mis ei mahu kuhugi ära ja läheb reavahetusse', icon: 'assignment' },
+  { href: '#', children: 'Ülesanded', icon: 'assignment' },
+  { href: '#', children: 'Ülesanne, mis on pikk tekst', icon: 'assignment' },
+  { href: '#', children: 'Ülesanded', icon: 'assignment' },
 ];
 
 export const exampleNavCollapsibleItems: SideNavItemProps[] = [
-  { href: '#', children: 'Dashboard', icon: 'dashboard' },
-  { href: '#', children: 'Patient Records', icon: 'people' },
+  { href: '#', children: 'Töölaud', icon: 'dashboard' },
+  { href: '#', children: 'Patsiendi andmed', icon: 'people' },
   {
-    children: 'Clinical Management',
+    children: 'Kliiniline haldus',
     icon: 'medical_services',
     subItemGroups: [
       {
         subItems: [
-          { href: '#', children: 'Vital Signs' },
+          { href: '#', children: 'Elunäitajad' },
           {
             href: '#',
-            children: 'Comprehensive Patient Care Coordination',
+            children: 'Terviklik patsiendihoolduse koordineerimine',
           },
-          { href: '#', children: 'Assessments' },
+          { href: '#', children: 'Hindamised' },
           {
             href: '#',
-            children: 'Treatments',
-          },
-          {
-            href: '#',
-            children: 'Documentation',
+            children: 'Ravid',
           },
           {
             href: '#',
-            children: 'Care Plan Development Services',
+            children: 'Dokumentatsioon',
+          },
+          {
+            href: '#',
+            children: 'Raviplaani koostamise teenused',
           },
         ],
       },
     ],
   },
   {
-    children: 'Administration',
+    children: 'Haldus',
     icon: 'admin_panel_settings',
     subItems: [
-      { href: '#', children: 'Staff Management' },
-      { href: '#', children: 'Scheduling' },
+      { href: '#', children: 'Personalihaldus' },
+      { href: '#', children: 'Ajakava' },
       {
         href: '#',
-        children: 'System Settings',
+        children: 'Süsteemi seaded',
       },
       {
         href: '#',
-        children: 'Reports & Analytics',
+        children: 'Aruanded ja analüütika',
       },
     ],
   },
-  { href: '#', children: 'Inventory Management', icon: 'inventory' },
-  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+  { href: '#', children: 'Laohaldus', icon: 'inventory' },
+  { href: '#', children: 'Arveldus ja rahandus', icon: 'payments' },
 ];
 
 export const exampleDefaultOpen: SideNavItemProps[] = [
-  { href: '#', children: 'Dashboard', icon: 'dashboard' },
-  { href: '#', children: 'Patient Records', icon: 'people' },
+  { href: '#', children: 'Töölaud', icon: 'dashboard' },
+  { href: '#', children: 'Patsiendi andmed', icon: 'people' },
   {
-    children: 'Clinical Management',
+    children: 'Kliiniline haldus',
     icon: 'medical_services',
     subItemGroups: [
       {
         subItems: [
-          { href: '#', children: 'Vital Signs' },
+          { href: '#', children: 'Elunäitajad' },
           {
             href: '#',
-            children: 'Comprehensive Patient Care Coordination',
+            children: 'Terviklik patsiendihoolduse koordineerimine',
           },
-          { href: '#', children: 'Assessments' },
+          { href: '#', children: 'Hindamised' },
           {
             href: '#',
-            children: 'Treatments',
-          },
-          {
-            href: '#',
-            children: 'Documentation',
+            children: 'Ravid',
           },
           {
             href: '#',
-            children: 'Care Plan Development Services',
+            children: 'Dokumentatsioon',
+          },
+          {
+            href: '#',
+            children: 'Raviplaani koostamise teenused',
           },
         ],
       },
     ],
   },
   {
-    children: 'Administration',
+    children: 'Haldus',
     isDefaultOpen: true,
     icon: 'admin_panel_settings',
     subItems: [
-      { href: '#', children: 'Staff Management' },
-      { href: '#', children: 'Scheduling' },
+      { href: '#', children: 'Personalihaldus' },
+      { href: '#', children: 'Ajakava' },
       {
         href: '#',
-        children: 'System Settings',
+        children: 'Süsteemi seaded',
       },
       {
         href: '#',
-        children: 'Reports & Analytics',
+        children: 'Aruanded ja analüütika',
       },
     ],
   },
-  { href: '#', children: 'Inventory Management', icon: 'inventory' },
-  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+  { href: '#', children: 'Laohaldus', icon: 'inventory' },
+  { href: '#', children: 'Arveldus ja rahandus', icon: 'payments' },
 ];
 
 export const exampleNavCollapsibleItemsWithLinks: SideNavItemProps[] = [
-  { href: '#', children: 'Dashboard', icon: 'dashboard' },
-  { href: '#', children: 'Patient Records', icon: 'people' },
+  { href: '#', children: 'Töölaud', icon: 'dashboard' },
+  { href: '#', children: 'Patsiendi andmed', icon: 'people' },
   {
     href: '#critical-management',
-    children: 'Clinical Management',
+    children: 'Kliiniline haldus',
     icon: 'medical_services',
     subItems: [
-      { href: '#', children: 'Vital Signs' },
+      { href: '#', children: 'Elunäitajad' },
       {
         href: '#',
-        children: 'Comprehensive Patient Care Coordination',
+        children: 'Terviklik patsiendihoolduse koordineerimine',
       },
-      { href: '#', children: 'Assessments' },
+      { href: '#', children: 'Hindamised' },
       {
         href: '#',
-        children: 'Treatments',
-      },
-      {
-        href: '#',
-        children: 'Documentation',
+        children: 'Ravid',
       },
       {
         href: '#',
-        children: 'Care Plan Development Services',
+        children: 'Dokumentatsioon',
+      },
+      {
+        href: '#',
+        children: 'Raviplaani koostamise teenused',
       },
     ],
   },
   {
     href: '#',
-    children: 'Administration',
+    children: 'Haldus',
     icon: 'admin_panel_settings',
     subItems: [
-      { href: '#', children: 'Staff Management' },
-      { href: '#', children: 'Scheduling' },
+      { href: '#', children: 'Personalihaldus' },
+      { href: '#', children: 'Ajakava' },
       {
         href: '#',
-        children: 'System Settings',
+        children: 'Süsteemi seaded',
       },
       {
         href: '#',
-        children: 'Reports & Analytics',
+        children: 'Aruanded ja analüütika',
       },
     ],
   },
-  { href: '#', children: 'Inventory Management', icon: 'inventory' },
-  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+  { href: '#', children: 'Laohaldus', icon: 'inventory' },
+  { href: '#', children: 'Arveldus ja rahandus', icon: 'payments' },
 ];
 
 export const exampleThirdLevelMenuItems: SideNavItemProps[] = [
-  { href: '#', children: 'Dashboard', icon: 'dashboard' },
-  { href: '#', children: 'Patient Records', icon: 'people' },
+  { href: '#', children: 'Töölaud', icon: 'dashboard' },
+  { href: '#', children: 'Patsiendi andmed', collapsedText: 'Patsiendid', icon: 'people' },
   {
-    children: 'Clinical Management',
+    children: 'Kliiniline haldus',
+    collapsedText: 'Kliiniline',
     icon: 'medical_services',
     subItems: [
-      { href: '#', children: 'Vital Signs' },
-      { href: '#', children: 'Assessments' },
+      { href: '#', children: 'Elunäitajad' },
+      { href: '#', children: 'Hindamised' },
       {
-        children: 'Treatments',
+        children: 'Ravid',
         subItems: [
-          { href: '#', children: 'Active Treatments' },
-          { href: '#', children: 'Treatment History' },
-          { href: '#', children: 'Treatment Plans' },
-          { href: '#', children: 'Clinical Protocols' },
+          { href: '#', children: 'Aktiivsed ravid' },
+          { href: '#', children: 'Ravi ajalugu' },
+          { href: '#', children: 'Raviplaanid' },
+          { href: '#', children: 'Kliinilised protokollid' },
         ],
       },
       {
-        children: 'Documentation',
+        children: 'Dokumentatsioon',
         subItems: [
-          { href: '#', children: 'Clinical Notes' },
-          { href: '#', children: 'Medical Forms' },
-          { href: '#', children: 'Consent Forms' },
-          { href: '#', children: 'Reports' },
+          { href: '#', children: 'Kliinilised märkmed' },
+          { href: '#', children: 'Meditsiinilised vormid' },
+          { href: '#', children: 'Nõusolekuvormid' },
+          { href: '#', children: 'Aruanded' },
         ],
       },
     ],
   },
   {
-    children: 'Administration',
+    children: 'Haldus',
     icon: 'admin_panel_settings',
     subItems: [
-      { href: '#', children: 'Staff Management' },
-      { href: '#', children: 'Scheduling' },
+      { href: '#', children: 'Personalihaldus' },
+      { href: '#', children: 'Ajakava' },
     ],
   },
-  { href: '#', children: 'Inventory Management', icon: 'inventory' },
-  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+  { href: '#', children: 'Laohaldus', icon: 'inventory' },
+  { href: '#', children: 'Arveldus ja rahandus', icon: 'payments' },
 ];
 
 export const exampleThirdLevelMenuItemsLinks: SideNavItemProps[] = [
-  { href: '#', children: 'Dashboard', icon: 'dashboard' },
-  { href: '#', children: 'Patient Records', icon: 'people' },
+  { href: '#', children: 'Töölaud', icon: 'dashboard' },
+  { href: '#', children: 'Patsiendi andmed', icon: 'people' },
   {
-    children: 'Clinical Management',
+    children: 'Kliiniline haldus',
     href: '#',
     icon: 'medical_services',
     subItems: [
-      { href: '#', children: 'Vital Signs' },
-      { href: '#', children: 'Assessments' },
+      { href: '#', children: 'Elunäitajad' },
+      { href: '#', children: 'Hindamised' },
       {
         href: '#',
-        children: 'Treatments',
+        children: 'Ravid',
         subItems: [
-          { href: '#', children: 'Active Treatments' },
-          { href: '#', children: 'Treatment History' },
-          { href: '#', children: 'Treatment Plans' },
-          { href: '#', children: 'Clinical Protocols' },
+          { href: '#', children: 'Aktiivsed ravid' },
+          { href: '#', children: 'Ravi ajalugu' },
+          { href: '#', children: 'Raviplaanid' },
+          { href: '#', children: 'Kliinilised protokollid' },
         ],
       },
       {
         href: '#',
-        children: 'Documentation',
+        children: 'Dokumentatsioon',
         subItems: [
-          { href: '#', children: 'Clinical Notes' },
-          { href: '#', children: 'Medical Forms' },
-          { href: '#', children: 'Consent Forms' },
-          { href: '#', children: 'Reports' },
+          { href: '#', children: 'Kliinilised märkmed' },
+          { href: '#', children: 'Meditsiinilised vormid' },
+          { href: '#', children: 'Nõusolekuvormid' },
+          { href: '#', children: 'Aruanded' },
         ],
       },
     ],
   },
   {
     href: '#',
-    children: 'Administration',
+    children: 'Haldus',
     icon: 'admin_panel_settings',
     subItems: [
-      { href: '#', children: 'Staff Management' },
-      { href: '#', children: 'Scheduling' },
+      { href: '#', children: 'Personalihaldus' },
+      { href: '#', children: 'Ajakava' },
     ],
   },
-  { href: '#', children: 'Inventory Management', icon: 'inventory' },
-  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+  { href: '#', children: 'Laohaldus', icon: 'inventory' },
+  { href: '#', children: 'Arveldus ja rahandus', icon: 'payments' },
 ];
 
 export const exampleThirdLevelMenuItemsLinksWithSubTitles: SideNavItemProps[] = [
-  { href: '#', children: 'Dashboard', icon: 'dashboard' },
-  { href: '#', children: 'Patient Records', icon: 'people' },
+  { href: '#', children: 'Töölaud', icon: 'dashboard' },
+  { href: '#', children: 'Patsiendi andmed', icon: 'people' },
   {
-    children: 'Clinical Management',
+    children: 'Kliiniline haldus',
     icon: 'medical_services',
     subItemGroups: [
       {
         subHeading: (
           <Text>
-            Minu tervise ajalugu <InfoButton color="inverted">Lorem ipsum</InfoButton>
+            Minu tervise ajalugu{' '}
+            <InfoTooltip color="inverted" isSmall>
+              Lorem ipsum
+            </InfoTooltip>
           </Text>
         ),
         subItems: [
-          { href: '#', children: 'Active Treatments' },
-          { href: '#', children: 'Treatment History' },
-          { href: '#', children: 'Treatment Plans' },
-          { href: '#', children: 'Clinical Protocols' },
+          { href: '#', children: 'Aktiivsed ravid' },
+          { href: '#', children: 'Ravi ajalugu' },
+          { href: '#', children: 'Raviplaanid' },
+          { href: '#', children: 'Kliinilised protokollid' },
         ],
       },
     ],
     subItems: [
-      { href: '#', children: 'Vital Signs' },
-      { href: '#', children: 'Assessments' },
+      { href: '#', children: 'Elunäitajad' },
+      { href: '#', children: 'Hindamised' },
       {
         href: '#',
-        children: 'Treatments',
+        children: 'Ravid',
         subItems: [
-          { href: '#', children: 'Active Treatments' },
-          { href: '#', children: 'Treatment History' },
-          { href: '#', children: 'Treatment Plans' },
-          { href: '#', children: 'Clinical Protocols' },
+          { href: '#', children: 'Aktiivsed ravid' },
+          { href: '#', children: 'Ravi ajalugu' },
+          { href: '#', children: 'Raviplaanid' },
+          { href: '#', children: 'Kliinilised protokollid' },
         ],
       },
       {
         href: '#',
-        children: 'Documentation',
+        children: 'Dokumentatsioon',
         subItems: [
-          { href: '#', children: 'Clinical Notes' },
-          { href: '#', children: 'Medical Forms' },
-          { href: '#', children: 'Consent Forms' },
-          { href: '#', children: 'Reports' },
+          { href: '#', children: 'Kliinilised märkmed' },
+          { href: '#', children: 'Meditsiinilised vormid' },
+          { href: '#', children: 'Nõusolekuvormid' },
+          { href: '#', children: 'Aruanded' },
         ],
       },
     ],
@@ -300,13 +304,27 @@ export const exampleThirdLevelMenuItemsLinksWithSubTitles: SideNavItemProps[] = 
   },
   {
     href: '#',
-    children: 'Administration',
+    children: 'Haldus',
     icon: 'admin_panel_settings',
     subItems: [
-      { href: '#', children: 'Staff Management' },
-      { href: '#', children: 'Scheduling' },
+      { href: '#', children: 'Personalihaldus' },
+      { href: '#', children: 'Ajakava' },
     ],
   },
-  { href: '#', children: 'Inventory Management', icon: 'inventory' },
-  { href: '#', children: 'Billing & Finance', icon: 'payments' },
+  { href: '#', children: 'Laohaldus', icon: 'inventory' },
+  { href: '#', children: 'Arveldus ja rahandus', icon: 'payments' },
+];
+
+export const exampleWithGroupTitle: SideNavItemProps[] = [
+  // `subHeading` starts a group: shows the title when expanded, a divider line when collapsed.
+  { href: '#', children: 'Minu töölaud', subHeading: 'Tervis', icon: 'dashboard' },
+  { href: '#', children: 'Minu andmed', icon: 'account_circle' },
+  { href: '#', children: 'Vastuvõtud ja saatekirjad', icon: 'calendar_today' },
+  { href: '#', children: 'Retseptid ja meditsiiniseadmed', icon: 'medical_services' },
+  { href: '#', children: 'Hammaste tervis', icon: 'dentistry' },
+  { href: '#', children: 'Vaktsineerimine', icon: 'vaccines' },
+  { href: '#', children: 'Tervisetõendid ja -deklaratsioonid', icon: 'assignment' },
+  { href: '#', children: 'Töövõime', icon: 'work' },
+  { href: '#', children: 'Raviarved', subHeading: 'Üldine', icon: 'payments' },
+  { href: '#', children: 'Minu seaded', icon: 'settings' },
 ];

@@ -1071,11 +1071,20 @@ Sub-components: `Header.Logo`, `Header.Center`, `Header.Actions`, `Header.Langua
 
 **Props:** `SideNavProps<C>` | poly
 
-- `ariaLabel: string` (required)
+- `ariaLabel: string` (required) — accessible name for the `<nav>` landmark
 - `navItems: SideNavItemProps<C>[]` (required)
-- `linkAs?: ElementType` — polymorphic link component
-- `collapsible?: boolean`
-- `mobileBreakpoint?: 'mobile' | 'tablet'`
+- `linkAs?: ElementType` — polymorphic link component applied to every item
+- `showDividers?: boolean = true` — dividers between top-level items
+- `mobileBreakpoint?: 'mobile' | 'tablet' = 'tablet'` — viewport at/below which it switches to the mobile drawer
+- `isMobileOpen?: boolean` + `onMenuToggle?: (isOpen) => void` — control the mobile drawer's open state (pair with `SideNav.Toggle`); omit to let it manage itself
+- `showMobileOverlay?: boolean = true` — dim backdrop behind the mobile drawer
+- `isCollapsed?: boolean = false` + `onCollapseToggle?: (isCollapsed) => void` — icon-only collapsed rail (items show `collapsedText`, submenus open as `SideNav.Dropdown` flyouts)
+- `sideNavItemSize?: 'default' | 'medium' | 'small'` — item height (medium / small suit dashboards)
+- `backToMainMenuText?: string` / `backToMenuText?: string` — override the mobile drawer's "back to main menu" / "back to menu" texts (default to the `sidenav.backToMainMenu` / `sidenav.backtoMenu` labels). Mobile view only.
+
+Nav item (`SideNavItemProps`) extras:
+- `subHeading?: ReactNode` — starts a new group with this title above the item. When the sidenav is collapsed the title text is replaced by a divider line.
+- `collapsedText?: string` — shorter label shown while collapsed; falls back to `children`. The full `children` stays in the hover tooltip and the accessible name.
 
 Sub-components: `SideNav.Toggle`, `SideNav.Item`, `SideNav.Dropdown`, `SideNav.Mobile`
 
