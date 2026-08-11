@@ -7,7 +7,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Component | Value Type | Key Features |
 |-----------|-----------|--------------|
 | TextField | `string` | Icon, clearable, size variants |
-| TextArea | `string` | Character limit counter |
+| Textarea | `string` | Character limit counter |
 | NumberField | `number` | Min/max, step, suffix, increment buttons |
 | Select | `ISelectOption \| ISelectOption[] \| null` | Async, multi-select, searchable |
 | Checkbox | `boolean` (via onChange) | Indeterminate state |

@@ -658,9 +658,9 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
 <Select id="country" label="Country" options={countries} value={sel} onChange={setSel} />
 ```
 
-### TextArea
+### Textarea
 
-**Props:** `TextAreaProps` extends TextFieldProps | fRef, bp, form
+**Props:** `TextareaProps` extends TextFieldProps | fRef, bp, form
 
 - `characterLimit?: number`
 
