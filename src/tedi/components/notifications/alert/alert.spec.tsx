@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpointProps } from '../../../helpers';
-import { Alert } from './alert';
+import { Alert, AlertProps } from './alert';
 
 jest.mock('../../../helpers', () => ({
   useBreakpointProps: jest.fn(),
@@ -47,6 +47,18 @@ describe('Alert component', () => {
     expect(iconElement).toBeInTheDocument();
     expect(iconElement).toHaveClass('tedi-icon');
     expect(iconElement).toHaveClass('tedi-icon--size-18');
+  });
+
+  it('renders the icon alongside the title in the head row', () => {
+    const { container } = render(
+      <Alert icon="info" title="Alert Title">
+        Alert Content
+      </Alert>
+    );
+
+    expect(container.querySelector('span[data-name="icon"]')).toBeInTheDocument();
+    expect(screen.getByText('Alert Title')).toBeInTheDocument();
+    expect(screen.getByText('Alert Content')).toBeInTheDocument();
   });
 
   it('applies global styles when isGlobal is true', () => {
@@ -103,6 +115,60 @@ describe('Alert component', () => {
 
     const alert = screen.getByRole('status');
     expect(alert).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('sets aria-live assertive for role="alert"', () => {
+    render(<Alert role="alert">Alert</Alert>);
+
+    expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
+  });
+
+  it('renders presentational (role="none") without live-region or name semantics', () => {
+    const { container } = render(
+      <Alert role="none" title="Presentational">
+        Body
+      </Alert>
+    );
+
+    const alert = container.querySelector('[data-name="alert"]');
+    expect(alert).toHaveAttribute('role', 'none');
+    expect(alert).not.toHaveAttribute('aria-live');
+    expect(alert).not.toHaveAttribute('aria-label');
+    expect(alert).not.toHaveAttribute('aria-labelledby');
+  });
+
+  it('does not let forwarded aria-* props re-add live-region semantics to a presentational alert', () => {
+    const injected = {
+      role: 'none',
+      'aria-live': 'assertive',
+      'aria-label': 'Injected',
+      'aria-labelledby': 'somewhere',
+    } as unknown as AlertProps;
+
+    const { container } = render(<Alert {...injected}>Body</Alert>);
+
+    const alert = container.querySelector('[data-name="alert"]');
+    expect(alert).not.toHaveAttribute('aria-live');
+    expect(alert).not.toHaveAttribute('aria-label');
+    expect(alert).not.toHaveAttribute('aria-labelledby');
+  });
+
+  it('names the alert via its title (aria-labelledby) and drops the fallback aria-label', () => {
+    render(<Alert title="Payment failed">Body</Alert>);
+
+    const alert = screen.getByRole('alert');
+    const labelledBy = alert.getAttribute('aria-labelledby');
+    expect(labelledBy).toBeTruthy();
+    expect(document.getElementById(labelledBy as string)).toHaveTextContent('Payment failed');
+    expect(alert).not.toHaveAttribute('aria-label');
+  });
+
+  it('falls back to a generated aria-label when there is no title', () => {
+    render(<Alert type="success">Body</Alert>);
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveAttribute('aria-label', 'success alert');
+    expect(alert).not.toHaveAttribute('aria-labelledby');
   });
 
   it('renders with danger type and applies correct class', () => {
