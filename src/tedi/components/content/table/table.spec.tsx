@@ -498,6 +498,7 @@ describe('Table', () => {
       ['verticalBorders', '--vertical-borders'],
       ['borderless', '--borderless'],
       ['stickyFirstColumn', '--sticky-first-column'],
+      ['stickyLastColumn', '--sticky-last-column'],
       ['stickyHeader', '--sticky-header'],
     ] as const;
 

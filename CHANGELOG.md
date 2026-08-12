@@ -1,3 +1,36 @@
+# [19.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.5...react-19.0.0-rc.6) (2026-08-12)
+
+
+### Features
+
+* **icons:** bump core to 6.5.0 for expanded material symbols set [#796](https://github.com/TEDI-Design-System/react/issues/796) ([#797](https://github.com/TEDI-Design-System/react/issues/797)) ([5f6b9d5](https://github.com/TEDI-Design-System/react/commit/5f6b9d5c724b254a3108d8b4d16d7d8682dffc5b))
+
+# [19.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.4...react-19.0.0-rc.5) (2026-08-12)
+
+
+### Features
+
+* **table:** sticky last column prop [#792](https://github.com/TEDI-Design-System/react/issues/792) ([#805](https://github.com/TEDI-Design-System/react/issues/805)) ([d74d82f](https://github.com/TEDI-Design-System/react/commit/d74d82f08d5ab949f526b41ecf51338658e38642))
+
+# [19.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.3...react-19.0.0-rc.4) (2026-08-12)
+
+
+### Bug Fixes
+
+* **breadcrumbs:** wcag fixes [#22](https://github.com/TEDI-Design-System/react/issues/22) ([#811](https://github.com/TEDI-Design-System/react/issues/811)) ([b41c1f7](https://github.com/TEDI-Design-System/react/commit/b41c1f7317897d2f193ff67da56beecf93268bf9))
+
+# [19.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.2...react-19.0.0-rc.3) (2026-08-12)
+
+
+### Features
+
+* **table-of-contents:** add heading level and aria label, remove validation [#803](https://github.com/TEDI-Design-System/react/issues/803) ([#808](https://github.com/TEDI-Design-System/react/issues/808)) ([b3dd545](https://github.com/TEDI-Design-System/react/commit/b3dd5451f4c6126284d1720c6049f9e9788f5cd4))
+
+
+### BREAKING CHANGES
+
+* **table-of-contents:** validation logic removed
+
 # [19.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.1...react-19.0.0-rc.2) (2026-08-11)
 
 
