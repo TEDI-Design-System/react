@@ -69,7 +69,8 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
   /** Visual size / weight of the title (`Text` modifiers), independent of `titleElement`. */
   titleModifiers?: TextModifiers;
   /**
-   * Make the header a toggle that shows / hides the body. Needs a `title`.
+   * Make the header a toggle that shows / hides the body. Provide a `title` (or, failing that,
+   * `ariaLabel`) so the toggle has an accessible name.
    * @default false
    */
   collapsible?: boolean;
@@ -94,8 +95,13 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
    * @default false
    */
   selectable?: boolean;
-  /** Selected state (controlled). */
+  /** Controlled selected state. Pair with `onSelectedChange`. */
   selected?: boolean;
+  /**
+   * Initial selected state in uncontrolled mode. Ignored when `selected` is provided.
+   * @default false
+   */
+  defaultSelected?: boolean;
   /** Called with the next selected state when the checkbox toggles. */
   onSelectedChange?: (selected: boolean) => void;
   /**
@@ -148,6 +154,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     summary,
     selectable = false,
     selected,
+    defaultSelected = false,
     onSelectedChange,
     smallLabels = false,
     selectionLabel = getLabel('table-card.select-row'),
@@ -163,8 +170,6 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   } = getCurrentBreakpointProps<TableCardProps>(props);
 
   const isHorizontal = layout === 'horizontal';
-  // Alignment/width defaults depend on the layout: horizontal cards read as a right-aligned
-  // key/value table; vertical cards stack label over value and read left-aligned.
   const resolvedLabelAlign = labelAlign ?? (isHorizontal ? 'right' : 'left');
   const resolvedValueAlign = valueAlign ?? (isHorizontal ? 'right' : 'left');
   const resolvedLabelWidth = labelWidth ?? (isHorizontal ? '8.25rem' : 'auto');
@@ -182,6 +187,15 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     const next = !isOpen;
     if (!isControlled) setInternalOpen(next);
     onOpenChange?.(next);
+  };
+
+  const [internalSelected, setInternalSelected] = React.useState(defaultSelected);
+  const isSelectedControlled = selected !== undefined;
+  const isSelected = isSelectedControlled ? selected : internalSelected;
+
+  const handleSelectedChange = (checked: boolean) => {
+    if (!isSelectedControlled) setInternalSelected(checked);
+    onSelectedChange?.(checked);
   };
 
   const HeadingTag = titleElement;
@@ -211,8 +225,8 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
               value="selected"
               label={selectionLabel}
               hideLabel
-              checked={selected}
-              onChange={(_, checked) => onSelectedChange?.(checked)}
+              checked={isSelected}
+              onChange={(_, checked) => handleSelectedChange(checked)}
             />
           )}
           {collapsible ? (
@@ -222,6 +236,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                 className={styles['tedi-table-card__toggle']}
                 aria-expanded={isOpen}
                 aria-controls={bodyId}
+                aria-label={title ? undefined : ariaLabel}
                 onClick={handleToggle}
               >
                 <span className={styles['tedi-table-card__title-group']}>

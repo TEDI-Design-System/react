@@ -43,6 +43,10 @@ type TextGroupListBreakpointProps =
        */
       labelAlign?: 'left';
       /**
+       * Value alignment is horizontal-only; not available in vertical layout.
+       */
+      valueAlign?: never;
+      /**
        * Width for the label column (e.g., `'200px'`, `'30%'`, or a `number`
        * interpreted as a percent).
        * @default 'auto'

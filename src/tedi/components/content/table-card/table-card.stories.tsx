@@ -577,7 +577,13 @@ const appointmentColumns: ColumnDef<Appointment>[] = [
   { id: 'kellaaeg', header: 'Kellaaeg', accessorKey: 'kellaaeg' },
   { id: 'kestus', header: 'Kestus', accessorKey: 'kestus' },
   { id: 'asukoht', header: 'Asukoht', accessorKey: 'asukoht' },
-  { id: 'actions', header: '', size: 1, cell: () => muudaButton },
+  {
+    id: 'actions',
+    header: () => <span className="sr-only">Tegevused</span>,
+    size: 1,
+    meta: { label: 'Tegevused' },
+    cell: () => muudaButton,
+  },
 ];
 
 /**

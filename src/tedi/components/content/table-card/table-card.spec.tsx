@@ -32,8 +32,8 @@ describe('TableCard', () => {
   });
 
   it('renders a non-string label node as-is (not wrapped in a Label)', () => {
-    render(<TableCard rows={[{ label: <span data-testid="custom">Custom</span>, value: 'v' }]} />);
-    const custom = screen.getByTestId('custom');
+    render(<TableCard rows={[{ label: <span>Custom</span>, value: 'v' }]} />);
+    const custom = screen.getByText('Custom');
     expect(custom.tagName).toBe('SPAN');
     expect(custom.closest('dt')).toBeInTheDocument();
   });
@@ -132,6 +132,11 @@ describe('TableCard', () => {
       expect(within(body as HTMLElement).getByText('2 päeva')).toBeInTheDocument();
     });
 
+    it('names the toggle via ariaLabel when there is no title (keeps the button accessible)', () => {
+      render(<TableCard rows={rows} collapsible ariaLabel="Broneering 22.03" />);
+      expect(screen.getByRole('button', { name: 'Broneering 22.03' })).toBeInTheDocument();
+    });
+
     it('respects controlled `open` and calls onOpenChange without self-toggling', () => {
       const onOpenChange = jest.fn();
       render(
@@ -191,12 +196,36 @@ describe('TableCard', () => {
       const checkbox = screen.getByRole('checkbox', { name: 'Vali Anna Tamm' });
       expect(checkbox).not.toBeChecked();
       fireEvent.click(checkbox);
+      expect(checkbox).toBeChecked();
       expect(onSelectedChange).toHaveBeenCalledWith(true);
     });
 
-    it('reflects the controlled selected state', () => {
-      render(<TableCard rows={rows} title="Anna Tamm" selectable selected selectionLabel="Vali" />);
-      expect(screen.getByRole('checkbox', { name: 'Vali' })).toBeChecked();
+    it('honours defaultSelected in uncontrolled mode', () => {
+      render(<TableCard rows={rows} title="Anna Tamm" selectable defaultSelected selectionLabel="Vali" />);
+      const checkbox = screen.getByRole('checkbox', { name: 'Vali' });
+      expect(checkbox).toBeChecked();
+      fireEvent.click(checkbox);
+      expect(checkbox).not.toBeChecked();
+    });
+
+    it('reflects the controlled selected state and does not self-toggle', () => {
+      const onSelectedChange = jest.fn();
+      render(
+        <TableCard
+          rows={rows}
+          title="Anna Tamm"
+          selectable
+          selected
+          onSelectedChange={onSelectedChange}
+          selectionLabel="Vali"
+        />
+      );
+      const checkbox = screen.getByRole('checkbox', { name: 'Vali' });
+      expect(checkbox).toBeChecked();
+
+      fireEvent.click(checkbox);
+      expect(onSelectedChange).toHaveBeenCalledWith(false);
+      expect(checkbox).toBeChecked();
     });
   });
 

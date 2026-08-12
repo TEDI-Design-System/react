@@ -47,8 +47,10 @@
   }
 
   &--columns {
+    --tedi-text-group-columns: 1;
+
     display: grid;
-    grid-template-columns: repeat(var(--tedi-text-group-columns, 1), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--tedi-text-group-columns), minmax(0, 1fr));
     column-gap: var(--layout-grid-gutters-16);
   }
 
