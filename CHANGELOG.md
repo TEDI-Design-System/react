@@ -1,3 +1,10 @@
+# [19.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.3...react-19.0.0-rc.4) (2026-08-12)
+
+
+### Bug Fixes
+
+* **breadcrumbs:** wcag fixes [#22](https://github.com/TEDI-Design-System/react/issues/22) ([#811](https://github.com/TEDI-Design-System/react/issues/811)) ([b41c1f7](https://github.com/TEDI-Design-System/react/commit/b41c1f7317897d2f193ff67da56beecf93268bf9))
+
 # [19.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.2...react-19.0.0-rc.3) (2026-08-12)
 
 
