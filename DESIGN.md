@@ -504,8 +504,9 @@ Bootstrap-style utilities (`gap-*`, `flex-*`, `order-*`, `justify-content-*`, `a
 declared `!important`, and the names overlap common utility frameworks at different values — TEDI's
 `gap-3`/`gap-4`/`gap-5` are `1rem`/`1.5rem`/`3rem` against Tailwind's `0.75rem`/`1rem`/`1.25rem`,
 while `gap-0`–`gap-2` coincide. TEDI wins every collision regardless of import order, so the
-mismatch only surfaces at larger spacing. Use `Row` / `Col` and `VerticalSpacing`, or arbitrary
-values that cannot collide.
+mismatch only surfaces at larger spacing. Prefer `Row` / `Col` and `VerticalSpacing`; where you need
+raw spacing, write token-backed values that cannot collide (`gap: var(--tedi-dimensions-10)`) rather
+than a bare utility class.
 
 Two rules hold whatever the stack: never rebuild something TEDI already provides, and never restyle
 a TEDI component from outside it. Reach for the component's own props first, and treat the absence

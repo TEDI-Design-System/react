@@ -613,7 +613,7 @@
     },
     {
       "id": "form/textarea/textarea",
-      "name": "TextArea",
+      "name": "Textarea",
       "category": "form",
       "sourcePath": "src/tedi/components/form/textarea/textarea",
       "status": [
@@ -1072,12 +1072,16 @@
     },
     {
       "id": "misc/timeline",
-      "name": null,
+      "name": "Timeline",
       "category": "misc",
       "sourcePath": "src/tedi/components/misc/timeline",
       "status": [],
-      "description": null,
-      "keyProps": []
+      "description": "Render a vertical sequence of events from Timeline.Item children (each composed with Timeline.Title and Timeline.Description), deriving past, current, and future item states from activeIndex.",
+      "keyProps": [
+        "activeIndex",
+        "variant",
+        "cardPadding"
+      ]
     },
     {
       "id": "misc/option-content/option-content",

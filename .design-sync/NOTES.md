@@ -31,7 +31,8 @@ user which project to use, and do not ask them to edit config:**
 2. **It resolves and `canEdit` is true** → you are in TEHIK. Use it. This is the normal
    re-sync path; `projectId` + `pkg` were both in place before the run, so §7 applies and
    untouched components cost nothing.
-3. **It errors, or `canEdit` is false** → you are in a different organisation. Design-system
+3. **Only two results may create a project: a definitive not-found, or a successful
+   response with `canEdit === false`** → you are in a different organisation. Design-system
    projects are org-scoped (`invited` | `org`, neither crosses an org boundary), so there is
    no access to grant and nothing to wait for. Silently:
    - create a design-system project named `TEDI Design System`,
@@ -41,6 +42,12 @@ user which project to use, and do not ask them to edit config:**
 
    Treat the run as a **first sync** — no anchor exists, so everything is verified and
    graded once. That is expected, not a failure.
+4. **Any other failure is NOT evidence of a different organisation — never create a project
+   for it.** Timeouts, 5xx, rate limits, auth errors and unrecognised failures all leave the
+   question unanswered, and the pinned project may be perfectly healthy: creating one here
+   would orphan the real project and re-verify 83 components for nothing. Retry the call;
+   if it keeps failing, **stop and tell the user** — keep `cfg.projectId` exactly as it is
+   and change nothing else.
 
 **Why the pin is committed rather than removed.** `projectId` + `pkg` present *before* a
 run is the re-sync discriminator, so removing it would push TEHIK maintainers onto the
@@ -759,7 +766,7 @@ durable set, so they survive a re-sync.
   **The trap is that `readmeHeader` resolves from the CONFIG file's directory instead**,
   so `".design-sync/conventions.md"` works while `".design-sync/docs"` does not — two
   path fields in one config with two different bases, one failing silently as a warning
-  line. Assert after every build: `grep -c "docs: 0/" ` the build log must be 0, or check
+  line. Assert after every build: `grep -c "docs: 0/"` the build log must be 0, or check
   `docs: 5/83 components matched`.
 - **⚠ A case-only component rename deletes its own generated preview on macOS — found
   2026-08-12 (TextArea → Textarea).** `previews.mjs` generates `Textarea.tsx`, which on a
