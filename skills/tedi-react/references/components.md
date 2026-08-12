@@ -554,6 +554,8 @@ const columnVisibility = { email: !belowMd, role: !belowMd, location: !belowMd }
 
 When `renderSubComponent` is `undefined` (≥ md) the expand column isn't rendered at all — the full table shows. See the `Responsive` story.
 
+For a fuller mobile treatment — each row as a readable card with its own title, status, actions and even nested child rows — render a list of **`TableCard`** below the breakpoint instead of collapsing columns (see `TableCard`).
+
 #### Nested rows + pagination — `paginateExpandedRows`
 
 `paginateExpandedRows` maps to TanStack's option but **defaults to `false`** (TanStack's own default is `true`), matching Angular: expanding a parent renders its children on the _same_ page and only top-level rows count toward `pageSize`, so opening a row never pushes siblings to the next page or splits a parent's children across pages. Pass `true` to restore TanStack's behavior where sub-rows occupy page slots like any other row. Only relevant when the table is both expandable (`getSubRows`) and client-paginated.
@@ -618,6 +620,45 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
     onRowDrop={({ fromIndex, toIndex }) => setRows((cur) => arrayMove(cur, fromIndex, toIndex))}
   />
   ```
+
+### TableCard
+
+The readable mobile counterpart of `Table` — renders one table row as a stacked card of label / value pairs (a semantic `<dl>`). Render a list of them below a breakpoint while showing a `Table` above it.
+
+```tsx
+<TableCard
+  layout="vertical"
+  rows={[
+    { label: 'Kuupäev', value: '22.03.2029 – 29.03.2029' },
+    { label: 'Kellaaeg', value: '11:14' },
+    { label: 'Summa', value: '0.00 €', bold: true },
+  ]}
+  actions={<Button visualType="neutral" size="small" iconLeft="edit">Muuda</Button>}
+/>
+```
+
+**Props (selection):** `rows` (`{ label, value, bold?, colSpan? }[]`), `layout: 'horizontal' | 'vertical'`, `columns`, `labelWidth`, `labelAlign`, `valueAlign`, `smallLabels`, `title` / `subtitle` / `status`, `titleElement` / `titleModifiers`, `collapsible` + `defaultOpen` / `open` / `onOpenChange`, `actions`, `summary` (`{ label, value }`), `selectable` + `selected` / `onSelectedChange` / `selectionLabel`, `children`, `ariaLabel`, `id`. Layout props are breakpoint-aware.
+
+- **`layout`** — `horizontal` reads as a right-aligned key/value table (default); `vertical` stacks label over value. `columns > 1` lays rows out in a grid; `colSpan` on a row spans it across columns.
+- **`smallLabels`** — 14px labels (compact summary/financial look) instead of the 16px body default.
+- **`collapsible`** — the header becomes a WAI-ARIA disclosure toggle (needs a `title`). The body, `summary` and `children` collapse together; the `actions` footer stays visible.
+- **`children`** — extra full-width content inside the (collapsible) body after `rows`, e.g. striped child row-groups composed with `Card.Content` + `TextGroup.List`.
+
+**Responsive `Table` ↔ `TableCard`** — switch at a breakpoint with `useBreakpoint()` + `isBreakpointBelow(bp, 'md')`:
+
+```tsx
+const belowMd = isBreakpointBelow(useBreakpoint(), 'md');
+
+return belowMd ? (
+  <VerticalSpacing size={1}>
+    {rows.map((r) => (
+      <TableCard key={r.id} layout="vertical" rows={toPairs(r)} actions={<EditButton row={r} />} />
+    ))}
+  </VerticalSpacing>
+) : (
+  <Table<Row> id="rows" data={rows} columns={columns} />
+);
+```
 
 ## Form
 

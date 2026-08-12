@@ -1,0 +1,74 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-table-card {
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    gap: var(--layout-grid-gutters-16);
+    align-items: center;
+  }
+
+  &__heading {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font: inherit;
+  }
+
+  &__toggle {
+    @include mixins.button-reset;
+
+    display: flex;
+    gap: var(--layout-grid-gutters-16);
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: var(--tedi-borders-02) solid var(--general-border-focus);
+      outline-offset: 2px;
+      border-radius: var(--table-radius);
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0;
+    word-break: break-word;
+
+    &--body {
+      font-size: var(--body-regular-size);
+      font-weight: var(--body-regular-weight);
+      line-height: var(--body-regular-line-height);
+    }
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease-in-out;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__status {
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--layout-grid-gutters-08);
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -17,6 +17,16 @@
     display: flex;
     gap: var(--text-group-value-inner-spacing);
     align-items: center;
+
+    &--align-right {
+      flex: 1;
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    &--align-left {
+      justify-content: flex-start;
+    }
   }
 
   &--align-left {
@@ -28,10 +38,18 @@
   }
 
   &--list {
+    --tedi-text-group-list-gap: var(--tedi-dimensions-03);
+
     display: flex;
     flex-direction: column;
-    gap: var(--tedi-dimensions-03);
+    gap: var(--tedi-text-group-list-gap);
     margin: 0;
+  }
+
+  &--columns {
+    display: grid;
+    grid-template-columns: repeat(var(--tedi-text-group-columns, 1), minmax(0, 1fr));
+    column-gap: var(--layout-grid-gutters-16);
   }
 
   &__row {
@@ -43,5 +61,9 @@
     flex-direction: row;
     gap: 1rem;
     align-items: flex-start;
+  }
+
+  &__row:has(&__value--align-right) {
+    width: 100%;
   }
 }

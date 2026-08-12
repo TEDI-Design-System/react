@@ -20,6 +20,12 @@ type TextGroupBreakpointProps =
        */
       labelAlign?: TextAlign;
       /**
+       * Alignment for the value text. `'right'` grows the value so it sits flush
+       * against the trailing edge. Horizontal only.
+       * @default 'left'
+       */
+      valueAlign?: TextAlign;
+      /**
        * Width for the label (e.g., '200px', '30%', etc.)
        * @default 'auto'
        */
@@ -72,6 +78,7 @@ const TextGroupBase = (props: TextGroupProps): JSX.Element => {
     className,
     type = 'vertical',
     labelAlign = 'left',
+    valueAlign = 'left',
   } = getCurrentBreakpointProps<TextGroupProps>(props);
 
   const textGroupBEM = cn(styles['tedi-text-group'], styles[`tedi-text-group--${type}`], className);
@@ -82,7 +89,9 @@ const TextGroupBase = (props: TextGroupProps): JSX.Element => {
       <dt className={cn(styles['tedi-text-group__label'], styles[`tedi-text-group--align-${labelAlign}`])}>
         {renderLabelContent(label)}
       </dt>
-      <dd className={cn(styles['tedi-text-group__value'])}>{value}</dd>
+      <dd className={cn(styles['tedi-text-group__value'], styles[`tedi-text-group__value--align-${valueAlign}`])}>
+        {value}
+      </dd>
     </dl>
   );
 };

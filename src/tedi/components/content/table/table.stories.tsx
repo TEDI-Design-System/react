@@ -28,6 +28,10 @@ import type { TableProps } from './table';
 import { groupRowSpan, Table } from './table';
 
 /**
+ * On small screens a wide table can either scroll (see the `Sticky*` stories) or, for better
+ * readability, turn each row into a stacked card. For the latter, use `TableCard` — the mobile
+ * counterpart of `Table` — and switch between them by breakpoint (see `TableCard`'s `Responsive` story).
+ *
  * <a href="https://tanstack.com/table" target="_BLANK">@tanstack/react-table ↗</a><br/>
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/557b9f-table" target="_BLANK">Zeroheight ↗</a>
