@@ -60,8 +60,9 @@ const MyPage = () => {
 > the TEDI stylesheet; only the flex / gap / align / justify / text / order families are.
 > Class names on DS components are hashed and not public API.
 >
-> See **Layout → Application shell** for the complete shell, including the broken
-> variants (padded column, content-height column, sticky column) side by side.
+> Three shell mistakes to avoid: giving the nav column its own padding (it must sit flush
+> against the shell edge), letting the nav column size to its content (it has to stretch to
+> the footer), and making the column `sticky` instead of the inner rail.
 
 > **Item labels are `children`, not `label`.** `navItems` entries are `LinkProps` plus
 > `icon` / `subItems` / `subItemGroups`.

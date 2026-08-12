@@ -13,8 +13,7 @@
   "docsDir": "../.design-sync/docs",
   "titleMap": {
     "FormLabel": null,
-    "Toast": null,
-    "Applicationshell": null
+    "Toast": null
   },
   "provider": {
     "component": "ThemeProvider",

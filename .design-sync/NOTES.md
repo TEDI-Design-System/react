@@ -416,13 +416,25 @@ Storybook titles with no matching public export, excluded on purpose:
 - **`Toast`** — there is no `Toast` component; the API is `sendNotification()` plus
   `ToastContainer`. The stories are click-driven, so nothing renders statically.
   No coverage lost: the thing a toast *looks* like is `Alert`, which is synced.
-- **`Applicationshell`** (added 2026-08-10) — `TEDI-Ready/Layout/Application shell` is a
-  documentation-only story added that day; it composes Header + SideNav + main + Footer
-  and has no export of its own. Note the key: `titleParts()` strips whitespace, so the
-  key is `Applicationshell`, **not** `"Application shell"`. Without the entry the title
-  reports `[TITLE_UNMAPPED]` on every sync and the next agent has to re-decide what to
-  do with it. The shell guidance itself lives in `conventions.md` §10, which is where
-  consumers read it — the story is for Storybook.
+- ~~**`Applicationshell`**~~ — **✅ STORY DELETED FROM THE REPO 2026-08-12; the
+  `titleMap` entry is gone too.** `TEDI-Ready/Layout/Application shell` (added 2026-08-10)
+  was a documentation-only story composing Header + SideNav + main + Footer, with three
+  deliberately broken variants. It had **no export of its own**, so it could never become
+  a component card: the roster pairs story titles to real bundle exports, and an
+  unpairable title yields `[TITLE_UNMAPPED]` plus a floor card. The DS team removed the
+  stories rather than keep a Storybook-only page (2026-08-12).
+  **Removing the `titleMap` exclusion is grade-free** — `configSlicesFor().componentFor()`
+  keys only remaps *into* a component (`[, v] => v === name`); `{title: null}` exclusions
+  are excluded from every key by design, so this edit re-keyed nothing.
+  **Where the shell guidance lives now:** `conventions.md` §10 "Page shell / app layout"
+  — canonical `AppShell` snippet, why-each-rule, wrong/right table, and the
+  no-positioning-utilities caveat. That is the single source; two dangling references
+  were repointed at it (`sidenav/documentation.mdx`, which now states the three failure
+  modes inline for Storybook readers, and `docs/figma-make-kit-composition-prompt.md`).
+  **If a shell card is ever wanted in claude.ai/design, the prerequisite is an exported
+  component in the `tedi` barrel — not a story.** Force-exporting a composition that the
+  library does not ship would teach the design agent markup that does not compile, which
+  is the same trap the `InputGroup` entry below documents.
 - ~~**`InputGroup`**~~ — **✅ FIXED IN THE REPO 2026-08-07; no longer excluded.**
   It was a real library defect: `input-group.tsx` had `export default InputGroup` only
   (a bare `const`, no named export) while `index.ts` used `export * from './input-group'`
