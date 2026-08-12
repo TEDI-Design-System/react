@@ -319,8 +319,11 @@ not appearance:
   reuse them only when building form-adjacent UI.
 
 **Typography, spacing, radius, dimensions.** These also come from tokens — sizing/spacing/radius
-values such as `form-field-height`, `form-field-radius` and the `--tedi-spacing-*` scale rather than
-hardcoded pixels. Use the token; do not invent a value.
+values such as `form-field-height`, `form-field-radius` and role-level spacing like
+`form-field-inner-spacing` rather than hardcoded pixels. The underlying scale is
+`--tedi-dimensions-00` … `--tedi-dimensions-25` (`0` → `24rem`); prefer a semantic role token where
+one exists, and fall back to the dimensions scale for layout spacing that has no role. Use the
+token; do not invent a value.
 
 **Theming.** A theme is a CSS class on `<html>` (`tedi-theme--default`, `tedi-theme--dark`) set by
 `ThemeProvider`. Dark mode is a semantic-token override subset — see `themes.dark` in
@@ -363,15 +366,22 @@ paths) is `design-tokens/component.manifest.json`; all of them import from
 - Wire forms as controlled or uncontrolled per `skills/tedi-react/references/forms.md`, and show
   validation via the `helper` prop.
 - Defer to the `tedi-react` skill for setup, theming and forms details.
+- In scaffolds that also ship a utility CSS framework (Tailwind in Figma Make), reach for a TEDI
+  component first and fall back to utilities only where TEDI has no equivalent — see
+  *Using TEDI in Figma Make*.
 
 **Don't**
 
 - Don't import from `@tedi-design-system/react/community` when a tedi-ready component exists.
 - Don't hardcode hex/rgb colours or pixel values, and don't reference raw `--tedi-*` primitive
-  tokens — go through the semantic layer.
+  tokens — go through the semantic layer. The one exception is the `--tedi-dimensions-*` scale,
+  which semantic spacing roles are themselves built from: use it directly only for spacing that has
+  no semantic role.
 - Don't add `var()` fallbacks — write `var(--token-name)`, not `var(--token-name, #fff)`.
 - Don't hand-roll inputs, dropdowns, modals or date/time pickers that TEDI already provides.
 - Don't skip the providers or the stylesheet import — components render unstyled or without theming.
+- Don't rebuild a TEDI component out of utility classes, and don't restyle one with utility colour,
+  spacing or typography classes — both bypass the semantic token layer and drift from the system.
 <!-- /prose:dosdonts -->
 
 ## Where to look things up
@@ -404,6 +414,12 @@ description ends mid-sentence, assume there is more and go to the source.
 [claude.ai/design](https://claude.ai/design) can host TEDI as a design system, so
 prototypes are built from real TEDI components rather than approximations.
 
+> **Creating the design system from this repository's URL does not work.** It produces
+> token-level styling and approximated markup, not working TEDI components — TEDI's class
+> names are hashed CSS Modules, so there is no class contract an importer can target from
+> source. Committing the compiled bundle to the repo was tested (2026-08-11) and did not
+> close the gap either. Use the flow below.
+
 **You cannot be given access to the TEHIK-owned project.** Design-system projects are
 org-scoped — sharing is `invited` or `org`, and neither crosses an organisation boundary.
 Each organisation runs its own. That is also the better outcome: you own a project you can
@@ -427,6 +443,10 @@ Then, in Claude Code inside the repo:
 The skill runs the library build, builds the reference Storybook, converts, renders and
 grades every component, and uploads — you do not run those steps yourself.
 
+**There is nothing to configure.** The committed config pins the TEHIK-owned project; the
+sync checks whether it can write there and, when it can't, creates a design system in your
+own organisation instead. You will not be asked to edit a config file or supply an id.
+
 ### What you get
 
 **82 TEDI-Ready components**, each with its real TypeScript prop contract (including the
@@ -446,3 +466,54 @@ The mechanical pipeline is about **two minutes** (library build ~1–1.5 min, St
 ~1 min, converter ~35 s). The rest of a first run is the verification pass — every
 component rendered and compared against Storybook — which is the part to budget for.
 Later refreshes only touch what changed.
+
+## Using TEDI in Figma Make
+
+Figma Make consumes TEDI through a **Make kit** (`@make-kits/tedi-kit`, published to TEHIK's private
+Figma npm registry), which installs `@tedi-design-system/react` from npm. Prototypes are therefore
+built from real TEDI components, not approximations. Note that Make installs packages fresh from
+npm and does **not** read this repository — Code Connect mappings play no part here either, they
+serve Dev Mode and the MCP server only.
+
+> **This section is the source of truth, but Make does not read it.** Make reads the markdown
+> guidelines bundled in the kit. The rules below only affect generated output once they are
+> mirrored into those guidelines; changing this file alone changes nothing in Make.
+
+### Styling precedence
+
+TEDI does not dictate a consuming project's toolchain — teams integrate it alongside whatever
+styling tools they already use, and that is fine. What matters is precedence, not which libraries
+are installed. Where a generating agent has utility classes available it will reach for them instead
+of a component, silently, and the result looks plausible — the drift only surfaces when someone
+tries to implement the prototype. Order of preference:
+
+1. **A tedi-ready component's own props**, from `@tedi-design-system/react/tedi`.
+2. **A community component**, from `@tedi-design-system/react/community`, only when no tedi-ready
+   equivalent exists.
+3. **TEDI layout primitives** — `Row` / `Col`, `VerticalSpacing`, `ShowAt` / `HideAt`.
+4. **Whatever the project already uses** for the remainder — plain CSS, CSS modules, a utility
+   framework — driven by real TEDI tokens: semantic roles for colour
+   (`var(--general-border-primary)`), the dimensions scale for spacing
+   (`var(--tedi-dimensions-10)`). Another library's own palette and scale are not TEDI's and will
+   not follow the active theme.
+
+**Bare utility classes for spacing and flex layout are unsafe.** `index.css` ships 261 of TEDI's own
+Bootstrap-style utilities (`gap-*`, `flex-*`, `order-*`, `justify-content-*`, `align-items-*`), all
+declared `!important`, and the names overlap common utility frameworks at different values — TEDI's
+`gap-3`/`gap-4`/`gap-5` are `1rem`/`1.5rem`/`3rem` against Tailwind's `0.75rem`/`1rem`/`1.25rem`,
+while `gap-0`–`gap-2` coincide. TEDI wins every collision regardless of import order, so the
+mismatch only surfaces at larger spacing. Use `Row` / `Col` and `VerticalSpacing`, or arbitrary
+values that cannot collide.
+
+Two rules hold whatever the stack: never rebuild something TEDI already provides, and never restyle
+a TEDI component from outside it. Reach for the component's own props first, and treat the absence
+of a prop as a signal that the design is off-system rather than a reason to override it.
+
+### Keeping a kit healthy
+
+- **Import `@tedi-design-system/react/index.css`** and wrap the app in the provider chain
+  (`ThemeProvider` → `LabelProvider` → `StyleProvider`). Without these, components render unstyled
+  or unthemed — which pushes an agent toward rebuilding them in Tailwind.
+- **Keep the kit's version pin current.** A caret range cannot cross a major boundary, so a kit
+  pinned to an older major silently loses every component added since — and Make will invent
+  Tailwind substitutes for them rather than fail. Bump the pin as part of the release checklist.

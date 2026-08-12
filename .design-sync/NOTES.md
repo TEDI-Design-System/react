@@ -1,5 +1,37 @@
 # design-sync notes — @tedi-design-system/react
 
+## 🎯 Which project to target — resolve this BEFORE §1 target settlement
+
+`cfg.projectId` pins `d10e8d07-6086-4ddd-970c-090a49feaa2f`, the **TEHIK-owned** project.
+That pin is correct for TEHIK and wrong for everyone else, and TEDI is consumed by many
+government teams across many organisations. Resolve it mechanically — **do not ask the
+user which project to use, and do not ask them to edit config:**
+
+1. `get_project(cfg.projectId)`.
+2. **It resolves and `canEdit` is true** → you are in TEHIK. Use it. This is the normal
+   re-sync path; `projectId` + `pkg` were both in place before the run, so §7 applies and
+   untouched components cost nothing.
+3. **It errors, or `canEdit` is false** → you are in a different organisation. Design-system
+   projects are org-scoped (`invited` | `org`, neither crosses an org boundary), so there is
+   no access to grant and nothing to wait for. Silently:
+   - create a design-system project named `TEDI Design System`,
+   - use it for this run,
+   - record its id in `.design-sync/config.json` after the upload verifies (the §6
+     backstop step, just reached by a different route).
+
+   Treat the run as a **first sync** — no anchor exists, so everything is verified and
+   graded once. That is expected, not a failure.
+
+**Why the pin is committed rather than removed.** `projectId` + `pkg` present *before* a
+run is the re-sync discriminator, so removing it would push TEHIK maintainers onto the
+full flow on every fresh clone. Keeping it plus this rule costs a downstream org exactly
+one API call and **zero human knowledge**, which is the point: nobody outside TEHIK
+should need to read a setup guide.
+
+**Downstream teams:** the recorded id is local. If you track upstream, `git pull` will
+conflict on `config.json` — keep your own id; the skill re-records it after every sync
+anyway, so taking upstream's version self-heals on the next run. Never push your id back.
+
 ## ✅ RUN COMPLETE + UPLOADED (2026-08-07) — read this first
 
 **Synced to claude.ai/design.** Project **`TEDI Design System`**,
@@ -134,9 +166,10 @@ the README header, the per-component gotcha docs, the uncapped prop descriptions
 referenced-type shapes all come from committed files, not from anything a previous agent
 remembered.
 
-**If the project was deleted:** `cfg.projectId` still points at the dead id and the
-target router will try to use it. Clear `projectId` from `config.json` first so the skill
-creates a new project, then let it record the new id after the upload verifies.
+**If the project was deleted**, no manual edit is needed — `get_project(cfg.projectId)`
+will error, which is case 3 of the targeting rule at the top of this file: create a new
+project, use it, record its id after the upload verifies. Same path a different
+organisation takes.
 
 ## Build
 
@@ -509,6 +542,16 @@ resulting `_ds_sync.json` is **byte-identical** to the uploaded one: `styleSha`,
 reproduces this exact design system — the conventions header, per-component gotcha docs,
 uncapped prop descriptions and referenced-type shapes all derive from committed files,
 not from any previous agent's reasoning.
+
+**Repository-URL import cannot replace design-sync — tested 2026-08-11, don't retry.**
+The full converter output (447 files, 11 MB — bundle, compiled CSS, tokens, fonts,
+per-component `.d.ts`/`.prompt.md`/`.html`, `_preview/`, `_vendor/`, sentinel and anchor)
+was committed to `design-system/` and the repo imported by URL in Claude Design. The
+importer **did** detect that compiled components were present, but the result still did
+not match a design-sync project. So "commit the built artifacts so the URL importer can
+use them" is a closed question: shipping a runnable bundle in git is not sufficient.
+The directory was removed afterwards (it survives in commit `ce9718c0`). Each
+organisation runs `/design-sync` against its own project — see DESIGN.md for the flow.
 
 **Storybook is not agent-readable (2026-08-10).** Fetching a docs deep link returns a
 client-rendered shell: the entire text content of

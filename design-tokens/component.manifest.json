@@ -159,7 +159,9 @@
       "name": "Calendar",
       "category": "content",
       "sourcePath": "src/tedi/components/content/calendar/calendar",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Lower-level always-visible inline calendar primitive for scheduling grids or custom date controls; use DateField for plain date inputs.",
       "keyProps": [
         "mode",
@@ -1067,6 +1069,15 @@
       "keyProps": [
         "children"
       ]
+    },
+    {
+      "id": "misc/timeline",
+      "name": null,
+      "category": "misc",
+      "sourcePath": "src/tedi/components/misc/timeline",
+      "status": [],
+      "description": null,
+      "keyProps": []
     },
     {
       "id": "misc/option-content/option-content",
