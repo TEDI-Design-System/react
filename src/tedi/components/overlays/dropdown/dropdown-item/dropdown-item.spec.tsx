@@ -270,28 +270,20 @@ describe('DropdownItem', () => {
       expect(mockSetOpen).toHaveBeenCalledWith(false);
     });
 
-    it('closes on Enter (letting the anchor navigate natively)', () => {
-      render(
-        <DropdownItem asChild index={0} onClick={mockOnClick}>
-          <a href="/x">Go</a>
-        </DropdownItem>
-      );
-      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key: 'Enter' });
-      expect(mockOnClick).toHaveBeenCalled();
-      expect(mockSetOpen).toHaveBeenCalledWith(false);
-    });
-
-    it('synthesises a click and closes on Space', () => {
+    it.each(['Enter', ' '])('activates exactly once via a single synthetic click on %s', (key) => {
       const childClick = jest.fn();
       render(
-        <DropdownItem asChild index={0}>
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
           <a href="/x" onClick={childClick}>
             Go
           </a>
         </DropdownItem>
       );
-      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key: ' ' });
-      expect(childClick).toHaveBeenCalled();
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key });
+      // No double activation: the item callback, the child handler, and the close each run once.
+      expect(mockOnClick).toHaveBeenCalledTimes(1);
+      expect(childClick).toHaveBeenCalledTimes(1);
+      expect(mockSetOpen).toHaveBeenCalledTimes(1);
       expect(mockSetOpen).toHaveBeenCalledWith(false);
     });
 
@@ -304,6 +296,48 @@ describe('DropdownItem', () => {
         </DropdownItem>
       );
       expect(screen.getByRole('menuitem', { name: 'Go' })).toHaveClass('my-link');
+    });
+
+    it('marks a disabled slotted anchor with aria-disabled and removes it from the tab order', () => {
+      render(
+        <DropdownItem asChild index={0} disabled>
+          <a href="/x">Go</a>
+        </DropdownItem>
+      );
+      const item = screen.getByRole('menuitem', { name: 'Go' });
+      expect(item).toHaveAttribute('aria-disabled', 'true');
+      expect(item).toHaveAttribute('tabindex', '-1');
+    });
+
+    it('does not activate a disabled slotted anchor on click', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} disabled onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      const clickEvent = fireEvent.click(screen.getByRole('menuitem', { name: 'Go' }));
+      expect(mockOnClick).not.toHaveBeenCalled();
+      expect(childClick).not.toHaveBeenCalled();
+      expect(mockSetOpen).not.toHaveBeenCalled();
+      expect(clickEvent).toBe(false);
+    });
+
+    it('does not activate a disabled slotted anchor on Enter', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} disabled onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key: 'Enter' });
+      expect(mockOnClick).not.toHaveBeenCalled();
+      expect(childClick).not.toHaveBeenCalled();
+      expect(mockSetOpen).not.toHaveBeenCalled();
     });
   });
 });

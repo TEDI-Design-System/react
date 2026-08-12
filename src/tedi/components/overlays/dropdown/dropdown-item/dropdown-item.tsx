@@ -6,10 +6,10 @@ import { useDropdownContext } from '../dropdown-context';
 import styles from './dropdown-item.module.scss';
 
 const composeHandlers =
-  <E,>(itemHandler?: (e: E) => void, childHandler?: (e: E) => void) =>
+  <E extends { defaultPrevented: boolean }>(itemHandler?: (e: E) => void, childHandler?: (e: E) => void) =>
   (event: E) => {
     itemHandler?.(event);
-    childHandler?.(event);
+    if (!event.defaultPrevented) childHandler?.(event);
   };
 
 export type DropdownItemProps = {
@@ -132,7 +132,10 @@ export const DropdownItem = ({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    if (disabled) return; // stop everything
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
 
     // only trigger inner inputs if not disabled
     const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
@@ -151,7 +154,10 @@ export const DropdownItem = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (disabled) return;
+    if (disabled) {
+      if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
+      return;
+    }
 
     if (e.key === 'Enter' || e.key === ' ') {
       const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
@@ -166,12 +172,8 @@ export const DropdownItem = ({
       }
 
       if (isSlot) {
-        if (e.key === ' ') {
-          e.preventDefault();
-          (e.currentTarget as HTMLElement).click();
-        }
-        onClick?.(e);
-        if (closeOnSelect) setOpen(false);
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
         return;
       }
 
@@ -231,6 +233,8 @@ export const DropdownItem = ({
       ref: slotRef,
       className: cn(merged.className, childProps.className),
       style: { ...merged.style, ...childProps.style },
+      'aria-disabled': disabled || undefined,
+      tabIndex: disabled ? -1 : merged.tabIndex,
       onClick: composeHandlers(merged.onClick, childProps.onClick),
       onKeyDown: composeHandlers(merged.onKeyDown, childProps.onKeyDown),
     });
