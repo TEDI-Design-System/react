@@ -63,7 +63,55 @@ anyway, so taking upstream's version self-heals on the next run. Never push your
 alone:** `TEDI Design System (deprecated)` (owner Silver) and `Design System` (owner
 Märt). The pinned project supersedes the deprecated one — don't sync into either.
 
-## ✅ RUN COMPLETE + UPLOADED (2026-08-12) — read this first
+## ✅ RUN COMPLETE + UPLOADED (2026-08-12, third pass — latest) — read this first
+
+**Re-synced at 19.0.0-rc.2 again.** Driver receipt: `ok: true`, all four stages exit 0,
+`pendingGrade: []`, `learningsUnmerged: []`, render check **83/83 previews render cleanly**
+(0 bad, 0 thin, 0 variantsIdentical). **452 files uploaded, 0 deleted**, anchor last.
+
+**What moved, and why it was cheap:**
+1. **The DS team added `parameters.a11y.test: 'todo'` to 10 story files** (commit
+   `cfd92610`, issues #782/#815–#823). Nine map to synced components — DateTimeField,
+   Popover, Search, Select, SideNav, Slider, Tabs, TimeField, TopNav — and the tenth was
+   `application-shell` (excluded). **A non-visual story edit still re-grades**: `srcSha` is
+   the story FILE fingerprint, so all nine `sourceKeys` moved, their generated wrappers
+   recompiled, and `renderHashes` changed (the compiled preview JS embeds the parameter).
+   `sourceHashes` (`.jsx`/`.d.ts`/`.prompt.md`) and `bundleSha12` did **not** move — the
+   library build never sees stories. All nine were re-captured and re-graded from fresh
+   sheets: **46 match / 8 close**, 0 mismatches, every `close` an already-documented
+   harness delta (pseudo-states addon, `example-*` demo scaffolding, capture-clipped tails).
+2. **`conventions.md` gained an `IconProps` section** from the DS team, then two
+   corrections from validation (see below). Committed by the team as `bcc044e8`.
+3. **The `Application shell` stories were deleted** (DS team decision) — see the
+   "Excluded components" entry, which now records the mechanism and where the guidance
+   lives.
+
+**Two `conventions.md` claims were false and are now fixed** (this is exactly the
+re-validation the last risk bullet demands):
+- *"Only `Header.Role`'s `Representative.icon` uses `IconProps`"* — **wrong**:
+  `OptionContent.icon` takes the same wider union (`option-content.tsx:74`, and its
+  `.d.ts` ships the expanded form). Both "only" claims corrected; `IconBackgroundColor`
+  was also spelled out as its four literals, since the type NAME is not resolvable from
+  the artifacts an agent receives.
+- *"19.0.0-rc.2 (npm `rc` tag)"* — the `rc` tag has moved to **19.0.0-rc.6**. The bundle
+  genuinely is rc.2 (this branch is 8 commits behind `origin/rc`), so the version stayed
+  and the parenthetical now says the tag has advanced.
+
+**⚠ `origin/rc` is ahead: 19.0.0-rc.6, including `feat(icons): bump core to 6.5.0`
+(#796/#797).** Installed core here is 6.4.3. **Merging that in and re-syncing will be a
+BIG run, not a cheap one:** a core bump changes the stylesheet, `styleSha` moves, and per
+the first Re-sync risk bullet that invalidates every carried grade — i.e. a full 83-component
+re-grade. Budget for it deliberately; do not treat it as a docs-sized sync.
+
+**Verified this pass** (don't re-derive): `titleMap` `{title: null}` exclusions are
+**grade-free** — `configSlicesFor().componentFor()` keys only remaps *into* a component
+(`[, v] => v === name`), so removing the `Applicationshell` entry re-keyed nothing. The
+83-vs-81 count gap between this sync and `design-tokens/component.manifest.json` is
+**basis, not drift**: the manifest keys off barrel export paths (`Grid` covers Row+Col,
+`Tooltip` covers InfoTooltip, providers are outside its `./components/**` regex, and
+`ToastContainer`/`MobileNav` are real exports this sync excludes).
+
+## ✅ Previous run (2026-08-12, first + second pass)
 
 **Re-synced to claude.ai/design at 19.0.0-rc.2.** Project **`TEDI Design System`**,
 `projectId: d10e8d07-6086-4ddd-970c-090a49feaa2f`.
@@ -843,6 +891,22 @@ durable set, so they survive a re-sync.
 
 ## Re-sync risks
 
+- **⚠ A story edit with ZERO visual effect still costs a full re-grade of that component
+  (2026-08-12).** Adding `parameters.a11y.test: 'todo'` to 9 story files moved every one of
+  their `sourceKeys` *and* `renderHashes`, because `srcSha` fingerprints the story FILE and
+  the compiled wrapper embeds the parameter. There is no "cosmetic edit" escape hatch and
+  there should not be — the pipeline cannot know the edit is inert. **What to do:** confirm
+  the diff really is inert (`git show` the commit), then re-grade the named components from
+  the fresh sheets; expect them to reproduce their previous verdicts exactly. Do NOT hand-copy
+  the old grades forward — the sheets are cheap and the images are the contract.
+  Corollary: `dist/` does **not** need rebuilding for story-only commits (the library build
+  never reads stories, so `bundleSha12` holds), but `.design-sync/sb-reference` **does**.
+- **Deleting or adding any story means rebuilding `sb-reference`, which fires a
+  `reference_drift` `[SPOT_CHECK]` canary.** Grades are KEPT; the driver recaptures ~5
+  unrelated components for confirmation. That is expected, not a regression — read the five
+  sheets, confirm against the recorded verdicts, move on. Two consecutive reference rebuilds
+  in one session will pick two different random sets (this run: Accordion/Footer/Header/
+  Truncate/FileDropzone, then Accordion/Link/TextField/Col/Dropdown — all confirmed).
 - **⚠ READ FIRST (2026-08-12): the whole roster was re-graded at 19.0.0-rc.2, so the
   grades in the uploaded anchor are current — but expect them ALL to read as churned again
   on the next converter update.** This run the driver reported `0 verified-by-upload, 81
