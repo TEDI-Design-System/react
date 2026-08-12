@@ -1,7 +1,16 @@
+import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
+import { cloneElement, isValidElement } from 'react';
 
 import { useDropdownContext } from '../dropdown-context';
 import styles from './dropdown-item.module.scss';
+
+const composeHandlers =
+  <E,>(itemHandler?: (e: E) => void, childHandler?: (e: E) => void) =>
+  (event: E) => {
+    itemHandler?.(event);
+    childHandler?.(event);
+  };
 
 export type DropdownItemProps = {
   /**
@@ -39,10 +48,14 @@ export type DropdownItemProps = {
    */
   indent?: number;
   /**
-   * When `true`, renders a plain `<div>` instead of a `<button>`.
-   * Useful when wrapping form controls like `<Checkbox>` or `<Radio>` that already handle their own events.
-   * **Warning:** When `asChild={true}`, the item is no longer focusable via keyboard navigation
-   * unless the child element itself is focusable.
+   * Render the item as its child element instead of a `<button>`.
+   *
+   * - **Navigable child (default `closeOnSelect`)** — e.g. a `Link`: the item props (`role`,
+   *   roving `tabindex`, handlers, styles) are merged directly onto the child so it becomes the
+   *   single focusable `menuitem`. This avoids a focusable wrapper *and* a focusable child (a
+   *   double Tab stop) and keeps the role and accessible name on one element.
+   * - **Form control (`closeOnSelect={false}`)** — e.g. a `Checkbox` / `Radio`: the child is
+   *   wrapped in a plain `<div>` menuitem that forwards activation to the inner control.
    *
    * @default false
    */
@@ -98,6 +111,15 @@ export const DropdownItem = ({
   const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
+  const isSlot = asChild && closeOnSelect !== false && isValidElement(children);
+
+  const setItemRef = (node: HTMLElement | null) => {
+    if (typeof index === 'number') {
+      listItemsRef.current[index] = node as HTMLButtonElement | null;
+    }
+  };
+  const childRef = isValidElement(children) ? (children as unknown as { ref?: React.Ref<unknown> }).ref : undefined;
+  const slotRef = useMergeRefs([setItemRef, childRef]);
 
   const getCssVars = (indent?: number): React.CSSProperties => {
     // indent <= 0 means no indentation — leave `--dropdown-indent` unset so the
@@ -121,11 +143,10 @@ export const DropdownItem = ({
       return;
     }
 
-    if (!asChild) {
-      onClick?.(e);
-      if (closeOnSelect) setOpen(false);
-    } else {
-      onClick?.(e);
+    onClick?.(e);
+
+    if ((!asChild || isSlot) && closeOnSelect) {
+      setOpen(false);
     }
   };
 
@@ -133,28 +154,35 @@ export const DropdownItem = ({
     if (disabled) return;
 
     if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-
       const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>(
         'input[type="checkbox"], input[type="radio"]'
       );
 
       if (input) {
+        e.preventDefault();
         input.click();
-      } else {
-        onClick?.(e);
+        if (!asChild && closeOnSelect) setOpen(false);
+        return;
       }
 
+      if (isSlot) {
+        if (e.key === ' ') {
+          e.preventDefault();
+          (e.currentTarget as HTMLElement).click();
+        }
+        onClick?.(e);
+        if (closeOnSelect) setOpen(false);
+        return;
+      }
+
+      e.preventDefault();
+      onClick?.(e);
       if (!asChild && closeOnSelect) setOpen(false);
     }
   };
 
   const baseProps = {
-    ref(node: HTMLElement | null) {
-      if (typeof index === 'number') {
-        listItemsRef.current[index] = node as HTMLButtonElement | null;
-      }
-    },
+    ref: setItemRef,
     tabIndex: activeIndex === index ? 0 : -1,
     className: cn(
       styles['tedi-dropdown__item'],
@@ -182,6 +210,31 @@ export const DropdownItem = ({
           disabled: !asChild ? disabled : undefined,
           ...baseProps,
         });
+
+  if (isSlot) {
+    const child = children as React.ReactElement;
+    const childProps = child.props as {
+      className?: string;
+      style?: React.CSSProperties;
+      onClick?: (e: React.MouseEvent) => void;
+      onKeyDown?: (e: React.KeyboardEvent) => void;
+    };
+    const merged = itemProps as typeof itemProps & {
+      className?: string;
+      style?: React.CSSProperties;
+      onClick?: (e: React.MouseEvent) => void;
+      onKeyDown?: (e: React.KeyboardEvent) => void;
+    };
+
+    return cloneElement(child, {
+      ...merged,
+      ref: slotRef,
+      className: cn(merged.className, childProps.className),
+      style: { ...merged.style, ...childProps.style },
+      onClick: composeHandlers(merged.onClick, childProps.onClick),
+      onKeyDown: composeHandlers(merged.onKeyDown, childProps.onKeyDown),
+    });
+  }
 
   return <Component {...itemProps}>{children}</Component>;
 };

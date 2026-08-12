@@ -240,4 +240,70 @@ describe('DropdownItem', () => {
     const item = screen.getByRole('menuitemcheckbox', { name: 'Item' });
     expect(item).toHaveAttribute('aria-checked', 'true');
   });
+
+  describe('asChild slot (navigable child, default closeOnSelect)', () => {
+    it('merges the item props onto the child so the link itself is the single menuitem', () => {
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x">Go</a>
+        </DropdownItem>
+      );
+      const item = screen.getByRole('menuitem', { name: 'Go' });
+      expect(item.tagName).toBe('A');
+      expect(item).toHaveAttribute('href', '/x');
+      expect(item).toHaveAttribute('tabindex', '0');
+      expect(item.querySelector('a, button, [tabindex]')).toBeNull();
+    });
+
+    it('runs both the item and child onClick and closes on click', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      fireEvent.click(screen.getByRole('menuitem', { name: 'Go' }));
+      expect(mockOnClick).toHaveBeenCalledTimes(1);
+      expect(childClick).toHaveBeenCalledTimes(1);
+      expect(mockSetOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('closes on Enter (letting the anchor navigate natively)', () => {
+      render(
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
+          <a href="/x">Go</a>
+        </DropdownItem>
+      );
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key: 'Enter' });
+      expect(mockOnClick).toHaveBeenCalled();
+      expect(mockSetOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('synthesises a click and closes on Space', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key: ' ' });
+      expect(childClick).toHaveBeenCalled();
+      expect(mockSetOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('preserves the child className alongside the dropdown item styling', () => {
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x" className="my-link">
+            Go
+          </a>
+        </DropdownItem>
+      );
+      expect(screen.getByRole('menuitem', { name: 'Go' })).toHaveClass('my-link');
+    });
+  });
 });
