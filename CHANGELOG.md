@@ -1,3 +1,10 @@
+# [19.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.5...react-19.0.0-rc.6) (2026-08-12)
+
+
+### Features
+
+* **icons:** bump core to 6.5.0 for expanded material symbols set [#796](https://github.com/TEDI-Design-System/react/issues/796) ([#797](https://github.com/TEDI-Design-System/react/issues/797)) ([5f6b9d5](https://github.com/TEDI-Design-System/react/commit/5f6b9d5c724b254a3108d8b4d16d7d8682dffc5b))
+
 # [19.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.4...react-19.0.0-rc.5) (2026-08-12)
 
 
