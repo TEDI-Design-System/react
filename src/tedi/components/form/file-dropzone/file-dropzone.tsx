@@ -48,6 +48,32 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
   attachmentProps?: FileDropzoneAttachmentProps;
 }
 
+/**
+ * Maps a comma-separated `accept` string to react-dropzone's accept-object shape
+ * (`{ [mime]: string[] }`) so the rendered input's `accept` attribute matches the
+ * prop exactly. Extensions are grouped under a wildcard key that react-dropzone
+ * drops from the attribute (it is not a valid MIME type) so only the extensions
+ * surface, while explicit MIME types stay as their own keys. Avoids the old
+ * hardcoded key that leaked the whole `application` wildcard family into the
+ * native picker and drag validation (#783).
+ */
+export const toDropzoneAccept = (accept?: string): Record<string, string[]> | undefined => {
+  if (!accept) return undefined;
+  const mapped = accept.split(',').reduce<Record<string, string[]>>((acc, token) => {
+    const value = token.trim();
+    if (!value) return acc;
+    if (value.startsWith('.')) {
+      acc['*/*'] = acc['*/*'] ?? [];
+      acc['*/*'].push(value);
+    } else {
+      acc[value] = acc[value] ?? [];
+    }
+    return acc;
+  }, {});
+
+  return Object.keys(mapped).length ? mapped : undefined;
+};
+
 export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
   const { getLabel } = useLabels();
   const {
@@ -56,19 +82,39 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     disabled = false,
     helper,
     id,
+    name,
     attachmentProps,
+    accept,
+    maxSize,
+    multiple,
+    validateIndividually,
+    defaultFiles,
+    files,
+    onChange,
+    onDelete,
+    announcementTimeout,
     ...rest
   } = props;
-  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload(props);
+  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload({
+    accept,
+    maxSize,
+    multiple,
+    validateIndividually,
+    defaultFiles,
+    files,
+    onChange,
+    onDelete,
+    announcementTimeout,
+  });
 
   const generatedId = React.useId();
   const resolvedId = id ?? generatedId;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     disabled,
-    accept: props.accept ? { 'application/*': [props.accept] } : undefined,
-    multiple: props.multiple,
-    maxSize: props.maxSize ? props.maxSize * 1024 ** 2 : undefined,
+    accept: toDropzoneAccept(accept),
+    multiple,
+    maxSize: maxSize ? maxSize * 1024 ** 2 : undefined,
     onDrop: (acceptedFiles, fileRejections = []) => {
       if (disabled) return;
 
@@ -113,7 +159,13 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         })}
         className={fileDropzoneBEM}
       >
-        <input {...getInputProps()} disabled={disabled} />
+        <input
+          {...getInputProps()}
+          id={resolvedId}
+          name={name}
+          className={styles['tedi-file-dropzone__input']}
+          disabled={disabled}
+        />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
             {...rest}
@@ -178,5 +230,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     </>
   );
 };
+
+FileDropzone.displayName = 'FileDropzone';
 
 export default FileDropzone;

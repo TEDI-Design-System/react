@@ -1,3 +1,57 @@
+# [19.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.1...react-19.0.0-rc.2) (2026-08-11)
+
+
+### Features
+
+* **timeline:** new tedi-ready component [#33](https://github.com/TEDI-Design-System/react/issues/33) ([#800](https://github.com/TEDI-Design-System/react/issues/800)) ([f8ec342](https://github.com/TEDI-Design-System/react/commit/f8ec34218bcd3efe63b813c3b613cf5626f82df9))
+
+# [19.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.4...react-19.0.0-rc.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **textarea:** rename TextArea to Textarea and fix screen reader bugs [#758](https://github.com/TEDI-Design-System/react/issues/758) ([#806](https://github.com/TEDI-Design-System/react/issues/806)) ([d61bffe](https://github.com/TEDI-Design-System/react/commit/d61bffe50c10293ecedba321e0bf49296df75bc9))
+
+
+### BREAKING CHANGES
+
+* **textarea:** TextArea is renamed to Textarea
+
+# [18.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.3...react-18.2.0-rc.4) (2026-08-10)
+
+
+### Bug Fixes
+
+* **date-field:** deselect date from calendar after clearing input [#789](https://github.com/TEDI-Design-System/react/issues/789) ([#807](https://github.com/TEDI-Design-System/react/issues/807)) ([f032d95](https://github.com/TEDI-Design-System/react/commit/f032d9506fb5b487d3fae4144dc0d16bcec3eb0d))
+
+# [18.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.2...react-18.2.0-rc.3) (2026-08-10)
+
+
+### Features
+
+* **calendar:** add dayStatus, fullWidth props, ability to make month/year picker static [#632](https://github.com/TEDI-Design-System/react/issues/632) ([#771](https://github.com/TEDI-Design-System/react/issues/771)) ([0de2560](https://github.com/TEDI-Design-System/react/commit/0de2560b4334c3d373f30008b2950648e0166d59))
+
+# [18.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.2.0-rc.1...react-18.2.0-rc.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* **file-dropzone:** map accept prop and fix input accessibility [#783](https://github.com/TEDI-Design-System/react/issues/783) ([#791](https://github.com/TEDI-Design-System/react/issues/791)) ([24d29cd](https://github.com/TEDI-Design-System/react/commit/24d29cda02f7a62946320a756787ac262868383e)), closes [#784](https://github.com/TEDI-Design-System/react/issues/784) [#784](https://github.com/TEDI-Design-System/react/issues/784)
+
+# [18.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.1.1-rc.2...react-18.2.0-rc.1) (2026-08-10)
+
+
+### Features
+
+* **file-upload:** add showRestrictions and report empty-result rejections [#786](https://github.com/TEDI-Design-System/react/issues/786) ([#793](https://github.com/TEDI-Design-System/react/issues/793)) ([fc207bf](https://github.com/TEDI-Design-System/react/commit/fc207bf29af77c1ed3698eb0b32b42c0d72e5769))
+
+## [18.1.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-18.1.1-rc.1...react-18.1.1-rc.2) (2026-08-07)
+
+
+### Bug Fixes
+
+* **table:** fix invalid variable [#801](https://github.com/TEDI-Design-System/react/issues/801) ([#802](https://github.com/TEDI-Design-System/react/issues/802)) ([e1f2b48](https://github.com/TEDI-Design-System/react/commit/e1f2b48df7e389a83a980c0d35904ac815c11da5))
+
 ## [18.1.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-18.1.0...react-18.1.1-rc.1) (2026-08-07)
 
 

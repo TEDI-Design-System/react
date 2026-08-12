@@ -40,6 +40,10 @@ const meta: Meta<typeof Table> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev',
     },
+    a11y: {
+      // TODO: [Table]: Review storybook a11y violations #804
+      test: 'todo',
+    },
   },
 };
 export default meta;

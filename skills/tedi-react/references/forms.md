@@ -7,7 +7,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Component | Value Type | Key Features |
 |-----------|-----------|--------------|
 | TextField | `string` | Icon, clearable, size variants |
-| TextArea | `string` | Character limit counter |
+| Textarea | `string` | Character limit counter |
 | NumberField | `number` | Min/max, step, suffix, increment buttons |
 | Select | `ISelectOption \| ISelectOption[] \| null` | Async, multi-select, searchable |
 | Checkbox | `boolean` (via onChange) | Indeterminate state |
@@ -17,8 +17,8 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
 | TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
-| FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states |
-| FileDropzone | `FileUploadFile[]` | Drag-and-drop |
+| FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states, `showRestrictions` hint toggle |
+| FileDropzone | `FileUploadFile[]` | Drag-and-drop, per-file validation, `showRestrictions` hint toggle |
 
 ## Controlled vs Uncontrolled
 
@@ -167,6 +167,17 @@ const [date, setDate] = useState<Date>();
 **Calendar selection granularity** — `selectionLevel="months"` or `"years"` commits at a coarser level (useful for "pick a year" UIs):
 ```tsx
 <DateField id="year" label="Year" selectionLevel="years" />
+```
+
+**Static header** — `monthYearSelectType="static"` renders the month/year as a plain, non-clickable label so users can only move via the prev/next nav (disables the month/year jump pickers). `'dropdown'` (default) and `'grid'` are the interactive options.
+
+**Per-day status** — `dayStatus` overlays a `StatusIndicator` dot on matching days (e.g. availability). Return `{ type, label }` per day (or `null`); the `label` is folded into the day's `aria-label` since the dot is decorative:
+```tsx
+<DateField
+  id="appointments"
+  label="Appointment"
+  dayStatus={(date) => (isBooked(date) ? { type: 'error', label: 'Fully booked' } : null)}
+/>
 ```
 
 **Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`, `isClearable`):
@@ -374,14 +385,14 @@ Multiple helpers:
 ```tsx
 import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 
-// Button-based upload
+// Button-based upload (`maxSize` is in MB)
 <FileUpload
   id="docs"
   name="documents"
   label="Upload documents"
   accept=".pdf,.doc"
   multiple
-  maxSize={5 * 1024 * 1024}
+  maxSize={5}
   files={files}
   onChange={setFiles}
   onDelete={handleDelete}
@@ -392,9 +403,16 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
   label="Drop files here"
   accept=".pdf,.doc"
   multiple
-  maxSize={10 * 1024 * 1024}
+  maxSize={10}
 />
 ```
+
+**Restrictions hint** — both components auto-render an "allowed types / max size" hint below the field. Hide it with `showRestrictions={false}` when the same info lives elsewhere (e.g. a `tooltip`); rejection error messages still render either way:
+```tsx
+<FileDropzone label="Drop files" accept=".pdf,.txt" maxSize={5} tooltip="PDF/TXT, max 5 MB" showRestrictions={false} />
+```
+
+**Rejections are reported and observable** — a file failing `accept`/`maxSize` (dragged *or* picked) surfaces a localised message, and `onChange` fires even when the drop is fully rejected (with the unchanged list), so single-file rejections aren't silent.
 
 ## Event Handler Conventions
 

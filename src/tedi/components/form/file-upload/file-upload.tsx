@@ -86,13 +86,20 @@ export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   disabled?: boolean;
   /**
-   * Maximum allowed file size in bytes.
+   * Maximum allowed file size in megabytes (MB).
    */
   maxSize?: number;
   /**
    * If `true`, validates each file separately instead of rejecting all at once.
    */
   validateIndividually?: boolean;
+  /**
+   * Whether to show the auto-generated restrictions hint (allowed types / max size)
+   * below the field. Turn it off when the same info is shown elsewhere to avoid a
+   * duplicate — rejection error messages still render.
+   * @default true
+   */
+  showRestrictions?: boolean;
   /**
    * Determines the visual size of the file upload field. Defaults to `"default"`.
    */
@@ -118,6 +125,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     disabled = false,
     maxSize,
     validateIndividually = false,
+    showRestrictions,
     size = 'default',
     helper,
     ...rest
@@ -132,6 +140,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     onChange,
     onDelete,
     files,
+    showRestrictions,
   });
 
   const currentBreakpoint = useBreakpoint();

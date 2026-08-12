@@ -428,7 +428,8 @@ Sub-component: `List.Item`
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level: `'years'` selects Jan 1 of the picked year, `'months'` selects day 1
 - `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
 - `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
-- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header picker style
+- `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header picker style; `'static'` makes the month/year a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status; return a `{ type, label }` to overlay a `StatusIndicator` dot on that day (the `label` is folded into the day's `aria-label`; the dot itself is `aria-hidden`)
 - `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
 - `required?: boolean`, `footer?: ReactNode`, `className?: string`
@@ -657,9 +658,9 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
 <Select id="country" label="Country" options={countries} value={sel} onChange={setSel} />
 ```
 
-### TextArea
+### Textarea
 
-**Props:** `TextAreaProps` extends TextFieldProps | fRef, bp, form
+**Props:** `TextareaProps` extends TextFieldProps | fRef, bp, form
 
 - `characterLimit?: number`
 
@@ -747,7 +748,8 @@ Same as Checkbox (without indeterminate)
 - `initialMonth?: Date`
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
-- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header pickers; `'static'` renders the month/year as a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status forwarded to the calendar; overlays a `StatusIndicator` dot on matching days (label folded into the day's `aria-label`)
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
 - `initialView?: 'days' | 'months' | 'years' = selectionLevel` — grid the calendar opens on, independent of `selectionLevel`; e.g. `initialView="years"` with default `selectionLevel="days"` opens the year grid and drills year → month → day (pair with `monthYearSelectType="grid"`)
@@ -945,10 +947,10 @@ Key props:
 **Props:** `FileUploadProps` | form
 
 - `id: string` (required), `name: string` (required)
-- `accept?: string`
-- `multiple?: boolean`
-- `files?: FileUploadFile[]`, `defaultFiles?: FileUploadFile[]`
-- `maxSize?: number`
+- `accept?: string`, `maxSize?: number` (MB), `multiple?: boolean`, `validateIndividually?: boolean`
+- `files?: FileUploadFile[]`, `defaultFiles?: FileUploadFile[]`, `onChange?: (files: FileUploadFile[]) => void`
+- `showRestrictions?: boolean = true` — show the auto-generated restrictions hint (allowed types / max size) below the field. Set `false` when the same info is shown elsewhere (e.g. a `tooltip`) to avoid a duplicate; **rejection error messages still render**.
+- Rejections are observable: `onChange` fires even when a drop/pick is fully rejected (with the unchanged list) — including single-file rejections — so a parent can react without re-implementing validation.
 
 ### FileDropzone
 
@@ -959,6 +961,8 @@ Key props:
 - `helper?: FeedbackTextProps`, `disabled?: boolean`
 - `accept?: string`, `multiple?: boolean`, `maxSize?: number` (MB), `validateIndividually?: boolean`
 - `defaultFiles?` / `files?` (controlled) `: FileUploadFile[]`, `onChange?`, `onDelete?`
+- `showRestrictions?: boolean = true` — show the auto-generated restrictions hint (allowed types / max size) below the dropzone. Set `false` to hide it (e.g. when duplicated in a `tooltip`); **rejection error messages still render**.
+- Rejections are observable: a **dragged** file failing `accept`/`maxSize` is reported exactly like a picked one (message + `onChange`), and `onChange` fires even for a fully-rejected drop (unchanged list) so single-file rejections aren't silent.
 - `attachmentProps?: Partial<Omit<AttachmentProps, 'name'>> | ((file) => …)` — overrides forwarded to each rendered `Attachment` (e.g. `icon`, `fileSize`, `feedback`); pass a function to vary per file. `FileDropzone` sets `name`, `isValid`, `isLoading` and always appends the remove button to the `actions` slot itself.
 
 ## Layout
@@ -1711,6 +1715,31 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `variant?: 'dotted' | 'dot-only'`
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
+
+### Timeline
+Vertical timeline for a sequence of events. **Compound API** — composed from `Timeline.Item` children, each with `Timeline.Title`, `Timeline.Description` and any extra content. Responsive: reflows below the `lg` breakpoint (timings stack above the marker on mobile). Mark the current step with `activeIndex` — earlier items render as completed (past), later ones as upcoming (future); the marker dot is filled for current/past, outlined for future, and the connecting line is accent up to the current item.
+
+- `<Timeline activeIndex? variant? cardPadding? className?>` props:
+  - `activeIndex?: number` — current item; omit for all-future.
+  - `variant?: 'default' | 'card' = 'default'` — `card` wraps the timeline in card chrome.
+  - `cardPadding?: number` — item padding in rem for the `card` variant (same scale as `Card`).
+- `<Timeline.Item timings? timingsBottom? children>`:
+  - `timings?: string[]` — timing labels (e.g. `['2024', '16. detsember']`); the first renders larger on desktop, inline on mobile.
+  - `timingsBottom?: ReactNode` — pinned to the bottom of the timings column on desktop, rendered after the content on mobile (e.g. a "last modified" note).
+  - Pass a leading icon by placing it inside `Timeline.Title`. Any non-title/description children render below the description (buttons, `Collapse`, etc.).
+- `<Timeline.Title>` / `<Timeline.Description>` — title (secondary, bold-small) and muted description; wrap a heading element inside the title for heading semantics.
+
+```tsx
+<Timeline activeIndex={1}>
+  <Timeline.Item timings={['2024', '16. detsember']}>
+    <Timeline.Title>Taotluse esitamine</Timeline.Title>
+    <Timeline.Description>Menetlemine võib võtta kuni 30 päeva.</Timeline.Description>
+  </Timeline.Item>
+  <Timeline.Item timings={['2025', '02. jaanuar']}>
+    <Timeline.Title>Otsus</Timeline.Title>
+  </Timeline.Item>
+</Timeline>
+```
 
 ### OptionContent
 A reusable **content template** for dropdown/select option rows — *not* an item itself and never interactive (no `role`, click or focus handling). Drop it inside an interactive parent (`DropdownItem`, a `Select` option) that owns the role, selection and keyboard handling. It lays out an optional selection indicator (checkbox/radio), an optional leading icon, a label and optional meta into one consistently-spaced row. **`Select` renders its options through this internally**, so menu items, select options and standalone rows share one source of truth.

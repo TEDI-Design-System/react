@@ -8,7 +8,7 @@
 .tedi-table__toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--tedi-dimensions-8);
+  gap: var(--tedi-dimensions-08);
   align-items: center;
   justify-content: flex-end;
 }
@@ -248,8 +248,8 @@
 }
 
 .tedi-table__row--filter .tedi-table__header-cell {
-  padding-top: var(--tedi-dimensions-8);
-  padding-bottom: var(--tedi-dimensions-8);
+  padding-top: var(--tedi-dimensions-08);
+  padding-bottom: var(--tedi-dimensions-08);
   font-weight: var(--body-regular-weight);
   background: var(--general-surface-primary);
 }
