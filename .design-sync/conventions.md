@@ -12,7 +12,7 @@ npm install @tedi-design-system/react
 | | |
 |---|---|
 | Package | [`@tedi-design-system/react`](https://www.npmjs.com/package/@tedi-design-system/react) |
-| This bundle corresponds to | **19.0.0-rc.2** (npm `rc` tag) |
+| This bundle corresponds to | **19.0.0-rc.2** (an `rc`-line prerelease; npm's `rc` tag has since advanced to **19.0.0-rc.6** — this bundle is not the newest rc) |
 | Also published | **18.1.0** (npm `latest`) |
 | Source | https://github.com/TEDI-Design-System/react |
 | **Live Storybook (React)** | **https://storybook.tedi.ee/react/rc** — rendered examples + prop tables |
@@ -348,8 +348,25 @@ interface IconWithoutBackgroundProps {
   name: string;                        // Material Symbols ligature
   size?: IconSize; color?: IconColor; type?: IconType;
   filled?: boolean; label?: string; className?: string;
+  background?: undefined;              // this arm FORBIDS a background
+  display?: 'block' | 'inline';
 }
+
+// `IconProps` is the WIDER union — the same shared fields, but the background
+// variant is allowed. Exactly two props take it: `Header.Role`'s
+// `Representative.icon` and `OptionContent`'s `icon`.
+type IconProps = IconWithoutBackgroundProps | (IconSharedProps & {
+  // required in this arm:
+  background: 'primary' | 'secondary' | 'brand-primary' | 'brand-secondary';
+  display?: 'block';
+});
 ```
+
+So `iconLeft` / `iconRight` on `Button` and `Link` take `string | IconWithoutBackgroundProps`
+(no background), while `Header.Role`'s `Representative.icon` and `OptionContent`'s `icon` take
+`string | IconProps` and may carry a background. `OptionContent.d.ts` spells that union out
+inline; for `Header` see `Header.prompt.md`, because `Header.d.ts` emits `HeaderProps` only,
+not subcomponent props.
 
 **Only `TextField`, `Textarea`, `Search` and `InputGroup` accept an array** of
 `FeedbackTextProps` (several messages at once, e.g. an error plus a hint). On `Select`,
