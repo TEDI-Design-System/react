@@ -348,13 +348,18 @@ export const WithActions: StoryFn = () => {
 WithActions.parameters = {
   a11y: {
     config: {
-      // The form-fields card uses `TimeField`, whose picker-toggle button lacks a name and whose
-      // wrapper carries `aria-expanded` without a supporting role. That's a pre-existing issue in
-      // the TimeField component (it reproduces in TimeField's own stories), not TableCard — so
-      // only these two rules are disabled here, not the whole a11y check.
+      // The form-fields card composes pre-existing form components whose own a11y quirks surface
+      // here (not caused by TableCard); only these specific rules are disabled, not the whole check:
+      // - `button-name` / `aria-allowed-attr`: `TimeField`'s picker-toggle button lacks a name and
+      //   its wrapper carries `aria-expanded` without a supporting role (reproduces in TimeField's
+      //   own stories).
+      // - `color-contrast`: react-select renders `.select__single-value` overlapped by the input
+      //   container, so axe can't determine its background (an "incomplete" false positive — the
+      //   value text is dark on white and readable).
       rules: [
         { id: 'button-name', enabled: false },
         { id: 'aria-allowed-attr', enabled: false },
+        { id: 'color-contrast', enabled: false },
       ],
     },
   },
