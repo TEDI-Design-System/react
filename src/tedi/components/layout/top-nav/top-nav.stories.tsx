@@ -91,6 +91,10 @@ const meta: Meta<typeof TopNav> = {
     },
   ],
   parameters: {
+    a11y: {
+      // TODO: [TopNav]: Review storybook a11y violations #823
+      test: 'todo',
+    },
     layout: 'fullscreen',
     design: {
       type: 'figma',

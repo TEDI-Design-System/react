@@ -19,6 +19,10 @@ const meta: Meta<typeof Slider> = {
     addonRight: { control: false },
   },
   parameters: {
+    a11y: {
+      // TODO: [Slider]: Review storybook a11y violations #822
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },

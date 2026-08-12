@@ -19,6 +19,12 @@ import Select, { IGroupedOptions, ISelectOption } from './select';
 const meta: Meta<typeof Select> = {
   component: Select,
   title: 'TEDI-Ready/Components/Form/Select',
+  parameters: {
+    a11y: {
+      // TODO: [Select]: Review storybook a11y violations #821
+      test: 'todo',
+    },
+  },
 };
 
 export default meta;

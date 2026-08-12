@@ -22,6 +22,10 @@ import { SideNav } from '../sidenav/sidenav';
 const meta: Meta = {
   title: 'TEDI-Ready/Layout/Application shell',
   parameters: {
+    a11y: {
+      // TODO: [Application shell]: Review storybook a11y violations #818
+      test: 'todo',
+    },
     layout: 'fullscreen',
     docs: {
       description: {

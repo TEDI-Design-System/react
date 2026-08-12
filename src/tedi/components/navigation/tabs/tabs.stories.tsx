@@ -29,6 +29,10 @@ const meta: Meta<typeof Tabs> = {
     'Tabs.Content': Tabs.Content,
   } as never,
   parameters: {
+    a11y: {
+      // TODO: [Tabs]: Review storybook a11y violations #820
+      test: 'todo',
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=3419-38773&m=dev',

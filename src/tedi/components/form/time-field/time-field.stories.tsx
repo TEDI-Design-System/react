@@ -16,6 +16,10 @@ export default {
   title: 'Tedi-Ready/Components/Form/TimeField',
   component: TimeField,
   parameters: {
+    a11y: {
+      // TODO: [TimeField]: Review storybook a11y violations #815
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },

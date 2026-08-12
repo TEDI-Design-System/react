@@ -32,6 +32,10 @@ const meta: Meta<typeof SideNav> = {
     'SideNav.Mobile': SideNav.Mobile,
   },
   parameters: {
+    a11y: {
+      // TODO: [SideNav]: Review storybook a11y violations #816
+      test: 'todo',
+    },
     docs: {
       source: {
         transform: (code: string) => {

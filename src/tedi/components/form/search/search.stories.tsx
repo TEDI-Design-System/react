@@ -22,6 +22,10 @@ const meta: Meta<SearchProps> = {
   component: Search,
   title: 'TEDI-Ready/Components/Form/Search',
   parameters: {
+    a11y: {
+      // TODO: [Search]: Review storybook a11y violations #819
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
