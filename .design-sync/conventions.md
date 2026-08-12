@@ -12,7 +12,7 @@ npm install @tedi-design-system/react
 | | |
 |---|---|
 | Package | [`@tedi-design-system/react`](https://www.npmjs.com/package/@tedi-design-system/react) |
-| This bundle corresponds to | **18.1.1-rc.1** (npm `rc` tag) |
+| This bundle corresponds to | **19.0.0-rc.2** (npm `rc` tag) |
 | Also published | **18.1.0** (npm `latest`) |
 | Source | https://github.com/TEDI-Design-System/react |
 | **Live Storybook (React)** | **https://storybook.tedi.ee/react/rc** — rendered examples + prop tables |
@@ -31,10 +31,14 @@ placeholder committed in `package.json`; semantic-release substitutes the real v
 only when publishing to npm, so any locally-built bundle carries the placeholder. The
 table above is authoritative.
 
-**One version-sensitive API:** `InputGroup` became a named export in **18.1.1-rc.1**
-(before that it was default-only and `export *` did not forward it, so
-`import { InputGroup }` was `undefined`). If the target app is pinned to **18.1.0 or
-earlier**, use `TextField` / `NumberField` inside `Field` instead of `InputGroup`.
+**Two version-sensitive APIs:**
+
+- `TextArea` was renamed to **`Textarea`** in **19.0.0** (this bundle). The old casing is
+  gone, so `import { TextArea }` is `undefined` here — always write `Textarea`.
+- `InputGroup` became a named export in **18.1.1-rc.1** (before that it was default-only
+  and `export *` did not forward it, so `import { InputGroup }` was `undefined`). If the
+  target app is pinned to **18.1.0 or earlier**, use `TextField` / `NumberField` inside
+  `Field` instead of `InputGroup`.
 
 Only the **`/tedi`** namespace (TEDI-Ready, production-grade) is included here. The
 package also ships `/community`, which is deliberately excluded — it is community-
@@ -84,6 +88,26 @@ Note the two independent Button axes — do not conflate them:
 |---|---|
 | `visualType` | `primary` \| `secondary` \| `neutral` \| `link` |
 | `color` | `default` \| `danger` \| `success` \| `inverted` \| `text` |
+
+`danger`, `success`, `inverted` and `text` are **`color`** values — `visualType="danger"` is the
+most common way to get this wrong.
+
+**An icon-only button still takes `children`, and that is its accessible name.** `children` is
+required (`children: React.ReactNode`), and setting `icon` adds `tedi-btn--icon-only`, whose
+stylesheet rule clips the label rather than removing it (`@include mixins.visually-hidden`). The
+text stays in the accessibility tree:
+
+```jsx
+<Button icon="delete" visualType="neutral">Kustuta</Button>   // ✓ label is the accessible name
+<Button icon="delete">{null}</Button>                          // ✗ no accessible name at all
+<Button icon="delete" aria-label="Kustuta" />                  // ✗ children is required, and
+                                                               //   aria-label would override it
+```
+
+Satisfying the required prop with `null` / `''` / empty children is the exact WCAG failure the
+label exists to prevent. `showTooltip` reuses the same string as hover text when children is a
+string. `Link` and `FloatingButton` share this contract; `ClosingButton` does not — it extends
+`ButtonHTMLAttributes` and takes `title`.
 
 Other enums worth knowing verbatim:
 
@@ -268,7 +292,44 @@ where the cell renders plain text normally and swaps to
 Adding and removing rows is your own state on the array passed as `data`. Reference: the
 `EditableValues` story.
 
-## 8. Shared shapes the per-component docs reference but never define
+## 8. Shapes and names the per-component docs never define
+
+### Same concept, different prop name
+
+The per-component docs show one component at a time, so cross-component naming inconsistency is
+invisible in them. TEDI names the same concept differently in several places, and the wrong name is
+either a type error or is passed to the DOM and silently ignored. Never transfer a prop name from a
+sibling component — or from another design system — without checking the `.d.ts`.
+
+**Open / close callback — three names:**
+
+| Name | Components |
+|---|---|
+| `onToggle` | `Modal`, `Collapse`, `Accordion.Item`, `Header.Language` |
+| `onOpenChange` | `Dropdown`, `CollapseButton`, `SideNav.Dropdown` |
+| `onMenuToggle` | `SideNav`, `TopNav` — `SideNav` also has `onCollapseToggle` |
+
+`Modal` is `onToggle`; `Dropdown` is `onOpenChange`. Radix/shadcn's universal `onOpenChange` does
+not transfer.
+
+**Open state:** `open` / `defaultOpen` on `Modal`, `Dropdown`, `Collapse` — but `isMobileOpen` on
+`SideNav` and `TopNav`, and `isOpen` on `MobileNav`.
+
+**Visual-style axis — four names, none universal:**
+
+| Name | Components |
+|---|---|
+| `variant` | `StatusBadge`, `Filter`, `ChoiceGroup`, `Breadcrumbs`, `Separator`, `TableOfContents`, `Dropdown`, `Carousel.Indicators`, `MobileNavToggle` |
+| `visualType` | `Button`, `Link`, `FloatingButton` |
+| `type` | `Alert`, `StatusIndicator`, `Toggle`, `Field`, `Pagination`, `ButtonGroup`, `EmptyState`, `OptionContent`, `TextGroup` |
+| `color` | `Icon`, `Text`, `Button`, `Link`, `Tag`, `List`, `Spinner`, `Separator`, `StatusBadge`, `ClosingButton`, `InfoButton`, `Toggle`, `ChoiceGroup` |
+
+`variant` is correct on nine components and **wrong on `Button`**, the one used most. `StatusBadge`
+has no `type` prop — it carries three independent axes: `variant`
+(`filled` / `filled-bordered` / `bordered`), `color` (`neutral` `brand` `accent` `success` `danger`
+`warning` `transparent`) and `status` (`danger` `success` `warning` `inactive`).
+
+### Shared type shapes
 
 These type names appear in many components' props with no definition anywhere in the
 bundle. Their real shapes:
@@ -290,7 +351,7 @@ interface IconWithoutBackgroundProps {
 }
 ```
 
-**Only `TextField`, `TextArea`, `Search` and `InputGroup` accept an array** of
+**Only `TextField`, `Textarea`, `Search` and `InputGroup` accept an array** of
 `FeedbackTextProps` (several messages at once, e.g. an error plus a hint). On `Select`,
 `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Toggle`, `Slider`, `FileUpload`,
 `FileDropzone` and `ProgressBar`, `helper` takes a single object only.
@@ -333,7 +394,7 @@ props. The ones most likely to cause you to hand-roll a workaround:
 | `SideNav.isMobileOpen` | Pair with `SideNav.Toggle` (`menuOpen` / `toggleMenu`) to drive the mobile menu from your own state. |
 | `Breadcrumbs.maxItems` | Collapses overflow crumbs into a dropdown (`'long'` variant only); `variant="short"` renders a single back link. |
 | `Pagination.showEdgeNavLabels` | Renders the arrows as labelled text links instead of circular icon buttons (`arrowVariant` is then ignored). |
-| `TextField/TextArea.onKeyPress` | Bound to the **surrounding container**, not the input element. |
+| `TextField/Textarea.onKeyPress` | Bound to the **surrounding container**, not the input element. |
 | `*.iconButtonProps` | Forwards `aria-expanded` / `aria-controls` / `aria-haspopup` to the icon trigger — only applies when `onIconClick` is set, which is also what turns the icon into a `<button>`. |
 | `Tag.role` | Defaults to `'status'`; pass `role="presentation"` for static tags in a list, or some screen readers announce them twice. |
 | `TopNav.submenuFit` | `'full'` (mega-menu width) vs `'content'` (shrink to content). |

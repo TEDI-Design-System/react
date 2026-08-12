@@ -10,7 +10,7 @@
   "cssEntry": "./index.css",
   "tokensPkg": "@tedi-design-system/core",
   "readmeHeader": ".design-sync/conventions.md",
-  "docsDir": ".design-sync/docs",
+  "docsDir": "../.design-sync/docs",
   "titleMap": {
     "FormLabel": null,
     "Toast": null,
@@ -131,6 +131,9 @@
       "cardMode": "column"
     },
     "TextGroup": {
+      "cardMode": "column"
+    },
+    "Timeline": {
       "cardMode": "column"
     },
     "Tooltip": {

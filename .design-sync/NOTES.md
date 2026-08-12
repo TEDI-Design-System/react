@@ -1,5 +1,25 @@
 # design-sync notes — @tedi-design-system/react
 
+> **Syncing this repo from another organisation?** You get your own Claude Design project
+> (the targeting rule below handles that automatically — nothing to edit), but you inherit
+> this repo, and that is what this file describes. The mechanical pipeline is ~2 minutes;
+> the cost is the verification campaign over ~400 stories. **Read these four sections
+> before grading anything:**
+>
+> 1. **Accepted permanent deltas** — the big one. Most differences you will see between the
+>    storybook and preview panels are already-diagnosed storybook-harness artifacts, not
+>    component faults. Grading them as `mismatch` and "fixing" them with an owned preview
+>    permanently shadows the real component.
+> 2. **Scope** — `cfg.entry` is tedi-only AND the reference storybook needs
+>    `STORYBOOK_EXCLUDE_COMMUNITY=true`; both are required.
+> 3. **Build** — always `npm run build`, never a bare `vite build` (a populated `dist/` is
+>    not evidence the build succeeded).
+> 4. **Re-sync risks** — what is only partially verified, and what goes stale silently.
+>
+> Everything under `.design-sync/` is committed on purpose: the four lib forks in
+> `overrides/` load automatically, and this file is where their rationale lives. Run
+> receipts are kept to the latest run only — git history has the rest.
+
 ## 🎯 Which project to target — resolve this BEFORE §1 target settlement
 
 `cfg.projectId` pins `d10e8d07-6086-4ddd-970c-090a49feaa2f`, the **TEHIK-owned** project.
@@ -32,56 +52,78 @@ should need to read a setup guide.
 conflict on `config.json` — keep your own id; the skill re-records it after every sync
 anyway, so taking upstream's version self-heals on the next run. Never push your id back.
 
-## ✅ RUN COMPLETE + UPLOADED (2026-08-07) — read this first
+**Two other design-system projects exist in the TEHIK org and are deliberately left
+alone:** `TEDI Design System (deprecated)` (owner Silver) and `Design System` (owner
+Märt). The pinned project supersedes the deprecated one — don't sync into either.
 
-**Synced to claude.ai/design.** Project **`TEDI Design System`**,
-`projectId: d10e8d07-6086-4ddd-970c-090a49feaa2f` (pinned in `config.json`).
+## ✅ RUN COMPLETE + UPLOADED (2026-08-12) — read this first
+
+**Re-synced to claude.ai/design at 19.0.0-rc.2.** Project **`TEDI Design System`**,
+`projectId: d10e8d07-6086-4ddd-970c-090a49feaa2f`.
 URL: https://claude.ai/design/p/d10e8d07-6086-4ddd-970c-090a49feaa2f
 
-447 files uploaded, then an 11-file delta re-upload after merging `origin/rc`
-(README with the corrected header, the rebuilt bundle/css/styles, InputGroup's 4
-artifacts + preview, anchor last). **The bundle corresponds to npm `18.1.1-rc.1`.**
-The project now carries an
-**`_ds_sync.json` anchor**, so the next re-sync diffs against it and skips unchanged
-components instead of re-verifying everything. The app's self-check has run
-(`_ds_manifest.json` and `_adherence.oxlintrc.json` exist remotely = cards registered).
-Upload order followed the contract: sentinel → content → (no deletes; project was
-empty) → sentinel re-arm → `_ds_sync.json` absolutely last.
+**452 files uploaded, 5 deleted** (the `TextArea` rename), anchor written last. The bundle
+now corresponds to npm **`19.0.0-rc.2`** (`rc` tag; `latest` is still 18.1.0), core 6.4.3.
+Roster went **82 → 83 components**: `Timeline` added, `TextArea` → **`Textarea`** renamed.
+Upload order followed the contract: sentinel → 451 content files in 7 chunks → 5 deletes →
+sentinel re-arm → `_ds_sync.json` absolutely last. Post-upload `list_files` confirms no
+`TextArea` paths remain.
 
-Two other design-system projects exist in the org and were deliberately left alone:
-`TEDI Design System (deprecated)` (owner Silver) and `Design System` (owner Märt).
-This new project supersedes the deprecated one.
+**Verification: the whole roster was re-graded, 0 mismatches.** 83 components / ~380
+captured stories, graded from true storybook-vs-preview screenshot pairs (solo phase of 5
+by the orchestrator, then 12 fan-out batches). Closing receipt: driver `ok: true`, all four
+stages green, `pendingGrade: []`, `learningsUnmerged: []`, **83/83 carried forward
+unchanged — 0 captured, 0 factual failures, 0 grade cleared** (that line is the proof the
+next sync starts fast), and `package-validate.mjs` reports **83/83 previews render
+cleanly** (0 bad, 0
+thin, 0 variantsIdentical). One non-blocking warning, `[TOKENS_MISSING]` (22, triaged
+below). Zero owned previews were needed again — `.design-sync/previews/` is still empty,
+and the compiled bundle still reproduces the oracle on its own for every component.
 
-Final state: `package-build.mjs` and `package-validate.mjs` both exit 0, **82/82
-previews render cleanly**, zero `[GRID_OVERFLOW]`, one non-blocking warning
-(`[TOKENS_MISSING]`, triaged below). All 82 components have a grade file. Across the
-campaign: **397 stories graded — 304 `match`, 93 `close`, 0 `mismatch`**, and **zero
-owned previews were ever needed** (`.design-sync/previews/` is empty) — the compiled
-bundle reproduces the storybook oracle on its own for every component.
+Why a full re-grade rather than a carry-forward: `styleSha` changed (real CSS churn across
+the major version), so verdicts earned against the 18.1.1-rc.1 stylesheet no longer
+applied. See the first bullet of **Re-sync risks** for how to tell that apart from
+converter-only churn next time.
 
-### ⚠ Grade provenance — 79 of 82 carry PRE-FIX verdicts
+**Four things this run fixed or corrected — all four were silent:**
+1. **`cfg.docsDir` never resolved** → all five authored docs were being dropped
+   (`docs: 0/83`). Now `"../.design-sync/docs"` → `docs: 5/83`. See the entry under
+   "Known converter gaps"; the `PKG_DIR`-vs-config-dir asymmetry is the trap.
+2. **The `TextArea` → `Textarea` rename deleted its own generated preview** on macOS, so
+   Textarea shipped a floor card with all stories `unpaired`. Fixed by rebuilding; the
+   mechanism is documented under "Known converter gaps" (build twice after a case-only
+   rename).
+3. **`conventions.md` had drifted** — it claimed 18.1.1-rc.1 and still named `TextArea`
+   twice, which would have taught the design agent an `undefined` import. Version table
+   corrected, both names fixed, and the 19.0.0 rename added to the version-sensitive API
+   list. Everything else in the file re-validated against the fresh build.
+4. **A stale accepted-delta entry** (Slider's InputGroup chrome) nearly cost two false
+   `close` grades; deleted with the correction recorded.
 
-> **Superseded 2026-08-10.** The `dts.mjs` fork reset every grade on the same technicality
-> (fork bytes are a global config slice), so the 3-vs-79 split below is now moot — all 82
-> read as churned. Read **Re-sync risks** first: `renderHashes` are byte-identical, so
-> that reset is a false alarm and the grades should be carried, not re-earned.
+**Second pass, same day (2026-08-12, after the run above).** The DS team edited
+`.design-sync/conventions.md` (added the icon-only-button accessibility contract) and
+`.design-sync/docs/Link.md` (the same rule for `Link`). Re-validated both against the
+build — **every claim verifies**: `children: React.ReactNode` is required on `Button`,
+`Link` and `FloatingButton` and optional on `ClosingButton`; `showTooltip` and `icon`
+exist; and the label really is *clipped, not removed* —
+`.tedi-btn--icon-only .tedi-btn__text` gets `position:absolute; 1px; clip:rect(...)` via
+`mixins.visually-hidden` in `button-content.module.scss`, and that compiled rule ships
+(`tedi-btn__text-a9860fef{clip:rect(1px,1px,1px,1px);…}`). `Link` genuinely shares the
+contract: it imports `ButtonContent` **and** `button-content.module.scss`, and
+`tedi-btn--icon-only` is applied there whenever `icon` is set. Rebuilt, then uploaded a
+**9-file delta** (Link's 4 artifacts + `_preview/Link.js`, `_ds_bundle.js`, `README.md`,
+sentinel, anchor last). Driver: `ok: true`, `changed: 0`, `pendingGrade: []`, 0 deletes.
+A `[SPOT_CHECK]` canary fired (`trigger: reference_drift`, picks Accordion / Link /
+StatusBadge / Skeleton / Button) — **all five fresh sheets confirmed against their kept
+grades, no divergence**, so no re-grade was needed.
 
-The final `InputGroup` fix changed `cfg.titleMap` and `cfg.storyImports`, which are
-**global** config slices, so it cleared every grade on a technicality even though only
-two components' rendering actually changed. The DS team decided (2026-08-07) not to pay
-for a full 82-component re-grade, because nothing is uploaded and the receipt's clean
-gate therefore has no project to protect.
+Newly documented harness deltas (all accepted, all in the deltas section): the
+`translateZ(0)` containing-block effect on `position: fixed`, sticky engaged only on the
+storybook panel, overlay text-trigger underlines clipped by the element shot, the
+`globals.backgrounds` canvas-vs-wrapper gap, and the refinement that `parameters.pseudo`
+is not by itself evidence of the pseudo-states delta.
 
-- **Freshly graded against the FINAL build (3):** `InputGroup`, `Slider`, `Icon`.
-- **Carry verdicts earned against the immediately-preceding build (79):** every other
-  component. That build differed from the final one *only* by the added `InputGroup`
-  named export. Each was visually graded from true storybook-vs-preview screenshots.
-- **What this costs:** the next sync's diff will treat all 79 as needing verification
-  (there is no anchor anyway, so it would re-verify regardless). Nothing rots silently.
-- To close the gap deliberately: re-run the driver and grade whatever it lists in
-  `verification.pendingGrade`.
-
-### Resume / re-sync commands
+## Resume / re-sync commands
 
 Nothing is pending. To re-sync after DS changes, from the repo root:
 
@@ -407,6 +449,21 @@ design system never actually applies, which is worse than the honest delta.
   get hover/focus/active rows painted by the addon, which rewrites `:hover`/`:focus`
   selectors into class variants. Previews render those rows in the default state.
   Not part of the DS contract → permanent `close`.
+  **⚠ Refinement (2026-08-12, found independently by three grading waves): the presence
+  of `parameters.pseudo` is NOT by itself evidence of this delta — grade from the images,
+  not from the story's parameters.** Three distinct sub-cases produce a legitimate
+  `match`:
+  - **Dead selectors.** `NumberField.States` declares `pseudo` with `#Hover` / `#Active` /
+    `#Focus`, but the story renders no elements carrying those ids (its rows are labelled
+    Default / Min value / Max value / Disabled / Error), so the addon paints nothing and
+    both panels are identical. Arguably a story bug worth reporting to the DS team — that
+    story never actually demonstrates hover/active/focus.
+  - **`hover` is a real component prop.** Checkbox / Radio `States` show a hovered row on
+    *both* panels and declare no `parameters.pseudo` at all.
+  - **The pseudo story is past the 6-story cap.** `horizontal-stepper.stories.tsx`
+    defines a `statesPseudo` block, but the story using it is never captured, so none of
+    the six captured rows carry the delta. A `grep` for `pseudo` in the story FILE proves
+    nothing about the captured stories.
 - **`tedi-storybook-styles.scss` demo scaffolding — the single most common `close`
   across the roster (~29 tedi story files; confirmed independently by two waves).**
   `grep -rln "example-list\|example-box\|padding-14-16\|border-bottom\|display-flex\|\"bg bg-" src/tedi --include="*.stories.tsx"`
@@ -441,6 +498,10 @@ design system never actually applies, which is worse than the honest delta.
   honest render. (`align-items-center` and `gap-3` ARE shipped and do work.)
   Do NOT inject a per-component `<style>` in an owned preview — a per-component
   workaround for a roster-wide cause shadows the real fix forever.
+  Red herrings added 2026-08-12: `state-example` and `slider-state-hover|active|focus`
+  (TimeField, Slider) exist in neither `dist/index.css`, nor
+  `@tedi-design-system/core/tedi-storybook-styles.scss`, nor the sb-reference iframe CSS
+  — inert on both sides, no delta.
   Red herring: `badge-grid`, `mb-2`, `d-flex` exist in NEITHER side's CSS, so they are
   inert on both and produce no delta — don't chase them.
   **Worst sub-case — looks like a component bug but isn't (Link, Tabs `States`,
@@ -474,11 +535,15 @@ design system never actually applies, which is worse than the honest delta.
   **Tooltip `Triggers`** (its third trigger is community `Toggle` → a bare native input
   sliver plus an unstyled bordered box, vs the styled TEDI switch in storybook).
   Find others with: `grep -rn "community/" src/tedi --include="*.stories.tsx"`
-- **InputGroup chrome inside Slider's `With Input Group` / `Custom Value`.**
-  `cfg.storyImports.bundle` deliberately compiles that subtree from `src` to keep its
-  React context consistent (see the Slider entry under Config history), so its
-  `.module.scss` is empty and the label sits above the box instead of inline. The
-  Slider itself must still match exactly.
+- ~~**InputGroup chrome inside Slider's `With Input Group` / `Custom Value`.**~~
+  **DELETED 2026-08-12 — this delta no longer exists; do NOT down-grade these two
+  stories.** The entry described `cfg.storyImports.bundle` compiling that subtree from
+  `src` with an empty `.module.scss`, so the label sat above the box instead of inline.
+  Verified this run: both stories render the InputGroup chrome **fully styled** in the
+  preview (bordered box, inline `%` suffix, divider, `-`/`+` NumberField group) and both
+  graded `match`. The cause was removed when InputGroup got its named export
+  (2026-08-07); the "Excluded components" section already said so, and this entry
+  contradicted it for five days. Two `match`es were nearly graded `close` off this text.
 - **Capture-height asymmetry — a real verification GAP, not just cosmetics.**
   `compare.mjs` shoots `#storybook-root` as a full-height *element* on the storybook
   side but `screenshot({fullPage:false})` on the preview side, so anything past the
@@ -530,6 +595,39 @@ design system never actually applies, which is worse than the honest delta.
   `ControlledOpen`-style). The honest remedy would be capturing
   `#storybook-root` + the portal root on the reference side — **never** neutralize the
   story's open state to make the two panels agree.
+
+- **`position: fixed` inside a preview cell is contained, so it can render off-capture
+  (Affix `Fixed Example`) — found 2026-08-12.** The preview page template in
+  `.ds-sync/lib/emit.mjs` sets `transform: translateZ(0)` on both `.ds-cell` and
+  `.ds-single`. A transform makes that element the **containing block** for
+  `position: fixed` descendants, so `bottom: 0` resolves to the bottom of the (1500px
+  tall) story instead of the viewport — around y≈1524, outside the 700px capture. The
+  storybook side is the honest panel here (fixed to the iframe viewport, visible at rows
+  681–695). Graded `close` with the cause named. **Not fixable from config or an owned
+  preview** — `emit.mjs` is app-contract surface the skill forbids forking, and an owned
+  preview would fake the containment. Worth reporting upstream: any DS with
+  fixed-position helpers hits it, and since containment is arguably *desirable* inside a
+  real grid cell, the honest upstream fix is dropping `translateZ(0)` from `.ds-single`
+  only (the single-story `?story=` capture path).
+- **`position: sticky` is ENGAGED on the storybook panel and not on the preview panel
+  (Affix `Default` / `Sticky Top 0`).** `compare.mjs` element-shots a 1500px-tall root and
+  playwright scrolls it into view, which engages sticky (`top: 1.5rem`); the preview side
+  is an unscrolled `fullPage:false` viewport shot. The text therefore sits 24px lower in
+  storybook. Sticky behaviour in previews is **untested rather than wrong**. Expect the
+  same on ScrollFade / ScrollVisibility / sticky SideNav rails.
+- **Text-type overlay triggers lose their dashed underline on the STORYBOOK panel.**
+  Whenever a story's `#storybook-root` box is exactly the text line-height (Tooltip
+  `Tooltip Width` sb 868x24 vs ds content 29px; Tooltip/Popover `Arrow Position`), the
+  underline — a `border-bottom` on the inline trigger — overflows the block box, and the
+  storybook **element** screenshot clips overflow while the preview's viewport shot does
+  not. Proven by a per-row dark-pixel scan: glyph rows byte-identical on both sides, only
+  the two underline rows missing from the sb shot. Same family as the portal rule — the
+  reference is the deficient side → grade `match`. No viewport change helps; it is an
+  element-shot property.
+- **`globals.backgrounds` paints the storybook CANVAS but only a wrapper div in the
+  fork.** Any part of a story that escapes the wrapper's box (e.g. Affix's collapsed
+  `marginTop: 100` band) is grey in storybook and white in the preview. Not fixable
+  without adding padding the `preview-gen-storybook.mjs` fork deliberately refuses.
 
 ## Affirmatively verified (don't re-audit these without a reason)
 
@@ -647,6 +745,34 @@ durable set, so they survive a re-sync.
 - **`emit.mjs` and `bundle.mjs` are app-contract surface and must never be forked**, which
   is why the two above are worked around rather than fixed. `dts.mjs` is forkable, which
   is why the prop-doc and referenced-type problems *were* fixed (see Lib forks).
+- **⚠ `cfg.docsDir` is resolved from `PKG_DIR`, which in THIS repo is `dist/`, not the
+  repo root — found and fixed 2026-08-12.** The value was `".design-sync/docs"`, which
+  resolved to `<repo>/dist/.design-sync/docs`; the build printed
+  `! docsDir: .design-sync/docs not found — skipped` and `docs: 0/83 components matched`,
+  silently dropping all five hand-authored docs (Footer, Header, Link, SideNav, Table) and
+  shipping the raw synthesised bodies — including the broken `## Examples` those docs
+  exist to replace. **Now `"../.design-sync/docs"`.** Why `PKG_DIR` is `dist/`: the
+  converter walks up from `--entry` (`./dist/tedi.es.js`) to the first `package.json`
+  carrying a `name`, and this repo's build copies the full package manifest into
+  `dist/package.json`. That is also why `cfg.cssEntry` is `"./index.css"` (i.e.
+  `dist/index.css`) and always looked correct.
+  **The trap is that `readmeHeader` resolves from the CONFIG file's directory instead**,
+  so `".design-sync/conventions.md"` works while `".design-sync/docs"` does not — two
+  path fields in one config with two different bases, one failing silently as a warning
+  line. Assert after every build: `grep -c "docs: 0/" ` the build log must be 0, or check
+  `docs: 5/83 components matched`.
+- **⚠ A case-only component rename deletes its own generated preview on macOS — found
+  2026-08-12 (TextArea → Textarea).** `previews.mjs` generates `Textarea.tsx`, which on a
+  case-insensitive filesystem OVERWRITES the existing `TextArea.tsx` while the directory
+  entry keeps the OLD casing. The stale sweep then reads the directory, sees an entry
+  named `TextArea` that is no longer an exported component, finds it machine-clean (the
+  marker matches — it is the freshly written Textarea body), and removes it. Net effect:
+  the log says `previews: 83 generated` and `(stale preview removed: TextArea)`, only 82
+  wrappers exist, and the renamed component ships a **floor card** with every story
+  `unpaired` plus a `[RENDER_BLANK]` warning. `preview-rebuild.mjs` cannot repair it (it
+  only recompiles existing wrappers). **Fix: just build again** — with the old-cased file
+  now gone, the second build writes the wrapper under the correct name and it survives.
+  Worth reporting upstream; a case-insensitive-aware stale sweep would prevent it.
 - **Class names that read as real but resolve to nothing** have bitten this repo twice:
   the Storybook-only `display-flex` helper, and Tailwind classes
   (`fixed left-0 top-0 h-full z-50`) in `sidenav/documentation.mdx`. Nothing validates
@@ -656,6 +782,36 @@ durable set, so they survive a re-sync.
 
 ## Known render warns (triaged — a warn NOT listed here is new)
 
+- **`[REFERENCE_STALE?]` fires on any docs-only or header-only change — usually benign
+  (triaged 2026-08-12).** The check compares "bundle changed" against "`sb-reference`
+  unchanged", but the bundle's header embeds the hashes of every `.d.ts`/`.prompt.md`, so
+  editing `.design-sync/conventions.md` or a `docsDir` doc moves `bundleSha12` without any
+  DS source change. **Decide it by the source, not the warn:** if `git status`/`git log`
+  shows no change under `src/` since `.design-sync/sb-reference` was built, ignore it. It
+  is a real warning only when DS source moved — then rebuild the reference first, because
+  a stale oracle makes every grade a comparison against the *old* design.
+- **A `[SPOT_CHECK]` canary with `trigger: reference_drift` is the expected companion to
+  that warn.** Grades are KEPT; the driver just recaptures ~5 components so you can
+  confirm them. Read those five sheets, compare against the recorded verdicts, and move on
+  — do not re-grade the roster unless several genuinely diverge.
+- **The emitted `.d.ts` drops `extends` clauses, so native-attribute forwarding is
+  invisible to the design agent** (noted 2026-08-12). `ClosingButtonProps extends
+  ButtonHTMLAttributes<HTMLButtonElement>` in `closing-button.tsx`, but
+  `ds-bundle/components/buttons/ClosingButton/ClosingButton.d.ts` emits a flat
+  `export interface ClosingButtonProps {` with the props inlined — an agent reading only
+  that file cannot tell the component forwards native button attributes. Not a bug to fix
+  in the artifact (the flattening is what makes props readable); the compensation is to
+  state it in `conventions.md`, which currently does for `ClosingButton`/`title`. Worth
+  remembering before claiming "the `.d.ts` is the complete contract".
+
+- **`[TOKENS_MISSING]` — 22 CSS custom properties at 19.0.0-rc.2** (was 23 at
+  18.1.1-rc.1; the membership shifted with the release, so match on the CLASS of name, not
+  a fixed list). Same triage as below — still non-blocking, validate still exits 0. Two
+  notes from 2026-08-12: `--timeline-layout-gutter-mobile` arrived with the new Timeline
+  component and belongs to the same runtime-injected class; `--form-input-border-error` is
+  new and was **verified resolving correctly** — FileUpload `Validation Failed` and
+  TextField/Search/Select `States` all render the red error border identically on both
+  panels. The historical 23-entry text follows.
 - **`[TOKENS_MISSING]` — 23 CSS custom properties** (`--separator-thickness`,
   `--separator-dot-position`, `--card-radius-rounded-desktop/tablet`,
   `--timeline-layout-gutter-mobile`,
@@ -668,9 +824,53 @@ durable set, so they survive a re-sync.
 
 ## Re-sync risks
 
-- **⚠ READ FIRST (2026-08-10): all 82 grades will read as churned, and it is a false
-  alarm.** `dts.mjs` was forked that day (doc-cap 120 → 1200, plus a `prelude` of
-  referenced types). `configSlicesFor()` hashes fork file bytes into the global config
+- **⚠ READ FIRST (2026-08-12): the whole roster was re-graded at 19.0.0-rc.2, so the
+  grades in the uploaded anchor are current — but expect them ALL to read as churned again
+  on the next converter update.** This run the driver reported `0 verified-by-upload, 81
+  changed, 2 new, 1 removed`: `sourceKeys` moved for all 83 components even though only
+  4 preview HTMLs actually changed (Calendar, FileDropzone, FileUpload, Table). Cause: the
+  staged converter's `scriptsSha` changed (`489fe541dac44703` → `d09681f16bb35382`) while
+  `KEY_RECIPE` stayed at 7. **How to tell a real change from this churn:** compare the
+  fresh `ds-bundle/_ds_sync.json` `renderHashes` against the remote anchor's, component by
+  component — identical hash means byte-identical preview HTML. When the churn is
+  converter-only AND `styleSha` is unchanged, carrying the grades forward is defensible;
+  **this run did NOT carry them, because `styleSha` DID change** (real CSS churn across a
+  major version), which invalidates verdicts earned against the old stylesheet.
+- **Capture-clipped tails — the complete known list, deliberately NOT closed
+  (2026-08-12).** `compare.mjs` element-shots `#storybook-root` full-height on the
+  storybook side but takes a 700px viewport shot on the preview side, so any taller
+  story's tail is missing from the preview panel only. Those tails are **unverified
+  rather than verified-good**. Six grading agents measured the raws and named these:
+  Accordion (`Action Types` 1954px, `With Icon Card` 1220px, `Variants` 886px), Card
+  (`Header Types` 1068px — the two inverted/dark header variants are exactly what is cut,
+  `Default Card` 809px), Table (`Simple` 987px, `Sizes` 732px), Calendar (`With Footer`
+  810px), InputGroup (`States` 1152px), Search (`Sizes` 784px), DateField / DateTimeField
+  (`States` Error row), TextField / Select / **Textarea** (`States` — Textarea loses its
+  Disabled/Success/Error rows), CardButton (`Card Rows` 800px),
+  FloatingButton (4 stories, up to 1172px), Filter (`Customize Content`), SideNav
+  (`Sidenav Item States` row 7), Footer (`With Bottom Section`, a 4px StatusBadge sliver),
+  HashTrigger (`Default` 1656px, and the community-Tabs story's tail), Affix
+  (`Fixed Example`, and see the `translateZ(0)` entry — a viewport raise is the only lever
+  and even then the containment stands). **Remedy per component:
+  `cfg.overrides.<Name>.viewport: "WxH"`** — but `viewport` IS in the grade key, so each
+  one re-grades that component and needs a full build. The DS team's standing decision
+  (2026-08-07, reaffirmed here) is to accept these, consistent with the story-cap
+  decision: the primary story proves the component arrived intact. Close them
+  deliberately, in one batch, if ever.
+- **Overlay SURFACES are unverified — only their triggers are (2026-08-12).** Dropdown,
+  Modal, Popover and InfoTooltip have no open-by-default story inside the 6-story capture,
+  so both panels show nothing but the trigger; all 20 of those stories graded `match` on
+  triggers alone. The actual menu / modal panel / popover card is therefore
+  verified-by-upload only. Tooltip is the exception (`Uncontrolled Default Open` proves
+  the real bubble renders, via the portal rule). Closing the gap needs an open-state story
+  plus `cfg.overrides.<Name>.cardMode: "single"`.
+- **Header's `lg`-gated variants verify nothing (2026-08-12).** Its Tag-label and
+  organisation-selector stories sit inside `<ShowAt lg>` and are invisible at the 900px
+  capture width on BOTH panels, so those two stories currently verify only the shared
+  chrome. A wider `cfg.overrides.Header.viewport` would expose them.
+- **Superseded (2026-08-10) — kept for the mechanism, which recurs.** `dts.mjs` was forked
+  that day (doc-cap 120 → 1200, plus a `prelude` of referenced types).
+  `configSlicesFor()` hashes fork file bytes into the global config
   slice, which feeds every component's `sourceKey` — so every component lands in
   `pendingGrade` on the next re-sync. **`renderHashes` are byte-identical** (spot-checked
   Accordion `44711f1b7314f4d6` before and after): the fork only changes `.d.ts` /
@@ -719,4 +919,19 @@ durable set, so they survive a re-sync.
   stories exceed the 700px preview capture (TextField `Error`, TextArea
   `Disabled`/`Success`/`Error`, Search `Error`, Select `Disabled`, Card's last variants,
   Filter `Customize Content`). Raising `cfg.overrides.<Name>.viewport` closes each gap
-  but re-grades that component and needs a full build.
+  but re-grades that component and needs a full build. *(Superseded by the complete
+  measured list at the top of this section — 2026-08-12.)*
+- **`conventions.md` carries a version table that rots silently.** It states which npm
+  release the bundle corresponds to; at 19.0.0-rc.2 it still said 18.1.1-rc.1 and named
+  the removed `TextArea`. A design agent reads that file as authoritative and would have
+  written `import { TextArea }`, which is `undefined` in this bundle. **On every re-sync,
+  re-run the header validation** (grep every backticked class/token/prop/component in
+  `.design-sync/conventions.md` against `ds-bundle/`'s compiled CSS, the
+  `components/<group>/<Name>/` dirs and `_ds_bundle.js`) and check the version table
+  against `npm view @tedi-design-system/react dist-tags`. Note that negative statements
+  in that file are deliberate and will always "fail" a naive name check — it tells agents
+  NOT to use `display-flex`, that Tailwind classes like `top-0 h-full z-50` do nothing
+  here, and that there is no `Layout` or `<Toast>` component.
+- **After ANY case-only component rename, build twice** — see the TextArea → Textarea
+  entry under "Known converter gaps". The first build silently ships a floor card for the
+  renamed component.

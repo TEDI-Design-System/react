@@ -56,3 +56,12 @@ ligature name or an `IconWithoutBackgroundProps` object.
 ```jsx
 <Link href="/report" iconRight="arrow_forward">Ava raport</Link>
 ```
+
+**4. An icon-only `Link` still needs `children` — that is its accessible name.** `children` is
+required, and `icon` clips the label visually while leaving it in the accessibility tree. Passing
+`{null}` to satisfy the prop leaves the link unnamed.
+
+```jsx
+<Link href="/edit" icon="edit">Muuda</Link>   // ✓
+<Link href="/edit" icon="edit">{null}</Link>  // ✗ no accessible name
+```
