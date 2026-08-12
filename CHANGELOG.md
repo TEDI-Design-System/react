@@ -1,3 +1,15 @@
+# [19.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.2...react-19.0.0-rc.3) (2026-08-12)
+
+
+### Features
+
+* **table-of-contents:** add heading level and aria label, remove validation [#803](https://github.com/TEDI-Design-System/react/issues/803) ([#808](https://github.com/TEDI-Design-System/react/issues/808)) ([b3dd545](https://github.com/TEDI-Design-System/react/commit/b3dd5451f4c6126284d1720c6049f9e9788f5cd4))
+
+
+### BREAKING CHANGES
+
+* **table-of-contents:** validation logic removed
+
 # [19.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.1...react-19.0.0-rc.2) (2026-08-11)
 
 
