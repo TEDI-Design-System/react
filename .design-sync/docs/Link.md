@@ -1,5 +1,7 @@
-Navigational link. Renders an `<a>` by default; polymorphic via `as` / `linkAs` for
-router links (`<Link as={NextLink} href="/x">`).
+Navigational link. Renders an `<a>` by default; polymorphic via `as` for router links
+(`<Link as={NextLink} href="/x">`). `linkAs` is not a `Link` prop — it belongs to the
+containers that render links for you (`SideNav`, `MobileNav`), which pass it down as
+their inner links' `as`.
 
 **Live Storybook:** https://storybook.tedi.ee/react/rc/?path=/docs/tedi-ready-components-navigation-link--docs
 

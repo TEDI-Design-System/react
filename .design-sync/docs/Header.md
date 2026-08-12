@@ -93,8 +93,9 @@ Header.Profile {
 }
 
 Header.Role {
-  representatives: { id: string; name: string;
-                     description?: string; icon?: string | IconProps }[];
+  // Representative = { id: string; name: string;
+  //                    description?: string; icon?: string | IconProps }
+  representatives: Representative[];
   label?: ReactNode;               // e.g. <Text modifiers="bold">Roll:</Text>
   showSearch?: boolean;            // search field in the representative list
   showDescription?: boolean;

@@ -302,7 +302,9 @@ for these, never raw `--tedi-*` primitives:
 `--tedi-color-blue-700`) are the raw scale and are an internal implementation detail — never
 reference them directly. Always consume the **semantic** tokens (the `general-*` and `form-*`
 roles listed in the table above and defined in `design-tokens/tokens.json`), which map a role to a
-primitive and are what re-theme cleanly.
+primitive and are what re-theme cleanly. The single exception is the `--tedi-dimensions-*` spacing
+scale, which the semantic spacing roles are themselves built from — see *Typography, spacing,
+radius, dimensions* below for when to reach for it directly.
 
 **Colour, by role.** Semantic colours are grouped by intent, so pick the role that matches meaning,
 not appearance:
@@ -436,7 +438,7 @@ npm ci
 
 Then, in Claude Code inside the repo:
 
-```
+```text
 /design-sync
 ```
 

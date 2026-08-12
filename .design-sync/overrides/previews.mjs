@@ -15,7 +15,7 @@ import { build } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { IIFE_IMPORT_META_DEFINE, hypothesisLine } from '../../.ds-sync/lib/common.mjs';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join, normalize, resolve as resolvePath } from 'node:path';
+import { join, normalize, resolve as resolvePath, sep } from 'node:path';
 
 // FORK: inline storybook staticDirs assets as data URIs.
 //
@@ -52,7 +52,7 @@ export function publicAssetInlinePlugin(staticDir) {
     if (cache.has(name)) return cache.get(name);
     let uri = null;
     const abs = resolvePath(root, normalize(name));
-    if (abs.startsWith(root + '/') && existsSync(abs)) {
+    if (abs.startsWith(root + sep) && existsSync(abs)) {
       const mime = ASSET_MIME[(name.match(/\.[a-z]+$/i) ?? [''])[0].toLowerCase()];
       if (mime) uri = `data:${mime};base64,${readFileSync(abs).toString('base64')}`;
     }

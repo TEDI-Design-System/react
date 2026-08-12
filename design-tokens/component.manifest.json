@@ -458,11 +458,11 @@
     },
     {
       "id": "notifications/toast/toast",
-      "name": "Toast",
+      "name": "ToastContainer",
       "category": "notifications",
       "sourcePath": "src/tedi/components/notifications/toast/toast",
       "status": [],
-      "description": "Trigger transient toast notifications via sendNotification, rendered by a root-level ToastContainer.",
+      "description": "Mount ToastContainer once at the app root, then raise transient notifications from anywhere with sendNotification(alertProps, toastOptions). There is no Toast component — each toast body is an Alert, so the key props below are AlertProps.",
       "keyProps": [
         "type",
         "title",
