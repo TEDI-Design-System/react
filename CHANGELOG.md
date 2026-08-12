@@ -1,3 +1,10 @@
+# [19.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.4...react-19.0.0-rc.5) (2026-08-12)
+
+
+### Features
+
+* **table:** sticky last column prop [#792](https://github.com/TEDI-Design-System/react/issues/792) ([#805](https://github.com/TEDI-Design-System/react/issues/805)) ([d74d82f](https://github.com/TEDI-Design-System/react/commit/d74d82f08d5ab949f526b41ecf51338658e38642))
+
 # [19.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.3...react-19.0.0-rc.4) (2026-08-12)
 
 
