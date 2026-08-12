@@ -97,11 +97,20 @@ re-validation the last risk bullet demands):
   genuinely is rc.2 (this branch is 8 commits behind `origin/rc`), so the version stayed
   and the parenthetical now says the tag has advanced.
 
-**⚠ `origin/rc` is ahead: 19.0.0-rc.6, including `feat(icons): bump core to 6.5.0`
-(#796/#797).** Installed core here is 6.4.3. **Merging that in and re-syncing will be a
-BIG run, not a cheap one:** a core bump changes the stylesheet, `styleSha` moves, and per
-the first Re-sync risk bullet that invalidates every carried grade — i.e. a full 83-component
-re-grade. Budget for it deliberately; do not treat it as a docs-sized sync.
+**⚠ THE UPLOADED PROJECT IS ONE COMMIT BEHIND THE REPO — read before the next sync.**
+Immediately after this upload finished, the DS team merged `origin/rc` (`7a55b541`), taking
+the branch to **19.0.0-rc.6** with **core 6.5.0** installed (`feat(icons): bump core to
+6.5.0`, #796/#797). So: the Claude Design project is a faithful, fully verified sync of
+**rc.2 / core 6.4.3**, and the working tree is now rc.6 / core 6.5.0. Nothing is broken —
+the project is just older than the repo.
+**The next sync is the EXPENSIVE kind. Budget for it; do not treat it as a docs-sized run:**
+`dist/` (11:54, core 6.4.3) and `sb-reference` (15:20, pre-merge) are both stale, so both
+must be rebuilt; a core bump rewrites the stylesheet, which moves `styleSha`; and per the
+first Re-sync risk bullet a moved `styleSha` invalidates **every** carried grade — a full
+83-component capture-and-re-grade campaign (solo phase + fan-out waves), not a scoped pass.
+Also re-check `conventions.md`'s version table on that run: it currently says the bundle is
+rc.2 and that the `rc` tag has advanced to rc.6, which will both need updating once the
+bundle actually is rc.6.
 
 **Verified this pass** (don't re-derive): `titleMap` `{title: null}` exclusions are
 **grade-free** — `configSlicesFor().componentFor()` keys only remaps *into* a component
