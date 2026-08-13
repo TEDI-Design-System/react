@@ -77,7 +77,7 @@ Guides development inside this repo: creating new components, running tests/lint
 
 [`DESIGN.md`](./DESIGN.md) is the machine-readable representation of the design system — semantic tokens plus tedi-ready component rules — that AI agents read to ground generated UI in real TEDI tokens and components. It also covers where to look things up, and how to use TEDI as a design system in [claude.ai/design](https://claude.ai/design) (each organisation runs its own; design-system projects cannot be shared across organisations).
 
-Its token table and [`design-tokens/component.manifest.json`](./design-tokens/component.manifest.json) are generated from `@tedi-design-system/core` via `npm run design:build`; the surrounding prose is hand-maintained, with the `update-design-docs` skill keeping it current. [`design-system-spec.json`](./design-system-spec.json) is a descriptor pointing at those files, intended for repository-URL import.
+Its token table is read straight from `@tedi-design-system/core/tokens.json` (core generates it from Figma and publishes it with the stylesheet it describes) and [`component.manifest.json`](./component.manifest.json) is derived from the `src/tedi` barrel; both are produced by `npm run design:build` (see [`design-docs/`](./design-docs)). The surrounding prose is hand-maintained, with the `update-design-docs` skill keeping it current. [`design-system-spec.json`](./design-system-spec.json) is a descriptor pointing at those files, intended for repository-URL import.
 
 ---
 

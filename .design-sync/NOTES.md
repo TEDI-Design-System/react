@@ -100,9 +100,14 @@ re-validation the last risk bullet demands):
 **⚠ THE UPLOADED PROJECT IS ONE COMMIT BEHIND THE REPO — read before the next sync.**
 Immediately after this upload finished, the DS team merged `origin/rc` (`7a55b541`), taking
 the branch to **19.0.0-rc.6** with **core 6.5.0** installed (`feat(icons): bump core to
-6.5.0`, #796/#797). So: the Claude Design project is a faithful, fully verified sync of
-**rc.2 / core 6.4.3**, and the working tree is now rc.6 / core 6.5.0. Nothing is broken —
-the project is just older than the repo.
+6.5.0`, #796/#797), and core has since been bumped again to **6.6.0** (the release that first
+ships `tokens.json`) with `dist/` rebuilt against it. So: the Claude Design project is a
+faithful, fully verified sync of **rc.2 / core 6.4.3**, and the working tree is now
+rc.6 / core 6.6.0. Nothing is broken — the project is just older than the repo.
+**Note for whoever re-syncs:** 6.6.0 renamed three tokens this repo used —
+`tooltip-background`/`tooltip-text` → `tooltip-primary-*` and `general-selected-border-width`
+→ `general-border-width-selected` — already fixed in `src/`, value-for-value, so no visual
+change is expected from them.
 **The next sync is the EXPENSIVE kind. Budget for it; do not treat it as a docs-sized run:**
 `dist/` (11:54, core 6.4.3) and `sb-reference` (15:20, pre-merge) are both stale, so both
 must be rebuilt; a core bump rewrites the stylesheet, which moves `styleSha`; and per the
@@ -115,7 +120,7 @@ bundle actually is rc.6.
 **Verified this pass** (don't re-derive): `titleMap` `{title: null}` exclusions are
 **grade-free** — `configSlicesFor().componentFor()` keys only remaps *into* a component
 (`[, v] => v === name`), so removing the `Applicationshell` entry re-keyed nothing. The
-83-vs-81 count gap between this sync and `design-tokens/component.manifest.json` is
+83-vs-81 count gap between this sync and `component.manifest.json` is
 **basis, not drift**: the manifest keys off barrel export paths (`Grid` covers Row+Col,
 `Tooltip` covers InfoTooltip, providers are outside its `./components/**` regex, and
 `ToastContainer`/`MobileNav` are real exports this sync excludes).

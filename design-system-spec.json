@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "systemName": "TEDI Design System",
   "repositoryUrl": "https://github.com/TEDI-Design-System/react",
   "framework": "react",
   "paths": {
-    "tokens": "design-tokens/tokens.json",
     "components": "src/tedi/components"
   },
-  "componentManifest": "design-tokens/component.manifest.json"
+  "componentManifest": "component.manifest.json",
+  "tokensPackage": "@tedi-design-system/core/tokens.json"
 }
