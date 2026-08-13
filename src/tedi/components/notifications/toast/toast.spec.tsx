@@ -128,6 +128,9 @@ describe('sendNotification', () => {
     });
 
     expect(onClose).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
   });
 
   test('takes the toast container out of the tab order so it is not focusable itself', async () => {

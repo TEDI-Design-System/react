@@ -56,9 +56,12 @@ describe('Alert component', () => {
       </Alert>
     );
 
-    expect(container.querySelector('span[data-name="icon"]')).toBeInTheDocument();
-    expect(screen.getByText('Alert Title')).toBeInTheDocument();
-    expect(screen.getByText('Alert Content')).toBeInTheDocument();
+    const icon = container.querySelector('span[data-name="icon"]');
+    expect(icon).toBeInTheDocument();
+
+    const headRow = icon?.closest('.tedi-alert__content');
+    expect(headRow).toContainElement(screen.getByText('Alert Title'));
+    expect(headRow).not.toContainElement(screen.getByText('Alert Content'));
   });
 
   it('applies global styles when isGlobal is true', () => {
