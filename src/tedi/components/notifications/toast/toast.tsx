@@ -34,6 +34,7 @@ export const sendNotification = (props: AlertProps, toastOptions?: ToastOptions)
     () => (
       <div
         className={styles['tedi-toast__focus-wrapper']}
+        ref={(node) => node?.closest('.Toastify__toast')?.setAttribute('tabindex', '-1')}
         onFocus={() => toast.pause({ id })}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) {

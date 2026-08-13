@@ -130,6 +130,20 @@ describe('sendNotification', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  test('takes the toast container out of the tab order so it is not focusable itself', async () => {
+    render(<ToastContainer />);
+
+    act(() => {
+      sendNotification({ type: 'info', title: 'Heads up', children: 'ok' });
+    });
+
+    await waitFor(() => {
+      const container = document.querySelector('.Toastify__toast');
+      expect(container).not.toBeNull();
+      expect(container).toHaveAttribute('tabindex', '-1');
+    });
+  });
+
   test('pauses the timer on keyboard focus and resumes when focus leaves the toast', async () => {
     const pauseSpy = jest.spyOn(toast, 'pause');
     const playSpy = jest.spyOn(toast, 'play');
