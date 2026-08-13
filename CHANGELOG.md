@@ -1,3 +1,10 @@
+# [19.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.6...react-19.0.0-rc.7) (2026-08-13)
+
+
+### Bug Fixes
+
+* **button-group:** wcag fixes [#69](https://github.com/TEDI-Design-System/react/issues/69) ([#809](https://github.com/TEDI-Design-System/react/issues/809)) ([8d560e0](https://github.com/TEDI-Design-System/react/commit/8d560e0a48c3bc244a54fd9dceae450eb372824c))
+
 # [19.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.5...react-19.0.0-rc.6) (2026-08-12)
 
 
