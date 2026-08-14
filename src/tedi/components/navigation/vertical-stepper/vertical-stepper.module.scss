@@ -252,9 +252,15 @@
   border-color: var(--stepper-step-danger-bg);
 }
 
-.tedi-vertical-stepper__sub-item--informative .tedi-vertical-stepper__sub-dot {
-  background-color: var(--stepper-step-default-border);
-  border-color: var(--stepper-step-default-border);
+.tedi-vertical-stepper__sub-item--informative {
+  .tedi-vertical-stepper__sub-dot {
+    background-color: var(--stepper-step-disabled-bg);
+    border-color: var(--stepper-step-disabled-border);
+  }
+
+  .tedi-vertical-stepper__label {
+    color: var(--general-text-tertiary);
+  }
 }
 
 .tedi-vertical-stepper__sub-item--disabled {
