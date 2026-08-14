@@ -20,6 +20,9 @@ import {
 import { TableOfContentsList } from './components/table-of-contents-list/table-of-contents-list';
 import styles from './table-of-contents.module.scss';
 
+/** Semantic level of the `TableOfContents` heading element. */
+export type TableOfContentsHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
 export interface TableOfContentsProps {
   /**
    * `TableOfContents.Item` elements. An item's non-`Item` children are its
@@ -32,6 +35,19 @@ export interface TableOfContentsProps {
    * the navigation keeps an accessible name via `aria-label`).
    */
   heading?: string | null;
+  /**
+   * Configurable semantic heading level (`h1`–`h6`); the visual style stays H4 regardless. Set it
+   * to match the surrounding page's heading outline and avoid skipped heading levels (WCAG 1.3.1).
+   * Ignored when the list is headless.
+   * @default h3
+   */
+  headingLevel?: TableOfContentsHeadingLevel;
+  /**
+   * Override the navigation landmark's accessible name. When empty, the `<nav>` falls back to the
+   * heading (via `aria-labelledby`), or the localised title when headless. Use it to disambiguate
+   * multiple tables of contents on the same page.
+   */
+  ariaLabel?: string;
   /**
    * Visual variant:
    * - `default` — rendered inside a bordered `Card`.
@@ -52,13 +68,6 @@ export interface TableOfContentsProps {
    * children.
    */
   activeId?: string;
-  /**
-   * Show a validation glyph before each item (multistep-form usage). Each state uses a distinct
-   * icon shape (not colour alone) with a localised text alternative: a check for `isValid === true`,
-   * an empty circle for `undefined` (not completed), and a warning for `isValid === false`.
-   * @default false
-   */
-  showIcons?: boolean;
   /**
    * Render the list as an ordered list with auto-generated hierarchical numbers
    * (`1.`, `2.`, `2.1`, …) shown before each item.
@@ -81,15 +90,14 @@ export interface TableOfContentsNode {
   id?: string;
   content: ReactNode;
   children?: TableOfContentsNode[];
-  isValid?: boolean;
   separator?: boolean;
-  hideIcon?: boolean;
 }
 
 interface TableOfContentsContextValue {
   activeId?: string;
-  showIcons?: boolean;
   numbered?: boolean;
+  headingLevel?: TableOfContentsHeadingLevel;
+  ariaLabel?: string;
   activeTrail: Set<string>;
 }
 
@@ -104,15 +112,13 @@ export const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
   Children.toArray(children)
     .filter(isItemElement)
     .map((element) => {
-      const { id, isValid, separator, hideIcon, children: itemChildren } = element.props;
+      const { id, separator, children: itemChildren } = element.props;
       const childArray = Children.toArray(itemChildren);
       const subItems = childArray.filter(isItemElement);
       const content = childArray.filter((child) => !isItemElement(child));
       return {
         id,
-        isValid,
         separator,
-        hideIcon,
         content: <>{content}</>,
         children: subItems.length ? childrenToNodes(itemChildren) : undefined,
       };
@@ -142,8 +148,9 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const {
     children,
     heading,
+    headingLevel = 'h3',
+    ariaLabel,
     activeId,
-    showIcons = false,
     numbered = false,
     sticky = true,
     variant = 'default',
@@ -157,8 +164,8 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, showIcons, numbered, activeTrail }),
-    [activeId, showIcons, numbered, activeTrail]
+    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail]
   );
 
   const rootStyle =

@@ -240,4 +240,104 @@ describe('DropdownItem', () => {
     const item = screen.getByRole('menuitemcheckbox', { name: 'Item' });
     expect(item).toHaveAttribute('aria-checked', 'true');
   });
+
+  describe('asChild slot (navigable child, default closeOnSelect)', () => {
+    it('merges the item props onto the child so the link itself is the single menuitem', () => {
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x">Go</a>
+        </DropdownItem>
+      );
+      const item = screen.getByRole('menuitem', { name: 'Go' });
+      expect(item.tagName).toBe('A');
+      expect(item).toHaveAttribute('href', '/x');
+      expect(item).toHaveAttribute('tabindex', '0');
+      expect(item.querySelector('a, button, [tabindex]')).toBeNull();
+    });
+
+    it('runs both the item and child onClick and closes on click', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      fireEvent.click(screen.getByRole('menuitem', { name: 'Go' }));
+      expect(mockOnClick).toHaveBeenCalledTimes(1);
+      expect(childClick).toHaveBeenCalledTimes(1);
+      expect(mockSetOpen).toHaveBeenCalledWith(false);
+    });
+
+    it.each(['Enter', ' '])('activates exactly once via a single synthetic click on %s', (key) => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key });
+      // No double activation: the item callback, the child handler, and the close each run once.
+      expect(mockOnClick).toHaveBeenCalledTimes(1);
+      expect(childClick).toHaveBeenCalledTimes(1);
+      expect(mockSetOpen).toHaveBeenCalledTimes(1);
+      expect(mockSetOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('preserves the child className alongside the dropdown item styling', () => {
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x" className="my-link">
+            Go
+          </a>
+        </DropdownItem>
+      );
+      expect(screen.getByRole('menuitem', { name: 'Go' })).toHaveClass('my-link');
+    });
+
+    it('marks a disabled slotted anchor with aria-disabled and removes it from the tab order', () => {
+      render(
+        <DropdownItem asChild index={0} disabled>
+          <a href="/x">Go</a>
+        </DropdownItem>
+      );
+      const item = screen.getByRole('menuitem', { name: 'Go' });
+      expect(item).toHaveAttribute('aria-disabled', 'true');
+      expect(item).toHaveAttribute('tabindex', '-1');
+    });
+
+    it('does not activate a disabled slotted anchor on click', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} disabled onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      const clickEvent = fireEvent.click(screen.getByRole('menuitem', { name: 'Go' }));
+      expect(mockOnClick).not.toHaveBeenCalled();
+      expect(childClick).not.toHaveBeenCalled();
+      expect(mockSetOpen).not.toHaveBeenCalled();
+      expect(clickEvent).toBe(false);
+    });
+
+    it('does not activate a disabled slotted anchor on Enter', () => {
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} disabled onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Go' }), { key: 'Enter' });
+      expect(mockOnClick).not.toHaveBeenCalled();
+      expect(childClick).not.toHaveBeenCalled();
+      expect(mockSetOpen).not.toHaveBeenCalled();
+    });
+  });
 });

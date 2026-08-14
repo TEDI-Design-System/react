@@ -1589,6 +1589,24 @@ export const StickyFirstColumn: Story = {
 };
 
 /**
+ * Last column stays fixed during horizontal scroll via `stickyLastColumn` — useful for a
+ * trailing actions column.
+ */
+export const StickyLastColumn: Story = {
+  render: () => (
+    <div style={{ maxWidth: 600 }}>
+      <Table<StickyDoctor>
+        id="tedi-table-sticky-last"
+        data={stickyDoctors}
+        columns={stickyDoctorColumns}
+        stickyLastColumn
+        pagination={DEFAULT_PAGINATION}
+      />
+    </div>
+  ),
+};
+
+/**
  * Header row stays pinned during vertical scroll via `stickyHeader` + `maxHeight`. The Table's
  * internal `.tedi-table__scroll` div is the sticky anchor — wrapping the Table in an external
  * scrollable container will NOT work, because `position: sticky` always resolves against the
