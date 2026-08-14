@@ -1,3 +1,10 @@
+# [19.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.7...react-19.0.0-rc.8) (2026-08-14)
+
+
+### Bug Fixes
+
+* **date-field,date-time-field:** changed min+max year defaults, exposed props [#590](https://github.com/TEDI-Design-System/react/issues/590) ([#788](https://github.com/TEDI-Design-System/react/issues/788)) ([db4957b](https://github.com/TEDI-Design-System/react/commit/db4957bb176d2b2dd936877b9e9df7f490cae12c))
+
 # [19.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.6...react-19.0.0-rc.7) (2026-08-13)
 
 
