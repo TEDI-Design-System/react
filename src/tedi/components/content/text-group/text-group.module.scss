@@ -65,6 +65,10 @@
     align-items: flex-start;
   }
 
+  &--list#{&}--horizontal#{&}--row-align-center > &__row {
+    align-items: center;
+  }
+
   &__row:has(&__value--align-right) {
     width: 100%;
   }

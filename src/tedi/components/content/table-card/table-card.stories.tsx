@@ -302,6 +302,8 @@ export const WithActions: StoryFn = () => {
 
       <TableCard
         title="Pass"
+        titleElement="h4"
+        titleModifiers="h4"
         status={<StatusBadge color="success">Kehtib 13.08.2027</StatusBadge>}
         layout="vertical"
         columns={2}
@@ -326,7 +328,11 @@ export const WithActions: StoryFn = () => {
       />
 
       <TableCard
-        title="Eesti Maksu- ja Tolliamet"
+        title={
+          <Label as="span" isSmall isBold>
+            Eesti Maksu- ja Tolliamet
+          </Label>
+        }
         status={<StatusBadge color="danger">Täitmata</StatusBadge>}
         layout="vertical"
         rows={[{ label: '', value: 'Käibedeklaratsiooni esitamise tähtaeg on 5 päeva pärast 10.10.2025' }]}
@@ -377,7 +383,15 @@ export const IsAccordion: StoryFn = () => {
   ];
   return (
     <VerticalSpacing size={1}>
-      <TableCard title="Hambarst" subtitle="14.04.2026 15:30" collapsible defaultOpen={false} smallLabels rows={rows} />
+      <TableCard
+        title="Hambarst"
+        subtitle="14.04.2026 15:30"
+        collapsible
+        defaultOpen={false}
+        smallLabels
+        rowAlign="center"
+        rows={rows}
+      />
 
       <TableCard
         title="Hambarst"
@@ -385,6 +399,7 @@ export const IsAccordion: StoryFn = () => {
         collapsible
         defaultOpen={false}
         smallLabels
+        rowAlign="center"
         rows={rows}
         actions={
           <>
@@ -468,6 +483,7 @@ export const HasChildrenRows: StoryFn = () => {
         layout="horizontal"
         labelAlign="left"
         valueAlign="left"
+        labelWidth="8.25rem"
         rows={[
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },
@@ -481,6 +497,7 @@ export const HasChildrenRows: StoryFn = () => {
                 type="horizontal"
                 labelAlign="left"
                 valueAlign="left"
+                labelWidth="8.25rem"
                 items={[
                   { label: 'Tõend', value: name },
                   { label: 'Tõendi staatus', value: kehtiv },
@@ -502,6 +519,7 @@ export const HasChildrenRows: StoryFn = () => {
         layout="horizontal"
         labelAlign="left"
         valueAlign="left"
+        labelWidth="8.25rem"
         rows={[
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },
@@ -514,6 +532,7 @@ export const HasChildrenRows: StoryFn = () => {
               type="horizontal"
               labelAlign="left"
               valueAlign="left"
+              labelWidth="8.25rem"
               items={[
                 { label: 'Tõend', value: name },
                 { label: 'Olek', value: kehtiv },

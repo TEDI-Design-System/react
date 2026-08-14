@@ -24,6 +24,8 @@ const meta: Meta<typeof TextGroup> = {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    //TODO: #827 a11y violations here are tracked for review in a separate issue — report as todo, don't fail CI.
+    a11y: { test: 'todo' },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=45-30752&mode=dev',

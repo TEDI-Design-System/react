@@ -30,6 +30,13 @@ type TextGroupListBreakpointProps =
        * @default 'auto'
        */
       labelWidth?: string | number;
+      /**
+       * Vertical alignment of the label against its value within each row.
+       * `'center'` aligns them on the cross axis (useful when a value is taller,
+       * e.g. a `StatusBadge`). Horizontal layout only.
+       * @default 'start'
+       */
+      rowAlign?: 'start' | 'center';
     }
   | {
       /**
@@ -46,6 +53,10 @@ type TextGroupListBreakpointProps =
        * Value alignment is horizontal-only; not available in vertical layout.
        */
       valueAlign?: never;
+      /**
+       * Row alignment is horizontal-only; not available in vertical layout.
+       */
+      rowAlign?: never;
       /**
        * Width for the label column (e.g., `'200px'`, `'30%'`, or a `number`
        * interpreted as a percent).
@@ -134,6 +145,7 @@ export const TextGroupList = (props: TextGroupListProps): JSX.Element => {
     valueAlign = 'left',
     columns = 1,
     rowGap,
+    rowAlign = 'start',
   } = getCurrentBreakpointProps<TextGroupListProps>(props);
 
   const listBEM = cn(
@@ -141,6 +153,7 @@ export const TextGroupList = (props: TextGroupListProps): JSX.Element => {
     styles['tedi-text-group--list'],
     styles[`tedi-text-group--${type}`],
     { [styles['tedi-text-group--columns']]: columns > 1 },
+    { [styles['tedi-text-group--row-align-center']]: type === 'horizontal' && rowAlign === 'center' },
     className
   );
   const listLabelWidth = resolveLabelWidth(labelWidth);

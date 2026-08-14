@@ -47,6 +47,12 @@ type TableCardBreakpointProps = {
   labelAlign?: TableCardAlign;
   /** Value text alignment. Defaults to `right` in horizontal layout, `left` otherwise. */
   valueAlign?: TableCardAlign;
+  /**
+   * Vertical alignment of each label against its value (horizontal layout only).
+   * `'center'` keeps the label centred when a value is taller, e.g. a `StatusBadge`.
+   * @default start
+   */
+  rowAlign?: 'start' | 'center';
   /** Class name for the root element. */
   className?: string;
 };
@@ -166,6 +172,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     labelWidth,
     labelAlign,
     valueAlign,
+    rowAlign = 'start',
     className,
   } = getCurrentBreakpointProps<TableCardProps>(props);
 
@@ -205,6 +212,10 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const hasSummary = Boolean(summary);
   const hasChildren = Boolean(children);
   const headerHasSeparator = collapsible ? isOpen || hasActions : selectable;
+  // Without a separator the header's bottom padding stacks on top of the body's top padding, which
+  // reads as too large a gap between the title and the content. Drop it when the body sits directly
+  // below (visible, no separator); keep it for collapsed accordions where the header is the last row.
+  const tightenHeaderBottom = isOpen && !headerHasSeparator;
   const bodyHasSeparator = hasSummary || hasActions || hasChildren;
   const summaryHasSeparator = hasActions;
 
@@ -217,7 +228,11 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   return (
     <Card padding={0} className={cn(styles['tedi-table-card'], className)} aria-label={ariaLabel} id={id}>
       {hasHeader && (
-        <Card.Content padding={1} hasSeparator={headerHasSeparator} className={styles['tedi-table-card__header']}>
+        <Card.Content
+          padding={tightenHeaderBottom ? { top: 1, right: 1, bottom: 0, left: 1 } : 1}
+          hasSeparator={headerHasSeparator}
+          className={styles['tedi-table-card__header']}
+        >
           {selectable && (
             <Checkbox
               id={`${id}-select`}
@@ -253,7 +268,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                     </Text>
                   )}
                   {subtitle && (
-                    <Text element="span" color="secondary">
+                    <Text element="span" color="secondary" modifiers="small">
                       {subtitle}
                     </Text>
                   )}
@@ -286,7 +301,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                     </Text>
                   )}
                   {subtitle && (
-                    <Text element="span" color="secondary">
+                    <Text element="span" color="secondary" modifiers="small">
                       {subtitle}
                     </Text>
                   )}
@@ -298,7 +313,11 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
         </Card.Content>
       )}
 
-      <div id={bodyId} hidden={collapsible && !isOpen}>
+      <div
+        id={bodyId}
+        hidden={collapsible && !isOpen}
+        className={cn({ [styles['tedi-table-card__body--has-footer']]: hasActions })}
+      >
         <Card.Content padding={1} hasSeparator={bodyHasSeparator}>
           <TextGroupList
             columns={columns}
@@ -309,6 +328,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                   labelAlign: resolvedLabelAlign,
                   valueAlign: resolvedValueAlign,
                   labelWidth: resolvedLabelWidth,
+                  rowAlign,
                 }
               : {
                   type: 'vertical' as const,
