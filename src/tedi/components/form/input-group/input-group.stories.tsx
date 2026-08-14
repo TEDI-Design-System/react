@@ -389,7 +389,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
     <VerticalSpacing>
       {array.map((state, index) => (
         <Row key={index} gutterY={2}>
-          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} xs={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col xs={12} lg={5}>
@@ -411,7 +411,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
         </Row>
       ))}
       <Row gutterY={2}>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col xs={12} lg={5}>

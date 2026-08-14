@@ -979,6 +979,17 @@ Key props:
 **Row:** `cols`, `gutter` (0-5), `gutterX`, `gutterY`, `gap`, `justifyContent`, `alignItems`, `direction`, `wrap` + breakpoints
 **Col:** `width` (1-12 or 'auto'), `offset`, `order`, `grow`, `shrink` + breakpoints
 
+Breakpoint props (`xs`, `sm`, `md`, `lg`, `xl`, `xxl`) accept **either a bare width number/`'auto'` (shorthand) or a full `ColSpec` object** to override several Col props at that breakpoint:
+
+```tsx
+<Row>
+  {/* full width on mobile, one-third from md up (shorthand number) */}
+  <Col width={12} md={4}>Sidebar</Col>
+  {/* object form to change width + order together at lg */}
+  <Col width={12} lg={{ width: 8, order: 'first' }}>Main</Col>
+</Row>
+```
+
 ### VerticalSpacing
 
 **Props:** `VerticalSpacingProps` | bp

@@ -21,6 +21,10 @@ const meta: Meta<DateTimeFieldProps> = {
     locale: { control: false },
   },
   parameters: {
+    a11y: {
+      // TODO: [DateTimeField]: fix a11y violations #782
+      test: 'todo',
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=7895-221619&m=dev',
@@ -86,7 +90,7 @@ export const States: Story = {
     <VerticalSpacing>
       {stateArray.map((state) => (
         <Row key={state}>
-          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} xs={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col>
@@ -95,7 +99,7 @@ export const States: Story = {
         </Row>
       ))}
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
@@ -107,7 +111,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>

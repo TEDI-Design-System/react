@@ -97,10 +97,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list w-50">
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col className="w-50 display-flex">
+          <Col className="w-50 flex">
             {value?.toString()}&nbsp;{value === 24 && <small className="example-text--secondary">default</small>}
           </Col>
-          <Col className="display-flex">
+          <Col className="flex">
             <Icon {...iconProps} {...{ [property]: value }} />
             &nbsp;
             <Icon {...iconProps} {...{ [property]: value }} filled={true} />
@@ -122,11 +122,11 @@ const TemplateColumnWithMultipleVariants: StoryFn<TemplateMultipleProps> = (args
           className={`${key === items.length - 1 ? '' : 'border-bottom'} padding-14-16`}
           key={key}
         >
-          <Col className="w-50 display-flex">
+          <Col className="w-50 flex">
             {item.size?.toString()}&nbsp;
             {item.size === 24 && <small className="example-text--secondary">default</small>}
           </Col>
-          <Col className="display-flex">
+          <Col className="flex">
             <Icon {...{ size: item.size, background: item.background, name: item.name, color: item.color }} />
             &nbsp;
             <Icon

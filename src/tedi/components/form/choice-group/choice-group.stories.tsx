@@ -544,7 +544,7 @@ export const CustomItemHTMLLabels: Story = {
       {
         id: 'checkbox-custom-item-labels-2',
         label: (
-          <div className="display-flex">
+          <div className="flex">
             <Icon name="check" color="success" aria-hidden="true" />
             <Text>Lorem ipsum 2</Text>
           </div>
