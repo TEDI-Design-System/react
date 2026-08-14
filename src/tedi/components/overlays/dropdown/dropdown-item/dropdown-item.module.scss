@@ -123,6 +123,10 @@
     }
   }
 
+  &--active:focus-visible:not(.tedi-dropdown__item--disabled) {
+    outline-color: var(--dropdown-item-active-text);
+  }
+
   &--indent {
     padding-left: calc(var(--dropdown-indent) + var(--dropdown-item-padding-x));
 
