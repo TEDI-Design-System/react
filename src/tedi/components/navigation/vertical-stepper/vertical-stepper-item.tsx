@@ -4,7 +4,7 @@ import React, { forwardRef, useId, useState } from 'react';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
-import { Collapse } from '../../content/collapse/collapse';
+import { CollapseButton } from '../../buttons/collapse-button/collapse-button';
 import styles from './vertical-stepper.module.scss';
 import { useVerticalStepperContext } from './vertical-stepper-context';
 
@@ -128,9 +128,9 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
     <span className={styles['tedi-vertical-stepper__indicator']}>
       {compact ? (
         state === 'completed' ? (
-          <Icon name="check" size={12} color="white" label={getLabel('stepper.completed')} />
+          <Icon name="check" size={16} color="white" label={getLabel('stepper.completed')} />
         ) : state === 'error' ? (
-          <Icon name="priority_high" size={12} color="white" label={getLabel('stepper.error')} />
+          <Icon name="priority_high" size={16} color="white" label={getLabel('stepper.error')} />
         ) : null
       ) : (
         <span className={styles['tedi-vertical-stepper__number']}>{index}</span>
@@ -197,17 +197,16 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
           <>
             <div className={styles['tedi-vertical-stepper__toggle']}>
               {interactiveTitle}
-              <Collapse
+              <CollapseButton
                 id={`${subListId}-toggle`}
-                iconOnly
+                hideText
                 size="small"
-                controlsId={subListId}
                 open={isOpen}
-                onToggle={handleToggle}
-                toggleLabel={typeof title === 'string' ? title : undefined}
-              >
-                {null}
-              </Collapse>
+                onOpenChange={handleToggle}
+                aria-controls={subListId}
+                aria-label={typeof title === 'string' ? title : undefined}
+                className={styles['tedi-vertical-stepper__toggle-button']}
+              />
             </div>
             {description_}
             {info_}

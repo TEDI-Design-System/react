@@ -17,7 +17,8 @@ import { CardStepperStep, CardStepperStepProps } from './card-stepper-step';
  * `CardStepper` is the mobile / compact form of a stepper: a single card showing
  * the active step, a `N / M` counter, a segmented progress bar and a button that
  * opens the full step list in a modal. Pair it with `VerticalStepper` on wider
- * screens (swap on a breakpoint — see `VerticalStepper` → **Responsive**), or use it on its own.
+ * screens (swap on a breakpoint — see `VerticalStepper` → **Responsive**), or use it on its own. <br/>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.75?node-id=4375-57530&m=dev" target="_blank">Figma ↗</a><br/>
  */
 const meta: Meta<typeof CardStepper> = {
   component: CardStepper,
@@ -415,9 +416,7 @@ const StepCard = ({ index, state, title, description, trailing, onClick }: StepC
           </span>
           <div style={{ display: 'flex', flex: 1, flexDirection: 'column', minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--layout-grid-gutters-04)' }}>
-              <Text element="span" modifiers="bold">
-                {title}
-              </Text>
+              <Text element="span">{title}</Text>
               {state === 'completed' && <Icon name="check" color="success" size={18} display="inline" />}
             </div>
             {description && (
@@ -544,9 +543,7 @@ const stateStepCard = (semantic: ButtonStepSemantic, row: (typeof BUTTON_STATE_R
               minWidth: 0,
             }}
           >
-            <Text element="span" modifiers="bold">
-              Minu andmed
-            </Text>
+            <Text element="span">Minu andmed</Text>
             {row !== 'Disabled' && semantic === 'error' && (
               <Icon name="error" color="danger" size={18} display="inline" />
             )}

@@ -6,41 +6,61 @@ import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import { Modal } from '../modal/modal';
 import styles from './sheet.module.scss';
 
-export interface SheetProps {
-  /** Controlled open state. */
-  open: boolean;
+interface SheetBaseProps {
+  /** Controlled open state. Pair with `onToggle`; omit for uncontrolled use with `defaultOpen`. */
+  open?: boolean;
   /** Called when the sheet opens or closes. */
-  onToggle: (open: boolean) => void;
+  onToggle?: (open: boolean) => void;
   /**
-   * Plain header title, rendered as the sheet's bold heading label with a close
-   * button (per `closeButton`) and wired to the dialog's `aria-labelledby`. Use
-   * `header` instead when you need full control of the header markup. Ignored
-   * when `header` is set.
+   * Initial open state in uncontrolled mode. Ignored when `open` is provided.
+   * @default false
    */
-  title?: ReactNode;
-  /**
-   * Full header override (custom controls, layout, …). Rendered as
-   * `Modal.Header` children, which replaces the default title/close-button
-   * layout — so the consumer owns any close control. Takes precedence over
-   * `title`.
-   */
-  header?: ReactNode;
+  defaultOpen?: boolean;
   /**
    * Whether the close button is shown next to the `title`. Only applies to the
    * `title` layout — a custom `header` owns its own controls.
    * @default true
    */
   closeButton?: boolean;
-  /**
-   * Accessible name for the dialog. Needed when `header` has no plain-text
-   * title element for the modal to label itself with.
-   */
-  ariaLabel?: string;
   /** Extra class name applied to the sheet container. */
   className?: string;
   /** Sheet body content. */
   children: ReactNode;
 }
+
+/**
+ * The dialog must always have an accessible name (WCAG 4.1.2). A plain `title` names it via
+ * `aria-labelledby`; when no title is rendered (a custom `header`, or no title at all) an explicit
+ * `ariaLabel` is required — the type enforces one of these.
+ */
+export type SheetProps = SheetBaseProps &
+  (
+    | {
+        /**
+         * Plain header title, rendered as the sheet's bold heading (with a close button per
+         * `closeButton`) and wired to the dialog's `aria-labelledby`.
+         */
+        title: ReactNode;
+        header?: never;
+        /** Optional — the rendered `title` already names the dialog. */
+        ariaLabel?: string;
+      }
+    | {
+        /**
+         * Accessible name for the dialog. Required here because no plain `title` is rendered
+         * (a custom `header`, or no title).
+         */
+        ariaLabel: string;
+        /** Plain header title. Ignored when `header` is set. */
+        title?: ReactNode;
+        /**
+         * Full header override (custom controls, layout, …), rendered as `Modal.Header` children —
+         * replaces the default title/close-button layout, so the consumer owns any close control.
+         * Takes precedence over `title`.
+         */
+        header?: ReactNode;
+      }
+  );
 
 /**
  * ⚠️ Internal, temporary component — **not exported publicly**.
@@ -54,6 +74,7 @@ export interface SheetProps {
 export const Sheet = ({
   open,
   onToggle,
+  defaultOpen,
   title,
   header,
   closeButton = true,
@@ -64,7 +85,7 @@ export const Sheet = ({
   const titleId = useId();
 
   return (
-    <Modal open={open} onToggle={onToggle}>
+    <Modal open={open} onToggle={onToggle} defaultOpen={defaultOpen}>
       <Modal.Content
         position="bottom"
         fullscreen="edge"

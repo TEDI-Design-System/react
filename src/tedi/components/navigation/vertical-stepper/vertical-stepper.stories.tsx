@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
@@ -17,6 +18,7 @@ import { VerticalStepperSubItem, VerticalStepperSubItemProps } from './vertical-
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.75?node-id=4375-57530&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/25a440-stepper-vertical" target="_blank">Zeroheight ↗</a>
  */
 const meta: Meta<typeof VerticalStepper> = {
   component: VerticalStepper,
@@ -99,7 +101,16 @@ export const WithStatusBadges: Story = {
         />
         <VerticalStepper.Item title="Üldandmed" state="completed" href="#i2" />
         <VerticalStepper.Item title="Terviseandmed" state="completed" href="#i3" />
-        <VerticalStepper.Item title="Vastus" current href="#i4" info={<Text color="tertiary">Täidab ametnik</Text>} />
+        <VerticalStepper.Item
+          title="Vastus"
+          current
+          href="#i4"
+          info={
+            <Text color="tertiary" modifiers="small">
+              Täidab ametnik
+            </Text>
+          }
+        />
       </VerticalStepper>
     </Frame>
   ),
@@ -251,14 +262,42 @@ const StateMatrix = <T,>({
 );
 
 export const States: Story = {
-  parameters: { pseudo: { hover: ['.vs-hover a', '.vs-hover button'] } },
+  parameters: {
+    pseudo: { hover: ['.vs-hover a', '.vs-hover button'] },
+    a11y: {
+      config: {
+        // This is a visual state matrix, not a real page: it renders the disabled/informative states
+        // (intentionally low-contrast) and repeats the same-labelled `<nav>` many times. Those two
+        // rules don't apply to this showcase — every real usage is covered by the other stories.
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'landmark-unique', enabled: false },
+        ],
+      },
+    },
+  },
   render: () => (
     <VerticalSpacing size={2}>
-      <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(false, props)} />
+      <VerticalSpacing size={1}>
+        <Heading element="h3" modifiers="h5">
+          Default
+        </Heading>
+        <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(false, props)} />
+      </VerticalSpacing>
       <Separator />
-      <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(true, props)} />
+      <VerticalSpacing size={1}>
+        <Heading element="h3" modifiers="h5">
+          Compact
+        </Heading>
+        <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(true, props)} />
+      </VerticalSpacing>
       <Separator />
-      <StateMatrix states={SUB_STATES} renderCell={subCell} />
+      <VerticalSpacing size={1}>
+        <Heading element="h3" modifiers="h5">
+          Has subitems
+        </Heading>
+        <StateMatrix states={SUB_STATES} renderCell={subCell} />
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };
