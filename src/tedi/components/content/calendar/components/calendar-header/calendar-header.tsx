@@ -14,9 +14,11 @@ export interface CalendarHeaderProps extends Pick<MonthCaptionProps, 'calendarMo
    * How the month/year selector in the calendar header is rendered.
    * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
    * - `'grid'` — each picker opens a full grid of options.
-   * @default 'dropdown'
+   * - `'static'` — the month/year is a plain, non-clickable label; the user can
+   *   only change the month via the prev/next navigation buttons.
+   * @default dropdown
    */
-  monthYearSelectType?: 'dropdown' | 'grid';
+  monthYearSelectType?: 'dropdown' | 'grid' | 'static';
   /*
    * Callback for opening month selection grid. Only used if `monthYearSelectType` is `'grid'`.
    */
@@ -67,6 +69,7 @@ export function CalendarHeader({
   maxYear,
 }: CalendarHeaderProps) {
   const isGridSelect = monthYearSelectType === 'grid';
+  const isStaticLabel = monthYearSelectType === 'static' || !showNavigation;
   const { getLabel } = useLabels();
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
 
@@ -137,13 +140,13 @@ export function CalendarHeader({
         </Button>
       )}
 
-      {!showNavigation ? (
+      {isStaticLabel ? (
         <div className={styles['tedi-calendar__month-year-label']}>
           <Text>{displayMonth.toLocaleString(localeCode, { month: 'long' })}</Text>
           <Text>{displayYear}</Text>
         </div>
       ) : isGridSelect ? (
-        <>
+        <div className={styles['tedi-calendar__title']}>
           <Button
             noStyle
             className={styles['tedi-calendar__month-year-selector']}
@@ -162,9 +165,9 @@ export function CalendarHeader({
             {displayMonth.getFullYear()}
             <Icon name="arrow_drop_down" color="tertiary" className={styles['tedi-calendar__month-year-caret']} />
           </Button>
-        </>
+        </div>
       ) : (
-        <>
+        <div className={styles['tedi-calendar__title']}>
           <Dropdown
             className={classNames(styles['tedi-calendar__month-year-dropdown'], {
               [styles['tedi-calendar__picker-grid-dropdown']]: isGridSelect,
@@ -234,7 +237,7 @@ export function CalendarHeader({
               ))}
             </Dropdown.Content>
           </Dropdown>
-        </>
+        </div>
       )}
 
       {showNavigation && (

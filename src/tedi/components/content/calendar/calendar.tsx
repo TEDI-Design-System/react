@@ -1,15 +1,35 @@
 import classNames from 'classnames';
 import React from 'react';
-import { DateRange, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import { DateRange, DayButton, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { CalendarView, DateFieldMode } from '../../form/date-field/date-field';
+import { StatusIndicator, StatusIndicatorType } from '../../tags/status-indicator';
 import styles from './calendar.module.scss';
 import { CalendarHeader } from './components/calendar-header/calendar-header';
 import { MonthGrid } from './components/calendar-month-grid/calendar-month-grid';
 import { YearGrid } from './components/calendar-year-grid/calendar-year-grid';
 
-export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
+export interface DayStatus {
+  /**
+   * Status type driving the indicator colour. Maps to `StatusIndicator`'s `type`.
+   */
+  type: StatusIndicatorType;
+  /**
+   * Accessible label for the status. Appended to the day button's `aria-label`
+   * so screen readers announce the date together with its status — required
+   * because the indicator dot itself is decorative (`aria-hidden`).
+   */
+  label: string;
+}
+
+/**
+ * Resolves a `DayStatus` for a given day, or `null`/`undefined` for no status.
+ */
+export type DayStatusFn = (date: Date) => DayStatus | null | undefined;
+
+interface CalendarBreakpointProps extends Omit<DayPickerProps, 'mode' | 'selected' | 'onSelect'> {
   /**
    * Current view of the calendar. Can be `'days'`, `'months'`, or `'years'`.
    * Controls which calendar grid is displayed.
@@ -95,9 +115,19 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * Forwarded to the internal `CalendarHeader`.
    * - `'dropdown'` (default) — each picker is a `<Select>` dropdown.
    * - `'grid'` — each picker opens a full grid of options.
+   * - `'static'` — the month/year is a plain, non-clickable label; only the
+   *   prev/next navigation buttons can change the month. Use to disable
+   *   month/year selection.
    * @default dropdown
    */
-  monthYearSelectType?: 'dropdown' | 'grid';
+  monthYearSelectType?: 'dropdown' | 'grid' | 'static';
+  /**
+   * Optional per-day status. Called for each rendered day; return a
+   * `{ type, label }` to overlay a `StatusIndicator` dot on that day (the
+   * `label` is folded into the day's `aria-label`), or `null` / `undefined` for
+   * no status.
+   */
+  dayStatus?: DayStatusFn;
   /**
    * Earliest year offered in the calendar header's year dropdown.
    * Forwarded to the internal `CalendarHeader`.
@@ -136,36 +166,49 @@ export interface CalendarProps extends Omit<DayPickerProps, 'mode' | 'selected' 
    * @default true
    */
   bordered?: boolean;
+  /**
+   * Grow to fill the container's width instead of a fixed width; cells keep a
+   * square aspect ratio. Wrap in a sized container to control the scale.
+   * @default false
+   */
+  fullWidth?: boolean;
 }
 
-export const Calendar = ({
-  view = 'days',
-  selectionLevel = 'days',
-  currentMonth,
-  setCurrentMonth,
-  setView = () => 'days',
-  mode = 'single',
-  value,
-  locale = et,
-  localeCode = 'et-EE',
-  showOutsideDays = true,
-  disabledMatchers,
-  required,
-  availableDays,
-  unavailableDays,
-  footer,
-  monthYearSelectType,
-  minYear,
-  maxYear,
-  handleSelect,
-  applyValue,
-  showNavigation = true,
-  className,
-  bordered = true,
-  ...dayPickerProps
-}: CalendarProps) => {
+export type CalendarProps = BreakpointSupport<CalendarBreakpointProps>;
+
+export const Calendar = (props: CalendarProps) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const {
+    view = 'days',
+    selectionLevel = 'days',
+    currentMonth,
+    setCurrentMonth,
+    setView = () => 'days',
+    mode = 'single',
+    value,
+    locale = et,
+    localeCode = 'et-EE',
+    showOutsideDays = true,
+    disabledMatchers,
+    required,
+    availableDays,
+    unavailableDays,
+    footer,
+    monthYearSelectType,
+    minYear,
+    maxYear,
+    dayStatus,
+    handleSelect,
+    applyValue,
+    showNavigation = true,
+    className,
+    bordered = true,
+    fullWidth = false,
+    ...dayPickerProps
+  } = getCurrentBreakpointProps<CalendarBreakpointProps>(props);
   const borderlessClass = !bordered ? styles['tedi-calendar--borderless'] : undefined;
-  const containerClassName = classNames(borderlessClass, className);
+  const fullWidthClass = fullWidth ? styles['tedi-calendar--full-width'] : undefined;
+  const containerClassName = classNames(borderlessClass, fullWidthClass, className);
   const isAvailable = (date: Date) => {
     if (!availableDays) return true;
 
@@ -276,10 +319,39 @@ export const Calendar = ({
               />
             ),
             Nav: () => <></>,
+            ...(dayStatus
+              ? {
+                  DayButton: (dayButtonProps) => {
+                    const status = dayStatus(dayButtonProps.day.date);
+
+                    if (!status) {
+                      return <DayButton {...dayButtonProps} />;
+                    }
+
+                    const ariaLabel = [dayButtonProps['aria-label'], status.label].filter(Boolean).join(', ');
+
+                    return (
+                      <DayButton {...dayButtonProps} aria-label={ariaLabel}>
+                        {dayButtonProps.children}
+                        <StatusIndicator type={status.type} size="sm" className={styles['tedi-calendar__day-status']} />
+                      </DayButton>
+                    );
+                  },
+                }
+              : {}),
+            ...(fullWidth
+              ? {
+                  Weekday: ({ children, ...weekdayProps }) => (
+                    <th {...weekdayProps}>
+                      <span className={styles['tedi-calendar__weekday-inner']}>{children}</span>
+                    </th>
+                  ),
+                }
+              : {}),
           }}
           footer={footer}
           classNames={{
-            root: classNames(styles['tedi-calendar'], borderlessClass, className),
+            root: classNames(styles['tedi-calendar'], borderlessClass, fullWidthClass, className),
             month_caption: styles['tedi-calendar__caption'],
             head: styles['tedi-calendar__head'],
             row: styles['tedi-calendar__row'],

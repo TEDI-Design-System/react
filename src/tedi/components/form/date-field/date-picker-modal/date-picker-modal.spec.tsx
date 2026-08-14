@@ -91,4 +91,20 @@ describe('DatePickerModal', () => {
     expect(screen.getByText(monthLabel(new Date(2025, 0, 1)))).toBeInTheDocument();
     expect(screen.getByText('2025')).toBeInTheDocument();
   });
+
+  describe('dayStatus', () => {
+    it('renders no day-status indicator by default', () => {
+      setup();
+      expect(document.querySelector('.tedi-calendar__day-status')).not.toBeInTheDocument();
+    });
+
+    it('forwards dayStatus to the calendar (dot + folded aria-label)', () => {
+      const dayStatus = (date: Date) =>
+        date.getDate() === 20 ? { type: 'success' as const, label: 'Kinnitatud vastuvõtt' } : null;
+      setup({ dayStatus });
+
+      expect(document.querySelector('.tedi-calendar__day-status')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
+    });
+  });
 });

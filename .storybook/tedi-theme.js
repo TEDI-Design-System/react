@@ -2,9 +2,9 @@ import { create } from 'storybook/theming';
 
 export default create({
   base: 'dark',
-  brandTitle: 'Tehik react components',
+  brandTitle: 'TEDI React components',
   brandUrl: 'https://storybook.tedi.ee/react',
-  brandImage: 'TEHIK_logo2.svg',
+  brandImage: 'TEDI-logo-valge.svg',
   brandTarget: '_self',
 
   appBg: '#004882',
