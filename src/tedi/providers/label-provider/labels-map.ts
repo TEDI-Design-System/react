@@ -128,6 +128,14 @@ export const labelsMap = validateDefaultLabels({
     en: 'Remove',
     ru: 'Удалить',
   },
+  'multi-value-field.hidden-count': {
+    description:
+      'Accessible label for the overflow counter shown in single-row (`tagsDirection="row"`) mode, announcing how many selected values are hidden.',
+    components: ['MultiValueField', 'DateField'],
+    et: (count: number) => `Veel ${count}`,
+    en: (count: number) => `${count} more`,
+    ru: (count: number) => `Ещё ${count}`,
+  },
   cancel: {
     description: 'For canceling an action',
     components: ['TableFilter'],
@@ -490,6 +498,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },
+  'file-dropzone.failed': {
+    description: 'Screen-reader status announced next to an invalid file in FileDropzone',
+    components: ['FileDropzone'],
+    et: 'Faili üleslaadimine ebaõnnestus',
+    en: 'File upload failed',
+    ru: 'Загрузка файла не удалась',
+  },
   'file-dropzone.no-file': {
     description: 'No file selected label for FileUpload or FileDropzone',
     components: ['FileDropzone', 'FileUpload'],
@@ -540,6 +555,21 @@ export const labelsMap = validateDefaultLabels({
     et: 'Valitud kuupäev pole saadaval',
     en: 'Selected date is not available',
     ru: 'Выбранная дата недоступна',
+  },
+  'dateField.invalidDateError': {
+    description:
+      'Inline error shown when the user types text that cannot be parsed into a valid date for the current mode.',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Vigane kuupäev',
+    en: 'Invalid date',
+    ru: 'Неверная дата',
+  },
+  'dateField.openCalendar': {
+    description: 'Accessible name for the calendar toggle button in the DateField input.',
+    components: ['DateField', 'DateTimeField'],
+    et: 'Ava kalender',
+    en: 'Open calendar',
+    ru: 'Открыть календарь',
   },
   'dateTimeField.timeHeading': {
     description: 'Heading rendered above the time picker in DateTimeField',
@@ -964,27 +994,6 @@ export const labelsMap = validateDefaultLabels({
     en: (count: string | number) => `${count} invalid`,
     ru: (count: string | number) => `${count} неверный`,
   },
-  'table-of-contents.step-valid': {
-    description: 'Accessible label for the validation icon of a completed (valid) step',
-    components: ['TableOfContents'],
-    et: 'Korrektne',
-    en: 'Valid',
-    ru: 'Действительно',
-  },
-  'table-of-contents.step-invalid': {
-    description: 'Accessible label for the validation icon of an invalid step',
-    components: ['TableOfContents'],
-    et: 'Vajab parandamist',
-    en: 'Invalid',
-    ru: 'Неверный',
-  },
-  'table-of-contents.step-incomplete': {
-    description: 'Accessible label for the validation icon of a step that has not been completed yet',
-    components: ['TableOfContents'],
-    et: 'Täitmata',
-    en: 'Not completed',
-    ru: 'Не заполнено',
-  },
   'truncate.see-more': {
     description: 'See more button label',
     components: ['Truncate'],
@@ -1259,25 +1268,29 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Нижний колонтитул',
   },
   'numberField.decrement': {
-    description: 'Label for screen-reader for number field decrease button',
+    description: 'Label for screen-reader for number field decrease button. Second argument is the field label.',
     components: ['NumberField'],
-    et: (count: string | number) => `Vähenda ${count} võrra`,
-    en: (count: string | number) => `Decrease by ${count}`,
-    ru: (count: string | number) => `Уменьшить на ${count}`,
+    et: (count: string | number, field?: string) =>
+      field ? `Vähenda välja "${field}" ${count} võrra` : `Vähenda ${count} võrra`,
+    en: (count: string | number, field?: string) => (field ? `Decrease ${field} by ${count}` : `Decrease by ${count}`),
+    ru: (count: string | number, field?: string) =>
+      field ? `Уменьшить «${field}» на ${count}` : `Уменьшить на ${count}`,
   },
   'numberField.increment': {
-    description: 'Label for screen-reader for number field increase button',
+    description: 'Label for screen-reader for number field increase button. Second argument is the field label.',
     components: ['NumberField'],
-    et: (count: string | number) => `Suurenda ${count} võrra`,
-    en: (count: string | number) => `Increase by ${count}`,
-    ru: (count: string | number) => `Увеличить на ${count}`,
+    et: (count: string | number, field?: string) =>
+      field ? `Suurenda välja "${field}" ${count} võrra` : `Suurenda ${count} võrra`,
+    en: (count: string | number, field?: string) => (field ? `Increase ${field} by ${count}` : `Increase by ${count}`),
+    ru: (count: string | number, field?: string) =>
+      field ? `Увеличить «${field}» на ${count}` : `Увеличить на ${count}`,
   },
   'numberField.quantityUpdated': {
     description: 'Label for screen-reader when quantity get updated by button click',
     components: ['NumberField'],
     et: (count: string | number) => `Uuendatud. Uus väärtus ${count}`,
     en: (count: string | number) => `Updated. New value ${count}`,
-    ru: (count: string | number) => `Ууэндатуд. Уус вяэртус ${count}`,
+    ru: (count: string | number) => `Обновлено. Новое значение ${count}`,
   },
   'sidenav.backToMainMenu': {
     description: 'Side navigation label',

@@ -86,6 +86,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
       type="radio"
       disabled={disabled}
       checked={getChecked}
+      required={required}
       onChange={onChangeHandler}
       className={styles['tedi-radio__input']}
       aria-describedby={describedBy}

@@ -50,7 +50,13 @@ const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Checkbox {...args} size={size} id={`checkbox-size-${size}`} label={`${size} checkbox`} hideLabel />
+              <Checkbox
+                {...args}
+                size={size}
+                id={`checkbox-size-${size}`}
+                label={`${size.charAt(0).toUpperCase() + size.slice(1)} size`}
+                hideLabel
+              />
             </Col>
           </Row>
         ))}

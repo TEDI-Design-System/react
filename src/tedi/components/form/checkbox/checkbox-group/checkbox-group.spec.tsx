@@ -100,7 +100,7 @@ describe('Checkbox.Group', () => {
     const group = screen.getByRole('group', { name: 'Toppings' });
     expect(group).not.toHaveAttribute('aria-required');
     expect(group).not.toHaveAttribute('aria-invalid');
-    expect(screen.getByRole('checkbox', { name: 'Cheese' })).toHaveAttribute('aria-required', 'true');
+    expect(screen.getByRole('checkbox', { name: 'Cheese' })).toBeRequired();
   });
 
   it('disables every checkbox when the group is disabled', () => {

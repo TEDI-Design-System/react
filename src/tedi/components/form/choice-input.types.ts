@@ -73,9 +73,10 @@ export interface ChoiceInputProps {
    */
   hover?: boolean;
   /**
-   * Provide content for tooltip.
+   * Provide content for tooltip. Accepts rich content (e.g. bold text, links),
+   * not just a plain string.
    */
-  tooltip?: string;
+  tooltip?: React.ReactNode;
   /**
    *  Input size
    */

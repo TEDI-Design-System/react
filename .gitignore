@@ -56,3 +56,6 @@ migrations.json
 
 # Coverage
 /coverage
+
+# Generated a11y report (CI)
+a11y-report/

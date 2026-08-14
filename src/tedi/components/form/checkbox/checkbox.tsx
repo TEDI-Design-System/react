@@ -104,8 +104,8 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
       type="checkbox"
       disabled={disabled}
       checked={getChecked !== 'mixed' ? getChecked : false}
-      aria-required={required}
-      aria-invalid={invalid}
+      required={required}
+      aria-invalid={invalid || undefined}
       onChange={onChangeHandler}
       className={styles['tedi-checkbox__input']}
       aria-describedby={describedBy}

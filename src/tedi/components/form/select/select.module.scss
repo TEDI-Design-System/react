@@ -41,6 +41,10 @@ div.tedi-select__control {
   color: var(--form-input-text-filled);
 }
 
+.tedi-select__control :global(.select__placeholder) {
+  color: var(--form-input-text-placeholder);
+}
+
 .tedi-select--invalid .tedi-select__control {
   border-color: var(--form-general-feedback-error-border);
 
@@ -252,18 +256,6 @@ div.tedi-select__multi-value-item {
 
 .tedi-select__multi-value-clear {
   margin: -0.125rem -0.25rem -0.125rem 0;
-}
-
-:global {
-  .tedi-select__value-container {
-    gap: var(--form-field-inner-spacing);
-    padding: 0 !important;
-
-    .tedi-select__placeholder {
-      color: var(--form-input-text-placeholder);
-      pointer-events: none;
-    }
-  }
 }
 
 .tedi-select--tags-row {

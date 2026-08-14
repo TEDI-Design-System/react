@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import { UnknownType } from '../../../types/commonTypes';
+import InputGroup from '../input-group/input-group';
 import { SelectMultiValueRemove } from './components/select-multi-value-remove';
 import { ISelectOption, Select, SelectProps } from './select';
 
@@ -341,7 +342,7 @@ describe('Select component', () => {
   it('stops event propagation on mouse down when closing a removable tag', () => {
     const stopPropagationSpy = jest.spyOn(Event.prototype, 'stopPropagation');
     render(<Select {...defaultProps} multiple value={[basicOptions[0]]} isTagRemovable />);
-    const closeButton = screen.getByRole('button', { name: /close/i });
+    const closeButton = screen.getByRole('button', { name: /remove/i });
 
     fireEvent.mouseDown(closeButton);
     expect(stopPropagationSpy).toHaveBeenCalled();
@@ -567,7 +568,7 @@ describe('Select component', () => {
       />
     );
 
-    const closeButtons = screen.getAllByRole('button', { name: /close/i });
+    const closeButtons = screen.getAllByRole('button', { name: /remove/i });
     await act(async () => {
       await userEvent.click(closeButtons[0]);
     });
@@ -706,6 +707,130 @@ describe('Select component', () => {
       await waitFor(() => {
         expect(screen.getByText(/^\+\d+$/)).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('accessibility', () => {
+    it('associates the label with the combobox even without an explicit id', () => {
+      // Regression: `inputId`/`instanceId` used the raw `id` prop, so with no id
+      // the input became "undefined-input" and no longer matched the label.
+      render(<Select label="Choose a fruit" options={basicOptions} onChange={jest.fn()} />);
+      expect(screen.getByRole('combobox')).toHaveAccessibleName('Choose a fruit');
+    });
+
+    it('describes the combobox with the helper text, not the placeholder', () => {
+      render(
+        <Select
+          {...defaultProps}
+          placeholder="Pick one"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox).toHaveAccessibleDescription('Only ripe fruit');
+      // react-select's placeholder must not describe the field.
+      expect(combobox.getAttribute('aria-describedby') ?? '').not.toMatch(/-placeholder/);
+    });
+
+    it('gives each tag remove button an accessible name including the option label', () => {
+      render(<Select {...defaultProps} multiple value={[{ value: 'apple', label: 'Apple' }]} isTagRemovable />);
+      expect(screen.getByRole('button', { name: /remove Apple/i })).toBeInTheDocument();
+    });
+
+    it('keeps the combobox named by the label of a surrounding labeled InputGroup', () => {
+      // Regression: the group renders <label htmlFor={inputGroup.inputId}> and Select
+      // hides its own label, so the combobox input (not the container) must own that id.
+      render(
+        <InputGroup id="fruit-group" label="Choose a fruit">
+          <Select options={basicOptions} onChange={jest.fn()} />
+        </InputGroup>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox).toHaveAccessibleName('Choose a fruit');
+      expect(combobox).toHaveAttribute('id', 'fruit-group');
+    });
+  });
+
+  describe('openKeyboardOnTouch (mobile soft keyboard)', () => {
+    const getControl = (combobox: HTMLElement) => combobox.closest('.tedi-select__control') as HTMLElement;
+
+    // jsdom's synthetic PointerEvent doesn't reliably carry `pointerType`, so set
+    // it explicitly on the native event React reads from.
+    const firePointerDown = (el: Element, pointerType: 'touch' | 'pen' | 'mouse') => {
+      const event = new Event('pointerdown', { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'pointerType', { value: pointerType });
+      fireEvent(el, event);
+    };
+
+    it('does not suppress the soft keyboard by default', () => {
+      render(<Select {...defaultProps} />);
+      const combobox = screen.getByRole('combobox');
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('suppresses the soft keyboard when opened by touch and openKeyboardOnTouch is false', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+      firePointerDown(getControl(combobox), 'touch');
+      // inputMode="none" keeps the on-screen keyboard down while browsing.
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+    });
+
+    it('raises the keyboard again once the user taps the search input directly', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+
+      firePointerDown(combobox, 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('never suppresses the keyboard for mouse users, even when openKeyboardOnTouch is false', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+      firePointerDown(getControl(combobox), 'mouse');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('resets the suppression when the field loses focus', () => {
+      render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+
+      fireEvent.blur(combobox);
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('does not suppress the keyboard when the label or helper text is tapped', () => {
+      const { container } = render(
+        <Select {...defaultProps} openKeyboardOnTouch={false} helper={{ text: 'Pick a fruit', type: 'hint' }} />
+      );
+      const combobox = screen.getByRole('combobox');
+
+      const label = container.querySelector('label') as HTMLElement;
+      firePointerDown(label, 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+
+      firePointerDown(screen.getByText('Pick a fruit'), 'touch');
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
+    });
+
+    it('stops forwarding inputMode="none" once the feature is turned off, even if still suppressed', () => {
+      const { rerender } = render(<Select {...defaultProps} openKeyboardOnTouch={false} />);
+      const combobox = screen.getByRole('combobox');
+
+      firePointerDown(getControl(combobox), 'touch');
+      expect(combobox).toHaveAttribute('inputmode', 'none');
+
+      rerender(<Select {...defaultProps} openKeyboardOnTouch={true} />);
+      expect(combobox).not.toHaveAttribute('inputmode', 'none');
     });
   });
 });

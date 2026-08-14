@@ -49,7 +49,13 @@ const TemplateSizes: StoryFn<RadioProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Radio {...args} size={size} id={`radio-size-${size}`} label={`${size} radio`} hideLabel />
+              <Radio
+                {...args}
+                size={size}
+                id={`radio-size-${size}`}
+                label={`${size.charAt(0).toUpperCase() + size.slice(1)} size`}
+                hideLabel
+              />
             </Col>
           </Row>
         ))}
