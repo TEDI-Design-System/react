@@ -41,7 +41,7 @@ import { TextField } from '@tedi-design-system/react/tedi';
 <TextField
   id="email"
   label="Email"
-  type="email"
+  input={{ type: 'email' }}
   icon="mail"
   isClearable
   value={email}
@@ -52,6 +52,8 @@ import { TextField } from '@tedi-design-system/react/tedi';
 ```
 
 Key props: `icon`, `isClearable`, `onClear`, `size` ('default' | 'small' | 'large'), `helper` (FeedbackTextProps), `hideLabel`, `readOnly`.
+
+Native input attributes (`type`, `autoComplete`, `min`, `maxLength`, …) are **not** top-level props — pass them through the `input` prop: `input={{ type: 'password', autoComplete: 'current-password' }}`. There is no separate `PasswordField`; a password input is a `TextField` with `input={{ type: 'password' }}`.
 
 ## Select
 

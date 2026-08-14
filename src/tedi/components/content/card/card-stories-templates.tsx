@@ -209,7 +209,7 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
     <Card>
       <Card.Content>
         <Row>
-          <Col className="display-flex align-items-center gap-3">
+          <Col className="flex align-items-center gap-3">
             <Icon name="monitor_heart" />
             <Text color="secondary">Kirjeldus</Text>
           </Col>
@@ -219,7 +219,7 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
     <Card>
       <Card.Content>
         <Row>
-          <Col className="display-flex align-items-center gap-3">
+          <Col className="flex align-items-center gap-3">
             <Icon name="monitor_heart" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
@@ -232,14 +232,14 @@ export const DefaultCardTemplates: StoryFn<CardStory> = (_args) => (
     <Card>
       <Card.Content>
         <Row>
-          <Col className="display-flex align-items-center gap-3">
+          <Col className="flex align-items-center gap-3">
             <Icon name="monitor_heart" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
               <Text color="secondary">Kirjeldus</Text>
             </VerticalSpacing>
           </Col>
-          <Col width="auto" className="display-flex align-items-center">
+          <Col width="auto" className="flex align-items-center">
             <Button>Loo</Button>
           </Col>
         </Row>
@@ -273,7 +273,7 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
     <Card>
       <Card.Content background="brand-tertiary">
         <Row>
-          <Col width="auto" className="display-flex align-items-center gap-3">
+          <Col width="auto" className="flex align-items-center gap-3">
             <Icon background="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
@@ -292,7 +292,7 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
         backgroundRepeat="no-repeat"
       >
         <Row>
-          <Col width="auto" className="display-flex align-items-center gap-3">
+          <Col width="auto" className="flex align-items-center gap-3">
             <Icon background="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
@@ -305,7 +305,7 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
     <Card border="accent">
       <Card.Content background="accent">
         <Row>
-          <Col width="auto" className="display-flex align-items-center gap-3">
+          <Col width="auto" className="flex align-items-center gap-3">
             <Icon background="primary" name="assignment_late" />
             <VerticalSpacing size={0}>
               <Text modifiers="bold">Pealkiri</Text>
@@ -318,7 +318,7 @@ export const CardInfoTemplate: StoryFn<CardStory> = (_args) => (
     <Card border="neutral-primary">
       <Card.Content background="neutral-primary">
         <Row>
-          <Col width="auto" className="display-flex align-items-center gap-3">
+          <Col width="auto" className="flex align-items-center gap-3">
             <Icon background="primary" name="calendar_today" filled />
             <Text color="secondary">
               Haigusleht: <strong>118.</strong> päev

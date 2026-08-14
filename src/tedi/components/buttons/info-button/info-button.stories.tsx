@@ -50,7 +50,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <VerticalSpacing>
       {array.map((state, index) => (
         <Row key={index}>
-          <Col xs={4} md={1} className="display-flex align-items-center">
+          <Col xs={4} md={1} className="flex align-items-center">
             <Text modifiers="bold" color={color === 'inverted' ? 'white' : 'primary'}>
               {state}
             </Text>

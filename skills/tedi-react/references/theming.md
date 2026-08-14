@@ -16,15 +16,21 @@ Or in SCSS:
 @use '@tedi-design-system/core/scss' as tedi;
 ```
 
-Wrap your app with `ThemeProvider`:
+Wrap your app with the three TEDI providers, in this order — `ThemeProvider` (theme tokens), `LabelProvider` (translatable component labels), `StyleProvider` (runtime style injection):
 
 ```tsx
-import { ThemeProvider } from '@tedi-design-system/react/tedi';
+import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system/react/tedi';
 
 <ThemeProvider defaultTheme="default">
-  <App />
+  <LabelProvider>
+    <StyleProvider>
+      <App />
+    </StyleProvider>
+  </LabelProvider>
 </ThemeProvider>
 ```
+
+`StyleProvider` is documented on its own below; it must sit inside the other two. Do not skip `LabelProvider` — components with built-in labels (close buttons, pagination, etc.) rely on it.
 
 ## Theme Switching
 
