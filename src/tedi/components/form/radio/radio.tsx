@@ -76,8 +76,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
   };
 
   const helperId = helper ? helper.id ?? `${resolvedId}-helper` : undefined;
-  const tooltipId = tooltip ? `${resolvedId}-tooltip` : undefined;
-  const describedBy = [helperId, tooltipId].filter(Boolean).join(' ') || undefined;
+  const describedBy = helperId;
 
   const input = (
     <input

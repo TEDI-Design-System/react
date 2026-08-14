@@ -161,8 +161,9 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(input).not.toHaveAttribute('aria-checked');
+    expect(input?.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
 
     const indeterminateIcon = container.querySelector('.tedi-checkbox__indicator--indeterminate');
@@ -174,8 +175,9 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" checked indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(input).not.toHaveAttribute('aria-checked');
+    expect(input?.indeterminate).toBe(true);
     expect(input).not.toBeChecked();
   });
 
@@ -184,8 +186,8 @@ describe('Checkbox component', () => {
       <Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" indeterminate />
     );
 
-    const input = container.querySelector('input[type="checkbox"]');
-    expect(input).toHaveAttribute('aria-checked', 'mixed');
+    const input = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(input?.indeterminate).toBe(true);
 
     if (input) {
       fireEvent.click(input);
@@ -193,7 +195,7 @@ describe('Checkbox component', () => {
 
     rerender(<Checkbox id="check-id" label="Check Label" value="check-value" name="check-group" />);
 
-    expect(input).not.toHaveAttribute('aria-checked', 'mixed');
+    expect(input?.indeterminate).toBe(false);
   });
 
   it('calls labelRef.current.click() when clicked', () => {

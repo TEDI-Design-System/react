@@ -59,14 +59,15 @@ describe('Checkbox.Group', () => {
 
     it('is unchecked and labelled "select all" when nothing is selected', () => {
       renderWith([]);
-      const selectAll = screen.getByRole('checkbox', { name: /select-all/i });
+      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: /select-all/i });
       expect(selectAll).not.toBeChecked();
-      expect(selectAll).toHaveAttribute('aria-checked', 'false');
+      expect(selectAll.indeterminate).toBe(false);
     });
 
     it('is indeterminate when only some are selected', () => {
       renderWith(['a']);
-      expect(screen.getByRole('checkbox', { name: /select-all/i })).toHaveAttribute('aria-checked', 'mixed');
+      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: /select-all/i });
+      expect(selectAll.indeterminate).toBe(true);
     });
 
     it('is checked and labelled "remove all" when all are selected', () => {
@@ -97,10 +98,8 @@ describe('Checkbox.Group', () => {
     );
 
     const group = screen.getByRole('group', { name: 'Toppings' });
-    // aria-required / aria-invalid are not valid on a `group` role.
     expect(group).not.toHaveAttribute('aria-required');
     expect(group).not.toHaveAttribute('aria-invalid');
-    // they belong on the individual checkboxes instead.
     expect(screen.getByRole('checkbox', { name: 'Cheese' })).toHaveAttribute('aria-required', 'true');
   });
 

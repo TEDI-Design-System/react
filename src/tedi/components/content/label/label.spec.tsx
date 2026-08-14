@@ -84,7 +84,7 @@ describe('Label component', () => {
   it('renders an InfoButton when tooltip is provided', () => {
     render(<Label tooltip="This is a tooltip">Label</Label>);
 
-    const infoButton = screen.getByRole('button', { hidden: true });
+    const infoButton = screen.getByRole('button');
     expect(infoButton).toBeInTheDocument();
 
     fireEvent.mouseEnter(infoButton);

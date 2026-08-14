@@ -29,7 +29,7 @@ const meta: Meta<typeof Checkbox> = {
 export default meta;
 type Story = StoryObj<typeof Checkbox>;
 
-const Template: StoryFn<CheckboxProps> = (args) => <Checkbox {...args} label="Text" value="default" />;
+const Template: StoryFn<CheckboxProps> = (args) => <Checkbox {...args} label="Tekst" value="default" />;
 const sizesArray: Array<'default' | 'large'> = ['default', 'large'];
 
 const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
@@ -50,7 +50,7 @@ const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Checkbox {...args} size={size} id={`checkbox-size-${size}`} />
+              <Checkbox {...args} size={size} id={`checkbox-size-${size}`} label={`${size} checkbox`} hideLabel />
             </Col>
           </Row>
         ))}
@@ -86,7 +86,7 @@ export const States = () => {
               <Text modifiers="bold">Default</Text>
             </Col>
             <Col>
-              <Checkbox id="check-default" label="Text" name="check-default" value="check" />
+              <Checkbox id="check-default" label="Tekst" name="check-default" value="check" />
             </Col>
           </Row>
           <Row>
@@ -94,7 +94,7 @@ export const States = () => {
               <Text modifiers="bold">Hover</Text>
             </Col>
             <Col>
-              <Checkbox id="check-hover" label="Text" name="check-hover" value="check" hover />
+              <Checkbox id="check-hover" label="Tekst" name="check-hover" value="check" hover />
             </Col>
           </Row>
           <Row>
@@ -104,7 +104,7 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-checked"
-                label="Text"
+                label="Tekst"
                 name="check-checked"
                 value="check"
                 checked={checked}
@@ -117,7 +117,7 @@ export const States = () => {
               <Text modifiers="bold">Disabled</Text>
             </Col>
             <Col>
-              <Checkbox id="check-disabled" label="Text" name="check-disabled" value="check" disabled />
+              <Checkbox id="check-disabled" label="Tekst" name="check-disabled" value="check" disabled />
             </Col>
           </Row>
           <Row>
@@ -127,7 +127,7 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-disabled-checked"
-                label="Text"
+                label="Tekst"
                 name="check-disabled-checked"
                 value="check"
                 disabled
@@ -143,7 +143,7 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-indeterminate"
-                label="Text"
+                label="Tekst"
                 name="check-indeterminate"
                 value="check"
                 indeterminate={indeterminate}
@@ -161,11 +161,11 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-invalid"
-                label="Text"
+                label="Tekst"
                 name="check-invalid"
                 value="check"
                 invalid
-                helper={{ text: 'Feedback text', type: 'error' }}
+                helper={{ text: 'Tagasiside tekst', type: 'error' }}
               />
             </Col>
           </Row>
@@ -174,7 +174,7 @@ export const States = () => {
               <Text modifiers="bold">Required</Text>
             </Col>
             <Col>
-              <Checkbox id="check-required" label="Text" name="check-required" value="check" required />
+              <Checkbox id="check-required" label="Tekst" name="check-required" value="check" required />
             </Col>
           </Row>
         </VerticalSpacing>
@@ -213,14 +213,14 @@ export const WithTooltip: Story = {
           <Checkbox
             {...args}
             id="check-short-title-tooltip"
-            label="Text"
+            label="Tekst"
             name="check-short-title-tooltip"
             value="check"
           />
           <Checkbox
             {...args}
             id="check-short-title-helper-tooltip"
-            label="Text"
+            label="Tekst"
             name="check-short-title-helper-tooltip"
             value="check"
             helper={{
@@ -254,7 +254,7 @@ export const Controlled = () => {
   return (
     <Checkbox
       id="controlled-check"
-      label="Select me"
+      label="Vali mind"
       name="controlled-check"
       value="controlled"
       checked={checked}
@@ -263,7 +263,7 @@ export const Controlled = () => {
   );
 };
 
-export const CheckWithLongTitle = () => {
+export const WithLongTitle = () => {
   return (
     <Row>
       <Col lg={6} md={12}>
@@ -281,12 +281,17 @@ export const CheckWithLongTitle = () => {
 /** Compose checkboxes inside `Checkbox.Group`, which owns the selected values. */
 export const Group: StoryObj = {
   render: () => {
-    const [values, setValues] = useState<string[]>(['cheese']);
+    const [values, setValues] = useState<string[]>(['kartul']);
     return (
-      <Checkbox.Group label="Toppings" value={values} onChange={setValues} helper={{ text: 'Pick any.' }}>
-        <Checkbox value="cheese" label="Cheese" />
-        <Checkbox value="ham" label="Ham" />
-        <Checkbox value="mushroom" label="Mushroom" />
+      <Checkbox.Group
+        label="Tooraine"
+        value={values}
+        onChange={setValues}
+        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
+      >
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
       </Checkbox.Group>
     );
   },
@@ -301,10 +306,10 @@ export const WithSelectAll: StoryObj = {
   render: () => {
     const [values, setValues] = useState<string[]>(['sms']);
     return (
-      <Checkbox.Group label="Notifications" indeterminateCheck value={values} onChange={setValues}>
-        <Checkbox value="email" label="Email" />
+      <Checkbox.Group label="Teavitused" indeterminateCheck value={values} onChange={setValues}>
+        <Checkbox value="email" label="E-post" />
         <Checkbox value="sms" label="SMS" />
-        <Checkbox value="push" label="Push" />
+        <Checkbox value="push" label="Tõuketeated" />
       </Checkbox.Group>
     );
   },
@@ -315,32 +320,78 @@ export const Cards: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
-        <Checkbox value="a" label="Text" />
-        <Checkbox value="b" label="Text" />
-        <Checkbox value="c" label="Text" />
+        <Checkbox value="a" label="Kartul" />
+        <Checkbox value="b" label="Peet" />
+        <Checkbox value="c" label="Kapsas" />
       </Checkbox.Group>
       <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
-        <Checkbox value="a" label="Text" />
-        <Checkbox value="b" label="Text" />
-        <Checkbox value="c" label="Text" />
+        <Checkbox value="a" label="Kartul" />
+        <Checkbox value="b" label="Peet" />
+        <Checkbox value="c" label="Kapsas" />
       </Checkbox.Group>
     </VerticalSpacing>
   ),
 };
 
-/** Add a `description` for a two-line card. */
+/** Add a `description` for a two-line card. Laid out as three columns with the grid. */
 export const CardsWithDescription: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
-        <Checkbox value="a" label="Text" description="Description" />
-        <Checkbox value="b" label="Text" description="Description" />
-        <Checkbox value="c" label="Text" description="Description" />
+        <Row className="w-100">
+          <Col md={4}>
+            <Checkbox
+              value="a"
+              label="Kartul"
+              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Checkbox
+              value="b"
+              label="Peet"
+              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Checkbox
+              value="c"
+              label="Kapsas"
+              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
+              className="w-100"
+            />
+          </Col>
+        </Row>
       </Checkbox.Group>
       <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
-        <Checkbox value="a" label="Text" description="Description" />
-        <Checkbox value="b" label="Text" description="Description" />
-        <Checkbox value="c" label="Text" description="Description" />
+        <Row className="w-100">
+          <Col md={4}>
+            <Checkbox
+              value="a"
+              label="Kartul"
+              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Checkbox
+              value="b"
+              label="Peet"
+              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Checkbox
+              value="c"
+              label="Kapsas"
+              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
+              className="w-100"
+            />
+          </Col>
+        </Row>
       </Checkbox.Group>
     </VerticalSpacing>
   ),
@@ -352,15 +403,49 @@ export const CardsWithDescription: StoryObj = {
 export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['desktop']}>
-        <Checkbox value="desktop" label="Text" icon="computer" />
-        <Checkbox value="phone" label="Text" icon="smartphone" />
-        <Checkbox value="tablet" label="Text" icon="tablet_mac" />
+      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['tram']}>
+        <Row className="w-100">
+          <Col md={4}>
+            <Checkbox value="tram" label="Trammiga" icon="tram" className="w-100" />
+          </Col>
+          <Col md={4}>
+            <Checkbox value="foot" label="Jalgsi" icon="directions_walk" className="w-100" />
+          </Col>
+          <Col md={4}>
+            <Checkbox value="car" label="Autoga" icon="directions_car" className="w-100" />
+          </Col>
+        </Row>
       </Checkbox.Group>
-      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['desktop']}>
-        <Checkbox value="desktop" label="Text" description="Description" icon="computer" />
-        <Checkbox value="phone" label="Text" description="Description" icon="smartphone" />
-        <Checkbox value="tablet" label="Text" description="Description" icon="tablet_mac" />
+      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['tram']}>
+        <Row className="w-100">
+          <Col md={4}>
+            <Checkbox
+              value="tram"
+              label="Trammiga"
+              description="Soovitatud variant, vähendab ummikuid"
+              icon="tram"
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Checkbox
+              value="foot"
+              label="Jalgsi"
+              description="Soovitatud variant, vähendab ummikuid"
+              icon="directions_walk"
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Checkbox
+              value="car"
+              label="Autoga"
+              description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
+              icon="directions_car"
+              className="w-100"
+            />
+          </Col>
+        </Row>
       </Checkbox.Group>
     </VerticalSpacing>
   ),
@@ -373,15 +458,15 @@ export const CardsWithIcons: StoryObj = {
 export const ResponsiveVariant: StoryObj = {
   render: () => (
     <Checkbox.Group
-      label="Toppings"
-      defaultValue={['cheese']}
+      label="Tooraine"
+      defaultValue={['kartul']}
       variant="card"
       cardVariant="secondary"
       md={{ variant: 'default', direction: 'column' }}
     >
-      <Checkbox value="cheese" label="Cheese" />
-      <Checkbox value="ham" label="Ham" />
-      <Checkbox value="mushroom" label="Mushroom" />
+      <Checkbox value="kartul" label="Kartul" />
+      <Checkbox value="peet" label="Peet" />
+      <Checkbox value="kapsas" label="Kapsas" />
     </Checkbox.Group>
   ),
 };

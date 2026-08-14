@@ -68,6 +68,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
 
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
   const labelRef = React.useRef<HTMLLabelElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const isGrouped = group !== null;
 
   const getChecked = React.useMemo((): boolean | 'mixed' => {
@@ -75,6 +76,12 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
     if (isGrouped) return !!group?.values.includes(value);
     return onChange && typeof checked !== 'undefined' ? checked : innerChecked;
   }, [indeterminate, isGrouped, group, value, onChange, checked, innerChecked]);
+
+  React.useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.indeterminate = !!indeterminate;
+    }
+  }, [indeterminate, getChecked]);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     if (isGrouped) {
@@ -86,18 +93,17 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
   };
 
   const helperId = helper ? helper.id ?? `${resolvedId}-helper` : undefined;
-  const tooltipId = tooltip ? `${resolvedId}-tooltip` : undefined;
-  const describedBy = [helperId, tooltipId].filter(Boolean).join(' ') || undefined;
+  const describedBy = helperId;
 
   const input = (
     <input
+      ref={inputRef}
       id={resolvedId}
       value={value}
       name={resolvedName}
       type="checkbox"
       disabled={disabled}
       checked={getChecked !== 'mixed' ? getChecked : false}
-      aria-checked={getChecked}
       aria-required={required}
       aria-invalid={invalid}
       onChange={onChangeHandler}

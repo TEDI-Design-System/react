@@ -28,7 +28,7 @@ const meta: Meta<typeof Radio> = {
 export default meta;
 type Story = StoryObj<typeof Radio>;
 
-const Template: StoryFn<RadioProps> = (args) => <Radio {...args} label="Text" value="default" />;
+const Template: StoryFn<RadioProps> = (args) => <Radio {...args} label="Tekst" value="default" />;
 const sizesArray: Array<'default' | 'large'> = ['default', 'large'];
 
 const TemplateSizes: StoryFn<RadioProps> = (args) => {
@@ -49,7 +49,7 @@ const TemplateSizes: StoryFn<RadioProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Radio {...args} size={size} id={`radio-size-${size}`} />
+              <Radio {...args} size={size} id={`radio-size-${size}`} label={`${size} radio`} hideLabel />
             </Col>
           </Row>
         ))}
@@ -82,7 +82,7 @@ export const States = () => {
               <Text modifiers="bold">Default</Text>
             </Col>
             <Col>
-              <Radio id="radio-default" label="Text" name="radio-default" value="radio" />
+              <Radio id="radio-default" label="Tekst" name="radio-default" value="radio" />
             </Col>
           </Row>
           <Row>
@@ -90,7 +90,7 @@ export const States = () => {
               <Text modifiers="bold">Hover</Text>
             </Col>
             <Col>
-              <Radio id="radio-hover" label="Text" name="radio-hover" value="radio" hover />
+              <Radio id="radio-hover" label="Tekst" name="radio-hover" value="radio" hover />
             </Col>
           </Row>
           <Row>
@@ -98,7 +98,7 @@ export const States = () => {
               <Text modifiers="bold">Selected</Text>
             </Col>
             <Col>
-              <Radio id="radio-checked" label="Text" name="radio-checked" value="radio" defaultChecked />
+              <Radio id="radio-checked" label="Tekst" name="radio-checked" value="radio" defaultChecked />
             </Col>
           </Row>
           <Row>
@@ -106,7 +106,7 @@ export const States = () => {
               <Text modifiers="bold">Disabled</Text>
             </Col>
             <Col>
-              <Radio id="radio-disabled" label="Text" name="radio-disabled" value="radio" disabled />
+              <Radio id="radio-disabled" label="Tekst" name="radio-disabled" value="radio" disabled />
             </Col>
           </Row>
           <Row>
@@ -116,7 +116,7 @@ export const States = () => {
             <Col>
               <Radio
                 id="radio-disabled-checked"
-                label="Text"
+                label="Tekst"
                 name="radio-disabled-checked"
                 value="radio"
                 disabled
@@ -131,11 +131,11 @@ export const States = () => {
             <Col>
               <Radio
                 id="radio-invalid"
-                label="Text"
+                label="Tekst"
                 name="radio-invalid"
                 value="radio"
                 invalid
-                helper={{ text: 'Feedback text', type: 'error' }}
+                helper={{ text: 'Tagasiside tekst', type: 'error' }}
               />
             </Col>
           </Row>
@@ -144,7 +144,7 @@ export const States = () => {
               <Text modifiers="bold">Required</Text>
             </Col>
             <Col>
-              <Radio id="radio-required" label="Text" name="radio-required" value="radio" required />
+              <Radio id="radio-required" label="Tekst" name="radio-required" value="radio" required />
             </Col>
           </Row>
         </VerticalSpacing>
@@ -163,7 +163,7 @@ export const HiddenLabel: Story = {
   },
 };
 
-export const WithExtraContent: Story = {
+export const WithHelper: Story = {
   render: Template,
 
   args: {
@@ -180,11 +180,17 @@ export const WithTooltip: Story = {
     <Row>
       <Col lg={6} md={12}>
         <VerticalSpacing>
-          <Radio {...args} id="radio-short-title-tooltip" label="Text" name="radio-short-title-tooltip" value="radio" />
+          <Radio
+            {...args}
+            id="radio-short-title-tooltip"
+            label="Tekst"
+            name="radio-short-title-tooltip"
+            value="radio"
+          />
           <Radio
             {...args}
             id="radio-short-title-helper-tooltip"
-            label="Text"
+            label="Tekst"
             name="radio-short-title-helper-tooltip"
             value="radio"
             helper={{
@@ -218,7 +224,7 @@ export const Controlled = () => {
   return (
     <Radio
       id="controlled-check"
-      label="Select me"
+      label="Vali mind"
       name="controlled-check"
       value="controlled"
       checked={checked}
@@ -227,7 +233,7 @@ export const Controlled = () => {
   );
 };
 
-export const RadioWithLongTitle = () => {
+export const WithLongTitle = () => {
   return (
     <Row>
       <Col width={6}>
@@ -245,12 +251,17 @@ export const RadioWithLongTitle = () => {
 /** Compose radios inside `Radio.Group`, which owns the selection and shared props. */
 export const Group: StoryObj = {
   render: () => {
-    const [value, setValue] = useState('email');
+    const [value, setValue] = useState('kartul');
     return (
-      <Radio.Group label="Contact method" value={value} onChange={setValue} helper={{ text: 'Choose one.' }}>
-        <Radio value="email" label="Email" />
-        <Radio value="phone" label="Phone" />
-        <Radio value="post" label="Post" />
+      <Radio.Group
+        label="Tooraine"
+        value={value}
+        onChange={setValue}
+        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
+      >
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="kapsas" label="Kapsas" />
+        <Radio value="peet" label="Peet" />
       </Radio.Group>
     );
   },
@@ -260,33 +271,79 @@ export const Group: StoryObj = {
 export const Cards: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="a">
-        <Radio value="a" label="Text" />
-        <Radio value="b" label="Text" />
-        <Radio value="c" label="Text" />
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kapsas" label="Kapsas" />
       </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="a">
-        <Radio value="a" label="Text" />
-        <Radio value="b" label="Text" />
-        <Radio value="c" label="Text" />
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kapsas" label="Kapsas" />
       </Radio.Group>
     </VerticalSpacing>
   ),
 };
 
-/** Add a `description` for a two-line card. */
+/** Add a `description` for a two-line card. Laid out as three columns with the grid. */
 export const CardsWithDescription: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="a">
-        <Radio value="a" label="Text" description="Description" />
-        <Radio value="b" label="Text" description="Description" />
-        <Radio value="c" label="Text" description="Description" />
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
+        <Row className="w-100">
+          <Col md={4}>
+            <Radio
+              value="kartul"
+              label="Kartul"
+              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Radio
+              value="peet"
+              label="Peet"
+              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Radio
+              value="kapsas"
+              label="Kapsas"
+              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
+              className="w-100"
+            />
+          </Col>
+        </Row>
       </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="a">
-        <Radio value="a" label="Text" description="Description" />
-        <Radio value="b" label="Text" description="Description" />
-        <Radio value="c" label="Text" description="Description" />
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
+        <Row className="w-100">
+          <Col md={4}>
+            <Radio
+              value="kartul"
+              label="Kartul"
+              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Radio
+              value="peet"
+              label="Peet"
+              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Radio
+              value="kapsas"
+              label="Kapsas"
+              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
+              className="w-100"
+            />
+          </Col>
+        </Row>
       </Radio.Group>
     </VerticalSpacing>
   ),
@@ -298,15 +355,49 @@ export const CardsWithDescription: StoryObj = {
 export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="desktop">
-        <Radio value="desktop" label="Text" icon="computer" />
-        <Radio value="phone" label="Text" icon="smartphone" />
-        <Radio value="tablet" label="Text" icon="tablet_mac" />
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="tram">
+        <Row className="w-100">
+          <Col md={4}>
+            <Radio value="tram" label="Trammiga" icon="tram" className="w-100" />
+          </Col>
+          <Col md={4}>
+            <Radio value="walk" label="Jalgsi" icon="directions_walk" className="w-100" />
+          </Col>
+          <Col md={4}>
+            <Radio value="car" label="Autoga" icon="directions_car" className="w-100" />
+          </Col>
+        </Row>
       </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="desktop">
-        <Radio value="desktop" label="Text" description="Description" icon="computer" />
-        <Radio value="phone" label="Text" description="Description" icon="smartphone" />
-        <Radio value="tablet" label="Text" description="Description" icon="tablet_mac" />
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="tram">
+        <Row className="w-100">
+          <Col md={4}>
+            <Radio
+              value="tram"
+              label="Trammiga"
+              description="Soovitatud variant, vähendab ummikuid"
+              icon="tram"
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Radio
+              value="walk"
+              label="Jalgsi"
+              description="Soovitatud variant, vähendab ummikuid"
+              icon="directions_walk"
+              className="w-100"
+            />
+          </Col>
+          <Col md={4}>
+            <Radio
+              value="car"
+              label="Autoga"
+              description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
+              icon="directions_car"
+              className="w-100"
+            />
+          </Col>
+        </Row>
       </Radio.Group>
     </VerticalSpacing>
   ),
@@ -316,15 +407,15 @@ export const CardsWithIcons: StoryObj = {
 export const CardsSegmented: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="a">
-        <Radio value="a" label="Text" />
-        <Radio value="b" label="Text" />
-        <Radio value="c" label="Text" />
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="kodu">
+        <Radio value="kodu" label="Kodu" />
+        <Radio value="too" label="Töö" />
+        <Radio value="muu" label="Muu" />
       </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="a">
-        <Radio value="a" label="Text" />
-        <Radio value="b" label="Text" />
-        <Radio value="c" label="Text" />
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kodu">
+        <Radio value="kodu" label="Kodu" />
+        <Radio value="too" label="Töö" />
+        <Radio value="muu" label="Muu" />
       </Radio.Group>
     </VerticalSpacing>
   ),
@@ -337,15 +428,15 @@ export const CardsSegmented: StoryObj = {
 export const ResponsiveVariant: StoryObj = {
   render: () => (
     <Radio.Group
-      label="Plan"
-      defaultValue="a"
+      label="Tooraine"
+      defaultValue="kartul"
       variant="card"
       cardVariant="secondary"
       md={{ variant: 'default', direction: 'column' }}
     >
-      <Radio value="a" label="Basic" />
-      <Radio value="b" label="Pro" />
-      <Radio value="c" label="Team" />
+      <Radio value="kartul" label="Kartul" />
+      <Radio value="peet" label="Peet" />
+      <Radio value="kapsas" label="Kapsas" />
     </Radio.Group>
   ),
 };
