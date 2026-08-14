@@ -227,6 +227,33 @@ describe('CalendarHeader', () => {
     expect(called.getMonth()).toBe(defaultProps.calendarMonth.date.getMonth());
   });
 
+  it('year dropdown spans 100 years back and 20 forward by default', async () => {
+    const user = userEvent.setup();
+
+    render(<CalendarHeader {...defaultProps} localeCode="et" />);
+
+    await user.click(screen.getByRole('button', { name: /2025/i }));
+
+    const currentYear = new Date().getFullYear();
+    expect(await screen.findByRole('menuitem', { name: String(currentYear - 100) })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: String(currentYear + 20) })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: String(currentYear - 101) })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: String(currentYear + 21) })).not.toBeInTheDocument();
+  });
+
+  it('limits the year dropdown to explicit minYear/maxYear', async () => {
+    const user = userEvent.setup();
+
+    render(<CalendarHeader {...defaultProps} localeCode="et" minYear={1950} maxYear={1970} />);
+
+    await user.click(screen.getByRole('button', { name: /2025/i }));
+
+    expect(await screen.findByRole('menuitem', { name: '1950' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: '1970' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: '1949' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: '1971' })).not.toBeInTheDocument();
+  });
+
   it('disables month items whose entire month is unavailable via disabledMatchers', async () => {
     const user = userEvent.setup();
 
@@ -247,7 +274,7 @@ describe('CalendarHeader', () => {
 
     const currentYear = new Date().getFullYear();
     // Disable everything before Jan 1 of the current year — past years in the
-    // 21-year window (currentYear-10 … currentYear-1) should all be disabled.
+    // dropdown window (currentYear-100 … currentYear-1) should all be disabled.
     render(
       <CalendarHeader {...defaultProps} localeCode="et" disabledMatchers={[{ before: new Date(currentYear, 0, 1) }]} />
     );

@@ -225,6 +225,16 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    */
   selectionLevel?: CalendarView;
   /**
+   * Earliest year offered in the calendar header's year dropdown.
+   * @default currentYear - 100
+   */
+  minYear?: number;
+  /**
+   * Latest year offered in the calendar header's year dropdown.
+   * @default currentYear + 20
+   */
+  maxYear?: number;
+  /**
    * Forwarded to the underlying `TextField`. `id`, `label`, `value`, and
    * `onChange` are owned by `DateTimeField`.
    */
@@ -313,6 +323,8 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     backLabel = getLabel('dateTimeField.back'),
     mode = 'single',
     selectionLevel = 'days',
+    minYear,
+    maxYear,
     inputProps,
     disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
   } = props;
@@ -642,6 +654,8 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
       localeCode={localeCode}
       showOutsideDays={showOutsideDays}
       monthYearSelectType={monthYearSelectType}
+      minYear={minYear}
+      maxYear={maxYear}
       disabledMatchers={disabledMatchers.length ? disabledMatchers : undefined}
       required={required}
       handleSelect={handleCalendarSelect}

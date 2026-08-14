@@ -429,6 +429,7 @@ Sub-component: `List.Item`
 - `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
 - `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
 - `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header picker style; `'static'` makes the month/year a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown
 - `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status; return a `{ type, label }` to overlay a `StatusIndicator` dot on that day (the `label` is folded into the day's `aria-label`; the dot itself is `aria-hidden`)
 - `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
@@ -749,6 +750,7 @@ Same as Checkbox (without indeterminate)
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
 - `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header pickers; `'static'` renders the month/year as a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown (defaults span 100 years back, 20 forward)
 - `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status forwarded to the calendar; overlays a `StatusIndicator` dot on matching days (label folded into the day's `aria-label`)
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
@@ -771,6 +773,8 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
   defaultValue={new Date(1990, 0, 1)}
   onSelect={(date) => console.log(date)}
   minDate={new Date(1900, 0, 1)}
+  minYear={1900}
+  maxYear={2010}
   disableFuture
 />
 
