@@ -180,6 +180,16 @@ export interface DateFieldProps
    */
   dayStatus?: DayStatusFn;
   /**
+   * Earliest year offered in the calendar header's year dropdown.
+   * @default currentYear - 100
+   */
+  minYear?: number;
+  /**
+   * Latest year offered in the calendar header's year dropdown.
+   * @default currentYear + 20
+   */
+  maxYear?: number;
+  /**
    * Show or hide the calendar header's previous/next navigation. When hidden, the month/year header
    * also becomes a static, non-interactive label (no dropdown / grid jumping) — so the calendar is
    * locked to the visible month(s): a clean "pick from these" view for a fixed month or range.
@@ -357,6 +367,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     showOutsideDays = true,
     parseDate,
     monthYearSelectType,
+    minYear,
+    maxYear,
     dayStatus,
     tagsDirection,
     showNavigation = true,
@@ -926,6 +938,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           availableDays={availableDays}
           footer={footer}
           monthYearSelectType={monthYearSelectType}
+          minYear={minYear}
+          maxYear={maxYear}
           dayStatus={dayStatus}
           showNavigation={showNavigation}
           selectionLevel={selectionLevel}
@@ -973,6 +987,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   availableDays={availableDays}
                   footer={footer}
                   monthYearSelectType={monthYearSelectType}
+                  minYear={minYear}
+                  maxYear={maxYear}
                   dayStatus={dayStatus}
                   showNavigation={showNavigation}
                   handleSelect={handleSelect}

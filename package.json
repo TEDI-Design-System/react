@@ -1,6 +1,7 @@
 {
   "name": "@tedi-design-system/react",
   "version": "0.0.0-semantic-version",
+  "description": "TEDI Design System React component library — accessible, reusable UI components. Docs & live examples: https://storybook.tedi.ee/react/rc/",
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -28,7 +29,8 @@
     "test-storybook": "test-storybook",
     "test-storybook:ci": "concurrently -k -s first -n \"SB,A11Y\" -c \"magenta,blue\" \"http-server dist/storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --index-json --url http://127.0.0.1:6006 --junit\"",
     "release": "npx semantic-release",
-    "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
+    "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN",
+    "design:build": "node design-docs/build.js"
   },
   "repository": {
     "type": "git",
@@ -45,7 +47,7 @@
     "@mui/material": "^5.15.13",
     "@mui/x-date-pickers": "^5.0.20",
     "@tanstack/react-table": "^8.13.2",
-    "@tedi-design-system/core": "6.5.0",
+    "@tedi-design-system/core": "^6.6.0",
     "classnames": "^2.5.1",
     "draft-js": "^0.11.7",
     "draftjs-md-converter": "^1.5.2",

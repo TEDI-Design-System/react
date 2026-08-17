@@ -41,7 +41,7 @@ import { TextField } from '@tedi-design-system/react/tedi';
 <TextField
   id="email"
   label="Email"
-  type="email"
+  input={{ type: 'email' }}
   icon="mail"
   isClearable
   value={email}
@@ -52,6 +52,8 @@ import { TextField } from '@tedi-design-system/react/tedi';
 ```
 
 Key props: `icon`, `isClearable`, `onClear`, `size` ('default' | 'small' | 'large'), `helper` (FeedbackTextProps), `hideLabel`, `readOnly`.
+
+Native input attributes (`type`, `autoComplete`, `min`, `maxLength`, …) are **not** top-level props — pass them through the `input` prop: `input={{ type: 'password', autoComplete: 'current-password' }}`. There is no separate `PasswordField`; a password input is a `TextField` with `input={{ type: 'password' }}`.
 
 ## Select
 
@@ -146,6 +148,11 @@ const [date, setDate] = useState<Date>();
   maxDate={new Date(2030, 11, 31)}
   shouldDisableYear={(year) => year.getFullYear() === 2026}
 />
+```
+
+**Year dropdown range** — the header's year dropdown spans **100 years back and 20 forward** by default. Override with `minYear` / `maxYear` (e.g. a date-of-birth field):
+```tsx
+<DateField id="dob" label="Date of birth" minYear={1900} maxYear={2010} />
 ```
 
 **Native picker on small screens** — uses `<input type="date">` below `md`, custom calendar from `md` up. Only valid with `mode="single"`:

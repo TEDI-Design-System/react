@@ -40,7 +40,7 @@ const TemplateSizes: StoryFn<NumberFieldProps> = (args) => {
       <Col lg={6} md={12} className="example-list">
         {sizesArray.map((size, key) => (
           <Row className={`${key === sizesArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-            <Col lg={2} md={12} className="display-flex align-items-center">
+            <Col lg={2} md={12} className="flex align-items-center">
               <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
             </Col>
             <Col lg="auto" md={12}>
@@ -93,7 +93,7 @@ export const States: Story = {
     return (
       <VerticalSpacing>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Default</Text>
           </Col>
           <Col>
@@ -101,7 +101,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Min value</Text>
           </Col>
           <Col>
@@ -109,7 +109,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Max value</Text>
           </Col>
           <Col>
@@ -117,7 +117,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Disabled</Text>
           </Col>
           <Col>
@@ -125,7 +125,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Error</Text>
           </Col>
           <Col>

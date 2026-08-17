@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["node_modules", "dist", "coverage", "design-tokens", ".husky", "public"],
+  "ignorePatterns": ["node_modules", "dist", "coverage", "design-tokens", "design-docs", ".husky", "public"],
   "env": {
     "node": true
   },

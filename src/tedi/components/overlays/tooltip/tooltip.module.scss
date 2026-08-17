@@ -8,8 +8,8 @@ $tooltip-max-width: (
 .tedi-tooltip {
   z-index: var(--z-index-tooltip);
   padding: var(--tooltip-padding-y) var(--tooltip-padding-x);
-  color: var(--tooltip-text);
-  background: var(--tooltip-background);
+  color: var(--tooltip-primary-text);
+  background: var(--tooltip-primary-background);
   border-radius: var(--tooltip-radius);
 
   @each $name, $width in $tooltip-max-width {
@@ -20,6 +20,6 @@ $tooltip-max-width: (
 
   &__arrow {
     z-index: 1;
-    fill: var(--tooltip-background);
+    fill: var(--tooltip-primary-background);
   }
 }
