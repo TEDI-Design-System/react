@@ -264,7 +264,6 @@ export const WithActions: StoryFn = () => {
           title={person.name}
           titleModifiers="h6"
           selectable
-          selectionLabel={`Vali ${person.name}`}
           layout="horizontal"
           labelAlign="left"
           valueAlign="left"
@@ -389,6 +388,8 @@ export const IsAccordion: StoryFn = () => {
         collapsible
         defaultOpen={false}
         smallLabels
+        labelAlign="left"
+        valueAlign="left"
         rowAlign="center"
         rows={rows}
       />
@@ -399,6 +400,8 @@ export const IsAccordion: StoryFn = () => {
         collapsible
         defaultOpen={false}
         smallLabels
+        labelAlign="left"
+        valueAlign="left"
         rowAlign="center"
         rows={rows}
         actions={
@@ -468,7 +471,12 @@ export const IsAccordion: StoryFn = () => {
  */
 export const HasChildrenRows: StoryFn = () => {
   const certificates = ['Puukentsefaliidi vaktsiin', 'COVID-19'];
-  const kehtiv = <StatusBadge color="success">Kehtiv</StatusBadge>;
+  // Bordered variant so the badge stays legible on the child rows' grey (tertiary) background.
+  const kehtiv = (
+    <StatusBadge color="success" variant="filled-bordered">
+      Kehtiv
+    </StatusBadge>
+  );
   const muuda = (
     <Button visualType="neutral" fullWidth iconLeft="edit">
       Muuda

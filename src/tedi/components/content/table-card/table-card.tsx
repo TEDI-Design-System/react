@@ -6,7 +6,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text, TextModifiers } from '../../base/typography/text/text';
 import { Checkbox } from '../../form/checkbox/checkbox';
-import { Card } from '../card/card';
+import { Card, CardContentPadding } from '../card/card';
 import { Label } from '../label/label';
 import { TextGroupList, TextGroupListItem } from '../text-group/text-group-list/text-group-list';
 import styles from './table-card.module.scss';
@@ -53,6 +53,17 @@ type TableCardBreakpointProps = {
    * @default start
    */
   rowAlign?: 'start' | 'center';
+  /**
+   * Padding of the card body (the rows section). Accepts the same values as `Card.Content`:
+   * a number in rems, `{ vertical, horizontal }`, or `{ top, right, bottom, left }`.
+   * @default 1
+   */
+  padding?: CardContentPadding;
+  /**
+   * Vertical gap between rows in the body. Any CSS length (a `number` is pixels).
+   * Defaults to the layout gutter in `vertical` layout and the list's compact spacing otherwise.
+   */
+  rowGap?: string | number;
   /** Class name for the root element. */
   className?: string;
 };
@@ -125,7 +136,19 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
   children?: React.ReactNode;
 }
 
-/** Wrap a bold value in a `Text` so we reuse its weight modifier instead of a bespoke style. */
+/**
+ * Layout-specific defaults for the body's `TextGroupList`, applied when the matching prop is omitted.
+ * Horizontal: fixed label column, right-aligned text, the list's own compact row gap. Vertical:
+ * auto-width left-aligned labels with the layout gutter between rows.
+ */
+const LAYOUT_DEFAULTS = {
+  horizontal: { labelAlign: 'right', valueAlign: 'right', labelWidth: '8.25rem', rowGap: undefined },
+  vertical: { labelAlign: 'left', valueAlign: 'left', labelWidth: 'auto', rowGap: 'var(--layout-grid-gutters-16)' },
+} as const satisfies Record<
+  'horizontal' | 'vertical',
+  { labelAlign: TableCardAlign; valueAlign: TableCardAlign; labelWidth: string; rowGap?: string }
+>;
+
 const renderValue = (row: TableCardRow): React.ReactNode =>
   row.bold ? (
     <Text element="span" modifiers="bold">
@@ -135,10 +158,6 @@ const renderValue = (row: TableCardRow): React.ReactNode =>
     row.value
   );
 
-/**
- * Render a row label. A string is wrapped in a `<Label>` (optionally the small 14px variant); a
- * custom node is left as-is so consumers keep full control.
- */
 const renderRowLabel = (label: React.ReactNode, small: boolean): React.ReactNode =>
   typeof label === 'string' ? <Label isSmall={small}>{label}</Label> : label;
 
@@ -173,13 +192,17 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     labelAlign,
     valueAlign,
     rowAlign = 'start',
+    padding = 1,
+    rowGap,
     className,
   } = getCurrentBreakpointProps<TableCardProps>(props);
 
   const isHorizontal = layout === 'horizontal';
-  const resolvedLabelAlign = labelAlign ?? (isHorizontal ? 'right' : 'left');
-  const resolvedValueAlign = valueAlign ?? (isHorizontal ? 'right' : 'left');
-  const resolvedLabelWidth = labelWidth ?? (isHorizontal ? '8.25rem' : 'auto');
+  const layoutDefaults = LAYOUT_DEFAULTS[layout];
+  const resolvedLabelAlign = labelAlign ?? layoutDefaults.labelAlign;
+  const resolvedValueAlign = valueAlign ?? layoutDefaults.valueAlign;
+  const resolvedLabelWidth = labelWidth ?? layoutDefaults.labelWidth;
+  const resolvedRowGap = rowGap ?? layoutDefaults.rowGap;
 
   const generatedId = React.useId();
   const id = idProp ?? generatedId;
@@ -212,12 +235,10 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const hasSummary = Boolean(summary);
   const hasChildren = Boolean(children);
   const headerHasSeparator = collapsible ? isOpen || hasActions : selectable;
-  // Without a separator the header's bottom padding stacks on top of the body's top padding, which
-  // reads as too large a gap between the title and the content. Drop it when the body sits directly
-  // below (visible, no separator); keep it for collapsed accordions where the header is the last row.
   const tightenHeaderBottom = isOpen && !headerHasSeparator;
   const bodyHasSeparator = hasSummary || hasActions || hasChildren;
   const summaryHasSeparator = hasActions;
+  const titleAsSelectionLabel = selectable && !collapsible && !!title && !subtitle;
 
   const items: TextGroupListItem[] = rows.map((row) => ({
     label: renderRowLabel(row.label, smallLabels),
@@ -231,15 +252,33 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
         <Card.Content
           padding={tightenHeaderBottom ? { top: 1, right: 1, bottom: 0, left: 1 } : 1}
           hasSeparator={headerHasSeparator}
-          className={styles['tedi-table-card__header']}
+          className={cn(styles['tedi-table-card__header'], {
+            [styles['tedi-table-card__header--select-title']]: titleAsSelectionLabel,
+          })}
         >
           {selectable && (
             <Checkbox
               id={`${id}-select`}
               name={`${id}-select`}
               value="selected"
-              label={selectionLabel}
-              hideLabel
+              label={
+                titleAsSelectionLabel ? (
+                  <Text
+                    element="span"
+                    color="primary"
+                    modifiers={titleModifiers}
+                    id={titleId}
+                    className={cn(styles['tedi-table-card__title'], {
+                      [styles['tedi-table-card__title--body']]: !titleModifiers,
+                    })}
+                  >
+                    {title}
+                  </Text>
+                ) : (
+                  selectionLabel
+                )
+              }
+              hideLabel={!titleAsSelectionLabel}
               checked={isSelected}
               onChange={(_, checked) => handleSelectedChange(checked)}
             />
@@ -286,7 +325,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
             </HeadingTag>
           ) : (
             <>
-              {(title || subtitle) && (
+              {(title || subtitle) && !titleAsSelectionLabel && (
                 <span className={styles['tedi-table-card__title-group']}>
                   {title && (
                     <Text
@@ -318,10 +357,11 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
         hidden={collapsible && !isOpen}
         className={cn({ [styles['tedi-table-card__body--has-footer']]: hasActions })}
       >
-        <Card.Content padding={1} hasSeparator={bodyHasSeparator}>
+        <Card.Content padding={padding} hasSeparator={bodyHasSeparator}>
           <TextGroupList
             columns={columns}
             items={items}
+            rowGap={resolvedRowGap}
             {...(isHorizontal
               ? {
                   type: 'horizontal' as const,
@@ -334,7 +374,6 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                   type: 'vertical' as const,
                   labelAlign: 'left' as const,
                   labelWidth: resolvedLabelWidth,
-                  rowGap: 'var(--layout-grid-gutters-16)',
                 })}
           />
         </Card.Content>

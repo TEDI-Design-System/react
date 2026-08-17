@@ -181,28 +181,24 @@ describe('TableCard', () => {
   });
 
   describe('selectable', () => {
-    it('renders a labelled selection checkbox and reports changes', () => {
+    it('uses the title as the checkbox label so the whole name is clickable, and reports changes', () => {
       const onSelectedChange = jest.fn();
-      render(
-        <TableCard
-          rows={rows}
-          title="Anna Tamm"
-          selectable
-          selectionLabel="Vali Anna Tamm"
-          onSelectedChange={onSelectedChange}
-        />
-      );
-
-      const checkbox = screen.getByRole('checkbox', { name: 'Vali Anna Tamm' });
+      render(<TableCard rows={rows} title="Anna Tamm" selectable onSelectedChange={onSelectedChange} />);
+      const checkbox = screen.getByRole('checkbox', { name: 'Anna Tamm' });
       expect(checkbox).not.toBeChecked();
       fireEvent.click(checkbox);
       expect(checkbox).toBeChecked();
       expect(onSelectedChange).toHaveBeenCalledWith(true);
     });
 
+    it('falls back to selectionLabel for the checkbox name when there is no title', () => {
+      render(<TableCard rows={rows} selectable selectionLabel="Vali rida" />);
+      expect(screen.getByRole('checkbox', { name: 'Vali rida' })).toBeInTheDocument();
+    });
+
     it('honours defaultSelected in uncontrolled mode', () => {
-      render(<TableCard rows={rows} title="Anna Tamm" selectable defaultSelected selectionLabel="Vali" />);
-      const checkbox = screen.getByRole('checkbox', { name: 'Vali' });
+      render(<TableCard rows={rows} title="Anna Tamm" selectable defaultSelected />);
+      const checkbox = screen.getByRole('checkbox', { name: 'Anna Tamm' });
       expect(checkbox).toBeChecked();
       fireEvent.click(checkbox);
       expect(checkbox).not.toBeChecked();
@@ -210,17 +206,8 @@ describe('TableCard', () => {
 
     it('reflects the controlled selected state and does not self-toggle', () => {
       const onSelectedChange = jest.fn();
-      render(
-        <TableCard
-          rows={rows}
-          title="Anna Tamm"
-          selectable
-          selected
-          onSelectedChange={onSelectedChange}
-          selectionLabel="Vali"
-        />
-      );
-      const checkbox = screen.getByRole('checkbox', { name: 'Vali' });
+      render(<TableCard rows={rows} title="Anna Tamm" selectable selected onSelectedChange={onSelectedChange} />);
+      const checkbox = screen.getByRole('checkbox', { name: 'Anna Tamm' });
       expect(checkbox).toBeChecked();
 
       fireEvent.click(checkbox);
