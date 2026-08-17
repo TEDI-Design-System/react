@@ -291,68 +291,46 @@ export const Cards: StoryObj = {
   ),
 };
 
-/** Add a `description` for a two-line card. Laid out as three columns with the grid. */
 export const CardsWithDescription: StoryObj = {
-  render: () => (
-    <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
-        <Row className="w-100">
-          <Col md={4}>
-            <Radio
-              value="kartul"
-              label="Kartul"
-              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
-              className="w-100"
-            />
+  render: () => {
+    const items = [
+      {
+        value: 'kartul',
+        label: 'Kartul',
+        description: 'Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks.',
+      },
+      {
+        value: 'peet',
+        label: 'Peet',
+        description: 'Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult.',
+      },
+      {
+        value: 'kapsas',
+        label: 'Kapsas',
+        description: 'Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades.',
+      },
+    ];
+
+    const cards = () => (
+      <Row className="w-100" gutter={2}>
+        {items.map((item) => (
+          <Col key={item.value} xs={12} md={4}>
+            <Radio value={item.value} label={item.label} description={item.description} className="w-100" />
           </Col>
-          <Col md={4}>
-            <Radio
-              value="peet"
-              label="Peet"
-              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Radio
-              value="kapsas"
-              label="Kapsas"
-              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
-              className="w-100"
-            />
-          </Col>
-        </Row>
-      </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
-        <Row className="w-100">
-          <Col md={4}>
-            <Radio
-              value="kartul"
-              label="Kartul"
-              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Radio
-              value="peet"
-              label="Peet"
-              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Radio
-              value="kapsas"
-              label="Kapsas"
-              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
-              className="w-100"
-            />
-          </Col>
-        </Row>
-      </Radio.Group>
-    </VerticalSpacing>
-  ),
+        ))}
+      </Row>
+    );
+    return (
+      <VerticalSpacing size={1.5}>
+        <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
+          {cards()}
+        </Radio.Group>
+        <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
+          {cards()}
+        </Radio.Group>
+      </VerticalSpacing>
+    );
+  },
 };
 
 /**
@@ -362,48 +340,19 @@ export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="tram">
-        <Row className="w-100">
-          <Col md={4}>
-            <Radio value="tram" label="Trammiga" icon="tram" className="w-100" />
-          </Col>
-          <Col md={4}>
-            <Radio value="walk" label="Jalgsi" icon="directions_walk" className="w-100" />
-          </Col>
-          <Col md={4}>
-            <Radio value="car" label="Autoga" icon="directions_car" className="w-100" />
-          </Col>
-        </Row>
+        <Radio value="tram" label="Trammiga" icon="tram" />
+        <Radio value="walk" label="Jalgsi" icon="directions_walk" />
+        <Radio value="car" label="Autoga" icon="directions_car" />
       </Radio.Group>
       <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="tram">
-        <Row className="w-100">
-          <Col md={4}>
-            <Radio
-              value="tram"
-              label="Trammiga"
-              description="Soovitatud variant, vähendab ummikuid"
-              icon="tram"
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Radio
-              value="walk"
-              label="Jalgsi"
-              description="Soovitatud variant, vähendab ummikuid"
-              icon="directions_walk"
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Radio
-              value="car"
-              label="Autoga"
-              description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
-              icon="directions_car"
-              className="w-100"
-            />
-          </Col>
-        </Row>
+        <Radio value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Radio value="walk" label="Jalgsi" description="Soovitatud variant, vähendab ummikuid" icon="directions_walk" />
+        <Radio
+          value="car"
+          label="Autoga"
+          description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
+          icon="directions_car"
+        />
       </Radio.Group>
     </VerticalSpacing>
   ),

@@ -24,8 +24,6 @@
   flex-direction: column;
 }
 
-// When a select-all checkbox is shown, indent the children under it so they read
-// as a tree beneath the parent.
 .tedi-checkbox-group__items--indented {
   padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-inner-spacing));
 }
@@ -33,4 +31,8 @@
 .tedi-checkbox-group--row .tedi-checkbox-group__items {
   flex-flow: row wrap;
   align-items: stretch;
+}
+
+.tedi-checkbox-group--card .tedi-checkbox-group__items {
+  gap: var(--layout-grid-gutters-08);
 }

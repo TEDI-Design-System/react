@@ -164,7 +164,12 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
 
   return (
     <fieldset
-      className={cn(styles['tedi-checkbox-group'], styles[`tedi-checkbox-group--${direction}`], className)}
+      className={cn(
+        styles['tedi-checkbox-group'],
+        styles[`tedi-checkbox-group--${direction}`],
+        { [styles['tedi-checkbox-group--card']]: variant === 'card' },
+        className
+      )}
       disabled={disabled}
       aria-describedby={helperId}
     >

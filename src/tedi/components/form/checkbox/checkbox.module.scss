@@ -150,6 +150,12 @@
     display: flex;
     gap: var(--form-checkbox-radio-card-inner-spacing);
     align-items: center;
+    min-width: 0;
+  }
+
+  .tedi-checkbox__card-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .tedi-checkbox__indicator {
@@ -167,6 +173,7 @@
     font-size: var(--body-small-regular-size);
     line-height: var(--body-small-regular-line-height);
     color: inherit;
+    overflow-wrap: anywhere;
   }
 
   &.tedi-checkbox--card-with-icon .tedi-checkbox__card-description {

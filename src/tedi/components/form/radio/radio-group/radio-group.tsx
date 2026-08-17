@@ -113,6 +113,7 @@ export const RadioGroup = (props: RadioGroupProps): JSX.Element => {
       className={cn(
         styles['tedi-radio-group'],
         styles[`tedi-radio-group--${direction}`],
+        { [styles['tedi-radio-group--card']]: variant === 'card' },
         { [styles['tedi-radio-group--segmented']]: layout === 'segmented' },
         className
       )}

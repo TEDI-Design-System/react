@@ -131,6 +131,12 @@
     display: flex;
     gap: var(--form-checkbox-radio-card-inner-spacing);
     align-items: center;
+    min-width: 0;
+  }
+
+  .tedi-radio__card-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .tedi-radio__indicator {
@@ -154,6 +160,7 @@
     font-size: var(--body-small-regular-size);
     line-height: var(--body-small-regular-line-height);
     color: inherit;
+    overflow-wrap: anywhere;
   }
 
   &.tedi-radio--card-with-icon .tedi-radio__card-description {

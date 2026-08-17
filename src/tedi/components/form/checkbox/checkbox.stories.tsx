@@ -339,68 +339,42 @@ export const Cards: StoryObj = {
   ),
 };
 
-/** Add a `description` for a two-line card. Laid out as three columns with the grid. */
 export const CardsWithDescription: StoryObj = {
-  render: () => (
-    <VerticalSpacing size={1.5}>
-      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
-        <Row className="w-100">
-          <Col md={4}>
-            <Checkbox
-              value="a"
-              label="Kartul"
-              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
-              className="w-100"
-            />
+  render: () => {
+    const items = [
+      { value: 'a', label: 'Kartul', description: 'Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks.' },
+      {
+        value: 'b',
+        label: 'Peet',
+        description: 'Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult.',
+      },
+      {
+        value: 'c',
+        label: 'Kapsas',
+        description: 'Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades.',
+      },
+    ];
+
+    const cards = () => (
+      <Row className="w-100" gutter={2}>
+        {items.map((item) => (
+          <Col key={item.value} xs={12} md={4}>
+            <Checkbox value={item.value} label={item.label} description={item.description} className="w-100" />
           </Col>
-          <Col md={4}>
-            <Checkbox
-              value="b"
-              label="Peet"
-              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Checkbox
-              value="c"
-              label="Kapsas"
-              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
-              className="w-100"
-            />
-          </Col>
-        </Row>
-      </Checkbox.Group>
-      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
-        <Row className="w-100">
-          <Col md={4}>
-            <Checkbox
-              value="a"
-              label="Kartul"
-              description="Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks."
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Checkbox
-              value="b"
-              label="Peet"
-              description="Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult."
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Checkbox
-              value="c"
-              label="Kapsas"
-              description="Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades."
-              className="w-100"
-            />
-          </Col>
-        </Row>
-      </Checkbox.Group>
-    </VerticalSpacing>
-  ),
+        ))}
+      </Row>
+    );
+    return (
+      <VerticalSpacing size={1.5}>
+        <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
+          {cards()}
+        </Checkbox.Group>
+        <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
+          {cards()}
+        </Checkbox.Group>
+      </VerticalSpacing>
+    );
+  },
 };
 
 /**
@@ -410,48 +384,24 @@ export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['tram']}>
-        <Row className="w-100">
-          <Col md={4}>
-            <Checkbox value="tram" label="Trammiga" icon="tram" className="w-100" />
-          </Col>
-          <Col md={4}>
-            <Checkbox value="foot" label="Jalgsi" icon="directions_walk" className="w-100" />
-          </Col>
-          <Col md={4}>
-            <Checkbox value="car" label="Autoga" icon="directions_car" className="w-100" />
-          </Col>
-        </Row>
+        <Checkbox value="tram" label="Trammiga" icon="tram" />
+        <Checkbox value="foot" label="Jalgsi" icon="directions_walk" />
+        <Checkbox value="car" label="Autoga" icon="directions_car" />
       </Checkbox.Group>
       <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['tram']}>
-        <Row className="w-100">
-          <Col md={4}>
-            <Checkbox
-              value="tram"
-              label="Trammiga"
-              description="Soovitatud variant, vähendab ummikuid"
-              icon="tram"
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Checkbox
-              value="foot"
-              label="Jalgsi"
-              description="Soovitatud variant, vähendab ummikuid"
-              icon="directions_walk"
-              className="w-100"
-            />
-          </Col>
-          <Col md={4}>
-            <Checkbox
-              value="car"
-              label="Autoga"
-              description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
-              icon="directions_car"
-              className="w-100"
-            />
-          </Col>
-        </Row>
+        <Checkbox value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Checkbox
+          value="foot"
+          label="Jalgsi"
+          description="Soovitatud variant, vähendab ummikuid"
+          icon="directions_walk"
+        />
+        <Checkbox
+          value="car"
+          label="Autoga"
+          description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
+          icon="directions_car"
+        />
       </Checkbox.Group>
     </VerticalSpacing>
   ),
