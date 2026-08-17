@@ -27,6 +27,10 @@ describe('TimeWheel', () => {
     Element.prototype.scrollTo = jest.fn();
   });
 
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
   it('renders hours and minutes', () => {
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="01" selectedMinute="10" onChange={jest.fn()} />);
 
