@@ -1,3 +1,10 @@
+# [19.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.8...react-19.0.0-rc.9) (2026-08-17)
+
+
+### Bug Fixes
+
+* **alert:** use proper variables for alert texts [#826](https://github.com/TEDI-Design-System/react/issues/826) ([#828](https://github.com/TEDI-Design-System/react/issues/828)) ([c171adc](https://github.com/TEDI-Design-System/react/commit/c171adc83745e9ca31fd9166762e2abd349a8186))
+
 # [19.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.7...react-19.0.0-rc.8) (2026-08-14)
 
 
