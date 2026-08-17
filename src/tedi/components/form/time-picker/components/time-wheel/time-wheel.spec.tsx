@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { act, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { clearScrollTimeout, needsScrollCorrection, scrollToIndex } from '../../../time-field/time-field-helpers';
 import { TimeWheel } from './time-wheel';
@@ -48,13 +47,14 @@ describe('TimeWheel', () => {
     expect(screen.getByText('10').className).toContain('--selected');
   });
 
-  it('calls onChange on hour click', async () => {
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  it('calls onChange on hour click', () => {
     const onChange = jest.fn();
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
-    await user.click(screen.getByText('02'));
+    act(() => {
+      fireEvent.click(screen.getByText('02'));
+    });
 
     act(() => {
       jest.advanceTimersByTime(400);
@@ -63,13 +63,14 @@ describe('TimeWheel', () => {
     expect(onChange).toHaveBeenCalledWith('02', '00');
   });
 
-  it('calls onChange on minute click', async () => {
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  it('calls onChange on minute click', () => {
     const onChange = jest.fn();
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
-    await user.click(screen.getByText('20'));
+    act(() => {
+      fireEvent.click(screen.getByText('20'));
+    });
 
     act(() => {
       jest.advanceTimersByTime(400);
@@ -244,26 +245,23 @@ describe('TimeWheel', () => {
   it('does nothing on scroll when a programmatic scroll is in progress', () => {
     (needsScrollCorrection as jest.Mock).mockReturnValue(false);
 
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const onChange = jest.fn();
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
     const col = screen.getAllByRole('listbox')[0];
 
-    // A click sets isProgrammaticScrollHour = true and schedules a reset after 350ms.
-    // Firing a scroll event right after should be ignored, so onChange must not be
-    // called for the scroll.
-    return user.click(screen.getByText('01')).then(() => {
-      onChange.mockClear();
-
-      act(() => {
-        Object.defineProperty(col, 'scrollTop', { value: 80, writable: true });
-        col.dispatchEvent(new Event('scroll'));
-      });
-
-      expect(onChange).not.toHaveBeenCalled();
+    act(() => {
+      fireEvent.click(screen.getByText('01'));
     });
+    onChange.mockClear();
+
+    act(() => {
+      Object.defineProperty(col, 'scrollTop', { value: 80, writable: true });
+      col.dispatchEvent(new Event('scroll'));
+    });
+
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('ignores scroll when the snapped index has not changed', () => {
@@ -677,17 +675,18 @@ describe('TimeWheel', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('skips minute scroll handling while a programmatic minute scroll is in progress', async () => {
+  it('skips minute scroll handling while a programmatic minute scroll is in progress', () => {
     (needsScrollCorrection as jest.Mock).mockReturnValue(false);
 
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const onChange = jest.fn();
 
     render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
 
     const col = screen.getAllByRole('listbox')[1];
 
-    await user.click(screen.getByText('10'));
+    act(() => {
+      fireEvent.click(screen.getByText('10'));
+    });
     onChange.mockClear();
 
     act(() => {
