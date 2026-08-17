@@ -1,3 +1,10 @@
+# [19.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.9...react-19.0.0-rc.10) (2026-08-17)
+
+
+### Bug Fixes
+
+* **select,dropdown,checkbox,radio:** fix hover/active styles [#752](https://github.com/TEDI-Design-System/react/issues/752) ([#781](https://github.com/TEDI-Design-System/react/issues/781)) ([da7a8f6](https://github.com/TEDI-Design-System/react/commit/da7a8f64c5b0b2bcc646cfcc3e6b4bbcab8d7783))
+
 # [19.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.8...react-19.0.0-rc.9) (2026-08-17)
 
 
