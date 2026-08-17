@@ -475,9 +475,7 @@ export const InsidePopover: Story = {
           </Button>
         </Popover.Trigger>
 
-        <Popover.Content width="none">
-          {/* `DropdownItem` needs a `DropdownContext`; the popover supplies a static one so the
-              rows get the dropdown hover / active styling that `OptionContent` inherits. */}
+        <Popover.Content width="none" padding={{ vertical: 0, horizontal: 0 }}>
           <DropdownContext.Provider value={showcaseContext('default')}>
             <div role="menu" style={{ display: 'flex', flexDirection: 'column', minWidth: 220 }}>
               {navItems.map((label, index) => (
