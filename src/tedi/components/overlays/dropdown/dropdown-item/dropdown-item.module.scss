@@ -30,9 +30,7 @@
     color: var(--dropdown-item-active-text);
     background-color: var(--dropdown-item-active-background);
 
-    p,
-    label,
-    div > span {
+    :is(p, label, div > span):not([class*='tedi-checkbox'] *, [class*='tedi-radio'] *) {
       color: var(--dropdown-item-active-text);
     }
   }
@@ -102,15 +100,13 @@
     }
   }
 
-  &:hover {
+  &:hover:not(.tedi-dropdown__item--active, .tedi-dropdown__item--disabled) {
     color: var(--dropdown-item-hover-text);
     cursor: pointer;
     outline: 0;
     background-color: var(--dropdown-item-hover-background);
 
-    p,
-    label,
-    div > span {
+    :is(p, label, div > span):not([class*='tedi-checkbox'] *, [class*='tedi-radio'] *) {
       color: var(--dropdown-item-hover-text);
     }
   }
