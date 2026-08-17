@@ -744,4 +744,73 @@ describe('TimeWheel', () => {
 
     expect(focusSpy).toHaveBeenCalled();
   });
+
+  it('ignores out-of-range selected values (index -1) without scrolling or firing onChange', () => {
+    const onChange = jest.fn();
+
+    render(<TimeWheel hours={hours} minutes={minutes} selectedHour="99" selectedMinute="99" onChange={onChange} />);
+
+    expect(screen.getAllByRole('listbox')).toHaveLength(2);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('ignores a scrollend that arrives during a programmatic scroll', () => {
+    const onChange = jest.fn();
+
+    render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
+
+    const [hourCol, minuteCol] = screen.getAllByRole('listbox');
+    act(() => {
+      hourCol.dispatchEvent(new Event('scrollend'));
+      minuteCol.dispatchEvent(new Event('scrollend'));
+    });
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('does not fire onChange when a scrollend lands on the already-selected index', () => {
+    (needsScrollCorrection as jest.Mock).mockReturnValue(false);
+    const onChange = jest.fn();
+
+    render(<TimeWheel hours={hours} minutes={minutes} selectedHour="01" selectedMinute="10" onChange={onChange} />);
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
+    const [hourCol] = screen.getAllByRole('listbox');
+    act(() => {
+      Object.defineProperty(hourCol, 'scrollTop', { value: 40, writable: true });
+      hourCol.dispatchEvent(new Event('scrollend'));
+    });
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('fires onChange when a scrollend lands on a new index (hour + minute)', () => {
+    (needsScrollCorrection as jest.Mock).mockReturnValue(false);
+    const onChange = jest.fn();
+
+    render(<TimeWheel hours={hours} minutes={minutes} selectedHour="00" selectedMinute="00" onChange={onChange} />);
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
+    const [hourCol, minuteCol] = screen.getAllByRole('listbox');
+
+    act(() => {
+      Object.defineProperty(hourCol, 'scrollTop', { value: 80, writable: true }); // index 2
+      hourCol.dispatchEvent(new Event('scrollend'));
+    });
+    expect(onChange).toHaveBeenCalledWith('02', '00');
+
+    onChange.mockClear();
+
+    act(() => {
+      Object.defineProperty(minuteCol, 'scrollTop', { value: 80, writable: true }); // index 2
+      minuteCol.dispatchEvent(new Event('scrollend'));
+    });
+    expect(onChange).toHaveBeenCalledWith('00', '20');
+  });
 });
