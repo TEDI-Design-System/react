@@ -153,7 +153,7 @@ div .tedi-select__menu {
     background-color: var(--form-input-background-default);
   }
 
-  &:active:not(.tedi-select__option--disabled),
+  &:active:not(.tedi-select__option--disabled, .tedi-select__option--control),
   &--selected {
     color: var(--dropdown-item-active-text);
     background-color: var(--dropdown-item-active-background);
@@ -163,6 +163,11 @@ div .tedi-select__menu {
     label {
       color: var(--dropdown-item-active-text);
     }
+  }
+
+  &--control:active:not(.tedi-select__option--disabled) {
+    color: var(--form-input-text-filled);
+    background-color: var(--dropdown-item-hover-background);
   }
 
   &--disabled {
