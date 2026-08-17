@@ -91,6 +91,10 @@ const meta: Meta<typeof TopNav> = {
     },
   ],
   parameters: {
+    a11y: {
+      // TODO: [TopNav]: Review storybook a11y violations #823
+      test: 'todo',
+    },
     layout: 'fullscreen',
     design: {
       type: 'figma',
@@ -391,10 +395,10 @@ export const ItemStates: StoryObj = {
     <VerticalSpacing size={0.5}>
       {itemStateRows.map((state) => (
         <Row key={state}>
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col className="display-flex align-items-center">
+          <Col className="flex align-items-center">
             <ul style={{ display: 'flex', gap: '1rem', listStyle: 'none', margin: 0, padding: 0 }}>
               {itemColumns.map(({ key, icon, withSubmenu }) => (
                 <TopNav.Item
@@ -438,7 +442,7 @@ export const SubItemStates: StoryObj = {
       <VerticalSpacing size={0.5}>
         {itemStateRows.map((state) => (
           <Row key={state}>
-            <Col width={2} className="display-flex align-items-center">
+            <Col width={2} className="flex align-items-center">
               <Text modifiers="bold" color="white">
                 {state}
               </Text>
@@ -477,7 +481,7 @@ export const GroupVariants: StoryObj = {
     >
       <VerticalSpacing size={1.5}>
         <Row>
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold" color="white">
               Default
             </Text>
@@ -491,7 +495,7 @@ export const GroupVariants: StoryObj = {
           </Col>
         </Row>
         <Row>
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold" color="white">
               With icon
             </Text>

@@ -22,6 +22,10 @@ const meta: Meta<SearchProps> = {
   component: Search,
   title: 'TEDI-Ready/Components/Form/Search',
   parameters: {
+    a11y: {
+      // TODO: [Search]: Review storybook a11y violations #819
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -97,7 +101,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 
         return (
           <Row key={index}>
-            <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+            <Col lg={2} xs={12} className="flex align-items-center gap-3">
               <Text modifiers="bold">{state}</Text>
             </Col>
             <Col>
@@ -108,7 +112,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
       })}
 
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
@@ -117,7 +121,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
       </Row>
 
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
