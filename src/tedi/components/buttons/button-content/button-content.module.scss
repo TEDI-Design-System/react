@@ -142,6 +142,10 @@ $btn-width-large: 3.72rem;
   @include mixins.print-grayscale;
 }
 
+.tedi-btn__loading-status {
+  @include mixins.visually-hidden;
+}
+
 .tedi-btn:disabled,
 .tedi-btn[aria-disabled='true'] {
   cursor: auto;

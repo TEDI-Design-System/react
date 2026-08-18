@@ -779,6 +779,14 @@ export const labelsMap = validateDefaultLabels({
     en: 'Loading',
     ru: 'Загрузка',
   },
+  'button.loading': {
+    description:
+      'Announced by screen-readers when a button (or link) is in its loading state. The visible spinner is decorative, so this text is what conveys the loading state to assistive tech.',
+    components: ['Button', 'Link'],
+    et: 'Laadimine',
+    en: 'Loading',
+    ru: 'Загрузка',
+  },
   'table.loading': {
     description: 'Shown when table is loading',
     components: ['Table'],

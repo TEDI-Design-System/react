@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
 import { AllowedHTMLTags, PolymorphicComponentPropWithRef, PolymorphicRef } from '../../../helpers/polymorphic/types';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
@@ -121,6 +122,7 @@ const InternalButtonContent = forwardRef(
     }: ButtonContentProps<C, P, A>,
     ref?: PolymorphicRef<C>
   ) => {
+    const { getLabel } = useLabels();
     const Component = as || 'button';
     const hasIcon = icon || iconLeft || iconRight;
 
@@ -224,6 +226,9 @@ const InternalButtonContent = forwardRef(
         ) : (
           buttonElement
         )}
+        <span role="status" aria-live="polite" className={styles['tedi-btn__loading-status']}>
+          {isLoading ? getLabel('button.loading') : ''}
+        </span>
       </Print>
     );
   }

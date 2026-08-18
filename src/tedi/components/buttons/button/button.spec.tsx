@@ -73,4 +73,24 @@ describe('Button component', () => {
     fireEvent.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('marks the button aria-busy while loading', () => {
+    render(<Button {...defaultProps} isLoading />);
+    expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('announces the loading state through a polite live region', () => {
+    render(<Button {...defaultProps} isLoading />);
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveTextContent(/\S/);
+    expect(screen.getByRole('button')).toHaveAccessibleName('Click Me');
+  });
+
+  it('keeps the live region present but empty when not loading', () => {
+    render(<Button {...defaultProps} />);
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toBeEmptyDOMElement();
+  });
 });

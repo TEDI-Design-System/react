@@ -50,7 +50,7 @@ describe('ButtonContent component', () => {
     expect(button).toHaveClass('tedi-btn--underline');
   });
 
-  it('renders in loading state with a decorative spinner and conveys loading via aria-busy', () => {
+  it('renders in loading state with a decorative spinner and announces loading via a live region', () => {
     render(<ButtonContent {...defaultProps} isLoading />);
 
     const button = screen.getByRole('button');
@@ -59,8 +59,17 @@ describe('ButtonContent component', () => {
     expect(spinner).toBeInTheDocument();
     expect(spinner).toHaveClass('tedi-btn__spinner');
     expect(spinner).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveTextContent(/\S/);
     expect(button).toHaveAccessibleName('Click Me');
+  });
+
+  it('keeps the live region present but empty when not loading', () => {
+    render(<ButtonContent {...defaultProps} />);
+    const status = screen.getByRole('status');
+    expect(status).toBeInTheDocument();
+    expect(status).toBeEmptyDOMElement();
   });
 
   it('renders with full width when fullWidth is true', () => {
