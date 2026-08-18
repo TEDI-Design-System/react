@@ -14,7 +14,7 @@ const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) 
     elements.forEach((el) => {
       const element = el as HTMLElement;
       element.style.backgroundColor = bg;
-      element.style.color = 'var(--general-text-white)';
+      element.style.color = color === 'secondary' ? 'var(--general-text-white)' : 'var(--general-text-primary)';
       element.style.transition = 'background-color 0.2s ease';
     });
 

@@ -13,7 +13,7 @@ import { TColorsBackground, TColorsBorder } from './commonTypes';
 export const LEGACY_COLOR_TO_CORE: Record<TColorsBackground | TColorsBorder, string> = {
   'primary-main': 'var(--general-surface-brand-primary)',
   'primary-active': 'var(--general-surface-brand-secondary)',
-  'primary-active-subtle': 'var(--tedi-primary-500)',
+  'primary-active-subtle': 'var(--tedi-primary-400)',
   'primary-highlight': 'var(--general-surface-brand-tertiary)',
   'primary-highlight-subtle': 'var(--general-surface-brand-quaternary)',
   'accent-main': 'var(--tedi-accent-600)',

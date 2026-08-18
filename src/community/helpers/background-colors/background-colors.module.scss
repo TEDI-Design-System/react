@@ -8,7 +8,7 @@ $colors: (
   // Primary / brand
   'primary-main': --general-surface-brand-primary,
   'primary-active': --general-surface-brand-secondary,
-  'primary-active-subtle': --general-surface-brand-secondary,
+  'primary-active-subtle': --tedi-primary-400,
   'primary-highlight': --general-surface-brand-tertiary,
   'primary-highlight-subtle': --general-surface-brand-quaternary,
   // Accent
@@ -49,7 +49,11 @@ $colors: (
     }
 
     @media print {
-      background-color: var(--general-surface-primary);
+      @if $token == transparent {
+        background-color: transparent;
+      } @else {
+        background-color: var(--general-surface-primary);
+      }
     }
   }
 }

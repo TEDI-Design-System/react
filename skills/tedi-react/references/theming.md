@@ -40,27 +40,30 @@ The ThemeProvider manages theme state and persistence (via cookie `tedi-theme`).
 
 ## Design Tokens
 
-Tokens follow the naming pattern `--tedi-{category}-{name}`:
+Tokens come in two layers: **semantic** `--general-*` tokens (role-based — text / surface / border / status), and **primitive** `--tedi-*` tokens (the raw scale). Prefer semantic tokens; reach for a primitive only when no semantic token fits.
 
 | Category | Examples |
 |----------|---------|
-| Color | `--tedi-color-primary`, `--tedi-color-bg-default`, `--tedi-color-text-secondary` |
-| Spacing | `--tedi-spacing-1`, `--tedi-spacing-2`, `--tedi-spacing-4` |
-| Typography | `--tedi-font-size-sm`, `--tedi-font-weight-bold`, `--tedi-line-height-default` |
-| Border | `--tedi-border-radius-sm`, `--tedi-border-width-default` |
-| Shadow | `--tedi-shadow-sm`, `--tedi-shadow-md` |
+| Text | `--general-text-primary`, `--general-text-secondary`, `--general-text-disabled` |
+| Surface | `--general-surface-primary`, `--general-surface-secondary`, `--general-surface-brand-primary` |
+| Border | `--general-border-primary`, `--general-border-secondary`, `--general-border-brand` |
+| Status | `--general-status-danger-text`, `--general-status-success-border`, `--general-status-warning-background-primary` |
+| Primitives | `--tedi-primary-600`, `--tedi-neutral-900`, `--tedi-green-600` |
+| Spacing | `--tedi-dimensions-02`, `--tedi-dimensions-04`, `--layout-grid-gutters-16` |
+| Radius | `--tedi-radius-02-default`, `--tedi-radius-08` |
+| Typography | `--family-default`, `--heading-h3-size`, `--heading-h3-weight` |
 
 Use tokens in your own SCSS:
 
 ```scss
 .my-custom-section {
-  padding: var(--tedi-spacing-4);
-  background-color: var(--tedi-color-bg-default);
-  border-radius: var(--tedi-border-radius-sm);
+  padding: var(--tedi-dimensions-04);
+  background-color: var(--general-surface-primary);
+  border-radius: var(--tedi-radius-02-default);
 }
 ```
 
-**Important:** Do NOT use fallback values in `var()`. Write `var(--tedi-spacing-4)`, not `var(--tedi-spacing-4, 16px)`.
+**Important:** Do NOT use fallback values in `var()`. Write `var(--general-surface-primary)`, not `var(--general-surface-primary, #fff)`.
 
 ## Migrating off legacy `--color-*` tokens (breaking change)
 
@@ -124,8 +127,8 @@ Create a custom theme by defining token values under a theme class:
 
 ```scss
 .tedi-theme--my-brand {
-  --tedi-color-primary: #1a73e8;
-  --tedi-color-bg-default: #fafafa;
+  --general-surface-brand-primary: #1a73e8;
+  --general-surface-primary: #fafafa;
   // ... override tokens as needed
 }
 ```
@@ -150,10 +153,10 @@ For responsive breakpoints in SCSS:
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints' as bp;
 
 .my-component {
-  padding: var(--tedi-spacing-2);
+  padding: var(--tedi-dimensions-02);
 
   @include bp.media-breakpoint-up(md) {
-    padding: var(--tedi-spacing-4);
+    padding: var(--tedi-dimensions-04);
   }
 }
 ```
