@@ -256,4 +256,25 @@ describe('Checkbox component', () => {
 
     expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
   });
+
+  it('names the checkbox via aria-labelledby pointing at its label', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
+
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toHaveAttribute('aria-labelledby', 'checkbox-id-label');
+    expect(screen.getByTestId('checkbox-label')).toHaveAttribute('id', 'checkbox-id-label');
+    expect(checkbox).toHaveAccessibleName('Checkbox Label');
+  });
+
+  it('keeps the accessible name when the label is visually hidden', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" hideLabel />);
+
+    expect(screen.getByRole('checkbox')).toHaveAccessibleName('Checkbox Label');
+  });
+
+  it('does not set an empty aria-describedby when there is no helper or tooltip', () => {
+    render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
+
+    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-describedby');
+  });
 });

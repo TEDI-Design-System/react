@@ -251,6 +251,27 @@ describe('Radio component', () => {
     expect(radio).not.toHaveAttribute('aria-invalid');
   });
 
+  it('names the radio via aria-labelledby pointing at its label', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" />);
+
+    const radio = screen.getByRole('radio');
+    expect(radio).toHaveAttribute('aria-labelledby', 'radio-id-label');
+    expect(screen.getByTestId('radio-label')).toHaveAttribute('id', 'radio-id-label');
+    expect(radio).toHaveAccessibleName('Radio Label');
+  });
+
+  it('keeps the accessible name when the label is visually hidden', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" hideLabel />);
+
+    expect(screen.getByRole('radio')).toHaveAccessibleName('Radio Label');
+  });
+
+  it('does not set an empty aria-describedby when there is no helper or tooltip', () => {
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" />);
+
+    expect(screen.getByRole('radio')).not.toHaveAttribute('aria-describedby');
+  });
+
   it('associates the error message with the radio when invalid', () => {
     render(
       <Radio

@@ -46,6 +46,8 @@ export const Radio = (props: RadioProps): JSX.Element => {
 
   const helperId = helper ? helper.id ?? `${id}-helper` : undefined;
   const tooltipId = tooltip ? `${id}-tooltip` : undefined;
+  const labelId = label ? `${id}-label` : undefined;
+  const describedBy = [helperId, tooltipId].filter(Boolean).join(' ') || undefined;
 
   const LabelBEM = cn(styles['tedi-radio__label'], { [styles['tedi-radio--disabled']]: disabled });
 
@@ -67,7 +69,8 @@ export const Radio = (props: RadioProps): JSX.Element => {
               checked={getChecked}
               onChange={onChangeHandler}
               className={styles['tedi-radio__input']}
-              aria-describedby={[helperId, tooltipId].filter(Boolean).join(' ')}
+              aria-labelledby={labelId}
+              aria-describedby={describedBy}
               required={required}
             />
             <div
@@ -90,6 +93,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
               ref={labelRef}
               className={LabelBEM}
               id={id}
+              labelId={labelId}
               data-testid="radio-label"
               hideLabel={hideLabel}
               label={label}
