@@ -37,20 +37,29 @@
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "react-hooks/rules-of-hooks": ["error"],
     "react-hooks/exhaustive-deps": ["warn"],
+    // eslint-plugin-react-hooks v7's `recommended` (pulled in via
+    // eslint-config-next) adds the new React Compiler rules. The ones the
+    // codebase already satisfies are enabled here at their recommended severity.
+    "react-hooks/purity": "error",
+    "react-hooks/set-state-in-render": "error",
+    "react-hooks/error-boundaries": "error",
+    "react-hooks/globals": "error",
+    "react-hooks/config": "error",
+    "react-hooks/gating": "error",
+    "react-hooks/use-memo": "error",
+    "react-hooks/immutability": "error",
+    "react-hooks/unsupported-syntax": "warn",
+    // Left off for now — each has existing violations that need real code
+    // changes (some behaviour-affecting, e.g. set-state-in-effect and
+    // preserve-manual-memoization). Opt in rule-by-rule under #TODO rather than
+    // bundling a large refactor into this dependency bump.
+    // `incompatible-library` is off too: its hits are the React Compiler
+    // skipping tanstack-table (a library-level notice), not a fixable defect.
     "react-hooks/static-components": "off",
-    "react-hooks/use-memo": "off",
     "react-hooks/preserve-manual-memoization": "off",
     "react-hooks/incompatible-library": "off",
-    "react-hooks/immutability": "off",
-    "react-hooks/globals": "off",
     "react-hooks/refs": "off",
     "react-hooks/set-state-in-effect": "off",
-    "react-hooks/error-boundaries": "off",
-    "react-hooks/purity": "off",
-    "react-hooks/set-state-in-render": "off",
-    "react-hooks/unsupported-syntax": "off",
-    "react-hooks/config": "off",
-    "react-hooks/gating": "off",
     "react/prop-types": "off",
     "@next/next/no-html-link-for-pages": 0,
     "@next/next/no-img-element": 0,
