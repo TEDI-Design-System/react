@@ -1957,3 +1957,41 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 ### Map Components
 
 14 specialized components for map UI interactions (BaseMapSelection, Legend, MapLayer, Directions, Timeline, etc.)
+
+## Extending components
+
+TEDI exports a few type helpers so you can build **custom or extended** components
+that match its patterns, without deep relative imports.
+
+**Polymorphic (`as` prop) components** — reuse TEDI's polymorphic types:
+
+```tsx
+import { forwardRef } from 'react';
+import { PolymorphicComponentPropWithRef, PolymorphicRef } from '@tedi-design-system/react/tedi';
+
+type MyBoxProps<C extends React.ElementType> = PolymorphicComponentPropWithRef<C, { muted?: boolean }>;
+
+const MyBox = forwardRef(
+  <C extends React.ElementType = 'div'>({ as, muted, ...rest }: MyBoxProps<C>, ref: PolymorphicRef<C>) => {
+    const Tag = as ?? 'div';
+    return <Tag ref={ref} data-muted={muted} {...rest} />;
+  }
+);
+```
+
+Also available: `PolymorphicComponentPropWithoutRef`, and `AllowedHTMLTags<C, Allowed>` to constrain `as` to specific tags.
+
+**Responsive props** — `BreakpointSupport<T>` + `useBreakpointProps` let a custom component accept per-breakpoint prop overrides the same way TEDI components do:
+
+```tsx
+import { BreakpointSupport, useBreakpointProps } from '@tedi-design-system/react/tedi';
+
+type Props = BreakpointSupport<{ size?: 'sm' | 'lg' }>;
+
+const MyResponsive = (props: Props) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps();
+  const { size = 'sm' } = getCurrentBreakpointProps<Props>(props);
+  return <div data-size={size} />;
+};
+// <MyResponsive size="sm" md={{ size: 'lg' }} />
+```
