@@ -8,13 +8,13 @@ const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) 
   const { color } = context.args;
 
   useEffect(() => {
-    const bg = color === 'secondary' ? 'var(--color-bg-inverted)' : 'var(--color-bg-default)';
+    const bg = color === 'secondary' ? 'var(--general-surface-inverted-primary)' : 'var(--general-surface-primary)';
     const elements = document.querySelectorAll('.sb-show-main, .docs-story > div, .sbdocs-preview');
 
     elements.forEach((el) => {
       const element = el as HTMLElement;
       element.style.backgroundColor = bg;
-      element.style.color = 'var(--color-text-inverted)';
+      element.style.color = 'var(--general-text-white)';
       element.style.transition = 'background-color 0.2s ease';
     });
 

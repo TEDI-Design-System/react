@@ -1,10 +1,10 @@
-@use '../mixins';
+@use '@tedi-design-system/core/mixins';
 
 /* Mui calendar picker */
 
 div.MuiCalendarPicker-root {
   margin: initial;
-  border-radius: var(--border-radius-default);
+  border-radius: var(--tedi-radius-02-default);
   box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
 
   @include mixins.print-grayscale;
@@ -17,13 +17,13 @@ div.MuiCalendarPicker-root {
 
   button.MuiPickersDay-root.Mui-highlighted {
     font-weight: 700;
-    color: var(--color-primary-main);
-    background-color: var(--color-primary-highlight-subtle);
+    color: var(--general-text-brand);
+    background-color: var(--general-surface-brand-quaternary);
   }
 
   button.MuiPickersDay-root.Mui-selected {
     font-weight: 700;
-    color: var(--color-white);
-    background-color: var(--color-primary-main);
+    color: var(--general-text-white);
+    background-color: var(--general-surface-brand-primary);
   }
 }

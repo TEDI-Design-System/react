@@ -1,45 +1,55 @@
+// Utility class name (public API, kept stable) → core surface/status token.
+// Every class sets `background-color`, so all map to surface/background tokens.
+// `black` has no core equivalent yet — left on the legacy token and flagged.
+// Utility class name (public API, kept stable) → core surface/status token name.
+// Every class sets `background-color`, so all map to surface/background tokens.
+// `black` has no core equivalent yet — left on the legacy token and flagged.
 $colors: (
-  // Primary
-  'primary-main',
-  'primary-active',
-  'primary-active-subtle',
-  'primary-highlight',
-  'primary-highlight-subtle',
+  // Primary / brand
+  'primary-main': --general-surface-brand-primary,
+  'primary-active': --general-surface-brand-secondary,
+  'primary-active-subtle': --general-surface-brand-secondary,
+  'primary-highlight': --general-surface-brand-tertiary,
+  'primary-highlight-subtle': --general-surface-brand-quaternary,
   // Accent
-  'accent-main',
-  'accent-highlight',
-  // Foreground
-  'bg-default',
-  'bg-muted',
-  'bg-subtle',
-  'bg-disabled',
-  'bg-inverted',
-  'bg-inverted-contrast',
+  'accent-main': --tedi-accent-600,
+  'accent-highlight': --tedi-accent-200,
+  // Foreground / surfaces
+  'bg-default': --general-surface-primary,
+  'bg-muted': --general-surface-secondary,
+  'bg-subtle': --general-surface-tertiary,
+  'bg-disabled': --general-surface-disabled,
+  'bg-inverted': --general-surface-inverted-primary,
+  'bg-inverted-contrast': --general-surface-inverted-secondary,
   // Shades
-  'black',
-  'white',
+  'black': --tedi-neutral-900,
+  'white': --general-surface-primary,
   // Functional colors
-  'positive-main',
-  'positive-active',
-  'positive-highlight',
-  'important-main',
-  'important-active',
-  'important-highlight',
-  'info-main',
-  'info-active',
-  'info-highlight',
-  'warning-main',
-  'warning-highlight',
-  // Transparent
-  'transparent'
+  'positive-main': --tedi-green-600,
+  'positive-active': --tedi-green-700,
+  'positive-highlight': --tedi-green-100,
+  'important-main': --tedi-red-600,
+  'important-active': --tedi-red-700,
+  'important-highlight': --tedi-red-100,
+  'info-main': --tedi-primary-600,
+  'info-active': --tedi-primary-700,
+  'info-highlight': --tedi-primary-100,
+  'warning-main': --tedi-yellow-700,
+  'warning-highlight': --tedi-yellow-200,
+  // Transparent (keyword, not a token)
+  'transparent': transparent
 );
 
-@each $color in $colors {
-  .#{$color} {
-    background-color: var(--color-#{$color});
+@each $name, $token in $colors {
+  .#{$name} {
+    @if $token == transparent {
+      background-color: transparent;
+    } @else {
+      background-color: var(#{$token});
+    }
 
     @media print {
-      background-color: var(--color-bg-default);
+      background-color: var(--general-surface-primary);
     }
   }
 }
