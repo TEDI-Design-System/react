@@ -266,4 +266,23 @@ describe('Radio component', () => {
     const radio = screen.getByRole('radio');
     expect(radio).toHaveAccessibleDescription('Something is wrong');
   });
+
+  it('card variant: accessible name is the label only; description and helper are the description', () => {
+    render(
+      <Radio
+        id="radio-card"
+        variant="card"
+        label="Standard delivery"
+        value="standard"
+        description="Arrives in 3 days"
+        helper={{ text: 'Free of charge' }}
+      />
+    );
+
+    const radio = screen.getByRole('radio', { name: 'Standard delivery' });
+    // Name is not merged with the description/helper text.
+    expect(radio).toHaveAccessibleName('Standard delivery');
+    expect(radio).toHaveAccessibleDescription(/Arrives in 3 days/);
+    expect(radio).toHaveAccessibleDescription(/Free of charge/);
+  });
 });

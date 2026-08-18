@@ -256,4 +256,23 @@ describe('Checkbox component', () => {
 
     expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
   });
+
+  it('card variant: accessible name is the label only; description and helper are the description', () => {
+    render(
+      <Checkbox
+        id="cb-card"
+        variant="card"
+        label="Express delivery"
+        value="express"
+        description="Arrives tomorrow"
+        helper={{ text: 'Costs extra' }}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Express delivery' });
+    // Name is not merged with the description/helper text.
+    expect(checkbox).toHaveAccessibleName('Express delivery');
+    expect(checkbox).toHaveAccessibleDescription(/Arrives tomorrow/);
+    expect(checkbox).toHaveAccessibleDescription(/Costs extra/);
+  });
 });

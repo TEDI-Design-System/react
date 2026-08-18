@@ -43,7 +43,7 @@ interface RadioGroupBreakpointProps {
    * Card layout. `separated` = individual cards with a gap; `segmented` = joined
    * cards with shared borders and only the group's outer corners rounded (a
    * button-group style). Only applies to `variant="card"`.
-   * @default 'separate
+   * @default separated
    */
   layout?: 'separated' | 'segmented';
   children: React.ReactNode;

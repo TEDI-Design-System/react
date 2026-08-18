@@ -107,6 +107,14 @@ export const Radio = ((props: RadioProps): JSX.Element => {
   );
 
   if (variant === 'card') {
+    // The whole card is a <label> for click convenience, but that would fold the
+    // description and helper text into the control's accessible NAME. Name the
+    // input from the choice text only (aria-labelledby), and expose the
+    // description + helper as its accessible DESCRIPTION (aria-describedby).
+    const cardLabelId = `${resolvedId}-label`;
+    const cardDescriptionId = description ? `${resolvedId}-description` : undefined;
+    const cardDescribedBy = [cardDescriptionId, helperId].filter(Boolean).join(' ') || undefined;
+
     return (
       <label
         data-name="radio"
@@ -120,12 +128,21 @@ export const Radio = ((props: RadioProps): JSX.Element => {
         )}
       >
         <span className={styles['tedi-radio__card-control']}>
-          {input}
+          {React.cloneElement(input, {
+            'aria-labelledby': label ? cardLabelId : undefined,
+            'aria-describedby': cardDescribedBy,
+          })}
           {indicator}
           {icon && <Icon name={icon} size={size === 'default' ? 18 : 24} className={styles['tedi-radio__card-icon']} />}
-          <span className={cn(styles['tedi-radio__card-label'], { 'sr-only': hideLabel })}>{label}</span>
+          <span id={cardLabelId} className={cn(styles['tedi-radio__card-label'], { 'sr-only': hideLabel })}>
+            {label}
+          </span>
         </span>
-        {description && <span className={styles['tedi-radio__card-description']}>{description}</span>}
+        {description && (
+          <span id={cardDescriptionId} className={styles['tedi-radio__card-description']}>
+            {description}
+          </span>
+        )}
         {helper && (
           <FeedbackText id={helperId} {...helper} className={cn(styles['tedi-radio__helper'], helper.className)} />
         )}

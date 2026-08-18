@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
+import { LabelProvider } from '../../../../providers/label-provider';
 import Checkbox from '../checkbox';
 
 import '@testing-library/jest-dom';
@@ -49,43 +50,48 @@ describe('Checkbox.Group', () => {
   });
 
   describe('select-all (indeterminate)', () => {
+    // Wrap in LabelProvider so getLabel resolves to real translations (the
+    // default context returns the raw key), letting us assert the resolved
+    // "Select all" / "Remove all" text rather than the label key.
     const renderWith = (value: string[], onChange = jest.fn()) =>
       render(
-        <Checkbox.Group label="Toppings" indeterminateCheck value={value} onChange={onChange}>
-          <Checkbox value="a" label="A" />
-          <Checkbox value="b" label="B" />
-        </Checkbox.Group>
+        <LabelProvider locale="en">
+          <Checkbox.Group label="Toppings" indeterminateCheck value={value} onChange={onChange}>
+            <Checkbox value="a" label="A" />
+            <Checkbox value="b" label="B" />
+          </Checkbox.Group>
+        </LabelProvider>
       );
 
-    it('is unchecked and labelled "select all" when nothing is selected', () => {
+    it('is unchecked and labelled "Select all" when nothing is selected', () => {
       renderWith([]);
-      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: /select-all/i });
+      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: /select all/i });
       expect(selectAll).not.toBeChecked();
       expect(selectAll.indeterminate).toBe(false);
     });
 
     it('is indeterminate when only some are selected', () => {
       renderWith(['a']);
-      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: /select-all/i });
+      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: /select all/i });
       expect(selectAll.indeterminate).toBe(true);
     });
 
-    it('is checked and labelled "remove all" when all are selected', () => {
+    it('is checked and labelled "Remove all" when all are selected', () => {
       renderWith(['a', 'b']);
-      expect(screen.getByRole('checkbox', { name: /remove-all/i })).toBeChecked();
+      expect(screen.getByRole('checkbox', { name: /remove all/i })).toBeChecked();
     });
 
     it('selects all children when clicked from empty', () => {
       const onChange = jest.fn();
       renderWith([], onChange);
-      fireEvent.click(screen.getByRole('checkbox', { name: /select-all/i }));
+      fireEvent.click(screen.getByRole('checkbox', { name: /select all/i }));
       expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
     });
 
     it('clears the children when clicked while all selected', () => {
       const onChange = jest.fn();
       renderWith(['a', 'b'], onChange);
-      fireEvent.click(screen.getByRole('checkbox', { name: /remove-all/i }));
+      fireEvent.click(screen.getByRole('checkbox', { name: /remove all/i }));
       expect(onChange).toHaveBeenLastCalledWith([]);
     });
   });

@@ -151,8 +151,8 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
       : typeof indeterminateCheck === 'function'
       ? indeterminateCheck(selectAllState)
       : allSelected
-      ? getLabel('table.filter.remove-all')
-      : getLabel('table.filter.select-all');
+      ? getLabel('checkbox-group.remove-all')
+      : getLabel('checkbox-group.select-all');
 
   const handleToggleAll = React.useCallback(() => {
     setValues(
