@@ -1,0 +1,68 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-editable-field {
+  display: inline-flex;
+  gap: var(--tedi-dimensions-02);
+  align-items: center;
+  max-width: 100%;
+}
+
+.tedi-editable-field--full-width {
+  display: flex;
+  width: 100%;
+
+  &.tedi-editable-field__trigger {
+    justify-content: space-between;
+  }
+
+  &.tedi-editable-field--editing {
+    display: block;
+  }
+}
+
+.tedi-editable-field__trigger {
+  @include mixins.button-reset;
+
+  display: inline-flex;
+  gap: var(--tedi-dimensions-02);
+  align-items: center;
+  padding: var(--tedi-dimensions-01) var(--tedi-dimensions-02);
+  color: var(--general-text-primary);
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--tedi-radius-02-default);
+
+  &:hover {
+    background-color: var(--general-surface-secondary);
+  }
+
+  &:focus-visible {
+    outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+    outline-offset: var(--tedi-borders-01);
+  }
+}
+
+.tedi-editable-field__icon {
+  flex: none;
+  color: var(--general-text-secondary);
+}
+
+.tedi-editable-field__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tedi-editable-field__placeholder {
+  color: var(--general-text-tertiary);
+}
+
+.tedi-editable-field__prefix {
+  @include mixins.visually-hidden;
+}
+
+// Disabled uses the muted disabled token. This intentionally does not meet the
+// WCAG 1.4.3 contrast minimum — disabled/inactive text is exempt from it.
+.tedi-editable-field--disabled {
+  color: var(--general-text-disabled);
+}

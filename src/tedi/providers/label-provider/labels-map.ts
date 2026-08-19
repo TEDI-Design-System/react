@@ -606,6 +606,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
+  'editable-field.edit': {
+    description: 'Screen-reader prefix on the EditableField read trigger, e.g. "Edit {label}".',
+    components: ['EditableField'],
+    et: 'Muuda',
+    en: 'Edit',
+    ru: 'Изменить',
+  },
   'table.no-data': {
     description: 'Default placeholder shown in the Table body when `data` is empty.',
     components: ['Table'],
