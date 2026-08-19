@@ -1966,17 +1966,25 @@ that match its patterns, without deep relative imports.
 **Polymorphic (`as` prop) components** — reuse TEDI's polymorphic types:
 
 ```tsx
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import { PolymorphicComponentPropWithRef, PolymorphicRef } from '@tedi-design-system/react/tedi';
 
-type MyBoxProps<C extends React.ElementType> = PolymorphicComponentPropWithRef<C, { muted?: boolean }>;
+type MyBoxProps<C extends React.ElementType = 'div'> = PolymorphicComponentPropWithRef<C, { muted?: boolean }>;
 
-const MyBox = forwardRef(
-  <C extends React.ElementType = 'div'>({ as, muted, ...rest }: MyBoxProps<C>, ref: PolymorphicRef<C>) => {
-    const Tag = as ?? 'div';
+const MyBoxInner = forwardRef(
+  <C extends React.ElementType = 'div'>({ as, muted, ...rest }: MyBoxProps<C>, ref?: PolymorphicRef<C>): JSX.Element => {
+    const Tag: React.ElementType = as ?? 'div';
     return <Tag ref={ref} data-muted={muted} {...rest} />;
   }
 );
+
+MyBoxInner.displayName = 'MyBox';
+
+// Cast to a generic call signature so `as`-specific props (e.g. `href` when
+// `as="a"`) are inferred — assigning forwardRef directly loses the generic.
+export const MyBox = MyBoxInner as <C extends React.ElementType = 'div'>(
+  props: MyBoxProps<C>
+) => React.ReactElement | null;
 ```
 
 Also available: `PolymorphicComponentPropWithoutRef`, and `AllowedHTMLTags<C, Allowed>` to constrain `as` to specific tags.
