@@ -606,6 +606,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
+  'search.loading': {
+    description: 'Loading row shown in the SearchAutocomplete listbox while suggestions are being fetched',
+    components: ['SearchAutocomplete'],
+    et: 'Otsin...',
+    en: 'Searching...',
+    ru: 'Поиск...',
+  },
+  'search.no-results': {
+    description: 'Text shown in the SearchAutocomplete listbox when no suggestions match the query',
+    components: ['SearchAutocomplete'],
+    et: 'Vasteid ei leitud',
+    en: 'No results found',
+    ru: 'Совпадений не найдено',
+  },
+  'search.results-count': {
+    description: 'Politely announced live-region text stating how many SearchAutocomplete suggestions are available',
+    components: ['SearchAutocomplete'],
+    et: (count: number) => `${count} vastet saadaval`,
+    en: (count: number) => `${count} results available`,
+    ru: (count: number) => `Доступно совпадений: ${count}`,
+  },
   'table.no-data': {
     description: 'Default placeholder shown in the Table body when `data` is empty.',
     components: ['Table'],

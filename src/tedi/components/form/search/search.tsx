@@ -6,6 +6,7 @@ import { IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Button, ButtonProps } from '../../buttons/button/button';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './search.module.scss';
+import { SearchAutocomplete } from './search-autocomplete';
 
 export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' | 'onKeyPress'> {
   /**
@@ -27,7 +28,7 @@ export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' 
   ariaLabel?: string;
 }
 
-export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
+const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>(
   (
     {
       placeholder,
@@ -111,4 +112,13 @@ export const Search = forwardRef<TextFieldForwardRef, SearchProps>(
   }
 );
 
-Search.displayName = 'Search';
+SearchInner.displayName = 'Search';
+
+/**
+ * `Search` with a `.Autocomplete` compound for the accessible combobox variant
+ * (typeahead / suggestions). Use `Search` for plain search input, and
+ * `Search.Autocomplete` when the field surfaces a suggestion listbox.
+ */
+export const Search = Object.assign(SearchInner, {
+  Autocomplete: SearchAutocomplete,
+});

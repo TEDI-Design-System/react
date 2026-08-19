@@ -46,6 +46,7 @@ export * from './components/form/number-field/number-field';
 export * from './components/form/toggle/toggle';
 export * from './components/form/feedback-text/feedback-text';
 export * from './components/form/search/search';
+export * from './components/form/search/search-autocomplete';
 export * from './components/form/radio/radio';
 export * from './components/form/choice-group';
 export * from './components/form/file-upload/file-upload';
