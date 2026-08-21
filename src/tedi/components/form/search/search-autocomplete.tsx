@@ -217,10 +217,12 @@ export const SearchAutocomplete = forwardRef<TextFieldForwardRef, SearchAutocomp
     }
   };
 
+  const activeOption = !loading && activeIndex !== null ? options[activeIndex] : undefined;
+
   const inputAttrs = getReferenceProps({
     role: 'combobox',
     'aria-autocomplete': 'list',
-    'aria-activedescendant': open && activeIndex !== null ? optionId(activeIndex) : undefined,
+    'aria-activedescendant': open && activeOption && activeIndex !== null ? optionId(activeIndex) : undefined,
     onKeyDown: handleInputKeyDown,
   }) as React.InputHTMLAttributes<HTMLInputElement>;
 

@@ -141,6 +141,22 @@ describe('SearchAutocomplete', () => {
     expect(within(listbox).getByText('search.loading')).toBeInTheDocument();
   });
 
+  it('clears aria-activedescendant when the active option is no longer rendered (loading)', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<ControlledExample />);
+
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'ma');
+    await screen.findByRole('listbox');
+    await user.keyboard('{ArrowDown}');
+
+    const firstOption = screen.getByRole('option', { name: 'Mari Maasikas' });
+    expect(input).toHaveAttribute('aria-activedescendant', firstOption.id);
+
+    rerender(<ControlledExample loading />);
+    expect(input).not.toHaveAttribute('aria-activedescendant');
+  });
+
   it('shows the no-results row when the query matches nothing', async () => {
     const user = userEvent.setup();
     render(<SearchAutocomplete id="ac" label="Otsi" options={[]} />);

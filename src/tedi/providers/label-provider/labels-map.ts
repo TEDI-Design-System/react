@@ -623,8 +623,8 @@ export const labelsMap = validateDefaultLabels({
   'search.results-count': {
     description: 'Politely announced live-region text stating how many SearchAutocomplete suggestions are available',
     components: ['SearchAutocomplete'],
-    et: (count: number) => `${count} vastet saadaval`,
-    en: (count: number) => `${count} results available`,
+    et: (count: number) => `${count} ${count === 1 ? 'vaste' : 'vastet'} saadaval`,
+    en: (count: number) => `${count} ${count === 1 ? 'result' : 'results'} available`,
     ru: (count: number) => `Доступно совпадений: ${count}`,
   },
   'table.no-data': {
