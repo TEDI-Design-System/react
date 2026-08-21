@@ -452,6 +452,7 @@ const [name, setName] = useState('Mari Maasikas');
 ```
 
 - **Commit / cancel:** commits when focus leaves the editor (click away / Tab out); `Escape` cancels. Focus moving into a floating popover the control opened (Select menu, DateField calendar) does **not** commit.
+- **Single-action vs multi-step controls (important):** only call `commit()` from a control's change handler when a single interaction completes the edit — e.g. picking a day in a single `DateField`, choosing one `Select` option, or flipping a `Toggle`. For **multi-step pickers** (`TimeField` hour+minute, `DateTimeField` date+time, multi-select `Select`, range `DateField`) do **not** call `commit()` on change — just update the draft and let the blur-commit fire when the picker closes. Committing on the first change closes the field mid-edit (e.g. after the hour, before the minute).
 - **Controlled or uncontrolled:** pass `value` + `onChange`, or `defaultValue`.
 - **`renderValue`:** formats the read view (e.g. format a `Date`, map an option to its label).
 - **`hideEditIcon`:** hides the pencil icon (shown by default, brand-coloured); the value stays clickable.
@@ -459,14 +460,19 @@ const [name, setName] = useState('Mari Maasikas');
 - **`disabled`:** renders the value as plain, non-interactive text (no dimming, no edit affordance).
 - **Headless:** use the `useEditable` hook for the state machine (`isEditing`, `edit`, `commit`, `cancel`, `value`) without the built-in markup.
 
-Controls whose value API differs need a one-line adapter, and pickers that commit on selection should call `commit()`:
+Controls whose value API differs need a one-line adapter. Single-action pickers call `commit()` on select; multi-step pickers (e.g. `TimeField`) omit it and let blur commit:
 
 ```tsx
-// DateField uses selected / onSelect
+// Single DateField — one click completes the edit, so commit on select
 <Editable<Date | undefined> label="Date" value={date} onChange={setDate} renderValue={formatDate}>
   {({ value, onChange, commit }) => (
     <DateField id="date" label="Date" mode="single" selected={value} onSelect={(d) => { onChange(d as Date); commit(); }} />
   )}
+</Editable>
+
+// TimeField (hour + minute) — no commit() on change; blur commits when the picker closes
+<Editable<string> label="Time" value={time} onChange={setTime} renderValue={(v) => v || '—'}>
+  {({ value, onChange }) => <TimeField id="time" label="Time" value={value} onChange={onChange} />}
 </Editable>
 
 // Toggle uses checked

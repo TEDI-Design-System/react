@@ -16,12 +16,9 @@ import { Slider } from '../slider/slider';
 import { Textarea } from '../textarea/textarea';
 import { TextField } from '../textfield/textfield';
 import { TimeField } from '../time-field/time-field';
-import { TimePicker } from '../time-picker/time-picker';
 import { Toggle } from '../toggle/toggle';
 import { Editable } from './editable';
 
-// Force zero-padded day and month (e.g. 22.03.2026) — the bare `et-EE` locale
-// drops leading zeros on some platforms (22.3.2026).
 const formatDate = (d?: Date): string =>
   d ? d.toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
 const formatDateTime = (d?: Date): string =>
@@ -87,7 +84,7 @@ const FormCard = ({ title, children }: { title: string; children: React.ReactNod
  * - **Text:** `TextField`, `TextArea`, `Search`
  * - **Numeric:** `NumberField`, `Slider`
  * - **Choice:** `Select` (single or `multiple`, commit on select), `ChoiceGroup`
- * - **Date & time:** `DateTimeField`, `TimeField`, `TimePicker`
+ * - **Date & time:** `DateTimeField`, `TimeField`
  *
  * Controls whose value API differs need a one-line adapter inside the render
  * function:
@@ -350,8 +347,10 @@ export const ProfileSettings: Story = {
 };
 
 /**
- * A realistic booking form. Covers the date/time controls (`DateField`, `DateTimeField`, `TimeField`, `TimePicker`), `NumberField`, `Slider` and
- * `Search`. Popover pickers commit on change; the inline controls commit on blur.
+ * A realistic booking form. Covers the date/time controls (`DateField`, `DateTimeField`, `TimeField`), `NumberField`, `Slider` and
+ * `Search`. Single-action pickers (single `DateField`) commit on selection; multi-step
+ * pickers (`TimeField` hour+minute, `DateTimeField` date+time) and inline controls
+ * commit on blur, so the picker stays open until you finish.
  */
 export const AppointmentBooking: Story = {
   render: function BookingForm() {
@@ -384,17 +383,7 @@ export const AppointmentBooking: Story = {
 
         <FormRow label="Algusaeg">
           <Editable<string> label="Algusaeg" value={start} onChange={setStart} renderValue={(v) => v || '—'}>
-            {({ value, onChange, commit }) => (
-              <TimeField
-                id="bk-start"
-                label="Algusaeg"
-                value={value}
-                onChange={(next) => {
-                  onChange(next);
-                  commit();
-                }}
-              />
-            )}
+            {({ value, onChange }) => <TimeField id="bk-start" label="Algusaeg" value={value} onChange={onChange} />}
           </Editable>
         </FormRow>
 
@@ -405,15 +394,12 @@ export const AppointmentBooking: Story = {
             onChange={setCheckIn}
             renderValue={formatDateTime}
           >
-            {({ value, onChange, commit }) => (
+            {({ value, onChange }) => (
               <DateTimeField
                 id="bk-checkin"
                 label="Saabumine"
                 value={value}
-                onChange={(next) => {
-                  onChange(next as Date | undefined);
-                  commit();
-                }}
+                onChange={(next) => onChange(next as Date | undefined)}
               />
             )}
           </Editable>
@@ -421,7 +407,9 @@ export const AppointmentBooking: Story = {
 
         <FormRow label="Meeldetuletus">
           <Editable<string> label="Meeldetuletus" value={reminder} onChange={setReminder} renderValue={(v) => v || '—'}>
-            {({ value, onChange }) => <TimePicker value={value} onChange={onChange} />}
+            {({ value, onChange }) => (
+              <TimeField id="bk-reminder" label="Meeldetuletus" value={value} onChange={onChange} />
+            )}
           </Editable>
         </FormRow>
 
