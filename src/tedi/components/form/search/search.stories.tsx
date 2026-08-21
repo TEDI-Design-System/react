@@ -8,8 +8,8 @@ import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
+import { SearchAutocomplete, SearchAutocompleteOption } from './components/autocomplete/autocomplete';
 import { Search, SearchProps } from './search';
-import { SearchAutocomplete, SearchAutocompleteOption } from './search-autocomplete';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4620-82860&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -335,16 +335,16 @@ Use \`ariaLabel\` only as a fallback when a real \`<label>\` cannot be rendered.
 };
 
 const PEOPLE: SearchAutocompleteOption[] = [
-  { value: 'mari', label: 'Mari Maasikas' },
-  { value: 'marelle', label: 'Marelle Mets' },
-  { value: 'marjanne', label: 'Marjanne Meri' },
-  { value: 'mart', label: 'Mart Mesi' },
-  { value: 'martin', label: 'Martin Saar' },
-  { value: 'kalle', label: 'Kalle Kask' },
-  { value: 'kati', label: 'Kati Kuusk' },
-  { value: 'tonu', label: 'Tõnu Tamm' },
-  { value: 'liisa', label: 'Liisa Lepp' },
-  { value: 'jaan', label: 'Jaan Järv' },
+  { value: 'mari', label: 'Mari Maasikas', description: 'Tootejuht' },
+  { value: 'marelle', label: 'Marelle Mets', description: 'Disainer' },
+  { value: 'marjanne', label: 'Marjanne Meri', description: 'Arendaja' },
+  { value: 'mart', label: 'Mart Mesi', description: 'Analüütik' },
+  { value: 'martin', label: 'Martin Saar', description: 'Arendaja' },
+  { value: 'kalle', label: 'Kalle Kask', description: 'Testija' },
+  { value: 'kati', label: 'Kati Kuusk', description: 'Tootejuht' },
+  { value: 'tonu', label: 'Tõnu Tamm', description: 'Disainer' },
+  { value: 'liisa', label: 'Liisa Lepp', description: 'Arendaja' },
+  { value: 'jaan', label: 'Jaan Järv', description: 'Analüütik' },
 ];
 
 const filterPeople = (query: string) =>

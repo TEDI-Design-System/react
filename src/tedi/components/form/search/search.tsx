@@ -5,8 +5,8 @@ import { useLabels } from '../../../providers/label-provider';
 import { IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Button, ButtonProps } from '../../buttons/button/button';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
+import { SearchAutocomplete } from './components/autocomplete/autocomplete';
 import styles from './search.module.scss';
-import { SearchAutocomplete } from './search-autocomplete';
 
 export interface SearchProps extends Omit<TextFieldProps, 'isTextArea' | 'icon' | 'onKeyPress'> {
   /**

@@ -2,11 +2,11 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
-import { SearchAutocomplete, SearchAutocompleteOption } from './search-autocomplete';
+import { SearchAutocomplete, SearchAutocompleteOption } from './autocomplete';
 
 import '@testing-library/jest-dom';
 
-jest.mock('../../../providers/label-provider', () => ({
+jest.mock('../../../../../providers/label-provider', () => ({
   useLabels: () => ({
     getLabel: (key: string, ...args: unknown[]) => (args.length ? `${key}:${args.join(',')}` : key),
   }),
@@ -155,6 +155,23 @@ describe('SearchAutocomplete', () => {
 
     rerender(<ControlledExample loading />);
     expect(input).not.toHaveAttribute('aria-activedescendant');
+  });
+
+  it('renders an option description as a secondary line', async () => {
+    const user = userEvent.setup();
+    render(
+      <SearchAutocomplete
+        id="ac"
+        label="Otsi"
+        openThreshold={0}
+        options={[{ value: 'mari', label: 'Mari Maasikas', description: 'Tootejuht' }]}
+      />
+    );
+
+    await user.type(screen.getByRole('combobox'), 'm');
+
+    const option = await screen.findByRole('option', { name: /Mari Maasikas/ });
+    expect(within(option).getByText('Tootejuht')).toBeInTheDocument();
   });
 
   it('shows the no-results row when the query matches nothing', async () => {

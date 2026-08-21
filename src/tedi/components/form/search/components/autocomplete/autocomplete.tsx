@@ -14,12 +14,12 @@ import {
 import cn from 'classnames';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
 
-import { useLabels } from '../../../providers/label-provider';
-import { Text } from '../../base/typography/text/text';
-import { Spinner } from '../../loaders/spinner/spinner';
-import { OptionContent } from '../../misc/option-content/option-content';
-import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
-import styles from './search-autocomplete.module.scss';
+import { useLabels } from '../../../../../providers/label-provider';
+import { Text } from '../../../../base/typography/text/text';
+import { Spinner } from '../../../../loaders/spinner/spinner';
+import { OptionContent } from '../../../../misc/option-content/option-content';
+import { TextField, TextFieldForwardRef, TextFieldProps } from '../../../textfield/textfield';
+import styles from './autocomplete.module.scss';
 
 export interface SearchAutocompleteOption {
   /**
@@ -31,6 +31,12 @@ export interface SearchAutocompleteOption {
    * Visible label. Falls back to `value` when omitted.
    */
   label?: React.ReactNode;
+  /**
+   * Optional secondary line shown beneath the label (e.g. a code, category, or
+   * hint). Rendered as `OptionContent.Meta` in the default option layout; ignored
+   * when a custom `renderOption` is supplied.
+   */
+  description?: React.ReactNode;
   /**
    * Renders the option greyed out and skips it during keyboard navigation.
    * @default false
@@ -279,8 +285,9 @@ export const SearchAutocomplete = forwardRef<TextFieldForwardRef, SearchAutocomp
           {renderOption ? (
             renderOption(option, { active, query })
           ) : (
-            <OptionContent>
+            <OptionContent layout={option.description !== undefined ? 'vertical' : 'horizontal'}>
               <OptionContent.Label>{option.label ?? option.value}</OptionContent.Label>
+              {option.description !== undefined && <OptionContent.Meta>{option.description}</OptionContent.Meta>}
             </OptionContent>
           )}
         </div>
