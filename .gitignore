@@ -60,6 +60,10 @@ migrations.json
 # Generated a11y report (CI)
 a11y-report/
 
+# Claude working docs (research/plan phase)
+/research.md
+/plan.md
+
 # design-sync (claude.ai/design import)
 .design-sync/sb-reference/
 .design-sync/learnings/
