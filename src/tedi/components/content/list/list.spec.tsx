@@ -58,6 +58,33 @@ describe('List Component', () => {
     expect(container.firstChild).toHaveClass('tedi-list--bullet-color-brand');
   });
 
+  test('forwards the "start" attribute and seeds the CSS counter so numbering begins at it', () => {
+    const { container } = renderList({ element: 'ol', start: 5 });
+    const ol = container.querySelector('ol');
+    expect(ol).toHaveAttribute('start', '5');
+    expect(ol).toHaveStyle({ counterReset: 'item 4' });
+  });
+
+  test('forwards native attributes (id, aria-label, reversed) to the list element', () => {
+    const { container } = renderList({ element: 'ol', id: 'steps', 'aria-label': 'Steps', reversed: true });
+    const ol = container.querySelector('ol');
+    expect(ol).toHaveAttribute('id', 'steps');
+    expect(ol).toHaveAttribute('aria-label', 'Steps');
+    expect(ol).toHaveAttribute('reversed');
+  });
+
+  test('forwards the "value" attribute on a ListItem and seeds the counter to that number', () => {
+    const { container } = render(
+      <List element="ol">
+        <ListItem value={10}>Item</ListItem>
+      </List>
+    );
+    const li = container.querySelector('li');
+    expect(li).toHaveAttribute('value', '10');
+    // Set the counter (no new scope) and drop the increment so the number is exact.
+    expect(li).toHaveStyle({ counterSet: 'item 10', counterIncrement: 'none' });
+  });
+
   test.each([
     'primary',
     'secondary',

@@ -23,7 +23,12 @@ type ListBreakpointProps = {
   style?: 'styled' | 'none';
 };
 
-export interface ListProps extends BreakpointSupport<ListBreakpointProps> {
+export interface ListProps
+  extends BreakpointSupport<ListBreakpointProps>,
+    // Forward native list attributes to the rendered element — notably `start`,
+    // `reversed` and `type` for ordered lists, plus `id` / `aria-*`. `style` is
+    // omitted because this component repurposes it for the styling variant.
+    Omit<React.OlHTMLAttributes<HTMLOListElement>, 'style' | 'children'> {
   /**
    * List children should be ListItem components
    */
@@ -55,6 +60,7 @@ export const List = (props: ListProps) => {
     verticalSpacing,
     className,
     color = 'brand',
+    ...rest
   } = getCurrentBreakpointProps<ListProps>(props);
   const listBEM = cn(
     styles['tedi-list'],
@@ -66,15 +72,30 @@ export const List = (props: ListProps) => {
   );
   const Element = element;
 
+  // The visible numbers come from a CSS counter, not the native `<ol>` marker, so
+  // `start` only takes effect if we seed that counter. `counter-reset` is
+  // processed before `counter-increment`, so resetting to `start - 1` makes the
+  // first item render as `start`. (The native `start` attribute is still
+  // forwarded for correct semantics / copy-paste / non-CSS fallback.)
+  const orderedListStyle =
+    element === 'ol' && typeof rest.start === 'number' ? { counterReset: `item ${rest.start - 1}` } : undefined;
+
   if (verticalSpacing) {
+    // `VerticalSpacing` owns the element's `style`, so the counter seed can't be
+    // applied here — `start` still forwards to the DOM but won't reseed the visible
+    // numbering in this (uncommon) composition.
     return (
-      <VerticalSpacing {...verticalSpacing} element={element} className={listBEM}>
+      <VerticalSpacing {...verticalSpacing} {...rest} element={element} className={listBEM}>
         {children}
       </VerticalSpacing>
     );
   }
 
-  return <Element className={listBEM}>{children}</Element>;
+  return (
+    <Element className={listBEM} {...rest} style={orderedListStyle}>
+      {children}
+    </Element>
+  );
 };
 
 List.Item = ListItem;

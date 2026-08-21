@@ -142,6 +142,28 @@ export const OrderedList: Story = {
   },
 };
 
+/**
+ * `start` begins the numbering at a given value, and a single `List.Item` can
+ * override its own number with `value` (following items continue from there).
+ * This example starts at **5** and jumps the third item to **10**, so it renders
+ * `5, 6, 10, 11`. The numbers are drawn with a CSS counter, so `List` seeds that
+ * counter from `start` / `value` (the native attributes are also forwarded).
+ */
+export const OrderedListWithStart: Story = {
+  name: 'Ordered list with start / value',
+  render: (args) => (
+    <List {...args} element="ol" start={5}>
+      <List.Item>Starts at five</List.Item>
+      <List.Item>Six</List.Item>
+      <List.Item value={10}>Jumps to ten</List.Item>
+      <List.Item>Eleven</List.Item>
+    </List>
+  ),
+  args: {
+    style: 'styled',
+  },
+};
+
 export const NoStyleList: Story = {
   render: TemplateNoStyleList,
   args: {

@@ -12,7 +12,12 @@ type ListItemBreakpointProps = {
   verticalSpacingItem?: Omit<VerticalSpacingItemProps, 'element' | 'children'>;
 };
 
-export interface ListItemProps extends BreakpointSupport<ListItemBreakpointProps> {
+export interface ListItemProps
+  extends BreakpointSupport<ListItemBreakpointProps>,
+    // Forward native `<li>` attributes — notably `value` to override a single
+    // item's number in an ordered list, plus `id` / `aria-*`. `style` is omitted
+    // for parity with `List`.
+    Omit<React.LiHTMLAttributes<HTMLLIElement>, 'style' | 'children'> {
   /**
    * List children should be ListItem components
    */
@@ -25,18 +30,34 @@ export interface ListItemProps extends BreakpointSupport<ListItemBreakpointProps
 
 export const ListItem = (props: ListItemProps) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { children, verticalSpacingItem, className } = getCurrentBreakpointProps<ListItemProps>(props);
+  const { children, verticalSpacingItem, className, ...rest } = getCurrentBreakpointProps<ListItemProps>(props);
   const listItemBEM = cn(styles['tedi-list__item'], verticalSpacingItem?.className, className);
 
+  // In an ordered list the number is a CSS counter, so `value` (override this
+  // item's number) only shows if we set the counter. Use `counter-set`, not
+  // `counter-reset` — reset would open a *new* nested counter scope, which
+  // `counters(item, '.')` then renders as e.g. "6.10". We also switch off this
+  // item's own increment so the value is exact regardless of the set/increment
+  // order; following items continue from it. (`counter-set` needs Safari 17.2+;
+  // older browsers fall back to normal numbering.)
+  const itemStyle =
+    typeof rest.value === 'number' ? { counterIncrement: 'none', counterSet: `item ${rest.value}` } : undefined;
+
   if (props.verticalSpacingItem) {
+    // `VerticalSpacingItem` owns the element's `style`; `value` still forwards to
+    // the DOM but won't reseed the visible number in this composition.
     return (
-      <VerticalSpacingItem {...verticalSpacingItem} element="li" className={listItemBEM}>
+      <VerticalSpacingItem {...verticalSpacingItem} {...rest} element="li" className={listItemBEM}>
         {children}
       </VerticalSpacingItem>
     );
   }
 
-  return <li className={listItemBEM}>{children}</li>;
+  return (
+    <li className={listItemBEM} {...rest} style={itemStyle}>
+      {children}
+    </li>
+  );
 };
 
 export default ListItem;
