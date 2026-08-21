@@ -154,7 +154,7 @@ describe('Overlay component', () => {
     await act(async () => {
       fireEvent.mouseEnter(trigger);
     });
-    expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(trigger);
@@ -163,7 +163,7 @@ describe('Overlay component', () => {
       fireEvent.mouseLeave(trigger);
     });
 
-    expect(screen.queryByTestId('overlay-content')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
   describe('Overlay scroll locking', () => {

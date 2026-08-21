@@ -65,5 +65,9 @@ describe('MapButton', () => {
     const options = screen.getAllByRole('option');
     expect(options[0].className).not.toContain('tedi-map-dropdown__item--active');
     expect(options[1].className).toContain('tedi-map-dropdown__item--active');
+
+    // Keyboard navigation should also initialize from the active item (roving tabIndex).
+    expect(options[0]).toHaveAttribute('tabindex', '-1');
+    expect(options[1]).toHaveAttribute('tabindex', '0');
   });
 });
