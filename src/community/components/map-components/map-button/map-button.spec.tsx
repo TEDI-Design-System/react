@@ -47,4 +47,23 @@ describe('MapButton', () => {
     rerender(<MapButton isActive>Text</MapButton>);
     expect(screen.getByRole('button').className).toContain('tedi-map-button--is-active');
   });
+
+  it('forwards isActive to dropdownItems so the active option is highlighted', () => {
+    render(
+      <MapButton
+        dropdownItems={[
+          { children: 'Option A', isActive: false },
+          { children: 'Option B', isActive: true },
+        ]}
+      >
+        Text
+      </MapButton>
+    );
+
+    fireEvent.click(screen.getByRole('combobox'));
+
+    const options = screen.getAllByRole('option');
+    expect(options[0].className).not.toContain('tedi-map-dropdown__item--active');
+    expect(options[1].className).toContain('tedi-map-dropdown__item--active');
+  });
 });
