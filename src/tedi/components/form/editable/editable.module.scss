@@ -1,0 +1,73 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-editable {
+  display: inline-flex;
+  gap: var(--tedi-dimensions-02);
+  align-items: center;
+  max-width: 100%;
+}
+
+.tedi-editable--full-width {
+  display: flex;
+  width: 100%;
+
+  &.tedi-editable__trigger {
+    justify-content: space-between;
+  }
+
+  &.tedi-editable--editing {
+    display: block;
+  }
+}
+
+// Read trigger per the "Hidden field" spec: transparent by default, the dedicated
+// hidden-field hover surface, the shared form-field radius and focus ring. The
+// value keeps primary text; only the edit icon carries the brand colour.
+.tedi-editable__trigger {
+  @include mixins.button-reset;
+
+  display: inline-flex;
+  gap: var(--tedi-dimensions-02);
+  align-items: center;
+  padding: var(--tedi-dimensions-01) var(--tedi-dimensions-02);
+  color: var(--general-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background-color: var(--form-hidden-default);
+  border-radius: var(--form-field-radius);
+
+  &:hover {
+    background-color: var(--form-hidden-hover);
+  }
+
+  &:focus-visible {
+    @include mixins.focus-element;
+  }
+}
+
+// The value keeps its normal text colour; only the edit icon carries the brand
+// colour (set via the Icon `color="brand"` prop) so the affordance stands out.
+.tedi-editable__icon {
+  flex: none;
+}
+
+.tedi-editable__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tedi-editable__placeholder {
+  color: var(--general-text-tertiary);
+}
+
+.tedi-editable__prefix {
+  @include mixins.visually-hidden;
+}
+
+// Disabled renders the value as plain, non-interactive text — the same as a
+// TextGroup value. There is no visible field, so the text is not dimmed; it is
+// ordinary body text that simply lacks the hover/edit affordance.
+.tedi-editable--disabled {
+  color: var(--general-text-primary);
+}

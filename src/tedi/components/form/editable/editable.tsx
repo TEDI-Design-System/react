@@ -3,9 +3,9 @@ import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
-import styles from './editable-field.module.scss';
+import styles from './editable.module.scss';
 
-export interface UseEditableFieldOptions<T> {
+export interface UseEditableOptions<T> {
   /** Controlled committed value. Pair with `onChange`. */
   value?: T;
   /** Initial committed value for uncontrolled use. Ignored when `value` is set. */
@@ -15,7 +15,7 @@ export interface UseEditableFieldOptions<T> {
 }
 
 /** Props handed to the editor render function. */
-export interface EditableFieldEditor<T> {
+export interface EditableEditor<T> {
   /** Current draft value — wire this to the control's `value`. */
   value: T;
   /** Update the draft — wire this to the control's `onChange`. */
@@ -26,7 +26,7 @@ export interface EditableFieldEditor<T> {
   cancel: () => void;
 }
 
-export interface UseEditableFieldResult<T> extends EditableFieldEditor<T> {
+export interface UseEditableResult<T> extends EditableEditor<T> {
   /** Whether the field is currently in edit mode. */
   isEditing: boolean;
   /** Enter edit mode (seeds the draft from the committed value). */
@@ -39,13 +39,9 @@ export interface UseEditableFieldResult<T> extends EditableFieldEditor<T> {
  * Headless edit-in-place state: read/committed value + an editable draft, with
  * `edit` / `commit` / `cancel` transitions. Supports controlled and
  * uncontrolled use. Use directly when you want full control of the markup;
- * otherwise use `EditableField`.
+ * otherwise use `Editable`.
  */
-export function useEditableField<T>({
-  value,
-  defaultValue,
-  onChange,
-}: UseEditableFieldOptions<T>): UseEditableFieldResult<T> {
+export function useEditable<T>({ value, defaultValue, onChange }: UseEditableOptions<T>): UseEditableResult<T> {
   const isControlled = value !== undefined;
   const [innerValue, setInnerValue] = React.useState<T>((value ?? defaultValue) as T);
   const committedValue = (isControlled ? value : innerValue) as T;
@@ -76,7 +72,7 @@ export function useEditableField<T>({
   return { isEditing, edit, commit, cancel, committedValue, value: draft, onChange: setDraft };
 }
 
-export interface EditableFieldProps<T> extends UseEditableFieldOptions<T> {
+export interface EditableProps<T> extends UseEditableOptions<T> {
   /** Accessible label for the field (announced on the read trigger). */
   label: string;
   /**
@@ -94,6 +90,12 @@ export interface EditableFieldProps<T> extends UseEditableFieldOptions<T> {
    * instead of sizing to their content. @default false
    */
   fullWidth?: boolean;
+  /**
+   * Hides the edit (pencil) icon on the read trigger. The affordance still works
+   * — the whole value stays clickable — this only drops the visual cue.
+   * @default false
+   */
+  hideEditIcon?: boolean;
   /** id applied to the read trigger. */
   id?: string;
   /** Additional class on the root element. */
@@ -102,28 +104,29 @@ export interface EditableFieldProps<T> extends UseEditableFieldOptions<T> {
    * Renders the edit view — return any TEDI control wired to the render props.
    * The wrapper commits on focus leaving the editor and cancels on `Escape`.
    */
-  children: (editor: EditableFieldEditor<T>) => React.ReactNode;
+  children: (editor: EditableEditor<T>) => React.ReactNode;
 }
 
 const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
 
-export function EditableField<T>({
+export function Editable<T>({
   label,
   renderValue,
   placeholder = '—',
   disabled = false,
   fullWidth = false,
+  hideEditIcon = false,
   id,
   className,
   children,
   ...options
-}: EditableFieldProps<T>): JSX.Element {
+}: EditableProps<T>): JSX.Element {
   const { getLabel } = useLabels();
   const generatedId = React.useId();
   const fieldId = id ?? generatedId;
   const editorRef = React.useRef<HTMLDivElement>(null);
-  const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useEditableField<T>(options);
-  const fullWidthClass = fullWidth ? styles['tedi-editable-field--full-width'] : undefined;
+  const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useEditable<T>(options);
+  const fullWidthClass = fullWidth ? styles['tedi-editable--full-width'] : undefined;
 
   React.useEffect(() => {
     if (!isEditing) return;
@@ -134,7 +137,7 @@ export function EditableField<T>({
     return (
       <div
         ref={editorRef}
-        className={cn(styles['tedi-editable-field'], styles['tedi-editable-field--editing'], fullWidthClass, className)}
+        className={cn(styles['tedi-editable'], styles['tedi-editable--editing'], fullWidthClass, className)}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.stopPropagation();
@@ -170,15 +173,8 @@ export function EditableField<T>({
 
   if (disabled) {
     return (
-      <span
-        className={cn(
-          styles['tedi-editable-field'],
-          styles['tedi-editable-field--disabled'],
-          fullWidthClass,
-          className
-        )}
-      >
-        <span className={empty ? styles['tedi-editable-field__placeholder'] : undefined}>
+      <span className={cn(styles['tedi-editable'], styles['tedi-editable--disabled'], fullWidthClass, className)}>
+        <span className={empty ? styles['tedi-editable__placeholder'] : undefined}>
           {empty ? placeholder : display}
         </span>
       </span>
@@ -190,19 +186,21 @@ export function EditableField<T>({
       type="button"
       id={fieldId}
       onClick={edit}
-      className={cn(styles['tedi-editable-field'], styles['tedi-editable-field__trigger'], fullWidthClass, className)}
+      className={cn(styles['tedi-editable'], styles['tedi-editable__trigger'], fullWidthClass, className)}
     >
-      <span className={styles['tedi-editable-field__prefix']}>
-        {getLabel('editable-field.edit')} {label}:{' '}
+      <span className={styles['tedi-editable__prefix']}>
+        {getLabel('editable.edit')} {label}:{' '}
       </span>
-      <span className={empty ? styles['tedi-editable-field__placeholder'] : styles['tedi-editable-field__value']}>
+      <span className={empty ? styles['tedi-editable__placeholder'] : styles['tedi-editable__value']}>
         {empty ? placeholder : display}
       </span>
-      <Icon name="edit" size={16} aria-hidden className={styles['tedi-editable-field__icon']} />
+      {!hideEditIcon && (
+        <Icon name="edit" size={18} color="brand" aria-hidden className={styles['tedi-editable__icon']} />
+      )}
     </button>
   );
 }
 
-EditableField.displayName = 'EditableField';
+Editable.displayName = 'Editable';
 
-export default EditableField;
+export default Editable;

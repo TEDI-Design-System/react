@@ -18,10 +18,22 @@ import { TextField } from '../textfield/textfield';
 import { TimeField } from '../time-field/time-field';
 import { TimePicker } from '../time-picker/time-picker';
 import { Toggle } from '../toggle/toggle';
-import { EditableField } from './editable-field';
+import { Editable } from './editable';
 
-const formatDate = (d?: Date): string => (d ? d.toLocaleDateString('et-EE') : '—');
-const formatDateTime = (d?: Date): string => (d ? d.toLocaleString('et-EE') : '—');
+// Force zero-padded day and month (e.g. 22.03.2026) — the bare `et-EE` locale
+// drops leading zeros on some platforms (22.3.2026).
+const formatDate = (d?: Date): string =>
+  d ? d.toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+const formatDateTime = (d?: Date): string =>
+  d
+    ? d.toLocaleString('et-EE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '—';
 
 const FormRow = ({
   label,
@@ -30,9 +42,12 @@ const FormRow = ({
   label: string;
   children: React.ReactElement<{ fullWidth?: boolean }>;
 }): JSX.Element => (
-  <Row alignItems="center" gutter={2}>
+  // Top-align the label so it keeps its place when a field grows in edit mode
+  // (e.g. the Textarea). The small top padding lines the label up with the read
+  // value, which sits inside the trigger's vertical padding.
+  <Row alignItems="start" gutter={2}>
     <Col xs={12} sm={4}>
-      <Text element="div" color="secondary" modifiers="small">
+      <Text element="div" color="secondary" modifiers="small" style={{ paddingTop: 'var(--tedi-dimensions-01)' }}>
         {label}
       </Text>
     </Col>
@@ -58,11 +73,11 @@ const FormCard = ({ title, children }: { title: string; children: React.ReactNod
 );
 
 /**
- * `EditableField` is an edit-in-place wrapper: it shows a value that becomes an editable control when clicked. It is control-agnostic - supply any TEDI form
+ * `Editable` is an edit-in-place wrapper: it shows a value that becomes an editable control when clicked. It is control-agnostic - supply any TEDI form
  * control through the `children` render function and wire it to the render props (`value`, `onChange`, `commit`, `cancel`).
  *
  * The wrapper owns the read <-> edit toggle, focus, and keyboard handling: clicking away (focus leaving the editor) commits, and `Escape` cancels. For state-only
- * usage without the built-in markup, use the `useEditableField` hook.
+ * usage without the built-in markup, use the `useEditable` hook.
  *
  * ### Supported TEDI-Ready controls
  *
@@ -84,9 +99,9 @@ const FormCard = ({ title, children }: { title: string; children: React.ReactNod
  *
  * Not a fit: `FileUpload` / `FileDropzone` (file management, not a single editable value), and standalone `Checkbox` / `Radio`
  */
-const meta: Meta<typeof EditableField> = {
-  title: 'Tedi-Ready/Components/Form/EditableField',
-  component: EditableField,
+const meta: Meta<typeof Editable> = {
+  title: 'TEDI-Ready/Components/Form/Editable',
+  component: Editable,
   argTypes: {
     label: {
       control: 'text',
@@ -107,6 +122,11 @@ const meta: Meta<typeof EditableField> = {
       control: 'boolean',
       description:
         'Stretches the field to the full width of its container so controls (Select, Slider, inputs) fill the row.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
+    hideEditIcon: {
+      control: 'boolean',
+      description: 'Hides the edit (pencil) icon on the read trigger; the value stays clickable.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     value: {
@@ -134,7 +154,7 @@ const meta: Meta<typeof EditableField> = {
       control: false,
       description:
         'Render function returning any TEDI control wired to the editor render props (`value`, `onChange`, `commit`, `cancel`).',
-      table: { type: { summary: '(editor: EditableFieldEditor<T>) => ReactNode' } },
+      table: { type: { summary: '(editor: EditableEditor<T>) => ReactNode' } },
     },
     id: { control: false, description: 'id applied to the read trigger.', table: { type: { summary: 'string' } } },
     className: {
@@ -146,7 +166,7 @@ const meta: Meta<typeof EditableField> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof EditableField>;
+type Story = StoryObj<typeof Editable>;
 
 export const Default: Story = {
   args: {
@@ -154,15 +174,16 @@ export const Default: Story = {
     placeholder: '—',
     disabled: false,
     fullWidth: false,
+    hideEditIcon: false,
   },
   render: function SingleField(args) {
     const [name, setName] = useState('Mari Maasikas');
     return (
-      <EditableField<string> {...args} value={name} onChange={setName} renderValue={(v) => v || '—'}>
+      <Editable<string> {...args} value={name} onChange={setName} renderValue={(v) => v || '—'}>
         {({ value, onChange }) => (
           <TextField id="ef-name" label={args.label} hideLabel value={value} onChange={onChange} />
         )}
-      </EditableField>
+      </Editable>
     );
   },
 };
@@ -204,23 +225,23 @@ export const ProfileSettings: Story = {
     return (
       <FormCard title="Profiili seaded">
         <FormRow label="Nimi">
-          <EditableField<string> label="Nimi" value={name} onChange={setName} renderValue={(v) => v || '—'}>
+          <Editable<string> label="Nimi" value={name} onChange={setName} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => (
               <TextField id="ps-name" label="Nimi" hideLabel value={value} onChange={onChange} />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="E-post">
-          <EditableField<string> label="E-post" value={email} onChange={setEmail} renderValue={(v) => v || '—'}>
+          <Editable<string> label="E-post" value={email} onChange={setEmail} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => (
               <TextField id="ps-email" label="E-post" hideLabel type="email" value={value} onChange={onChange} />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Roll">
-          <EditableField<string>
+          <Editable<string>
             label="Roll"
             value={role}
             onChange={setRole}
@@ -241,11 +262,11 @@ export const ProfileSettings: Story = {
                 }}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Riik">
-          <EditableField<ISelectOption | null>
+          <Editable<ISelectOption | null>
             label="Riik"
             value={country}
             onChange={setCountry}
@@ -264,11 +285,11 @@ export const ProfileSettings: Story = {
                 }}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Tutvustus">
-          <EditableField<string>
+          <Editable<string>
             label="Tutvustus"
             value={bio}
             onChange={setBio}
@@ -278,11 +299,11 @@ export const ProfileSettings: Story = {
             {({ value, onChange }) => (
               <Textarea id="ps-bio" label="Tutvustus" hideLabel value={value} onChange={onChange} />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Oskused">
-          <EditableField<ISelectOption[]>
+          <Editable<ISelectOption[]>
             label="Oskused"
             value={skills}
             onChange={setSkills}
@@ -299,11 +320,11 @@ export const ProfileSettings: Story = {
                 onChange={(next) => onChange((next as ISelectOption[] | null) ?? [])}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Teavitused">
-          <EditableField<boolean>
+          <Editable<boolean>
             label="Teavitused"
             value={notifications}
             onChange={setNotifications}
@@ -321,7 +342,7 @@ export const ProfileSettings: Story = {
                 }}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
       </FormCard>
     );
@@ -345,7 +366,7 @@ export const AppointmentBooking: Story = {
     return (
       <FormCard title="Broneering">
         <FormRow label="Kuupäev">
-          <EditableField<Date | undefined> label="Kuupäev" value={date} onChange={setDate} renderValue={formatDate}>
+          <Editable<Date | undefined> label="Kuupäev" value={date} onChange={setDate} renderValue={formatDate}>
             {({ value, onChange, commit }) => (
               <DateField
                 id="bk-date"
@@ -358,11 +379,11 @@ export const AppointmentBooking: Story = {
                 }}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Algusaeg">
-          <EditableField<string> label="Algusaeg" value={start} onChange={setStart} renderValue={(v) => v || '—'}>
+          <Editable<string> label="Algusaeg" value={start} onChange={setStart} renderValue={(v) => v || '—'}>
             {({ value, onChange, commit }) => (
               <TimeField
                 id="bk-start"
@@ -374,11 +395,11 @@ export const AppointmentBooking: Story = {
                 }}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Saabumine">
-          <EditableField<Date | undefined>
+          <Editable<Date | undefined>
             label="Saabumine"
             value={checkIn}
             onChange={setCheckIn}
@@ -395,22 +416,17 @@ export const AppointmentBooking: Story = {
                 }}
               />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Meeldetuletus">
-          <EditableField<string>
-            label="Meeldetuletus"
-            value={reminder}
-            onChange={setReminder}
-            renderValue={(v) => v || '—'}
-          >
+          <Editable<string> label="Meeldetuletus" value={reminder} onChange={setReminder} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => <TimePicker value={value} onChange={onChange} />}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Kohtade arv">
-          <EditableField<number | undefined>
+          <Editable<number | undefined>
             label="Kohtade arv"
             value={seats}
             onChange={setSeats}
@@ -419,23 +435,23 @@ export const AppointmentBooking: Story = {
             {({ value, onChange }) => (
               <NumberField id="bk-seats" label="Kohtade arv" hideLabel value={value} onChange={onChange} min={1} />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Täituvus">
-          <EditableField<number> label="Täituvus" value={capacity} onChange={setCapacity} renderValue={(v) => `${v}%`}>
+          <Editable<number> label="Täituvus" value={capacity} onChange={setCapacity} renderValue={(v) => `${v}%`}>
             {({ value, onChange }) => (
               <Slider id="bk-capacity" label="Täituvus" hideLabel value={value} onChange={onChange} min={0} max={100} />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
 
         <FormRow label="Asukoht">
-          <EditableField<string> label="Asukoht" value={location} onChange={setLocation} renderValue={(v) => v || '—'}>
+          <Editable<string> label="Asukoht" value={location} onChange={setLocation} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => (
               <Search id="bk-location" label="Asukoht" hideLabel value={value} onChange={onChange} />
             )}
-          </EditableField>
+          </Editable>
         </FormRow>
       </FormCard>
     );
@@ -443,22 +459,18 @@ export const AppointmentBooking: Story = {
 };
 
 /**
- * Disabled renders the value as static text with no edit affordance.
+ * Disabled renders the value as plain, non-interactive text — the same as a
+ * `TextGroup` value (ordinary body text, not dimmed, with no hover/edit affordance).
  */
 export const Disabled: Story = {
-  parameters: {
-    a11y: {
-      config: { rules: [{ id: 'color-contrast', enabled: false }] },
-    },
-  },
   render: () => (
     <FormCard title="Ainult lugemiseks">
       <FormRow label="Nimi">
-        <EditableField<string> label="Nimi" value="Mari Maasikas" disabled renderValue={(v) => v}>
+        <Editable<string> label="Nimi" value="Mari Maasikas" disabled renderValue={(v) => v}>
           {({ value, onChange }) => (
             <TextField id="ef-disabled" label="Nimi" hideLabel value={value} onChange={onChange} />
           )}
-        </EditableField>
+        </Editable>
       </FormRow>
     </FormCard>
   ),

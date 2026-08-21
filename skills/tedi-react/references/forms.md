@@ -19,6 +19,7 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states, `showRestrictions` hint toggle |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop, per-file validation, `showRestrictions` hint toggle |
+| Editable | wraps any control (generic `T`) | Edit-in-place wrapper: read view → control on click; commit on blur, cancel on `Escape`; optional edit icon |
 
 ## Controlled vs Uncontrolled
 
@@ -434,4 +435,44 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 <TextField id="name" label="Name" disabled />
 <Select id="country" label="Country" disabled />
 <Checkbox id="agree" label="Agree" value="agree" disabled />
+```
+
+## Editable (edit-in-place)
+
+`Editable` wraps any TEDI form control so a value is shown read-only until clicked, then edited in place. It is control-agnostic — supply the control through a render function and wire it to the render props (`value`, `onChange`, `commit`, `cancel`).
+
+```tsx
+import { Editable } from '@tedi-design-system/react/tedi';
+
+const [name, setName] = useState('Mari Maasikas');
+
+<Editable<string> label="Name" value={name} onChange={setName} renderValue={(v) => v || '—'}>
+  {({ value, onChange }) => <TextField id="name" label="Name" hideLabel value={value} onChange={onChange} />}
+</Editable>;
+```
+
+- **Commit / cancel:** commits when focus leaves the editor (click away / Tab out); `Escape` cancels. Focus moving into a floating popover the control opened (Select menu, DateField calendar) does **not** commit.
+- **Controlled or uncontrolled:** pass `value` + `onChange`, or `defaultValue`.
+- **`renderValue`:** formats the read view (e.g. format a `Date`, map an option to its label).
+- **`hideEditIcon`:** hides the pencil icon (shown by default, brand-coloured); the value stays clickable.
+- **`fullWidth`:** stretches the field so controls like `Select` / `Slider` fill the row.
+- **`disabled`:** renders the value as plain, non-interactive text (no dimming, no edit affordance).
+- **Headless:** use the `useEditable` hook for the state machine (`isEditing`, `edit`, `commit`, `cancel`, `value`) without the built-in markup.
+
+Controls whose value API differs need a one-line adapter, and pickers that commit on selection should call `commit()`:
+
+```tsx
+// DateField uses selected / onSelect
+<Editable<Date | undefined> label="Date" value={date} onChange={setDate} renderValue={formatDate}>
+  {({ value, onChange, commit }) => (
+    <DateField id="date" label="Date" mode="single" selected={value} onSelect={(d) => { onChange(d as Date); commit(); }} />
+  )}
+</Editable>
+
+// Toggle uses checked
+<Editable<boolean> label="Notify" value={on} onChange={setOn} renderValue={(v) => (v ? 'On' : 'Off')}>
+  {({ value, onChange, commit }) => (
+    <Toggle id="notify" label="Notify" hideLabel checked={value} onChange={(c) => { onChange(c); commit(); }} />
+  )}
+</Editable>
 ```

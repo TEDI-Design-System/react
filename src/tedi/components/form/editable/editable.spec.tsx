@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
 import { TextField } from '../textfield/textfield';
-import { EditableField } from './editable-field';
+import { Editable } from './editable';
 
 import '@testing-library/jest-dom';
 
-const TextEditor = (props: Partial<React.ComponentProps<typeof EditableField<string>>> & { outside?: boolean }) => {
+const TextEditor = (props: Partial<React.ComponentProps<typeof Editable<string>>> & { outside?: boolean }) => {
   const [value, setValue] = useState('John Mets');
   return (
     <>
-      <EditableField<string>
+      <Editable<string>
         label="Name"
         value={props.value ?? value}
         onChange={props.onChange ?? setValue}
@@ -21,13 +21,13 @@ const TextEditor = (props: Partial<React.ComponentProps<typeof EditableField<str
         {({ value: draft, onChange }) => (
           <TextField id="name-edit" label="Name" hideLabel value={draft} onChange={onChange} />
         )}
-      </EditableField>
+      </Editable>
       {props.outside && <button type="button">outside</button>}
     </>
   );
 };
 
-describe('EditableField', () => {
+describe('Editable', () => {
   it('shows the value as a read trigger by default', () => {
     render(<TextEditor />);
     const trigger = screen.getByRole('button', { name: /name/i });
@@ -83,9 +83,9 @@ describe('EditableField', () => {
     const user = userEvent.setup();
     render(
       <>
-        <EditableField<string> label="Name" defaultValue="Kalle" renderValue={(v) => v || '—'}>
+        <Editable<string> label="Name" defaultValue="Kalle" renderValue={(v) => v || '—'}>
           {({ value, onChange }) => <TextField id="u" label="Name" hideLabel value={value} onChange={onChange} />}
-        </EditableField>
+        </Editable>
         <button type="button">outside</button>
       </>
     );
@@ -101,9 +101,9 @@ describe('EditableField', () => {
 
   it('renders the placeholder when the value is empty', () => {
     render(
-      <EditableField<string> label="Name" value="" renderValue={(v) => v} placeholder="Add name">
+      <Editable<string> label="Name" value="" renderValue={(v) => v} placeholder="Add name">
         {({ value, onChange }) => <TextField id="e" label="Name" hideLabel value={value} onChange={onChange} />}
-      </EditableField>
+      </Editable>
     );
     expect(screen.getByRole('button', { name: /name/i })).toHaveTextContent('Add name');
   });
@@ -114,7 +114,7 @@ describe('EditableField', () => {
     const CommitOnChange = () => {
       const [v, setV] = useState('off');
       return (
-        <EditableField<string>
+        <Editable<string>
           label="State"
           value={v}
           onChange={(next) => {
@@ -134,7 +134,7 @@ describe('EditableField', () => {
               flip
             </button>
           )}
-        </EditableField>
+        </Editable>
       );
     };
     render(<CommitOnChange />);
@@ -151,11 +151,11 @@ describe('EditableField', () => {
     const user = userEvent.setup();
     render(
       <>
-        <EditableField<string> label="Date" value="x" onChange={onChange} renderValue={(v) => v}>
+        <Editable<string> label="Date" value="x" onChange={onChange} renderValue={(v) => v}>
           {({ value, onChange: setDraft }) => (
             <input aria-label="Date" value={value} onChange={(e) => setDraft(e.target.value)} />
           )}
-        </EditableField>
+        </Editable>
         <div data-floating-ui-portal>
           <button type="button">day</button>
         </div>
@@ -169,11 +169,27 @@ describe('EditableField', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it('shows the edit icon by default and hides it with hideEditIcon', () => {
+    const { rerender } = render(
+      <Editable<string> label="Name" value="Mari" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="i" label="Name" hideLabel value={value} onChange={onChange} />}
+      </Editable>
+    );
+    expect(screen.getByRole('button', { name: /name/i }).querySelector('svg, i, [class*="icon"]')).toBeInTheDocument();
+
+    rerender(
+      <Editable<string> label="Name" value="Mari" renderValue={(v) => v} hideEditIcon>
+        {({ value, onChange }) => <TextField id="i" label="Name" hideLabel value={value} onChange={onChange} />}
+      </Editable>
+    );
+    expect(screen.getByRole('button', { name: /name/i }).querySelector('[class*="icon"]')).not.toBeInTheDocument();
+  });
+
   it('renders static text (no button) when disabled', () => {
     render(
-      <EditableField<string> label="Name" value="Locked" disabled>
+      <Editable<string> label="Name" value="Locked" disabled>
         {({ value, onChange }) => <TextField id="d" label="Name" hideLabel value={value} onChange={onChange} />}
-      </EditableField>
+      </Editable>
     );
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     expect(screen.getByText('Locked')).toBeInTheDocument();

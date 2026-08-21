@@ -691,6 +691,15 @@
       ]
     },
     {
+      "id": "form/editable/editable",
+      "name": null,
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/editable/editable",
+      "status": [],
+      "description": null,
+      "keyProps": []
+    },
+    {
       "id": "form/radio/radio",
       "name": "Radio",
       "category": "form",
