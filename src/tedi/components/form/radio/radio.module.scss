@@ -67,9 +67,14 @@
 
     .tedi-radio__input:not(:disabled) + &--hover,
     .tedi-radio__input:hover:not(:disabled) + &,
-    .tedi-radio__input:not(:disabled) + &:hover,
-    .tedi-radio__input:focus:not(:disabled) + & {
+    .tedi-radio__input:not(:disabled) + &:hover {
       cursor: pointer;
+    }
+
+    .tedi-radio__input:not(:disabled, :checked) + &--hover,
+    .tedi-radio__input:hover:not(:disabled, :checked) + &,
+    .tedi-radio__input:not(:disabled, :checked) + &:hover,
+    .tedi-radio__input:focus:not(:disabled) + & {
       outline: 1px solid var(--form-checkbox-radio-default-border-hover);
       border: 1px solid var(--form-checkbox-radio-default-border-hover);
     }

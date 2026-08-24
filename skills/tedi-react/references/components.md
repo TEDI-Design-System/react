@@ -388,8 +388,9 @@ import { Carousel } from '@tedi-design-system/react/tedi';
 - `element: 'ul' | 'ol' = 'ul'`
 - `style: 'styled' | 'none' = 'none'`
 - `color: BulletColor = 'brand'`
+- Forwards native list attributes to the element (`OlHTMLAttributes`) — notably `start` / `reversed` for ordered lists, plus `id` / `aria-*`. `style` is not forwarded (repurposed for the styling variant). The numbers are a CSS counter, so `List` reseeds it: `start` sets the first number, and `reversed` counts down (from `start`, or the item count when `start` is omitted).
 
-Sub-component: `List.Item`
+Sub-component: `List.Item` — forwards native `<li>` attributes; `value` overrides a single item's number in an ordered list (`5, 6, 10, 11`). `value` needs Safari 17.2+ to reseed the visible counter; older browsers keep sequential numbering.
 
 ### Section
 
@@ -429,6 +430,7 @@ Sub-component: `List.Item`
 - `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
 - `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
 - `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header picker style; `'static'` makes the month/year a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown
 - `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status; return a `{ type, label }` to overlay a `StatusIndicator` dot on that day (the `label` is folded into the day's `aria-label`; the dot itself is `aria-hidden`)
 - `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
@@ -796,6 +798,7 @@ Deprecated in favour of the compound `Radio.Group` / `Checkbox.Group` APIs above
 - `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `formatDate?: (date) => string` — display formatter (default: `dd.MM.yyyy`, et-EE)
 - `parseDate?: (value: string) => Date | Date[] | DateRange | undefined` — manual-input parser; without it the field is calendar-only
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
@@ -803,6 +806,7 @@ Deprecated in favour of the compound `Radio.Group` / `Checkbox.Group` APIs above
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
 - `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header pickers; `'static'` renders the month/year as a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown (defaults span 100 years back, 20 forward)
 - `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status forwarded to the calendar; overlays a `StatusIndicator` dot on matching days (label folded into the day's `aria-label`)
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
@@ -825,6 +829,8 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
   defaultValue={new Date(1990, 0, 1)}
   onSelect={(date) => console.log(date)}
   minDate={new Date(1900, 0, 1)}
+  minYear={1900}
+  maxYear={2010}
   disableFuture
 />
 
@@ -852,6 +858,7 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `onChange?: (time: string) => void`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
@@ -1035,6 +1042,17 @@ Key props:
 
 **Row:** `cols`, `gutter` (0-5), `gutterX`, `gutterY`, `gap`, `justifyContent`, `alignItems`, `direction`, `wrap` + breakpoints
 **Col:** `width` (1-12 or 'auto'), `offset`, `order`, `grow`, `shrink` + breakpoints
+
+Breakpoint props (`xs`, `sm`, `md`, `lg`, `xl`, `xxl`) accept **either a bare width number/`'auto'` (shorthand) or a full `ColSpec` object** to override several Col props at that breakpoint:
+
+```tsx
+<Row>
+  {/* full width on mobile, one-third from md up (shorthand number) */}
+  <Col width={12} md={4}>Sidebar</Col>
+  {/* object form to change width + order together at lg */}
+  <Col width={12} lg={{ width: 8, order: 'first' }}>Main</Col>
+</Row>
+```
 
 ### VerticalSpacing
 
@@ -1999,3 +2017,49 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 ### Map Components
 
 14 specialized components for map UI interactions (BaseMapSelection, Legend, MapLayer, Directions, Timeline, etc.)
+
+## Extending components
+
+TEDI exports a few type helpers so you can build **custom or extended** components
+that match its patterns, without deep relative imports.
+
+**Polymorphic (`as` prop) components** — reuse TEDI's polymorphic types:
+
+```tsx
+import React, { forwardRef } from 'react';
+import { PolymorphicComponentPropWithRef, PolymorphicRef } from '@tedi-design-system/react/tedi';
+
+type MyBoxProps<C extends React.ElementType = 'div'> = PolymorphicComponentPropWithRef<C, { muted?: boolean }>;
+
+const MyBoxInner = forwardRef(
+  <C extends React.ElementType = 'div'>({ as, muted, ...rest }: MyBoxProps<C>, ref?: PolymorphicRef<C>): JSX.Element => {
+    const Tag: React.ElementType = as ?? 'div';
+    return <Tag ref={ref} data-muted={muted} {...rest} />;
+  }
+);
+
+MyBoxInner.displayName = 'MyBox';
+
+// Cast to a generic call signature so `as`-specific props (e.g. `href` when
+// `as="a"`) are inferred — assigning forwardRef directly loses the generic.
+export const MyBox = MyBoxInner as <C extends React.ElementType = 'div'>(
+  props: MyBoxProps<C>
+) => React.ReactElement | null;
+```
+
+Also available: `PolymorphicComponentPropWithoutRef`, and `AllowedHTMLTags<C, Allowed>` to constrain `as` to specific tags.
+
+**Responsive props** — `BreakpointSupport<T>` + `useBreakpointProps` let a custom component accept per-breakpoint prop overrides the same way TEDI components do:
+
+```tsx
+import { BreakpointSupport, useBreakpointProps } from '@tedi-design-system/react/tedi';
+
+type Props = BreakpointSupport<{ size?: 'sm' | 'lg' }>;
+
+const MyResponsive = (props: Props) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps();
+  const { size = 'sm' } = getCurrentBreakpointProps<Props>(props);
+  return <div data-size={size} />;
+};
+// <MyResponsive size="sm" md={{ size: 'lg' }} />
+```

@@ -14,8 +14,8 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Radio | `boolean` (via onChange) | `Radio.Group`, card variant, segmented layout |
 | ChoiceGroup | `ChoiceGroupValue` | **Deprecated** — use `Radio.Group` / `Checkbox.Group` |
 | Search | `string` | Search button, onSearch callback |
-| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
-| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
+| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, clearable, breakpoint-aware |
+| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes, clearable |
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states, `showRestrictions` hint toggle |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop, per-file validation, `showRestrictions` hint toggle |
@@ -41,7 +41,7 @@ import { TextField } from '@tedi-design-system/react/tedi';
 <TextField
   id="email"
   label="Email"
-  type="email"
+  input={{ type: 'email' }}
   icon="mail"
   isClearable
   value={email}
@@ -52,6 +52,8 @@ import { TextField } from '@tedi-design-system/react/tedi';
 ```
 
 Key props: `icon`, `isClearable`, `onClear`, `size` ('default' | 'small' | 'large'), `helper` (FeedbackTextProps), `hideLabel`, `readOnly`.
+
+Native input attributes (`type`, `autoComplete`, `min`, `maxLength`, …) are **not** top-level props — pass them through the `input` prop: `input={{ type: 'password', autoComplete: 'current-password' }}`. There is no separate `PasswordField`; a password input is a `TextField` with `input={{ type: 'password' }}`.
 
 ## Select
 
@@ -148,6 +150,11 @@ const [date, setDate] = useState<Date>();
 />
 ```
 
+**Year dropdown range** — the header's year dropdown spans **100 years back and 20 forward** by default. Override with `minYear` / `maxYear` (e.g. a date-of-birth field):
+```tsx
+<DateField id="dob" label="Date of birth" minYear={1900} maxYear={2010} />
+```
+
 **Native picker on small screens** — uses `<input type="date">` below `md`, custom calendar from `md` up. Only valid with `mode="single"`:
 ```tsx
 <DateField id="dob" label="Date of birth" useNativePicker md={{ useNativePicker: false }} />
@@ -178,14 +185,18 @@ const [date, setDate] = useState<Date>();
 />
 ```
 
-**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`, `isClearable`):
+**Clear button** — shown by default when the field has a value; set `clearable={false}` to hide it (e.g. required fields that must not be emptied). The same `clearable?: boolean` prop (default `true`, breakpoint-aware) exists on `DateField`, `TimeField`, and `DateTimeField`.
+```tsx
+<DateField id="dob" label="Date of birth" required clearable={false} />
+```
+
+**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`):
 ```tsx
 <DateField
   id="end"
   label="End date"
   inputProps={{
     helper: { type: 'hint', text: 'Leave empty for "ongoing"' },
-    isClearable: true,
   }}
 />
 ```
