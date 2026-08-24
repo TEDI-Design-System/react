@@ -1,3 +1,10 @@
+# [19.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.12...react-19.0.0-rc.13) (2026-08-24)
+
+
+### Features
+
+* **date-field,time-field,date-time-field:** add clearable prop [#765](https://github.com/TEDI-Design-System/react/issues/765) ([#829](https://github.com/TEDI-Design-System/react/issues/829)) ([3282212](https://github.com/TEDI-Design-System/react/commit/32822126865dbabca29b1737d33d5f62121309f3))
+
 # [19.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.11...react-19.0.0-rc.12) (2026-08-24)
 
 
