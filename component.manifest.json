@@ -691,19 +691,13 @@
       ]
     },
     {
-      "id": "form/radio/radio",
-      "name": "Radio",
+      "id": "form/radio",
+      "name": null,
       "category": "form",
-      "sourcePath": "src/tedi/components/form/radio/radio",
+      "sourcePath": "src/tedi/components/form/radio",
       "status": [],
-      "description": "Single radio input control, typically used within a ChoiceGroup for mutually-exclusive selection.",
-      "keyProps": [
-        "id",
-        "label",
-        "value",
-        "checked",
-        "onChange"
-      ]
+      "description": null,
+      "keyProps": []
     },
     {
       "id": "form/choice-group",
@@ -797,19 +791,13 @@
       ]
     },
     {
-      "id": "form/checkbox/checkbox",
-      "name": "Checkbox",
+      "id": "form/checkbox",
+      "name": null,
       "category": "form",
-      "sourcePath": "src/tedi/components/form/checkbox/checkbox",
+      "sourcePath": "src/tedi/components/form/checkbox",
       "status": [],
-      "description": "Single checkbox input control supporting a checked, unchecked, and indeterminate state.",
-      "keyProps": [
-        "id",
-        "label",
-        "checked",
-        "onChange",
-        "indeterminate"
-      ]
+      "description": null,
+      "keyProps": []
     },
     {
       "id": "form/slider/slider",
