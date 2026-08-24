@@ -1,3 +1,10 @@
+# [19.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.11...react-19.0.0-rc.12) (2026-08-24)
+
+
+### Features
+
+* **helpers:** export polymorphic type helpers for extensibility [#200](https://github.com/TEDI-Design-System/react/issues/200) ([#835](https://github.com/TEDI-Design-System/react/issues/835)) ([4c65740](https://github.com/TEDI-Design-System/react/commit/4c65740337f7cc064560d12725adfd16fd75051a))
+
 # [19.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.10...react-19.0.0-rc.11) (2026-08-24)
 
 
