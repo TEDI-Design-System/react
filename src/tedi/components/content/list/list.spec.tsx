@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { useBreakpointProps } from '../../../helpers';
 import List, { ListProps } from './list';
@@ -59,29 +59,55 @@ describe('List Component', () => {
   });
 
   test('forwards the "start" attribute and seeds the CSS counter so numbering begins at it', () => {
-    const { container } = renderList({ element: 'ol', start: 5 });
-    const ol = container.querySelector('ol');
+    renderList({ element: 'ol', start: 5 });
+    const ol = screen.getByRole('list');
     expect(ol).toHaveAttribute('start', '5');
     expect(ol).toHaveStyle({ counterReset: 'item 4' });
   });
 
   test('forwards native attributes (id, aria-label, reversed) to the list element', () => {
-    const { container } = renderList({ element: 'ol', id: 'steps', 'aria-label': 'Steps', reversed: true });
-    const ol = container.querySelector('ol');
+    renderList({ element: 'ol', id: 'steps', 'aria-label': 'Steps', reversed: true });
+    const ol = screen.getByRole('list', { name: 'Steps' });
     expect(ol).toHaveAttribute('id', 'steps');
-    expect(ol).toHaveAttribute('aria-label', 'Steps');
     expect(ol).toHaveAttribute('reversed');
   });
 
+  test('counts a reversed ordered list down, seeding from the item count', () => {
+    renderList({ element: 'ol', reversed: true });
+    const ol = screen.getByRole('list');
+    expect(ol).toHaveClass('tedi-list--reversed');
+    expect(ol).toHaveStyle({ counterReset: 'item 4' });
+  });
+
+  test('reversed ordered list honours an explicit start', () => {
+    renderList({ element: 'ol', reversed: true, start: 5 });
+    expect(screen.getByRole('list')).toHaveStyle({ counterReset: 'item 6' });
+  });
+
+  test('seeds the counter through the verticalSpacing wrapper', () => {
+    const { container } = renderList({ element: 'ol', start: 5, verticalSpacing: { size: 1 } });
+    expect(container.querySelector('ol')).toHaveStyle({ counterReset: 'item 4' });
+  });
+
+  test('applies the value counter override through the verticalSpacingItem wrapper', () => {
+    render(
+      <List element="ol">
+        <ListItem verticalSpacingItem={{ size: 1 }} value={10}>
+          Item
+        </ListItem>
+      </List>
+    );
+    expect(screen.getByRole('listitem')).toHaveStyle({ counterSet: 'item 10', counterIncrement: 'none' });
+  });
+
   test('forwards the "value" attribute on a ListItem and seeds the counter to that number', () => {
-    const { container } = render(
+    render(
       <List element="ol">
         <ListItem value={10}>Item</ListItem>
       </List>
     );
-    const li = container.querySelector('li');
+    const li = screen.getByRole('listitem');
     expect(li).toHaveAttribute('value', '10');
-    // Set the counter (no new scope) and drop the increment so the number is exact.
     expect(li).toHaveStyle({ counterSet: 'item 10', counterIncrement: 'none' });
   });
 

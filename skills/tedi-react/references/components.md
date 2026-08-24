@@ -388,7 +388,7 @@ import { Carousel } from '@tedi-design-system/react/tedi';
 - `element: 'ul' | 'ol' = 'ul'`
 - `style: 'styled' | 'none' = 'none'`
 - `color: BulletColor = 'brand'`
-- Forwards native list attributes to the element (`OlHTMLAttributes`) — notably `start` / `reversed` for ordered lists, plus `id` / `aria-*`. `style` is not forwarded (repurposed for the styling variant). `start` visibly reseeds the numbering (the numbers are a CSS counter, so `List` sets `counter-reset` from it).
+- Forwards native list attributes to the element (`OlHTMLAttributes`) — notably `start` / `reversed` for ordered lists, plus `id` / `aria-*`. `style` is not forwarded (repurposed for the styling variant). The numbers are a CSS counter, so `List` reseeds it: `start` sets the first number, and `reversed` counts down (from `start`, or the item count when `start` is omitted).
 
 Sub-component: `List.Item` — forwards native `<li>` attributes; `value` overrides a single item's number in an ordered list (`5, 6, 10, 11`). `value` needs Safari 17.2+ to reseed the visible counter; older browsers keep sequential numbering.
 

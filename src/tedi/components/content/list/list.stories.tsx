@@ -164,6 +164,25 @@ export const OrderedListWithStart: Story = {
   },
 };
 
+/**
+ * `reversed` counts the list down. With no `start` it begins at the item count
+ * (here `3, 2, 1`); pass `start` to begin elsewhere. The numbers are a CSS
+ * counter, so `List` applies a descending increment and seeds the first value.
+ */
+export const ReversedOrderedList: Story = {
+  name: 'Reversed ordered list',
+  render: (args) => (
+    <List {...args} element="ol" reversed>
+      <List.Item>Third</List.Item>
+      <List.Item>Second</List.Item>
+      <List.Item>First</List.Item>
+    </List>
+  ),
+  args: {
+    style: 'styled',
+  },
+};
+
 export const NoStyleList: Story = {
   render: TemplateNoStyleList,
   args: {

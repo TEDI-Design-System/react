@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { Children } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { IconColor } from '../../base/icon/icon';
@@ -62,30 +63,36 @@ export const List = (props: ListProps) => {
     color = 'brand',
     ...rest
   } = getCurrentBreakpointProps<ListProps>(props);
+  const isReversedOrdered = element === 'ol' && rest.reversed === true;
   const listBEM = cn(
     styles['tedi-list'],
     styles[`tedi-list--${element === 'ul' ? 'unordered' : 'ordered'}`],
     styles[`tedi-list--style-${style}`],
     styles[`tedi-list--bullet-color-${color}`],
+    isReversedOrdered && styles['tedi-list--reversed'],
     verticalSpacing?.className,
     className
   );
   const Element = element;
 
   // The visible numbers come from a CSS counter, not the native `<ol>` marker, so
-  // `start` only takes effect if we seed that counter. `counter-reset` is
-  // processed before `counter-increment`, so resetting to `start - 1` makes the
-  // first item render as `start`. (The native `start` attribute is still
-  // forwarded for correct semantics / copy-paste / non-CSS fallback.)
-  const orderedListStyle =
-    element === 'ol' && typeof rest.start === 'number' ? { counterReset: `item ${rest.start - 1}` } : undefined;
+  // `start` / `reversed` only take effect if we seed that counter (the native
+  // attributes are still forwarded for correct semantics / copy-paste / non-CSS
+  // fallback). `counter-reset` is processed before `counter-increment`.
+  const orderedListStyle = (() => {
+    if (element !== 'ol') return undefined;
+    if (isReversedOrdered) {
+      const first = typeof rest.start === 'number' ? rest.start : Children.count(children);
+      return { counterReset: `item ${first + 1}` };
+    }
+
+    return typeof rest.start === 'number' ? { counterReset: `item ${rest.start - 1}` } : undefined;
+  })();
 
   if (verticalSpacing) {
-    // `VerticalSpacing` owns the element's `style`, so the counter seed can't be
-    // applied here — `start` still forwards to the DOM but won't reseed the visible
-    // numbering in this (uncommon) composition.
+    // `VerticalSpacing` merges the counter seed with its own spacing style.
     return (
-      <VerticalSpacing {...verticalSpacing} {...rest} element={element} className={listBEM}>
+      <VerticalSpacing {...verticalSpacing} {...rest} element={element} className={listBEM} style={orderedListStyle}>
         {children}
       </VerticalSpacing>
     );

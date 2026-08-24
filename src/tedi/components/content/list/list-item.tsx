@@ -44,10 +44,9 @@ export const ListItem = (props: ListItemProps) => {
     typeof rest.value === 'number' ? { counterIncrement: 'none', counterSet: `item ${rest.value}` } : undefined;
 
   if (props.verticalSpacingItem) {
-    // `VerticalSpacingItem` owns the element's `style`; `value` still forwards to
-    // the DOM but won't reseed the visible number in this composition.
+    // `VerticalSpacingItem` merges the counter override with its own spacing style.
     return (
-      <VerticalSpacingItem {...verticalSpacingItem} {...rest} element="li" className={listItemBEM}>
+      <VerticalSpacingItem {...verticalSpacingItem} {...rest} element="li" className={listItemBEM} style={itemStyle}>
         {children}
       </VerticalSpacingItem>
     );
