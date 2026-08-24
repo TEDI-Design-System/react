@@ -1,3 +1,10 @@
+# [19.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.10...react-19.0.0-rc.11) (2026-08-24)
+
+
+### Bug Fixes
+
+* migrate to core tokens and remove design-tokens folder [#769](https://github.com/TEDI-Design-System/react/issues/769) ([#834](https://github.com/TEDI-Design-System/react/issues/834)) ([a4cacab](https://github.com/TEDI-Design-System/react/commit/a4cacab34528783457e39180fb5aa2efae5bca08))
+
 # [19.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.9...react-19.0.0-rc.10) (2026-08-17)
 
 
