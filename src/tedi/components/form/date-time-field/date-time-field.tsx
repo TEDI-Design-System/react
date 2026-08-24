@@ -54,6 +54,12 @@ type DateTimeFieldBreakpointProps = {
    */
   useNativePicker?: boolean;
   /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
+  /**
    * Layout of the date-and-time popover. `mode='range'` always uses
    * `'side-by-side'` regardless of this value — the range UI needs the
    * calendar and both `from` / `to` time pickers visible at once.
@@ -297,6 +303,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     showOutsideDays = true,
     availableTimes,
     timeHeading = getLabel('dateTimeField.timeHeading'),
+    clearable = true,
   } = getCurrentBreakpointProps<DateTimeFieldBreakpointProps>(props);
 
   const {
@@ -719,7 +726,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     placeholder,
     readOnly: readOnly || (!useNative && !!availableTimes && !!currentValue),
     icon: 'calendar_today',
-    isClearable: true,
+    isClearable: clearable,
     required,
     disabled,
     invalid: hasDisabledDateError || (inputProps as TextFieldProps)?.invalid,

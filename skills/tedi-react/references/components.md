@@ -743,6 +743,7 @@ Same as Checkbox (without indeterminate)
 - `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `formatDate?: (date) => string` — display formatter (default: `dd.MM.yyyy`, et-EE)
 - `parseDate?: (value: string) => Date | Date[] | DateRange | undefined` — manual-input parser; without it the field is calendar-only
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
@@ -802,6 +803,7 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `onChange?: (time: string) => void`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input

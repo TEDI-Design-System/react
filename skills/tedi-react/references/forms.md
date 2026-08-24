@@ -14,8 +14,8 @@ TEDI form controls support both **controlled** and **uncontrolled** modes, follo
 | Radio | `boolean` (via onChange) | Used in ChoiceGroup |
 | ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
 | Search | `string` | Search button, onSearch callback |
-| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, breakpoint-aware |
-| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes |
+| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, clearable, breakpoint-aware |
+| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes, clearable |
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states, `showRestrictions` hint toggle |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop, per-file validation, `showRestrictions` hint toggle |
@@ -185,14 +185,18 @@ const [date, setDate] = useState<Date>();
 />
 ```
 
-**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`, `isClearable`):
+**Clear button** — shown by default when the field has a value; set `clearable={false}` to hide it (e.g. required fields that must not be emptied). The same `clearable?: boolean` prop (default `true`, breakpoint-aware) exists on `DateField`, `TimeField`, and `DateTimeField`.
+```tsx
+<DateField id="dob" label="Date of birth" required clearable={false} />
+```
+
+**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`):
 ```tsx
 <DateField
   id="end"
   label="End date"
   inputProps={{
     helper: { type: 'hint', text: 'Leave empty for "ongoing"' },
-    isClearable: true,
   }}
 />
 ```
