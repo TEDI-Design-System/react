@@ -1,3 +1,10 @@
+# [19.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.14...react-19.0.0-rc.15) (2026-08-24)
+
+
+### Bug Fixes
+
+* **overlay,map-button,button-group:** tooltip stuck open, dropdownItems isActive drop, className overwrite [#837](https://github.com/TEDI-Design-System/react/issues/837) ([#838](https://github.com/TEDI-Design-System/react/issues/838)) ([d12afe5](https://github.com/TEDI-Design-System/react/commit/d12afe58d2e83c2e06491c4db2a1e3ef6ce5d96a))
+
 # [19.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.13...react-19.0.0-rc.14) (2026-08-24)
 
 
