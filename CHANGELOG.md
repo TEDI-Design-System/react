@@ -1,3 +1,10 @@
+# [19.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.13...react-19.0.0-rc.14) (2026-08-24)
+
+
+### Features
+
+* **list:** add start prop [#620](https://github.com/TEDI-Design-System/react/issues/620) ([#839](https://github.com/TEDI-Design-System/react/issues/839)) ([1706b4b](https://github.com/TEDI-Design-System/react/commit/1706b4b09c070b8bb28ea6e49604622ee7843926))
+
 # [19.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.12...react-19.0.0-rc.13) (2026-08-24)
 
 
