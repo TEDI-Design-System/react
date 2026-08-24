@@ -84,7 +84,7 @@ const HeaderRoleDropdown = (props: HeaderRoleComponentProps) => {
           <>
             {' '}
             <Text element="span" modifiers={['small', 'normal']}>
-              <span style={{ color: 'var(--color-border-default)' }}>|</span> {secondaryInfo}
+              <span className={styles['header-role-separator']}>|</span> {secondaryInfo}
             </Text>
           </>
         )}

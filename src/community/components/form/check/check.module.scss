@@ -22,8 +22,8 @@
   height: 1.125rem;
   margin-top: 0.125rem;
   margin-right: 0.625rem;
-  background-color: var(--color-bg-default);
-  border: 1px solid var(--color-border-contrast);
+  background-color: var(--general-surface-primary);
+  border: 1px solid var(--general-border-secondary);
   border-radius: 2px;
   transition: 150ms ease;
   transition-property: background-color, border-color;
@@ -33,30 +33,30 @@
   .check__input:not(:disabled) + &:hover,
   .check__input:focus:not(:disabled) + & {
     cursor: pointer;
-    outline: var(--color-primary-main) solid 1px;
-    border-color: var(--color-primary-main);
+    outline: var(--general-border-brand) solid 1px;
+    border-color: var(--general-border-brand);
   }
 
   .check__input:focus-visible:not(:disabled) + & {
-    outline: var(--color-primary-main) solid 2px;
+    outline: var(--general-border-brand) solid 2px;
     outline-offset: 2px;
-    border-color: var(--color-primary-main);
+    border-color: var(--general-border-brand);
   }
 
   [type='checkbox']:checked + &,
   &--indeterminate {
-    background: var(--color-primary-main);
-    border-color: var(--color-primary-main);
+    background: var(--general-surface-brand-primary);
+    border-color: var(--general-border-brand);
   }
 
   .check__input:disabled + & {
-    background-color: var(--color-bg-disabled);
+    background-color: var(--general-surface-disabled);
   }
 }
 
 .check__icon {
   position: absolute;
-  color: var(--color-text-inverted);
+  color: var(--general-text-white);
   opacity: 0;
   transition: opacity 150ms ease;
 
