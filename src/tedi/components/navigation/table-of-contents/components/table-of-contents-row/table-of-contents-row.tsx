@@ -15,7 +15,7 @@ interface TableOfContentsRowProps {
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
   const { activeId, numbered, activeTrail } = useContext(TableOfContentsContext);
-  const { id, content, children, separator } = node;
+  const { id, content, children, separator, slot } = node;
 
   const hasChildren = !!children?.length;
   const isSelected = !!id && id === activeId;
@@ -43,6 +43,7 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
           </span>
         )}
         <span className={styles['tedi-table-of-contents__content']}>{content}</span>
+        {slot !== undefined && <span className={styles['tedi-table-of-contents__slot']}>{slot}</span>}
       </span>
 
       {isOpen && (

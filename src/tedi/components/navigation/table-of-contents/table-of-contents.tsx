@@ -63,6 +63,17 @@ export interface TableOfContentsProps {
    */
   padding?: number;
   /**
+   * Draws a divider between items and a bottom border under the last one, so the
+   * list reads as a set of separated rows.
+   * @default false
+   */
+  bordered?: boolean;
+  /**
+   * Content rendered at the very end of the list — e.g. a link or button. Sits
+   * below the items, inside the container.
+   */
+  footer?: ReactNode;
+  /**
    * Id of the currently active item. The active item gets the left accent bar
    * and active link colour; the branch leading to it auto-expands its nested
    * children.
@@ -91,6 +102,7 @@ export interface TableOfContentsNode {
   content: ReactNode;
   children?: TableOfContentsNode[];
   separator?: boolean;
+  slot?: ReactNode;
 }
 
 interface TableOfContentsContextValue {
@@ -112,13 +124,14 @@ export const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
   Children.toArray(children)
     .filter(isItemElement)
     .map((element) => {
-      const { id, separator, children: itemChildren } = element.props;
+      const { id, separator, slot, children: itemChildren } = element.props;
       const childArray = Children.toArray(itemChildren);
       const subItems = childArray.filter(isItemElement);
       const content = childArray.filter((child) => !isItemElement(child));
       return {
         id,
         separator,
+        slot,
         content: <>{content}</>,
         children: subItems.length ? childrenToNodes(itemChildren) : undefined,
       };
@@ -155,6 +168,8 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     sticky = true,
     variant = 'default',
     padding,
+    bordered = false,
+    footer,
     className,
   } = props;
 
@@ -175,10 +190,12 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     <div
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
+        [styles['tedi-table-of-contents--bordered']]: bordered,
       })}
       style={rootStyle}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />
+      {footer !== undefined && <div className={styles['tedi-table-of-contents__footer']}>{footer}</div>}
     </div>
   );
 

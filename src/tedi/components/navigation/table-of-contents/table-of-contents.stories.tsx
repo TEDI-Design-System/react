@@ -8,6 +8,8 @@ import { Col, Row } from '../../layout/grid';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import Separator from '../../misc/separator/separator';
+import { Tag } from '../../tags/tag/tag';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
 
@@ -43,10 +45,15 @@ type Story = StoryObj<TableOfContentsProps>;
 
 const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
 
-const sectionItems = () =>
+const sectionItems = (lastIcon?: string) =>
   sections.map((label, index) => (
     <TableOfContents.Item key={label} id={`section-${index + 1}`}>
-      <Link href={`#section-${index + 1}`} underline={false}>
+      <Link
+        href={`#section-${index + 1}`}
+        underline={false}
+        iconLeft={index === sections.length - 1 ? lastIcon : undefined}
+        iconStandalone={index === sections.length - 1 && !!lastIcon}
+      >
         {label}
       </Link>
     </TableOfContents.Item>
@@ -76,6 +83,65 @@ export const Headless: Story = {
   ),
 };
 
+/**
+ * `bordered` draws a divider between items and a border under the last one, so the
+ * list reads as separated rows.
+ */
+export const Bordered: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
+      {sectionItems('description')}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * Each `TableOfContents.Item` accepts a `slot` for trailing content shown at the
+ * end of its row (right-aligned) — e.g. a result-count `Tag`. It stays out of the
+ * link's accessible name.
+ */
+export const WithSlot: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      {sections.map((label, index) => (
+        <TableOfContents.Item
+          key={label}
+          id={`section-${index + 1}`}
+          slot={index === sections.length - 1 ? <Tag color="primary">43 tulemust</Tag> : undefined}
+        >
+          <Link href={`#section-${index + 1}`} underline={false}>
+            {label}
+          </Link>
+        </TableOfContents.Item>
+      ))}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * `footer` is a free-form slot at the very end of the list. Compose it yourself —
+ * e.g. a `Separator` above a "back to top" link — for a divided footer.
+ */
+export const WithFooter: Story = {
+  render: () => (
+    <TableOfContents
+      heading="Sisukord"
+      sticky={false}
+      activeId="section-3"
+      footer={
+        <VerticalSpacing size={0.5}>
+          <Separator />
+          <Link href="#top" underline={false}>
+            Tagasi üles
+          </Link>
+        </VerticalSpacing>
+      }
+    >
+      {sectionItems()}
+    </TableOfContents>
+  ),
+};
+
 export const WithIcon: Story = {
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
@@ -95,7 +161,7 @@ export const WithIcon: Story = {
         </Link>
       </TableOfContents.Item>
       <TableOfContents.Item id="section-6">
-        <Link href="#section-6" underline={false} iconLeft="mail" iconStandalone>
+        <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
           Kokkuvõte
         </Link>
       </TableOfContents.Item>
@@ -188,13 +254,12 @@ export const ItemStates: Story = {
       borderLeft: `var(--table-of-contents-active-item-border-width) solid ${
         active ? 'var(--general-border-brand)' : 'transparent'
       }`,
-      paddingLeft: 'calc(var(--table-of-contents-padding-level-1) - var(--table-of-contents-active-item-border-width))',
+      paddingLeft:
+        'calc(var(--table-of-contents-padding-left-level-1) - var(--table-of-contents-active-item-border-width))',
       ...(active ? ({ '--link-primary-default': 'var(--link-primary-active)' } as CSSProperties) : {}),
     });
 
     const numberStyle = (active: boolean) => ({
-      minWidth: '1.5rem',
-      textAlign: 'right' as const,
       color: active ? 'var(--link-primary-active)' : 'var(--link-primary-default)',
     });
 
@@ -427,7 +492,7 @@ export const Collapsible: Story = {
         </Link>
       </TableOfContents.Item>,
       <TableOfContents.Item key="conclusion" id="conclusion">
-        <Link href="#conclusion" underline={false}>
+        <Link href="#conclusion" underline={false} iconStandalone>
           Kokkuvõte
         </Link>
       </TableOfContents.Item>,

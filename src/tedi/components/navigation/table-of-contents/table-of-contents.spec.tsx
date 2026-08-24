@@ -167,6 +167,52 @@ describe('TableOfContents', () => {
     expect(container.querySelector('[class*="tedi-table-of-contents--transparent"]')).toBeInTheDocument();
   });
 
+  it('applies the bordered modifier only when bordered', () => {
+    const { container, rerender } = render(<Tree />);
+    expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).not.toBeInTheDocument();
+
+    rerender(
+      <TableOfContents bordered>
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
+  });
+
+  it('renders footer content at the end of the list', () => {
+    const { container } = render(
+      <TableOfContents
+        footer={
+          <a href="#top" data-testid="toc-footer-link">
+            Back to top
+          </a>
+        }
+      >
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    const footer = container.querySelector('[class*="tedi-table-of-contents__footer"]');
+    expect(footer).toBeInTheDocument();
+    expect(footer).toContainElement(screen.getByRole('link', { name: 'Back to top' }));
+  });
+
+  it('renders an item slot as trailing content, outside the link', () => {
+    render(
+      <TableOfContents>
+        <TableOfContents.Item id="x" slot={<span data-testid="count">43</span>}>
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    const slot = screen.getByTestId('count');
+    expect(slot).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'X' })).not.toContainElement(slot);
+  });
+
   it('renders headless (no heading) when heading is null, keeping the localized landmark name', () => {
     render(
       <TableOfContents heading={null}>
