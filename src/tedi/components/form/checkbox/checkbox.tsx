@@ -4,11 +4,11 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
+import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
 import { ChoiceInputProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './checkbox.module.scss';
-import CheckboxGroup from './checkbox-group/checkbox-group';
 import { CheckboxGroupContext } from './checkbox-group/checkbox-group-context';
 
 export interface CheckboxBaseProps extends ChoiceInputProps {
@@ -23,7 +23,6 @@ export type CheckboxProps = BreakpointSupport<CheckboxBaseProps>;
 
 interface CheckboxComponent {
   (props: CheckboxProps): JSX.Element;
-  Group: typeof CheckboxGroup;
   displayName?: string;
 }
 
@@ -60,7 +59,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
   const cardVariant = cardVariantProp ?? group?.cardVariant ?? 'primary';
   const disabled = disabledProp ?? group?.disabled ?? false;
   const invalid = invalidProp ?? group?.invalid;
-  const required = requiredProp ?? group?.required;
+  const required = requiredProp;
 
   const generatedId = React.useId();
   const resolvedId = id ?? generatedId;
@@ -105,7 +104,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
       disabled={disabled}
       checked={getChecked !== 'mixed' ? getChecked : false}
       required={required}
-      aria-invalid={invalid || undefined}
+      aria-invalid={invalidProp || undefined}
       onChange={onChangeHandler}
       className={styles['tedi-checkbox__input']}
       aria-describedby={describedBy}
@@ -161,6 +160,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
           { [styles['tedi-checkbox--disabled']]: disabled },
           className
         )}
+        {...rest}
       >
         <span className={styles['tedi-checkbox__card-control']}>
           {React.cloneElement(input, {
@@ -174,6 +174,15 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
           <span id={cardLabelId} className={cn(styles['tedi-checkbox__card-label'], { 'sr-only': hideLabel })}>
             {label}
           </span>
+          {tooltip && (
+            <span
+              className={styles['tedi-checkbox__card-info']}
+              onClick={(event) => event.preventDefault()}
+              role="presentation"
+            >
+              <InfoTooltip>{tooltip}</InfoTooltip>
+            </span>
+          )}
         </span>
         {description && (
           <span id={cardDescriptionId} className={styles['tedi-checkbox__card-description']}>
@@ -224,11 +233,6 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
   );
 }) as CheckboxComponent;
 
-Checkbox.Group = CheckboxGroup;
-
 Checkbox.displayName = 'Checkbox';
-
-export { CheckboxGroup };
-export type { CheckboxGroupProps } from './checkbox-group/checkbox-group';
 
 export default Checkbox;

@@ -285,4 +285,18 @@ describe('Radio component', () => {
     expect(radio).toHaveAccessibleDescription(/Arrives in 3 days/);
     expect(radio).toHaveAccessibleDescription(/Free of charge/);
   });
+
+  it('card variant: renders the tooltip info button and clicking it does not toggle the radio', () => {
+    render(
+      <Radio id="radio-card-tip" variant="card" label="Standard delivery" value="standard" tooltip="Extra info" />
+    );
+
+    const radio = screen.getByRole('radio', { name: 'Standard delivery' });
+
+    expect(radio).toHaveAccessibleName('Standard delivery');
+    expect(radio).not.toBeChecked();
+
+    fireEvent.click(screen.getByRole('button'));
+    expect(radio).not.toBeChecked();
+  });
 });

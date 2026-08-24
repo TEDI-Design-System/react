@@ -11,7 +11,6 @@ export interface CheckboxGroupContextValue {
   onToggle: (value: string, checked: boolean) => void;
   disabled?: boolean;
   invalid?: boolean;
-  required?: boolean;
   size?: 'default' | 'large';
   variant?: ChoiceInputVariant;
   cardVariant?: ChoiceInputCardVariant;

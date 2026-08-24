@@ -5,7 +5,7 @@ import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Radio, { RadioGroup, RadioProps } from './radio';
+import Radio, { RadioGroup, RadioProps } from '.';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4598-78103&m=dev" target="_BLANK">Figma ↗</a><br />
@@ -288,6 +288,20 @@ export const Cards: StoryObj = {
         <Radio value="kapsas" label="Kapsas" />
       </Radio.Group>
     </VerticalSpacing>
+  ),
+};
+
+/**
+ * A card radio can also carry a `tooltip`. The info button opens the tooltip on
+ * hover/focus; because the whole card is a `<label>`, clicking the info button
+ * does not toggle the radio.
+ */
+export const CardsWithTooltip: StoryObj = {
+  render: () => (
+    <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
+      <Radio value="kartul" label="Kartul" tooltip="Tärkliserikas mugulköögivili." />
+      <Radio value="peet" label="Peet" tooltip="Magusamaitseline juurvili." />
+    </Radio.Group>
   ),
 };
 

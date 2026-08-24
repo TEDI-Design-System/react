@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
-import Radio from '../radio';
+import Radio from '..';
 
 import '@testing-library/jest-dom';
 
@@ -87,6 +87,29 @@ describe('Radio.Group', () => {
     expect(group).toHaveAccessibleName('Plan');
     expect(group).toHaveAttribute('aria-required', 'true');
     expect(group).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('shows the required asterisk on the legend only, not repeated on every option', () => {
+    const { container } = render(
+      <Radio.Group label="Plan" required>
+        <Radio value="a" label="A" />
+        <Radio value="b" label="B" />
+        <Radio value="c" label="C" />
+      </Radio.Group>
+    );
+
+    expect(container.querySelectorAll('[class*="tedi-label__required"]')).toHaveLength(0);
+  });
+
+  it('still shows a single option’s own required asterisk', () => {
+    const { container } = render(
+      <Radio.Group label="Plan">
+        <Radio value="a" label="A" required />
+        <Radio value="b" label="B" />
+      </Radio.Group>
+    );
+
+    expect(container.querySelectorAll('[class*="tedi-label__required"]')).toHaveLength(1);
   });
 
   it('marks the items wrapper for the segmented card layout', () => {

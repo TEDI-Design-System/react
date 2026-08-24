@@ -4,18 +4,17 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
+import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
 import { ChoiceInputProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './radio.module.scss';
-import RadioGroup from './radio-group/radio-group';
 import { RadioGroupContext } from './radio-group/radio-group-context';
 
 export type RadioProps = BreakpointSupport<ChoiceInputProps>;
 
 interface RadioComponent {
   (props: RadioProps): JSX.Element;
-  Group: typeof RadioGroup;
   displayName?: string;
 }
 
@@ -126,6 +125,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
           { [styles['tedi-radio--disabled']]: disabled },
           className
         )}
+        {...rest}
       >
         <span className={styles['tedi-radio__card-control']}>
           {React.cloneElement(input, {
@@ -137,6 +137,15 @@ export const Radio = ((props: RadioProps): JSX.Element => {
           <span id={cardLabelId} className={cn(styles['tedi-radio__card-label'], { 'sr-only': hideLabel })}>
             {label}
           </span>
+          {tooltip && (
+            <span
+              className={styles['tedi-radio__card-info']}
+              onClick={(event) => event.preventDefault()}
+              role="presentation"
+            >
+              <InfoTooltip>{tooltip}</InfoTooltip>
+            </span>
+          )}
         </span>
         {description && (
           <span id={cardDescriptionId} className={styles['tedi-radio__card-description']}>
@@ -178,7 +187,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
               hideLabel={hideLabel}
               label={label}
               tooltip={tooltip}
-              required={required}
+              required={requiredProp}
             />
           </Col>
         )}
@@ -191,11 +200,6 @@ export const Radio = ((props: RadioProps): JSX.Element => {
   );
 }) as RadioComponent;
 
-Radio.Group = RadioGroup;
-
 Radio.displayName = 'Radio';
-
-export { RadioGroup };
-export type { RadioGroupProps } from './radio-group/radio-group';
 
 export default Radio;

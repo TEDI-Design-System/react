@@ -127,7 +127,11 @@ export const RadioGroup = (props: RadioGroupProps): JSX.Element => {
       {label && (
         <legend id={legendId} className={cn(styles['tedi-radio-group__legend'], { 'sr-only': hideLabel })}>
           {label}
-          {required && <span aria-hidden="true"> *</span>}
+          {required && (
+            <span aria-hidden="true" className={styles['tedi-radio-group__required']}>
+              *
+            </span>
+          )}
         </legend>
       )}
       <RadioGroupContext.Provider value={contextValue}>

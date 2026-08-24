@@ -2,7 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
 import { LabelProvider } from '../../../../providers/label-provider';
-import Checkbox from '../checkbox';
+import { Col, Row } from '../../../layout/grid';
+import Checkbox from '..';
 
 import '@testing-library/jest-dom';
 
@@ -36,6 +37,19 @@ describe('Checkbox.Group', () => {
 
     expect(screen.getByRole('checkbox', { name: 'Ham' })).toBeChecked();
     expect(screen.getByRole('checkbox', { name: 'Cheese' })).not.toBeChecked();
+  });
+
+  it('does not put native required on any child when the group is required ("at least one")', () => {
+    render(
+      <Checkbox.Group label="Toppings" required>
+        <Checkbox value="cheese" label="Cheese" />
+        <Checkbox value="ham" label="Ham" />
+        <Checkbox value="olives" label="Olives" />
+      </Checkbox.Group>
+    );
+
+    screen.getAllByRole('checkbox').forEach((box) => expect(box).not.toBeRequired());
+    expect(screen.getByRole('group', { name: /Toppings/ })).toHaveAccessibleName(/required/i);
   });
 
   it('renders the legend and applies the card variant from the group', () => {
@@ -94,19 +108,44 @@ describe('Checkbox.Group', () => {
       fireEvent.click(screen.getByRole('checkbox', { name: /remove all/i }));
       expect(onChange).toHaveBeenLastCalledWith([]);
     });
+
+    it('collects checkboxes wrapped in layout elements (Row/Col), not just direct children', () => {
+      const onChange = jest.fn();
+      render(
+        <LabelProvider locale="en">
+          <Checkbox.Group label="Toppings" indeterminateCheck value={[]} onChange={onChange}>
+            <Row>
+              <Col>
+                <Checkbox value="a" label="A" />
+              </Col>
+              <Col>
+                <Checkbox value="b" label="B" />
+              </Col>
+            </Row>
+          </Checkbox.Group>
+        </LabelProvider>
+      );
+
+      fireEvent.click(screen.getByRole('checkbox', { name: /select all/i }));
+      expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
+    });
   });
 
-  it('keeps required/invalid on each checkbox, not on the group container', () => {
+  it('carries group required/invalid on the container, never as native constraints on the boxes', () => {
     render(
       <Checkbox.Group label="Toppings" required invalid>
         <Checkbox value="cheese" label="Cheese" />
       </Checkbox.Group>
     );
 
-    const group = screen.getByRole('group', { name: 'Toppings' });
+    const group = screen.getByRole('group', { name: /Toppings/ });
+
     expect(group).not.toHaveAttribute('aria-required');
-    expect(group).not.toHaveAttribute('aria-invalid');
-    expect(screen.getByRole('checkbox', { name: 'Cheese' })).toBeRequired();
+    expect(group).toHaveAttribute('aria-invalid', 'true');
+
+    const box = screen.getByRole('checkbox', { name: 'Cheese' });
+    expect(box).not.toBeRequired();
+    expect(box).not.toHaveAttribute('aria-invalid');
   });
 
   it('disables every checkbox when the group is disabled', () => {

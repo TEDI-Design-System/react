@@ -15,6 +15,11 @@
   color: var(--general-text-secondary);
 }
 
+.tedi-checkbox-group__required {
+  margin-left: var(--content-label-inner-spacing-x);
+  color: var(--form-general-feedback-error-border);
+}
+
 .tedi-checkbox-group__items {
   display: flex;
   gap: var(--form-checkbox-radio-gutter-y);

@@ -117,27 +117,26 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
       onToggle: handleToggle,
       disabled,
       invalid,
-      required,
       size,
       variant,
       cardVariant,
     }),
-    [name, currentValues, handleToggle, disabled, invalid, required, size, variant, cardVariant]
+    [name, currentValues, handleToggle, disabled, invalid, size, variant, cardVariant]
   );
 
-  // Enabled child values, used by the select-all checkbox.
   const enabledValues = React.useMemo(() => {
-    const values: string[] = [];
-    React.Children.toArray(children).forEach((child) => {
-      if (
-        React.isValidElement<{ value?: string; disabled?: boolean }>(child) &&
-        child.props.value !== undefined &&
-        !child.props.disabled
-      ) {
-        values.push(child.props.value);
-      }
-    });
-    return values;
+    const values = new Set<string>();
+    const collect = (nodes: React.ReactNode) => {
+      React.Children.forEach(nodes, (child) => {
+        if (!React.isValidElement<{ value?: string; disabled?: boolean; children?: React.ReactNode }>(child)) return;
+        if (child.props.value !== undefined && !child.props.disabled) {
+          values.add(child.props.value);
+        }
+        collect(child.props.children);
+      });
+    };
+    collect(children);
+    return [...values];
   }, [children]);
 
   const allSelected = enabledValues.length > 0 && enabledValues.every((value) => currentValues.includes(value));
@@ -171,12 +170,20 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
         className
       )}
       disabled={disabled}
+      aria-invalid={invalid || undefined}
       aria-describedby={helperId}
     >
       {label && (
         <legend className={cn(styles['tedi-checkbox-group__legend'], { 'sr-only': hideLabel })}>
           {label}
-          {required && <span aria-hidden="true"> *</span>}
+          {required && (
+            <>
+              <span aria-hidden="true" className={styles['tedi-checkbox-group__required']}>
+                *
+              </span>
+              <span className="sr-only"> {getLabel('required')}</span>
+            </>
+          )}
         </legend>
       )}
       {indeterminateCheck && (

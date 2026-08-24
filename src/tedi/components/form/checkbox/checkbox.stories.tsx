@@ -5,7 +5,7 @@ import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Checkbox, { CheckboxGroup, CheckboxProps } from './checkbox';
+import Checkbox, { CheckboxGroup, CheckboxProps } from '.';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4228-72934&m=dev" target="_BLANK">Figma ↗</a><br />
@@ -280,6 +280,48 @@ export const WithLongTitle = () => {
   );
 };
 
+/**
+ * A `required` group means "at least one must be selected". It's conveyed via the
+ * group's accessible name (legend), not native `required` on each box — that would
+ * demand every box be ticked, and there's no `aria-required` for a checkbox group.
+ */
+export const GroupRequired: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>([]);
+    return (
+      <Checkbox.Group label="Tooraine" required value={values} onChange={setValues}>
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/**
+ * An `invalid` group marks the fieldset `aria-invalid` and paints every box in the
+ * error state, but does not mark each box `aria-invalid` (no single box's value is
+ * wrong). Pair it with an error `helper` so the reason is announced.
+ */
+export const GroupInvalid: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>([]);
+    return (
+      <Checkbox.Group
+        label="Tooraine"
+        invalid
+        value={values}
+        onChange={setValues}
+        helper={{ text: 'Vali vähemalt üks', type: 'error' }}
+      >
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
+      </Checkbox.Group>
+    );
+  },
+};
+
 /** Compose checkboxes inside `Checkbox.Group`, which owns the selected values. */
 export const Group: StoryObj = {
   render: () => {
@@ -332,6 +374,20 @@ export const Cards: StoryObj = {
         <Checkbox value="c" label="Kapsas" />
       </Checkbox.Group>
     </VerticalSpacing>
+  ),
+};
+
+/**
+ * A card checkbox can also carry a `tooltip`. The info button opens the tooltip on
+ * hover/focus; because the whole card is a `<label>`, clicking the info button
+ * does not toggle the checkbox.
+ */
+export const CardsWithTooltip: StoryObj = {
+  render: () => (
+    <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
+      <Checkbox value="a" label="Kartul" tooltip="Tärkliserikas mugulköögivili." />
+      <Checkbox value="b" label="Peet" tooltip="Magusamaitseline juurvili." />
+    </Checkbox.Group>
   ),
 };
 

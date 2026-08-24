@@ -1,0 +1,13 @@
+import BaseCheckbox from './checkbox';
+import CheckboxGroup from './checkbox-group/checkbox-group';
+
+// Attach the compound `Group` here rather than in `checkbox.tsx`. The base
+// component must not import `checkbox-group`, because `checkbox-group` imports
+// `Checkbox` back (for its select-all box) — that pair formed a circular import.
+const Checkbox = Object.assign(BaseCheckbox, { Group: CheckboxGroup });
+
+export { Checkbox, CheckboxGroup };
+export type { CheckboxBaseProps, CheckboxProps } from './checkbox';
+export type { CheckboxGroupProps } from './checkbox-group/checkbox-group';
+
+export default Checkbox;

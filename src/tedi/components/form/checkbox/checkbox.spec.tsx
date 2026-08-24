@@ -275,4 +275,15 @@ describe('Checkbox component', () => {
     expect(checkbox).toHaveAccessibleDescription(/Arrives tomorrow/);
     expect(checkbox).toHaveAccessibleDescription(/Costs extra/);
   });
+
+  it('card variant: renders the tooltip info button and clicking it does not toggle the checkbox', () => {
+    render(<Checkbox id="cb-card-tip" variant="card" label="Express delivery" value="express" tooltip="Extra info" />);
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Express delivery' });
+    expect(checkbox).toHaveAccessibleName('Express delivery');
+    expect(checkbox).not.toBeChecked();
+
+    fireEvent.click(screen.getByRole('button'));
+    expect(checkbox).not.toBeChecked();
+  });
 });
