@@ -244,6 +244,12 @@ export const TextWeight: Story = {
  */
 export const Types: Story = {
   name: 'Type',
+  parameters: {
+    // The `Has icon` examples use the design's muted `color="tertiary"` decorative icons, which don't
+    // meet text-contrast in isolation. Suppress only the color-contrast rule here (other a11y checks
+    // still run) rather than deviating from Figma.
+    a11y: { config: { rules: [{ id: 'color-contrast', enabled: false }] } },
+  },
   render: () => (
     <ExampleRows
       rows={[
@@ -279,14 +285,21 @@ export const Types: Story = {
             <VerticalSpacing size={1}>
               <TextGroup
                 label="Ligipääsetavus"
-                value={[
-                  <Icon key="i" name="lock" size={16} color="tertiary" />,
-                  <Text key="v">Nähtav arstile ja esindajale</Text>,
-                ]}
+                value={
+                  <>
+                    <Icon name="lock" size={16} color="tertiary" />
+                    <Text>Nähtav arstile ja esindajale</Text>
+                  </>
+                }
               />
               <TextGroup
                 label="Patsient"
-                value={[<Icon key="i" name="person" size={18} color="tertiary" />, <Text key="v">Mari Maasikas</Text>]}
+                value={
+                  <>
+                    <Icon name="person" size={18} color="tertiary" />
+                    <Text>Mari Maasikas</Text>
+                  </>
+                }
               />
             </VerticalSpacing>
           ),
