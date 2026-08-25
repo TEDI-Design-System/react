@@ -398,27 +398,45 @@ export const Responsive: Story = {
   },
 };
 
+/**
+ * The `label` accepts any node, not just a string — e.g. a bold / secondary label with an info button,
+ * or a status badge inline with the label text.
+ */
 export const CustomLabel: Story = {
+  name: 'Custom label',
   render: () => (
-    <VerticalSpacing>
-      <TextGroup
-        label={
-          <Text modifiers="bold" color="secondary">
-            Authorisations <InfoButton>More information</InfoButton>
-          </Text>
-        }
-        value={<Text>Visible to doctor and representative</Text>}
-      />
-      <TextGroup
-        label={
-          <Text modifiers="bold" color="secondary">
-            Status <StatusBadge color="success">Active</StatusBadge>
-          </Text>
-        }
-        value={<Text>Some text regarding to status</Text>}
-        type="horizontal"
-      />
-    </VerticalSpacing>
+    <ExampleRows
+      rows={[
+        {
+          title: 'With info button',
+          content: (
+            <TextGroup
+              label={
+                <Text modifiers="bold" color="secondary">
+                  Volitused <InfoButton aria-label="Rohkem infot" />
+                </Text>
+              }
+              value={<Text>Arstile ja esindajale nähtav</Text>}
+            />
+          ),
+        },
+        {
+          title: 'With status badge',
+          content: (
+            <TextGroup
+              type="horizontal"
+              labelWidth="150px"
+              label={
+                <Text modifiers="bold" color="secondary">
+                  Olek <StatusBadge color="success">Aktiivne</StatusBadge>
+                </Text>
+              }
+              value={<Text>Olekuga seotud tekst</Text>}
+            />
+          ),
+        },
+      ]}
+    />
   ),
 };
 
@@ -439,10 +457,10 @@ export const WithList: Story = {
           content: (
             <TextGroup.List
               items={[
-                { label: 'Patient', value: <Text>Mari Maasikas</Text> },
-                { label: 'Address', value: <Text>Tulbi tn 4, Tallinn, 23562, Estonia</Text> },
-                { label: 'Vaccine', value: <Text>COVID-19 mRNA</Text> },
-                { label: 'Next vaccination', value: <Text>Immunization finished</Text> },
+                { label: 'Patsient', value: <Text>Mari Maasikas</Text> },
+                { label: 'Aadress', value: <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text> },
+                { label: 'Vaktsiin', value: <Text>COVID-19 mRNA</Text> },
+                { label: 'Järgmine vaktsineerimine', value: <Text>Immuniseerimine lõpetatud</Text> },
               ]}
             />
           ),
@@ -455,7 +473,7 @@ export const WithList: Story = {
               labelWidth="220px"
               items={[
                 {
-                  label: 'Patient',
+                  label: 'Patsient',
                   value: (
                     <>
                       <Icon name="person" size={18} color="tertiary" />
@@ -464,17 +482,17 @@ export const WithList: Story = {
                   ),
                 },
                 {
-                  label: 'Address',
+                  label: 'Aadress',
                   value: (
                     <>
                       <Icon name="location_on" size={16} color="tertiary" />
-                      <Text>Tulbi tn 4, Tallinn, 23562, Estonia</Text>
+                      <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text>
                     </>
                   ),
                 },
-                { label: 'Healthcare provider', value: <Text>SA Põhja-Eesti Regionaalhaigla</Text> },
-                { label: 'Healthcare specialist', value: <Text>Mart Mets</Text> },
-                { label: 'Document creation time', value: <Text>16.08.2023 14:51:48</Text> },
+                { label: 'Tervishoiuteenuse osutaja', value: <Text>SA Põhja-Eesti Regionaalhaigla</Text> },
+                { label: 'Tervishoiutöötaja', value: <Text>Mart Mets</Text> },
+                { label: 'Dokumendi loomise aeg', value: <Text>16.08.2023 14:51:48</Text> },
               ]}
             />
           ),
@@ -486,12 +504,12 @@ export const WithList: Story = {
               type="horizontal"
               labelWidth="160px"
               items={[
-                { label: 'Item', value: <Text>USB-C charging cable</Text> },
-                { label: 'Quantity', value: <Text>2</Text> },
-                { label: 'Unit price', value: <Text>€ 12.50</Text>, labelAlign: 'right', labelWidth: '220px' },
+                { label: 'Toode', value: <Text>USB-C laadimiskaabel</Text> },
+                { label: 'Kogus', value: <Text>2</Text> },
+                { label: 'Ühiku hind', value: <Text>12.50 €</Text>, labelAlign: 'right', labelWidth: '220px' },
                 {
-                  label: 'Total',
-                  value: <Text modifiers="bold">€ 25.00</Text>,
+                  label: 'Kokku',
+                  value: <Text modifiers="bold">25.00 €</Text>,
                   labelAlign: 'right',
                   labelWidth: '220px',
                 },
