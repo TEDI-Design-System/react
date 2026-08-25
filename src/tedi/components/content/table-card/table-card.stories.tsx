@@ -1,7 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
-import type { ColumnDef } from '@tanstack/react-table';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { DateField } from '../../form/date-field/date-field';
@@ -15,7 +13,6 @@ import { Dropdown } from '../../overlays/dropdown';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { Card } from '../card/card';
 import { Label } from '../label/label';
-import { Table } from '../table/table';
 import { TextGroup } from '../text-group/text-group';
 import { TableCard, TableCardProps, TableCardRow } from './table-card';
 
@@ -578,106 +575,3 @@ export const HasChildrenRows: StoryFn = () => {
     </VerticalSpacing>
   );
 };
-
-interface Appointment {
-  kuupaev: string;
-  kellaaeg: string;
-  kestus: string;
-  asukoht: string;
-}
-
-const appointments: Appointment[] = Array.from({ length: 6 }, () => ({
-  kuupaev: '22.03.2029 – 29.03.2029',
-  kellaaeg: '11:14',
-  kestus: '6 min',
-  asukoht: 'Harjumaa',
-}));
-
-const muudaButton = (
-  <Button visualType="neutral" size="small" iconLeft="edit">
-    Muuda
-  </Button>
-);
-
-const appointmentColumns: ColumnDef<Appointment>[] = [
-  {
-    id: 'kuupaev',
-    header: 'Kuupäev',
-    accessorKey: 'kuupaev',
-    cell: ({ row }) => <span style={{ whiteSpace: 'nowrap' }}>{row.original.kuupaev}</span>,
-  },
-  { id: 'kellaaeg', header: 'Kellaaeg', accessorKey: 'kellaaeg' },
-  { id: 'kestus', header: 'Kestus', accessorKey: 'kestus' },
-  { id: 'asukoht', header: 'Asukoht', accessorKey: 'asukoht' },
-  {
-    id: 'actions',
-    header: () => <span className="sr-only">Tegevused</span>,
-    size: 1,
-    meta: { label: 'Tegevused' },
-    cell: () => muudaButton,
-  },
-];
-
-/**
- * When there's no room to switch to cards, a `Table` can instead **scroll**. The first column can
- * stay pinned during horizontal scroll (`stickyFirstColumn`), and the header can stay pinned during
- * vertical scroll (`stickyHeader` + `maxHeight`). This is the desktop-friendly alternative to
- * `TableCard` — see the `Responsive` story for switching between the two.
- */
-export const Scrollable: StoryFn = () => (
-  <VerticalSpacing size={2}>
-    <div style={{ maxWidth: 480 }}>
-      <Table<Appointment> id="tc-scroll-plain" data={appointments} columns={appointmentColumns} />
-    </div>
-
-    <div style={{ maxWidth: 560 }}>
-      <Table<Appointment>
-        id="tc-scroll-sticky-col"
-        data={appointments}
-        columns={appointmentColumns}
-        stickyFirstColumn
-      />
-    </div>
-
-    <Table<Appointment>
-      id="tc-scroll-sticky-header"
-      data={appointments}
-      columns={appointmentColumns}
-      stickyHeader
-      maxHeight={240}
-    />
-  </VerticalSpacing>
-);
-Scrollable.parameters = { fullWidth: true, layout: 'padded' };
-
-/**
- * The core use case: one dataset, two presentations. On `md` and wider it renders a `Table`; below
- * `md` each row becomes a `TableCard`. Resize the viewport (or use the toolbar's viewport control)
- * to see it switch.
- */
-export const Responsive: StoryFn = () => {
-  const belowMd = isBreakpointBelow(useBreakpoint(), 'md');
-
-  if (belowMd) {
-    return (
-      <VerticalSpacing size={1}>
-        {appointments.map((appointment, index) => (
-          <TableCard
-            key={index}
-            layout="vertical"
-            rows={[
-              { label: 'Kuupäev', value: appointment.kuupaev },
-              { label: 'Kellaaeg', value: appointment.kellaaeg },
-              { label: 'Kestus', value: appointment.kestus },
-              { label: 'Asukoht', value: appointment.asukoht },
-            ]}
-            actions={muudaButton}
-          />
-        ))}
-      </VerticalSpacing>
-    );
-  }
-
-  return <Table<Appointment> id="tc-responsive" data={appointments} columns={appointmentColumns} />;
-};
-Responsive.parameters = { fullWidth: true, layout: 'padded' };
