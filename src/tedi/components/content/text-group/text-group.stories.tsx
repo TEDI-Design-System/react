@@ -440,9 +440,12 @@ export const CustomLabel: Story = {
               type="horizontal"
               labelWidth="150px"
               label={
-                <Text modifiers="bold" color="secondary">
-                  Olek <StatusBadge color="success">Aktiivne</StatusBadge>
-                </Text>
+                <div className="flex align-items-center gap-2">
+                  <Text element="span" modifiers="bold" color="secondary">
+                    Olek
+                  </Text>
+                  <StatusBadge color="success">Aktiivne</StatusBadge>
+                </div>
               }
               value={<Text>Olekuga seotud tekst</Text>}
             />
