@@ -386,7 +386,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     className: cn(iconBase.className, rest.disabled && styles['tedi-search__icon--disabled']),
   };
 
-  const comboboxInputProps = isAutocomplete
+  const comboboxInputProps: React.InputHTMLAttributes<HTMLInputElement> = isAutocomplete
     ? (getReferenceProps({
         role: 'combobox',
         'aria-autocomplete': 'list',
@@ -396,7 +396,18 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
           panelVisible && activeOption && activeIndex !== null ? optionId(activeIndex) : undefined,
         onKeyDown: handleAutocompleteKeyDown,
       }) as React.InputHTMLAttributes<HTMLInputElement>)
-    : ({ role: 'searchbox' } as const);
+    : { role: 'searchbox' };
+
+  const mergedInput: React.InputHTMLAttributes<HTMLInputElement> = { ...input, ...comboboxInputProps };
+
+  if (isAutocomplete) {
+    const consumerOnKeyDown = input?.onKeyDown;
+    const comboboxOnKeyDown = comboboxInputProps.onKeyDown;
+    mergedInput.onKeyDown = (event) => {
+      consumerOnKeyDown?.(event);
+      comboboxOnKeyDown?.(event);
+    };
+  }
 
   const textFieldProps = {
     ...rest,
@@ -409,7 +420,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     inputClassName: cn(styles['tedi-search__input'], button && styles['tedi-search__input--has-button'], className),
     placeholder,
     isClearable,
-    input: { ...input, ...comboboxInputProps },
+    input: mergedInput,
     ...(button ? {} : { icon: resolvedSearchIcon }),
     ...(isAutocomplete ? {} : { onKeyDown: handlePlainKeyDown }),
   };

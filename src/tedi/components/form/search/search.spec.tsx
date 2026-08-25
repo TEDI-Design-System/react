@@ -328,6 +328,21 @@ describe('Search autocomplete (suggestions)', () => {
     await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
   });
 
+  it('preserves a consumer-supplied input.onKeyDown alongside combobox key handling', async () => {
+    const onKeyDown = jest.fn();
+    const onSuggestionSelect = jest.fn();
+    const user = userEvent.setup();
+    render(<ControlledExample input={{ onKeyDown }} onSuggestionSelect={onSuggestionSelect} />);
+
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'ma');
+    expect(onKeyDown).toHaveBeenCalled();
+
+    await screen.findByRole('listbox');
+    await user.keyboard('{ArrowDown}{Enter}');
+    expect(onSuggestionSelect).toHaveBeenCalledWith(expect.objectContaining({ value: 'mari' }));
+  });
+
   it('renders footer content and lets Tab move focus into it', async () => {
     const user = userEvent.setup();
     render(<ControlledExample footer={<button type="button">Isik teadmata</button>} />);

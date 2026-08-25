@@ -702,12 +702,14 @@
       "status": [
         "breakpointSupport"
       ],
-      "description": "TextField variant with a built-in search button and onSearch callback. Includes the `Search.Autocomplete` compound — an accessible combobox for typeahead / suggestions (options, onQueryChange, onSelect, loading).",
+      "description": "TextField-based search field with an onSearch callback and optional button. Pass a `suggestions` array to turn it into an accessible combobox for typeahead / suggestions (onSuggestionSelect, loading, minQueryLength, renderSuggestion, footer, hideOnScroll).",
       "keyProps": [
         "id",
         "label",
         "onSearch",
-        "button"
+        "button",
+        "suggestions",
+        "onSuggestionSelect"
       ]
     },
     {
