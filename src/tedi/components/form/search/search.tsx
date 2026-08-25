@@ -19,6 +19,7 @@ import { Text } from '../../base/typography/text/text';
 import { Button, ButtonProps } from '../../buttons/button/button';
 import { Spinner } from '../../loaders/spinner/spinner';
 import { OptionContent } from '../../misc/option-content/option-content';
+import { FieldElement } from '../field/field';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './search.module.scss';
 
@@ -141,6 +142,11 @@ export interface SearchProps
    * `Tab` from the field moves focus into the footer's controls.
    */
   footer?: React.ReactNode;
+  /**
+   * Additional native attributes for the input element (e.g. `autoComplete`, `maxLength`).
+   * Narrowed to input attributes — a search field is always a single-line `<input>`.
+   */
+  input?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
 const suggestionText = (option: SearchOption, getSuggestionText?: SearchProps['getSuggestionText']): string => {
@@ -294,7 +300,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     }
   };
 
-  const handleFocus: React.FocusEventHandler = (event) => {
+  const handleFocus: React.FocusEventHandler<FieldElement> = (event) => {
     onFocus?.(event);
     if (!isAutocomplete) return;
     if (skipReopenRef.current) {
