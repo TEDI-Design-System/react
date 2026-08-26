@@ -181,23 +181,22 @@ describe('TableOfContents', () => {
     expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
   });
 
-  it('renders footer content at the end of the list', () => {
+  it('renders a separator below the item that sets `separator`, not the next one', () => {
     const { container } = render(
-      <TableOfContents
-        footer={
-          <a href="#top" data-testid="toc-footer-link">
-            Back to top
-          </a>
-        }
-      >
-        <TableOfContents.Item id="x">
-          <a href="#x">X</a>
+      <TableOfContents>
+        <TableOfContents.Item id="a" separator>
+          <a href="#a">A</a>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="b">
+          <a href="#b">B</a>
         </TableOfContents.Item>
       </TableOfContents>
     );
-    const footer = container.querySelector('[class*="tedi-table-of-contents__footer"]');
-    expect(footer).toBeInTheDocument();
-    expect(footer).toContainElement(screen.getByRole('link', { name: 'Back to top' }));
+    const items = container.querySelectorAll('[class*="tedi-table-of-contents__item"]');
+    const separator = container.querySelector('[class*="tedi-table-of-contents__separator"]');
+    expect(separator).toBeInTheDocument();
+    expect(items[0]).toContainElement(separator as HTMLElement);
+    expect(items[1]).not.toContainElement(separator as HTMLElement);
   });
 
   it('renders an item slot as trailing content, outside the link', () => {

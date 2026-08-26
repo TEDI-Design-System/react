@@ -8,7 +8,6 @@ import { Col, Row } from '../../layout/grid';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import Separator from '../../misc/separator/separator';
 import { Tag } from '../../tags/tag/tag';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
@@ -45,9 +44,13 @@ type Story = StoryObj<TableOfContentsProps>;
 
 const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
 
-const sectionItems = (lastIcon?: string) =>
+const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
   sections.map((label, index) => (
-    <TableOfContents.Item key={label} id={`section-${index + 1}`}>
+    <TableOfContents.Item
+      key={label}
+      id={`section-${index + 1}`}
+      separator={separatorBeforeLast && index === sections.length - 2}
+    >
       <Link
         href={`#section-${index + 1}`}
         underline={false}
@@ -119,25 +122,13 @@ export const WithSlot: Story = {
 };
 
 /**
- * `footer` is a free-form slot at the very end of the list. Compose it yourself —
- * e.g. a `Separator` above a "back to top" link — for a divided footer.
+ * Set `separator` on any `TableOfContents.Item` to draw a divider below it — e.g. to set a summary
+ * or "back to top" entry apart from the section list. It can follow any item, not just the last one.
  */
-export const WithFooter: Story = {
+export const WithSeparator: Story = {
   render: () => (
-    <TableOfContents
-      heading="Sisukord"
-      sticky={false}
-      activeId="section-3"
-      footer={
-        <VerticalSpacing size={0.5}>
-          <Separator />
-          <Link href="#top" underline={false}>
-            Tagasi üles
-          </Link>
-        </VerticalSpacing>
-      }
-    >
-      {sectionItems()}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      {sectionItems('description', true)}
     </TableOfContents>
   ),
 };

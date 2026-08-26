@@ -69,11 +69,6 @@ export interface TableOfContentsProps {
    */
   bordered?: boolean;
   /**
-   * Content rendered at the very end of the list — e.g. a link or button. Sits
-   * below the items, inside the container.
-   */
-  footer?: ReactNode;
-  /**
    * Id of the currently active item. The active item gets the left accent bar
    * and active link colour; the branch leading to it auto-expands its nested
    * children.
@@ -169,7 +164,6 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     variant = 'default',
     padding,
     bordered = false,
-    footer,
     className,
   } = props;
 
@@ -195,7 +189,6 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
       style={rootStyle}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />
-      {footer !== undefined && <div className={styles['tedi-table-of-contents__footer']}>{footer}</div>}
     </div>
   );
 

@@ -104,12 +104,8 @@
   border-bottom: var(--tedi-borders-01) solid var(--card-border-primary);
 }
 
-.tedi-table-of-contents__footer {
-  padding: var(--tedi-table-of-contents-padding);
-}
-
-.tedi-table-of-contents:has(> .tedi-table-of-contents__footer) .tedi-table-of-contents__list {
-  padding-bottom: 0;
+.tedi-table-of-contents__separator {
+  margin-inline: var(--tedi-table-of-contents-padding);
 }
 
 .tedi-table-of-contents__bar {

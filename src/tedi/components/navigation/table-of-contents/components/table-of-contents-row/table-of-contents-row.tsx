@@ -60,7 +60,7 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         </Group>
       )}
 
-      {separator && <Separator />}
+      {separator && <Separator className={styles['tedi-table-of-contents__separator']} />}
     </li>
   );
 };
