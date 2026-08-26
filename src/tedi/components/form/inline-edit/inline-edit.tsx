@@ -3,9 +3,9 @@ import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
-import styles from './editable.module.scss';
+import styles from './inline-edit.module.scss';
 
-export interface UseEditableOptions<T> {
+export interface UseInlineEditOptions<T> {
   /** Controlled committed value. Pair with `onChange`. */
   value?: T;
   /** Initial committed value for uncontrolled use. Ignored when `value` is set. */
@@ -15,7 +15,7 @@ export interface UseEditableOptions<T> {
 }
 
 /** Props handed to the editor render function. */
-export interface EditableEditor<T> {
+export interface InlineEditEditor<T> {
   /** Current draft value — wire this to the control's `value`. */
   value: T;
   /** Update the draft — wire this to the control's `onChange`. */
@@ -26,7 +26,7 @@ export interface EditableEditor<T> {
   cancel: () => void;
 }
 
-export interface UseEditableResult<T> extends EditableEditor<T> {
+export interface UseInlineEditResult<T> extends InlineEditEditor<T> {
   /** Whether the field is currently in edit mode. */
   isEditing: boolean;
   /** Enter edit mode (seeds the draft from the committed value). */
@@ -36,12 +36,12 @@ export interface UseEditableResult<T> extends EditableEditor<T> {
 }
 
 /**
- * Headless edit-in-place state: read/committed value + an editable draft, with
+ * Headless edit-in-place state: read/committed value + an inline-edit draft, with
  * `edit` / `commit` / `cancel` transitions. Supports controlled and
  * uncontrolled use. Use directly when you want full control of the markup;
- * otherwise use `Editable`.
+ * otherwise use `InlineEdit`.
  */
-export function useEditable<T>({ value, defaultValue, onChange }: UseEditableOptions<T>): UseEditableResult<T> {
+export function useInlineEdit<T>({ value, defaultValue, onChange }: UseInlineEditOptions<T>): UseInlineEditResult<T> {
   const isControlled = value !== undefined;
   const [innerValue, setInnerValue] = React.useState<T>((value ?? defaultValue) as T);
   const committedValue = (isControlled ? value : innerValue) as T;
@@ -72,7 +72,7 @@ export function useEditable<T>({ value, defaultValue, onChange }: UseEditableOpt
   return { isEditing, edit, commit, cancel, committedValue, value: draft, onChange: setDraft };
 }
 
-export interface EditableProps<T> extends UseEditableOptions<T> {
+export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   /** Accessible label for the field (announced on the read trigger). */
   label: string;
   /**
@@ -104,12 +104,12 @@ export interface EditableProps<T> extends UseEditableOptions<T> {
    * Renders the edit view — return any TEDI control wired to the render props.
    * The wrapper commits on focus leaving the editor and cancels on `Escape`.
    */
-  children: (editor: EditableEditor<T>) => React.ReactNode;
+  children: (editor: InlineEditEditor<T>) => React.ReactNode;
 }
 
 const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
 
-export function Editable<T>({
+export function InlineEdit<T>({
   label,
   renderValue,
   placeholder = '—',
@@ -120,24 +120,24 @@ export function Editable<T>({
   className,
   children,
   ...options
-}: EditableProps<T>): JSX.Element {
+}: InlineEditProps<T>): JSX.Element {
   const { getLabel } = useLabels();
   const generatedId = React.useId();
   const fieldId = id ?? generatedId;
   const editorRef = React.useRef<HTMLDivElement>(null);
-  const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useEditable<T>(options);
-  const fullWidthClass = fullWidth ? styles['tedi-editable--full-width'] : undefined;
+  const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<T>(options);
+  const fullWidthClass = fullWidth ? styles['tedi-inline-edit--full-width'] : undefined;
 
   React.useEffect(() => {
     if (!isEditing) return;
-    editorRef.current?.querySelector<HTMLElement>('input, textarea, select, [contenteditable], [tabindex]')?.focus();
+    editorRef.current?.querySelector<HTMLElement>('input, textarea, select, [contentinline-edit], [tabindex]')?.focus();
   }, [isEditing]);
 
   if (isEditing) {
     return (
       <div
         ref={editorRef}
-        className={cn(styles['tedi-editable'], styles['tedi-editable--editing'], fullWidthClass, className)}
+        className={cn(styles['tedi-inline-edit'], styles['tedi-inline-edit--editing'], fullWidthClass, className)}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.stopPropagation();
@@ -173,8 +173,8 @@ export function Editable<T>({
 
   if (disabled) {
     return (
-      <span className={cn(styles['tedi-editable'], styles['tedi-editable--disabled'], fullWidthClass, className)}>
-        <span className={empty ? styles['tedi-editable__placeholder'] : undefined}>
+      <span className={cn(styles['tedi-inline-edit'], styles['tedi-inline-edit--disabled'], fullWidthClass, className)}>
+        <span className={empty ? styles['tedi-inline-edit__placeholder'] : undefined}>
           {empty ? placeholder : display}
         </span>
       </span>
@@ -186,21 +186,21 @@ export function Editable<T>({
       type="button"
       id={fieldId}
       onClick={edit}
-      className={cn(styles['tedi-editable'], styles['tedi-editable__trigger'], fullWidthClass, className)}
+      className={cn(styles['tedi-inline-edit'], styles['tedi-inline-edit__trigger'], fullWidthClass, className)}
     >
-      <span className={styles['tedi-editable__prefix']}>
-        {getLabel('editable.edit')} {label}:{' '}
+      <span className={styles['tedi-inline-edit__prefix']}>
+        {getLabel('inline-edit.edit')} {label}:{' '}
       </span>
-      <span className={empty ? styles['tedi-editable__placeholder'] : styles['tedi-editable__value']}>
+      <span className={empty ? styles['tedi-inline-edit__placeholder'] : styles['tedi-inline-edit__value']}>
         {empty ? placeholder : display}
       </span>
       {!hideEditIcon && (
-        <Icon name="edit" size={18} color="brand" aria-hidden className={styles['tedi-editable__icon']} />
+        <Icon name="edit" size={18} color="brand" aria-hidden className={styles['tedi-inline-edit__icon']} />
       )}
     </button>
   );
 }
 
-Editable.displayName = 'Editable';
+InlineEdit.displayName = 'InlineEdit';
 
-export default Editable;
+export default InlineEdit;

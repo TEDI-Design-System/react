@@ -691,10 +691,10 @@
       ]
     },
     {
-      "id": "form/editable/editable",
+      "id": "form/inline-edit/inline-edit",
       "name": null,
       "category": "form",
-      "sourcePath": "src/tedi/components/form/editable/editable",
+      "sourcePath": "src/tedi/components/form/inline-edit/inline-edit",
       "status": [],
       "description": null,
       "keyProps": []

@@ -1,0 +1,65 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-inline-edit {
+  display: inline-flex;
+  gap: var(--tedi-dimensions-02);
+  align-items: center;
+  max-width: 100%;
+}
+
+.tedi-inline-edit--full-width {
+  display: flex;
+  width: 100%;
+
+  &.tedi-inline-edit__trigger {
+    justify-content: space-between;
+  }
+
+  &.tedi-inline-edit--editing {
+    display: block;
+  }
+}
+
+.tedi-inline-edit__trigger {
+  @include mixins.button-reset;
+
+  display: inline-flex;
+  gap: var(--tedi-dimensions-05);
+  align-items: center;
+  padding: var(--tedi-dimensions-01) var(--tedi-dimensions-02);
+  color: var(--general-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background-color: var(--form-hidden-default);
+  border-radius: var(--form-field-radius);
+
+  &:hover {
+    background-color: var(--form-hidden-hover);
+  }
+
+  &:focus-visible {
+    @include mixins.focus-element;
+  }
+}
+
+.tedi-inline-edit__icon {
+  flex: none;
+}
+
+.tedi-inline-edit__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tedi-inline-edit__placeholder {
+  color: var(--general-text-tertiary);
+}
+
+.tedi-inline-edit__prefix {
+  @include mixins.visually-hidden;
+}
+
+.tedi-inline-edit--disabled {
+  color: var(--general-text-primary);
+}

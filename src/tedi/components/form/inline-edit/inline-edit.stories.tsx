@@ -6,6 +6,7 @@ import { Text } from '../../base/typography/text/text';
 import { Card, CardContent } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { ChoiceGroup, ChoiceGroupValue } from '../choice-group';
 import { DateField } from '../date-field/date-field';
 import { DateTimeField } from '../date-time-field/date-time-field';
@@ -17,7 +18,7 @@ import { Textarea } from '../textarea/textarea';
 import { TextField } from '../textfield/textfield';
 import { TimeField } from '../time-field/time-field';
 import { Toggle } from '../toggle/toggle';
-import { Editable } from './editable';
+import { InlineEdit } from './inline-edit';
 
 const formatDate = (d?: Date): string =>
   d ? d.toLocaleDateString('et-EE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
@@ -70,11 +71,11 @@ const FormCard = ({ title, children }: { title: string; children: React.ReactNod
 );
 
 /**
- * `Editable` is an edit-in-place wrapper: it shows a value that becomes an editable control when clicked. It is control-agnostic - supply any TEDI form
+ * `InlineEdit` is an edit-in-place wrapper: it shows a value that becomes an inline-edit control when clicked. It is control-agnostic - supply any TEDI form
  * control through the `children` render function and wire it to the render props (`value`, `onChange`, `commit`, `cancel`).
  *
  * The wrapper owns the read <-> edit toggle, focus, and keyboard handling: clicking away (focus leaving the editor) commits, and `Escape` cancels. For state-only
- * usage without the built-in markup, use the `useEditable` hook.
+ * usage without the built-in markup, use the `useInlineEdit` hook.
  *
  * ### Supported TEDI-Ready controls
  *
@@ -94,11 +95,11 @@ const FormCard = ({ title, children }: { title: string; children: React.ReactNod
  * - **`Toggle`** — uses `checked`:
  *   `checked={value} onChange={onChange}` (its `onChange` already gives a boolean).
  *
- * Not a fit: `FileUpload` / `FileDropzone` (file management, not a single editable value), and standalone `Checkbox` / `Radio`
+ * Not a fit: `FileUpload` / `FileDropzone` (file management, not a single inline-edit value), and standalone `Checkbox` / `Radio`
  */
-const meta: Meta<typeof Editable> = {
-  title: 'TEDI-Ready/Components/Form/Editable',
-  component: Editable,
+const meta: Meta<typeof InlineEdit> = {
+  title: 'TEDI-Ready/Components/Form/InlineEdit',
+  component: InlineEdit,
   argTypes: {
     label: {
       control: 'text',
@@ -151,7 +152,7 @@ const meta: Meta<typeof Editable> = {
       control: false,
       description:
         'Render function returning any TEDI control wired to the editor render props (`value`, `onChange`, `commit`, `cancel`).',
-      table: { type: { summary: '(editor: EditableEditor<T>) => ReactNode' } },
+      table: { type: { summary: '(editor: InlineEditEditor<T>) => ReactNode' } },
     },
     id: { control: false, description: 'id applied to the read trigger.', table: { type: { summary: 'string' } } },
     className: {
@@ -163,7 +164,7 @@ const meta: Meta<typeof Editable> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Editable>;
+type Story = StoryObj<typeof InlineEdit>;
 
 export const Default: Story = {
   args: {
@@ -176,11 +177,11 @@ export const Default: Story = {
   render: function SingleField(args) {
     const [name, setName] = useState('Mari Maasikas');
     return (
-      <Editable<string> {...args} value={name} onChange={setName} renderValue={(v) => v || '—'}>
+      <InlineEdit<string> {...args} value={name} onChange={setName} renderValue={(v) => v || '—'}>
         {({ value, onChange }) => (
           <TextField id="ef-name" label={args.label} hideLabel value={value} onChange={onChange} />
         )}
-      </Editable>
+      </InlineEdit>
     );
   },
 };
@@ -222,23 +223,23 @@ export const ProfileSettings: Story = {
     return (
       <FormCard title="Profiili seaded">
         <FormRow label="Nimi">
-          <Editable<string> label="Nimi" value={name} onChange={setName} renderValue={(v) => v || '—'}>
+          <InlineEdit<string> label="Nimi" value={name} onChange={setName} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => (
               <TextField id="ps-name" label="Nimi" hideLabel value={value} onChange={onChange} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="E-post">
-          <Editable<string> label="E-post" value={email} onChange={setEmail} renderValue={(v) => v || '—'}>
+          <InlineEdit<string> label="E-post" value={email} onChange={setEmail} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => (
               <TextField id="ps-email" label="E-post" hideLabel type="email" value={value} onChange={onChange} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Roll">
-          <Editable<string>
+          <InlineEdit<string>
             label="Roll"
             value={role}
             onChange={setRole}
@@ -259,11 +260,11 @@ export const ProfileSettings: Story = {
                 }}
               />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Riik">
-          <Editable<ISelectOption | null>
+          <InlineEdit<ISelectOption | null>
             label="Riik"
             value={country}
             onChange={setCountry}
@@ -282,11 +283,11 @@ export const ProfileSettings: Story = {
                 }}
               />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Tutvustus">
-          <Editable<string>
+          <InlineEdit<string>
             label="Tutvustus"
             value={bio}
             onChange={setBio}
@@ -296,11 +297,11 @@ export const ProfileSettings: Story = {
             {({ value, onChange }) => (
               <Textarea id="ps-bio" label="Tutvustus" hideLabel value={value} onChange={onChange} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Oskused">
-          <Editable<ISelectOption[]>
+          <InlineEdit<ISelectOption[]>
             label="Oskused"
             value={skills}
             onChange={setSkills}
@@ -317,11 +318,11 @@ export const ProfileSettings: Story = {
                 onChange={(next) => onChange((next as ISelectOption[] | null) ?? [])}
               />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Teavitused">
-          <Editable<boolean>
+          <InlineEdit<boolean>
             label="Teavitused"
             value={notifications}
             onChange={setNotifications}
@@ -339,7 +340,7 @@ export const ProfileSettings: Story = {
                 }}
               />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
       </FormCard>
     );
@@ -365,7 +366,7 @@ export const AppointmentBooking: Story = {
     return (
       <FormCard title="Broneering">
         <FormRow label="Kuupäev">
-          <Editable<Date | undefined> label="Kuupäev" value={date} onChange={setDate} renderValue={formatDate}>
+          <InlineEdit<Date | undefined> label="Kuupäev" value={date} onChange={setDate} renderValue={formatDate}>
             {({ value, onChange, commit }) => (
               <DateField
                 id="bk-date"
@@ -378,17 +379,17 @@ export const AppointmentBooking: Story = {
                 }}
               />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Algusaeg">
-          <Editable<string> label="Algusaeg" value={start} onChange={setStart} renderValue={(v) => v || '—'}>
+          <InlineEdit<string> label="Algusaeg" value={start} onChange={setStart} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => <TimeField id="bk-start" label="Algusaeg" value={value} onChange={onChange} />}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Saabumine">
-          <Editable<Date | undefined>
+          <InlineEdit<Date | undefined>
             label="Saabumine"
             value={checkIn}
             onChange={setCheckIn}
@@ -402,19 +403,24 @@ export const AppointmentBooking: Story = {
                 onChange={(next) => onChange(next as Date | undefined)}
               />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Meeldetuletus">
-          <Editable<string> label="Meeldetuletus" value={reminder} onChange={setReminder} renderValue={(v) => v || '—'}>
+          <InlineEdit<string>
+            label="Meeldetuletus"
+            value={reminder}
+            onChange={setReminder}
+            renderValue={(v) => v || '—'}
+          >
             {({ value, onChange }) => (
               <TimeField id="bk-reminder" label="Meeldetuletus" value={value} onChange={onChange} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Kohtade arv">
-          <Editable<number | undefined>
+          <InlineEdit<number | undefined>
             label="Kohtade arv"
             value={seats}
             onChange={setSeats}
@@ -423,23 +429,23 @@ export const AppointmentBooking: Story = {
             {({ value, onChange }) => (
               <NumberField id="bk-seats" label="Kohtade arv" hideLabel value={value} onChange={onChange} min={1} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Täituvus">
-          <Editable<number> label="Täituvus" value={capacity} onChange={setCapacity} renderValue={(v) => `${v}%`}>
+          <InlineEdit<number> label="Täituvus" value={capacity} onChange={setCapacity} renderValue={(v) => `${v}%`}>
             {({ value, onChange }) => (
               <Slider id="bk-capacity" label="Täituvus" hideLabel value={value} onChange={onChange} min={0} max={100} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
 
         <FormRow label="Asukoht">
-          <Editable<string> label="Asukoht" value={location} onChange={setLocation} renderValue={(v) => v || '—'}>
+          <InlineEdit<string> label="Asukoht" value={location} onChange={setLocation} renderValue={(v) => v || '—'}>
             {({ value, onChange }) => (
               <Search id="bk-location" label="Asukoht" hideLabel value={value} onChange={onChange} />
             )}
-          </Editable>
+          </InlineEdit>
         </FormRow>
       </FormCard>
     );
@@ -454,12 +460,98 @@ export const Disabled: Story = {
   render: () => (
     <FormCard title="Ainult lugemiseks">
       <FormRow label="Nimi">
-        <Editable<string> label="Nimi" value="Mari Maasikas" disabled renderValue={(v) => v}>
+        <InlineEdit<string> label="Nimi" value="Mari Maasikas" disabled renderValue={(v) => v}>
           {({ value, onChange }) => (
             <TextField id="ef-disabled" label="Nimi" hideLabel value={value} onChange={onChange} />
           )}
-        </Editable>
+        </InlineEdit>
       </FormRow>
     </FormCard>
   ),
+};
+
+const statusOptions: ISelectOption[] = [
+  { value: 'submitted', label: 'Esitatud' },
+  { value: 'in-progress', label: 'Menetluses' },
+  { value: 'approved', label: 'Kinnitatud' },
+  { value: 'rejected', label: 'Tagasi lükatud' },
+];
+
+const statusColor: Record<string, StatusBadgeColor> = {
+  submitted: 'brand',
+  'in-progress': 'warning',
+  approved: 'success',
+  rejected: 'danger',
+};
+
+/**
+ * A status field: the read view shows the current value as a `StatusBadge`; clicking it opens a
+ * `Select` to change the status (commits on pick).
+ */
+export const StatusSelect: Story = {
+  name: 'Status select',
+  render: function StatusField() {
+    const [status, setStatus] = useState<ISelectOption | null>(statusOptions[0]);
+    return (
+      <FormCard title="Staatus">
+        <FormRow label="Taotluse staatus">
+          <InlineEdit<ISelectOption | null>
+            label="Taotluse staatus"
+            value={status}
+            onChange={setStatus}
+            renderValue={(v) => (v ? <StatusBadge color={statusColor[v.value as string]}>{v.label}</StatusBadge> : '—')}
+          >
+            {({ value, onChange, commit }) => (
+              <Select
+                id="ef-status"
+                label="Taotluse staatus"
+                hideLabel
+                options={statusOptions}
+                value={value}
+                onChange={(next) => {
+                  onChange(next as ISelectOption | null);
+                  commit();
+                }}
+              />
+            )}
+          </InlineEdit>
+        </FormRow>
+      </FormCard>
+    );
+  },
+};
+
+/**
+ * `hideEditIcon` drops the pencil cue while keeping the whole value clickable — useful when the edit
+ * affordance is already implied by context (e.g. a settings form) and the icon would add visual noise.
+ */
+export const WithoutEditIcon: Story = {
+  render: function WithoutIcon() {
+    const [name, setName] = useState('Mari Maasikas');
+    const [email, setEmail] = useState('mari.maasikas@example.ee');
+    return (
+      <FormCard title="Ilma muutmise ikoonita">
+        <FormRow label="Nimi">
+          <InlineEdit<string> label="Nimi" value={name} onChange={setName} hideEditIcon renderValue={(v) => v || '—'}>
+            {({ value, onChange }) => (
+              <TextField id="ef-no-icon-name" label="Nimi" hideLabel value={value} onChange={onChange} />
+            )}
+          </InlineEdit>
+        </FormRow>
+        <FormRow label="E-post">
+          <InlineEdit<string>
+            label="E-post"
+            value={email}
+            onChange={setEmail}
+            hideEditIcon
+            renderValue={(v) => v || '—'}
+          >
+            {({ value, onChange }) => (
+              <TextField id="ef-no-icon-email" label="E-post" hideLabel value={value} onChange={onChange} />
+            )}
+          </InlineEdit>
+        </FormRow>
+      </FormCard>
+    );
+  },
 };

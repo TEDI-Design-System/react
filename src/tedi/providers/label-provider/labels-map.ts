@@ -606,9 +606,9 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
-  'editable.edit': {
-    description: 'Screen-reader prefix on the Editable read trigger, e.g. "Edit {label}".',
-    components: ['Editable'],
+  'inline-edit.edit': {
+    description: 'Screen-reader prefix on the InlineEdit read trigger, e.g. "Edit {label}".',
+    components: ['InlineEdit'],
     et: 'Muuda',
     en: 'Edit',
     ru: 'Изменить',
