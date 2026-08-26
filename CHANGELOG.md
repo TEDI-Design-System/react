@@ -1,3 +1,10 @@
+# [19.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.17...react-19.0.0-rc.18) (2026-08-26)
+
+
+### Features
+
+* **text-group:** review a11y issues, align examples with figma [#842](https://github.com/TEDI-Design-System/react/issues/842) ([#846](https://github.com/TEDI-Design-System/react/issues/846)) ([d274c6b](https://github.com/TEDI-Design-System/react/commit/d274c6bb4ab818b9fb0699451eaf559e3bf699bc))
+
 # [19.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.16...react-19.0.0-rc.17) (2026-08-26)
 
 
