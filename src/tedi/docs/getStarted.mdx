@@ -37,12 +37,7 @@ Import the styles once at the root of your application and wrap it in the provid
 ```tsx
 import '@tedi-design-system/react/index.css';
 
-import {
-  AccessibilityProvider,
-  LabelProvider,
-  StyleProvider,
-  ThemeProvider,
-} from '@tedi-design-system/react/tedi';
+import { AccessibilityProvider, LabelProvider, StyleProvider, ThemeProvider } from '@tedi-design-system/react/tedi';
 
 <ThemeProvider>
   <LabelProvider>
@@ -62,7 +57,13 @@ that loaders announce through.
 
 #### ThemeProvider
 
-Provides the active theme. Dark mode is a semantic-token override applied through this provider.
+Provides the active theme, applied as a `.tedi-theme--*` class on the `html` element. Dark mode is a
+semantic-token override applied through this provider.
+
+Only `default` and `dark` ship with the library's CSS. Any other theme name is a custom theme and is
+**not bundled** — you generate it from your project's Figma variables and include its stylesheet
+yourself. The prop is not validated, so an unknown name fails silently. See
+[Custom theming](/docs/documentation-custom-theming--docs).
 
 #### LabelProvider
 
