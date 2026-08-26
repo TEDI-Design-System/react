@@ -2,7 +2,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta name="Get Started" title="Documentation/Get started" />
 
-# Get started with tedi-design-system/react
+# Get started with @tedi-design-system/react
 
 ### Installation
 
@@ -10,59 +10,87 @@ import { Meta } from '@storybook/addon-docs/blocks';
 npm install @tedi-design-system/react
 ```
 
-### Labels - LabelProvider
+Supported React versions are **React 18.3.1 and React 19**. See
+[Supported versions](https://github.com/TEDI-Design-System/general/wiki/Supported-versions) for the
+support policy.
 
-@tedi-design-system/react uses labels that are provided with <b>{'<LabelProvider>'}</b> component. Every
-application should be wrapped with LabelProvider to provide all necessary labels for users (mostly for
-accessibility). See all labels under [Documentation/Labels](/docs/documentation-labels--docs).
-More documentation about LabelProvider can be found under [components](/docs/components-labelprovider--docs).
+`dayjs` is a peer dependency and must be installed by the application — see the Day.js section below.
 
-#### 1. Wrap Application with LabelProvider
+### Importing components
 
-```tsx
-<LabelProvider labels={labels} locale={locale}>
-  <YourApp />
-</LabelProvider>
-```
-
-### Styles - StyleProvider
-
-@tedi-design-system/react depends on some global styles. Follow next steps to import styles to your
-application.
-
-#### 1. Wrap Application with StyleProvider
+Components are published as two separate entry points:
 
 ```tsx
-<StyleProvider>
-  <YourApp />
-</StyleProvider>
+import { Button } from '@tedi-design-system/react/tedi';
+import { Card } from '@tedi-design-system/react/community';
 ```
 
-#### 2. Add styles import to the root of application
+**TEDI-Ready** components are maintained by the TEDI team and meet the full
+[Definition of Done](https://github.com/TEDI-Design-System/general/wiki/Definition-of-Done).
+**Community** components are contributed and held to a lighter standard. Prefer a TEDI-Ready
+component where one exists.
+
+### Application setup
+
+Import the styles once at the root of your application and wrap it in the provider chain:
 
 ```tsx
 import '@tedi-design-system/react/index.css';
+
+import {
+  AccessibilityProvider,
+  LabelProvider,
+  StyleProvider,
+  ThemeProvider,
+} from '@tedi-design-system/react/tedi';
+
+<ThemeProvider>
+  <LabelProvider labels={labels} locale={locale}>
+    <StyleProvider>
+      <AccessibilityProvider>
+        <YourApp />
+      </AccessibilityProvider>
+    </StyleProvider>
+  </LabelProvider>
+</ThemeProvider>;
 ```
 
-#### 3. If u are not using Layout component u should wrap your application with AccessibilityProvider
+Without these providers components render unstyled or unthemed.
 
-It provides some global functionality for accessibility. For example Skeleton accessibilty texts and initializes what-input library.
+#### ThemeProvider
 
-```tsx
-<AccessibilityProvider>
-  <YourApp />
-</AccessibilityProvider>
-```
+Provides the active theme. Dark mode is a semantic-token override applied through this provider.
 
-### Dayjs
+#### LabelProvider
 
-Some @tedi-design-system/react components depend on Day.js and MUI X.
-Day.js must be an application dependency, so it's recommended to use it for handling dates.
+Provides the labels components use, mostly for accessibility. Every application should be wrapped
+with it. See all labels under [Documentation/Labels](/docs/documentation-labels--docs), and the
+component documentation under [components](/docs/components-labelprovider--docs).
 
-The <code>'en'</code> locale has a modified rule that sets weekStart to Monday. Currently, overriding this rule is not supported.
-If you need to override it, please reach out on Slack.
+#### StyleProvider
 
-### Server-side-rendering
+Provides the global styles the library depends on.
 
-When using SSR, you have option to pass defaultServerBreakpoint prop to every component that uses [BreakpointProps](/docs/helpers-usebreakpointprops--usebreakpointprops).
-This creates a possibility to tell in which breakpoint the component should be rendered on the server to avoid layout shifts.
+#### AccessibilityProvider
+
+Provides global accessibility functionality — Skeleton accessibility texts, and initialising the
+`what-input` library.
+
+The community `Layout` component renders `AccessibilityProvider` internally, so applications built
+on `Layout` do not need to add it. `Layout` is a **community** component and is not required for
+consuming TEDI, so an application built on TEDI-Ready components alone must include
+`AccessibilityProvider` in its own provider chain, as shown above.
+
+### Day.js
+
+Some components depend on Day.js and MUI X. Day.js must be an application dependency, so it is
+recommended to use it for handling dates.
+
+The `'en'` locale has a modified rule that sets `weekStart` to Monday. Overriding this rule is
+currently not supported — if you need to, please reach out on Slack.
+
+### Server-side rendering
+
+When using SSR you can pass the `defaultServerBreakpoint` prop to every component that uses
+[BreakpointProps](/docs/helpers-usebreakpointprops--usebreakpointprops). This lets you declare which
+breakpoint the component should render at on the server, avoiding layout shifts.
