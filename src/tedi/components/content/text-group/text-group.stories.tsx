@@ -70,7 +70,7 @@ const MultipleTextGroupsTemplate: StoryFn<TextGroupProps> = (args) => {
           label: 'Patsient',
           value: (
             <>
-              <Icon name="person" size={18} color="tertiary" />
+              <Icon name="person" size={18} color="secondary" />
               <Text>Mari Maasikas</Text>
             </>
           ),
@@ -79,7 +79,7 @@ const MultipleTextGroupsTemplate: StoryFn<TextGroupProps> = (args) => {
           label: 'Aadress',
           value: (
             <>
-              <Icon name="location_on" size={16} color="tertiary" />
+              <Icon name="location_on" size={16} color="secondary" />
               <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text>
             </>
           ),
@@ -244,12 +244,6 @@ export const TextWeight: Story = {
  */
 export const Types: Story = {
   name: 'Type',
-  parameters: {
-    // The `Has icon` examples use the design's muted `color="tertiary"` decorative icons, which don't
-    // meet text-contrast in isolation. Suppress only the color-contrast rule here (other a11y checks
-    // still run) rather than deviating from Figma.
-    a11y: { config: { rules: [{ id: 'color-contrast', enabled: false }] } },
-  },
   render: () => (
     <ExampleRows
       rows={[
@@ -287,7 +281,7 @@ export const Types: Story = {
                 label="Ligipääsetavus"
                 value={
                   <>
-                    <Icon name="lock" size={16} color="tertiary" />
+                    <Icon name="lock" size={16} color="secondary" />
                     <Text>Nähtav arstile ja esindajale</Text>
                   </>
                 }
@@ -296,7 +290,7 @@ export const Types: Story = {
                 label="Patsient"
                 value={
                   <>
-                    <Icon name="person" size={18} color="tertiary" />
+                    <Icon name="person" size={18} color="secondary" />
                     <Text>Mari Maasikas</Text>
                   </>
                 }
@@ -492,7 +486,7 @@ export const WithList: Story = {
                   label: 'Patsient',
                   value: (
                     <>
-                      <Icon name="person" size={18} color="tertiary" />
+                      <Icon name="person" size={18} color="secondary" />
                       <Text>Mari Maasikas</Text>
                     </>
                   ),
@@ -501,7 +495,7 @@ export const WithList: Story = {
                   label: 'Aadress',
                   value: (
                     <>
-                      <Icon name="location_on" size={16} color="tertiary" />
+                      <Icon name="location_on" size={16} color="secondary" />
                       <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text>
                     </>
                   ),
