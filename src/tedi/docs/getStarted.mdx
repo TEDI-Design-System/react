@@ -45,7 +45,7 @@ import {
 } from '@tedi-design-system/react/tedi';
 
 <ThemeProvider>
-  <LabelProvider labels={labels} locale={locale}>
+  <LabelProvider>
     <StyleProvider>
       <AccessibilityProvider>
         <YourApp />
@@ -55,7 +55,10 @@ import {
 </ThemeProvider>;
 ```
 
-Without these providers components render unstyled or unthemed.
+Each provider does one thing: `ThemeProvider` applies the theme class to the `html` element,
+`StyleProvider` imports the library's global SCSS, `LabelProvider` supplies the label context
+components read, and `AccessibilityProvider` initializes `what-input` and renders the live region
+that loaders announce through.
 
 #### ThemeProvider
 
