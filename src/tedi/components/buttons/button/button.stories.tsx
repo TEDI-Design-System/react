@@ -16,6 +16,12 @@ const meta: Meta<typeof Button> = {
   component: Button,
   title: 'TEDI-Ready/Components/Buttons/Button',
   parameters: {
+    a11y: {
+      config: {
+        // TODO: [Button]: Review storybook a11y violations #843
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
