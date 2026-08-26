@@ -1,3 +1,10 @@
+# [19.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.16...react-19.0.0-rc.17) (2026-08-26)
+
+
+### Bug Fixes
+
+* **choice-group:** fix variables [#841](https://github.com/TEDI-Design-System/react/issues/841) ([#845](https://github.com/TEDI-Design-System/react/issues/845)) ([d030f9f](https://github.com/TEDI-Design-System/react/commit/d030f9f8da3589b4fdb0f641a1be44e76350a6ed))
+
 # [19.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.15...react-19.0.0-rc.16) (2026-08-26)
 
 
