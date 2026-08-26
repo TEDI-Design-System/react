@@ -130,7 +130,13 @@ export function InlineEdit<T>({
 
   React.useEffect(() => {
     if (!isEditing) return;
-    editorRef.current?.querySelector<HTMLElement>('input, textarea, select, [contentinline-edit], [tabindex]')?.focus();
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const target =
+      editor.querySelector<HTMLElement>('input, textarea, select, [contenteditable]') ??
+      editor.querySelector<HTMLElement>('[tabindex]:not([tabindex="-1"])');
+    target?.focus();
   }, [isEditing]);
 
   if (isEditing) {
@@ -145,19 +151,10 @@ export function InlineEdit<T>({
           }
         }}
         onBlur={() => {
-          // Defer so focus can settle: composite controls (Select, Toggle) move
-          // focus around internally while editing, which would otherwise blur
-          // the container and commit mid-interaction.
           window.setTimeout(() => {
             if (!editorRef.current) return;
             const active = document.activeElement;
-            // Focus is still inside the editor → keep editing.
             if (editorRef.current.contains(active)) return;
-            // Focus landed in a floating-ui popover the editor opened (calendar,
-            // select menu, time picker). Committing here would unmount the
-            // control mid-interaction — before the user's pick fires its own
-            // `onSelect`/`onChange` — and lose the change. Keep editing; those
-            // controls call `commit()` themselves once a value is chosen.
             if (active?.closest('[data-floating-ui-portal]')) return;
             commit();
           }, 0);

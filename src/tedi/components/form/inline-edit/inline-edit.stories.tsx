@@ -2,8 +2,8 @@ import { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';
-import { Text } from '../../base/typography/text/text';
 import { Card, CardContent } from '../../content/card';
+import { Label } from '../../content/label/label';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
@@ -40,14 +40,9 @@ const FormRow = ({
   label: string;
   children: React.ReactElement<{ fullWidth?: boolean }>;
 }): JSX.Element => (
-  // Top-align the label so it keeps its place when a field grows in edit mode
-  // (e.g. the Textarea). The small top padding lines the label up with the read
-  // value, which sits inside the trigger's vertical padding.
   <Row alignItems="start" gutter={2}>
     <Col xs={12} sm={4}>
-      <Text element="div" color="secondary" modifiers="small" style={{ paddingTop: 'var(--tedi-dimensions-01)' }}>
-        {label}
-      </Text>
+      <Label style={{ display: 'inline-block', paddingTop: 'var(--tedi-dimensions-01)' }}>{label}</Label>
     </Col>
     <Col xs={12} sm={8}>
       {React.cloneElement(children, { fullWidth: true })}
@@ -371,6 +366,7 @@ export const AppointmentBooking: Story = {
               <DateField
                 id="bk-date"
                 label="Kuupäev"
+                inputProps={{ hideLabel: true }}
                 mode="single"
                 selected={value}
                 onSelect={(next) => {
@@ -384,7 +380,15 @@ export const AppointmentBooking: Story = {
 
         <FormRow label="Algusaeg">
           <InlineEdit<string> label="Algusaeg" value={start} onChange={setStart} renderValue={(v) => v || '—'}>
-            {({ value, onChange }) => <TimeField id="bk-start" label="Algusaeg" value={value} onChange={onChange} />}
+            {({ value, onChange }) => (
+              <TimeField
+                id="bk-start"
+                label="Algusaeg"
+                inputProps={{ hideLabel: true }}
+                value={value}
+                onChange={onChange}
+              />
+            )}
           </InlineEdit>
         </FormRow>
 
@@ -399,6 +403,7 @@ export const AppointmentBooking: Story = {
               <DateTimeField
                 id="bk-checkin"
                 label="Saabumine"
+                inputProps={{ hideLabel: true }}
                 value={value}
                 onChange={(next) => onChange(next as Date | undefined)}
               />
@@ -414,7 +419,13 @@ export const AppointmentBooking: Story = {
             renderValue={(v) => v || '—'}
           >
             {({ value, onChange }) => (
-              <TimeField id="bk-reminder" label="Meeldetuletus" value={value} onChange={onChange} />
+              <TimeField
+                id="bk-reminder"
+                label="Meeldetuletus"
+                inputProps={{ hideLabel: true }}
+                value={value}
+                onChange={onChange}
+              />
             )}
           </InlineEdit>
         </FormRow>
