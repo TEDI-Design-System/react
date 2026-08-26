@@ -1,3 +1,10 @@
+# [19.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.15...react-19.0.0-rc.16) (2026-08-26)
+
+
+### Bug Fixes
+
+* **button:** fix wrong variable for secondary button hover text [#840](https://github.com/TEDI-Design-System/react/issues/840) ([#844](https://github.com/TEDI-Design-System/react/issues/844)) ([678c0e2](https://github.com/TEDI-Design-System/react/commit/678c0e2181f1ab5354b374994dec6f18168375b5))
+
 # [19.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-19.0.0-rc.14...react-19.0.0-rc.15) (2026-08-24)
 
 
