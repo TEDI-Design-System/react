@@ -125,12 +125,12 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     onClick: handleClick,
     className: cn(styles['tedi-sidenav__link'], isLinkedParent && styles['tedi-sidenav__link--has-children-link']),
     noStyle: true,
-    role: 'menuitem',
     'aria-current': isActive ? 'page' : undefined,
     'aria-label': isCollapsed && typeof children === 'string' ? children : undefined,
+    // Disclosure trigger (expandable group): `aria-expanded` + `aria-controls`,
+    // no `aria-haspopup` — the panel is a list of links, not a menu.
     ...(hasChildren
       ? {
-          'aria-haspopup': 'true',
           'aria-expanded': isCollapsedInternal,
           'aria-controls': collapseId,
         }
@@ -142,7 +142,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     groupsToRender?.map((group, index) => (
       <div key={index}>
         {group?.subHeading && <div className={styles['tedi-sidenav__subheading']}>{group.subHeading}</div>}
-        <ul className={styles['tedi-sidenav__list']} role="menu">
+        <ul className={styles['tedi-sidenav__list']}>
           {group.subItems?.map((item, key) => (
             <SideNavItem
               as={as}
