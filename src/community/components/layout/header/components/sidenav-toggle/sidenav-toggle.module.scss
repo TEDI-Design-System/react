@@ -2,7 +2,7 @@
 
 .sidenav-toggle {
   --global-outline-offset: -3px;
-  --global-outline-color: var(--color-primary-highlight);
+  --global-outline-color: var(--general-surface-brand-tertiary);
 
   width: 3.5rem;
   height: 3.5rem;
@@ -14,8 +14,8 @@
   }
 
   .header &--open {
-    background-color: var(--color-primary-active);
-    border-color: var(--color-primary-active);
+    background-color: var(--general-surface-brand-secondary);
+    border-color: var(--general-border-brand);
   }
 
   .header &:focus {

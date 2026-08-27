@@ -77,6 +77,7 @@ jest.mock('../textfield/textfield', () => {
         <button data-testid="icon" onClick={props.onIconClick}>
           icon
         </button>
+        {props.isClearable && props.value ? <button aria-label="Clear">clear</button> : null}
       </div>
     );
   });
@@ -337,6 +338,18 @@ describe('TimeField', () => {
       await user.click(screen.getByTestId('icon'));
       await user.click(screen.getByText('modal-confirm'));
       expect(onChange).toHaveBeenCalledWith('12:30');
+    });
+  });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<TimeField id="t-clear" label="Time" defaultValue="10:00" />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<TimeField id="t-clear-off" label="Time" defaultValue="10:00" clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
     });
   });
 });

@@ -7,3 +7,6 @@ export * from './hooks/use-is-touch-device';
 export * from './hooks/use-file-upload';
 export * from './hooks/use-what-input';
 export * from './hooks/use-scroll-fade';
+
+// Type helpers for building custom / extended polymorphic components (issue #200).
+export * from './polymorphic/types';

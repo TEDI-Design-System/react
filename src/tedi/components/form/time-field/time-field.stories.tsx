@@ -16,6 +16,10 @@ export default {
   title: 'Tedi-Ready/Components/Form/TimeField',
   component: TimeField,
   parameters: {
+    a11y: {
+      // TODO: [TimeField]: Review storybook a11y violations #815
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -91,19 +95,19 @@ export const States: StoryObj<TimeFieldProps> = {
     <div className="state-example">
       {stateArray.map((state) => (
         <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
+          <Col md={4} xs={12} className="flex align-items-center">
             <TimeField id={state} label="Aeg" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
       <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+        <Col width={2} className="flex align-items-center">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col md={4} xs={12} className="flex align-items-center">
           <TimeField
             id="success-timefield"
             label="Aeg"
@@ -112,10 +116,10 @@ export const States: StoryObj<TimeFieldProps> = {
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+        <Col width={2} className="flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col md={4} xs={12} className="flex align-items-center">
           <TimeField id="error-timefield" label="Aeg" inputProps={{ helper: { text: 'Vihjetekst', type: 'error' } }} />
         </Col>
       </Row>

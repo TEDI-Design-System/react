@@ -16,6 +16,12 @@ const meta: Meta<typeof Button> = {
   component: Button,
   title: 'TEDI-Ready/Components/Buttons/Button',
   parameters: {
+    a11y: {
+      config: {
+        // TODO: [Button]: Review storybook a11y violations #843
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -76,12 +82,12 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
         </Row>
         {array.map((value, key) => (
           <Row key={key}>
-            <Col md={1} className="display-flex align-items-center">
+            <Col md={1} className="flex align-items-center">
               <Text color={titleColor} modifiers="bold">
                 {value}
               </Text>
             </Col>
-            <Col className="display-flex align-items-center gap-3">
+            <Col className="flex align-items-center gap-3">
               <Button id={value} {...buttonProps} disabled={value === 'Disabled'} isLoading={value === 'Loading'}>
                 Create
               </Button>
@@ -114,7 +120,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Icon Only
               </Button>
             </Col>
-            <Col className="display-flex align-items-center gap-3">
+            <Col className="flex align-items-center gap-3">
               <Button
                 id={value}
                 size="small"

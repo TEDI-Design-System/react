@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import { et } from 'react-day-picker/locale';
 
 import { TextFieldForwardRef } from '../textfield/textfield';
@@ -182,6 +182,62 @@ describe('DateField component', () => {
     expect(screen.getByLabelText('Birth date')).toHaveValue('15.06.2024');
   });
 
+  it('clears the calendar highlight when the input is cleared (#789)', async () => {
+    const user = userEvent.setup();
+    const onSelect = jest.fn();
+    render(
+      <DateField
+        {...defaultProps}
+        defaultValue={new Date(2025, 5, 15)}
+        initialMonth={new Date(2025, 5, 1)}
+        onSelect={onSelect}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('gridcell', { selected: true })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByLabelText('Birth date')).toHaveValue('');
+    expect(onSelect).toHaveBeenLastCalledWith(undefined, undefined, {}, {});
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).queryByRole('gridcell', { selected: true })).not.toBeInTheDocument();
+  });
+
+  it('clears the calendar highlight in controlled mode when the parent clears selected (#789)', async () => {
+    const user = userEvent.setup();
+
+    const ControlledDateField = () => {
+      const [selected, setSelected] = useState<DateFieldProps['selected']>(new Date(2025, 5, 15));
+      return (
+        <DateField
+          {...defaultProps}
+          selected={selected}
+          initialMonth={new Date(2025, 5, 1)}
+          onSelect={(next) => setSelected(next)}
+        />
+      );
+    };
+
+    render(<ControlledDateField />);
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('gridcell', { selected: true })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByLabelText('Birth date')).toHaveValue('');
+
+    await user.click(screen.getByRole('button', { name: 'dateField.openCalendar' }));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).queryByRole('gridcell', { selected: true })).not.toBeInTheDocument();
+  });
+
   it('removes value from MultiValueField in multiple mode', async () => {
     const user = userEvent.setup();
     const onSelect = jest.fn();
@@ -349,6 +405,30 @@ describe('DateField component', () => {
     await user.click(button);
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  describe('dayStatus (popover path)', () => {
+    const markDay15 = (date: Date) =>
+      date.getDate() === 15 ? ({ type: 'success', label: 'Kinnitatud vastuvõtt' } as const) : null;
+
+    it('renders no day-status indicator by default', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} initialMonth={new Date(2025, 5, 1)} />);
+
+      await user.click(screen.getByRole('button'));
+      await screen.findByRole('dialog');
+      expect(document.querySelector('.tedi-calendar__day-status')).not.toBeInTheDocument();
+    });
+
+    it('forwards dayStatus to the popover calendar (dot + folded aria-label)', async () => {
+      const user = userEvent.setup();
+      render(<DateField {...defaultProps} initialMonth={new Date(2025, 5, 1)} dayStatus={markDay15} />);
+
+      await user.click(screen.getByRole('button'));
+      await screen.findByRole('dialog');
+      expect(document.querySelector('.tedi-calendar__day-status')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Kinnitatud vastuvõtt/ })).toBeInTheDocument();
+    });
   });
 
   it('links the calendar trigger to the popover via aria-controls when open', async () => {
@@ -720,6 +800,18 @@ describe('DateField component', () => {
 
       expect(onSelect).not.toHaveBeenCalled();
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+  });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
     });
   });
 });

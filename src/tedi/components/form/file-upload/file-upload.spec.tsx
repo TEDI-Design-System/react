@@ -94,7 +94,7 @@ describe('FileUpload component', () => {
     const file = new File(['dummy content'], 'test.txt', { type: 'text/plain' });
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
-      expect(defaultProps.onChange).not.toHaveBeenCalled();
+      expect(defaultProps.onChange).toHaveBeenCalledWith([]);
       expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
     });
   });
@@ -105,7 +105,7 @@ describe('FileUpload component', () => {
     const file = new File(['a'.repeat(6 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' });
     Object.defineProperty(file, 'size', { value: 6 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [file] } });
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith([]);
     expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
@@ -282,7 +282,7 @@ describe('FileUpload component', () => {
 
     fireEvent.change(input, { target: { files: [largeFile] } });
 
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith([]);
     expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
@@ -423,5 +423,65 @@ describe('FileUpload component', () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  describe('showRestrictions (#786)', () => {
+    it('shows the auto-generated restrictions hint by default', () => {
+      render(<FileUpload {...defaultProps} />);
+      expect(screen.getByText(/file-upload\.accept/)).toBeInTheDocument();
+    });
+
+    it('hides the restrictions hint when showRestrictions is false', () => {
+      render(<FileUpload {...defaultProps} showRestrictions={false} />);
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+
+    it('updates the hint live when showRestrictions changes on a mounted field', () => {
+      const { rerender } = render(<FileUpload {...defaultProps} showRestrictions />);
+      expect(screen.getByText(/file-upload\.accept/)).toBeInTheDocument();
+
+      rerender(<FileUpload {...defaultProps} showRestrictions={false} />);
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+
+    it('still renders rejection errors when the hint is hidden', async () => {
+      render(<FileUpload {...defaultProps} showRestrictions={false} />);
+      const input = screen.getByLabelText(/Upload files/i);
+      fireEvent.change(input, { target: { files: [new File(['x'], 'bad.txt', { type: 'text/plain' })] } });
+
+      await waitFor(() => expect(screen.getByText(/file-upload\.extension-rejected/)).toBeInTheDocument());
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('single-file rejection observability (#786)', () => {
+    it('fires onChange for a rejected single file so the parent can react', () => {
+      const onChange = jest.fn();
+      render(<FileUpload {...defaultProps} multiple={false} onChange={onChange} />);
+      fireEvent.change(screen.getByLabelText(/Upload files/i), {
+        target: { files: [new File(['x'], 'bad.txt', { type: 'text/plain' })] },
+      });
+
+      expect(onChange).toHaveBeenCalledWith([]);
+      expect(screen.getByText(/file-upload\.extension-rejected/)).toBeInTheDocument();
+    });
+
+    it('keeps a previously-valid single file when a later invalid one is rejected', () => {
+      const onChange = jest.fn();
+      render(
+        <FileUpload
+          {...defaultProps}
+          multiple={false}
+          defaultFiles={[{ name: 'good.jpg', id: '1' }]}
+          onChange={onChange}
+        />
+      );
+      fireEvent.change(screen.getByLabelText(/Upload files/i), {
+        target: { files: [new File(['x'], 'bad.txt', { type: 'text/plain' })] },
+      });
+
+      expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ name: 'good.jpg' })]);
+      expect(screen.getByText('good.jpg')).toBeInTheDocument();
+    });
   });
 });

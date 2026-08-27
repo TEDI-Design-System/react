@@ -149,7 +149,7 @@
       --filter-bg: var(--filter-secondary-selected-background);
       --filter-text: var(--filter-secondary-selected-text);
       --filter-border: var(--filter-secondary-selected-border);
-      --filter-border-width: var(--general-selected-border-width);
+      --filter-border-width: var(--general-border-width-selected);
 
       .tedi-filter__button:hover:not(:disabled),
       .tedi-filter__button[aria-expanded='true']:not(:disabled) {
@@ -209,7 +209,7 @@
 
   .tedi-filter--secondary.tedi-filter--selected + .tedi-filter--secondary,
   .tedi-filter--secondary + .tedi-filter--secondary.tedi-filter--selected {
-    margin-left: calc(-1 * var(--general-selected-border-width));
+    margin-left: calc(-1 * var(--general-border-width-selected));
   }
 
   .tedi-filter:first-child {
