@@ -7,13 +7,12 @@ import React, {
   ReactNode,
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
 } from 'react';
 
-import { Breakpoint, BREAKPOINT_WIDTHS, isBreakpointBelow, useBreakpoint } from '../../../helpers';
+import { Breakpoint, BREAKPOINT_WIDTHS, isBreakpointBelow, useBreakpoint, useSafeId } from '../../../helpers';
 import { MobileNav } from '../mobile-nav/mobile-nav';
 import { SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
 import { TopNavGroup, TopNavGroupProps } from './components/top-nav-group/top-nav-group';
@@ -207,7 +206,7 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
   const topNavContextValue = useMemo(() => ({ closeSubmenu }), [closeSubmenu]);
 
   const navRef = useRef<HTMLElement>(null);
-  const panelId = useId();
+  const panelId = useSafeId('tedi-top-nav-submenu');
 
   useEffect(() => {
     if (openButtonIndex === null) return;
