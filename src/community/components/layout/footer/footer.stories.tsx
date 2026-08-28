@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
@@ -9,6 +9,11 @@ import Footer, { FooterProps } from './footer';
 const meta: Meta<typeof Footer> = {
   component: Footer,
   title: 'Community/Layout/Footer',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

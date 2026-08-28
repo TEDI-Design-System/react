@@ -2,10 +2,10 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
 $stepper-transition: 150ms ease;
-$stepper-step-bg: var(--color-bg-subtle);
-$stepper-step-bg-hover: var(--color-bg-disabled);
-$stepper-step-bg-active: var(--color-primary-main);
-$stepper-step-bg-active-hover: var(--color-primary-active);
+$stepper-step-bg: var(--general-surface-tertiary);
+$stepper-step-bg-hover: var(--general-surface-disabled);
+$stepper-step-bg-active: var(--general-surface-brand-primary);
+$stepper-step-bg-active-hover: var(--general-surface-brand-secondary);
 
 .stepper__nav {
   display: flex;
@@ -24,13 +24,13 @@ $stepper-step-bg-active-hover: var(--color-primary-active);
   display: flex;
   align-items: center;
   overflow: clip;
-  color: var(--color-text-default);
+  color: var(--general-text-primary);
   white-space: nowrap;
 
   @include mixins.print-grayscale;
 
   &--active {
-    color: var(--color-text-inverted);
+    color: var(--general-text-white);
   }
 
   &:first-of-type {
@@ -58,7 +58,7 @@ $stepper-step-bg-active-hover: var(--color-primary-active);
     border-radius: 0;
 
     --global-outline-offset: -4px;
-    --global-outline-color: var(--color-primary-highlight);
+    --global-outline-color: var(--general-surface-brand-tertiary);
   }
 
   .stepper__nav-item--active:hover:not(.stepper__nav-item--disabled) & {
@@ -83,19 +83,19 @@ $stepper-step-bg-active-hover: var(--color-primary-active);
   height: 1.25rem;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--color-text-muted);
-  background-color: var(--color-bg-default);
+  color: var(--general-text-secondary);
+  background-color: var(--general-surface-primary);
   border-radius: 10rem;
   transition: $stepper-transition;
   transition-property: color, background-color;
 
   .stepper__nav-item--completed & {
-    color: var(--color-positive-main);
+    color: var(--general-status-success-text);
   }
 
   .stepper__nav-item:hover:not(.stepper__nav-item--disabled, .stepper__nav-item--active) & {
-    color: var(--color-text-inverted);
-    background-color: var(--color-primary-active);
+    color: var(--general-text-white);
+    background-color: var(--general-surface-brand-secondary);
   }
 }
 
@@ -107,7 +107,7 @@ $stepper-step-bg-active-hover: var(--color-primary-active);
   transition-property: color;
 
   .stepper__nav-item:hover:not(.stepper__nav-item--disabled, .stepper__nav-item--active) & {
-    color: var(--color-primary-active);
+    color: var(--general-text-brand);
   }
 }
 
@@ -118,9 +118,9 @@ $stepper-step-bg-active-hover: var(--color-primary-active);
   height: 100%;
   aspect-ratio: 1 / 1;
   background-color: $stepper-step-bg-active;
+  transform: rotate(45deg);
   transition: $stepper-transition;
   transition-property: background-color;
-  transform: rotate(45deg);
 
   &:hover:not(.stepper__nav-item--disabled) {
     background-color: $stepper-step-bg-active-hover;

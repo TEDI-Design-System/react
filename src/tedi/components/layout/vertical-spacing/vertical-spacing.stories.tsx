@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
@@ -11,7 +11,7 @@ import { VerticalSpacing, VerticalSpacingProps } from './vertical-spacing';
 
 const meta: Meta<typeof VerticalSpacing> = {
   component: VerticalSpacing,
-  title: 'Tedi-Ready/Components/Helpers/VerticalSpacing',
+  title: 'Tedi-Ready/Layout/VerticalSpacing',
   subcomponents: {
     'VerticalSpacing.Item': VerticalSpacing.Item,
   } as never,
@@ -97,7 +97,9 @@ const MixedContentTemplate: StoryFn<VerticalSpacingProps> = (args) => (
   <VerticalSpacing {...args}>
     <Heading element="h1">Mixed Content Example</Heading>
     <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pretium lacinia urna in efficitur.</Text>
-    <Heading element="h4">Mixed Content Example</Heading>
+    <Heading element="h2" modifiers="h4">
+      Mixed Content Example
+    </Heading>
     <img width={200} src="tehik_logo.png" alt="tehik.ee" />
     <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pretium lacinia urna in efficitur.</Text>
     <Icon name="home" />

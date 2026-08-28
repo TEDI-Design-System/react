@@ -35,7 +35,7 @@ export type ButtonContentProps<
      */
     fullWidth?: boolean;
     /**
-     * Color schema for button. PS text-color works only with link type links.
+     * Color scheme of the button. The 'text' value is only supported when visualType is 'link'.
      * @default default
      */
     color?: ButtonColor;
@@ -157,7 +157,7 @@ const InternalButtonContent = forwardRef(
           ? { ...defaultIconProps, name: icon }
           : { ...defaultIconProps, ...icon, className: cn(defaultIconProps.className, icon?.className) };
 
-      return isLoading ? <Spinner className={iconProps.className} size={18} /> : <Icon {...iconProps} />;
+      return isLoading ? <Spinner className={iconProps.className} size={18} decorative /> : <Icon {...iconProps} />;
     };
 
     const renderContent = (): JSX.Element => {
@@ -166,6 +166,7 @@ const InternalButtonContent = forwardRef(
           position={!hasIcon ? 'absolute' : undefined}
           className={cn(styles['tedi-btn__spinner'], styles['tedi-btn__spinner--left'])}
           size={18}
+          decorative
         />
       ) : iconLeft ? (
         getIcon('left', iconLeft)
@@ -216,7 +217,7 @@ const InternalButtonContent = forwardRef(
     return (
       <Print visibility="hide">
         {showTooltip && isIconOnly && buttonText ? (
-          <Tooltip>
+          <Tooltip ariaHidden>
             <Tooltip.Trigger>{buttonElement}</Tooltip.Trigger>
             <Tooltip.Content>{buttonText}</Tooltip.Content>
           </Tooltip>

@@ -6,7 +6,7 @@
 
   @include mixins.print-grayscale;
 
-  &:hover:not(.checkbox--disabled) {
+  &:hover:not(.tedi-checkbox--disabled) label {
     cursor: pointer;
   }
 
@@ -68,10 +68,6 @@
     height: var(--form-checkbox-radio-size-large);
   }
 
-  &--invalid {
-    border-color: var(--form-general-feedback-error-border);
-  }
-
   .tedi-checkbox__input:not(:disabled) + &:active {
     background: var(--form-checkbox-radio-default-background-active);
     border-color: var(--form-checkbox-radio-default-border-active);
@@ -79,23 +75,44 @@
 
   .tedi-checkbox__input:not(:disabled) + &--hover,
   .tedi-checkbox__input:hover:not(:disabled) + &,
-  .tedi-checkbox__input:not(:disabled) + &:hover,
-  .tedi-checkbox__input:focus:not(:disabled) + & {
+  .tedi-checkbox__input:not(:disabled) + &:hover {
     cursor: pointer;
-    border-color: var(--form-checkbox-radio-default-border-selected);
+  }
+
+  .tedi-checkbox__input:not(:disabled, :checked) + &--hover:not(#{&}--indeterminate),
+  .tedi-checkbox__input:hover:not(:disabled, :checked) + &:not(#{&}--indeterminate),
+  .tedi-checkbox__input:not(:disabled, :checked) + &:not(#{&}--indeterminate):hover,
+  .tedi-checkbox__input:focus:not(:disabled, :checked) + &:not(#{&}--indeterminate) {
     outline: 1px solid var(--form-checkbox-radio-default-border-selected);
+    border-color: var(--form-checkbox-radio-default-border-selected);
   }
 
   .tedi-checkbox__input:focus-visible:not(:disabled) + & {
-    border-color: var(--form-checkbox-radio-default-border-selected);
     outline: var(--form-checkbox-radio-default-border-selected) solid 2px;
     outline-offset: 2px;
+    border-color: var(--form-checkbox-radio-default-border-selected);
   }
 
   [type='checkbox']:checked + &,
   &--indeterminate {
     background: var(--form-checkbox-radio-default-background-selected);
     border-color: var(--form-checkbox-radio-default-border-selected);
+  }
+
+  &--invalid {
+    border-color: var(--form-general-feedback-error-border);
+
+    .tedi-checkbox__input:hover:not(:disabled) + &,
+    .tedi-checkbox__input:not(:disabled) + &:hover,
+    .tedi-checkbox__input:focus:not(:disabled) + & {
+      outline: 1px solid var(--form-general-feedback-error-border);
+      border-color: var(--form-general-feedback-error-border);
+    }
+
+    .tedi-checkbox__input:focus-visible:not(:disabled) + & {
+      outline: var(--form-general-feedback-error-border) solid 2px;
+      border-color: var(--form-general-feedback-error-border);
+    }
   }
 
   .tedi-checkbox__input:disabled + & {

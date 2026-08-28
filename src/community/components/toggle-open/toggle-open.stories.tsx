@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
 import ToggleOpen from './toggle-open';
@@ -9,6 +9,11 @@ import ToggleOpen from './toggle-open';
 const meta: Meta<typeof ToggleOpen> = {
   component: ToggleOpen,
   title: 'Community/ToggleOpen',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

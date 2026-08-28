@@ -1,7 +1,7 @@
-import { addons } from '@storybook/manager-api';
+import { addons } from 'storybook/manager-api';
 
-import tehikTheme from './tehik-theme.js';
+import tediTheme from './tedi-theme.js';
 
 addons.setConfig({
-  theme: tehikTheme,
+  theme: tediTheme,
 });

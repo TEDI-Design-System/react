@@ -8,6 +8,9 @@ import Print from '../../../tedi/components/misc/print/print';
 import useLayout from '../../helpers/hooks/use-layout';
 import { Card, CardContent, CardProps } from '../card';
 
+/**
+ * @deprecated Use EmptyState from `@tedi-design-system/react/tedi` instead.
+ */
 export interface PlaceholderProps {
   /**
    * Placeholder block content
@@ -38,6 +41,8 @@ export interface PlaceholderProps {
 }
 
 /**
+ * @deprecated Use EmptyState from `@tedi-design-system/react/tedi` instead.
+ *
  * Placeholder is used to indicate, that there is no data to show. It can be used on its own or inside other components, like a `<CardContent>`.
  * Other components also use it internally for displaying empty state. (E.g. `<Table>`)
  */

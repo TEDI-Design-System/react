@@ -5,9 +5,13 @@ import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
 
 export const SelectControl = (props: ControlProps<ISelectOption, boolean>): JSX.Element => {
-  const CustomControlBEM = cn(styles['tedi-select__control'], props.className, {
-    [styles['tedi-select__control--focused']]: props.isFocused,
-  });
+  const CustomControlBEM = cn(
+    styles['tedi-select__control'],
+    {
+      [styles['tedi-select__control--focused']]: props.isFocused,
+    },
+    props.className
+  );
 
   return <ReactSelectComponents.Control {...props} className={CustomControlBEM} />;
 };

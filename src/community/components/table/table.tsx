@@ -18,8 +18,8 @@ import {
 import cn from 'classnames';
 import React from 'react';
 
-import { usePrint } from '../../../tedi/helpers';
 import { useLabels } from '../../../tedi/providers/label-provider';
+import { usePrint } from '../../../tedi/providers/printing-provider';
 import { IntentionalAny } from '../../types';
 import { Card, CardContent } from '../card';
 import { PlaceholderProps } from '../placeholder/placeholder';
@@ -40,6 +40,9 @@ import { TableContext } from './table-context';
 export const PAGE_SIZE_WITHOUT_PAGINATION = 10000;
 const emptyData: IntentionalAny[] = [];
 
+/**
+ * @deprecated Use `Table` from `@tedi-design-system/react/tedi` instead.
+ */
 export function Table<TData extends DefaultTData<TData>>(props: TableProps<TData>): JSX.Element {
   const { getLabel } = useLabels();
   const {

@@ -1,13 +1,13 @@
-import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/blocks';
-import { Preview, StoryContext } from '@storybook/react';
+import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
+import { Preview, StoryContext } from '@storybook/react-vite';
 
 import StorybookDecorator from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
-import '../src/community/styles/storybook.scss';
 
+import { PrintingProvider } from '../src/tedi/providers/printing-provider';
 import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
 import { useEffect } from 'react';
 
@@ -32,63 +32,47 @@ export const decorators: Preview['decorators'] = [
     const theme = (context.globals.theme || 'default') as 'default' | 'dark';
 
     useEffect(() => {
+      // The dark surface itself is applied via CSS in preview-head.html, keyed
+      // off this class — that beats the backgrounds addon on direct story URLs.
       document.documentElement.classList.remove('tedi-theme--default', 'tedi-theme--dark');
       document.documentElement.classList.add(`tedi-theme--${theme}`);
-      
-      updateAllCanvasBackgrounds(theme);
     }, [theme]);
-
-    const updateAllCanvasBackgrounds = (currentTheme: string) => {
-      const backgroundColor = getBackgroundColor(currentTheme);
-      const canvases = document.querySelectorAll('.sb-show-main, .docs-story > div');
-      
-      canvases.forEach((canvas) => {
-        const element = canvas as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-        element.style.transition = 'background-color 0.3s ease';
-      });
-
-      const storyPreviews = document.querySelectorAll('[data-story="true"], .sbdocs-preview');
-      storyPreviews.forEach((preview) => {
-        const element = preview as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-      });
-    };
-
-    const getBackgroundColor = (currentTheme: string): string =>  currentTheme === 'dark' ? 'var(--color-bg-inverted)' : '';
 
     return (
       <ThemeProvider theme={theme}>
-        {context.componentId === 'components-labelprovider' ? (
-          <Story />
-        ) : (
-          <StorybookDecorator>
+        <PrintingProvider>
+          {context.componentId === 'components-labelprovider' ? (
             <Story />
-          </StorybookDecorator>
-        )}
+          ) : (
+            <StorybookDecorator>
+              <Story />
+            </StorybookDecorator>
+          )}
+        </PrintingProvider>
       </ThemeProvider>
     );
   },
 ];
 
-
 const preview: Preview = {
+  tags: ['autodocs'],
+  initialGlobals: {
+    backgrounds: { value: 'default' },
+  },
   parameters: {
     viewMode: 'docs',
+    a11y: {
+      test: 'error',
+    },
     backgrounds: {
-      default: 'default',
-      values: [
-        { name: 'default', value: 'var(--color-bg-default)' },
-        { name: 'muted', value: 'var(--color-bg-muted)' },
-        { name: 'subtle', value: 'var(--color-bg-subtle)' },
-        { name: 'disabled', value: 'var(--color-bg-disabled)' },
-        { name: 'black', value: 'var(--color-black)' },
-        { name: 'inverted', value: 'var(--color-bg-inverted)' },
-        { name: 'inverted-contrast', value: 'var(--color-bg-inverted-contrast)' },
-        { name: 'brand', value: 'var(--tedi-primary-600)' },
-      ],
+      options: {
+        default: { name: 'default', value: 'var(--general-surface-primary)' },
+        inverted: { name: 'inverted', value: 'var(--general-surface-inverted-primary)' },
+        brand: { name: 'brand', value: 'var(--general-surface-brand-primary)' },
+      },
     },
     docs: {
+      codePanel: true,
       toc: true,
       page: () => (
         <>
@@ -96,6 +80,7 @@ const preview: Preview = {
           <Subtitle />
           <Description />
           <Primary />
+          <Description of="story" />
           <Controls />
           <Stories includePrimary={false} />
         </>

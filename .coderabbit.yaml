@@ -1,0 +1,43 @@
+language: en
+early_access: true
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  collapse_walkthrough: true
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - rc
+      - main
+
+  tools:
+    eslint:
+      enabled: true
+    stylelint:
+      enabled: true
+
+  path_instructions:
+    - path: "**"
+      instructions: |
+        Read and enforce the project conventions from these files:
+        - `CLAUDE.md` — project overview, architecture, component patterns, styling rules, testing setup, and "Do NOT" list.
+        - `.claude/skills/contributing/references/best-practices.md` — detailed coding patterns for components, SCSS, testing, stories, and barrel exports.
+
+        Key things to NOT flag as issues:
+        - Missing CSS `var()` fallback values — intentionally omitted.
+        - `community/` code not following TEDI patterns — community components have lighter standards.
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto

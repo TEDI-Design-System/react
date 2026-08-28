@@ -67,7 +67,7 @@ const Pagination = <TData extends DefaultTData<TData>>(props: PaginationProps): 
   return (
     <div className={styles['pagination__wrapper']}>
       <Text color="secondary" modifiers="small">
-        {props.totalRows} {resultsLabel}
+        {resultsLabel}
       </Text>
       {getPageCount() > 1 && (
         <nav role="navigation" aria-label={getLabel('pagination.title')} className={styles['pagination']}>

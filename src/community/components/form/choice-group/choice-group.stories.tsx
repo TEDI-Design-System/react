@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../../../tedi/components/base/typography/text/text';
 import { ColProps } from '../../../../tedi/components/layout/grid/col';
@@ -13,6 +13,11 @@ import { ChoiceGroupItemProps } from './choice-group.types';
 const meta: Meta<typeof ChoiceGroup> = {
   component: ChoiceGroup,
   title: 'Community/Form/ChoiceGroup',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

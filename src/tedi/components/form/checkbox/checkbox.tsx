@@ -39,10 +39,13 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
   } = props;
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
   const labelRef = React.useRef<HTMLLabelElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const getChecked = React.useMemo((): boolean | 'mixed' => {
-    return indeterminate ? 'mixed' : onChange && typeof checked !== 'undefined' ? checked : innerChecked;
-  }, [indeterminate, onChange, checked, innerChecked]);
+  const isChecked = onChange && typeof checked !== 'undefined' ? checked : innerChecked;
+
+  React.useEffect(() => {
+    if (inputRef.current) inputRef.current.indeterminate = !!indeterminate;
+  }, [indeterminate]);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     if (typeof checked === 'undefined') {
@@ -57,21 +60,27 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
   const LabelBEM = cn(styles['tedi-checkbox__label'], { [styles['tedi-checkbox--disabled']]: disabled });
 
   return (
-    <div data-name="check" {...rest}>
+    <div
+      className={cn(styles['tedi-checkbox'], { [styles['tedi-checkbox--disabled']]: disabled })}
+      data-name="check"
+      {...rest}
+    >
       <Row gutter={0}>
         <Col width="auto">
           <div className={styles['tedi-checkbox__outer-indicator-wrapper']}>
             <input
+              ref={inputRef}
               id={id}
               value={value}
               name={name}
               type="checkbox"
               disabled={disabled}
-              checked={getChecked !== 'mixed' ? getChecked : false}
-              aria-checked={getChecked}
+              checked={indeterminate ? false : isChecked}
               onChange={onChangeHandler}
               className={styles['tedi-checkbox__input']}
               aria-describedby={[helperId, tooltipId].filter(Boolean).join(' ')}
+              required={required}
+              aria-invalid={invalid || undefined}
             />
             <div
               aria-hidden="true"

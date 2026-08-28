@@ -1,9 +1,19 @@
-import { Meta } from '@storybook/blocks';
-import { Markdown } from '@storybook/addon-docs';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Markdown } from '@storybook/addon-docs/blocks';
 import ChangelogMDX from '../../../CHANGELOG.md?raw';
 
 <Meta name="Changelog" title="Documentation/Changelog" />
 
 # Changelog
 
-<Markdown>{ChangelogMDX}</Markdown>
+{/*
+  The docs table of contents only picks up h3 headings. The raw changelog has
+  versions as h1/h2 and categories ("Features", "Bug Fixes") as h3 — demote
+  categories to h4 and normalize versions to h3 so the TOC lists versions.
+*/}
+
+<Markdown>
+  {ChangelogMDX.replace(/^### /gm, '#### ')
+    .replace(/^## /gm, '### ')
+    .replace(/^# /gm, '### ')}
+</Markdown>

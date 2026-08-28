@@ -1,0 +1,10 @@
+.tedi-header-logout {
+  display: flex;
+  gap: var(--link-inner-spacing-x);
+  align-items: center;
+
+  &__text {
+    min-width: max-content;
+    color: inherit;
+  }
+}

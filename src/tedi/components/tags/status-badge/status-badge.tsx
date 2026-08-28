@@ -1,7 +1,9 @@
 import cn from 'classnames';
+import { forwardRef } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
-import { Icon, IconColor } from '../../base/icon/icon';
+import { Icon } from '../../base/icon/icon';
+import { StatusIndicator } from '../status-indicator/status-indicator';
 import styles from './status-badge.module.scss';
 
 export type StatusBadgeColor = 'neutral' | 'brand' | 'accent' | 'success' | 'danger' | 'warning' | 'transparent';
@@ -60,7 +62,7 @@ export interface StatusBadgeProps extends BreakpointSupport<StatusBadgePropsBrea
   role?: React.AriaRole;
 }
 
-export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
+export const StatusBadge = forwardRef<HTMLDivElement, StatusBadgeProps>((props, ref) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     color = 'neutral',
@@ -78,29 +80,10 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
 
   const BadgeElement = title ? 'abbr' : 'div';
 
-  const mapBadgeColorToIconColor = (badgeColor: StatusBadgeColor): IconColor => {
-    switch (badgeColor) {
-      case 'brand':
-        return 'brand-dark';
-      case 'success':
-        return 'success';
-      case 'accent':
-        return 'secondary';
-      case 'danger':
-        return 'danger';
-      case 'warning':
-        return 'warning-dark';
-      default:
-        return 'primary';
-    }
-  };
-
   const badgeClass = cn(
     styles['tedi-status-badge'],
     styles[`tedi-status-badge--variant-${variant}`],
     styles[`tedi-status-badge--color-${color}`],
-    status && styles['tedi-status-badge--status'],
-    status && styles[`tedi-status-badge--status-${status}`],
     size === 'large' && styles['tedi-status-badge--large'],
     icon && !children && styles['tedi-status-badge__icon-only'],
     className
@@ -110,6 +93,7 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
 
   return (
     <BadgeElement
+      ref={ref}
       className={badgeClass}
       id={id}
       title={title}
@@ -117,15 +101,11 @@ export const StatusBadge = (props: StatusBadgeProps): JSX.Element => {
       aria-live={role ? ariaLive : undefined}
       {...rest}
     >
-      {icon && (
-        <Icon
-          name={icon}
-          color={mapBadgeColorToIconColor(color)}
-          size={16}
-          className={styles[`tedi-status-badge__icon-${color}`]}
-        />
-      )}
+      {status && <StatusIndicator type={status} size={size === 'large' ? 'lg' : 'sm'} hasBorder position="top-right" />}
+      {icon && <Icon name={icon} color="inherit" size={16} className={styles[`tedi-status-badge__icon-${color}`]} />}
       {children && <span className={styles['tedi-status-badge__inner-text']}>{children}</span>}
     </BadgeElement>
   );
-};
+});
+
+StatusBadge.displayName = 'StatusBadge';

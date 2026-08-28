@@ -1,4 +1,4 @@
-import { Title } from '@storybook/blocks';
+import { Title } from '@storybook/addon-docs/blocks';
 import React from 'react';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';

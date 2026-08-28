@@ -34,6 +34,7 @@ export const sendNotification = (props: AlertProps, toastOptions?: ToastOptions)
           props.onClose?.();
           toast.dismiss(id);
         }}
+        className={styles['tedi-toast']}
       >
         {props.children}
       </Alert>

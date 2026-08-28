@@ -8,6 +8,9 @@ import styles from './calendar.module.scss';
 export type CalendarValue = Dayjs | null;
 export type CalendarStatus = 'error' | 'success' | 'inactive';
 
+/**
+ * @deprecated Use `Calendar` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface CalendarProps {
   /**
    * Currently selected value. Accepts a dayjs date object.
@@ -94,6 +97,9 @@ export interface CalendarProps {
   shouldShowStatusOnDate?: (day: CalendarValue) => CalendarStatus | undefined;
 }
 
+/**
+ * @deprecated Use `Calendar` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Calendar = (props: CalendarProps): JSX.Element => {
   const {
     value,

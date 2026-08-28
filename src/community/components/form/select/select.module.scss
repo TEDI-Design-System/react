@@ -3,16 +3,16 @@
 $input-height-small: 2rem;
 
 div.select__control {
-  border: 1px solid var(--color-border-contrast);
+  border: 1px solid var(--general-border-secondary);
 
   @include mixins.print-grayscale;
 }
 
 .select--invalid .select__control {
-  border-color: var(--color-important-active);
+  border-color: var(--general-status-danger-border);
 
   &.select__control--focused {
-    box-shadow: 0 0 0 1px var(--color-important-active);
+    box-shadow: 0 0 0 1px var(--general-status-danger-border);
   }
 }
 
@@ -21,11 +21,11 @@ div.select__control {
   padding: calc(0.5rem - 1px) 2rem calc(0.5rem - 1px) 0;
 
   .select__control--focused & {
-    color: var(--color-primary-active);
+    color: var(--general-text-brand);
   }
 
   .select--invalid .select__control--focused & {
-    color: var(--color-important-active);
+    color: var(--general-status-danger-text);
   }
 }
 
@@ -36,7 +36,7 @@ div.select__menu-portal {
 div .select__menu {
   margin: 1px 0 0;
   overflow: hidden;
-  border-radius: var(--border-radius-default);
+  border-radius: var(--tedi-radius-02-default);
 
   @include mixins.print-grayscale;
 }
@@ -51,29 +51,29 @@ div .select__menu {
 
 .select__menu-list-footer {
   padding: 1rem;
-  border-top: 1px solid var(--color-border-default);
+  border-top: 1px solid var(--general-border-primary);
 }
 
 .select__menu .select__option {
   font-size: 0.875rem;
-  color: var(--color-text-default);
+  color: var(--general-text-primary);
   cursor: pointer;
-  background-color: var(--color-bg-default);
+  background-color: var(--general-surface-primary);
 
   &--focused {
-    background-color: var(--color-bg-subtle);
+    background-color: var(--general-surface-tertiary);
   }
 
   &:active,
   &--selected {
-    color: var(--color-primary-main);
-    background-color: var(--color-primary-highlight);
+    color: var(--general-text-brand);
+    background-color: var(--general-surface-brand-tertiary);
   }
 
   &--disabled {
-    color: var(--color-text-disabled);
+    color: var(--general-text-disabled);
     cursor: default;
-    background-color: var(--color-bg-disabled);
+    background-color: var(--general-surface-disabled);
   }
 }
 
@@ -132,7 +132,8 @@ div.select__multi-value-item {
   }
 
   .select__value-container .select__placeholder {
-    color: var(--color-text-subtle);
+    color: var(--general-text-tertiary);
+    pointer-events: none;
   }
 
   .select__value-container--is-multi .select__placeholder {
@@ -156,7 +157,7 @@ div.select__multi-value-item {
       inset: 0;
       pointer-events: none;
       content: '';
-      box-shadow: inset 0.5rem 0 0.25rem -0.25rem var(--color-white);
+      box-shadow: inset 0.5rem 0 0.25rem -0.25rem var(--general-border-white);
     }
   }
 

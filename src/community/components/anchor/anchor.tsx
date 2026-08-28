@@ -52,6 +52,7 @@ InternalAnchor.displayName = 'Anchor';
  * Inherits all props from the component passed into `as`. If `as` is omitted, then the default is native `<a>` tag
  *
  * To allow Customized Anchor usage as direct children of Header you need to add displayName to it. <a href="/docs/components-layout-header-header-overview--header-overview#settings">See more.</a>
+ * @deprecated Use `Link` from `@tedi-design-system/react/tedi` instead.
  */
 
 // TODO: Remove ts-ignore

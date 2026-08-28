@@ -1,0 +1,83 @@
+.tedi-pagination-mobile-modal__content {
+  --modal-body-padding: 0;
+  --modal-body-padding-sm: 0;
+}
+
+.tedi-pagination-mobile-modal__close {
+  margin-left: auto;
+}
+
+.tedi-pagination-mobile-modal__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.tedi-pagination-mobile-modal__item {
+  display: flex;
+  gap: var(--form-checkbox-radio-inner-spacing);
+  align-items: center;
+  width: 100%;
+  padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+  font-family: var(--family-default);
+  font-size: var(--body-regular-size);
+  font-weight: var(--body-regular-weight);
+  line-height: var(--body-regular-line-height);
+  color: var(--general-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: var(--dropdown-item-default-background);
+  border: 0;
+  border-bottom: 1px solid var(--general-border-primary);
+
+  li:last-child > & {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background: var(--general-surface-tertiary);
+  }
+
+  &:focus-visible {
+    outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+    outline-offset: calc(var(--tedi-borders-02) * -1);
+  }
+}
+
+.tedi-pagination-mobile-modal__item--selected {
+  color: var(--general-text-white);
+  background: var(--dropdown-item-active-background);
+
+  &:hover {
+    background: var(--dropdown-item-active-background);
+  }
+}
+
+.tedi-pagination-mobile-modal__radio {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--form-checkbox-radio-size-responsive);
+  height: var(--form-checkbox-radio-size-responsive);
+  background: var(--form-checkbox-radio-default-background-default);
+  border: 1px solid var(--form-checkbox-radio-default-border-default);
+  border-radius: var(--form-checkbox-radio-indicator-radius-radio);
+}
+
+.tedi-pagination-mobile-modal__radio--selected {
+  background: var(--dropdown-item-active-background);
+  border-color: var(--general-text-white);
+
+  &::after {
+    position: absolute;
+    inset: 4px;
+    content: '';
+    background: var(--general-text-white);
+    border-radius: 50%;
+  }
+}
+
+.tedi-pagination-mobile-modal__label {
+  flex: 1;
+}

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -38,6 +38,11 @@ const meta: Meta<typeof Table> = {
   argTypes: {
     data: {
       control: false,
+    },
+  },
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
     },
   },
 };

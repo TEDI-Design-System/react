@@ -1,8 +1,8 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from '../../../tedi/components/base/icon/icon';
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
-import { Collapse } from '../../../tedi/components/buttons/collapse/collapse';
+import { Collapse } from '../../../tedi/components/content/collapse/collapse';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
 import Separator from '../../../tedi/components/misc/separator/separator';
@@ -24,7 +24,8 @@ export default {
   },
 } as Meta;
 
-export interface CardStory {
+export interface CardStory
+  extends Pick<CardProps, 'padding' | 'background' | 'border' | 'borderless' | 'borderRadius'> {
   card: CardProps;
   cardContent: CardContentProps | boolean;
   cardHeader: CardHeaderProps | boolean;
@@ -92,7 +93,16 @@ const Template: StoryFn<CardStory> = (args) => {
   );
 
   return (
-    <Card {...args.card}>
+    // Top-level props are driven by the Controls panel (auto-generated from
+    // `Card`); `args.card` still wins for the composite showcase stories.
+    <Card
+      padding={args.padding}
+      background={args.background}
+      border={args.border}
+      borderless={args.borderless}
+      borderRadius={args.borderRadius}
+      {...args.card}
+    >
       {args.cardHeader && getCardHeader(typeof args.cardHeader === 'boolean' ? {} : args.cardHeader)}
       {args.cardNotification &&
         getNotification(typeof args.cardNotification === 'boolean' ? {} : args.cardNotification)}
@@ -108,7 +118,12 @@ const Template: StoryFn<CardStory> = (args) => {
 
 export const Default: Story = {
   render: Template,
-  args: {},
+  args: {
+    padding: 1,
+    background: 'bg-default',
+    border: 'border-default',
+    borderless: false,
+  },
 };
 
 /**

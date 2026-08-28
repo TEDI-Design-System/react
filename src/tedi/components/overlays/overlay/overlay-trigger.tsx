@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
 import { cloneElement, isValidElement, ReactNode, useContext } from 'react';
 
+import { getElementRef } from '../../../helpers/get-element-ref';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { OverlayContext } from './overlay';
@@ -21,11 +22,12 @@ export interface OverlayTriggerProps {
 export const OverlayTrigger = (props: OverlayTriggerProps) => {
   const { children, className } = props;
   const { getLabel } = useLabels();
-  const { getReferenceProps, reference, openWith, open, role, contentId } = useContext(OverlayContext);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const refs = useMergeRefs([reference, (children as React.ComponentPropsWithRef<any>).ref]);
+  const { getReferenceProps, reference, openWith, open, role, ariaHidden, contentId } = useContext(OverlayContext);
+
+  const childRef = isValidElement(children) ? getElementRef(children) : undefined;
+  const refs = useMergeRefs([reference, childRef]);
   const extraProps =
-    role === 'tooltip'
+    role === 'tooltip' && !ariaHidden
       ? {
           'aria-describedby': open ? contentId : undefined,
         }
@@ -35,11 +37,11 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
     return cloneElement(
       children,
       getReferenceProps({
-        ref: refs,
         tabIndex: 0,
         ...extraProps,
         label: children.type === Icon ? getLabel('tooltip.icon-trigger') : undefined,
         ...children.props,
+        ref: refs,
       })
     );
   }

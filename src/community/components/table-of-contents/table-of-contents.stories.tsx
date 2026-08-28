@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
@@ -19,6 +19,9 @@ const meta: Meta<TableOfContentsProps> = {
   component: TableOfContents,
   title: 'Community/TableOfContents',
   parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
     docs: {
       story: {
         inline: false,
@@ -26,8 +29,8 @@ const meta: Meta<TableOfContentsProps> = {
       },
     },
     layout: 'fullscreen',
-    backgrounds: { default: 'subtle' },
   },
+  globals: { backgrounds: { value: 'subtle' } },
 };
 
 export default meta;

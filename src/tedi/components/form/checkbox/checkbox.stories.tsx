@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -30,7 +30,7 @@ const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
       <Col lg={6} md={12} className="example-list">
         {sizesArray.map((size, key) => (
           <Row className={`${key === sizesArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-            <Col lg={10} md={6} xs={8} className="display-flex align-items-center">
+            <Col lg={10} md={6} xs={8} className="flex align-items-center">
               <VerticalSpacing>
                 <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
                 {size === 'large' && (
@@ -42,7 +42,13 @@ const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Checkbox {...args} size={size} id={`checkbox-size-${size}`} />
+              <Checkbox
+                {...args}
+                size={size}
+                id={`checkbox-size-${size}`}
+                label={`${size.charAt(0).toUpperCase() + size.slice(1)} size`}
+                hideLabel
+              />
             </Col>
           </Row>
         ))}
@@ -123,8 +129,7 @@ export const States = () => {
                 name="check-disabled-checked"
                 value="check"
                 disabled
-                checked={checked}
-                onChange={(value, checked) => setChecked(checked)}
+                defaultChecked
               />
             </Col>
           </Row>
@@ -139,10 +144,7 @@ export const States = () => {
                 name="check-indeterminate"
                 value="check"
                 indeterminate={indeterminate}
-                onChange={(value, checked) => {
-                  setIndeterminate(false);
-                  setChecked(checked);
-                }}
+                onChange={() => setIndeterminate(false)}
               />
             </Col>
           </Row>

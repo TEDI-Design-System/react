@@ -53,19 +53,41 @@ describe('Ellipsis Component', () => {
     jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(100);
     jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(50);
 
-    act(() => {
-      renderEllipsis();
-    });
+    render(
+      <Ellipsis>
+        <p>Ellipsis content</p>
+      </Ellipsis>
+    );
 
-    expect(screen.getByText('Ellipsis content')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toHaveTextContent('Ellipsis content');
   });
 
   it('does not show popover when content fits within container', () => {
     jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(50);
     jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(50);
 
+    render(
+      <Ellipsis>
+        <p>Ellipsis content</p>
+      </Ellipsis>
+    );
+
+    expect(screen.getByText('Ellipsis content')).toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('does not apply a lineClamp style for the start position', () => {
+    const { container } = renderEllipsis({ position: 'start' });
+    const ellipsisElement = container.querySelector('[data-name="ellipsis"]');
+    expect(ellipsisElement).not.toHaveStyle({ 'line-clamp': '2' });
+  });
+
+  it('detects horizontal overflow (scrollWidth) for the start position', () => {
+    jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(200);
+    jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(100);
+
     act(() => {
-      renderEllipsis();
+      renderEllipsis({ position: 'start' });
     });
 
     expect(screen.getByText('Ellipsis content')).toBeInTheDocument();

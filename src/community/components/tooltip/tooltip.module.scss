@@ -8,9 +8,9 @@ $tooltip-max-width: (
 .tooltip {
   z-index: var(--z-index-tooltip);
   word-break: break-word;
-  background-color: var(--color-bg-default);
+  background-color: var(--general-surface-primary);
+  border-radius: var(--tedi-radius-02-default);
   filter: drop-shadow(0 4px 10px rgb(0 0 0 / 14%));
-  border-radius: var(--border-radius-default);
   transform: translateZ(0);
 }
 

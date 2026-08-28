@@ -75,6 +75,15 @@ export interface OverlayProps {
    */
   role?: UseRoleProps['role'];
   /**
+   * Renders the overlay purely visually: no `useRole` aria wiring on the trigger
+   * (so no `aria-describedby`) and the content is `aria-hidden`. Use when the
+   * trigger already conveys the same text through its accessible name — e.g. an
+   * icon-only button whose visible tooltip merely mirrors its label — so screen
+   * readers don't announce it twice.
+   * @default false
+   */
+  ariaHidden?: boolean;
+  /**
    * Content overlay arrow dimensions.
    */
   arrowDimensions?: {
@@ -91,6 +100,25 @@ export interface OverlayProps {
    * @default GAP + arrow height
    */
   offset?: OffsetOptions;
+  /**
+   * Re-measure the floating element every animation frame while mounted.
+   *
+   * Enable this when the trigger/reference element's position can change without a
+   * DOM-observable event (e.g. position driven by an inherited CSS custom property on an
+   * ancestor). The default `autoUpdate` only reacts to scroll, resize, and element-size
+   * changes, so position-only movement goes unnoticed and the overlay lags behind.
+   *
+   * Opt-in because animation-frame tracking is more expensive than the default.
+   * @default false
+   */
+  trackReferencePosition?: boolean;
+  /**
+   * Minimum distance (in px) between the arrow and the edges of the content.
+   * Helps keep the arrow away from rounded corners, especially on `-start` and `-end` placements.
+   * Use a larger value for bigger arrows or arrows with borders.
+   * @default 4
+   */
+  arrowPadding?: number;
 }
 
 export interface OverlayContextType {
@@ -118,6 +146,7 @@ export interface OverlayContextType {
   context: FloatingContext<ReferenceType>;
   scrollLock?: boolean;
   role?: UseRoleProps['role'];
+  ariaHidden?: boolean;
   contentId: string;
 }
 
@@ -159,11 +188,14 @@ export const Overlay = (props: OverlayProps) => {
     open: externalOpen,
     onToggle,
     role = 'tooltip',
+    ariaHidden = false,
     arrowDimensions,
     offset: offsetOptions = GAP + (arrowDimensions?.height ?? 0),
+    arrowPadding = 4,
     focusManager,
     dismissible,
     scrollLock,
+    trackReferencePosition = false,
   } = props;
 
   const { order = ['reference', 'content'], initialFocus, modal, ...restFocusManager } = focusManager ?? {};
@@ -199,10 +231,12 @@ export const Overlay = (props: OverlayProps) => {
       shift({ padding: 8 }),
       arrow({
         element: arrowRef,
-        padding: 4,
+        padding: arrowPadding,
       }),
     ],
-    whileElementsMounted: autoUpdate,
+    whileElementsMounted: trackReferencePosition
+      ? (reference, floating, update) => autoUpdate(reference, floating, update, { animationFrame: true })
+      : autoUpdate,
   });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
@@ -211,12 +245,13 @@ export const Overlay = (props: OverlayProps) => {
       handleClose: safePolygon(),
     }),
     useClick(context, {
+      enabled: openWith === 'click',
       toggle: dismissible,
     }),
     useFocus(context, {
       enabled: openWith === 'hover',
     }),
-    useRole(context, { role }),
+    useRole(context, { role, enabled: !ariaHidden }),
     useDismiss(context, {
       enabled: dismissible,
       outsidePressEvent: openWith === 'click' ? 'mousedown' : 'pointerdown',
@@ -255,6 +290,7 @@ export const Overlay = (props: OverlayProps) => {
       placement,
       scrollLock,
       role,
+      ariaHidden,
       contentId,
     }),
     [
@@ -278,6 +314,7 @@ export const Overlay = (props: OverlayProps) => {
       placement,
       scrollLock,
       role,
+      ariaHidden,
       contentId,
       modal,
       order,

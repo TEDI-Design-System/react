@@ -2,16 +2,17 @@ import cn from 'classnames';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { IconSize } from '../../base/icon/icon';
 import styles from './spinner.module.scss';
 
-export type SpinnerSize = 10 | 16 | 18 | 48;
+export type SpinnerSize = IconSize | 10;
 export type SpinnerColor = 'primary' | 'secondary';
 export type SpinnerPosition = 'absolute';
 
 type SpinnerBreakpointProps = {
   /**
    * Defines the size of the spinner.
-   * Accepted values: 10 (small), 16 (default), 48 (large).
+   * Accepted values: 8, 10 (small), 12, 16 (default), 18, 24, 36, 48 (large).
    *
    * @default 16
    */
@@ -39,6 +40,13 @@ export interface SpinnerProps extends BreakpointSupport<SpinnerBreakpointProps> 
    * Provides a text label for screen readers to announce the spinner's purpose or status.
    */
   label?: string;
+  /**
+   * Renders the spinner as purely decorative — no `role="status"` live region and
+   * no screen-reader label. Use when the loading state is already announced by an
+   * ancestor (e.g. a button's `aria-busy`), so it isn't announced twice.
+   * @default false
+   */
+  decorative?: boolean;
 }
 
 export const Spinner = (props: SpinnerProps): JSX.Element => {
@@ -51,6 +59,7 @@ export const Spinner = (props: SpinnerProps): JSX.Element => {
     color = 'primary',
     label = getLabel('spinner.loading'),
     position,
+    decorative = false,
   } = getCurrentBreakpointProps<SpinnerProps>(props);
 
   const spinnerBEM = cn(
@@ -62,11 +71,17 @@ export const Spinner = (props: SpinnerProps): JSX.Element => {
   );
 
   return (
-    <span className={spinnerBEM} role="status" aria-live="polite" data-testid="tedi-spinner">
+    <span
+      className={spinnerBEM}
+      role={decorative ? undefined : 'status'}
+      aria-live={decorative ? undefined : 'polite'}
+      aria-hidden={decorative || undefined}
+      data-testid="tedi-spinner"
+    >
       <svg viewBox="22 22 44 44" aria-hidden="true">
         <circle className={styles['tedi-spinner__inner']} cx="44" cy="44" r="20" fill="none"></circle>
       </svg>
-      <span className="sr-only">{label}</span>
+      {!decorative && <span className="sr-only">{label}</span>}
     </span>
   );
 };

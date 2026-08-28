@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base//typography/heading/heading';
 import { Icon } from '../../../tedi/components/base/icon/icon';
@@ -249,6 +249,32 @@ export const TooltipPosition: StoryFn = () => {
           </TooltipTrigger>
           <Tooltip>{tooltiptext}</Tooltip>
         </TooltipProvider>
+      </Col>
+    </Row>
+  );
+};
+
+export const ScrollableRowInCard: StoryFn = () => {
+  return (
+    <Row justifyContent="center">
+      <Col width="auto" style={{ width: '100%' }}>
+        <div style={{ width: '100%', overflowX: 'scroll' }}>
+          <div style={{ minWidth: '100rem' }}>
+            <TooltipProvider>
+              <TooltipTrigger>
+                <span
+                  style={{
+                    display: 'block',
+                    width: 'fit-content',
+                  }}
+                >
+                  Lorem ipsum dolor sit amet
+                </span>
+              </TooltipTrigger>
+              <Tooltip>Lorem ipsum dolor sit amet</Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
       </Col>
     </Row>
   );

@@ -69,11 +69,11 @@
     width: 9px;
     height: 9px;
     margin: auto;
+    outline: 2px solid var(--stepper-step-default-bg);
     content: '';
     background-color: var(--stepper-step-default-bg);
     border: 1px solid var(--stepper-item-vertical-line);
     border-radius: 50%;
-    outline: 2px solid var(--stepper-step-default-bg);
   }
 
   &:last-child::before {

@@ -1,4 +1,4 @@
-import { StoryFn } from '@storybook/react';
+import { StoryFn } from '@storybook/react-vite';
 import { MenuListProps, OptionProps } from 'react-select';
 
 import { Text } from '../../../../../tedi/components/base/typography/text/text';

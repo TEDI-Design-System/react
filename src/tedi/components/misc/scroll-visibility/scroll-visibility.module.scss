@@ -3,8 +3,8 @@ $animation-ease: ease-in-out;
 
 .tedi-scroll-visibility {
   opacity: 1;
-  transition: opacity $animation-time $animation-ease, translate $animation-time $animation-ease;
   translate: none;
+  transition: opacity $animation-time $animation-ease, translate $animation-time $animation-ease;
 
   &--hidden:not(:focus-within) {
     pointer-events: none;

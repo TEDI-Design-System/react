@@ -32,6 +32,9 @@ export interface StepperNavItem {
   showCompletedIcon?: boolean;
 }
 
+/**
+ * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface StepperNavProps {
   /**
    * Navigation items
@@ -53,6 +56,9 @@ export interface StepperNavProps {
   notCompletedLabel?: string;
 }
 
+/**
+ * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export const StepperNav = (props: StepperNavProps): JSX.Element => {
   const { getLabel } = useLabels();
   const {

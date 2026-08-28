@@ -81,6 +81,23 @@ describe('Alert component', () => {
     expect(closeButton).not.toBeInTheDocument();
   });
 
+  it('renders the `action` slot in place of the default close button', () => {
+    const onCloseMock = jest.fn();
+    render(
+      <Alert onClose={onCloseMock} action={<button type="button">Open profile</button>}>
+        Custom action
+      </Alert>
+    );
+
+    expect(screen.getByRole('button', { name: 'Open profile' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument();
+  });
+
+  it('renders the `action` slot even without `onClose`', () => {
+    render(<Alert action={<a href="/x">Read more</a>}>Custom action only</Alert>);
+    expect(screen.getByRole('link', { name: 'Read more' })).toBeInTheDocument();
+  });
+
   it('sets aria-live based on role prop', () => {
     render(<Alert role="status">Status Alert</Alert>);
 

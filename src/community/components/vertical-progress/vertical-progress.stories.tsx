@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { Controls, Description, Primary, Stories, Title } from '@storybook/addon-docs';
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Controls, Description, Primary, Stories, Title } from '@storybook/addon-docs/blocks';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React from 'react';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';

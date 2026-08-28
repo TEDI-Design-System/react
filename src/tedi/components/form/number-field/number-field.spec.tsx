@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import { useBreakpointProps } from '../../../helpers';
+import { LabelProvider } from '../../../providers/label-provider';
 import NumberField, { NumberFieldProps } from './number-field';
 
 import '@testing-library/jest-dom';
@@ -63,7 +64,7 @@ describe('NumberField component', () => {
     fireEvent.click(decrementButton);
 
     const input = screen.getByRole('spinbutton');
-    expect(input).toHaveValue(0);
+    expect(input).toHaveValue('0');
   });
 
   it('does not increment above the maximum value', () => {
@@ -72,7 +73,61 @@ describe('NumberField component', () => {
     fireEvent.click(incrementButton);
 
     const input = screen.getByRole('spinbutton');
-    expect(input).toHaveValue(10);
+    expect(input).toHaveValue('10');
+  });
+
+  it('parses a comma as a decimal separator', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={0} max={100} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '1,5' } });
+    expect(handleChange).toHaveBeenCalledWith(1.5);
+  });
+
+  it('does not fire onChange for partial entries like a lone minus sign', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={-100} max={100} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '-' } });
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('does not fire onChange for inputs with trailing non-numeric characters (1a, 12-, 1.5xyz)', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={-100} max={100} />);
+    const input = screen.getByRole('spinbutton');
+
+    fireEvent.change(input, { target: { value: '1a' } });
+    fireEvent.change(input, { target: { value: '12-' } });
+    fireEvent.change(input, { target: { value: '1.5xyz' } });
+    fireEvent.change(input, { target: { value: '1e5' } });
+
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('does not re-fire onChange when the parsed value is unchanged (e.g. trailing decimal separator)', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} min={0} max={100} />);
+    const input = screen.getByRole('spinbutton');
+
+    fireEvent.change(input, { target: { value: '2' } });
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenLastCalledWith(2);
+
+    fireEvent.change(input, { target: { value: '2,' } });
+    expect(handleChange).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(input, { target: { value: '2,5' } });
+    expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleChange).toHaveBeenLastCalledWith(2.5);
+  });
+
+  it('fires onChange with undefined when the input is cleared', () => {
+    const handleChange = jest.fn();
+    render(<NumberField {...defaultProps} onChange={handleChange} defaultValue={5} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '' } });
+    expect(handleChange).toHaveBeenCalledWith(undefined);
   });
 
   it('renders helper text when provided', () => {
@@ -117,5 +172,91 @@ describe('NumberField component', () => {
     render(<NumberField {...defaultProps} size="small" />);
     const container = document.querySelector('.tedi-number-field');
     expect(container).toHaveClass('tedi-number-field--small');
+  });
+
+  it('formats the displayed value with the configured decimal separator', () => {
+    render(<NumberField {...defaultProps} decimalSeparator="," defaultValue={1.5} min={-10} max={10} />);
+    const input = screen.getByRole('spinbutton');
+    expect(input).toHaveValue('1,5');
+  });
+
+  it('reformats the display to the configured decimal separator on blur', () => {
+    render(<NumberField {...defaultProps} decimalSeparator="," defaultValue={0} min={0} max={10} />);
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '2.5' } });
+    fireEvent.blur(input);
+    expect(input).toHaveValue('2,5');
+  });
+
+  it('uses inputMode="decimal" when decimalSeparator is a comma', () => {
+    render(<NumberField {...defaultProps} decimalSeparator="," />);
+    const input = screen.getByRole('spinbutton');
+    expect(input).toHaveAttribute('inputmode', 'decimal');
+  });
+
+  it('treats a supplied value as controlled even without onChange (display + aria stay in sync)', () => {
+    render(<NumberField label="Amount" value={7} min={0} max={10} />);
+    const input = screen.getByRole('spinbutton');
+    expect(input).toHaveValue('7');
+    expect(input).toHaveAttribute('aria-valuenow', '7');
+  });
+
+  describe('accessibility', () => {
+    it('associates the label with the spinbutton even without an explicit id', () => {
+      render(<NumberField label="Amount" onChange={jest.fn()} />);
+      expect(screen.getByRole('spinbutton')).toHaveAccessibleName('Amount');
+    });
+
+    it('gives each field a unique id so labels never cross-associate', () => {
+      render(
+        <>
+          <NumberField label="First" onChange={jest.fn()} />
+          <NumberField label="Second" onChange={jest.fn()} />
+        </>
+      );
+
+      const [first, second] = screen.getAllByRole('spinbutton');
+      expect(first.id).not.toBe(second.id);
+      expect(first).toHaveAccessibleName('First');
+      expect(second).toHaveAccessibleName('Second');
+    });
+
+    it('names the +/- buttons with the field context', () => {
+      render(
+        <LabelProvider locale="en">
+          <NumberField label="Amount" step={2} onChange={jest.fn()} />
+        </LabelProvider>
+      );
+
+      expect(screen.getByRole('button', { name: 'Decrease Amount by 2' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Increase Amount by 2' })).toBeInTheDocument();
+    });
+
+    it('announces value changes driven by an external/controlled update', () => {
+      jest.useFakeTimers();
+      try {
+        const { rerender } = render(
+          <LabelProvider locale="en">
+            <NumberField label="Amount" value={1} onChange={jest.fn()} />
+          </LabelProvider>
+        );
+        const status = screen.getByRole('status');
+        expect(status).toHaveTextContent('');
+
+        rerender(
+          <LabelProvider locale="en">
+            <NumberField label="Amount" value={2} onChange={jest.fn()} />
+          </LabelProvider>
+        );
+        act(() => {
+          jest.advanceTimersByTime(150);
+        });
+
+        // Assert the user-facing localized announcement, not the fallback key.
+        expect(status).toHaveTextContent('Updated. New value 2');
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 });

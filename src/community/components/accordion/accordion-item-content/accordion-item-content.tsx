@@ -2,7 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 import AnimateHeight from 'react-animate-height';
 
-import { usePrint } from '../../../../tedi/helpers';
+import { usePrint } from '../../../../tedi/providers/printing-provider';
 import { CardContent, CardContentProps } from '../../card';
 import { AccordionContext } from '../accordion';
 import styles from '../accordion.module.scss';
@@ -10,6 +10,9 @@ import { AccordionItemContext } from '../accordion-item/accordion-item';
 
 export type AccordionItemContentProps = CardContentProps;
 
+/**
+ * @deprecated Use `<Accordion.Item.Content>` from the TEDI-Ready Accordion (`@tedi-design-system/react/tedi`) instead.
+ */
 export const AccordionItemContent = (props: AccordionItemContentProps): JSX.Element => {
   const { children, className, ...rest } = props;
   const { isOpen } = React.useContext(AccordionContext);

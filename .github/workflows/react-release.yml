@@ -57,9 +57,6 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --cache .npm --prefer-offline
-      - name: Build Storybook
-        run: |
-          npm run build:sb
       - name: Publish to Chromatic
         run: |
           CHROMATIC_PROJECT_TOKEN=${{ secrets.CHROMATIC_TOKEN }} npm run chromatic
@@ -69,6 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -85,11 +83,9 @@ jobs:
           npm run build
           ls -la dist
           git pull
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPMJS_TEDI_AUTH_TOKEN }}
 
   merge-to-rc:
     needs: build-and-deploy

@@ -9,6 +9,9 @@ import {
 } from '@floating-ui/react';
 import React from 'react';
 
+/**
+ * @deprecated Use Modal from `@tedi-design-system/react/tedi` instead.
+ */
 export interface ModalProviderProps {
   /**
    * ModalTrigger and Modal components
@@ -74,6 +77,9 @@ export const ModalContext = React.createContext<IModalContext>({
   outsidePress: true,
 });
 
+/**
+ * @deprecated Use Modal from `@tedi-design-system/react/tedi` instead.
+ */
 export const ModalProvider = (props: ModalProviderProps): JSX.Element => {
   const {
     children,

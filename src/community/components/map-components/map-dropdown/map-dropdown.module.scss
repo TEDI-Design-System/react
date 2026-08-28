@@ -39,8 +39,8 @@
     &:not(.tedi-map-dropdown__item--disabled) {
       color: var(--general-text-brand);
       cursor: pointer;
-      background-color: var(--dropdown-item-hover-background);
       outline: 0;
+      background-color: var(--dropdown-item-hover-background);
     }
   }
 }

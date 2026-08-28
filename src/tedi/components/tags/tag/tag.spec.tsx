@@ -5,6 +5,7 @@ import { Tag } from './tag';
 
 jest.mock('../../../helpers', () => ({
   useBreakpointProps: jest.fn(),
+  useElementSize: jest.fn(),
 }));
 
 describe('Tag component', () => {
@@ -104,5 +105,32 @@ describe('Tag component', () => {
     const tag = screen.getByRole('status');
     expect(tag).toBeInTheDocument();
     expect(tag).not.toHaveAttribute('aria-live');
+  });
+
+  it('does not add the ellipsis class or wrapper by default', () => {
+    render(<Tag>Plain Tag</Tag>);
+
+    const tag = screen.getByRole('status');
+    expect(tag).not.toHaveClass('tedi-tag--ellipsis');
+    expect(tag.querySelector('[data-name="ellipsis"]')).not.toBeInTheDocument();
+  });
+
+  it('wraps the label in an ellipsis container when ellipsis is set', () => {
+    render(<Tag ellipsis="end">Tag with a very long label that will not fit</Tag>);
+
+    const tag = screen.getByRole('status');
+    expect(tag).toHaveClass('tedi-tag--ellipsis');
+
+    const ellipsis = tag.querySelector('[data-name="ellipsis"]');
+    expect(ellipsis).toBeInTheDocument();
+    expect(ellipsis).toHaveTextContent('Tag with a very long label that will not fit');
+  });
+
+  it('renders the leading-ellipsis variant with a single line clamp', () => {
+    render(<Tag ellipsis="start">2026-06-25 invoice</Tag>);
+
+    const tag = screen.getByRole('status');
+    expect(tag).toHaveClass('tedi-tag--ellipsis');
+    expect(tag.querySelector('[data-name="ellipsis"]')).toBeInTheDocument();
   });
 });

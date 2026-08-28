@@ -3,5 +3,6 @@
   "buildScriptName": "build:sb",
   "autoAcceptChanges": "main",
   "exitOnceUploaded": true,
-  "skip": "dependabot/**"
+  "skip": "dependabot/**",
+  "onlyChanged": true
 }

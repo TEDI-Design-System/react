@@ -1,11 +1,14 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { ReactNode } from 'react';
 
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import InfoButton from '../../buttons/info-button/info-button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Link } from '../../navigation/link/link';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
+import { Label } from '../label/label';
 import { TextGroup, TextGroupProps } from './text-group';
 
 /**
@@ -16,6 +19,7 @@ import { TextGroup, TextGroupProps } from './text-group';
 const meta: Meta<typeof TextGroup> = {
   component: TextGroup,
   title: 'Tedi-Ready/Content/TextGroup',
+  subcomponents: { 'TextGroup.List': TextGroup.List } as never,
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -63,20 +67,20 @@ const MultipleTextGroupsTemplate: StoryFn<TextGroupProps> = (args) => {
       labelWidth: '150px',
       items: [
         {
-          label: 'Patient',
+          label: 'Patsient',
           value: (
             <>
-              <Icon name="person" size={18} color="tertiary" />
+              <Icon name="person" size={18} color="secondary" />
               <Text>Mari Maasikas</Text>
             </>
           ),
         },
         {
-          label: 'Address',
+          label: 'Aadress',
           value: (
             <>
-              <Icon name="location_on" size={16} color="tertiary" />
-              <Text>Tulbi tn 4, Tallinn, 23562, Estonia</Text>
+              <Icon name="location_on" size={16} color="secondary" />
+              <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text>
             </>
           ),
         },
@@ -86,12 +90,12 @@ const MultipleTextGroupsTemplate: StoryFn<TextGroupProps> = (args) => {
       labelWidth: '180px',
       items: [
         {
-          label: 'Vaccine',
+          label: 'Vaktsiin',
           value: <Text>Mari Maasikas</Text>,
         },
         {
-          label: 'Next vaccination',
-          value: <Text>Immunization finished</Text>,
+          label: 'Järgmine vaktsineerimine',
+          value: <Text>Vaktsineerimine lõpetatud</Text>,
         },
       ],
     },
@@ -99,15 +103,15 @@ const MultipleTextGroupsTemplate: StoryFn<TextGroupProps> = (args) => {
       labelWidth: '200px',
       items: [
         {
-          label: 'Healthcare provider',
+          label: 'Tervishoiuteenuse osutaja',
           value: <Text>SA Põhja-Eesti Regionaalhaigla</Text>,
         },
         {
-          label: 'Healthcare specialist',
+          label: 'Tervishoiutöötaja',
           value: <Text>Mart Mets</Text>,
         },
         {
-          label: 'Document creation time',
+          label: 'Dokumendi loomise aeg',
           value: <Text>16.08.2023 14:51:48</Text>,
         },
       ],
@@ -129,67 +133,218 @@ const MultipleTextGroupsTemplate: StoryFn<TextGroupProps> = (args) => {
   );
 };
 
-const TemplateWithTypes: StoryFn<TextGroupProps> = (args) => {
-  return (
-    <Row>
-      <Col>
-        <VerticalSpacing size={1}>
-          <TextGroup {...args} type="vertical" labelAlign="left" />
-          <TextGroup
-            {...args}
-            type="vertical"
-            labelAlign="left"
-            value={
-              <>
-                <Icon name="lock" size={16} color="tertiary" />
-                <Text>Visible to doctor and representative</Text>
-              </>
-            }
-          />
-          <TextGroup
-            {...args}
-            type="vertical"
-            labelAlign="left"
-            value={<Text modifiers="bold">Visible to doctor and representative</Text>}
-          />
-          <TextGroup
-            label="Patient"
-            value={
-              <>
-                <Icon name="person" size={18} color="tertiary" />
-                <Text>Mari Maasikas</Text>
-              </>
-            }
-            type="horizontal"
-          />
-        </VerticalSpacing>
-      </Col>
-    </Row>
-  );
-};
+/**
+ * Renders titled examples as a two-column list — the variant name on the left, the example(s) on the
+ * right — with a divider between rows, so each variant is clearly separated.
+ */
+const ExampleRows = ({ rows }: { rows: { title: string; content: ReactNode }[] }): JSX.Element => (
+  <Row>
+    <Col className="example-list">
+      {rows.map((row, key) => (
+        <Row className={`${key === rows.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
+          <Col width={12} md={3} className="flex align-items-center">
+            <Text modifiers="bold">{row.title}</Text>
+          </Col>
+          <Col width={12} md={9}>
+            {row.content}
+          </Col>
+        </Row>
+      ))}
+    </Col>
+  </Row>
+);
 
 export const Default: Story = {
-  render: TemplateWithLayouts,
   args: {
-    label: 'Accessibility',
-    value: <Text>Visible to doctor and representative</Text>,
+    label: 'Ligipääsetavus',
+    value: <Text>Arstile ja esindajale nähtav</Text>,
   },
 };
 
-export const Types: Story = {
-  render: TemplateWithTypes,
-  args: {
-    label: 'Accessibility',
-    value: <Text>Visible to doctor and representative</Text>,
-  },
-};
-
+/**
+ * Position of the value relative to the label: stacked (`vertical`) or side by side
+ * (`horizontal`) with the label aligned left or right.
+ */
 export const PositionType: Story = {
-  render: TemplateWithLayouts,
-  args: {
-    label: 'Accessibility',
-    value: <Text>Visible to doctor and representative</Text>,
-  },
+  name: 'Position',
+  render: () => (
+    <ExampleRows
+      rows={[
+        {
+          title: 'Vertical',
+          content: (
+            <TextGroup type="vertical" label="Ligipääsetavus" value={<Text>Arstile ja esindajale nähtav</Text>} />
+          ),
+        },
+        {
+          title: 'Horizontal, label left',
+          content: (
+            <TextGroup
+              type="horizontal"
+              labelWidth="150px"
+              label="Ligipääsetavus"
+              value={<Text>Arstile ja esindajale nähtav</Text>}
+            />
+          ),
+        },
+        {
+          title: 'Horizontal, label right',
+          content: (
+            <TextGroup
+              type="horizontal"
+              labelWidth="150px"
+              labelAlign="right"
+              label="Ligipääsetavus"
+              value={<Text>Arstile ja esindajale nähtav</Text>}
+            />
+          ),
+        },
+      ]}
+    />
+  ),
+};
+
+/**
+ * Both the label and the value can be regular or bold. Keep the weight consistent throughout the
+ * project — pick one convention and stick to it.
+ */
+export const TextWeight: Story = {
+  name: 'Text weight',
+  render: () => (
+    <ExampleRows
+      rows={[
+        {
+          title: 'Regular label',
+          content: <TextGroup label="Ligipääsetavus" value={<Text>Arstile ja esindajale nähtav</Text>} />,
+        },
+        {
+          title: 'Bold label',
+          content: (
+            <TextGroup label={<Label isBold>Ligipääsetavus</Label>} value={<Text>Nähtav arstile ja esindajale</Text>} />
+          ),
+        },
+        {
+          title: 'Regular value',
+          content: <TextGroup label="Ligipääsetavus" value={<Text>Nähtav arstile ja esindajale</Text>} />,
+        },
+        {
+          title: 'Bold value',
+          content: (
+            <TextGroup label="Ligipääsetavus" value={<Text modifiers="bold">Nähtav arstile ja esindajale</Text>} />
+          ),
+        },
+      ]}
+    />
+  ),
+};
+
+/**
+ * The value can carry extra content beside the text: a link, a leading icon, or a status badge.
+ * (For a trailing element like an info tooltip or a tag, see the **Has slot** story.)
+ */
+export const Types: Story = {
+  name: 'Type',
+  render: () => (
+    <ExampleRows
+      rows={[
+        {
+          title: 'Has link',
+          content: (
+            <VerticalSpacing size={1}>
+              <TextGroup label="Ligipääsetavus" value={<Text>Nähtav arstile ja esindajale</Text>} />
+              <TextGroup
+                label="Ligipääsetavus"
+                value={[
+                  <Text key="v">Nähtav arstile ja esindajale</Text>,
+                  <Link key="l" href="#">
+                    Vaata dokumenti
+                  </Link>,
+                ]}
+              />
+              <TextGroup
+                label="Ligipääsetavus"
+                value={[
+                  <Text key="v">Nähtav arstile ja esindajale</Text>,
+                  <Link key="l" href="#">
+                    dokument nr 4534
+                  </Link>,
+                ]}
+              />
+            </VerticalSpacing>
+          ),
+        },
+        {
+          title: 'Has icon',
+          content: (
+            <VerticalSpacing size={1}>
+              <TextGroup
+                label="Ligipääsetavus"
+                value={
+                  <>
+                    <Icon name="lock" size={16} color="secondary" />
+                    <Text>Nähtav arstile ja esindajale</Text>
+                  </>
+                }
+              />
+              <TextGroup
+                label="Patsient"
+                value={
+                  <>
+                    <Icon name="person" size={18} color="secondary" />
+                    <Text>Mari Maasikas</Text>
+                  </>
+                }
+              />
+            </VerticalSpacing>
+          ),
+        },
+        {
+          title: 'Has status',
+          content: (
+            <TextGroup
+              label="Ligipääs"
+              value={
+                <VerticalSpacing size={0.25}>
+                  <Text>Arstile ja esindajale nähtav</Text>
+                  <StatusBadge color="brand">Esitatud</StatusBadge>
+                </VerticalSpacing>
+              }
+            />
+          ),
+        },
+      ]}
+    />
+  ),
+};
+
+/**
+ * The Figma "Has slot" variant is just a `value` that carries a trailing element — an info tooltip, a
+ * `StatusBadge`, a `Tag`, etc. Because `value` accepts multiple nodes and the value row is a flex
+ * container with a small gap, the extra element sits inline beside the text (which hugs its content).
+ * No dedicated slot prop is needed — pass an array or a fragment as the `value`.
+ */
+export const HasSlot: Story = {
+  name: 'Has slot',
+  render: () => (
+    <VerticalSpacing size={1}>
+      <TextGroup
+        label="Ligipääs"
+        value={[
+          <Text key="v">Arstile ja esindajale nähtav</Text>,
+          <InfoButton key="s" aria-label="Lisainfo ligipääsu kohta" />,
+        ]}
+      />
+      <TextGroup
+        label="Nimi"
+        value={[
+          <Text key="v">Mari Maasikas</Text>,
+          <StatusBadge key="s" color="success">
+            Ligipääs lubatud
+          </StatusBadge>,
+        ]}
+      />
+    </VerticalSpacing>
+  ),
 };
 
 export const HorizontalLabelLength: Story = {
@@ -215,37 +370,164 @@ export const LongTextValues: Story = {
   },
 };
 
-export const ResponsiveLayoutChange: Story = {
-  args: {
-    label: 'Accessibility',
-    value: <Text>Visible to doctor and representative</Text>,
-    md: { type: 'vertical' },
-    lg: { type: 'horizontal' },
-  },
+/**
+ * Override the label `type` and `labelWidth` per breakpoint. Below `sm` the label stacks above the
+ * value; from `sm` up it sits beside the value, widening at `md` and `lg`. Resize the preview to see
+ * the layout adapt.
+ */
+export const Responsive: Story = {
+  render: () => {
+    const rows = [
+      { label: 'Patsient', value: 'Mari Maasikas' },
+      { label: 'Aadress', value: 'Tulbi tn 4, Tallinn, 23562, Eesti' },
+      { label: 'Vaktsiin', value: 'Mari Maasikas' },
+      { label: 'Järgmine vaktsineerimine', value: 'Immuniseerimine lõpetatud' },
+      { label: 'Tervishoiuteenuse osutaja', value: 'SA Põhja-Eesti Regionaalhaigla' },
+      { label: 'Tervishoiutöötaja', value: 'Mart Mets' },
+      { label: 'Dokumendi loomise aeg', value: '16.08.2023 14:51:48' },
+    ];
 
-  render: (args) => <TextGroup {...args} />,
+    return (
+      <VerticalSpacing size={0.25}>
+        {rows.map((row, index) => (
+          <TextGroup
+            key={index}
+            type="vertical"
+            sm={{ type: 'horizontal', labelWidth: '120px' }}
+            md={{ labelWidth: '200px' }}
+            lg={{ labelWidth: '25%' }}
+            label={row.label}
+            value={<Text>{row.value}</Text>}
+          />
+        ))}
+      </VerticalSpacing>
+    );
+  },
 };
 
+/**
+ * The `label` accepts any node, not just a string — e.g. a bold / secondary label with an info button,
+ * or a status badge inline with the label text.
+ */
 export const CustomLabel: Story = {
+  name: 'Custom label',
   render: () => (
-    <VerticalSpacing>
-      <TextGroup
-        label={
-          <Text modifiers="bold" color="secondary">
-            Authorisations <InfoButton>More information</InfoButton>
-          </Text>
-        }
-        value={<Text>Visible to doctor and representative</Text>}
-      />
-      <TextGroup
-        label={
-          <Text modifiers="bold" color="secondary">
-            Status <StatusBadge color="success">Active</StatusBadge>
-          </Text>
-        }
-        value={<Text>Some text regarding to status</Text>}
-        type="horizontal"
-      />
-    </VerticalSpacing>
+    <ExampleRows
+      rows={[
+        {
+          title: 'With info button',
+          content: (
+            <TextGroup
+              label={
+                <Text modifiers="bold" color="secondary">
+                  Volitused <InfoButton aria-label="Rohkem infot" />
+                </Text>
+              }
+              value={<Text>Arstile ja esindajale nähtav</Text>}
+            />
+          ),
+        },
+        {
+          title: 'With status badge',
+          content: (
+            <TextGroup
+              type="horizontal"
+              labelWidth="150px"
+              label={
+                <div className="flex align-items-center gap-2">
+                  <Text element="span" modifiers="bold" color="secondary">
+                    Olek
+                  </Text>
+                  <StatusBadge color="success">Aktiivne</StatusBadge>
+                </div>
+              }
+              value={<Text>Olekuga seotud tekst</Text>}
+            />
+          ),
+        },
+      ]}
+    />
+  ),
+};
+
+/**
+ * `TextGroup.List` renders multiple label / value pairs inside a **single**
+ * `<dl>` element instead of stacking N separate `<TextGroup>`s — so screen
+ * readers announce them as one definition list rather than N fragments. Use
+ * it whenever the rows describe the same entity (patient summary, document
+ * metadata, …). Each row supports the same `labelAlign` / `labelWidth`
+ * overrides as the single-pair component when you need per-row tweaks.
+ */
+export const WithList: Story = {
+  render: () => (
+    <ExampleRows
+      rows={[
+        {
+          title: 'Vertical list (default)',
+          content: (
+            <TextGroup.List
+              items={[
+                { label: 'Patsient', value: <Text>Mari Maasikas</Text> },
+                { label: 'Aadress', value: <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text> },
+                { label: 'Vaktsiin', value: <Text>COVID-19 mRNA</Text> },
+                { label: 'Järgmine vaktsineerimine', value: <Text>Immuniseerimine lõpetatud</Text> },
+              ]}
+            />
+          ),
+        },
+        {
+          title: 'Horizontal list with shared label column',
+          content: (
+            <TextGroup.List
+              type="horizontal"
+              labelWidth="220px"
+              items={[
+                {
+                  label: 'Patsient',
+                  value: (
+                    <>
+                      <Icon name="person" size={18} color="secondary" />
+                      <Text>Mari Maasikas</Text>
+                    </>
+                  ),
+                },
+                {
+                  label: 'Aadress',
+                  value: (
+                    <>
+                      <Icon name="location_on" size={16} color="secondary" />
+                      <Text>Tulbi tn 4, Tallinn, 23562, Eesti</Text>
+                    </>
+                  ),
+                },
+                { label: 'Tervishoiuteenuse osutaja', value: <Text>SA Põhja-Eesti Regionaalhaigla</Text> },
+                { label: 'Tervishoiutöötaja', value: <Text>Mart Mets</Text> },
+                { label: 'Dokumendi loomise aeg', value: <Text>16.08.2023 14:51:48</Text> },
+              ]}
+            />
+          ),
+        },
+        {
+          title: 'Per-row labelAlign / labelWidth overrides',
+          content: (
+            <TextGroup.List
+              type="horizontal"
+              labelWidth="160px"
+              items={[
+                { label: 'Toode', value: <Text>USB-C laadimiskaabel</Text> },
+                { label: 'Kogus', value: <Text>2</Text> },
+                { label: 'Ühiku hind', value: <Text>12.50 €</Text>, labelAlign: 'right', labelWidth: '220px' },
+                {
+                  label: 'Kokku',
+                  value: <Text modifiers="bold">25.00 €</Text>,
+                  labelAlign: 'right',
+                  labelWidth: '220px',
+                },
+              ]}
+            />
+          ),
+        },
+      ]}
+    />
   ),
 };

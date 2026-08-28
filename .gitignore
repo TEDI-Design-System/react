@@ -41,6 +41,11 @@ testem.log
 Thumbs.db
 
 **/**/tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Stray tsc emit from .storybook/tsconfig.json (type-check only; should never emit)
+/.storybook/src/
+/.storybook/.storybook/
 
 # Local Netlify folder
 .netlify
@@ -51,3 +56,14 @@ migrations.json
 
 # Coverage
 /coverage
+
+# Generated a11y report (CI)
+a11y-report/
+
+# design-sync (claude.ai/design import)
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.ds-sync/
+ds-bundle/

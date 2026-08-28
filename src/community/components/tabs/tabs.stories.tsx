@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
@@ -8,6 +8,11 @@ const meta: Meta<typeof Tabs> = {
   component: Tabs,
   title: 'Community/Tabs',
   subcomponents: { TabsItem } as never,
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

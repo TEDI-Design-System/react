@@ -4,6 +4,9 @@ import React from 'react';
 import styles from './stepper.module.scss';
 import { StepperContext } from './stepper-context';
 
+/**
+ * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface StepProps {
   /**
    * ID of step
@@ -38,6 +41,9 @@ export interface StepProps {
   showCompletedIcon?: boolean;
 }
 
+/**
+ * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Step = (props: StepProps): JSX.Element | null => {
   const { children, className, index, id } = props;
   const { activeStep } = React.useContext(StepperContext);

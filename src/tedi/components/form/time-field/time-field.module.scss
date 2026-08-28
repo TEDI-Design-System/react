@@ -1,0 +1,65 @@
+@use '../field-icon-button' as field-icon-button;
+
+.tedi-time-field__textfield {
+  @include field-icon-button.states;
+
+  &--disabled {
+    @include field-icon-button.disabled;
+  }
+
+  input[type='time'] {
+    appearance: none;
+
+    &::-webkit-calendar-picker-indicator {
+      display: none !important;
+      width: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      appearance: none;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-clear-button {
+      display: none;
+      appearance: none;
+    }
+  }
+
+  input[type='time'][value='']:not(:focus)::-webkit-datetime-edit {
+    /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
+    color: transparent;
+  }
+
+  input[type='time'][value='']:not(:focus)::before {
+    position: absolute;
+    color: var(--form-input-text-placeholder);
+    content: attr(placeholder);
+  }
+
+  input[type='time'][value='']:focus::-webkit-datetime-edit {
+    color: inherit;
+  }
+
+  input[type='time'][value='']:focus::before {
+    content: '';
+  }
+}
+
+.tedi-time-field__container {
+  width: 100%;
+}
+
+.tedi-time-field__icon--disabled {
+  @include field-icon-button.icon-only-disabled;
+}
+
+.tedi-time-field__icon--disabled [aria-hidden='true'] {
+  color: var(--form-input-text-placeholder);
+}
+
+.tedi-time-field__picker-wrapper {
+  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
+}

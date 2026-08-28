@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -48,7 +48,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 <Col xs={2}>
                   <Text>{value}</Text>
                 </Col>
-                <Col className="display-flex align-items-center gap-3">
+                <Col className="flex align-items-center gap-3">
                   <FloatingButton id={value} size={size === 'Large' ? 'large' : 'medium'} {...buttonProps}>
                     Scroll up
                   </FloatingButton>

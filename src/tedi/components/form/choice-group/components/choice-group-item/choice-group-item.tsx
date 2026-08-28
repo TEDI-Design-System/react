@@ -91,14 +91,16 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
 
     document.getElementById(id)?.click();
   };
+
+  const isRadio = type === 'radio';
   return (
     <Col {...colProps} className={ColumnBEM}>
       <div
         className={ChoiceGroupItemBEM}
-        tabIndex={disabled ? -1 : 0}
+        tabIndex={isRadio || disabled ? -1 : 0}
         onClick={handleClick}
-        role={type}
-        aria-checked={isChecked}
+        role={isRadio ? undefined : type}
+        aria-checked={isRadio ? undefined : isChecked}
       >
         {variant === 'default' || showIndicator ? (
           <InputComponent
@@ -119,7 +121,6 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
             }
             tooltip={tooltip}
             data-testid="choice-group-item-indicator"
-            aria-checked={isChecked}
           />
         ) : (
           <>

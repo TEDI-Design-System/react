@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
@@ -40,7 +40,7 @@ const TemplateSizes: StoryFn<NumberFieldProps> = (args) => {
       <Col lg={6} md={12} className="example-list">
         {sizesArray.map((size, key) => (
           <Row className={`${key === sizesArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-            <Col lg={2} md={12} className="display-flex align-items-center">
+            <Col lg={2} md={12} className="flex align-items-center">
               <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
             </Col>
             <Col lg="auto" md={12}>
@@ -55,7 +55,6 @@ const TemplateSizes: StoryFn<NumberFieldProps> = (args) => {
 
 export const Default: Story = {
   args: {
-    id: 'example-1',
     label: 'Label',
     defaultValue: 1,
     step: 1,
@@ -94,7 +93,7 @@ export const States: Story = {
     return (
       <VerticalSpacing>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Default</Text>
           </Col>
           <Col>
@@ -102,7 +101,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Min value</Text>
           </Col>
           <Col>
@@ -110,7 +109,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Max value</Text>
           </Col>
           <Col>
@@ -118,7 +117,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Disabled</Text>
           </Col>
           <Col>
@@ -126,7 +125,7 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} md={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} md={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">Error</Text>
           </Col>
           <Col>
@@ -140,10 +139,8 @@ export const States: Story = {
 
 export const WithHint: Story = {
   args: {
-    id: 'example-1',
     label: 'Label',
     helper: {
-      id: 'example-3',
       text: 'Hint text',
       type: 'hint',
     },
@@ -151,7 +148,6 @@ export const WithHint: Story = {
 };
 export const Decimal: Story = {
   args: {
-    id: 'example-1',
     label: 'Label',
     defaultValue: 1.5,
     step: 0.25,
@@ -162,7 +158,6 @@ export const Decimal: Story = {
 
 export const WithUnit: Story = {
   args: {
-    id: 'example-2',
     label: 'Label',
     defaultValue: 2,
     step: 1,
@@ -174,7 +169,6 @@ export const WithUnit: Story = {
 
 export const FullWidth: Story = {
   args: {
-    id: 'example-3',
     label: 'Label',
     value: 2,
     step: 1,

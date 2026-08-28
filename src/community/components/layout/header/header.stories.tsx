@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { StretchContent } from '../../../../tedi/components/misc/stretch-content/stretch-content';
@@ -17,6 +17,11 @@ import Header, { HeaderProps } from './header/header';
 export default {
   component: Header,
   title: 'Community/Layout/Header',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 } as Meta;
 type Story = StoryObj<typeof Header>;
 

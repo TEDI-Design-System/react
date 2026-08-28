@@ -4,15 +4,15 @@ import { FeedbackTextProps } from '../../components/form/feedback-text/feedback-
 import { ILabelContext, useLabels } from '../../providers/label-provider';
 
 export interface FileUploadFile extends Partial<File> {
-  /*
+  /**
    * A unique identifier for the file, useful for tracking files in a list.
    */
   id?: string;
-  /*
+  /**
    * Indicates if the file is currently being uploaded.
    */
   isLoading?: boolean;
-  /*
+  /**
    * Specifies whether the file passed validation checks (e.g., size, extension).
    */
   isValid?: boolean;
@@ -21,47 +21,47 @@ export interface FileUploadFile extends Partial<File> {
 export type FileRejectionType = 'size' | 'extension';
 
 export interface RejectedFile {
-  /*
+  /**
    * The reason the file was rejected (either 'size' or 'extension').
    */
   type: FileRejectionType;
-  /*
+  /**
    * The original file object that was rejected.
    */
   file: File;
 }
 
 export interface UseFileUploadProps {
-  /*
+  /**
    * Specifies the allowed file types (e.g., "image/png, image/jpeg").
    */
   accept?: string;
-  /*
-   * The maximum file size allowed for upload, in bytes.
+  /**
+   * The maximum file size allowed for upload, in megabytes (MB).
    */
   maxSize?: number;
-  /*
+  /**
    * Determines if multiple files can be uploaded at once.
    * @default false
    */
   multiple?: boolean;
-  /*
+  /**
    * If true, each file is validated separately instead of rejecting all at once.
    */
   validateIndividually?: boolean;
-  /*
+  /**
    * An array of default files that are preloaded in the upload list.
    */
   defaultFiles?: FileUploadFile[];
-  /*
+  /**
    * Callback function triggered when files are added or changed.
    */
   onChange?: (files: FileUploadFile[]) => void;
-  /*
+  /**
    * Callback function triggered when a file is removed.
    */
   onDelete?: (file: FileUploadFile) => void;
-  /*
+  /**
    * An optional array of files to be used in controlled mode.
    When provided, the hook uses this array as the source of truth for the file list instead of its internal state. 
    The parent component is responsible for updating this prop in response to the `onChange` callback. 
@@ -73,6 +73,14 @@ export interface UseFileUploadProps {
    * @default 5000
    */
   announcementTimeout?: number;
+  /**
+   * Whether to show the auto-generated restrictions hint (allowed types / max size)
+   * below the field. Turn it off when the same information is presented elsewhere
+   * (e.g. a `tooltip`) to avoid a visible duplicate — rejection error messages are
+   * unaffected and still render.
+   * @default true
+   */
+  showRestrictions?: boolean;
 }
 
 const getDefaultHelpers = (
@@ -93,6 +101,8 @@ const getDefaultHelpers = (
 
 const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+const ANNOUNCEMENT_RESET_DELAY = 100;
+
 export const useFileUpload = (props: UseFileUploadProps) => {
   const { getLabel } = useLabels();
   const {
@@ -105,24 +115,47 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onDelete,
     files,
     announcementTimeout = 5000,
+    showRestrictions = true,
   } = props;
 
   const isControlled = files !== undefined;
   const [innerFiles, setInnerFiles] = React.useState<FileUploadFile[]>(defaultFiles);
   const actualFiles = isControlled ? files : innerFiles;
 
-  const [uploadErrorHelper, setUploadErrorHelper] = React.useState<FeedbackTextProps | undefined>(
-    getDefaultHelpers({ accept, maxSize }, getLabel)
-  );
+  const restrictionsHint = showRestrictions ? getDefaultHelpers({ accept, maxSize }, getLabel) : undefined;
+
+  const [errorHelper, setErrorHelper] = React.useState<FeedbackTextProps | undefined>(undefined);
+  const uploadErrorHelper = errorHelper ?? restrictionsHint;
 
   const [announcement, setAnnouncement] = React.useState<string>('');
   const isMounted = React.useRef(true);
+  const announceShowTimer = React.useRef<ReturnType<typeof setTimeout>>();
+  const announceHideTimer = React.useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     return () => {
       isMounted.current = false;
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
     };
   }, []);
+
+  const announce = React.useCallback(
+    (message: string) => {
+      if (!message || !isMounted.current) return;
+      setAnnouncement('');
+      if (announceShowTimer.current) clearTimeout(announceShowTimer.current);
+      if (announceHideTimer.current) clearTimeout(announceHideTimer.current);
+      announceShowTimer.current = setTimeout(() => {
+        if (!isMounted.current) return;
+        setAnnouncement(message);
+        announceHideTimer.current = setTimeout(() => {
+          if (isMounted.current) setAnnouncement('');
+        }, announcementTimeout);
+      }, ANNOUNCEMENT_RESET_DELAY);
+    },
+    [announcementTimeout]
+  );
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -177,56 +210,37 @@ export const useFileUpload = (props: UseFileUploadProps) => {
         });
       });
 
-      let newFiles: FileUploadFile[] = [];
+      let newFiles: FileUploadFile[];
 
-      if (!multiple && uploadedFiles.length > 0) {
-        if (uploadedFiles[0].isValid) {
-          newFiles = [uploadedFiles[0]];
-        }
+      if (!multiple) {
+        newFiles = uploadedFiles.length > 0 && uploadedFiles[0].isValid ? [uploadedFiles[0]] : actualFiles;
       } else if (validateIndividually) {
         newFiles = [...actualFiles, ...uploadedFiles];
       } else {
         const validFiles = uploadedFiles.filter((file) => file.isValid);
-        if (validFiles.length > 0) {
-          newFiles = [...actualFiles, ...validFiles];
-        }
+        newFiles = validFiles.length > 0 ? [...actualFiles, ...validFiles] : actualFiles;
       }
 
-      if (newFiles.length > 0) {
-        if (!isControlled) {
-          setInnerFiles(newFiles);
-        }
-        onChange?.(newFiles);
+      const addedCount = newFiles.filter((file) => !actualFiles.includes(file)).length;
 
-        if (rejectedFiles.length === 0) {
-          const count = newFiles.length - actualFiles.length;
-          const message =
-            getLabel('file-upload.success-added', count.toString()) || `${count} file(s) added successfully`;
-
-          if (isMounted.current) {
-            setAnnouncement(message);
-          }
-        }
+      if (addedCount > 0 && !isControlled) {
+        setInnerFiles(newFiles);
       }
+      onChange?.(newFiles);
 
       if (rejectedFiles.length) {
-        const failedNames = rejectedFiles.map((r) => r.file.name).join(', ');
-        const errorMessage = getLabel('file-upload.failed-some', failedNames) || `Upload failed for: ${failedNames}`;
-
-        if (isMounted.current) {
-          setAnnouncement(errorMessage);
-        }
-        setUploadErrorHelper({ type: 'error', text: getUploadErrorHelperText(rejectedFiles) });
+        const errorText = getUploadErrorHelperText(rejectedFiles);
+        setErrorHelper({ type: 'error', text: errorText });
+        announce(errorText);
       } else {
-        setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
+        setErrorHelper(undefined);
+
+        if (addedCount > 0) {
+          announce(getLabel('file-upload.success-added', addedCount.toString()));
+        }
       }
 
-      setTimeout(() => {
-        if (isMounted.current) {
-          setAnnouncement('');
-        }
-      }, announcementTimeout);
-
+      event.target.value = '';
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -243,8 +257,10 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onChange?.(newFiles);
 
     if (newFiles.length === 0) {
-      setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
+      setErrorHelper(undefined);
     }
+
+    announce(getLabel('file-upload.removed', file.name ?? ''));
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -259,7 +275,9 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       setInnerFiles([]);
     }
     onChange?.([]);
-    setUploadErrorHelper(getDefaultHelpers({ accept, maxSize }, getLabel));
+    setErrorHelper(undefined);
+
+    announce(getLabel('file-upload.cleared'));
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';

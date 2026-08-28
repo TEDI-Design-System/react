@@ -82,12 +82,12 @@
 
   &.completed:not(.selected) {
     .stepper-counter {
-      color: var(--color-white);
-      background-color: var(--color-positive-active);
+      color: var(--general-text-white);
+      background-color: var(--tedi-green-700);
     }
 
     .stepper-link {
-      color: var(--color-text-default);
+      color: var(--general-text-primary);
     }
 
     &:hover {
@@ -96,7 +96,7 @@
       }
 
       .stepper-link {
-        color: var(--color-primary-active);
+        color: var(--general-text-brand);
         text-decoration: underline;
         text-decoration-thickness: 1px;
       }
@@ -105,12 +105,12 @@
 
   &.error {
     .stepper-counter {
-      color: var(--color-white);
-      background-color: var(--color-important-active);
+      color: var(--general-text-white);
+      background-color: var(--tedi-red-700);
     }
 
     .stepper-link {
-      color: var(--color-text-default);
+      color: var(--general-text-primary);
     }
 
     &:hover {
@@ -119,7 +119,7 @@
       }
 
       .stepper-link {
-        color: var(--color-primary-active);
+        color: var(--general-text-brand);
         text-decoration: underline;
         text-decoration-thickness: 1px;
       }
@@ -128,35 +128,35 @@
 
   &.disabled {
     .stepper-counter {
-      color: var(--color-text-disabled);
-      background-color: var(--color-bg-disabled);
+      color: var(--general-text-disabled);
+      background-color: var(--general-surface-disabled);
       border: 1px solid var(--general-border-secondary);
     }
 
     .stepper-link {
-      color: var(--color-text-disabled);
+      color: var(--general-text-disabled);
       cursor: default;
     }
   }
 
   &.default {
     .stepper-counter {
-      color: var(--color-text-muted);
-      background-color: var(--color-white);
+      color: var(--general-text-secondary);
+      background-color: var(--general-surface-primary);
       border: 1px solid var(--general-border-secondary);
     }
 
     .stepper-link {
-      color: var(--color-text-default);
+      color: var(--general-text-primary);
     }
 
     &:hover {
       .stepper-counter {
-        border-color: var(--color-primary-main);
+        border-color: var(--general-border-brand);
       }
 
       .stepper-link {
-        color: var(--color-primary-active);
+        color: var(--general-text-brand);
         text-decoration: underline;
         text-decoration-thickness: 1px;
       }
@@ -165,14 +165,14 @@
 
   &.selected {
     .stepper-counter {
-      color: var(--color-primary-active);
-      background-color: var(--color-white);
-      border: 2px solid var(--color-primary-active);
+      color: var(--general-text-brand);
+      background-color: var(--general-surface-primary);
+      border: 2px solid var(--general-border-brand);
     }
 
     .stepper-link {
       font-weight: bold;
-      color: var(--color-primary-active);
+      color: var(--general-text-brand);
     }
 
     &:hover {
@@ -199,7 +199,7 @@
   .stepper-item-collapse {
     button > span {
       align-items: flex-start !important;
-      color: var(--color-text-default);
+      color: var(--general-text-primary);
     }
   }
 }
@@ -213,8 +213,8 @@
   width: 24px;
   height: 24px;
   font-weight: 400;
-  color: var(--color-white);
-  background-color: var(--color-text-default);
+  color: var(--general-text-white);
+  background-color: var(--general-text-primary);
   border-radius: 50%;
 
   &::before {
@@ -228,7 +228,7 @@
 }
 
 .stepper-link {
-  color: var(--color-text-default);
+  color: var(--general-text-primary);
   text-decoration: none;
 
   .stepper-icon {
@@ -276,7 +276,7 @@
     left: -17px;
     width: 10px;
     height: 10px;
-    border: 1px solid var(--color-white);
+    border: 1px solid var(--general-border-white);
     border-radius: 50%;
   }
 
@@ -284,7 +284,7 @@
     position: absolute;
     width: 9px;
     height: 9px;
-    background-color: var(--color-white);
+    background-color: var(--general-surface-primary);
     border: 1px solid var(--general-border-secondary);
     border-radius: 50%;
   }
@@ -301,7 +301,7 @@
   .sub-item-text a .sub-item-title,
   .sub-item-text button .sub-item-title {
     font-size: 16px;
-    color: var(--color-text-default);
+    color: var(--general-text-primary);
     text-decoration: none;
   }
 
@@ -314,12 +314,12 @@
 
   &:hover {
     .sub-item-dot {
-      border-color: var(--color-primary-active);
+      border-color: var(--general-border-brand);
     }
 
     .sub-item-text a .sub-item-title,
     .sub-item-text button .sub-item-title {
-      color: var(--color-primary-active);
+      color: var(--general-text-brand);
       text-decoration: underline;
       text-decoration-thickness: 1px;
       cursor: pointer;
@@ -329,8 +329,8 @@
   // ===== SUB ITEM STATES =====
   &.completed {
     .sub-item-dot {
-      background-color: var(--color-positive-active);
-      border-color: var(--color-positive-active);
+      background-color: var(--tedi-green-700);
+      border-color: var(--general-status-success-border);
     }
 
     &:hover .sub-item-dot {
@@ -341,8 +341,8 @@
 
   &.error {
     .sub-item-dot {
-      background-color: var(--color-important-active);
-      border-color: var(--color-important-active);
+      background-color: var(--tedi-red-700);
+      border-color: var(--general-status-danger-border);
     }
 
     &:hover .sub-item-dot {
@@ -353,27 +353,27 @@
 
   &.default {
     .sub-item-dot {
-      color: var(--color-text-muted);
-      background-color: var(--color-white);
+      color: var(--general-text-secondary);
+      background-color: var(--general-surface-primary);
       border-color: var(--general-border-secondary);
     }
   }
 
   &.default:hover .sub-item-dot {
-    border-color: var(--color-primary-active);
+    border-color: var(--general-border-brand);
   }
 
   &.selected {
     .sub-item-dot {
-      color: var(--color-primary-active);
-      background-color: var(--color-white);
-      border: 2px solid var(--color-primary-active);
+      color: var(--general-text-brand);
+      background-color: var(--general-surface-primary);
+      border: 2px solid var(--general-border-brand);
     }
 
     .sub-item-text a .sub-item-title,
     .sub-item-text button .sub-item-title {
       font-weight: bold;
-      color: var(--color-primary-active);
+      color: var(--general-text-brand);
     }
 
     &:hover .sub-item-dot {
@@ -388,14 +388,14 @@
 
   &.disabled {
     .sub-item-dot {
-      color: var(--color-text-disabled);
-      background-color: var(--color-bg-disabled);
+      color: var(--general-text-disabled);
+      background-color: var(--general-surface-disabled);
       border-color: var(--general-border-secondary);
     }
 
     .sub-item-text a .sub-item-title,
     .sub-item-text button .sub-item-title {
-      color: var(--color-text-disabled);
+      color: var(--general-text-disabled);
       text-decoration: none;
       cursor: default;
     }
@@ -453,8 +453,8 @@
   width: 5px;
   height: 9px;
   content: '';
-  border-right: 2px solid var(--color-white);
-  border-bottom: 2px solid var(--color-white);
+  border-right: 2px solid var(--general-border-white);
+  border-bottom: 2px solid var(--general-border-white);
   transform: rotate(45deg);
 }
 
@@ -466,9 +466,9 @@
 }
 
 .stepper--compact .stepper-item.selected .stepper-counter {
-  color: var(--color-primary-active);
-  background-color: var(--color-white);
-  border: 4px solid var(--color-primary-active);
+  color: var(--general-text-brand);
+  background-color: var(--general-surface-primary);
+  border: 4px solid var(--general-border-brand);
 }
 
 .stepper--compact .stepper-item .stepper-counter {
@@ -512,21 +512,21 @@
   height: 9px;
 
   &:hover {
-    border-color: var(--color-primary-main);
+    border-color: var(--general-border-brand);
   }
 }
 
 .stepper--compact .stepper-item .sub-item:hover .sub-item-text a .sub-item-title,
 .stepper--compact .stepper-item .sub-item:hover .sub-item-text button .sub-item-title {
-  color: var(--color-primary-active);
+  color: var(--general-text-brand);
   text-decoration: underline;
   text-decoration-thickness: 1px;
 }
 
 /* ===== COMPACT SUB ITEM STATES ===== */
 .stepper--compact .stepper-item .sub-item.completed .sub-item-dot {
-  background-color: var(--color-positive-active);
-  border-color: var(--color-positive-active);
+  background-color: var(--tedi-green-700);
+  border-color: var(--general-status-success-border);
 }
 
 .stepper--compact .stepper-item .sub-item.completed:hover .sub-item-dot {
@@ -535,8 +535,8 @@
 }
 
 .stepper--compact .stepper-item .sub-item.error .sub-item-dot {
-  background-color: var(--color-important-active);
-  border-color: var(--color-important-active);
+  background-color: var(--tedi-red-700);
+  border-color: var(--general-status-danger-border);
 }
 
 .stepper--compact .stepper-item .sub-item.error:hover .sub-item-dot {
@@ -545,8 +545,8 @@
 }
 
 .stepper--compact .stepper-item .sub-item.disabled .sub-item-dot {
-  color: var(--color-text-disabled);
-  background-color: var(--color-bg-disabled);
+  color: var(--general-text-disabled);
+  background-color: var(--general-surface-disabled);
   border-color: var(--general-border-secondary);
 }
 
@@ -555,34 +555,34 @@
 }
 
 .stepper--compact .stepper-item .sub-item.default .sub-item-dot {
-  color: var(--color-text-muted);
-  background-color: var(--color-white);
+  color: var(--general-text-secondary);
+  background-color: var(--general-surface-primary);
   border-color: var(--general-border-secondary);
 
   &:hover {
-    border-color: var(--color-primary-main);
+    border-color: var(--general-border-brand);
   }
 }
 
 .stepper--compact .stepper-item .sub-item.default:hover .sub-item-dot {
-  border-color: var(--color-primary-main);
+  border-color: var(--general-border-brand);
 }
 
 .stepper--compact .stepper-item .sub-item.selected .sub-item-dot {
-  color: var(--color-primary-active);
-  background-color: var(--color-white);
-  border: 2px solid var(--color-primary-active);
+  color: var(--general-text-brand);
+  background-color: var(--general-surface-primary);
+  border: 2px solid var(--general-border-brand);
 }
 
 .stepper--compact .stepper-item .sub-item.selected .sub-item-text a .sub-item-title,
 .stepper--compact .stepper-item .sub-item.selected .sub-item-text button .sub-item-title {
   font-weight: bold;
-  color: var(--color-primary-active);
+  color: var(--general-text-brand);
 }
 
 .stepper--compact .stepper-item .sub-item.disabled .sub-item-text a .sub-item-title,
 .stepper--compact .stepper-item .sub-item.disabled .sub-item-text button .sub-item-title {
-  color: var(--color-text-disabled);
+  color: var(--general-text-disabled);
   text-decoration: none;
   cursor: default;
 }
@@ -593,7 +593,7 @@
 }
 
 .stepper--compact .stepper-item .sub-item.selected:hover .sub-item-dot {
-  border-color: var(--color-primary-active);
+  border-color: var(--general-border-brand);
 }
 
 .stepper--compact .stepper-link {

@@ -35,7 +35,15 @@ export const Tooltip = (props: TooltipProps) => {
       focusManager={{
         modal: false,
         order: ['reference', 'content'],
-        returnFocus: true,
+        // Tooltips are non-interactive (just descriptive text), so the focus
+        // manager must not move focus on open or close. `initialFocus: -1`
+        // skips the programmatic `.focus()` on the trigger when the tooltip
+        // mounts — that programmatic focus is what the browser's
+        // `:focus-visible` heuristic was upgrading to a "keyboard-style" ring,
+        // leaving the trigger painted with the focus border after a plain
+        // hover or mouse click.
+        initialFocus: -1,
+        returnFocus: false,
         ...focusManager,
       }}
       {...rest}

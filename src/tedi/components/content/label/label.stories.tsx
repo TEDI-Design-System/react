@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Label, LabelProps } from './label';
 
@@ -33,7 +33,7 @@ export const Default: Story = {
   render: Template,
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
   },
 };
 
@@ -42,7 +42,7 @@ export const Required: Story = {
   name: 'Required field',
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
     required: true,
   },
 };
@@ -52,7 +52,7 @@ export const DefaultBold: Story = {
   name: 'Bold',
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
     isBold: true,
   },
 };
@@ -62,7 +62,7 @@ export const RequiredBold: Story = {
   name: 'Bold Required field',
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
     required: true,
     isBold: true,
   },
@@ -72,9 +72,9 @@ export const InfoButtonStory: Story = {
   render: Template,
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
     required: true,
-    tooltip: 'More Info',
+    tooltip: 'Lisainfo',
   },
 };
 
@@ -82,7 +82,7 @@ export const DefaultSmall: Story = {
   render: Template,
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
     isSmall: true,
   },
 };
@@ -91,7 +91,7 @@ export const DefaultSmallBold: Story = {
   render: Template,
 
   args: {
-    children: 'Active ingredient',
+    children: 'Toimeaine',
     isBold: true,
     isSmall: true,
   },

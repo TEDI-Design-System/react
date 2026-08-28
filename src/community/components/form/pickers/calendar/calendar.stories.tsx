@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import dayjs, { Dayjs } from 'dayjs';
 
 import Calendar, { CalendarStatus } from './calendar';
@@ -6,6 +6,11 @@ import Calendar, { CalendarStatus } from './calendar';
 const meta: Meta<typeof Calendar> = {
   component: Calendar,
   title: 'Community/Form/Pickers/Calendar',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

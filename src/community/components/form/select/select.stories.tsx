@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 import { OptionsOrGroups } from 'react-select';
 
 import { AsyncSelectTemplate } from './examples/async';
@@ -10,6 +10,11 @@ import Select, { IGroupedOptions, ISelectOption } from './select';
 const meta: Meta<typeof Select> = {
   component: Select,
   title: 'Community/Form/Select',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;
@@ -58,7 +63,7 @@ const groupedOptions2: OptionsOrGroups<ISelectOption, IGroupedOptions<ISelectOpt
     label: 'Group 3 - Separately set styles have priority',
     text: {
       modifiers: ['small'],
-      color: 'inverted',
+      color: 'white',
     },
     backgroundColor: 'primary-main',
     options: [
@@ -191,7 +196,7 @@ export const SelectWithStyledGroupedOptions: Story = {
     label: 'Grouped options label',
     optionGroupHeadingText: {
       modifiers: ['italic'],
-      color: 'important',
+      color: 'danger',
     },
     optionGroupBackgroundColor: 'important-highlight',
     options: groupedOptions2,

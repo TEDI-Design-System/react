@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import Anchor from '../anchor/anchor';
@@ -6,9 +6,18 @@ import { Card, CardContent } from '../card';
 import CardHeader from '../card/card-header/card-header';
 import Placeholder from './placeholder';
 
+/**
+ * **⚠️ DEPRECATED** — use `EmptyState` from `@tedi-design-system/react/tedi` instead. This
+ * Community component is no longer maintained and will be removed in a future release.
+ */
 const meta: Meta<typeof Placeholder> = {
   component: Placeholder,
   title: 'Community/Placeholder',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

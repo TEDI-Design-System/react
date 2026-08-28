@@ -1,4 +1,4 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
+import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import NextLink from 'next/link';
 import { ElementType, forwardRef } from 'react';
 
@@ -57,10 +57,10 @@ const SizeTemplate: StoryFn = () => {
     <div className="example-list">
       {sizeArray.map((size, key) => (
         <Row className={`${key === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col className="display-flex w-50">
+          <Col className="flex w-50">
             <b>{size.charAt(0).toUpperCase() + size.slice(1)}</b>
           </Col>
-          <Col className="display-flex">
+          <Col className="flex">
             <Link size={size as LinkProps['size']} href="#">
               View result
             </Link>
@@ -138,12 +138,12 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
         </Row>
         {array.map((value, key) => (
           <Row key={key}>
-            <Col md={1} className="display-flex align-items-center">
+            <Col md={1} className="flex align-items-center">
               <Text color={titleColor} modifiers="bold">
                 {value}
               </Text>
             </Col>
-            <Col className="display-flex align-items-center gap-3">
+            <Col className="flex align-items-center gap-3">
               <Link id={value} href="#" {...buttonProps}>
                 Create
               </Link>
@@ -154,7 +154,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 Edit
               </Link>
             </Col>
-            <Col className="display-flex align-items-center gap-3">
+            <Col className="flex align-items-center gap-3">
               <Link id={value} href="#" size="small" {...buttonProps}>
                 Create
               </Link>
@@ -214,8 +214,8 @@ export const InvertedUnderline: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const InvertedNoUnderline: StoryObj<TemplateMultipleProps> = {
@@ -232,8 +232,8 @@ export const InvertedNoUnderline: StoryObj<TemplateMultipleProps> = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };
 
 export const AsPrimaryButton: StoryObj<TemplateMultipleProps> = {
