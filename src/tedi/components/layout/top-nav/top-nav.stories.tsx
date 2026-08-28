@@ -21,10 +21,10 @@ const headerLanguages = [
 ];
 
 const headerRepresentatives: Representative[] = [
-  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
-  { id: '2', name: 'Juulia Sarapuu', description: '47008124512', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '3', name: 'Marta Sarapuu', description: '48302270037', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '4', name: 'Helgi Sarapuu', description: '45611090286', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '1', name: 'Mari Maasikas', description: '47013010001', icon: { name: 'person', size: 24 } },
+  { id: '2', name: 'Juulia Sarapuu', description: '47013010002', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '3', name: 'Marta Sarapuu', description: '47013010003', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '4', name: 'Helgi Sarapuu', description: '47013010004', icon: { name: 'supervised_user_circle', size: 24 } },
 ];
 
 const headerLogo = <img src="header-logo.svg" alt="Logo" />;

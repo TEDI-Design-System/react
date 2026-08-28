@@ -127,14 +127,10 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     noStyle: true,
     'aria-current': isActive ? 'page' : undefined,
     'aria-label': isCollapsed && typeof children === 'string' ? children : undefined,
-    // Disclosure trigger (expandable group): `aria-expanded` + `aria-controls`,
-    // no `aria-haspopup` — the panel is a list of links, not a menu.
-    ...(hasChildren
-      ? {
-          'aria-expanded': isCollapsedInternal,
-          'aria-controls': collapseId,
-        }
-      : {}),
+    // Disclosure state (`aria-expanded` / `aria-controls`) belongs on the control
+    // that actually toggles the group — the `Collapse` button below — not on this
+    // navigating link. Putting it here exposed stale expanded state and, in the
+    // nested branch (no Collapse), an `aria-controls` pointing at no element.
   } as unknown as LinkProps<C>;
 
   const renderChildren = () =>
@@ -194,6 +190,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 id={collapseId}
                 hideCollapseText
                 inverted
+                contentAsRegion={false}
                 open={isCollapsedInternal}
                 onToggle={handleCollapseToggle}
                 toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
@@ -213,6 +210,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
             hideCollapseText
             inverted
             fullRowToggle
+            contentAsRegion={false}
             open={isCollapsedInternal}
             onToggle={handleCollapseToggle}
             className={styles['tedi-sidenav__collapse']}

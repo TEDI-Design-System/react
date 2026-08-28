@@ -200,10 +200,15 @@ describe('SideNavItem', () => {
   test('sets aria attributes for linked parent with children', () => {
     renderWithProviders(<SideNavItem {...defaultProps} href="/parent" subItems={[{ children: 'Child' }]} />);
 
+    // Disclosure attributes live on the toggle button, not the navigating link.
     const link = screen.getByRole('link', { name: /test item/i });
     expect(link).not.toHaveAttribute('aria-haspopup');
-    expect(link).toHaveAttribute('aria-expanded');
-    expect(link).toHaveAttribute('aria-controls');
+    expect(link).not.toHaveAttribute('aria-expanded');
+    expect(link).not.toHaveAttribute('aria-controls');
+
+    const toggle = screen.getByRole('button');
+    expect(toggle).toHaveAttribute('aria-expanded');
+    expect(toggle).toHaveAttribute('aria-controls');
   });
 
   test('updates dropdown open state when SideNavDropdown opens', async () => {
