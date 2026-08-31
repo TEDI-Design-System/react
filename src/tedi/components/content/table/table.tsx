@@ -593,10 +593,11 @@ interface TableDataRowProps<TData> {
   onClick: ((row: Row<TData>) => void) | undefined;
   onKeyDownHandler: ((event: KeyboardEvent<HTMLTableRowElement>) => void) | undefined;
   ariaRowIndex: number | undefined;
+  ariaExpanded?: boolean;
+  ariaControls?: string;
   columnProps: ((columnId: string) => { className?: string; style?: CSSProperties } | undefined) | undefined;
   draggable: boolean;
   dragHandleLabel: string;
-  /** When `draggable` is true, native HTML5 drag handlers wired by the parent Table. */
   dragHandlers?: {
     onDragStart: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onDragOver: (event: ReactDragEvent<HTMLTableRowElement>) => void;
@@ -604,12 +605,9 @@ interface TableDataRowProps<TData> {
     onDragEnd: () => void;
     onDrop: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onHandlePointerDown: () => void;
-    /** Keyboard reordering on the drag handle (pick up / move / drop / cancel). */
     onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
   };
-  /** Stable id for the row's drag handle — lets the parent restore focus after a keyboard move. */
   dragHandleId?: string;
-  /** Whether this row is currently picked up for keyboard reordering. */
   dragHandlePickedUp?: boolean;
   dragOverColumnId?: string | null;
 }
@@ -657,6 +655,8 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
     onClick,
     onKeyDownHandler,
     ariaRowIndex,
+    ariaExpanded,
+    ariaControls,
     columnProps,
     draggable,
     dragHandleLabel,
@@ -680,7 +680,9 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
       onKeyDown={clickable ? onKeyDownHandler : undefined}
       tabIndex={clickable ? 0 : undefined}
       role={clickable ? 'button' : undefined}
-      aria-rowindex={ariaRowIndex}
+      aria-rowindex={clickable ? undefined : ariaRowIndex}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
       aria-current={isActiveRow ? 'true' : undefined}
     >
       {row.getVisibleCells().map((cell) => {
@@ -946,6 +948,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableColumnFilter: false,
         size: 40,
         header: '',
+        meta: { label: getLabelRef.current('table.reorder-column') },
         cell: () => null,
       });
     }
@@ -960,6 +963,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableHiding: false,
         enableColumnFilter: false,
         size: 40,
+        meta: { label: getLabelRef.current('table.select-column') },
         header: isSingle
           ? ''
           : ({ table }) => (
@@ -1015,9 +1019,18 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableColumnFilter: false,
         size: 40,
         header: '',
+        meta: { label: getLabelRef.current('table.expand-column') },
         cell: ({ row }) => {
           if (!row.getCanExpand()) return null;
           const subRowId = `${resolvedId}-sub-${row.id}`;
+
+          // In row-trigger mode the whole `<tr>` is the disclosure button (it carries
+          // `aria-expanded`/`aria-controls`), so the indicator must be a non-interactive icon —
+          // a real button here would be an interactive control nested in another (axe
+          // `nested-interactive`).
+          if (expandTrigger === 'row') {
+            return <Icon name={row.getIsExpanded() ? 'expand_less' : 'expand_more'} size={24} filled color="inherit" />;
+          }
 
           return (
             <span
@@ -1027,7 +1040,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               }}
             >
               <CollapseButton
-                arrowType={expandTrigger === 'row' ? 'default' : 'secondary'}
+                arrowType="secondary"
                 {...collapseProps}
                 hideText
                 id={`${resolvedId}-expand-${row.id}`}
@@ -1601,6 +1614,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           ref={scrollRef}
           className={styles['tedi-table__scroll']}
           style={maxHeight !== undefined ? { maxHeight, overflowY: 'auto' } : undefined}
+          // The wrapper scrolls (always `overflow-x: auto`, plus `overflow-y` when `maxHeight`
+          // is set), so it must be keyboard-focusable for scroll access (axe
+          // `scrollable-region-focusable`).
+          tabIndex={0}
         >
           <table
             id={id}
@@ -1637,9 +1654,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         : 'none'
                       : undefined;
                     const headerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
-                    const headerLabel =
+                    const rawHeaderLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
+                    const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
+                    const headerDef = header.column.columnDef.header;
+                    const headerIsBlank =
+                      !columnHasChildren &&
+                      (headerDef === null ||
+                        headerDef === undefined ||
+                        (typeof headerDef === 'string' && headerDef.trim() === ''));
+                    const headerFallbackLabel = headerLabel ?? (columnHasChildren ? undefined : header.column.id);
                     const userColumnProps = columnProps?.(header.column.id);
                     const headerSize = header.column.getSize();
                     const isBuiltInColumn =
@@ -1704,6 +1729,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             </button>
                             {flexRender(header.column.columnDef.header, header.getContext())}
                           </span>
+                        ) : headerIsBlank && headerFallbackLabel ? (
+                          <span className={styles['tedi-table__sr-only']}>{headerFallbackLabel}</span>
                         ) : (
                           flexRender(header.column.columnDef.header, header.getContext())
                         )}
@@ -1796,6 +1823,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     onClick: handleRowActivate,
                     onKeyDownHandler: handleRowKeyDown(row),
                     ariaRowIndex,
+                    ariaExpanded: rowExpandsOnClick && row.getCanExpand() ? row.getIsExpanded() : undefined,
+                    ariaControls: rowExpandsOnClick && row.getCanExpand() && renderSubComponent ? subRowId : undefined,
                     columnProps,
                     draggable: reorderableRows,
                     dragHandleLabel: getLabel('table.drag-row'),
