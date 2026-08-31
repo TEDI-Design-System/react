@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { act, useState } from 'react';
 
 import Checkbox from './checkbox';
+import CheckboxGroup from './checkbox-group/checkbox-group';
 
 import '@testing-library/jest-dom';
 
@@ -276,14 +277,18 @@ describe('Checkbox component', () => {
     expect(checkbox).toHaveAccessibleDescription(/Costs extra/);
   });
 
-  it('card variant: renders the tooltip info button and clicking it does not toggle the checkbox', () => {
-    render(<Checkbox id="cb-card-tip" variant="card" label="Express delivery" value="express" tooltip="Extra info" />);
+  it('card variant: ignores a group-inherited tooltip and warns (tooltip and card are mutually exclusive)', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    const checkbox = screen.getByRole('checkbox', { name: 'Express delivery' });
-    expect(checkbox).toHaveAccessibleName('Express delivery');
-    expect(checkbox).not.toBeChecked();
+    render(
+      <CheckboxGroup label="Delivery" variant="card">
+        <Checkbox label="Express delivery" value="express" tooltip="Extra info" />
+      </CheckboxGroup>
+    );
 
-    fireEvent.click(screen.getByRole('button'));
-    expect(checkbox).not.toBeChecked();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
+
+    warn.mockRestore();
   });
 });

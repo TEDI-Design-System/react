@@ -4,20 +4,19 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
-import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
-import { ChoiceInputProps } from '../choice-input.types';
+import { ChoiceInputExclusiveProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './checkbox.module.scss';
 import { CheckboxGroupContext } from './checkbox-group/checkbox-group-context';
 
-export interface CheckboxBaseProps extends ChoiceInputProps {
+export type CheckboxBaseProps = ChoiceInputExclusiveProps & {
   /**
    * If the check is in indeterminate state. (Not checked or unchecked)
    * When this is true then the checked prop is ignored
    */
   indeterminate?: boolean;
-}
+};
 
 export type CheckboxProps = BreakpointSupport<CheckboxBaseProps>;
 
@@ -57,6 +56,10 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
   const size = sizeProp ?? group?.size ?? 'default';
   const variant = variantProp ?? group?.variant ?? 'default';
   const cardVariant = cardVariantProp ?? group?.cardVariant ?? 'primary';
+
+  if (variant === 'card' && !!tooltip) {
+    console.warn('Checkbox: `tooltip` is not supported with `variant="card"` and will be ignored. Use `description`.');
+  }
   const disabled = disabledProp ?? group?.disabled ?? false;
   const invalid = invalidProp ?? group?.invalid;
   const required = requiredProp;
@@ -174,15 +177,6 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
           <span id={cardLabelId} className={cn(styles['tedi-checkbox__card-label'], { 'sr-only': hideLabel })}>
             {label}
           </span>
-          {tooltip && (
-            <span
-              className={styles['tedi-checkbox__card-info']}
-              onClick={(event) => event.preventDefault()}
-              role="presentation"
-            >
-              <InfoTooltip>{tooltip}</InfoTooltip>
-            </span>
-          )}
         </span>
         {description && (
           <span id={cardDescriptionId} className={styles['tedi-checkbox__card-description']}>

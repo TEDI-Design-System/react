@@ -160,12 +160,6 @@
     color: inherit;
   }
 
-  .tedi-radio__card-info {
-    display: inline-flex;
-    flex-shrink: 0;
-    margin-left: auto;
-  }
-
   .tedi-radio__card-description {
     padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing));
     font-size: var(--body-small-regular-size);

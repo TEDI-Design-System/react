@@ -377,20 +377,6 @@ export const Cards: StoryObj = {
   ),
 };
 
-/**
- * A card checkbox can also carry a `tooltip`. The info button opens the tooltip on
- * hover/focus; because the whole card is a `<label>`, clicking the info button
- * does not toggle the checkbox.
- */
-export const CardsWithTooltip: StoryObj = {
-  render: () => (
-    <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
-      <Checkbox value="a" label="Kartul" tooltip="Tärkliserikas mugulköögivili." />
-      <Checkbox value="b" label="Peet" tooltip="Magusamaitseline juurvili." />
-    </Checkbox.Group>
-  ),
-};
-
 export const CardsWithDescription: StoryObj = {
   render: () => {
     const items = [

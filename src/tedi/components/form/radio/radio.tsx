@@ -4,14 +4,13 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
-import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
-import { ChoiceInputProps } from '../choice-input.types';
+import { ChoiceInputExclusiveProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './radio.module.scss';
 import { RadioGroupContext } from './radio-group/radio-group-context';
 
-export type RadioProps = BreakpointSupport<ChoiceInputProps>;
+export type RadioProps = BreakpointSupport<ChoiceInputExclusiveProps>;
 
 interface RadioComponent {
   (props: RadioProps): JSX.Element;
@@ -43,7 +42,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
     invalid: invalidProp,
     required: requiredProp,
     ...rest
-  } = getCurrentBreakpointProps<ChoiceInputProps>(props);
+  } = getCurrentBreakpointProps<ChoiceInputExclusiveProps>(props);
 
   const size = sizeProp ?? group?.size ?? 'default';
   const variant = variantProp ?? group?.variant ?? 'default';
@@ -51,6 +50,10 @@ export const Radio = ((props: RadioProps): JSX.Element => {
   const disabled = disabledProp ?? group?.disabled ?? false;
   const invalid = invalidProp ?? group?.invalid;
   const required = requiredProp ?? group?.required;
+
+  if (variant === 'card' && !!tooltip) {
+    console.warn('Radio: `tooltip` is not supported with `variant="card"` and will be ignored. Use `description`.');
+  }
 
   const generatedId = React.useId();
   const resolvedId = id ?? generatedId;
@@ -137,15 +140,6 @@ export const Radio = ((props: RadioProps): JSX.Element => {
           <span id={cardLabelId} className={cn(styles['tedi-radio__card-label'], { 'sr-only': hideLabel })}>
             {label}
           </span>
-          {tooltip && (
-            <span
-              className={styles['tedi-radio__card-info']}
-              onClick={(event) => event.preventDefault()}
-              role="presentation"
-            >
-              <InfoTooltip>{tooltip}</InfoTooltip>
-            </span>
-          )}
         </span>
         {description && (
           <span id={cardDescriptionId} className={styles['tedi-radio__card-description']}>

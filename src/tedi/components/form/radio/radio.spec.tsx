@@ -3,6 +3,7 @@ import { act, useState } from 'react';
 
 import Radio from './radio';
 import styles from './radio.module.scss';
+import RadioGroup from './radio-group/radio-group';
 
 jest.mock('../../base/icon/icon', () => ({
   Icon: jest.fn(() => <span data-testid="icon">Icon</span>),
@@ -286,17 +287,18 @@ describe('Radio component', () => {
     expect(radio).toHaveAccessibleDescription(/Free of charge/);
   });
 
-  it('card variant: renders the tooltip info button and clicking it does not toggle the radio', () => {
+  it('card variant: ignores a group-inherited tooltip and warns (tooltip and card are mutually exclusive)', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
     render(
-      <Radio id="radio-card-tip" variant="card" label="Standard delivery" value="standard" tooltip="Extra info" />
+      <RadioGroup label="Delivery" name="delivery" variant="card">
+        <Radio label="Standard delivery" value="standard" tooltip="Extra info" />
+      </RadioGroup>
     );
 
-    const radio = screen.getByRole('radio', { name: 'Standard delivery' });
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
 
-    expect(radio).toHaveAccessibleName('Standard delivery');
-    expect(radio).not.toBeChecked();
-
-    fireEvent.click(screen.getByRole('button'));
-    expect(radio).not.toBeChecked();
+    warn.mockRestore();
   });
 });

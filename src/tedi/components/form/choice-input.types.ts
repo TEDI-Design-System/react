@@ -3,7 +3,7 @@ import { FeedbackTextProps } from './feedback-text/feedback-text';
 export type ChoiceInputVariant = 'default' | 'card';
 export type ChoiceInputCardVariant = 'primary' | 'secondary';
 
-export interface ChoiceInputProps {
+interface ChoiceInputBaseProps {
   /**
    * ID property. When omitted a stable id is generated (useful inside `Radio.Group` / `Checkbox.Group`).
    */
@@ -24,13 +24,6 @@ export interface ChoiceInputProps {
    * name of the input. Provided automatically when rendered inside `Radio.Group` / `Checkbox.Group`.
    */
   name?: string;
-  /**
-   * Visual variant.
-   * - `default` — standard indicator + label.
-   * - `card` — the whole control renders as a selectable card (indicator, label, optional icon/description).
-   * @default default
-   */
-  variant?: ChoiceInputVariant;
   /**
    * Card colour variant. Only applies when `variant="card"`.
    * @default primary
@@ -73,11 +66,6 @@ export interface ChoiceInputProps {
    */
   hover?: boolean;
   /**
-   * Provide content for tooltip. Accepts rich content (e.g. bold text, links),
-   * not just a plain string.
-   */
-  tooltip?: React.ReactNode;
-  /**
    *  Input size
    */
   size?: 'default' | 'large';
@@ -90,3 +78,54 @@ export interface ChoiceInputProps {
    */
   required?: boolean;
 }
+
+/**
+ * Base choice-input props with `variant` and `tooltip` freely combinable. Kept as a
+ * flat interface so it can be `extends`-ed (e.g. by the deprecated `ChoiceGroup`).
+ * Checkbox / Radio expose {@link ChoiceInputExclusiveProps} instead, which forbids
+ * combining the two.
+ */
+export interface ChoiceInputProps extends ChoiceInputBaseProps {
+  /**
+   * Visual variant.
+   * - `default` — standard indicator + label.
+   * - `card` — the whole control renders as a selectable card (indicator, label, optional icon/description).
+   * @default default
+   */
+  variant?: ChoiceInputVariant;
+  /**
+   * Provide content for tooltip. Accepts rich content (e.g. bold text, links),
+   * not just a plain string.
+   */
+  tooltip?: React.ReactNode;
+}
+
+/**
+ * Checkbox / Radio public props: identical to {@link ChoiceInputProps} except that
+ * `variant="card"` and `tooltip` are mutually exclusive. The card variant carries
+ * supplementary content through its own `description` slot, so an info tooltip on the
+ * same control is redundant and unsupported — passing both is a type error.
+ *
+ * The type guard only catches the combination when `variant` is set on the control
+ * itself; when the variant is inherited from a `Checkbox.Group` / `Radio.Group`, the
+ * components additionally warn at runtime (dev only) and ignore the tooltip.
+ */
+export type ChoiceInputExclusiveProps =
+  | (ChoiceInputBaseProps & {
+      /**
+       * Visual variant.
+       * - `default` — standard indicator + label.
+       * - `card` — the whole control renders as a selectable card (indicator, label, optional icon/description).
+       * @default default
+       */
+      variant?: 'default';
+      /**
+       * Provide content for tooltip. Accepts rich content (e.g. bold text, links),
+       * not just a plain string. Not available on `variant="card"` — use `description` instead.
+       */
+      tooltip?: React.ReactNode;
+    })
+  | (ChoiceInputBaseProps & {
+      variant: 'card';
+      tooltip?: never;
+    });
