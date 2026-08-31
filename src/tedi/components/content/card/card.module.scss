@@ -18,12 +18,6 @@ $card-colors: (
   'warning-primary': '--general-status-warning-background-light',
   'warning-secondary': '--general-status-warning-background-dark',
 );
-
-// Every card block (header, content, notification) renders a CardContent, so
-// each one carries `.tedi-card__content`. Match blocks by class rather than by
-// element position (`:first-of-type` / `:last-child`) so an out-of-flow sibling
-// a consumer projects at a card edge — a badge, a decoration — can't steal the
-// first/last slot away from a real block.
 $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification-content';
 
 @mixin reset-corner($corner) {
@@ -47,10 +41,6 @@ $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification
   border: 1px solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
 
-  // Edge blocks sit inside the 1px border, so their corners need the inner
-  // radius (outer minus the border width) to trace the same curve — otherwise a
-  // hairline of card background shows at each corner wherever the block has its
-  // own background. Borderless cards override this to the full radius below.
   --card-inner-radius: calc(var(--card-radius-rounded) - 1px);
 
   > :nth-child(1 of #{$card-blocks}) {
@@ -85,7 +75,6 @@ $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification
     border-bottom-color: var(--card-border-primary);
     border-left: 4px solid var(--card-border-color);
 
-    // 4px accent border on the start edge — square off the corners it meets.
     > :nth-child(1 of #{$card-blocks}),
     > :nth-last-child(1 of #{$card-blocks}) {
       border-start-start-radius: 0;
@@ -99,7 +88,6 @@ $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification
     border-bottom-color: var(--card-border-primary);
     border-left-color: var(--card-border-primary);
 
-    // 4px accent border on the top edge — square off the top corners.
     > :nth-child(1 of #{$card-blocks}) {
       border-start-start-radius: 0;
       border-start-end-radius: 0;
@@ -109,7 +97,6 @@ $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification
   &--borderless {
     border: none;
 
-    // No border to sit inside of — blocks trace the full outer radius.
     --card-inner-radius: var(--card-radius-rounded);
   }
 

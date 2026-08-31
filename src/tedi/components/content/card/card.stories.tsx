@@ -398,9 +398,6 @@ export const TwoTonedCard: StoryObj<CardProps> = {
 
 const PinnedOverlay: StoryFn<CardProps> = (args) => (
   <Card {...args}>
-    {/* Pinned to the card corner and placed *before* the header in the DOM: it must
-        paint above the header (header no longer traps it), and the header must still
-        round its top corners even though this out-of-flow sibling is the first child. */}
     <StatusIndicator position="top-right" type="danger" size="lg" hasBorder />
     <Card.Header background="brand-primary">
       <Heading element="h3">Kaardi pealkiri</Heading>
