@@ -77,8 +77,8 @@ $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification
 
     > :nth-child(1 of #{$card-blocks}),
     > :nth-last-child(1 of #{$card-blocks}) {
-      border-start-start-radius: 0;
-      border-end-start-radius: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
     }
   }
 
@@ -97,7 +97,18 @@ $card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification
   &--borderless {
     border: none;
 
+    // No border to sit inside of — blocks trace the full outer radius.
     --card-inner-radius: var(--card-radius-rounded);
+
+    > :nth-child(1 of #{$card-blocks}) {
+      border-start-start-radius: var(--card-inner-radius);
+      border-start-end-radius: var(--card-inner-radius);
+    }
+
+    > :nth-last-child(1 of #{$card-blocks}) {
+      border-end-start-radius: var(--card-inner-radius);
+      border-end-end-radius: var(--card-inner-radius);
+    }
   }
 
   &--no-radius-tl {
