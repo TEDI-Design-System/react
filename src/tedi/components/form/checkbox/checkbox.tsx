@@ -4,13 +4,13 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
-import { ChoiceInputExclusiveProps } from '../choice-input.types';
+import { ChoiceInputProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './checkbox.module.scss';
 import { CheckboxGroupContext } from './checkbox-group/checkbox-group-context';
 
-export type CheckboxBaseProps = ChoiceInputExclusiveProps & {
+export type CheckboxBaseProps = ChoiceInputProps & {
   /**
    * If the check is in indeterminate state. (Not checked or unchecked)
    * When this is true then the checked prop is ignored

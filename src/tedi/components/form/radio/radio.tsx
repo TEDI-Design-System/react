@@ -4,13 +4,13 @@ import React from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
-import { ChoiceInputExclusiveProps } from '../choice-input.types';
+import { ChoiceInputProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './radio.module.scss';
 import { RadioGroupContext } from './radio-group/radio-group-context';
 
-export type RadioProps = BreakpointSupport<ChoiceInputExclusiveProps>;
+export type RadioProps = BreakpointSupport<ChoiceInputProps>;
 
 interface RadioComponent {
   (props: RadioProps): JSX.Element;
@@ -42,7 +42,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
     invalid: invalidProp,
     required: requiredProp,
     ...rest
-  } = getCurrentBreakpointProps<ChoiceInputExclusiveProps>(props);
+  } = getCurrentBreakpointProps<ChoiceInputProps>(props);
 
   const size = sizeProp ?? group?.size ?? 'default';
   const variant = variantProp ?? group?.variant ?? 'default';
