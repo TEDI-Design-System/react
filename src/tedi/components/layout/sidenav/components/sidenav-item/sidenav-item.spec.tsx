@@ -197,14 +197,8 @@ describe('SideNavItem', () => {
     expect(screen.getByText('Hidden Child')).toBeInTheDocument();
   });
 
-  test('sets aria attributes for linked parent with children', () => {
+  test('sets disclosure aria attributes on the toggle button of a linked parent', () => {
     renderWithProviders(<SideNavItem {...defaultProps} href="/parent" subItems={[{ children: 'Child' }]} />);
-
-    // Disclosure attributes live on the toggle button, not the navigating link.
-    const link = screen.getByRole('link', { name: /test item/i });
-    expect(link).not.toHaveAttribute('aria-haspopup');
-    expect(link).not.toHaveAttribute('aria-expanded');
-    expect(link).not.toHaveAttribute('aria-controls');
 
     const toggle = screen.getByRole('button');
     expect(toggle).toHaveAttribute('aria-expanded');

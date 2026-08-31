@@ -127,10 +127,6 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     noStyle: true,
     'aria-current': isActive ? 'page' : undefined,
     'aria-label': isCollapsed && typeof children === 'string' ? children : undefined,
-    // Disclosure state (`aria-expanded` / `aria-controls`) belongs on the control
-    // that actually toggles the group — the `Collapse` button below — not on this
-    // navigating link. Putting it here exposed stale expanded state and, in the
-    // nested branch (no Collapse), an `aria-controls` pointing at no element.
   } as unknown as LinkProps<C>;
 
   const renderChildren = () =>
