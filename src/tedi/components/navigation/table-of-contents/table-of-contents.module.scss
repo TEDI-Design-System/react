@@ -105,6 +105,7 @@
 }
 
 .tedi-table-of-contents__separator {
+  margin-block: var(--layout-grid-gutters-04);
   margin-inline: var(--tedi-table-of-contents-padding);
 }
 
