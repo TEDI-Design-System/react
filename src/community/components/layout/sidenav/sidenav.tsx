@@ -79,6 +79,9 @@ export type SideNavItem<C extends React.ElementType = 'a'> = AnchorProps<C> & {
 // tiny helper to defer closing to the next frame (prevents ghost click on touch)
 const defer = (fn: () => void) => requestAnimationFrame(fn);
 
+/**
+ * @deprecated Use `SideNav` from `@tedi-design-system/react/tedi` instead.
+ */
 export const SideNav = <C extends React.ElementType = 'a'>(props: SideNavProps<C>) => {
   const {
     navItems,

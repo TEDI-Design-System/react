@@ -34,6 +34,9 @@ export interface HeaderRoleProps {
   renderModal?: boolean;
 }
 
+/**
+ * @deprecated Use `HeaderRole` from `@tedi-design-system/react/tedi` instead.
+ */
 export const HeaderRole: React.FC<HeaderRoleProps> = (props) => {
   const { renderModal = false, ...rest } = props;
   const [isOpen, setIsOpen] = React.useState(false);
@@ -81,7 +84,7 @@ const HeaderRoleDropdown = (props: HeaderRoleComponentProps) => {
           <>
             {' '}
             <Text element="span" modifiers={['small', 'normal']}>
-              <span style={{ color: 'var(--color-border-default)' }}>|</span> {secondaryInfo}
+              <span className={styles['header-role-separator']}>|</span> {secondaryInfo}
             </Text>
           </>
         )}

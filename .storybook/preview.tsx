@@ -6,7 +6,6 @@ import StorybookDecorator from './storybook-decorator';
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
-import '../src/community/styles/storybook.scss';
 
 import { PrintingProvider } from '../src/tedi/providers/printing-provider';
 import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
@@ -62,16 +61,14 @@ const preview: Preview = {
   },
   parameters: {
     viewMode: 'docs',
+    a11y: {
+      test: 'error',
+    },
     backgrounds: {
       options: {
-        default: { name: 'default', value: 'var(--color-bg-default)' },
-        muted: { name: 'muted', value: 'var(--color-bg-muted)' },
-        subtle: { name: 'subtle', value: 'var(--color-bg-subtle)' },
-        disabled: { name: 'disabled', value: 'var(--color-bg-disabled)' },
-        black: { name: 'black', value: 'var(--color-black)' },
-        inverted: { name: 'inverted', value: 'var(--color-bg-inverted)' },
-        'inverted-contrast': { name: 'inverted-contrast', value: 'var(--color-bg-inverted-contrast)' },
-        brand: { name: 'brand', value: 'var(--tedi-primary-600)' },
+        default: { name: 'default', value: 'var(--general-surface-primary)' },
+        inverted: { name: 'inverted', value: 'var(--general-surface-inverted-primary)' },
+        brand: { name: 'brand', value: 'var(--general-surface-brand-primary)' },
       },
     },
     docs: {

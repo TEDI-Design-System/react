@@ -5,7 +5,7 @@ import { FeedbackTextProps } from '../feedback-text/feedback-text';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './textarea.module.scss';
 
-export interface TextAreaProps extends TextFieldProps {
+export interface TextareaProps extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'onClear'> {
   /**
    * Maximum number of characters allowed in the textarea.
    */
@@ -41,7 +41,7 @@ export interface TextAreaProps extends TextFieldProps {
   maxHeight?: string | number;
 }
 
-export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, ref): JSX.Element => {
+export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, ref): JSX.Element => {
   const {
     className,
     helper = [],
@@ -202,6 +202,6 @@ export const TextArea = forwardRef<TextFieldForwardRef, TextAreaProps>((props, r
   );
 });
 
-TextArea.displayName = 'TextArea';
+Textarea.displayName = 'Textarea';
 
-export default TextArea;
+export default Textarea;

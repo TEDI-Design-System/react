@@ -388,8 +388,9 @@ import { Carousel } from '@tedi-design-system/react/tedi';
 - `element: 'ul' | 'ol' = 'ul'`
 - `style: 'styled' | 'none' = 'none'`
 - `color: BulletColor = 'brand'`
+- Forwards native list attributes to the element (`OlHTMLAttributes`) — notably `start` / `reversed` for ordered lists, plus `id` / `aria-*`. `style` is not forwarded (repurposed for the styling variant). The numbers are a CSS counter, so `List` reseeds it: `start` sets the first number, and `reversed` counts down (from `start`, or the item count when `start` is omitted).
 
-Sub-component: `List.Item`
+Sub-component: `List.Item` — forwards native `<li>` attributes; `value` overrides a single item's number in an ordered list (`5, 6, 10, 11`). `value` needs Safari 17.2+ to reseed the visible counter; older browsers keep sequential numbering.
 
 ### Section
 
@@ -428,7 +429,9 @@ Sub-component: `List.Item`
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level: `'years'` selects Jan 1 of the picked year, `'months'` selects day 1
 - `disabledMatchers?: Matcher[]` — same shape as DayPicker's `disabled`
 - `availableDays?: Date[] | ((date) => boolean)`, `unavailableDays?: Date[] | ((date) => boolean)` — overlay highlights without disabling neighbours
-- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header picker style
+- `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header picker style; `'static'` makes the month/year a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown
+- `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status; return a `{ type, label }` to overlay a `StatusIndicator` dot on that day (the `label` is folded into the day's `aria-label`; the dot itself is `aria-hidden`)
 - `showOutsideDays?: boolean = true`, `showNavigation?: boolean = true`
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
 - `required?: boolean`, `footer?: ReactNode`, `className?: string`
@@ -657,9 +660,9 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
 <Select id="country" label="Country" options={countries} value={sel} onChange={setSel} />
 ```
 
-### TextArea
+### Textarea
 
-**Props:** `TextAreaProps` extends TextFieldProps | fRef, bp, form
+**Props:** `TextareaProps` extends TextFieldProps | fRef, bp, form
 
 - `characterLimit?: number`
 
@@ -741,13 +744,16 @@ Same as Checkbox (without indeterminate)
 - `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `formatDate?: (date) => string` — display formatter (default: `dd.MM.yyyy`, et-EE)
 - `parseDate?: (value: string) => Date | Date[] | DateRange | undefined` — manual-input parser; without it the field is calendar-only
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
 - `initialMonth?: Date`
 - `closeOnSelect?: boolean` — default: `true` for `'single'`, `false` otherwise
 - `footer?: ReactNode` — slot below the calendar grid
-- `monthYearSelectType?: 'dropdown' | 'grid' = 'dropdown'` — header pickers
+- `monthYearSelectType?: 'dropdown' | 'grid' | 'static' = 'dropdown'` — header pickers; `'static'` renders the month/year as a plain non-clickable label (only prev/next nav changes the month — disables month/year selection)
+- `minYear?: number = currentYear - 100`, `maxYear?: number = currentYear + 20` — bounds of the header's year dropdown (defaults span 100 years back, 20 forward)
+- `dayStatus?: (date: Date) => { type: StatusIndicatorType; label: string } | null | undefined` — per-day status forwarded to the calendar; overlays a `StatusIndicator` dot on matching days (label folded into the day's `aria-label`)
 - `showNavigation?: boolean = true` — show/hide the header prev/next nav; when hidden the month/year header also becomes a static (non-clickable) label, locking the calendar to the visible month(s) — a clean "pick from these" view
 - `selectionLevel?: 'days' | 'months' | 'years' = 'days'` — coarser commit level
 - `initialView?: 'days' | 'months' | 'years' = selectionLevel` — grid the calendar opens on, independent of `selectionLevel`; e.g. `initialView="years"` with default `selectionLevel="days"` opens the year grid and drills year → month → day (pair with `monthYearSelectType="grid"`)
@@ -769,6 +775,8 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
   defaultValue={new Date(1990, 0, 1)}
   onSelect={(date) => console.log(date)}
   minDate={new Date(1900, 0, 1)}
+  minYear={1900}
+  maxYear={2010}
   disableFuture
 />
 
@@ -796,6 +804,7 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `onChange?: (time: string) => void`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
@@ -945,10 +954,10 @@ Key props:
 **Props:** `FileUploadProps` | form
 
 - `id: string` (required), `name: string` (required)
-- `accept?: string`
-- `multiple?: boolean`
-- `files?: FileUploadFile[]`, `defaultFiles?: FileUploadFile[]`
-- `maxSize?: number`
+- `accept?: string`, `maxSize?: number` (MB), `multiple?: boolean`, `validateIndividually?: boolean`
+- `files?: FileUploadFile[]`, `defaultFiles?: FileUploadFile[]`, `onChange?: (files: FileUploadFile[]) => void`
+- `showRestrictions?: boolean = true` — show the auto-generated restrictions hint (allowed types / max size) below the field. Set `false` when the same info is shown elsewhere (e.g. a `tooltip`) to avoid a duplicate; **rejection error messages still render**.
+- Rejections are observable: `onChange` fires even when a drop/pick is fully rejected (with the unchanged list) — including single-file rejections — so a parent can react without re-implementing validation.
 
 ### FileDropzone
 
@@ -959,6 +968,8 @@ Key props:
 - `helper?: FeedbackTextProps`, `disabled?: boolean`
 - `accept?: string`, `multiple?: boolean`, `maxSize?: number` (MB), `validateIndividually?: boolean`
 - `defaultFiles?` / `files?` (controlled) `: FileUploadFile[]`, `onChange?`, `onDelete?`
+- `showRestrictions?: boolean = true` — show the auto-generated restrictions hint (allowed types / max size) below the dropzone. Set `false` to hide it (e.g. when duplicated in a `tooltip`); **rejection error messages still render**.
+- Rejections are observable: a **dragged** file failing `accept`/`maxSize` is reported exactly like a picked one (message + `onChange`), and `onChange` fires even for a fully-rejected drop (unchanged list) so single-file rejections aren't silent.
 - `attachmentProps?: Partial<Omit<AttachmentProps, 'name'>> | ((file) => …)` — overrides forwarded to each rendered `Attachment` (e.g. `icon`, `fileSize`, `feedback`); pass a function to vary per file. `FileDropzone` sets `name`, `isValid`, `isLoading` and always appends the remove button to the `actions` slot itself.
 
 ## Layout
@@ -974,6 +985,17 @@ Key props:
 
 **Row:** `cols`, `gutter` (0-5), `gutterX`, `gutterY`, `gap`, `justifyContent`, `alignItems`, `direction`, `wrap` + breakpoints
 **Col:** `width` (1-12 or 'auto'), `offset`, `order`, `grow`, `shrink` + breakpoints
+
+Breakpoint props (`xs`, `sm`, `md`, `lg`, `xl`, `xxl`) accept **either a bare width number/`'auto'` (shorthand) or a full `ColSpec` object** to override several Col props at that breakpoint:
+
+```tsx
+<Row>
+  {/* full width on mobile, one-third from md up (shorthand number) */}
+  <Col width={12} md={4}>Sidebar</Col>
+  {/* object form to change width + order together at lg */}
+  <Col width={12} lg={{ width: 8, order: 'first' }}>Main</Col>
+</Row>
+```
 
 ### VerticalSpacing
 
@@ -1321,16 +1343,13 @@ import { Breadcrumbs, Link } from '@tedi-design-system/react/tedi';
 ```
 
 ### TableOfContents
-Navigational TOC for long pages / multistep forms. **Compound API** — composed from `TableOfContents.Item` children; nest items by placing `Item`s inside an `Item` (alongside its link). Renders a (optionally sticky) card. Mark the current section with `activeId` for the left accent bar + active link colour; the active branch auto-expands its nested items. For small viewports there's a separate `TableOfContents.Collapsible` (bottom bar + bottom-sheet overlay) — render it instead of the card on mobile (e.g. via `ShowAt`/`HideAt`).
+Navigational TOC for long pages. **Compound API** — composed from `TableOfContents.Item` children; nest items by placing `Item`s inside an `Item` (alongside its link). Renders a (optionally sticky) card. Mark the current section with `activeId` for the left accent bar + active link colour; the active branch auto-expands its nested items. For small viewports there's a separate `TableOfContents.Collapsible` (bottom bar + bottom-sheet overlay) — render it instead of the card on mobile (e.g. via `ShowAt`/`HideAt`).
 
-- `<TableOfContents>` props: `heading?: string | null` (default LabelProvider `table-of-contents.title`; pass `null` for a **headless** list — no visible heading, `nav` still gets the localised `aria-label`), `variant?: 'default' | 'transparent' = 'default'` (`transparent` drops the card border/background and shows a continuous grey left rail — the active item's segment turns blue), `padding?: number` (inner container padding in rem; defaults to the card's medium padding token), `activeId?`, `numbered?` (ordered list with auto hierarchical numbers `1.` / `2.` / `2.1`), `showIcons?` (multistep-form validation glyphs — see below), `sticky?: boolean = true`, `className?`. Children must be `TableOfContents.Item` elements (direct children — don't wrap them in another component).
-- `<TableOfContents.Collapsible heading? activeId? showIcons? numbered? sticky? className>` — mobile variant. A bar (`heading` + an "open" link) that reveals the same list in a bottom-sheet `Modal` (dimmed backdrop, Escape / backdrop to dismiss). Takes the same `TableOfContents.Item` children. `sticky?: boolean = true` pins the bar to the bottom of the viewport (`position: fixed`); set `false` to render it inline in normal flow. No `variant`/`padding` (it's not a card). Show it only on small screens; keep the desktop `<TableOfContents>` card for wider ones.
-- `<TableOfContents.Item id? isValid? separator? hideIcon?>` — its non-`Item` children are the link / label; nested `TableOfContents.Item` children become its sub-items.
+- `<TableOfContents>` props: `heading?: string | null` (default LabelProvider `table-of-contents.title`; pass `null` for a **headless** list — no visible heading, `nav` still gets the localised `aria-label`), `variant?: 'default' | 'transparent' = 'default'` (`transparent` drops the card border/background and shows a continuous grey left rail — the active item's segment turns blue), `padding?: number` (inner container padding in rem; defaults to the card's medium padding token), `headingLevel?: 'h1'..'h6' = 'h3'` (configurable semantic heading level — visual style stays H4; set it to fit the page's heading outline and avoid skipped heading levels), `ariaLabel?: string` (override the nav landmark's accessible name; when empty it falls back to the heading via `aria-labelledby`, or the localised title when headless — use it to disambiguate multiple TOCs on a page), `activeId?`, `numbered?` (ordered list with auto hierarchical numbers `1.` / `2.` / `2.1`), `sticky?: boolean = true`, `className?`. Children must be `TableOfContents.Item` elements (direct children — don't wrap them in another component).
+- `<TableOfContents.Collapsible heading? ariaLabel? activeId? numbered? sticky? className>` — mobile variant. No `headingLevel` (the sheet shows the title as a label, not a semantic heading; `ariaLabel` — or the `heading` / localised title — names the sheet's `<nav>`). A bar (`heading` + an "open" link) that reveals the same list in a bottom-sheet `Modal` (dimmed backdrop, Escape / backdrop to dismiss). Takes the same `TableOfContents.Item` children. `sticky?: boolean = true` pins the bar to the bottom of the viewport (`position: fixed`); set `false` to render it inline in normal flow. No `variant`/`padding` (it's not a card). Show it only on small screens; keep the desktop `<TableOfContents>` card for wider ones.
+- `<TableOfContents.Item id? separator?>` — its non-`Item` children are the link / label; nested `TableOfContents.Item` children become its sub-items.
   - For a **leading icon**, put it on the item's `Link` (`<Link iconLeft="…">`) so it shares the link's colour and hover / active states — there is no separate item-level icon prop.
-  - `isValid?: boolean` — with `showIcons`, drives the per-item glyph (`true` → valid check, `false` → warning, omitted → not-completed).
   - `separator?: boolean = false` — render a `Separator` line below the item, e.g. to group sections.
-  - `hideIcon?: boolean = false` — hide this item's validation glyph even when `showIcons` is on (e.g. for a heading-only row).
-- `showIcons` glyphs are distinguished by **shape, not colour alone** (WCAG 1.4.1) and carry a localised text alternative (1.1.1): `isValid === true` → `check` (success) "Valid"; `isValid === false` → `warning` (danger) "Invalid"; `isValid === undefined` → `radio_button_unchecked` (tertiary) "Not completed".
 - Semantics: `<nav aria-labelledby>` (or `aria-label` from `table-of-contents.title` when headingless) + `<ul>`/`<ol>` + `<li>`, active item `aria-current="true"`. **Never uses `role="tree"`/`treeitem`.** Provide the item link/button yourself; pass **`underline={false}` on the `Link`** so it matches the design (no underline at rest, underline on hover). Use matching `id`s on the in-page sections (and `tabIndex={-1}` on them for SR focus).
 - When `sticky` (default), the card is capped to the viewport (`max-height: calc(100dvh - 3rem)`) and scrolls internally, so every item stays reachable when it's taller than the viewport (e.g. narrow widths at high zoom — WCAG 1.4.10 Reflow).
 
@@ -1348,7 +1367,7 @@ Navigational TOC for long pages / multistep forms. **Compound API** — composed
 </TableOfContents>
 ```
 
-Variants: add `numbered` for an ordered list with auto hierarchical numbers (`1.` / `2.1`); for a multistep form, set `showIcons` and give each `TableOfContents.Item` an `isValid` for its per-step validation glyph (see the props above).
+Variants: add `numbered` for an ordered list with auto hierarchical numbers (`1.` / `2.1`).
 
 ### HorizontalStepper
 
@@ -1781,6 +1800,31 @@ function ConfirmButton({ onConfirm }: { onConfirm: () => void }) {
 - `thickness?: 1 | 2`
 - `spacing?: SeparatorSpacing`
 
+### Timeline
+Vertical timeline for a sequence of events. **Compound API** — composed from `Timeline.Item` children, each with `Timeline.Title`, `Timeline.Description` and any extra content. Responsive: reflows below the `lg` breakpoint (timings stack above the marker on mobile). Mark the current step with `activeIndex` — earlier items render as completed (past), later ones as upcoming (future); the marker dot is filled for current/past, outlined for future, and the connecting line is accent up to the current item.
+
+- `<Timeline activeIndex? variant? cardPadding? className?>` props:
+  - `activeIndex?: number` — current item; omit for all-future.
+  - `variant?: 'default' | 'card' = 'default'` — `card` wraps the timeline in card chrome.
+  - `cardPadding?: number` — item padding in rem for the `card` variant (same scale as `Card`).
+- `<Timeline.Item timings? timingsBottom? children>`:
+  - `timings?: string[]` — timing labels (e.g. `['2024', '16. detsember']`); the first renders larger on desktop, inline on mobile.
+  - `timingsBottom?: ReactNode` — pinned to the bottom of the timings column on desktop, rendered after the content on mobile (e.g. a "last modified" note).
+  - Pass a leading icon by placing it inside `Timeline.Title`. Any non-title/description children render below the description (buttons, `Collapse`, etc.).
+- `<Timeline.Title>` / `<Timeline.Description>` — title (secondary, bold-small) and muted description; wrap a heading element inside the title for heading semantics.
+
+```tsx
+<Timeline activeIndex={1}>
+  <Timeline.Item timings={['2024', '16. detsember']}>
+    <Timeline.Title>Taotluse esitamine</Timeline.Title>
+    <Timeline.Description>Menetlemine võib võtta kuni 30 päeva.</Timeline.Description>
+  </Timeline.Item>
+  <Timeline.Item timings={['2025', '02. jaanuar']}>
+    <Timeline.Title>Otsus</Timeline.Title>
+  </Timeline.Item>
+</Timeline>
+```
+
 ### OptionContent
 A reusable **content template** for dropdown/select option rows — *not* an item itself and never interactive (no `role`, click or focus handling). Drop it inside an interactive parent (`DropdownItem`, a `Select` option) that owns the role, selection and keyboard handling. It lays out an optional selection indicator (checkbox/radio), an optional leading icon, a label and optional meta into one consistently-spaced row. **`Select` renders its options through this internally**, so menu items, select options and standalone rows share one source of truth.
 
@@ -1849,10 +1893,10 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `openItem?: string[]`, `onToggleItem?: (id: string) => void`, `gutter?: VerticalSpacingSize`
 - Sub-components: AccordionItem, AccordionItemHeader, AccordionItemContent
 
-### Card
+### Card — **DEPRECATED** (use TEDI-Ready Card)
 
 - `border?: CardBorderType`, `borderless?: boolean`, `padding?: number`, `background?: CardBackground`
-- Sub-components: Card.Header, Card.Content, Card.Notification
+- Sub-components: Card.Header, Card.Content, Card.Notification (all deprecated — use the TEDI-Ready equivalents)
 
 ## Buttons
 
@@ -1866,22 +1910,24 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Radio — **DEPRECATED** (use TEDI-Ready Radio via ChoiceGroup)
 
-### Select
+### Select — **DEPRECATED** (use TEDI-Ready Select)
 
 - `id: string`, `options`, `value?`, `defaultValue?`, `onChange?`
 - `multiple?: boolean`, `async?: boolean`, `isSearchable?: boolean`, `isClearable?: boolean`
 
-### Toggle
+### Toggle — **DEPRECATED** (use TEDI-Ready Toggle)
 
 - `ariaLabel: string`, `label?`, `checked?`, `defaultChecked?`, `onChange?`
 - `size?: 'medium' | 'large'`, `color?: 'default' | 'alternative'`, `icon?`, `disabled?`
 
-### ChoiceGroup
+### ChoiceGroup — **DEPRECATED** (use TEDI-Ready ChoiceGroup)
 
 - `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
 - `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`
 
-### FileUpload
+### FileUpload — **DEPRECATED** (use TEDI-Ready FileUpload)
+
+> The community `FileUpload` (`@tedi-design-system/react/community`) is **⚠️ DEPRECATED** in favour of the TEDI-Ready component (same name; import from `/tedi` instead of `/community`).
 
 - `id: string`, `name: string`, `accept?`, `multiple?`, `maxSize?`
 - `files?`, `defaultFiles?`, `onChange?`, `onDelete?`
@@ -1897,18 +1943,18 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `fieldOptions: TextFieldProps | SelectProps | DateTimePickerProps`
 - `content: ReactNode`
 
-### DateTimePicker
+### DateTimePicker — **DEPRECATED** (use TEDI-Ready DateTimeField)
 
 - Date/time picker using MUI x-date-pickers
 
 ## Navigation
 
-### Stepper
+### Stepper — **DEPRECATED** (use TEDI-Ready HorizontalStepper)
 
 - `activeStep?`, `defaultActiveStep?: number`, `onActiveStepChange?`
 - `allowStepLabelClick?: boolean`, `ariaLabel: string`, `card?: CardProps | boolean`
 
-### Tabs
+### Tabs — **DEPRECATED** (use TEDI-Ready Tabs)
 
 - `currentTab?: string`, `defaultCurrentTab?`, `onTabChange?`
 - Sub-components: Tabs.Nav, Tabs.NavItem, Tabs.Item
@@ -1922,7 +1968,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Dropdown — **DEPRECATED** (use TEDI-Ready Dropdown)
 
-### Modal
+### Modal — **DEPRECATED** (use TEDI-Ready Modal)
 
 - `size?: 12 | 10 | 8 | 6`, `position?: 'center' | 'right' | 'bottom'`
 - `lockScroll?: boolean`, `trapFocus?: boolean`, `returnFocus?: boolean`
@@ -1938,14 +1984,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Tag — **DEPRECATED** (use TEDI-Ready Tag)
 
-### Status
+### Status — **DEPRECATED** (use TEDI-Ready StatusIndicator)
 
 - `type: 'error' | 'success' | 'inactive' | 'warning'`
 - `tooltipContent?: ReactNode`
 
 ## Table
 
-### Table (TanStack React Table wrapper)
+### Table (TanStack React Table wrapper) — **DEPRECATED** (use TEDI-Ready Table)
 
 - `data: TData[]`, `columns: ColumnDef[]`
 - `pagination?`, `sorting?`, `rowSelection?`, `columnPinning?`
@@ -1959,10 +2005,14 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ## Layout
 
-### Header
+### Header — **DEPRECATED** (use TEDI-Ready Header)
 
 - Sub-components: HeaderContent, HeaderActions, HeaderNavigation, HeaderLanguage, HeaderRole, HeaderSettings, HeaderNotifications, HeaderLogo
-- **Note:** The TEDI-Ready Header is now available with a different sub-component API. Prefer the TEDI-Ready version for new work.
+- **Note:** The TEDI-Ready Header is available with a different sub-component API. `HeaderLanguage` and `HeaderRole` are deprecated too — prefer the TEDI-Ready equivalents.
+
+### SideNav — **DEPRECATED** (use TEDI-Ready SideNav)
+
+- Sub-components: SideNavItem (also `SidenavToggle`, deprecated — use the TEDI-Ready equivalents)
 
 ### Footer — **DEPRECATED** (use TEDI-Ready Footer)
 
@@ -1970,7 +2020,7 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 
 ## Misc
 
-### Placeholder (empty state)
+### Placeholder (empty state) — **DEPRECATED** (use TEDI-Ready EmptyState)
 
 - `icon?: string | IconProps | ReactNode`, `cardProps?`, `isNested?: boolean`
 
@@ -1983,10 +2033,56 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 
 - `children: ReactNode`, `onItemOpen: (index: number) => void`
 
-### ToggleOpen
+### ToggleOpen — **DEPRECATED** (use TEDI-Ready CollapseButton)
 
 - `openText: string`, `closeText: string`, `isOpen: boolean`
 
 ### Map Components
 
 14 specialized components for map UI interactions (BaseMapSelection, Legend, MapLayer, Directions, Timeline, etc.)
+
+## Extending components
+
+TEDI exports a few type helpers so you can build **custom or extended** components
+that match its patterns, without deep relative imports.
+
+**Polymorphic (`as` prop) components** — reuse TEDI's polymorphic types:
+
+```tsx
+import React, { forwardRef } from 'react';
+import { PolymorphicComponentPropWithRef, PolymorphicRef } from '@tedi-design-system/react/tedi';
+
+type MyBoxProps<C extends React.ElementType = 'div'> = PolymorphicComponentPropWithRef<C, { muted?: boolean }>;
+
+const MyBoxInner = forwardRef(
+  <C extends React.ElementType = 'div'>({ as, muted, ...rest }: MyBoxProps<C>, ref?: PolymorphicRef<C>): JSX.Element => {
+    const Tag: React.ElementType = as ?? 'div';
+    return <Tag ref={ref} data-muted={muted} {...rest} />;
+  }
+);
+
+MyBoxInner.displayName = 'MyBox';
+
+// Cast to a generic call signature so `as`-specific props (e.g. `href` when
+// `as="a"`) are inferred — assigning forwardRef directly loses the generic.
+export const MyBox = MyBoxInner as <C extends React.ElementType = 'div'>(
+  props: MyBoxProps<C>
+) => React.ReactElement | null;
+```
+
+Also available: `PolymorphicComponentPropWithoutRef`, and `AllowedHTMLTags<C, Allowed>` to constrain `as` to specific tags.
+
+**Responsive props** — `BreakpointSupport<T>` + `useBreakpointProps` let a custom component accept per-breakpoint prop overrides the same way TEDI components do:
+
+```tsx
+import { BreakpointSupport, useBreakpointProps } from '@tedi-design-system/react/tedi';
+
+type Props = BreakpointSupport<{ size?: 'sm' | 'lg' }>;
+
+const MyResponsive = (props: Props) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps();
+  const { size = 'sm' } = getCurrentBreakpointProps<Props>(props);
+  return <div data-size={size} />;
+};
+// <MyResponsive size="sm" md={{ size: 'lg' }} />
+```

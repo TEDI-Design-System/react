@@ -29,6 +29,7 @@ const meta: Meta<typeof ChoiceGroup> = {
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/ChoiceGroup',
   subcomponents: { 'ChoiceGroup.Item': ChoiceGroup.Item } as never,
   parameters: {
+    a11y: { test: 'todo' },
     docs: {
       source: {
         transform: (code: string) => {
@@ -543,7 +544,7 @@ export const CustomItemHTMLLabels: Story = {
       {
         id: 'checkbox-custom-item-labels-2',
         label: (
-          <div className="display-flex">
+          <div className="flex">
             <Icon name="check" color="success" aria-hidden="true" />
             <Text>Lorem ipsum 2</Text>
           </div>

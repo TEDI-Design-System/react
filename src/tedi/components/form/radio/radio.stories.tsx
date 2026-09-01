@@ -29,7 +29,7 @@ const TemplateSizes: StoryFn<RadioProps> = (args) => {
       <Col lg={6} md={12} className="example-list">
         {sizesArray.map((size, key) => (
           <Row className={`${key === sizesArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-            <Col lg={10} md={6} xs={8} className="display-flex align-items-center">
+            <Col lg={10} md={6} xs={8} className="flex align-items-center">
               <VerticalSpacing>
                 <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
                 {size === 'large' && (
@@ -41,7 +41,13 @@ const TemplateSizes: StoryFn<RadioProps> = (args) => {
               </VerticalSpacing>
             </Col>
             <Col lg={2} md={6} xs={4}>
-              <Radio {...args} size={size} id={`radio-size-${size}`} />
+              <Radio
+                {...args}
+                size={size}
+                id={`radio-size-${size}`}
+                label={`${size.charAt(0).toUpperCase() + size.slice(1)} size`}
+                hideLabel
+              />
             </Col>
           </Row>
         ))}

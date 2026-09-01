@@ -121,6 +121,7 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
           items={dropdownItems.map((item) => ({
             children: item.children,
             onClick: item.onClick,
+            isActive: item.isActive,
             isDisabled: item.isDisabled,
           }))}
         />

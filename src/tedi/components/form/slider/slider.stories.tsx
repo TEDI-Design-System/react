@@ -19,6 +19,10 @@ const meta: Meta<typeof Slider> = {
     addonRight: { control: false },
   },
   parameters: {
+    a11y: {
+      // TODO: [Slider]: Review storybook a11y violations #822
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -245,10 +249,10 @@ export const States: Story = {
     return (
       <VerticalSpacing size={2}>
         <Row gutterY={2}>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Default</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Default-thumb" />
             </div>
@@ -258,10 +262,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Hover</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Hover-thumb" className="slider-state-hover" />
             </div>
@@ -271,10 +275,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Active</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Active-thumb" className="slider-state-active" />
             </div>
@@ -284,10 +288,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Disabled</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Disabled-thumb" disabled />
             </div>
@@ -297,10 +301,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Focus</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Focus-thumb" className="slider-state-focus" />
             </div>
@@ -310,10 +314,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Error</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Error-thumb" invalid />
             </div>

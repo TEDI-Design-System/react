@@ -292,6 +292,12 @@ export interface TableProps<TData> {
    */
   stickyFirstColumn?: boolean;
   /**
+   * Freezes the last column during horizontal scroll — typically a trailing
+   * actions column that should stay reachable while a wide table scrolls.
+   * @default false
+   */
+  stickyLastColumn?: boolean;
+  /**
    * Pins the `<thead>` row(s) to the top during vertical scroll. Requires
    * `maxHeight` so the table's internal scroll container becomes the sticky
    * anchor — wrapping the Table in an external scrollable div will NOT work,
@@ -410,11 +416,14 @@ export interface TableProps<TData> {
   pagination?: boolean | TablePaginationOptions;
   /**
    * Whether the current page resets to the first page whenever `data` changes
-   * (TanStack's `autoResetPageIndex`). Defaults to `true`, which keeps the user
-   * on a valid page after filtering or sorting. Set to `false` for tables that
-   * mutate `data` in place — e.g. inline row editing — so saving a row doesn't
-   * yank the user back to page 1.
-   * @default true
+   * (TanStack's `autoResetPageIndex`). Defaults to `true` for client-side
+   * pagination (keeps the user on a valid page after filtering or sorting) and
+   * to `false` when `manualPagination` is set — in server-side mode `data` is
+   * replaced on every page/sort change, so auto-resetting would bounce the user
+   * back to page 1 and trigger an update loop. Set to `false` for client-side
+   * tables that mutate `data` in place (e.g. inline row editing), or override
+   * explicitly in either mode.
+   * @default true (client-side) / false (manualPagination)
    */
   autoResetPageIndex?: boolean;
   /**
@@ -767,6 +776,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     verticalBorders = false,
     borderless = false,
     stickyFirstColumn = false,
+    stickyLastColumn = false,
     stickyHeader = false,
     maxHeight,
     onRowClick,
@@ -783,7 +793,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     expandTrigger = 'button',
     paginateExpandedRows = false,
     pagination: paginationProp,
-    autoResetPageIndex = true,
+    autoResetPageIndex,
     manualPagination = false,
     manualSorting = false,
     manualFiltering = false,
@@ -1073,7 +1083,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
     enableColumnFilters,
-    autoResetPageIndex,
+    autoResetPageIndex: autoResetPageIndex ?? !manualPagination,
     paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
     manualSorting,
@@ -1106,6 +1116,32 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const [scrollOverflow, setScrollOverflow] = useState({ left: false, right: false });
+  const stickyColumnsEnabled = stickyFirstColumn || stickyLastColumn;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !stickyColumnsEnabled) return;
+
+    const update = () => {
+      const left = el.scrollLeft > 0;
+      const right = Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth;
+      setScrollOverflow((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
+    };
+
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+
+    return () => {
+      el.removeEventListener('scroll', update);
+      observer.disconnect();
+    };
+  }, [stickyColumnsEnabled]);
+
   const resetScrollTop = useCallback(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, []);
@@ -1137,6 +1173,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--vertical-borders']]: verticalBorders,
       [styles['tedi-table--borderless']]: borderless,
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
+      [styles['tedi-table--sticky-last-column']]: stickyLastColumn,
+      [styles['tedi-table--overflow-left']]: stickyFirstColumn && scrollOverflow.left,
+      [styles['tedi-table--overflow-right']]: stickyLastColumn && scrollOverflow.right,
       [styles['tedi-table--sticky-header']]: stickyHeader,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick) || rowExpandsOnClick,
       [styles['tedi-table--row-hover']]: hoverEnabled,

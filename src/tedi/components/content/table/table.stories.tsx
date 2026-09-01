@@ -40,6 +40,10 @@ const meta: Meta<typeof Table> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev',
     },
+    a11y: {
+      // TODO: [Table]: Review storybook a11y violations #804
+      test: 'todo',
+    },
   },
 };
 export default meta;
@@ -1574,6 +1578,24 @@ export const StickyFirstColumn: Story = {
         data={stickyDoctors}
         columns={stickyDoctorColumns}
         stickyFirstColumn
+        pagination={DEFAULT_PAGINATION}
+      />
+    </div>
+  ),
+};
+
+/**
+ * Last column stays fixed during horizontal scroll via `stickyLastColumn` — useful for a
+ * trailing actions column.
+ */
+export const StickyLastColumn: Story = {
+  render: () => (
+    <div style={{ maxWidth: 600 }}>
+      <Table<StickyDoctor>
+        id="tedi-table-sticky-last"
+        data={stickyDoctors}
+        columns={stickyDoctorColumns}
+        stickyLastColumn
         pagination={DEFAULT_PAGINATION}
       />
     </div>

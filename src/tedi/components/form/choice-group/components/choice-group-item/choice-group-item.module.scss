@@ -68,22 +68,22 @@
     border-color: var(--form-checkbox-radio-card-primary-hover-border);
 
     [type='checkbox']:checked + .tedi-choice-group-item__indicator {
-      border-color: var(--form-checkbox-radio-default-border-inverted);
+      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
     }
 
     [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
-      background-color: var(--form-checkbox-radio-card-primary-selected-background);
-      border-color: var(--form-checkbox-radio-default-border-inverted);
+      background-color: var(--form-checkbox-radio-default-background-inverted);
+      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
     }
 
     [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator::after {
       background-color: var(--form-checkbox-radio-default-background-selected-inverted);
-      border-color: var(--form-checkbox-radio-default-background-inverted);
+      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
     }
 
     [type='radio']:checked:disabled + .tedi-choice-group-item__indicator::after {
       background-color: var(--form-checkbox-radio-default-background-selected-disabled);
-      border-color: var(--form-checkbox-radio-card-default-disabled-selected-background);
+      border-color: var(--form-checkbox-radio-default-background-selected-disabled);
     }
 
     label,
@@ -109,7 +109,7 @@
     outline-offset: -2px;
 
     &:not(:last-child) {
-      border-right: 2px solid var(--form-checkbox-radio-card-secondary-active-border);
+      border-right: 2px solid var(--form-checkbox-radio-card-secondary-selected-border);
     }
 
     [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
@@ -155,13 +155,13 @@
     }
 
     &:first-of-type .tedi-choice-group-item {
-      border-top-left-radius: var(--border-radius-default);
-      border-top-right-radius: var(--border-radius-default);
+      border-top-left-radius: var(--form-checkbox-radio-card-radius);
+      border-top-right-radius: var(--form-checkbox-radio-card-radius);
     }
 
     &:last-of-type .tedi-choice-group-item {
-      border-bottom-right-radius: var(--border-radius-default);
-      border-bottom-left-radius: var(--border-radius-default);
+      border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
+      border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
     }
 
     &:not(:first-of-type) .tedi-choice-group-item--disabled {
@@ -180,13 +180,13 @@
     }
 
     &:first-of-type .tedi-choice-group-item {
-      border-bottom-right-radius: var(--border-radius-default);
-      border-bottom-left-radius: var(--border-radius-default);
+      border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
+      border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
     }
 
     &:last-of-type .tedi-choice-group-item {
-      border-top-left-radius: var(--border-radius-default);
-      border-top-right-radius: var(--border-radius-default);
+      border-top-left-radius: var(--form-checkbox-radio-card-radius);
+      border-top-right-radius: var(--form-checkbox-radio-card-radius);
     }
 
     &:not(:first-of-type) .tedi-choice-group-item--disabled {
@@ -213,13 +213,13 @@
     }
 
     &:first-of-type .tedi-choice-group-item {
-      border-top-left-radius: var(--border-radius-default);
-      border-bottom-left-radius: var(--border-radius-default);
+      border-top-left-radius: var(--form-checkbox-radio-card-radius);
+      border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
     }
 
     &:last-of-type .tedi-choice-group-item {
-      border-top-right-radius: var(--border-radius-default);
-      border-bottom-right-radius: var(--border-radius-default);
+      border-top-right-radius: var(--form-checkbox-radio-card-radius);
+      border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
     }
 
     .tedi-choice-group-item--disabled.tedi-choice-group-item--card-secondary {
@@ -246,13 +246,13 @@
     }
 
     &:first-of-type .tedi-choice-group-item {
-      border-top-right-radius: var(--border-radius-default);
-      border-bottom-right-radius: var(--border-radius-default);
+      border-top-right-radius: var(--form-checkbox-radio-card-radius);
+      border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
     }
 
     &:last-of-type .tedi-choice-group-item {
-      border-top-left-radius: var(--border-radius-default);
-      border-bottom-left-radius: var(--border-radius-default);
+      border-top-left-radius: var(--form-checkbox-radio-card-radius);
+      border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
     }
 
     .tedi-choice-group-item--disabled.tedi-choice-group-item--card-secondary {

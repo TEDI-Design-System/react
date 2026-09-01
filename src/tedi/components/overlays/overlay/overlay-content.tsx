@@ -1,5 +1,5 @@
 import { FloatingArrow, FloatingFocusManager, FloatingPortal } from '@floating-ui/react';
-import { ReactNode, useContext, useEffect } from 'react';
+import { CSSProperties, ReactNode, useContext, useEffect } from 'react';
 
 import { OverlayContext } from './overlay';
 
@@ -44,10 +44,16 @@ export interface OverlayContentProps {
    * Useful for longer explanations or supporting content that complements the title.
    */
   describedBy?: string;
+
+  /**
+   * Extra inline styles merged onto the floating content container (after the positioning styles).
+   * Used to pass through consumer-controlled values such as padding CSS variables.
+   */
+  contentStyle?: CSSProperties;
 }
 
 export const OverlayContent = (props: OverlayContentProps) => {
-  const { children, classNames, labelledBy, describedBy } = props;
+  const { children, classNames, labelledBy, describedBy, contentStyle } = props;
   const {
     open,
     x,
@@ -63,6 +69,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
     scrollLock,
     contentId,
     role,
+    ariaHidden,
   } = useContext(OverlayContext);
 
   useEffect(() => {
@@ -89,12 +96,14 @@ export const OverlayContent = (props: OverlayContentProps) => {
         ref: floating,
         tabIndex: -1,
         id: contentId,
+        'aria-hidden': ariaHidden || undefined,
         'aria-labelledby': labelledBy,
         'aria-describedby': describedBy,
         style: {
           position: strategy,
           left: x,
           top: y,
+          ...contentStyle,
         },
         className: classNames?.content,
       })}
