@@ -421,7 +421,7 @@ export const Sizes: Story = {
             columns={bookingShowcaseColumns}
             pagination={{
               ...SHOWCASE_PAGINATION_3,
-              paginationProps: { labels: { ariaLabel: 'Pagineerimine – vaikimisi suurus' } },
+              paginationProps: { labels: { ariaLabel: 'Pagination – default size' } },
             }}
           />
         </EditableRowsProvider>
@@ -435,7 +435,7 @@ export const Sizes: Story = {
             size="small"
             pagination={{
               ...SHOWCASE_PAGINATION_3,
-              paginationProps: { labels: { ariaLabel: 'Pagineerimine – väike suurus' } },
+              paginationProps: { labels: { ariaLabel: 'Pagination – small size' } },
             }}
           />
         </EditableRowsProvider>
