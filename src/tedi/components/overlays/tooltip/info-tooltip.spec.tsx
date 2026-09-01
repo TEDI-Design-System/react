@@ -35,6 +35,24 @@ describe('InfoTooltip', () => {
     expect(screen.getByText('Helpful hint')).toBeInTheDocument();
   });
 
+  it('opens via tap and dismisses on outside press on touch devices, instead of getting stuck open (mobile regression, see MapButton fix)', () => {
+    (useIsTouchDevice as jest.Mock).mockReturnValue(true);
+    render(<InfoTooltip>Helpful hint</InfoTooltip>);
+
+    const trigger = screen.getByRole('button');
+
+    // A tap focuses the trigger natively; this must not open the tooltip on its own, otherwise
+    // there is no reliable way to close it again on a touch device (no real blur/hover-out).
+    fireEvent.focus(trigger);
+    expect(screen.queryByText('Helpful hint')).not.toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    expect(screen.getByText('Helpful hint')).toBeInTheDocument();
+
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByText('Helpful hint')).not.toBeInTheDocument();
+  });
+
   it('uses a custom ariaLabel for the trigger', () => {
     render(<InfoTooltip ariaLabel="What is this?">Helpful hint</InfoTooltip>);
 
