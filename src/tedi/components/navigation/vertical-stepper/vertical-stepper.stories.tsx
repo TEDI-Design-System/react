@@ -93,7 +93,7 @@ export const WithStatusBadges: Story = {
           title="Isikuandmed"
           state="completed"
           href="#i1"
-          info={
+          endSlot={
             <StatusBadge color="success" variant="bordered">
               Isik on tõestatud
             </StatusBadge>
@@ -105,7 +105,7 @@ export const WithStatusBadges: Story = {
           title="Vastus"
           current
           href="#i4"
-          info={
+          endSlot={
             <Text color="tertiary" modifiers="small">
               Täidab ametnik
             </Text>
@@ -124,7 +124,7 @@ export const WithButton: Story = {
           title="Isikuandmed"
           state="completed"
           href="#b1"
-          info={
+          endSlot={
             <Button visualType="secondary" size="small" iconLeft="add">
               Lisa isik
             </Button>
@@ -146,7 +146,7 @@ export const WithLinks: Story = {
           title="Vaimne tervis"
           state="completed"
           href="#l1"
-          info={
+          endSlot={
             <Link href="#read-1" iconRight="arrow_forward">
               Loe rohkem
             </Link>
@@ -156,7 +156,7 @@ export const WithLinks: Story = {
           title="Füüsiline tervis"
           state="completed"
           href="#l2"
-          info={
+          endSlot={
             <Link href="#read-2" iconRight="arrow_forward">
               Loe rohkem
             </Link>

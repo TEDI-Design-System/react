@@ -103,7 +103,7 @@ export const Sheet = ({
               </Text>
               {closeButton && (
                 <Modal.Closer>
-                  <ClosingButton />
+                  <ClosingButton size="small" />
                 </Modal.Closer>
               )}
             </div>

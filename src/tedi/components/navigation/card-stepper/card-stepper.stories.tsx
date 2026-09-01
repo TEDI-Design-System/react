@@ -14,11 +14,11 @@ import { CardStepper } from './card-stepper';
 import { CardStepperStep, CardStepperStepProps } from './card-stepper-step';
 
 /**
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.59.78?node-id=51362-134115&m=dev" target="_blank">Figma ↗</a><br/><hr/>
  * `CardStepper` is the mobile / compact form of a stepper: a single card showing
  * the active step, a `N / M` counter, a segmented progress bar and a button that
  * opens the full step list in a modal. Pair it with `VerticalStepper` on wider
- * screens (swap on a breakpoint — see `VerticalStepper` → **Responsive**), or use it on its own. <br/>
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.75?node-id=4375-57530&m=dev" target="_blank">Figma ↗</a><br/>
+ * screens (swap on a breakpoint — see `VerticalStepper` → **Responsive**), or use it on its own.
  */
 const meta: Meta<typeof CardStepper> = {
   component: CardStepper,
@@ -87,7 +87,7 @@ export const WithStatusIcon: Story = {
         activeStep={2}
         showStatusIcon
         labels={ET_LABELS}
-        aria-label="Lõpetatud samm"
+        aria-label="Taotluse sammud"
       />
       <CardStepper
         steps={[
@@ -99,7 +99,7 @@ export const WithStatusIcon: Story = {
         activeStep={2}
         showStatusIcon
         labels={ET_LABELS}
-        aria-label="Veaga samm"
+        aria-label="Taotluse sammud"
       />
     </VerticalSpacing>
   ),
@@ -121,21 +121,16 @@ export const WithInfoBottom: Story = {
           activeStep={2}
           showStepNumber={false}
           labels={ET_LABELS}
-          aria-label="Info all, ilma numbrita"
+          aria-label="Taotluse sammud"
         />
         <CardStepper
           steps={INFO_BOTTOM_STEPS}
           activeStep={1}
           showNavigation
           labels={ET_LABELS}
-          aria-label="Info all, navigatsiooniga"
+          aria-label="Taotluse sammud"
         />
-        <CardStepper
-          steps={INFO_BOTTOM_STEPS}
-          activeStep={2}
-          labels={ET_LABELS}
-          aria-label="Info all, sammu numbriga"
-        />
+        <CardStepper steps={INFO_BOTTOM_STEPS} activeStep={2} labels={ET_LABELS} aria-label="Taotluse sammud" />
       </VerticalSpacing>
     );
   },
@@ -158,30 +153,30 @@ export const WithInfoTop: Story = {
           counterPosition="top"
           showStepNumber={false}
           labels={ET_LABELS}
-          aria-label="Loendur üleval"
+          aria-label="Taotluse sammud"
         />
         <CardStepper
           steps={INFO_TOP_STEPS}
           activeStep={2}
-          infoPosition="top"
+          descriptionPosition="top"
           labels={ET_LABELS}
-          aria-label="Info üleval, sammu numbriga"
+          aria-label="Taotluse sammud"
         />
         <CardStepper
           steps={INFO_TOP_STEPS}
           activeStep={1}
-          infoPosition="top"
+          descriptionPosition="top"
           showNavigation
           labels={ET_LABELS}
-          aria-label="Info üleval, navigatsiooniga"
+          aria-label="Taotluse sammud"
         />
         <CardStepper
           steps={INFO_TOP_STEPS}
           activeStep={2}
-          infoPosition="top"
+          descriptionPosition="top"
           showStepNumber={false}
           labels={ET_LABELS}
-          aria-label="Info üleval, ilma numbrita"
+          aria-label="Taotluse sammud"
         />
       </VerticalSpacing>
     );
@@ -191,7 +186,13 @@ export const WithInfoTop: Story = {
 export const HasNavigation: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <CardStepper steps={STEPS_NO_DESC} activeStep={1} showNavigation labels={ET_LABELS} aria-label="Navigatsioon" />
+      <CardStepper
+        steps={STEPS_NO_DESC}
+        activeStep={1}
+        showNavigation
+        labels={ET_LABELS}
+        aria-label="Taotluse sammud"
+      />
     </VerticalSpacing>
   ),
 };
@@ -205,7 +206,7 @@ export const WithoutProgressbar: Story = {
         showNavigation
         showProgress={false}
         labels={ET_LABELS}
-        aria-label="Ilma edenemisribata + kirjeldus"
+        aria-label="Taotluse sammud"
       />
       <CardStepper
         steps={STEPS_NO_DESC}
@@ -213,7 +214,7 @@ export const WithoutProgressbar: Story = {
         showNavigation
         showProgress={false}
         labels={ET_LABELS}
-        aria-label="Ilma edenemisribata"
+        aria-label="Taotluse sammud"
       />
     </VerticalSpacing>
   ),
@@ -235,14 +236,14 @@ export const WithBottomSlot: Story = {
           activeStep={2}
           showProgress={false}
           labels={ET_LABELS}
-          aria-label="Hoiatus bottom-slotis"
+          aria-label="Taotluse sammud"
         />
 
         <CardStepper
           steps={slotSteps(<Alert type="success">Isikuandmed vastavad nõuetele</Alert>)}
           activeStep={2}
           labels={ET_LABELS}
-          aria-label="Õnnestumine bottom-slotis"
+          aria-label="Taotluse sammud"
         />
 
         <CardStepper
@@ -254,7 +255,7 @@ export const WithBottomSlot: Story = {
           activeStep={2}
           showNavigation
           labels={ET_LABELS}
-          aria-label="Laiendatav sisu bottom-slotis"
+          aria-label="Taotluse sammud"
         />
 
         <CardStepper
@@ -266,7 +267,7 @@ export const WithBottomSlot: Story = {
           activeStep={2}
           showNavigation
           labels={ET_LABELS}
-          aria-label="Tegevusnupp bottom-slotis"
+          aria-label="Taotluse sammud"
         />
       </VerticalSpacing>
     );
@@ -319,9 +320,7 @@ const SUB_STEP_FLOW: CardStepperStepProps[] = [
  */
 export const CollapsibleSubSteps: Story = {
   name: 'Collapsible sub-steps (open the list)',
-  render: () => (
-    <CardStepper steps={SUB_STEP_FLOW} activeStep={2} labels={ET_LABELS} aria-label="Sammud alamsammudega" />
-  ),
+  render: () => <CardStepper steps={SUB_STEP_FLOW} activeStep={2} labels={ET_LABELS} aria-label="Taotluse sammud" />,
 };
 
 /**

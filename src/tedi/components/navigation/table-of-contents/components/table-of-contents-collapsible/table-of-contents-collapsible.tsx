@@ -66,14 +66,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         <Text modifiers="bold" className={styles['tedi-table-of-contents__bar-title']}>
           {title}
         </Text>
-        <CollapseButton
-          open={open}
-          onOpenChange={setOpen}
-          openText={getLabel('open')}
-          closeText={getLabel('close')}
-          underline={false}
-          aria-haspopup="dialog"
-        />
+        <CollapseButton open={open} onOpenChange={setOpen} underline={false} aria-haspopup="dialog" />
       </div>
 
       <Sheet
@@ -86,13 +79,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
             <Text modifiers="bold" className={styles['tedi-table-of-contents__bar-title']}>
               {title}
             </Text>
-            <CollapseButton
-              open={open}
-              onOpenChange={setOpen}
-              openText={getLabel('open')}
-              closeText={getLabel('close')}
-              underline={false}
-            />
+            <CollapseButton open={open} onOpenChange={setOpen} underline={false} />
           </div>
         }
       >

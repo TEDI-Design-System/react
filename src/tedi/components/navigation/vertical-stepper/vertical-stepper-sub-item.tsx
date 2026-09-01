@@ -25,6 +25,7 @@ export interface VerticalStepperSubItemProps {
   /**
    * Marks the sub-step as the active one — blue ring dot, bold blue label and
    * `aria-current="step"`. Independent from `state`.
+   * @default false
    */
   current?: boolean;
   /**
@@ -41,9 +42,10 @@ export interface VerticalStepperSubItemProps {
    */
   as?: 'a' | 'button';
   /**
-   * Trailing content rendered under the label — a `StatusBadge`, `Link`, `Button`, `Text`, etc.
+   * Content rendered at the end of the sub-item, below the label — a `StatusBadge`,
+   * `Link`, `Button`, `Text`, etc. (Figma: "related assets".)
    */
-  info?: React.ReactNode;
+  endSlot?: React.ReactNode;
   /**
    * Additional class name applied to the `<li>`.
    */
@@ -52,7 +54,7 @@ export interface VerticalStepperSubItemProps {
 
 export const VerticalStepperSubItem = forwardRef<HTMLLIElement, VerticalStepperSubItemProps>((props, ref) => {
   const { getLabel } = useLabels();
-  const { title, state = 'default', current = false, href, onClick, as, info, className } = props;
+  const { title, state = 'default', current = false, href, onClick, as, endSlot, className } = props;
 
   const isStatic = state === 'disabled' || state === 'informative';
   const isInteractive = !isStatic && (href !== undefined || onClick !== undefined);
@@ -115,7 +117,7 @@ export const VerticalStepperSubItem = forwardRef<HTMLLIElement, VerticalStepperS
         ) : (
           label
         )}
-        {info && <div className={styles['tedi-vertical-stepper__info']}>{info}</div>}
+        {endSlot && <div className={styles['tedi-vertical-stepper__end-slot']}>{endSlot}</div>}
       </span>
     </li>
   );

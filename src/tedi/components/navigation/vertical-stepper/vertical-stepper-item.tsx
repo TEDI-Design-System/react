@@ -30,6 +30,7 @@ export interface VerticalStepperItemProps {
   /**
    * Marks the step as the active one — blue indicator, bold blue title and
    * `aria-current="step"`. Independent from `state`.
+   * @default false
    */
   current?: boolean;
   /**
@@ -48,9 +49,10 @@ export interface VerticalStepperItemProps {
    */
   as?: 'a' | 'button';
   /**
-   * Trailing content under the title — a `StatusBadge`, `Link`, `Button`, `Text`, etc.
+   * Content rendered at the end of the item, below the title / description — a
+   * `StatusBadge`, `Link`, `Button`, `Text`, etc. (Figma: "related assets".)
    */
-  info?: React.ReactNode;
+  endSlot?: React.ReactNode;
   /**
    * `VerticalStepper.SubItem` elements. When present the step becomes an
    * expandable section: the title toggles the (collapsible) sub-step list.
@@ -90,7 +92,7 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
     href,
     onClick,
     as,
-    info,
+    endSlot,
     children,
     open,
     defaultOpen,
@@ -171,7 +173,7 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
     </Text>
   );
 
-  const info_ = info && <div className={styles['tedi-vertical-stepper__info']}>{info}</div>;
+  const endSlot_ = endSlot && <div className={styles['tedi-vertical-stepper__end-slot']}>{endSlot}</div>;
 
   const ariaCurrent = current ? 'step' : undefined;
 
@@ -209,7 +211,7 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
               />
             </div>
             {description_}
-            {info_}
+            {endSlot_}
             <ul id={subListId} hidden={!isOpen} className={styles['tedi-vertical-stepper__sub-list']}>
               {children}
             </ul>
@@ -218,7 +220,7 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
           <>
             {interactiveTitle}
             {description_}
-            {info_}
+            {endSlot_}
           </>
         )}
       </div>

@@ -250,13 +250,13 @@ describe('CardStepper', () => {
     expect(container.querySelector('.tedi-card-stepper__status-icon')).not.toBeInTheDocument();
   });
 
-  it('places the description below the title by default and above it when infoPosition="top"', () => {
+  it('places the description below the title by default and above it when descriptionPosition="top"', () => {
     const steps: CardStepperStepProps[] = [{ title: 'One', description: 'Helper' }];
     const { container, rerender } = render(<CardStepper steps={steps} activeStep={0} aria-label="Wizard" />);
     expect(container.querySelector('.tedi-card-stepper__description-bottom')).toBeInTheDocument();
     expect(container.querySelector('.tedi-card-stepper__top')).not.toBeInTheDocument();
 
-    rerender(<CardStepper steps={steps} activeStep={0} infoPosition="top" aria-label="Wizard" />);
+    rerender(<CardStepper steps={steps} activeStep={0} descriptionPosition="top" aria-label="Wizard" />);
     const top = container.querySelector('.tedi-card-stepper__top');
     expect(top).toBeInTheDocument();
     expect(top).toHaveTextContent('Helper');

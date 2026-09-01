@@ -155,10 +155,10 @@ describe('VerticalStepper', () => {
     expect(onToggle).toHaveBeenCalledWith(false);
   });
 
-  it('renders the info slot content', () => {
+  it('renders the endSlot content', () => {
     render(
       <VerticalStepper>
-        <VerticalStepper.Item title="With info" info={<span>extra detail</span>} />
+        <VerticalStepper.Item title="With info" endSlot={<span>extra detail</span>} />
       </VerticalStepper>
     );
     expect(screen.getByText('extra detail')).toBeInTheDocument();
@@ -230,11 +230,11 @@ describe('VerticalStepper', () => {
     expect(within(off).getByText(/stepper\.disabled/)).toBeInTheDocument();
   });
 
-  it('renders sub-item info slot content', () => {
+  it('renders sub-item endSlot content', () => {
     render(
       <VerticalStepper>
         <VerticalStepper.Item title="Parent" defaultOpen>
-          <VerticalStepper.SubItem title="Sub" info={<span>sub detail</span>} />
+          <VerticalStepper.SubItem title="Sub" endSlot={<span>sub detail</span>} />
         </VerticalStepper.Item>
       </VerticalStepper>
     );

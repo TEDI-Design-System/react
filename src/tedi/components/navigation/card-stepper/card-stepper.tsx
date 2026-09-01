@@ -66,7 +66,7 @@ export interface CardStepperProps {
   /**
    * Show a status icon next to the active step's title — a success check when the
    * step's `state` is `'completed'`, a danger icon when it's `'error'`. Nothing is
-   * shown for other states. Matches the Figma "with status icon" variant.
+   * shown for other states.
    * @default false
    */
   showStatusIcon?: boolean;
@@ -74,17 +74,13 @@ export interface CardStepperProps {
    * Where the active step's `description` sits relative to its title:
    * - `'bottom'` (default) — below the title.
    * - `'top'` — above the title, as a small secondary line.
-   *
-   * Matches the Figma "with info top" / "with info bottom" variants.
    * @default bottom
    */
-  infoPosition?: 'top' | 'bottom';
+  descriptionPosition?: 'top' | 'bottom';
   /**
    * Where the `N / M` step counter sits:
    * - `'inline'` (default) — in the trailing controls, next to the list / next button.
    * - `'top'` — above the title (and removed from the trailing controls).
-   *
-   * Matches the Figma "with info top" variant that floats the counter above the title.
    * @default inline
    */
   counterPosition?: 'inline' | 'top';
@@ -146,7 +142,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
     onStepChange,
     showStepNumber = true,
     showStatusIcon = false,
-    infoPosition = 'bottom',
+    descriptionPosition = 'bottom',
     counterPosition = 'inline',
     showProgress = true,
     showNavigation = false,
@@ -230,7 +226,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
     </Text>
   ) : null;
 
-  const showTopDescription = infoPosition === 'top' && descriptionNode;
+  const showTopDescription = descriptionPosition === 'top' && descriptionNode;
   const showTopRow = counterPosition === 'top' || showTopDescription;
 
   return (
@@ -292,7 +288,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
             )}
           </Text>
 
-          {infoPosition === 'bottom' && descriptionNode && (
+          {descriptionPosition === 'bottom' && descriptionNode && (
             <div className={styles['tedi-card-stepper__description-bottom']}>{descriptionNode}</div>
           )}
         </div>

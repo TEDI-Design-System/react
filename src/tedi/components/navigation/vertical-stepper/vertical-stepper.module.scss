@@ -152,7 +152,7 @@
   color: var(--general-text-secondary);
 }
 
-.tedi-vertical-stepper__info {
+.tedi-vertical-stepper__end-slot {
   padding-top: var(--layout-grid-gutters-04);
   padding-bottom: var(--layout-grid-gutters-02);
 }
@@ -289,4 +289,8 @@
 .tedi-vertical-stepper--compact {
   --tedi-vertical-stepper-indicator-size: 1rem;
   --tedi-vertical-stepper-row-height: var(--body-regular-line-height);
+
+  .tedi-vertical-stepper__item--current .tedi-vertical-stepper__indicator {
+    border-width: var(--tedi-borders-04);
+  }
 }
