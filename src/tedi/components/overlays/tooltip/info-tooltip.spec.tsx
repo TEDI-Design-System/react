@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { useBreakpointProps } from '../../../helpers';
+import { useBreakpointProps, useIsTouchDevice } from '../../../helpers';
 import { InfoTooltip } from './info-tooltip';
 
 import '@testing-library/jest-dom';
@@ -8,6 +8,7 @@ import '@testing-library/jest-dom';
 jest.mock('../../../helpers', () => ({
   ...jest.requireActual('../../../helpers'),
   useBreakpointProps: jest.fn(),
+  useIsTouchDevice: jest.fn(),
 }));
 
 describe('InfoTooltip', () => {
@@ -16,6 +17,8 @@ describe('InfoTooltip', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars, @typescript-eslint/no-explicit-any
       getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => xs,
     });
+    // InfoTooltip defaults to hover on non-touch devices (see Overlay's isTouchDevice-aware default).
+    (useIsTouchDevice as jest.Mock).mockReturnValue(false);
   });
 
   it('renders an info button with an accessible name and no visible tooltip initially', () => {
