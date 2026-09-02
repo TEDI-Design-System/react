@@ -29,6 +29,17 @@ const meta: Meta<typeof TableCard> = {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
   },
+  argTypes: {
+    // `ReactNode` props still show in the (type-derived) args table, but their control is
+    // disabled: Storybook infers an "object" control that assigns `{}` when clicked, which
+    // React can't render as a child ("Objects are not valid as a React child") and crashes
+    // the story. They can't be meaningfully authored from a control anyway.
+    title: { control: false },
+    subtitle: { control: false },
+    endSlot: { control: false },
+    actions: { control: false },
+    children: { control: false },
+  },
   decorators: [
     (Story, context) => (
       <div style={{ maxWidth: context.parameters.fullWidth ? undefined : 360 }}>
@@ -57,7 +68,6 @@ export const Default: Story = {
   args: {
     rows: benefitRows,
     summary: { label: 'Ülekande summa', value: '0.00 €' },
-    smallLabels: true,
   },
 };
 
@@ -66,7 +76,7 @@ export const SimpleCard: Story = {
     <VerticalSpacing size={1}>
       {/* 1. Financial statement — several benefit blocks joined by dividers with one shared total,
           all right-aligned in a 132px (8.25rem) label column, matching Figma. */}
-      <Card padding={0} style={{ overflow: 'hidden' }}>
+      <Card padding={0}>
         {[0, 1, 2, 3].map((block) => (
           <Card.Content key={block} padding={1} hasSeparator>
             <TextGroup.List
@@ -93,9 +103,9 @@ export const SimpleCard: Story = {
         title="ID kaart"
         titleElement="h4"
         titleModifiers="h4"
-        status={<StatusBadge color="success">Kehtib 13.08.2027</StatusBadge>}
+        endSlot={<StatusBadge color="success">Kehtib 13.08.2027</StatusBadge>}
         layout="vertical"
-        smallLabels
+        labelSize="small"
         columns={2}
         rows={[
           { label: 'Eesnimi', value: 'Mari' },
@@ -110,7 +120,7 @@ export const SimpleCard: Story = {
       <TableCard
         title="4. juuli 2026"
         layout="vertical"
-        smallLabels
+        labelSize="small"
         rows={[
           { label: 'Päringu teostaja', value: 'EE4800234675' },
           { label: 'Päringu nimetus', value: 'Inimeste arv kohalikus omavalitsuses' },
@@ -300,7 +310,7 @@ export const WithActions: StoryFn = () => {
         title="Pass"
         titleElement="h4"
         titleModifiers="h4"
-        status={<StatusBadge color="success">Kehtib 13.08.2027</StatusBadge>}
+        endSlot={<StatusBadge color="success">Kehtib 13.08.2027</StatusBadge>}
         layout="vertical"
         columns={2}
         rows={[
@@ -329,7 +339,7 @@ export const WithActions: StoryFn = () => {
             Eesti Maksu- ja Tolliamet
           </Label>
         }
-        status={<StatusBadge color="danger">Täitmata</StatusBadge>}
+        endSlot={<StatusBadge color="danger">Täitmata</StatusBadge>}
         layout="vertical"
         rows={[{ label: '', value: 'Käibedeklaratsiooni esitamise tähtaeg on 5 päeva pärast 10.10.2025' }]}
         actions={
@@ -369,7 +379,7 @@ WithActions.parameters = {
 
 /**
  * Collapsible cards (`collapsible`) — the header toggles the body. Combine with a `subtitle`,
- * a header `status`, an `actions` footer, or multiple `columns`.
+ * a header `endSlot`, an `actions` footer, or multiple `columns`.
  */
 export const IsAccordion: StoryFn = () => {
   const rows: TableCardRow[] = [
@@ -384,7 +394,7 @@ export const IsAccordion: StoryFn = () => {
         subtitle="14.04.2026 15:30"
         collapsible
         defaultOpen={false}
-        smallLabels
+        labelSize="small"
         labelAlign="left"
         valueAlign="left"
         rowAlign="center"
@@ -396,7 +406,7 @@ export const IsAccordion: StoryFn = () => {
         subtitle="14.04.2026 15:30"
         collapsible
         defaultOpen={false}
-        smallLabels
+        labelSize="small"
         labelAlign="left"
         valueAlign="left"
         rowAlign="center"
@@ -418,14 +428,14 @@ export const IsAccordion: StoryFn = () => {
 
       <TableCard
         title="Mari Maasikas"
-        status={<StatusBadge color="success">Verifitseeritud</StatusBadge>}
+        endSlot={<StatusBadge color="success">Verifitseeritud</StatusBadge>}
         subtitle="Vanus: 25"
         collapsible
         defaultOpen={false}
         layout="horizontal"
         labelAlign="left"
         valueAlign="left"
-        smallLabels
+        labelSize="small"
         rows={rows}
       />
 
@@ -435,7 +445,7 @@ export const IsAccordion: StoryFn = () => {
         layout="horizontal"
         labelAlign="left"
         valueAlign="left"
-        smallLabels
+        labelSize="small"
         rows={rows}
         actions={
           <Button visualType="neutral" fullWidth iconLeft="edit">
@@ -449,7 +459,7 @@ export const IsAccordion: StoryFn = () => {
         collapsible
         layout="vertical"
         columns={3}
-        smallLabels
+        labelSize="small"
         rows={[
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },

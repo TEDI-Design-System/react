@@ -81,8 +81,8 @@ describe('TableCard', () => {
     expect(screen.getByText('Liik').closest('div')).not.toHaveStyle('grid-column: span 2');
   });
 
-  it('renders trailing header status content', () => {
-    render(<TableCard rows={rows} title="ID kaart" status={<span>Kehtib</span>} />);
+  it('renders header endSlot content', () => {
+    render(<TableCard rows={rows} title="ID kaart" endSlot={<span>Kehtib</span>} />);
     expect(screen.getByText('Kehtib')).toBeInTheDocument();
   });
 

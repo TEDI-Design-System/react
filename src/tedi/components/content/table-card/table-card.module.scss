@@ -38,9 +38,21 @@
     cursor: pointer;
 
     &:focus-visible {
-      outline: var(--tedi-borders-02) solid var(--general-border-focus);
+      outline: var(--tedi-borders-02) solid var(--general-border-brand);
       outline-offset: 2px;
       border-radius: var(--table-radius);
+    }
+
+    &:hover .tedi-table-card__chevron {
+      color: var(--link-primary-hover);
+    }
+
+    &:active .tedi-table-card__chevron {
+      color: var(--link-primary-active);
+    }
+
+    &:focus-visible .tedi-table-card__chevron {
+      color: var(--link-primary-focus);
     }
   }
 
@@ -63,15 +75,17 @@
   }
 
   &__chevron {
+    display: inline-flex;
     flex-shrink: 0;
-    transition: transform 0.2s ease-in-out;
+    color: var(--link-primary-default);
+    transition: color 300ms ease, transform 0.2s ease-in-out;
 
     &--open {
-      transform: rotate(180deg);
+      transform: rotate(-180deg);
     }
   }
 
-  &__status {
+  &__end-slot {
     flex-shrink: 0;
   }
 

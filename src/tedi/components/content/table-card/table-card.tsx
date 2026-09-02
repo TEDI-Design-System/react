@@ -60,7 +60,8 @@ type TableCardBreakpointProps = {
    */
   padding?: CardContentPadding;
   /**
-   * Vertical gap between rows in the body. Any CSS length (a `number` is pixels).
+   * Vertical gap between rows in the body. A `number` is rems (matching `padding`); pass a
+   * string for any other CSS length.
    * Defaults to the layout gutter in `vertical` layout and the list's compact spacing otherwise.
    */
   rowGap?: string | number;
@@ -75,8 +76,8 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
   title?: React.ReactNode;
   /** Secondary line under the title. */
   subtitle?: React.ReactNode;
-  /** Trailing header content, e.g. a `StatusBadge`. */
-  status?: React.ReactNode;
+  /** Content rendered at the end of the header — a `StatusBadge`, a link, etc. */
+  endSlot?: React.ReactNode;
   /**
    * Heading tag for `title` (for the document outline). The title stays body-sized unless
    * `titleModifiers` is set.
@@ -122,10 +123,10 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
   /** Called with the next selected state when the checkbox toggles. */
   onSelectedChange?: (selected: boolean) => void;
   /**
-   * Use the smaller 14px label style instead of 16px body.
-   * @default false
+   * Label text size — `small` uses the 14px label style, `default` the 16px body style.
+   * @default default
    */
-  smallLabels?: boolean;
+  labelSize?: 'small' | 'default';
   /** Accessible name for the selection checkbox. Defaults to the `table-card.select-row` label. */
   selectionLabel?: string;
   /** Accessible name for the card region. */
@@ -168,7 +169,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     rows,
     title,
     subtitle,
-    status,
+    endSlot,
     titleElement = 'h3',
     titleModifiers,
     collapsible = false,
@@ -181,7 +182,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     selected,
     defaultSelected = false,
     onSelectedChange,
-    smallLabels = false,
+    labelSize = 'default',
     selectionLabel = getLabel('table-card.select-row'),
     ariaLabel,
     id: idProp,
@@ -202,12 +203,12 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const resolvedLabelAlign = labelAlign ?? layoutDefaults.labelAlign;
   const resolvedValueAlign = valueAlign ?? layoutDefaults.valueAlign;
   const resolvedLabelWidth = labelWidth ?? layoutDefaults.labelWidth;
-  const resolvedRowGap = rowGap ?? layoutDefaults.rowGap;
+  // A numeric `rowGap` is rems (consistent with `padding`); strings pass through as-is.
+  const resolvedRowGap = typeof rowGap === 'number' ? `${rowGap}rem` : rowGap ?? layoutDefaults.rowGap;
 
   const generatedId = React.useId();
   const id = idProp ?? generatedId;
   const bodyId = `${id}-body`;
-  const titleId = `${id}-title`;
 
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const isControlled = open !== undefined;
@@ -230,7 +231,14 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
 
   const HeadingTag = titleElement;
 
-  const hasHeader = Boolean(selectable || title || subtitle || status || collapsible);
+  if (collapsible && !title && !ariaLabel) {
+    // The toggle is otherwise nameless (its only content is the aria-hidden chevron).
+    console.warn(
+      'TableCard: a `collapsible` card needs a `title` or `ariaLabel` so its toggle has an accessible name.'
+    );
+  }
+
+  const hasHeader = Boolean(selectable || title || subtitle || endSlot || collapsible);
   const hasActions = Boolean(actions);
   const hasSummary = Boolean(summary);
   const hasChildren = Boolean(children);
@@ -241,10 +249,37 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const titleAsSelectionLabel = selectable && !collapsible && !!title && !subtitle;
 
   const items: TextGroupListItem[] = rows.map((row) => ({
-    label: renderRowLabel(row.label, smallLabels),
+    label: renderRowLabel(row.label, labelSize === 'small'),
     value: renderValue(row),
     ...(row.colSpan ? { colSpan: row.colSpan } : {}),
   }));
+
+  const selectionCheckbox = selectable ? (
+    <Checkbox
+      id={`${id}-select`}
+      name={`${id}-select`}
+      value="selected"
+      label={
+        titleAsSelectionLabel ? (
+          <Text
+            element="span"
+            color="primary"
+            modifiers={titleModifiers}
+            className={cn(styles['tedi-table-card__title'], {
+              [styles['tedi-table-card__title--body']]: !titleModifiers,
+            })}
+          >
+            {title}
+          </Text>
+        ) : (
+          selectionLabel
+        )
+      }
+      hideLabel={!titleAsSelectionLabel}
+      checked={isSelected}
+      onChange={(_, checked) => handleSelectedChange(checked)}
+    />
+  ) : null;
 
   return (
     <Card padding={0} className={cn(styles['tedi-table-card'], className)} aria-label={ariaLabel} id={id}>
@@ -256,32 +291,10 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
             [styles['tedi-table-card__header--select-title']]: titleAsSelectionLabel,
           })}
         >
-          {selectable && (
-            <Checkbox
-              id={`${id}-select`}
-              name={`${id}-select`}
-              value="selected"
-              label={
-                titleAsSelectionLabel ? (
-                  <Text
-                    element="span"
-                    color="primary"
-                    modifiers={titleModifiers}
-                    id={titleId}
-                    className={cn(styles['tedi-table-card__title'], {
-                      [styles['tedi-table-card__title--body']]: !titleModifiers,
-                    })}
-                  >
-                    {title}
-                  </Text>
-                ) : (
-                  selectionLabel
-                )
-              }
-              hideLabel={!titleAsSelectionLabel}
-              checked={isSelected}
-              onChange={(_, checked) => handleSelectedChange(checked)}
-            />
+          {titleAsSelectionLabel ? (
+            <HeadingTag className={styles['tedi-table-card__heading']}>{selectionCheckbox}</HeadingTag>
+          ) : (
+            selectionCheckbox
           )}
           {collapsible ? (
             <HeadingTag className={styles['tedi-table-card__heading']}>
@@ -290,7 +303,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                 className={styles['tedi-table-card__toggle']}
                 aria-expanded={isOpen}
                 aria-controls={bodyId}
-                aria-label={title ? undefined : ariaLabel}
+                aria-label={title ? undefined : ariaLabel ?? getLabel(isOpen ? 'close' : 'open')}
                 onClick={handleToggle}
               >
                 <span className={styles['tedi-table-card__title-group']}>
@@ -298,7 +311,6 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                     <Text
                       element="span"
                       modifiers={titleModifiers}
-                      id={titleId}
                       className={cn(styles['tedi-table-card__title'], {
                         [styles['tedi-table-card__title--body']]: !titleModifiers,
                       })}
@@ -312,15 +324,14 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                     </Text>
                   )}
                 </span>
-                {status && <span className={styles['tedi-table-card__status']}>{status}</span>}
-                <Icon
-                  name="expand_more"
-                  size={24}
-                  color="brand"
+                {endSlot && <span className={styles['tedi-table-card__end-slot']}>{endSlot}</span>}
+                <span
                   className={cn(styles['tedi-table-card__chevron'], {
                     [styles['tedi-table-card__chevron--open']]: isOpen,
                   })}
-                />
+                >
+                  <Icon name="expand_more" size={24} color="inherit" />
+                </span>
               </button>
             </HeadingTag>
           ) : (
@@ -331,7 +342,6 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                     <Text
                       element={titleElement}
                       modifiers={titleModifiers}
-                      id={titleId}
                       className={cn(styles['tedi-table-card__title'], {
                         [styles['tedi-table-card__title--body']]: !titleModifiers,
                       })}
@@ -346,7 +356,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                   )}
                 </span>
               )}
-              {status && <div className={styles['tedi-table-card__status']}>{status}</div>}
+              {endSlot && <div className={styles['tedi-table-card__end-slot']}>{endSlot}</div>}
             </>
           )}
         </Card.Content>

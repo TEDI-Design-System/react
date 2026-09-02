@@ -213,7 +213,7 @@
 
   &:focus-visible {
     color: var(--button-main-primary-background-default);
-    outline: var(--tedi-borders-02) solid var(--general-border-focus);
+    outline: var(--tedi-borders-02) solid var(--general-border-brand);
     outline-offset: 0;
     background: var(--button-main-neutral-icon-only-background-hover);
   }
@@ -231,7 +231,7 @@
   cursor: pointer;
 
   &:focus-visible {
-    outline: var(--tedi-borders-02) solid var(--general-border-focus);
+    outline: var(--tedi-borders-02) solid var(--general-border-brand);
     outline-offset: calc(var(--tedi-borders-02) * -1);
   }
 }
