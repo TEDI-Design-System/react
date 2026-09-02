@@ -11,7 +11,6 @@ import { Col, Row } from '../../layout/grid';
 import { Separator } from '../../misc/separator/separator';
 import { StretchContent } from '../../misc/stretch-content/stretch-content';
 import { CardsExample } from '../../misc/stretch-content/stretch-content.stories';
-import { StatusIndicator } from '../../tags/status-indicator';
 import {
   AlternativeCardsTemplate,
   BackgroundColorsTemplate,
@@ -393,27 +392,5 @@ const TwoToned: StoryFn<CardProps> = (_args) => (
 
 export const TwoTonedCard: StoryObj<CardProps> = {
   render: TwoToned,
-  args: {},
-};
-
-const PinnedOverlay: StoryFn<CardProps> = (args) => (
-  <Card {...args}>
-    <StatusIndicator position="top-right" type="danger" size="lg" hasBorder />
-    <Card.Header background="brand-primary">
-      <Heading element="h3">Kaardi pealkiri</Heading>
-    </Card.Header>
-    <Card.Content>
-      <p>Kaardi sisu</p>
-    </Card.Content>
-  </Card>
-);
-
-/**
- * A `StatusIndicator` pinned to the card corner stays above the header, and the header keeps its
- * rounded top corners even though the indicator is the first child in the DOM - edge blocks are
- * matched by class, not position.
- */
-export const PinnedOverlayCard: StoryObj<CardProps> = {
-  render: PinnedOverlay,
   args: {},
 };
