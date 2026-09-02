@@ -109,6 +109,13 @@
   min-width: 0;
 }
 
+.tedi-card-stepper--reserve-description .tedi-card-stepper__body {
+  justify-content: center;
+  min-height: calc(
+    var(--heading-h4-line-height) + var(--layout-grid-gutters-02) + var(--body-small-regular-line-height)
+  );
+}
+
 .tedi-card-stepper__bottom-slot {
   display: flex;
   flex-direction: column;

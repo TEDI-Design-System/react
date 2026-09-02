@@ -228,6 +228,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
 
   const showTopDescription = descriptionPosition === 'top' && descriptionNode;
   const showTopRow = counterPosition === 'top' || showTopDescription;
+  const reserveBottomDescription = descriptionPosition === 'bottom' && steps.some((step) => step.description);
 
   return (
     <div
@@ -236,7 +237,10 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
       aria-label={ariaLabel}
       className={cn(
         styles['tedi-card-stepper'],
-        { [styles['tedi-card-stepper--progress-flush']]: progressFlush },
+        {
+          [styles['tedi-card-stepper--progress-flush']]: progressFlush,
+          [styles['tedi-card-stepper--reserve-description']]: reserveBottomDescription,
+        },
         className
       )}
     >
