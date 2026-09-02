@@ -669,6 +669,27 @@ export const labelsMap = validateDefaultLabels({
     en: (columnLabel: string) => `Drag column ${columnLabel}`,
     ru: (columnLabel: string) => `Перетащить столбец ${columnLabel}`,
   },
+  'table.reorder-column': {
+    description: 'Accessible header label for the built-in row-reorder (drag-handle) column.',
+    components: ['Table'],
+    et: 'Järjesta',
+    en: 'Reorder',
+    ru: 'Порядок',
+  },
+  'table.select-column': {
+    description: 'Accessible header label for the built-in selection column.',
+    components: ['Table'],
+    et: 'Vali',
+    en: 'Select',
+    ru: 'Выбрать',
+  },
+  'table.expand-column': {
+    description: 'Accessible header label for the built-in row-expansion column.',
+    components: ['Table'],
+    et: 'Laienda',
+    en: 'Expand',
+    ru: 'Развернуть',
+  },
   'table.reorder.pickup': {
     description: 'Live-region message when a column is picked up for keyboard reordering.',
     components: ['Table'],

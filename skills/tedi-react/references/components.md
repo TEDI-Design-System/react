@@ -388,8 +388,9 @@ import { Carousel } from '@tedi-design-system/react/tedi';
 - `element: 'ul' | 'ol' = 'ul'`
 - `style: 'styled' | 'none' = 'none'`
 - `color: BulletColor = 'brand'`
+- Forwards native list attributes to the element (`OlHTMLAttributes`) — notably `start` / `reversed` for ordered lists, plus `id` / `aria-*`. `style` is not forwarded (repurposed for the styling variant). The numbers are a CSS counter, so `List` reseeds it: `start` sets the first number, and `reversed` counts down (from `start`, or the item count when `start` is omitted).
 
-Sub-component: `List.Item`
+Sub-component: `List.Item` — forwards native `<li>` attributes; `value` overrides a single item's number in an ordered list (`5, 6, 10, 11`). `value` needs Safari 17.2+ to reseed the visible counter; older browsers keep sequential numbering.
 
 ### Section
 
@@ -784,6 +785,7 @@ Same as Checkbox (without indeterminate)
 - `onSelect?: OnSelectHandler<Date | Date[] | DateRange | undefined>`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `formatDate?: (date) => string` — display formatter (default: `dd.MM.yyyy`, et-EE)
 - `parseDate?: (value: string) => Date | Date[] | DateRange | undefined` — manual-input parser; without it the field is calendar-only
 - `locale?: Locale = et`, `localeCode?: string = 'et-EE'`
@@ -843,6 +845,7 @@ The ref shape mirrors TextField (`{ input, wrapper }`). In `'multiple'` mode the
 - `onChange?: (time: string) => void`
 - `placeholder?: string`
 - `required?: boolean`, `readOnly?: boolean`
+- `clearable?: boolean = true` — show the field's clear button; set `false` to hide it (e.g. required fields that must not be emptied). Breakpoint-aware. Also on `DateTimeField`.
 - `stepMinutes?: number = 1` — minute increment for the picker wheel / grid
 - `availableTimes?: string[]` — limit selectable times to a fixed list (`["09:00", "09:30", …]`); switches the popover to grid mode
 - `inputProps?: Omit<TextFieldProps, 'id' | 'label' | 'value' | 'onChange'>` — pass-through to the underlying input
@@ -1998,3 +2001,49 @@ Data-driven legacy footer (`categories` array + `logo` + `bottomElement`). Respo
 ### Map Components
 
 14 specialized components for map UI interactions (BaseMapSelection, Legend, MapLayer, Directions, Timeline, etc.)
+
+## Extending components
+
+TEDI exports a few type helpers so you can build **custom or extended** components
+that match its patterns, without deep relative imports.
+
+**Polymorphic (`as` prop) components** — reuse TEDI's polymorphic types:
+
+```tsx
+import React, { forwardRef } from 'react';
+import { PolymorphicComponentPropWithRef, PolymorphicRef } from '@tedi-design-system/react/tedi';
+
+type MyBoxProps<C extends React.ElementType = 'div'> = PolymorphicComponentPropWithRef<C, { muted?: boolean }>;
+
+const MyBoxInner = forwardRef(
+  <C extends React.ElementType = 'div'>({ as, muted, ...rest }: MyBoxProps<C>, ref?: PolymorphicRef<C>): JSX.Element => {
+    const Tag: React.ElementType = as ?? 'div';
+    return <Tag ref={ref} data-muted={muted} {...rest} />;
+  }
+);
+
+MyBoxInner.displayName = 'MyBox';
+
+// Cast to a generic call signature so `as`-specific props (e.g. `href` when
+// `as="a"`) are inferred — assigning forwardRef directly loses the generic.
+export const MyBox = MyBoxInner as <C extends React.ElementType = 'div'>(
+  props: MyBoxProps<C>
+) => React.ReactElement | null;
+```
+
+Also available: `PolymorphicComponentPropWithoutRef`, and `AllowedHTMLTags<C, Allowed>` to constrain `as` to specific tags.
+
+**Responsive props** — `BreakpointSupport<T>` + `useBreakpointProps` let a custom component accept per-breakpoint prop overrides the same way TEDI components do:
+
+```tsx
+import { BreakpointSupport, useBreakpointProps } from '@tedi-design-system/react/tedi';
+
+type Props = BreakpointSupport<{ size?: 'sm' | 'lg' }>;
+
+const MyResponsive = (props: Props) => {
+  const { getCurrentBreakpointProps } = useBreakpointProps();
+  const { size = 'sm' } = getCurrentBreakpointProps<Props>(props);
+  return <div data-size={size} />;
+};
+// <MyResponsive size="sm" md={{ size: 'lg' }} />
+```

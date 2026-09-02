@@ -129,8 +129,7 @@ export const States = () => {
                 name="check-disabled-checked"
                 value="check"
                 disabled
-                checked={checked}
-                onChange={(value, checked) => setChecked(checked)}
+                defaultChecked
               />
             </Col>
           </Row>
@@ -145,10 +144,7 @@ export const States = () => {
                 name="check-indeterminate"
                 value="check"
                 indeterminate={indeterminate}
-                onChange={(value, checked) => {
-                  setIndeterminate(false);
-                  setChecked(checked);
-                }}
+                onChange={() => setIndeterminate(false)}
               />
             </Col>
           </Row>

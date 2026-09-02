@@ -16,7 +16,7 @@ type TextGroupBreakpointProps =
       type?: 'horizontal';
       /**
        * Alignment for the label text
-       *  @default 'left'
+       *  @default left
        */
       labelAlign?: TextAlign;
       /**
@@ -27,7 +27,7 @@ type TextGroupBreakpointProps =
       valueAlign?: TextAlign;
       /**
        * Width for the label (e.g., '200px', '30%', etc.)
-       * @default 'auto'
+       * @default auto
        */
       labelWidth?: string | number;
     }
@@ -38,7 +38,7 @@ type TextGroupBreakpointProps =
       type: 'vertical';
       /**
        * Alignment for the label text
-       *  @default 'left'
+       *  @default left
        */
       labelAlign?: 'left';
       /**
@@ -47,7 +47,7 @@ type TextGroupBreakpointProps =
       valueAlign?: never;
       /**
        * Width for the label (e.g., '200px', '30%', etc.)
-       * @default 'auto'
+       * @default auto
        */
       labelWidth?: string | number;
     };
@@ -58,7 +58,9 @@ export type TextGroupProps = BreakpointSupport<TextGroupBreakpointProps> & {
    */
   label: React.ReactNode;
   /**
-   * Value displayed alongside the label
+   * Value displayed alongside the label. Accepts multiple nodes — a trailing
+   * `StatusBadge`, `Tag`, or info tooltip renders inline beside the text (the
+   * value row is a flex container with a small gap).
    */
   value: React.ReactNode | React.ReactNode[];
   /**

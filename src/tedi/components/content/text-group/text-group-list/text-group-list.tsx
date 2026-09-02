@@ -15,7 +15,7 @@ type TextGroupListBreakpointProps =
       type?: 'horizontal';
       /**
        * Alignment for the label text.
-       * @default 'left'
+       * @default left
        */
       labelAlign?: TextAlign;
       /**
@@ -27,7 +27,7 @@ type TextGroupListBreakpointProps =
       /**
        * Width for the label column (e.g., `'200px'`, `'30%'`, or a `number`
        * interpreted as a percent).
-       * @default 'auto'
+       * @default auto
        */
       labelWidth?: string | number;
       /**
@@ -46,7 +46,7 @@ type TextGroupListBreakpointProps =
       /**
        * Alignment for the label text. Vertical layout only supports left
        * alignment — pass `'right'` only with `type: 'horizontal'`.
-       * @default 'left'
+       * @default left
        */
       labelAlign?: 'left';
       /**
@@ -60,7 +60,7 @@ type TextGroupListBreakpointProps =
       /**
        * Width for the label column (e.g., `'200px'`, `'30%'`, or a `number`
        * interpreted as a percent).
-       * @default 'auto'
+       * @default auto
        */
       labelWidth?: string | number;
     };
@@ -72,7 +72,8 @@ export interface TextGroupListItem {
    */
   label: React.ReactNode;
   /**
-   * Value rendered as the `<dd>` for this row.
+   * Value rendered as the `<dd>` for this row. Accepts multiple nodes — a trailing
+   * `StatusBadge`, `Tag`, or info tooltip renders inline beside the text.
    */
   value: React.ReactNode | React.ReactNode[];
   /**

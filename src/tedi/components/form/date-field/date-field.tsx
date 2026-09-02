@@ -75,6 +75,12 @@ type DateFieldBreakpointProps = {
    * count is kept: the months wrap to a vertical stack and the modal body scrolls.
    */
   numberOfMonths?: number;
+  /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
 };
 
 export interface DateFieldProps
@@ -350,6 +356,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     enableCalendar = true,
     calendarTrigger = 'button',
     numberOfMonths,
+    clearable = true,
   } = getCurrentBreakpointProps<DateFieldBreakpointProps>(props);
 
   const {
@@ -852,7 +859,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             icon="calendar_today"
             onIconClick={openCalendar}
             iconButtonProps={enableCalendar ? calendarTriggerProps : { 'aria-label': openCalendarLabel }}
-            isClearable
+            isClearable={clearable}
             required={required}
             onChange={(newLabels) => {
               if (!Array.isArray(value)) return;
@@ -878,7 +885,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
-            isClearable
+            isClearable={clearable}
             onIconClick={openCalendar}
             iconButtonProps={
               enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : { 'aria-label': openCalendarLabel }
