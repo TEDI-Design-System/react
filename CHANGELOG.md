@@ -1,3 +1,10 @@
+## [19.0.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.0.0...react-19.0.1-rc.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* **table:** a11y violation fixes [#804](https://github.com/TEDI-Design-System/react/issues/804) ([#856](https://github.com/TEDI-Design-System/react/issues/856)) ([9042d07](https://github.com/TEDI-Design-System/react/commit/9042d0704fa008953791a93a65ceb373245e18f6))
+
 # [19.0.0](https://github.com/TEDI-Design-System/react/compare/react-18.1.0...react-19.0.0) (2026-08-27)
 
 
