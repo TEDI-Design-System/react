@@ -1027,9 +1027,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           // In row-trigger mode the whole `<tr>` is the disclosure button (it carries
           // `aria-expanded`/`aria-controls`), so the indicator must be a non-interactive icon —
           // a real button here would be an interactive control nested in another (axe
-          // `nested-interactive`).
+          // `nested-interactive`). `brand` keeps the chevron the same accent colour the
+          // `CollapseButton` uses in the button-trigger variant.
           if (expandTrigger === 'row') {
-            return <Icon name={row.getIsExpanded() ? 'expand_less' : 'expand_more'} size={24} filled color="inherit" />;
+            return <Icon name={row.getIsExpanded() ? 'expand_less' : 'expand_more'} size={24} filled color="brand" />;
           }
 
           return (
