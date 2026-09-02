@@ -40,10 +40,6 @@ const meta: Meta<typeof Table> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev',
     },
-    a11y: {
-      // TODO: [Table]: Review storybook a11y violations #804
-      test: 'todo',
-    },
   },
 };
 export default meta;
@@ -423,7 +419,10 @@ export const Sizes: Story = {
             autoResetPageIndex={false}
             data={defaultEditor.rows}
             columns={bookingShowcaseColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Pagination – default size' } },
+            }}
           />
         </EditableRowsProvider>
         <Heading element="h3">Small</Heading>
@@ -434,7 +433,10 @@ export const Sizes: Story = {
             data={smallEditor.rows}
             columns={bookingShowcaseColumns}
             size="small"
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Pagination – small size' } },
+            }}
           />
         </EditableRowsProvider>
       </VerticalSpacing>
@@ -503,14 +505,20 @@ export const Simple: Story = {
             autoResetPageIndex={false}
             data={bookingEditor.rows}
             columns={bookingShowcaseColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Broneeringute pagineerimine' } },
+            }}
           />
         </EditableRowsProvider>
         <Table<PersonRecord>
           id="tedi-table-simple-people"
           data={filterablePeople}
           columns={simplePeopleColumns}
-          pagination={SHOWCASE_PAGINATION_4}
+          pagination={{
+            ...SHOWCASE_PAGINATION_4,
+            paginationProps: { labels: { ariaLabel: 'Isikute pagineerimine' } },
+          }}
         />
         <EditableRowsProvider value={doctorEditor}>
           <Table<Doctor>
@@ -518,7 +526,10 @@ export const Simple: Story = {
             autoResetPageIndex={false}
             data={doctorEditor.rows}
             columns={simpleDoctorColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Arstide pagineerimine' } },
+            }}
           />
         </EditableRowsProvider>
       </VerticalSpacing>
