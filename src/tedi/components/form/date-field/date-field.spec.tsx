@@ -83,6 +83,22 @@ describe('DateField component', () => {
     expect(screen.queryByText('dateField.invalidDateError')).not.toBeInTheDocument();
   });
 
+  it('makes the range input read-only when no parseDate is supplied (calendar-only)', () => {
+    render(<DateField {...defaultProps} mode="range" />);
+    expect(screen.getByLabelText('Birth date')).toHaveAttribute('readonly');
+  });
+
+  it('allows typing in a range field when a parseDate is supplied', () => {
+    render(
+      <DateField
+        {...defaultProps}
+        mode="range"
+        parseDate={() => ({ from: new Date(2025, 0, 1), to: new Date(2025, 0, 5) })}
+      />
+    );
+    expect(screen.getByLabelText('Birth date')).not.toHaveAttribute('readonly');
+  });
+
   it('is read-only when readOnly=true', () => {
     render(<DateField {...defaultProps} readOnly />);
     const input = screen.getByLabelText('Birth date');

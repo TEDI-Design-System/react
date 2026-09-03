@@ -886,7 +886,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             ref={setTextFieldRef}
             id={id}
             label={label}
-            readOnly={readOnly}
+            readOnly={readOnly || (!parseDate && mode !== 'single')}
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
