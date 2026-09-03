@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
-import { Card, CardContent } from '../../cards/card';
+import { Card, CardContent } from '../../content/card';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ChoiceGroup } from '../choice-group/choice-group';
 import { ChoiceGroupValue } from '../choice-group/choice-group.types';
-import { TextArea } from '../textarea/textarea';
+import { Textarea } from '../textarea/textarea';
 import { Rating, RatingType } from './rating';
 
 /**
@@ -237,7 +237,7 @@ export const FeedbackFormExample: Story = {
                     rowProps={{ justifyContent: 'center' }}
                   />
 
-                  <TextArea
+                  <Textarea
                     id="feedback-comment"
                     label="Soovi korral lisa täpsustus"
                     characterLimit={500}
