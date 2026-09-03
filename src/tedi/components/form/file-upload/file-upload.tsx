@@ -16,7 +16,16 @@ import { useOptionalInputGroup } from '../input-group/input-group';
 import styles from './file-upload.module.scss';
 
 export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
+  /**
+   * Unique HTML id for the file input, also used to associate the label and
+   * helper/error text for accessibility. When omitted, falls back to the
+   * surrounding `InputGroup`'s id or a generated one.
+   */
   id?: string;
+  /**
+   * Visible label for the field. May be omitted when the surrounding
+   * `InputGroup` provides its own label.
+   */
   label?: string;
   /**
    * Additional class names appended to the inner dropzone element
@@ -77,13 +86,20 @@ export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   disabled?: boolean;
   /**
-   * Maximum allowed file size in bytes.
+   * Maximum allowed file size in megabytes (MB).
    */
   maxSize?: number;
   /**
    * If `true`, validates each file separately instead of rejecting all at once.
    */
   validateIndividually?: boolean;
+  /**
+   * Whether to show the auto-generated restrictions hint (allowed types / max size)
+   * below the field. Turn it off when the same info is shown elsewhere to avoid a
+   * duplicate — rejection error messages still render.
+   * @default true
+   */
+  showRestrictions?: boolean;
   /**
    * Determines the visual size of the file upload field. Defaults to `"default"`.
    */
@@ -109,6 +125,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     disabled = false,
     maxSize,
     validateIndividually = false,
+    showRestrictions,
     size = 'default',
     helper,
     ...rest
@@ -123,35 +140,56 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
     onChange,
     onDelete,
     files,
+    showRestrictions,
   });
 
   const currentBreakpoint = useBreakpoint();
   const generatedId = React.useId();
   const inputGroup = useOptionalInputGroup?.();
   const shouldHideLabel = inputGroup?.hasExternalLabel;
-  const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
+  const resolvedId = id ?? inputGroup?.inputId ?? generatedId;
 
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const addButtonRef = React.useRef<HTMLButtonElement>(null);
 
   const fileUploadBEM = cn(styles['tedi-file-upload'], { [styles['tedi-file-upload--disabled']]: disabled }, className);
-  const helperId = helper?.id ?? (helper || uploadErrorHelper ? `${resolvedId}-helper` : undefined);
+  const hasUploadError = uploadErrorHelper?.type === 'error';
+  const baseHelper = helper ?? (hasUploadError ? undefined : uploadErrorHelper);
+  const errorHelper = hasUploadError ? uploadErrorHelper : undefined;
+  const baseHelperId = baseHelper ? helper?.id ?? `${resolvedId}-helper` : undefined;
+  const errorHelperId = errorHelper ? `${resolvedId}-error` : undefined;
+  const describedBy = [baseHelperId, errorHelperId].filter(Boolean).join(' ') || undefined;
 
   const getFiles = React.useMemo(() => {
     return !!files && !!onChange ? files : innerFiles;
   }, [files, innerFiles, onChange]);
 
+  const focusAddButton = () => addButtonRef.current?.focus();
+
+  const handleFileRemove = (file: FileUploadFile) => {
+    onFileRemove(file);
+    focusAddButton();
+  };
+
+  const handleClearAndFocus = () => {
+    handleClear();
+    focusAddButton();
+  };
+
   const getFileElement = (file: FileUploadFile, index: number) => {
-    const fileLabel = file.isValid === false ? `${file.name} (${getLabel('file-upload.failed')})` : file.name;
+    const isFailed = file.isValid === false;
 
     return (
-      <li key={index}>
+      <li key={file.id ?? index}>
         <Tag
-          color={file.isValid === false ? 'danger' : 'primary'}
-          onClose={!file.isLoading && !disabled && !readOnly ? () => onFileRemove(file) : undefined}
+          role="presentation"
+          color={isFailed ? 'danger' : 'primary'}
+          onClose={!file.isLoading && !disabled && !readOnly ? () => handleFileRemove(file) : undefined}
           isLoading={file.isLoading}
-          aria-label={fileLabel}
+          closeButtonProps={{ title: `${getLabel('remove')} ${file.name}` }}
         >
           {file.name}
+          {isFailed && <span className="sr-only"> ({getLabel('file-upload.failed')})</span>}
         </Tag>
       </li>
     );
@@ -160,21 +198,18 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
   const showFiles = () => {
     if (getFiles.length > 1) {
       return (
-        <ul className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__truncate-list'])}>
+        <ul className={styles['tedi-file-upload__items']}>
           {getFiles.map((file, index) => getFileElement(file, index))}
         </ul>
       );
     } else if (getFiles.length === 1) {
       const singleFile = getFiles[0];
-      const singleLabel =
-        singleFile.isValid === false ? `${singleFile.name} (${getLabel('file-upload.failed')})` : singleFile.name;
+      const isFailed = singleFile.isValid === false;
 
       return (
-        <Text
-          aria-label={singleLabel}
-          className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__truncate'])}
-        >
+        <Text className={cn(styles['tedi-file-upload__items'], styles['tedi-file-upload__items--truncate'])}>
           {singleFile.name}
+          {isFailed && <span className="sr-only"> ({getLabel('file-upload.failed')})</span>}
         </Text>
       );
     }
@@ -196,7 +231,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         )}
       </div>
 
-      <div aria-live="polite" aria-atomic="true" className="sr-only">
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </div>
 
@@ -217,7 +252,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
         >
           <div className={styles['tedi-file-upload__content']}>
             <Row>
-              <Col className="display-flex">{showFiles()}</Col>
+              <Col className="flex">{showFiles()}</Col>
               <Col xs={12} md="auto">
                 <div className={fileUploadBEM}>
                   <input
@@ -230,7 +265,7 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                     multiple={multiple}
                     disabled={disabled}
                     aria-invalid={!!uploadErrorHelper && uploadErrorHelper.type === 'error'}
-                    aria-describedby={helperId}
+                    aria-describedby={describedBy}
                   />
                   {hasClearButton && getFiles.length > 0 && !disabled && (
                     <>
@@ -239,24 +274,26 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
                           visualType="neutral"
                           iconLeft="close"
                           disabled={disabled}
-                          onClick={handleClear}
+                          onClick={handleClearAndFocus}
                           className={styles['tedi-file-upload__button']}
                         >
                           {getLabel('clear')}
                         </Button>
                       ) : (
-                        <ClosingButton onClick={handleClear} iconSize={18} title={getLabel('clear')} />
+                        <ClosingButton onClick={handleClearAndFocus} iconSize={18} title={getLabel('clear')} />
                       )}
                       <Separator axis="vertical" height={1.5} spacing={0.5} color="primary" />
                     </>
                   )}
                   <Button
+                    ref={addButtonRef}
                     visualType="neutral"
                     iconLeft="file_upload"
                     disabled={disabled}
                     onClick={() => inputRef.current?.click()}
                     className={styles['tedi-file-upload__button']}
                     size={size}
+                    aria-describedby={describedBy}
                   >
                     {getLabel('file-upload.add')}
                   </Button>
@@ -266,13 +303,12 @@ export const FileUpload = (props: FileUploadProps): JSX.Element => {
           </div>
         </div>
       )}
-      {helper ? (
-        <FeedbackText {...helper} id={helperId} />
-      ) : uploadErrorHelper ? (
-        <FeedbackText {...uploadErrorHelper} id={helperId} />
-      ) : null}
+      {baseHelper && <FeedbackText {...baseHelper} id={baseHelperId} />}
+      {errorHelper && <FeedbackText {...errorHelper} id={errorHelperId} />}
     </>
   );
 };
+
+FileUpload.displayName = 'FileUpload';
 
 export default FileUpload;

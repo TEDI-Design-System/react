@@ -92,15 +92,6 @@
 
 .tedi-footer-section__collapse {
   width: 100%;
-
-  [data-name='collapse-trigger'] {
-    width: 100%;
-    padding: 0;
-
-    > * {
-      gap: var(--link-inner-spacing-x);
-    }
-  }
 }
 
 .tedi-footer-side {

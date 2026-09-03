@@ -153,9 +153,7 @@ export const Inverted: Story = {
     color: 'inverted',
   },
 
-  parameters: {
-    backgrounds: { default: 'inverted' },
-  },
+  globals: { backgrounds: { value: 'inverted' } },
 };
 
 export const InvertedSecondary: Story = {
@@ -166,9 +164,7 @@ export const InvertedSecondary: Story = {
     visualType: 'secondary',
   },
 
-  parameters: {
-    backgrounds: { default: 'inverted' },
-  },
+  globals: { backgrounds: { value: 'inverted' } },
 };
 
 export const InvertedTertiary: Story = {
@@ -179,9 +175,7 @@ export const InvertedTertiary: Story = {
     visualType: 'tertiary',
   },
 
-  parameters: {
-    backgrounds: { default: 'inverted' },
-  },
+  globals: { backgrounds: { value: 'inverted' } },
 };
 
 export const Link: Story = {
@@ -200,9 +194,7 @@ export const InvertedLink: Story = {
     color: 'inverted',
   },
 
-  parameters: {
-    backgrounds: { default: 'inverted' },
-  },
+  globals: { backgrounds: { value: 'inverted' } },
 };
 
 const NoStyleTemplate: StoryFn<ButtonProps> = (args) => {

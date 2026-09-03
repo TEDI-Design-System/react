@@ -3,7 +3,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { Icon, IconProps } from '../../../../tedi/components/base/icon/icon';
-import { Collapse } from '../../../../tedi/components/buttons/collapse/collapse';
+import { Collapse } from '../../../../tedi/components/content/collapse/collapse';
 import Print from '../../../../tedi/components/misc/print/print';
 import useLayout, { Layouts } from '../../../helpers/hooks/use-layout';
 import { AllowedHTMLTags } from '../../../helpers/polymorphic/types';
@@ -79,6 +79,9 @@ export type SideNavItem<C extends React.ElementType = 'a'> = AnchorProps<C> & {
 // tiny helper to defer closing to the next frame (prevents ghost click on touch)
 const defer = (fn: () => void) => requestAnimationFrame(fn);
 
+/**
+ * @deprecated Use `SideNav` from `@tedi-design-system/react/tedi` instead.
+ */
 export const SideNav = <C extends React.ElementType = 'a'>(props: SideNavProps<C>) => {
   const {
     navItems,

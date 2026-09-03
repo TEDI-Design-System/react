@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import { useBreakpointProps } from '../../../helpers';
 import { UnknownType } from '../../../types/commonTypes';
-import TextArea, { TextAreaProps } from './textarea';
+import Textarea, { TextareaProps } from './textarea';
 
 import '@testing-library/jest-dom';
 
@@ -11,22 +11,22 @@ jest.mock('../../../helpers', () => ({
   useBreakpointProps: jest.fn(),
 }));
 
-describe('TextArea component', () => {
+describe('Textarea component', () => {
   beforeEach(() => {
     (useBreakpointProps as jest.Mock).mockReturnValue({
       getCurrentBreakpointProps: jest.fn((props) => props),
     });
   });
 
-  const defaultProps: TextAreaProps = {
+  const defaultProps: TextareaProps = {
     id: 'test-textarea',
     label: 'Test Label',
     placeholder: 'Enter text...',
     name: 'testTextarea',
   };
 
-  it('renders the TextArea with default properties', () => {
-    render(<TextArea {...defaultProps} />);
+  it('renders the Textarea with default properties', () => {
+    render(<Textarea {...defaultProps} />);
     const textarea = screen.getByPlaceholderText(/enter text/i);
     expect(textarea).toBeInTheDocument();
     expect(textarea).toHaveAttribute('id', 'test-textarea');
@@ -34,7 +34,7 @@ describe('TextArea component', () => {
   });
 
   it('applies the correct CSS classes', () => {
-    render(<TextArea {...defaultProps} className="custom-class" />);
+    render(<Textarea {...defaultProps} className="custom-class" />);
     const wrapper = screen.getByRole('textbox').closest('div[data-name="textarea"]');
     expect(wrapper).toHaveClass('tedi-textarea', 'custom-class');
     const textarea = screen.getByRole('textbox');
@@ -44,7 +44,7 @@ describe('TextArea component', () => {
   it('displays error when char count exceeds characterLimit', () => {
     const charLimit = 10;
     const newText = 'This text is too long';
-    render(<TextArea {...defaultProps} characterLimit={charLimit} />);
+    render(<Textarea {...defaultProps} characterLimit={charLimit} />);
     const textarea = screen.getByPlaceholderText(/enter text/i);
     fireEvent.change(textarea, { target: { value: newText } });
 
@@ -53,7 +53,7 @@ describe('TextArea component', () => {
   });
 
   it('displays character counter as hint when under limit', () => {
-    render(<TextArea {...defaultProps} characterLimit={15} />);
+    render(<Textarea {...defaultProps} characterLimit={15} />);
     const textarea = screen.getByPlaceholderText(/enter text/i);
     fireEvent.change(textarea, { target: { value: 'Short text' } });
 
@@ -62,7 +62,7 @@ describe('TextArea component', () => {
   });
 
   it('displays a character counter when characterLimit is set', () => {
-    render(<TextArea {...defaultProps} characterLimit={15} />);
+    render(<Textarea {...defaultProps} characterLimit={15} />);
     const textarea = screen.getByPlaceholderText(/enter text/i);
     fireEvent.change(textarea, { target: { value: 'Some text' } });
     const counter = screen.getByText(/9\/15/i);
@@ -70,7 +70,7 @@ describe('TextArea component', () => {
   });
 
   it('does not display a character counter when characterLimit is not set', () => {
-    render(<TextArea {...defaultProps} />);
+    render(<Textarea {...defaultProps} />);
     const textarea = screen.getByPlaceholderText(/enter text/i);
     fireEvent.change(textarea, { target: { value: 'Some text' } });
     const counter = screen.queryByText(/\d+\/\d+/i);
@@ -78,7 +78,7 @@ describe('TextArea component', () => {
   });
 
   it('applies minRows when autoGrow is enabled', () => {
-    render(<TextArea {...defaultProps} autoGrow minRows={5} />);
+    render(<Textarea {...defaultProps} autoGrow minRows={5} />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea).toHaveAttribute('rows', '5');
   });
@@ -105,7 +105,7 @@ describe('TextArea component', () => {
       },
     });
 
-    render(<TextArea {...defaultProps} autoGrow minRows={3} maxRows={10} />);
+    render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={10} />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea).toHaveAttribute('rows', '3');
 
@@ -145,7 +145,7 @@ describe('TextArea component', () => {
       },
     });
 
-    render(<TextArea {...defaultProps} autoGrow minRows={3} maxRows={5} />);
+    render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={5} />);
 
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
 
@@ -166,45 +166,45 @@ describe('TextArea component', () => {
   });
 
   it('applies maxHeight when autoGrow=true', () => {
-    render(<TextArea {...defaultProps} autoGrow maxHeight="200px" />);
+    render(<Textarea {...defaultProps} autoGrow maxHeight="200px" />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea.style.maxHeight).toBe('200px');
   });
 
   // === Fixed height (non-autoGrow) Tests ===
   it('applies fixed height when autoGrow=false (default)', () => {
-    render(<TextArea {...defaultProps} height="200px" />);
+    render(<Textarea {...defaultProps} height="200px" />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea.style.height).toBe('200px');
   });
 
   it('uses default height 7.5rem when not specified and autoGrow=false', () => {
-    render(<TextArea {...defaultProps} />);
+    render(<Textarea {...defaultProps} />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea.style.height).toBe('7.5rem');
   });
 
   it('applies maxHeight when autoGrow=false', () => {
-    render(<TextArea {...defaultProps} height="150px" maxHeight="300px" />);
+    render(<Textarea {...defaultProps} height="150px" maxHeight="300px" />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea.style.height).toBe('150px');
     expect(textarea.style.maxHeight).toBe('300px');
   });
 
   it('disables the textarea when disabled prop is true', () => {
-    render(<TextArea {...defaultProps} disabled />);
+    render(<Textarea {...defaultProps} disabled />);
     const textarea = screen.getByPlaceholderText(/enter text/i);
     expect(textarea).toBeDisabled();
   });
 
   it('renders helper text when provided', () => {
-    render(<TextArea {...defaultProps} helper={{ type: 'hint', text: 'Helper text', id: 'helper-id' }} />);
+    render(<Textarea {...defaultProps} helper={{ type: 'hint', text: 'Helper text', id: 'helper-id' }} />);
     const helper = screen.getByText(/helper text/i);
     expect(helper).toBeInTheDocument();
   });
 
   it('displays validation error if invalid prop is true', () => {
-    render(<TextArea {...defaultProps} invalid helper={{ type: 'error', text: 'Error message' }} />);
+    render(<Textarea {...defaultProps} invalid helper={{ type: 'error', text: 'Error message' }} />);
     const error = screen.getByText(/error message/i);
     expect(error).toHaveClass('tedi-feedback-text--error');
   });
@@ -212,7 +212,7 @@ describe('TextArea component', () => {
   it('applies defaultValue correctly when component is uncontrolled', async () => {
     const user = userEvent.setup();
     const defaultValue = 'Initial text';
-    render(<TextArea {...defaultProps} defaultValue={defaultValue} />);
+    render(<Textarea {...defaultProps} defaultValue={defaultValue} />);
 
     const textarea = screen.getByRole('textbox');
     expect(textarea).toHaveValue(defaultValue);
@@ -228,7 +228,7 @@ describe('TextArea component', () => {
     const initialValue = 'Initial Value';
     const newValue = 'New Value';
 
-    render(<TextArea {...defaultProps} value={initialValue} onChange={handleChange} placeholder="Enter text" />);
+    render(<Textarea {...defaultProps} value={initialValue} onChange={handleChange} placeholder="Enter text" />);
     const textarea = screen.getByRole('textbox');
     expect(textarea).toHaveValue(initialValue);
 
@@ -249,7 +249,7 @@ describe('TextArea component', () => {
       currentValue = event.target.value;
     };
 
-    const { rerender } = render(<TextArea {...defaultProps} value={currentValue} onChangeEvent={handleChangeEvent} />);
+    const { rerender } = render(<Textarea {...defaultProps} value={currentValue} onChangeEvent={handleChangeEvent} />);
 
     const textarea = screen.getByRole('textbox');
     expect(textarea).toHaveValue(initialValue);
@@ -257,7 +257,7 @@ describe('TextArea component', () => {
     const newValue = 'Changed value';
     fireEvent.change(textarea, { target: { value: newValue } });
 
-    rerender(<TextArea {...defaultProps} value={currentValue} onChangeEvent={handleChangeEvent} />);
+    rerender(<Textarea {...defaultProps} value={currentValue} onChangeEvent={handleChangeEvent} />);
     expect(textarea).toHaveValue(newValue);
     expect(currentValue).toBe(newValue);
   });

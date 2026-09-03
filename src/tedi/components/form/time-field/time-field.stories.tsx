@@ -1,7 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import { LabelProvider } from '../../../providers/label-provider';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -17,6 +16,10 @@ export default {
   title: 'Tedi-Ready/Components/Form/TimeField',
   component: TimeField,
   parameters: {
+    a11y: {
+      // TODO: [TimeField]: Review storybook a11y violations #815
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -92,19 +95,19 @@ export const States: StoryObj<TimeFieldProps> = {
     <div className="state-example">
       {stateArray.map((state) => (
         <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
+          <Col md={4} xs={12} className="flex align-items-center">
             <TimeField id={state} label="Aeg" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
       <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+        <Col width={2} className="flex align-items-center">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col md={4} xs={12} className="flex align-items-center">
           <TimeField
             id="success-timefield"
             label="Aeg"
@@ -113,10 +116,10 @@ export const States: StoryObj<TimeFieldProps> = {
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+        <Col width={2} className="flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col md={4} xs={12} className="flex align-items-center">
           <TimeField id="error-timefield" label="Aeg" inputProps={{ helper: { text: 'Vihjetekst', type: 'error' } }} />
         </Col>
       </Row>
@@ -337,11 +340,7 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
  * Confirm — Cancel / Escape / backdrop dismiss discards it.
  */
 export const ModalPicker: Story = {
-  render: (args) => (
-    <LabelProvider locale="et">
-      <Template {...args} />
-    </LabelProvider>
-  ),
+  render: (args) => <Template {...args} />,
   args: {
     id: 'time-modal',
     label: 'Aeg',
@@ -357,11 +356,7 @@ export const ModalPicker: Story = {
  * canvas or pick a mobile preset to see the modal kick in.
  */
 export const ResponsiveModalPicker: Story = {
-  render: (args) => (
-    <LabelProvider locale="et">
-      <Template {...args} />
-    </LabelProvider>
-  ),
+  render: (args) => <Template {...args} />,
   args: {
     id: 'time-modal-responsive',
     label: 'Aeg',

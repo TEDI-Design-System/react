@@ -40,10 +40,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => (
         <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col width={2}>
+          <Col width={12} sm={2}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="d-flex">
+          <Col width={12} sm={10} className="d-flex">
             <Toggle id="toggle-column-1" label="Toggle" size={value as ToggleProps['size']} hideLabel />
           </Col>
         </Row>
@@ -60,12 +60,12 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
       <VerticalSpacing size={1}>
         {array.map((value, key) => (
           <Row key={key}>
-            <Col lg={1} md={2} className="display-flex align-items-center">
+            <Col lg={1} md={2} className="flex align-items-center">
               <Text color={titleColor} modifiers="bold">
                 {value}
               </Text>
             </Col>
-            <Col width="auto" className="display-flex align-items-center gap-3">
+            <Col width="auto" className="flex align-items-center gap-3">
               <Toggle
                 {...toggleProps}
                 label="Toggle"
@@ -82,7 +82,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 id={value}
               />
             </Col>
-            <Col width="auto" className="display-flex align-items-center gap-3">
+            <Col width="auto" className="flex align-items-center gap-3">
               <Toggle
                 {...toggleProps}
                 label="Toggle"
@@ -101,7 +101,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 id={value}
               />
             </Col>
-            <Col width="auto" className="display-flex align-items-center gap-3">
+            <Col width="auto" className="flex align-items-center gap-3">
               <Toggle
                 {...toggleProps}
                 label="Toggle"

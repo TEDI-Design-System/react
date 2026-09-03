@@ -72,6 +72,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - uses: actions/download-artifact@v4
@@ -102,7 +105,20 @@ jobs:
             fi
           done
           valid_branches="[${valid_branches::-1}]"
-          echo "$valid_branches" >> index.html
+          # Last-commit date per branch (Europe/Tallinn) for the In-development cards.
+          git -C .. fetch origin --no-tags --quiet '+refs/heads/*:refs/remotes/origin/*' || true
+          branch_updated="{}"
+          for b in $(echo "$valid_branches" | jq -r '.[]'); do
+            d=$(TZ=Europe/Tallinn git -C .. log -1 --format=%cd --date=format-local:'%d.%m.%Y %H:%M' "origin/$b" 2>/dev/null || echo "")
+            branch_updated=$(echo "$branch_updated" | jq -c --arg k "$b" --arg v "$d" '. + {($k): $v}')
+          done
+          # Inject the data object the page renders: framework + main/rc versions &
+          # publish timestamps (from npm) + the valid branch list + per-branch commit dates.
+          # Change "React" and the package name in the Angular repo; index.html stays identical.
+          node ../.github/workflows/pages-release-info.mjs "React" "@tedi-design-system/react" \
+            | jq -c --argjson branches "$valid_branches" --argjson updated "$branch_updated" \
+              '. + {branches: $branches, branchUpdated: $updated}' \
+            >> index.html
           cat ../.github/workflows/index_suffix.html >> index.html
 
       - name: Upload artifact

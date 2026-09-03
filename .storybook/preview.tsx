@@ -6,7 +6,6 @@ import StorybookDecorator from './storybook-decorator';
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
-import '../src/community/styles/storybook.scss';
 
 import { PrintingProvider } from '../src/tedi/providers/printing-provider';
 import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
@@ -33,30 +32,11 @@ export const decorators: Preview['decorators'] = [
     const theme = (context.globals.theme || 'default') as 'default' | 'dark';
 
     useEffect(() => {
+      // The dark surface itself is applied via CSS in preview-head.html, keyed
+      // off this class — that beats the backgrounds addon on direct story URLs.
       document.documentElement.classList.remove('tedi-theme--default', 'tedi-theme--dark');
       document.documentElement.classList.add(`tedi-theme--${theme}`);
-
-      updateAllCanvasBackgrounds(theme);
     }, [theme]);
-
-    const updateAllCanvasBackgrounds = (currentTheme: string) => {
-      const backgroundColor = getBackgroundColor(currentTheme);
-      const canvases = document.querySelectorAll('.sb-show-main, .docs-story > div');
-
-      canvases.forEach((canvas) => {
-        const element = canvas as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-        element.style.transition = 'background-color 0.3s ease';
-      });
-
-      const storyPreviews = document.querySelectorAll('[data-story="true"], .sbdocs-preview');
-      storyPreviews.forEach((preview) => {
-        const element = preview as HTMLElement;
-        element.style.backgroundColor = backgroundColor;
-      });
-    };
-
-    const getBackgroundColor = (currentTheme: string): string =>  currentTheme === 'dark' ? 'var(--color-bg-inverted)' : '';
 
     return (
       <ThemeProvider theme={theme}>
@@ -81,16 +61,14 @@ const preview: Preview = {
   },
   parameters: {
     viewMode: 'docs',
+    a11y: {
+      test: 'error',
+    },
     backgrounds: {
       options: {
-        default: { name: 'default', value: 'var(--color-bg-default)' },
-        muted: { name: 'muted', value: 'var(--color-bg-muted)' },
-        subtle: { name: 'subtle', value: 'var(--color-bg-subtle)' },
-        disabled: { name: 'disabled', value: 'var(--color-bg-disabled)' },
-        black: { name: 'black', value: 'var(--color-black)' },
-        inverted: { name: 'inverted', value: 'var(--color-bg-inverted)' },
-        'inverted-contrast': { name: 'inverted-contrast', value: 'var(--color-bg-inverted-contrast)' },
-        brand: { name: 'brand', value: 'var(--tedi-primary-600)' },
+        default: { name: 'default', value: 'var(--general-surface-primary)' },
+        inverted: { name: 'inverted', value: 'var(--general-surface-inverted-primary)' },
+        brand: { name: 'brand', value: 'var(--general-surface-brand-primary)' },
       },
     },
     docs: {

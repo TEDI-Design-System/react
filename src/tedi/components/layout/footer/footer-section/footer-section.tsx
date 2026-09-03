@@ -4,7 +4,7 @@ import { ReactNode, useContext, useId } from 'react';
 import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../../helpers';
 import { Icon } from '../../../base/icon/icon';
 import { Heading } from '../../../base/typography/heading/heading';
-import { Collapse } from '../../../buttons/collapse/collapse';
+import { Collapse } from '../../../content/collapse/collapse';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
 
@@ -96,6 +96,7 @@ export const FooterSection = ({
             size="small"
             inverted
             hideCollapseText
+            fullRowToggle
             defaultOpen={defaultOpen}
             toggleLabel={typeof heading === 'string' ? heading : undefined}
             className={styles['tedi-footer-section__collapse']}

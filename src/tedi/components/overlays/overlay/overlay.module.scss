@@ -11,6 +11,11 @@
     &--text {
       text-decoration: underline dashed var(--general-border-secondary);
       text-underline-offset: 0.5em;
+
+      &:hover {
+        color: var(--link-primary-default);
+        text-decoration-color: var(--general-border-brand);
+      }
     }
 
     &--click {

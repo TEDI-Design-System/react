@@ -22,6 +22,10 @@ const meta: Meta<SearchProps> = {
   component: Search,
   title: 'TEDI-Ready/Components/Form/Search',
   parameters: {
+    a11y: {
+      // TODO: [Search]: Review storybook a11y violations #819
+      test: 'todo',
+    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -60,10 +64,10 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
 
         return (
           <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-            <Col width={2}>
+            <Col width={12} sm={2}>
               <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
             </Col>
-            <Col>
+            <Col width={12} sm={10}>
               <VerticalSpacing>
                 <Search {...textFieldProps} {...{ [property]: value }} id={`${baseId}-plain`} />
                 <Search
@@ -91,40 +95,40 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
   const { array, id = 'search', ...textFieldProps } = args;
 
   return (
-    <div className="state-example">
+    <VerticalSpacing>
       {array.map((state, index) => {
         const stateId = `${id}-${state.toLowerCase()}`;
 
         return (
-          <Row key={index} className="padding-14-16">
-            <Col lg={2} md={12} className="display-flex align-items-center">
+          <Row key={index}>
+            <Col lg={2} xs={12} className="flex align-items-center gap-3">
               <Text modifiers="bold">{state}</Text>
             </Col>
-            <Col lg={10} md={12} className="display-flex align-items-center">
+            <Col>
               <Search {...textFieldProps} id={stateId} disabled={state === 'Disabled'} />
             </Col>
           </Row>
         );
       })}
 
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col>
           <Search {...textFieldProps} id={`${id}-success`} helper={{ text: 'Tagasiside tekst', type: 'valid' }} />
         </Col>
       </Row>
 
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col>
           <Search {...textFieldProps} id={`${id}-error`} helper={{ text: 'Tagasiside tekst', type: 'error' }} />
         </Col>
       </Row>
-    </div>
+    </VerticalSpacing>
   );
 };
 

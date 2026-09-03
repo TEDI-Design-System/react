@@ -9,7 +9,7 @@ import { StatusIndicator } from './status-indicator';
  */
 const meta: Meta<typeof StatusIndicator> = {
   component: StatusIndicator,
-  title: 'TEDI-Ready/Components/Tag/StatusIndicator',
+  title: 'TEDI-Ready/Components/Helpers/StatusIndicator',
   parameters: {
     design: {
       type: 'figma',
@@ -37,10 +37,10 @@ export const AllVariants: Story = {
     <div>
       {sizes.map((size) => (
         <Row key={size} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold">{size === 'sm' ? 'Small' : 'Large'}</Text>
           </Col>
-          <Col className="display-flex align-items-center gap-3">
+          <Col className="flex align-items-center gap-3">
             {types.map((type) => (
               <StatusIndicator key={type} type={type} size={size} />
             ))}
@@ -49,10 +49,10 @@ export const AllVariants: Story = {
       ))}
       {sizes.map((size) => (
         <Row key={`${size}-bordered`} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold">{size === 'sm' ? 'Small bordered' : 'Large bordered'}</Text>
           </Col>
-          <Col className="display-flex align-items-center gap-3">
+          <Col className="flex align-items-center gap-3">
             {types.map((type) => (
               <StatusIndicator key={type} type={type} size={size} hasBorder />
             ))}

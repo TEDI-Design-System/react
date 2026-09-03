@@ -9,7 +9,7 @@ import { StatusBadge, StatusBadgeColor, StatusBadgeProps, StatusBadgeSize, Statu
 
 /**
  * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2385-24154&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/764a67-status-badge" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/764a67-status-badge" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof StatusBadge> = {
@@ -157,7 +157,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
           <Col width={6}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="display-flex gap-2">
+          <Col className="flex gap-2">
             <StatusBadge {...args} color="neutral" size={array[key]} />
             <StatusBadge {...args} color="neutral" size={array[key]} status="success" />
           </Col>

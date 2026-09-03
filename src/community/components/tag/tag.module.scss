@@ -14,7 +14,7 @@
 
   &.tag--type-ghost {
     color: $primary-bg;
-    background-color: var(--color-bg-default);
+    background-color: var(--general-surface-primary);
     border: 1px solid $primary-bg;
 
     &.tag--color-accent {
@@ -24,7 +24,7 @@
 
   &.tag--type-borderless {
     color: $primary-bg;
-    background-color: var(--color-bg-default);
+    background-color: var(--general-surface-primary);
   }
 
   &.tag--type-invisible,
@@ -34,8 +34,8 @@
 
   &.tag--type-invisible {
     color: $primary-bg;
-    background-color: var(--color-transparent);
-    border-color: var(--color-transparent);
+    background-color: transparent;
+    border-color: transparent;
   }
 
   &.tag--disabled {
@@ -67,7 +67,7 @@
   vertical-align: bottom; // Removes extra pixel added to height by inline-flex
   text-align: center;
   text-decoration: none;
-  border-radius: var(--border-radius-default);
+  border-radius: var(--tedi-radius-02-default);
 
   @include mixins.print-grayscale;
 
@@ -84,56 +84,46 @@
 
 .tag--color-default {
   @include tag-variant(
-    var(--color-bg-inverted),
-    var(--color-bg-subtle),
-    var(--color-text-subtle),
-    var(--color-text-inverted)
+    var(--general-surface-inverted-primary),
+    var(--general-surface-tertiary),
+    var(--general-text-tertiary),
+    var(--general-text-white)
   );
 }
 
 .tag--color-primary {
   @include tag-variant(
-    var(--color-primary-main),
-    var(--color-primary-highlight-subtle),
-    var(--color-primary-active),
-    var(--color-text-inverted)
+    var(--general-surface-brand-primary),
+    var(--general-surface-brand-quaternary),
+    var(--general-surface-brand-secondary),
+    var(--general-text-white)
   );
 }
 
 .tag--color-accent {
   @include tag-variant(
-    var(--color-accent-main),
-    var(--color-accent-highlight),
-    var(--color-accent-active),
-    var(--color-text-inverted)
+    var(--tedi-accent-600),
+    var(--tedi-accent-200),
+    var(--tedi-accent-700),
+    var(--general-text-white)
   );
 }
 
 .tag--color-positive {
-  @include tag-variant(
-    var(--color-positive-main),
-    var(--color-positive-highlight),
-    var(--color-positive-active),
-    var(--color-text-inverted)
-  );
+  @include tag-variant(var(--tedi-green-600), var(--tedi-green-100), var(--tedi-green-700), var(--general-text-white));
 }
 
 .tag--color-warning {
   @include tag-variant(
-    var(--color-warning-main),
-    var(--color-warning-highlight),
-    var(--color-warning-active),
-    var(--color-text-inverted)
+    var(--tedi-yellow-700),
+    var(--tedi-yellow-200),
+    var(--tedi-yellow-800),
+    var(--general-text-white)
   );
 }
 
 .tag--color-important {
-  @include tag-variant(
-    var(--color-important-main),
-    var(--color-important-highlight),
-    var(--color-important-active),
-    var(--color-text-inverted)
-  );
+  @include tag-variant(var(--tedi-red-600), var(--tedi-red-100), var(--tedi-red-700), var(--general-text-white));
 }
 
 .tag--with-arrow {
@@ -142,9 +132,9 @@
     top: 2px;
     right: 0;
     content: '';
-    border-right: 4px solid var(--color-transparent);
-    border-bottom: 4px solid var(--color-text-inverted);
-    border-left: 4px solid var(--color-transparent);
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid var(--general-text-white);
+    border-left: 4px solid transparent;
     transform: rotate(45deg);
   }
 
@@ -164,7 +154,7 @@
     width: 0.625rem;
     height: 0.625rem;
     content: '';
-    border: 1px solid var(--color-bg-default);
+    border: 1px solid var(--general-surface-primary);
     border-radius: 50%;
   }
 
@@ -177,15 +167,15 @@
 }
 
 .tag--status-success::before {
-  background-color: var(--color-positive-main);
+  background-color: var(--tedi-green-600);
 }
 
 .tag--status-error::before {
-  background-color: var(--color-important-main);
+  background-color: var(--tedi-red-600);
 }
 
 .tag--status-inactive::before {
-  background-color: var(--color-text-disabled);
+  background-color: var(--general-text-disabled);
 }
 
 .tag--rounded {

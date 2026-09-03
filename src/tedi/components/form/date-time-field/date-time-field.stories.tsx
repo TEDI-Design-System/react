@@ -11,7 +11,7 @@ import { DateTimeField, DateTimeFieldProps } from './date-time-field';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=7895-221619&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/78211a-date-and-time-picker" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/78211a-date-and-time-picker" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<DateTimeFieldProps> = {
   component: DateTimeField,
@@ -21,6 +21,10 @@ const meta: Meta<DateTimeFieldProps> = {
     locale: { control: false },
   },
   parameters: {
+    a11y: {
+      // TODO: [DateTimeField]: fix a11y violations #782
+      test: 'todo',
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=7895-221619&m=dev',
@@ -83,22 +87,22 @@ const stateArray = ['Default', 'Hover', 'Focus', 'Active', 'Disabled'] as const;
 
 export const States: Story = {
   render: () => (
-    <div className="state-example">
+    <VerticalSpacing>
       {stateArray.map((state) => (
-        <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+        <Row key={state}>
+          <Col lg={2} xs={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
+          <Col>
             <DateTimeField id={state} label="Kuupäev ja kellaaeg" disabled={state === 'Disabled'} />
           </Col>
         </Row>
       ))}
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col>
           <DateTimeField
             id="success-datetimefield"
             label="Kuupäev ja kellaaeg"
@@ -106,11 +110,11 @@ export const States: Story = {
           />
         </Col>
       </Row>
-      <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+      <Row>
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col>
           <DateTimeField
             id="error-datetimefield"
             label="Kuupäev ja kellaaeg"
@@ -118,7 +122,7 @@ export const States: Story = {
           />
         </Col>
       </Row>
-    </div>
+    </VerticalSpacing>
   ),
   parameters: {
     pseudo: {

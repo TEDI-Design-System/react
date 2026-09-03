@@ -9,7 +9,7 @@ import ButtonGroup, { ButtonGroupProps } from './button-group';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=2215-38193&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/82e9cf-button-group" target="_BLANK">ZeroHeight ↗</a>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/82e9cf-button-group" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof ButtonGroup> = {
@@ -117,13 +117,13 @@ const TemplateWithIcons: StoryFn<ButtonGroupProps> = (args) => {
 const TemplateIconOnly: StoryFn<ButtonGroupProps> = (args) => {
   return (
     <ButtonGroup {...args} stretch={false}>
-      <Button id="1" icon="table">
+      <Button id="1" icon="table" showTooltip>
         Tab 1
       </Button>
-      <Button id="2" icon="refresh" isActive>
+      <Button id="2" icon="refresh" isActive showTooltip>
         Tab 2
       </Button>
-      <Button id="3" icon="settings">
+      <Button id="3" icon="settings" showTooltip>
         Tab 3
       </Button>
     </ButtonGroup>
@@ -136,6 +136,7 @@ export const Default: Story = {
     type: 'primary',
     stretch: false,
     dropdownLabel: 'Text',
+    enableMobileDropdown: true,
   },
 };
 
@@ -268,5 +269,7 @@ export const Stretched: Story = {
   render: Template,
   args: {
     stretch: true,
+    dropdownLabel: 'Text',
+    enableMobileDropdown: true,
   },
 };

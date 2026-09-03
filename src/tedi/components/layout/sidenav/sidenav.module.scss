@@ -72,8 +72,34 @@
     }
   }
 
-  [data-name='collapse-trigger'] {
+  [class*='tedi-collapse__header--clickable'] {
     border: 1px solid var(--tedi-alpha-01);
+
+    &:hover {
+      background-color: var(--navigation-vertical-item-background-hover);
+    }
+
+    &:has(:focus-visible) {
+      outline: 1px solid var(--navigation-vertical-item-background-focus);
+      border: 1px solid var(--tedi-neutral-100);
+    }
+
+    button[class*='tedi-collapse-button'] {
+      background: transparent;
+
+      &:hover {
+        background: transparent;
+      }
+
+      &:focus-visible {
+        outline: none;
+        background: transparent;
+      }
+    }
+  }
+
+  .tedi-sidenav__link:hover {
+    background: transparent;
   }
 }
 
@@ -162,27 +188,6 @@
   transition: all 0.3s ease;
 }
 
-.tedi-sidenav__item [data-name='collapse-trigger'] {
-  border-radius: 0;
-
-  [data-name='icon'] {
-    color: var(--general-icon-white);
-  }
-
-  &:hover {
-    background-color: var(--navigation-vertical-item-background-hover);
-  }
-
-  &:focus-visible {
-    outline: 1px solid var(--navigation-vertical-item-background-focus);
-    border: 1px solid var(--tedi-neutral-100);
-  }
-}
-
-.tedi-sidenav__item [data-name='collapse-trigger'] .tedi-sidenav__link:hover {
-  background-color: var(--tedi-alpha-01);
-}
-
 .tedi-sidenav__item div[class^='tedi-collapse__content'] {
   margin: 0;
 }
@@ -236,7 +241,7 @@
 .tedi-sidenav__item
   .tedi-sidenav__link--has-children-link
   + .tedi-sidenav__link-collapse-wrapper
-  [data-name='collapse-trigger'] {
+  button[class*='tedi-collapse-button'] {
   position: absolute;
   top: calc((var(--navigation-vertical-item-min-height-large) - var(--button-xs-icon-size)) / 2);
   right: var(--navigation-vertical-item-padding-right);
@@ -245,6 +250,7 @@
   justify-content: center;
   width: var(--button-xs-icon-size);
   height: var(--button-xs-icon-size);
+  background: transparent;
   border-radius: var(--button-radius-sm);
 
   &:hover,

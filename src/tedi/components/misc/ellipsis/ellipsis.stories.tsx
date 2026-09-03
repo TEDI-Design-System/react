@@ -55,6 +55,19 @@ export const ResponsiveExample: Story = {
 };
 
 /**
+ * With `position="start"` the text is truncated on a single line with a **leading**
+ * ellipsis, keeping the end of the string visible. Useful for file paths, URLs or IDs
+ * where the tail is the most distinguishing part. `lineClamp` does not apply here.
+ */
+export const LeadingStart: Story = {
+  render: Template,
+  args: {
+    position: 'start',
+    children: 'https://www.tedi.ee/some/very/long/path/to/a/specific-resource-identifier.pdf',
+  },
+};
+
+/**
  * Example when popover is shown even when text doesn't ellipse.
  * Use this when you want to show popover always or with custom content
  */
@@ -65,7 +78,7 @@ export const ResponsiveWithCustomPopover: Story = {
     children: (
       <Popover openWith="hover" focusManager={{ modal: false }}>
         <Popover.Trigger>
-          <span>
+          <span role="button">
             Any inline <b>content (even bold)</b>, that is too long for the wrapper
             <span className="text-small"> and dont fit in x number of rows</span>
           </span>

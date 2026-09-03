@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { FileUploadFile } from '../../../helpers';
@@ -40,14 +40,62 @@ describe('FileUpload component', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith([expect.objectContaining({ name: 'test.jpg' })]);
   });
 
+  it('clears the input value after selection so the same file can be re-selected', () => {
+    render(<FileUpload {...defaultProps} />);
+    const input = screen.getByLabelText(/Upload files/i) as HTMLInputElement;
+    const file = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
+
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(input.value).toBe('');
+  });
+
+  it('associates the helper text with the add button as a description', () => {
+    render(<FileUpload {...defaultProps} helper={{ text: 'Some hint', id: 'my-helper' }} />);
+    const addButton = screen.getByRole('button', { name: /file-upload.add/i });
+    expect(addButton).toHaveAttribute('aria-describedby', 'my-helper');
+  });
+
+  it('gives each file remove button an accessible name including the file name', () => {
+    render(
+      <FileUpload
+        {...defaultProps}
+        defaultFiles={[
+          { name: 'a.jpg', id: '1' },
+          { name: 'b.png', id: '2' },
+        ]}
+      />
+    );
+    expect(screen.getByRole('button', { name: /remove a.jpg/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /remove b.png/i })).toBeInTheDocument();
+  });
+
+  it('exposes a failed file to screen readers, not by colour alone', () => {
+    render(<FileUpload {...defaultProps} defaultFiles={[{ name: 'bad.txt', id: '1', isValid: false }]} />);
+    expect(screen.getByText(/file-upload.failed/i)).toBeInTheDocument();
+  });
+
+  it('moves focus to the add button after removing a file', () => {
+    render(
+      <FileUpload
+        {...defaultProps}
+        defaultFiles={[
+          { name: 'a.jpg', id: '1' },
+          { name: 'b.png', id: '2' },
+        ]}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: /remove a.jpg/i }));
+    expect(screen.getByRole('button', { name: /file-upload.add/i })).toHaveFocus();
+  });
+
   it('rejects files with invalid extensions', async () => {
     render(<FileUpload {...defaultProps} />);
     const input = screen.getByLabelText(/Upload files/i);
     const file = new File(['dummy content'], 'test.txt', { type: 'text/plain' });
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
-      expect(defaultProps.onChange).not.toHaveBeenCalled();
-      expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
+      expect(defaultProps.onChange).toHaveBeenCalledWith([]);
+      expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
     });
   });
 
@@ -57,8 +105,8 @@ describe('FileUpload component', () => {
     const file = new File(['a'.repeat(6 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' });
     Object.defineProperty(file, 'size', { value: 6 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [file] } });
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(defaultProps.onChange).toHaveBeenCalledWith([]);
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('does not render close button when there is only one file', () => {
@@ -110,7 +158,7 @@ describe('FileUpload component', () => {
     const input = screen.getByLabelText(/Upload files/i);
     const file = new File(['dummy content'], 'test.txt', { type: 'text/plain' });
     fireEvent.change(input, { target: { files: [file] } });
-    expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('should display error message for files exceeding max size', () => {
@@ -119,7 +167,7 @@ describe('FileUpload component', () => {
     const file = new File(['a'.repeat(6 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' });
     Object.defineProperty(file, 'size', { value: 6 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [file] } });
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('handles empty accept prop', () => {
@@ -156,8 +204,8 @@ describe('FileUpload component', () => {
     ];
 
     fireEvent.change(input, { target: { files: invalidFiles } });
-    expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('calls handleClear when clicked', () => {
@@ -234,8 +282,8 @@ describe('FileUpload component', () => {
 
     fireEvent.change(input, { target: { files: [largeFile] } });
 
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
-    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+    expect(defaultProps.onChange).toHaveBeenCalledWith([]);
+    expect(screen.getAllByText(/file-upload.size-rejected/i)[0]).toBeInTheDocument();
   });
 
   it('should update innerFiles when files prop is not provided', () => {
@@ -341,7 +389,7 @@ describe('FileUpload component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('new.jpg')).toBeInTheDocument();
-      expect(screen.getByText(/file-upload.extension-rejected/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
     });
 
     const clearButton = screen.getByRole('button', { name: /clear/i });
@@ -349,6 +397,91 @@ describe('FileUpload component', () => {
     await waitFor(() => {
       expect(screen.queryByText('initial.jpg')).not.toBeInTheDocument();
       expect(screen.queryByText('new.jpg')).not.toBeInTheDocument();
+    });
+  });
+
+  it('resets the live region so an identical consecutive announcement is re-announced', () => {
+    jest.useFakeTimers();
+    try {
+      render(<FileUpload {...defaultProps} />);
+      const input = screen.getByLabelText(/Upload files/i);
+      const liveRegion = screen.getByRole('status');
+
+      fireEvent.change(input, { target: { files: [new File(['a'], 'a.jpg', { type: 'image/jpeg' })] } });
+      expect(liveRegion).toBeEmptyDOMElement();
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      expect(liveRegion).toHaveTextContent('file-upload.success-added');
+
+      fireEvent.change(input, { target: { files: [new File(['b'], 'b.jpg', { type: 'image/jpeg' })] } });
+      expect(liveRegion).toBeEmptyDOMElement();
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      expect(liveRegion).toHaveTextContent('file-upload.success-added');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  describe('showRestrictions (#786)', () => {
+    it('shows the auto-generated restrictions hint by default', () => {
+      render(<FileUpload {...defaultProps} />);
+      expect(screen.getByText(/file-upload\.accept/)).toBeInTheDocument();
+    });
+
+    it('hides the restrictions hint when showRestrictions is false', () => {
+      render(<FileUpload {...defaultProps} showRestrictions={false} />);
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+
+    it('updates the hint live when showRestrictions changes on a mounted field', () => {
+      const { rerender } = render(<FileUpload {...defaultProps} showRestrictions />);
+      expect(screen.getByText(/file-upload\.accept/)).toBeInTheDocument();
+
+      rerender(<FileUpload {...defaultProps} showRestrictions={false} />);
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+
+    it('still renders rejection errors when the hint is hidden', async () => {
+      render(<FileUpload {...defaultProps} showRestrictions={false} />);
+      const input = screen.getByLabelText(/Upload files/i);
+      fireEvent.change(input, { target: { files: [new File(['x'], 'bad.txt', { type: 'text/plain' })] } });
+
+      await waitFor(() => expect(screen.getByText(/file-upload\.extension-rejected/)).toBeInTheDocument());
+      expect(screen.queryByText(/file-upload\.accept/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('single-file rejection observability (#786)', () => {
+    it('fires onChange for a rejected single file so the parent can react', () => {
+      const onChange = jest.fn();
+      render(<FileUpload {...defaultProps} multiple={false} onChange={onChange} />);
+      fireEvent.change(screen.getByLabelText(/Upload files/i), {
+        target: { files: [new File(['x'], 'bad.txt', { type: 'text/plain' })] },
+      });
+
+      expect(onChange).toHaveBeenCalledWith([]);
+      expect(screen.getByText(/file-upload\.extension-rejected/)).toBeInTheDocument();
+    });
+
+    it('keeps a previously-valid single file when a later invalid one is rejected', () => {
+      const onChange = jest.fn();
+      render(
+        <FileUpload
+          {...defaultProps}
+          multiple={false}
+          defaultFiles={[{ name: 'good.jpg', id: '1' }]}
+          onChange={onChange}
+        />
+      );
+      fireEvent.change(screen.getByLabelText(/Upload files/i), {
+        target: { files: [new File(['x'], 'bad.txt', { type: 'text/plain' })] },
+      });
+
+      expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ name: 'good.jpg' })]);
+      expect(screen.getByText('good.jpg')).toBeInTheDocument();
     });
   });
 });

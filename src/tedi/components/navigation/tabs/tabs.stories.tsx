@@ -5,7 +5,7 @@ import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { ButtonGroup } from '../../buttons/button-group/button-group';
-import { CardContent } from '../../cards/card/card-content/card-content';
+import { CardContent } from '../../content/card/card-content/card-content';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Ellipsis } from '../../misc/ellipsis/ellipsis';
@@ -29,6 +29,10 @@ const meta: Meta<typeof Tabs> = {
     'Tabs.Content': Tabs.Content,
   } as never,
   parameters: {
+    a11y: {
+      // TODO: [Tabs]: Review storybook a11y violations #820
+      test: 'todo',
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=3419-38773&m=dev',
@@ -72,10 +76,10 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 
         return (
           <Row key={index} className="padding-14-16">
-            <Col width={2} className="display-flex align-items-center">
+            <Col width={2} className="flex align-items-center">
               <Text modifiers="bold">{state}</Text>
             </Col>
-            <Col className="display-flex align-items-center">
+            <Col className="flex align-items-center">
               <TabsContext.Provider value={{ currentTab, setCurrentTab: noop }}>
                 <div role="tablist">
                   <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>

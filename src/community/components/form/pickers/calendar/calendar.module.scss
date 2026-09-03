@@ -8,19 +8,19 @@
     width: 0.625rem;
     height: 0.625rem;
     content: '';
-    border: 1px solid var(--color-bg-default);
+    border: 1px solid var(--general-surface-primary);
     border-radius: 50%;
   }
 }
 
 .calendar__day--status-success::before {
-  background-color: var(--color-positive-main);
+  background-color: var(--tedi-green-600);
 }
 
 .calendar__day--status-error::before {
-  background-color: var(--color-important-main);
+  background-color: var(--tedi-red-600);
 }
 
 .calendar__day--status-inactive::before {
-  background-color: var(--color-text-disabled);
+  background-color: var(--general-text-disabled);
 }

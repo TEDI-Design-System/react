@@ -1,5 +1,10 @@
 /**
- * This file should contain only helpers that are used for developing components. They don't get exported separately from component library
+ * Type helpers for building polymorphic components (the `as` prop pattern).
+ *
+ * These are part of the public API (re-exported from the package root via
+ * `helpers`) so consumers can build custom or extended components that match
+ * TEDI's polymorphic typing without deep relative imports. Treat them as a
+ * stable, advanced/extension API. See issue #200.
  */
 import React from 'react';
 

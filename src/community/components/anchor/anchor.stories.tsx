@@ -93,9 +93,7 @@ export const Inverted: Story = {
     color: 'inverted',
   },
 
-  parameters: {
-    backgrounds: { default: 'inverted' },
-  },
+  globals: { backgrounds: { value: 'inverted' } },
 };
 
 export const TextColor: Story = {

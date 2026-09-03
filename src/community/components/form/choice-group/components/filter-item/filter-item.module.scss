@@ -1,6 +1,11 @@
 @use '@tedi-design-system/core/mixins';
 
-$backgrounds: ('positive-main', 'important-main', 'warning-main');
+// Modifier name (public class API) → core surface token for the checked state.
+$backgrounds: (
+  'positive-main': --tedi-green-600,
+  'important-main': --tedi-red-600,
+  'warning-main': --tedi-yellow-700,
+);
 
 .filter-item__input {
   @include mixins.visually-hidden;
@@ -12,29 +17,29 @@ $backgrounds: ('positive-main', 'important-main', 'warning-main');
   justify-content: center;
   padding: 0.25rem 0.5rem;
   font-size: 1rem;
-  color: var(--color-text-muted);
+  color: var(--general-text-secondary);
   cursor: pointer;
-  background: var(--color-bg-subtle);
-  border-radius: var(--border-radius-default);
+  background: var(--general-surface-tertiary);
+  border-radius: var(--tedi-radius-02-default);
 
   .filter-item__input:focus + & {
     @include mixins.focus-element;
   }
 
   .filter-item--disabled & {
-    color: var(--color-text-disabled);
+    color: var(--general-text-disabled);
     cursor: unset;
-    background-color: var(--color-bg-disabled);
+    background-color: var(--general-surface-disabled);
   }
 
   .filter-item--checked & {
-    color: var(--color-text-inverted);
-    background-color: var(--color-primary-main);
+    color: var(--general-text-white);
+    background-color: var(--general-surface-brand-primary);
   }
 
-  @each $background in $backgrounds {
-    .filter-item--#{$background}.filter-item--checked & {
-      background-color: var(--color-#{$background});
+  @each $name, $token in $backgrounds {
+    .filter-item--#{$name}.filter-item--checked & {
+      background-color: var(#{$token});
     }
   }
 }

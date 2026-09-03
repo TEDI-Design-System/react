@@ -31,8 +31,8 @@ const SizeTemplate: StoryFn = () => {
     <div className="example-list">
       {sizeArray.map((size, key) => (
         <Row className={`${key === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col className="display-flex w-50">{size}</Col>
-          <Col className="display-flex">
+          <Col className="flex w-50">{size}</Col>
+          <Col className="flex">
             <ClosingButton size={size} onClick={() => alert(`${size} button clicked`)} />
           </Col>
         </Row>
@@ -67,8 +67,8 @@ const IconSizeTemplate: StoryFn = () => {
     <div className="example-list">
       {iconSizeArray.map((iconSize, key) => (
         <Row className={`${key === iconSizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col className="display-flex w-50">{`${iconSize}px`}</Col>
-          <Col className="display-flex">
+          <Col className="flex w-50">{`${iconSize}px`}</Col>
+          <Col className="flex">
             <ClosingButton iconSize={iconSize} onClick={() => alert(`${iconSize}px icon clicked`)} className="hover" />
             {iconSize === 24 && (
               <div style={{ marginLeft: '16px' }}>
@@ -145,6 +145,6 @@ export const ColorInverted: Story = {
       active: '#Active',
       focusVisible: '#Focus',
     },
-    backgrounds: { default: 'brand' },
   },
+  globals: { backgrounds: { value: 'brand' } },
 };

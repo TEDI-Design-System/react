@@ -129,9 +129,12 @@ describe('Breadcrumbs', () => {
     );
     const trigger = screen.getByRole('button', { name: 'breadcrumbs.show-more' });
     fireEvent.click(trigger);
-    expect(screen.getByRole('link', { name: 'B' })).toHaveAttribute('href', '/b');
-    expect(screen.getByRole('link', { name: 'C' })).toHaveAttribute('href', '/c');
-    expect(screen.getByRole('link', { name: 'D' })).toHaveAttribute('href', '/d');
+
+    const itemB = screen.getByRole('menuitem', { name: 'B' });
+    expect(itemB.tagName).toBe('A');
+    expect(itemB).toHaveAttribute('href', '/b');
+    expect(screen.getByRole('menuitem', { name: 'C' })).toHaveAttribute('href', '/c');
+    expect(screen.getByRole('menuitem', { name: 'D' })).toHaveAttribute('href', '/d');
   });
 
   it('skips collapse when maxItems is not exceeded', () => {

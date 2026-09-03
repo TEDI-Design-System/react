@@ -16,7 +16,6 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@tedi-design-system/react/design-tokens": ["./design-tokens/tokens.js"],
       "@tedi-design-system/react/community": ["src/community/index.ts"],
       "@tedi-design-system/react/tedi": ["src/tedi/index.ts"],
       "react-select/dist/declarations/*": ["./node_modules/react-select/dist/declarations/*"]

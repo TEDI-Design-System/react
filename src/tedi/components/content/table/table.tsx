@@ -36,7 +36,7 @@ import {
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
-import { Collapse, CollapseProps } from '../../buttons/collapse/collapse';
+import { CollapseButton, CollapseButtonProps } from '../../buttons/collapse-button/collapse-button';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
 import { Radio, RadioProps } from '../../form/radio/radio';
 import { TextField, type TextFieldProps } from '../../form/textfield/textfield';
@@ -190,8 +190,8 @@ export type TableSelectionRadioProps = Omit<
 export type TableSelectionMode = 'multiple' | 'single';
 
 export type TableExpandCollapseProps = Omit<
-  CollapseProps,
-  'id' | 'controlsId' | 'children' | 'open' | 'onToggle' | 'openText' | 'closeText' | 'title'
+  CollapseButtonProps,
+  'id' | 'open' | 'onOpenChange' | 'openText' | 'closeText' | 'aria-controls' | 'hideText'
 >;
 
 export interface TablePersistOptions {
@@ -291,6 +291,12 @@ export interface TableProps<TData> {
    * @default false
    */
   stickyFirstColumn?: boolean;
+  /**
+   * Freezes the last column during horizontal scroll — typically a trailing
+   * actions column that should stay reachable while a wide table scrolls.
+   * @default false
+   */
+  stickyLastColumn?: boolean;
   /**
    * Pins the `<thead>` row(s) to the top during vertical scroll. Requires
    * `maxHeight` so the table's internal scroll container becomes the sticky
@@ -410,11 +416,14 @@ export interface TableProps<TData> {
   pagination?: boolean | TablePaginationOptions;
   /**
    * Whether the current page resets to the first page whenever `data` changes
-   * (TanStack's `autoResetPageIndex`). Defaults to `true`, which keeps the user
-   * on a valid page after filtering or sorting. Set to `false` for tables that
-   * mutate `data` in place — e.g. inline row editing — so saving a row doesn't
-   * yank the user back to page 1.
-   * @default true
+   * (TanStack's `autoResetPageIndex`). Defaults to `true` for client-side
+   * pagination (keeps the user on a valid page after filtering or sorting) and
+   * to `false` when `manualPagination` is set — in server-side mode `data` is
+   * replaced on every page/sort change, so auto-resetting would bounce the user
+   * back to page 1 and trigger an update loop. Set to `false` for client-side
+   * tables that mutate `data` in place (e.g. inline row editing), or override
+   * explicitly in either mode.
+   * @default true (client-side) / false (manualPagination)
    */
   autoResetPageIndex?: boolean;
   /**
@@ -507,10 +516,10 @@ export interface TableProps<TData> {
    */
   radioProps?: TableSelectionRadioProps;
   /**
-   * Props forwarded to the row-expand Collapse toggle. Use this to e.g.
-   * switch to `arrowType: 'default'`, change the icon size, or disable
-   * `iconOnly`. Wiring props (id, controlsId, open, onToggle, openText,
-   * closeText, children) are owned by Table and cannot be overridden.
+   * Props forwarded to the row-expand `CollapseButton` toggle. Use this to
+   * e.g. switch to `arrowType: 'default'` or change the `size`. Wiring props
+   * (id, open, onOpenChange, openText, closeText, aria-controls, hideText) are
+   * owned by Table and cannot be overridden.
    */
   collapseProps?: TableExpandCollapseProps;
   /**
@@ -584,10 +593,11 @@ interface TableDataRowProps<TData> {
   onClick: ((row: Row<TData>) => void) | undefined;
   onKeyDownHandler: ((event: KeyboardEvent<HTMLTableRowElement>) => void) | undefined;
   ariaRowIndex: number | undefined;
+  ariaExpanded?: boolean;
+  ariaControls?: string;
   columnProps: ((columnId: string) => { className?: string; style?: CSSProperties } | undefined) | undefined;
   draggable: boolean;
   dragHandleLabel: string;
-  /** When `draggable` is true, native HTML5 drag handlers wired by the parent Table. */
   dragHandlers?: {
     onDragStart: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onDragOver: (event: ReactDragEvent<HTMLTableRowElement>) => void;
@@ -595,12 +605,9 @@ interface TableDataRowProps<TData> {
     onDragEnd: () => void;
     onDrop: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onHandlePointerDown: () => void;
-    /** Keyboard reordering on the drag handle (pick up / move / drop / cancel). */
     onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
   };
-  /** Stable id for the row's drag handle — lets the parent restore focus after a keyboard move. */
   dragHandleId?: string;
-  /** Whether this row is currently picked up for keyboard reordering. */
   dragHandlePickedUp?: boolean;
   dragOverColumnId?: string | null;
 }
@@ -648,6 +655,8 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
     onClick,
     onKeyDownHandler,
     ariaRowIndex,
+    ariaExpanded,
+    ariaControls,
     columnProps,
     draggable,
     dragHandleLabel,
@@ -671,7 +680,9 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
       onKeyDown={clickable ? onKeyDownHandler : undefined}
       tabIndex={clickable ? 0 : undefined}
       role={clickable ? 'button' : undefined}
-      aria-rowindex={ariaRowIndex}
+      aria-rowindex={clickable ? undefined : ariaRowIndex}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
       aria-current={isActiveRow ? 'true' : undefined}
     >
       {row.getVisibleCells().map((cell) => {
@@ -767,6 +778,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     verticalBorders = false,
     borderless = false,
     stickyFirstColumn = false,
+    stickyLastColumn = false,
     stickyHeader = false,
     maxHeight,
     onRowClick,
@@ -783,7 +795,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     expandTrigger = 'button',
     paginateExpandedRows = false,
     pagination: paginationProp,
-    autoResetPageIndex = true,
+    autoResetPageIndex,
     manualPagination = false,
     manualSorting = false,
     manualFiltering = false,
@@ -936,6 +948,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableColumnFilter: false,
         size: 40,
         header: '',
+        meta: { label: getLabelRef.current('table.reorder-column') },
         cell: () => null,
       });
     }
@@ -950,6 +963,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableHiding: false,
         enableColumnFilter: false,
         size: 40,
+        meta: { label: getLabelRef.current('table.select-column') },
         header: isSingle
           ? ''
           : ({ table }) => (
@@ -1005,9 +1019,19 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         enableColumnFilter: false,
         size: 40,
         header: '',
+        meta: { label: getLabelRef.current('table.expand-column') },
         cell: ({ row }) => {
           if (!row.getCanExpand()) return null;
           const subRowId = `${resolvedId}-sub-${row.id}`;
+
+          // In row-trigger mode the whole `<tr>` is the disclosure button (it carries
+          // `aria-expanded`/`aria-controls`), so the indicator must be a non-interactive icon —
+          // a real button here would be an interactive control nested in another (axe
+          // `nested-interactive`). `brand` keeps the chevron the same accent colour the
+          // `CollapseButton` uses in the button-trigger variant.
+          if (expandTrigger === 'row') {
+            return <Icon name={row.getIsExpanded() ? 'expand_less' : 'expand_more'} size={24} filled color="brand" />;
+          }
 
           return (
             <span
@@ -1016,20 +1040,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
               }}
             >
-              <Collapse
-                iconOnly
-                arrowType={expandTrigger === 'row' ? 'default' : 'secondary'}
-                hideCollapseText
+              <CollapseButton
+                arrowType="secondary"
                 {...collapseProps}
+                hideText
                 id={`${resolvedId}-expand-${row.id}`}
-                controlsId={subRowId}
+                aria-controls={renderSubComponent ? subRowId : undefined}
                 openText={getLabelRef.current('table.expand-row')}
                 closeText={getLabelRef.current('table.collapse-row')}
                 open={row.getIsExpanded()}
-                onToggle={() => row.toggleExpanded()}
-              >
-                {null}
-              </Collapse>
+                onOpenChange={() => row.toggleExpanded()}
+              />
             </span>
           );
         },
@@ -1042,6 +1063,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     hasSelection,
     selectionMode,
     hasExpansion,
+    renderSubComponent,
     expandTrigger,
     reorderableRows,
     resolvedId,
@@ -1075,7 +1097,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     enableRowSelection,
     enableMultiRowSelection: selectionMode !== 'single',
     enableColumnFilters,
-    autoResetPageIndex,
+    autoResetPageIndex: autoResetPageIndex ?? !manualPagination,
     paginateExpandedRows: paginationEnabled && !manualPagination ? paginateExpandedRows : true,
     manualPagination,
     manualSorting,
@@ -1106,8 +1128,52 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     [table, size, resolvedId, tableState]
   );
 
-  const handlePaginationPageChange = useCallback((nextPage: number) => table.setPageIndex(nextPage - 1), [table]);
-  const handlePaginationPageSizeChange = useCallback((nextSize: number) => table.setPageSize(nextSize), [table]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [scrollOverflow, setScrollOverflow] = useState({ left: false, right: false });
+  const stickyColumnsEnabled = stickyFirstColumn || stickyLastColumn;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !stickyColumnsEnabled) return;
+
+    const update = () => {
+      const left = el.scrollLeft > 0;
+      const right = Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth;
+      setScrollOverflow((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
+    };
+
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+
+    return () => {
+      el.removeEventListener('scroll', update);
+      observer.disconnect();
+    };
+  }, [stickyColumnsEnabled]);
+
+  const resetScrollTop = useCallback(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, []);
+
+  const handlePaginationPageChange = useCallback(
+    (nextPage: number) => {
+      table.setPageIndex(nextPage - 1);
+      resetScrollTop();
+    },
+    [table, resetScrollTop]
+  );
+  const handlePaginationPageSizeChange = useCallback(
+    (nextSize: number) => {
+      table.setPageSize(nextSize);
+      resetScrollTop();
+    },
+    [table, resetScrollTop]
+  );
 
   const hasGroupedHeaders = table.getHeaderGroups().length > 1;
   const rowExpandsOnClick = expandTrigger === 'row' && hasExpansion;
@@ -1121,6 +1187,9 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       [styles['tedi-table--vertical-borders']]: verticalBorders,
       [styles['tedi-table--borderless']]: borderless,
       [styles['tedi-table--sticky-first-column']]: stickyFirstColumn,
+      [styles['tedi-table--sticky-last-column']]: stickyLastColumn,
+      [styles['tedi-table--overflow-left']]: stickyFirstColumn && scrollOverflow.left,
+      [styles['tedi-table--overflow-right']]: stickyLastColumn && scrollOverflow.right,
       [styles['tedi-table--sticky-header']]: stickyHeader,
       [styles['tedi-table--clickable-rows']]: Boolean(onRowClick) || rowExpandsOnClick,
       [styles['tedi-table--row-hover']]: hoverEnabled,
@@ -1543,8 +1612,13 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           </div>
         )}
         <div
+          ref={scrollRef}
           className={styles['tedi-table__scroll']}
           style={maxHeight !== undefined ? { maxHeight, overflowY: 'auto' } : undefined}
+          // The wrapper scrolls (always `overflow-x: auto`, plus `overflow-y` when `maxHeight`
+          // is set), so it must be keyboard-focusable for scroll access (axe
+          // `scrollable-region-focusable`).
+          tabIndex={0}
         >
           <table
             id={id}
@@ -1581,9 +1655,17 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         : 'none'
                       : undefined;
                     const headerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
-                    const headerLabel =
+                    const rawHeaderLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
+                    const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
+                    const headerDef = header.column.columnDef.header;
+                    const headerIsBlank =
+                      !columnHasChildren &&
+                      (headerDef === null ||
+                        headerDef === undefined ||
+                        (typeof headerDef === 'string' && headerDef.trim() === ''));
+                    const headerFallbackLabel = headerLabel ?? (columnHasChildren ? undefined : header.column.id);
                     const userColumnProps = columnProps?.(header.column.id);
                     const headerSize = header.column.getSize();
                     const isBuiltInColumn =
@@ -1648,6 +1730,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             </button>
                             {flexRender(header.column.columnDef.header, header.getContext())}
                           </span>
+                        ) : headerIsBlank && headerFallbackLabel ? (
+                          <span className={styles['tedi-table__sr-only']}>{headerFallbackLabel}</span>
                         ) : (
                           flexRender(header.column.columnDef.header, header.getContext())
                         )}
@@ -1740,6 +1824,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     onClick: handleRowActivate,
                     onKeyDownHandler: handleRowKeyDown(row),
                     ariaRowIndex,
+                    ariaExpanded: rowExpandsOnClick && row.getCanExpand() ? row.getIsExpanded() : undefined,
+                    ariaControls: rowExpandsOnClick && row.getCanExpand() && renderSubComponent ? subRowId : undefined,
                     columnProps,
                     draggable: reorderableRows,
                     dragHandleLabel: getLabel('table.drag-row'),

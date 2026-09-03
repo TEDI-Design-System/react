@@ -96,3 +96,22 @@ export const Danger: Story = {
     children: 'Tag',
   },
 };
+
+/**
+ * When width-constrained, `ellipsis` truncates the label (the close button stays fixed) and
+ * reveals the full text in a popover on hover/focus. `false` never truncates — the label wraps;
+ * `end` cuts the end; `start` cuts the start.
+ */
+export const Ellipsis: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '7rem' }}>
+      <Tag onClose={(e) => console.log('Close button clicked', e)}>A fairly long tag label that wraps</Tag>
+      <Tag onClose={(e) => console.log('Close button clicked', e)} ellipsis="end">
+        A fairly long tag label, end
+      </Tag>
+      <Tag onClose={(e) => console.log('Close button clicked', e)} ellipsis="start">
+        start, a fairly long tag label
+      </Tag>
+    </div>
+  ),
+};

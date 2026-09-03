@@ -300,6 +300,9 @@ export type TSelectValue<CustomData = unknown> =
   | ReadonlyArray<ISelectOption<CustomData>>
   | null;
 
+/**
+ * @deprecated Use `Select` from `@tedi-design-system/react/tedi` instead.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>, SelectProps>(
   (props, ref): JSX.Element => {
