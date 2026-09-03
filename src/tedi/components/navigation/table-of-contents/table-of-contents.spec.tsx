@@ -18,7 +18,12 @@ jest.mock('../../../providers/label-provider', () => ({
   }),
 }));
 
-const Tree = (props: { activeId?: string; numbered?: boolean; variant?: 'default' | 'transparent' }) => (
+const Tree = (props: {
+  activeId?: string;
+  numbered?: boolean;
+  variant?: 'default' | 'transparent';
+  collapseInactive?: boolean;
+}) => (
   <TableOfContents {...props}>
     <TableOfContents.Item id="a">
       <a href="#a">Alpha</a>
@@ -52,8 +57,20 @@ describe('TableOfContents', () => {
     expect(screen.getByRole('link', { name: 'Bravo' }).closest('li')).not.toHaveAttribute('aria-current');
   });
 
-  it('expands only the active branch and hides other branches', () => {
+  it('shows every branch’s sub-items by default', () => {
     render(<Tree activeId="a1" />);
+    expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Bravo 1' })).toBeInTheDocument();
+  });
+
+  it('shows sub-items even without an active id', () => {
+    render(<Tree />);
+    expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Bravo 1' })).toBeInTheDocument();
+  });
+
+  it('expands only the active branch and hides other branches when collapseInactive is set', () => {
+    render(<Tree activeId="a1" collapseInactive />);
     expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Bravo 1' })).not.toBeInTheDocument();
   });

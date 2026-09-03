@@ -14,12 +14,12 @@ interface TableOfContentsRowProps {
 }
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
-  const { activeId, numbered, activeTrail } = useContext(TableOfContentsContext);
+  const { activeId, numbered, activeTrail, collapseInactive } = useContext(TableOfContentsContext);
   const { id, content, children, separator, slot } = node;
 
   const hasChildren = !!children?.length;
   const isSelected = !!id && id === activeId;
-  const isOpen = hasChildren && !!id && activeTrail.has(id);
+  const isOpen = hasChildren && (!collapseInactive || (!!id && activeTrail.has(id)));
   const level = Math.min(depth, 2);
 
   const numberBase = numberPrefix ? `${numberPrefix}.${index + 1}` : `${index + 1}`;
