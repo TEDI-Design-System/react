@@ -81,7 +81,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     onChange?.(next);
   };
 
-  const hours = useMemo(generateHours, []);
+  const hours = useMemo(() => generateHours(), []);
   const minutes = useMemo(() => generateMinutes(stepMinutes), [stepMinutes]);
 
   const { hour, minute } = parseTime(current || '12:00');

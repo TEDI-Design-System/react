@@ -47,7 +47,7 @@
     "@mui/material": "^5.15.13",
     "@mui/x-date-pickers": "^5.0.20",
     "@tanstack/react-table": "^8.13.2",
-    "@tedi-design-system/core": "^6.7.0",
+    "@tedi-design-system/core": "^6.8.1",
     "classnames": "^2.5.1",
     "draft-js": "^0.11.7",
     "draftjs-md-converter": "^1.5.2",
@@ -116,7 +116,7 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "eslint-plugin-storybook": "^10.4.6",
     "eslint-plugin-unused-imports": "^4.1.4",
@@ -133,7 +133,7 @@
     "react-dom": "18.3.1",
     "replace-in-file": "^8.4.0",
     "rollup-plugin-preserve-directives": "^0.4.0",
-    "rollup-plugin-visualizer": "^6.0.5",
+    "rollup-plugin-visualizer": "^7.1.1",
     "sass": "^1.83.1",
     "semantic-release": "^25.0.3",
     "showdown": "^2.1.0",
@@ -143,7 +143,7 @@
     "stylelint-config-recess-order": "^7.7.0",
     "stylelint-config-standard-scss": "^14.0.0",
     "stylelint-declaration-strict-value": "^1.9.2",
-    "ts-jest": "29.1.2",
+    "ts-jest": "29.4.12",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "typescript": "5.9.2",
@@ -186,6 +186,7 @@
     "access": "public"
   },
   "overrides": {
-    "dayjs": "$dayjs"
+    "dayjs": "$dayjs",
+    "eslint-plugin-react-hooks": "$eslint-plugin-react-hooks"
   }
 }

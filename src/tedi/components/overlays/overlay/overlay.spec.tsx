@@ -37,7 +37,7 @@ describe('Overlay component', () => {
     expect(trigger).toHaveClass('tedi-overlay__trigger--text');
     expect(trigger).toHaveClass('custom-class');
 
-    fireEvent.click(trigger);
+    fireEvent.mouseEnter(trigger);
     const content = screen.getByTestId('overlay-content');
     const arrow = screen.getByTestId('overlay-arrow');
 
@@ -131,7 +131,7 @@ describe('Overlay component', () => {
     const onToggleMock = jest.fn();
 
     render(
-      <Overlay open={false} onToggle={onToggleMock}>
+      <Overlay open={false} onToggle={onToggleMock} openWith="click">
         <Overlay.Trigger>Trigger</Overlay.Trigger>
         <Overlay.Content>Content</Overlay.Content>
       </Overlay>
@@ -139,6 +139,31 @@ describe('Overlay component', () => {
 
     fireEvent.click(screen.getByText('Trigger'));
     expect(onToggleMock).toHaveBeenCalledWith(true);
+  });
+
+  it('does not stay open after a click while hovering (hover mode)', async () => {
+    render(
+      <Overlay>
+        <Overlay.Trigger>Trigger</Overlay.Trigger>
+        <Overlay.Content>Content</Overlay.Content>
+      </Overlay>
+    );
+
+    const trigger = screen.getByText('Trigger');
+
+    await act(async () => {
+      fireEvent.mouseEnter(trigger);
+    });
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(trigger);
+    });
+    await act(async () => {
+      fireEvent.mouseLeave(trigger);
+    });
+
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
   describe('Overlay scroll locking', () => {
