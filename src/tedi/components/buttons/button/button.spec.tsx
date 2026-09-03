@@ -79,18 +79,16 @@ describe('Button component', () => {
     expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('announces the loading state through a polite live region', () => {
+  it('exposes the loading state in the accessible description while loading', () => {
     render(<Button {...defaultProps} isLoading />);
-    const status = screen.getByRole('status');
-    expect(status).toHaveAttribute('aria-live', 'polite');
-    expect(status).toHaveTextContent(/\S/);
-    expect(screen.getByRole('button')).toHaveAccessibleName('Click Me');
+    const button = screen.getByRole('button');
+    expect(button).toHaveAccessibleName('Click Me');
+    expect(button).toHaveAccessibleDescription(/\S/);
+    expect(button).toHaveAttribute('aria-describedby');
   });
 
-  it('keeps the live region present but empty when not loading', () => {
+  it('does not describe the button when not loading', () => {
     render(<Button {...defaultProps} />);
-    const status = screen.getByRole('status');
-    expect(status).toBeInTheDocument();
-    expect(status).toBeEmptyDOMElement();
+    expect(screen.getByRole('button')).not.toHaveAttribute('aria-describedby');
   });
 });

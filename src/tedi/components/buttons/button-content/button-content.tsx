@@ -123,6 +123,7 @@ const InternalButtonContent = forwardRef(
     ref?: PolymorphicRef<C>
   ) => {
     const { getLabel } = useLabels();
+    const loadingStatusId = React.useId();
     const Component = as || 'button';
     const hasIcon = icon || iconLeft || iconRight;
 
@@ -202,12 +203,14 @@ const InternalButtonContent = forwardRef(
     };
 
     const buttonText = getButtonText(children);
+    const ariaDescribedBy = cn(rest['aria-describedby'], isLoading && loadingStatusId) || undefined;
     const buttonElement = (
       <Component
         data-name="button-content"
         {...rest}
         aria-disabled={isLoading || rest['aria-disabled']}
         aria-busy={isLoading || undefined}
+        aria-describedby={ariaDescribedBy}
         onClick={onClickHandler}
         ref={ref}
         className={BEM}
@@ -226,7 +229,13 @@ const InternalButtonContent = forwardRef(
         ) : (
           buttonElement
         )}
-        <span role="status" aria-live="polite" className={styles['tedi-btn__loading-status']}>
+        {/*
+          The loading label is referenced by the button via `aria-describedby` (see above) so
+          it is read on focus. It is `aria-hidden` so screen-reader users navigating in browse
+          mode do not also land on it as a separate node — otherwise "loading" is announced twice
+          (once on the button, once on the span). `aria-describedby` still reads hidden targets.
+        */}
+        <span id={loadingStatusId} aria-hidden="true" className={styles['tedi-btn__loading-status']}>
           {isLoading ? getLabel('button.loading') : ''}
         </span>
       </Print>
