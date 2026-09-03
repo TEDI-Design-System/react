@@ -689,6 +689,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       setHasInvalidDateError(false);
       return;
     }
+
+    if (!parseDate && mode !== 'single') {
+      setHasInvalidDateError(false);
+      return;
+    }
     setHasInvalidDateError(!isParsedValidForMode(parseInputValue(inputValue)));
   };
 
