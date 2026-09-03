@@ -1,3 +1,10 @@
+## [19.0.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.1-rc.1...react-19.0.1-rc.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* **map-button,tooltip:** Fix Stuck Hover And Tooltip On Mobile Tap [#862](https://github.com/TEDI-Design-System/react/issues/862) ([#863](https://github.com/TEDI-Design-System/react/issues/863)) ([212b2ca](https://github.com/TEDI-Design-System/react/commit/212b2ca0c7d5ace1c96d38c59d0abc9925febb87)), closes [#838](https://github.com/TEDI-Design-System/react/issues/838)
+
 ## [19.0.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.0.0...react-19.0.1-rc.1) (2026-09-02)
 
 
