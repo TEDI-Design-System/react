@@ -100,7 +100,7 @@
   }
 }
 
-.tedi-table-of-contents--bordered .tedi-table-of-contents__list > .tedi-table-of-contents__item:not(:last-child) {
+.tedi-table-of-contents--bordered .tedi-table-of-contents__list > .tedi-table-of-contents__item {
   border-bottom: var(--tedi-borders-01) solid var(--card-border-primary);
 }
 

@@ -34,17 +34,15 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         [styles['tedi-table-of-contents__item--selected']]: isSelected,
       })}
     >
-      <span
-        className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}
-      >
+      <div className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}>
         {numbered && (
           <span className={styles['tedi-table-of-contents__number']} aria-hidden="true">
             {ordinal}
           </span>
         )}
         <span className={styles['tedi-table-of-contents__content']}>{content}</span>
-        {slot !== undefined && <span className={styles['tedi-table-of-contents__slot']}>{slot}</span>}
-      </span>
+        {slot !== undefined && <div className={styles['tedi-table-of-contents__slot']}>{slot}</div>}
+      </div>
 
       {isOpen && (
         <Group className={styles['tedi-table-of-contents__group']}>
