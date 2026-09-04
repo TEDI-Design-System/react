@@ -613,6 +613,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'No data',
     ru: 'Нет данных',
   },
+  'table-card.select-row': {
+    description: 'Accessible label for the TableCard selection checkbox.',
+    components: ['TableCard'],
+    et: 'Vali rida',
+    en: 'Select row',
+    ru: 'Выбрать строку',
+  },
   'table.expand-row': {
     description: 'Accessible label on the expand toggle in expandable rows.',
     components: ['Table'],

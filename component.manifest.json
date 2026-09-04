@@ -155,6 +155,15 @@
       ]
     },
     {
+      "id": "content/table-card",
+      "name": null,
+      "category": "content",
+      "sourcePath": "src/tedi/components/content/table-card",
+      "status": [],
+      "description": null,
+      "keyProps": []
+    },
+    {
       "id": "content/calendar/calendar",
       "name": "Calendar",
       "category": "content",
