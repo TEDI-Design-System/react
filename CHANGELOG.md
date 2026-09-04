@@ -1,3 +1,10 @@
+# [19.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.0.1-rc.2...react-19.1.0-rc.1) (2026-09-04)
+
+
+### Features
+
+* **vertical-stepper,card-stepper:** new TEDI-Ready components [#172](https://github.com/TEDI-Design-System/react/issues/172) ([#690](https://github.com/TEDI-Design-System/react/issues/690)) ([a30b463](https://github.com/TEDI-Design-System/react/commit/a30b4631f7a0f2f82c4b869aa9e795ff2266a89c))
+
 ## [19.0.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.1-rc.1...react-19.0.1-rc.2) (2026-09-03)
 
 
