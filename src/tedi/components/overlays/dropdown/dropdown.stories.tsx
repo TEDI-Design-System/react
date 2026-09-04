@@ -413,6 +413,44 @@ export const CustomWidth: Story = {
   ),
 };
 
+/**
+ * Set `maxHeight` to cap the dropdown's scrollable body. When the content is taller than the cap,
+ * the body scrolls; accepts a `number` (px) or any CSS length string (e.g. `'20rem'`, `'50vh'`).
+ */
+export const RestrictedHeight: Story = {
+  render: () => (
+    <Row>
+      <Col width="auto">
+        <Dropdown maxHeight={240} width={280}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Vali raviasutus
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            {[
+              'Fertilitas',
+              'Ida-Tallinna Keskhaigla',
+              'Lääne-Tallinna Keskhaigla',
+              'Põhja-Eesti Regionaalhaigla',
+              'Tallinna Lastehaigla',
+              'Tartu Ülikooli Kliinikum',
+              'Pärnu Haigla',
+              'Narva Haigla',
+              'Viljandi Haigla',
+              'Kuressaare Haigla',
+            ].map((label, index) => (
+              <Dropdown.Item key={label} index={index}>
+                {label}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
+  ),
+};
+
 export const WithDescription: Story = {
   render: () => (
     <Row>
