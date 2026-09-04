@@ -10,6 +10,9 @@ const meta: Meta<typeof VerticalStepper> = {
   title: 'Community/VerticalStepper',
   subcomponents: { StepItem, SubItem } as never,
   parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
     docs: {
       description: {
         component: 'Vertical Stepper with StepItem and SubItem. Currently supports desktop only. ',

@@ -2,6 +2,9 @@ import cn from 'classnames';
 
 import styles from './vertical-stepper.module.scss';
 
+/**
+ * @deprecated Use `VerticalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface VerticalStepperProps {
   /**
    * SubItem or Separator
@@ -15,6 +18,9 @@ export interface VerticalStepperProps {
   isCompact?: boolean;
 }
 
+/**
+ * @deprecated Use `VerticalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export const VerticalStepper = (props: VerticalStepperProps): JSX.Element => {
   const { className, children, isCompact } = props;
 

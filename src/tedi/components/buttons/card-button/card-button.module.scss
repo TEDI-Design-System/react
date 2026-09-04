@@ -24,7 +24,11 @@
       background-color: var(--button-card-hover-background);
     }
 
-    [data-name='icon'] {
+    [data-name='icon']:not(
+        [class*='tedi-icon--color-success'],
+        [class*='tedi-icon--color-warning'],
+        [class*='tedi-icon--color-danger']
+      ) {
       color: var(--button-card-icon-hover);
     }
 
@@ -42,7 +46,11 @@
       background-color: var(--button-card-active-background);
     }
 
-    [data-name='icon'] {
+    [data-name='icon']:not(
+        [class*='tedi-icon--color-success'],
+        [class*='tedi-icon--color-warning'],
+        [class*='tedi-icon--color-danger']
+      ) {
       color: var(--button-card-icon-hover);
     }
 
