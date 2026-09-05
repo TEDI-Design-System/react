@@ -26,9 +26,20 @@ const isDateRange = (val: SelectedValueLike): val is DateRange =>
  * start instead drags the existing end. That surprises users who expect a
  * fresh click to begin a new range.
  *
- * This normalises that: once a range is complete, the next click starts over
- * with `from` set to the clicked day and `to` cleared. While the range is
- * still being built (or empty), DayPicker's own result is passed through.
+ * It also returns a same-day `{ from, to }` (a single-day range) for the very
+ * first click on an empty range. Left as-is that reads as an already-complete
+ * range, so the *next* click looks like a "start over" and the whole
+ * interaction ends up one click behind (issue #813).
+ *
+ * This normalises both cases:
+ * - once a range is complete, the next click starts over with `from` set to the
+ *   clicked day and `to` cleared;
+ * - the first click on an empty range becomes a `to`-less start, so a second
+ *   click is still needed to set the end. Clicking the same start day again
+ *   (an in-progress start already exists) keeps DayPicker's single-day range,
+ *   so deliberate single-day ranges remain possible.
+ *
+ * While a distinct end is being added, DayPicker's own result is passed through.
  *
  * @param computed - the range react-day-picker derived from the click
  * @param previous - the range that was selected before this click
@@ -42,7 +53,14 @@ export const resolveRangeSelection = (
   if (clickedDay && isDateRange(previous) && previous.from && previous.to) {
     return { from: clickedDay, to: undefined };
   }
-  return isDateRange(computed) ? computed : undefined;
+  if (!isDateRange(computed)) return undefined;
+
+  const isSameDayRange = !!computed.from && !!computed.to && computed.from.getTime() === computed.to.getTime();
+  const hasInProgressStart = isDateRange(previous) && !!previous.from && !previous.to;
+  if (isSameDayRange && !hasInProgressStart) {
+    return { from: computed.from, to: undefined };
+  }
+  return computed;
 };
 
 /**
