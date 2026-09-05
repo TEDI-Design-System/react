@@ -1590,7 +1590,7 @@ Sub-components: `Dropdown.Trigger`, `Dropdown.Content`, `Dropdown.Item`, `Dropdo
 </Dropdown>
 ```
 
-**Props:** `width`, `placement`, `divided`, `open?` (controlled), `modal?: boolean`
+**Props:** `width`, `placement`, `divided`, `variant?: 'default' | 'tree'`, `maxHeight?: number | string` (caps the scrollable body — `number` = px, `string` = any CSS length; content scrolls when taller, sticky regions stay pinned), `open?` (controlled), `modal?: boolean`
 
 ### Popover
 
