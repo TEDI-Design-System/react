@@ -10,8 +10,8 @@ export interface TopNavSeparatorProps {
 }
 
 export const TopNavSeparator = ({ className }: TopNavSeparatorProps): JSX.Element => (
-  <li role="separator" aria-orientation="vertical" className={cn(styles['tedi-top-nav__separator'], className)}>
-    <span className={styles['tedi-top-nav__separator-line']} aria-hidden="true" />
+  <li className={cn(styles['tedi-top-nav__separator'], className)}>
+    <span role="separator" aria-orientation="vertical" className={styles['tedi-top-nav__separator-line']} />
   </li>
 );
 

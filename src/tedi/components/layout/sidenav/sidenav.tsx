@@ -179,7 +179,12 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
     <Print visibility="hide">
       <nav id={props.id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
         {isCollapsible && <MobileNavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
-        <ul className={styles['tedi-sidenav__list']} role="menubar" aria-label={ariaLabel}>
+        {/* Disclosure Navigation (WAI-ARIA APG), not a menubar: SideNav is site
+            navigation (links + `aria-expanded` groups) without menu keyboard
+            semantics. A plain list inside the `<nav aria-label>` landmark is the
+            correct model — and a `menubar` can't legally contain the expandable
+            item's Collapse toggle button. */}
+        <ul className={styles['tedi-sidenav__list']}>
           {navItems.map((item, key) => (
             <SideNavItem
               as={linkAs}
