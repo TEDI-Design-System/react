@@ -47,7 +47,9 @@
       "name": "Carousel",
       "category": "content",
       "sourcePath": "src/tedi/components/content/carousel",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Compound slide carousel with an infinite-looping track, drag/wheel/keyboard navigation, and screen-reader announcements.",
       "keyProps": [
         "slidesPerView",
@@ -62,7 +64,9 @@
       "name": "List",
       "category": "content",
       "sourcePath": "src/tedi/components/content/list",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render an ordered or unordered list of List.Item children with an optional bullet style and color.",
       "keyProps": [
         "element",
@@ -145,7 +149,9 @@
       "name": "TextGroup",
       "category": "content",
       "sourcePath": "src/tedi/components/content/text-group",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a label/value pair, stacked vertically or inline horizontally with a configurable label width.",
       "keyProps": [
         "label",
@@ -191,7 +197,9 @@
       "name": "Skeleton",
       "category": "loaders",
       "sourcePath": "src/tedi/components/loaders/skeleton",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render placeholder blocks that mimic loading content shape before real content is ready.",
       "keyProps": [
         "children",
@@ -203,7 +211,9 @@
       "name": "ProgressBar",
       "category": "loaders",
       "sourcePath": "src/tedi/components/loaders/progress-bar",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a labeled progress bar reporting a 0-100 value with accessible aria-valuenow semantics.",
       "keyProps": [
         "value",
@@ -376,7 +386,9 @@
       "name": "VerticalSpacing",
       "category": "layout",
       "sourcePath": "src/tedi/components/layout/vertical-spacing",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Apply consistent vertical gaps between stacked child elements.",
       "keyProps": [
         "size",
@@ -474,7 +486,9 @@
       "name": "Card",
       "category": "content",
       "sourcePath": "src/tedi/components/content/card",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a bordered content surface composed from Card.Header, Card.Content, and Card.Notification sub-components.",
       "keyProps": [
         "padding",
@@ -487,7 +501,9 @@
       "name": "Accordion",
       "category": "content",
       "sourcePath": "src/tedi/components/content/accordion",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Compound collapsible-content component with one or more Accordion.Item entries, supporting single or multiple expansion.",
       "keyProps": [
         "allowMultiple",
@@ -500,7 +516,9 @@
       "name": "Breadcrumbs",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/breadcrumbs",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a trail of navigational crumbs with automatic separators, a mobile back-link variant, and collapsing for long trails.",
       "keyProps": [
         "children",
@@ -557,7 +575,9 @@
       "name": "Pagination",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/pagination",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a page-number list with prev/next arrows, a results count, and an optional page-size selector; collapses to a mobile modal picker.",
       "keyProps": [
         "pageCount",
@@ -693,19 +713,21 @@
       ]
     },
     {
-      "id": "form/search/search",
+      "id": "form/search",
       "name": "Search",
       "category": "form",
-      "sourcePath": "src/tedi/components/form/search/search",
+      "sourcePath": "src/tedi/components/form/search",
       "status": [
         "breakpointSupport"
       ],
-      "description": "TextField variant with a built-in search button and onSearch callback for triggering a search action.",
+      "description": "TextField-based search field with an onSearch callback and optional button. Pass a `suggestions` array to turn it into an accessible combobox for typeahead / suggestions (onSuggestionSelect, loading, minQueryLength, renderSuggestion, footer, hideOnScroll).",
       "keyProps": [
         "id",
         "label",
         "onSearch",
-        "button"
+        "button",
+        "suggestions",
+        "onSuggestionSelect"
       ]
     },
     {
@@ -728,7 +750,9 @@
       "name": "ChoiceGroup",
       "category": "form",
       "sourcePath": "src/tedi/components/form/choice-group",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a group of radio or checkbox items with a shared label, supporting a default or segmented visual variant.",
       "keyProps": [
         "items",
@@ -868,7 +892,9 @@
       "name": "Filter",
       "category": "filter",
       "sourcePath": "src/tedi/components/filter/filter",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Compact pill-shaped trigger for refining result sets, rendering as a toggle, single- or multi-select dropdown, or custom panel.",
       "keyProps": [
         "text",
@@ -954,7 +980,9 @@
       "name": "Dropdown",
       "category": "overlays",
       "sourcePath": "src/tedi/components/overlays/dropdown",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Render a floating menu of Dropdown.Item actions anchored to a trigger element.",
       "keyProps": [
         "width",
@@ -968,7 +996,9 @@
       "name": "Modal",
       "category": "overlays",
       "sourcePath": "src/tedi/components/overlays/modal",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Portalled dialog with focus trapping, backdrop, and scroll locking, composed from Modal.Trigger, Modal.Content, Modal.Header, Modal.Body, and Modal.Footer.",
       "keyProps": [
         "open",
@@ -1137,7 +1167,9 @@
       "name": "Footer",
       "category": "layout",
       "sourcePath": "src/tedi/components/layout/footer",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Composable page footer built from Footer.Side, Footer.Body/Footer.Section, and Footer.Bottom slots, with a mobile-collapsed layout.",
       "keyProps": [
         "mobileBreakpoint",
@@ -1150,7 +1182,9 @@
       "name": "Header",
       "category": "layout",
       "sourcePath": "src/tedi/components/layout/header",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Composable site header built from Header.Logo, Header.Center, Header.Actions, and related sub-components, with mobile toggle support.",
       "keyProps": [
         "toggle",

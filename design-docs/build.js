@@ -36,8 +36,15 @@ export function generateManifest() {
   const fresh = parseBarrel(barrelSrc).map((row) => {
     const dir = resolve(repoRoot, row.sourcePath, '..');
     const base = basename(row.sourcePath);
-    const storyFile = resolve(dir, `${base}.stories.tsx`);
-    const status = existsSync(storyFile) ? extractStatus(readFileSync(storyFile, 'utf8')) : [];
+    // File-style components live at `<dir>/<base>.stories.tsx`; folder-exported
+    // compounds (e.g. input-group, search) keep the story at
+    // `<sourcePath>/<base>.stories.tsx`. Check both so folder compounds still
+    // pick up their status badges.
+    const storyFile = [
+      resolve(dir, `${base}.stories.tsx`),
+      resolve(repoRoot, row.sourcePath, `${base}.stories.tsx`),
+    ].find(existsSync);
+    const status = storyFile ? extractStatus(readFileSync(storyFile, 'utf8')) : [];
     return { ...row, status };
   });
   const existing = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')).components ?? [] : [];
