@@ -6,7 +6,6 @@ import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import { Col, Row } from '../../layout/grid';
-import { VerticalSpacing } from '../../layout/vertical-spacing';
 import styles from './alert.module.scss';
 
 export type AlertType = 'info' | 'success' | 'warning' | 'danger';
@@ -141,45 +140,51 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     return <Icon {...iconProps} className={styles['tedi-alert__icon']} />;
   };
 
-  const ariaLive = role === 'alert' ? 'assertive' : role === 'status' ? 'polite' : 'off';
+  const isPresentational = role === 'none';
+  const ariaLive = role === 'alert' ? 'assertive' : role === 'status' ? 'polite' : undefined;
   const headingId = React.useId();
 
   return isMounted ? (
     <div
       role={role}
       data-name="alert"
-      aria-label={`${type} alert`}
-      aria-live={ariaLive}
-      aria-labelledby={title ? headingId : undefined}
       {...rest}
+      aria-live={isPresentational ? undefined : ariaLive}
+      aria-labelledby={!isPresentational && title ? headingId : undefined}
+      aria-label={!isPresentational && !title ? `${type} alert` : undefined}
       className={alertBEM}
     >
-      <VerticalSpacing size={0.25}>
-        <Row gutterX={2} alignItems={title ? 'center' : 'start'}>
-          <Col grow={1} className={styles['tedi-alert__content']}>
-            {icon && getIcon(icon)}
-            <div className="tedi-alert__content-wrapper">
-              {title ? (
+      <Row gutterX={2} alignItems="start">
+        <Col grow={1}>
+          {title ? (
+            <>
+              <div className={styles['tedi-alert__content']}>
+                {icon && getIcon(icon)}
                 <Heading element={titleElement} id={headingId} modifiers={['h5']}>
                   {title}
                 </Heading>
-              ) : (
-                children
+              </div>
+              {children && (
+                <div className={cn('tedi-alert__content-wrapper', styles['tedi-alert__message'])}>{children}</div>
               )}
-            </div>
-          </Col>
-          {action ? (
-            <Col width="auto">{action}</Col>
+            </>
           ) : (
-            onClose && (
-              <Col width="auto">
-                <ClosingButton onClick={onClose} iconSize={18} />
-              </Col>
-            )
+            <div className={styles['tedi-alert__content']}>
+              {icon && getIcon(icon)}
+              <div className="tedi-alert__content-wrapper">{children}</div>
+            </div>
           )}
-        </Row>
-        {title && children && <div className="tedi-alert__content-wrapper">{children}</div>}
-      </VerticalSpacing>
+        </Col>
+        {action ? (
+          <Col width="auto">{action}</Col>
+        ) : (
+          onClose && (
+            <Col width="auto">
+              <ClosingButton onClick={onClose} iconSize={18} />
+            </Col>
+          )
+        )}
+      </Row>
     </div>
   ) : null;
 };
