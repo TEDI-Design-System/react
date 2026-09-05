@@ -3,6 +3,7 @@ import { act, useState } from 'react';
 
 import Radio from './radio';
 import styles from './radio.module.scss';
+import RadioGroup from './radio-group/radio-group';
 
 jest.mock('../../base/icon/icon', () => ({
   Icon: jest.fn(() => <span data-testid="icon">Icon</span>),
@@ -265,5 +266,39 @@ describe('Radio component', () => {
 
     const radio = screen.getByRole('radio');
     expect(radio).toHaveAccessibleDescription('Something is wrong');
+  });
+
+  it('card variant: accessible name is the label only; description and helper are the description', () => {
+    render(
+      <Radio
+        id="radio-card"
+        variant="card"
+        label="Standard delivery"
+        value="standard"
+        description="Arrives in 3 days"
+        helper={{ text: 'Free of charge' }}
+      />
+    );
+
+    const radio = screen.getByRole('radio', { name: 'Standard delivery' });
+    // Name is not merged with the description/helper text.
+    expect(radio).toHaveAccessibleName('Standard delivery');
+    expect(radio).toHaveAccessibleDescription(/Arrives in 3 days/);
+    expect(radio).toHaveAccessibleDescription(/Free of charge/);
+  });
+
+  it('card variant: ignores a group-inherited tooltip and warns (tooltip and card are mutually exclusive)', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    render(
+      <RadioGroup label="Delivery" name="delivery" variant="card">
+        <Radio label="Standard delivery" value="standard" tooltip="Extra info" />
+      </RadioGroup>
+    );
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
+
+    warn.mockRestore();
   });
 });

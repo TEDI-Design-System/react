@@ -701,22 +701,76 @@ Both are accessible by **mouse and keyboard**. A grip handle (`≡`) is added to
 
 ### Checkbox
 
-**Props:** `CheckboxProps` | form
+**Props:** `CheckboxProps` | bp, form
+**Compound:** `Checkbox.Group`
 
-- `id: string` (required)
-- `label?: ReactNode`
+- `label: ReactNode` (required)
 - `value: string` (required)
+- `id?: string` (auto-generated when omitted, e.g. inside `Checkbox.Group`)
+- `name?: string` (provided automatically inside `Checkbox.Group`)
 - `checked?: boolean`, `defaultChecked?: boolean`
 - `onChange?: (value: string, checked: boolean) => void`
 - `indeterminate?: boolean`
-- `size?: 'default' | 'small'`
+- `size?: 'default' | 'large'`
+- `variant?: 'default' | 'card'`, `cardVariant?: 'primary' | 'secondary'`
+- `description?: ReactNode`, `icon?: string` (Material icon) — for card variant
+- `disabled?`, `invalid?`, `required?`, `hideLabel?`, `helper?`, `tooltip?`
+
+```tsx
+// Compound group — Checkbox.Group owns selection and shared props
+<Checkbox.Group label="Toppings" value={values} onChange={setValues}>
+  <Checkbox value="cheese" label="Cheese" />
+  <Checkbox value="ham" label="Ham" />
+</Checkbox.Group>
+
+// Card variant + select-all (indeterminate)
+<Checkbox.Group label="Plan" variant="card" cardVariant="secondary" indeterminateCheck>
+  <Checkbox value="a" label="Basic" description="Description" icon="check" />
+  <Checkbox value="b" label="Pro" />
+</Checkbox.Group>
+```
+
+**`Checkbox.Group` props:** `CheckboxGroupProps` | bp
+
+- `label: ReactNode` (required), `children` (required)
+- `value?: string[]`, `defaultValue?: string[]`, `onChange?: (value: string[]) => void`
+- `variant?: 'default' | 'card'`, `cardVariant?: 'primary' | 'secondary'`
+- `direction?: 'row' | 'column'`, `layout?: 'separated' | 'segmented'`
+- `indeterminateCheck?: boolean | string | ((state: 'all' | 'some' | 'none') => string)` — renders a select-all checkbox
+- `indeterminateCheckProps?: Partial<CheckboxProps>`
+- `disabled?`, `invalid?`, `required?`, `hideLabel?`, `helper?`
 
 ### Radio
 
-**Props:** `RadioProps` | form
-Same as Checkbox (without indeterminate)
+**Props:** `RadioProps` | bp, form
+**Compound:** `Radio.Group`
 
-### ChoiceGroup
+Same item-level props as `Checkbox` (no `indeterminate`).
+
+```tsx
+<Radio.Group label="Contact method" value={value} onChange={setValue}>
+  <Radio value="email" label="Email" />
+  <Radio value="phone" label="Phone" />
+</Radio.Group>
+
+// Card variant, segmented layout
+<Radio.Group label="Plan" variant="card" cardVariant="primary" layout="segmented" defaultValue="a">
+  <Radio value="a" label="Text" icon="computer" />
+  <Radio value="b" label="Text" />
+</Radio.Group>
+```
+
+**`Radio.Group` props:** `RadioGroupProps` | bp
+
+- `label: ReactNode` (required), `children` (required)
+- `value?: string | null`, `defaultValue?: string | null`, `onChange?: (value: string) => void`
+- `variant?: 'default' | 'card'`, `cardVariant?: 'primary' | 'secondary'`
+- `direction?: 'row' | 'column'`, `layout?: 'separated' | 'segmented'`
+- `disabled?`, `invalid?`, `required?`, `hideLabel?`, `helper?`
+
+### ChoiceGroup — **⚠️ DEPRECATED** (use compound `Radio.Group` / `Checkbox.Group`)
+
+Deprecated in favour of the compound `Radio.Group` / `Checkbox.Group` APIs above (composable children, `variant="card"`, segmented layout, select-all). Kept for backwards compatibility.
 
 **Props:** `ChoiceGroupProps` | bp, form
 
@@ -914,8 +968,11 @@ import { Filter, FilterGroup } from '@tedi-design-system/react/tedi';
 
 // Custom dropdown content — show clear action that resets consumer state
 <Filter text={periodLabel} selected={!!period} showClear onClear={() => setPeriod('')}>
-  <ChoiceGroup id="period" label="Period" inputType="radio" items={periodItems}
-    value={period} onChange={setPeriod} />
+  <Radio.Group label="Period" value={period} onChange={setPeriod}>
+    {periodItems.map((item) => (
+      <Radio key={item.value} value={item.value} label={item.label} />
+    ))}
+  </Radio.Group>
 </Filter>
 ```
 
@@ -1908,7 +1965,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 
 ### Check (Checkbox) — **DEPRECATED** (use TEDI-Ready Checkbox)
 
-### Radio — **DEPRECATED** (use TEDI-Ready Radio via ChoiceGroup)
+### Radio — **DEPRECATED** (use TEDI-Ready `Radio` / `Radio.Group`)
 
 ### Select — **DEPRECATED** (use TEDI-Ready Select)
 
@@ -1920,7 +1977,7 @@ Import from `@tedi-design-system/react/community`. These are community-contribut
 - `ariaLabel: string`, `label?`, `checked?`, `defaultChecked?`, `onChange?`
 - `size?: 'medium' | 'large'`, `color?: 'default' | 'alternative'`, `icon?`, `disabled?`
 
-### ChoiceGroup — **DEPRECATED** (use TEDI-Ready ChoiceGroup)
+### ChoiceGroup — **DEPRECATED** (use TEDI-Ready `Radio.Group` / `Checkbox.Group`)
 
 - `id: string`, `items: ChoiceGroupItemProps[]`, `inputType?: 'radio' | 'checkbox'`
 - `type?: 'light' | 'selector' | 'filter' | 'default'`, `value?`, `onChange?`

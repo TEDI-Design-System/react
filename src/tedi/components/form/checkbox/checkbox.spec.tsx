@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { act, useState } from 'react';
 
 import Checkbox from './checkbox';
+import CheckboxGroup from './checkbox-group/checkbox-group';
 
 import '@testing-library/jest-dom';
 
@@ -255,5 +256,39 @@ describe('Checkbox component', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
 
     expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('card variant: accessible name is the label only; description and helper are the description', () => {
+    render(
+      <Checkbox
+        id="cb-card"
+        variant="card"
+        label="Express delivery"
+        value="express"
+        description="Arrives tomorrow"
+        helper={{ text: 'Costs extra' }}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Express delivery' });
+    // Name is not merged with the description/helper text.
+    expect(checkbox).toHaveAccessibleName('Express delivery');
+    expect(checkbox).toHaveAccessibleDescription(/Arrives tomorrow/);
+    expect(checkbox).toHaveAccessibleDescription(/Costs extra/);
+  });
+
+  it('card variant: ignores a group-inherited tooltip and warns (tooltip and card are mutually exclusive)', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    render(
+      <CheckboxGroup label="Delivery" variant="card">
+        <Checkbox label="Express delivery" value="express" tooltip="Extra info" />
+      </CheckboxGroup>
+    );
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
+
+    warn.mockRestore();
   });
 });

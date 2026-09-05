@@ -1,0 +1,43 @@
+.tedi-checkbox-group {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.tedi-checkbox-group__legend {
+  padding: 0;
+  margin-bottom: var(--tedi-dimensions-05);
+  font-family: var(--family-default);
+  font-size: var(--body-regular-size);
+  font-weight: var(--body-regular-weight);
+  line-height: var(--body-regular-line-height);
+  color: var(--general-text-secondary);
+}
+
+.tedi-checkbox-group__required {
+  margin-left: var(--content-label-inner-spacing-x);
+  color: var(--form-general-feedback-error-border);
+}
+
+.tedi-checkbox-group__items {
+  display: flex;
+  gap: var(--form-checkbox-radio-gutter-y);
+}
+
+.tedi-checkbox-group--column .tedi-checkbox-group__items {
+  flex-direction: column;
+}
+
+.tedi-checkbox-group__items--indented {
+  padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-inner-spacing));
+}
+
+.tedi-checkbox-group--row .tedi-checkbox-group__items {
+  flex-flow: row wrap;
+  align-items: stretch;
+}
+
+.tedi-checkbox-group--card .tedi-checkbox-group__items {
+  gap: var(--layout-grid-gutters-08);
+}

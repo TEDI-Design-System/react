@@ -885,6 +885,20 @@ export const labelsMap = validateDefaultLabels({
     en: 'Remove all',
     ru: 'Удалить все',
   },
+  'checkbox-group.select-all': {
+    description: 'Label for the CheckboxGroup select-all checkbox when not all options are selected',
+    components: ['Checkbox'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
+  },
+  'checkbox-group.remove-all': {
+    description: 'Label for the CheckboxGroup select-all checkbox when every option is selected',
+    components: ['Checkbox'],
+    et: 'Eemalda kõik',
+    en: 'Remove all',
+    ru: 'Удалить все',
+  },
   'table.filter.no-options': {
     description: 'When select filter has no options',
     components: ['Table', 'TableFilter'],

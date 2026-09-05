@@ -5,23 +5,31 @@ import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Checkbox, { CheckboxProps } from './checkbox';
+import Checkbox, { CheckboxGroup, CheckboxProps } from '.';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4228-72934&m=dev" target="_BLANK">Figma ↗</a><br />
- * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Zeroheight ↗</a><br/><hr/>
- * In most cases, you should use the `ChoiceGroup` component. However, we also provide a standalone `Check` component for custom use cases.
+ * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Checkbox> = {
   component: Checkbox,
+  subcomponents: { 'Checkbox.Group': CheckboxGroup },
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/Checkbox',
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof Checkbox>;
 
-const Template: StoryFn<CheckboxProps> = (args) => <Checkbox {...args} label="Text" value="default" />;
+const Template: StoryFn<CheckboxProps> = (args) => <Checkbox {...args} label="Tekst" value="default" />;
 const sizesArray: Array<'default' | 'large'> = ['default', 'large'];
 
 const TemplateSizes: StoryFn<CheckboxProps> = (args) => {
@@ -84,7 +92,7 @@ export const States = () => {
               <Text modifiers="bold">Default</Text>
             </Col>
             <Col>
-              <Checkbox id="check-default" label="Text" name="check-default" value="check" />
+              <Checkbox id="check-default" label="Tekst" name="check-default" value="check" />
             </Col>
           </Row>
           <Row>
@@ -92,7 +100,7 @@ export const States = () => {
               <Text modifiers="bold">Hover</Text>
             </Col>
             <Col>
-              <Checkbox id="check-hover" label="Text" name="check-hover" value="check" hover />
+              <Checkbox id="check-hover" label="Tekst" name="check-hover" value="check" hover />
             </Col>
           </Row>
           <Row>
@@ -102,7 +110,7 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-checked"
-                label="Text"
+                label="Tekst"
                 name="check-checked"
                 value="check"
                 checked={checked}
@@ -115,7 +123,7 @@ export const States = () => {
               <Text modifiers="bold">Disabled</Text>
             </Col>
             <Col>
-              <Checkbox id="check-disabled" label="Text" name="check-disabled" value="check" disabled />
+              <Checkbox id="check-disabled" label="Tekst" name="check-disabled" value="check" disabled />
             </Col>
           </Row>
           <Row>
@@ -125,7 +133,7 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-disabled-checked"
-                label="Text"
+                label="Tekst"
                 name="check-disabled-checked"
                 value="check"
                 disabled
@@ -140,7 +148,7 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-indeterminate"
-                label="Text"
+                label="Tekst"
                 name="check-indeterminate"
                 value="check"
                 indeterminate={indeterminate}
@@ -155,11 +163,11 @@ export const States = () => {
             <Col>
               <Checkbox
                 id="check-invalid"
-                label="Text"
+                label="Tekst"
                 name="check-invalid"
                 value="check"
                 invalid
-                helper={{ text: 'Feedback text', type: 'error' }}
+                helper={{ text: 'Tagasiside tekst', type: 'error' }}
               />
             </Col>
           </Row>
@@ -168,7 +176,7 @@ export const States = () => {
               <Text modifiers="bold">Required</Text>
             </Col>
             <Col>
-              <Checkbox id="check-required" label="Text" name="check-required" value="check" required />
+              <Checkbox id="check-required" label="Tekst" name="check-required" value="check" required />
             </Col>
           </Row>
         </VerticalSpacing>
@@ -207,14 +215,14 @@ export const WithTooltip: Story = {
           <Checkbox
             {...args}
             id="check-short-title-tooltip"
-            label="Text"
+            label="Tekst"
             name="check-short-title-tooltip"
             value="check"
           />
           <Checkbox
             {...args}
             id="check-short-title-helper-tooltip"
-            label="Text"
+            label="Tekst"
             name="check-short-title-helper-tooltip"
             value="check"
             helper={{
@@ -248,7 +256,7 @@ export const Controlled = () => {
   return (
     <Checkbox
       id="controlled-check"
-      label="Select me"
+      label="Vali mind"
       name="controlled-check"
       value="controlled"
       checked={checked}
@@ -257,7 +265,7 @@ export const Controlled = () => {
   );
 };
 
-export const CheckWithLongTitle = () => {
+export const WithLongTitle = () => {
   return (
     <Row>
       <Col lg={6} md={12}>
@@ -270,4 +278,189 @@ export const CheckWithLongTitle = () => {
       </Col>
     </Row>
   );
+};
+
+/**
+ * A `required` group means "at least one must be selected". It's conveyed via the
+ * group's accessible name (legend), not native `required` on each box — that would
+ * demand every box be ticked, and there's no `aria-required` for a checkbox group.
+ */
+export const GroupRequired: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>([]);
+    return (
+      <Checkbox.Group label="Tooraine" required value={values} onChange={setValues}>
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/**
+ * An `invalid` group marks the fieldset `aria-invalid` and paints every box in the
+ * error state, but does not mark each box `aria-invalid` (no single box's value is
+ * wrong). Pair it with an error `helper` so the reason is announced.
+ */
+export const GroupInvalid: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>([]);
+    return (
+      <Checkbox.Group
+        label="Tooraine"
+        invalid
+        value={values}
+        onChange={setValues}
+        helper={{ text: 'Vali vähemalt üks', type: 'error' }}
+      >
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/** Compose checkboxes inside `Checkbox.Group`, which owns the selected values. */
+export const Group: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>(['kartul']);
+    return (
+      <Checkbox.Group
+        label="Tooraine"
+        value={values}
+        onChange={setValues}
+        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
+      >
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/**
+ * `indeterminateCheck` adds a "select all" checkbox: checked when all children are
+ * selected, indeterminate when some are, unchecked when none — toggling it selects
+ * or clears them all.
+ */
+export const WithSelectAll: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>(['sms']);
+    return (
+      <Checkbox.Group label="Teavitused" indeterminateCheck value={values} onChange={setValues}>
+        <Checkbox value="email" label="E-post" />
+        <Checkbox value="sms" label="SMS" />
+        <Checkbox value="push" label="Tõuketeated" />
+      </Checkbox.Group>
+    );
+  },
+};
+
+/** `variant="card"` renders each checkbox as a card. `cardVariant` sets primary / secondary. */
+export const Cards: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
+        <Checkbox value="a" label="Kartul" />
+        <Checkbox value="b" label="Peet" />
+        <Checkbox value="c" label="Kapsas" />
+      </Checkbox.Group>
+      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
+        <Checkbox value="a" label="Kartul" />
+        <Checkbox value="b" label="Peet" />
+        <Checkbox value="c" label="Kapsas" />
+      </Checkbox.Group>
+    </VerticalSpacing>
+  ),
+};
+
+export const CardsWithDescription: StoryObj = {
+  render: () => {
+    const items = [
+      { value: 'a', label: 'Kartul', description: 'Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks.' },
+      {
+        value: 'b',
+        label: 'Peet',
+        description: 'Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult.',
+      },
+      {
+        value: 'c',
+        label: 'Kapsas',
+        description: 'Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades.',
+      },
+    ];
+
+    const cards = () => (
+      <Row className="w-100" gutter={2}>
+        {items.map((item) => (
+          <Col key={item.value} xs={12} md={4}>
+            <Checkbox value={item.value} label={item.label} description={item.description} className="w-100" />
+          </Col>
+        ))}
+      </Row>
+    );
+    return (
+      <VerticalSpacing size={1.5}>
+        <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
+          {cards()}
+        </Checkbox.Group>
+        <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
+          {cards()}
+        </Checkbox.Group>
+      </VerticalSpacing>
+    );
+  },
+};
+
+/**
+ * Add a leading `icon` (Material icon name), optionally with a `description`.
+ */
+export const CardsWithIcons: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['tram']}>
+        <Checkbox value="tram" label="Trammiga" icon="tram" />
+        <Checkbox value="foot" label="Jalgsi" icon="directions_walk" />
+        <Checkbox value="car" label="Autoga" icon="directions_car" />
+      </Checkbox.Group>
+      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['tram']}>
+        <Checkbox value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Checkbox
+          value="foot"
+          label="Jalgsi"
+          description="Soovitatud variant, vähendab ummikuid"
+          icon="directions_walk"
+        />
+        <Checkbox
+          value="car"
+          label="Autoga"
+          description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
+          icon="directions_car"
+        />
+      </Checkbox.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Group props are breakpoint-aware (mobile-first). Here it's cards by default and
+ * regular checkboxes from `md` up — resize the canvas to see it switch.
+ */
+export const ResponsiveVariant: StoryObj = {
+  render: () => (
+    <Checkbox.Group
+      label="Tooraine"
+      defaultValue={['kartul']}
+      variant="card"
+      cardVariant="secondary"
+      md={{ variant: 'default', direction: 'column' }}
+    >
+      <Checkbox value="kartul" label="Kartul" />
+      <Checkbox value="peet" label="Peet" />
+      <Checkbox value="kapsas" label="Kapsas" />
+    </Checkbox.Group>
+  ),
 };
