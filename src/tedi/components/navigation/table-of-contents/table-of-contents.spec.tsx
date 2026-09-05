@@ -18,7 +18,12 @@ jest.mock('../../../providers/label-provider', () => ({
   }),
 }));
 
-const Tree = (props: { activeId?: string; numbered?: boolean; variant?: 'default' | 'transparent' }) => (
+const Tree = (props: {
+  activeId?: string;
+  numbered?: boolean;
+  variant?: 'default' | 'transparent';
+  collapseInactive?: boolean;
+}) => (
   <TableOfContents {...props}>
     <TableOfContents.Item id="a">
       <a href="#a">Alpha</a>
@@ -52,8 +57,20 @@ describe('TableOfContents', () => {
     expect(screen.getByRole('link', { name: 'Bravo' }).closest('li')).not.toHaveAttribute('aria-current');
   });
 
-  it('expands only the active branch and hides other branches', () => {
+  it('shows every branch’s sub-items by default', () => {
     render(<Tree activeId="a1" />);
+    expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Bravo 1' })).toBeInTheDocument();
+  });
+
+  it('shows sub-items even without an active id', () => {
+    render(<Tree />);
+    expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Bravo 1' })).toBeInTheDocument();
+  });
+
+  it('expands only the active branch and hides other branches when collapseInactive is set', () => {
+    render(<Tree activeId="a1" collapseInactive />);
     expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Bravo 1' })).not.toBeInTheDocument();
   });
@@ -165,6 +182,51 @@ describe('TableOfContents', () => {
     expect(screen.getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Alpha' })).toBeInTheDocument();
     expect(container.querySelector('[class*="tedi-table-of-contents--transparent"]')).toBeInTheDocument();
+  });
+
+  it('applies the bordered modifier only when bordered', () => {
+    const { container, rerender } = render(<Tree />);
+    expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).not.toBeInTheDocument();
+
+    rerender(
+      <TableOfContents bordered>
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
+  });
+
+  it('renders a separator below the item that sets `separator`, not the next one', () => {
+    const { container } = render(
+      <TableOfContents>
+        <TableOfContents.Item id="a" separator>
+          <a href="#a">A</a>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="b">
+          <a href="#b">B</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    const items = container.querySelectorAll('[class*="tedi-table-of-contents__item"]');
+    const separator = container.querySelector('[class*="tedi-table-of-contents__separator"]');
+    expect(separator).toBeInTheDocument();
+    expect(items[0]).toContainElement(separator as HTMLElement);
+    expect(items[1]).not.toContainElement(separator as HTMLElement);
+  });
+
+  it('renders an item slot as trailing content, outside the link', () => {
+    render(
+      <TableOfContents>
+        <TableOfContents.Item id="x" slot={<span data-testid="count">43</span>}>
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents>
+    );
+    const slot = screen.getByTestId('count');
+    expect(slot).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'X' })).not.toContainElement(slot);
   });
 
   it('renders headless (no heading) when heading is null, keeping the localized landmark name', () => {

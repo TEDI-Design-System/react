@@ -14,12 +14,12 @@ interface TableOfContentsRowProps {
 }
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
-  const { activeId, numbered, activeTrail } = useContext(TableOfContentsContext);
-  const { id, content, children, separator } = node;
+  const { activeId, numbered, activeTrail, collapseInactive } = useContext(TableOfContentsContext);
+  const { id, content, children, separator, slot } = node;
 
   const hasChildren = !!children?.length;
   const isSelected = !!id && id === activeId;
-  const isOpen = hasChildren && !!id && activeTrail.has(id);
+  const isOpen = hasChildren && (!collapseInactive || (!!id && activeTrail.has(id)));
   const level = Math.min(depth, 2);
 
   const numberBase = numberPrefix ? `${numberPrefix}.${index + 1}` : `${index + 1}`;
@@ -34,16 +34,15 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         [styles['tedi-table-of-contents__item--selected']]: isSelected,
       })}
     >
-      <span
-        className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}
-      >
+      <div className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}>
         {numbered && (
           <span className={styles['tedi-table-of-contents__number']} aria-hidden="true">
             {ordinal}
           </span>
         )}
         <span className={styles['tedi-table-of-contents__content']}>{content}</span>
-      </span>
+        {slot !== undefined && <div className={styles['tedi-table-of-contents__slot']}>{slot}</div>}
+      </div>
 
       {isOpen && (
         <Group className={styles['tedi-table-of-contents__group']}>
@@ -59,7 +58,7 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         </Group>
       )}
 
-      {separator && <Separator />}
+      {separator && <Separator className={styles['tedi-table-of-contents__separator']} />}
     </li>
   );
 };

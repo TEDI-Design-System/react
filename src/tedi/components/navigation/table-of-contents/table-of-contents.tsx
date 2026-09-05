@@ -63,11 +63,24 @@ export interface TableOfContentsProps {
    */
   padding?: number;
   /**
+   * Draws a divider between items and a bottom border under the last one, so the
+   * list reads as a set of separated rows.
+   * @default false
+   */
+  bordered?: boolean;
+  /**
    * Id of the currently active item. The active item gets the left accent bar
-   * and active link colour; the branch leading to it auto-expands its nested
-   * children.
+   * and active link colour. When `collapseInactive` is set, the branch leading
+   * to it is the only one kept expanded.
    */
   activeId?: string;
+  /**
+   * Collapse branches that are not on the active trail, so the list behaves like
+   * an accordion: only the branch leading to `activeId` keeps its nested children
+   * visible. When `false` (default) every item's sub-items are always shown.
+   * @default false
+   */
+  collapseInactive?: boolean;
   /**
    * Render the list as an ordered list with auto-generated hierarchical numbers
    * (`1.`, `2.`, `2.1`, …) shown before each item.
@@ -91,6 +104,7 @@ export interface TableOfContentsNode {
   content: ReactNode;
   children?: TableOfContentsNode[];
   separator?: boolean;
+  slot?: ReactNode;
 }
 
 interface TableOfContentsContextValue {
@@ -99,6 +113,7 @@ interface TableOfContentsContextValue {
   headingLevel?: TableOfContentsHeadingLevel;
   ariaLabel?: string;
   activeTrail: Set<string>;
+  collapseInactive?: boolean;
 }
 
 export const TableOfContentsContext = createContext<TableOfContentsContextValue>({
@@ -112,13 +127,14 @@ export const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
   Children.toArray(children)
     .filter(isItemElement)
     .map((element) => {
-      const { id, separator, children: itemChildren } = element.props;
+      const { id, separator, slot, children: itemChildren } = element.props;
       const childArray = Children.toArray(itemChildren);
       const subItems = childArray.filter(isItemElement);
       const content = childArray.filter((child) => !isItemElement(child));
       return {
         id,
         separator,
+        slot,
         content: <>{content}</>,
         children: subItems.length ? childrenToNodes(itemChildren) : undefined,
       };
@@ -151,10 +167,12 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     headingLevel = 'h3',
     ariaLabel,
     activeId,
+    collapseInactive = false,
     numbered = false,
     sticky = true,
     variant = 'default',
     padding,
+    bordered = false,
     className,
   } = props;
 
@@ -164,8 +182,8 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail }),
-    [activeId, numbered, headingLevel, ariaLabel, activeTrail]
+    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, collapseInactive }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail, collapseInactive]
   );
 
   const rootStyle =
@@ -175,6 +193,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     <div
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
+        [styles['tedi-table-of-contents--bordered']]: bordered,
       })}
       style={rootStyle}
     >

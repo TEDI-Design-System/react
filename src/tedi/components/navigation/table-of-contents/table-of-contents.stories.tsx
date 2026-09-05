@@ -8,6 +8,7 @@ import { Col, Row } from '../../layout/grid';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Tag } from '../../tags/tag/tag';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
 
@@ -43,10 +44,19 @@ type Story = StoryObj<TableOfContentsProps>;
 
 const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
 
-const sectionItems = () =>
+const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
   sections.map((label, index) => (
-    <TableOfContents.Item key={label} id={`section-${index + 1}`}>
-      <Link href={`#section-${index + 1}`} underline={false}>
+    <TableOfContents.Item
+      key={label}
+      id={`section-${index + 1}`}
+      separator={separatorBeforeLast && index === sections.length - 2}
+    >
+      <Link
+        href={`#section-${index + 1}`}
+        underline={false}
+        iconLeft={index === sections.length - 1 ? lastIcon : undefined}
+        iconStandalone={index === sections.length - 1 && !!lastIcon}
+      >
         {label}
       </Link>
     </TableOfContents.Item>
@@ -76,6 +86,53 @@ export const Headless: Story = {
   ),
 };
 
+/**
+ * `bordered` draws a divider between items and a border under the last one, so the
+ * list reads as separated rows.
+ */
+export const Bordered: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
+      {sectionItems('description')}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * Each `TableOfContents.Item` accepts a `slot` for trailing content shown at the
+ * end of its row (right-aligned) — e.g. a result-count `Tag`. It stays out of the
+ * link's accessible name.
+ */
+export const WithSlot: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      {sections.map((label, index) => (
+        <TableOfContents.Item
+          key={label}
+          id={`section-${index + 1}`}
+          slot={index === sections.length - 1 ? <Tag color="primary">43 tulemust</Tag> : undefined}
+        >
+          <Link href={`#section-${index + 1}`} underline={false}>
+            {label}
+          </Link>
+        </TableOfContents.Item>
+      ))}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * Set `separator` on any `TableOfContents.Item` to draw a divider below it — e.g. to set a summary
+ * or "back to top" entry apart from the section list. It can follow any item, not just the last one.
+ */
+export const WithSeparator: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      {sectionItems('description', true)}
+    </TableOfContents>
+  ),
+};
+
 export const WithIcon: Story = {
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
@@ -95,7 +152,7 @@ export const WithIcon: Story = {
         </Link>
       </TableOfContents.Item>
       <TableOfContents.Item id="section-6">
-        <Link href="#section-6" underline={false} iconLeft="mail" iconStandalone>
+        <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
           Kokkuvõte
         </Link>
       </TableOfContents.Item>
@@ -106,6 +163,48 @@ export const WithIcon: Story = {
 export const Nested: Story = {
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} activeId="methods-2">
+      <TableOfContents.Item id="intro">
+        <Link href="#intro" underline={false}>
+          Sissejuhatus
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="methods">
+        <Link href="#methods" underline={false}>
+          Meetodid
+        </Link>
+        <TableOfContents.Item id="methods-1">
+          <Link href="#methods-1" underline={false}>
+            Andmete kogumine
+          </Link>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="methods-2">
+          <Link href="#methods-2" underline={false}>
+            Analüüs
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="results">
+        <Link href="#results" underline={false}>
+          Tulemused
+        </Link>
+        <TableOfContents.Item id="results-1">
+          <Link href="#results-1" underline={false}>
+            Joonised
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>
+    </TableOfContents>
+  ),
+};
+
+/**
+ * By default every item's sub-items stay visible. Set `collapseInactive` to make the list behave
+ * like an accordion: only the branch leading to `activeId` keeps its nested children expanded, and
+ * all other branches collapse. Here `activeId="methods-2"`, so only *Meetodid* is expanded.
+ */
+export const CollapseInactive: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods-2" collapseInactive>
       <TableOfContents.Item id="intro">
         <Link href="#intro" underline={false}>
           Sissejuhatus
@@ -175,76 +274,57 @@ export const Numbered: Story = {
 export const ItemStates: Story = {
   parameters: { fullWidth: true },
   render: () => {
-    const states = [
-      { label: 'Default', linkProps: {}, active: false },
-      { label: 'Hover', linkProps: { isHovered: true }, active: false },
-      { label: 'Selected', linkProps: {}, active: true },
+    const rows = [
+      { id: 'default', label: 'Default', linkProps: {} },
+      // "Hover" forces the hover state via `isHovered`; "Selected" is the active item (via activeId).
+      { id: 'hover', label: 'Hover', linkProps: { isHovered: true } },
+      { id: 'selected', label: 'Selected', linkProps: {} },
     ];
 
-    const rowStyle = (active: boolean): CSSProperties => ({
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 'var(--layout-grid-gutters-04)',
-      borderLeft: `var(--table-of-contents-active-item-border-width) solid ${
-        active ? 'var(--general-border-brand)' : 'transparent'
-      }`,
-      paddingLeft: 'calc(var(--table-of-contents-padding-level-1) - var(--table-of-contents-active-item-border-width))',
-      ...(active ? ({ '--link-primary-default': 'var(--link-primary-active)' } as CSSProperties) : {}),
-    });
+    const stateItems = (options?: { icon?: boolean; separator?: boolean }) => {
+      const iconProps = options?.icon ? { iconLeft: 'mail', iconStandalone: true } : {};
+      return rows.map((row) => (
+        <TableOfContents.Item key={row.id} id={row.id} separator={options?.separator}>
+          <Link href={`#${row.id}`} underline={false} {...iconProps} {...row.linkProps}>
+            {row.label}
+          </Link>
+        </TableOfContents.Item>
+      ));
+    };
 
-    const numberStyle = (active: boolean) => ({
-      minWidth: '1.5rem',
-      textAlign: 'right' as const,
-      color: active ? 'var(--link-primary-active)' : 'var(--link-primary-default)',
-    });
-
-    const link = (linkProps: object, iconLeft?: string) => (
-      <Link href="#" underline={false} iconLeft={iconLeft} {...linkProps}>
-        Pealkiri
-      </Link>
-    );
-
-    const columns = [
-      { header: 'Default', render: (s: (typeof states)[number]) => link(s.linkProps) },
-      {
-        header: 'With number',
-        render: (s: (typeof states)[number]) => (
-          <>
-            <span aria-hidden="true" style={numberStyle(s.active)}>
-              1.
-            </span>
-            {link(s.linkProps)}
-          </>
-        ),
-      },
-      {
-        header: 'With icon',
-        render: (s: (typeof states)[number]) => link(s.linkProps, 'mail'),
-      },
+    const columns: {
+      header: string;
+      numbered?: boolean;
+      bordered?: boolean;
+      options?: { icon?: boolean; separator?: boolean };
+    }[] = [
+      { header: 'Default' },
+      { header: 'With number', numbered: true },
+      { header: 'With icon', options: { icon: true } },
+      { header: 'With separator', options: { separator: true } },
+      { header: 'With border', bordered: true },
     ];
 
     return (
-      <Row gutterY={3}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'flex-start' }}>
         {columns.map((column) => (
-          <Col key={column.header} xs={12} sm={6} lg={4}>
+          <div key={column.header} style={{ flex: '1 1 12rem', minWidth: '11rem' }}>
             <VerticalSpacing size={1}>
               <Text modifiers="bold">{column.header}</Text>
-              <VerticalSpacing size={0.5}>
-                {states.map((state) => (
-                  <div key={state.label} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ minWidth: '5rem' }}>
-                      <Text element="span" color="secondary">
-                        {state.label}
-                      </Text>
-                    </div>
-                    <span style={rowStyle(state.active)}>{column.render(state)}</span>
-                  </div>
-                ))}
-              </VerticalSpacing>
+              <TableOfContents
+                heading={null}
+                ariaLabel={`${column.header} item states`}
+                sticky={false}
+                numbered={column.numbered}
+                bordered={column.bordered}
+                activeId="selected"
+              >
+                {stateItems(column.options)}
+              </TableOfContents>
             </VerticalSpacing>
-          </Col>
+          </div>
         ))}
-      </Row>
+      </div>
     );
   },
 };
@@ -259,8 +339,6 @@ export const StickyInLayout: Story = {
   render: function StickyInLayout() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [activeId, setActiveId] = useState('sec-1');
-    // On mobile the article reads as a full-screen page; on desktop it's a 24rem scroll box next
-    // to the sticky TOC card.
     const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
 
     useEffect(() => {
@@ -268,8 +346,6 @@ export const StickyInLayout: Story = {
       if (typeof IntersectionObserver === 'undefined') return undefined;
       if (!isMobile && !container) return undefined;
 
-      // On mobile the article is the page itself (single scrollbar), so track against the viewport;
-      // on desktop it's a nested scroll box.
       const observerRoot = isMobile ? null : container;
 
       const ids = sections.map((_, index) => `sec-${index + 1}`);
@@ -427,7 +503,7 @@ export const Collapsible: Story = {
         </Link>
       </TableOfContents.Item>,
       <TableOfContents.Item key="conclusion" id="conclusion">
-        <Link href="#conclusion" underline={false}>
+        <Link href="#conclusion" underline={false} iconStandalone>
           Kokkuvõte
         </Link>
       </TableOfContents.Item>,
