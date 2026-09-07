@@ -21,6 +21,7 @@ import {
   useBreakpoint,
   useBreakpointProps,
 } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
@@ -155,6 +156,7 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
 
 export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getLabel } = useLabels();
 
   const {
     id,
@@ -297,6 +299,10 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     isClearable: clearable,
     required,
     onIconClick: showPicker ? handleIconClick : undefined,
+    iconButtonProps: {
+      'aria-label': getLabel('time-field.open-picker'),
+      ...(inputProps as TextFieldProps | undefined)?.iconButtonProps,
+    },
     onChange: updateTime,
     onBlur: handleInputBlur,
     className: cn(
@@ -327,6 +333,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
       <Dropdown width="trigger" defaultActiveIndex={defaultActiveIndex}>
         <Dropdown.Trigger>
           <div
+            role="combobox"
             className={cn(styles['tedi-time-field__container'], className, {
               [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
             })}
@@ -361,11 +368,14 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     <>
       <div
         className={cn(styles['tedi-time-field__container'], className)}
-        {...(shouldUseCustomInputTrigger ? interactions.getReferenceProps() : {})}
-        aria-haspopup={showPicker ? 'listbox' : undefined}
+        {...(shouldUseCustomInputTrigger
+          ? interactions.getReferenceProps()
+          : showPicker && !shouldUseNativePicker && !useModalPicker
+          ? { role: 'combobox', 'aria-haspopup': 'listbox', 'aria-expanded': open }
+          : {})}
         tabIndex={-1}
       >
-        <TextField ref={textFieldRef} aria-expanded={showPicker ? open : undefined} {...textFieldProps} />
+        <TextField ref={textFieldRef} {...textFieldProps} />
       </div>
 
       {useModalPicker && (

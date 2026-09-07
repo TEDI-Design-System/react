@@ -185,6 +185,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Time',
     ru: 'Время',
   },
+  'time-field.open-picker': {
+    description: 'Accessible name for the TimeField icon button that opens the time picker',
+    components: ['TimeField'],
+    et: 'Ava kellavalija',
+    en: 'Open time picker',
+    ru: 'Открыть выбор времени',
+  },
   'time-field.cancel': {
     description: 'Cancel button label inside the time-picker modal',
     components: ['TimeField'],
