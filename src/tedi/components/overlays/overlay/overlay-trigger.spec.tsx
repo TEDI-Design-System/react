@@ -110,6 +110,19 @@ describe('Overlay.Trigger', () => {
     expect(trigger).not.toHaveAttribute('aria-expanded');
   });
 
+  it('does NOT add role="button" to a text trigger for label role', () => {
+    render(
+      <Overlay role="label">
+        <OverlayTrigger>Text Trigger</OverlayTrigger>
+        <Overlay.Content>Label content</Overlay.Content>
+      </Overlay>
+    );
+
+    const trigger = screen.getByText('Text Trigger');
+    expect(trigger).not.toHaveAttribute('role', 'button');
+    expect(trigger).not.toHaveAttribute('aria-expanded');
+  });
+
   it('does NOT add aria-describedby when role is not "tooltip"', () => {
     render(
       <Overlay role="dialog" defaultOpen={true}>

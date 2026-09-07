@@ -26,7 +26,7 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
 
   const childRef = isValidElement(children) ? getElementRef(children) : undefined;
   const refs = useMergeRefs([reference, childRef]);
-  const isInteractivePopup = role !== 'tooltip' && !ariaHidden;
+  const isInteractivePopup = role !== 'tooltip' && role !== 'label' && !ariaHidden;
   const extraProps =
     role === 'tooltip' && !ariaHidden
       ? {
