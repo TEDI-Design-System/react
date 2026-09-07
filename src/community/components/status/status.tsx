@@ -22,6 +22,9 @@ export interface StatusProps {
   tooltipContent?: React.ReactNode;
 }
 
+/**
+ * @deprecated Use `StatusIndicator` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Status = (props: StatusProps): JSX.Element => {
   const { children, type, className, tooltipContent, ...rest } = props;
   const StatusBEM = cn(styles['status'], className, styles[`status--${type}`]);

@@ -1,21 +1,12 @@
-:root {
-  --alert-default-padding-x-sm: 8px;
-}
-
 .tedi-left-panel {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-width: 330px;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
-  background-color: var(--sidepanel-background);
-
-  &__alert {
-    padding: var(--alert-default-padding-x-sm);
-    margin-bottom: var(--sidepanel-header-padding-y);
-  }
+  color: var(--general-text-primary);
+  background-color: var(--general-surface-primary);
 }
 
 .tedi-left-panel__header {
@@ -24,12 +15,12 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--sidepanel-header-padding-y) var(--sidepanel-item-padding-x);
-  color: var(--button-main-neutral-inverted-text-default);
-  background-color: var(--sidepanel-header-background-default);
+  color: var(--general-text-white);
+  background-color: var(--general-surface-brand-primary);
 }
 
-.tedi-left-panel__content {
-  padding: var(--sidepanel-item-padding-x);
+.tedi-left-panel__close {
+  margin-left: auto;
 }
 
 .tedi-left-panel__footer {
@@ -44,13 +35,8 @@
   font-size: var(--body-small-regular-size);
   line-height: var(--body-small-regular-line-height);
   word-break: break-all;
-  background: var(--sidepanel-footer-background);
-  border-top: 1px solid var(--general-border-primary);
-
-  &__theme-switch {
-    width: 100%;
-    padding: 8px 0;
-  }
+  background: var(--general-surface-secondary);
+  border-top: var(--tedi-borders-01) solid var(--general-border-primary);
 }
 
 .tedi-left-panel__header-controls {
@@ -61,19 +47,46 @@
   padding-right: var(--sidepanel-item-padding-x);
   padding-bottom: var(--layout-grid-gutters-04);
   padding-left: var(--sidepanel-item-padding-x);
-  color: var(--button-main-neutral-inverted-text-default);
-  background-color: var(--sidepanel-header-background-default);
+  color: var(--general-text-white);
+  background-color: var(--general-surface-brand-primary);
   border-bottom-right-radius: var(--sidepanel-header-radius-bottom);
   border-bottom-left-radius: var(--sidepanel-header-radius-bottom);
 }
 
-.tedi-accordion {
-  [data-name='accordion-item-header'] {
-    border-radius: 0;
-  }
+.tedi-left-panel__actions {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .tedi-left-panel__content-wrapper {
   flex: 1 1 auto;
   overflow: hidden auto;
+}
+
+.tedi-left-panel__expander-button {
+  position: absolute;
+  top: var(--layout-grid-gutters-08);
+  left: 0;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--tedi-dimensions-14);
+  height: var(--tedi-dimensions-22);
+  cursor: pointer;
+  background-color: var(--general-surface-primary);
+  border: var(--tedi-borders-01) solid var(--general-border-primary);
+  border-radius: var(--sidepanel-header-radius-bottom);
+  box-shadow: 0 2px 4px var(--tedi-alpha-14);
+
+  &:hover {
+    background-color: var(--general-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--general-border-brand);
+    background-color: var(--general-surface-primary);
+  }
 }

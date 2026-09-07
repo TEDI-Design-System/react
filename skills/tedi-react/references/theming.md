@@ -16,15 +16,21 @@ Or in SCSS:
 @use '@tedi-design-system/core/scss' as tedi;
 ```
 
-Wrap your app with `ThemeProvider`:
+Wrap your app with the three TEDI providers, in this order — `ThemeProvider` (theme tokens), `LabelProvider` (translatable component labels), `StyleProvider` (runtime style injection):
 
 ```tsx
-import { ThemeProvider } from '@tedi-design-system/react/tedi';
+import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system/react/tedi';
 
 <ThemeProvider defaultTheme="default">
-  <App />
+  <LabelProvider>
+    <StyleProvider>
+      <App />
+    </StyleProvider>
+  </LabelProvider>
 </ThemeProvider>
 ```
+
+`StyleProvider` is documented on its own below; it must sit inside the other two. Do not skip `LabelProvider` — components with built-in labels (close buttons, pagination, etc.) rely on it.
 
 ## Theme Switching
 
@@ -34,29 +40,97 @@ The available theme names and cookie name are implementation details — verify 
 
 ## Design Tokens
 
-Tokens follow the naming pattern `--tedi-{category}-{name}`:
+Tokens come in two layers: **semantic** `--general-*` tokens (role-based — text / surface / border / status), and **primitive** `--tedi-*` tokens (the raw scale). Prefer semantic tokens; reach for a primitive only when no semantic token fits.
 
-| Category | Example (illustrative) |
-|----------|------------------------|
-| Color | `--tedi-color-primary` |
-| Spacing | `--tedi-spacing-4` |
-| Typography | `--tedi-font-size-sm` |
-| Border | `--tedi-border-radius-sm` |
-| Shadow | `--tedi-shadow-sm` |
+| Category | Examples |
+|----------|---------|
+| Text | `--general-text-primary`, `--general-text-secondary`, `--general-text-disabled` |
+| Surface | `--general-surface-primary`, `--general-surface-secondary`, `--general-surface-brand-primary` |
+| Border | `--general-border-primary`, `--general-border-secondary`, `--general-border-brand` |
+| Status | `--general-status-danger-text`, `--general-status-success-border`, `--general-status-warning-background-primary` |
+| Primitives | `--tedi-primary-600`, `--tedi-neutral-900`, `--tedi-green-600` |
+| Spacing | `--tedi-dimensions-02`, `--tedi-dimensions-04`, `--layout-grid-gutters-16` |
+| Radius | `--tedi-radius-02-default`, `--tedi-radius-08` |
+| Typography | `--family-default`, `--heading-h3-size`, `--heading-h3-weight` |
 
-The examples above illustrate the **pattern** — they are not the full set. The authoritative list of token names lives in `@tedi-design-system/core`; look them up there (or via a browser devtools inspection of the rendered CSS custom properties) rather than assuming a specific token exists.
+**Look token names up, don't recall them.** The authoritative, machine-readable list ships with
+the consumer's installed `core`:
+
+```
+node_modules/@tedi-design-system/core/tokens.json
+```
+
+It is generated from Figma and carries two tiers, `base` (the `--tedi-*` primitives) and
+`semantic` (the role tokens), under `themes.default`; `themes.dark` holds only the semantic
+overrides, and `breakpoints.mobile` / `.tablet` the responsive ones. Each entry is
+`{ value, resolved }`, so you get both the `var()` chain and the computed colour:
+
+```bash
+# does a token exist, and what does it resolve to?
+python3 -c "import json;t=json.load(open('node_modules/@tedi-design-system/core/tokens.json'));print(t['themes']['default']['semantic']['general-surface-primary'])"
+# find every surface token
+python3 -c "import json;t=json.load(open('node_modules/@tedi-design-system/core/tokens.json'));print([k for k in t['themes']['default']['semantic'] if 'surface' in k])"
+```
+
+The table above illustrates the naming *pattern*; it is not the full set. Never invent a token
+name, and never fall back to a hex value because a guessed token didn't work.
 
 Use tokens in your own SCSS:
 
 ```scss
 .my-custom-section {
-  padding: var(--tedi-spacing-4);
-  background-color: var(--tedi-color-bg-default);
-  border-radius: var(--tedi-border-radius-sm);
+  padding: var(--tedi-dimensions-04);
+  background-color: var(--general-surface-primary);
+  border-radius: var(--tedi-radius-02-default);
 }
 ```
 
-**Important:** Do NOT use fallback values in `var()`. Write `var(--tedi-spacing-4)`, not `var(--tedi-spacing-4, 16px)`.
+**Important:** Do NOT use fallback values in `var()`. Write `var(--general-surface-primary)`, not `var(--general-surface-primary, #fff)`.
+
+## Migrating off legacy `--color-*` tokens (breaking change)
+
+The old `--color-*` palette and the standalone `design-tokens` package have been **removed**.
+Everything now uses `@tedi-design-system/core` tokens: semantic `--general-*` tokens where a
+role fits (text / surface / border / status), and `--tedi-*` primitives for strong fills that
+have no semantic equivalent.
+
+**Not affected:** normal component usage. Props and classes are unchanged — e.g. `Card`'s
+`background="bg-muted"` / `border="primary-main"`, `Tag`'s `color`, and
+`getBackgroundColorClass('bg-muted')` all still work; they now resolve to core tokens
+internally.
+
+**Affected:** any code that referenced a legacy `--color-*` CSS variable directly, imported
+`@tedi-design-system/react/design-tokens`, or deep-imported a removed community SCSS partial
+(`styles/_variables`, `_fonts`, `_helpers`, `_mixins`).
+
+Mapping for direct token references (pick the role that matches the usage):
+
+| Legacy | Core |
+|--------|------|
+| `--color-text-default` / `-muted` / `-subtle` / `-disabled` | `--general-text-primary` / `-secondary` / `-tertiary` / `-disabled` |
+| `--color-text-inverted` | `--general-text-white` |
+| `--color-bg-default` / `-muted` / `-subtle` / `-disabled` | `--general-surface-primary` / `-secondary` / `-tertiary` / `-disabled` |
+| `--color-bg-inverted` / `-inverted-contrast` | `--general-surface-inverted-primary` / `-secondary` |
+| `--color-border-default` / `-contrast` | `--general-border-primary` / `-secondary` |
+| `--color-primary-main` | text `--general-text-brand` · surface `--general-surface-brand-primary` · border `--general-border-brand` |
+| `--color-primary-highlight` / `-highlight-subtle` | `--general-surface-brand-tertiary` / `-quaternary` |
+| `--color-positive-main` / `-active` / `-highlight` | `--tedi-green-600` / `-700` / `-100` (text/border: `--general-status-success-text` / `-border`) |
+| `--color-important-main` / `-active` / `-highlight` | `--tedi-red-600` / `-700` / `-100` (text/border: `--general-status-danger-text` / `-border`) |
+| `--color-warning-main` / `-active` / `-highlight` | `--tedi-yellow-700` / `-800` / `-200` (text/border: `--general-status-warning-text` / `-border`) |
+| `--color-accent-main` / `-highlight` / `-active` | `--tedi-accent-600` / `-200` / `-700` |
+| `--color-black` | `--tedi-neutral-900` |
+| `--color-white` | `--general-surface-primary` (bg) / `--general-text-white` (text) |
+| `--color-transparent` | the `transparent` keyword |
+| `--font-family` | `--family-default` |
+| `--font-size-h{1..6}` / `--font-weight-h{1..6}` / `--font-line-height-h{1..6}` | `--heading-h{1..6}-size` / `-weight` / `-line-height` |
+
+Removed imports → replacements: `@tedi-design-system/react/design-tokens` → core tokens;
+community `styles/_fonts` / `_helpers` / `_mixins` → `@tedi-design-system/core/_fonts.scss` /
+`_helpers.scss` / `mixins`.
+
+Note: strong status fills use `--tedi-*` primitives, which (unlike semantic tokens) do not
+re-theme automatically — this matches the previous fixed-hex behaviour. The full guide lives in
+Storybook under **Documentation → Migration → Legacy color tokens**.
 
 ## Overriding Component Styles
 
@@ -75,8 +149,8 @@ Create a custom theme by defining token values under a theme class:
 
 ```scss
 .tedi-theme--my-brand {
-  --tedi-color-primary: #1a73e8;
-  --tedi-color-bg-default: #fafafa;
+  --general-surface-brand-primary: #1a73e8;
+  --general-surface-primary: #fafafa;
   // ... override tokens as needed
 }
 ```
@@ -101,10 +175,10 @@ For responsive breakpoints in SCSS:
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints' as bp;
 
 .my-component {
-  padding: var(--tedi-spacing-2);
+  padding: var(--tedi-dimensions-02);
 
   @include bp.media-breakpoint-up(md) {
-    padding: var(--tedi-spacing-4);
+    padding: var(--tedi-dimensions-04);
   }
 }
 ```

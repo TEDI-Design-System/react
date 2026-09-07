@@ -49,6 +49,8 @@ import styles from './select.module.scss';
 declare module 'react-select/dist/declarations/src/Select' {
   export interface Props<Option, IsMulti extends boolean, Group extends GroupBase<Option>> {
     inputIsHidden?: boolean;
+    /** When true, the search input is rendered with `inputMode="none"` so the mobile soft keyboard stays down. */
+    softKeyboardSuppressed?: boolean;
   }
 }
 
@@ -293,6 +295,18 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   isSearchable?: boolean;
   /**
+   * Touch-only UX for searchable selects. When `false`, tapping the field on a
+   * touch or pen device opens the menu for browsing **without** raising the
+   * on-screen keyboard (the input is marked `inputMode="none"`). The keyboard
+   * appears only once the user explicitly taps the search input — so a
+   * quick-pick dropdown doesn't immediately cover the screen with a keyboard.
+   *
+   * Has no effect for mouse/keyboard users and never blocks hardware-keyboard
+   * typing, so the combobox stays fully operable (WCAG 2.1.1 Keyboard).
+   * @default true
+   */
+  openKeyboardOnTouch?: boolean;
+  /**
    * In multi-select mode, render an "×" remove button on each selected tag
    * so the user can deselect single options without re-opening the menu.
    * @default false
@@ -414,7 +428,6 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const {
       options,
       defaultOptions,
-      id,
       name,
       iconName = 'arrow_drop_down',
       label,
@@ -454,6 +467,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       isClearable = true,
       isClearIndicatorVisible = false,
       isSearchable = true,
+      openKeyboardOnTouch = true,
       menuIsOpen,
       onMenuClose,
       onMenuOpen,
@@ -474,6 +488,14 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const shouldHideLabel = inputGroup?.hasExternalLabel;
     const resolvedId = props.id ?? inputGroup?.inputId ?? generatedId;
 
+    // The visible <label> that names the combobox is rendered either by Select
+    // itself (own FormLabel, targeting `${resolvedId}-input`) or, when nested in
+    // a labeled InputGroup, by the group (targeting `inputGroup.inputId`). The
+    // focusable input must own whichever id the label's `htmlFor` points at, and
+    // react-select's container needs a *different* id so the two never collide.
+    const inputId = shouldHideLabel ? inputGroup?.inputId ?? resolvedId : `${resolvedId}-input`;
+    const containerId = shouldHideLabel ? `${resolvedId}-container` : resolvedId;
+
     const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
     const { getLabel } = useLabels();
@@ -482,6 +504,31 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       ref,
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
+
+    // Touch-only keyboard deferral (see `openKeyboardOnTouch`). Tapping the field
+    // to *open* it suppresses the soft keyboard (`inputMode="none"`); tapping the
+    // input *itself* clears the flag so typing can raise the keyboard. Mouse and
+    // keyboard users are never affected, and hardware typing is never blocked.
+    const [suppressSoftKeyboard, setSuppressSoftKeyboard] = React.useState(false);
+
+    const handlePointerDownCapture = (event: React.PointerEvent<HTMLDivElement>) => {
+      if (openKeyboardOnTouch || !isSearchable) return;
+      if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+
+      const targetEl = event.target as HTMLElement;
+      if (!targetEl.closest?.(`.${styles['tedi-select__control']}`)) return;
+
+      const inputEl = element.current?.inputRef;
+      const tappedInput = !!inputEl && (event.target === inputEl || inputEl.contains(targetEl));
+      setSuppressSoftKeyboard(!tappedInput);
+    };
+
+    const handleBlur = () => {
+      // Reset when the field is left so an idle field never lingers with the
+      // keyboard suppressed; the next touch-open re-evaluates from scratch.
+      setSuppressSoftKeyboard(false);
+      onBlur?.();
+    };
 
     const showSelectAllMode = !!showSelectAll && multiple;
 
@@ -693,11 +740,11 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           keyboardMode={keyboardMode}
           exitKeyboardMode={exitKeyboardMode}
           onKeyDown={handleSelectKeyDown}
-          id={resolvedId}
+          id={containerId}
           aria-describedby={helperId}
           autoFocus={autoFocus}
           ref={element}
-          instanceId={id}
+          instanceId={resolvedId}
           className="tedi-select__wrapper"
           name={name}
           options={optionsForReactSelect}
@@ -708,9 +755,10 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           onChange={onChangeHandler}
           filterOption={showSelectAllMode || selectableGroupsMode ? filterOption : undefined}
           onInputChange={onInputChange}
-          onBlur={onBlur}
+          onBlur={handleBlur}
+          softKeyboardSuppressed={!openKeyboardOnTouch && isSearchable && suppressSoftKeyboard}
           inputValue={inputValue}
-          inputId={`${id}-input`}
+          inputId={inputId}
           loadOptions={loadOptions}
           isLoading={isLoading}
           noOptionsMessage={noOptionsMessage || getNoOptionsMessage}
@@ -783,7 +831,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     );
 
     return (
-      <div data-name="select" className={SelectBEM}>
+      <div data-name="select" className={SelectBEM} onPointerDownCapture={handlePointerDownCapture}>
         <div className={styles['tedi-select__inner']}>
           {!shouldHideLabel && (
             <FormLabel

@@ -54,6 +54,12 @@ type DateTimeFieldBreakpointProps = {
    */
   useNativePicker?: boolean;
   /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
+  /**
    * Layout of the date-and-time popover. `mode='range'` always uses
    * `'side-by-side'` regardless of this value — the range UI needs the
    * calendar and both `from` / `to` time pickers visible at once.
@@ -225,6 +231,16 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    */
   selectionLevel?: CalendarView;
   /**
+   * Earliest year offered in the calendar header's year dropdown.
+   * @default currentYear - 100
+   */
+  minYear?: number;
+  /**
+   * Latest year offered in the calendar header's year dropdown.
+   * @default currentYear + 20
+   */
+  maxYear?: number;
+  /**
    * Forwarded to the underlying `TextField`. `id`, `label`, `value`, and
    * `onChange` are owned by `DateTimeField`.
    */
@@ -287,6 +303,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     showOutsideDays = true,
     availableTimes,
     timeHeading = getLabel('dateTimeField.timeHeading'),
+    clearable = true,
   } = getCurrentBreakpointProps<DateTimeFieldBreakpointProps>(props);
 
   const {
@@ -313,6 +330,8 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     backLabel = getLabel('dateTimeField.back'),
     mode = 'single',
     selectionLevel = 'days',
+    minYear,
+    maxYear,
     inputProps,
     disabledDateErrorMessage = getLabel('dateField.disabledDateError'),
   } = props;
@@ -642,6 +661,8 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
       localeCode={localeCode}
       showOutsideDays={showOutsideDays}
       monthYearSelectType={monthYearSelectType}
+      minYear={minYear}
+      maxYear={maxYear}
       disabledMatchers={disabledMatchers.length ? disabledMatchers : undefined}
       required={required}
       handleSelect={handleCalendarSelect}
@@ -705,7 +726,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     placeholder,
     readOnly: readOnly || (!useNative && !!availableTimes && !!currentValue),
     icon: 'calendar_today',
-    isClearable: true,
+    isClearable: clearable,
     required,
     disabled,
     invalid: hasDisabledDateError || (inputProps as TextFieldProps)?.invalid,

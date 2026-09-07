@@ -60,12 +60,12 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
       <VerticalSpacing size={1}>
         {array.map((value, key) => (
           <Row key={key}>
-            <Col lg={1} md={2} className="display-flex align-items-center">
+            <Col lg={1} md={2} className="flex align-items-center">
               <Text color={titleColor} modifiers="bold">
                 {value}
               </Text>
             </Col>
-            <Col width="auto" className="display-flex align-items-center gap-3">
+            <Col width="auto" className="flex align-items-center gap-3">
               <Toggle
                 {...toggleProps}
                 label="Toggle"
@@ -82,7 +82,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 id={value}
               />
             </Col>
-            <Col width="auto" className="display-flex align-items-center gap-3">
+            <Col width="auto" className="flex align-items-center gap-3">
               <Toggle
                 {...toggleProps}
                 label="Toggle"
@@ -101,7 +101,7 @@ const TemplateStates: StoryFn<TemplateMultipleProps> = (args) => {
                 id={value}
               />
             </Col>
-            <Col width="auto" className="display-flex align-items-center gap-3">
+            <Col width="auto" className="flex align-items-center gap-3">
               <Toggle
                 {...toggleProps}
                 label="Toggle"

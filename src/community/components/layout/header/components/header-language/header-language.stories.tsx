@@ -10,6 +10,11 @@ positioned. <br />
 const meta: Meta<typeof HeaderLanguage> = {
   component: HeaderLanguage,
   title: 'Community/Layout/Header/HeaderLanguage',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

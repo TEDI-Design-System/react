@@ -68,7 +68,7 @@ const StatesTemplate: StoryFn<StatesArgs> = (args) => {
       <Col>
         <Text color={titleColor}>{state}</Text>
       </Col>
-      <Col width={4} className="display-flex align-items-center gap-3">
+      <Col width={4} className="flex align-items-center gap-3">
         <CollapseButton {...collapseProps} id={state} size={size ?? 'default'} open={false} />
         <CollapseButton {...collapseProps} id={state} size={size ?? 'default'} open />
       </Col>

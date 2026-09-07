@@ -1,44 +1,19 @@
-import { JSX } from 'react';
+import cn from 'classnames';
+import { JSX, ReactNode } from 'react';
 
-import { Alert, Button, ButtonGroup, VerticalSpacing } from '../../../../tedi';
-import { LeftPanelProps } from './left-panel';
 import styles from './left-panel.module.scss';
 
-type LeftPanelContentProps = LeftPanelProps & {
-  children?: React.ReactNode;
-};
+export interface LeftPanelContentProps {
+  /** Additional class name applied to the content region. */
+  className?: string;
+  /** Main scrollable content of the panel. */
+  children?: ReactNode;
+}
 
-const LeftPanelContent = ({
-  showAlert = true,
-  show2D3DButtons = true,
-  children,
-}: LeftPanelContentProps): JSX.Element => {
-  return (
-    <div className={styles['tedi-left-panel__content-wrapper']}>
-      {showAlert ||
-        (show2D3DButtons && (
-          <div className={styles['tedi-left-panel__content']}>
-            {showAlert && (
-              <Alert className={styles['tedi-left-panel__alert']}>
-                Kõikide sisselülitatud kihtide kuvamiseks tuleb sisse suumida.
-              </Alert>
-            )}
+export const LeftPanelContent = ({ className, children }: LeftPanelContentProps): JSX.Element => (
+  <div className={cn(styles['tedi-left-panel__content-wrapper'], className)}>{children}</div>
+);
 
-            <VerticalSpacing size={0.5}>
-              {show2D3DButtons && (
-                <ButtonGroup type="primary" stretch={true}>
-                  <Button id="1" isActive iconLeft="checked">
-                    2D
-                  </Button>
-                  <Button id="2">3D</Button>
-                </ButtonGroup>
-              )}
-            </VerticalSpacing>
-          </div>
-        ))}
-      {children}
-    </div>
-  );
-};
+LeftPanelContent.displayName = 'LeftPanel.Content';
 
 export default LeftPanelContent;

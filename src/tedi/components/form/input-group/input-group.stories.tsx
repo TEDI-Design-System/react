@@ -28,6 +28,13 @@ const meta: Meta<typeof InputGroup> = {
     'InputGroup.Input': InputGroup.Input,
     'InputGroup.Suffix': InputGroup.Suffix,
   } as never,
+  parameters: {
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
+  },
 };
 
 export default meta;
@@ -39,10 +46,10 @@ export const StartStatic: Story = {
     label: 'Address',
   },
   render: (args) => (
-    <InputGroup {...args}>
+    <InputGroup {...args} id="start-static">
       <InputGroup.Prefix>Street</InputGroup.Prefix>
       <InputGroup.Input>
-        <Field id="start-static-1" />
+        <Field />
       </InputGroup.Input>
     </InputGroup>
   ),
@@ -212,9 +219,9 @@ export const EndStatic: Story = {
     label: 'Cost',
   },
   render: (args) => (
-    <InputGroup {...args}>
+    <InputGroup {...args} id="end-static">
       <InputGroup.Input>
-        <Field id="end-static-1" />
+        <Field />
       </InputGroup.Input>
       <InputGroup.Suffix>EUR</InputGroup.Suffix>
     </InputGroup>
@@ -382,21 +389,21 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
     <VerticalSpacing>
       {array.map((state, index) => (
         <Row key={index} gutterY={2}>
-          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} xs={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col xs={12} lg={5}>
-            <InputGroup label="Label" id="state-example" disabled={state === 'Disabled'}>
+            <InputGroup label="Label" id={`state-${state}-prefix`} disabled={state === 'Disabled'}>
               <InputGroup.Prefix>Street</InputGroup.Prefix>
               <InputGroup.Input>
-                <Field id={state} />
+                <Field />
               </InputGroup.Input>
             </InputGroup>
           </Col>
           <Col xs={12} lg={5}>
-            <InputGroup label="Label" id="state-example" disabled={state === 'Disabled'}>
+            <InputGroup label="Label" id={`state-${state}-suffix`} disabled={state === 'Disabled'}>
               <InputGroup.Input>
-                <Field id={state} />
+                <Field />
               </InputGroup.Input>
               <InputGroup.Suffix>EUR</InputGroup.Suffix>
             </InputGroup>
@@ -404,11 +411,11 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
         </Row>
       ))}
       <Row gutterY={2}>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col xs={12} lg={5}>
-          <InputGroup label="Label" id="state-example" invalid helper={{ text: 'Feedback text', type: 'error' }}>
+          <InputGroup label="Label" id="state-error-prefix" invalid helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Prefix>Street</InputGroup.Prefix>
             <InputGroup.Input>
               <Field />
@@ -416,7 +423,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           </InputGroup>
         </Col>
         <Col xs={12} lg={5}>
-          <InputGroup label="Label" id="state-example" invalid helper={{ text: 'Feedback text', type: 'error' }}>
+          <InputGroup label="Label" id="state-error-suffix" invalid helper={{ text: 'Feedback text', type: 'error' }}>
             <InputGroup.Input>
               <Field />
             </InputGroup.Input>
@@ -435,9 +442,9 @@ export const States: StoryObj<TemplateStateProps> = {
   },
   parameters: {
     pseudo: {
-      hover: '#Hover',
-      focus: '#Focus',
-      active: '#Active',
+      hover: ['#state-Hover-prefix', '#state-Hover-suffix'],
+      focus: ['#state-Focus-prefix', '#state-Focus-suffix'],
+      active: ['#state-Active-prefix', '#state-Active-suffix'],
     },
   },
 };

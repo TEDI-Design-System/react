@@ -40,6 +40,9 @@ import { TableContext } from './table-context';
 export const PAGE_SIZE_WITHOUT_PAGINATION = 10000;
 const emptyData: IntentionalAny[] = [];
 
+/**
+ * @deprecated Use `Table` from `@tedi-design-system/react/tedi` instead.
+ */
 export function Table<TData extends DefaultTData<TData>>(props: TableProps<TData>): JSX.Element {
   const { getLabel } = useLabels();
   const {

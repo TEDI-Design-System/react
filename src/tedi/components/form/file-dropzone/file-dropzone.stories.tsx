@@ -129,16 +129,6 @@ export const MultipleWithIndividualValidation: Story = {
   ),
 };
 
-export const HasTooltip: Story = {
-  render: Template,
-  args: {
-    id: 'file-dropzone-tooltip',
-    name: 'file-tooltip',
-    label: 'Lohista failid siia',
-    tooltip: 'Lorem ipsum',
-  },
-};
-
 /**
  * Combines per-file validation with `attachmentProps`. The function form
  * derives `fileSize` and per-file `feedback` from each `FileUploadFile`, so the

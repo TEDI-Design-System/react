@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Design system for AI/UI generation:** read [`DESIGN.md`](./DESIGN.md) (tokens + tedi-ready component rules) before generating or modifying UI. It complements the `tedi-react` skill.
+
 ## Project Overview
 
 TEDI Design System React — a React component library (`@tedi-design-system/react`) providing accessible, reusable UI components. Two export namespaces:

@@ -8,7 +8,7 @@
 }
 
 .accordion__item-header {
-  border-radius: var(--border-radius-default);
+  border-radius: var(--tedi-radius-02-default);
   transition: 300ms ease; // match content height animation
   transition-property: border-radius, background, color;
 
@@ -28,7 +28,7 @@
   }
 
   .accordion__item--disabled & {
-    color: var(--color-text-disabled);
+    color: var(--general-text-disabled);
   }
 }
 

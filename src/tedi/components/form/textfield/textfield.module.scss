@@ -105,7 +105,11 @@ $input-padding-right-map: (
 }
 
 @each $size in default, small, large {
-  $selector: if($size == default, '.tedi-textfield', '.tedi-textfield--#{$size}');
+  $selector: '.tedi-textfield';
+
+  @if $size != default {
+    $selector: '.tedi-textfield--#{$size}';
+  }
   #{$selector} {
     $padding: get-padding-right($size, true, false);
 

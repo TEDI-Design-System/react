@@ -132,7 +132,7 @@ export const Size: Story = {
           <Col width={2}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="display-flex gap-2 flex-wrap">
+          <Col className="flex gap-2 flex-wrap">
             <Filter text="Text" size={value} selected />
             <Filter text="Text" size={value} />
             <Filter text="Text" size={value} />
@@ -153,19 +153,19 @@ export const SingleValueFilter: Story = {
     <VerticalSpacing>
       <VerticalSpacing size={1}>
         <Text modifiers="bold">Separate</Text>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter text="Vastuvõtud" defaultSelected />
           <Filter text="Analüüsid" defaultSelected />
           <Filter text="Uuringud" />
           <Filter text="Vaktsineerimised" />
         </div>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter text="Vastuvõtud" variant="secondary" defaultSelected />
           <Filter text="Analüüsid" variant="secondary" defaultSelected />
           <Filter text="Uuringud" variant="secondary" />
           <Filter text="Vaktsineerimised" variant="secondary" />
         </div>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter
             text="Vastuvõtud"
             variant="secondary"
@@ -184,7 +184,7 @@ export const SingleValueFilter: Story = {
 
       <VerticalSpacing size={1}>
         <Text modifiers="bold">Grouped</Text>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <FilterGroup>
             <Filter text="Kooskõlastatud" />
             <Filter text="Tagasilükatud" />
@@ -194,7 +194,7 @@ export const SingleValueFilter: Story = {
             <Filter text="Tagasilükatud" />
           </FilterGroup>
         </div>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <FilterGroup>
             <Filter text="Kooskõlastatud" variant="secondary" />
             <Filter text="Tagasilükatud" variant="secondary" />
@@ -204,7 +204,7 @@ export const SingleValueFilter: Story = {
             <Filter text="Tagasilükatud" variant="secondary" />
           </FilterGroup>
         </div>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <FilterGroup>
             <Filter text="Analüüsid" />
             <Filter text="Doonorlus" />
@@ -216,22 +216,22 @@ export const SingleValueFilter: Story = {
 
       <VerticalSpacing size={1}>
         <Text modifiers="bold">Dropdown label + value</Text>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter text="Teenus" options={teenusOptions} preserveLabel showClear />
         </div>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter text="Teenus" variant="secondary" options={teenusOptions} preserveLabel showClear />
         </div>
       </VerticalSpacing>
 
       <VerticalSpacing size={1}>
         <Text modifiers="bold">Dropdown value</Text>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter text="Raviasutus" options={raviasutusOptions} />
           <Filter text="Teenus" options={teenusOptions} />
           <RangeFilter text="Ajavahemik" defaultRange={{ from: new Date(2026, 6, 13), to: new Date(2026, 7, 15) }} />
         </div>
-        <div className="display-flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           <Filter text="Raviasutus" variant="secondary" options={raviasutusOptions} />
           <Filter text="Teenus" variant="secondary" options={teenusOptions} />
           <RangeFilter
@@ -266,7 +266,7 @@ const ajavahemikOptions: FilterOption[] = [
 export const MultiValueFilter: Story = {
   render: () => (
     <VerticalSpacing>
-      <div className="display-flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         <Filter
           text="Teenused"
           multiselect
@@ -288,7 +288,7 @@ export const MultiValueFilter: Story = {
         <Filter text="Arst" multiselect options={arstOptions} searchable showSelectAll showClear />
         <Filter text="Ajavahemik" multiselect options={ajavahemikOptions} showClear />
       </div>
-      <div className="display-flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         <Filter
           text="Teenused"
           variant="secondary"
@@ -631,7 +631,7 @@ export const CustomDropdownContent: Story = {
     const label = periods.find((p) => p.value === selectedPeriod)?.label ?? 'Periood';
 
     return (
-      <div className="display-flex gap-2">
+      <div className="flex gap-2">
         <Filter text={label} selected={!!selectedPeriod} showClear onClear={() => setSelectedPeriod('')}>
           <ChoiceGroup
             id="period"
@@ -652,7 +652,7 @@ type TagEntry = { key: string; text: string; remove: () => void };
 
 const TagList = ({ tags }: { tags: TagEntry[] }) =>
   tags.length === 0 ? null : (
-    <div className="display-flex gap-1 flex-wrap">
+    <div className="flex gap-1 flex-wrap">
       {tags.map((tag) => (
         <Tag key={tag.key} onClose={tag.remove}>
           {tag.text}
@@ -837,7 +837,7 @@ export const Examples: Story = {
         <Text element="h1" modifiers="h1" color="secondary">
           Taotlused
         </Text>
-        <div className="display-flex gap-2 flex-wrap align-items-center">
+        <div className="flex gap-2 flex-wrap align-items-center">
           <Filter text="Vastuvõtud" variant="secondary" selected={vastuvotud} onSelectedChange={setVastuvotud} />
           <Filter text="Analüüsid" variant="secondary" selected={analuusid} onSelectedChange={setAnaluusid} />
           <Filter text="Uuringud" variant="secondary" selected={uuringud} onSelectedChange={setUuringud} />
@@ -890,7 +890,7 @@ export const Examples: Story = {
         <Text element="h1" modifiers="h1" color="secondary">
           Andmed
         </Text>
-        <div className="display-flex gap-2 flex-wrap align-items-center">
+        <div className="flex gap-2 flex-wrap align-items-center">
           <FilterGroup label="Tüüp" value={typeAndmed} onValueChange={setTypeAndmed}>
             <Filter text="Kõik" value="all" variant="secondary" />
             <Filter text="Aktiivsed" value="active" variant="secondary" />
@@ -924,7 +924,7 @@ export const Examples: Story = {
         <Text element="h1" modifiers="h1" color="secondary">
           Menetlusdokumendid
         </Text>
-        <div className="display-flex gap-2 flex-wrap align-items-center">
+        <div className="flex gap-2 flex-wrap align-items-center">
           <FilterGroup label="Kategooria" multiselect values={category} onValuesChange={setCategory}>
             <Filter text="Vastuvõtud" value="vastuvotud" variant="secondary" />
             <Filter text="Analüüsid" value="analuusid" variant="secondary" />
@@ -948,7 +948,7 @@ export const Examples: Story = {
         <Text element="h1" modifiers="h1" color="secondary">
           Taotlused
         </Text>
-        <div className="display-flex gap-2 flex-wrap align-items-center">
+        <div className="flex gap-2 flex-wrap align-items-center">
           <FilterGroup label="Tüüp" value={typePrimary} onValueChange={setTypePrimary}>
             <Filter text="Kõik" value="all" />
             <Filter text="Aktiivsed" value="active" />

@@ -108,12 +108,12 @@ const OptionStatesTemplate: StoryFn<OptionTemplateProps> = (args) => {
     <VerticalSpacing size={0.5}>
       {array.map((value, key) => (
         <Row key={key}>
-          <Col md={2} className="display-flex align-items-center">
+          <Col md={2} className="flex align-items-center">
             <Text color={titleColor} modifiers="bold">
               {value}
             </Text>
           </Col>
-          <Col className="display-flex align-items-center gap-3">
+          <Col className="flex align-items-center gap-3">
             <BaseMapOption {...args} selected={value === 'Selected'} disabled={value === 'Disabled'} id={value} />
           </Col>
         </Row>
@@ -161,18 +161,18 @@ export const OptionWithInfo: StoryObj<OptionTemplateProps> = {
   render: (args) => (
     <VerticalSpacing size={0.5}>
       <Row>
-        <Col md={2} className="display-flex align-items-center">
+        <Col md={2} className="flex align-items-center">
           <Text modifiers="bold">Info</Text>
         </Col>
-        <Col className="display-flex align-items-center gap-3">
+        <Col className="flex align-items-center gap-3">
           <BaseMapOption {...args} id="info" tooltipText="See kaart uueneb igal aastal." tooltipType="info" />
         </Col>
       </Row>
       <Row>
-        <Col md={2} className="display-flex align-items-center">
+        <Col md={2} className="flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col className="display-flex align-items-center gap-3">
+        <Col className="flex align-items-center gap-3">
           <BaseMapOption
             {...args}
             id="error"

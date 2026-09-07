@@ -1,9 +1,15 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { useBreakpointProps } from '../../../helpers';
 import ChoiceGroup, { ChoiceGroupProps } from './choice-group';
 import { ChoiceGroupContext } from './choice-group-context';
 
 import '@testing-library/jest-dom';
+
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
 
 const defaultProps: ChoiceGroupProps = {
   id: 'test-choice-group',
@@ -20,6 +26,13 @@ const defaultProps: ChoiceGroupProps = {
 };
 
 describe('ChoiceGroup Component', () => {
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars, @typescript-eslint/no-explicit-any
+      getCurrentBreakpointProps: ({ sm, md, lg, xl, xxl, defaultServerBreakpoint, ...xs }: any) => xs,
+    });
+  });
+
   it('renders correctly with required props', () => {
     render(
       <ChoiceGroupContext.Provider
@@ -151,6 +164,31 @@ describe('ChoiceGroup Component', () => {
   it('returns select-all label when no items are selected', () => {
     render(<ChoiceGroup {...defaultProps} indeterminateCheck={true} value={[]} />);
     expect(screen.getByText(/table.filter.select-all/i)).toBeInTheDocument();
+  });
+
+  it('exposes required and invalid state on the radiogroup, not on individual radios', () => {
+    render(
+      <ChoiceGroup {...defaultProps} inputType="radio" required helper={{ text: 'Please choose one', type: 'error' }} />
+    );
+
+    const group = screen.getByRole('radiogroup');
+    expect(group).toHaveAttribute('aria-required', 'true');
+    expect(group).toHaveAttribute('aria-invalid', 'true');
+    expect(group).toHaveAccessibleDescription('Please choose one');
+
+    // The state lives on the group; the individual radios must not carry it.
+    screen.getAllByRole('radio').forEach((radio) => {
+      expect(radio).not.toHaveAttribute('aria-required');
+      expect(radio).not.toHaveAttribute('aria-invalid');
+    });
+  });
+
+  it('does not set aria-required or aria-invalid on the radiogroup by default', () => {
+    render(<ChoiceGroup {...defaultProps} inputType="radio" />);
+
+    const group = screen.getByRole('radiogroup');
+    expect(group).not.toHaveAttribute('aria-required');
+    expect(group).not.toHaveAttribute('aria-invalid');
   });
 
   it('handles indeterminate checkbox change correctly', () => {

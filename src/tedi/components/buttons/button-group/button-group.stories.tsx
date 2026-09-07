@@ -117,13 +117,13 @@ const TemplateWithIcons: StoryFn<ButtonGroupProps> = (args) => {
 const TemplateIconOnly: StoryFn<ButtonGroupProps> = (args) => {
   return (
     <ButtonGroup {...args} stretch={false}>
-      <Button id="1" icon="table">
+      <Button id="1" icon="table" showTooltip>
         Tab 1
       </Button>
-      <Button id="2" icon="refresh" isActive>
+      <Button id="2" icon="refresh" isActive showTooltip>
         Tab 2
       </Button>
-      <Button id="3" icon="settings">
+      <Button id="3" icon="settings" showTooltip>
         Tab 3
       </Button>
     </ButtonGroup>
@@ -136,6 +136,7 @@ export const Default: Story = {
     type: 'primary',
     stretch: false,
     dropdownLabel: 'Text',
+    enableMobileDropdown: true,
   },
 };
 
@@ -268,5 +269,7 @@ export const Stretched: Story = {
   render: Template,
   args: {
     stretch: true,
+    dropdownLabel: 'Text',
+    enableMobileDropdown: true,
   },
 };

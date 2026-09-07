@@ -18,31 +18,60 @@ React component library with 50+ accessible components. Built on React 18/19 wit
 
 ## Authoritative Sources
 
-This skill bundles a snapshot of the API and patterns, but the library is public and ships fast. When a prop, default, or component listed below feels stale or absent, treat these as the source of truth and fetch from them.
+This skill teaches the integration idiom and the traps. It is **not** a prop reference: the
+library ships fast and any prop list here would be stale. Read props from the installed package.
 
-### Pin to the consumer's installed version
+### Read the installed package, not the internet
 
-Before fetching source, **determine which version of `@tedi-design-system/react` the project actually has installed** and browse the matching git tag — not `main`. The repo's release tags follow the pattern `react-<version>` (e.g. `react-17.0.0-rc.8`, `react-17.1.0-rc.4`).
+The consumer's `node_modules` is the best source available: it is the exact version their code
+compiles against, it needs no network, and it is greppable with ordinary tools. Prefer it over
+GitHub and Storybook in every case.
 
-1. Read the resolved version from the project — `package.json`'s `dependencies."@tedi-design-system/react"`, or `npm ls @tedi-design-system/react`, or the lockfile entry. Strip any range prefix (`^`, `~`).
-2. Construct the tag URL: `https://github.com/TEDI-Design-System/react/tree/react-<version>/...`
-3. If the resolved version is a pre-release or the tag doesn't exist (rare), fall back to `main` and note the version mismatch when answering.
+```
+node_modules/@tedi-design-system/react/component.manifest.json   # generated component catalog
+node_modules/@tedi-design-system/react/src/tedi/index.d.ts       # barrel export (roster)
+node_modules/@tedi-design-system/react/src/tedi/**/*.d.ts        # per-component props + JSDoc
+node_modules/@tedi-design-system/core/tokens.json                # every design token, resolved
+```
 
-**Example** for a project on `17.0.0-rc.8`:
-- TEDI-Ready components: `https://github.com/TEDI-Design-System/react/tree/react-17.0.0-rc.8/src/tedi/components`
-- Barrel export: `https://github.com/TEDI-Design-System/react/blob/react-17.0.0-rc.8/src/tedi/index.ts`
-- Specific component: `https://github.com/TEDI-Design-System/react/blob/react-17.0.0-rc.8/src/tedi/components/buttons/button/button.tsx`
+The `.d.ts` tree ships with JSDoc preserved, so defaults, rationale and worked examples are all
+there. `component.manifest.json` is generated from the source tree and drift-tested, so it cannot
+fall behind the code the way a hand-written list does. See
+[references/components.md](references/components.md) for how to resolve a component to its types
+and how to query the manifest.
+
+Confirm the version you are reading, so you can say what your answer applies to:
+
+```bash
+npm ls @tedi-design-system/react @tedi-design-system/core
+```
+
+### When there is no install to read
+
+Only when `node_modules` is unavailable (planning before install, or reviewing a diff), fall back
+to the public repo, pinned to the version in `package.json`. Release tags are `react-<version>`
+(e.g. `react-19.1.0-rc.2`); every release, including pre-releases, is tagged, so use the tag rather
+than `main`. Fetch raw files, not blob pages:
+
+```
+https://raw.githubusercontent.com/TEDI-Design-System/react/react-19.1.0-rc.2/src/tedi/index.ts
+https://raw.githubusercontent.com/TEDI-Design-System/react/react-19.1.0-rc.2/src/tedi/components/buttons/button/button.tsx
+https://raw.githubusercontent.com/TEDI-Design-System/react/react-19.1.0-rc.2/component.manifest.json
+```
+
+If the tag genuinely doesn't exist, use `main` and say so in your answer.
 
 ### Canonical references
 
-- **Source code & releases**: [github.com/TEDI-Design-System/react](https://github.com/TEDI-Design-System/react) — TEDI-Ready components live under `src/tedi/components/`, community under `src/community/components/`. The barrel export `src/tedi/index.ts` is the canonical list of TEDI-Ready exports. Always prefer the version-pinned tag URLs (see above) over `main` when consulting source.
-- **Live Storybook (interactive docs + prop tables)**: [storybook.tedi.ee/react/main](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started) — has every component's args table, default values, and runnable examples. Note that the public Storybook tracks `main`; if it disagrees with the consumer's installed tag, the tag wins.
+- **Source & tags**: [github.com/TEDI-Design-System/react](https://github.com/TEDI-Design-System/react). TEDI-Ready lives under `src/tedi/components/`, community under `src/community/components/`.
+- **Live Storybook (args tables + runnable examples)**: [storybook.tedi.ee/react/main](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started), generated from the same JSDoc. It tracks `main`, so the installed `.d.ts` wins on any disagreement.
 - **Design system wiki** (cross-framework guidelines): [github.com/TEDI-Design-System/general/wiki](https://github.com/TEDI-Design-System/general/wiki)
-- **Releases & changelog**: [github.com/TEDI-Design-System/react/releases](https://github.com/TEDI-Design-System/react/releases), [CHANGELOG.md](https://github.com/TEDI-Design-System/react/blob/main/CHANGELOG.md), [Issues](https://github.com/TEDI-Design-System/react/issues)
+- **Releases & changelog**: [releases](https://github.com/TEDI-Design-System/react/releases), [CHANGELOG.md](https://github.com/TEDI-Design-System/react/blob/main/CHANGELOG.md), [issues](https://github.com/TEDI-Design-System/react/issues)
 - **npm**: [@tedi-design-system/react](https://www.npmjs.com/package/@tedi-design-system/react)
-- **Sibling packages**: [@tedi-design-system/core](https://www.npmjs.com/package/@tedi-design-system/core) (tokens, SCSS, icons), [@tedi-design-system/angular](https://www.npmjs.com/package/@tedi-design-system/angular) (Angular counterpart — useful for behavioral parity questions)
+- **Sibling packages**: [@tedi-design-system/core](https://www.npmjs.com/package/@tedi-design-system/core) (tokens, SCSS, icons), [@tedi-design-system/angular](https://www.npmjs.com/package/@tedi-design-system/angular) (useful for behavioural parity questions)
 
-**Verification tip**: if the user asks about a recently added component or a prop you're unsure of, fetch the relevant `.tsx` file from the version-pinned tag (e.g. `src/tedi/components/<category>/<name>/<name>.tsx`) — the JSDoc on `interface ...Props` is the canonical spec.
+**Never invent a prop.** If you can't find it in the types, it doesn't exist. Say so instead of
+guessing a plausible name.
 
 ## Installation
 
@@ -197,7 +226,7 @@ const [email, setEmail] = useState('');
 <Checkbox id="agree" label="I agree" value="agree" onChange={(val, checked) => setAgreed(checked)} />
 ```
 
-TEDI ships a full set of form controls (text, number, select, choice, date/time, filter, file upload, etc.). For the current roster and per-control usage, see [references/forms.md](references/forms.md) and the barrel export (`src/tedi/index.ts`).
+Form controls: `TextField`, `Select`, `Textarea`, `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`. Verify the roster and per-control usage against [references/forms.md](references/forms.md) and the installed package (see Authoritative Sources).
 
 ## Theming
 
@@ -234,10 +263,10 @@ sendNotification({ type: 'success', title: 'Done', children: 'Task completed' })
 A handful of mistakes account for most TEDI integration issues. Avoid them up front:
 
 - **Import from `/tedi` or `/community`, never the package root.** `@tedi-design-system/react` is not a valid import path — the package has explicit entry points (`@tedi-design-system/react/tedi`, `@tedi-design-system/react/community`, `@tedi-design-system/react/index.css`). Importing from the root will fail or silently miss types.
-- **Prefer TEDI-Ready over Community whenever possible.** Several Community components are deprecated in favor of TEDI-Ready equivalents, and the set with no TEDI-Ready alternative yet shifts over time — check the barrel exports / component JSDoc / Storybook for the current deprecation status and whether a TEDI-Ready alternative exists before reaching into Community. See [references/components.md](references/components.md).
+- **Prefer TEDI-Ready over Community whenever possible.** Several Community components are deprecated in favor of TEDI-Ready equivalents, and the set with no TEDI-Ready alternative yet shifts over time — check the manifest's `status` field and the component JSDoc for the current deprecation status before reaching into Community. See [references/components.md](references/components.md).
 - **Always pass `id` to form controls.** `TextField`, `Select`, `Checkbox`, `Radio`, etc. require it — it's how the label/helper/aria wiring works. There is no auto-generated fallback.
-- **Use design tokens, not hardcoded colors.** Reach for `var(--tedi-color-*)`, `var(--tedi-spacing-*)`, etc. from `@tedi-design-system/core` instead of hex codes. This is what makes theme switching and brand overrides work.
-- **Do not add CSS `var()` fallbacks.** Write `var(--tedi-spacing-4)`, not `var(--tedi-spacing-4, 16px)` — fallbacks defeat token-driven theming.
+- **Use design tokens, not hardcoded colors.** Prefer the semantic roles (`var(--general-surface-primary)`, `var(--general-text-secondary)`) and drop to a `--tedi-*` primitive only when no semantic token fits. This is what makes theme switching and brand overrides work. Look names up in `node_modules/@tedi-design-system/core/tokens.json` rather than recalling them — see [references/theming.md](references/theming.md).
+- **Do not add CSS `var()` fallbacks.** Write `var(--tedi-dimensions-04)`, not `var(--tedi-dimensions-04, 16px)` — fallbacks defeat token-driven theming.
 - **Support both controlled and uncontrolled.** When wrapping a TEDI form control with your own, accept `value`/`defaultValue` and forward both — don't force consumers into one mode.
 - **Mock `useBreakpointProps` in tests** for any component you wrote that uses breakpoint support; jsdom won't respond to media queries.
 
@@ -245,6 +274,6 @@ A handful of mistakes account for most TEDI integration issues. Avoid them up fr
 
 Load based on your task — **do not load all at once**:
 
-- [references/components.md](references/components.md) — How to discover the current components and read their real props from the authoritative sources (barrel exports, source JSDoc, Storybook)
-- [references/theming.md](references/theming.md) — Design tokens, SCSS customization, theme provider
+- [references/components.md](references/components.md) — Finding a component in the generated manifest, resolving it to its shipped types, and the behaviour those types don't tell you (composition constraints, responsive quirks, a11y requirements)
+- [references/theming.md](references/theming.md) — Design tokens and how to look them up, SCSS customization, theme provider, migrating off the legacy `--color-*` palette
 - [references/forms.md](references/forms.md) — Form controls, controlled/uncontrolled modes, validation

@@ -75,7 +75,7 @@ export const ControlledExample: StoryFn<TimePickerProps> = () => {
         <TimePicker value={time} onChange={setTime} />
       </Col>
 
-      <Col width={8} sm={12} className="display-flex align-items-center">
+      <Col width={8} sm={12} className="flex align-items-center">
         <Text>Selected time: {time}</Text>
       </Col>
     </Row>

@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { MultiValueProps } from 'react-select';
 
+import { useLabels } from '../../../../providers/label-provider';
 import { Tag, TagEllipsis } from '../../../tags/tag/tag';
 import { ISelectOption } from '../select';
 import styles from '../select.module.scss';
@@ -47,6 +48,7 @@ export const SelectMultiValue = ({
   removeProps,
   ...props
 }: MultiValueType): JSX.Element | null => {
+  const { getLabel } = useLabels();
   const { isSingleRow, visibleCount } = useSelectTagsContext();
 
   if (props.data.value === SELECT_ALL_VALUE || isGroupSentinel(props.data)) {
@@ -88,6 +90,11 @@ export const SelectMultiValue = ({
           isTagRemovable
             ? {
                 tabIndex: 0,
+                // Name the button "Remove <option>" so screen readers say which
+                // tag is removed, instead of a bare "Close".
+                title: `${getLabel('remove')} ${
+                  typeof props.data.label === 'string' ? props.data.label : props.data.value
+                }`,
                 onMouseDown: (event) => event.stopPropagation(),
                 onKeyDown: handleCloseKeyDown,
               }

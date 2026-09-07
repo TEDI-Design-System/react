@@ -20,34 +20,52 @@ The `SideNav` is no longer included in any layout or context provider by default
 
 ```tsx
 import { useState } from 'react';
-import { SideNav } from '@tedi-design-system/react/tedi';
+import { Footer, Header, SideNav } from '@tedi-design-system/react/tedi';
 
 const MyPage = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
-      {/* Toggle button (you must place this yourself) */}
-      <SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* The toggle belongs in Header's `toggle` slot; `menuOpen` and `isMobileOpen`
+          must be the SAME boolean — the two components share no context. */}
+      <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>…</Header>
 
-      {/* Position SideNav on the left manually */}
-      <div className="fixed left-0 top-0 h-full z-50">
-        <SideNav
-          ariaLabel="Main navigation"
-          isMobileOpen={isOpen}
-          navItems={[
-            { label: 'Dashboard', href: '/' },
-            { label: 'Settings', href: '/settings' },
-          ]}
-        />
+      {/* The row stretches between header and footer */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        {/* No padding, no align-self, no sticky — SideNav is height:100%, so this
+            column decides its height. Any of those three leaves white gaps. */}
+        <div style={{ display: 'flex' }}>
+          <SideNav
+            ariaLabel="Main navigation"
+            isMobileOpen={isOpen}
+            navItems={[
+              { children: 'Dashboard', href: '/' },
+              { children: 'Settings', href: '/settings' },
+            ]}
+          />
+        </div>
+
+        <main style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>…</main>
       </div>
-    </>
+
+      <Footer>…</Footer>
+    </div>
   );
 };
 ```
 
-> Use `fixed`, `absolute`, or any positioning strategy that fits your layout.  
-> The component doesn't dictate placement anymore.
+> **Position it with your own CSS — TEDI ships no positioning utilities.**
+> `fixed`, `absolute`, `relative`, `sticky`, `top-0`, `h-full` and `z-50` are **not** in
+> the TEDI stylesheet; only the flex / gap / align / justify / text / order families are.
+> Class names on DS components are hashed and not public API.
+>
+> Three shell mistakes to avoid: giving the nav column its own padding (it must sit flush
+> against the shell edge), letting the nav column size to its content (it has to stretch to
+> the footer), and making the column `sticky` instead of the inner rail.
+
+> **Item labels are `children`, not `label`.** `navItems` entries are `LinkProps` plus
+> `icon` / `subItems` / `subItemGroups`.
 
 ---
 

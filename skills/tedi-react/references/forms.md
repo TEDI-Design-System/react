@@ -2,27 +2,32 @@
 
 TEDI form controls support both **controlled** and **uncontrolled** modes, following standard React patterns.
 
-> The prop names, defaults, value shapes, and enum members in this file are **illustrative** — they teach the integration idiom, not the exact current API. Verify against the control's `.tsx` JSDoc / Storybook before relying on a specific prop (see SKILL.md → Authoritative Sources).
+> The prop names, defaults, value shapes, and enum members in this file are **illustrative**: they
+> teach the integration idiom, not the exact current API. Before relying on a specific prop, verify
+> it against the control's shipped types in
+> `node_modules/@tedi-design-system/react/src/tedi/components/form/`
+> (see SKILL.md → Authoritative Sources).
 
 ## Available Form Controls
 
-Orientation only — verify the current roster against the barrel export (`src/tedi/index.ts`):
+Orientation only. Verify the current roster against the installed package's barrel export
+(`node_modules/@tedi-design-system/react/src/tedi/index.d.ts`):
 
-| Component | Purpose |
-|-----------|---------|
-| TextField | Single-line text; icon, clearable, size variants |
-| TextArea | Multi-line text; character-limit counter |
-| NumberField | Numeric input; min/max, step, suffix, increment buttons |
-| Select | Dropdown; async, multi-select, searchable |
-| Checkbox | Boolean toggle; indeterminate state |
-| Radio | Single choice; used within ChoiceGroup |
-| ChoiceGroup | Radio/checkbox groups; segmented and card variants |
-| Search | Text with a search button / onSearch callback |
-| DateField | Date picker; single/multiple/range, manual input, native picker, breakpoint-aware |
-| TimeField | Time picker; wheel / grid picker, native fallback |
-| Filter | Pill-shaped toggle / dropdown filter; pairs with `FilterGroup` |
-| FileUpload | Button-based multi-file upload; validation, loading states |
-| FileDropzone | Drag-and-drop file upload |
+| Component | Value Type | Key Features |
+|-----------|-----------|--------------|
+| TextField | `string` | Icon, clearable, size variants |
+| Textarea | `string` | Character limit counter |
+| NumberField | `number` | Min/max, step, suffix, increment buttons |
+| Select | `ISelectOption \| ISelectOption[] \| null` | Async, multi-select, searchable |
+| Checkbox | `boolean` (via onChange) | Indeterminate state |
+| Radio | `boolean` (via onChange) | Used in ChoiceGroup |
+| ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
+| Search | `string` | Search button, onSearch callback |
+| DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, clearable, breakpoint-aware |
+| TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes, clearable |
+| Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
+| FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states, `showRestrictions` hint toggle |
+| FileDropzone | `FileUploadFile[]` | Drag-and-drop, per-file validation, `showRestrictions` hint toggle |
 
 ## Controlled vs Uncontrolled
 
@@ -45,7 +50,7 @@ import { TextField } from '@tedi-design-system/react/tedi';
 <TextField
   id="email"
   label="Email"
-  type="email"
+  input={{ type: 'email' }}
   icon="mail"
   isClearable
   value={email}
@@ -54,6 +59,10 @@ import { TextField } from '@tedi-design-system/react/tedi';
   required
 />
 ```
+
+Key props: `icon`, `isClearable`, `onClear`, `size` ('default' | 'small' | 'large'), `helper` (FeedbackTextProps), `hideLabel`, `readOnly`.
+
+Native input attributes (`type`, `autoComplete`, `min`, `maxLength`, …) are **not** top-level props — pass them through the `input` prop: `input={{ type: 'password', autoComplete: 'current-password' }}`. There is no separate `PasswordField`; a password input is a `TextField` with `input={{ type: 'password' }}`.
 
 ## Select
 
@@ -150,6 +159,11 @@ const [date, setDate] = useState<Date>();
 />
 ```
 
+**Year dropdown range** — the header's year dropdown spans **100 years back and 20 forward** by default. Override with `minYear` / `maxYear` (e.g. a date-of-birth field):
+```tsx
+<DateField id="dob" label="Date of birth" minYear={1900} maxYear={2010} />
+```
+
 **Native picker on small screens** — uses `<input type="date">` below `md`, custom calendar from `md` up. Only valid with `mode="single"`:
 ```tsx
 <DateField id="dob" label="Date of birth" useNativePicker md={{ useNativePicker: false }} />
@@ -169,14 +183,29 @@ const [date, setDate] = useState<Date>();
 <DateField id="year" label="Year" selectionLevel="years" />
 ```
 
-**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`, `isClearable`):
+**Static header** — `monthYearSelectType="static"` renders the month/year as a plain, non-clickable label so users can only move via the prev/next nav (disables the month/year jump pickers). `'dropdown'` (default) and `'grid'` are the interactive options.
+
+**Per-day status** — `dayStatus` overlays a `StatusIndicator` dot on matching days (e.g. availability). Return `{ type, label }` per day (or `null`); the `label` is folded into the day's `aria-label` since the dot is decorative:
+```tsx
+<DateField
+  id="appointments"
+  label="Appointment"
+  dayStatus={(date) => (isBooked(date) ? { type: 'error', label: 'Fully booked' } : null)}
+/>
+```
+
+**Clear button** — shown by default when the field has a value; set `clearable={false}` to hide it (e.g. required fields that must not be emptied). The same `clearable?: boolean` prop (default `true`, breakpoint-aware) exists on `DateField`, `TimeField`, and `DateTimeField`.
+```tsx
+<DateField id="dob" label="Date of birth" required clearable={false} />
+```
+
+**Forwarding to the inner input** — pass-through props (e.g. `helper`, `icon`):
 ```tsx
 <DateField
   id="end"
   label="End date"
   inputProps={{
     helper: { type: 'hint', text: 'Leave empty for "ongoing"' },
-    isClearable: true,
   }}
 />
 ```
@@ -380,14 +409,14 @@ Multiple helpers:
 ```tsx
 import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
 
-// Button-based upload
+// Button-based upload (`maxSize` is in MB)
 <FileUpload
   id="docs"
   name="documents"
   label="Upload documents"
   accept=".pdf,.doc"
   multiple
-  maxSize={5 * 1024 * 1024}
+  maxSize={5}
   files={files}
   onChange={setFiles}
   onDelete={handleDelete}
@@ -398,15 +427,22 @@ import { FileUpload, FileDropzone } from '@tedi-design-system/react/tedi';
   label="Drop files here"
   accept=".pdf,.doc"
   multiple
-  maxSize={10 * 1024 * 1024}
+  maxSize={10}
 />
 ```
+
+**Restrictions hint** — both components auto-render an "allowed types / max size" hint below the field. Hide it with `showRestrictions={false}` when the same info lives elsewhere (e.g. a `tooltip`); rejection error messages still render either way:
+```tsx
+<FileDropzone label="Drop files" accept=".pdf,.txt" maxSize={5} tooltip="PDF/TXT, max 5 MB" showRestrictions={false} />
+```
+
+**Rejections are reported and observable** — a file failing `accept`/`maxSize` (dragged *or* picked) surfaces a localised message, and `onChange` fires even when the drop is fully rejected (with the unchanged list), so single-file rejections aren't silent.
 
 ## Event Handler Conventions
 
 TEDI form controls hand you the **parsed value**, not the raw DOM event. The convention across controls (confirm the exact signature for any control against its `.tsx` / Storybook):
 
-- **Text-like inputs** (TextField, TextArea, Search) call `onChange` with the string value; a raw-event variant (`onChangeEvent`) is also available.
+- **Text-like inputs** (TextField, Textarea, Search) call `onChange` with the string value; a raw-event variant (`onChangeEvent`) is also available.
 - **NumberField** calls `onChange` with a number.
 - **Checkbox / Radio** call `onChange` with the value and its checked state.
 - **ChoiceGroup** calls `onChange` with the whole group's parsed value (`string | string[] | null`) — not the `(value, checked)` pair.

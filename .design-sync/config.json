@@ -1,0 +1,152 @@
+{
+  "pkg": "@tedi-design-system/react",
+  "projectId": "d10e8d07-6086-4ddd-970c-090a49feaa2f",
+  "globalName": "Tedi",
+  "shape": "storybook",
+  "storybookConfigDir": ".storybook",
+  "storybookStatic": ".design-sync/sb-reference",
+  "buildCmd": "npm run build",
+  "entry": "./dist/tedi.es.js",
+  "cssEntry": "./index.css",
+  "tokensPkg": "@tedi-design-system/core",
+  "readmeHeader": ".design-sync/conventions.md",
+  "docsDir": "../.design-sync/docs",
+  "titleMap": {
+    "FormLabel": null,
+    "Toast": null
+  },
+  "provider": {
+    "component": "ThemeProvider",
+    "props": {
+      "theme": "default"
+    },
+    "inner": {
+      "component": "PrintingProvider",
+      "inner": {
+        "component": "LabelProvider",
+        "props": {
+          "locale": "et"
+        }
+      }
+    }
+  },
+  "storyImports": {
+    "shim": [
+      "src/tedi/providers/"
+    ]
+  },
+  "overrides": {
+    "Accordion": {
+      "cardMode": "column"
+    },
+    "Affix": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "Attachment": {
+      "cardMode": "column"
+    },
+    "Button": {
+      "cardMode": "column",
+      "viewport": "916x700"
+    },
+    "ButtonGroup": {
+      "cardMode": "column"
+    },
+    "Calendar": {
+      "cardMode": "column"
+    },
+    "CardButton": {
+      "cardMode": "column"
+    },
+    "DateField": {
+      "cardMode": "column"
+    },
+    "Ellipsis": {
+      "cardMode": "column"
+    },
+    "FileDropzone": {
+      "cardMode": "column"
+    },
+    "Filter": {
+      "cardMode": "column"
+    },
+    "FloatingButton": {
+      "cardMode": "column"
+    },
+    "Link": {
+      "cardMode": "column"
+    },
+    "Footer": {
+      "cardMode": "column",
+      "skip": [
+        "tedi-ready-layout-footer--device-size",
+        "tedi-ready-layout-footer--logo-position"
+      ],
+      "viewport": "1200x900"
+    },
+    "HashTrigger": {
+      "cardMode": "column"
+    },
+    "Header": {
+      "cardMode": "column"
+    },
+    "HorizontalStepper": {
+      "cardMode": "column"
+    },
+    "InfoButton": {
+      "cardMode": "column"
+    },
+    "OptionContent": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "Pagination": {
+      "cardMode": "column"
+    },
+    "ProgressBar": {
+      "cardMode": "column"
+    },
+    "ScrollVisibility": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "SideNav": {
+      "cardMode": "column"
+    },
+    "StretchContent": {
+      "cardMode": "column"
+    },
+    "Table": {
+      "cardMode": "column"
+    },
+    "TableOfContents": {
+      "cardMode": "column"
+    },
+    "Tabs": {
+      "cardMode": "column"
+    },
+    "Tag": {
+      "cardMode": "column"
+    },
+    "TextGroup": {
+      "cardMode": "column"
+    },
+    "Timeline": {
+      "cardMode": "column"
+    },
+    "Tooltip": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "TopNav": {
+      "cardMode": "column"
+    }
+  },
+  "libOverrides": {
+    "dts.mjs": "package declares its .d.ts entry only under exports['./tedi'].types (no top-level types) — upstream resolved the nonexistent dist/index.d.ts and found 0 exports. ALSO (2026-08-10): doc cap 120→1200 (upstream truncated 35% of prop descriptions mid-sentence) and preludeFor() fills the prelude with referenced type shapes (118 names referenced, defined nowhere) — see NOTES.md",
+    "previews.mjs": "(1) code reachable from stories reads process.env (label-provider, next/link) — needs the same 'process.env' -> {} substitution Vite makes in the reference storybook; (2) inlines .storybook staticDirs assets as data URIs, which have no other way to reach a preview card",
+    "story-imports.mjs": "kebab-case filenames vs PascalCase exports (button.tsx -> Button) — upstream's case-sensitive filename match shimmed NOTHING, so previews compiled components from src where .module.scss loads empty and all 81 rendered unstyled",
+    "preview-gen-storybook.mjs": "stories declare globals.backgrounds.value and read globals.theme (storybook addon/globalTypes) — unhonoured, inverted cells render white-on-white and the theme readout is blank"
+  }
+}

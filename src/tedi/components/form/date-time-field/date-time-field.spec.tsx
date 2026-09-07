@@ -610,4 +610,16 @@ describe('DateTimeField component', () => {
       expect(onChange).not.toHaveBeenCalled();
     });
   });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<DateTimeField {...defaultProps} value={new Date(2025, 8, 1, 11, 30)} />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<DateTimeField {...defaultProps} value={new Date(2025, 8, 1, 11, 30)} clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
+    });
+  });
 });

@@ -62,6 +62,9 @@ export type DropdownProps = {
   focusManager?: Omit<React.ComponentProps<typeof FloatingFocusManager>, 'context' | 'children'>;
 };
 
+/**
+ * @deprecated Use `Dropdown` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Dropdown = (props: DropdownProps) => {
   const { getLabel } = useLabels();
   const { button, items, onItemClick, closeMenuOnClick = true, ...rest } = props;

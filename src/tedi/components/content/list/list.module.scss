@@ -84,6 +84,10 @@ $bullet-colors: (
   }
 }
 
+.tedi-list--ordered.tedi-list--reversed > .tedi-list__item {
+  counter-increment: item -1;
+}
+
 .tedi-list--style-none {
   padding: 0;
   list-style: none;

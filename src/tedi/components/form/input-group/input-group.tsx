@@ -193,14 +193,10 @@ export const InputGroupBase = forwardRef<InputGroupForwardRef, InputGroupProps>(
 
 InputGroupBase.displayName = 'InputGroup';
 
-const InputGroup = InputGroupBase as typeof InputGroupBase & {
-  Prefix: typeof Prefix;
-  Suffix: typeof Suffix;
-  Input: typeof Input;
-};
-
-InputGroup.Prefix = Prefix;
-InputGroup.Suffix = Suffix;
-InputGroup.Input = Input;
+export const InputGroup = Object.assign(InputGroupBase, {
+  Prefix,
+  Suffix,
+  Input,
+});
 
 export default InputGroup;

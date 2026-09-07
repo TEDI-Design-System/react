@@ -9,6 +9,14 @@
   }
 }
 
+.tedi-calendar__title {
+  display: flex;
+  flex: 1;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: center;
+}
+
 .tedi-calendar__month-year-dropdown {
   max-height: 15rem;
   overflow-y: auto;
@@ -50,6 +58,7 @@
 .tedi-calendar__month-year-label {
   display: flex;
   gap: var(--layout-grid-gutters-08);
+  font-weight: var(--tedi-weight-02);
   color: var(--general-text-primary);
   text-transform: capitalize;
 }

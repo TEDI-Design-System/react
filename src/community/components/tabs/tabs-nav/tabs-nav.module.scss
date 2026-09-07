@@ -4,7 +4,7 @@
   margin: 0;
   overflow-y: auto;
   list-style: none;
-  background-color: var(--color-bg-muted);
+  background-color: var(--general-surface-secondary);
 }
 
 .tabs__nav-item {
@@ -12,19 +12,19 @@
 }
 
 .tabs__nav-item--current {
-  background-color: var(--color-bg-default);
-  border-top-left-radius: var(--border-radius-default);
-  border-top-right-radius: var(--border-radius-default);
+  background-color: var(--general-surface-primary);
+  border-top-left-radius: var(--tedi-radius-02-default);
+  border-top-right-radius: var(--tedi-radius-02-default);
 }
 
 a.tabs__nav-link:not(:disabled) {
   display: inline-block;
   padding: 1rem;
-  color: var(--color-text-default);
+  color: var(--general-text-primary);
   white-space: nowrap;
 
   .tabs__nav-item--current & {
-    color: var(--color-primary-main);
+    color: var(--general-text-brand);
   }
 
   &:hover:not(:disabled) span span {
@@ -32,6 +32,6 @@ a.tabs__nav-link:not(:disabled) {
   }
 
   .tabs__nav-item:not(.tabs__nav-item--current) &:hover {
-    background-color: var(--color-bg-subtle);
+    background-color: var(--general-surface-tertiary);
   }
 }

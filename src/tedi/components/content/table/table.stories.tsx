@@ -419,7 +419,10 @@ export const Sizes: Story = {
             autoResetPageIndex={false}
             data={defaultEditor.rows}
             columns={bookingShowcaseColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Pagination – default size' } },
+            }}
           />
         </EditableRowsProvider>
         <Heading element="h3">Small</Heading>
@@ -430,7 +433,10 @@ export const Sizes: Story = {
             data={smallEditor.rows}
             columns={bookingShowcaseColumns}
             size="small"
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Pagination – small size' } },
+            }}
           />
         </EditableRowsProvider>
       </VerticalSpacing>
@@ -499,14 +505,20 @@ export const Simple: Story = {
             autoResetPageIndex={false}
             data={bookingEditor.rows}
             columns={bookingShowcaseColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Broneeringute pagineerimine' } },
+            }}
           />
         </EditableRowsProvider>
         <Table<PersonRecord>
           id="tedi-table-simple-people"
           data={filterablePeople}
           columns={simplePeopleColumns}
-          pagination={SHOWCASE_PAGINATION_4}
+          pagination={{
+            ...SHOWCASE_PAGINATION_4,
+            paginationProps: { labels: { ariaLabel: 'Isikute pagineerimine' } },
+          }}
         />
         <EditableRowsProvider value={doctorEditor}>
           <Table<Doctor>
@@ -514,7 +526,10 @@ export const Simple: Story = {
             autoResetPageIndex={false}
             data={doctorEditor.rows}
             columns={simpleDoctorColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Arstide pagineerimine' } },
+            }}
           />
         </EditableRowsProvider>
       </VerticalSpacing>
@@ -1574,6 +1589,24 @@ export const StickyFirstColumn: Story = {
         data={stickyDoctors}
         columns={stickyDoctorColumns}
         stickyFirstColumn
+        pagination={DEFAULT_PAGINATION}
+      />
+    </div>
+  ),
+};
+
+/**
+ * Last column stays fixed during horizontal scroll via `stickyLastColumn` — useful for a
+ * trailing actions column.
+ */
+export const StickyLastColumn: Story = {
+  render: () => (
+    <div style={{ maxWidth: 600 }}>
+      <Table<StickyDoctor>
+        id="tedi-table-sticky-last"
+        data={stickyDoctors}
+        columns={stickyDoctorColumns}
+        stickyLastColumn
         pagination={DEFAULT_PAGINATION}
       />
     </div>

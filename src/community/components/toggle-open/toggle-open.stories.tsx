@@ -9,6 +9,11 @@ import ToggleOpen from './toggle-open';
 const meta: Meta<typeof ToggleOpen> = {
   component: ToggleOpen,
   title: 'Community/ToggleOpen',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

@@ -162,11 +162,17 @@ export const Breadcrumbs = (props: BreadcrumbsProps): JSX.Element | null => {
                     </Button>
                   </Dropdown.Trigger>
                   <Dropdown.Content>
-                    {token.hidden.map((hiddenCrumb, hiddenIndex) => (
-                      <Dropdown.Item key={hiddenCrumb.key ?? hiddenIndex} index={hiddenIndex} asChild>
-                        {hiddenCrumb}
-                      </Dropdown.Item>
-                    ))}
+                    {token.hidden.map((hiddenCrumb, hiddenIndex) => {
+                      const menuCrumb =
+                        typeof hiddenCrumb.type !== 'string'
+                          ? cloneElement(hiddenCrumb, { noStyle: true })
+                          : hiddenCrumb;
+                      return (
+                        <Dropdown.Item key={hiddenCrumb.key ?? hiddenIndex} index={hiddenIndex} asChild>
+                          {menuCrumb}
+                        </Dropdown.Item>
+                      );
+                    })}
                   </Dropdown.Content>
                 </Dropdown>
               </li>

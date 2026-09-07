@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React, { forwardRef } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../helpers';
+import { legacyColorToCore } from '../color-tokens';
 import { TColorsBorder } from '../commonTypes';
 import styles from './card.module.scss';
 import { CardContentProps } from './card-content/card-content';
@@ -43,6 +44,9 @@ export interface CardProps extends BreakpointSupport<CardBreakpointProps> {
     | React.ReactNode;
 }
 
+/**
+ * @deprecated Use `Card` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Card = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.Element => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
@@ -76,7 +80,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.Elem
         {...rest}
         className={BEM}
         ref={ref}
-        style={borderColor ? { '--card-border-color': `var(--color-${borderColor})` } : undefined}
+        style={borderColor ? { '--card-border-color': legacyColorToCore(borderColor) } : undefined}
       >
         {children}
       </div>

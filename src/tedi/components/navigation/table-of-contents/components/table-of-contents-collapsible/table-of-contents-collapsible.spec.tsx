@@ -91,4 +91,25 @@ describe('TableOfContents.Collapsible', () => {
     );
     expect(screen.getByText('Table of contents')).toBeInTheDocument();
   });
+
+  it('names the sheet navigation with the heading when no ariaLabel is set', () => {
+    render(<Tree />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByRole('navigation', { name: 'Sisukord' })).toBeInTheDocument();
+  });
+
+  it('names the sheet navigation with ariaLabel, taking precedence over the heading', () => {
+    render(
+      <TableOfContents.Collapsible heading="Sisukord" ariaLabel="Section navigation">
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents.Collapsible>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByRole('navigation', { name: 'Section navigation' })).toBeInTheDocument();
+    expect(within(dialog).queryByRole('navigation', { name: 'Sisukord' })).not.toBeInTheDocument();
+  });
 });

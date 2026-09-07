@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Card, CardContent, CardProps } from '../card';
 import { getCardBorderPlacementColor } from '../card/utility';
-import { TColorsBackground, TColorsBorder } from '../commonTypes';
+import { legacyColorToCore } from '../color-tokens';
 import styles from './tooltip.module.scss';
 import { ARROW_HEIGHT, ARROW_WIDTH, TooltipContext } from './tooltip-provider';
 
@@ -30,6 +30,9 @@ export interface TooltipProps {
   maxWidth?: 'none' | 'small' | 'medium' | 'large';
 }
 
+/**
+ * @deprecated Use `Tooltip` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Tooltip = (props: TooltipProps): JSX.Element | null => {
   const { children, maxWidth = 'medium', cardProps, className } = props;
   const { open, x, y, strategy, focusManager, floating, arrowRef, getFloatingProps, placement, context } =
@@ -37,9 +40,9 @@ export const Tooltip = (props: TooltipProps): JSX.Element | null => {
 
   const [cardBorderPlacement, cardBorderColor] = getCardBorderPlacementColor(cardProps?.border);
 
-  const getArrowStrokeColor = (): 'none' | `var(--color-${TColorsBorder})` => {
+  const getArrowStrokeColor = (): string => {
     if (cardBorderPlacement && cardBorderColor) {
-      return `var(--color-${cardBorderColor})`;
+      return legacyColorToCore(cardBorderColor);
     }
 
     return 'none';
@@ -47,12 +50,12 @@ export const Tooltip = (props: TooltipProps): JSX.Element | null => {
 
   const hasArrowStroke = getArrowStrokeColor() !== 'none';
 
-  const getArrowFill = (): `var(--color-${TColorsBackground})` => {
+  const getArrowFill = (): string => {
     if (cardProps?.background) {
-      return `var(--color-${cardProps?.background})`;
+      return legacyColorToCore(cardProps.background);
     }
 
-    return 'var(--color-bg-default)';
+    return 'var(--general-surface-primary)';
   };
 
   const renderTooltip = (): JSX.Element | null => {

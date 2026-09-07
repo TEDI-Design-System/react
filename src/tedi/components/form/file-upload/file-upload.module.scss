@@ -1,4 +1,5 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '@tedi-design-system/core/mixins';
 
 $container-height: 2.5rem;
 $container-height-small: 2rem;
@@ -8,7 +9,12 @@ $container-height-small: 2rem;
   align-items: center;
 
   & input[type='file'] {
-    display: none;
+    @include mixins.visually-hidden;
+  }
+
+  & input[type='file']:focus-visible ~ .tedi-file-upload__button {
+    outline: 2px solid var(--form-input-border-active);
+    outline-offset: 2px;
   }
 }
 

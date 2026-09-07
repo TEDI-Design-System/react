@@ -13,19 +13,9 @@ export interface TableOfContentsItemProps {
    */
   children?: React.ReactNode;
   /**
-   * Validation state for multistep-form usage (only rendered with `showIcons`
-   * on the parent): `true` = valid, `false` = invalid, `undefined` = not yet
-   * validated.
-   */
-  isValid?: boolean;
-  /**
    * Render a separator below the item.
    */
   separator?: boolean;
-  /**
-   * Hide the validation glyph for this item even when `showIcons` is on.
-   */
-  hideIcon?: boolean;
 }
 
 export const TableOfContentsItem = (_props: TableOfContentsItemProps): JSX.Element | null => null;

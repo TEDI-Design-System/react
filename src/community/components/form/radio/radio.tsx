@@ -9,6 +9,9 @@ import styles from './radio.module.scss';
 
 export type RadioProps = ChoiceInputProps;
 
+/**
+ * @deprecated Use `Radio` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Radio = (props: RadioProps): JSX.Element => {
   const {
     id,

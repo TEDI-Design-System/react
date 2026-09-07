@@ -32,6 +32,10 @@ const meta: Meta<PopoverProps> = {
   } as never,
   title: 'TEDI-Ready/Components/Overlay/Popover',
   parameters: {
+    a11y: {
+      // TODO: [Popover]: Review storybook a11y violations #817
+      test: 'todo',
+    },
     docs: {
       source: {
         transform: (code: string) => {
@@ -64,7 +68,7 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content title="Pealkiri" close>
             {POLAR_BEAR_TEXT}
-            <div className="display-flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
+            <div className="flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
               <Button visualType="secondary" onClick={() => setFirstOpen(false)}>
                 Tühista
               </Button>
@@ -87,7 +91,7 @@ const ContentExamplesTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content>
             {POLAR_BEAR_TEXT}
-            <div className="display-flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
+            <div className="flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
               <Button visualType="secondary" onClick={() => setSecondOpen(false)}>
                 Tühista
               </Button>
@@ -138,10 +142,7 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content width="medium" title="Pealkiri" close>
             This popover is with title and close button.
-            <div
-              className="display-flex justify-content-end gap-2"
-              style={{ marginTop: 'var(--layout-grid-gutters-08)' }}
-            >
+            <div className="flex justify-content-end gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
               <Button visualType="secondary">Tühista</Button>
               <Button>Esita</Button>
             </div>
@@ -155,7 +156,7 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content width="medium" title="Pealkiri">
             This popover is with title.
-            <div className="display-flex justify-content-end gap-2">
+            <div className="flex justify-content-end gap-2">
               <Button visualType="secondary">Tühista</Button>
               <Button>Esita</Button>
             </div>
@@ -174,7 +175,7 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
             close
             closeProps={{ size: 'small' }}
           >
-            <div className="display-flex justify-content-end gap-2">
+            <div className="flex justify-content-end gap-2">
               <Button visualType="secondary">Tühista</Button>
               <Button>Esita</Button>
             </div>
@@ -188,10 +189,7 @@ const HeadingTemplate: StoryFn<PopoverProps> = (args) => {
           </Popover.Trigger>
           <Popover.Content width="medium">
             This popover does not have title and close button.
-            <div
-              className="display-flex justify-content-end gap-2"
-              style={{ marginTop: 'var(--layout-grid-gutters-08)' }}
-            >
+            <div className="flex justify-content-end gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
               <Button visualType="secondary">Tühista</Button>
               <Button>Esita</Button>
             </div>
@@ -234,73 +232,73 @@ const TriggerTemplate: StoryFn<PopoverProps> = (args) => {
 const ArrowPositionTemplate: StoryFn<PopoverProps> = (args) => {
   return (
     <Row gutterY={3} justifyContent="center">
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="top-start">
           <Popover.Trigger>Top start</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="top">
           <Popover.Trigger>Top center</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="top-end">
           <Popover.Trigger>Top end</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="bottom-start">
           <Popover.Trigger>Bottom start</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="bottom">
           <Popover.Trigger>Bottom center</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="bottom-end">
           <Popover.Trigger>Bottom end</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="left-start">
           <Popover.Trigger>Left start</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="left">
           <Popover.Trigger>Left center</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="left-end">
           <Popover.Trigger>Left end</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="right-start">
           <Popover.Trigger>Right start</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="right">
           <Popover.Trigger>Right center</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
         </Popover>
       </Col>
-      <Col xs={12} lg={4} className="display-flex justify-content-center">
+      <Col xs={12} lg={4} className="flex justify-content-center">
         <Popover {...args} placement="right-end">
           <Popover.Trigger>Right end</Popover.Trigger>
           <Popover.Content>{POLAR_BEAR_TEXT}</Popover.Content>
@@ -375,7 +373,7 @@ const HeaderPopoverItem = ({
 }) => (
   <button
     type="button"
-    className="display-flex align-items-center gap-2 w-100"
+    className="flex align-items-center gap-2 w-100"
     style={{
       padding: 'var(--card-padding-xs)',
       borderRadius: 'var(--card-radius-rounded)',
@@ -425,7 +423,7 @@ const WithProminentBorderTemplate: StoryFn<PopoverProps> = (args) => {
           <Popover {...args} withBorder placement="bottom">
             <Popover.Trigger>Profile menu</Popover.Trigger>
             <Popover.Content width="small" className="story-popover-content--menu">
-              <div className="display-flex flex-column">
+              <div className="flex flex-column">
                 <div style={menuItemStyle}>
                   <OptionContent>
                     <OptionContent.Label>Minu profiil</OptionContent.Label>
@@ -474,14 +472,14 @@ const WithProminentBorderTemplate: StoryFn<PopoverProps> = (args) => {
                 </Link>
                 <Separator axis="horizontal" />
                 <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
-                  <span className="display-flex gap-1">
+                  <span className="flex gap-1">
                     <Icon name="notifications" size={16} />
                     Riiklikud teated
                   </span>
                 </Link>
                 <Separator axis="horizontal" />
                 <Link href="#" underline={false} fullWidth style={{ justifyContent: 'flex-start' }}>
-                  <span className="display-flex gap-1">
+                  <span className="flex gap-1">
                     <Icon name="logout" size={16} />
                     Logi välja
                   </span>
@@ -659,10 +657,7 @@ export const FocusLocked: Story = {
         </Popover.Trigger>
         <Popover.Content title="Pealkiri" width="medium" close>
           {POLAR_BEAR_TEXT}
-          <div
-            className="display-flex justify-content-end gap-2"
-            style={{ marginTop: 'var(--layout-grid-gutters-08)' }}
-          >
+          <div className="flex justify-content-end gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
             <Button visualType="secondary" onClick={() => setOpen(false)} id="cancelButton">
               Tühista
             </Button>
@@ -711,7 +706,7 @@ export const AccessibilityBaseline: Story = {
 
         <Link href="#">Loe rohkem</Link>
 
-        <div className="display-flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
+        <div className="flex gap-2" style={{ marginTop: 'var(--layout-grid-gutters-08)' }}>
           <Button visualType="secondary">Tühista</Button>
           <Button>Kinnita</Button>
         </div>

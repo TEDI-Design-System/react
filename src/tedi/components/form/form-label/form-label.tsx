@@ -44,7 +44,7 @@ export interface FormLabelProps {
    * Tooltip content to display when hovering over the info button.
    * If provided, an info button with a tooltip will be rendered.
    */
-  tooltip?: string;
+  tooltip?: React.ReactNode;
 }
 
 export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(

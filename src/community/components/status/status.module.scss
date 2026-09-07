@@ -16,18 +16,18 @@
   @include mixins.print-grayscale;
 
   .status--error & {
-    background-color: var(--color-important-main);
+    background-color: var(--tedi-red-600);
   }
 
   .status--success & {
-    background-color: var(--color-positive-main);
+    background-color: var(--tedi-green-600);
   }
 
   .status--inactive & {
-    background-color: var(--color-text-disabled);
+    background-color: var(--general-text-disabled);
   }
 
   .status--warning & {
-    background-color: var(--color-warning-main);
+    background-color: var(--tedi-yellow-700);
   }
 }

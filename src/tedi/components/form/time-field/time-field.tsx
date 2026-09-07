@@ -61,6 +61,12 @@ type TimeFieldBreakpointProps = {
    * - 'dropdown' – dropdown list
    */
   availableTimesVariant?: 'grid-buttons' | 'grid-radio' | 'dropdown';
+  /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
 };
 
 export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointProps> {
@@ -173,6 +179,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     timePickerTrigger = 'button',
     showPicker = true,
     availableTimesVariant = 'grid-buttons',
+    clearable = true,
   } = getCurrentBreakpointProps<TimeFieldBreakpointProps>(props);
 
   const isControlled = value !== undefined;
@@ -287,7 +294,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),
     disabled: disabled || inputProps?.disabled,
     icon: showPicker ? 'schedule' : { name: 'schedule', color: 'inherit' },
-    isClearable: true,
+    isClearable: clearable,
     required,
     onIconClick: showPicker ? handleIconClick : undefined,
     onChange: updateTime,

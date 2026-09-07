@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--card-border-color);
-  border-radius: var(--border-radius-default);
+  border-radius: var(--tedi-radius-02-default);
 }
 
 .card--borderless {
@@ -66,10 +66,12 @@
 
 .card--border-left,
 .card--border-top {
-  border-color: var(--card-border-color, var(--color-border-default));
+  --card-border-color: var(--general-border-primary);
+
+  border-color: var(--card-border-color);
 
   @media print {
-    border-color: var(--color-border-contrast);
+    border-color: var(--general-border-secondary);
   }
 }
 
@@ -80,30 +82,30 @@
 }
 
 .card__header--default {
-  color: var(--color-text-inverted);
-  background: var(--color-gradient-main);
+  color: var(--general-text-white);
+  background: linear-gradient(140.44deg, var(--tedi-blue-700) -17.66%, var(--tedi-blue-500) 71.2%);
 }
 
 .card__header--primary-main {
-  color: var(--color-text-inverted);
-  background: var(--color-primary-main);
+  color: var(--general-text-white);
+  background: var(--general-surface-brand-primary);
 }
 
 .card__header--primary-active {
-  color: var(--color-text-inverted);
-  background: var(--color-primary-active);
+  color: var(--general-text-white);
+  background: var(--general-surface-brand-secondary);
 }
 
 .card__header--white {
-  color: var(--color-text-muted);
-  background: var(--color-bg-default);
-  border-bottom: 1px solid var(--color-border-default);
+  color: var(--general-text-secondary);
+  background: var(--general-surface-primary);
+  border-bottom: 1px solid var(--general-border-primary);
 }
 
 .card__header--bg-muted {
-  color: var(--color-text-muted);
-  background: var(--color-bg-muted);
-  border-bottom: 1px solid var(--color-border-default);
+  color: var(--general-text-secondary);
+  background: var(--general-surface-secondary);
+  border-bottom: 1px solid var(--general-border-primary);
 }
 
 .card__header {
@@ -112,16 +114,16 @@
     var(--card-content-padding-bottom, 1rem) var(--card-content-padding-left, 1rem);
 
   @media print {
-    color: var(--color-text-default);
-    background: var(--color-bg-default);
-    border-bottom: 1px solid var(--color-border-default);
+    color: var(--general-text-primary);
+    background: var(--general-surface-primary);
+    border-bottom: 1px solid var(--general-border-primary);
   }
 }
 
 .card__header:first-of-type,
 .card__content:first-of-type {
-  border-start-start-radius: var(--border-radius-default);
-  border-start-end-radius: var(--border-radius-default);
+  border-start-start-radius: var(--tedi-radius-02-default);
+  border-start-end-radius: var(--tedi-radius-02-default);
 
   .card--border-top & {
     border-start-start-radius: 0;
@@ -131,8 +133,8 @@
 
 .card__header:last-child,
 .card__content:last-child {
-  border-end-start-radius: var(--border-radius-default);
-  border-end-end-radius: var(--border-radius-default);
+  border-end-start-radius: var(--tedi-radius-02-default);
+  border-end-end-radius: var(--tedi-radius-02-default);
 }
 
 .card__header,

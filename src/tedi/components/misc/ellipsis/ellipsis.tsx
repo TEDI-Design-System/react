@@ -56,11 +56,14 @@ export const Ellipsis = (props: EllipsisProps): JSX.Element => {
     );
   }, [elementSize, position, lineClamp]);
 
+  const showPopover = isEllipsed && popover;
+
   const ellipsis = (
     <div
       data-name="ellipsis"
       {...rest}
       ref={elementRef}
+      role={showPopover ? 'button' : undefined}
       className={classNames(
         styles['tedi-ellipsis'],
         { [styles['tedi-ellipsis--start']]: position === 'start' },
@@ -72,7 +75,7 @@ export const Ellipsis = (props: EllipsisProps): JSX.Element => {
     </div>
   );
 
-  return isEllipsed && popover ? (
+  return showPopover ? (
     <Popover openWith="hover" focusManager={{ modal: false }}>
       <Popover.Trigger>{ellipsis}</Popover.Trigger>
       <Popover.Content>

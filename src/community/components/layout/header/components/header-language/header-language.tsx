@@ -26,6 +26,9 @@ export interface HeaderLanguageProps {
   languages?: Language[];
 }
 
+/**
+ * @deprecated Use `HeaderLanguage` from `@tedi-design-system/react/tedi` instead.
+ */
 export const HeaderLanguage: React.FC<HeaderLanguageProps> = (props) => {
   const { languages } = props;
   const isDesktopTablet = useLayout(['desktop', 'tablet']);

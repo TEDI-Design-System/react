@@ -70,6 +70,9 @@ export interface ToggleProps {
   isLoading?: boolean;
 }
 
+/**
+ * @deprecated Use `Toggle` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>((props, ref) => {
   const {
     ariaLabel,

@@ -2,7 +2,7 @@ import { Meta, StoryFn } from '@storybook/react-vite';
 
 import { Heading } from '../../../tedi/components/base/typography/heading/heading';
 import { Section } from '../../../tedi/components/content/section/section';
-import { TextArea } from '../../../tedi/components/form/textarea/textarea';
+import { Textarea } from '../../../tedi/components/form/textarea/textarea';
 import TextField from '../../../tedi/components/form/textfield/textfield';
 import { Col, Row } from '../../../tedi/components/layout/grid';
 import { VerticalSpacing } from '../../../tedi/components/layout/vertical-spacing';
@@ -57,7 +57,7 @@ const Template: StoryFn<FeedbackProps> = (args) => {
                 text: '0/200',
               }}
             />
-            <TextArea
+            <Textarea
               id="content"
               label="Content"
               helper={{
