@@ -1,3 +1,10 @@
+# [19.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.1...react-19.1.0-rc.2) (2026-09-07)
+
+
+### Bug Fixes
+
+* **top-nav,header,sidenav:** a11y violation fixes [#823](https://github.com/TEDI-Design-System/react/issues/823) ([#852](https://github.com/TEDI-Design-System/react/issues/852)) ([d824830](https://github.com/TEDI-Design-System/react/commit/d824830938bd0cd0d687f3dbcd78e03dc9aed8cd))
+
 # [19.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.0.1-rc.2...react-19.1.0-rc.1) (2026-09-04)
 
 
