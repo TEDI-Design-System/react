@@ -32,10 +32,6 @@ const meta: Meta<PopoverProps> = {
   } as never,
   title: 'TEDI-Ready/Components/Overlay/Popover',
   parameters: {
-    a11y: {
-      // TODO: [Popover]: Review storybook a11y violations #817
-      test: 'todo',
-    },
     docs: {
       source: {
         transform: (code: string) => {

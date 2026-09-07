@@ -84,6 +84,32 @@ describe('Overlay.Trigger', () => {
     expect(span).toHaveAttribute('tabindex', '0');
   });
 
+  it('adds role="button" to a text trigger for interactive popup roles', () => {
+    render(
+      <Overlay role="dialog">
+        <OverlayTrigger>Text Trigger</OverlayTrigger>
+        <Overlay.Content>Dialog content</Overlay.Content>
+      </Overlay>
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Text Trigger' });
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('does NOT add role="button" to a text trigger for tooltip role', () => {
+    render(
+      <Overlay role="tooltip">
+        <OverlayTrigger>Text Trigger</OverlayTrigger>
+        <Overlay.Content>Tooltip content</Overlay.Content>
+      </Overlay>
+    );
+
+    const trigger = screen.getByText('Text Trigger');
+    expect(trigger).not.toHaveAttribute('role', 'button');
+    expect(trigger).not.toHaveAttribute('aria-expanded');
+  });
+
   it('does NOT add aria-describedby when role is not "tooltip"', () => {
     render(
       <Overlay role="dialog" defaultOpen={true}>
