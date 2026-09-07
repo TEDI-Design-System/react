@@ -21,7 +21,7 @@ Wrap your app with the three TEDI providers, in this order — `ThemeProvider` (
 ```tsx
 import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system/react/tedi';
 
-<ThemeProvider defaultTheme="default">
+<ThemeProvider theme="default">
   <LabelProvider>
     <StyleProvider>
       <App />

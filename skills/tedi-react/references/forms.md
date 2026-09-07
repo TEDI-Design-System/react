@@ -21,7 +21,7 @@ Orientation only. Verify the current roster against the installed package's barr
 | Select | `ISelectOption \| ISelectOption[] \| null` | Async, multi-select, searchable |
 | Checkbox | `boolean` (via onChange) | Indeterminate state |
 | Radio | `boolean` (via onChange) | Used in ChoiceGroup |
-| ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups, segmented variant |
+| ChoiceGroup | `ChoiceGroupValue` | Radio/checkbox groups; `layout="segmented"` for a merged control |
 | Search | `string` | Search button, onSearch callback |
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, clearable, breakpoint-aware |
 | TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes, clearable |

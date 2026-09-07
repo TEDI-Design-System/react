@@ -70,7 +70,7 @@ So when you add, remove, rename, or change a component's API:
    the default is what it is when that isn't obvious. This is the deliverable, not an afterthought.
 2. **Regenerate.** `npm run design:build`, then fill in the new component's `description` and
    `keyProps` (use the `update-design-docs` skill). Validate with
-   `npx jest design-docs/ --coverage=false`.
+   `npm test -- design-docs/ --coverage=false`.
 3. **Update the consumer skill only for what JSDoc cannot carry** (see below). If there is nothing
    in that category, you are done. A routine new prop needs no consumer-skill edit at all.
 

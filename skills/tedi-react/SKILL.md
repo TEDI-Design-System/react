@@ -49,9 +49,19 @@ npm ls @tedi-design-system/react @tedi-design-system/core
 ### When there is no install to read
 
 Only when `node_modules` is unavailable (planning before install, or reviewing a diff), fall back
-to the public repo, pinned to the version in `package.json`. Release tags are `react-<version>`
-(e.g. `react-19.1.0-rc.2`); every release, including pre-releases, is tagged, so use the tag rather
-than `main`. Fetch raw files, not blob pages:
+to the public repo, pinned to the **resolved** version from the lockfile. `package.json` holds a
+semver range (`^19.1.0`), which is not a tag; the lockfile records the exact version that was
+installed:
+
+```bash
+# npm
+grep -A2 '"node_modules/@tedi-design-system/react"' package-lock.json
+# pnpm / yarn: search the lockfile for the @tedi-design-system/react entry
+grep -A2 '@tedi-design-system/react' pnpm-lock.yaml yarn.lock
+```
+
+Release tags are `react-<resolved version>` (e.g. `react-19.1.0-rc.2`); every release, including
+pre-releases, is tagged, so use the tag rather than `main`. Fetch raw files, not blob pages:
 
 ```
 https://raw.githubusercontent.com/TEDI-Design-System/react/react-19.1.0-rc.2/src/tedi/index.ts
@@ -236,7 +246,7 @@ TEDI uses CSS custom properties (design tokens) from `@tedi-design-system/core`:
 import { ThemeProvider } from '@tedi-design-system/react/tedi';
 
 // Wrap app
-<ThemeProvider defaultTheme="default">
+<ThemeProvider theme="default">
   <App />
 </ThemeProvider>
 ```

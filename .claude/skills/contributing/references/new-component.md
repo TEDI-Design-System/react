@@ -81,7 +81,7 @@ the generated docs pick it up. See **SKILL.md → Consumer-Facing Docs** for the
 3. **Fill in its manifest entry**: a one-line `description` saying what it is for, the canonical
    `name`, and 2 to 5 `keyProps`. The `update-design-docs` skill covers this; do not touch
    `category`, `sourcePath` or `status`, which the generator owns.
-4. **Validate**: `npx jest design-docs/ --coverage=false`, then run `npm run design:build` a second
+4. **Validate**: `npm test -- design-docs/ --coverage=false`, then run `npm run design:build` a second
    time and confirm it produces no diff.
 5. **Add a hand-written entry to `skills/tedi-react/references/components.md` only if** the component
    has behaviour the types cannot express: a composition constraint, layout that restacks on its own,

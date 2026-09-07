@@ -40,7 +40,7 @@ you own the prose.** Never hand-edit token values or the manifest's derived fiel
    changed, read its `.tsx`, prop types, and `.stories.tsx`; set a one-line `description`, the
    canonical `name` (from the export / `displayName`), and 2–5 `keyProps`. Preserve existing
    human-authored descriptions unless the component's behavior changed.
-5. **Validate.** Run `npm run design:build` again then `npx jest design-docs/ --coverage=false` —
+5. **Validate.** Run `npm run design:build` again then `npm test -- design-docs/ --coverage=false` —
    the drift test must pass and the second build must produce no diff (idempotent). Confirm DESIGN.md
    has no duplicate `##` headings.
 6. **Report.** Summarize what changed and flag any component whose intended usage is unclear from
