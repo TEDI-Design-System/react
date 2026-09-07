@@ -74,7 +74,7 @@ jest.mock('../textfield/textfield', () => {
           onChange={(e: any) => props.onChange?.(e.target.value)}
           onBlur={props.onBlur}
         />
-        <button data-testid="icon" onClick={props.onIconClick}>
+        <button data-testid="icon" onClick={props.onIconClick} {...props.iconButtonProps}>
           icon
         </button>
         {props.isClearable && props.value ? <button aria-label="Clear">clear</button> : null}
@@ -281,6 +281,47 @@ describe('TimeField', () => {
     await user.click(screen.getByTestId('icon'));
 
     expect(showPicker).toHaveBeenCalled();
+  });
+
+  it('falls back to focusing the input when the native showPicker API is unavailable', async () => {
+    const user = userEvent.setup();
+
+    render(<TimeField id="t1" label="Time" useNativePicker />);
+
+    const input = screen.getByTestId('textfield-input') as HTMLInputElement;
+    Object.defineProperty(input, 'showPicker', { value: undefined, configurable: true });
+    const focusSpy = jest.spyOn(input, 'focus');
+
+    await user.click(screen.getByTestId('icon'));
+
+    expect(focusSpy).toHaveBeenCalled();
+  });
+
+  it('gives the picker icon button an accessible name', () => {
+    render(<TimeField id="t1" label="Time" />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-label', expect.stringMatching(/\S/));
+  });
+
+  it('lets consumers override the icon button props (aria-label)', () => {
+    render(<TimeField id="t1" label="Time" inputProps={{ iconButtonProps: { 'aria-label': 'Vali aeg' } }} />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-label', 'Vali aeg');
+  });
+
+  it('exposes combobox semantics on the container when a picker is available', () => {
+    render(<TimeField id="t1" label="Time" />);
+    const combobox = screen.getByTestId('textfield-input').closest('[role="combobox"]');
+    expect(combobox).not.toBeNull();
+    expect(combobox).toHaveAttribute('aria-haspopup', 'listbox');
+  });
+
+  it('does not expose combobox semantics when the picker is disabled', () => {
+    render(<TimeField id="t1" label="Time" showPicker={false} />);
+    expect(screen.getByTestId('textfield-input').closest('[role="combobox"]')).toBeNull();
+  });
+
+  it('keeps the picker icon accessible with the input trigger', () => {
+    render(<TimeField id="t1" label="Time" timePickerTrigger="input" />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-label', expect.stringMatching(/\S/));
   });
 
   it('normalises a delimiter-less time on blur (e.g. "1155" -> "11:55")', async () => {

@@ -333,6 +333,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
       <Dropdown width="trigger" defaultActiveIndex={defaultActiveIndex}>
         <Dropdown.Trigger>
           <div
+            // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
             role="combobox"
             className={cn(styles['tedi-time-field__container'], className, {
               [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
