@@ -67,8 +67,25 @@ export * from './components/<category>/<component-name>/<component-name>';
 3. Run lint: `npm run lint`
 4. Fix any lint errors.
 
-## Step 7: Update Consumer Catalog
+## Step 7: Publish It to Consumers
 
-Update `skills/tedi-react/references/components.md` with the new component:
-1. Add an entry to the appropriate section (TEDI-Ready or Community) with import path, key props, and a usage example.
-2. Follow the format of existing entries in the file.
+Consumers read the component out of the published package, so the work here is mostly making sure
+the generated docs pick it up. See **SKILL.md → Consumer-Facing Docs** for the full contract.
+
+1. **Check the JSDoc is complete** before anything else. Every public prop needs a one-line
+   description and an `@default` where it has a default. This JSDoc ships in the `.d.ts` and is what
+   a consuming agent reads to write correct code, so an undocumented prop is an invisible prop.
+   Document the props interface, not the implementation.
+2. **Regenerate the catalog**: `npm run design:build`. The new component appears in
+   `component.manifest.json` with a `null` description.
+3. **Fill in its manifest entry**: a one-line `description` saying what it is for, the canonical
+   `name`, and 2 to 5 `keyProps`. The `update-design-docs` skill covers this; do not touch
+   `category`, `sourcePath` or `status`, which the generator owns.
+4. **Validate**: `npm test -- design-docs/ --coverage=false`, then run `npm run design:build` a second
+   time and confirm it produces no diff.
+5. **Add a hand-written entry to `skills/tedi-react/references/components.md` only if** the component
+   has behaviour the types cannot express: a composition constraint, layout that restacks on its own,
+   an `aria-label` that is optional in the types but required in practice, a browser caveat. A
+   well-documented component with no surprises needs **no** entry. Do not add a prop table.
+6. **If it is a form control**, add a row and the value-shape / event convention to
+   `skills/tedi-react/references/forms.md`.

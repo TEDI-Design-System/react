@@ -29,282 +29,52 @@ for how to wire components together.
 
 ## Design tokens
 
-Full machine-readable data: `@tedi-design-system/core/tokens.json` (generated in core from Figma,
-published with the stylesheet it describes). The table below is the subset you write in your own
-CSS — the `general-*` and `form-*` **role** tokens of the default theme. Reach for these, never raw
-`--tedi-*` primitives:
+**Look token values up; do not read them from this file.** They live in
+`@tedi-design-system/core/tokens.json`, generated in core from Figma and published with the
+stylesheet it describes, so it ships to every consumer:
+
+```bash
+T=node_modules/@tedi-design-system/core/tokens.json
+# one token: both the var() chain and the computed value
+python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['themes']['default']['semantic']['general-surface-primary'])" $T
+# every member of a family
+python3 -c "import json,sys;print([k for k in json.load(open(sys.argv[1]))['themes']['default']['semantic'] if k.startswith('general-text-')])" $T
+```
+
+That file is also the only place the **dark theme** (`themes.dark`) and the **per-breakpoint**
+(`breakpoints.mobile`, `breakpoints.tablet`) overrides exist. A default-theme value is not the
+value: treat every role token as theme-dependent unless you have checked.
+
+The table below is a map of the vocabulary, not a data source. It groups the `general-*` and
+`form-*` **role** tokens of the semantic tier into families so you can see which roles exist and
+roughly how granular each is. Reach for these, never raw `--tedi-*` primitives. Note that the
+heavily-populated `form-<component>-*` families (`form-checkbox-*`, `form-toggle-*`,
+`form-slider-*`) are component internals; an application author normally writes `general-*`,
+`form-field-*`, `form-input-*` and `form-general-*`.
 
 <!-- tokens:start -->
-| Semantic token | Default value |
-| --- | --- |
-| `form-calendar-date-width` | `40px` |
-| `form-checkbox-radio-card-checkbox-icon-padding-y` | `0.375rem` |
-| `form-checkbox-radio-card-checkbox-indicator-padding-y` | `11px` |
-| `form-checkbox-radio-card-checkbox-padding-x` | `0.5rem` |
-| `form-checkbox-radio-card-checkbox-padding-y` | `0.5rem` |
-| `form-checkbox-radio-card-disabled-text` | `rgb(146 147 164)` |
-| `form-checkbox-radio-card-gutter` | `0.5rem` |
-| `form-checkbox-radio-card-inner-spacing` | `0.375rem` |
-| `form-checkbox-radio-card-primary-default-background` | `rgb(240 240 242)` |
-| `form-checkbox-radio-card-primary-default-border-group` | `rgb(146 147 164)` |
-| `form-checkbox-radio-card-primary-default-border-separate` | `rgb(240 240 242)` |
-| `form-checkbox-radio-card-primary-default-text` | `rgb(75 78 98)` |
-| `form-checkbox-radio-card-primary-disabled-default-background` | `rgb(240 240 242)` |
-| `form-checkbox-radio-card-primary-disabled-default-text` | `rgb(146 147 164)` |
-| `form-checkbox-radio-card-primary-disabled-selected-background` | `rgb(153 189 218)` |
-| `form-checkbox-radio-card-primary-disabled-selected-text` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-primary-hover-background` | `rgb(0 66 119)` |
-| `form-checkbox-radio-card-primary-hover-border` | `rgb(0 66 119)` |
-| `form-checkbox-radio-card-primary-hover-text` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-primary-selected-background` | `rgb(0 90 163)` |
-| `form-checkbox-radio-card-primary-selected-border-group` | `rgb(0 54 98)` |
-| `form-checkbox-radio-card-primary-selected-border-separate` | `rgb(0 90 163)` |
-| `form-checkbox-radio-card-primary-selected-text` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-radio-icon-padding-y` | `0.375rem` |
-| `form-checkbox-radio-card-radio-indicator-padding-y` | `0.625rem` |
-| `form-checkbox-radio-card-radio-padding-x` | `0.5rem` |
-| `form-checkbox-radio-card-radio-padding-y` | `0.5rem` |
-| `form-checkbox-radio-card-radius` | `0.25rem` |
-| `form-checkbox-radio-card-secondary-default-background` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-secondary-default-border` | `rgb(146 147 164)` |
-| `form-checkbox-radio-card-secondary-default-text` | `rgb(75 78 98)` |
-| `form-checkbox-radio-card-secondary-disabled-default-background` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-secondary-disabled-default-border` | `rgb(225 226 229)` |
-| `form-checkbox-radio-card-secondary-disabled-default-text` | `rgb(146 147 164)` |
-| `form-checkbox-radio-card-secondary-disabled-selected-background` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-secondary-disabled-selected-border` | `rgb(153 189 218)` |
-| `form-checkbox-radio-card-secondary-disabled-selected-text` | `rgb(153 189 218)` |
-| `form-checkbox-radio-card-secondary-hover-background` | `rgb(231 240 246)` |
-| `form-checkbox-radio-card-secondary-hover-border` | `rgb(0 90 163)` |
-| `form-checkbox-radio-card-secondary-hover-text` | `rgb(0 90 163)` |
-| `form-checkbox-radio-card-secondary-selected-background` | `rgb(255 255 255)` |
-| `form-checkbox-radio-card-secondary-selected-border` | `rgb(0 90 163)` |
-| `form-checkbox-radio-card-secondary-selected-text` | `rgb(0 90 163)` |
-| `form-checkbox-radio-default-background-active` | `rgb(0 66 119)` |
-| `form-checkbox-radio-default-background-default` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-background-error` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-background-focus` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-background-hover` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-background-inverted` | `rgb(0 90 163)` |
-| `form-checkbox-radio-default-background-selected` | `rgb(0 90 163)` |
-| `form-checkbox-radio-default-background-selected-disabled` | `rgb(153 189 218)` |
-| `form-checkbox-radio-default-background-selected-inverted` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-border-active` | `rgb(0 66 119)` |
-| `form-checkbox-radio-default-border-default` | `rgb(131 132 148)` |
-| `form-checkbox-radio-default-border-focus` | `rgb(131 132 148)` |
-| `form-checkbox-radio-default-border-hover` | `rgb(0 90 163)` |
-| `form-checkbox-radio-default-border-inverted` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-border-selected` | `rgb(0 90 163)` |
-| `form-checkbox-radio-default-border-selected-disabled` | `rgb(153 189 218)` |
-| `form-checkbox-radio-default-border-selected-inverted` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-check-indicator-active` | `rgb(255 255 255)` |
-| `form-checkbox-radio-default-check-indicator-default` | `rgb(255 255 255)` |
-| `form-checkbox-radio-gutter-x` | `0.75rem` |
-| `form-checkbox-radio-gutter-y` | `0.25rem` |
-| `form-checkbox-radio-indicator-container-height` | `1.5rem` |
-| `form-checkbox-radio-indicator-radius-checkbox` | `0.125rem` |
-| `form-checkbox-radio-indicator-radius-radio` | `22.5rem` |
-| `form-checkbox-radio-inner-spacing` | `0.5rem` |
-| `form-checkbox-radio-label-gutter-y` | `0` |
-| `form-checkbox-radio-size-fixed` | `1.125rem` |
-| `form-checkbox-radio-size-large` | `1.5rem` |
-| `form-checkbox-radio-size-responsive` | `1.125rem` |
-| `form-checkbox-radio-subitem-padding-left` | `2rem` |
-| `form-datepicker-date-active` | `rgb(208 225 238)` |
-| `form-datepicker-date-available` | `rgb(234 243 238)` |
-| `form-datepicker-date-default` | `rgb(255 255 255)` |
-| `form-datepicker-date-hover` | `rgb(231 240 246)` |
-| `form-datepicker-date-selected` | `rgb(0 90 163)` |
-| `form-datepicker-date-selected-hover` | `rgb(0 66 119)` |
-| `form-datepicker-date-text-available` | `rgb(38 107 66)` |
-| `form-datepicker-date-text-muted` | `rgb(146 147 164)` |
-| `form-datepicker-date-text-selected` | `rgb(255 255 255)` |
-| `form-datepicker-today-border` | `rgb(0 90 163)` |
-| `form-datepicker-today-border-secondary` | `rgb(255 255 255)` |
-| `form-field-button-height` | `2rem` |
-| `form-field-button-height-sm` | `1.5rem` |
-| `form-field-height` | `2.5rem` |
-| `form-field-height-lg` | `3.5rem` |
-| `form-field-height-sm` | `2rem` |
-| `form-field-inner-spacing` | `0.5rem` |
-| `form-field-inner-spacing-sm` | `0.25rem` |
-| `form-field-outer-spacing` | `0.25rem` |
-| `form-field-padding-x-lg` | `1rem` |
-| `form-field-padding-x-md-default` | `0.5rem` |
-| `form-field-padding-y-lg` | `1rem` |
-| `form-field-padding-y-md-default` | `0.5rem` |
-| `form-field-padding-y-md-has-button` | `0.25rem` |
-| `form-field-padding-y-sm` | `0.25rem` |
-| `form-field-padding-y-sm-has-button` | `0.25rem` |
-| `form-field-padding-y-xs` | `0.125rem` |
-| `form-field-padding-y-xxs` | `0` |
-| `form-field-radius` | `0.25rem` |
-| `form-general-background-action-background` | `rgb(249 249 249)` |
-| `form-general-background-default` | `rgb(255 255 255)` |
-| `form-general-background-disabled` | `rgb(240 240 242)` |
-| `form-general-border-default` | `rgb(131 132 148)` |
-| `form-general-border-disabled` | `rgb(225 226 229)` |
-| `form-general-feedback-error-border` | `rgb(172 50 50)` |
-| `form-general-feedback-error-text` | `rgb(172 50 50)` |
-| `form-general-feedback-success-border` | `rgb(48 134 83)` |
-| `form-general-feedback-success-text` | `rgb(38 107 66)` |
-| `form-hidden-default` | `rgb(0 0 0 / 0.1%)` |
-| `form-hidden-hover` | `rgb(240 240 242)` |
-| `form-input-background-default` | `rgb(255 255 255)` |
-| `form-input-background-disabled` | `rgb(240 240 242)` |
-| `form-input-border-active` | `rgb(0 90 163)` |
-| `form-input-border-default` | `rgb(131 132 148)` |
-| `form-input-border-disabled` | `rgb(225 226 229)` |
-| `form-input-border-focus` | `rgb(0 90 163)` |
-| `form-input-border-hover` | `rgb(0 90 163)` |
-| `form-input-text-disabled` | `rgb(75 78 98)` |
-| `form-input-text-filled` | `rgb(21 25 38)` |
-| `form-input-text-placeholder` | `rgb(115 116 130)` |
-| `form-label` | `rgb(75 78 98)` |
-| `form-number-input-min-width` | `5rem` |
-| `form-number-min-width` | `163px` |
-| `form-select-area-max-height` | `300px` |
-| `form-select-area-radius` | `0.25rem` |
-| `form-slider-active-background-active` | `rgb(0 54 98)` |
-| `form-slider-active-background-default` | `rgb(0 90 163)` |
-| `form-slider-active-background-disabled` | `rgb(210 211 216)` |
-| `form-slider-active-background-focus` | `rgb(0 90 163)` |
-| `form-slider-active-background-hover` | `rgb(0 66 119)` |
-| `form-slider-border-default` | `rgb(131 132 148)` |
-| `form-slider-height` | `0.5rem` |
-| `form-slider-inner-spacing` | `0.75rem` |
-| `form-slider-passive-background-default` | `rgb(249 249 249)` |
-| `form-slider-radius` | `0.25rem` |
-| `form-slider-range-label-text` | `rgb(93 96 113)` |
-| `form-slider-thumb-background-active` | `rgb(208 225 238)` |
-| `form-slider-thumb-background-default` | `rgb(255 255 255)` |
-| `form-slider-thumb-background-disabled` | `rgb(255 255 255)` |
-| `form-slider-thumb-background-focus` | `rgb(255 255 255)` |
-| `form-slider-thumb-background-hover` | `rgb(208 225 238)` |
-| `form-slider-thumb-border-active` | `rgb(0 54 98)` |
-| `form-slider-thumb-border-default` | `rgb(0 90 163)` |
-| `form-slider-thumb-border-disabled` | `rgb(210 211 216)` |
-| `form-slider-thumb-border-focus` | `rgb(0 90 163)` |
-| `form-slider-thumb-border-hover` | `rgb(0 66 119)` |
-| `form-slider-thumb-size` | `1.5rem` |
-| `form-slider-track` | `rgb(255 255 255)` |
-| `form-textarea-min-height` | `2.5rem` |
-| `form-toggle-colored-active-active` | `rgb(29 80 50)` |
-| `form-toggle-colored-active-default` | `rgb(48 134 83)` |
-| `form-toggle-colored-active-hover` | `rgb(38 107 66)` |
-| `form-toggle-colored-active-icon` | `rgb(38 107 66)` |
-| `form-toggle-colored-active-icon-outlined` | `rgb(255 255 255)` |
-| `form-toggle-colored-active-indicator` | `rgb(255 255 255)` |
-| `form-toggle-colored-inactive-active` | `rgb(129 37 37)` |
-| `form-toggle-colored-inactive-default` | `rgb(215 62 62)` |
-| `form-toggle-colored-inactive-hover` | `rgb(172 50 50)` |
-| `form-toggle-colored-inactive-icon` | `rgb(172 50 50)` |
-| `form-toggle-colored-inactive-icon-outlined` | `rgb(255 255 255)` |
-| `form-toggle-colored-inactive-indicator` | `rgb(255 255 255)` |
-| `form-toggle-default-height` | `20px` |
-| `form-toggle-default-indicator` | `1rem` |
-| `form-toggle-default-margin-y` | `0.125rem` |
-| `form-toggle-default-width` | `2.5rem` |
-| `form-toggle-large-height` | `28px` |
-| `form-toggle-large-indicator` | `24px` |
-| `form-toggle-large-width` | `56px` |
-| `form-toggle-outlined-background` | `rgb(0 0 0 / 0.1%)` |
-| `form-toggle-padding` | `0.125rem` |
-| `form-toggle-primary-active-active` | `rgb(0 54 98)` |
-| `form-toggle-primary-active-default` | `rgb(0 90 163)` |
-| `form-toggle-primary-active-hover` | `rgb(0 66 119)` |
-| `form-toggle-primary-active-icon` | `rgb(0 90 163)` |
-| `form-toggle-primary-active-icon-outlined` | `rgb(255 255 255)` |
-| `form-toggle-primary-active-indicator` | `rgb(255 255 255)` |
-| `form-toggle-primary-inactive-active` | `rgb(115 116 130)` |
-| `form-toggle-primary-inactive-default` | `rgb(146 147 164)` |
-| `form-toggle-primary-inactive-hover` | `rgb(131 132 148)` |
-| `form-toggle-primary-inactive-icon` | `rgb(146 147 164)` |
-| `form-toggle-primary-inactive-icon-outlined` | `rgb(255 255 255)` |
-| `form-toggle-primary-inactive-indicator` | `rgb(255 255 255)` |
-| `form-toggle-radius` | `1rem` |
-| `general-border-accent` | `rgb(231 116 0)` |
-| `general-border-brand` | `rgb(0 90 163)` |
-| `general-border-primary` | `rgb(225 226 229)` |
-| `general-border-secondary` | `rgb(146 147 164)` |
-| `general-border-transparent-white` | `rgb(255 255 255 / 30%)` |
-| `general-border-white` | `rgb(255 255 255)` |
-| `general-border-width-default` | `0.0625rem` |
-| `general-border-width-selected` | `0.125rem` |
-| `general-effect-colors-elevation-dropdown-area-drop-shadow` | `rgb(0 0 0 / 20%)` |
-| `general-effect-colors-elevation-general-primary` | `rgb(0 0 0 / 20%)` |
-| `general-effect-colors-elevation-general-secondary` | `rgb(0 0 0 / 14%)` |
-| `general-effect-colors-focus-inset-inner-shadow-1` | `rgb(51 123 181)` |
-| `general-effect-colors-focus-inset-inner-shadow-2` | `rgb(255 255 255)` |
-| `general-effect-colors-focus-inverted-inner-shadow` | `rgb(21 25 38)` |
-| `general-effect-colors-focus-inverted-outer-shadow` | `rgb(255 255 255)` |
-| `general-effect-colors-focus-outset-inner-shadow` | `rgb(255 255 255)` |
-| `general-effect-colors-focus-outset-outer-shadow` | `rgb(0 90 163)` |
-| `general-effect-colors-focus-outset-primary` | `rgb(255 255 255)` |
-| `general-icon-accent` | `rgb(153 77 0)` |
-| `general-icon-background-brand-primary` | `rgb(0 90 163)` |
-| `general-icon-background-brand-secondary` | `rgb(208 225 238)` |
-| `general-icon-background-primary` | `rgb(255 255 255)` |
-| `general-icon-background-secondary` | `rgb(255 255 255 / 30%)` |
-| `general-icon-brand` | `rgb(0 90 163)` |
-| `general-icon-brand-dark` | `rgb(0 66 119)` |
-| `general-icon-danger` | `rgb(172 50 50)` |
-| `general-icon-primary` | `rgb(21 25 38)` |
-| `general-icon-secondary` | `rgb(75 78 98)` |
-| `general-icon-success` | `rgb(38 107 66)` |
-| `general-icon-tertiary` | `rgb(146 147 164)` |
-| `general-icon-warning` | `rgb(148 105 13)` |
-| `general-icon-warning-dark` | `rgb(102 72 7)` |
-| `general-icon-white` | `rgb(255 255 255)` |
-| `general-separator-primary` | `rgb(225 226 229)` |
-| `general-status-danger-background-primary` | `rgb(251 236 236)` |
-| `general-status-danger-background-secondary` | `rgb(215 62 62)` |
-| `general-status-danger-background-tertiary` | `rgb(172 50 50)` |
-| `general-status-danger-border` | `rgb(223 101 101)` |
-| `general-status-danger-text` | `rgb(172 50 50)` |
-| `general-status-info-background-dark` | `rgb(0 90 163)` |
-| `general-status-info-background-light` | `rgb(208 225 238)` |
-| `general-status-info-border` | `rgb(51 123 181)` |
-| `general-status-info-text` | `rgb(0 66 119)` |
-| `general-status-neutral-background-dark` | `rgb(146 147 164)` |
-| `general-status-neutral-background-light` | `rgb(240 240 242)` |
-| `general-status-neutral-border` | `rgb(146 147 164)` |
-| `general-status-neutral-text` | `rgb(21 25 38)` |
-| `general-status-success-background-primary` | `rgb(234 243 238)` |
-| `general-status-success-background-secondary` | `rgb(48 134 83)` |
-| `general-status-success-background-tertiary` | `rgb(38 107 66)` |
-| `general-status-success-border` | `rgb(89 158 117)` |
-| `general-status-success-text` | `rgb(38 107 66)` |
-| `general-status-warning-background-dark` | `rgb(186 131 13)` |
-| `general-status-warning-background-light` | `rgb(255 240 207)` |
-| `general-status-warning-background-primary` | `rgb(255 248 231)` |
-| `general-status-warning-border` | `rgb(186 131 13)` |
-| `general-status-warning-text` | `rgb(102 72 7)` |
-| `general-surface-accent` | `rgb(255 230 204)` |
-| `general-surface-active` | `rgb(0 66 119)` |
-| `general-surface-brand-primary` | `rgb(0 90 163)` |
-| `general-surface-brand-quaternary` | `rgb(231 240 246)` |
-| `general-surface-brand-secondary` | `rgb(0 66 119)` |
-| `general-surface-brand-tertiary` | `rgb(208 225 238)` |
-| `general-surface-disabled` | `rgb(210 211 216)` |
-| `general-surface-hover` | `rgb(231 240 246)` |
-| `general-surface-inverted-primary` | `rgb(93 96 113)` |
-| `general-surface-inverted-secondary` | `rgb(52 57 76)` |
-| `general-surface-inverted-tertiary` | `rgb(38 43 59)` |
-| `general-surface-overlay` | `rgb(23 23 23 / 40%)` |
-| `general-surface-primary` | `rgb(255 255 255)` |
-| `general-surface-secondary` | `rgb(249 249 249)` |
-| `general-surface-selected` | `rgb(0 90 163)` |
-| `general-surface-success` | `rgb(234 243 238)` |
-| `general-surface-tertiary` | `rgb(240 240 242)` |
-| `general-text-brand` | `rgb(0 90 163)` |
-| `general-text-dark` | `rgb(21 25 38)` |
-| `general-text-disabled` | `rgb(146 147 164)` |
-| `general-text-primary` | `rgb(21 25 38)` |
-| `general-text-secondary` | `rgb(75 78 98)` |
-| `general-text-tertiary` | `rgb(93 96 113)` |
-| `general-text-text-inverted-tehik` | `rgb(255 255 255)` |
-| `general-text-white` | `rgb(255 255 255)` |
+| Role family | Tokens | Example members |
+| --- | --- | --- |
+| `form-calendar-*` | 1 | `form-calendar-date-width` |
+| `form-checkbox-*` | 72 | `form-checkbox-radio-card-checkbox-icon-padding-y`, `form-checkbox-radio-card-checkbox-indicator-padding-y` |
+| `form-datepicker-*` | 11 | `form-datepicker-date-active`, `form-datepicker-date-available` |
+| `form-field-*` | 18 | `form-field-button-height`, `form-field-button-height-sm` |
+| `form-general-*` | 9 | `form-general-background-action-background`, `form-general-background-default` |
+| `form-hidden-*` | 2 | `form-hidden-default`, `form-hidden-hover` |
+| `form-input-*` | 10 | `form-input-background-default`, `form-input-background-disabled` |
+| `form-label-*` | 1 | `form-label` |
+| `form-number-*` | 2 | `form-number-input-min-width`, `form-number-min-width` |
+| `form-select-*` | 2 | `form-select-area-max-height`, `form-select-area-radius` |
+| `form-slider-*` | 23 | `form-slider-active-background-active`, `form-slider-active-background-default` |
+| `form-textarea-*` | 1 | `form-textarea-min-height` |
+| `form-toggle-*` | 34 | `form-toggle-colored-active-active`, `form-toggle-colored-active-default` |
+| `general-border-*` | 8 | `general-border-accent`, `general-border-brand` |
+| `general-effect-*` | 10 | `general-effect-colors-elevation-dropdown-area-drop-shadow`, `general-effect-colors-elevation-general-primary` |
+| `general-icon-*` | 15 | `general-icon-accent`, `general-icon-background-brand-primary` |
+| `general-separator-*` | 1 | `general-separator-primary` |
+| `general-status-*` | 23 | `general-status-danger-background-primary`, `general-status-danger-background-secondary` |
+| `general-surface-*` | 17 | `general-surface-accent`, `general-surface-active` |
+| `general-text-*` | 8 | `general-text-brand`, `general-text-dark` |
 <!-- tokens:end -->
 
 ## Colors, Typography, Shapes, Layout

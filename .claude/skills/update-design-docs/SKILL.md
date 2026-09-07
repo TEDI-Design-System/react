@@ -17,7 +17,7 @@ you own the prose.** Never hand-edit token values or the manifest's derived fiel
    `@tedi-design-system/core` version bump in `package.json`/lockfile.
 2. **Refresh data.** Run `npm run design:build`. This regenerates the root
    `component.manifest.json` skeleton (merge-preserving descriptions) and the DESIGN.md token
-   table. Do not edit these outputs by hand. Token data is **not** generated here — it is read
+   *family* table (role families and counts, deliberately no values: see step 3). Do not edit these outputs by hand. Token data is **not** generated here — it is read
    from `@tedi-design-system/core/tokens.json`, which core generates from Figma and publishes;
    if the build reports that file missing, the installed core is too old and needs bumping.
 3. **Author prose — DESIGN.md, only between `<!-- prose:* -->` markers:**
@@ -31,12 +31,16 @@ you own the prose.** Never hand-edit token values or the manifest's derived fiel
      Do NOT re-document every component — the skill and manifest are the catalog.
    - `dosdonts`: concrete rules (import from `@tedi-design-system/react/tedi`; wrap in
      `ThemeProvider`/`LabelProvider`/`StyleProvider`; no hardcoded hex; tedi-ready over community).
-   Never write outside the marker pairs; never touch the `<!-- tokens:start/end -->` block.
+   Never touch the `<!-- tokens:start/end -->` block. The one hand-maintained passage outside a
+   prose marker is the paragraph directly above that block, which explains how to look values up in
+   `tokens.json`; keep it accurate if the token pipeline changes, and do not reintroduce a table of
+   token *values* there. Values go stale on every core bump, are default-theme only, and printing
+   them teaches agents the literal instead of the token.
 4. **Fill manifest descriptions.** For each component whose `description` is `null` or whose source
    changed, read its `.tsx`, prop types, and `.stories.tsx`; set a one-line `description`, the
    canonical `name` (from the export / `displayName`), and 2–5 `keyProps`. Preserve existing
    human-authored descriptions unless the component's behavior changed.
-5. **Validate.** Run `npm run design:build` again then `npx jest design-tokens/ --coverage=false` —
+5. **Validate.** Run `npm run design:build` again then `npm test -- design-docs/ --coverage=false` —
    the drift test must pass and the second build must produce no diff (idempotent). Confirm DESIGN.md
    has no duplicate `##` headings.
 6. **Report.** Summarize what changed and flag any component whose intended usage is unclear from
