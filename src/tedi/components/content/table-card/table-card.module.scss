@@ -1,0 +1,98 @@
+@use '@tedi-design-system/core/mixins';
+
+.tedi-table-card {
+  overflow: hidden;
+
+  & &__body--has-footer > :last-child {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  &__header {
+    display: flex;
+    gap: var(--layout-grid-gutters-16);
+    align-items: center;
+  }
+
+  &__header--select-title [data-name='check'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__heading {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font: inherit;
+  }
+
+  &__toggle {
+    @include mixins.button-reset;
+
+    display: flex;
+    gap: var(--layout-grid-gutters-16);
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: var(--tedi-borders-02) solid var(--general-border-brand);
+      outline-offset: 2px;
+      border-radius: var(--table-radius);
+    }
+
+    &:hover .tedi-table-card__chevron {
+      color: var(--link-primary-hover);
+    }
+
+    &:active .tedi-table-card__chevron {
+      color: var(--link-primary-active);
+    }
+
+    &:focus-visible .tedi-table-card__chevron {
+      color: var(--link-primary-focus);
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0;
+    word-break: break-word;
+
+    &--body {
+      font-size: var(--body-regular-size);
+      font-weight: var(--body-regular-weight);
+      line-height: var(--body-regular-line-height);
+    }
+  }
+
+  &__chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--link-primary-default);
+    transition: color 300ms ease, transform 0.2s ease-in-out;
+
+    &--open {
+      transform: rotate(-180deg);
+    }
+  }
+
+  &__end-slot {
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--layout-grid-gutters-08);
+    align-items: center;
+    justify-content: space-between;
+  }
+}

@@ -9,6 +9,7 @@ export * from './components/content/heading-with-icon/heading-with-icon';
 export * from './components/content/truncate/truncate';
 export * from './components/content/table';
 export * from './components/content/text-group';
+export * from './components/content/table-card';
 export * from './components/content/calendar/calendar';
 export * from './components/loaders/spinner/spinner';
 export * from './components/loaders/skeleton';
