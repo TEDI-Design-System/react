@@ -1,3 +1,10 @@
+# [19.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.2...react-19.1.0-rc.3) (2026-09-08)
+
+
+### Features
+
+* **dropdown:** add ability to add maxHeight to Dropdown body [#866](https://github.com/TEDI-Design-System/react/issues/866) ([#867](https://github.com/TEDI-Design-System/react/issues/867)) ([b9448e7](https://github.com/TEDI-Design-System/react/commit/b9448e76b87f1aa11d3d455be2153b343a8aa721))
+
 # [19.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.1...react-19.1.0-rc.2) (2026-09-07)
 
 
