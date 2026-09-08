@@ -968,3 +968,30 @@ export const Examples: Story = {
     );
   },
 };
+
+/**
+ * Set `maxHeight` to cap the option list. When there are more options than fit, the list scrolls
+ * while the search input and "Clear selection" stay pinned to the top and bottom of the dropdown.
+ */
+export const RestrictedHeight: Story = {
+  render: () => {
+    const manyOptions: FilterOption[] = Array.from({ length: 20 }, (_, i) => ({
+      value: `${i + 1}`,
+      label: `Raviasutus ${i + 1}`,
+    }));
+    return (
+      <div className="flex gap-2 flex-wrap">
+        <Filter
+          text="Raviasutus"
+          multiselect
+          options={manyOptions}
+          defaultSelectedValues={['4']}
+          searchable
+          showSelectAll
+          showClear
+          maxHeight={280}
+        />
+      </div>
+    );
+  },
+};
