@@ -131,6 +131,12 @@
 
   &--hidden {
     transform: translateY(100%);
+
+    // Keep the bar on-screen while it holds keyboard focus — a translated-away control must not
+    // stay reachable in the tab order while invisible.
+    &:focus-within {
+      transform: translateY(0);
+    }
   }
 }
 
