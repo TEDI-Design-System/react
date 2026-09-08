@@ -11,7 +11,7 @@ export interface TooltipProps
   extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset' | 'dismissible' | 'scrollLock'> {
   /**
    * Adds correct event listeners that change the open state.
-   * @default hover
+   * @default hover on pointer devices, click on touch devices
    */
   openWith?: OverlayOpenWith;
   /**
@@ -22,7 +22,7 @@ export interface TooltipProps
 }
 
 export const Tooltip = (props: TooltipProps) => {
-  const { openWith = 'hover', focusManager, ...rest } = props;
+  const { openWith, focusManager, ...rest } = props;
 
   return (
     <Overlay

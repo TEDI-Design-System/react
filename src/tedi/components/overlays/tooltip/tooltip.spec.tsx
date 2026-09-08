@@ -1,7 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ComponentProps, createRef } from 'react';
 
+import * as helpers from '../../../helpers';
 import Tooltip, { TooltipProps } from './tooltip';
+
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useIsTouchDevice: jest.fn(),
+}));
 
 describe('Tooltip component', () => {
   const renderTooltip = (
@@ -19,6 +25,7 @@ describe('Tooltip component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (helpers.useIsTouchDevice as jest.Mock).mockReturnValue(false);
   });
 
   it('renders correct Trigger children', async () => {
@@ -75,6 +82,27 @@ describe('Tooltip component', () => {
     expect(screen.getByText('Tooltip content')).toBeInTheDocument();
 
     fireEvent.click(trigger);
+    expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
+  });
+
+  it('defers to the touch-aware default on touch devices: opens via tap, not stuck via focus (mobile regression)', () => {
+    (helpers.useIsTouchDevice as jest.Mock).mockReturnValue(true);
+
+    renderTooltip({ children: 'Trigger content' }, { children: 'Tooltip content' });
+
+    const trigger = screen.getByText('Trigger content');
+    expect(trigger).toHaveClass('tedi-overlay__trigger--click');
+
+    // A tap focuses the trigger natively; in click mode this must not open the tooltip on its own,
+    // otherwise there is no reliable way to close it again on a touch device (no real blur/hover-out).
+    fireEvent.focus(trigger);
+    expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    expect(screen.getByText('Tooltip content')).toBeInTheDocument();
+
+    // Click mode dismisses on 'mousedown' (see overlay.tsx's outsidePressEvent).
+    fireEvent.mouseDown(document.body);
     expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
   });
 

@@ -4,6 +4,9 @@ import { Text } from '../../../../tedi';
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import styles from '../vertical-stepper.module.scss';
 
+/**
+ * @deprecated Use `VerticalStepper.SubItem` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface SubItemProps {
   /**
    * Additional info components like StatusBadge, Button, Link or Text.
@@ -22,6 +25,9 @@ export interface SubItemProps {
   as?: 'a' | 'button';
 }
 
+/**
+ * @deprecated Use `VerticalStepper.SubItem` from `@tedi-design-system/react/tedi` instead.
+ */
 export const SubItem = ({
   children,
   className,

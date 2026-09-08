@@ -111,7 +111,7 @@ export const SideNav = <C extends React.ElementType = 'a'>(props: SideNavProps<C
   const renderSidebar = (
     <Print visibility="hide">
       <nav data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
-        <ul className={styles['sidenav__list']} role="menubar" aria-label={ariaLabel}>
+        <ul className={styles['sidenav__list']}>
           {navItems.map((item, key) => (
             <SideNavItem as={linkAs} {...item} key={key} />
           ))}
@@ -189,18 +189,17 @@ const SideNavItem = <C extends React.ElementType = 'a'>(props: SideNavItem<C>) =
   };
 
   return (
-    <li data-name="sidenav-item" className={SideNavItemBEM} role="presentation">
+    <li data-name="sidenav-item" className={SideNavItemBEM}>
       {subItems ? (
         <Collapse
           id={collapseId}
           hideCollapseText
+          contentAsRegion={false}
           open={isActive}
           title={
             <span
               {...(({ _href, ...spanRest }) => spanRest)(rest)}
               className={styles['sidenav__link']}
-              noStyle={true}
-              role="menuitem"
               aria-current={isActive ? 'page' : undefined}
             >
               {icon && getIcon(icon)}
@@ -208,7 +207,7 @@ const SideNavItem = <C extends React.ElementType = 'a'>(props: SideNavItem<C>) =
             </span>
           }
         >
-          <ul className={styles['sidenav__list']} role="menubar">
+          <ul className={styles['sidenav__list']}>
             {subItems.map((item, key) => (
               <SideNavItem as={as} {...item} key={key} />
             ))}
@@ -224,7 +223,6 @@ const SideNavItem = <C extends React.ElementType = 'a'>(props: SideNavItem<C>) =
           onClick={handleClick}
           className={styles['sidenav__link']}
           noStyle={true}
-          role="menuitem"
           aria-current={isActive ? 'page' : undefined}
         >
           {icon && getIcon(icon)}

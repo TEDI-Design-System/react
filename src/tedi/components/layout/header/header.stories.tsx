@@ -172,7 +172,7 @@ const LanguageLinks = () => {
 };
 
 const representatives: Representative[] = [
-  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person' } },
+  { id: '1', name: 'Mari Maasikas', description: '47013010001', icon: { name: 'person' } },
   { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle' } },
   { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle' } },
   { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle' } },
@@ -243,7 +243,7 @@ const loggedInNavItems = [
   },
 ];
 
-const representatives2 = [{ id: '1', name: 'Mari Maasikas', description: '49504080934' }];
+const representatives2 = [{ id: '1', name: 'Mari Maasikas', description: '47013010001' }];
 
 const organizations = [
   { id: 'org-1', name: 'Pärnu linnavolikogu' },
