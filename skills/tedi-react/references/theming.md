@@ -21,7 +21,7 @@ Wrap your app with the three TEDI providers, in this order — `ThemeProvider` (
 ```tsx
 import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system/react/tedi';
 
-<ThemeProvider defaultTheme="default">
+<ThemeProvider theme="default">
   <LabelProvider>
     <StyleProvider>
       <App />
@@ -34,9 +34,9 @@ import { ThemeProvider, LabelProvider, StyleProvider } from '@tedi-design-system
 
 ## Theme Switching
 
-Themes are applied as a CSS class on `<html>`: `tedi-theme--default`, `tedi-theme--dark`.
+Themes are applied as a CSS class on `<html>` (e.g. `tedi-theme--default`, `tedi-theme--dark`). The ThemeProvider manages theme state and persists the selected theme across reloads — in both `localStorage` and a cookie, with `localStorage` taking precedence on read.
 
-The ThemeProvider manages theme state and persistence (via cookie `tedi-theme`).
+The available theme names and cookie name are implementation details — verify the current set against the `ThemeProvider` source / Storybook (see SKILL.md → Authoritative Sources).
 
 ## Design Tokens
 
@@ -52,6 +52,28 @@ Tokens come in two layers: **semantic** `--general-*` tokens (role-based — tex
 | Spacing | `--tedi-dimensions-02`, `--tedi-dimensions-04`, `--layout-grid-gutters-16` |
 | Radius | `--tedi-radius-02-default`, `--tedi-radius-08` |
 | Typography | `--family-default`, `--heading-h3-size`, `--heading-h3-weight` |
+
+**Look token names up, don't recall them.** The authoritative, machine-readable list ships with
+the consumer's installed `core`:
+
+```
+node_modules/@tedi-design-system/core/tokens.json
+```
+
+It is generated from Figma and carries two tiers, `base` (the `--tedi-*` primitives) and
+`semantic` (the role tokens), under `themes.default`; `themes.dark` holds only the semantic
+overrides, and `breakpoints.mobile` / `.tablet` the responsive ones. Each entry is
+`{ value, resolved }`, so you get both the `var()` chain and the computed colour:
+
+```bash
+# does a token exist, and what does it resolve to?
+python3 -c "import json;t=json.load(open('node_modules/@tedi-design-system/core/tokens.json'));print(t['themes']['default']['semantic']['general-surface-primary'])"
+# find every surface token
+python3 -c "import json;t=json.load(open('node_modules/@tedi-design-system/core/tokens.json'));print([k for k in t['themes']['default']['semantic'] if 'surface' in k])"
+```
+
+The table above illustrates the naming *pattern*; it is not the full set. Never invent a token
+name, and never fall back to a hex value because a guessed token didn't work.
 
 Use tokens in your own SCSS:
 
