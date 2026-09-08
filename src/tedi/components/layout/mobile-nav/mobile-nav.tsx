@@ -189,7 +189,7 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
           {currentLevel.parent?.children}
         </div>
       )}
-      <ul className={styles['tedi-sidenav__list']} role="menubar">
+      <ul className={styles['tedi-sidenav__list']}>
         {currentLevel.renderParentLink && currentLevel.parent && (
           <li className={styles['tedi-sidenav__list-item']}>
             <div className={classNames(styles['tedi-sidenav__collapse'])}>
@@ -209,11 +209,8 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
 
   return showOverlay ? (
     <FloatingOverlay
-      style={{
-        top: '0',
-        position: 'relative',
-        height: '100%',
-      }}
+      lockScroll
+      style={{ top: 'var(--layout-header-height)' }}
       className={styles['tedi-sidenav__overlay']}
     >
       {content}

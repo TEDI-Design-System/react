@@ -3,6 +3,8 @@ import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../grid';
+import { Header } from '../header';
+import { HideAt } from '../hide-at/hide-at';
 import { SideNavItem } from './components/sidenav-item/sidenav-item';
 import {
   exampleDefaultOpen,
@@ -32,6 +34,9 @@ const meta: Meta<typeof SideNav> = {
     'SideNav.Mobile': SideNav.Mobile,
   },
   parameters: {
+    // App-shell component: render edge-to-edge so the header sits flush at the viewport top and the
+    // fixed mobile overlay lines up with it (Storybook's default 'padded' layout offsets the header).
+    layout: 'fullscreen',
     docs: {
       source: {
         transform: (code: string) => {
@@ -58,7 +63,11 @@ const Template: StoryFn<typeof SideNav> = (args) => {
 
   return (
     <>
-      <SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />
+      <HideAt lg>
+        <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+          <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
+        </Header>
+      </HideAt>
       <SideNav {...args} isMobileOpen={isOpen} />
     </>
   );
