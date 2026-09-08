@@ -9,6 +9,7 @@ import {
   useMemo,
 } from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Card, CardContent } from '../../content/card';
 import { Affix } from '../../misc/affix/affix';
@@ -23,12 +24,7 @@ import styles from './table-of-contents.module.scss';
 /** Semantic level of the `TableOfContents` heading element. */
 export type TableOfContentsHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
-export interface TableOfContentsProps {
-  /**
-   * `TableOfContents.Item` elements. An item's non-`Item` children are its
-   * link / label; nested `TableOfContents.Item` children become its sub-items.
-   */
-  children: ReactNode;
+type TableOfContentsBreakpointProps = {
   /**
    * Heading rendered above the list. Defaults to the localised "Table of
    * contents" label; pass `null` to render it headless (no visible heading —
@@ -69,12 +65,6 @@ export interface TableOfContentsProps {
    */
   bordered?: boolean;
   /**
-   * Id of the currently active item. The active item gets the left accent bar
-   * and active link colour. When `collapseInactive` is set, the branch leading
-   * to it is the only one kept expanded.
-   */
-  activeId?: string;
-  /**
    * Collapse branches that are not on the active trail, so the list behaves like
    * an accordion: only the branch leading to `activeId` keeps its nested children
    * visible. When `false` (default) every item's sub-items are always shown.
@@ -96,6 +86,20 @@ export interface TableOfContentsProps {
    * Additional class name on the root element.
    */
   className?: string;
+};
+
+export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsBreakpointProps> {
+  /**
+   * `TableOfContents.Item` elements. An item's non-`Item` children are its
+   * link / label; nested `TableOfContents.Item` children become its sub-items.
+   */
+  children: ReactNode;
+  /**
+   * Id of the currently active item. The active item gets the left accent bar
+   * and active link colour. When `collapseInactive` is set, the branch leading
+   * to it is the only one kept expanded.
+   */
+  activeId?: string;
 }
 
 /** Internal data shape derived from the `TableOfContents.Item` element tree. */
@@ -161,6 +165,7 @@ export const buildActiveTrail = (nodes: TableOfContentsNode[], activeId?: string
 
 export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const { getLabel } = useLabels();
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     children,
     heading,
@@ -174,7 +179,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     padding,
     bordered = false,
     className,
-  } = props;
+  } = getCurrentBreakpointProps<TableOfContentsProps>(props);
 
   const resolvedHeading = heading === undefined ? getLabel('table-of-contents.title') : heading;
 

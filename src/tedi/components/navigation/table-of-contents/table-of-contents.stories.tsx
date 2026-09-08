@@ -25,6 +25,9 @@ const meta: Meta<typeof TableOfContents> = {
   title: 'TEDI-Ready/Components/Navigation/TableOfContents',
   parameters: {
     layout: 'padded',
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
@@ -44,6 +47,14 @@ type Story = StoryObj<TableOfContentsProps>;
 
 const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
 
+// Sub-items nested under specific sections (by index), so every example built from this helper
+// showcases nesting. Passed as an array — never a fragment — so `Children.toArray` keeps each
+// `TableOfContents.Item` detectable.
+const subSections: Record<number, string[]> = {
+  2: ['Andmete kogumine', 'Analüüs'],
+  3: ['Joonised', 'Tabelid'],
+};
+
 const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
   sections.map((label, index) => (
     <TableOfContents.Item
@@ -59,6 +70,13 @@ const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
       >
         {label}
       </Link>
+      {subSections[index]?.map((childLabel, childIndex) => (
+        <TableOfContents.Item key={childLabel} id={`section-${index + 1}-${childIndex + 1}`}>
+          <Link href={`#section-${index + 1}-${childIndex + 1}`} underline={false}>
+            {childLabel}
+          </Link>
+        </TableOfContents.Item>
+      ))}
     </TableOfContents.Item>
   ));
 
@@ -115,6 +133,18 @@ export const WithSlot: Story = {
           <Link href={`#section-${index + 1}`} underline={false}>
             {label}
           </Link>
+          {index === 2 && [
+            <TableOfContents.Item key="collection" id="section-3-1" slot={<Tag color="primary">12</Tag>}>
+              <Link href="#section-3-1" underline={false}>
+                Andmete kogumine
+              </Link>
+            </TableOfContents.Item>,
+            <TableOfContents.Item key="analysis" id="section-3-2">
+              <Link href="#section-3-2" underline={false}>
+                Analüüs
+              </Link>
+            </TableOfContents.Item>,
+          ]}
         </TableOfContents.Item>
       ))}
     </TableOfContents>
@@ -150,6 +180,16 @@ export const WithIcon: Story = {
         <Link href="#section-3" underline={false}>
           Meetodid
         </Link>
+        <TableOfContents.Item id="section-3-1">
+          <Link href="#section-3-1" underline={false}>
+            Andmete kogumine
+          </Link>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="section-3-2">
+          <Link href="#section-3-2" underline={false}>
+            Analüüs
+          </Link>
+        </TableOfContents.Item>
       </TableOfContents.Item>
       <TableOfContents.Item id="section-6">
         <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
@@ -334,6 +374,64 @@ const LOREM =
   'dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ' +
   'ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
 
+interface LayoutNode {
+  id: string;
+  label: string;
+  children?: LayoutNode[];
+}
+
+const layoutTree: LayoutNode[] = [
+  { id: 'sec-1', label: 'Sissejuhatus' },
+  {
+    id: 'sec-2',
+    label: 'Taust',
+    children: [
+      { id: 'sec-2-1', label: 'Varasem uurimus' },
+      { id: 'sec-2-2', label: 'Probleemipüstitus' },
+    ],
+  },
+  {
+    id: 'sec-3',
+    label: 'Meetodid',
+    children: [
+      { id: 'sec-3-1', label: 'Andmete kogumine' },
+      { id: 'sec-3-2', label: 'Analüüs' },
+    ],
+  },
+  {
+    id: 'sec-4',
+    label: 'Tulemused',
+    children: [
+      { id: 'sec-4-1', label: 'Joonised' },
+      { id: 'sec-4-2', label: 'Tabelid' },
+    ],
+  },
+  { id: 'sec-5', label: 'Arutelu' },
+  {
+    id: 'sec-6',
+    label: 'Järeldused',
+    children: [
+      { id: 'sec-6-1', label: 'Piirangud' },
+      { id: 'sec-6-2', label: 'Edasine töö' },
+    ],
+  },
+  { id: 'sec-7', label: 'Kokkuvõte' },
+  { id: 'sec-8', label: 'Viited' },
+];
+
+// Depth-tagged flat list, used for the scroll-spy observer and the content sections.
+const layoutFlat = layoutTree.flatMap((node) => [
+  { id: node.id, label: node.label, depth: 0 },
+  ...(node.children ?? []).map((child) => ({ id: child.id, label: child.label, depth: 1 })),
+]);
+const layoutIds = layoutFlat.map((node) => node.id);
+
+/**
+ * Both panes are fixed-height scroll regions of the same height (`24rem`): the content on the left and
+ * the sidebar list on the right. Add as many `TableOfContents.Item`s as you like — the sidebar scrolls
+ * inside its own scrollbar instead of stretching past its frame. Below `md` the list collapses into
+ * `TableOfContents.Collapsible`.
+ */
 export const StickyInLayout: Story = {
   parameters: { fullWidth: true },
   render: function StickyInLayout() {
@@ -348,7 +446,7 @@ export const StickyInLayout: Story = {
 
       const observerRoot = isMobile ? null : container;
 
-      const ids = sections.map((_, index) => `sec-${index + 1}`);
+      const ids = layoutIds;
       const visibility = new Map<string, boolean>();
       const atBottom = (): boolean =>
         isMobile
@@ -405,13 +503,17 @@ export const StickyInLayout: Story = {
       setActiveId(id);
     };
 
-    const items = sections.map((label, index) => (
-      <TableOfContents.Item key={label} id={`sec-${index + 1}`}>
-        <Link href={`#sec-${index + 1}`} underline={false} onClick={selectSection(`sec-${index + 1}`)}>
-          {label}
-        </Link>
-      </TableOfContents.Item>
-    ));
+    const renderItems = (nodes: LayoutNode[]): JSX.Element[] =>
+      nodes.map((node) => (
+        <TableOfContents.Item key={node.id} id={node.id}>
+          <Link href={`#${node.id}`} underline={false} onClick={selectSection(node.id)}>
+            {node.label}
+          </Link>
+          {node.children && renderItems(node.children)}
+        </TableOfContents.Item>
+      ));
+
+    const items = renderItems(layoutTree);
 
     return (
       <>
@@ -423,13 +525,12 @@ export const StickyInLayout: Story = {
               {...(isMobile ? {} : { tabIndex: 0, role: 'region' as const, 'aria-label': 'Artikli sisu' })}
             >
               <VerticalSpacing size={1.5}>
-                {sections.map((label, index) => (
-                  <section key={label} id={`sec-${index + 1}`} tabIndex={-1}>
+                {layoutFlat.map(({ id, label, depth }) => (
+                  <section key={id} id={id} tabIndex={-1}>
                     <VerticalSpacing size={0.5}>
-                      <Heading element="h2" modifiers="h3">
+                      <Heading element={depth === 0 ? 'h2' : 'h3'} modifiers={depth === 0 ? 'h3' : 'h4'}>
                         {label}
                       </Heading>
-                      <Text>{LOREM}</Text>
                       <Text>{LOREM}</Text>
                     </VerticalSpacing>
                   </section>
@@ -439,15 +540,18 @@ export const StickyInLayout: Story = {
           </Col>
           <ShowAt md>
             <Col md={4}>
-              <TableOfContents heading="Sisukord" sticky={false} activeId={activeId}>
-                {items}
-              </TableOfContents>
+              {/* Same fixed height as the content pane, so the long list scrolls in its own scrollbar. */}
+              <div style={{ maxHeight: '24rem', overflowY: 'auto' }}>
+                <TableOfContents heading="Sisukord" sticky={false} numbered activeId={activeId}>
+                  {items}
+                </TableOfContents>
+              </div>
             </Col>
           </ShowAt>
         </Row>
 
         <HideAt md>
-          <TableOfContents.Collapsible heading="Sisukord" activeId={activeId}>
+          <TableOfContents.Collapsible heading="Sisukord" numbered activeId={activeId}>
             {items}
           </TableOfContents.Collapsible>
         </HideAt>
@@ -587,4 +691,34 @@ export const Collapsible: Story = {
       </>
     );
   },
+};
+
+/**
+ * `hideOnScroll` slides the pinned bar out of the way while you scroll **down** and brings it back on
+ * scroll **up** — handy on long mobile pages so the bar stays out of the reading area but is one gesture
+ * away. Only applies when the bar is `sticky` (the default). Scroll the canvas to see it.
+ */
+export const CollapsibleHideOnScroll: Story = {
+  name: 'Collapsible: hide on scroll',
+  parameters: { layout: 'fullscreen', fullWidth: true },
+  render: () => (
+    <div
+      style={{
+        minHeight: '260vh',
+        padding: 'var(--layout-page-spacing-top) var(--layout-page-spacing-x)',
+        background: 'var(--general-surface-tertiary)',
+      }}
+    >
+      <VerticalSpacing size={1}>
+        <Text color="secondary">Scroll down — ToC disappears. Scroll back up — ToC reappears.</Text>
+        {Array.from({ length: 12 }, (_, index) => (
+          <Text key={index}>{LOREM}</Text>
+        ))}
+      </VerticalSpacing>
+
+      <TableOfContents.Collapsible heading="Sisukord" activeId="section-3" hideOnScroll>
+        {sectionItems()}
+      </TableOfContents.Collapsible>
+    </div>
+  ),
 };

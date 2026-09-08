@@ -21,6 +21,13 @@ export interface TableOfContentsCollapsibleProps
    * @default true
    */
   sticky?: boolean;
+  /**
+   * When the bar is pinned (`sticky`), hide it while the page scrolls down and reveal it again on
+   * scroll up — so it stays out of the way while reading but is one gesture away. No effect when
+   * `sticky` is `false`.
+   * @default false
+   */
+  hideOnScroll?: boolean;
 }
 
 /**
@@ -28,10 +35,49 @@ export interface TableOfContentsCollapsibleProps
  * Same `TableOfContents.Item` children as the desktop card; render it on small viewports.
  */
 export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProps): JSX.Element => {
-  const { children, heading, ariaLabel, activeId, numbered = false, sticky = true, className } = props;
+  const {
+    children,
+    heading,
+    ariaLabel,
+    activeId,
+    numbered = false,
+    sticky = true,
+    hideOnScroll = false,
+    className,
+  } = props;
   const { getLabel } = useLabels();
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hideOnScroll || !sticky) {
+      setHidden(false);
+      return undefined;
+    }
+
+    let lastY = window.scrollY;
+    let frame = 0;
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const y = window.scrollY;
+        const delta = y - lastY;
+        if (Math.abs(delta) > 4) {
+          setHidden(delta > 0 && y > 0);
+          lastY = y;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [hideOnScroll, sticky]);
 
   useEffect(() => {
     const element = listRef.current;
@@ -61,7 +107,10 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
       <div
         className={cn(
           styles['tedi-table-of-contents__bar'],
-          { [styles['tedi-table-of-contents__bar--static']]: !sticky },
+          {
+            [styles['tedi-table-of-contents__bar--static']]: !sticky,
+            [styles['tedi-table-of-contents__bar--hidden']]: hidden && !open,
+          },
           className
         )}
       >

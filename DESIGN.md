@@ -131,7 +131,6 @@ CSS — the `general-*` and `form-*` **role** tokens of the default theme. Reach
 | `form-field-outer-spacing` | `0.25rem` |
 | `form-field-padding-x-lg` | `1rem` |
 | `form-field-padding-x-md-default` | `0.5rem` |
-| `form-field-padding-x-sm` | `0.25rem` |
 | `form-field-padding-y-lg` | `1rem` |
 | `form-field-padding-y-md-default` | `0.5rem` |
 | `form-field-padding-y-md-has-button` | `0.25rem` |
