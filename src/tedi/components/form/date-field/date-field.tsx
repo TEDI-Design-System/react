@@ -156,7 +156,7 @@ export interface DateFieldProps
   showOutsideDays?: boolean;
   /**
    * Custom date parsing function for user input. Receives the input string and should return a `Date`, an array of `Date`s, a `DateRange`, or `undefined` if the input is invalid or cleared.
-   * If not provided, the component will not allow manual input and will rely solely on the calendar picker for date selection.
+   * If not provided, `mode="single"` falls back to a built-in `dd.MM.yyyy` parser and stays typeable. `mode="multiple"` and `mode="range"` cannot be parsed automatically, so their input is read-only and dates are selected via the calendar only.
    */
   parseDate?: (value: string) => Date | Date[] | DateRange | undefined;
   /**
@@ -886,7 +886,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             ref={setTextFieldRef}
             id={id}
             label={label}
-            readOnly={readOnly || (!parseDate && mode !== 'single')}
+            readOnly={readOnly}
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
@@ -920,6 +920,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             })}
             input={{
               ...((inputProps as TextFieldProps)?.input as UnknownType),
+              ...(!parseDate && mode !== 'single' && { readOnly: true }),
               ...(shouldUseNativePicker && { type: 'date' }),
               ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
                 ? {
