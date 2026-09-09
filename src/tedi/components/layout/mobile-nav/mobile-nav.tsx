@@ -1,12 +1,14 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
 import { SideNavItem, SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
 import styles from '../sidenav/sidenav.module.scss';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 type NavigationLevel<C extends React.ElementType> = {
   items: SideNavItemProps<C>[];
@@ -37,10 +39,32 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
 }: MobileNavProps<C>) => {
   const { getLabel } = useLabels();
   const [navigationStack, setNavigationStack] = useState<NavigationLevel<C>[]>([{ items: navItems }]);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [overlayTop, setOverlayTop] = useState<string>('var(--layout-header-height)');
 
   useEffect(() => {
     setNavigationStack([{ items: navItems }]);
   }, [navItems]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
+
+    const scope: ParentNode = overlayRef.current?.parentElement ?? document;
+    const header = scope.querySelector('header') ?? document.querySelector('header');
+
+    if (!header) {
+      setOverlayTop('var(--layout-header-height)');
+      return undefined;
+    }
+
+    const measure = () => setOverlayTop(`${Math.max(0, Math.round(header.getBoundingClientRect().bottom))}px`);
+    measure();
+
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, [isOpen, showOverlay]);
 
   const currentLevel = navigationStack[navigationStack.length - 1];
   const isRootLevel = navigationStack.length === 1;
@@ -209,8 +233,9 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
 
   return showOverlay ? (
     <FloatingOverlay
+      ref={overlayRef}
       lockScroll
-      style={{ top: 'var(--layout-header-height)' }}
+      style={{ top: overlayTop, insetInlineEnd: 'var(--floating-ui-scrollbar-width)' }}
       className={styles['tedi-sidenav__overlay']}
     >
       {content}
