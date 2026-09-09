@@ -21,6 +21,7 @@ import {
   useBreakpoint,
   useBreakpointProps,
 } from '../../../helpers';
+import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
@@ -155,6 +156,7 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
 
 export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { getLabel } = useLabels();
 
   const {
     id,
@@ -285,6 +287,22 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
         }
       : undefined;
 
+  const shouldUseDropdownPicker =
+    !shouldUseNativePicker &&
+    showPicker &&
+    !disabled &&
+    availableTimesVariant === 'dropdown' &&
+    !!availableTimes?.length;
+
+  const pickerPopupRole: 'dialog' | 'listbox' = useModalPicker ? 'dialog' : 'listbox';
+  const pickerExpanded = useModalPicker ? modalOpen : open;
+  const iconOpensPicker =
+    showPicker &&
+    !shouldUseNativePicker &&
+    !shouldUseDropdownPicker &&
+    (timePickerTrigger === 'button' || useModalPicker);
+  const inputIsCombobox = showPicker && isInputTrigger && !shouldUseNativePicker && !shouldUseDropdownPicker;
+
   const textFieldProps: TextFieldProps = {
     ...(inputProps as TextFieldProps),
     id,
@@ -297,6 +315,11 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     isClearable: clearable,
     required,
     onIconClick: showPicker ? handleIconClick : undefined,
+    iconButtonProps: {
+      'aria-label': getLabel('time-field.open-picker'),
+      ...(iconOpensPicker && { 'aria-haspopup': pickerPopupRole, 'aria-expanded': pickerExpanded }),
+      ...(inputProps as TextFieldProps | undefined)?.iconButtonProps,
+    },
     onChange: updateTime,
     onBlur: handleInputBlur,
     className: cn(
@@ -309,15 +332,9 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
       ...(inputProps?.input as UnknownType),
       ...(shouldUseNativePicker && { type: 'time' }),
       ...(inputClickFromTrigger && { onClick: inputClickFromTrigger }),
+      ...(inputIsCombobox && { role: 'combobox', 'aria-haspopup': pickerPopupRole, 'aria-expanded': pickerExpanded }),
     },
   };
-
-  const shouldUseDropdownPicker =
-    !shouldUseNativePicker &&
-    showPicker &&
-    !disabled &&
-    availableTimesVariant === 'dropdown' &&
-    !!availableTimes?.length;
 
   if (shouldUseDropdownPicker) {
     const selectedIndex = availableTimes.indexOf(currentValue);
@@ -327,6 +344,8 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
       <Dropdown width="trigger" defaultActiveIndex={defaultActiveIndex}>
         <Dropdown.Trigger>
           <div
+            // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
+            role="combobox"
             className={cn(styles['tedi-time-field__container'], className, {
               [styles['tedi-time-field__container--native']]: shouldUseNativePicker,
             })}
@@ -357,15 +376,18 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     );
   }
 
+  const containerInteractionProps = {
+    ...(shouldUseCustomInputTrigger ? interactions.getReferenceProps() : {}),
+  } as Record<string, unknown>;
+  delete containerInteractionProps.role;
+  delete containerInteractionProps['aria-haspopup'];
+  delete containerInteractionProps['aria-expanded'];
+  delete containerInteractionProps['aria-controls'];
+
   return (
     <>
-      <div
-        className={cn(styles['tedi-time-field__container'], className)}
-        {...(shouldUseCustomInputTrigger ? interactions.getReferenceProps() : {})}
-        aria-haspopup={showPicker ? 'listbox' : undefined}
-        tabIndex={-1}
-      >
-        <TextField ref={textFieldRef} aria-expanded={showPicker ? open : undefined} {...textFieldProps} />
+      <div className={cn(styles['tedi-time-field__container'], className)} {...containerInteractionProps} tabIndex={-1}>
+        <TextField ref={textFieldRef} {...textFieldProps} />
       </div>
 
       {useModalPicker && (
