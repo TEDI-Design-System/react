@@ -188,7 +188,7 @@ export const labelsMap = validateDefaultLabels({
   'time-field.open-picker': {
     description: 'Accessible name for the TimeField icon button that opens the time picker',
     components: ['TimeField'],
-    et: 'Ava kellavalija',
+    et: 'Ava kellaajavalija',
     en: 'Open time picker',
     ru: 'Открыть выбор времени',
   },
