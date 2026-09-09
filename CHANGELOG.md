@@ -1,3 +1,10 @@
+# [19.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.3...react-19.1.0-rc.4) (2026-09-09)
+
+
+### Bug Fixes
+
+* **time-field:** a11y violation fixes [#815](https://github.com/TEDI-Design-System/react/issues/815) ([#868](https://github.com/TEDI-Design-System/react/issues/868)) ([de87313](https://github.com/TEDI-Design-System/react/commit/de873134d14ada45f94f9bfdbd12501d8d1ac8e9))
+
 # [19.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.2...react-19.1.0-rc.3) (2026-09-08)
 
 
