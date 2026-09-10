@@ -15,7 +15,10 @@ import styles from '../../table-of-contents.module.scss';
 import { TableOfContentsList } from '../table-of-contents-list/table-of-contents-list';
 
 export interface TableOfContentsCollapsibleProps
-  extends Pick<TableOfContentsProps, 'children' | 'heading' | 'ariaLabel' | 'activeId' | 'numbered' | 'className'> {
+  extends Pick<
+    TableOfContentsProps,
+    'children' | 'heading' | 'ariaLabel' | 'activeId' | 'numbered' | 'bordered' | 'defaultOpen' | 'className'
+  > {
   /**
    * Pin the bar to the bottom of the viewport. Set `false` to render it inline.
    * @default true
@@ -42,6 +45,8 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
     ariaLabel,
     activeId,
     numbered = false,
+    bordered = false,
+    defaultOpen = true,
     sticky = true,
     hideOnScroll = false,
     className,
@@ -98,8 +103,8 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
   const contextValue = useMemo(
-    () => ({ activeId, numbered, ariaLabel: navLabel, activeTrail, defaultOpen: true }),
-    [activeId, numbered, navLabel, activeTrail]
+    () => ({ activeId, numbered, ariaLabel: navLabel, activeTrail, defaultOpen }),
+    [activeId, numbered, navLabel, activeTrail, defaultOpen]
   );
 
   return (
@@ -134,7 +139,12 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
           </div>
         }
       >
-        <div ref={setListElement} className={styles['tedi-table-of-contents']}>
+        <div
+          ref={setListElement}
+          className={cn(styles['tedi-table-of-contents'], {
+            [styles['tedi-table-of-contents--bordered']]: bordered,
+          })}
+        >
           <TableOfContentsList nodes={nodes} heading={null} />
         </div>
       </Sheet>

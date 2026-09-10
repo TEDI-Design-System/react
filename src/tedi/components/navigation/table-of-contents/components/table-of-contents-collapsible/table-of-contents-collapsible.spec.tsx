@@ -177,4 +177,59 @@ describe('TableOfContents.Collapsible', () => {
       expect(bar).not.toHaveClass('tedi-table-of-contents__bar--hidden');
     });
   });
+
+  describe('bordered', () => {
+    it('does not apply the bordered modifier by default', () => {
+      render(<Tree />);
+      fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+      expect(document.querySelector('[class*="tedi-table-of-contents--bordered"]')).not.toBeInTheDocument();
+    });
+
+    it('applies the bordered modifier to the sheet list when bordered', () => {
+      render(
+        <TableOfContents.Collapsible heading="Sisukord" bordered>
+          <TableOfContents.Item id="intro">
+            <a href="#intro">Sissejuhatus</a>
+          </TableOfContents.Item>
+        </TableOfContents.Collapsible>
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+      expect(document.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
+    });
+  });
+
+  describe('defaultOpen', () => {
+    const TwoBranches = ({ defaultOpen }: { defaultOpen?: boolean }) => (
+      <TableOfContents.Collapsible heading="Sisukord" activeId="methods" defaultOpen={defaultOpen}>
+        <TableOfContents.Item id="methods">
+          <a href="#methods">Meetodid</a>
+          <TableOfContents.Item id="methods-1">
+            <a href="#methods-1">Andmete kogumine</a>
+          </TableOfContents.Item>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="results">
+          <a href="#results">Tulemused</a>
+          <TableOfContents.Item id="results-1">
+            <a href="#results-1">Joonised</a>
+          </TableOfContents.Item>
+        </TableOfContents.Item>
+      </TableOfContents.Collapsible>
+    );
+
+    it('keeps every branch expanded by default', () => {
+      render(<TwoBranches />);
+      fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+      const dialog = screen.getByRole('dialog');
+      expect(within(dialog).getByRole('link', { name: 'Andmete kogumine' })).toBeInTheDocument();
+      expect(within(dialog).getByRole('link', { name: 'Joonised' })).toBeInTheDocument();
+    });
+
+    it('expands only the active branch when defaultOpen is false', () => {
+      render(<TwoBranches defaultOpen={false} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+      const dialog = screen.getByRole('dialog');
+      expect(within(dialog).getByRole('link', { name: 'Andmete kogumine' })).toBeInTheDocument();
+      expect(within(dialog).queryByRole('link', { name: 'Joonised' })).not.toBeInTheDocument();
+    });
+  });
 });

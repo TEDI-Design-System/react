@@ -1,13 +1,5 @@
 import cn from 'classnames';
-import {
-  Children,
-  createContext,
-  type CSSProperties,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-  useMemo,
-} from 'react';
+import { Children, createContext, isValidElement, type ReactElement, type ReactNode, useMemo } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -33,11 +25,6 @@ type TableOfContentsBreakpointProps = {
    * @default default
    */
   variant?: 'default' | 'transparent';
-  /**
-   * Inner padding of the container, in rem — the spacing between the card edge and the
-   * heading / items. Defaults to the card's medium padding token.
-   */
-  padding?: number;
   /**
    * Stick the card to the viewport while scrolling.
    * @default true
@@ -174,7 +161,6 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     numbered = false,
     sticky = true,
     variant = 'default',
-    padding,
     bordered = false,
     className,
   } = getCurrentBreakpointProps<TableOfContentsProps>(props);
@@ -189,16 +175,12 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen]
   );
 
-  const rootStyle =
-    padding !== undefined ? ({ '--tedi-table-of-contents-padding': `${padding}rem` } as CSSProperties) : undefined;
-
   const list = (
     <div
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
         [styles['tedi-table-of-contents--bordered']]: bordered,
       })}
-      style={rootStyle}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />
     </div>

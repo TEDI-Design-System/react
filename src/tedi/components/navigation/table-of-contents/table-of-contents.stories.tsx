@@ -84,7 +84,6 @@ export const Default: Story = {
     activeId: 'section-3',
     variant: 'default',
     headingLevel: 'h3',
-    padding: undefined,
     sticky: false,
     numbered: false,
     bordered: false,
@@ -103,15 +102,29 @@ export const ItemStates: Story = {
       { id: 'selected', label: 'Selected', linkProps: {} },
     ];
 
-    const stateItems = (options?: { icon?: boolean; separator?: boolean }) => {
+    const stateItems = (options?: { icon?: boolean; separator?: boolean }, withFiller = false) => {
       const iconProps = options?.icon ? { iconLeft: 'mail', iconStandalone: true } : {};
-      return rows.map((row) => (
+      const items = rows.map((row) => (
         <TableOfContents.Item key={row.id} id={row.id} separator={options?.separator}>
           <Link href={`#${row.id}`} underline={false} {...iconProps} {...row.linkProps}>
             {row.label}
           </Link>
         </TableOfContents.Item>
       ));
+
+      // A bordered list draws no divider under its last item, so the Selected state (last row) would
+      // have no bottom border. Append a filler item so the Selected row's border stays visible.
+      if (withFiller) {
+        items.push(
+          <TableOfContents.Item key="filler" id="filler">
+            <Link href="#filler" underline={false} {...iconProps}>
+              Item
+            </Link>
+          </TableOfContents.Item>
+        );
+      }
+
+      return items;
     };
 
     const columns: {
@@ -141,7 +154,7 @@ export const ItemStates: Story = {
                 bordered={column.bordered}
                 activeId="selected"
               >
-                {stateItems(column.options)}
+                {stateItems(column.options, column.bordered)}
               </TableOfContents>
             </VerticalSpacing>
           </div>
