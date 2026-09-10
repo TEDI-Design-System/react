@@ -223,25 +223,25 @@ export const WithErrors: Story = {
 export const WithDescriptions: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
+      <HorizontalStepper aria-label="Steps with descriptions – Kutse active" compact="lg">
         <HorizontalStepper.Item label="Kutse" selected />
         <HorizontalStepper.Item label="Tahteavaldus" />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
+      <HorizontalStepper aria-label="Steps with descriptions – Tahteavaldus active" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
+      <HorizontalStepper aria-label="Steps with descriptions – Geenianalüüs active" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions" compact="lg">
+      <HorizontalStepper aria-label="Steps with descriptions – Vastus active" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />

@@ -44,7 +44,13 @@ const NavigationTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
   }, []);
 
   return (
-    <div ref={containerRef} style={{ height: CONTAINER_HEIGHT, overflowY: 'auto' }}>
+    <div
+      ref={containerRef}
+      tabIndex={0}
+      aria-label="Keritav sisu"
+      role="group"
+      style={{ height: CONTAINER_HEIGHT, overflowY: 'auto' }}
+    >
       <ScrollVisibility {...args} scrollContainer={scrollContainer} />
       <Text>{lorem.map((text) => text)}</Text>
     </div>
@@ -56,6 +62,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
     <>
       <ScrollVisibility {...args} animationDirection="up">
         <nav
+          aria-label="Üleval kinnituv navigatsioon"
           style={{
             width: '100%',
             position: 'fixed',
@@ -73,6 +80,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
       </ScrollVisibility>
       <ScrollVisibility {...args} animationDirection="left">
         <nav
+          aria-label="Vasakul kinnituv navigatsioon"
           style={{
             width: NAVIGATION_HEIGHT,
             position: 'fixed',
@@ -91,6 +99,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
       </ScrollVisibility>
       <ScrollVisibility {...args} animationDirection="right">
         <nav
+          aria-label="Paremal kinnituv navigatsioon"
           style={{
             width: NAVIGATION_HEIGHT,
             position: 'fixed',
@@ -109,6 +118,7 @@ const AnimationDirectionTemplate: StoryFn<typeof ScrollVisibility> = (args) => {
       </ScrollVisibility>
       <ScrollVisibility {...args} animationDirection="down">
         <nav
+          aria-label="All kinnituv navigatsioon"
           style={{
             width: '100%',
             position: 'fixed',
