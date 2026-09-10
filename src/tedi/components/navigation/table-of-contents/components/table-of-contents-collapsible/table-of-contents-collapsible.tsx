@@ -97,7 +97,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
   const contextValue = useMemo(
-    () => ({ activeId, numbered, ariaLabel: navLabel, activeTrail }),
+    () => ({ activeId, numbered, ariaLabel: navLabel, activeTrail, defaultOpen: true }),
     [activeId, numbered, navLabel, activeTrail]
   );
 

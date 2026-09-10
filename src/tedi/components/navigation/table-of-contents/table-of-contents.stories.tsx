@@ -28,6 +28,7 @@ const meta: Meta<typeof TableOfContents> = {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
+    controls: { exclude: ['children', 'sm', 'md', 'lg', 'xl', 'xxl', 'defaultServerBreakpoint'] },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
@@ -47,9 +48,6 @@ type Story = StoryObj<TableOfContentsProps>;
 
 const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
 
-// Sub-items nested under specific sections (by index), so every example built from this helper
-// showcases nesting. Passed as an array — never a fragment — so `Children.toArray` keeps each
-// `TableOfContents.Item` detectable.
 const subSections: Record<number, string[]> = {
   2: ['Andmete kogumine', 'Analüüs'],
   3: ['Joonised', 'Tabelid'],
@@ -81,234 +79,18 @@ const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
   ));
 
 export const Default: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sectionItems()}
-    </TableOfContents>
-  ),
-};
-
-export const Transparent: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="section-3">
-      {sectionItems()}
-    </TableOfContents>
-  ),
-};
-
-export const Headless: Story = {
-  render: () => (
-    <TableOfContents heading={null} sticky={false} numbered activeId="section-3">
-      {sectionItems()}
-    </TableOfContents>
-  ),
-};
-
-/**
- * `bordered` draws a divider between items and a border under the last one, so the
- * list reads as separated rows.
- */
-export const Bordered: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
-      {sectionItems('description')}
-    </TableOfContents>
-  ),
-};
-
-/**
- * Each `TableOfContents.Item` accepts a `slot` for trailing content shown at the
- * end of its row (right-aligned) — e.g. a result-count `Tag`. It stays out of the
- * link's accessible name.
- */
-export const WithSlot: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sections.map((label, index) => (
-        <TableOfContents.Item
-          key={label}
-          id={`section-${index + 1}`}
-          slot={index === sections.length - 1 ? <Tag color="primary">43 tulemust</Tag> : undefined}
-        >
-          <Link href={`#section-${index + 1}`} underline={false}>
-            {label}
-          </Link>
-          {index === 2 && [
-            <TableOfContents.Item key="collection" id="section-3-1" slot={<Tag color="primary">12</Tag>}>
-              <Link href="#section-3-1" underline={false}>
-                Andmete kogumine
-              </Link>
-            </TableOfContents.Item>,
-            <TableOfContents.Item key="analysis" id="section-3-2">
-              <Link href="#section-3-2" underline={false}>
-                Analüüs
-              </Link>
-            </TableOfContents.Item>,
-          ]}
-        </TableOfContents.Item>
-      ))}
-    </TableOfContents>
-  ),
-};
-
-/**
- * Set `separator` on any `TableOfContents.Item` to draw a divider below it — e.g. to set a summary
- * or "back to top" entry apart from the section list. It can follow any item, not just the last one.
- */
-export const WithSeparator: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sectionItems('description', true)}
-    </TableOfContents>
-  ),
-};
-
-export const WithIcon: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      <TableOfContents.Item id="section-1">
-        <Link href="#section-1" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-2">
-        <Link href="#section-2" underline={false}>
-          Taust
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-3">
-        <Link href="#section-3" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="section-3-1">
-          <Link href="#section-3-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="section-3-2">
-          <Link href="#section-3-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-6">
-        <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>
-    </TableOfContents>
-  ),
-};
-
-export const Nested: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="methods-2">
-      <TableOfContents.Item id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-        <TableOfContents.Item id="results-1">
-          <Link href="#results-1" underline={false}>
-            Joonised
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-    </TableOfContents>
-  ),
-};
-
-/**
- * By default every item's sub-items stay visible. Set `collapseInactive` to make the list behave
- * like an accordion: only the branch leading to `activeId` keeps its nested children expanded, and
- * all other branches collapse. Here `activeId="methods-2"`, so only *Meetodid* is expanded.
- */
-export const CollapseInactive: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="methods-2" collapseInactive>
-      <TableOfContents.Item id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-        <TableOfContents.Item id="results-1">
-          <Link href="#results-1" underline={false}>
-            Joonised
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-    </TableOfContents>
-  ),
-};
-
-export const Numbered: Story = {
-  render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} numbered activeId="methods">
-      <TableOfContents.Item id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-      </TableOfContents.Item>
-    </TableOfContents>
-  ),
+  args: {
+    heading: 'Sisukord',
+    activeId: 'section-3',
+    variant: 'default',
+    headingLevel: 'h3',
+    padding: undefined,
+    sticky: false,
+    numbered: false,
+    bordered: false,
+    defaultOpen: true,
+  },
+  render: (args) => <TableOfContents {...args}>{sectionItems()}</TableOfContents>,
 };
 
 export const ItemStates: Story = {
@@ -367,6 +149,150 @@ export const ItemStates: Story = {
       </div>
     );
   },
+};
+
+export const Transparent: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="section-3">
+      {sectionItems()}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * Each `TableOfContents.Item` accepts a `slot` for trailing content shown at the
+ * end of its row (right-aligned) — e.g. a result-count `Tag`. It stays out of the
+ * link's accessible name.
+ */
+export const WithSlot: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      {sections.map((label, index) => (
+        <TableOfContents.Item
+          key={label}
+          id={`section-${index + 1}`}
+          slot={index === sections.length - 1 ? <Tag color="primary">43 tulemust</Tag> : undefined}
+        >
+          <Link href={`#section-${index + 1}`} underline={false}>
+            {label}
+          </Link>
+          {index === 2 && [
+            <TableOfContents.Item key="collection" id="section-3-1" slot={<Tag color="primary">12</Tag>}>
+              <Link href="#section-3-1" underline={false}>
+                Andmete kogumine
+              </Link>
+            </TableOfContents.Item>,
+            <TableOfContents.Item key="analysis" id="section-3-2">
+              <Link href="#section-3-2" underline={false}>
+                Analüüs
+              </Link>
+            </TableOfContents.Item>,
+          ]}
+        </TableOfContents.Item>
+      ))}
+    </TableOfContents>
+  ),
+};
+
+export const Numbered: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} numbered activeId="methods">
+      <TableOfContents.Item id="intro">
+        <Link href="#intro" underline={false}>
+          Sissejuhatus
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="methods">
+        <Link href="#methods" underline={false}>
+          Meetodid
+        </Link>
+        <TableOfContents.Item id="methods-1">
+          <Link href="#methods-1" underline={false}>
+            Andmete kogumine
+          </Link>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="methods-2">
+          <Link href="#methods-2" underline={false}>
+            Analüüs
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="results">
+        <Link href="#results" underline={false}>
+          Tulemused
+        </Link>
+      </TableOfContents.Item>
+    </TableOfContents>
+  ),
+};
+
+export const WithIcon: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      <TableOfContents.Item id="section-1">
+        <Link href="#section-1" underline={false}>
+          Sissejuhatus
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="section-2">
+        <Link href="#section-2" underline={false}>
+          Taust
+        </Link>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="section-3">
+        <Link href="#section-3" underline={false}>
+          Meetodid
+        </Link>
+        <TableOfContents.Item id="section-3-1">
+          <Link href="#section-3-1" underline={false}>
+            Andmete kogumine
+          </Link>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="section-3-2">
+          <Link href="#section-3-2" underline={false}>
+            Analüüs
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>
+      <TableOfContents.Item id="section-6">
+        <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
+          Kokkuvõte
+        </Link>
+      </TableOfContents.Item>
+    </TableOfContents>
+  ),
+};
+
+export const Headless: Story = {
+  render: () => (
+    <TableOfContents heading={null} sticky={false} numbered activeId="section-3">
+      {sectionItems()}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * Set `separator` on any `TableOfContents.Item` to draw a divider below it — e.g. to set a summary
+ * or "back to top" entry apart from the section list. It can follow any item, not just the last one.
+ */
+export const WithSeparator: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
+      {sectionItems('description', true)}
+    </TableOfContents>
+  ),
+};
+
+/**
+ * `bordered` draws a divider between items and a border under the last one, so the
+ * list reads as separated rows.
+ */
+export const Bordered: Story = {
+  render: () => (
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
+      {sectionItems('description')}
+    </TableOfContents>
+  ),
 };
 
 const LOREM =
@@ -429,7 +355,7 @@ const layoutIds = layoutFlat.map((node) => node.id);
 /**
  * Both panes are fixed-height scroll regions of the same height (`24rem`): the content on the left and
  * the sidebar list on the right. Add as many `TableOfContents.Item`s as you like — the sidebar scrolls
- * inside its own scrollbar instead of stretching past its frame. Below `md` the list collapses into
+ * inside its own scrollbar instead of stretching past its frame. Below `lg` the list collapses into
  * `TableOfContents.Collapsible`.
  */
 export const StickyInLayout: Story = {
@@ -437,7 +363,7 @@ export const StickyInLayout: Story = {
   render: function StickyInLayout() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [activeId, setActiveId] = useState('sec-1');
-    const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
+    const isMobile = isBreakpointBelow(useBreakpoint(), 'lg');
 
     useEffect(() => {
       const container = scrollRef.current;
@@ -538,7 +464,7 @@ export const StickyInLayout: Story = {
               </VerticalSpacing>
             </div>
           </Col>
-          <ShowAt md>
+          <ShowAt lg>
             <Col md={4}>
               {/* Same fixed height as the content pane, so the long list scrolls in its own scrollbar. */}
               <div style={{ maxHeight: '24rem', overflowY: 'auto' }}>
@@ -550,7 +476,7 @@ export const StickyInLayout: Story = {
           </ShowAt>
         </Row>
 
-        <HideAt md>
+        <HideAt lg>
           <TableOfContents.Collapsible heading="Sisukord" numbered activeId={activeId}>
             {items}
           </TableOfContents.Collapsible>
@@ -561,8 +487,8 @@ export const StickyInLayout: Story = {
 };
 
 /**
- * On desktop (`md` and up) the
- * table of contents is a sidebar card next to the page content; below `md` it collapses into
+ * On desktop (`lg` and up) the
+ * table of contents is a sidebar card next to the page content; below `lg` it collapses into
  * `TableOfContents.Collapsible` — a bottom bar that opens the list in a bottom-sheet overlay.
  * `ShowAt` / `HideAt` mount only the matching variant, so ids never duplicate. Resize the canvas
  * to switch between the two.
@@ -637,7 +563,7 @@ export const Collapsible: Story = {
 
     return (
       <>
-        <ShowAt md>
+        <ShowAt lg>
           <div style={{ background: 'var(--general-surface-primary)', padding: '2rem' }}>
             {intro}
             <div
@@ -657,7 +583,7 @@ export const Collapsible: Story = {
           </div>
         </ShowAt>
 
-        <HideAt md>
+        <HideAt lg>
           <div
             style={{
               display: 'flex',
@@ -694,31 +620,135 @@ export const Collapsible: Story = {
 };
 
 /**
- * `hideOnScroll` slides the pinned bar out of the way while you scroll **down** and brings it back on
- * scroll **up** — handy on long mobile pages so the bar stays out of the reading area but is one gesture
- * away. Only applies when the bar is `sticky` (the default). Scroll the canvas to see it.
+ * Same layout as `Collapsible` — a desktop sidebar card at `lg` and up — but below `lg` the pinned bar
+ * uses `hideOnScroll`: it slides out of the way while you scroll **down** and returns on scroll **up**,
+ * handy on long mobile pages. Only applies when the bar is `sticky` (the default). Resize below `lg`
+ * and scroll the canvas to see it.
  */
 export const CollapsibleHideOnScroll: Story = {
   name: 'Collapsible: hide on scroll',
   parameters: { layout: 'fullscreen', fullWidth: true },
-  render: () => (
-    <div
-      style={{
-        minHeight: '260vh',
-        padding: 'var(--layout-page-spacing-top) var(--layout-page-spacing-x)',
-        background: 'var(--general-surface-tertiary)',
-      }}
-    >
-      <VerticalSpacing size={1}>
-        <Text color="secondary">Scroll down — ToC disappears. Scroll back up — ToC reappears.</Text>
-        {Array.from({ length: 12 }, (_, index) => (
-          <Text key={index}>{LOREM}</Text>
-        ))}
-      </VerticalSpacing>
+  render: () => {
+    const items = [
+      <TableOfContents.Item key="intro" id="intro">
+        <Link href="#intro" underline={false}>
+          Sissejuhatus
+        </Link>
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="methods" id="methods">
+        <Link href="#methods" underline={false}>
+          Meetodid
+        </Link>
+        <TableOfContents.Item id="methods-1">
+          <Link href="#methods-1" underline={false}>
+            Andmete kogumine
+          </Link>
+        </TableOfContents.Item>
+        <TableOfContents.Item id="methods-2">
+          <Link href="#methods-2" underline={false}>
+            Analüüs
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="results" id="results">
+        <Link href="#results" underline={false}>
+          Tulemused
+        </Link>
+        <TableOfContents.Item id="results-1">
+          <Link href="#results-1" underline={false}>
+            Joonised
+          </Link>
+        </TableOfContents.Item>
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="discussion" id="discussion">
+        <Link href="#discussion" underline={false}>
+          Arutelu
+        </Link>
+      </TableOfContents.Item>,
+      <TableOfContents.Item key="conclusion" id="conclusion">
+        <Link href="#conclusion" underline={false} iconStandalone>
+          Kokkuvõte
+        </Link>
+      </TableOfContents.Item>,
+    ];
 
-      <TableOfContents.Collapsible heading="Sisukord" activeId="section-3" hideOnScroll>
-        {sectionItems()}
-      </TableOfContents.Collapsible>
-    </div>
-  ),
+    const intro = (
+      <VerticalSpacing size={0.5}>
+        <Heading element="h2" modifiers="h1">
+          Tervisedeklaratsioon
+        </Heading>
+        <Text color="secondary">
+          Tervisedeklaratsioon koosneb 22 kohustuslikust küsimusest. Alusta või jätka selle koostamisega allpool.
+        </Text>
+      </VerticalSpacing>
+    );
+
+    const placeholder = (extraStyle: CSSProperties) => (
+      <div
+        style={{
+          background: 'var(--general-surface-primary)',
+          border: '1px solid var(--general-border-primary)',
+          borderRadius: 'var(--card-radius-rounded)',
+          ...extraStyle,
+        }}
+      />
+    );
+
+    return (
+      <>
+        <ShowAt lg>
+          <div style={{ background: 'var(--general-surface-primary)', padding: '2rem' }}>
+            {intro}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) 340px',
+                gap: '1.5rem',
+                alignItems: 'start',
+                marginTop: '1.5rem',
+              }}
+            >
+              {placeholder({ minHeight: '35rem' })}
+              <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+                {items}
+              </TableOfContents>
+            </div>
+          </div>
+        </ShowAt>
+
+        <HideAt lg>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+              gap: '3px',
+              background: 'var(--general-surface-tertiary)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 'var(--layout-page-spacing-top) var(--layout-page-spacing-x) 0 var(--layout-page-spacing-x)',
+              }}
+            >
+              <VerticalSpacing size={1}>
+                <Link href="#" underline={false} iconLeft="arrow_back">
+                  Tervisetõendid ja -deklaratsioonid
+                </Link>
+                <Text color="secondary">Scroll down — the bar hides. Scroll up — it reappears.</Text>
+                {intro}
+              </VerticalSpacing>
+              {/* Tall content so the page scrolls and the pinned bar can hide / reveal. */}
+              {placeholder({ minHeight: '150vh', marginTop: '1rem' })}
+            </div>
+            <TableOfContents.Collapsible heading="Sisukord" activeId="methods" hideOnScroll>
+              {items}
+            </TableOfContents.Collapsible>
+          </div>
+        </HideAt>
+      </>
+    );
+  },
 };

@@ -22,7 +22,7 @@ const Tree = (props: {
   activeId?: string;
   numbered?: boolean;
   variant?: 'default' | 'transparent';
-  collapseInactive?: boolean;
+  defaultOpen?: boolean;
 }) => (
   <TableOfContents {...props}>
     <TableOfContents.Item id="a">
@@ -69,8 +69,8 @@ describe('TableOfContents', () => {
     expect(screen.getByRole('link', { name: 'Bravo 1' })).toBeInTheDocument();
   });
 
-  it('expands only the active branch and hides other branches when collapseInactive is set', () => {
-    render(<Tree activeId="a1" collapseInactive />);
+  it('expands only the active branch and hides other branches when defaultOpen is false', () => {
+    render(<Tree activeId="a1" defaultOpen={false} />);
     expect(screen.getByRole('link', { name: 'Alpha 1' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Bravo 1' })).not.toBeInTheDocument();
   });

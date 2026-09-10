@@ -21,10 +21,36 @@ import {
 import { TableOfContentsList } from './components/table-of-contents-list/table-of-contents-list';
 import styles from './table-of-contents.module.scss';
 
-/** Semantic level of the `TableOfContents` heading element. */
 export type TableOfContentsHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 type TableOfContentsBreakpointProps = {
+  /**
+   * Visual variant:
+   * - `default` — rendered inside a bordered `Card`.
+   * - `transparent` — no card chrome (border / background); the list sits
+   *   directly on the page, with a continuous grey left rail (the active item's
+   *   segment turns blue).
+   * @default default
+   */
+  variant?: 'default' | 'transparent';
+  /**
+   * Inner padding of the container, in rem — the spacing between the card edge and the
+   * heading / items. Defaults to the card's medium padding token.
+   */
+  padding?: number;
+  /**
+   * Stick the card to the viewport while scrolling.
+   * @default true
+   */
+  sticky?: boolean;
+};
+
+export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsBreakpointProps> {
+  /**
+   * `TableOfContents.Item` elements. An item's non-`Item` children are its
+   * link / label; nested `TableOfContents.Item` children become its sub-items.
+   */
+  children: ReactNode;
   /**
    * Heading rendered above the list. Defaults to the localised "Table of
    * contents" label; pass `null` to render it headless (no visible heading —
@@ -45,32 +71,23 @@ type TableOfContentsBreakpointProps = {
    */
   ariaLabel?: string;
   /**
-   * Visual variant:
-   * - `default` — rendered inside a bordered `Card`.
-   * - `transparent` — no card chrome (border / background); the list sits
-   *   directly on the page, with a continuous grey left rail (the active item's
-   *   segment turns blue).
-   * @default default
+   * Id of the currently active item. The active item gets the left accent bar
+   * and active link colour. When `defaultOpen` is `false`, the branch leading
+   * to it is the only one kept expanded.
    */
-  variant?: 'default' | 'transparent';
+  activeId?: string;
   /**
-   * Inner padding of the container, in rem — the spacing between the card edge and the
-   * heading / items. Defaults to the card's medium padding token.
-   */
-  padding?: number;
-  /**
-   * Draws a divider between items and a bottom border under the last one, so the
-   * list reads as a set of separated rows.
+   * Draws a divider between items so the list reads as a set of separated rows. The last item has no
+   * divider — the card border closes the list.
    * @default false
    */
   bordered?: boolean;
   /**
-   * Collapse branches that are not on the active trail, so the list behaves like
-   * an accordion: only the branch leading to `activeId` keeps its nested children
-   * visible. When `false` (default) every item's sub-items are always shown.
-   * @default false
+   * Whether every item's sub-items are expanded by default. Set `false` to make the list behave like
+   * an accordion: only the branch leading to `activeId` keeps its nested children visible.
+   * @default true
    */
-  collapseInactive?: boolean;
+  defaultOpen?: boolean;
   /**
    * Render the list as an ordered list with auto-generated hierarchical numbers
    * (`1.`, `2.`, `2.1`, …) shown before each item.
@@ -78,28 +95,9 @@ type TableOfContentsBreakpointProps = {
    */
   numbered?: boolean;
   /**
-   * Stick the card to the viewport while scrolling.
-   * @default true
-   */
-  sticky?: boolean;
-  /**
    * Additional class name on the root element.
    */
   className?: string;
-};
-
-export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsBreakpointProps> {
-  /**
-   * `TableOfContents.Item` elements. An item's non-`Item` children are its
-   * link / label; nested `TableOfContents.Item` children become its sub-items.
-   */
-  children: ReactNode;
-  /**
-   * Id of the currently active item. The active item gets the left accent bar
-   * and active link colour. When `collapseInactive` is set, the branch leading
-   * to it is the only one kept expanded.
-   */
-  activeId?: string;
 }
 
 /** Internal data shape derived from the `TableOfContents.Item` element tree. */
@@ -117,7 +115,7 @@ interface TableOfContentsContextValue {
   headingLevel?: TableOfContentsHeadingLevel;
   ariaLabel?: string;
   activeTrail: Set<string>;
-  collapseInactive?: boolean;
+  defaultOpen?: boolean;
 }
 
 export const TableOfContentsContext = createContext<TableOfContentsContextValue>({
@@ -172,7 +170,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     headingLevel = 'h3',
     ariaLabel,
     activeId,
-    collapseInactive = false,
+    defaultOpen = true,
     numbered = false,
     sticky = true,
     variant = 'default',
@@ -187,8 +185,8 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, collapseInactive }),
-    [activeId, numbered, headingLevel, ariaLabel, activeTrail, collapseInactive]
+    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen]
   );
 
   const rootStyle =
