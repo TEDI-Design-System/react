@@ -22,8 +22,9 @@ export interface TableOfContentsCollapsibleProps
    */
   sticky?: boolean;
   /**
-   * When the bar is pinned (`sticky`), hide it while the page scrolls down and reveal it again on
-   * scroll up — so it stays out of the way while reading but is one gesture away. No effect when
+   * Mobile-only behaviour of this `TableOfContents.Collapsible` bar — there is no desktop equivalent.
+   * When the bar is pinned (`sticky`), auto-hide it while the page scrolls down and reveal it again on
+   * scroll up, so it stays out of the way while reading but is one gesture away. No effect when
    * `sticky` is `false`.
    * @default false
    */
