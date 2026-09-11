@@ -306,7 +306,7 @@ export const Borders: Story = {
           totalItems={97}
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
-          labels={{ ariaLabel: 'Pagineerimine (äärised: üleval)' }}
+          labels={{ ariaLabel: 'Pagination (borders: top)' }}
         />
       </div>
       <div>
@@ -318,7 +318,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="bottom"
-          labels={{ ariaLabel: 'Pagineerimine (äärised: all)' }}
+          labels={{ ariaLabel: 'Pagination (borders: bottom)' }}
         />
       </div>
       <div>
@@ -330,7 +330,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="both"
-          labels={{ ariaLabel: 'Pagineerimine (äärised: mõlemad)' }}
+          labels={{ ariaLabel: 'Pagination (borders: both)' }}
         />
       </div>
       <div>
@@ -342,7 +342,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="none"
-          labels={{ ariaLabel: 'Pagineerimine (äärised: puuduvad)' }}
+          labels={{ ariaLabel: 'Pagination (borders: none)' }}
         />
       </div>
     </div>

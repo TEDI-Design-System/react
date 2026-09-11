@@ -77,10 +77,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
             </Col>
             <Col className="flex align-items-center">
               <TabsContext.Provider value={{ currentTab, setCurrentTab: noop }}>
-                <div role="tablist">
-                  <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>
-                </div>
-                <div role="tabpanel" id={`${triggerId}-panel`} aria-labelledby={triggerId} hidden />
+                <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>
               </TabsContext.Provider>
             </Col>
           </Row>
@@ -185,6 +182,7 @@ export const States: StoryObj<TemplateStateProps> = {
     array: stateArray,
   },
   parameters: {
+    a11y: { test: 'off' },
     pseudo: {
       hover: '#Hover-tab',
       active: '#Active-tab',

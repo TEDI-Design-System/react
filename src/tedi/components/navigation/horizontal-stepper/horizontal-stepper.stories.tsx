@@ -173,7 +173,7 @@ const statesPseudo = {
 
 export const SecondStep: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Form progress" compact="lg">
+    <HorizontalStepper aria-label="Protsessi sammud" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" selected />
       <HorizontalStepper.Item label="Geenianalüüs" />
@@ -184,7 +184,7 @@ export const SecondStep: Story = {
 
 export const ThirdStep: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Form progress" compact="lg">
+    <HorizontalStepper aria-label="Protsessi sammud" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" completed />
       <HorizontalStepper.Item label="Geenianalüüs" selected />
@@ -201,13 +201,13 @@ export const ThirdStep: Story = {
 export const WithErrors: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Form with errors" compact="lg">
+      <HorizontalStepper aria-label="Vorm vigadega" compact="lg">
         <HorizontalStepper.Item label="Kutse" error />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" />
         <HorizontalStepper.Item label="Vastus" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Form with error description" compact="lg">
+      <HorizontalStepper aria-label="Vorm vea kirjeldusega" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" error description="Sammus esinevad vead" />
         <HorizontalStepper.Item label="Geenianalüüs" selected />
@@ -223,25 +223,25 @@ export const WithErrors: Story = {
 export const WithDescriptions: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Steps with descriptions – Kutse active" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega – Kutse aktiivne" compact="lg">
         <HorizontalStepper.Item label="Kutse" selected />
         <HorizontalStepper.Item label="Tahteavaldus" />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions – Tahteavaldus active" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega – Tahteavaldus aktiivne" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions – Geenianalüüs active" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega – Geenianalüüs aktiivne" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Steps with descriptions – Vastus active" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega – Vastus aktiivne" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />
@@ -257,7 +257,7 @@ export const WithDescriptions: Story = {
  */
 export const TransparentBackground: Story = {
   render: () => (
-    <HorizontalStepper aria-label="Form progress" background="transparent" compact="lg">
+    <HorizontalStepper aria-label="Protsessi sammud" background="transparent" compact="lg">
       <HorizontalStepper.Item label="Kutse" completed />
       <HorizontalStepper.Item label="Tahteavaldus" selected />
       <HorizontalStepper.Item label="Geenianalüüs" />
@@ -277,7 +277,7 @@ export const Compact: Story = {
       const [current, setCurrent] = useState(1);
       return (
         <div style={{ maxWidth: 480 }}>
-          <HorizontalStepper aria-label="Form progress" compact>
+          <HorizontalStepper aria-label="Protsessi sammud" compact>
             {STEPS.map((label, index) => (
               <HorizontalStepper.Item
                 key={label}
@@ -306,7 +306,7 @@ export const ClickToNavigate: Story = {
     const Demo = () => {
       const [current, setCurrent] = useState(1);
       return (
-        <HorizontalStepper aria-label="Form progress" compact="lg">
+        <HorizontalStepper aria-label="Protsessi sammud" compact="lg">
           {STEPS.map((label, index) => (
             <HorizontalStepper.Item
               key={label}
@@ -334,7 +334,7 @@ export const ExternalNavigation: Story = {
       const [current, setCurrent] = useState(0);
       return (
         <VerticalSpacing size={1.5}>
-          <HorizontalStepper aria-label="Form progress" compact="lg">
+          <HorizontalStepper aria-label="Protsessi sammud" compact="lg">
             {STEPS.map((label, index) => (
               <HorizontalStepper.Item
                 key={label}
