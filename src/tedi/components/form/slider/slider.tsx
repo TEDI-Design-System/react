@@ -297,9 +297,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
         </div>
         {addonRight && <div className={styles['tedi-slider__addon']}>{addonRight}</div>}
       </div>
-      {helper && (
-        <FeedbackText {...helper} id={helperId} className={cn(styles['tedi-slider__feedback'], helper.className)} />
-      )}
+      {helper && <FeedbackText {...helper} id={helperId} />}
     </div>
   );
 });
