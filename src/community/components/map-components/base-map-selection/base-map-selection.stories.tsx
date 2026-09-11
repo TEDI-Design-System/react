@@ -34,8 +34,8 @@ const MAPS = [
   { id: 'streets', title: 'Kaart', src: MAP_IMG },
   { id: 'satellite', title: 'Satelliit', src: HISTORICAL_IMG, multiple: true },
   { id: 'hybrid', title: 'Hübriid', src: MAP_IMG, disabled: true },
-  { id: 'test2', title: 'Test 2', src: MAP_IMG },
-  { id: 'test3', title: 'Test 3', src: MAP_IMG },
+  { id: 'test2', title: 'Test 2 test', src: MAP_IMG },
+  { id: 'test3', title: 'Test 3', src: MAP_IMG, tooltipText: 'Error test' },
 ];
 
 const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
@@ -61,6 +61,8 @@ const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
           multiple={map.multiple}
           disabled={map.disabled ?? false}
           selected={map.id === active}
+          tooltipText={map.tooltipText ?? ''}
+          tooltipType="error"
           onSelect={() => setActive(map.id)}
           content={<img src={map.src} alt={map.title} />}
         />

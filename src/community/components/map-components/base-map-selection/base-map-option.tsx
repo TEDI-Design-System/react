@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { JSX, useEffect, useRef, useState } from 'react';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
+import Button from '../../../../tedi/components/buttons/button/button';
 import { Tooltip } from '../../../../tedi/components/overlays/tooltip';
 import { isBreakpointBelow, useBreakpoint, useElementSize } from '../../../../tedi/helpers';
 import styles from './base-map-selection.module.scss';
@@ -102,16 +103,6 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     onSelect?.();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) {
-      return;
-    }
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onSelect?.();
-    }
-  };
-
   const optionBEM = classNames(
     styles['tedi-base-map-selection__wrapper'],
     selected && styles['tedi-base-map-selection--selected'],
@@ -122,13 +113,11 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   );
 
   const option = (
-    <div
-      role="button"
-      tabIndex={disabled ? -1 : 0}
+    <Button
+      noStyle
       aria-pressed={!!selected}
       aria-disabled={disabled || undefined}
       onClick={handleSelect}
-      onKeyDown={handleKeyDown}
       className={optionBEM}
       id={id}
     >
@@ -148,7 +137,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
       <div ref={titleRef} className={styles['tedi-base-map-selection__title']}>
         {title}
       </div>
-    </div>
+    </Button>
   );
 
   if (!tooltipText && !isTruncated) {
@@ -156,7 +145,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   }
 
   return (
-    <Tooltip>
+    <Tooltip openWith="hover">
       <Tooltip.Trigger>{option}</Tooltip.Trigger>
       <Tooltip.Content>
         {tooltipText ? (

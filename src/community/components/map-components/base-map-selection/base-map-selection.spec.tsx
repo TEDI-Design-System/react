@@ -1,4 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+// The `src/tedi` barrel transitively imports react-sticky-box (ESM-only), which Jest does not transform.
+jest.mock('react-sticky-box', () => ({ __esModule: true, default: () => null }));
 
 import { useIsTouchDevice } from '../../../../tedi/helpers';
 import { BaseMapOption, BaseMapSelection } from './base-map-selection';
@@ -7,6 +11,12 @@ jest.mock('../../../../tedi/helpers', () => ({
   ...jest.requireActual('../../../../tedi/helpers'),
   useIsTouchDevice: jest.fn(),
 }));
+
+// `useElementSize` measures through a 20ms lodash debounce, so it lands a setState
+// shortly after mount. Synchronous `fireEvent` tests finish first, but `userEvent`
+// yields to the event loop - flush the debounce inside act() so that late update
+// does not trip React's act(...) warning.
+const settleElementSize = () => act(async () => void (await new Promise((resolve) => setTimeout(resolve, 25))));
 
 const renderSelection = (props?: Partial<React.ComponentProps<typeof BaseMapSelection>>) =>
   render(
@@ -151,7 +161,8 @@ describe('BaseMapOption', () => {
     expect(screen.getByRole('button', { name: /Streets/ })).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('calls onSelect on click and on Enter/Space', () => {
+  it('calls onSelect on click and on Enter/Space', async () => {
+    const user = userEvent.setup();
     const onSelect = jest.fn();
     render(
       <BaseMapOption
@@ -162,23 +173,28 @@ describe('BaseMapOption', () => {
       />
     );
     const option = screen.getByRole('button', { name: /Streets/ });
+    await settleElementSize();
 
-    fireEvent.click(option);
-    fireEvent.keyDown(option, { key: 'Enter' });
-    fireEvent.keyDown(option, { key: ' ' });
+    await user.click(option);
+    option.focus();
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
 
     expect(onSelect).toHaveBeenCalledTimes(3);
   });
 
-  it('exposes the disabled state and removes itself from the tab order', () => {
+  it('exposes the disabled state while staying focusable', () => {
     render(<BaseMapOption disabled id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
     const option = screen.getByRole('button', { name: /Streets/ });
 
+    // `aria-disabled` rather than `disabled` keeps the option reachable for screen
+    // reader users; `onSelect` is guarded in the handler instead.
     expect(option).toHaveAttribute('aria-disabled', 'true');
-    expect(option).toHaveAttribute('tabindex', '-1');
+    expect(option).not.toHaveAttribute('tabindex');
   });
 
-  it('does not call onSelect when disabled, on click or keyboard', () => {
+  it('does not call onSelect when disabled, on click or keyboard', async () => {
+    const user = userEvent.setup();
     const onSelect = jest.fn();
     render(
       <BaseMapOption
@@ -190,10 +206,12 @@ describe('BaseMapOption', () => {
       />
     );
     const option = screen.getByRole('button', { name: /Streets/ });
+    await settleElementSize();
 
-    fireEvent.click(option);
-    fireEvent.keyDown(option, { key: 'Enter' });
-    fireEvent.keyDown(option, { key: ' ' });
+    await user.click(option);
+    option.focus();
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
 
     expect(onSelect).not.toHaveBeenCalled();
   });
