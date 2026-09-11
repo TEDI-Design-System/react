@@ -16,6 +16,12 @@ export interface TableOfContentsItemProps {
    * Render a separator below the item.
    */
   separator?: boolean;
+  /**
+   * Trailing content shown at the end of the item's row (right-aligned) — e.g. a
+   * count `Tag` or `StatusBadge`. Kept out of the link so it isn't part of the
+   * link's accessible name.
+   */
+  slot?: React.ReactNode;
 }
 
 export const TableOfContentsItem = (_props: TableOfContentsItemProps): JSX.Element | null => null;
