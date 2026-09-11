@@ -4,7 +4,7 @@ import { JSX, useEffect, useRef, useState } from 'react';
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import Button from '../../../../tedi/components/buttons/button/button';
 import { Tooltip } from '../../../../tedi/components/overlays/tooltip';
-import { isBreakpointBelow, useBreakpoint, useElementSize } from '../../../../tedi/helpers';
+import { useElementSize } from '../../../../tedi/helpers';
 import styles from './base-map-selection.module.scss';
 
 export type BaseMapOptionType = 'button' | 'historical' | 'selection';
@@ -60,7 +60,11 @@ export interface BaseMapOptionProps {
    */
   tooltipText?: string;
   /**
-   * Name of material icon https://fonts.google.com/icons
+   * Which icon and colour the tooltip indicator uses.
+   * - `'info'`: neutral info icon in the brand colour (default)
+   * - `'error'`: error icon in the danger colour, for a layer that is unavailable
+   *
+   * Only takes effect when `tooltipText` is set, since that is what renders the icon.
    * @default 'info'
    */
   tooltipType?: BaseMapOptionTooltipType;
@@ -80,9 +84,6 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     tooltipText,
     tooltipType = 'info',
   } = props;
-
-  const currentBreakpoint = useBreakpoint();
-  const isMobile = isBreakpointBelow(currentBreakpoint, 'md');
 
   const titleRef = useRef<HTMLDivElement>(null);
   const titleSize = useElementSize(titleRef);
@@ -115,6 +116,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   const option = (
     <Button
       noStyle
+      disabled={disabled}
       aria-pressed={!!selected}
       aria-disabled={disabled || undefined}
       onClick={handleSelect}
@@ -129,7 +131,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
           <Icon
             background="brand-secondary"
             name={tooltipType === 'error' ? 'error' : 'info'}
-            size={isMobile ? 12 : 16}
+            size={16}
             color={tooltipType === 'error' ? 'danger' : 'brand'}
           />
         </span>
@@ -145,7 +147,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   }
 
   return (
-    <Tooltip openWith="hover">
+    <Tooltip ariaHidden={!tooltipText} openWith="hover">
       <Tooltip.Trigger>{option}</Tooltip.Trigger>
       <Tooltip.Content>
         {tooltipText ? (

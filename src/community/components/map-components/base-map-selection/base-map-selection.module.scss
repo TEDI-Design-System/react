@@ -60,6 +60,10 @@
     display: grid;
     place-items: center;
     transform: translate(-50%, -50%);
+
+    @include breakpoints.media-breakpoint-down(md) {
+      --icon-02: var(--icon-01);
+    }
   }
 
   &__options {
@@ -132,8 +136,6 @@
 
 .tedi-base-map-selection--disabled {
   &.tedi-base-map-selection__wrapper {
-    cursor: default;
-
     .tedi-base-map-selection__content,
     .tedi-base-map-selection__title {
       opacity: 0.25;

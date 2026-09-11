@@ -7,6 +7,7 @@ import { Input, Suffix } from '../../../../tedi/components/form/input-group';
 import { InputGroupBase } from '../../../../tedi/components/form/input-group/input-group';
 import { Slider } from '../../../../tedi/components/form/slider/slider';
 import { Popover } from '../../../../tedi/components/overlays/popover';
+import { useLabels } from '../../../../tedi/providers/label-provider';
 import BaseMapOption from './base-map-option';
 import styles from './base-map-selection.module.scss';
 
@@ -48,10 +49,6 @@ export interface BaseMapSelectionProps {
    */
   onTransparencyChange?: (value: number) => void;
   /**
-   * Label for the transparency slider.
-   */
-  transparencyLabel?: string;
-  /**
    * HTML `id` attribute applied to the trigger button.
    */
   id: string;
@@ -77,9 +74,12 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
     transparency,
     defaultTransparency,
     onTransparencyChange,
-    transparencyLabel = '',
     id,
   } = props;
+
+  const { getLabel } = useLabels();
+
+  const transparencyLabel = getLabel('baseMapSelection.transparency');
 
   const isControlled = transparency !== undefined;
   const [uncontrolledTransparency, setUncontrolledTransparency] = useState(() =>
