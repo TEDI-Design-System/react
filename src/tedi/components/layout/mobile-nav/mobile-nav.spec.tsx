@@ -89,4 +89,36 @@ describe('MobileNav', () => {
     expect(screen.queryByTestId('floating-overlay')).not.toBeInTheDocument();
     expect(screen.getByRole('navigation')).toBeInTheDocument();
   });
+
+  test('offsets the overlay to the real header bottom and keeps it in sync via ResizeObserver', () => {
+    // A page header the overlay should sit below.
+    const header = document.createElement('header');
+    jest.spyOn(header, 'getBoundingClientRect').mockReturnValue({ bottom: 80 } as DOMRect);
+    document.body.appendChild(header);
+
+    // jsdom has no ResizeObserver — stub it so the observe/disconnect path runs.
+    const observe = jest.fn();
+    const disconnect = jest.fn();
+    const originalResizeObserver = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = jest.fn(() => ({ observe, disconnect, unobserve: jest.fn() })) as never;
+
+    const { container, unmount } = render(<MobileNav {...baseProps} navItems={navItems} />);
+
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    expect(overlay).toHaveStyle({ top: '80px' });
+    expect(observe).toHaveBeenCalledWith(header);
+
+    unmount();
+    expect(disconnect).toHaveBeenCalled();
+
+    globalThis.ResizeObserver = originalResizeObserver;
+    header.remove();
+    jest.restoreAllMocks();
+  });
+
+  test('falls back to the header-height token when there is no page header', () => {
+    const { container } = render(<MobileNav {...baseProps} navItems={navItems} />);
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    expect(overlay).toHaveStyle({ top: 'var(--layout-header-height)' });
+  });
 });
