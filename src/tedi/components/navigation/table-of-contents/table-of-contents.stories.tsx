@@ -112,16 +112,8 @@ export const ItemStates: Story = {
         </TableOfContents.Item>
       ));
 
-      // A bordered list draws no divider under its last item, so the Selected state (last row) would
-      // have no bottom border. Append a filler item so the Selected row's border stays visible.
       if (withFiller) {
-        items.push(
-          <TableOfContents.Item key="filler" id="filler">
-            <Link href="#filler" underline={false} {...iconProps}>
-              Item
-            </Link>
-          </TableOfContents.Item>
-        );
+        items.push(<TableOfContents.Item key="filler" id="filler" />);
       }
 
       return items;

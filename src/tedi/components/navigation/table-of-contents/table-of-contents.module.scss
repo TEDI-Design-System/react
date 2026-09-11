@@ -3,7 +3,6 @@
   --tedi-table-of-contents-list-padding: var(--tedi-table-of-contents-padding);
 }
 
-// Bordered rows sit closer to the edges — the list uses a smaller top / bottom padding (Figma).
 .tedi-table-of-contents--bordered {
   --tedi-table-of-contents-list-padding: var(--card-padding-xs);
 }
@@ -32,8 +31,6 @@
 
 .tedi-table-of-contents__heading {
   padding: var(--tedi-table-of-contents-padding);
-
-  // No bottom padding — the gap down to the list comes from the list's own top padding (Figma).
   padding-bottom: 0;
 }
 
@@ -48,8 +45,6 @@
 }
 
 .tedi-table-of-contents__list {
-  // Both top and bottom padding live on the list (the heading has no bottom padding). Applies with or
-  // without a heading, so the headless list keeps the same top spacing (Figma).
   padding-block: var(--tedi-table-of-contents-list-padding);
 }
 
@@ -117,6 +112,11 @@
       &,
       &:hover {
         color: var(--link-primary-active);
+        text-decoration: none;
+      }
+
+      &:hover [class*='tedi-btn__text'] {
+        text-decoration: none;
       }
     }
   }
