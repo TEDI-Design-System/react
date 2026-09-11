@@ -10,13 +10,30 @@ import {
   useState,
 } from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import styles from '../../sheet.module.scss';
 import { useSheetContext } from '../../sheet-context';
 
 const DRAG_DISMISS_THRESHOLD = 120;
+const DRAG_EXPAND_THRESHOLD = 40;
 
-export interface SheetContentProps {
+type SheetContentBreakpointProps = {
+  /**
+   * Top-corner radius of the sheet panel (the header follows it). Overrides the default sheet radius,
+   * and can be set per breakpoint via the `BreakpointSupport` API (e.g.
+   * `<Sheet.Content radius="none" md={{ radius: 'card' }} />`).
+   * - `default` — the standard sheet radius.
+   * - `card` — matches a `Card`'s rounded corners (`--card-radius-rounded`).
+   * - `none` — square corners.
+   *
+   * For any other value, set the `--tedi-sheet-radius` custom property via `style`.
+   * @default default
+   */
+  radius?: 'default' | 'card' | 'none';
+};
+
+export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpointProps> {
   /**
    * `<Sheet.Header>`, `<Sheet.Body>`, `<Sheet.Footer>` and any other content.
    */
@@ -99,6 +116,9 @@ export interface SheetContentProps {
 }
 
 export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
+  const { radius = 'default' } = getCurrentBreakpointProps<SheetContentBreakpointProps>(props);
+
   const {
     children,
     showHandle = true,
@@ -114,7 +134,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   } = props;
 
   const { getLabel } = useLabels();
-  const { floating, getFloatingProps, context, labelId, onOpenChange } = useSheetContext();
+  const { floating, getFloatingProps, context, labelId, onOpenChange, collapsed, onCollapsedChange } =
+    useSheetContext();
   const { isMounted, status } = useTransitionStatus(context, { duration: { open: 350, close: 300 } });
 
   const { snapPoints, defaultSnapPoint, onSnapPointChange } = props;
@@ -170,6 +191,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
         setSnapIndex(nearest);
         onSnapPointChange?.(snaps[nearest]);
       }
+    } else if (collapsed && delta < -DRAG_EXPAND_THRESHOLD) {
+      onCollapsedChange(false);
     } else if (delta > DRAG_DISMISS_THRESHOLD) {
       onOpenChange(false);
     }
@@ -185,7 +208,11 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const ariaLabelledBy = props['aria-labelledby'] ?? (labelId || undefined);
   const ariaLabel = !ariaLabelledBy ? props['aria-label'] : undefined;
 
-  const panelStyle: CSSProperties = { ...style };
+  const radiusOverride = radius === 'card' ? 'var(--card-radius-rounded)' : radius === 'none' ? '0' : undefined;
+  const panelStyle: CSSProperties = {
+    ...(radiusOverride ? ({ '--tedi-sheet-radius': radiusOverride } as CSSProperties) : undefined),
+    ...style,
+  };
   if (hasSnaps) {
     panelStyle.maxHeight = `${maxSnap * 100}dvh`;
     if (dragging) {

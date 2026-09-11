@@ -211,7 +211,7 @@ export const Header: Story = {
   ),
 };
 
-/** Controlled open state — the parent owns visibility via `open` + `onToggle`. */
+/** Controlled open state - the parent owns visibility via `open` + `onToggle`. */
 export const Controlled: Story = {
   render: function ControlledSheet() {
     const [open, setOpen] = useState(false);
@@ -239,7 +239,7 @@ export const Controlled: Story = {
 
 /**
  * **Snap points.** `snapPoints={[0.4, 0.9]}` lets the bottom sheet rest at 40% or 90% of the
- * viewport. Drag the handle to move between them — releasing snaps to the nearest, and dragging
+ * viewport. Drag the handle to move between them - releasing snaps to the nearest, and dragging
  * below the lowest point dismisses.
  */
 export const SnapPoints: Story = {
@@ -264,7 +264,7 @@ export const SnapPoints: Story = {
 
 /**
  * **`keepMounted`.** The panel stays in the DOM (hidden) while closed, so its content and state
- * persist. Type into the field, close the sheet, then reopen — the value is retained.
+ * persist. Type into the field, close the sheet, then reopen - the value is retained.
  */
 export const KeepMounted: Story = {
   render: () => (
@@ -279,6 +279,39 @@ export const KeepMounted: Story = {
         </Sheet.Body>
       </Sheet.Content>
     </Sheet>
+  ),
+};
+
+/**
+ * **`radius`.** Override the sheet's top-corner radius - `default`, `card` (matches a `Card`), or
+ * `none`. It drives both the panel and header corners, and is breakpoint-aware, e.g.
+ * `<Sheet.Content radius="none" md={{ radius: 'card' }} />`. For any other value, set the
+ * `--tedi-sheet-radius` custom property via `style`.
+ */
+export const Radius: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+      {(['default', 'card', 'none'] as const).map((radius) => (
+        <Sheet key={radius}>
+          <Sheet.Trigger>
+            <Button visualType="secondary">radius=&quot;{radius}&quot;</Button>
+          </Sheet.Trigger>
+          <Sheet.Content radius={radius}>
+            <Sheet.Header title="Seaded" variant="default" />
+            <Sheet.Body>{demoBody}</Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      ))}
+      <Sheet key="responsive">
+        <Sheet.Trigger>
+          <Button visualType="secondary">none → card @ md</Button>
+        </Sheet.Trigger>
+        <Sheet.Content radius="none" md={{ radius: 'card' }}>
+          <Sheet.Header title="Seaded" variant="default" />
+          <Sheet.Body>{demoBody}</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    </div>
   ),
 };
 

@@ -10,6 +10,19 @@ jest.mock('../../../providers/label-provider', () => ({
 }));
 
 describe('Sheet', () => {
+  beforeAll(() => {
+    class PointerEventPolyfill extends MouseEvent {
+      pointerId: number;
+      constructor(type: string, params: PointerEventInit = {}) {
+        super(type, params);
+        this.pointerId = params.pointerId ?? 0;
+      }
+    }
+    window.PointerEvent = PointerEventPolyfill as unknown as typeof PointerEvent;
+    HTMLElement.prototype.setPointerCapture = jest.fn();
+    HTMLElement.prototype.releasePointerCapture = jest.fn();
+  });
+
   it('opens on trigger click and renders body content', () => {
     render(
       <Sheet>
@@ -123,6 +136,47 @@ describe('Sheet', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.expand' }));
     expect(screen.getByText('Body content')).toBeInTheDocument();
+  });
+
+  it('expands a collapsed sheet when the drag handle is pulled up', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    expect(screen.queryByText('Body content')).not.toBeInTheDocument();
+
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerDown(handle, { clientY: 500, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientY: 440, pointerId: 1 });
+    fireEvent.pointerUp(handle, { clientY: 440, pointerId: 1 });
+
+    // Dragging the peek upward past the threshold expands it back to full height.
+    expect(screen.getByText('Body content')).toBeInTheDocument();
+  });
+
+  it('closes a collapsed sheet when the drag handle is swiped down', async () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerDown(handle, { clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientY: 260, pointerId: 1 });
+    fireEvent.pointerUp(handle, { clientY: 260, pointerId: 1 });
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('closes via Sheet.Closer while calling the child onClick first', async () => {
@@ -247,5 +301,47 @@ describe('Sheet', () => {
 
     const panel = document.querySelector<HTMLElement>('[class*="tedi-sheet__panel"]');
     expect(panel).toHaveStyle({ height: '90dvh' });
+  });
+
+  it('overrides the corner radius via the radius prop', () => {
+    const { rerender } = render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    // Default leaves the sheet radius to the stylesheet.
+    expect(screen.getByRole('dialog').style.getPropertyValue('--tedi-sheet-radius')).toBe('');
+
+    rerender(
+      <Sheet defaultOpen>
+        <Sheet.Content radius="none">
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(screen.getByRole('dialog')).toHaveStyle({ '--tedi-sheet-radius': '0' });
+
+    rerender(
+      <Sheet defaultOpen>
+        <Sheet.Content radius="card">
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(screen.getByRole('dialog')).toHaveStyle({ '--tedi-sheet-radius': 'var(--card-radius-rounded)' });
+  });
+
+  it('accepts a per-breakpoint radius and resolves the base breakpoint', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content radius="none" md={{ radius: 'card' }}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    // jsdom reports the base (xs) breakpoint, so the flat `radius="none"` applies.
+    expect(screen.getByRole('dialog')).toHaveStyle({ '--tedi-sheet-radius': '0' });
   });
 });

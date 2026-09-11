@@ -160,8 +160,14 @@ files. This is the part of this document worth maintaining by hand.
 - **`Sheet` `snapPoints` resize the panel; they don't translate it.** With `snapPoints={[0.4, 0.9]}`
   the bottom sheet's height *is* the active snap, so the body scrolls and the footer stays visible at
   every rest position, and dragging below the lowest snap dismisses. `collapsible` is the lighter
-  relative: it peeks the sheet down to just its header (toggled by the `CollapseButton`; the drag
-  handle still dismisses).
+  relative: it peeks the sheet down to just its header (toggled by the `CollapseButton`). From that
+  peek the drag handle is direction-sensitive — drag up to expand, swipe down to dismiss.
+- **`Sheet.Content`'s `radius` drives both the panel and header corners.** `radius="card" | "none" |
+  "default"` overrides the top-corner radius via a single `--tedi-sheet-radius` variable the panel
+  and header both read, so it's a sheet-level concern, not a `Sheet.Header` prop — and the panel's
+  `overflow: hidden` clips to its own radius, so a header-only override would be invisible anyway.
+  It's breakpoint-aware (`radius="none" md={{ radius: 'card' }}`); for any value outside the three
+  keywords, set `--tedi-sheet-radius` through `style`.
 
 ### Responsive behaviour that isn't a prop
 
