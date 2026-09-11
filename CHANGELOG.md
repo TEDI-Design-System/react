@@ -1,3 +1,10 @@
+# [19.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.5...react-19.1.0-rc.6) (2026-09-11)
+
+
+### Bug Fixes
+
+* **card:** correct edge block radii and free pinned overlays [#851](https://github.com/TEDI-Design-System/react/issues/851) ([#855](https://github.com/TEDI-Design-System/react/issues/855)) ([df6dde0](https://github.com/TEDI-Design-System/react/commit/df6dde0a117a80d39412323c30ce7c338bd6e12a))
+
 # [19.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.4...react-19.1.0-rc.5) (2026-09-11)
 
 
