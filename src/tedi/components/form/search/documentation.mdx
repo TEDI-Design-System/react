@@ -1,0 +1,187 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { StatusBadge } from '../../tags/status-badge/status-badge';
+import * as SearchStories from './search.stories';
+
+<Meta of={SearchStories} name="Documentation" />
+
+export const Code = ({ children }) => <StatusBadge color="neutral">{children}</StatusBadge>;
+
+# Choosing a search pattern
+
+The <Code>Search</Code> field has four usage patterns. Pick by **what the popup contains**, not by how it looks.
+
+<table>
+  <thead>
+    <tr>
+      <th>You need…</th>
+      <th>Use</th>
+      <th>Popup role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A plain query box (submit on Enter / button)</td>
+      <td>
+        <Code>Search</Code>
+      </td>
+      <td>none</td>
+    </tr>
+    <tr>
+      <td>Suggestions the user picks from as they type</td>
+      <td>
+        <Code>Search</Code> + <Code>suggestions</Code>
+      </td>
+      <td>
+        <Code>listbox</Code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Suggestions plus <strong>fallback actions</strong> (buttons / a hint)
+      </td>
+      <td>
+        <Code>Search</Code> + <Code>suggestions</Code> + <Code>footer</Code>
+      </td>
+      <td>
+        <Code>listbox</Code> + footer
+      </td>
+    </tr>
+    <tr>
+      <td>
+        A rich result panel with non-option content (no listbox at all)
+      </td>
+      <td>
+        <Code>Search</Code> + inline region
+      </td>
+      <td>none (inline)</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Search - plain input
+
+No popup. Use it when the field just captures a query and submits it (via <Code>onSearch</Code> or a button). This is the default; reach for it unless you specifically need suggestions.
+
+```tsx
+<Search id="q" label="Otsi" onSearch={(query) => runSearch(query)} />
+```
+
+---
+
+## Search with suggestions - accessible combobox
+
+Pass a <Code>suggestions</Code> array (even empty) to turn `Search` into a combobox — use it whenever the field should **suggest matches from a dataset** - typeahead, a server-backed lookup, or free-text-plus-suggestions. It implements the [WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/): the input is a <Code>combobox</Code> controlling a <Code>listbox</Code> popup. Leave <Code>suggestions</Code> unset for a plain search field.
+
+**Why this and not a Dropdown?** Focus never leaves the input. The arrow keys move a virtual cursor via <Code>aria-activedescendant</Code>, so typing is never interrupted; <Code>Enter</Code> selects the active option (or submits free text via <Code>onSearch</Code>), <Code>Escape</Code> closes the list, and a polite live region announces loading / result count / no-results. A <Code>Dropdown</Code> is a <Code>menu</Code> that moves focus into the list when it opens - which breaks typing - so it is the wrong tool for suggestions.
+
+**You own the data.** Filter or fetch <Code>suggestions</Code> in <Code>onChange</Code> and hand back what should be shown - the component renders exactly that (no internal filtering). Each option is <Code>{'{ value, label?, description?, disabled? }'}</Code>; keep a lookup keyed by <Code>value</Code> on your side for richer payloads. A <Code>description</Code> renders as a second line beneath the label, and the matched substring is bolded automatically; for anything richer use <Code>renderSuggestion</Code>.
+
+### Wiring cheat-sheet
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <Code>value</Code> / <Code>onChange</Code>
+      </td>
+      <td>Controlled query string (filter / fetch here).</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>suggestions</Code>
+      </td>
+      <td>The options to render right now (its presence enables the combobox).</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>onSuggestionSelect(option)</Code>
+      </td>
+      <td>User picked a suggestion (Enter on active, or click).</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>onSearch(query)</Code>
+      </td>
+      <td>User pressed Enter with no active option (free-text submit).</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>loading</Code>
+      </td>
+      <td>Show the loading row while a request is in flight.</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>renderSuggestion</Code>
+      </td>
+      <td>Custom option markup (overrides the default row + highlighting).</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>footer</Code>
+      </td>
+      <td>Fallback actions / a hint pinned below the options (reachable with Tab).</td>
+    </tr>
+    <tr>
+      <td>
+        <Code>minQueryLength</Code>
+      </td>
+      <td>
+        Min query length before the popup opens (default <Code>0</Code>).
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <Code>hideOnScroll</Code>
+      </td>
+      <td>Close the popup when the page (or a scrollable ancestor) scrolls. Scrolling the list keeps it open.</td>
+    </tr>
+  </tbody>
+</table>
+
+See the **Autocomplete** stories for typeahead, custom rows, async, disabled options, free-text submit and footer actions.
+
+```tsx
+const [query, setQuery] = useState('');
+const suggestions = query ? filter(query) : [];
+
+<Search
+  id="people"
+  label="Otsi"
+  value={query}
+  onChange={setQuery}
+  suggestions={suggestions}
+  onSuggestionSelect={(option) => setQuery(option.label as string)}
+/>;
+```
+
+---
+
+## Search + inline results region - result with actions
+
+When suggestions come with fallback actions, prefer the built-in <Code>footer</Code> slot (see the **Autocomplete: with footer actions** story) — it keeps the listbox semantics and manages keyboard focus for you.
+
+Reach for an inline region only when the panel contains things that are **not selectable options at all** - e.g. a single matched result plus action buttons and a hint, with no listbox (a national-registry person lookup is the canonical case) - rendered **below** the field, not in a popup.
+
+**Why not a menu Dropdown?** A floating menu is anchored by <Code>aria-haspopup</Code> / <Code>aria-expanded</Code> on its trigger, and those disclosure attributes are only valid on interactive roles (button, combobox…) - never on a search field or a wrapper div. So anchoring a menu <Code>Dropdown</Code> to a <Code>Search</Code> produces an invalid-ARIA trigger (<Code>aria-expanded</Code> not allowed). And a <Code>combobox</Code> popup may only be a <Code>listbox</Code>, which can't contain buttons. An inline region avoids both: the result and every action are ordinary <Code>Tab</Code> stops - nothing to navigate with disclosure ARIA, nothing to get wrong.
+
+```tsx
+<VerticalSpacing size={0.5}>
+  <Search id="q" label="Otsi" value={value} onChange={setValue} />
+  {hasQuery && (
+    <Card>
+      <Card.Content>{/* a result button that fills the field, then the action buttons + hint */}</Card.Content>
+    </Card>
+  )}
+</VerticalSpacing>
+```
+
+See the **With result and actions** story for the full pattern.

@@ -1,21 +1,26 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useEffect, useRef, useState } from 'react';
+import { userEvent, within } from 'storybook/test';
 
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
+import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import { Spinner } from '../../loaders/spinner/spinner';
 import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
-import { Dropdown } from '../../overlays/dropdown/dropdown';
-import { DropdownContext, DropdownContextValue } from '../../overlays/dropdown/dropdown-context';
-import { DropdownItem } from '../../overlays/dropdown/dropdown-item/dropdown-item';
-import { Search, SearchProps } from './search';
+import { Search, SearchOption, SearchProps } from './search';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4620-82860&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/4013b4-search" target="_BLANK">Zeroheight ↗</a>
+ *
+ * `Search` is the search input. Pass a `suggestions` array to turn it into an accessible combobox for
+ * typeahead / suggestions (the **Autocomplete: …** stories demonstrate it); leave `suggestions` unset for a
+ * plain search field.
+ *
+ * Not sure which pattern to reach for? See the **Choosing a pattern** doc for a decision guide between plain
+ * `Search`, `Search` with `suggestions` (autocomplete), and `Search` + an inline region (rich results with actions).
  */
 
 const meta: Meta<SearchProps> = {
@@ -23,7 +28,6 @@ const meta: Meta<SearchProps> = {
   title: 'TEDI-Ready/Components/Form/Search',
   parameters: {
     a11y: {
-      // TODO: [Search]: Review storybook a11y violations #819
       test: 'todo',
     },
     status: {
@@ -69,17 +73,24 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             </Col>
             <Col width={12} sm={10}>
               <VerticalSpacing>
-                <Search {...textFieldProps} {...{ [property]: value }} id={`${baseId}-plain`} />
+                <Search
+                  {...textFieldProps}
+                  {...{ [property]: value }}
+                  id={`${baseId}-plain`}
+                  ariaLabel={`Otsing – ${value} – tavaline`}
+                />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-icon`}
+                  ariaLabel={`Otsing – ${value} – ikooninupuga`}
                   button={{ icon: 'search', size: value, 'aria-label': 'Otsi' }}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-button`}
+                  ariaLabel={`Otsing – ${value} – nupuga`}
                   button={{ iconLeft: 'search', children: 'Otsi', size: value }}
                 />
               </VerticalSpacing>
@@ -105,7 +116,12 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
               <Text modifiers="bold">{state}</Text>
             </Col>
             <Col>
-              <Search {...textFieldProps} id={stateId} disabled={state === 'Disabled'} />
+              <Search
+                {...textFieldProps}
+                id={stateId}
+                disabled={state === 'Disabled'}
+                ariaLabel={`Otsing – ${state}`}
+              />
             </Col>
           </Row>
         );
@@ -116,7 +132,12 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
-          <Search {...textFieldProps} id={`${id}-success`} helper={{ text: 'Tagasiside tekst', type: 'valid' }} />
+          <Search
+            {...textFieldProps}
+            id={`${id}-success`}
+            ariaLabel="Otsing – Success"
+            helper={{ text: 'Tagasiside tekst', type: 'valid' }}
+          />
         </Col>
       </Row>
 
@@ -125,7 +146,12 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
-          <Search {...textFieldProps} id={`${id}-error`} helper={{ text: 'Tagasiside tekst', type: 'error' }} />
+          <Search
+            {...textFieldProps}
+            id={`${id}-error`}
+            ariaLabel="Otsing – Error"
+            helper={{ text: 'Tagasiside tekst', type: 'error' }}
+          />
         </Col>
       </Row>
     </VerticalSpacing>
@@ -148,6 +174,7 @@ export const Sizes: StoryObj<TemplateMultipleProps> = {
     property: 'size',
     array: sizeArray,
   },
+  parameters: { a11y: { test: 'error' } },
 };
 
 export const States: StoryObj<TemplateStateProps> = {
@@ -158,6 +185,7 @@ export const States: StoryObj<TemplateStateProps> = {
     id: 'search-states',
   },
   parameters: {
+    a11y: { test: 'error' },
     pseudo: {
       hover: '#search-states-hover',
       focus: '#search-states-focus',
@@ -210,321 +238,89 @@ export const WithHint: Story = {
 };
 
 /**
- * Typeahead — matches rendered in a real `Dropdown` anchored to the field, each
- * row a `OptionContent`. Closed by default; opening is left to the dropdown's
- * own trigger / dismiss handlers (click the field to open, click away or Esc to
- * close). `Search` exposes an imperative ref, so it is wrapped in a `<div>` to
- * give `Dropdown.Trigger` a DOM element to anchor to.
- */
-export const WithSuggestions: Story = {
-  name: 'With suggestions',
-  render: function WithSuggestionsExample() {
-    const [value, setValue] = useState('Mar');
-    const [open, setOpen] = useState(false);
-    const names = ['Mari Maasikas', 'Marelle Mets', 'Marjanne Meri', 'Mart Mesi', 'Martin Saar'];
-    const matches = names.filter((name) => name.toLowerCase().includes(value.toLowerCase()));
-
-    return (
-      <Dropdown open={open && matches.length > 0} onOpenChange={setOpen} width="trigger">
-        <Dropdown.Trigger>
-          <div>
-            <Search id="search-suggestions" label="Otsi" value={value} onChange={setValue} />
-          </div>
-        </Dropdown.Trigger>
-
-        <Dropdown.Content>
-          {matches.map((name, i) => (
-            <Dropdown.Item key={name} index={i} onClick={() => setValue(name)}>
-              {name}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Content>
-      </Dropdown>
-    );
-  },
-};
-
-/**
- * A single matched result (`OptionContent` with a name + code) followed by
- * fallback actions and a hint — e.g. a national-registry person lookup. Closed
- * by default; click the field to open.
+ * A national-registry person lookup, shown **live**: the field starts empty and the result
+ * panel appears below it as you type (the `play` function types a code to reveal it). The
+ * panel is an inline region **below** the field — not a popup — on purpose.
+ *
+ * **Why not a `Dropdown` or the `suggestions` combobox here?** A floating menu is anchored by
+ * `aria-haspopup` / `aria-expanded` on its trigger, but those disclosure attributes are only
+ * valid on interactive roles (button, combobox…) — never on a search field or a wrapper
+ * `<div>`. And a `combobox` popup may only contain a `listbox`, which can't hold buttons.
+ * Rendering the result and its actions inline sidesteps both problems: every control — the
+ * result and both buttons — is a normal `Tab` stop, fully keyboard-accessible, with no
+ * disclosure ARIA to get wrong. When the panel is a pure list of options use the `suggestions`
+ * combobox, or its `footer` slot (see **Autocomplete: with footer actions**) when those options
+ * come with fallback actions.
  */
 export const WithResultAndActions: Story = {
   name: 'With result and actions',
+  parameters: { a11y: { test: 'error' } },
+  play: async ({ canvasElement }) => {
+    // Drive the live example: type a code so the result panel is revealed, which is
+    // also the state the a11y (axe) check then runs against.
+    const canvas = within(canvasElement);
+    await userEvent.type(canvas.getByRole('searchbox'), '49504080254');
+    await canvas.findByText('Laura Kassisaba');
+  },
   render: function WithResultAndActionsExample() {
-    const [value, setValue] = useState('4954080254');
-    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState('');
+    const hasQuery = value.trim().length > 0;
 
     return (
-      <Dropdown open={open} onOpenChange={setOpen} width="trigger">
-        <Dropdown.Trigger>
-          <div>
-            <Search id="search-result-actions" label="Otsi" value={value} onChange={setValue} />
-          </div>
-        </Dropdown.Trigger>
+      <VerticalSpacing size={0.5}>
+        <Search
+          id="search-result-actions"
+          label="Otsi"
+          placeholder="Sisesta isikukood…"
+          value={value}
+          onChange={setValue}
+        />
 
-        <Dropdown.Content>
-          <Dropdown.Item index={0} closeOnSelect={false}>
-            <OptionContent>
-              <OptionContent.Label>
-                <Text element="span" modifiers="bold">
-                  Laura Kassisaba
+        {hasQuery && (
+          <Card>
+            <Card.Content>
+              <VerticalSpacing size={0.5}>
+                <Button visualType="link" onClick={() => setValue('Laura Kassisaba')}>
+                  <OptionContent>
+                    <OptionContent.Label>
+                      <Text element="span" modifiers="bold">
+                        Laura Kassisaba
+                      </Text>
+                      <Separator
+                        axis="vertical"
+                        color="secondary"
+                        display="inline"
+                        dotSize="small"
+                        element="span"
+                        spacing={0.5}
+                        variant="dot-only"
+                      />
+                      49504080254
+                    </OptionContent.Label>
+                  </OptionContent>
+                </Button>
+
+                <Separator color="secondary" />
+
+                <Row gutter={2} justifyContent="center">
+                  <Col width="auto">
+                    <Button visualType="secondary" size="small" onClick={() => setValue('')}>
+                      Isik teadmata
+                    </Button>
+                  </Col>
+                  <Col width="auto">
+                    <Button visualType="secondary" size="small" onClick={() => setValue('')}>
+                      Puudub Eesti isikukood
+                    </Button>
+                  </Col>
+                </Row>
+
+                <Text color="tertiary" modifiers={['small', 'center']} element="p">
+                  Rahvastikuregistri andmete päringuks sisesta isikukood täismahus
                 </Text>
-                <Separator
-                  axis="vertical"
-                  color="secondary"
-                  display="inline"
-                  dotSize="small"
-                  element="span"
-                  spacing={0.5}
-                  variant="dot-only"
-                />
-                49504080254
-              </OptionContent.Label>
-            </OptionContent>
-          </Dropdown.Item>
-
-          <Separator color="secondary" />
-
-          <div style={{ padding: 'var(--dropdown-item-padding-y) var(--dropdown-item-padding-x)' }}>
-            <VerticalSpacing size={0.75}>
-              <Row gutter={2} justifyContent="center">
-                <Col width="auto">
-                  <Button visualType="secondary" size="small">
-                    Isik teadmata
-                  </Button>
-                </Col>
-                <Col width="auto">
-                  <Button visualType="secondary" size="small">
-                    Puudub Eesti isikukood
-                  </Button>
-                </Col>
-              </Row>
-              <Text color="tertiary" modifiers={['small', 'center']} element="p">
-                Rahvastikuregistri andmete päringuks sisesta isikukood täismahus
-              </Text>
-            </VerticalSpacing>
-          </div>
-        </Dropdown.Content>
-      </Dropdown>
-    );
-  },
-};
-
-// Live "suggest as you type" needs focus to stay in the input. The floating
-// `Dropdown` moves focus into the list when it opens (it is a menu, not a
-// combobox), which would interrupt typing — so these examples render results in
-// an inline region. `DropdownItem` only needs a `DropdownContext`, supplied here
-// without the floating overlay, so items keep their padding and `hover`.
-// separators while focus stays in the field. The surface matches `.tedi-dropdown`.
-const LiveResults = ({ children }: { children: React.ReactNode }): JSX.Element => (
-  <DropdownContext.Provider
-    value={
-      {
-        open: true,
-        setOpen: () => undefined,
-        refs: {},
-        getReferenceProps: () => ({}),
-        getFloatingProps: () => ({}),
-        getItemProps: (props?: Record<string, unknown>) => props ?? {},
-        listItemsRef: { current: [] },
-        activeIndex: null,
-        setActiveIndex: () => undefined,
-        content: null,
-        setContent: () => undefined,
-        variant: 'default',
-      } as unknown as DropdownContextValue
-    }
-  >
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'var(--dropdown-item-default-background)',
-        border: '1px solid var(--card-border-primary)',
-        borderRadius: 'var(--form-select-area-radius)',
-        boxShadow: '0 1px 5px 0 var(--tedi-alpha-20)',
-      }}
-    >
-      {children}
-    </div>
-  </DropdownContext.Provider>
-);
-
-const StatusRow = ({ children }: { children: React.ReactNode }): JSX.Element => (
-  <div
-    style={{
-      display: 'flex',
-      gap: 'var(--dropdown-item-inner-spacing)',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 'var(--dropdown-item-padding-y) var(--dropdown-item-padding-x)',
-    }}
-  >
-    {children}
-  </div>
-);
-
-// Bolds the part of the suggestion that matches the current query.
-const Highlight = ({ text, query }: { text: string; query: string }): JSX.Element => {
-  const index = query ? text.toLowerCase().indexOf(query.toLowerCase()) : -1;
-  if (index === -1) {
-    return <>{text}</>;
-  }
-
-  return (
-    <>
-      {text.slice(0, index)}
-      <Text element="span" modifiers="bold">
-        {text.slice(index, index + query.length)}
-      </Text>
-      {text.slice(index + query.length)}
-    </>
-  );
-};
-
-const PEOPLE = [
-  'Mari Maasikas',
-  'Marelle Mets',
-  'Marjanne Meri',
-  'Mart Mesi',
-  'Martin Saar',
-  'Kalle Kask',
-  'Kati Kuusk',
-  'Tõnu Tamm',
-  'Liisa Lepp',
-  'Jaan Järv',
-];
-
-/**
- * Live typeahead — results filter as you type and the matched text is bolded.
- * The panel appears once the field is non-empty and shows a "no results" row
- * when nothing matches. Focus stays in the input (inline region, not the
- * floating menu), so typing is never interrupted.
- */
-export const Typeahead: Story = {
-  name: 'Typeahead (live filtering)',
-  render: function TypeaheadExample() {
-    const [value, setValue] = useState('');
-    const [open, setOpen] = useState(false);
-    const query = value.trim();
-    const matches = query ? PEOPLE.filter((name) => name.toLowerCase().includes(query.toLowerCase())) : [];
-
-    const select = (name: string) => {
-      setValue(name);
-      setOpen(false);
-    };
-
-    return (
-      <VerticalSpacing size={0.25}>
-        <Search
-          id="search-typeahead"
-          label="Otsi"
-          placeholder="Hakka nime trükkima…"
-          value={value}
-          onChange={(next) => {
-            setValue(next);
-            setOpen(true);
-          }}
-        />
-        {open && query.length > 0 && (
-          <LiveResults>
-            {matches.length > 0 ? (
-              matches.map((name, i) => (
-                <DropdownItem key={name} index={i} closeOnSelect={false} onClick={() => select(name)}>
-                  <OptionContent>
-                    <OptionContent.Label>
-                      <Highlight text={name} query={query} />
-                    </OptionContent.Label>
-                  </OptionContent>
-                </DropdownItem>
-              ))
-            ) : (
-              <StatusRow>
-                <Text color="tertiary">Tulemusi ei leitud</Text>
-              </StatusRow>
-            )}
-          </LiveResults>
-        )}
-      </VerticalSpacing>
-    );
-  },
-};
-
-/**
- * Asynchronous suggestions — typing debounces a fake request that shows a spinner
- * while "loading", then the matched results (or an empty state).
- */
-export const AsyncSuggestions: Story = {
-  name: 'Async suggestions (loading)',
-  render: function AsyncSuggestionsExample() {
-    const [value, setValue] = useState('');
-    const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [results, setResults] = useState<string[]>([]);
-    const timer = useRef<ReturnType<typeof setTimeout>>();
-
-    useEffect(() => () => clearTimeout(timer.current), []);
-
-    const handleChange = (next: string) => {
-      setValue(next);
-      setOpen(true);
-      clearTimeout(timer.current);
-
-      if (!next.trim()) {
-        setLoading(false);
-        setResults([]);
-        return;
-      }
-
-      setLoading(true);
-      timer.current = setTimeout(() => {
-        setResults(PEOPLE.filter((name) => name.toLowerCase().includes(next.trim().toLowerCase())));
-        setLoading(false);
-      }, 600);
-    };
-
-    const select = (name: string) => {
-      clearTimeout(timer.current);
-      setValue(name);
-      setLoading(false);
-      setOpen(false);
-    };
-
-    const query = value.trim();
-
-    return (
-      <VerticalSpacing size={0.25}>
-        <Search
-          id="search-async"
-          label="Otsi"
-          placeholder="Hakka nime trükkima…"
-          value={value}
-          onChange={handleChange}
-        />
-        {open && query.length > 0 && (
-          <LiveResults>
-            {loading ? (
-              <StatusRow>
-                <Spinner size={16} />
-                <Text color="tertiary">Otsin…</Text>
-              </StatusRow>
-            ) : results.length > 0 ? (
-              results.map((name, i) => (
-                <DropdownItem key={name} index={i} closeOnSelect={false} onClick={() => select(name)}>
-                  <OptionContent>
-                    <OptionContent.Label>
-                      <Highlight text={name} query={query} />
-                    </OptionContent.Label>
-                  </OptionContent>
-                </DropdownItem>
-              ))
-            ) : (
-              <StatusRow>
-                <Text color="tertiary">Tulemusi ei leitud</Text>
-              </StatusRow>
-            )}
-          </LiveResults>
+              </VerticalSpacing>
+            </Card.Content>
+          </Card>
         )}
       </VerticalSpacing>
     );
@@ -548,5 +344,281 @@ Use \`ariaLabel\` only as a fallback when a real \`<label>\` cannot be rendered.
           `,
       },
     },
+  },
+};
+
+const PEOPLE: SearchOption[] = [
+  { value: 'mari', label: 'Mari Maasikas', description: 'Tootejuht' },
+  { value: 'marelle', label: 'Marelle Mets', description: 'Disainer' },
+  { value: 'marjanne', label: 'Marjanne Meri', description: 'Arendaja' },
+  { value: 'mart', label: 'Mart Mesi', description: 'Analüütik' },
+  { value: 'martin', label: 'Martin Saar', description: 'Arendaja' },
+  { value: 'kalle', label: 'Kalle Kask', description: 'Testija' },
+  { value: 'kati', label: 'Kati Kuusk', description: 'Tootejuht' },
+  { value: 'tonu', label: 'Tõnu Tamm', description: 'Disainer' },
+  { value: 'liisa', label: 'Liisa Lepp', description: 'Arendaja' },
+  { value: 'jaan', label: 'Jaan Järv', description: 'Analüütik' },
+];
+
+const filterPeople = (query: string) =>
+  PEOPLE.filter((person) => (person.label as string).toLowerCase().includes(query.trim().toLowerCase()));
+
+/**
+ * Pass a `suggestions` array to turn `Search` into an accessible combobox - client-side
+ * typeahead. You own the data: filter / fetch in `onChange` and hand back what should be
+ * shown. Focus stays in the input, the arrow keys move through the listbox, and the matched
+ * substring of each row is bolded automatically.
+ */
+export const Autocomplete: Story = {
+  parameters: { a11y: { test: 'error' } },
+  render: function AutocompleteExample() {
+    const [value, setValue] = useState('');
+    const suggestions = value.trim() ? filterPeople(value) : [];
+
+    return (
+      <Search
+        id="search-autocomplete-default"
+        label="Otsi"
+        placeholder="Hakka nime trükkima…"
+        value={value}
+        onChange={setValue}
+        suggestions={suggestions}
+        onSuggestionSelect={(option) => setValue(option.label as string)}
+      />
+    );
+  },
+};
+
+/**
+ * Custom row markup via `renderSuggestion` - full control over each option (here the name is
+ * bolded and the role shown inline).
+ */
+export const AutocompleteCustomRow: Story = {
+  name: 'Autocomplete: custom row',
+  parameters: { a11y: { test: 'error' } },
+  render: function AutocompleteCustomRowExample() {
+    const [value, setValue] = useState('');
+    const suggestions = value.trim() ? filterPeople(value) : [];
+
+    return (
+      <Search
+        id="search-autocomplete-custom-row"
+        label="Otsi"
+        placeholder="Hakka nime trükkima…"
+        value={value}
+        onChange={setValue}
+        suggestions={suggestions}
+        onSuggestionSelect={(option) => setValue(option.label as string)}
+        renderSuggestion={(option) => (
+          <OptionContent>
+            <OptionContent.Label>
+              <Text element="span" modifiers="bold">
+                {option.label}
+              </Text>
+              <Separator
+                axis="vertical"
+                color="secondary"
+                display="inline"
+                dotSize="small"
+                element="span"
+                spacing={0.5}
+                variant="dot-only"
+              />
+              {option.description}
+            </OptionContent.Label>
+          </OptionContent>
+        )}
+      />
+    );
+  },
+};
+
+/**
+ * Asynchronous suggestions - typing debounces a request that shows the loading row,
+ * then the matched results (or the no-results row). Mirrors a server-backed registry
+ * lookup.
+ */
+export const AutocompleteAsync: Story = {
+  name: 'Autocomplete: async',
+  parameters: { a11y: { test: 'error' } },
+  render: function AutocompleteAsyncExample() {
+    const [value, setValue] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState<SearchOption[]>([]);
+    const timer = useRef<ReturnType<typeof setTimeout>>();
+
+    useEffect(() => () => clearTimeout(timer.current), []);
+
+    const handleChange = (next: string) => {
+      setValue(next);
+      clearTimeout(timer.current);
+
+      if (!next.trim()) {
+        setLoading(false);
+        setSuggestions([]);
+        return;
+      }
+
+      setLoading(true);
+      timer.current = setTimeout(() => {
+        setSuggestions(filterPeople(next));
+        setLoading(false);
+      }, 600);
+    };
+
+    return (
+      <Search
+        id="search-autocomplete-async"
+        label="Otsi"
+        placeholder="Hakka nime trükkima…"
+        value={value}
+        onChange={handleChange}
+        suggestions={suggestions}
+        loading={loading}
+        onSuggestionSelect={(option) => {
+          clearTimeout(timer.current);
+          setLoading(false);
+          setValue(option.label as string);
+        }}
+      />
+    );
+  },
+};
+
+/**
+ * Disabled options are shown but greyed out and skipped by keyboard navigation and selection.
+ */
+export const AutocompleteDisabledOptions: Story = {
+  name: 'Autocomplete: disabled options',
+  parameters: { a11y: { test: 'error' } },
+  render: function AutocompleteDisabledExample() {
+    const [value, setValue] = useState('');
+    const suggestions = value.trim()
+      ? filterPeople(value).map((option, index) => (index % 3 === 0 ? { ...option, disabled: true } : option))
+      : [];
+
+    return (
+      <VerticalSpacing size={0.5}>
+        <Search
+          id="search-autocomplete-disabled"
+          label="Otsi"
+          placeholder="Hakka nime trükkima…"
+          value={value}
+          onChange={setValue}
+          suggestions={suggestions}
+          onSuggestionSelect={(option) => setValue(option.label as string)}
+        />
+        <Text color="tertiary" modifiers="small">
+          Iga kolmas vaste on keelatud.
+        </Text>
+      </VerticalSpacing>
+    );
+  },
+};
+
+/**
+ * Free-text submit — pressing Enter with no active option fires `onSearch` instead of
+ * `onSuggestionSelect`, so the field doubles as a plain search box.
+ */
+export const AutocompleteFreeText: Story = {
+  name: 'Autocomplete: free-text search',
+  parameters: { a11y: { test: 'error' } },
+  render: function AutocompleteFreeTextExample() {
+    const [value, setValue] = useState('');
+    const [submitted, setSubmitted] = useState<string>();
+    const suggestions = value.trim() ? filterPeople(value) : [];
+
+    return (
+      <VerticalSpacing size={0.5}>
+        <Search
+          id="search-autocomplete-free-text"
+          label="Otsi"
+          placeholder="Otsi ja vajuta Enter…"
+          value={value}
+          onChange={setValue}
+          suggestions={suggestions}
+          onSuggestionSelect={(option) => setValue(option.label as string)}
+          onSearch={setSubmitted}
+        />
+        {submitted !== undefined && (
+          <Text color="tertiary" modifiers="small">
+            Otsisid: „{submitted}”
+          </Text>
+        )}
+      </VerticalSpacing>
+    );
+  },
+};
+
+/**
+ * The `footer` slot pins fallback actions below the suggestions — shown whenever the popup is
+ * open, including the no-results state (a national-registry lookup is the canonical case).
+ * `Tab` from the field moves focus into the footer buttons; `Escape` returns to the field.
+ */
+export const AutocompleteWithFooter: Story = {
+  name: 'Autocomplete: with footer actions',
+  parameters: { a11y: { test: 'error' } },
+  render: function AutocompleteWithFooterExample() {
+    const [value, setValue] = useState('');
+    const suggestions = value.trim() ? filterPeople(value) : [];
+
+    return (
+      <Search
+        id="search-autocomplete-footer"
+        label="Otsi"
+        placeholder="Hakka nime trükkima…"
+        value={value}
+        onChange={setValue}
+        suggestions={suggestions}
+        onSuggestionSelect={(option) => setValue(option.label as string)}
+        footer={
+          <>
+            <Row gutter={2} justifyContent="center">
+              <Col width="auto">
+                <Button visualType="secondary" size="small" onClick={() => setValue('')}>
+                  Isik teadmata
+                </Button>
+              </Col>
+              <Col width="auto">
+                <Button visualType="secondary" size="small" onClick={() => setValue('')}>
+                  Puudub Eesti isikukood
+                </Button>
+              </Col>
+            </Row>
+            <Text color="tertiary" modifiers={['small', 'center']} element="p">
+              Rahvastikuregistri andmete päringuks sisesta isikukood täismahus
+            </Text>
+          </>
+        }
+      />
+    );
+  },
+};
+
+/**
+ * With `hideOnScroll`, scrolling the page (or a scrollable ancestor) closes the popup —
+ * scrolling the option list itself keeps it open. Type to open the list, then scroll the page.
+ */
+export const AutocompleteHideOnScroll: Story = {
+  name: 'Autocomplete: hide on scroll',
+  render: function AutocompleteHideOnScrollExample() {
+    const [value, setValue] = useState('');
+    const suggestions = value.trim() ? filterPeople(value) : [];
+
+    return (
+      <VerticalSpacing size={1}>
+        <Search
+          id="search-autocomplete-hide-on-scroll"
+          label="Otsi"
+          placeholder="Hakka nime trükkima…"
+          value={value}
+          onChange={setValue}
+          suggestions={suggestions}
+          onSuggestionSelect={(option) => setValue(option.label as string)}
+          hideOnScroll
+        />
+        <div style={{ height: '150vh' }} aria-hidden="true" />
+      </VerticalSpacing>
+    );
   },
 };
