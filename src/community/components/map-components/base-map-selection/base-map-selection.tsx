@@ -7,6 +7,7 @@ import { Input, Suffix } from '../../../../tedi/components/form/input-group';
 import { InputGroupBase } from '../../../../tedi/components/form/input-group/input-group';
 import { Slider } from '../../../../tedi/components/form/slider/slider';
 import { Popover } from '../../../../tedi/components/overlays/popover';
+import { useLabels } from '../../../../tedi/providers/label-provider';
 import BaseMapOption from './base-map-option';
 import styles from './base-map-selection.module.scss';
 
@@ -48,10 +49,6 @@ export interface BaseMapSelectionProps {
    */
   onTransparencyChange?: (value: number) => void;
   /**
-   * Label for the transparency slider.
-   */
-  transparencyLabel?: string;
-  /**
    * HTML `id` attribute applied to the trigger button.
    */
   id: string;
@@ -77,9 +74,12 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
     transparency,
     defaultTransparency,
     onTransparencyChange,
-    transparencyLabel = '',
     id,
   } = props;
+
+  const { getLabel } = useLabels();
+
+  const transparencyLabel = getLabel('baseMapSelection.transparency');
 
   const isControlled = transparency !== undefined;
   const [uncontrolledTransparency, setUncontrolledTransparency] = useState(() =>
@@ -100,13 +100,12 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
 
   const triggerBEM = classNames(
     styles['tedi-base-map-selection__wrapper'],
-    styles['tedi-base-map-selection__trigger'],
     styles['tedi-base-map-selection--button'],
     multiple && styles['tedi-base-map-selection--multiple']
   );
 
   return (
-    <Popover placement="top-end">
+    <Popover placement="top-start">
       <Popover.Trigger>
         <Button noStyle id={id} className={triggerBEM}>
           <div className={styles['tedi-base-map-selection__content']} aria-hidden>
@@ -120,8 +119,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
         {showTransparency && (
           <div className={styles['tedi-base-map-selection__transparency']}>
             <Slider
-              label={transparencyLabel}
-              aria-label={transparencyLabel || 'Transparency'}
+              aria-label={transparencyLabel}
               min={0}
               max={100}
               value={transparencyValue}
@@ -130,7 +128,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
               maxLabel="100%"
               addonRight={
                 <div className={styles['tedi-base-map-selection__transparency-field']}>
-                  <InputGroupBase id={`${id}-transparency`} label={transparencyLabel || 'Transparency'} hideLabel>
+                  <InputGroupBase id={`${id}-transparency`} label={transparencyLabel} hideLabel>
                     <Input>
                       <Field
                         type="number"

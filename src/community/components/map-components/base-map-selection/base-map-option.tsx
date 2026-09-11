@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { JSX, useEffect, useRef, useState } from 'react';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
+import Button from '../../../../tedi/components/buttons/button/button';
 import { Tooltip } from '../../../../tedi/components/overlays/tooltip';
 import { useElementSize } from '../../../../tedi/helpers';
 import styles from './base-map-selection.module.scss';
@@ -53,14 +54,17 @@ export interface BaseMapOptionProps {
    */
   disabled?: boolean;
   /**
-   * Text shown in a tooltip. When set, an info icon is rendered in the middle of
-   * the option and reveals this text on hover.
+   * Text shown in a tooltip. When set, an info icon is rendered in the middle of the
+   * option and hovering anywhere on the option reveals this text. A title too long to
+   * fit is shown above it in the same tooltip rather than in a second, competing one.
    */
   tooltipText?: string;
   /**
-   * Visual style of the info icon shown when `tooltipText` is set.
-   * - `'info'`: neutral informational icon (default)
-   * - `'error'`: error/danger styled icon
+   * Which icon and colour the tooltip indicator uses.
+   * - `'info'`: neutral info icon in the brand colour (default)
+   * - `'error'`: error icon in the danger colour, for a layer that is unavailable
+   *
+   * Only takes effect when `tooltipText` is set, since that is what renders the icon.
    * @default 'info'
    */
   tooltipType?: BaseMapOptionTooltipType;
@@ -100,16 +104,6 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     onSelect?.();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) {
-      return;
-    }
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onSelect?.();
-    }
-  };
-
   const optionBEM = classNames(
     styles['tedi-base-map-selection__wrapper'],
     selected && styles['tedi-base-map-selection--selected'],
@@ -119,29 +113,13 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     className
   );
 
-  const titleContent = (
-    <div ref={titleRef} tabIndex={-1} className={styles['tedi-base-map-selection__title']}>
-      {title}
-    </div>
-  );
-
-  const titleElement = isTruncated ? (
-    <Tooltip>
-      <Tooltip.Trigger>{titleContent}</Tooltip.Trigger>
-      <Tooltip.Content>{title}</Tooltip.Content>
-    </Tooltip>
-  ) : (
-    titleContent
-  );
-
-  return (
-    <div
-      role="button"
-      tabIndex={disabled ? -1 : 0}
+  const option = (
+    <Button
+      noStyle
+      disabled={disabled}
       aria-pressed={!!selected}
       aria-disabled={disabled || undefined}
       onClick={handleSelect}
-      onKeyDown={handleKeyDown}
       className={optionBEM}
       id={id}
     >
@@ -149,22 +127,39 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
         {content}
       </div>
       {tooltipText && (
-        <Tooltip>
-          <Tooltip.Trigger>
-            <span tabIndex={-1} className={styles['tedi-base-map-selection__info']}>
-              <Icon
-                background="brand-secondary"
-                name={tooltipType === 'error' ? 'error' : 'info'}
-                size={16}
-                color={tooltipType === 'error' ? 'danger' : 'brand'}
-              />
-            </span>
-          </Tooltip.Trigger>
-          <Tooltip.Content>{tooltipText}</Tooltip.Content>
-        </Tooltip>
+        <span className={styles['tedi-base-map-selection__info']}>
+          <Icon
+            background="brand-secondary"
+            name={tooltipType === 'error' ? 'error' : 'info'}
+            size={16}
+            color={tooltipType === 'error' ? 'danger' : 'brand'}
+          />
+        </span>
       )}
-      {titleElement}
-    </div>
+      <div ref={titleRef} className={styles['tedi-base-map-selection__title']}>
+        {title}
+      </div>
+    </Button>
+  );
+
+  if (!tooltipText && !isTruncated) {
+    return option;
+  }
+
+  return (
+    <Tooltip ariaHidden={!tooltipText} openWith="hover">
+      <Tooltip.Trigger>{option}</Tooltip.Trigger>
+      <Tooltip.Content>
+        {tooltipText ? (
+          <>
+            {isTruncated && <div aria-hidden>{title}</div>}
+            {tooltipText}
+          </>
+        ) : (
+          title
+        )}
+      </Tooltip.Content>
+    </Tooltip>
   );
 };
 

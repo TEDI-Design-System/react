@@ -1,6 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+// The `src/tedi` barrel transitively imports react-sticky-box (ESM-only), which Jest does not transform.
+jest.mock('react-sticky-box', () => ({ __esModule: true, default: () => null }));
 
 import { useIsTouchDevice } from '../../../../tedi/helpers';
+import { LabelProvider } from '../../../../tedi/providers/label-provider';
 import { BaseMapOption, BaseMapSelection } from './base-map-selection';
 
 jest.mock('../../../../tedi/helpers', () => ({
@@ -8,12 +13,26 @@ jest.mock('../../../../tedi/helpers', () => ({
   useIsTouchDevice: jest.fn(),
 }));
 
+// `useElementSize` measures through a 20ms lodash debounce, so it lands a setState
+// shortly after mount. Synchronous `fireEvent` tests finish first, but `userEvent`
+// yields to the event loop - flush the debounce inside act() so that late update
+// does not trip React's act(...) warning.
+const settleElementSize = () => act(async () => void (await new Promise((resolve) => setTimeout(resolve, 25))));
+
+// The transparency controls take their accessible name from the label provider, so the
+// component must be wrapped the way a consuming app wraps it.
 const renderSelection = (props?: Partial<React.ComponentProps<typeof BaseMapSelection>>) =>
   render(
-    <BaseMapSelection id="basemap" title="Active map" content={<img src="active.png" alt="Active map" />} {...props}>
-      <BaseMapSelection.Option id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />
-      <BaseMapSelection.Option id="satellite" title="Satellite" content={<img src="satellite.png" alt="Satellite" />} />
-    </BaseMapSelection>
+    <LabelProvider>
+      <BaseMapSelection id="basemap" title="Active map" content={<img src="active.png" alt="Active map" />} {...props}>
+        <BaseMapSelection.Option id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />
+        <BaseMapSelection.Option
+          id="satellite"
+          title="Satellite"
+          content={<img src="satellite.png" alt="Satellite" />}
+        />
+      </BaseMapSelection>
+    </LabelProvider>
   );
 
 beforeEach(() => {
@@ -43,14 +62,16 @@ describe('BaseMapSelection', () => {
     expect(screen.queryByRole('slider')).not.toBeInTheDocument();
 
     rerender(
-      <BaseMapSelection
-        id="basemap"
-        title="Active map"
-        content={<img src="active.png" alt="Active map" />}
-        showTransparency
-      >
-        <BaseMapSelection.Option id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />
-      </BaseMapSelection>
+      <LabelProvider>
+        <BaseMapSelection
+          id="basemap"
+          title="Active map"
+          content={<img src="active.png" alt="Active map" />}
+          showTransparency
+        >
+          <BaseMapSelection.Option id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />
+        </BaseMapSelection>
+      </LabelProvider>
     );
 
     expect(screen.getByRole('slider')).toBeInTheDocument();
@@ -67,12 +88,22 @@ describe('BaseMapSelection', () => {
   });
 
   it('associates the transparency numeric field with its label', () => {
-    renderSelection({ showTransparency: true, transparency: 50, transparencyLabel: 'Map transparency' });
+    renderSelection({ showTransparency: true, transparency: 50 });
 
     fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
 
-    const field = screen.getByRole('spinbutton', { name: 'Map transparency' });
+    const field = screen.getByRole('spinbutton', { name: 'Nähtavus' });
     expect(field).toHaveAttribute('id', 'basemap-transparency');
+  });
+
+  it('names the transparency controls from the TEDI label', () => {
+    renderSelection({ showTransparency: true });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
+
+    // 'et' is the LabelProvider default locale.
+    expect(screen.getByRole('slider', { name: 'Nähtavus' })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Nähtavus' })).toBeInTheDocument();
   });
 
   it('calls onTransparencyChange when the numeric field value changes', () => {
@@ -80,23 +111,22 @@ describe('BaseMapSelection', () => {
     renderSelection({
       showTransparency: true,
       transparency: 50,
-      transparencyLabel: 'Map transparency',
       onTransparencyChange,
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Map transparency' }), { target: { value: '70' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Nähtavus' }), { target: { value: '70' } });
 
     expect(onTransparencyChange).toHaveBeenCalledWith(70);
   });
 
   it('clamps an out-of-range transparency value consistently in the slider and the field', () => {
-    renderSelection({ showTransparency: true, transparency: 150, transparencyLabel: 'Map transparency' });
+    renderSelection({ showTransparency: true, transparency: 150 });
 
     fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
 
     expect(screen.getByRole('slider')).toHaveValue('100');
-    expect(screen.getByRole('spinbutton', { name: 'Map transparency' })).toHaveValue(100);
+    expect(screen.getByRole('spinbutton', { name: 'Nähtavus' })).toHaveValue(100);
   });
 
   it('reports a clamped value when the numeric field exceeds the range', () => {
@@ -104,18 +134,17 @@ describe('BaseMapSelection', () => {
     renderSelection({
       showTransparency: true,
       transparency: 50,
-      transparencyLabel: 'Map transparency',
       onTransparencyChange,
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Map transparency' }), { target: { value: '150' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Nähtavus' }), { target: { value: '150' } });
 
     expect(onTransparencyChange).toHaveBeenCalledWith(100);
   });
 
   it('keeps slider edits in uncontrolled mode (no transparency prop)', () => {
-    renderSelection({ showTransparency: true, transparencyLabel: 'Map transparency' });
+    renderSelection({ showTransparency: true });
 
     fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
 
@@ -125,16 +154,16 @@ describe('BaseMapSelection', () => {
     fireEvent.change(slider, { target: { value: '40' } });
 
     expect(slider).toHaveValue('40');
-    expect(screen.getByRole('spinbutton', { name: 'Map transparency' })).toHaveValue(40);
+    expect(screen.getByRole('spinbutton', { name: 'Nähtavus' })).toHaveValue(40);
   });
 
   it('seeds uncontrolled mode from defaultTransparency, clamped', () => {
-    renderSelection({ showTransparency: true, defaultTransparency: 150, transparencyLabel: 'Map transparency' });
+    renderSelection({ showTransparency: true, defaultTransparency: 150 });
 
     fireEvent.click(screen.getByRole('button', { name: 'Active map' }));
 
     expect(screen.getByRole('slider')).toHaveValue('100');
-    expect(screen.getByRole('spinbutton', { name: 'Map transparency' })).toHaveValue(100);
+    expect(screen.getByRole('spinbutton', { name: 'Nähtavus' })).toHaveValue(100);
   });
 });
 
@@ -151,7 +180,8 @@ describe('BaseMapOption', () => {
     expect(screen.getByRole('button', { name: /Streets/ })).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('calls onSelect on click and on Enter/Space', () => {
+  it('calls onSelect on click and on Enter/Space', async () => {
+    const user = userEvent.setup();
     const onSelect = jest.fn();
     render(
       <BaseMapOption
@@ -162,23 +192,29 @@ describe('BaseMapOption', () => {
       />
     );
     const option = screen.getByRole('button', { name: /Streets/ });
+    await settleElementSize();
 
-    fireEvent.click(option);
-    fireEvent.keyDown(option, { key: 'Enter' });
-    fireEvent.keyDown(option, { key: ' ' });
+    await user.click(option);
+    option.focus();
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
 
     expect(onSelect).toHaveBeenCalledTimes(3);
   });
 
-  it('exposes the disabled state and removes itself from the tab order', () => {
+  it('exposes the disabled state on the underlying button and drops it from the tab order', () => {
     render(<BaseMapOption disabled id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
     const option = screen.getByRole('button', { name: /Streets/ });
 
+    // The tooltip trigger stamps `tabIndex: 0` on every option, but native `disabled`
+    // outranks it in browsers - the option is neither tabbable nor programmatically
+    // focusable. jsdom does not model that, so assert the attribute rather than focus.
+    expect(option).toBeDisabled();
     expect(option).toHaveAttribute('aria-disabled', 'true');
-    expect(option).toHaveAttribute('tabindex', '-1');
   });
 
-  it('does not call onSelect when disabled, on click or keyboard', () => {
+  it('does not call onSelect when disabled, on click or keyboard', async () => {
+    const user = userEvent.setup();
     const onSelect = jest.fn();
     render(
       <BaseMapOption
@@ -190,10 +226,12 @@ describe('BaseMapOption', () => {
       />
     );
     const option = screen.getByRole('button', { name: /Streets/ });
+    await settleElementSize();
 
-    fireEvent.click(option);
-    fireEvent.keyDown(option, { key: 'Enter' });
-    fireEvent.keyDown(option, { key: ' ' });
+    await user.click(option);
+    option.focus();
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
 
     expect(onSelect).not.toHaveBeenCalled();
   });
@@ -215,8 +253,80 @@ describe('BaseMapOption', () => {
 
       expect(screen.getAllByText(title)).toHaveLength(1);
 
-      fireEvent.mouseEnter(screen.getByText(title));
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
+      expect(screen.getAllByText(title)).toHaveLength(2);
+    });
+
+    it('does not describe the trigger with a title-only tooltip, which would announce the title twice', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+
+      const option = screen.getByRole('button');
+      fireEvent.mouseEnter(option);
+
+      // Visible in the tooltip, but not wired up as a description: the title already *is*
+      // the button's accessible name.
+      expect(screen.getAllByText(title)).toHaveLength(2);
+      expect(option).not.toHaveAttribute('aria-describedby');
+    });
+
+    it('describes the trigger with the tooltip text, which is not already the accessible name', () => {
+      render(
+        <BaseMapOption
+          id="streets"
+          title="Streets"
+          tooltipText="Kaardikiht ei ole hetkel saadaval."
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      const option = screen.getByRole('button');
+      fireEvent.mouseEnter(option);
+
+      const describedBy = option.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
+      expect(document.getElementById(describedBy as string)).toHaveTextContent('Kaardikiht ei ole hetkel saadaval.');
+    });
+
+    it('stays closed when the title fits and there is no tooltip text', () => {
+      stubTitleWidths(100, 100);
+      const title = 'Streets';
+      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+
+      fireEvent.mouseEnter(screen.getByRole('button'));
+
+      expect(screen.getAllByText(title)).toHaveLength(1);
+    });
+
+    it('opens the tooltip on a disabled option too', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(<BaseMapOption disabled id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+
+      fireEvent.mouseEnter(screen.getByRole('button'));
+
+      expect(screen.getAllByText(title)).toHaveLength(2);
+    });
+
+    it('merges a truncated title into the info tooltip instead of opening a second one', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(
+        <BaseMapOption
+          id="streets"
+          title={title}
+          tooltipText="Additional information"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      fireEvent.mouseEnter(screen.getByRole('button'));
+
+      const tooltip = screen.getByRole('tooltip');
+      expect(tooltip).toHaveTextContent(title);
+      expect(tooltip).toHaveTextContent('Additional information');
       expect(screen.getAllByText(title)).toHaveLength(2);
     });
 
@@ -224,7 +334,7 @@ describe('BaseMapOption', () => {
       stubTitleWidths(100, 100);
       render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
 
-      fireEvent.mouseEnter(screen.getByText('Streets'));
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getAllByText('Streets')).toHaveLength(1);
     });
@@ -248,11 +358,10 @@ describe('BaseMapOption', () => {
         />
       );
 
-      const trigger = screen.getByText('info').closest('span[class*="__info"]');
-      expect(trigger).not.toBeNull();
+      expect(screen.getByText('info')).toBeInTheDocument();
       expect(screen.queryByText('Additional information')).not.toBeInTheDocument();
 
-      fireEvent.mouseEnter(trigger as HTMLElement);
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('Additional information')).toBeInTheDocument();
     });
@@ -268,10 +377,7 @@ describe('BaseMapOption', () => {
         />
       );
 
-      const trigger = screen.getByText('info').closest('span[class*="__info"]');
-      expect(trigger).not.toBeNull();
-
-      fireEvent.mouseEnter(trigger as HTMLElement);
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('Additional information')).toBeInTheDocument();
     });
@@ -287,12 +393,25 @@ describe('BaseMapOption', () => {
         />
       );
 
-      const trigger = screen.getByText('error').closest('span[class*="__info"]');
-      expect(trigger).not.toBeNull();
+      expect(screen.getByText('error')).toBeInTheDocument();
 
-      fireEvent.mouseEnter(trigger as HTMLElement);
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('This layer is unavailable')).toBeInTheDocument();
+    });
+
+    it('renders the icon at a single size, leaving the responsive step to CSS', () => {
+      render(
+        <BaseMapOption
+          id="streets"
+          title="Streets"
+          tooltipText="Additional information"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      // Below md the SCSS rebinds --icon-02 to the 12px token; no breakpoint branch in JS.
+      expect(screen.getByText('info')).toHaveClass('tedi-icon--size-16');
     });
   });
 });
