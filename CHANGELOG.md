@@ -1,3 +1,10 @@
+# [19.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.4...react-19.1.0-rc.5) (2026-09-11)
+
+
+### Bug Fixes
+
+* **popover:** a11y violation fixes [#817](https://github.com/TEDI-Design-System/react/issues/817) ([#870](https://github.com/TEDI-Design-System/react/issues/870)) ([38b6887](https://github.com/TEDI-Design-System/react/commit/38b68872d9a970c20a9a66a3722fcb288898ce1d))
+
 # [19.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.3...react-19.1.0-rc.4) (2026-09-09)
 
 
