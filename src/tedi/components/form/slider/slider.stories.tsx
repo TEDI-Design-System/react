@@ -130,6 +130,24 @@ export const WithCurrentValue: Story = {
   },
 };
 
+/**
+ * Adds hint text below the slider for guidance.
+ */
+export const WithHint: Story = {
+  decorators: [wrapInCol],
+  args: {
+    id: 'slider-hint',
+    min: 0,
+    max: 100,
+    step: 1,
+    defaultValue: 50,
+    showCurrentValue: true,
+    valueFormatter: (value) => `${value}%`,
+    helper: { text: 'Hint text', type: 'hint' },
+    'aria-label': 'Väärtus',
+  },
+};
+
 const CustomValueTemplate = (args: SliderProps) => {
   const [numberValue, setNumberValue] = useState<number>(4);
   const [inputValue, setInputValue] = useState<number>(50);
@@ -356,22 +374,5 @@ export const WithoutTooltip: Story = {
     minLabel: '0%',
     maxLabel: '100%',
     tooltip: false,
-  },
-};
-
-/**
- * Adds helper / hint text below the slider for guidance.
- */
-export const WithHelper: Story = {
-  decorators: [wrapInCol],
-  args: {
-    id: 'slider-helper',
-    label: 'Väärtus',
-    min: 0,
-    max: 100,
-    defaultValue: 40,
-    minLabel: '0%',
-    maxLabel: '100%',
-    helper: { id: 'slider-helper-text', text: 'Liiguta nuppu, et väärtust muuta', type: 'hint' },
   },
 };
