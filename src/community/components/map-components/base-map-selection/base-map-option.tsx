@@ -3,7 +3,7 @@ import { JSX, useEffect, useRef, useState } from 'react';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Tooltip } from '../../../../tedi/components/overlays/tooltip';
-import { useElementSize } from '../../../../tedi/helpers';
+import { isBreakpointBelow, useBreakpoint, useElementSize } from '../../../../tedi/helpers';
 import styles from './base-map-selection.module.scss';
 
 export type BaseMapOptionType = 'button' | 'historical' | 'selection';
@@ -53,14 +53,13 @@ export interface BaseMapOptionProps {
    */
   disabled?: boolean;
   /**
-   * Text shown in a tooltip. When set, an info icon is rendered in the middle of
-   * the option and reveals this text on hover.
+   * Text shown in a tooltip. When set, an info icon is rendered in the middle of the
+   * option and hovering anywhere on the option reveals this text. A title too long to
+   * fit is shown above it in the same tooltip rather than in a second, competing one.
    */
   tooltipText?: string;
   /**
-   * Visual style of the info icon shown when `tooltipText` is set.
-   * - `'info'`: neutral informational icon (default)
-   * - `'error'`: error/danger styled icon
+   * Name of material icon https://fonts.google.com/icons
    * @default 'info'
    */
   tooltipType?: BaseMapOptionTooltipType;
@@ -80,6 +79,9 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     tooltipText,
     tooltipType = 'info',
   } = props;
+
+  const currentBreakpoint = useBreakpoint();
+  const isMobile = isBreakpointBelow(currentBreakpoint, 'md');
 
   const titleRef = useRef<HTMLDivElement>(null);
   const titleSize = useElementSize(titleRef);
@@ -119,22 +121,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     className
   );
 
-  const titleContent = (
-    <div ref={titleRef} tabIndex={-1} className={styles['tedi-base-map-selection__title']}>
-      {title}
-    </div>
-  );
-
-  const titleElement = isTruncated ? (
-    <Tooltip>
-      <Tooltip.Trigger>{titleContent}</Tooltip.Trigger>
-      <Tooltip.Content>{title}</Tooltip.Content>
-    </Tooltip>
-  ) : (
-    titleContent
-  );
-
-  return (
+  const option = (
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
@@ -149,22 +136,39 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
         {content}
       </div>
       {tooltipText && (
-        <Tooltip>
-          <Tooltip.Trigger>
-            <span tabIndex={-1} className={styles['tedi-base-map-selection__info']}>
-              <Icon
-                background="brand-secondary"
-                name={tooltipType === 'error' ? 'error' : 'info'}
-                size={16}
-                color={tooltipType === 'error' ? 'danger' : 'brand'}
-              />
-            </span>
-          </Tooltip.Trigger>
-          <Tooltip.Content>{tooltipText}</Tooltip.Content>
-        </Tooltip>
+        <span className={styles['tedi-base-map-selection__info']}>
+          <Icon
+            background="brand-secondary"
+            name={tooltipType === 'error' ? 'error' : 'info'}
+            size={isMobile ? 12 : 16}
+            color={tooltipType === 'error' ? 'danger' : 'brand'}
+          />
+        </span>
       )}
-      {titleElement}
+      <div ref={titleRef} className={styles['tedi-base-map-selection__title']}>
+        {title}
+      </div>
     </div>
+  );
+
+  if (!tooltipText && !isTruncated) {
+    return option;
+  }
+
+  return (
+    <Tooltip>
+      <Tooltip.Trigger>{option}</Tooltip.Trigger>
+      <Tooltip.Content>
+        {tooltipText ? (
+          <>
+            {isTruncated && <div aria-hidden>{title}</div>}
+            {tooltipText}
+          </>
+        ) : (
+          title
+        )}
+      </Tooltip.Content>
+    </Tooltip>
   );
 };
 

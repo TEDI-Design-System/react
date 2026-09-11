@@ -165,7 +165,7 @@ export const OptionWithInfo: StoryObj<OptionTemplateProps> = {
           <Text modifiers="bold">Info</Text>
         </Col>
         <Col className="flex align-items-center gap-3">
-          <BaseMapOption {...args} id="info" tooltipText="See kaart uueneb igal aastal." tooltipType="info" />
+          <BaseMapOption {...args} id="info" tooltipText="See kaart uueneb igal aastal." tooltipType="error" />
         </Col>
       </Row>
       <Row>
@@ -175,6 +175,7 @@ export const OptionWithInfo: StoryObj<OptionTemplateProps> = {
         <Col className="flex align-items-center gap-3">
           <BaseMapOption
             {...args}
+            title="Pikk nimi koos infoga"
             id="error"
             disabled
             tooltipText="Kaardikiht ei ole hetkel saadaval."

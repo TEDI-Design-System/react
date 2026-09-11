@@ -215,8 +215,51 @@ describe('BaseMapOption', () => {
 
       expect(screen.getAllByText(title)).toHaveLength(1);
 
-      fireEvent.mouseEnter(screen.getByText(title));
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
+      expect(screen.getAllByText(title)).toHaveLength(2);
+    });
+
+    it('opens the tooltip from anywhere in the option, not only the title text', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+
+      const option = screen.getByRole('button');
+      expect(option).toContainElement(screen.getByText(title));
+
+      fireEvent.mouseEnter(option);
+
+      expect(screen.getAllByText(title)).toHaveLength(2);
+    });
+
+    it('opens the tooltip on a disabled option too', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(<BaseMapOption disabled id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+
+      fireEvent.mouseEnter(screen.getByRole('button'));
+
+      expect(screen.getAllByText(title)).toHaveLength(2);
+    });
+
+    it('merges a truncated title into the info tooltip instead of opening a second one', () => {
+      stubTitleWidths(200, 100);
+      const title = 'A Very Long Base Map Title';
+      render(
+        <BaseMapOption
+          id="streets"
+          title={title}
+          tooltipText="Additional information"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+
+      fireEvent.mouseEnter(screen.getByRole('button'));
+
+      const tooltip = screen.getByRole('tooltip');
+      expect(tooltip).toHaveTextContent(title);
+      expect(tooltip).toHaveTextContent('Additional information');
       expect(screen.getAllByText(title)).toHaveLength(2);
     });
 
@@ -224,7 +267,7 @@ describe('BaseMapOption', () => {
       stubTitleWidths(100, 100);
       render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
 
-      fireEvent.mouseEnter(screen.getByText('Streets'));
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getAllByText('Streets')).toHaveLength(1);
     });
@@ -248,11 +291,10 @@ describe('BaseMapOption', () => {
         />
       );
 
-      const trigger = screen.getByText('info').closest('span[class*="__info"]');
-      expect(trigger).not.toBeNull();
+      expect(screen.getByText('info')).toBeInTheDocument();
       expect(screen.queryByText('Additional information')).not.toBeInTheDocument();
 
-      fireEvent.mouseEnter(trigger as HTMLElement);
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('Additional information')).toBeInTheDocument();
     });
@@ -268,10 +310,7 @@ describe('BaseMapOption', () => {
         />
       );
 
-      const trigger = screen.getByText('info').closest('span[class*="__info"]');
-      expect(trigger).not.toBeNull();
-
-      fireEvent.mouseEnter(trigger as HTMLElement);
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('Additional information')).toBeInTheDocument();
     });
@@ -287,10 +326,9 @@ describe('BaseMapOption', () => {
         />
       );
 
-      const trigger = screen.getByText('error').closest('span[class*="__info"]');
-      expect(trigger).not.toBeNull();
+      expect(screen.getByText('error')).toBeInTheDocument();
 
-      fireEvent.mouseEnter(trigger as HTMLElement);
+      fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('This layer is unavailable')).toBeInTheDocument();
     });
