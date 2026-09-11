@@ -126,6 +126,12 @@ files. This is the part of this document worth maintaining by hand.
 - **`OptionContent` is a template, not an item.** It has no role, click or focus handling by design.
   It must go inside an interactive parent (`DropdownItem`, a `Select` option) that owns the role,
   selection and keyboard handling.
+- **`Sheet` is the bottom sheet; `Modal` is the centred dialog.** Reach for `Sheet` on mobile-first
+  surfaces — it anchors to the bottom and adds a drag handle, snap points and collapse-to-header that
+  `Modal` has no concept of. It is bottom-only by design (no side/drawer variant). `SheetModal` is a
+  *separate*, Modal-backed variant used internally by `CardStepper` and
+  `TableOfContents.Collapsible`; it is **not** a sub-component of `Sheet`, so don't reach for it when
+  composing one.
 
 ### Composition constraints
 
@@ -144,6 +150,18 @@ files. This is the part of this document worth maintaining by hand.
   prop. Children win when both are given.
 - **`TableOfContents.Item` children must be direct children.** Don't wrap them in another
   component. Pass `underline={false}` on the `Link` inside an item to match the design.
+- **`Sheet` is a compound with an auto-wired title.** Compose `Sheet.Trigger` / `.Content` /
+  `.Header` / `.Body` / `.Footer` / `.Closer`. `Sheet.Header`'s `title` is wired to the dialog's
+  `aria-labelledby` for you; set `Sheet.Content`'s `aria-label` only when there is no visible title.
+- **`Sheet`'s `keepMounted` preserves state, invisibly.** By default the panel is removed from the
+  DOM when closed; `keepMounted` keeps it mounted-but-`hidden`, so form values and scroll position
+  survive a close→reopen. Nothing in the type signals that state-preservation difference — and the
+  kept panel is inert while closed, not just off-screen.
+- **`Sheet` `snapPoints` resize the panel; they don't translate it.** With `snapPoints={[0.4, 0.9]}`
+  the bottom sheet's height *is* the active snap, so the body scrolls and the footer stays visible at
+  every rest position, and dragging below the lowest snap dismisses. `collapsible` is the lighter
+  relative: it peeks the sheet down to just its header (toggled by the `CollapseButton`; the drag
+  handle still dismisses).
 
 ### Responsive behaviour that isn't a prop
 

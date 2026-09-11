@@ -978,6 +978,15 @@
       ]
     },
     {
+      "id": "overlays/sheet",
+      "name": null,
+      "category": "overlays",
+      "sourcePath": "src/tedi/components/overlays/sheet",
+      "status": [],
+      "description": null,
+      "keyProps": []
+    },
+    {
       "id": "misc/separator/separator",
       "name": "Separator",
       "category": "misc",
