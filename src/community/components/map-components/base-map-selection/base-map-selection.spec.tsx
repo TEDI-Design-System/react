@@ -178,7 +178,7 @@ describe('BaseMapSelection', () => {
       expect(trigger).toHaveClass('tedi-map-button');
       // The thumbnail is too small to read at this size, so it gives way to the icon.
       expect(within(trigger).queryByAltText('Active map')).not.toBeInTheDocument();
-      expect(within(trigger).getByText('layers')).toBeInTheDocument();
+      expect(within(trigger).getByText('map')).toBeInTheDocument();
     });
 
     it('opens the popover from the mobile trigger and marks it selected while open', () => {
