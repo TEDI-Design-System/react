@@ -8,6 +8,10 @@
     border-end-end-radius: 0;
   }
 
+  [class*='tedi-text-group--list'][class*='tedi-text-group--horizontal'] > [class*='tedi-text-group__row'] {
+    gap: var(--layout-grid-gutters-08);
+  }
+
   &__header {
     display: flex;
     gap: var(--layout-grid-gutters-16);

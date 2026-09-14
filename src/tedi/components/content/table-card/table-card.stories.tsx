@@ -68,14 +68,13 @@ export const Default: Story = {
   args: {
     rows: benefitRows,
     summary: { label: 'Ülekande summa', value: '0.00 €' },
+    labelSize: 'small',
   },
 };
 
 export const SimpleCard: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      {/* 1. Financial statement — several benefit blocks joined by dividers with one shared total,
-          all right-aligned in a 132px (8.25rem) label column, matching Figma. */}
       <Card padding={0}>
         {[0, 1, 2, 3].map((block) => (
           <Card.Content key={block} padding={1} hasSeparator>
@@ -83,7 +82,7 @@ export const SimpleCard: Story = {
               type="horizontal"
               labelAlign="right"
               valueAlign="right"
-              labelWidth="8.25rem"
+              labelWidth="var(--text-group-label-width-sm)"
               items={benefitStatementItems}
             />
           </Card.Content>
@@ -93,7 +92,7 @@ export const SimpleCard: Story = {
             type="horizontal"
             labelAlign="right"
             valueAlign="right"
-            labelWidth="8.25rem"
+            labelWidth="var(--text-group-label-width-sm)"
             items={[{ label: <Label isSmall>Ülekande summa</Label>, value: <Text modifiers="bold">0.00 €</Text> }]}
           />
         </Card.Content>
@@ -192,7 +191,7 @@ export const WithActions: StoryFn = () => {
             ]}
           />
           <Separator spacing={{ top: 1, bottom: 0.5 }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--layout-grid-gutters-08)' }}>
             <Label isSmall>Asukoht</Label>
             <Dropdown>
               <Dropdown.Trigger>
@@ -360,14 +359,6 @@ export const WithActions: StoryFn = () => {
 WithActions.parameters = {
   a11y: {
     config: {
-      // The form-fields card composes pre-existing form components whose own a11y quirks surface
-      // here (not caused by TableCard); only these specific rules are disabled, not the whole check:
-      // - `button-name` / `aria-allowed-attr`: `TimeField`'s picker-toggle button lacks a name and
-      //   its wrapper carries `aria-expanded` without a supporting role (reproduces in TimeField's
-      //   own stories).
-      // - `color-contrast`: react-select renders `.select__single-value` overlapped by the input
-      //   container, so axe can't determine its background (an "incomplete" false positive — the
-      //   value text is dark on white and readable).
       rules: [
         { id: 'button-name', enabled: false },
         { id: 'aria-allowed-attr', enabled: false },
@@ -390,7 +381,7 @@ export const IsAccordion: StoryFn = () => {
   return (
     <VerticalSpacing size={1}>
       <TableCard
-        title="Hambarst"
+        title="Hambaarst"
         subtitle="14.04.2026 15:30"
         collapsible
         defaultOpen={false}
@@ -402,7 +393,7 @@ export const IsAccordion: StoryFn = () => {
       />
 
       <TableCard
-        title="Hambarst"
+        title="Hambaarst"
         subtitle="14.04.2026 15:30"
         collapsible
         defaultOpen={false}
@@ -478,13 +469,12 @@ export const IsAccordion: StoryFn = () => {
  */
 export const HasChildrenRows: StoryFn = () => {
   const certificates = ['Puukentsefaliidi vaktsiin', 'COVID-19'];
-  // Bordered variant so the badge stays legible on the child rows' grey (tertiary) background.
-  const kehtiv = (
+  const validBadge = (
     <StatusBadge color="success" variant="filled-bordered">
       Kehtiv
     </StatusBadge>
   );
-  const muuda = (
+  const editButton = (
     <Button visualType="neutral" fullWidth iconLeft="edit">
       Muuda
     </Button>
@@ -498,12 +488,12 @@ export const HasChildrenRows: StoryFn = () => {
         layout="horizontal"
         labelAlign="left"
         valueAlign="left"
-        labelWidth="8.25rem"
+        labelWidth="var(--text-group-label-width-sm)"
         rows={[
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },
         ]}
-        actions={muuda}
+        actions={editButton}
       >
         {certificates.map((name) => (
           <Card.Content key={name} padding={1} background="tertiary" hasSeparator>
@@ -512,10 +502,10 @@ export const HasChildrenRows: StoryFn = () => {
                 type="horizontal"
                 labelAlign="left"
                 valueAlign="left"
-                labelWidth="8.25rem"
+                labelWidth="var(--text-group-label-width-sm)"
                 items={[
                   { label: 'Tõend', value: name },
-                  { label: 'Tõendi staatus', value: kehtiv },
+                  { label: 'Tõendi staatus', value: validBadge },
                 ]}
               />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -534,12 +524,12 @@ export const HasChildrenRows: StoryFn = () => {
         layout="horizontal"
         labelAlign="left"
         valueAlign="left"
-        labelWidth="8.25rem"
+        labelWidth="var(--text-group-label-width-sm)"
         rows={[
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },
         ]}
-        actions={muuda}
+        actions={editButton}
       >
         {certificates.map((name) => (
           <Card.Content key={name} padding={1} background="tertiary" hasSeparator>
@@ -547,10 +537,10 @@ export const HasChildrenRows: StoryFn = () => {
               type="horizontal"
               labelAlign="left"
               valueAlign="left"
-              labelWidth="8.25rem"
+              labelWidth="var(--text-group-label-width-sm)"
               items={[
                 { label: 'Tõend', value: name },
-                { label: 'Olek', value: kehtiv },
+                { label: 'Olek', value: validBadge },
               ]}
             />
           </Card.Content>
@@ -566,7 +556,7 @@ export const HasChildrenRows: StoryFn = () => {
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },
         ]}
-        actions={muuda}
+        actions={editButton}
       >
         {certificates.map((name) => (
           <Card.Content key={name} padding={1} background="tertiary" hasSeparator>
@@ -576,7 +566,7 @@ export const HasChildrenRows: StoryFn = () => {
               rowGap="var(--layout-grid-gutters-16)"
               items={[
                 { label: 'Tõend', value: name },
-                { label: 'Olek', value: kehtiv },
+                { label: 'Olek', value: validBadge },
               ]}
             />
           </Card.Content>

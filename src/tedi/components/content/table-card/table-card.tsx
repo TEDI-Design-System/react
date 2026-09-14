@@ -139,11 +139,16 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
 
 /**
  * Layout-specific defaults for the body's `TextGroupList`, applied when the matching prop is omitted.
- * Horizontal: fixed label column, right-aligned text, the list's own compact row gap. Vertical:
- * auto-width left-aligned labels with the layout gutter between rows.
+ * Horizontal: fixed label column, right-aligned text, a compact `gutters-08` row gap. Vertical:
+ * auto-width left-aligned labels with the larger `gutters-16` gap between rows.
  */
 const LAYOUT_DEFAULTS = {
-  horizontal: { labelAlign: 'right', valueAlign: 'right', labelWidth: '8.25rem', rowGap: undefined },
+  horizontal: {
+    labelAlign: 'right',
+    valueAlign: 'right',
+    labelWidth: 'var(--text-group-label-width-sm)',
+    rowGap: '0',
+  },
   vertical: { labelAlign: 'left', valueAlign: 'left', labelWidth: 'auto', rowGap: 'var(--layout-grid-gutters-16)' },
 } as const satisfies Record<
   'horizontal' | 'vertical',

@@ -2195,20 +2195,20 @@ export const Responsive: Story = {
 };
 
 interface Appointment {
-  kuupaev: string;
-  kellaaeg: string;
-  kestus: string;
-  asukoht: string;
+  date: string;
+  time: string;
+  duration: string;
+  location: string;
 }
 
 const appointments: Appointment[] = Array.from({ length: 6 }, () => ({
-  kuupaev: '22.03.2029 – 29.03.2029',
-  kellaaeg: '11:14',
-  kestus: '6 min',
-  asukoht: 'Harjumaa',
+  date: '22.03.2029 – 29.03.2029',
+  time: '11:14',
+  duration: '6 min',
+  location: 'Harjumaa',
 }));
 
-const muudaButton = (
+const editButton = (
   <Button visualType="neutral" size="small" iconLeft="edit">
     Muuda
   </Button>
@@ -2216,20 +2216,20 @@ const muudaButton = (
 
 const appointmentColumns: ColumnDef<Appointment>[] = [
   {
-    id: 'kuupaev',
+    id: 'date',
     header: 'Kuupäev',
-    accessorKey: 'kuupaev',
-    cell: ({ row }) => <span style={{ whiteSpace: 'nowrap' }}>{row.original.kuupaev}</span>,
+    accessorKey: 'date',
+    cell: ({ row }) => <span style={{ whiteSpace: 'nowrap' }}>{row.original.date}</span>,
   },
-  { id: 'kellaaeg', header: 'Kellaaeg', accessorKey: 'kellaaeg' },
-  { id: 'kestus', header: 'Kestus', accessorKey: 'kestus' },
-  { id: 'asukoht', header: 'Asukoht', accessorKey: 'asukoht' },
+  { id: 'time', header: 'Kellaaeg', accessorKey: 'time' },
+  { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
   {
     id: 'actions',
     header: () => <span className="sr-only">Tegevused</span>,
     size: 1,
     meta: { label: 'Tegevused' },
-    cell: () => muudaButton,
+    cell: () => editButton,
   },
 ];
 
@@ -2283,12 +2283,12 @@ export const ResponsiveCards: StoryFn = () => (
             key={index}
             layout="vertical"
             rows={[
-              { label: 'Kuupäev', value: appointment.kuupaev },
-              { label: 'Kellaaeg', value: appointment.kellaaeg },
-              { label: 'Kestus', value: appointment.kestus },
-              { label: 'Asukoht', value: appointment.asukoht },
+              { label: 'Kuupäev', value: appointment.date },
+              { label: 'Kellaaeg', value: appointment.time },
+              { label: 'Kestus', value: appointment.duration },
+              { label: 'Asukoht', value: appointment.location },
             ]}
-            actions={muudaButton}
+            actions={editButton}
           />
         ))}
       </VerticalSpacing>
