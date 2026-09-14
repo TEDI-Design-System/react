@@ -1,3 +1,10 @@
+# [19.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.8...react-19.1.0-rc.9) (2026-09-14)
+
+
+### Bug Fixes
+
+* **map-dropdown:** fix floating element position [#880](https://github.com/TEDI-Design-System/react/issues/880) ([#881](https://github.com/TEDI-Design-System/react/issues/881)) ([cfb9eea](https://github.com/TEDI-Design-System/react/commit/cfb9eeae862d4b5b7c4ba45650cb559d61dab97d))
+
 # [19.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.7...react-19.1.0-rc.8) (2026-09-14)
 
 
