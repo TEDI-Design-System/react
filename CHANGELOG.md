@@ -1,3 +1,10 @@
+# [19.1.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.7...react-19.1.0-rc.8) (2026-09-14)
+
+
+### Bug Fixes
+
+* **base-map-selection:** base-map-selection mobile trigger is a button [#878](https://github.com/TEDI-Design-System/react/issues/878) ([#879](https://github.com/TEDI-Design-System/react/issues/879)) ([c4ae9ac](https://github.com/TEDI-Design-System/react/commit/c4ae9acae378e52f8618e8f10b13c1234468b297))
+
 # [19.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.6...react-19.1.0-rc.7) (2026-09-14)
 
 
