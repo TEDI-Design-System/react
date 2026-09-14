@@ -62,6 +62,14 @@ type DropdownBreakpointProps = {
    * @default 'default'
    */
   variant?: 'default' | 'tree';
+  /**
+   * Restricts the height of the dropdown's scrollable body. When the content is taller,
+   * the body scrolls vertically while any sticky regions (e.g. a Filter search / clear) stay pinned.
+   * - `number` – fixed max height in pixels
+   * - `string` – any valid CSS length (e.g. `'20rem'`, `'50vh'`)
+   * @default undefined (no restriction)
+   */
+  maxHeight?: number | string;
 };
 
 export interface DropdownProps extends BreakpointSupport<DropdownBreakpointProps> {
@@ -119,6 +127,7 @@ export const Dropdown = (props: DropdownProps) => {
     onOpenChange,
     defaultActiveIndex,
     placement = 'bottom-start',
+    maxHeight,
     className,
   } = getCurrentBreakpointProps<DropdownProps>(props);
   const { getLabel } = useLabels();
@@ -228,7 +237,16 @@ export const Dropdown = (props: DropdownProps) => {
               data-placement={placement}
               data-state={open ? 'open' : 'closed'}
             >
-              {content}
+              {maxHeight !== undefined ? (
+                <div
+                  className={styles['tedi-dropdown__scroll']}
+                  style={{ maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight }}
+                >
+                  {content}
+                </div>
+              ) : (
+                content
+              )}
             </div>
           </FloatingFocusManager>
         )}

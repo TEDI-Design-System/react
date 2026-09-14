@@ -1,3 +1,59 @@
+# [19.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.6...react-19.1.0-rc.7) (2026-09-14)
+
+
+### Features
+
+* **table-of-contents:** bordered, separator prop, add new examples [#833](https://github.com/TEDI-Design-System/react/issues/833) ([#864](https://github.com/TEDI-Design-System/react/issues/864)) ([635d742](https://github.com/TEDI-Design-System/react/commit/635d7425eae565da117457e5dc3d75393e8051f6))
+
+# [19.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.5...react-19.1.0-rc.6) (2026-09-11)
+
+
+### Bug Fixes
+
+* **card:** correct edge block radii and free pinned overlays [#851](https://github.com/TEDI-Design-System/react/issues/851) ([#855](https://github.com/TEDI-Design-System/react/issues/855)) ([df6dde0](https://github.com/TEDI-Design-System/react/commit/df6dde0a117a80d39412323c30ce7c338bd6e12a))
+
+# [19.1.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.4...react-19.1.0-rc.5) (2026-09-11)
+
+
+### Bug Fixes
+
+* **popover:** a11y violation fixes [#817](https://github.com/TEDI-Design-System/react/issues/817) ([#870](https://github.com/TEDI-Design-System/react/issues/870)) ([38b6887](https://github.com/TEDI-Design-System/react/commit/38b68872d9a970c20a9a66a3722fcb288898ce1d))
+
+# [19.1.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.3...react-19.1.0-rc.4) (2026-09-09)
+
+
+### Bug Fixes
+
+* **time-field:** a11y violation fixes [#815](https://github.com/TEDI-Design-System/react/issues/815) ([#868](https://github.com/TEDI-Design-System/react/issues/868)) ([de87313](https://github.com/TEDI-Design-System/react/commit/de873134d14ada45f94f9bfdbd12501d8d1ac8e9))
+
+# [19.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.2...react-19.1.0-rc.3) (2026-09-08)
+
+
+### Features
+
+* **dropdown:** add ability to add maxHeight to Dropdown body [#866](https://github.com/TEDI-Design-System/react/issues/866) ([#867](https://github.com/TEDI-Design-System/react/issues/867)) ([b9448e7](https://github.com/TEDI-Design-System/react/commit/b9448e76b87f1aa11d3d455be2153b343a8aa721))
+
+# [19.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.1...react-19.1.0-rc.2) (2026-09-07)
+
+
+### Bug Fixes
+
+* **top-nav,header,sidenav:** a11y violation fixes [#823](https://github.com/TEDI-Design-System/react/issues/823) ([#852](https://github.com/TEDI-Design-System/react/issues/852)) ([d824830](https://github.com/TEDI-Design-System/react/commit/d824830938bd0cd0d687f3dbcd78e03dc9aed8cd))
+
+# [19.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.0.1-rc.2...react-19.1.0-rc.1) (2026-09-04)
+
+
+### Features
+
+* **vertical-stepper,card-stepper:** new TEDI-Ready components [#172](https://github.com/TEDI-Design-System/react/issues/172) ([#690](https://github.com/TEDI-Design-System/react/issues/690)) ([a30b463](https://github.com/TEDI-Design-System/react/commit/a30b4631f7a0f2f82c4b869aa9e795ff2266a89c))
+
+## [19.0.1-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.0.1-rc.1...react-19.0.1-rc.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* **map-button,tooltip:** Fix Stuck Hover And Tooltip On Mobile Tap [#862](https://github.com/TEDI-Design-System/react/issues/862) ([#863](https://github.com/TEDI-Design-System/react/issues/863)) ([212b2ca](https://github.com/TEDI-Design-System/react/commit/212b2ca0c7d5ace1c96d38c59d0abc9925febb87)), closes [#838](https://github.com/TEDI-Design-System/react/issues/838)
+
 ## [19.0.1-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.0.0...react-19.0.1-rc.1) (2026-09-02)
 
 

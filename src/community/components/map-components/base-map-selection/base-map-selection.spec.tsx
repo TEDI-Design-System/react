@@ -1,6 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { useIsTouchDevice } from '../../../../tedi/helpers';
 import { BaseMapOption, BaseMapSelection } from './base-map-selection';
+
+jest.mock('../../../../tedi/helpers', () => ({
+  ...jest.requireActual('../../../../tedi/helpers'),
+  useIsTouchDevice: jest.fn(),
+}));
 
 const renderSelection = (props?: Partial<React.ComponentProps<typeof BaseMapSelection>>) =>
   render(
@@ -9,6 +15,11 @@ const renderSelection = (props?: Partial<React.ComponentProps<typeof BaseMapSele
       <BaseMapSelection.Option id="satellite" title="Satellite" content={<img src="satellite.png" alt="Satellite" />} />
     </BaseMapSelection>
   );
+
+beforeEach(() => {
+  // Tooltips default to hover on non-touch devices (see Overlay's isTouchDevice-aware default).
+  (useIsTouchDevice as jest.Mock).mockReturnValue(false);
+});
 
 describe('BaseMapSelection', () => {
   it('renders the trigger button labelled by its title', () => {
