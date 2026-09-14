@@ -1,16 +1,17 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // The `src/tedi` barrel transitively imports react-sticky-box (ESM-only), which Jest does not transform.
 jest.mock('react-sticky-box', () => ({ __esModule: true, default: () => null }));
 
-import { useIsTouchDevice } from '../../../../tedi/helpers';
+import { useBreakpoint, useIsTouchDevice } from '../../../../tedi/helpers';
 import { LabelProvider } from '../../../../tedi/providers/label-provider';
 import { BaseMapOption, BaseMapSelection } from './base-map-selection';
 
 jest.mock('../../../../tedi/helpers', () => ({
   ...jest.requireActual('../../../../tedi/helpers'),
   useIsTouchDevice: jest.fn(),
+  useBreakpoint: jest.fn(),
 }));
 
 // `useElementSize` measures through a 20ms lodash debounce, so it lands a setState
@@ -38,6 +39,8 @@ const renderSelection = (props?: Partial<React.ComponentProps<typeof BaseMapSele
 beforeEach(() => {
   // Tooltips default to hover on non-touch devices (see Overlay's isTouchDevice-aware default).
   (useIsTouchDevice as jest.Mock).mockReturnValue(false);
+  // Desktop by default - the mobile trigger is covered in its own block below.
+  (useBreakpoint as jest.Mock).mockReturnValue('lg');
 });
 
 describe('BaseMapSelection', () => {
@@ -155,6 +158,41 @@ describe('BaseMapSelection', () => {
 
     expect(slider).toHaveValue('40');
     expect(screen.getByRole('spinbutton', { name: 'Nähtavus' })).toHaveValue(40);
+  });
+
+  describe('trigger', () => {
+    it('shows the active map thumbnail from md upwards', () => {
+      renderSelection();
+
+      const trigger = screen.getByRole('button', { name: 'Active map' });
+      expect(trigger).toHaveAttribute('id', 'basemap');
+      expect(within(trigger).getByAltText('Active map')).toBeInTheDocument();
+    });
+
+    it('replaces the thumbnail with a MapButton below md', () => {
+      (useBreakpoint as jest.Mock).mockReturnValue('sm');
+      renderSelection();
+
+      const trigger = screen.getByRole('button', { name: 'Active map' });
+      expect(trigger).toHaveAttribute('id', 'basemap');
+      expect(trigger).toHaveClass('tedi-map-button');
+      // The thumbnail is too small to read at this size, so it gives way to the icon.
+      expect(within(trigger).queryByAltText('Active map')).not.toBeInTheDocument();
+      expect(within(trigger).getByText('layers')).toBeInTheDocument();
+    });
+
+    it('opens the popover from the mobile trigger and marks it selected while open', () => {
+      (useBreakpoint as jest.Mock).mockReturnValue('xs');
+      renderSelection();
+
+      const trigger = screen.getByRole('button', { name: 'Active map' });
+      expect(trigger).not.toHaveClass('tedi-map-button--selected');
+
+      fireEvent.click(trigger);
+
+      expect(screen.getByText('Streets')).toBeInTheDocument();
+      expect(trigger).toHaveClass('tedi-map-button--selected');
+    });
   });
 
   it('seeds uncontrolled mode from defaultTransparency, clamped', () => {

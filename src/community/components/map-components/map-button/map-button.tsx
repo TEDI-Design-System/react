@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { JSX, useState } from 'react';
+import { forwardRef, useState } from 'react';
 
 import { Button, ButtonProps, Icon, Spinner, Tooltip } from '../../../../tedi';
 import MapDropdown, { MapDropdownItem } from '../map-dropdown/map-dropdown';
@@ -55,7 +55,7 @@ export interface MapButtonProps extends Omit<ButtonProps, OmittedButtonProps> {
   dropdownItems?: MapDropdownItem[];
 }
 
-export const MapButton = (props: MapButtonProps): JSX.Element => {
+export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, ref) => {
   const {
     size = 'default',
     icon,
@@ -98,7 +98,7 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
   );
 
   const buttonElement = (
-    <Button noStyle isLoading={isLoading} className={mapButtonBEM} size={size} {...rest}>
+    <Button noStyle isLoading={isLoading} className={mapButtonBEM} size={size} {...rest} ref={ref}>
       {buttonContent}
     </Button>
   );
@@ -130,6 +130,8 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
   }
 
   return buttonWithTooltip;
-};
+});
+
+MapButton.displayName = 'MapButton';
 
 export default MapButton;

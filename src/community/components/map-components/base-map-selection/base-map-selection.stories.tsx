@@ -101,6 +101,19 @@ export const Multiple: Story = {
   },
 };
 
+/**
+ * Below the `md` breakpoint the thumbnail is too small to read as a map preview, so the trigger
+ * becomes a `MapButton` instead.
+ */
+export const MobileTrigger: Story = {
+  ...Default,
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+  },
+};
+
 const optionStateArray = ['Default', 'Hover', 'Focus', 'Selected'];
 type OptionTemplateProps<Type = typeof optionStateArray> = BaseMapOptionProps & {
   array: Type;

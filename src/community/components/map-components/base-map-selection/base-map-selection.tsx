@@ -7,7 +7,9 @@ import { Input, Suffix } from '../../../../tedi/components/form/input-group';
 import { InputGroupBase } from '../../../../tedi/components/form/input-group/input-group';
 import { Slider } from '../../../../tedi/components/form/slider/slider';
 import { Popover } from '../../../../tedi/components/overlays/popover';
+import { isBreakpointBelow, useBreakpoint } from '../../../../tedi/helpers';
 import { useLabels } from '../../../../tedi/providers/label-provider';
+import MapButton from '../map-button/map-button';
 import BaseMapOption from './base-map-option';
 import styles from './base-map-selection.module.scss';
 
@@ -26,6 +28,7 @@ export interface BaseMapSelectionProps {
   children: React.ReactNode;
   /**
    * Renders a "stacked" trigger, indicating that multiple base maps are available.
+   * Has no effect below the `md` breakpoint, where the trigger is a `MapButton`.
    * @default false
    */
   multiple?: boolean;
@@ -78,6 +81,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
   } = props;
 
   const { getLabel } = useLabels();
+  const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
 
   const transparencyLabel = getLabel('baseMapSelection.transparency');
 
@@ -104,16 +108,22 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
     multiple && styles['tedi-base-map-selection--multiple']
   );
 
+  const trigger = isMobile ? (
+    <MapButton id={id} icon="map" hideLabel tooltipContent="">
+      {title}
+    </MapButton>
+  ) : (
+    <Button noStyle id={id} className={triggerBEM}>
+      <div className={styles['tedi-base-map-selection__content']} aria-hidden>
+        {content}
+      </div>
+      <div className={styles['tedi-base-map-selection__title']}>{title}</div>
+    </Button>
+  );
+
   return (
     <Popover placement="top-start">
-      <Popover.Trigger>
-        <Button noStyle id={id} className={triggerBEM}>
-          <div className={styles['tedi-base-map-selection__content']} aria-hidden>
-            {content}
-          </div>
-          <div className={styles['tedi-base-map-selection__title']}>{title}</div>
-        </Button>
-      </Popover.Trigger>
+      <Popover.Trigger>{trigger}</Popover.Trigger>
       <Popover.Content width="medium">
         <div className={styles['tedi-base-map-selection__options']}>{children}</div>
         {showTransparency && (
