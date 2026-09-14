@@ -104,8 +104,6 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     onSelect?.();
   };
 
-  const keepFocusable = !!disabled && !!tooltipText;
-
   const optionBEM = classNames(
     styles['tedi-base-map-selection__wrapper'],
     selected && styles['tedi-base-map-selection--selected'],
@@ -118,7 +116,7 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
   const option = (
     <Button
       noStyle
-      disabled={disabled && !keepFocusable}
+      disabled={disabled && !tooltipText}
       aria-pressed={!!selected}
       aria-disabled={disabled || undefined}
       onClick={handleSelect}
