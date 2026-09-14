@@ -40,7 +40,7 @@ export interface MapButtonProps extends Omit<ButtonProps, OmittedButtonProps> {
   selected?: boolean;
   /**
    * If `true`, hides the label visually (icon-only button).
-   * Label may still be available to screen readers.
+   * The label stays in the accessible name, so `children` is required for the button to be named.
    */
   hideLabel?: boolean;
   /**
@@ -93,7 +93,11 @@ export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, r
       ) : (
         icon && <Icon name={icon} className={styles['tedi-map-button__icon']} size={size === 'small' ? 24 : 18} />
       )}
-      {!hideLabel && <div className={cn(styles['tedi-map-button__text'])}>{children}</div>}
+      {hideLabel ? (
+        <span className="sr-only">{children}</span>
+      ) : (
+        <div className={cn(styles['tedi-map-button__text'])}>{children}</div>
+      )}
     </>
   );
 

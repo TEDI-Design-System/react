@@ -82,6 +82,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
 
   const { getLabel } = useLabels();
   const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
+  const [isOpen, setIsOpen] = useState(false);
 
   const transparencyLabel = getLabel('baseMapSelection.transparency');
 
@@ -109,7 +110,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
   );
 
   const trigger = isMobile ? (
-    <MapButton id={id} icon="map" hideLabel tooltipContent="">
+    <MapButton id={id} icon="map" hideLabel tooltipContent={null} selected={isOpen}>
       {title}
     </MapButton>
   ) : (
@@ -122,7 +123,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
   );
 
   return (
-    <Popover placement="top-start">
+    <Popover placement="top-start" onToggle={setIsOpen}>
       <Popover.Trigger>{trigger}</Popover.Trigger>
       <Popover.Content width="medium">
         <div className={styles['tedi-base-map-selection__options']}>{children}</div>
