@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 // The `src/tedi` barrel transitively imports react-sticky-box (ESM-only), which Jest does not transform.
 jest.mock('react-sticky-box', () => ({ __esModule: true, default: () => null }));
@@ -9,6 +9,19 @@ describe('MapButton', () => {
   it('renders its label', () => {
     render(<MapButton>Mõõda</MapButton>);
     expect(screen.getByRole('button', { name: 'Mõõda' })).toBeInTheDocument();
+  });
+
+  it('keeps the label as the accessible name when it is hidden visually', () => {
+    render(
+      <MapButton hideLabel icon="straighten" tooltipContent={null}>
+        Mõõda
+      </MapButton>
+    );
+
+    // The icon is `aria-hidden`, so the visually hidden label is the only source of a name.
+    const btn = screen.getByRole('button', { name: 'Mõõda' });
+    expect(btn).toHaveTextContent('Mõõda');
+    expect(within(btn).getByText('Mõõda')).toHaveClass('sr-only');
   });
 
   it('is disabled and does not fire onClick when disabled', () => {
