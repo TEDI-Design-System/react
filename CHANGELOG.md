@@ -1,3 +1,10 @@
+# [19.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.9...react-19.1.0-rc.10) (2026-09-14)
+
+
+### Bug Fixes
+
+* **date-field:** fix date selection range error [#813](https://github.com/TEDI-Design-System/react/issues/813) ([#865](https://github.com/TEDI-Design-System/react/issues/865)) ([a9dd427](https://github.com/TEDI-Design-System/react/commit/a9dd427f2ecbb0a71f2969620ee311dcfec9de43))
+
 # [19.1.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.8...react-19.1.0-rc.9) (2026-09-14)
 
 
