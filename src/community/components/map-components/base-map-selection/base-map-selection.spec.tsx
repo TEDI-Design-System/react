@@ -202,13 +202,14 @@ describe('BaseMapOption', () => {
     expect(onSelect).toHaveBeenCalledTimes(3);
   });
 
-  it('exposes the disabled state on the underlying button and drops it from the tab order', () => {
+  it('drops a disabled option with nothing to reveal from the tab order', () => {
     render(<BaseMapOption disabled id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
     const option = screen.getByRole('button', { name: /Streets/ });
 
-    // The tooltip trigger stamps `tabIndex: 0` on every option, but native `disabled`
-    // outranks it in browsers - the option is neither tabbable nor programmatically
-    // focusable. jsdom does not model that, so assert the attribute rather than focus.
+    // With no `tooltipText` there is nothing a keyboard user could learn by landing here, so
+    // the option stays natively disabled. The tooltip trigger stamps `tabIndex: 0` on every
+    // option, but native `disabled` outranks it in browsers - the option is neither tabbable
+    // nor programmatically focusable. jsdom does not model that, so assert the attribute.
     expect(option).toBeDisabled();
     expect(option).toHaveAttribute('aria-disabled', 'true');
   });
@@ -380,6 +381,70 @@ describe('BaseMapOption', () => {
       fireEvent.mouseEnter(screen.getByRole('button'));
 
       expect(screen.getByText('Additional information')).toBeInTheDocument();
+    });
+
+    it('reveals the tooltip text when an enabled option is reached by keyboard', async () => {
+      const user = userEvent.setup();
+      render(
+        <BaseMapOption
+          id="streets"
+          title="Streets"
+          tooltipText="Additional information"
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+      await settleElementSize();
+
+      await user.tab();
+
+      expect(screen.getByRole('button')).toHaveFocus();
+      expect(screen.getByText('Additional information')).toBeInTheDocument();
+    });
+
+    it('keeps a disabled option with tooltip text reachable by keyboard', async () => {
+      const user = userEvent.setup();
+      render(
+        <BaseMapOption
+          disabled
+          id="streets"
+          title="Streets"
+          tooltipText="Kaardikiht ei ole hetkel saadaval."
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+      await settleElementSize();
+
+      await user.tab();
+
+      const option = screen.getByRole('button');
+      // Disabled through ARIA rather than the native attribute, which would bar focus outright
+      // and leave the explanation of why the layer is unavailable pointer-only.
+      expect(option).toBeEnabled();
+      expect(option).toHaveAttribute('aria-disabled', 'true');
+      expect(option).toHaveFocus();
+      expect(screen.getByText('Kaardikiht ei ole hetkel saadaval.')).toBeInTheDocument();
+    });
+
+    it('still does not select a keyboard-focusable disabled option on Enter or Space', async () => {
+      const user = userEvent.setup();
+      const onSelect = jest.fn();
+      render(
+        <BaseMapOption
+          disabled
+          id="streets"
+          title="Streets"
+          tooltipText="Kaardikiht ei ole hetkel saadaval."
+          onSelect={onSelect}
+          content={<img src="streets.png" alt="Streets" />}
+        />
+      );
+      await settleElementSize();
+
+      await user.tab();
+      await user.keyboard('{Enter}');
+      await user.keyboard(' ');
+
+      expect(onSelect).not.toHaveBeenCalled();
     });
 
     it('renders the error icon variant when tooltipType is "error"', () => {
