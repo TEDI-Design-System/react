@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { createRef } from 'react';
 
 // The `src/tedi` barrel transitively imports react-sticky-box (ESM-only), which Jest does not transform.
 jest.mock('react-sticky-box', () => ({ __esModule: true, default: () => null }));
@@ -82,5 +83,30 @@ describe('MapButton', () => {
     // Keyboard navigation should also initialize from the active item (roving tabIndex).
     expect(options[0]).toHaveAttribute('tabindex', '-1');
     expect(options[1]).toHaveAttribute('tabindex', '0');
+  });
+
+  it('forwards the ref to the button element', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(<MapButton ref={ref}>Text</MapButton>);
+    expect(ref.current).toBe(screen.getByRole('button'));
+  });
+
+  it('forwards the ref even when the dropdown claims the trigger as its floating reference', () => {
+    // Regression: MapDropdown clones the trigger, and its own `refs.setReference` used to be
+    // overwritten by (or overwrite) the trigger's ref. On React 19 the collision dropped
+    // floating-ui's reference, so the dropdown rendered unanchored in the top-left corner.
+    const ref = createRef<HTMLButtonElement>();
+    render(
+      <MapButton ref={ref} dropdownItems={[{ children: 'Option A' }]}>
+        Text
+      </MapButton>
+    );
+
+    const trigger = screen.getByRole('combobox');
+    expect(ref.current).toBe(trigger);
+
+    // Floating-ui still owns the trigger: clicking it opens the listbox.
+    fireEvent.click(trigger);
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
   });
 });
