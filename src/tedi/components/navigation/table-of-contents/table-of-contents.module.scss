@@ -1,5 +1,10 @@
 .tedi-table-of-contents {
   --tedi-table-of-contents-padding: var(--card-padding-md-default);
+  --tedi-table-of-contents-list-padding: var(--tedi-table-of-contents-padding);
+}
+
+.tedi-table-of-contents--bordered {
+  --tedi-table-of-contents-list-padding: var(--card-padding-xs);
 }
 
 .tedi-table-of-contents--transparent .tedi-table-of-contents__list {
@@ -19,42 +24,40 @@
 }
 
 .tedi-table-of-contents--sticky {
-  max-height: calc(100dvh - 3rem);
+  max-height: calc(100dvh - var(--tedi-affix-offset-top) - var(--tedi-affix-offset-bottom));
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .tedi-table-of-contents__heading {
   padding: var(--tedi-table-of-contents-padding);
+  padding-bottom: 0;
 }
 
 .tedi-table-of-contents__list,
 .tedi-table-of-contents__group {
   display: flex;
   flex-direction: column;
-  gap: var(--layout-grid-gutters-08);
+  gap: 0;
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
 .tedi-table-of-contents__list {
-  padding-bottom: var(--tedi-table-of-contents-padding);
-}
-
-.tedi-table-of-contents__list--headless {
-  padding-top: var(--tedi-table-of-contents-padding);
+  padding-block: var(--tedi-table-of-contents-list-padding);
 }
 
 .tedi-table-of-contents__item {
   display: flex;
   flex-direction: column;
-  gap: var(--layout-grid-gutters-08);
 }
 
 .tedi-table-of-contents__row {
   display: flex;
   gap: var(--layout-grid-gutters-04);
   align-items: center;
+  padding-block: var(--table-of-contents-padding-y);
   padding-right: var(--tedi-table-of-contents-padding);
   padding-left: calc(var(--tedi-table-of-contents-padding) - var(--table-of-contents-active-item-border-width));
   border-left: var(--table-of-contents-active-item-border-width) solid transparent;
@@ -63,7 +66,7 @@
 .tedi-table-of-contents__row--level-2 {
   padding-left: calc(
     var(--tedi-table-of-contents-padding) +
-      (var(--table-of-contents-padding-level-2) - var(--table-of-contents-padding-level-1)) -
+      (var(--table-of-contents-padding-left-level-2) - var(--table-of-contents-padding-left-level-1)) -
       var(--table-of-contents-active-item-border-width)
   );
 }
@@ -81,16 +84,68 @@
   overflow-wrap: anywhere;
 }
 
-.tedi-table-of-contents__item--selected > .tedi-table-of-contents__row {
-  border-left-color: var(--general-border-brand);
+.tedi-table-of-contents__slot {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-left: auto;
+}
 
-  .tedi-table-of-contents__number {
-    color: var(--link-primary-active);
+.tedi-table-of-contents__item--selected {
+  position: relative;
+
+  &::before {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: var(--table-of-contents-active-item-border-width);
+    content: '';
+    background: var(--table-of-contents-border-active);
   }
 
-  .tedi-table-of-contents__content :is(a, button) {
-    color: var(--link-primary-active);
+  > .tedi-table-of-contents__row {
+    .tedi-table-of-contents__number {
+      color: var(--link-primary-active);
+    }
+
+    .tedi-table-of-contents__content :is(a, button) {
+      &,
+      &:hover {
+        color: var(--link-primary-active);
+        text-decoration: none;
+      }
+
+      &:hover [class*='tedi-btn__text'] {
+        text-decoration: none;
+      }
+    }
   }
+}
+
+.tedi-table-of-contents__item--selected:has(> .tedi-table-of-contents__group) {
+  &::before {
+    content: none;
+  }
+
+  > .tedi-table-of-contents__row {
+    border-left-color: var(--table-of-contents-border-active);
+  }
+}
+
+.tedi-table-of-contents--bordered .tedi-table-of-contents__row {
+  border-top: var(--tedi-borders-01) solid var(--card-border-primary);
+}
+
+.tedi-table-of-contents--bordered
+  .tedi-table-of-contents__list
+  > .tedi-table-of-contents__item:first-child
+  > .tedi-table-of-contents__row {
+  border-top: 0;
+}
+
+.tedi-table-of-contents__separator {
+  margin-block: var(--layout-grid-gutters-04);
+  margin-inline: var(--tedi-table-of-contents-padding);
 }
 
 .tedi-table-of-contents__bar {
@@ -107,9 +162,24 @@
   border-top: var(--tedi-borders-01) solid var(--card-border-primary);
   border-top-left-radius: var(--card-radius-rounded);
   border-top-right-radius: var(--card-radius-rounded);
+  transition: transform 0.25s ease;
 
   &--static {
     position: static;
+  }
+
+  &--hidden {
+    transform: translateY(100%);
+
+    &:focus-within {
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tedi-table-of-contents__bar {
+    transition: none;
   }
 }
 

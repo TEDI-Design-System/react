@@ -15,12 +15,23 @@ import styles from '../../table-of-contents.module.scss';
 import { TableOfContentsList } from '../table-of-contents-list/table-of-contents-list';
 
 export interface TableOfContentsCollapsibleProps
-  extends Pick<TableOfContentsProps, 'children' | 'heading' | 'ariaLabel' | 'activeId' | 'numbered' | 'className'> {
+  extends Pick<
+    TableOfContentsProps,
+    'children' | 'heading' | 'ariaLabel' | 'activeId' | 'numbered' | 'bordered' | 'defaultOpen' | 'className'
+  > {
   /**
    * Pin the bar to the bottom of the viewport. Set `false` to render it inline.
    * @default true
    */
   sticky?: boolean;
+  /**
+   * Mobile-only behaviour of this `TableOfContents.Collapsible` bar — there is no desktop equivalent.
+   * When the bar is pinned (`sticky`), auto-hide it while the page scrolls down and reveal it again on
+   * scroll up, so it stays out of the way while reading but is one gesture away. No effect when
+   * `sticky` is `false`.
+   * @default false
+   */
+  hideOnScroll?: boolean;
 }
 
 /**
@@ -28,10 +39,51 @@ export interface TableOfContentsCollapsibleProps
  * Same `TableOfContents.Item` children as the desktop card; render it on small viewports.
  */
 export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProps): JSX.Element => {
-  const { children, heading, ariaLabel, activeId, numbered = false, sticky = true, className } = props;
+  const {
+    children,
+    heading,
+    ariaLabel,
+    activeId,
+    numbered = false,
+    bordered = false,
+    defaultOpen = true,
+    sticky = true,
+    hideOnScroll = false,
+    className,
+  } = props;
   const { getLabel } = useLabels();
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [listElement, setListElement] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hideOnScroll || !sticky) {
+      setHidden(false);
+      return undefined;
+    }
+
+    let lastY = window.scrollY;
+    let frame = 0;
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const y = window.scrollY;
+        const delta = y - lastY;
+        if (Math.abs(delta) > 4) {
+          setHidden(delta > 0 && y > 0);
+          lastY = y;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [hideOnScroll, sticky]);
 
   useEffect(() => {
     if (!open || !listElement) return undefined;
@@ -51,8 +103,8 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
   const contextValue = useMemo(
-    () => ({ activeId, numbered, ariaLabel: navLabel, activeTrail }),
-    [activeId, numbered, navLabel, activeTrail]
+    () => ({ activeId, numbered, ariaLabel: navLabel, activeTrail, defaultOpen }),
+    [activeId, numbered, navLabel, activeTrail, defaultOpen]
   );
 
   return (
@@ -60,7 +112,10 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
       <div
         className={cn(
           styles['tedi-table-of-contents__bar'],
-          { [styles['tedi-table-of-contents__bar--static']]: !sticky },
+          {
+            [styles['tedi-table-of-contents__bar--static']]: !sticky,
+            [styles['tedi-table-of-contents__bar--hidden']]: hidden && !open,
+          },
           className
         )}
       >
@@ -84,7 +139,12 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
           </div>
         }
       >
-        <div ref={setListElement} className={styles['tedi-table-of-contents']}>
+        <div
+          ref={setListElement}
+          className={cn(styles['tedi-table-of-contents'], {
+            [styles['tedi-table-of-contents--bordered']]: bordered,
+          })}
+        >
           <TableOfContentsList nodes={nodes} heading={null} />
         </div>
       </Sheet>
