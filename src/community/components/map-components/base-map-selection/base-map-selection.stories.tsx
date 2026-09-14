@@ -30,12 +30,17 @@ type Story = StoryObj<typeof BaseMapSelection>;
 const MAP_IMG = 'https://snazzy-maps-cdn.azureedge.net/assets/72543-assassins-creed-iv.png';
 const HISTORICAL_IMG = 'https://snazzy-maps-cdn.azureedge.net/assets/8097-wy.png';
 
-const MAPS = [
+type PlaygroundMap = Pick<BaseMapOptionProps, 'title' | 'multiple' | 'disabled' | 'tooltipText' | 'tooltipType'> & {
+  id: string;
+  src: string;
+};
+
+const MAPS: PlaygroundMap[] = [
   { id: 'streets', title: 'Kaart', src: MAP_IMG },
   { id: 'satellite', title: 'Satelliit', src: HISTORICAL_IMG, multiple: true },
-  { id: 'hybrid', title: 'Hübriid', src: MAP_IMG, disabled: true },
-  { id: 'test2', title: 'Test 2', src: MAP_IMG },
-  { id: 'test3', title: 'Test 3', src: MAP_IMG },
+  { id: 'hybrid', title: 'Hübriid', src: MAP_IMG, disabled: true, tooltipText: 'Error test', tooltipType: 'error' },
+  { id: 'test2', title: 'Test 2 test', src: MAP_IMG },
+  { id: 'test3', title: 'Test 3', src: MAP_IMG, tooltipText: 'Info test', tooltipType: 'info' },
 ];
 
 const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
@@ -61,6 +66,8 @@ const PlaygroundTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
           multiple={map.multiple}
           disabled={map.disabled ?? false}
           selected={map.id === active}
+          tooltipText={map.tooltipText}
+          tooltipType={map.tooltipType}
           onSelect={() => setActive(map.id)}
           content={<img src={map.src} alt={map.title} />}
         />
@@ -83,7 +90,6 @@ export const WithTransparency: Story = {
   args: {
     ...Default.args,
     showTransparency: true,
-    transparencyLabel: 'Läbipaistvus',
   },
 };
 
@@ -175,6 +181,7 @@ export const OptionWithInfo: StoryObj<OptionTemplateProps> = {
         <Col className="flex align-items-center gap-3">
           <BaseMapOption
             {...args}
+            title="Pikk nimi koos infoga"
             id="error"
             disabled
             tooltipText="Kaardikiht ei ole hetkel saadaval."

@@ -1407,6 +1407,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Pick time',
     ru: 'Выберите время',
   },
+  'baseMapSelection.transparency': {
+    description: 'Accessible name for the base map transparency slider and its numeric field',
+    components: ['BaseMapSelection'],
+    et: 'Nähtavus',
+    en: 'Visibility',
+    ru: 'Видимость',
+  },
 });
 
 type DefaultLabels = typeof labelsMap;
