@@ -315,6 +315,35 @@ export const Radius: Story = {
   ),
 };
 
+/**
+ * **Non-modal peek.** `showOverlay`, `trapFocus` and `lockScroll` off (plus
+ * `closeOnBackdropClick={false}`) keep a `collapsible` sheet docked as a header peek while the page
+ * behind stays usable and clicks don't dismiss it.
+ */
+export const NonModalPeek: Story = {
+  render: function NonModalPeek() {
+    return (
+      <VerticalSpacing size={1}>
+        <Sheet closeOnBackdropClick={false}>
+          <Sheet.Trigger>
+            <Button>Ava kihid</Button>
+          </Sheet.Trigger>
+          <Sheet.Content showOverlay={false} trapFocus={false} lockScroll={false}>
+            <Sheet.Header title="Kihid" variant="brand" collapsible />
+            <Sheet.Body>
+              <VerticalSpacing size={0.5}>
+                <Checkbox id="np-hybrid" name="np-hybrid" value="hybrid" label="Hübriidkaart" defaultChecked />
+                <Checkbox id="np-relief" name="np-relief" value="relief" label="Reljeef" />
+                <Checkbox id="np-cadastre" name="np-cadastre" value="cadastre" label="Katastriüksused" />
+              </VerticalSpacing>
+            </Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      </VerticalSpacing>
+    );
+  },
+};
+
 const MAP_LAYERS = ['Hübriidkaart', 'Reljeef', 'Katastriüksused', 'Kitsendused', 'Aadressandmed'];
 
 const SearchableLayersSheet = () => {
