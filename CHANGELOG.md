@@ -1,3 +1,10 @@
+# [19.1.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.6...react-19.1.0-rc.7) (2026-09-14)
+
+
+### Features
+
+* **table-of-contents:** bordered, separator prop, add new examples [#833](https://github.com/TEDI-Design-System/react/issues/833) ([#864](https://github.com/TEDI-Design-System/react/issues/864)) ([635d742](https://github.com/TEDI-Design-System/react/commit/635d7425eae565da117457e5dc3d75393e8051f6))
+
 # [19.1.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.5...react-19.1.0-rc.6) (2026-09-11)
 
 
