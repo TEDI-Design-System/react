@@ -9,7 +9,7 @@ import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { OptionContent } from '../../misc/option-content/option-content';
 import Separator from '../../misc/separator/separator';
-import { Search, SearchOption, SearchProps } from './search';
+import { Search, SearchProps, SearchSuggestion } from './search';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4620-82860&m=dev" target="_BLANK">Figma ↗</a><br/>
@@ -19,8 +19,10 @@ import { Search, SearchOption, SearchProps } from './search';
  * typeahead / suggestions (the **Autocomplete: …** stories demonstrate it); leave `suggestions` unset for a
  * plain search field.
  *
- * Not sure which pattern to reach for? See the **Choosing a pattern** doc for a decision guide between plain
- * `Search`, `Search` with `suggestions` (autocomplete), and `Search` + an inline region (rich results with actions).
+ * Not sure which pattern to reach for? See the
+ * <a href="?path=/docs/tedi-ready-components-form-search--documentation">Choosing a pattern</a> doc for a decision
+ * guide between plain `Search`, `Search` with `suggestions` (autocomplete), and `Search` + an inline region
+ * (rich results with actions).
  */
 
 const meta: Meta<SearchProps> = {
@@ -77,20 +79,20 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-plain`}
-                  ariaLabel={`Otsing – ${value} – tavaline`}
+                  ariaLabel={`Search – ${value} – plain`}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-icon`}
-                  ariaLabel={`Otsing – ${value} – ikooninupuga`}
+                  ariaLabel={`Search – ${value} – icon button`}
                   button={{ icon: 'search', size: value, 'aria-label': 'Otsi' }}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-button`}
-                  ariaLabel={`Otsing – ${value} – nupuga`}
+                  ariaLabel={`Search – ${value} – button`}
                   button={{ iconLeft: 'search', children: 'Otsi', size: value }}
                 />
               </VerticalSpacing>
@@ -120,7 +122,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
                 {...textFieldProps}
                 id={stateId}
                 disabled={state === 'Disabled'}
-                ariaLabel={`Otsing – ${state}`}
+                ariaLabel={`Search – ${state}`}
               />
             </Col>
           </Row>
@@ -135,7 +137,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Search
             {...textFieldProps}
             id={`${id}-success`}
-            ariaLabel="Otsing – Success"
+            ariaLabel="Search – Success"
             helper={{ text: 'Tagasiside tekst', type: 'valid' }}
           />
         </Col>
@@ -149,7 +151,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Search
             {...textFieldProps}
             id={`${id}-error`}
-            ariaLabel="Otsing – Error"
+            ariaLabel="Search – Error"
             helper={{ text: 'Tagasiside tekst', type: 'error' }}
           />
         </Col>
@@ -238,9 +240,9 @@ export const WithHint: Story = {
 };
 
 /**
- * A national-registry person lookup, shown **live**: the field starts empty and the result
- * panel appears below it as you type (the `play` function types a code to reveal it). The
- * panel is an inline region **below** the field — not a popup — on purpose.
+ * A single matched result with fallback actions, shown **live**: the field starts empty and the
+ * result panel appears below it as you type (the `play` function types to reveal it). The panel is
+ * an inline region **below** the field — not a popup — on purpose.
  *
  * **Why not a `Dropdown` or the `suggestions` combobox here?** A floating menu is anchored by
  * `aria-haspopup` / `aria-expanded` on its trigger, but those disclosure attributes are only
@@ -347,7 +349,7 @@ Use \`ariaLabel\` only as a fallback when a real \`<label>\` cannot be rendered.
   },
 };
 
-const PEOPLE: SearchOption[] = [
+const PEOPLE: SearchSuggestion[] = [
   { value: 'mari', label: 'Mari Maasikas', description: 'Tootejuht' },
   { value: 'marelle', label: 'Marelle Mets', description: 'Disainer' },
   { value: 'marjanne', label: 'Marjanne Meri', description: 'Arendaja' },
@@ -383,14 +385,14 @@ export const Autocomplete: Story = {
         value={value}
         onChange={setValue}
         suggestions={suggestions}
-        onSuggestionSelect={(option) => setValue(option.label as string)}
+        onSuggestionSelect={(suggestion) => setValue(suggestion.label as string)}
       />
     );
   },
 };
 
 /**
- * Custom row markup via `renderSuggestion` - full control over each option (here the name is
+ * Custom row markup via `renderSuggestionContent` - full control over each suggestion (here the name is
  * bolded and the role shown inline).
  */
 export const AutocompleteCustomRow: Story = {
@@ -408,12 +410,12 @@ export const AutocompleteCustomRow: Story = {
         value={value}
         onChange={setValue}
         suggestions={suggestions}
-        onSuggestionSelect={(option) => setValue(option.label as string)}
-        renderSuggestion={(option) => (
+        onSuggestionSelect={(suggestion) => setValue(suggestion.label as string)}
+        renderSuggestionContent={(suggestion) => (
           <OptionContent>
             <OptionContent.Label>
               <Text element="span" modifiers="bold">
-                {option.label}
+                {suggestion.label}
               </Text>
               <Separator
                 axis="vertical"
@@ -424,7 +426,7 @@ export const AutocompleteCustomRow: Story = {
                 spacing={0.5}
                 variant="dot-only"
               />
-              {option.description}
+              {suggestion.description}
             </OptionContent.Label>
           </OptionContent>
         )}
@@ -444,7 +446,7 @@ export const AutocompleteAsync: Story = {
   render: function AutocompleteAsyncExample() {
     const [value, setValue] = useState('');
     const [loading, setLoading] = useState(false);
-    const [suggestions, setSuggestions] = useState<SearchOption[]>([]);
+    const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
     const timer = useRef<ReturnType<typeof setTimeout>>();
 
     useEffect(() => () => clearTimeout(timer.current), []);
@@ -475,10 +477,10 @@ export const AutocompleteAsync: Story = {
         onChange={handleChange}
         suggestions={suggestions}
         loading={loading}
-        onSuggestionSelect={(option) => {
+        onSuggestionSelect={(suggestion) => {
           clearTimeout(timer.current);
           setLoading(false);
-          setValue(option.label as string);
+          setValue(suggestion.label as string);
         }}
       />
     );
@@ -494,30 +496,28 @@ export const AutocompleteDisabledOptions: Story = {
   render: function AutocompleteDisabledExample() {
     const [value, setValue] = useState('');
     const suggestions = value.trim()
-      ? filterPeople(value).map((option, index) => (index % 3 === 0 ? { ...option, disabled: true } : option))
+      ? filterPeople(value).map((suggestion, index) =>
+          index % 3 === 0 ? { ...suggestion, disabled: true } : suggestion
+        )
       : [];
 
     return (
-      <VerticalSpacing size={0.5}>
-        <Search
-          id="search-autocomplete-disabled"
-          label="Otsi"
-          placeholder="Hakka nime trükkima…"
-          value={value}
-          onChange={setValue}
-          suggestions={suggestions}
-          onSuggestionSelect={(option) => setValue(option.label as string)}
-        />
-        <Text color="tertiary" modifiers="small">
-          Iga kolmas vaste on keelatud.
-        </Text>
-      </VerticalSpacing>
+      <Search
+        id="search-autocomplete-disabled"
+        label="Otsi"
+        placeholder="Hakka nime trükkima…"
+        value={value}
+        onChange={setValue}
+        suggestions={suggestions}
+        onSuggestionSelect={(suggestion) => setValue(suggestion.label as string)}
+        helper={{ text: 'Iga kolmas vaste on keelatud.' }}
+      />
     );
   },
 };
 
 /**
- * Free-text submit — pressing Enter with no active option fires `onSearch` instead of
+ * Free-text submit — pressing Enter with no active suggestion fires `onSearch` instead of
  * `onSuggestionSelect`, so the field doubles as a plain search box.
  */
 export const AutocompleteFreeText: Story = {
@@ -537,7 +537,7 @@ export const AutocompleteFreeText: Story = {
           value={value}
           onChange={setValue}
           suggestions={suggestions}
-          onSuggestionSelect={(option) => setValue(option.label as string)}
+          onSuggestionSelect={(suggestion) => setValue(suggestion.label as string)}
           onSearch={setSubmitted}
         />
         {submitted !== undefined && (
@@ -570,7 +570,7 @@ export const AutocompleteWithFooter: Story = {
         value={value}
         onChange={setValue}
         suggestions={suggestions}
-        onSuggestionSelect={(option) => setValue(option.label as string)}
+        onSuggestionSelect={(suggestion) => setValue(suggestion.label as string)}
         footer={
           <>
             <Row gutter={2} justifyContent="center">
@@ -597,7 +597,7 @@ export const AutocompleteWithFooter: Story = {
 
 /**
  * With `hideOnScroll`, scrolling the page (or a scrollable ancestor) closes the popup —
- * scrolling the option list itself keeps it open. Type to open the list, then scroll the page.
+ * scrolling the suggestion list itself keeps it open. Type to open the list, then scroll the container.
  */
 export const AutocompleteHideOnScroll: Story = {
   name: 'Autocomplete: hide on scroll',
@@ -606,19 +606,29 @@ export const AutocompleteHideOnScroll: Story = {
     const suggestions = value.trim() ? filterPeople(value) : [];
 
     return (
-      <VerticalSpacing size={1}>
-        <Search
-          id="search-autocomplete-hide-on-scroll"
-          label="Otsi"
-          placeholder="Hakka nime trükkima…"
-          value={value}
-          onChange={setValue}
-          suggestions={suggestions}
-          onSuggestionSelect={(option) => setValue(option.label as string)}
-          hideOnScroll
-        />
-        <div style={{ height: '150vh' }} aria-hidden="true" />
-      </VerticalSpacing>
+      <div
+        style={{
+          maxHeight: '16rem',
+          overflowY: 'auto',
+          padding: '1rem',
+          border: '1px solid var(--card-border-primary)',
+          borderRadius: 'var(--form-field-radius)',
+        }}
+      >
+        <VerticalSpacing size={1}>
+          <Search
+            id="search-autocomplete-hide-on-scroll"
+            label="Otsi"
+            placeholder="Hakka nime trükkima…"
+            value={value}
+            onChange={setValue}
+            suggestions={suggestions}
+            onSuggestionSelect={(suggestion) => setValue(suggestion.label as string)}
+            hideOnScroll
+          />
+          <div style={{ height: '24rem' }} aria-hidden="true" />
+        </VerticalSpacing>
+      </div>
     );
   },
 };

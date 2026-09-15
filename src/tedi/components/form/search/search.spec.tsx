@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
-import { Search, SearchOption, SearchProps } from './search';
+import { Search, SearchProps, SearchSuggestion } from './search';
 
 import '@testing-library/jest-dom';
 
@@ -110,7 +110,7 @@ describe('Search component', () => {
 });
 
 describe('Search autocomplete (suggestions)', () => {
-  const OPTIONS: SearchOption[] = [
+  const OPTIONS: SearchSuggestion[] = [
     { value: 'mari', label: 'Mari Maasikas' },
     { value: 'mart', label: 'Mart Mesi' },
     { value: 'kalle', label: 'Kalle Kask', disabled: true },
@@ -131,6 +131,15 @@ describe('Search autocomplete (suggestions)', () => {
     const input = screen.getByRole('combobox', { name: 'Otsi' });
     expect(input).toHaveAttribute('aria-autocomplete', 'list');
     expect(input).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('does not crash when suggestions is not an array (e.g. Storybook object control)', () => {
+    // Storybook's "Set object" control seeds the arg with `{}` rather than `[]`.
+    expect(() =>
+      render(<Search id="ac" label="Otsi" suggestions={{} as unknown as SearchSuggestion[]} />)
+    ).not.toThrow();
+
+    expect(screen.getByRole('combobox', { name: 'Otsi' })).toBeInTheDocument();
   });
 
   it('opens a listbox with options once the query meets the threshold', async () => {
@@ -272,6 +281,16 @@ describe('Search autocomplete (suggestions)', () => {
     await user.type(screen.getByRole('combobox'), 'zzz');
 
     expect((await screen.findAllByText('search.no-results')).length).toBeGreaterThan(0);
+  });
+
+  it('uses a custom resultsCountText for the live-region announcement', async () => {
+    const user = userEvent.setup();
+    render(<ControlledExample resultsCountText={(count) => `${count} isikut leitud`} />);
+
+    await user.type(screen.getByRole('combobox'), 'ma');
+    await screen.findByRole('listbox');
+
+    expect(screen.getByRole('status')).toHaveTextContent('2 isikut leitud');
   });
 
   it('supports uncontrolled use — picking an option fills the input', async () => {

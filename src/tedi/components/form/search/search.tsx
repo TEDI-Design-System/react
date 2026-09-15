@@ -23,7 +23,7 @@ import { FieldElement } from '../field/field';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './search.module.scss';
 
-export interface SearchOption {
+export interface SearchSuggestion {
   /**
    * Stable value returned to `onSuggestionSelect` and used as the React key. For
    * richer payloads keep a lookup keyed by this value on the consumer side.
@@ -36,15 +36,18 @@ export interface SearchOption {
   /**
    * Optional secondary line shown beneath the label (e.g. a code, category, or
    * hint). Rendered as `OptionContent.Meta` in the default row layout; ignored
-   * when a custom `renderSuggestion` is supplied.
+   * when a custom `renderSuggestionContent` is supplied.
    */
   description?: React.ReactNode;
   /**
-   * Renders the option greyed out and skips it during keyboard navigation.
+   * Renders the suggestion greyed out and skips it during keyboard navigation.
    * @default false
    */
   disabled?: boolean;
 }
+
+const SEARCH_PANEL_OFFSET = 4;
+const SEARCH_PANEL_PADDING = 8;
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -94,12 +97,12 @@ export interface SearchProps
    * field. Filter / fetch these yourself in response to `onChange`; the component
    * renders exactly what it is given.
    */
-  suggestions?: SearchOption[];
+  suggestions?: SearchSuggestion[];
   /**
-   * Fired when a suggestion is chosen (Enter on the active option, or click). In
+   * Fired when a suggestion is chosen (Enter on the active suggestion, or click). In
    * controlled mode update `value` from here to reflect the picked label.
    */
-  onSuggestionSelect?: (option: SearchOption) => void;
+  onSuggestionSelect?: (suggestion: SearchSuggestion) => void;
   /**
    * Shows a loading row in the popup instead of suggestions — use while an async
    * request is in flight.
@@ -113,20 +116,23 @@ export interface SearchProps
   minQueryLength?: number;
   /**
    * Closes the suggestion popup when the page (or a scrollable ancestor) scrolls.
-   * Scrolling the option list itself keeps the popup open.
+   * Scrolling the suggestion list itself keeps the popup open.
    * @default false
    */
   hideOnScroll?: boolean;
   /**
-   * Custom suggestion renderer. Receives the option plus its active state and the
-   * current query (handy for match highlighting).
+   * Custom suggestion renderer. Receives the suggestion plus its active state and
+   * the current query (handy for match highlighting).
    */
-  renderSuggestion?: (option: SearchOption, state: { active: boolean; query: string }) => React.ReactNode;
+  renderSuggestionContent?: (
+    suggestion: SearchSuggestion,
+    state: { active: boolean; query: string }
+  ) => React.ReactNode;
   /**
    * Derives the input text to show after a suggestion is picked (uncontrolled mode).
-   * Defaults to the option's string label, falling back to its `value`.
+   * Defaults to the suggestion's string label, falling back to its `value`.
    */
-  getSuggestionText?: (option: SearchOption) => string;
+  getSuggestionText?: (suggestion: SearchSuggestion) => string;
   /**
    * Text shown when there are no suggestions and it is not loading. Defaults to the
    * localized `search.no-results` label.
@@ -136,6 +142,11 @@ export interface SearchProps
    * Text shown in the loading row. Defaults to the localized `search.loading` label.
    */
   loadingText?: React.ReactNode;
+  /**
+   * Builds the politely announced live-region message stating how many suggestions
+   * are available. Defaults to the localized `search.results-count` label.
+   */
+  resultsCountText?: (count: number) => string;
   /**
    * Extra content pinned below the suggestions — fallback actions or a hint, for
    * example. It shows whenever the popup is open, including the no-results state.
@@ -149,9 +160,9 @@ export interface SearchProps
   input?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
-const suggestionText = (option: SearchOption, getSuggestionText?: SearchProps['getSuggestionText']): string => {
-  if (getSuggestionText) return getSuggestionText(option);
-  return typeof option.label === 'string' ? option.label : String(option.value);
+const suggestionText = (suggestion: SearchSuggestion, getSuggestionText?: SearchProps['getSuggestionText']): string => {
+  if (getSuggestionText) return getSuggestionText(suggestion);
+  return typeof suggestion.label === 'string' ? suggestion.label : String(suggestion.value);
 };
 
 /** Bolds the substring of `label` that matches `query` (case-insensitive). */
@@ -189,16 +200,16 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     input,
     value: externalValue,
     defaultValue,
-    // autocomplete
     suggestions,
     onSuggestionSelect,
     loading = false,
     minQueryLength = 0,
     hideOnScroll = false,
-    renderSuggestion,
+    renderSuggestionContent,
     getSuggestionText,
     noResultsText,
     loadingText,
+    resultsCountText,
     footer,
     ...rest
   } = props;
@@ -209,7 +220,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
   const resolvedId = id ?? generatedId;
 
   const isAutocomplete = suggestions !== undefined;
-  const options = useMemo(() => suggestions ?? [], [suggestions]);
+  const suggestionList = useMemo(() => (Array.isArray(suggestions) ? suggestions : []), [suggestions]);
 
   const isControlled = externalValue !== undefined;
   const [innerValue, setInnerValue] = useState(defaultValue ?? '');
@@ -225,10 +236,11 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
   React.useImperativeHandle(ref, () => fieldRef.current as TextFieldForwardRef, []);
 
   const meetsThreshold = query.trim().length >= minQueryLength;
-  const hasSuggestions = !loading && options.length > 0;
+  const hasSuggestions = !loading && suggestionList.length > 0;
   const disabledIndices = useMemo(
-    () => options.reduce<number[]>((acc, option, index) => (option.disabled ? [...acc, index] : acc), []),
-    [options]
+    () =>
+      suggestionList.reduce<number[]>((acc, suggestion, index) => (suggestion.disabled ? [...acc, index] : acc), []),
+    [suggestionList]
   );
 
   const { refs, floatingStyles, context } = useFloating({
@@ -237,16 +249,14 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     placement: 'bottom-start',
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(4),
-      flip({ padding: 8 }),
-      shift({ padding: 8 }),
+      offset(SEARCH_PANEL_OFFSET),
+      flip({ padding: SEARCH_PANEL_PADDING }),
+      shift({ padding: SEARCH_PANEL_PADDING }),
       size({
-        padding: 8,
+        padding: SEARCH_PANEL_PADDING,
         apply({ rects, elements, availableHeight }) {
-          Object.assign(elements.floating.style, {
-            width: `${rects.reference.width}px`,
-            maxHeight: `${Math.min(availableHeight, 320)}px`,
-          });
+          elements.floating.style.width = `${rects.reference.width}px`;
+          elements.floating.style.setProperty('--tedi-search-panel-available-height', `${availableHeight}px`);
         },
       }),
     ],
@@ -283,10 +293,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     setActiveIndex(null);
   };
 
-  const selectOption = (option: SearchOption) => {
-    if (option.disabled) return;
-    if (!isControlled) setInnerValue(suggestionText(option, getSuggestionText));
-    onSuggestionSelect?.(option);
+  const selectSuggestion = (suggestion: SearchSuggestion) => {
+    if (suggestion.disabled) return;
+    if (!isControlled) setInnerValue(suggestionText(suggestion, getSuggestionText));
+    onSuggestionSelect?.(suggestion);
     closePanel();
   };
 
@@ -314,7 +324,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     if (event.key === 'Enter') onSearch?.(query);
   };
 
-  const activeOption = !loading && activeIndex !== null ? options[activeIndex] : undefined;
+  const activeSuggestion = !loading && activeIndex !== null ? suggestionList[activeIndex] : undefined;
 
   const focusAfterField = () => {
     const inputEl = fieldRef.current?.input;
@@ -329,9 +339,14 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
 
   const handleAutocompleteKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
     if (event.key === 'Enter') {
-      if (panelVisible && activeIndex !== null && options[activeIndex] && !options[activeIndex].disabled) {
+      if (
+        panelVisible &&
+        activeIndex !== null &&
+        suggestionList[activeIndex] &&
+        !suggestionList[activeIndex].disabled
+      ) {
         event.preventDefault();
-        selectOption(options[activeIndex]);
+        selectSuggestion(suggestionList[activeIndex]);
         return;
       }
       onSearch?.(query);
@@ -393,7 +408,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
         'aria-expanded': panelVisible,
         'aria-controls': panelVisible && hasSuggestions ? listboxId : undefined,
         'aria-activedescendant':
-          panelVisible && activeOption && activeIndex !== null ? optionId(activeIndex) : undefined,
+          panelVisible && activeSuggestion && activeIndex !== null ? optionId(activeIndex) : undefined,
         onKeyDown: handleAutocompleteKeyDown,
       }) as React.InputHTMLAttributes<HTMLInputElement>)
     : { role: 'searchbox' };
@@ -429,23 +444,18 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     onSearch?.(query);
   };
 
-  // Name the search landmark with the generic "search" label rather than the
-  // placeholder. The input already surfaces the placeholder, so reusing it as
-  // the region name makes screen readers announce it twice. Consumers should
-  // set `ariaLabel` to give the region a distinct name (e.g. "Search products").
-  // `||` (not `??`) so an empty-string `ariaLabel` also falls back — otherwise
-  // the landmark would render with an empty accessible name.
   const searchAriaLabel = ariaLabel || getLabel('search');
 
   const resolvedLoadingText = loadingText ?? getLabel('search.loading');
   const resolvedNoResults = noResultsText ?? getLabel('search.no-results');
+  const resolvedResultsCount = resultsCountText ?? ((count: number) => getLabel('search.results-count', count));
 
   const liveMessage = !panelVisible
     ? ''
     : loading
     ? resolvedLoadingText
-    : options.length > 0
-    ? getLabel('search.results-count', options.length)
+    : suggestionList.length > 0
+    ? resolvedResultsCount(suggestionList.length)
     : resolvedNoResults;
 
   const renderPanelBody = () => {
@@ -461,42 +471,48 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     if (hasSuggestions) {
       return (
         <ul id={listboxId} role="listbox" className={styles['tedi-search__panel-list']}>
-          {options.map((option, index) => {
+          {suggestionList.map((suggestion, index) => {
             const active = activeIndex === index;
             const labelText =
-              typeof (option.label ?? option.value) === 'string' ? String(option.label ?? option.value) : undefined;
-            const descriptionText = typeof option.description === 'string' ? option.description : undefined;
+              typeof (suggestion.label ?? suggestion.value) === 'string'
+                ? String(suggestion.label ?? suggestion.value)
+                : undefined;
+            const descriptionText = typeof suggestion.description === 'string' ? suggestion.description : undefined;
             const optionAriaLabel =
-              !renderSuggestion && labelText ? [labelText, descriptionText].filter(Boolean).join(', ') : undefined;
+              !renderSuggestionContent && labelText
+                ? [labelText, descriptionText].filter(Boolean).join(', ')
+                : undefined;
 
             return (
               <li
-                key={option.value}
+                key={suggestion.value}
                 id={optionId(index)}
                 role="option"
                 aria-selected={active}
-                aria-disabled={option.disabled || undefined}
+                aria-disabled={suggestion.disabled || undefined}
                 aria-label={optionAriaLabel}
                 ref={(node) => {
                   listRef.current[index] = node;
                 }}
                 className={cn(styles['tedi-search__option'], {
                   [styles['tedi-search__option--active']]: active,
-                  [styles['tedi-search__option--disabled']]: option.disabled,
+                  [styles['tedi-search__option--disabled']]: suggestion.disabled,
                 })}
                 {...getItemProps({
-                  onClick: () => selectOption(option),
+                  onClick: () => selectSuggestion(suggestion),
                   onMouseDown: (event) => event.preventDefault(),
                 })}
               >
-                {renderSuggestion ? (
-                  renderSuggestion(option, { active, query })
+                {renderSuggestionContent ? (
+                  renderSuggestionContent(suggestion, { active, query })
                 ) : (
-                  <OptionContent layout={option.description !== undefined ? 'vertical' : 'horizontal'}>
+                  <OptionContent layout={suggestion.description !== undefined ? 'vertical' : 'horizontal'}>
                     <OptionContent.Label>
-                      {labelText ? highlightMatch(labelText, query) : option.label ?? option.value}
+                      {labelText ? highlightMatch(labelText, query) : suggestion.label ?? suggestion.value}
                     </OptionContent.Label>
-                    {option.description !== undefined && <OptionContent.Meta>{option.description}</OptionContent.Meta>}
+                    {suggestion.description !== undefined && (
+                      <OptionContent.Meta>{suggestion.description}</OptionContent.Meta>
+                    )}
                   </OptionContent>
                 )}
               </li>
