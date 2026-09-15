@@ -144,6 +144,17 @@ describe('TextGroup component', () => {
     expect(dt?.querySelector('em')).toBeInTheDocument();
     expect(dt?.querySelector('.tedi-label')).not.toBeInTheDocument();
   });
+
+  it('renders multiple value nodes (e.g. text + a trailing badge) inline in the <dd>', () => {
+    const { container } = render(
+      <TextGroup label="Name" value={[<span key="v">Mari Maasikas</span>, <span key="s">Access granted</span>]} />
+    );
+
+    const dd = container.querySelector('dd.tedi-text-group__value');
+    expect(dd).toHaveTextContent('Mari Maasikas');
+    expect(within(dd as HTMLElement).getByText('Access granted')).toBeInTheDocument();
+    expect(dd?.textContent).toBe('Mari MaasikasAccess granted');
+  });
 });
 
 describe('TextGroup.List', () => {

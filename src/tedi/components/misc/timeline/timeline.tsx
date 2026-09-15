@@ -53,13 +53,17 @@ export const Timeline = ({
   cardPadding,
   className,
 }: TimelineProps): JSX.Element => {
-  const itemCount = Children.toArray(children).filter(isItemElement).length;
+  const childArray = Children.toArray(children);
+  // Ordinal of each TimelineItem among items only (non-item children are passed
+  // through untouched). Precomputed as a pure lookup so no mutable counter is
+  // reassigned inside the render mapping.
+  const itemPositions = childArray.flatMap((child, position) => (isItemElement(child) ? [position] : []));
+  const itemCount = itemPositions.length;
+  const ordinalByPosition = new Map(itemPositions.map((position, ordinal) => [position, ordinal] as const));
 
-  let itemIndex = -1;
-  const items = Children.map(children, (child) => {
+  const items = childArray.map((child, position) => {
     if (!isItemElement(child)) return child;
-    itemIndex += 1;
-    const index = itemIndex;
+    const index = ordinalByPosition.get(position) ?? 0;
     return cloneElement(child, { state: resolveState(index, activeIndex), isLast: index === itemCount - 1 });
   });
 

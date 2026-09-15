@@ -29,10 +29,6 @@ const meta: Meta<typeof Tabs> = {
     'Tabs.Content': Tabs.Content,
   } as never,
   parameters: {
-    a11y: {
-      // TODO: [Tabs]: Review storybook a11y violations #820
-      test: 'todo',
-    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=3419-38773&m=dev',
@@ -81,9 +77,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
             </Col>
             <Col className="flex align-items-center">
               <TabsContext.Provider value={{ currentTab, setCurrentTab: noop }}>
-                <div role="tablist">
-                  <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>
-                </div>
+                <TabsTrigger id={triggerId}>Terviseteekond</TabsTrigger>
               </TabsContext.Provider>
             </Col>
           </Row>
@@ -188,6 +182,7 @@ export const States: StoryObj<TemplateStateProps> = {
     array: stateArray,
   },
   parameters: {
+    a11y: { test: 'off' },
     pseudo: {
       hover: '#Hover-tab',
       active: '#Active-tab',

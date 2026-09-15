@@ -595,6 +595,24 @@
       ]
     },
     {
+      "id": "navigation/vertical-stepper",
+      "name": null,
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/vertical-stepper",
+      "status": [],
+      "description": null,
+      "keyProps": []
+    },
+    {
+      "id": "navigation/card-stepper",
+      "name": null,
+      "category": "navigation",
+      "sourcePath": "src/tedi/components/navigation/card-stepper",
+      "status": [],
+      "description": null,
+      "keyProps": []
+    },
+    {
       "id": "form/textfield/textfield",
       "name": "TextField",
       "category": "form",

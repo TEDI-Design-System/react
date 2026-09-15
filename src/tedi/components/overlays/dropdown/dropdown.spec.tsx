@@ -277,4 +277,29 @@ describe('Dropdown component', () => {
 
     expect(screen.getByRole('menu')).toHaveStyle({ width: '500px' });
   });
+
+  it('does not wrap content in a scroll body when maxHeight is unset', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>);
+    fireEvent.click(screen.getByText('Open menu'));
+    expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).not.toBeInTheDocument();
+  });
+
+  it('restricts the body height with a scrollable wrapper when maxHeight is a number (px)', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      maxHeight: 200,
+    });
+    fireEvent.click(screen.getByText('Open menu'));
+    const scroll = document.querySelector(`.${styles['tedi-dropdown__scroll']}`);
+    expect(scroll).toBeInTheDocument();
+    expect(scroll).toHaveStyle({ maxHeight: '200px' });
+    expect(scroll).toContainElement(screen.getByText('Item'));
+  });
+
+  it('accepts a CSS length string for maxHeight', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      maxHeight: '20rem',
+    });
+    fireEvent.click(screen.getByText('Open menu'));
+    expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).toHaveStyle({ maxHeight: '20rem' });
+  });
 });

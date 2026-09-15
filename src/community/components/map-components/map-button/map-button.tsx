@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { JSX, useState } from 'react';
+import { forwardRef, useState } from 'react';
 
 import { Button, ButtonProps, Icon, Spinner, Tooltip } from '../../../../tedi';
 import MapDropdown, { MapDropdownItem } from '../map-dropdown/map-dropdown';
@@ -40,7 +40,7 @@ export interface MapButtonProps extends Omit<ButtonProps, OmittedButtonProps> {
   selected?: boolean;
   /**
    * If `true`, hides the label visually (icon-only button).
-   * Label may still be available to screen readers.
+   * The label stays in the accessible name, so `children` is required for the button to be named.
    */
   hideLabel?: boolean;
   /**
@@ -55,7 +55,7 @@ export interface MapButtonProps extends Omit<ButtonProps, OmittedButtonProps> {
   dropdownItems?: MapDropdownItem[];
 }
 
-export const MapButton = (props: MapButtonProps): JSX.Element => {
+export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, ref) => {
   const {
     size = 'default',
     icon,
@@ -93,12 +93,16 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
       ) : (
         icon && <Icon name={icon} className={styles['tedi-map-button__icon']} size={size === 'small' ? 24 : 18} />
       )}
-      {!hideLabel && <div className={cn(styles['tedi-map-button__text'])}>{children}</div>}
+      {hideLabel ? (
+        <span className="sr-only">{children}</span>
+      ) : (
+        <div className={cn(styles['tedi-map-button__text'])}>{children}</div>
+      )}
     </>
   );
 
   const buttonElement = (
-    <Button noStyle isLoading={isLoading} className={mapButtonBEM} size={size} {...rest}>
+    <Button noStyle isLoading={isLoading} className={mapButtonBEM} size={size} {...rest} ref={ref}>
       {buttonContent}
     </Button>
   );
@@ -121,6 +125,7 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
           items={dropdownItems.map((item) => ({
             children: item.children,
             onClick: item.onClick,
+            isActive: item.isActive,
             isDisabled: item.isDisabled,
           }))}
         />
@@ -129,6 +134,8 @@ export const MapButton = (props: MapButtonProps): JSX.Element => {
   }
 
   return buttonWithTooltip;
-};
+});
+
+MapButton.displayName = 'MapButton';
 
 export default MapButton;
