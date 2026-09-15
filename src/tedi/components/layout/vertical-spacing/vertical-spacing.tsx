@@ -29,6 +29,11 @@ export interface VerticalSpacingProps extends BreakpointSupport<VerticalSpacingB
    * Additional class name(s) to apply to the element
    */
   className?: string;
+  /**
+   * Additional inline styles, merged with the internal spacing custom property
+   * (rather than replacing it).
+   */
+  style?: React.CSSProperties;
 }
 
 export const VerticalSpacing = (props: VerticalSpacingProps): JSX.Element => {
@@ -38,6 +43,7 @@ export const VerticalSpacing = (props: VerticalSpacingProps): JSX.Element => {
     className,
     element: Element = 'div',
     size = 1,
+    style,
     ...rest
   } = getCurrentBreakpointProps<VerticalSpacingProps>(props);
 
@@ -49,7 +55,7 @@ export const VerticalSpacing = (props: VerticalSpacingProps): JSX.Element => {
       role="presentation"
       {...rest}
       className={VerticalSpacingBEM}
-      style={{ '--vertical-spacing-internal': size !== 0 ? `${size}em` : '0' }}
+      style={{ '--vertical-spacing-internal': size !== 0 ? `${size}em` : '0', ...style }}
     >
       {children}
     </Element>

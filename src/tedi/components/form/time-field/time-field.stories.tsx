@@ -16,10 +16,6 @@ export default {
   title: 'Tedi-Ready/Components/Form/TimeField',
   component: TimeField,
   parameters: {
-    a11y: {
-      // TODO: [TimeField]: Review storybook a11y violations #815
-      test: 'todo',
-    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -169,13 +165,13 @@ export const OnClickType: Story = {
         <Row>
           <Col lg={3} md={6}>
             <Text modifiers="small">Clock button is clickable</Text>
-            <TimeField label="Aeg" id="calendar-button-trigger" timePickerTrigger="button" />
+            <TimeField label="Aeg" id="time-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
             <Text modifiers="small">Input is clickable</Text>
-            <TimeField label="Aeg" id="calendar-button-trigger" timePickerTrigger="input" />
+            <TimeField label="Aeg" id="time-input-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
       </VerticalSpacing>

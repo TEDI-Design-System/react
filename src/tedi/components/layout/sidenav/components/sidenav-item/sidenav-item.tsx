@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { useState } from 'react';
 
+import { useSafeId } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Icon, IconWithoutBackgroundProps } from '../../../../base/icon/icon';
 import Collapse from '../../../../content/collapse/collapse';
@@ -69,7 +70,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
   const { getLabel } = useLabels();
   const [isCollapsedInternal, setIsCollapsedInternal] = useState(isDefaultOpen ?? false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const collapseId = React.useId();
+  const collapseId = useSafeId('sidenav-collapse');
 
   const groupsToRender = subItemGroups ?? (subItems ? [{ subItems }] : null);
   const hasChildren = !!groupsToRender;
@@ -124,16 +125,8 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     onClick: handleClick,
     className: cn(styles['tedi-sidenav__link'], isLinkedParent && styles['tedi-sidenav__link--has-children-link']),
     noStyle: true,
-    role: 'menuitem',
     'aria-current': isActive ? 'page' : undefined,
     'aria-label': isCollapsed && typeof children === 'string' ? children : undefined,
-    ...(hasChildren
-      ? {
-          'aria-haspopup': 'true',
-          'aria-expanded': isCollapsedInternal,
-          'aria-controls': collapseId,
-        }
-      : {}),
   } as unknown as LinkProps<C>;
 
   const renderChildren = () =>
@@ -141,7 +134,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
     groupsToRender?.map((group, index) => (
       <div key={index}>
         {group?.subHeading && <div className={styles['tedi-sidenav__subheading']}>{group.subHeading}</div>}
-        <ul className={styles['tedi-sidenav__list']} role="menu">
+        <ul className={styles['tedi-sidenav__list']}>
           {group.subItems?.map((item, key) => (
             <SideNavItem
               as={as}
@@ -193,6 +186,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
                 id={collapseId}
                 hideCollapseText
                 inverted
+                contentAsRegion={false}
                 open={isCollapsedInternal}
                 onToggle={handleCollapseToggle}
                 toggleLabel={getLabel('sidenav.toggleSubmenuChildren', {
@@ -212,6 +206,7 @@ export const SideNavItem = <C extends React.ElementType = 'a'>(
             hideCollapseText
             inverted
             fullRowToggle
+            contentAsRegion={false}
             open={isCollapsedInternal}
             onToggle={handleCollapseToggle}
             className={styles['tedi-sidenav__collapse']}

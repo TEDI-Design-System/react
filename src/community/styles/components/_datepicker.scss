@@ -1,4 +1,4 @@
-@use '../mixins';
+@use '@tedi-design-system/core/mixins';
 
 /* Mui datepicker */
 div.MuiClockPointer-root {
@@ -9,14 +9,14 @@ div.MuiClockPointer-root,
 div.MuiClock-pin,
 div.PrivatePickersYear-root button.Mui-selected,
 div.MuiDayPicker-weekContainer button.Mui-selected {
-  background-color: var(--color-primary-main);
+  background-color: var(--general-surface-brand-primary);
 }
 
 div.MuiClockPointer-thumb {
-  border-color: var(--color-primary-main);
+  border-color: var(--general-border-brand);
 }
 
 div.PrivatePickersYear-root button.Mui-selected:hover,
 div.MuiDayPicker-weekContainer button.Mui-selected:hover {
-  background-color: var(--color-primary-active);
+  background-color: var(--general-surface-brand-secondary);
 }

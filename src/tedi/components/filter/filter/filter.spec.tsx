@@ -460,3 +460,30 @@ describe('FilterGroup — uncontrolled', () => {
     expect(onValuesChange).toHaveBeenLastCalledWith(['bar']);
   });
 });
+
+describe('Filter — maxHeight', () => {
+  it('scrolls only the options body, leaving search and clear outside the scroll region', async () => {
+    const user = userEvent.setup();
+    render(<Filter text="Raviasutus" multiselect options={options} searchable showClear maxHeight={200} />);
+
+    await user.click(screen.getByRole('button', { name: /raviasutus/i }));
+
+    const optionsBody = document.querySelector('[class*="tedi-filter-dropdown__options"]');
+    expect(optionsBody).toBeInTheDocument();
+    expect(optionsBody).toHaveStyle({ maxHeight: '200px' });
+
+    const search = document.querySelector('[class*="tedi-filter-dropdown__search"]');
+    const clear = document.querySelector('[class*="tedi-filter-dropdown__clear"]');
+    expect(optionsBody).not.toContainElement(search as HTMLElement);
+    expect(optionsBody).not.toContainElement(clear as HTMLElement);
+    expect(optionsBody).toContainElement(screen.getByRole('checkbox', { name: 'Option A' }));
+  });
+
+  it('does not wrap the options when maxHeight is unset', async () => {
+    const user = userEvent.setup();
+    render(<Filter text="Raviasutus" multiselect options={options} searchable showClear />);
+
+    await user.click(screen.getByRole('button', { name: /raviasutus/i }));
+    expect(document.querySelector('[class*="tedi-filter-dropdown__options"]')).not.toBeInTheDocument();
+  });
+});

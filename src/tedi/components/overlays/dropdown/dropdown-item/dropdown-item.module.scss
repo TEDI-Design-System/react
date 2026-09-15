@@ -36,9 +36,9 @@
   }
 
   &--disabled {
-    color: var(--color-text-disabled);
+    color: var(--dropdown-item-disabled-text);
     pointer-events: none;
-    background-color: var(--color-bg-disabled);
+    background-color: var(--dropdown-item-disabled-background);
   }
 
   &--divided {

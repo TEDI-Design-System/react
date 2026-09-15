@@ -1,4 +1,5 @@
-import { Meta, Title, Subtitle, Unstyled } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Subtitle, Unstyled, Markdown } from '@storybook/addon-docs/blocks';
+import ComponentTypes from '@tedi-design-system/core/docs/component-types.md?raw';
 
 <Meta name="Welcome" title="Documentation/Welcome" />
 
@@ -7,10 +8,14 @@ import { Meta, Title, Subtitle, Unstyled } from '@storybook/addon-docs/blocks';
 Here you can find our design guidelines, component documentation, and resources for building apps with
 `@tedi-design-system/react`
 
-## Resources
+<Markdown>{ComponentTypes}</Markdown>
+
+---
+
+#### **Resources:**
 
 - [Repository](https://github.com/TEDI-Design-System/react)
-- [WIKI](https://github.com/TEDI-Design-System/general)
+- [WIKI](https://github.com/TEDI-Design-System/general/wiki)
 - [NPM](https://www.npmjs.com/package/@tedi-design-system/react)
 - [Storybook](https://storybook.tedi.ee/)
 - [Documentation](https://tedi.ee)

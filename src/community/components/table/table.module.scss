@@ -1,13 +1,13 @@
 @use '@tedi-design-system/core/mixins';
 
 .table {
-  --table-bottom-border: 0.01px solid var(--color-border-contrast);
+  --table-bottom-border: 0.01px solid var(--general-border-secondary);
   --table-cell-horizontal-padding: 0.875rem;
   --table-cell-vertical-padding: 0.75rem;
   --table-cell-padding: var(--table-cell-vertical-padding) var(--table-cell-horizontal-padding);
 
   // 0.01px fix https://bugs.chromium.org/p/chromium/issues/detail?id=1201762
-  --table-row-border: 0.01px solid var(--color-border-default);
+  --table-row-border: 0.01px solid var(--general-border-primary);
 
   width: 100%;
   overflow-x: auto;
@@ -26,7 +26,7 @@
 
   @include mixins.table-cell-selector(thead) {
     font-weight: 400;
-    color: var(--color-text-muted);
+    color: var(--general-text-secondary);
     text-align: left;
 
     @include mixins.print-grayscale;
@@ -43,13 +43,13 @@
     .filter__icon {
       --icon-variation-size: 1.5rem;
 
-      color: var(--color-text-subtle);
+      color: var(--general-text-tertiary);
       transition: 200ms ease;
       transition-property: color;
 
       &:hover,
       &--active {
-        color: var(--color-primary-main);
+        color: var(--general-text-brand);
       }
     }
 
@@ -69,7 +69,7 @@
     border-top: var(--table-row-border);
 
     &:first-of-type {
-      border-color: var(--color-border-contrast);
+      border-color: var(--general-border-secondary);
     }
 
     &:last-child {
@@ -83,7 +83,7 @@
 
     &.table__row--clickable:hover {
       cursor: pointer;
-      background-color: var(--color-bg-subtle);
+      background-color: var(--general-surface-tertiary);
     }
   }
 
@@ -120,7 +120,7 @@
   --table-cell-padding: var(--table-cell-vertical-padding) var(--table-cell-horizontal-padding) 0;
 
   font-size: 0.875rem;
-  color: var(--color-text-muted);
+  color: var(--general-text-secondary);
 }
 
 .table__row--group-item {
@@ -149,14 +149,14 @@
   z-index: 1;
   padding: 0.5rem 1rem 0.125rem;
   margin: -1rem -1rem 0.5rem;
-  background: var(--color-bg-default);
-  border-bottom: 1px solid var(--color-border-default);
+  background: var(--general-surface-primary);
+  border-bottom: 1px solid var(--general-border-primary);
 }
 
 .sticky-column {
   position: sticky;
   z-index: 1;
-  background-color: var(--color-bg-default);
+  background-color: var(--general-surface-primary);
   opacity: 0.95;
 }
 
