@@ -89,7 +89,7 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
     const target = e.target as HTMLElement;
     if (target.closest('input, label')) return;
 
-    document.getElementById(id)?.click();
+    if (id) document.getElementById(id)?.click();
   };
 
   const isRadio = type === 'radio';

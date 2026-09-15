@@ -144,6 +144,11 @@ files. This is the part of this document worth maintaining by hand.
   prop. Children win when both are given.
 - **`TableOfContents.Item` children must be direct children.** Don't wrap them in another
   component. Pass `underline={false}` on the `Link` inside an item to match the design.
+- **`Checkbox` / `Radio` pair with `Checkbox.Group` / `Radio.Group`.** The `.Group` owns selection
+  (`value` / `onChange`) and the shared props (`variant`, `size`, `name`); items inside inherit
+  `name` and auto-generate their `id`, so don't hand-wire those. `variant="card"` + `layout`
+  (`separated` / `segmented`) switches to the card styling, and `Checkbox.Group`'s `indeterminateCheck`
+  adds a select-all whose checkbox shows the indeterminate ("some selected") state.
 
 ### Responsive behaviour that isn't a prop
 

@@ -2,25 +2,34 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Radio, { RadioProps } from './radio';
+import Radio, { RadioGroup, RadioProps } from '.';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4598-78103&m=dev" target="_BLANK">Figma ↗</a><br />
- * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Zeroheight ↗</a><br/><hr/>
- * In most cases, you should use the `ChoiceGroup` component. However, we also provide a standalone `Radio` component for custom use cases.
+ * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Radio> = {
   component: Radio,
+  subcomponents: { 'Radio.Group': RadioGroup },
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/Radio',
+  parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof Radio>;
 
-const Template: StoryFn<RadioProps> = (args) => <Radio {...args} label="Text" value="default" />;
+const Template: StoryFn<RadioProps> = (args) => <Radio {...args} label="Tekst" value="default" />;
 const sizesArray: Array<'default' | 'large'> = ['default', 'large'];
 
 const TemplateSizes: StoryFn<RadioProps> = (args) => {
@@ -80,7 +89,7 @@ export const States = () => {
               <Text modifiers="bold">Default</Text>
             </Col>
             <Col>
-              <Radio id="radio-default" label="Text" name="radio-default" value="radio" />
+              <Radio id="radio-default" label="Tekst" name="radio-default" value="radio" />
             </Col>
           </Row>
           <Row>
@@ -88,7 +97,7 @@ export const States = () => {
               <Text modifiers="bold">Hover</Text>
             </Col>
             <Col>
-              <Radio id="radio-hover" label="Text" name="radio-hover" value="radio" hover />
+              <Radio id="radio-hover" label="Tekst" name="radio-hover" value="radio" hover />
             </Col>
           </Row>
           <Row>
@@ -96,7 +105,15 @@ export const States = () => {
               <Text modifiers="bold">Selected</Text>
             </Col>
             <Col>
-              <Radio id="radio-checked" label="Text" name="radio-checked" value="radio" defaultChecked />
+              <Radio id="radio-checked" label="Tekst" name="radio-checked" value="radio" defaultChecked />
+            </Col>
+          </Row>
+          <Row>
+            <Col md={3}>
+              <Text modifiers="bold">Active</Text>
+            </Col>
+            <Col>
+              <Radio id="radio-active" label="Tekst" name="radio-active" value="radio" defaultChecked />
             </Col>
           </Row>
           <Row>
@@ -104,7 +121,7 @@ export const States = () => {
               <Text modifiers="bold">Disabled</Text>
             </Col>
             <Col>
-              <Radio id="radio-disabled" label="Text" name="radio-disabled" value="radio" disabled />
+              <Radio id="radio-disabled" label="Tekst" name="radio-disabled" value="radio" disabled />
             </Col>
           </Row>
           <Row>
@@ -114,7 +131,7 @@ export const States = () => {
             <Col>
               <Radio
                 id="radio-disabled-checked"
-                label="Text"
+                label="Tekst"
                 name="radio-disabled-checked"
                 value="radio"
                 disabled
@@ -129,11 +146,11 @@ export const States = () => {
             <Col>
               <Radio
                 id="radio-invalid"
-                label="Text"
+                label="Tekst"
                 name="radio-invalid"
                 value="radio"
                 invalid
-                helper={{ text: 'Feedback text', type: 'error' }}
+                helper={{ text: 'Tagasiside tekst', type: 'error' }}
               />
             </Col>
           </Row>
@@ -142,13 +159,19 @@ export const States = () => {
               <Text modifiers="bold">Required</Text>
             </Col>
             <Col>
-              <Radio id="radio-required" label="Text" name="radio-required" value="radio" required />
+              <Radio id="radio-required" label="Tekst" name="radio-required" value="radio" required />
             </Col>
           </Row>
         </VerticalSpacing>
       </Col>
     </Row>
   );
+};
+
+States.parameters = {
+  pseudo: {
+    active: '#radio-active + *',
+  },
 };
 
 export const HiddenLabel: Story = {
@@ -161,7 +184,7 @@ export const HiddenLabel: Story = {
   },
 };
 
-export const WithExtraContent: Story = {
+export const WithHelper: Story = {
   render: Template,
 
   args: {
@@ -178,11 +201,17 @@ export const WithTooltip: Story = {
     <Row>
       <Col lg={6} md={12}>
         <VerticalSpacing>
-          <Radio {...args} id="radio-short-title-tooltip" label="Text" name="radio-short-title-tooltip" value="radio" />
+          <Radio
+            {...args}
+            id="radio-short-title-tooltip"
+            label="Tekst"
+            name="radio-short-title-tooltip"
+            value="radio"
+          />
           <Radio
             {...args}
             id="radio-short-title-helper-tooltip"
-            label="Text"
+            label="Tekst"
             name="radio-short-title-helper-tooltip"
             value="radio"
             helper={{
@@ -205,30 +234,15 @@ export const WithTooltip: Story = {
   ),
 
   args: {
-    name: 'tooltip-check',
+    name: 'tooltip-radio',
     tooltip: 'This is a tooltip',
   },
 };
 
-export const Controlled = () => {
-  const [checked, setChecked] = useState<boolean>(false);
-
-  return (
-    <Radio
-      id="controlled-check"
-      label="Select me"
-      name="controlled-check"
-      value="controlled"
-      checked={checked}
-      onChange={(value, checked) => setChecked(checked)}
-    />
-  );
-};
-
-export const RadioWithLongTitle = () => {
+export const WithLongTitle = () => {
   return (
     <Row>
-      <Col width={6}>
+      <Col width={12} lg={6}>
         <Radio
           id="radio-long-title"
           label="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius, sem blandit sodales tincidunt, orci elit ornare ex, eu ultrices diam turpis id nisl. Sed sollicitudin auctor nunc. Aliquam a arcu in sem bibendum laoreet non eu nunc."
@@ -238,4 +252,239 @@ export const RadioWithLongTitle = () => {
       </Col>
     </Row>
   );
+};
+
+/** Compose radios inside `Radio.Group`, which owns the selection and shared props. */
+export const Group: StoryObj = {
+  render: () => {
+    const [value, setValue] = useState('kartul');
+    return (
+      <Radio.Group
+        label="Tooraine"
+        value={value}
+        onChange={setValue}
+        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
+      >
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="kapsas" label="Kapsas" />
+        <Radio value="peet" label="Peet" />
+      </Radio.Group>
+    );
+  },
+};
+
+/**
+ * In controlled mode the parent owns the selected value. Because it lives outside the radios, it
+ * can be changed programmatically — the **Tühjenda valik** button clears the selection, something a
+ * user can't do to a radio and an uncontrolled radio can't offer. The current value is shown below.
+ */
+export const Controlled = () => {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const options = [
+    { value: 'email', label: 'E-post' },
+    { value: 'sms', label: 'SMS' },
+  ];
+
+  return (
+    <VerticalSpacing>
+      {options.map((option) => (
+        <Radio
+          key={option.value}
+          id={`controlled-${option.value}`}
+          label={option.label}
+          name="controlled-radio"
+          value={option.value}
+          checked={selected === option.value}
+          onChange={(value) => setSelected(value)}
+        />
+      ))}
+      <Text>Valitud: {selected ?? '—'}</Text>
+      <Button visualType="secondary" onClick={() => setSelected(null)} disabled={selected === null}>
+        Tühjenda valik
+      </Button>
+    </VerticalSpacing>
+  );
+};
+
+/** `variant="card"` renders each radio as a card. `cardVariant` sets primary / secondary. */
+export const Cards: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kapsas" label="Kapsas" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kapsas" label="Kapsas" />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+export const CardsWithDescription: StoryObj = {
+  render: () => {
+    const items = [
+      {
+        value: 'kartul',
+        label: 'Kartul',
+        description: 'Tärkliserikas mugulköögivili, mida kasutatakse laialt toiduks.',
+      },
+      {
+        value: 'peet',
+        label: 'Peet',
+        description: 'Magusamaitseline juurvili, mida süüakse nii toorelt kui ka kuumtöödeldult.',
+      },
+      {
+        value: 'kapsas',
+        label: 'Kapsas',
+        description: 'Lehtköögivili, mille tihedaid lehti kasutatakse mitmesugustes roogades.',
+      },
+    ];
+
+    const cards = () => (
+      <Row className="w-100" gutter={2}>
+        {items.map((item) => (
+          <Col key={item.value} xs={12} md={4}>
+            <Radio value={item.value} label={item.label} description={item.description} className="w-100" />
+          </Col>
+        ))}
+      </Row>
+    );
+    return (
+      <VerticalSpacing size={1.5}>
+        <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
+          {cards()}
+        </Radio.Group>
+        <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
+          {cards()}
+        </Radio.Group>
+      </VerticalSpacing>
+    );
+  },
+};
+
+/**
+ * Add a leading `icon` (Material icon name), optionally with a `description`.
+ */
+export const CardsWithIcons: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="tram">
+        <Radio value="tram" label="Trammiga" icon="tram" />
+        <Radio value="walk" label="Jalgsi" icon="directions_walk" />
+        <Radio value="car" label="Autoga" icon="directions_car" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="tram">
+        <Radio value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Radio value="walk" label="Jalgsi" description="Soovitatud variant, vähendab ummikuid" icon="directions_walk" />
+        <Radio
+          value="car"
+          label="Autoga"
+          description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
+          icon="directions_car"
+        />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/** `layout="segmented"` joins the cards into one button-group surface (Figma "Grouped"). */
+export const CardsSegmented: StoryObj = {
+  render: () => (
+    <VerticalSpacing size={1.5}>
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="kodu">
+        <Radio value="kodu" label="Kodu" />
+        <Radio value="too" label="Töö" />
+        <Radio value="muu" label="Muu" />
+      </Radio.Group>
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kodu">
+        <Radio value="kodu" label="Kodu" />
+        <Radio value="too" label="Töö" />
+        <Radio value="muu" label="Muu" />
+      </Radio.Group>
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Group props are breakpoint-aware (mobile-first). Here it's cards by default and
+ * regular radios from `md` up — resize the canvas to see it switch.
+ */
+export const ResponsiveVariant: StoryObj = {
+  render: () => (
+    <Radio.Group
+      label="Tooraine"
+      defaultValue="kartul"
+      variant="card"
+      cardVariant="secondary"
+      md={{ variant: 'default', direction: 'column' }}
+    >
+      <Radio value="kartul" label="Kartul" />
+      <Radio value="peet" label="Peet" />
+      <Radio value="kapsas" label="Kapsas" />
+    </Radio.Group>
+  ),
+};
+
+const CARD_STATES: Array<{ state: string; props: Partial<RadioProps> }> = [
+  { state: 'Default', props: {} },
+  { state: 'Hover', props: {} },
+  { state: 'Selected', props: { defaultChecked: true } },
+  { state: 'Active', props: { defaultChecked: true } },
+  { state: 'Focus', props: {} },
+  { state: 'Disabled', props: { disabled: true } },
+  { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
+];
+
+const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
+
+/**
+ * Every card state across the primary and secondary variants. Hover, active, and focus are forced
+ * with the pseudo-states addon so all states are visible at once.
+ */
+export const CardStates: StoryObj = {
+  parameters: {
+    pseudo: {
+      hover: ['#card-primary-hover', '#card-secondary-hover'],
+      active: ['#card-primary-active', '#card-secondary-active'],
+      focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={0.5}>
+      <Row>
+        <Col width={4} />
+        <Col width={4}>
+          <Text modifiers="bold">Primary</Text>
+        </Col>
+        <Col width={4}>
+          <Text modifiers="bold">Secondary</Text>
+        </Col>
+      </Row>
+      {CARD_STATES.map(({ state, props }) => (
+        <Row key={state}>
+          <Col width={4} className="flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          {(['primary', 'secondary'] as const).map((cardVariant) => (
+            <Col width={4} key={cardVariant}>
+              <Radio
+                variant="card"
+                cardVariant={cardVariant}
+                id={`card-${cardVariant}-${cardStateSlug(state)}`}
+                name={`card-${cardVariant}-${cardStateSlug(state)}`}
+                value="radio"
+                label="Tekst"
+                {...props}
+              />
+            </Col>
+          ))}
+        </Row>
+      ))}
+    </VerticalSpacing>
+  ),
 };
