@@ -84,6 +84,25 @@ describe('MobileNav', () => {
     expect(baseProps.onClose).toHaveBeenCalled();
   });
 
+  test('calls onClose when clicking the overlay backdrop', () => {
+    const onClose = jest.fn();
+    const { container } = render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
+
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    fireEvent.click(overlay);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not call onClose when clicking inside the nav content', () => {
+    const onClose = jest.fn();
+    render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
+
+    fireEvent.click(screen.getByRole('navigation', { name: 'Main navigation' }));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   test('renders without overlay if showOverlay is false', () => {
     render(<MobileNav {...baseProps} navItems={navItems} showOverlay={false} />);
     expect(screen.queryByTestId('floating-overlay')).not.toBeInTheDocument();

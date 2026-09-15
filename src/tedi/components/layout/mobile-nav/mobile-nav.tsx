@@ -237,6 +237,11 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
       lockScroll
       style={{ top: overlayTop, insetInlineEnd: 'var(--floating-ui-scrollbar-width)' }}
       className={styles['tedi-sidenav__overlay']}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
     >
       {content}
     </FloatingOverlay>

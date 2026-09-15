@@ -68,7 +68,7 @@ const Template: StoryFn<typeof SideNav> = (args) => {
           <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
         </Header>
       </HideAt>
-      <SideNav {...args} isMobileOpen={isOpen} />
+      <SideNav {...args} isMobileOpen={isOpen} onMenuToggle={setIsOpen} />
     </>
   );
 };
