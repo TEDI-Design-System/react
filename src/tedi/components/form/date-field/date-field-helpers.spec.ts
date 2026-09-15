@@ -50,6 +50,18 @@ describe('date-field-helpers', () => {
       expect(resolveRangeSelection(computed, undefined, clicked)).toEqual(computed);
     });
 
+    it('starts a to-less range on the first click, when DayPicker returns a same-day range (#813)', () => {
+      // react-day-picker returns `{ from: X, to: X }` for the first click on an empty range.
+      const computed = { from, to: from };
+      expect(resolveRangeSelection(computed, undefined, from)).toEqual({ from, to: undefined });
+    });
+
+    it('keeps a deliberate single-day range when clicking the same start again', () => {
+      // An in-progress start already exists, so a same-day result completes a single-day range.
+      const computed = { from, to: from };
+      expect(resolveRangeSelection(computed, { from, to: undefined }, from)).toEqual(computed);
+    });
+
     it('returns undefined when the computed value is not a range and no restart applies', () => {
       expect(resolveRangeSelection(undefined, undefined, from)).toBeUndefined();
     });
