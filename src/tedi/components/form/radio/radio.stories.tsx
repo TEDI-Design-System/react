@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
@@ -109,6 +110,14 @@ export const States = () => {
           </Row>
           <Row>
             <Col md={3}>
+              <Text modifiers="bold">Active</Text>
+            </Col>
+            <Col>
+              <Radio id="radio-active" label="Tekst" name="radio-active" value="radio" defaultChecked />
+            </Col>
+          </Row>
+          <Row>
+            <Col md={3}>
               <Text modifiers="bold">Disabled</Text>
             </Col>
             <Col>
@@ -157,6 +166,12 @@ export const States = () => {
       </Col>
     </Row>
   );
+};
+
+States.parameters = {
+  pseudo: {
+    active: '#radio-active + *',
+  },
 };
 
 export const HiddenLabel: Story = {
@@ -219,30 +234,15 @@ export const WithTooltip: Story = {
   ),
 
   args: {
-    name: 'tooltip-check',
+    name: 'tooltip-radio',
     tooltip: 'This is a tooltip',
   },
-};
-
-export const Controlled = () => {
-  const [checked, setChecked] = useState<boolean>(false);
-
-  return (
-    <Radio
-      id="controlled-check"
-      label="Vali mind"
-      name="controlled-check"
-      value="controlled"
-      checked={checked}
-      onChange={(value, checked) => setChecked(checked)}
-    />
-  );
 };
 
 export const WithLongTitle = () => {
   return (
     <Row>
-      <Col width={6}>
+      <Col width={12} lg={6}>
         <Radio
           id="radio-long-title"
           label="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin varius, sem blandit sodales tincidunt, orci elit ornare ex, eu ultrices diam turpis id nisl. Sed sollicitudin auctor nunc. Aliquam a arcu in sem bibendum laoreet non eu nunc."
@@ -271,6 +271,40 @@ export const Group: StoryObj = {
       </Radio.Group>
     );
   },
+};
+
+/**
+ * In controlled mode the parent owns the selected value. Because it lives outside the radios, it
+ * can be changed programmatically — the **Tühjenda valik** button clears the selection, something a
+ * user can't do to a radio and an uncontrolled radio can't offer. The current value is shown below.
+ */
+export const Controlled = () => {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const options = [
+    { value: 'email', label: 'E-post' },
+    { value: 'sms', label: 'SMS' },
+  ];
+
+  return (
+    <VerticalSpacing>
+      {options.map((option) => (
+        <Radio
+          key={option.value}
+          id={`controlled-${option.value}`}
+          label={option.label}
+          name="controlled-radio"
+          value={option.value}
+          checked={selected === option.value}
+          onChange={(value) => setSelected(value)}
+        />
+      ))}
+      <Text>Valitud: {selected ?? '—'}</Text>
+      <Button visualType="secondary" onClick={() => setSelected(null)} disabled={selected === null}>
+        Tühjenda valik
+      </Button>
+    </VerticalSpacing>
+  );
 };
 
 /** `variant="card"` renders each radio as a card. `cardVariant` sets primary / secondary. */
@@ -393,5 +427,64 @@ export const ResponsiveVariant: StoryObj = {
       <Radio value="peet" label="Peet" />
       <Radio value="kapsas" label="Kapsas" />
     </Radio.Group>
+  ),
+};
+
+const CARD_STATES: Array<{ state: string; props: Partial<RadioProps> }> = [
+  { state: 'Default', props: {} },
+  { state: 'Hover', props: {} },
+  { state: 'Selected', props: { defaultChecked: true } },
+  { state: 'Active', props: { defaultChecked: true } },
+  { state: 'Focus', props: {} },
+  { state: 'Disabled', props: { disabled: true } },
+  { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
+];
+
+const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
+
+/**
+ * Every card state across the primary and secondary variants. Hover, active, and focus are forced
+ * with the pseudo-states addon so all states are visible at once.
+ */
+export const CardStates: StoryObj = {
+  parameters: {
+    pseudo: {
+      hover: ['#card-primary-hover', '#card-secondary-hover'],
+      active: ['#card-primary-active', '#card-secondary-active'],
+      focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={0.5}>
+      <Row>
+        <Col width={4} />
+        <Col width={4}>
+          <Text modifiers="bold">Primary</Text>
+        </Col>
+        <Col width={4}>
+          <Text modifiers="bold">Secondary</Text>
+        </Col>
+      </Row>
+      {CARD_STATES.map(({ state, props }) => (
+        <Row key={state}>
+          <Col width={4} className="flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          {(['primary', 'secondary'] as const).map((cardVariant) => (
+            <Col width={4} key={cardVariant}>
+              <Radio
+                variant="card"
+                cardVariant={cardVariant}
+                id={`card-${cardVariant}-${cardStateSlug(state)}`}
+                name={`card-${cardVariant}-${cardStateSlug(state)}`}
+                value="radio"
+                label="Tekst"
+                {...props}
+              />
+            </Col>
+          ))}
+        </Row>
+      ))}
+    </VerticalSpacing>
   ),
 };

@@ -50,6 +50,18 @@ interface CheckboxGroupBreakpointProps {
    * - `(state) => string` — a label derived from the current `all` / `some` / `none` state.
    */
   indeterminateCheck?: boolean | string | ((state: CheckboxGroupSelectAllState) => string);
+  /**
+   * Overrides the localised label shown on the select-all checkbox when not all children are
+   * selected (the `some` / `none` states). Ignored when `indeterminateCheck` is a `string` or
+   * function, which control the label directly.
+   */
+  selectAllLabel?: string;
+  /**
+   * Overrides the localised label shown on the select-all checkbox when every child is selected
+   * (the `all` state). Ignored when `indeterminateCheck` is a `string` or function, which control
+   * the label directly.
+   */
+  removeAllLabel?: string;
   /** Extra props forwarded to the select-all checkbox (its checked/indeterminate/value are managed). */
   indeterminateCheckProps?: Partial<
     Omit<CheckboxBaseProps, 'value' | 'label' | 'checked' | 'indeterminate' | 'onChange'>
@@ -80,6 +92,8 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
     cardVariant = 'primary',
     direction = variant === 'card' ? 'row' : 'column',
     indeterminateCheck,
+    selectAllLabel,
+    removeAllLabel,
     indeterminateCheckProps,
     children,
   } = getCurrentBreakpointProps<CheckboxGroupBreakpointProps>(props);
@@ -144,14 +158,14 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
   const someSelected = !allSelected && !noneSelected;
 
   const selectAllState: CheckboxGroupSelectAllState = allSelected ? 'all' : noneSelected ? 'none' : 'some';
-  const selectAllLabel =
+  const selectAllCheckboxLabel =
     typeof indeterminateCheck === 'string'
       ? indeterminateCheck
       : typeof indeterminateCheck === 'function'
       ? indeterminateCheck(selectAllState)
       : allSelected
-      ? getLabel('checkbox-group.remove-all')
-      : getLabel('checkbox-group.select-all');
+      ? removeAllLabel ?? getLabel('checkbox-group.remove-all')
+      : selectAllLabel ?? getLabel('checkbox-group.select-all');
 
   const handleToggleAll = React.useCallback(() => {
     setValues(
@@ -191,7 +205,7 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
           id={`${resolvedId}-select-all`}
           {...indeterminateCheckProps}
           value="select-all"
-          label={selectAllLabel}
+          label={selectAllCheckboxLabel}
           checked={allSelected}
           indeterminate={someSelected}
           onChange={handleToggleAll}

@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
@@ -120,6 +121,22 @@ export const States = () => {
           </Row>
           <Row>
             <Col md={3}>
+              <Text modifiers="bold">Active</Text>
+            </Col>
+            <Col>
+              <Checkbox id="check-active" label="Tekst" name="check-active" value="check" defaultChecked />
+            </Col>
+          </Row>
+          <Row>
+            <Col md={3}>
+              <Text modifiers="bold">Focus</Text>
+            </Col>
+            <Col>
+              <Checkbox id="check-focus" label="Tekst" name="check-focus" value="check" />
+            </Col>
+          </Row>
+          <Row>
+            <Col md={3}>
               <Text modifiers="bold">Disabled</Text>
             </Col>
             <Col>
@@ -185,6 +202,13 @@ export const States = () => {
   );
 };
 
+States.parameters = {
+  pseudo: {
+    active: '#check-active + *',
+    focusVisible: '#check-focus',
+  },
+};
+
 export const HiddenLabel: Story = {
   render: Template,
 
@@ -248,21 +272,6 @@ export const WithTooltip: Story = {
     name: 'tooltip-check',
     tooltip: 'This is a tooltip',
   },
-};
-
-export const Controlled = () => {
-  const [checked, setChecked] = React.useState<boolean>(true);
-
-  return (
-    <Checkbox
-      id="controlled-check"
-      label="Vali mind"
-      name="controlled-check"
-      value="controlled"
-      checked={checked}
-      onChange={(value, checked) => setChecked(checked)}
-    />
-  );
 };
 
 export const WithLongTitle = () => {
@@ -353,10 +362,36 @@ export const WithSelectAll: StoryObj = {
       <Checkbox.Group label="Teavitused" indeterminateCheck value={values} onChange={setValues}>
         <Checkbox value="email" label="E-post" />
         <Checkbox value="sms" label="SMS" />
-        <Checkbox value="push" label="Tõuketeated" />
+        <Checkbox value="push" label="Tõuketeavitus" />
       </Checkbox.Group>
     );
   },
+};
+
+/**
+ * In controlled mode React owns the checked state. Because it lives outside the checkbox, other UI
+ * can read and change it — the text below reflects the current value and the button toggles the box
+ * from outside the control, which an uncontrolled checkbox can't expose.
+ */
+export const Controlled = () => {
+  const [checked, setChecked] = React.useState<boolean>(true);
+
+  return (
+    <VerticalSpacing>
+      <Checkbox
+        id="controlled-check"
+        label="Nõustun tingimustega"
+        name="controlled-check"
+        value="controlled"
+        checked={checked}
+        onChange={(value, checked) => setChecked(checked)}
+      />
+      <Text>Valitud: {checked ? 'jah' : 'ei'}</Text>
+      <Button visualType="secondary" onClick={() => setChecked((prev) => !prev)}>
+        Lülita väljastpoolt
+      </Button>
+    </VerticalSpacing>
+  );
 };
 
 /** `variant="card"` renders each checkbox as a card. `cardVariant` sets primary / secondary. */
@@ -462,5 +497,64 @@ export const ResponsiveVariant: StoryObj = {
       <Checkbox value="peet" label="Peet" />
       <Checkbox value="kapsas" label="Kapsas" />
     </Checkbox.Group>
+  ),
+};
+
+const CARD_STATES: Array<{ state: string; props: Partial<CheckboxProps> }> = [
+  { state: 'Default', props: {} },
+  { state: 'Hover', props: {} },
+  { state: 'Selected', props: { defaultChecked: true } },
+  { state: 'Active', props: { defaultChecked: true } },
+  { state: 'Focus', props: {} },
+  { state: 'Disabled', props: { disabled: true } },
+  { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
+];
+
+const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
+
+/**
+ * Every card state across the primary and secondary variants. Hover, active, and focus are forced
+ * with the pseudo-states addon so all states are visible at once.
+ */
+export const CardStates: StoryObj = {
+  parameters: {
+    pseudo: {
+      hover: ['#card-primary-hover', '#card-secondary-hover'],
+      active: ['#card-primary-active', '#card-secondary-active'],
+      focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={0.5}>
+      <Row>
+        <Col width={4} />
+        <Col width={4}>
+          <Text modifiers="bold">Primary</Text>
+        </Col>
+        <Col width={4}>
+          <Text modifiers="bold">Secondary</Text>
+        </Col>
+      </Row>
+      {CARD_STATES.map(({ state, props }) => (
+        <Row key={state}>
+          <Col width={4} className="flex align-items-center">
+            <Text modifiers="bold">{state}</Text>
+          </Col>
+          {(['primary', 'secondary'] as const).map((cardVariant) => (
+            <Col width={4} key={cardVariant}>
+              <Checkbox
+                variant="card"
+                cardVariant={cardVariant}
+                id={`card-${cardVariant}-${cardStateSlug(state)}`}
+                name={`card-${cardVariant}-${cardStateSlug(state)}`}
+                value="check"
+                label="Tekst"
+                {...props}
+              />
+            </Col>
+          ))}
+        </Row>
+      ))}
+    </VerticalSpacing>
   ),
 };

@@ -68,7 +68,7 @@
     height: var(--form-checkbox-radio-size-large);
   }
 
-  .tedi-checkbox__input:not(:disabled) + &:active {
+  .tedi-checkbox__input:not(:disabled) + &:active:not(#{&}--invalid) {
     background: var(--form-checkbox-radio-default-background-active);
     border-color: var(--form-checkbox-radio-default-border-active);
   }
@@ -79,15 +79,15 @@
     cursor: pointer;
   }
 
-  .tedi-checkbox__input:not(:disabled, :checked) + &--hover:not(#{&}--indeterminate),
-  .tedi-checkbox__input:hover:not(:disabled, :checked) + &:not(#{&}--indeterminate),
-  .tedi-checkbox__input:not(:disabled, :checked) + &:not(#{&}--indeterminate):hover,
-  .tedi-checkbox__input:focus:not(:disabled, :checked) + &:not(#{&}--indeterminate) {
+  .tedi-checkbox__input:not(:disabled, :checked) + &--hover:not(#{&}--indeterminate, #{&}--invalid),
+  .tedi-checkbox__input:hover:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid),
+  .tedi-checkbox__input:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid):hover,
+  .tedi-checkbox__input:focus:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid) {
     outline: 1px solid var(--form-checkbox-radio-default-border-selected);
     border-color: var(--form-checkbox-radio-default-border-selected);
   }
 
-  .tedi-checkbox__input:focus-visible:not(:disabled) + & {
+  .tedi-checkbox__input:focus-visible:not(:disabled) + &:not(#{&}--invalid) {
     outline: var(--form-checkbox-radio-default-border-selected) solid 2px;
     outline-offset: 2px;
     border-color: var(--form-checkbox-radio-default-border-selected);
@@ -144,11 +144,11 @@
   justify-content: center;
   min-height: var(--form-field-height);
   padding: calc(var(--form-checkbox-radio-card-checkbox-padding-y) - var(--tedi-borders-01))
-    var(--form-checkbox-radio-card-checkbox-padding-x);
+    calc(var(--form-checkbox-radio-card-checkbox-padding-x) - var(--tedi-borders-01));
   color: var(--_card-text);
   cursor: pointer;
   background-color: var(--_card-bg);
-  border: 1px solid var(--_card-border);
+  border: var(--tedi-borders-01) solid var(--_card-border);
   border-radius: var(--form-checkbox-radio-card-radius);
 
   .tedi-checkbox__card-control {
@@ -224,7 +224,6 @@
     --_card-text: var(--form-checkbox-radio-card-primary-selected-text);
     --_card-border: var(--form-checkbox-radio-card-primary-selected-border-separate);
 
-    // On the filled card the checkbox reads as a light glyph on a transparent box.
     .tedi-checkbox__input:not(:disabled) + .tedi-checkbox__indicator {
       background-color: transparent;
       border-color: var(--form-checkbox-radio-default-border-selected-inverted);

@@ -710,12 +710,18 @@
     },
     {
       "id": "form/radio",
-      "name": null,
+      "name": "Radio",
       "category": "form",
       "sourcePath": "src/tedi/components/form/radio",
       "status": [],
-      "description": null,
-      "keyProps": []
+      "description": "Single-select radio input with a label and helper text; supports a selectable card variant and grouping via Radio.Group.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "checked",
+        "onChange"
+      ]
     },
     {
       "id": "form/choice-group",
@@ -810,12 +816,18 @@
     },
     {
       "id": "form/checkbox",
-      "name": null,
+      "name": "Checkbox",
       "category": "form",
       "sourcePath": "src/tedi/components/form/checkbox",
       "status": [],
-      "description": null,
-      "keyProps": []
+      "description": "Checkbox input with a label and helper text; supports an indeterminate state, a selectable card variant, and grouping via Checkbox.Group.",
+      "keyProps": [
+        "id",
+        "label",
+        "value",
+        "checked",
+        "onChange"
+      ]
     },
     {
       "id": "form/slider/slider",

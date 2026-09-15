@@ -109,6 +109,45 @@ describe('Checkbox.Group', () => {
       expect(onChange).toHaveBeenLastCalledWith([]);
     });
 
+    it('overrides the default labels via selectAllLabel / removeAllLabel', () => {
+      const { rerender } = render(
+        <LabelProvider locale="en">
+          <Checkbox.Group
+            label="Toppings"
+            indeterminateCheck
+            selectAllLabel="Pick everything"
+            removeAllLabel="Clear everything"
+            value={[]}
+            onChange={jest.fn()}
+          >
+            <Checkbox value="a" label="A" />
+            <Checkbox value="b" label="B" />
+          </Checkbox.Group>
+        </LabelProvider>
+      );
+
+      expect(screen.getByRole('checkbox', { name: 'Pick everything' })).toBeInTheDocument();
+      expect(screen.queryByRole('checkbox', { name: /select all/i })).not.toBeInTheDocument();
+
+      rerender(
+        <LabelProvider locale="en">
+          <Checkbox.Group
+            label="Toppings"
+            indeterminateCheck
+            selectAllLabel="Pick everything"
+            removeAllLabel="Clear everything"
+            value={['a', 'b']}
+            onChange={jest.fn()}
+          >
+            <Checkbox value="a" label="A" />
+            <Checkbox value="b" label="B" />
+          </Checkbox.Group>
+        </LabelProvider>
+      );
+
+      expect(screen.getByRole('checkbox', { name: 'Clear everything' })).toBeInTheDocument();
+    });
+
     it('collects checkboxes wrapped in layout elements (Row/Col), not just direct children', () => {
       const onChange = jest.fn();
       render(
