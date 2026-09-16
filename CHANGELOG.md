@@ -1,3 +1,10 @@
+# [19.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.10...react-19.1.0-rc.11) (2026-09-16)
+
+
+### Features
+
+* **table-card:** new tedi-ready component [#735](https://github.com/TEDI-Design-System/react/issues/735) ([#814](https://github.com/TEDI-Design-System/react/issues/814)) ([d8ab14c](https://github.com/TEDI-Design-System/react/commit/d8ab14cc70644c2e64189b474ed1a1c16e3123a1))
+
 # [19.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.9...react-19.1.0-rc.10) (2026-09-14)
 
 
