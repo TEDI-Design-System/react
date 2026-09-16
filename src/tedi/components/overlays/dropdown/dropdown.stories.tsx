@@ -89,6 +89,7 @@ export const Default: StoryObj = {
 };
 
 export const WithActiveItem: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [lang, setLang] = React.useState('ENG');
     const [filter, setFilter] = React.useState('Newest first');
@@ -135,6 +136,7 @@ export const WithActiveItem: Story = {
 };
 
 export const WithAction: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown>
       <Dropdown.Trigger>
@@ -157,6 +159,7 @@ export const WithAction: Story = {
 };
 
 export const WithIcon: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown>
       <Dropdown.Trigger>
@@ -187,6 +190,7 @@ export const WithIcon: Story = {
 };
 
 export const WithCheckbox: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [cities, setCities] = React.useState<string[]>([]);
 
@@ -245,6 +249,7 @@ type City = 'tallinn' | 'tartu' | 'parnu';
 const allCities: City[] = ['tallinn', 'tartu', 'parnu'];
 
 export const WithIndentedItems: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [selected, setSelected] = React.useState<City[]>([]);
 
@@ -320,6 +325,7 @@ export const WithIndentedItems: Story = {
 };
 
 export const WithRadio: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [city, setCity] = React.useState<'tallinn' | 'tartu' | 'parnu'>('tallinn');
 
@@ -377,6 +383,7 @@ export const WithRadio: Story = {
 };
 
 export const CustomWidth: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row>
       <Col width={12}>
@@ -418,6 +425,7 @@ export const CustomWidth: Story = {
  * the body scrolls; accepts a `number` (px) or any CSS length string (e.g. `'20rem'`, `'50vh'`).
  */
 export const RestrictedHeight: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row>
       <Col width="auto">
@@ -452,6 +460,7 @@ export const RestrictedHeight: Story = {
 };
 
 export const WithDescription: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row>
       <Col width="auto">
@@ -540,6 +549,7 @@ export const WithDescription: Story = {
 };
 
 export const Divided: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown divided>
       <Dropdown.Trigger>
@@ -563,6 +573,7 @@ export const Divided: Story = {
 };
 
 export const WithSeparatorAndOpensRight: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Dropdown placement="right-start">
       <Dropdown.Trigger>
@@ -598,6 +609,7 @@ export const WithSeparatorAndOpensRight: Story = {
 };
 
 export const CustomContent: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [query, setQuery] = React.useState('');
 
@@ -658,6 +670,7 @@ export const CustomContent: Story = {
 };
 
 export const Tree: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row>
       <Col width="auto">
@@ -689,5 +702,42 @@ export const Tree: Story = {
         </Dropdown>
       </Col>
     </Row>
+  ),
+};
+
+/**
+ * Visual-regression only. The other stories all render a closed trigger, so the menu, its
+ * items and their spacing are never captured. `defaultOpen` renders it open from props alone.
+ */
+export const OpenForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    a11y: {
+      config: {
+        // Measured, not defensive: axe reports `aria-hidden-focus` on the two
+        // `data-floating-ui-focus-guard` spans that @floating-ui/react renders
+        // around a non-modal floating element (`modal={false}`, the default).
+        // They carry tabindex="0" with aria-hidden="true" by the library's own
+        // design. Pre-existing in every open dropdown — this is simply the
+        // first story that renders one open, so the gate can finally see it.
+        rules: [{ id: 'aria-hidden-focus', enabled: false }],
+      },
+    },
+  },
+  render: () => (
+    <Dropdown defaultOpen>
+      <Dropdown.Trigger>
+        <Button visualType="secondary" iconRight="keyboard_arrow_down">
+          Create
+        </Button>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item index={0}>Access to health data</Dropdown.Item>
+        <Dropdown.Item index={1} active>
+          Declaration of intent
+        </Dropdown.Item>
+        <Dropdown.Item index={2}>Contacts</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown>
   ),
 };

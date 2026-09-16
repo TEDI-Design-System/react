@@ -573,36 +573,43 @@ export const Default: StoryObj = {
 };
 
 export const ContentExamples: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ContentExamplesTemplate,
   args: {},
 };
 
 export const Heading: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: HeadingTemplate,
   args: {},
 };
 
 export const Trigger: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: TriggerTemplate,
   args: {},
 };
 
 export const ArrowPosition: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ArrowPositionTemplate,
   args: {},
 };
 
 export const WithProminentBorder: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: WithProminentBorderTemplate,
   args: {},
 };
 
 export const Size: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: SizeTemplate,
   args: {},
 };
 
 export const ClosingButton: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ClosingButtonTemplate,
   args: {},
 };
@@ -613,6 +620,7 @@ export const NotDismissible: Story = {
     dismissible: false,
   },
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -629,6 +637,7 @@ export const NotDismissible: Story = {
 };
 
 export const ScrollLocked: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ScrollLockedTemplate,
   args: {
     scrollLock: true,
@@ -672,6 +681,7 @@ export const FocusLocked: Story = {
     );
   },
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -710,6 +720,7 @@ export const AccessibilityBaseline: Story = {
     </Popover>
   ),
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -741,6 +752,7 @@ export const NoTitleAccessibleName: Story = {
     </Popover>
   ),
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -774,6 +786,7 @@ export const ReadAllStressTest: Story = {
     </Popover>
   ),
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -788,4 +801,22 @@ export const ReadAllStressTest: Story = {
       },
     },
   },
+};
+
+/**
+ * Visual-regression only. The other stories all start closed, so the popover body, its
+ * arrow and its border are never captured. `defaultOpen` renders it open from props alone.
+ */
+export const OpenForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Popover defaultOpen placement="bottom">
+      <Popover.Trigger>
+        <Button>Popover Trigger</Button>
+      </Popover.Trigger>
+      <Popover.Content title="Pealkiri" width="medium" close>
+        {POLAR_BEAR_TEXT}
+      </Popover.Content>
+    </Popover>
+  ),
 };

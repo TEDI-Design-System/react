@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
 
       - name: Disable ESLint problem matcher
         run: echo "::remove-matcher owner=eslint::"
@@ -35,7 +35,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
       - name: Test
         run: |
           npm ci --cache .npm --prefer-offline
@@ -44,6 +44,9 @@ jobs:
   chromatic:
     needs: [lint, test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # the result is posted back to the merged PR
     if: github.event_name == 'push' && (github.ref == 'refs/heads/rc' || github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
@@ -53,13 +56,89 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
       - name: Install dependencies
         run: |
           npm ci --cache .npm --prefer-offline
+      # chromaui/action rather than the raw CLI: it surfaces the build result
+      # as step outputs (change count, build URL, capture counts), which the
+      # two steps below need. exitZeroOnChanges keeps the release green: a
+      # visual change is something to review, not a broken build. Storybook is
+      # built by the CLI itself via buildScriptName in chromatic.config.json.
       - name: Publish to Chromatic
+        id: chromatic
+        uses: chromaui/action@v18
+        with:
+          projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          exitZeroOnChanges: true
+
+      # The rc build runs after the pull request merged, so its result has no
+      # PR to land on by default. Map the commit back to its pull request
+      # (this resolves correctly for squash merges) and leave a sticky comment
+      # there, which is the page the author was last looking at.
+      - name: Comment the result on the merged pull request
+        if: steps.chromatic.outputs.changeCount != '0' && steps.chromatic.outputs.changeCount != ''
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          CHANGE_COUNT: ${{ steps.chromatic.outputs.changeCount }}
+          BUILD_URL: ${{ steps.chromatic.outputs.buildUrl }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner, repo, commit_sha: context.sha,
+            });
+            const pr = prs.find((p) => p.merged_at) ?? prs[0];
+            if (!pr) {
+              core.info("No pull request is associated with this commit; nothing to comment on.");
+              return;
+            }
+            const marker = "<!-- chromatic-rc -->";
+            const branch = context.ref.replace("refs/heads/", "");
+            const body = [
+              marker,
+              "## 🎨 Chromatic",
+              "",
+              `${process.env.CHANGE_COUNT} visual change(s) were detected on \`${branch}\` after this pull request merged.`,
+              "",
+              `[Review and accept them](${process.env.BUILD_URL})`,
+            ].join("\n");
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: pr.number,
+            });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            }
+
+      # actualCaptureCount is what is billed at 1x and inheritedCaptureCount is
+      # what TurboSnap copied at 0.2x, so this is the real per-build cost
+      # against the monthly quota rather than an estimate.
+      - name: Record the snapshot usage
+        if: always()
+        env:
+          CAPTURED: ${{ steps.chromatic.outputs.actualCaptureCount }}
+          INHERITED: ${{ steps.chromatic.outputs.inheritedCaptureCount }}
+          CHANGES: ${{ steps.chromatic.outputs.changeCount }}
+          ERRORS: ${{ steps.chromatic.outputs.errorCount }}
+          SPECS: ${{ steps.chromatic.outputs.specCount }}
+          BUILD_URL: ${{ steps.chromatic.outputs.buildUrl }}
         run: |
-          CHROMATIC_PROJECT_TOKEN=${{ secrets.CHROMATIC_TOKEN }} npm run chromatic
+          {
+            echo "### Chromatic"
+            echo ""
+            echo "| metric | value |"
+            echo "| --- | --- |"
+            echo "| Stories | ${SPECS:-n/a} |"
+            echo "| Captured (billed 1x) | ${CAPTURED:-n/a} |"
+            echo "| Inherited via TurboSnap (billed 0.2x) | ${INHERITED:-n/a} |"
+            echo "| Visual changes | ${CHANGES:-n/a} |"
+            echo "| Errored stories | ${ERRORS:-n/a} |"
+            echo "| Build | ${BUILD_URL:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   build-and-deploy:
     needs: [lint, test]
@@ -75,7 +154,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
       - name: Build and publish npm package
         run: |
           HUSKY=0

@@ -179,6 +179,7 @@ export const Default: StoryObj = {
 };
 
 export const Position: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={2}>
       {(['center', 'top', 'right', 'left'] as const).map((p) => (
@@ -206,6 +207,7 @@ export const Position: Story = {
 };
 
 export const Size: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={2}>
       <Col xs="auto">
@@ -241,6 +243,7 @@ export const Size: Story = {
 };
 
 export const Width: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={2}>
       {(['xs', 'sm', 'md', 'lg', 'xl'] as ModalWidthPreset[]).map((w) => (
@@ -268,6 +271,7 @@ export const Width: Story = {
  * to cap the size on small viewports.
  */
 export const CustomWidth: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   name: 'Custom width',
   render: () => (
     <Modal>
@@ -297,6 +301,7 @@ export const CustomWidth: Story = {
  * **Responsive props** story.
  */
 export const Fullscreen: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const variants: { label: string; value: ModalFullscreen }[] = [
       { label: 'Normal (default)', value: false },
@@ -327,6 +332,7 @@ export const Fullscreen: Story = {
 };
 
 export const ScrollableContent: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={2}>
       <Col xs="auto">
@@ -401,6 +407,7 @@ export const ScrollableContent: Story = {
 };
 
 export const WithDescription: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   name: 'With header description',
   render: () => (
     <Modal>
@@ -422,6 +429,7 @@ export const WithDescription: Story = {
 };
 
 export const NoBackdropClose: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   name: 'No backdrop close',
   render: () => (
     <Modal closeOnBackdropClick={false}>
@@ -440,6 +448,7 @@ export const NoBackdropClose: Story = {
 };
 
 export const NoCloseButton: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   name: 'No close button',
   render: () => (
     <Modal>
@@ -458,6 +467,7 @@ export const NoCloseButton: Story = {
 };
 
 export const FooterVariants: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={2}>
       <Col xs="auto">
@@ -555,6 +565,7 @@ export const FooterVariants: Story = {
  * before the client has measured the viewport.
  */
 export const ResponsiveProps: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => (
     <Row gutterY={2}>
       <Col xs="auto">
@@ -602,6 +613,7 @@ export const ResponsiveProps: Story = {
  * Cancel button (via `ref`) prevents an accidental Enter from triggering the destructive action.
  */
 export const AlertDialog: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: function AlertDialog() {
     const cancelRef = useRef<HTMLButtonElement>(null);
     return (
@@ -637,6 +649,7 @@ export const AlertDialog: Story = {
  * Open / close from outside the Modal subtree by owning `open` and `onToggle` in the parent.
  */
 export const Controlled: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: function Controlled() {
     const [open, setOpen] = useState(false);
     return (
@@ -660,4 +673,27 @@ export const Controlled: Story = {
       </>
     );
   },
+};
+
+/**
+ * Visual-regression only. Every other story here renders a closed `Modal.Trigger`, so the
+ * snapshot is a picture of a button and the dialog itself is never captured. `defaultOpen`
+ * renders it open from props alone, with no interaction to drive.
+ */
+export const OpenForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Modal defaultOpen>
+      <Modal.Trigger>
+        <Button visualType="secondary">Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content width="md">
+        <Modal.Header title="Modal title" description="Supporting description text." />
+        <Modal.Body>
+          <SampleForm />
+        </Modal.Body>
+        <DefaultFooter />
+      </Modal.Content>
+    </Modal>
+  ),
 };

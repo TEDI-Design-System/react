@@ -253,21 +253,25 @@ export const Default: StoryObj = {
 };
 
 export const ArrowPosition: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: PositionTemplate,
   args: {},
 };
 
 export const TooltipWidth: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: WidthTemplate,
   args: {},
 };
 
 export const Triggers: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: TriggerTemplate,
   args: {},
 };
 
 export const OpenWithClick: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
   args: {
     openWith: 'click',
