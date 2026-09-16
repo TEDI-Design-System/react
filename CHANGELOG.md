@@ -1,3 +1,11 @@
+# [19.1.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.11...react-19.1.0-rc.12) (2026-09-16)
+
+
+### Bug Fixes
+
+* **carousel:** a11y violation fixes [#884](https://github.com/TEDI-Design-System/react/issues/884) ([#891](https://github.com/TEDI-Design-System/react/issues/891)) ([128f4bd](https://github.com/TEDI-Design-System/react/commit/128f4bd843b2dad79f4ebd185f2f23ed8aa2bbd8))
+* **date-time-field:** fix a11y violations [#886](https://github.com/TEDI-Design-System/react/issues/886) ([#887](https://github.com/TEDI-Design-System/react/issues/887)) ([0f6040e](https://github.com/TEDI-Design-System/react/commit/0f6040e48d10fc239666355d70b83b99de6db146))
+
 # [19.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.10...react-19.1.0-rc.11) (2026-09-16)
 
 
