@@ -677,7 +677,7 @@ export const BoundedOverlayNavigation: Story = {
 export const Examples: Story = {
   render: () => (
     <VerticalSpacing size={4}>
-      <Carousel>
+      <Carousel ariaLabel="Uudised">
         <Carousel.Header>
           <Text element="h2" modifiers="h1">
             Uudised
@@ -699,7 +699,7 @@ export const Examples: Story = {
         </Carousel.Footer>
       </Carousel>
 
-      <Carousel>
+      <Carousel ariaLabel="Sündmused">
         <Carousel.Header>
           <Text element="h2" modifiers="h1">
             Sündmused
@@ -716,7 +716,7 @@ export const Examples: Story = {
         </Carousel.Footer>
       </Carousel>
 
-      <Carousel>
+      <Carousel ariaLabel="Teenused">
         <Carousel.Header>
           <Text element="h2" modifiers="h1">
             Teenused
@@ -740,7 +740,7 @@ export const Examples: Story = {
         </Carousel.Footer>
       </Carousel>
 
-      <Carousel>
+      <Carousel ariaLabel="Esiletõstetud">
         <Carousel.Content slidesPerView={1}>
           {HERO.map((item) => (
             <HeroSlide key={item.id} {...item} />

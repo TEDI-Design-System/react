@@ -69,6 +69,18 @@ describe('Carousel', () => {
     expect(region).toHaveAttribute('aria-live', 'off');
   });
 
+  it('uses a custom ariaLabel as the region name (distinguishes multiple carousels)', () => {
+    render(
+      <Carousel ariaLabel="Uudised">
+        <Carousel.Content>
+          <div>Slide 1</div>
+        </Carousel.Content>
+      </Carousel>
+    );
+    expect(screen.getByRole('region', { name: 'Uudised' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'carousel' })).not.toBeInTheDocument();
+  });
+
   it('exposes only the slides in view as groups (default 1 per view)', () => {
     renderCarousel(3);
     expect(screen.getAllByRole('group')).toHaveLength(1);

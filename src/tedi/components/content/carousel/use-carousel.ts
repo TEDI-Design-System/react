@@ -69,7 +69,7 @@ export interface CarouselApi {
  * imperative API consumed by `Carousel.Content`, `Carousel.Navigation` and
  * `Carousel.Indicators`. Ported from the Angular `tedi-carousel-content`.
  */
-export const useCarousel = (): CarouselApi => {
+export const useCarousel = (ariaLabel?: string): CarouselApi => {
   const { getLabel } = useLabels();
   const breakpoint = useBreakpoint();
 
@@ -471,7 +471,7 @@ export const useCarousel = (): CarouselApi => {
     contentClassName,
     isSlideVisible,
     announcement,
-    regionLabel: getLabel('carousel'),
+    regionLabel: ariaLabel ?? getLabel('carousel'),
     slideLabel: (slide: number) => getLabel('carousel.slide', slide, slidesCount),
     next,
     prev,
