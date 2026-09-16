@@ -81,6 +81,17 @@ describe('Carousel', () => {
     expect(screen.queryByRole('region', { name: 'carousel' })).not.toBeInTheDocument();
   });
 
+  it('falls back to the localized label when ariaLabel is blank', () => {
+    render(
+      <Carousel ariaLabel="   ">
+        <Carousel.Content>
+          <div>Slide 1</div>
+        </Carousel.Content>
+      </Carousel>
+    );
+    expect(screen.getByRole('region', { name: 'carousel' })).toBeInTheDocument();
+  });
+
   it('exposes only the slides in view as groups (default 1 per view)', () => {
     renderCarousel(3);
     expect(screen.getAllByRole('group')).toHaveLength(1);

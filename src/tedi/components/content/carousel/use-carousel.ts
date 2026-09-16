@@ -471,7 +471,7 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     contentClassName,
     isSlideVisible,
     announcement,
-    regionLabel: ariaLabel ?? getLabel('carousel'),
+    regionLabel: ariaLabel?.trim() || getLabel('carousel'),
     slideLabel: (slide: number) => getLabel('carousel.slide', slide, slidesCount),
     next,
     prev,
