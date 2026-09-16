@@ -109,6 +109,19 @@ describe('MobileNav', () => {
     expect(screen.getByRole('navigation')).toBeInTheDocument();
   });
 
+  test('locks background scroll while the overlay is open and restores it on close', () => {
+    const { unmount } = render(<MobileNav {...baseProps} navItems={navItems} />);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    unmount();
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  test('does not lock background scroll when showOverlay is false', () => {
+    render(<MobileNav {...baseProps} navItems={navItems} showOverlay={false} />);
+    expect(document.body.style.overflow).not.toBe('hidden');
+  });
+
   test('offsets the overlay to the real header bottom and keeps it in sync via ResizeObserver', () => {
     // A page header the overlay should sit below.
     const header = document.createElement('header');

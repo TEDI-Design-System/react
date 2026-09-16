@@ -34,8 +34,6 @@ const meta: Meta<typeof SideNav> = {
     'SideNav.Mobile': SideNav.Mobile,
   },
   parameters: {
-    // App-shell component: render edge-to-edge so the header sits flush at the viewport top and the
-    // fixed mobile overlay lines up with it (Storybook's default 'padded' layout offsets the header).
     layout: 'fullscreen',
     docs: {
       source: {
@@ -58,8 +56,8 @@ const meta: Meta<typeof SideNav> = {
 export default meta;
 type Story = StoryObj<typeof SideNav>;
 
-const Template: StoryFn<typeof SideNav> = (args) => {
-  const [isOpen, setIsOpen] = useState(true);
+const Template: StoryFn<typeof SideNav> = (args, { viewMode }) => {
+  const [isOpen, setIsOpen] = useState(viewMode !== 'docs');
 
   return (
     <>
@@ -248,14 +246,24 @@ export const ThirdLevelMenuItemsParentsAreLinks: Story = {
   ],
 };
 
-export const CollapsibleToggle: React.FC = () => {
+export const CollapsibleToggle: StoryFn<typeof SideNav> = (_args, { viewMode }) => {
+  const [isOpen, setIsOpen] = useState(viewMode !== 'docs');
+
   return (
-    <SideNav
-      ariaLabel="Collapsible menu"
-      navItems={exampleThirdLevelMenuItems}
-      isCollapsed={true}
-      isMobileOpen={true}
-    />
+    <>
+      <HideAt lg>
+        <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+          <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
+        </Header>
+      </HideAt>
+      <SideNav
+        ariaLabel="Collapsible menu"
+        navItems={exampleThirdLevelMenuItems}
+        isCollapsed={true}
+        isMobileOpen={isOpen}
+        onMenuToggle={setIsOpen}
+      />
+    </>
   );
 };
 

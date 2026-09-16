@@ -66,6 +66,18 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
     return () => observer.disconnect();
   }, [isOpen, showOverlay]);
 
+  useEffect(() => {
+    if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+    body.style.overflow = 'hidden';
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isOpen, showOverlay]);
+
   const currentLevel = navigationStack[navigationStack.length - 1];
   const isRootLevel = navigationStack.length === 1;
 
@@ -234,8 +246,7 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
   return showOverlay ? (
     <FloatingOverlay
       ref={overlayRef}
-      lockScroll
-      style={{ top: overlayTop, insetInlineEnd: 'var(--floating-ui-scrollbar-width)' }}
+      style={{ top: overlayTop }}
       className={styles['tedi-sidenav__overlay']}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
