@@ -1,3 +1,10 @@
+# [19.1.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.14...react-19.1.0-rc.15) (2026-09-17)
+
+
+### Features
+
+* **map-button:** map button accepts an icon size prop [#898](https://github.com/TEDI-Design-System/react/issues/898) ([#899](https://github.com/TEDI-Design-System/react/issues/899)) ([cc66bb0](https://github.com/TEDI-Design-System/react/commit/cc66bb0f567c7595f33a485719f48d66ea01cb83))
+
 # [19.1.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.13...react-19.1.0-rc.14) (2026-09-17)
 
 
