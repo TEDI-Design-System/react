@@ -101,6 +101,47 @@ export const Multiple: Story = {
   },
 };
 
+const MANY_MAPS: PlaygroundMap[] = Array.from({ length: 22 }, (_, index) => ({
+  id: `map-${index}`,
+  title: `Aluskaart ${index + 1}`,
+  src: index % 2 === 0 ? MAP_IMG : HISTORICAL_IMG,
+}));
+
+const ManyOptionsTemplate: StoryFn<BaseMapSelectionProps> = (args) => {
+  const [active, setActive] = useState(MANY_MAPS[0].id);
+  const [transparency, setTransparency] = useState(0);
+  const activeMap = MANY_MAPS.find((map) => map.id === active) ?? MANY_MAPS[0];
+
+  return (
+    <BaseMapSelection
+      {...args}
+      content={<img src={activeMap.src} alt={activeMap.title} />}
+      transparency={transparency}
+      onTransparencyChange={setTransparency}
+    >
+      {MANY_MAPS.map((map) => (
+        <BaseMapSelection.Option
+          key={map.id}
+          id={map.id}
+          type="selection"
+          title={map.title}
+          selected={map.id === active}
+          onSelect={() => setActive(map.id)}
+          content={<img src={map.src} alt={map.title} />}
+        />
+      ))}
+    </BaseMapSelection>
+  );
+};
+
+export const ManyOptions: Story = {
+  render: ManyOptionsTemplate,
+  args: {
+    ...Default.args,
+    showTransparency: true,
+  },
+};
+
 /**
  * Below the `md` breakpoint the thumbnail is too small to read as a map preview, so the trigger
  * becomes a `MapButton` instead.

@@ -85,6 +85,19 @@ describe('MapButton', () => {
     expect(options[1]).toHaveAttribute('tabindex', '0');
   });
 
+  it('renders the dropdown indicator without a dropdown when showDropdownIndicator is set', () => {
+    render(<MapButton showDropdownIndicator>Text</MapButton>);
+
+    const button = screen.getByRole('button', { name: 'Text' });
+    expect(button.className).toContain('tedi-map-button--dropdown');
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  });
+
+  it('does not render the dropdown indicator by default', () => {
+    render(<MapButton>Text</MapButton>);
+    expect(screen.getByRole('button', { name: 'Text' }).className).not.toContain('tedi-map-button--dropdown');
+  });
+
   it('forwards the ref to the button element', () => {
     const ref = createRef<HTMLButtonElement>();
     render(<MapButton ref={ref}>Text</MapButton>);
