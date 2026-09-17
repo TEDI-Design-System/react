@@ -163,6 +163,17 @@ export const WithDropdown: Story = {
   },
 };
 
+export const DropdownIndicatorOnly: Story = {
+  args: {
+    iconSize: 24,
+    hideLabel: true,
+    children: 'Text',
+    tooltipContent: '',
+    icon: 'map',
+    showDropdownIndicator: true,
+  },
+};
+
 export const States: StoryObj<TemplateMultipleProps> = {
   render: TemplateColumn,
   args: {
