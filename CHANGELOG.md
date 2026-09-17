@@ -1,3 +1,10 @@
+# [19.1.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.12...react-19.1.0-rc.13) (2026-09-17)
+
+
+### Bug Fixes
+
+* **slider:** remove gaps between label, slider and feedback text [#732](https://github.com/TEDI-Design-System/react/issues/732) ([#876](https://github.com/TEDI-Design-System/react/issues/876)) ([2617c37](https://github.com/TEDI-Design-System/react/commit/2617c37dd4af01ab427d9e6e3cef8decd8e5c6b1))
+
 # [19.1.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.11...react-19.1.0-rc.12) (2026-09-16)
 
 
