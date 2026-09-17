@@ -91,19 +91,19 @@ jobs:
             });
             const pr = prs.find((p) => p.merged_at) ?? prs[0];
             if (!pr) {
-              core.info("No pull request is associated with this commit; nothing to comment on.");
+              core.info('No pull request is associated with this commit; nothing to comment on.');
               return;
             }
-            const marker = "<!-- chromatic-rc -->";
-            const branch = context.ref.replace("refs/heads/", "");
+            const marker = '<!-- chromatic-rc -->';
+            const branch = context.ref.replace('refs/heads/', '');
             const body = [
               marker,
-              "## 🎨 Chromatic",
-              "",
+              '## 🎨 Chromatic',
+              '',
               `${process.env.CHANGE_COUNT} visual change(s) were detected on \`${branch}\` after this pull request merged.`,
-              "",
+              '',
               `[Review and accept them](${process.env.BUILD_URL})`,
-            ].join("\n");
+            ].join('\n');
             const { data: comments } = await github.rest.issues.listComments({
               owner, repo, issue_number: pr.number,
             });

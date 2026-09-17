@@ -14,17 +14,23 @@ on:
     types: [submitted]
   workflow_dispatch:
 
-# A second approval on the same PR supersedes the first.
+# A second approval on the same PR supersedes the first while it is still
+# running; once it has finished, the `guard` job below is what stops a second
+# approval from paying for the same snapshots twice.
 concurrency:
   group: chromatic-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  chromatic:
+  # Every approval fires this workflow, and most pull requests here collect two.
+  # The build is keyed to the head commit, so the second approval of an unchanged
+  # head would re-buy the same snapshots. The sticky comment records the commit it
+  # was built from; if that commit is still the head, there is nothing new to see.
+  # A push after the approval moves the head, so re-approving does rebuild.
+  guard:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: write # the result is posted back to the PR
+      pull-requests: read
     # `pull_request_review` has no `branches:` filter, so the base branch is
     # checked here. Note the dependabot check reads the PR author, not
     # `github.actor`, which on a review event is the reviewer.
@@ -36,11 +42,44 @@ jobs:
         github.event.pull_request.draft == false &&
         github.event.pull_request.user.login != 'dependabot[bot]'
       )
+    outputs:
+      build: ${{ steps.check.outputs.build }}
+    steps:
+      - name: Has this head already been built?
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.eventName === 'workflow_dispatch') {
+              core.setOutput('build', 'yes');
+              return;
+            }
+            const { owner, repo } = context.repo;
+            const sha = context.payload.pull_request.head.sha;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: context.payload.pull_request.number,
+            });
+            const built = comments.some((c) => c.body?.includes(`chromatic-sha:${sha}`));
+            if (built) {
+              core.info(`${sha} already has a Chromatic build; skipping this approval.`);
+            }
+            core.setOutput('build', built ? 'no' : 'yes');
+
+  chromatic:
+    needs: guard
+    if: needs.guard.outputs.build == 'yes'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # the result is posted back to the PR
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node
@@ -74,18 +113,22 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
-            const marker = "<!-- chromatic-pr -->";
+            const sha = context.payload.pull_request.head.sha;
+            const marker = '<!-- chromatic-pr -->';
             const count = Number(process.env.CHANGE_COUNT);
+            // The commit is named in the comment, and the machine-readable copy
+            // is what the `guard` job reads to skip a repeat build of this head.
             const body = [
               marker,
-              "## 🎨 Chromatic",
-              "",
-              count > 0
-                ? `${count} visual change(s) to review before merging.`
-                : "No visual changes.",
-              "",
+              `<!-- chromatic-sha:${sha} -->`,
+              '## 🎨 Chromatic',
+              '',
+              count > 0 ? `${count} visual change(s) to review before merging.` : 'No visual changes.',
+              '',
+              `Built from \`${sha.slice(0, 7)}\`. Commits pushed after this are not covered; approve again to rebuild.`,
+              '',
               `[View the build](${process.env.BUILD_URL})`,
-            ].join("\n");
+            ].join('\n');
             const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
             const existing = comments.find((c) => c.body?.includes(marker));
             if (existing) {

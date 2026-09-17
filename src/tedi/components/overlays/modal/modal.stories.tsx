@@ -680,6 +680,12 @@ export const Controlled: Story = {
  * snapshot is a picture of a button and the dialog itself is never captured. `defaultOpen`
  * renders it open from props alone, with no interaction to drive.
  */
+/**
+ * Visual-regression only. Every other story renders a closed trigger, so the dialog frame, its
+ * backdrop and its header/body/footer padding are never captured. Only one modal can be open per
+ * snapshot (each renders its own full-viewport backdrop), so the variants are split one per story
+ * and limited to the ones that change the layout rather than a single CSS length.
+ */
 export const OpenForVisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   render: () => (
@@ -689,6 +695,131 @@ export const OpenForVisualTest: Story = {
       </Modal.Trigger>
       <Modal.Content width="md">
         <Modal.Header title="Modal title" description="Supporting description text." />
+        <Modal.Body>
+          <SampleForm />
+        </Modal.Body>
+        <DefaultFooter />
+      </Modal.Content>
+    </Modal>
+  ),
+};
+
+/**
+ * Visual-regression only. `size="small"` tightens the header, body and footer padding, and the
+ * footer's `left` slot is the other footer layout, so both ride in the same snapshot.
+ */
+export const OpenSmallForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Modal defaultOpen>
+      <Modal.Trigger>
+        <Button visualType="secondary">Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content width="sm" size="small">
+        <Modal.Header title="Modal title" description="Supporting description text." />
+        <Modal.Body>
+          <SampleForm />
+        </Modal.Body>
+        <Modal.Footer
+          left={
+            <Modal.Closer>
+              <Button visualType="neutral" iconLeft="arrow_back">
+                Back
+              </Button>
+            </Modal.Closer>
+          }
+        >
+          <Modal.Closer>
+            <Button visualType="secondary">Cancel</Button>
+          </Modal.Closer>
+          <Modal.Closer>
+            <Button>Continue</Button>
+          </Modal.Closer>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal>
+  ),
+};
+
+/**
+ * Visual-regression only. The widest preset together with a body that overflows: the frame stays
+ * fixed, the body scrolls and the header and footer hold their edges.
+ */
+export const OpenWideScrollingForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Modal defaultOpen>
+      <Modal.Trigger>
+        <Button visualType="secondary">Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content width="xl">
+        <Modal.Header title="Modal title" />
+        <Modal.Body>
+          <ScrollableForm idPrefix="visual-test-wide" />
+        </Modal.Body>
+        <DefaultFooter />
+      </Modal.Content>
+    </Modal>
+  ),
+};
+
+/**
+ * Visual-regression only. `position="top"` pins the dialog to the top of the backdrop instead of
+ * centring it.
+ */
+export const OpenPositionTopForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Modal defaultOpen>
+      <Modal.Trigger>
+        <Button visualType="secondary">Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content width="sm" position="top">
+        <Modal.Header title="Modal title" />
+        <Modal.Body>
+          <SampleForm />
+        </Modal.Body>
+        <DefaultFooter />
+      </Modal.Content>
+    </Modal>
+  ),
+};
+
+/**
+ * Visual-regression only. A side position turns the modal into a full-height drawer, which is a
+ * different frame rather than a different width.
+ */
+export const OpenPositionDrawerForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Modal defaultOpen>
+      <Modal.Trigger>
+        <Button visualType="secondary">Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content width="sm" position="right">
+        <Modal.Header title="Modal title" />
+        <Modal.Body>
+          <SampleForm />
+        </Modal.Body>
+        <DefaultFooter />
+      </Modal.Content>
+    </Modal>
+  ),
+};
+
+/**
+ * Visual-regression only. `fullscreen="edge"` drops the backdrop padding, the border and the
+ * radius, which is the one fullscreen value that changes more than the dialog's size.
+ */
+export const OpenFullscreenEdgeForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Modal defaultOpen>
+      <Modal.Trigger>
+        <Button visualType="secondary">Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content fullscreen="edge">
+        <Modal.Header title="Modal title" />
         <Modal.Body>
           <SampleForm />
         </Modal.Body>

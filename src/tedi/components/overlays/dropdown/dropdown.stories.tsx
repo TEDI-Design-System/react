@@ -706,38 +706,272 @@ export const Tree: Story = {
 };
 
 /**
- * Visual-regression only. The other stories all render a closed trigger, so the menu, its
- * items and their spacing are never captured. `defaultOpen` renders it open from props alone.
+ * Visual-regression only. Every other story renders a closed trigger, so the menu itself was
+ * never captured. These three render the variants open, grouped so the whole surface costs
+ * three snapshots instead of one per variant: item content here, container chrome and control
+ * items below. Each menu gets an explicit `width` so the open menus keep to their own column.
  */
-export const OpenForVisualTest: Story = {
+export const OpenItemsForVisualTest: Story = {
   tags: ['!dev', '!autodocs'],
   parameters: {
     a11y: {
       config: {
-        // Measured, not defensive: axe reports `aria-hidden-focus` on the two
-        // `data-floating-ui-focus-guard` spans that @floating-ui/react renders
-        // around a non-modal floating element (`modal={false}`, the default).
-        // They carry tabindex="0" with aria-hidden="true" by the library's own
-        // design. Pre-existing in every open dropdown — this is simply the
-        // first story that renders one open, so the gate can finally see it.
-        rules: [{ id: 'aria-hidden-focus', enabled: false }],
+        rules: [
+          // `aria-hidden-focus`: @floating-ui/react wraps a non-modal floating element in two
+          // `data-floating-ui-focus-guard` spans that carry tabindex="0" with aria-hidden="true"
+          // by its own design. Pre-existing in every open dropdown.
+          { id: 'aria-hidden-focus', enabled: false },
+          // `aria-valid-attr-value`: the open menu sets aria-activedescendant="dropdown-item-N"
+          // once an item takes focus, but no `Dropdown.Item` renders that id. A component bug,
+          // reported separately; these are the first stories that render a focused open menu.
+          { id: 'aria-valid-attr-value', enabled: false },
+        ],
       },
     },
   },
   render: () => (
-    <Dropdown defaultOpen>
-      <Dropdown.Trigger>
-        <Button visualType="secondary" iconRight="keyboard_arrow_down">
-          Create
-        </Button>
-      </Dropdown.Trigger>
-      <Dropdown.Content>
-        <Dropdown.Item index={0}>Access to health data</Dropdown.Item>
-        <Dropdown.Item index={1} active>
-          Declaration of intent
-        </Dropdown.Item>
-        <Dropdown.Item index={2}>Contacts</Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown>
+    <Row>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={260}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Create
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>Access to health data</Dropdown.Item>
+            <Dropdown.Item index={1} active>
+              Declaration of intent
+            </Dropdown.Item>
+            <Dropdown.Item index={2} disabled>
+              Contacts
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={260}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconLeft="more_vert">
+              More
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>
+              <Text>
+                <Icon name="download" color="inherit" display="inline" /> Download
+              </Text>
+            </Dropdown.Item>
+            <Dropdown.Item index={1}>
+              <Text>
+                <Icon name="add" color="inherit" display="inline" /> Add
+              </Text>
+            </Dropdown.Item>
+            <Dropdown.Item index={2}>
+              <Text>
+                <Icon name="delete" color="inherit" display="inline" /> Delete
+              </Text>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={320}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconLeft="share" iconRight="keyboard_arrow_down">
+              Share access
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0} active>
+              <div className="flex flex-column">
+                <Text>Access to health data</Text>
+                <Text color="tertiary" modifiers="small">
+                  Doctors will be able to see your health data
+                </Text>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Item index={1}>
+              <div className="flex align-items-center justify-content-between">
+                <Text>Tallinn</Text>
+                <Text color="tertiary" modifiers="small">
+                  3 timeslots
+                </Text>
+              </div>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
+  ),
+};
+
+/**
+ * Visual-regression only. `divided`, `Dropdown.Separator` and the `maxHeight` scroll cap are all
+ * container chrome, invisible until the menu is open.
+ */
+export const OpenChromeForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          // `aria-hidden-focus`: @floating-ui/react wraps a non-modal floating element in two
+          // `data-floating-ui-focus-guard` spans that carry tabindex="0" with aria-hidden="true"
+          // by its own design. Pre-existing in every open dropdown.
+          { id: 'aria-hidden-focus', enabled: false },
+          // `aria-valid-attr-value`: the open menu sets aria-activedescendant="dropdown-item-N"
+          // once an item takes focus, but no `Dropdown.Item` renders that id. A component bug,
+          // reported separately; these are the first stories that render a focused open menu.
+          { id: 'aria-valid-attr-value', enabled: false },
+        ],
+      },
+    },
+  },
+  render: () => (
+    <Row>
+      <Col xs={4}>
+        <Dropdown defaultOpen divided width={240}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconLeft="account_circle" iconRight="keyboard_arrow_down">
+              Account
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>Profile</Dropdown.Item>
+            <Dropdown.Item index={1}>Security</Dropdown.Item>
+            <Dropdown.Item index={2}>Billing</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={240}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              More actions
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0}>
+              <Text>
+                <Icon name="edit" display="inline" color="inherit" /> Edit
+              </Text>
+            </Dropdown.Item>
+            <Dropdown.Separator />
+            <Dropdown.Item index={1}>
+              <Text>
+                <Icon name="delete" display="inline" color="inherit" /> Delete
+              </Text>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col xs={4}>
+        <Dropdown defaultOpen maxHeight={200} width={280}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              Vali raviasutus
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            {[
+              'Fertilitas',
+              'Ida-Tallinna Keskhaigla',
+              'Lääne-Tallinna Keskhaigla',
+              'Põhja-Eesti Regionaalhaigla',
+              'Tallinna Lastehaigla',
+              'Tartu Ülikooli Kliinikum',
+              'Pärnu Haigla',
+            ].map((label, index) => (
+              <Dropdown.Item key={label} index={index}>
+                {label}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
+  ),
+};
+
+/**
+ * Visual-regression only. Checkbox and radio items sit in the menu through `asChild`, and `indent`
+ * only reads as a hierarchy once the rows are visible next to each other.
+ */
+export const OpenControlItemsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          // `aria-hidden-focus`: @floating-ui/react wraps a non-modal floating element in two
+          // `data-floating-ui-focus-guard` spans that carry tabindex="0" with aria-hidden="true"
+          // by its own design. Pre-existing in every open dropdown.
+          { id: 'aria-hidden-focus', enabled: false },
+          // `aria-valid-attr-value`: the open menu sets aria-activedescendant="dropdown-item-N"
+          // once an item takes focus, but no `Dropdown.Item` renders that id. A component bug,
+          // reported separately; these are the first stories that render a focused open menu.
+          { id: 'aria-valid-attr-value', enabled: false },
+        ],
+      },
+    },
+  },
+  render: () => (
+    <Row>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={240}>
+          <Dropdown.Trigger>
+            <Button visualType="primary" iconRight="keyboard_arrow_down">
+              Locations (1)
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0} asChild>
+              <Checkbox id="vt-parnu" label="Pärnu" value="parnu" name="" defaultChecked />
+            </Dropdown.Item>
+            <Dropdown.Item index={1} asChild>
+              <Checkbox id="vt-tartu" label="Tartu" value="tartu" name="" />
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={240}>
+          <Dropdown.Trigger>
+            <Button visualType="link" iconRight="keyboard_arrow_down">
+              City: Tallinn
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0} asChild>
+              <Radio id="vt-city-tallinn" name="vt-city" value="tallinn" label="Tallinn" defaultChecked />
+            </Dropdown.Item>
+            <Dropdown.Item index={1} asChild>
+              <Radio id="vt-city-tartu" name="vt-city" value="tartu" label="Tartu" />
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+      <Col xs={4}>
+        <Dropdown defaultOpen width={240}>
+          <Dropdown.Trigger>
+            <Button visualType="secondary" iconRight="keyboard_arrow_down">
+              All locations
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item index={0} asChild>
+              <Checkbox id="vt-all" label="All locations" value="" name="" indeterminate />
+            </Dropdown.Item>
+            <Dropdown.Item index={1} asChild indent={1}>
+              <Checkbox id="vt-ind-tallinn" label="Tallinn" value="tallinn" name="" defaultChecked />
+            </Dropdown.Item>
+            <Dropdown.Item index={2} asChild indent={1}>
+              <Checkbox id="vt-ind-tartu" label="Tartu" value="tartu" name="" />
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      </Col>
+    </Row>
   ),
 };
