@@ -1,3 +1,10 @@
+# [19.1.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.13...react-19.1.0-rc.14) (2026-09-17)
+
+
+### Bug Fixes
+
+* **tabs:** scroll tab fully into view on click [#706](https://github.com/TEDI-Design-System/react/issues/706) ([#883](https://github.com/TEDI-Design-System/react/issues/883)) ([5c06274](https://github.com/TEDI-Design-System/react/commit/5c062741c43387d9b4105e96ee7ba72c3ff3624c))
+
 # [19.1.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.12...react-19.1.0-rc.13) (2026-09-17)
 
 
