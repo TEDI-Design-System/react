@@ -84,9 +84,73 @@ describe('MobileNav', () => {
     expect(baseProps.onClose).toHaveBeenCalled();
   });
 
+  test('calls onClose when clicking the overlay backdrop', () => {
+    const onClose = jest.fn();
+    const { container } = render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
+
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    fireEvent.click(overlay);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not call onClose when clicking inside the nav content', () => {
+    const onClose = jest.fn();
+    render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
+
+    fireEvent.click(screen.getByRole('navigation', { name: 'Main navigation' }));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   test('renders without overlay if showOverlay is false', () => {
     render(<MobileNav {...baseProps} navItems={navItems} showOverlay={false} />);
     expect(screen.queryByTestId('floating-overlay')).not.toBeInTheDocument();
     expect(screen.getByRole('navigation')).toBeInTheDocument();
+  });
+
+  test('locks background scroll while the overlay is open and restores it on close', () => {
+    const { unmount } = render(<MobileNav {...baseProps} navItems={navItems} />);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    unmount();
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  test('does not lock background scroll when showOverlay is false', () => {
+    render(<MobileNav {...baseProps} navItems={navItems} showOverlay={false} />);
+    expect(document.body.style.overflow).not.toBe('hidden');
+  });
+
+  test('offsets the overlay to the real header bottom and keeps it in sync via ResizeObserver', () => {
+    // A page header the overlay should sit below.
+    const header = document.createElement('header');
+    jest.spyOn(header, 'getBoundingClientRect').mockReturnValue({ bottom: 80 } as DOMRect);
+    document.body.appendChild(header);
+
+    // jsdom has no ResizeObserver — stub it so the observe/disconnect path runs.
+    const observe = jest.fn();
+    const disconnect = jest.fn();
+    const originalResizeObserver = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = jest.fn(() => ({ observe, disconnect, unobserve: jest.fn() })) as never;
+
+    const { container, unmount } = render(<MobileNav {...baseProps} navItems={navItems} />);
+
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    expect(overlay).toHaveStyle({ top: '80px' });
+    expect(observe).toHaveBeenCalledWith(header);
+
+    unmount();
+    expect(disconnect).toHaveBeenCalled();
+
+    globalThis.ResizeObserver = originalResizeObserver;
+    header.remove();
+    jest.restoreAllMocks();
+  });
+
+  test('falls back to the header-height token when there is no page header', () => {
+    const { container } = render(<MobileNav {...baseProps} navItems={navItems} />);
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    expect(overlay).toHaveStyle({ top: 'var(--layout-header-height)' });
   });
 });

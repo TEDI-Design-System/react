@@ -3,6 +3,8 @@ import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../grid';
+import { Header } from '../header';
+import { HideAt } from '../hide-at/hide-at';
 import { SideNavItem } from './components/sidenav-item/sidenav-item';
 import {
   exampleDefaultOpen,
@@ -32,6 +34,7 @@ const meta: Meta<typeof SideNav> = {
     'SideNav.Mobile': SideNav.Mobile,
   },
   parameters: {
+    layout: 'fullscreen',
     docs: {
       source: {
         transform: (code: string) => {
@@ -53,13 +56,17 @@ const meta: Meta<typeof SideNav> = {
 export default meta;
 type Story = StoryObj<typeof SideNav>;
 
-const Template: StoryFn<typeof SideNav> = (args) => {
-  const [isOpen, setIsOpen] = useState(true);
+const Template: StoryFn<typeof SideNav> = (args, { viewMode }) => {
+  const [isOpen, setIsOpen] = useState(viewMode !== 'docs');
 
   return (
     <>
-      <SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />
-      <SideNav {...args} isMobileOpen={isOpen} />
+      <HideAt lg>
+        <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+          <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
+        </Header>
+      </HideAt>
+      <SideNav {...args} isMobileOpen={isOpen} onMenuToggle={setIsOpen} />
     </>
   );
 };
@@ -239,14 +246,24 @@ export const ThirdLevelMenuItemsParentsAreLinks: Story = {
   ],
 };
 
-export const CollapsibleToggle: React.FC = () => {
+export const CollapsibleToggle: StoryFn<typeof SideNav> = (_args, { viewMode }) => {
+  const [isOpen, setIsOpen] = useState(viewMode !== 'docs');
+
   return (
-    <SideNav
-      ariaLabel="Collapsible menu"
-      navItems={exampleThirdLevelMenuItems}
-      isCollapsed={true}
-      isMobileOpen={true}
-    />
+    <>
+      <HideAt lg>
+        <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+          <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
+        </Header>
+      </HideAt>
+      <SideNav
+        ariaLabel="Collapsible menu"
+        navItems={exampleThirdLevelMenuItems}
+        isCollapsed={true}
+        isMobileOpen={isOpen}
+        onMenuToggle={setIsOpen}
+      />
+    </>
   );
 };
 
