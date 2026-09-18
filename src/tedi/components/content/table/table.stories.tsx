@@ -1,7 +1,7 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import type { ColumnDef } from '@tanstack/react-table';
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
@@ -15,6 +15,8 @@ import { Checkbox } from '../../form/checkbox/checkbox';
 import { DateField } from '../../form/date-field/date-field';
 import { TextField } from '../../form/textfield/textfield';
 import { TimeField } from '../../form/time-field/time-field';
+import { HideAt } from '../../layout/hide-at/hide-at';
+import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
 import { Alert } from '../../notifications/alert/alert';
@@ -22,12 +24,17 @@ import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger } from '../../
 import { Popover, PopoverContent, PopoverTrigger } from '../../overlays/popover';
 import { Tooltip } from '../../overlays/tooltip';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
+import { TableCard } from '../table-card/table-card';
 import { TextGroup } from '../text-group/text-group';
 import { Truncate } from '../truncate/truncate';
 import type { TableProps } from './table';
 import { groupRowSpan, Table } from './table';
 
 /**
+ * On small screens a wide table can either scroll (see the `Scrollable` story) or, for better
+ * readability, turn each row into a stacked card. For the latter, use `TableCard` — the mobile
+ * counterpart of `Table` — and switch between them by breakpoint (see the `ResponsiveCards` story).
+ *
  * <a href="https://tanstack.com/table" target="_BLANK">@tanstack/react-table ↗</a><br/>
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/557b9f-table" target="_BLANK">Zeroheight ↗</a>
@@ -39,10 +46,6 @@ const meta: Meta<typeof Table> = {
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=4514-63761&m=dev',
-    },
-    a11y: {
-      // TODO: [Table]: Review storybook a11y violations #804
-      test: 'todo',
     },
   },
 };
@@ -232,9 +235,6 @@ function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<T | null>(null);
 
-  const draftRef = useRef(draft);
-  draftRef.current = draft;
-
   const beginEdit = useCallback((row: T) => {
     setEditingId(row.id);
     setDraft(row);
@@ -244,12 +244,11 @@ function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T
     setDraft(null);
   }, []);
   const commitEdit = useCallback(() => {
-    const current = draftRef.current;
-    if (!current) return;
-    setRows((existing) => existing.map((row) => (row.id === current.id ? (current as T) : row)));
+    if (!draft) return;
+    setRows((existing) => existing.map((row) => (row.id === draft.id ? draft : row)));
     setEditingId(null);
     setDraft(null);
-  }, []);
+  }, [draft]);
 
   return { rows, editingId, draft, setDraft, beginEdit, cancelEdit, commitEdit };
 }
@@ -423,7 +422,10 @@ export const Sizes: Story = {
             autoResetPageIndex={false}
             data={defaultEditor.rows}
             columns={bookingShowcaseColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Pagination – default size' } },
+            }}
           />
         </EditableRowsProvider>
         <Heading element="h3">Small</Heading>
@@ -434,7 +436,10 @@ export const Sizes: Story = {
             data={smallEditor.rows}
             columns={bookingShowcaseColumns}
             size="small"
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Pagination – small size' } },
+            }}
           />
         </EditableRowsProvider>
       </VerticalSpacing>
@@ -503,14 +508,20 @@ export const Simple: Story = {
             autoResetPageIndex={false}
             data={bookingEditor.rows}
             columns={bookingShowcaseColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Broneeringute pagineerimine' } },
+            }}
           />
         </EditableRowsProvider>
         <Table<PersonRecord>
           id="tedi-table-simple-people"
           data={filterablePeople}
           columns={simplePeopleColumns}
-          pagination={SHOWCASE_PAGINATION_4}
+          pagination={{
+            ...SHOWCASE_PAGINATION_4,
+            paginationProps: { labels: { ariaLabel: 'Isikute pagineerimine' } },
+          }}
         />
         <EditableRowsProvider value={doctorEditor}>
           <Table<Doctor>
@@ -518,7 +529,10 @@ export const Simple: Story = {
             autoResetPageIndex={false}
             data={doctorEditor.rows}
             columns={simpleDoctorColumns}
-            pagination={SHOWCASE_PAGINATION_3}
+            pagination={{
+              ...SHOWCASE_PAGINATION_3,
+              paginationProps: { labels: { ariaLabel: 'Arstide pagineerimine' } },
+            }}
           />
         </EditableRowsProvider>
       </VerticalSpacing>
@@ -2179,3 +2193,106 @@ export const Responsive: Story = {
     );
   },
 };
+
+interface Appointment {
+  date: string;
+  time: string;
+  duration: string;
+  location: string;
+}
+
+const appointments: Appointment[] = Array.from({ length: 6 }, () => ({
+  date: '22.03.2029 – 29.03.2029',
+  time: '11:14',
+  duration: '6 min',
+  location: 'Harjumaa',
+}));
+
+const editButton = (
+  <Button visualType="neutral" size="small" iconLeft="edit">
+    Muuda
+  </Button>
+);
+
+const appointmentColumns: ColumnDef<Appointment>[] = [
+  {
+    id: 'date',
+    header: 'Kuupäev',
+    accessorKey: 'date',
+    cell: ({ row }) => <span style={{ whiteSpace: 'nowrap' }}>{row.original.date}</span>,
+  },
+  { id: 'time', header: 'Kellaaeg', accessorKey: 'time' },
+  { id: 'duration', header: 'Kestus', accessorKey: 'duration' },
+  { id: 'location', header: 'Asukoht', accessorKey: 'location' },
+  {
+    id: 'actions',
+    header: () => <span className="sr-only">Tegevused</span>,
+    size: 1,
+    meta: { label: 'Tegevused' },
+    cell: () => editButton,
+  },
+];
+
+/**
+ * When there's no room to switch to cards, a `Table` can instead **scroll**. The first column can
+ * stay pinned during horizontal scroll (`stickyFirstColumn`), and the header can stay pinned during
+ * vertical scroll (`stickyHeader` + `maxHeight`). This is the desktop-friendly alternative to
+ * `TableCard` — see the `ResponsiveCards` story for switching between the two.
+ */
+export const Scrollable: StoryFn = () => (
+  <VerticalSpacing size={2}>
+    <div style={{ maxWidth: 480 }}>
+      <Table<Appointment> id="table-scroll-plain" data={appointments} columns={appointmentColumns} />
+    </div>
+
+    <div style={{ maxWidth: 560 }}>
+      <Table<Appointment>
+        id="table-scroll-sticky-col"
+        data={appointments}
+        columns={appointmentColumns}
+        stickyFirstColumn
+      />
+    </div>
+
+    <Table<Appointment>
+      id="table-scroll-sticky-header"
+      data={appointments}
+      columns={appointmentColumns}
+      stickyHeader
+      maxHeight={240}
+    />
+  </VerticalSpacing>
+);
+Scrollable.parameters = { fullWidth: true, layout: 'padded' };
+
+/**
+ * Table that turns into cards on mobile — one dataset, two presentations. `ShowAt md` renders the
+ * `Table` at `md` and wider; `HideAt md` renders each row as a `TableCard` — the readable mobile
+ * counterpart — below `md`. (The `Responsive` story shows the alternative expand-row approach.) Resize
+ * the viewport (or use the toolbar's viewport control) to see it switch.
+ */
+export const ResponsiveCards: StoryFn = () => (
+  <>
+    <ShowAt md>
+      <Table<Appointment> id="table-responsive-cards" data={appointments} columns={appointmentColumns} />
+    </ShowAt>
+    <HideAt md>
+      <VerticalSpacing size={1}>
+        {appointments.map((appointment, index) => (
+          <TableCard
+            key={index}
+            layout="vertical"
+            rows={[
+              { label: 'Kuupäev', value: appointment.date },
+              { label: 'Kellaaeg', value: appointment.time },
+              { label: 'Kestus', value: appointment.duration },
+              { label: 'Asukoht', value: appointment.location },
+            ]}
+            actions={editButton}
+          />
+        ))}
+      </VerticalSpacing>
+    </HideAt>
+  </>
+);
+ResponsiveCards.parameters = { fullWidth: true, layout: 'padded' };

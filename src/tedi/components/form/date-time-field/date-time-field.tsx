@@ -54,6 +54,12 @@ type DateTimeFieldBreakpointProps = {
    */
   useNativePicker?: boolean;
   /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
+  /**
    * Layout of the date-and-time popover. `mode='range'` always uses
    * `'side-by-side'` regardless of this value — the range UI needs the
    * calendar and both `from` / `to` time pickers visible at once.
@@ -297,6 +303,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     showOutsideDays = true,
     availableTimes,
     timeHeading = getLabel('dateTimeField.timeHeading'),
+    clearable = true,
   } = getCurrentBreakpointProps<DateTimeFieldBreakpointProps>(props);
 
   const {
@@ -711,6 +718,17 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     ? [...consumerHelper, errorHelper]
     : [consumerHelper, errorHelper];
 
+  const openCalendarLabel = getLabel('dateField.openCalendar');
+
+  const calendarTriggerProps: React.ButtonHTMLAttributes<HTMLButtonElement> = useNative
+    ? { 'aria-label': openCalendarLabel }
+    : {
+        'aria-label': openCalendarLabel,
+        'aria-haspopup': 'dialog',
+        'aria-expanded': open,
+        'aria-controls': open ? context.floatingId : undefined,
+      };
+
   const textFieldProps: TextFieldProps = {
     ...(inputProps as TextFieldProps),
     id,
@@ -719,12 +737,13 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     placeholder,
     readOnly: readOnly || (!useNative && !!availableTimes && !!currentValue),
     icon: 'calendar_today',
-    isClearable: true,
+    isClearable: clearable,
     required,
     disabled,
     invalid: hasDisabledDateError || (inputProps as TextFieldProps)?.invalid,
     helper: mergedHelper,
     onIconClick: handleIconClick,
+    iconButtonProps: calendarTriggerProps,
     onChange: handleInputChange,
     className: cn(styles['tedi-date-time-field__textfield'], inputProps?.className, {
       [styles['tedi-date-time-field__icon--disabled']]: disabled,
@@ -732,14 +751,13 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     input: {
       ...(inputProps?.input as UnknownType),
       type: useNative ? 'datetime-local' : 'text',
-      'aria-expanded': useNative ? undefined : open,
     },
   };
 
   return (
     <>
-      <div className={cn(styles['tedi-date-time-field__container'], className)} aria-haspopup="dialog">
-        <TextField ref={setTextFieldRef} aria-expanded={useNative ? undefined : open} {...textFieldProps} />
+      <div className={cn(styles['tedi-date-time-field__container'], className)}>
+        <TextField ref={setTextFieldRef} {...textFieldProps} />
       </div>
 
       {!useNative && (

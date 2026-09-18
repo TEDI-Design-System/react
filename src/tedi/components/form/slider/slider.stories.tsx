@@ -19,10 +19,6 @@ const meta: Meta<typeof Slider> = {
     addonRight: { control: false },
   },
   parameters: {
-    a11y: {
-      // TODO: [Slider]: Review storybook a11y violations #822
-      test: 'todo',
-    },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -134,6 +130,24 @@ export const WithCurrentValue: Story = {
   },
 };
 
+/**
+ * Adds hint text below the slider for guidance.
+ */
+export const WithHint: Story = {
+  decorators: [wrapInCol],
+  args: {
+    id: 'slider-hint',
+    min: 0,
+    max: 100,
+    step: 1,
+    defaultValue: 50,
+    showCurrentValue: true,
+    valueFormatter: (value) => `${value}%`,
+    helper: { text: 'Liiguta nuppu, et väärtust muuta', type: 'hint' },
+    'aria-label': 'Väärtus',
+  },
+};
+
 const CustomValueTemplate = (args: SliderProps) => {
   const [numberValue, setNumberValue] = useState<number>(4);
   const [inputValue, setInputValue] = useState<number>(50);
@@ -233,6 +247,7 @@ export const States: Story = {
       minLabel: '0%',
       maxLabel: '100%',
       valueFormatter: (value) => `${value}%`,
+      'aria-label': 'Väärtus',
     };
 
     const thumbArgs: SliderProps = {
@@ -359,22 +374,5 @@ export const WithoutTooltip: Story = {
     minLabel: '0%',
     maxLabel: '100%',
     tooltip: false,
-  },
-};
-
-/**
- * Adds helper / hint text below the slider for guidance.
- */
-export const WithHelper: Story = {
-  decorators: [wrapInCol],
-  args: {
-    id: 'slider-helper',
-    label: 'Väärtus',
-    min: 0,
-    max: 100,
-    defaultValue: 40,
-    minLabel: '0%',
-    maxLabel: '100%',
-    helper: { id: 'slider-helper-text', text: 'Liiguta nuppu, et väärtust muuta', type: 'hint' },
   },
 };

@@ -1,4 +1,5 @@
 import { parseBarrel, extractStatus, mergeManifest } from './manifest.js';
+import { renderTokenTable, tokenFamilies } from './tokens.js';
 
 const BARREL = [
   "export * from './components/buttons/button/button';",
@@ -46,5 +47,34 @@ describe('mergeManifest', () => {
     const foo = merged.find((c) => c.id === 'form/foo');
     expect(foo.description).toBeNull(); // new component gets null skeleton
     expect(foo.name).toBeNull();
+  });
+});
+
+describe('token families', () => {
+  const tokens = {
+    themes: {
+      default: {
+        semantic: {
+          'general-text-primary': { value: 'var(--tedi-neutral-900)', resolved: 'rgb(21 25 38)' },
+          'general-text-brand': { value: 'var(--tedi-primary-600)', resolved: 'rgb(0 90 163)' },
+          'general-surface-primary': { value: '#fff', resolved: 'rgb(255 255 255)' },
+          'form-field-padding-x-lg': { value: '1rem', resolved: '1rem' },
+          'button-primary-background': { value: '#000', resolved: 'rgb(0 0 0)' },
+        },
+      },
+    },
+  };
+
+  it('groups role tokens into families and ignores component-scoped tiers', () => {
+    const families = tokenFamilies(tokens);
+    expect([...families.keys()]).toEqual(['form-field', 'general-surface', 'general-text']);
+    expect(families.get('general-text')).toEqual(['general-text-brand', 'general-text-primary']);
+  });
+
+  it('never emits resolved token values, so the doc cannot teach a literal', () => {
+    const table = renderTokenTable(tokens);
+    expect(table).toContain('`general-text-*`');
+    expect(table).not.toContain('rgb(');
+    expect(table).not.toContain('#fff');
   });
 });

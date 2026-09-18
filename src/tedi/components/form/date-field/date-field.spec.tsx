@@ -69,6 +69,36 @@ describe('DateField component', () => {
     expect(input).toHaveValue('10.01.2025 – 25.01.2025');
   });
 
+  it('does not flag a valid range selection as invalid on blur', async () => {
+    const user = userEvent.setup();
+    const range = { from: new Date(2025, 0, 10), to: new Date(2025, 0, 25) };
+    render(<DateField {...defaultProps} mode="range" selected={range} />);
+
+    const input = screen.getByLabelText('Birth date');
+    expect(input).toHaveValue('10.01.2025 – 25.01.2025');
+
+    await user.click(input);
+    await user.tab();
+
+    expect(screen.queryByText('dateField.invalidDateError')).not.toBeInTheDocument();
+  });
+
+  it('makes the range input read-only when no parseDate is supplied (calendar-only)', () => {
+    render(<DateField {...defaultProps} mode="range" />);
+    expect(screen.getByLabelText('Birth date')).toHaveAttribute('readonly');
+  });
+
+  it('allows typing in a range field when a parseDate is supplied', () => {
+    render(
+      <DateField
+        {...defaultProps}
+        mode="range"
+        parseDate={() => ({ from: new Date(2025, 0, 1), to: new Date(2025, 0, 5) })}
+      />
+    );
+    expect(screen.getByLabelText('Birth date')).not.toHaveAttribute('readonly');
+  });
+
   it('is read-only when readOnly=true', () => {
     render(<DateField {...defaultProps} readOnly />);
     const input = screen.getByLabelText('Birth date');
@@ -800,6 +830,18 @@ describe('DateField component', () => {
 
       expect(onSelect).not.toHaveBeenCalled();
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+  });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
     });
   });
 });

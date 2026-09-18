@@ -11,9 +11,9 @@
   min-height: 100%;
   margin: 0;
   font-size: 0.875rem;
-  background: var(--color-primary-main);
+  background: var(--general-surface-brand-primary);
 
-  --global-outline-color: var(--color-primary-highlight);
+  --global-outline-color: var(--general-surface-brand-tertiary);
   --global-outline-offset: -2px;
 
   @include mixins.print-grayscale;
@@ -41,7 +41,7 @@
 
   .sidenav__list {
     margin: 0;
-    background: var(--color-primary-highlight);
+    background: var(--general-surface-brand-tertiary);
   }
 }
 
@@ -50,10 +50,10 @@
   flex-direction: row;
 
   .sidenav--has-dividers & {
-    border-top: 1px solid var(--color-primary-active);
+    border-top: 1px solid var(--general-border-brand);
 
     &:last-of-type {
-      border-bottom: 1px solid var(--color-primary-active);
+      border-bottom: 1px solid var(--general-border-brand);
     }
   }
 
@@ -73,9 +73,9 @@
     &[aria-expanded='true'],
     &:hover,
     &.sidenav__item--current {
-      --global-outline-color: var(--color-primary-highlight);
+      --global-outline-color: var(--general-surface-brand-tertiary);
 
-      background-color: var(--color-primary-active);
+      background-color: var(--general-surface-brand-secondary);
     }
 
     [class^='sidenav__link'] {
@@ -83,7 +83,7 @@
     }
 
     [data-name='icon'] {
-      color: var(--color-text-inverted);
+      color: var(--general-text-white);
       transition: 200ms ease;
       transition-property: color;
     }
@@ -109,7 +109,7 @@
 }
 
 .sidenav__item .sidenav__item {
-  --global-outline-color: var(--color-primary-active);
+  --global-outline-color: var(--general-border-brand);
 
   .sidenav--hide-subitem-icons & {
     .sidenav__link [data-name='icon'] {
@@ -120,17 +120,17 @@
   [data-name='collapse-trigger'] {
     span.sidenav__link,
     [data-name='icon'] {
-      color: var(--color-primary-active);
+      color: var(--general-text-brand);
     }
 
     &[aria-expanded='true'],
     &:hover,
     &.sidenav__item--current {
-      background-color: var(--color-primary-active-subtle);
+      background-color: var(--general-surface-brand-secondary);
 
       span.sidenav__link,
       [data-name='icon'] {
-        color: var(--color-text-inverted);
+        color: var(--general-text-white);
       }
     }
   }
@@ -145,7 +145,7 @@ a.sidenav__link {
   min-height: 3.5rem;
   padding: 0.75rem 1rem;
   font: inherit;
-  color: var(--color-text-inverted);
+  color: var(--general-text-white);
   word-break: break-word;
   text-decoration: none;
   border-radius: 0;
@@ -184,25 +184,25 @@ a.sidenav__link {
 a.sidenav__link {
   &:hover,
   .sidenav__item--current > & {
-    color: var(--color-text-inverted);
-    background-color: var(--color-primary-active);
+    color: var(--general-text-white);
+    background-color: var(--general-surface-brand-secondary);
   }
 
   .sidenav__item .sidenav__item & {
-    color: var(--color-primary-active);
+    color: var(--general-text-brand);
 
-    --global-outline-color: var(--color-primary-active);
+    --global-outline-color: var(--general-border-brand);
 
     &:hover {
-      color: var(--color-text-inverted);
-      background-color: var(--color-primary-active-subtle);
+      color: var(--general-text-white);
+      background-color: var(--general-surface-brand-secondary);
     }
   }
 
   .sidenav__item .sidenav__item.sidenav__item--current > & {
-    color: var(--color-text-inverted);
-    background-color: var(--color-primary-active-subtle);
+    color: var(--general-text-white);
+    background-color: var(--general-surface-brand-secondary);
 
-    --global-outline-color: var(--color-primary-highlight);
+    --global-outline-color: var(--general-surface-brand-tertiary);
   }
 }

@@ -75,7 +75,7 @@ const SpacingsTable = () => {
           style={{
             width: original.px,
             height: original.px,
-            background: 'var(--color-primary-main)',
+            background: 'var(--general-surface-brand-primary)',
           }}
         />
       ),

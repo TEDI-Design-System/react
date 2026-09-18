@@ -26,6 +26,7 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
 
   const childRef = isValidElement(children) ? getElementRef(children) : undefined;
   const refs = useMergeRefs([reference, childRef]);
+  const isInteractivePopup = role !== 'tooltip' && role !== 'label' && !ariaHidden;
   const extraProps =
     role === 'tooltip' && !ariaHidden
       ? {
@@ -51,6 +52,7 @@ export const OverlayTrigger = (props: OverlayTriggerProps) => {
       {...getReferenceProps({
         ref: refs,
         tabIndex: 0,
+        role: isInteractivePopup ? 'button' : undefined,
         className: cn(
           styles['tedi-overlay__trigger'],
           styles['tedi-overlay__trigger--text'],
