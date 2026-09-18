@@ -1,3 +1,10 @@
+# [19.1.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.15...react-19.1.0-rc.16) (2026-09-18)
+
+
+### Features
+
+* **dock-panel:** Add DockPanel Component [#198](https://github.com/TEDI-Design-System/react/issues/198) ([#895](https://github.com/TEDI-Design-System/react/issues/895)) ([cd8b3d7](https://github.com/TEDI-Design-System/react/commit/cd8b3d73aeaa90e0c07bff41532d6c5fe603e992))
+
 # [19.1.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.14...react-19.1.0-rc.15) (2026-09-17)
 
 
