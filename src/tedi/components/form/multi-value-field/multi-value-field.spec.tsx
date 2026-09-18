@@ -102,6 +102,19 @@ describe('MultiValueField', () => {
     expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
   });
 
+  it('adds the reveal-on-hover modifier only with showClearButtonOnHover and existing values', () => {
+    const root = () => document.querySelector('[class*="tedi-multi-value-field"]') as HTMLElement;
+    const { rerender } = render(<MultiValueField {...defaultProps} values={['one']} showClearButtonOnHover />);
+    expect(root().className).toContain('tedi-multi-value-field--clear-on-hover');
+    expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+
+    rerender(<MultiValueField {...defaultProps} values={[]} showClearButtonOnHover />);
+    expect(root().className).not.toContain('tedi-multi-value-field--clear-on-hover');
+
+    rerender(<MultiValueField {...defaultProps} values={['one']} />);
+    expect(root().className).not.toContain('tedi-multi-value-field--clear-on-hover');
+  });
+
   it('clears all values when clear button is clicked', () => {
     const handleChange = jest.fn();
 

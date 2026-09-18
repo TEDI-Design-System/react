@@ -164,6 +164,15 @@ $input-padding-right-map: (
   }
 }
 
+.tedi-textfield--clear-on-hover .tedi-textfield__clear-button {
+  visibility: hidden;
+}
+
+.tedi-textfield--clear-on-hover .tedi-textfield__inner:hover .tedi-textfield__clear-button,
+.tedi-textfield--clear-on-hover .tedi-textfield__inner:focus-within .tedi-textfield__clear-button {
+  visibility: visible;
+}
+
 .tedi-textfield__icon-wrapper {
   display: flex;
   align-items: center;
