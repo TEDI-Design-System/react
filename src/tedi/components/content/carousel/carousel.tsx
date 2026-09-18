@@ -20,10 +20,15 @@ export interface CarouselProps {
    * Additional class name applied to the carousel root.
    */
   className?: string;
+  /**
+   * Accessible name for the carousel region. Set a distinct label per carousel when a page has
+   * several. Defaults to the localized `carousel` label.
+   */
+  ariaLabel?: string;
 }
 
-const CarouselInner = forwardRef<HTMLDivElement, CarouselProps>(({ children, className }, ref) => {
-  const carousel = useCarousel();
+const CarouselInner = forwardRef<HTMLDivElement, CarouselProps>(({ children, className, ariaLabel }, ref) => {
+  const carousel = useCarousel(ariaLabel);
 
   return (
     <CarouselContext.Provider value={carousel}>

@@ -110,7 +110,7 @@ export function BaseMapSelection(props: BaseMapSelectionProps): JSX.Element {
   );
 
   const trigger = isMobile ? (
-    <MapButton id={id} icon="map" hideLabel tooltipContent={null} selected={isOpen}>
+    <MapButton id={id} icon="map" showDropdownIndicator hideLabel iconSize={24} tooltipContent={null} selected={isOpen}>
       {title}
     </MapButton>
   ) : (
