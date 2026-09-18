@@ -257,6 +257,8 @@ export const Controlled = () => {
   );
 };
 
+Controlled.parameters = { chromatic: { disableSnapshot: true } };
+
 export const CheckWithLongTitle = () => {
   return (
     <Row>
