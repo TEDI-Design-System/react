@@ -125,6 +125,15 @@ export interface CollapseProps extends BreakpointSupport<CollapseBreakpointProps
    * built-in `role="region"` panel.
    */
   controlsId?: string;
+  /**
+   * Whether the disclosed content panel is exposed as a `region` landmark
+   * (`role="region"` + `aria-labelledby`). Turn this **off** for repeated or
+   * nested disclosures such as navigation sub-menus, where many labelled regions
+   * pollute the landmark map and collide (axe `landmark-unique`); the
+   * `aria-expanded` toggle already conveys the relationship.
+   * @default true
+   */
+  contentAsRegion?: boolean;
 }
 
 export const Collapse = (props: CollapseProps): JSX.Element => {
@@ -149,6 +158,7 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
     controlsId,
     inverted = false,
     fullRowToggle = false,
+    contentAsRegion = true,
     ...rest
   } = getCurrentBreakpointProps<CollapseProps>(props);
 
@@ -190,7 +200,11 @@ export const Collapse = (props: CollapseProps): JSX.Element => {
   }, [fullRowToggle]);
 
   const renderContent = (
-    <div id={contentId} role="region" aria-labelledby={triggerId} className={styles['tedi-collapse__content']}>
+    <div
+      id={contentId}
+      {...(contentAsRegion ? { role: 'region', 'aria-labelledby': triggerId } : {})}
+      className={styles['tedi-collapse__content']}
+    >
       {children}
     </div>
   );

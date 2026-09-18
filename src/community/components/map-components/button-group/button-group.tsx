@@ -91,10 +91,14 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
         if (isValidElement(child) && child.type === MapButton) {
           const typedChild = child as React.ReactElement<MapButtonProps>;
           return cloneElement(typedChild, {
-            className: cn(styles['tedi-button-group__item'], {
-              [styles['tedi-button-group__item--active']]: typedChild.props.isActive,
-              [styles['tedi-button-group__item--disabled']]: typedChild.props.disabled,
-            }),
+            className: cn(
+              styles['tedi-button-group__item'],
+              {
+                [styles['tedi-button-group__item--active']]: typedChild.props.isActive,
+                [styles['tedi-button-group__item--disabled']]: typedChild.props.disabled,
+              },
+              typedChild.props.className
+            ),
             onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
               if (!typedChild.props.disabled) {
                 typedChild.props.onClick?.(event);

@@ -92,10 +92,10 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
     <>
       {states.map((state, index) => (
         <Row key={index} className="padding-14-16">
-          <Col width={3} className="display-flex align-items-center">
+          <Col width={3} className="flex align-items-center">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col className="display-flex align-items-center">
+          <Col className="flex align-items-center">
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '240px' }}>
               <SideNavItem
                 {...sideNavItemProps}
@@ -109,10 +109,10 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
       ))}
 
       <Row className="padding-14-16">
-        <Col width={3} className="display-flex align-items-center">
+        <Col width={3} className="flex align-items-center">
           <Text modifiers="bold">With Subitems</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col className="flex align-items-center">
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '240px' }}>
             <SideNavItem
               {...sideNavItemProps}
@@ -125,10 +125,10 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col width={3} className="display-flex align-items-center">
+        <Col width={3} className="flex align-items-center">
           <Text modifiers="bold">Parent is link with subitems</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col className="flex align-items-center">
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '240px' }}>
             <SideNavItem
               href="#"
@@ -141,10 +141,10 @@ const TemplateWithStates: StoryFn<TemplateStateProps> = (args) => {
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col width={3} className="display-flex align-items-center">
+        <Col width={3} className="flex align-items-center">
           <Text modifiers="bold">Sub item is parent</Text>
         </Col>
-        <Col className="display-flex align-items-center">
+        <Col className="flex align-items-center">
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '240px' }}>
             <SideNavItem
               isDefaultOpen

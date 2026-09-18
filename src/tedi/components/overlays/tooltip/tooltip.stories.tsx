@@ -56,73 +56,73 @@ const Template: StoryFn<TooltipProps> = (args) => {
 const PositionTemplate: StoryFn<TooltipProps> = (args) => {
   return (
     <Row gap={3} justifyContent="center">
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="top-start">
           <Tooltip.Trigger>Top start</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="top">
           <Tooltip.Trigger>Top center</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="top-end">
           <Tooltip.Trigger>Top end</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="bottom-start">
           <Tooltip.Trigger>Bottom start</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="bottom">
           <Tooltip.Trigger>Bottom center</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="bottom-end">
           <Tooltip.Trigger>Bottom end</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="left-start">
           <Tooltip.Trigger>Left start</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="left">
           <Tooltip.Trigger>Left center</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="left-end">
           <Tooltip.Trigger>Left end</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="right-start">
           <Tooltip.Trigger>Right start</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="right">
           <Tooltip.Trigger>Right center</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>
         </Tooltip>
       </Col>
-      <Col xs={12} lg={3} className="display-flex justify-content-center">
+      <Col xs={12} lg={3} className="flex justify-content-center">
         <Tooltip {...args} placement="right-end">
           <Tooltip.Trigger>Right end</Tooltip.Trigger>
           <Tooltip.Content>Tooltip Content</Tooltip.Content>

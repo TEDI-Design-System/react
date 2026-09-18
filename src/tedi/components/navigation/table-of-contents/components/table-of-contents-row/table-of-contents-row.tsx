@@ -1,8 +1,6 @@
 import cn from 'classnames';
 import { useContext } from 'react';
 
-import { useLabels } from '../../../../../providers/label-provider';
-import { Icon } from '../../../../base/icon/icon';
 import Separator from '../../../../misc/separator/separator';
 import { TableOfContentsContext, type TableOfContentsNode } from '../../table-of-contents';
 import styles from '../../table-of-contents.module.scss';
@@ -16,13 +14,12 @@ interface TableOfContentsRowProps {
 }
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
-  const { activeId, showIcons, numbered, activeTrail } = useContext(TableOfContentsContext);
-  const { getLabel } = useLabels();
-  const { id, content, children, isValid, separator, hideIcon } = node;
+  const { activeId, numbered, activeTrail, defaultOpen } = useContext(TableOfContentsContext);
+  const { id, content, children, separator, slot } = node;
 
   const hasChildren = !!children?.length;
   const isSelected = !!id && id === activeId;
-  const isOpen = hasChildren && !!id && activeTrail.has(id);
+  const isOpen = hasChildren && (defaultOpen || (!!id && activeTrail.has(id)));
   const level = Math.min(depth, 2);
 
   const numberBase = numberPrefix ? `${numberPrefix}.${index + 1}` : `${index + 1}`;
@@ -37,31 +34,15 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         [styles['tedi-table-of-contents__item--selected']]: isSelected,
       })}
     >
-      <span
-        className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}
-      >
-        {showIcons && !hideIcon && (
-          <Icon
-            className={styles['tedi-table-of-contents__icon']}
-            name={isValid === false ? 'warning' : isValid === true ? 'check' : 'circle'}
-            color={isValid === false ? 'danger' : isValid === true ? 'success' : 'tertiary'}
-            label={getLabel(
-              isValid === false
-                ? 'table-of-contents.step-invalid'
-                : isValid === true
-                ? 'table-of-contents.step-valid'
-                : 'table-of-contents.step-incomplete'
-            )}
-            size={18}
-          />
-        )}
+      <div className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}>
         {numbered && (
           <span className={styles['tedi-table-of-contents__number']} aria-hidden="true">
             {ordinal}
           </span>
         )}
         <span className={styles['tedi-table-of-contents__content']}>{content}</span>
-      </span>
+        {slot !== undefined && <div className={styles['tedi-table-of-contents__slot']}>{slot}</div>}
+      </div>
 
       {isOpen && (
         <Group className={styles['tedi-table-of-contents__group']}>
@@ -77,7 +58,7 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         </Group>
       )}
 
-      {separator && <Separator />}
+      {separator && <Separator className={styles['tedi-table-of-contents__separator']} />}
     </li>
   );
 };

@@ -70,19 +70,19 @@ export const Default: Story = {
 export const Long: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <Breadcrumbs>
+      <Breadcrumbs ariaLabel="Applications trail">
         <Link href="#">Dashboard</Link>
         <Link href="#">Applications</Link>
         <span aria-current="page">Application nr 506</span>
       </Breadcrumbs>
-      <Breadcrumbs>
+      <Breadcrumbs ariaLabel="Documents trail">
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <Link href="#">My documents</Link>
         <Link href="#">Application nr 506</Link>
         <span aria-current="page">Restrictions</span>
       </Breadcrumbs>
-      <Breadcrumbs>
+      <Breadcrumbs ariaLabel="Medications trail">
         <Link href="#">Medications</Link>
         <span aria-current="page">Ibuprofen</span>
       </Breadcrumbs>
@@ -168,19 +168,23 @@ export const ResponsiveVariant: Story = {
  * icon, or arbitrary markup. The separator is hidden from assistive technology.
  */
 export const CustomSeparator: Story = {
+  // Distinct `ariaLabel`s keep the three `<nav>` landmarks unique (axe `landmark-unique`).
   render: () => (
     <VerticalSpacing size={1}>
-      <Breadcrumbs separator="/">
+      <Breadcrumbs separator="/" ariaLabel="Slash separator">
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
       </Breadcrumbs>
-      <Breadcrumbs separator={<Icon name="arrow_forward" color="inherit" size={16} aria-hidden />}>
+      <Breadcrumbs
+        separator={<Icon name="arrow_forward" color="inherit" size={16} aria-hidden />}
+        ariaLabel="Arrow separator"
+      >
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
       </Breadcrumbs>
-      <Breadcrumbs separator="—">
+      <Breadcrumbs separator="—" ariaLabel="Dash separator">
         <Link href="#">Dashboard</Link>
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>

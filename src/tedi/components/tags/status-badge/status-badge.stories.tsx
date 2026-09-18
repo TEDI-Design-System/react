@@ -157,7 +157,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
           <Col width={6}>
             <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
           </Col>
-          <Col className="display-flex gap-2">
+          <Col className="flex gap-2">
             <StatusBadge {...args} color="neutral" size={array[key]} />
             <StatusBadge {...args} color="neutral" size={array[key]} status="success" />
           </Col>

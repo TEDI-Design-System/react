@@ -13,6 +13,7 @@ type SingleOptionType = OptionProps<ISelectOption, boolean> & {
 export const SelectSingleOption = ({ showRadioButtons, renderOption, ...props }: SingleOptionType): JSX.Element => {
   const OptionBEM = cn(
     styles['tedi-select__option'],
+    { [styles['tedi-select__option--control']]: showRadioButtons },
     { [styles['tedi-select__option--disabled']]: props.isDisabled },
     { [styles['tedi-select__option--selected']]: props.isSelected && !showRadioButtons },
     { [styles['tedi-select__option--focused']]: props.isFocused }

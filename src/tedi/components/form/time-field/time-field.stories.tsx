@@ -91,19 +91,19 @@ export const States: StoryObj<TimeFieldProps> = {
     <div className="state-example">
       {stateArray.map((state) => (
         <Row key={state} className="padding-14-16">
-          <Col width={2} className="display-flex align-items-center">
+          <Col width={2} className="flex align-items-center">
             <Text modifiers="bold">{state}</Text>
           </Col>
-          <Col md={4} xs={12} className="display-flex align-items-center">
+          <Col md={4} xs={12} className="flex align-items-center">
             <TimeField id={state} label="Aeg" inputProps={{ disabled: state === 'Disabled' }} />
           </Col>
         </Row>
       ))}
       <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+        <Col width={2} className="flex align-items-center">
           <Text modifiers="bold">Success</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col md={4} xs={12} className="flex align-items-center">
           <TimeField
             id="success-timefield"
             label="Aeg"
@@ -112,10 +112,10 @@ export const States: StoryObj<TimeFieldProps> = {
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col width={2} className="display-flex align-items-center">
+        <Col width={2} className="flex align-items-center">
           <Text modifiers="bold">Error</Text>
         </Col>
-        <Col md={4} xs={12} className="display-flex align-items-center">
+        <Col md={4} xs={12} className="flex align-items-center">
           <TimeField id="error-timefield" label="Aeg" inputProps={{ helper: { text: 'Vihjetekst', type: 'error' } }} />
         </Col>
       </Row>
@@ -165,13 +165,13 @@ export const OnClickType: Story = {
         <Row>
           <Col lg={3} md={6}>
             <Text modifiers="small">Clock button is clickable</Text>
-            <TimeField label="Aeg" id="calendar-button-trigger" timePickerTrigger="button" />
+            <TimeField label="Aeg" id="time-button-trigger" timePickerTrigger="button" />
           </Col>
         </Row>
         <Row>
           <Col lg={3} md={6}>
             <Text modifiers="small">Input is clickable</Text>
-            <TimeField label="Aeg" id="calendar-button-trigger" timePickerTrigger="input" />
+            <TimeField label="Aeg" id="time-input-trigger" timePickerTrigger="input" />
           </Col>
         </Row>
       </VerticalSpacing>

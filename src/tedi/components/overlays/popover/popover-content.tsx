@@ -1,13 +1,31 @@
 import cn from 'classnames';
-import { useContext } from 'react';
+import { CSSProperties, useContext } from 'react';
 import { useId } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
 import ClosingButton, { ClosingButtonProps } from '../../buttons/closing-button/closing-button';
+import { CardContentPadding } from '../../content/card/card';
 import { OverlayContext } from '../overlay/overlay';
 import { OverlayContent, OverlayContentProps } from '../overlay/overlay-content';
 import styles from './popover.module.scss';
 import { PopoverContext } from './popover-context';
+
+const resolvePopoverPadding = (padding: CardContentPadding | undefined): CSSProperties | undefined => {
+  if (padding === undefined) return undefined;
+  const rem = (value: number) => `${value}rem`;
+  const sides =
+    typeof padding === 'number'
+      ? { top: padding, right: padding, bottom: padding, left: padding }
+      : 'vertical' in padding
+      ? { top: padding.vertical, right: padding.horizontal, bottom: padding.vertical, left: padding.horizontal }
+      : padding;
+  return {
+    '--popover-content-padding-top': rem(sides.top),
+    '--popover-content-padding-right': rem(sides.right),
+    '--popover-content-padding-bottom': rem(sides.bottom),
+    '--popover-content-padding-left': rem(sides.left),
+  } as CSSProperties;
+};
 
 export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames'> {
   /**
@@ -36,6 +54,12 @@ export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNam
    * @default small
    */
   width?: 'small' | 'medium' | 'large' | 'none';
+  /**
+   * Inner padding of the popover, using the same scale as `Card` — a number in rems,
+   * `{ vertical, horizontal }`, or `{ top, right, bottom, left }`. Set to `0` (or zero a single axis)
+   * when the popover holds a menu whose rows should reach the edges. Defaults to the popover padding.
+   */
+  padding?: CardContentPadding;
 }
 
 export const PopoverContent = (props: PopoverContentProps) => {
@@ -47,11 +71,9 @@ export const PopoverContent = (props: PopoverContentProps) => {
     titleProps = { element: 'h4' },
     close,
     closeProps = { size: 'default' },
+    padding,
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
-  // `withBorder` is owned by <Popover> because it also influences floating-ui
-  // arrow padding, not just styling. Reading it from context keeps the two
-  // concerns in sync.
   const { withBorder } = useContext(PopoverContext);
   const titleId = useId();
   const hasDescription = Boolean(children);
@@ -72,6 +94,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
       }}
       labelledBy={title ? titleId : undefined}
       describedBy={hasDescription ? descriptionId : undefined}
+      contentStyle={resolvePopoverPadding(padding)}
     >
       {(title || close) && (
         <div className={cn(styles['tedi-popover__header'], { [styles['tedi-popover__header--no-title']]: !title })}>

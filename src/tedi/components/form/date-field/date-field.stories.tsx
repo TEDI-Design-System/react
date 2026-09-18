@@ -94,7 +94,7 @@ export const States: Story = {
     <VerticalSpacing>
       {stateArray.map((state) => (
         <Row key={state}>
-          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} xs={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col>
@@ -103,7 +103,7 @@ export const States: Story = {
         </Row>
       ))}
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
@@ -116,7 +116,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
@@ -816,5 +816,21 @@ export const ModalPickers: Story = {
         </Col>
       </Row>
     );
+  },
+};
+
+/**
+ * `minYear` / `maxYear` control how far the header **year dropdown** reaches. By default it spans
+ * `currentYear - 100` to `currentYear + 20` — narrow or widen it for cases like a birthdate field
+ * that needs to go back much further.
+ */
+export const YearRange: Story = {
+  render: Template,
+  args: {
+    mode: 'single',
+    label: 'Sünnikuupäev',
+    placeholder: 'pp.kk.aaaa',
+    minYear: 1920,
+    maxYear: new Date().getFullYear(),
   },
 };

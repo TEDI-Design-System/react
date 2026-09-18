@@ -48,7 +48,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
                 <Col xs={2}>
                   <Text>{value}</Text>
                 </Col>
-                <Col className="display-flex align-items-center gap-3">
+                <Col className="flex align-items-center gap-3">
                   <FloatingButton id={value} size={size === 'Large' ? 'large' : 'medium'} {...buttonProps}>
                     Scroll up
                   </FloatingButton>

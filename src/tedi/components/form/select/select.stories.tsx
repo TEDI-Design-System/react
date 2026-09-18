@@ -37,7 +37,7 @@ const TemplateSizes: StoryFn = (args) => (
   <Row>
     <Col lg={12} xs={12} className="example-list">
       <Row className="border-bottom padding-14-16">
-        <Col lg={2} xs={12} className="display-flex align-items-center">
+        <Col lg={2} xs={12} className="flex align-items-center">
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col lg={10} xs={12}>
@@ -45,7 +45,7 @@ const TemplateSizes: StoryFn = (args) => (
         </Col>
       </Row>
       <Row className="padding-14-16">
-        <Col lg={2} xs={12} className="display-flex align-items-center">
+        <Col lg={2} xs={12} className="flex align-items-center">
           <Text modifiers="bold">Small</Text>
         </Col>
         <Col lg={10} xs={12}>
@@ -99,7 +99,7 @@ export const States: Story = {
   render: (args) => (
     <VerticalSpacing>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Default</Text>
         </Col>
         <Col>
@@ -107,7 +107,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Hover</Text>
         </Col>
         <Col>
@@ -121,7 +121,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Focus</Text>
         </Col>
         <Col>
@@ -135,7 +135,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Active</Text>
         </Col>
         <Col>
@@ -149,7 +149,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
@@ -157,7 +157,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
@@ -165,7 +165,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Disabled</Text>
         </Col>
         <Col>

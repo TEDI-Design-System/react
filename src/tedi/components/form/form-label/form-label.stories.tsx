@@ -31,10 +31,10 @@ const SizeTemplate: StoryFn = () => {
     <div className="example-list">
       {sizeArray.map((size, key) => (
         <Row className={`${key === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
-          <Col className="display-flex w-50">
+          <Col className="flex w-50">
             <b>{size.charAt(0).toUpperCase() + size.slice(1)}</b>
           </Col>
-          <Col className="display-flex gap-3">
+          <Col className="flex gap-3">
             <Label isSmall={size === 'small'}>Label</Label>
             <Label isSmall={size === 'small'} isBold={true}>
               Label

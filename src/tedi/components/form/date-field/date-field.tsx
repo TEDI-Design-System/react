@@ -75,6 +75,12 @@ type DateFieldBreakpointProps = {
    * count is kept: the months wrap to a vertical stack and the modal body scrolls.
    */
   numberOfMonths?: number;
+  /**
+   * Whether the field shows a clear button to reset the value. Disable it
+   * when the field is required or the value should not be cleared.
+   * @default true
+   */
+  clearable?: boolean;
 };
 
 export interface DateFieldProps
@@ -150,7 +156,7 @@ export interface DateFieldProps
   showOutsideDays?: boolean;
   /**
    * Custom date parsing function for user input. Receives the input string and should return a `Date`, an array of `Date`s, a `DateRange`, or `undefined` if the input is invalid or cleared.
-   * If not provided, the component will not allow manual input and will rely solely on the calendar picker for date selection.
+   * If not provided, `mode="single"` falls back to a built-in `dd.MM.yyyy` parser and stays typeable. `mode="multiple"` and `mode="range"` cannot be parsed automatically, so their input is read-only and dates are selected via the calendar only.
    */
   parseDate?: (value: string) => Date | Date[] | DateRange | undefined;
   /**
@@ -179,6 +185,16 @@ export interface DateFieldProps
    * day's `aria-label`), or `null` / `undefined` for no status.
    */
   dayStatus?: DayStatusFn;
+  /**
+   * Earliest year offered in the calendar header's year dropdown.
+   * @default currentYear - 100
+   */
+  minYear?: number;
+  /**
+   * Latest year offered in the calendar header's year dropdown.
+   * @default currentYear + 20
+   */
+  maxYear?: number;
   /**
    * Show or hide the calendar header's previous/next navigation. When hidden, the month/year header
    * also becomes a static, non-interactive label (no dropdown / grid jumping) — so the calendar is
@@ -340,6 +356,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     enableCalendar = true,
     calendarTrigger = 'button',
     numberOfMonths,
+    clearable = true,
   } = getCurrentBreakpointProps<DateFieldBreakpointProps>(props);
 
   const {
@@ -357,6 +374,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     showOutsideDays = true,
     parseDate,
     monthYearSelectType,
+    minYear,
+    maxYear,
     dayStatus,
     tagsDirection,
     showNavigation = true,
@@ -670,6 +689,11 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
       setHasInvalidDateError(false);
       return;
     }
+
+    if (!parseDate && mode !== 'single') {
+      setHasInvalidDateError(false);
+      return;
+    }
     setHasInvalidDateError(!isParsedValidForMode(parseInputValue(inputValue)));
   };
 
@@ -840,7 +864,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             icon="calendar_today"
             onIconClick={openCalendar}
             iconButtonProps={enableCalendar ? calendarTriggerProps : { 'aria-label': openCalendarLabel }}
-            isClearable
+            isClearable={clearable}
             required={required}
             onChange={(newLabels) => {
               if (!Array.isArray(value)) return;
@@ -866,7 +890,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}
             icon="calendar_today"
-            isClearable
+            isClearable={clearable}
             onIconClick={openCalendar}
             iconButtonProps={
               enableCalendar && !shouldUseNativePicker ? calendarTriggerProps : { 'aria-label': openCalendarLabel }
@@ -896,6 +920,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             })}
             input={{
               ...((inputProps as TextFieldProps)?.input as UnknownType),
+              ...(!parseDate && mode !== 'single' && { readOnly: true }),
               ...(shouldUseNativePicker && { type: 'date' }),
               ...(enableCalendar && !shouldUseNativePicker && calendarTrigger === 'input'
                 ? {
@@ -926,6 +951,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
           availableDays={availableDays}
           footer={footer}
           monthYearSelectType={monthYearSelectType}
+          minYear={minYear}
+          maxYear={maxYear}
           dayStatus={dayStatus}
           showNavigation={showNavigation}
           selectionLevel={selectionLevel}
@@ -973,6 +1000,8 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
                   availableDays={availableDays}
                   footer={footer}
                   monthYearSelectType={monthYearSelectType}
+                  minYear={minYear}
+                  maxYear={maxYear}
                   dayStatus={dayStatus}
                   showNavigation={showNavigation}
                   handleSelect={handleSelect}

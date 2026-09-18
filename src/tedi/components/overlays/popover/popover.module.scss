@@ -6,11 +6,17 @@ $popover-width: (
 $arrow-offset: -1rem;
 
 .tedi-popover {
+  --popover-content-padding-top: var(--popover-padding-sm);
+  --popover-content-padding-right: var(--popover-padding-sm);
+  --popover-content-padding-bottom: var(--popover-padding-sm);
+  --popover-content-padding-left: var(--popover-padding-sm);
+
   z-index: var(--z-index-tooltip);
   display: flex;
   flex-direction: column;
   gap: var(--layout-grid-gutters-08);
-  padding: var(--popover-padding-sm);
+  padding: var(--popover-content-padding-top) var(--popover-content-padding-right) var(--popover-content-padding-bottom)
+    var(--popover-content-padding-left);
   color: var(--popover-text);
   background: var(--popover-background);
   border: var(--popover-border-width-md) solid var(--popover-border-default);

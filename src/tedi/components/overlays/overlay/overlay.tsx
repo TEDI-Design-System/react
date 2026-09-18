@@ -245,6 +245,7 @@ export const Overlay = (props: OverlayProps) => {
       handleClose: safePolygon(),
     }),
     useClick(context, {
+      enabled: openWith === 'click',
       toggle: dismissible,
     }),
     useFocus(context, {

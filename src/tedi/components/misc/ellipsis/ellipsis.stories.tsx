@@ -78,7 +78,7 @@ export const ResponsiveWithCustomPopover: Story = {
     children: (
       <Popover openWith="hover" focusManager={{ modal: false }}>
         <Popover.Trigger>
-          <span>
+          <span role="button">
             Any inline <b>content (even bold)</b>, that is too long for the wrapper
             <span className="text-small"> and dont fit in x number of rows</span>
           </span>

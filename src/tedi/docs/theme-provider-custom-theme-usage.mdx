@@ -1,7 +1,7 @@
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import { Link } from '../components/navigation/link/link.tsx';
 
-<Meta name="Labels" title="Documentation/Custom theming" />
+<Meta title="Documentation/Custom theming" />
 
 # Custom theming
 
@@ -28,6 +28,12 @@ The **theme** prop accepts:
   - `dark`
 - Custom themes:
   - Any string (e.g. `"custom-theme"`)
+
+Only the built-in themes ship with the library's CSS. **A custom theme is not bundled** — you supply
+its stylesheet yourself, as described below. The prop is typed as `Theme = 'default' | 'dark' | string`
+and is not validated, so an unknown name **fails silently**: the `.tedi-theme--*` class lands on
+`<html>` with no variables behind it, and components keep rendering with the default theme's values
+that `:root` provides.
 
 ---
 

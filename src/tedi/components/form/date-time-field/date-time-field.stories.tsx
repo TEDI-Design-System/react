@@ -86,7 +86,7 @@ export const States: Story = {
     <VerticalSpacing>
       {stateArray.map((state) => (
         <Row key={state}>
-          <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+          <Col lg={2} xs={12} className="flex align-items-center gap-3">
             <Text modifiers="bold">{state}</Text>
           </Col>
           <Col>
@@ -95,7 +95,7 @@ export const States: Story = {
         </Row>
       ))}
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
@@ -107,7 +107,7 @@ export const States: Story = {
         </Col>
       </Row>
       <Row>
-        <Col lg={2} xs={12} className="display-flex align-items-center gap-3">
+        <Col lg={2} xs={12} className="flex align-items-center gap-3">
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>

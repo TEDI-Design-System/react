@@ -49,6 +49,7 @@ export const SelectMultiOption = ({ renderOption, ...props }: MultiOptionType): 
 
   const OptionBEM = cn(
     styles['tedi-select__option'],
+    styles['tedi-select__option--control'],
     { [styles['tedi-select__option--disabled']]: props.isDisabled },
     { [styles['tedi-select__option--focused']]: props.isFocused },
     { [styles['tedi-select__option--select-all']]: isSelectAll },

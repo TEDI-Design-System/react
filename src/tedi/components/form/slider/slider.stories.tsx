@@ -130,6 +130,24 @@ export const WithCurrentValue: Story = {
   },
 };
 
+/**
+ * Adds hint text below the slider for guidance.
+ */
+export const WithHint: Story = {
+  decorators: [wrapInCol],
+  args: {
+    id: 'slider-hint',
+    min: 0,
+    max: 100,
+    step: 1,
+    defaultValue: 50,
+    showCurrentValue: true,
+    valueFormatter: (value) => `${value}%`,
+    helper: { text: 'Liiguta nuppu, et väärtust muuta', type: 'hint' },
+    'aria-label': 'Väärtus',
+  },
+};
+
 const CustomValueTemplate = (args: SliderProps) => {
   const [numberValue, setNumberValue] = useState<number>(4);
   const [inputValue, setInputValue] = useState<number>(50);
@@ -229,6 +247,7 @@ export const States: Story = {
       minLabel: '0%',
       maxLabel: '100%',
       valueFormatter: (value) => `${value}%`,
+      'aria-label': 'Väärtus',
     };
 
     const thumbArgs: SliderProps = {
@@ -245,10 +264,10 @@ export const States: Story = {
     return (
       <VerticalSpacing size={2}>
         <Row gutterY={2}>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Default</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Default-thumb" />
             </div>
@@ -258,10 +277,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Hover</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Hover-thumb" className="slider-state-hover" />
             </div>
@@ -271,10 +290,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Active</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Active-thumb" className="slider-state-active" />
             </div>
@@ -284,10 +303,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Disabled</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Disabled-thumb" disabled />
             </div>
@@ -297,10 +316,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Focus</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Focus-thumb" className="slider-state-focus" />
             </div>
@@ -310,10 +329,10 @@ export const States: Story = {
           </Col>
         </Row>
         <Row>
-          <Col lg={2} xs={12} className="display-flex align-items-center">
+          <Col lg={2} xs={12} className="flex align-items-center">
             <Text modifiers="bold">Error</Text>
           </Col>
-          <Col lg={1} xs={2} className="display-flex align-items-center">
+          <Col lg={1} xs={2} className="flex align-items-center">
             <div style={thumbColStyle}>
               <Slider {...thumbArgs} id="Error-thumb" invalid />
             </div>
@@ -355,22 +374,5 @@ export const WithoutTooltip: Story = {
     minLabel: '0%',
     maxLabel: '100%',
     tooltip: false,
-  },
-};
-
-/**
- * Adds helper / hint text below the slider for guidance.
- */
-export const WithHelper: Story = {
-  decorators: [wrapInCol],
-  args: {
-    id: 'slider-helper',
-    label: 'Väärtus',
-    min: 0,
-    max: 100,
-    defaultValue: 40,
-    minLabel: '0%',
-    maxLabel: '100%',
-    helper: { id: 'slider-helper-text', text: 'Liiguta nuppu, et väärtust muuta', type: 'hint' },
   },
 };

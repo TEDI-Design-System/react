@@ -3,7 +3,7 @@
 `@tedi-design-system/react` is a library of React components implementing the TEDI Design System.
 It provides reusable, accessible, and consistent UI components to streamline building React applications.
 
-Usage instructions and detailed documentation for using the components in your application are available in [Storybook](https://storybook.tedi.ee/react/main/?path=/docs/documentation-get-started--get-started).
+Usage instructions and detailed documentation for using the components in your application are available in [Storybook](https://storybook.tedi.ee/react/rc/?path=/docs/documentation-get-started--get-started).
 
 [![codecov](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)
 [![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
@@ -22,6 +22,34 @@ The Storybook documentation covers:
 - component usage examples
 - accessibility notes
 - component APIs
+
+---
+
+## AI Agent Skills
+
+This repository ships an **integration skill** for AI coding agents that consume `@tedi-design-system/react` in a downstream application. The skill lives at [`skills/tedi-react/`](./skills/tedi-react) and conforms to the [skill.sh](https://skill.sh) standard, so it works with any modern AI tool that supports skills.
+
+It teaches an agent:
+
+- The canonical import paths (`/tedi` vs `/community`), required providers, and setup snippet
+- How to read the current component roster and props out of the **installed package** (the generated `component.manifest.json` plus the shipped `.d.ts` tree), so the agent never works from a stale prop list
+- Component patterns: polymorphic `as`, per-breakpoint props, compound sub-components
+- Form control conventions (controlled/uncontrolled, helpers, validation)
+- Theming with design tokens from `@tedi-design-system/core`, looked up in its `tokens.json`
+- Behaviour the types don't express: composition constraints, responsive quirks, and the accessibility requirements a prop signature won't tell you
+- Common pitfalls to avoid (deprecated Community components, hardcoded colors, `var()` fallbacks, etc.)
+
+### Install
+
+Use the [skills.sh](https://skills.sh) CLI from your project root:
+
+```bash
+npx skills add TEDI-Design-System/react
+```
+
+The CLI auto-discovers the `tedi-react` skill under [`skills/`](./skills) and registers it for any compatible agent. Once installed, the agent will trigger the skill whenever you work with TEDI React components.
+
+> Skills for **contributing to** the TEDI Design System (contributor skills, standards validation, etc.) live in a separate repo: [TEDI-Design-System/ai-skills](https://github.com/TEDI-Design-System/ai-skills).
 
 ---
 
@@ -52,6 +80,32 @@ This will launch a local Storybook instance for component development.
 
 Check the [wiki](https://github.com/TEDI-Design-System/general/wiki) for component guidelines and coding standards.  
 Report issues or contribute via [GitHub Issues](https://github.com/TEDI-Design-System/react/issues).
+
+---
+
+## AI Skills
+
+This project ships with AI agent skills to help both contributors and consumers work with TEDI components.
+
+### For consumers — `tedi-react`
+
+Helps you build UIs with `@tedi-design-system/react`: component usage, forms integration, and theming. Lives in [`skills/tedi-react`](./skills/tedi-react).
+
+Install it into your agent (Claude Code, Cursor, Codex, and others) with the [`skills`](https://www.skills.sh/tedi-design-system/react/tedi-react) CLI:
+
+```bash
+npx skills add https://github.com/tedi-design-system/react --skill tedi-react
+```
+
+### For contributors — `contributing`
+
+Guides development inside this repo: creating new components, running tests/lint, WCAG audits, refactoring, and Storybook stories. Available as `/contributing` when working in this repository.
+
+### For AI-driven design & UI generation — `DESIGN.md`
+
+[`DESIGN.md`](./DESIGN.md) is the machine-readable representation of the design system — semantic tokens plus tedi-ready component rules — that AI agents read to ground generated UI in real TEDI tokens and components. It also covers where to look things up, and how to use TEDI as a design system in [claude.ai/design](https://claude.ai/design) (each organisation runs its own; design-system projects cannot be shared across organisations).
+
+Its token table is read straight from `@tedi-design-system/core/tokens.json` (core generates it from Figma and publishes it with the stylesheet it describes) and [`component.manifest.json`](./component.manifest.json) is derived from the `src/tedi` barrel; both are produced by `npm run design:build` (see [`design-docs/`](./design-docs)). The surrounding prose is hand-maintained, with the `update-design-docs` skill keeping it current. [`design-system-spec.json`](./design-system-spec.json) is a descriptor pointing at those files, intended for repository-URL import.
 
 ---
 

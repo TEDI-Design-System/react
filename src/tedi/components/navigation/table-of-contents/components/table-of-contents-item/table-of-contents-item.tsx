@@ -13,19 +13,15 @@ export interface TableOfContentsItemProps {
    */
   children?: React.ReactNode;
   /**
-   * Validation state for multistep-form usage (only rendered with `showIcons`
-   * on the parent): `true` = valid, `false` = invalid, `undefined` = not yet
-   * validated.
-   */
-  isValid?: boolean;
-  /**
    * Render a separator below the item.
    */
   separator?: boolean;
   /**
-   * Hide the validation glyph for this item even when `showIcons` is on.
+   * Trailing content shown at the end of the item's row (right-aligned) — e.g. a
+   * count `Tag` or `StatusBadge`. Kept out of the link so it isn't part of the
+   * link's accessible name.
    */
-  hideIcon?: boolean;
+  slot?: React.ReactNode;
 }
 
 export const TableOfContentsItem = (_props: TableOfContentsItemProps): JSX.Element | null => null;

@@ -70,6 +70,29 @@ describe('DateTimeField component', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('exposes disclosure ARIA on the trigger and links aria-controls to the open dialog', async () => {
+    const user = userEvent.setup();
+    render(<DateTimeField {...defaultProps} />);
+
+    const trigger = screen.getByRole('button');
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).not.toHaveAttribute('aria-controls');
+
+    await user.click(trigger);
+
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.id).toBeTruthy();
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(trigger).toHaveAttribute('aria-controls', dialog.id);
+
+    await user.click(trigger);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).not.toHaveAttribute('aria-controls');
+  });
+
   it('renders both calendar and time picker together in the side-by-side layout (default)', async () => {
     const user = userEvent.setup();
     render(<DateTimeField {...defaultProps} availableTimes={['09:30', '11:30', '15:30']} />);
@@ -608,6 +631,18 @@ describe('DateTimeField component', () => {
       input.dispatchEvent(new Event('input', { bubbles: true }));
 
       expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<DateTimeField {...defaultProps} value={new Date(2025, 8, 1, 11, 30)} />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<DateTimeField {...defaultProps} value={new Date(2025, 8, 1, 11, 30)} clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
     });
   });
 });

@@ -74,9 +74,10 @@ jest.mock('../textfield/textfield', () => {
           onChange={(e: any) => props.onChange?.(e.target.value)}
           onBlur={props.onBlur}
         />
-        <button data-testid="icon" onClick={props.onIconClick}>
+        <button data-testid="icon" {...props.iconButtonProps} onClick={props.onIconClick}>
           icon
         </button>
+        {props.isClearable && props.value ? <button aria-label="Clear">clear</button> : null}
       </div>
     );
   });
@@ -282,6 +283,58 @@ describe('TimeField', () => {
     expect(showPicker).toHaveBeenCalled();
   });
 
+  it('falls back to focusing the input when the native showPicker API is unavailable', async () => {
+    const user = userEvent.setup();
+
+    render(<TimeField id="t1" label="Time" useNativePicker />);
+
+    const input = screen.getByTestId('textfield-input') as HTMLInputElement;
+    Object.defineProperty(input, 'showPicker', { value: undefined, configurable: true });
+    const focusSpy = jest.spyOn(input, 'focus');
+
+    await user.click(screen.getByTestId('icon'));
+
+    expect(focusSpy).toHaveBeenCalled();
+  });
+
+  it('gives the picker icon button an accessible name', () => {
+    render(<TimeField id="t1" label="Time" />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-label', expect.stringMatching(/\S/));
+  });
+
+  it('lets consumers override the icon button props (aria-label)', () => {
+    render(<TimeField id="t1" label="Time" inputProps={{ iconButtonProps: { 'aria-label': 'Vali aeg' } }} />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-label', 'Vali aeg');
+  });
+
+  it('exposes the popup state on the focusable icon button in button mode', () => {
+    render(<TimeField id="t1" label="Time" />);
+    const icon = screen.getByTestId('icon');
+    expect(icon).toHaveAttribute('aria-haspopup', 'listbox');
+    expect(icon).toHaveAttribute('aria-expanded', 'false');
+    // The combobox role is not put on the non-focusable input in button mode.
+    expect(screen.getByTestId('textfield-input')).not.toHaveAttribute('role', 'combobox');
+  });
+
+  it('marks the read-only input as the combobox in input-trigger mode', () => {
+    render(<TimeField id="t1" label="Time" timePickerTrigger="input" />);
+    const input = screen.getByTestId('textfield-input');
+    expect(input).toHaveAttribute('role', 'combobox');
+    expect(input).toHaveAttribute('aria-haspopup', 'listbox');
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('exposes a dialog popup on the icon button in modal mode', () => {
+    render(<TimeField id="t1" label="Time" modal />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-haspopup', 'dialog');
+  });
+
+  it('does not expose picker semantics when the picker is disabled', () => {
+    render(<TimeField id="t1" label="Time" showPicker={false} />);
+    expect(screen.getByTestId('textfield-input')).not.toHaveAttribute('role', 'combobox');
+    expect(screen.getByTestId('icon')).not.toHaveAttribute('aria-haspopup');
+  });
+
   it('normalises a delimiter-less time on blur (e.g. "1155" -> "11:55")', async () => {
     const user = userEvent.setup();
     const onChange = jest.fn();
@@ -337,6 +390,18 @@ describe('TimeField', () => {
       await user.click(screen.getByTestId('icon'));
       await user.click(screen.getByText('modal-confirm'));
       expect(onChange).toHaveBeenCalledWith('12:30');
+    });
+  });
+
+  describe('clearable', () => {
+    it('shows the clear button by default when the field has a value', () => {
+      render(<TimeField id="t-clear" label="Time" defaultValue="10:00" />);
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
+    it('hides the clear button when clearable is false', () => {
+      render(<TimeField id="t-clear-off" label="Time" defaultValue="10:00" clearable={false} />);
+      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
     });
   });
 });
