@@ -239,7 +239,7 @@ export const WithTooltip: Story = {
   },
 };
 
-export const WithLongTitle = () => {
+export const RadioWithLongTitle = () => {
   return (
     <Row>
       <Col width={12} lg={6}>

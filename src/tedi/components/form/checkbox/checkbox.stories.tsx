@@ -274,7 +274,7 @@ export const WithTooltip: Story = {
   },
 };
 
-export const WithLongTitle = () => {
+export const CheckWithLongTitle = () => {
   return (
     <Row>
       <Col lg={6} md={12}>
