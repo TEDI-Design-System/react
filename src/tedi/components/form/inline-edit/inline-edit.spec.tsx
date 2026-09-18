@@ -194,4 +194,51 @@ describe('InlineEdit', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
     expect(screen.getByText('Locked')).toBeInTheDocument();
   });
+
+  it('applies the small size class and a 16px edit icon', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" size="small" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="s" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    const trigger = screen.getByRole('button', { name: /name/i });
+    expect(trigger).toHaveClass('tedi-inline-edit--small');
+    expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-16');
+  });
+
+  it('exposes its size to the editor render function so a small field opens a small control', async () => {
+    const user = userEvent.setup();
+    let receivedSize: string | undefined;
+    render(
+      <InlineEdit<string> label="Name" value="Mari" size="small" renderValue={(v) => v}>
+        {({ value, onChange, size }) => {
+          receivedSize = size;
+          return <TextField id="sz" label="Name" hideLabel value={value} onChange={onChange} size={size} />;
+        }}
+      </InlineEdit>
+    );
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    expect(receivedSize).toBe('small');
+  });
+
+  it('aligns the edit icon to the trailing edge with editIconAlign="aligned"', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" editIconAlign="aligned" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="a" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--icon-aligned');
+  });
+
+  it('defaults to the following alignment and default size (no modifier classes)', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
+        {({ value, onChange }) => <TextField id="def" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    const trigger = screen.getByRole('button', { name: /name/i });
+    expect(trigger).not.toHaveClass('tedi-inline-edit--small');
+    expect(trigger).not.toHaveClass('tedi-inline-edit--icon-aligned');
+    expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
+  });
 });

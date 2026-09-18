@@ -26,6 +26,7 @@
   display: inline-flex;
   gap: var(--tedi-dimensions-05);
   align-items: center;
+  min-height: var(--form-field-height-sm);
   padding: var(--tedi-dimensions-01) var(--tedi-dimensions-02);
   color: var(--general-text-primary);
   text-align: left;
@@ -37,9 +38,24 @@
     background-color: var(--form-hidden-hover);
   }
 
+  &:active {
+    box-shadow: inset 0 0 0 var(--tedi-borders-02) var(--form-input-border-active);
+  }
+
   &:focus-visible {
     @include mixins.focus-element;
   }
+}
+
+.tedi-inline-edit--small {
+  font-size: var(--body-small-regular-size);
+  line-height: var(--body-small-regular-line-height);
+}
+
+.tedi-inline-edit--icon-aligned.tedi-inline-edit__trigger {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .tedi-inline-edit__icon {

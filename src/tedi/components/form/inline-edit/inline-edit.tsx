@@ -14,6 +14,8 @@ export interface UseInlineEditOptions<T> {
   onChange?: (value: T) => void;
 }
 
+export type InlineEditSize = 'default' | 'small';
+
 /** Props handed to the editor render function. */
 export interface InlineEditEditor<T> {
   /** Current draft value — wire this to the control's `value`. */
@@ -96,6 +98,21 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    * @default false
    */
   hideEditIcon?: boolean;
+  /**
+   * Size of the read trigger and editor.
+   * - `default` — body text (16px) with an 18px edit icon.
+   * - `small` — smaller body text (14px) with a 16px edit icon, for dense layouts.
+   * @default default
+   */
+  size?: InlineEditSize;
+  /**
+   * Placement of the edit (pencil) icon on the read trigger.
+   * - `following` — the icon sits directly after the value.
+   * - `aligned` — the trigger fills its container and the icon is pushed to the
+   *   trailing edge, so icons line up across stacked rows.
+   * @default following
+   */
+  editIconAlign?: 'following' | 'aligned';
   /** id applied to the read trigger. */
   id?: string;
   /** Additional class on the root element. */
@@ -103,8 +120,10 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   /**
    * Renders the edit view — return any TEDI control wired to the render props.
    * The wrapper commits on focus leaving the editor and cancels on `Escape`.
+   * The editor also receives the field's `size` — forward it to the control so the
+   * editor matches the read view (a small field opens a small control).
    */
-  children: (editor: InlineEditEditor<T>) => React.ReactNode;
+  children: (editor: InlineEditEditor<T> & { size: InlineEditSize }) => React.ReactNode;
 }
 
 const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
@@ -116,6 +135,8 @@ export function InlineEdit<T>({
   disabled = false,
   fullWidth = false,
   hideEditIcon = false,
+  size = 'default',
+  editIconAlign = 'following',
   id,
   className,
   children,
@@ -127,6 +148,7 @@ export function InlineEdit<T>({
   const editorRef = React.useRef<HTMLDivElement>(null);
   const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<T>(options);
   const fullWidthClass = fullWidth ? styles['tedi-inline-edit--full-width'] : undefined;
+  const smallClass = size === 'small' ? styles['tedi-inline-edit--small'] : undefined;
 
   React.useEffect(() => {
     if (!isEditing) return;
@@ -143,7 +165,13 @@ export function InlineEdit<T>({
     return (
       <div
         ref={editorRef}
-        className={cn(styles['tedi-inline-edit'], styles['tedi-inline-edit--editing'], fullWidthClass, className)}
+        className={cn(
+          styles['tedi-inline-edit'],
+          styles['tedi-inline-edit--editing'],
+          fullWidthClass,
+          smallClass,
+          className
+        )}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.stopPropagation();
@@ -160,7 +188,7 @@ export function InlineEdit<T>({
           }, 0);
         }}
       >
-        {children({ value, onChange, commit, cancel })}
+        {children({ value, onChange, commit, cancel, size })}
       </div>
     );
   }
@@ -170,7 +198,15 @@ export function InlineEdit<T>({
 
   if (disabled) {
     return (
-      <span className={cn(styles['tedi-inline-edit'], styles['tedi-inline-edit--disabled'], fullWidthClass, className)}>
+      <span
+        className={cn(
+          styles['tedi-inline-edit'],
+          styles['tedi-inline-edit--disabled'],
+          fullWidthClass,
+          smallClass,
+          className
+        )}
+      >
         <span className={empty ? styles['tedi-inline-edit__placeholder'] : undefined}>
           {empty ? placeholder : display}
         </span>
@@ -183,7 +219,14 @@ export function InlineEdit<T>({
       type="button"
       id={fieldId}
       onClick={edit}
-      className={cn(styles['tedi-inline-edit'], styles['tedi-inline-edit__trigger'], fullWidthClass, className)}
+      className={cn(
+        styles['tedi-inline-edit'],
+        styles['tedi-inline-edit__trigger'],
+        fullWidthClass,
+        smallClass,
+        { [styles['tedi-inline-edit--icon-aligned']]: editIconAlign === 'aligned' },
+        className
+      )}
     >
       <span className={styles['tedi-inline-edit__prefix']}>
         {getLabel('inline-edit.edit')} {label}:{' '}
@@ -192,7 +235,13 @@ export function InlineEdit<T>({
         {empty ? placeholder : display}
       </span>
       {!hideEditIcon && (
-        <Icon name="edit" size={18} color="brand" aria-hidden className={styles['tedi-inline-edit__icon']} />
+        <Icon
+          name="edit"
+          size={size === 'small' ? 16 : 18}
+          color="brand"
+          aria-hidden
+          className={styles['tedi-inline-edit__icon']}
+        />
       )}
     </button>
   );
