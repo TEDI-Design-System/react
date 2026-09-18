@@ -1,0 +1,281 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import * as InlineEditStories from './inline-edit.stories';
+
+<Meta of={InlineEditStories} name="Documentation" />
+
+# InlineEdit
+
+`InlineEdit` is an **edit-in-place** wrapper: it shows a value that becomes an inline-edit control when clicked. It is
+control-agnostic - you supply any TEDI form control through the `children` render function and wire it to the editor
+render props (`value`, `onChange`, `commit`, `cancel`).
+
+The wrapper owns the read ↔ edit toggle, focus management, and keyboard handling:
+
+- Clicking the read view (the value) enters edit mode and focuses the control.
+- Clicking away - focus leaving the editor - **commits** the draft.
+- Pressing `Escape` **cancels** and restores the last committed value.
+
+For state-only usage without the built-in markup, use the [`useInlineEdit`](#useinlineedit-hook) hook.
+
+---
+
+## Supported form elements
+
+Any **controlled** TEDI form control works as the editor. Wire the control's `value`/`onChange` to the render props
+provided by `children`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Controls</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Text</td>
+      <td>
+        <code>TextField</code>, <code>Textarea</code>, <code>Search</code>
+      </td>
+      <td>
+        Map directly onto <code>value</code> / <code>onChange</code>. Commit on blur.
+      </td>
+    </tr>
+    <tr>
+      <td>Numeric</td>
+      <td>
+        <code>NumberField</code>, <code>Slider</code>
+      </td>
+      <td>
+        Map directly onto <code>value</code> / <code>onChange</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>Choice</td>
+      <td>
+        <code>Select</code>, <code>ChoiceGroup</code>
+      </td>
+      <td>
+        Call <code>commit()</code> inside <code>onChange</code> to commit immediately on pick.
+      </td>
+    </tr>
+    <tr>
+      <td>Date / time</td>
+      <td>
+        <code>DateField</code>, <code>DateTimeField</code>, <code>TimeField</code>
+      </td>
+      <td>
+        <code>DateField</code> uses <code>selected</code> / <code>onSelect</code>, so it needs a one-line adapter.
+      </td>
+    </tr>
+    <tr>
+      <td>Toggle</td>
+      <td>
+        <code>Toggle</code>
+      </td>
+      <td>
+        Uses <code>checked</code> instead of <code>value</code>, so it needs a one-line adapter.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+**Not a fit:** `FileUpload` / `FileDropzone` (no single committed value), and standalone `Checkbox` / `Radio` (use
+`ChoiceGroup` instead).
+
+### Committing on pick
+
+For choice and toggle controls, commit as soon as the user makes a selection rather than waiting for blur:
+
+```tsx
+<InlineEdit<ISelectOption | null>
+  label="Riik"
+  value={country}
+  onChange={setCountry}
+  renderValue={(v) => (v ? (v.label as string) : '-')}
+>
+  {({ value, onChange, commit }) => (
+    <Select
+      id="country"
+      label="Riik"
+      hideLabel
+      options={countryOptions}
+      value={value}
+      onChange={(next) => {
+        onChange(next as ISelectOption | null);
+        commit();
+      }}
+    />
+  )}
+</InlineEdit>
+```
+
+---
+
+## Editor render props
+
+The `children` render function receives an editor object:
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>T</code>
+      </td>
+      <td>
+        Current draft value - wire this to the control's <code>value</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>onChange</code>
+      </td>
+      <td>
+        <code>(value: T) =&gt; void</code>
+      </td>
+      <td>
+        Update the draft - wire this to the control's <code>onChange</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>commit</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>
+        Commit the draft (fires <code>onChange</code>) and leave edit mode.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>cancel</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Discard the draft and leave edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>size</code>
+      </td>
+      <td>
+        <code>'default' | 'small'</code>
+      </td>
+      <td>The field's size - forward it so the editor matches the read view.</td>
+    </tr>
+  </tbody>
+</table>
+
+Forward `size` to the control so a small field opens a small editor:
+
+```tsx
+{
+  ({ value, onChange, size }) => (
+    <TextField id="name" label="Nimi" hideLabel value={value} onChange={onChange} size={size} />
+  );
+}
+```
+
+---
+
+## `useInlineEdit` hook
+
+When you need full control of the markup, use the headless `useInlineEdit` hook instead of the `InlineEdit` wrapper. It
+manages the read/committed value and the edit draft, with `edit` / `commit` / `cancel` transitions, and supports both
+controlled and uncontrolled use.
+
+```tsx
+const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<string>({
+  value,
+  onChange: setValue,
+});
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Returns</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>isEditing</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>Whether the field is currently in edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>edit</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Enter edit mode (seeds the draft from the committed value).</td>
+    </tr>
+    <tr>
+      <td>
+        <code>commit</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Commit the draft and leave edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>cancel</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Discard the draft and leave edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>committedValue</code>
+      </td>
+      <td>
+        <code>T</code>
+      </td>
+      <td>The last committed value (what the read view shows).</td>
+    </tr>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>T</code>
+      </td>
+      <td>The current draft value.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onChange</code>
+      </td>
+      <td>
+        <code>(value: T) =&gt; void</code>
+      </td>
+      <td>Update the draft.</td>
+    </tr>
+  </tbody>
+</table>

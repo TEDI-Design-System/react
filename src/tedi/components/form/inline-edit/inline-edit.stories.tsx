@@ -163,17 +163,13 @@ const CountryInline = (props: {
 };
 
 /**
- * `InlineEdit` is an edit-in-place wrapper: it shows a value that becomes an inline-edit control when clicked. It is control-agnostic — supply any TEDI form
- * control through the `children` render function and wire it to the render props (`value`, `onChange`, `commit`, `cancel`).
+ * `InlineEdit` is an edit-in-place wrapper: it shows a value that becomes an inline-edit control when clicked. It is
+ * control-agnostic — supply any TEDI form control through the `children` render function and wire it to the render props
+ * (`value`, `onChange`, `commit`, `cancel`).
  *
- * The wrapper owns the read ↔ edit toggle, focus, and keyboard handling: clicking away (focus leaving the editor) commits, and `Escape` cancels. For state-only
- * usage without the built-in markup, use the `useInlineEdit` hook.
+ * See the <a href="?path=/docs/tedi-ready-components-form-inlineedit--documentation">Documentation</a> page for the full guide, supported form elements, and the `useInlineEdit` hook.
  *
- * ### Supported TEDI-Ready controls
- *
- * Any controlled TEDI form control works as the editor. Text (`TextField`, `Textarea`, `Search`), numeric (`NumberField`, `Slider`), choice (`Select`,
- * `ChoiceGroup`) and date/time (`DateField`, `DateTimeField`, `TimeField`) controls all map onto the render props. `DateField` (`selected` / `onSelect`) and
- * `Toggle` (`checked`) need a one-line adapter. Not a fit: `FileUpload` / `FileDropzone` and standalone `Checkbox` / `Radio`.
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.75.92?node-id=5881-57032&m=dev" target="_BLANK">Figma ↗</a><br/>
  */
 const meta: Meta<typeof InlineEdit> = {
   title: 'TEDI-Ready/Components/Form/InlineEdit',
@@ -363,7 +359,6 @@ export const Sizes: Story = {
   ),
 };
 
-/** A `TextField` editor: the read view shows the value, clicking turns it into a text input. */
 export const TextFieldType: Story = {
   name: 'Text field',
   render: function TextFieldType() {
@@ -382,10 +377,6 @@ export const TextFieldType: Story = {
   },
 };
 
-/**
- * A `Select` editor across its value shapes: single value, multiple (tags), a `StatusBadge` value, and an empty
- * placeholder. Each commits on pick.
- */
 export const SelectType: Story = {
   name: 'Select',
   render: function SelectType() {
@@ -509,7 +500,6 @@ export const SelectType: Story = {
   },
 };
 
-/** A `disabled` field renders as plain, read-only text (a `TextGroup`-style value) with no edit affordance. */
 export const ReadOnly: Story = {
   name: 'Read-only',
   render: () => (
@@ -713,6 +703,31 @@ export const Example: Story = {
             </VerticalSpacing>
           </CardContent>
         </Card>
+      </div>
+    );
+  },
+};
+
+/**
+ * Editing is non-destructive until it is committed. Click the value, change it, then press `Escape` to discard the draft
+ * and restore the last committed value - the read view snaps back untouched. Committing instead happens on click-away
+ * (focus leaving the editor). The committed value shown below updates only on commit, never on cancel.
+ */
+export const CancelEdit: Story = {
+  name: 'Cancel edit',
+  render: function CancelEdit() {
+    const [name, setName] = useState('Mari Maasikas');
+    return (
+      <div style={{ maxWidth: '22rem' }}>
+        <VerticalSpacing size={0.5}>
+          <FieldRow label="Nimi">
+            <InlineEdit<string> label="Nimi" value={name} onChange={setName} fullWidth renderValue={(v) => v || '—'}>
+              {({ value, onChange, size }) => (
+                <TextField id="cancel-name" label="Nimi" hideLabel value={value} onChange={onChange} size={size} />
+              )}
+            </InlineEdit>
+          </FieldRow>
+        </VerticalSpacing>
       </div>
     );
   },
