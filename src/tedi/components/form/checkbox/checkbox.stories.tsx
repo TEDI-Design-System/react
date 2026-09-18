@@ -504,7 +504,6 @@ const CARD_STATES: Array<{ state: string; props: Partial<CheckboxProps> }> = [
   { state: 'Default', props: {} },
   { state: 'Hover', props: {} },
   { state: 'Selected', props: { defaultChecked: true } },
-  { state: 'Active', props: { defaultChecked: true } },
   { state: 'Focus', props: {} },
   { state: 'Disabled', props: { disabled: true } },
   { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
@@ -513,14 +512,13 @@ const CARD_STATES: Array<{ state: string; props: Partial<CheckboxProps> }> = [
 const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
 
 /**
- * Every card state across the primary and secondary variants. Hover, active, and focus are forced
+ * Every card state across the primary and secondary variants. Hover and focus are forced
  * with the pseudo-states addon so all states are visible at once.
  */
 export const CardStates: StoryObj = {
   parameters: {
     pseudo: {
       hover: ['#card-primary-hover', '#card-secondary-hover'],
-      active: ['#card-primary-active', '#card-secondary-active'],
       focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
     },
   },

@@ -202,8 +202,8 @@
     outline-offset: var(--tedi-borders-01);
   }
 
-  .tedi-checkbox__input:focus + .tedi-checkbox__indicator,
-  .tedi-checkbox__input:focus-visible + .tedi-checkbox__indicator {
+  .tedi-checkbox__input:focus:not(:disabled) + .tedi-checkbox__indicator,
+  .tedi-checkbox__input:focus-visible:not(:disabled) + .tedi-checkbox__indicator {
     outline: none;
   }
 }
@@ -244,6 +244,11 @@
     --_card-bg: var(--form-checkbox-radio-card-primary-disabled-selected-background);
     --_card-text: var(--form-checkbox-radio-card-primary-disabled-selected-text);
     --_card-border: var(--form-checkbox-radio-card-primary-disabled-selected-background);
+
+    .tedi-checkbox__indicator {
+      background-color: transparent;
+      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
+    }
   }
 }
 
