@@ -93,8 +93,13 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   fullWidth?: boolean;
   /**
-   * Hides the edit (pencil) icon on the read trigger. The affordance still works
-   * — the whole value stays clickable — this only drops the visual cue.
+   * Hides the edit (pencil) icon on the read trigger. The whole value stays
+   * clickable, but the pencil is the only visual cue that the value is editable.
+   *
+   * **Accessibility risk:** hiding it removes that affordance, so sighted users
+   * cannot perceive the field is interactive (fails WCAG 1.3.3 Sensory
+   * Characteristics / 3.2 affordance guidance). Only enable it when an adjacent
+   * element already signals editability — use at your own risk.
    * @default false
    */
   hideEditIcon?: boolean;

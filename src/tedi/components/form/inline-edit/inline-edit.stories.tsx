@@ -216,7 +216,8 @@ const meta: Meta<typeof InlineEdit> = {
     },
     hideEditIcon: {
       control: 'boolean',
-      description: 'Hides the edit (pencil) icon on the read trigger; the value stays clickable.',
+      description:
+        'Hides the edit (pencil) icon on the read trigger; the value stays clickable. Accessibility risk: the pencil is the only visual cue that the value is editable, so hiding it fails WCAG (1.3.3 Sensory Characteristics) unless something adjacent signals editability. Use at your own risk.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     value: {
