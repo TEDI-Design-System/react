@@ -440,7 +440,8 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     ...(isAutocomplete ? {} : { onKeyDown: handlePlainKeyDown }),
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    button?.onClick?.(event);
     onSearch?.(query);
   };
 
@@ -551,7 +552,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
             !button.children && styles['tedi-search__button--icon-only'],
             button.className
           )}
-          aria-label={button.children ? undefined : getLabel('search')}
+          aria-label={button['aria-label'] ?? (button.children ? undefined : getLabel('search'))}
         >
           {button.children ?? getLabel('search')}
         </Button>

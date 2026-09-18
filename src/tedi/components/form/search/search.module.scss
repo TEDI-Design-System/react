@@ -110,7 +110,7 @@
     }
 
     &--disabled {
-      color: var(--color-text-disabled);
+      color: var(--general-text-disabled);
       pointer-events: none;
       cursor: default;
     }
