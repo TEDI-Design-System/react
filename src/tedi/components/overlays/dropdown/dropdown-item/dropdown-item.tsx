@@ -108,7 +108,7 @@ export const DropdownItem = ({
   role,
   ...aria
 }: DropdownItemProps) => {
-  const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
+  const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant, navigation } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
   const isSlot = asChild && closeOnSelect !== false && isValidElement(children);
@@ -204,14 +204,15 @@ export const DropdownItem = ({
     ...aria,
   };
 
-  const itemProps =
-    asChild && closeOnSelect === false
-      ? { ...baseProps, role }
-      : getItemProps({
-          role: role ?? 'menuitem',
-          disabled: !asChild ? disabled : undefined,
-          ...baseProps,
-        });
+  const itemProps = navigation
+    ? { ...baseProps, tabIndex: disabled ? -1 : 0, role }
+    : asChild && closeOnSelect === false
+    ? { ...baseProps, role }
+    : getItemProps({
+        role: role ?? 'menuitem',
+        disabled: !asChild ? disabled : undefined,
+        ...baseProps,
+      });
 
   if (isSlot) {
     const child = children as React.ReactElement;
