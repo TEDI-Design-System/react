@@ -285,7 +285,7 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
       ref={overlayRef}
       style={{ top: overlayTop }}
       className={styles['tedi-sidenav__overlay']}
-      onClick={(event) => {
+      onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }

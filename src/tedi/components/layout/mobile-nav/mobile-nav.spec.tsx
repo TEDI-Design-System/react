@@ -84,21 +84,37 @@ describe('MobileNav', () => {
     expect(baseProps.onClose).toHaveBeenCalled();
   });
 
-  test('calls onClose when clicking the overlay backdrop', () => {
+  test('calls onClose when pressing the overlay backdrop', () => {
     const onClose = jest.fn();
     const { container } = render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
 
     const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
-    fireEvent.click(overlay);
+    fireEvent.mouseDown(overlay);
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  test('does not call onClose when clicking inside the nav content', () => {
+  test('does not call onClose when pressing inside the nav content', () => {
     const onClose = jest.fn();
     render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
 
-    fireEvent.click(screen.getByRole('navigation', { name: 'Main navigation' }));
+    fireEvent.mouseDown(screen.getByRole('navigation', { name: 'Main navigation' }));
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  test('does not call onClose when a text selection dragged from the nav is released on the backdrop', () => {
+    const onClose = jest.fn();
+    const { container } = render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
+
+    const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
+    const nav = screen.getByRole('navigation', { name: 'Main navigation' });
+
+    // Selection starts inside the nav (mousedown target is the nav) and the drag ends on the
+    // backdrop, where the browser dispatches a click to the overlay. Dismissal keys off mousedown,
+    // so the press originating in the nav must not close the menu.
+    fireEvent.mouseDown(nav);
+    fireEvent.click(overlay);
 
     expect(onClose).not.toHaveBeenCalled();
   });
