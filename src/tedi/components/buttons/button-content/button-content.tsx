@@ -229,13 +229,7 @@ const InternalButtonContent = forwardRef(
         ) : (
           buttonElement
         )}
-        {/*
-          The loading label is referenced by the button via `aria-describedby` (see above) so
-          it is read on focus. It is `aria-hidden` so screen-reader users navigating in browse
-          mode do not also land on it as a separate node — otherwise "loading" is announced twice
-          (once on the button, once on the span). `aria-describedby` still reads hidden targets.
-        */}
-        <span id={loadingStatusId} aria-hidden="true" className={styles['tedi-btn__loading-status']}>
+        <span id={loadingStatusId} role="status" aria-live="polite" className={styles['tedi-btn__loading-status']}>
           {isLoading ? getLabel('button.loading') : ''}
         </span>
       </Print>

@@ -91,4 +91,16 @@ describe('Button component', () => {
     render(<Button {...defaultProps} />);
     expect(screen.getByRole('button')).not.toHaveAttribute('aria-describedby');
   });
+
+  it('announces the loading state via a live region so it is read even while focus stays on the button', () => {
+    const { rerender } = render(<Button {...defaultProps} />);
+    const status = screen.getByRole('status');
+
+    expect(status).toBeEmptyDOMElement();
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).not.toHaveAttribute('aria-hidden');
+
+    rerender(<Button {...defaultProps} isLoading />);
+    expect(screen.getByRole('status')).toHaveTextContent(/\S/);
+  });
 });
