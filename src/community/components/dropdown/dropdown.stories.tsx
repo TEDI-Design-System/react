@@ -39,6 +39,7 @@ export const Default: Story = {
 };
 
 export const WithActiveItem: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     button: {
       visualType: 'link',

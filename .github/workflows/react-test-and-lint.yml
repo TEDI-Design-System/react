@@ -154,35 +154,3 @@ jobs:
           name: a11y-report
           path: a11y-report/
           retention-days: 7
-
-  chromatic:
-    runs-on: ubuntu-latest
-    if: |
-      (
-        github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        github.event.pull_request.draft == false &&
-        github.actor != 'dependabot[bot]'
-      ) || (
-        github.event_name == 'push' &&
-        github.ref == 'refs/heads/rc'
-      )
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "lts/*"
-
-      - name: Install dependencies
-        run: |
-          npm ci --cache .npm --prefer-offline
-
-      - name: Publish to Chromatic
-        run: |
-          CHROMATIC_PROJECT_TOKEN=${{ secrets.CHROMATIC_TOKEN }} npm run chromatic

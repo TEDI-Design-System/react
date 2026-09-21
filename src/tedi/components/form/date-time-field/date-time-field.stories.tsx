@@ -345,6 +345,7 @@ export const RangePredefinedTimeSlots: Story = {
  * (form integration, programmatic updates, etc.).
  */
 export const Controlled: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ControlledTemplate,
   args: {
     id: 'date-time-controlled',

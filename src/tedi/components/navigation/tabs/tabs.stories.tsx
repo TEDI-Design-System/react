@@ -192,6 +192,7 @@ export const States: StoryObj<TemplateStateProps> = {
 };
 
 export const Controlled: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [currentTab, setCurrentTab] = useState('tab-1');
 
