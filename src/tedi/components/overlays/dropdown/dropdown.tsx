@@ -240,6 +240,7 @@ export const Dropdown = (props: DropdownProps) => {
               {maxHeight !== undefined ? (
                 <div
                   className={styles['tedi-dropdown__scroll']}
+                  tabIndex={0}
                   style={{ maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight }}
                 >
                   {content}
