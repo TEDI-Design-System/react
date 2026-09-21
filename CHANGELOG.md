@@ -1,3 +1,10 @@
+# [19.1.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.16...react-19.1.0-rc.17) (2026-09-21)
+
+
+### Bug Fixes
+
+* **sidenav:** overlay content instead of push [#869](https://github.com/TEDI-Design-System/react/issues/869) ([#871](https://github.com/TEDI-Design-System/react/issues/871)) ([2f90b7a](https://github.com/TEDI-Design-System/react/commit/2f90b7a986312b55cf3b57cec24c67d460401761))
+
 # [19.1.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.15...react-19.1.0-rc.16) (2026-09-18)
 
 
