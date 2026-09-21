@@ -79,6 +79,7 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
               checked={indeterminate ? false : isChecked}
               onChange={onChangeHandler}
               className={styles['tedi-checkbox__input']}
+              aria-label={typeof label === 'string' ? label : undefined}
               aria-describedby={describedBy}
               required={required}
               aria-invalid={invalid || undefined}

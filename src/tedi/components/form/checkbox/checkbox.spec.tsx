@@ -257,12 +257,13 @@ describe('Checkbox component', () => {
     expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
   });
 
-  it('names the checkbox via its native <label for>, not aria-labelledby', () => {
+  it('names the checkbox with aria-label plus a native <label for>, not aria-labelledby', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
 
     const checkbox = screen.getByRole('checkbox');
 
     expect(checkbox).not.toHaveAttribute('aria-labelledby');
+    expect(checkbox).toHaveAttribute('aria-label', 'Checkbox Label');
     expect(screen.getByTestId('checkbox-label')).toHaveAttribute('for', 'checkbox-id');
     expect(checkbox).toHaveAccessibleName('Checkbox Label');
   });
