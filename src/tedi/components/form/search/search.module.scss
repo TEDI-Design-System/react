@@ -111,8 +111,8 @@
 
     &--disabled {
       color: var(--general-text-disabled);
-      pointer-events: none;
-      cursor: default;
+      cursor: not-allowed;
+      background-color: var(--dropdown-item-disabled-background);
     }
   }
 

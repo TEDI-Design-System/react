@@ -258,8 +258,6 @@ export const WithResultAndActions: Story = {
   name: 'With result and actions',
   parameters: { a11y: { test: 'error' } },
   play: async ({ canvasElement }) => {
-    // Drive the live example: type a code so the result panel is revealed, which is
-    // also the state the a11y (axe) check then runs against.
     const canvas = within(canvasElement);
     await userEvent.type(canvas.getByRole('searchbox'), '49504080254');
     await canvas.findByText('Laura Kassisaba');
@@ -488,10 +486,10 @@ export const AutocompleteAsync: Story = {
 };
 
 /**
- * Disabled options are shown but greyed out and skipped by keyboard navigation and selection.
+ * Disabled suggestions are shown but greyed out and skipped by keyboard navigation and selection.
  */
-export const AutocompleteDisabledOptions: Story = {
-  name: 'Autocomplete: disabled options',
+export const AutocompleteDisabledSuggestions: Story = {
+  name: 'Autocomplete: disabled suggestions',
   parameters: { a11y: { test: 'error' } },
   render: function AutocompleteDisabledExample() {
     const [value, setValue] = useState('');

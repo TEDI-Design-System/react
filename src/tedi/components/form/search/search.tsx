@@ -274,6 +274,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
 
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, listNav]);
 
+  React.useEffect(() => {
+    refs.setPositionReference(fieldRef.current?.inner ?? null);
+  }, [refs, isAutocomplete]);
+
   const listboxId = `${resolvedId}-listbox`;
   const optionId = (index: number) => `${resolvedId}-option-${index}`;
 
@@ -324,7 +328,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     if (event.key === 'Enter') onSearch?.(query);
   };
 
-  const activeSuggestion = !loading && activeIndex !== null ? suggestionList[activeIndex] : undefined;
+  const activeSuggestion =
+    !loading && activeIndex !== null && !suggestionList[activeIndex]?.disabled
+      ? suggestionList[activeIndex]
+      : undefined;
 
   const focusAfterField = () => {
     const inputEl = fieldRef.current?.input;
@@ -473,7 +480,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
       return (
         <ul id={listboxId} role="listbox" className={styles['tedi-search__panel-list']}>
           {suggestionList.map((suggestion, index) => {
-            const active = activeIndex === index;
+            const active = activeIndex === index && !suggestion.disabled;
             const labelText =
               typeof (suggestion.label ?? suggestion.value) === 'string'
                 ? String(suggestion.label ?? suggestion.value)
@@ -507,7 +514,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
                 {renderSuggestionContent ? (
                   renderSuggestionContent(suggestion, { active, query })
                 ) : (
-                  <OptionContent layout={suggestion.description !== undefined ? 'vertical' : 'horizontal'}>
+                  <OptionContent
+                    disabled={suggestion.disabled}
+                    layout={suggestion.description !== undefined ? 'vertical' : 'horizontal'}
+                  >
                     <OptionContent.Label>
                       {labelText ? highlightMatch(labelText, query) : suggestion.label ?? suggestion.value}
                     </OptionContent.Label>
