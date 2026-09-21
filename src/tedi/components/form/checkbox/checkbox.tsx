@@ -56,7 +56,6 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
 
   const helperId = helper ? helper.id ?? `${id}-helper` : undefined;
   const tooltipId = tooltip ? `${id}-tooltip` : undefined;
-  const labelId = label ? `${id}-label` : undefined;
   const describedBy = [helperId, tooltipId].filter(Boolean).join(' ') || undefined;
 
   const LabelBEM = cn(styles['tedi-checkbox__label'], { [styles['tedi-checkbox--disabled']]: disabled });
@@ -80,7 +79,6 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
               checked={indeterminate ? false : isChecked}
               onChange={onChangeHandler}
               className={styles['tedi-checkbox__input']}
-              aria-labelledby={labelId}
               aria-describedby={describedBy}
               required={required}
               aria-invalid={invalid || undefined}
@@ -119,7 +117,6 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
               ref={labelRef}
               className={LabelBEM}
               id={id}
-              labelId={labelId}
               data-testid="checkbox-label"
               hideLabel={hideLabel}
               label={label}

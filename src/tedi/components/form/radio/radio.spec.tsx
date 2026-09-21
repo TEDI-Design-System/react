@@ -251,12 +251,13 @@ describe('Radio component', () => {
     expect(radio).not.toHaveAttribute('aria-invalid');
   });
 
-  it('names the radio via aria-labelledby pointing at its label', () => {
+  it('names the radio via its native <label for>, not aria-labelledby', () => {
     render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" />);
 
     const radio = screen.getByRole('radio');
-    expect(radio).toHaveAttribute('aria-labelledby', 'radio-id-label');
-    expect(screen.getByTestId('radio-label')).toHaveAttribute('id', 'radio-id-label');
+
+    expect(radio).not.toHaveAttribute('aria-labelledby');
+    expect(screen.getByTestId('radio-label')).toHaveAttribute('for', 'radio-id');
     expect(radio).toHaveAccessibleName('Radio Label');
   });
 

@@ -11,13 +11,6 @@ export interface FormLabelProps {
    */
   id: string;
   /**
-   * Optional `id` applied to the label element itself (not the `htmlFor` target).
-   * Set this when the associated control needs to reference the label explicitly
-   * via `aria-labelledby` — a more robust name association than `<label for>`
-   * alone on some screen reader / browser combinations.
-   */
-  labelId?: string;
-  /**
    * The text content of the label that describes the input field.
    */
   label: React.ReactNode;
@@ -55,10 +48,7 @@ export interface FormLabelProps {
 }
 
 export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
-  (
-    { label, hideLabel, required, id, labelId, renderWithoutLabel, size = 'default', className, tooltip, ...rest },
-    ref
-  ) => {
+  ({ label, hideLabel, required, id, renderWithoutLabel, size = 'default', className, tooltip, ...rest }, ref) => {
     const FormLabelBEM = cn(
       styles['tedi-form-label'],
       styles[`tedi-form-label--${size}`],
@@ -72,7 +62,6 @@ export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
       <Label
         as={renderWithoutLabel ? 'span' : 'label'}
         ref={ref}
-        id={labelId}
         className={FormLabelBEM}
         htmlFor={id}
         required={required}
