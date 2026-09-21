@@ -86,8 +86,9 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
   onSnapPointChange?: (snapPoint: number) => void;
   /**
    * Render visually-hidden dismiss buttons at the start and end of the dialog
-   * so touch screen-readers can escape without an Escape key.
-   * @default false
+   * so touch screen-readers can escape without an Escape key. Only applies while
+   * `trapFocus` is `true` (a modal sheet); set `false` to opt out.
+   * @default true
    */
   visuallyHiddenDismiss?: boolean;
   /**
@@ -127,7 +128,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     showOverlay = true,
     lockScroll = true,
     keepMounted = false,
-    visuallyHiddenDismiss = false,
+    visuallyHiddenDismiss = true,
     initialFocus,
     className,
     style,
@@ -243,7 +244,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
           modal={trapFocus}
           returnFocus={returnFocus}
           initialFocus={initialFocus}
-          visuallyHiddenDismiss={visuallyHiddenDismiss && active ? getLabel('sheet.close') : undefined}
+          visuallyHiddenDismiss={trapFocus && visuallyHiddenDismiss && active ? getLabel('sheet.close') : undefined}
         >
           <div
             {...getFloatingProps({

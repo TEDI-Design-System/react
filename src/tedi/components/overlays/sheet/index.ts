@@ -5,5 +5,4 @@ export * from './components/sheet-header/sheet-header';
 export * from './components/sheet-body/sheet-body';
 export * from './components/sheet-footer/sheet-footer';
 export * from './components/sheet-closer/sheet-closer';
-export * from './components/sheet-modal/sheet-modal';
 export * from './sheet-context';

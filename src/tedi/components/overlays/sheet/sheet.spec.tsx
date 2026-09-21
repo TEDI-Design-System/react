@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { Sheet } from './sheet';
+import { useSheet } from './sheet-context';
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: jest.fn(() => ({
@@ -9,7 +11,18 @@ jest.mock('../../../providers/label-provider', () => ({
   })),
 }));
 
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
+
 describe('Sheet', () => {
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: (props: Record<string, unknown>) => props,
+    });
+  });
+
   beforeAll(() => {
     class PointerEventPolyfill extends MouseEvent {
       pointerId: number;
@@ -56,6 +69,24 @@ describe('Sheet', () => {
     const labelledBy = dialog.getAttribute('aria-labelledby');
     expect(labelledBy).toBeTruthy();
     expect(document.getElementById(labelledBy as string)).toHaveTextContent('Title text');
+  });
+
+  it('keeps a Content aria-label when the header renders custom children (no built-in title)', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content aria-label="Custom labelled sheet">
+          <Sheet.Header>
+            <span>Fully custom header</span>
+          </Sheet.Header>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(dialog).toHaveAttribute('aria-label', 'Custom labelled sheet');
+    expect(dialog).not.toHaveAttribute('aria-labelledby');
   });
 
   it('falls back to aria-label when no header title is set', () => {
@@ -333,7 +364,7 @@ describe('Sheet', () => {
     expect(screen.getByRole('dialog')).toHaveStyle({ '--tedi-sheet-radius': 'var(--card-radius-rounded)' });
   });
 
-  it('accepts a per-breakpoint radius and resolves the base breakpoint', () => {
+  it('applies the base radius when the breakpoint resolver reports the base breakpoint', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content radius="none" md={{ radius: 'card' }}>
@@ -341,7 +372,140 @@ describe('Sheet', () => {
         </Sheet.Content>
       </Sheet>
     );
-    // jsdom reports the base (xs) breakpoint, so the flat `radius="none"` applies.
     expect(screen.getByRole('dialog')).toHaveStyle({ '--tedi-sheet-radius': '0' });
+  });
+
+  it('applies the md radius when the breakpoint resolver reports md', () => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: () => ({ radius: 'card' }),
+    });
+
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content radius="none" md={{ radius: 'card' }}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(screen.getByRole('dialog')).toHaveStyle({ '--tedi-sheet-radius': 'var(--card-radius-rounded)' });
+  });
+
+  it('throws when a subcomponent is rendered outside <Sheet>', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() =>
+      render(
+        <Sheet.Trigger>
+          <button type="button">Orphan</button>
+        </Sheet.Trigger>
+      )
+    ).toThrow('Sheet subcomponents must be rendered inside <Sheet>.');
+    spy.mockRestore();
+  });
+
+  it('exposes the sheet state to descendants via useSheet', async () => {
+    const CloseFromBody = () => {
+      const { open, onOpenChange } = useSheet();
+      return (
+        <button type="button" onClick={() => onOpenChange(false)}>
+          {open ? 'Close from body' : 'Closed'}
+        </button>
+      );
+    };
+
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body>
+            <CloseFromBody />
+          </Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const closeButton = screen.getByRole('button', { name: 'Close from body' });
+    expect(closeButton).toBeInTheDocument();
+    fireEvent.click(closeButton);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('merges an object ref supplied on the trigger child', () => {
+    const TriggerWithRef = () => {
+      const ref = useRef<HTMLButtonElement>(null);
+      const [tag, setTag] = useState('');
+      return (
+        <Sheet>
+          <Sheet.Trigger>
+            <button type="button" ref={ref}>
+              Open
+            </button>
+          </Sheet.Trigger>
+          <Sheet.Content>
+            <Sheet.Body>Body</Sheet.Body>
+          </Sheet.Content>
+          <button type="button" onClick={() => setTag(ref.current?.tagName ?? 'null')}>
+            Probe
+          </button>
+          <span data-testid="probe">{tag}</span>
+        </Sheet>
+      );
+    };
+    render(<TriggerWithRef />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Probe' }));
+    expect(screen.getByTestId('probe')).toHaveTextContent('BUTTON');
+  });
+
+  it('renders a split footer with right-aligned content', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body>Body</Sheet.Body>
+          <Sheet.Footer right={<button type="button">Confirm</button>}>
+            <button type="button">Cancel</button>
+          </Sheet.Footer>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
+    expect(document.querySelector('[class*="tedi-sheet__footer--split"]')).toBeInTheDocument();
+    expect(document.querySelector('[class*="tedi-sheet__footer-side--right"]')).toBeInTheDocument();
+  });
+
+  it('snaps to the nearest snap point on drag end', () => {
+    const onSnapPointChange = jest.fn();
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[0.4, 0.9]} onSnapPointChange={onSnapPointChange}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerDown(handle, { clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientY: 450, pointerId: 1 });
+    fireEvent.pointerUp(handle, { clientY: 450, pointerId: 1 });
+
+    expect(onSnapPointChange).toHaveBeenCalledWith(0.4);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('dismisses a snap-point sheet when dragged below the lowest snap', async () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[0.4, 0.9]}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerDown(handle, { clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientY: 700, pointerId: 1 });
+    fireEvent.pointerUp(handle, { clientY: 700, pointerId: 1 });
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });

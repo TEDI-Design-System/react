@@ -37,7 +37,10 @@ export type SheetModalProps = SheetModalBaseProps &
          */
         title: ReactNode;
         header?: never;
-        /** Optional — the rendered `title` already names the dialog. */
+        /**
+         * Optional — the rendered `title` already names the dialog. Pass it anyway when `title` may
+         * render empty (e.g. `title={condition && 'Steps'}`), so the dialog keeps an accessible name.
+         */
         ariaLabel?: string;
       }
     | {
@@ -78,6 +81,8 @@ export const SheetModal = ({
   children,
 }: SheetModalProps): JSX.Element => {
   const titleId = useId();
+  const hasRenderedTitle = !header && Boolean(title);
+  const labelledBy = hasRenderedTitle ? titleId : '';
 
   return (
     <Modal open={open} onToggle={onToggle} defaultOpen={defaultOpen}>
@@ -85,7 +90,7 @@ export const SheetModal = ({
         position="bottom"
         fullscreen="edge"
         aria-label={ariaLabel}
-        aria-labelledby={!header && title !== undefined && title !== null ? titleId : undefined}
+        aria-labelledby={labelledBy}
         className={cn(styles['tedi-sheet'], className)}
       >
         {header ? (
@@ -93,7 +98,12 @@ export const SheetModal = ({
         ) : (
           <Modal.Header>
             <div className={styles['tedi-sheet__header']}>
-              <Text id={titleId} modifiers="bold" color="secondary" className={styles['tedi-sheet__title']}>
+              <Text
+                id={hasRenderedTitle ? titleId : undefined}
+                modifiers="bold"
+                color="secondary"
+                className={styles['tedi-sheet__title']}
+              >
                 {title}
               </Text>
               {closeButton && (

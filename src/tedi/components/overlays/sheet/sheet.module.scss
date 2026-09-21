@@ -58,7 +58,7 @@ $sheet-fade-duration: 200ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tedi-sheet__overlay,
+  .tedi-sheet__overlay::before,
   .tedi-sheet__panel {
     transition: none;
   }
