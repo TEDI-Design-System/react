@@ -126,6 +126,9 @@ files. This is the part of this document worth maintaining by hand.
 - **`OptionContent` is a template, not an item.** It has no role, click or focus handling by design.
   It must go inside an interactive parent (`DropdownItem`, a `Select` option) that owns the role,
   selection and keyboard handling.
+- **`TableCard` is `Table`'s readable mobile form.** Below a breakpoint, render a list of
+  `TableCard` (each row a stacked `<dl>` of label / value pairs with its own title / status /
+  actions) instead of collapsing columns; swap via `useBreakpoint` + `isBreakpointBelow(bp, 'md')`.
 
 ### Composition constraints
 
@@ -144,6 +147,9 @@ files. This is the part of this document worth maintaining by hand.
   prop. Children win when both are given.
 - **`TableOfContents.Item` children must be direct children.** Don't wrap them in another
   component. Pass `underline={false}` on the `Link` inside an item to match the design.
+- **`TableCard`'s `collapsible` needs a `title`.** The header becomes the disclosure toggle; `rows`,
+  `summary` and `children` collapse together while the `actions` footer stays visible. `layout`
+  (`horizontal` key/value vs `vertical` stacked) and the column / grid props are breakpoint-aware.
 
 ### Responsive behaviour that isn't a prop
 

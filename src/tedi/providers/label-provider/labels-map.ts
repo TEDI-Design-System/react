@@ -185,6 +185,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Time',
     ru: 'Время',
   },
+  'time-field.open-picker': {
+    description: 'Accessible name for the TimeField icon button that opens the time picker',
+    components: ['TimeField'],
+    et: 'Ava kellaajavalija',
+    en: 'Open time picker',
+    ru: 'Открыть выбор времени',
+  },
   'time-field.cancel': {
     description: 'Cancel button label inside the time-picker modal',
     components: ['TimeField'],
@@ -612,6 +619,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Andmed puuduvad',
     en: 'No data',
     ru: 'Нет данных',
+  },
+  'table-card.select-row': {
+    description: 'Accessible label for the TableCard selection checkbox.',
+    components: ['TableCard'],
+    et: 'Vali rida',
+    en: 'Select row',
+    ru: 'Выбрать строку',
   },
   'table.expand-row': {
     description: 'Accessible label on the expand toggle in expandable rows.',
@@ -1399,6 +1413,13 @@ export const labelsMap = validateDefaultLabels({
     et: 'Vali kellaaeg',
     en: 'Pick time',
     ru: 'Выберите время',
+  },
+  'baseMapSelection.transparency': {
+    description: 'Accessible name for the base map transparency slider and its numeric field',
+    components: ['BaseMapSelection'],
+    et: 'Nähtavus',
+    en: 'Visibility',
+    ru: 'Видимость',
   },
 });
 
