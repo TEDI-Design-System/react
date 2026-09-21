@@ -11,9 +11,9 @@ $btn-height-small: 2.25rem;
   $background-h,
   $border-h,
   $color-h,
-  $background-d: var(--color-bg-disabled),
-  $border-d: var(--color-bg-disabled),
-  $color-d: var(--color-text-disabled)
+  $background-d: var(--general-surface-disabled),
+  $border-d: var(--general-surface-disabled),
+  $color-d: var(--general-text-disabled)
 ) {
   color: $color;
   background-color: $background;
@@ -40,12 +40,12 @@ $btn-height-small: 2.25rem;
   $border-h,
   $color-h,
   $background-h,
-  $background-d: var(--color-bg-disabled),
-  $border-d: var(--color-bg-disabled),
-  $color-d: var(--color-text-disabled)
+  $background-d: var(--general-surface-disabled),
+  $border-d: var(--general-surface-disabled),
+  $color-d: var(--general-text-disabled)
 ) {
   @include button-variant(
-    var(--color-white),
+    var(--general-surface-primary),
     $border,
     $color,
     $background-h,
@@ -127,33 +127,33 @@ $btn-height-small: 2.25rem;
 
   &.btn--primary {
     @include button-variant(
-      var(--color-primary-main),
-      var(--color-primary-main),
-      var(--color-text-inverted),
-      var(--color-primary-active),
-      var(--color-primary-active),
-      var(--color-text-inverted)
+      var(--general-surface-brand-primary),
+      var(--general-surface-brand-primary),
+      var(--general-text-white),
+      var(--general-surface-brand-secondary),
+      var(--general-surface-brand-secondary),
+      var(--general-text-white)
     );
   }
 
   &.btn--secondary {
     @include button-secondary-variant(
-      var(--color-border-contrast),
-      var(--color-primary-main),
-      var(--color-primary-main),
-      var(--color-primary-active),
+      var(--general-border-secondary),
+      var(--general-surface-brand-primary),
+      var(--general-surface-brand-primary),
+      var(--general-surface-brand-secondary),
       $btn-default-opacity-bg
     );
   }
 
   &.btn--tertiary {
     @include button-variant(
-      var(--color-transparent),
-      var(--color-transparent),
-      var(--color-primary-main),
+      transparent,
+      transparent,
+      var(--general-surface-brand-primary),
       $btn-default-opacity-bg,
       $btn-default-opacity-bg,
-      var(--color-primary-active)
+      var(--general-surface-brand-secondary)
     );
   }
 }
@@ -163,33 +163,33 @@ $btn-height-small: 2.25rem;
 
   &.btn--primary {
     @include button-variant(
-      var(--color-important-main),
-      var(--color-important-main),
-      var(--color-text-inverted),
-      var(--color-important-active),
-      var(--color-important-active),
-      var(--color-text-inverted)
+      var(--general-status-danger-background-primary),
+      var(--general-status-danger-background-primary),
+      var(--general-text-white),
+      var(--general-status-danger-background-secondary),
+      var(--general-status-danger-background-secondary),
+      var(--general-text-white)
     );
   }
 
   &.btn--secondary {
     @include button-secondary-variant(
-      var(--color-border-contrast),
-      var(--color-important-main),
-      var(--color-important-main),
-      var(--color-important-active),
+      var(--general-border-secondary),
+      var(--general-status-danger-background-primary),
+      var(--general-status-danger-background-primary),
+      var(--general-status-danger-background-secondary),
       $btn-important-opacity-bg
     );
   }
 
   &.btn--tertiary {
     @include button-variant(
-      var(--color-transparent),
-      var(--color-transparent),
-      var(--color-important-main),
+      transparent,
+      transparent,
+      var(--general-status-danger-background-primary),
       $btn-important-opacity-bg,
       $btn-important-opacity-bg,
-      var(--color-important-active)
+      var(--general-status-danger-background-secondary)
     );
   }
 }
@@ -199,33 +199,33 @@ $btn-height-small: 2.25rem;
 
   &.btn--primary {
     @include button-variant(
-      var(--color-positive-main),
-      var(--color-positive-main),
-      var(--color-text-inverted),
-      var(--color-positive-active),
-      var(--color-positive-active),
-      var(--color-text-inverted)
+      var(--general-status-success-background-primary),
+      var(--general-status-success-background-primary),
+      var(--general-text-white),
+      var(--general-status-success-background-secondary),
+      var(--general-status-success-background-secondary),
+      var(--general-text-white)
     );
   }
 
   &.btn--secondary {
     @include button-secondary-variant(
-      var(--color-border-contrast),
-      var(--color-positive-main),
-      var(--color-positive-main),
-      var(--color-positive-active),
+      var(--general-border-secondary),
+      var(--general-status-success-background-primary),
+      var(--general-status-success-background-primary),
+      var(--general-status-success-background-secondary),
       $btn-positive-opacity-bg
     );
   }
 
   &.btn--tertiary {
     @include button-variant(
-      var(--color-transparent),
-      var(--color-transparent),
-      var(--color-positive-main),
+      transparent,
+      transparent,
+      var(--general-status-success-background-primary),
       $btn-positive-opacity-bg,
       $btn-positive-opacity-bg,
-      var(--color-positive-active)
+      var(--general-status-success-background-secondary)
     );
   }
 }
@@ -234,54 +234,54 @@ $btn-height-small: 2.25rem;
   $btn-inverted-border: rgb(255 255 255 / 50%);
   $btn-inverted-opacity-bg: rgb(255 255 255 / 10%);
 
-  --global-outline-color: var(--color-primary-highlight);
+  --global-outline-color: var(--general-surface-brand-tertiary);
 
   &.btn--primary {
     @include button-variant(
-      var(--color-primary-highlight),
-      var(--color-primary-highlight),
-      var(--color-primary-active),
-      var(--color-white),
-      var(--color-white),
-      var(--color-primary-main)
+      var(--general-surface-brand-tertiary),
+      var(--general-surface-brand-tertiary),
+      var(--general-surface-brand-secondary),
+      var(--general-surface-primary),
+      var(--general-surface-primary),
+      var(--general-surface-brand-primary)
     );
   }
 
   &.btn--secondary {
     /* used text color as border, because we don't want to add new border variable */
     @include button-variant(
-      var(--color-transparent),
+      transparent,
       $btn-inverted-border,
-      var(--color-text-inverted),
+      var(--general-text-white),
       $btn-inverted-opacity-bg,
-      var(--color-text-inverted),
-      var(--color-text-inverted),
-      var(--color-transparent),
-      var(--color-text-disabled)
+      var(--general-text-white),
+      var(--general-text-white),
+      transparent,
+      var(--general-text-disabled)
     );
   }
 
   &.btn--tertiary {
     @include button-variant(
-      var(--color-transparent),
-      var(--color-transparent),
-      var(--color-text-inverted),
+      transparent,
+      transparent,
+      var(--general-text-white),
       $btn-inverted-opacity-bg,
       $btn-inverted-opacity-bg,
-      var(--color-important-active),
-      var(--color-transparent),
-      var(--color-text-disabled)
+      var(--general-status-danger-background-secondary),
+      transparent,
+      var(--general-text-disabled)
     );
   }
 
   &.btn--link {
-    @include link-variant(var(--color-text-inverted), var(--color-text-inverted), var(--color-text-disabled));
+    @include link-variant(var(--general-text-white), var(--general-text-white), var(--general-text-disabled));
   }
 }
 
 .btn--text-color {
   &.btn--link {
-    @include link-variant(inherit, var(--color-text-subtle), var(--color-text-disabled));
+    @include link-variant(inherit, var(--general-text-tertiary), var(--general-text-disabled));
   }
 }
 
@@ -291,14 +291,18 @@ $btn-height-small: 2.25rem;
   height: auto;
   min-height: auto;
   padding: 0;
-  color: var(--color-primary-main);
+  color: var(--general-text-brand);
   text-align: left;
   text-decoration: none;
   background: none;
   border: none;
   border-radius: 3px;
 
-  @include link-variant(var(--color-primary-main), var(--color-primary-active), var(--color-text-disabled));
+  @include link-variant(
+    var(--general-surface-brand-primary),
+    var(--general-surface-brand-secondary),
+    var(--general-text-disabled)
+  );
 }
 
 .btn__text {
@@ -312,7 +316,7 @@ $btn-height-small: 2.25rem;
   }
 
   .btn--is-loading:not(.btn--icon) & {
-    color: var(--color-transparent);
+    color: transparent;
   }
 
   &:not(.btn--link .btn__text) {

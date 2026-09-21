@@ -1,4 +1,12 @@
 /**
+ * Scrolls a tab fully into view inside a horizontally scrollable tablist.
+ * A no-op when the tab is already fully visible.
+ */
+export const scrollTabIntoView = (tab: HTMLElement): void => {
+  tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+};
+
+/**
  * Navigates to a sibling tab in the tablist using ArrowLeft/ArrowRight/Home/End keys.
  * Returns the target tab element if navigation occurred, or null otherwise.
  */
@@ -35,7 +43,7 @@ export const navigateTablist = (e: React.KeyboardEvent<HTMLButtonElement>): HTML
   if (newIndex !== -1) {
     e.preventDefault();
     tabs[newIndex].focus();
-    tabs[newIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    scrollTabIntoView(tabs[newIndex]);
     return tabs[newIndex];
   }
 

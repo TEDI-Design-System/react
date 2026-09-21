@@ -178,6 +178,7 @@ export const FullWidth: Story = {
 };
 
 export const Controlled: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     step: 1,
     max: 10,

@@ -818,3 +818,19 @@ export const ModalPickers: Story = {
     );
   },
 };
+
+/**
+ * `minYear` / `maxYear` control how far the header **year dropdown** reaches. By default it spans
+ * `currentYear - 100` to `currentYear + 20` — narrow or widen it for cases like a birthdate field
+ * that needs to go back much further.
+ */
+export const YearRange: Story = {
+  render: Template,
+  args: {
+    mode: 'single',
+    label: 'Sünnikuupäev',
+    placeholder: 'pp.kk.aaaa',
+    minYear: 1920,
+    maxYear: new Date().getFullYear(),
+  },
+};

@@ -104,6 +104,7 @@ export const WithoutDropdown: Story = {
  * Controlled mode — the consumer owns `page` state explicitly.
  */
 export const ControlledPage: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: function ControlledPage() {
     const [page, setPage] = useState(3);
     return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
@@ -300,7 +301,14 @@ export const Borders: Story = {
         <p style={{ margin: '0 0 0.5rem', color: 'var(--general-text-secondary)' }}>
           borders=&quot;top&quot; (default)
         </p>
-        <Pagination pageCount={10} defaultPage={3} totalItems={97} pageSize={10} pageSizeOptions={[10, 25, 50]} />
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          labels={{ ariaLabel: 'Pagination (borders: top)' }}
+        />
       </div>
       <div>
         <p style={{ margin: '0 0 0.5rem', color: 'var(--general-text-secondary)' }}>borders=&quot;bottom&quot;</p>
@@ -311,6 +319,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="bottom"
+          labels={{ ariaLabel: 'Pagination (borders: bottom)' }}
         />
       </div>
       <div>
@@ -322,6 +331,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="both"
+          labels={{ ariaLabel: 'Pagination (borders: both)' }}
         />
       </div>
       <div>
@@ -333,6 +343,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="none"
+          labels={{ ariaLabel: 'Pagination (borders: none)' }}
         />
       </div>
     </div>

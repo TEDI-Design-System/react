@@ -21,10 +21,10 @@ const headerLanguages = [
 ];
 
 const headerRepresentatives: Representative[] = [
-  { id: '1', name: 'Mari Maasikas', description: '49504080934', icon: { name: 'person', size: 24 } },
-  { id: '2', name: 'Juulia Sarapuu', description: 'Peasekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '3', name: 'Marta Sarapuu', description: 'Sekretär', icon: { name: 'supervised_user_circle', size: 24 } },
-  { id: '4', name: 'Helgi Sarapuu', description: 'Jurist', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '1', name: 'Mari Maasikas', description: '47013010001', icon: { name: 'person', size: 24 } },
+  { id: '2', name: 'Juulia Sarapuu', description: '47013010002', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '3', name: 'Marta Sarapuu', description: '47013010003', icon: { name: 'supervised_user_circle', size: 24 } },
+  { id: '4', name: 'Helgi Sarapuu', description: '47013010004', icon: { name: 'supervised_user_circle', size: 24 } },
 ];
 
 const headerLogo = <img src="header-logo.svg" alt="Logo" />;
@@ -91,10 +91,6 @@ const meta: Meta<typeof TopNav> = {
     },
   ],
   parameters: {
-    a11y: {
-      // TODO: [TopNav]: Review storybook a11y violations #823
-      test: 'todo',
-    },
     layout: 'fullscreen',
     design: {
       type: 'figma',

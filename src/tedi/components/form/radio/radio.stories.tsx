@@ -225,6 +225,8 @@ export const Controlled = () => {
   );
 };
 
+Controlled.parameters = { chromatic: { disableSnapshot: true } };
+
 export const RadioWithLongTitle = () => {
   return (
     <Row>
