@@ -331,6 +331,28 @@ describe('Tabs overflow (scroll mode)', () => {
     expect(tablist).toBeInTheDocument();
     expect(screen.queryByText('More')).not.toBeInTheDocument();
   });
+
+  it('scrolls a clicked trigger into view', () => {
+    render(
+      <Tabs defaultValue="tab-1">
+        <Tabs.List aria-label="Scroll tabs" overflowMode="scroll">
+          <Tabs.Trigger id="tab-1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger id="tab-2">Tab 2</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content id="tab-1">Content 1</Tabs.Content>
+        <Tabs.Content id="tab-2">Content 2</Tabs.Content>
+      </Tabs>
+    );
+
+    const tab2 = screen.getByRole('tab', { name: 'Tab 2' });
+    const scrollSpy = jest.fn();
+    tab2.scrollIntoView = scrollSpy;
+
+    fireEvent.click(tab2);
+
+    expect(scrollSpy).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+    expect(tab2).toHaveAttribute('aria-selected', 'true');
+  });
 });
 
 describe('TabsContent without id', () => {
