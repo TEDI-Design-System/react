@@ -1,3 +1,46 @@
+# [19.1.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.15...react-19.1.0-rc.16) (2026-09-18)
+
+
+### Features
+
+* **dock-panel:** Add DockPanel Component [#198](https://github.com/TEDI-Design-System/react/issues/198) ([#895](https://github.com/TEDI-Design-System/react/issues/895)) ([cd8b3d7](https://github.com/TEDI-Design-System/react/commit/cd8b3d73aeaa90e0c07bff41532d6c5fe603e992))
+
+# [19.1.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.14...react-19.1.0-rc.15) (2026-09-17)
+
+
+### Features
+
+* **map-button:** map button accepts an icon size prop [#898](https://github.com/TEDI-Design-System/react/issues/898) ([#899](https://github.com/TEDI-Design-System/react/issues/899)) ([cc66bb0](https://github.com/TEDI-Design-System/react/commit/cc66bb0f567c7595f33a485719f48d66ea01cb83))
+
+# [19.1.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.13...react-19.1.0-rc.14) (2026-09-17)
+
+
+### Bug Fixes
+
+* **tabs:** scroll tab fully into view on click [#706](https://github.com/TEDI-Design-System/react/issues/706) ([#883](https://github.com/TEDI-Design-System/react/issues/883)) ([5c06274](https://github.com/TEDI-Design-System/react/commit/5c062741c43387d9b4105e96ee7ba72c3ff3624c))
+
+# [19.1.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.12...react-19.1.0-rc.13) (2026-09-17)
+
+
+### Bug Fixes
+
+* **slider:** remove gaps between label, slider and feedback text [#732](https://github.com/TEDI-Design-System/react/issues/732) ([#876](https://github.com/TEDI-Design-System/react/issues/876)) ([2617c37](https://github.com/TEDI-Design-System/react/commit/2617c37dd4af01ab427d9e6e3cef8decd8e5c6b1))
+
+# [19.1.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.11...react-19.1.0-rc.12) (2026-09-16)
+
+
+### Bug Fixes
+
+* **carousel:** a11y violation fixes [#884](https://github.com/TEDI-Design-System/react/issues/884) ([#891](https://github.com/TEDI-Design-System/react/issues/891)) ([128f4bd](https://github.com/TEDI-Design-System/react/commit/128f4bd843b2dad79f4ebd185f2f23ed8aa2bbd8))
+* **date-time-field:** fix a11y violations [#886](https://github.com/TEDI-Design-System/react/issues/886) ([#887](https://github.com/TEDI-Design-System/react/issues/887)) ([0f6040e](https://github.com/TEDI-Design-System/react/commit/0f6040e48d10fc239666355d70b83b99de6db146))
+
+# [19.1.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.10...react-19.1.0-rc.11) (2026-09-16)
+
+
+### Features
+
+* **table-card:** new tedi-ready component [#735](https://github.com/TEDI-Design-System/react/issues/735) ([#814](https://github.com/TEDI-Design-System/react/issues/814)) ([d8ab14c](https://github.com/TEDI-Design-System/react/commit/d8ab14cc70644c2e64189b474ed1a1c16e3123a1))
+
 # [19.1.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.9...react-19.1.0-rc.10) (2026-09-14)
 
 

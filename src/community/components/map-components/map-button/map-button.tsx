@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { forwardRef, useState } from 'react';
 
-import { Button, ButtonProps, Icon, Spinner, Tooltip } from '../../../../tedi';
+import { Button, ButtonProps, Icon, IconSize, Spinner, Tooltip } from '../../../../tedi';
 import MapDropdown, { MapDropdownItem } from '../map-dropdown/map-dropdown';
 import styles from './map-button.module.scss';
 
@@ -53,6 +53,15 @@ export interface MapButtonProps extends Omit<ButtonProps, OmittedButtonProps> {
    * When provided, the button can toggle a dropdown menu.
    */
   dropdownItems?: MapDropdownItem[];
+  /**
+   * Renders the dropdown indicator arrow in the bottom-right corner without wiring up a dropdown.
+   * @default false
+   */
+  showDropdownIndicator?: boolean;
+  /**
+   * Size of the icon displayed on the button.
+   */
+  iconSize?: IconSize;
 }
 
 export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, ref) => {
@@ -65,10 +74,12 @@ export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, r
     hideLabel = false,
     tooltipContent = children,
     dropdownItems,
+    showDropdownIndicator = false,
     isActive,
     isHovered,
     underline,
     isLoading,
+    iconSize,
     ...rest
   } = props;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -78,7 +89,7 @@ export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, r
     styles['tedi-map-button'],
     styles[`tedi-map-button--${size}`],
     isSelected && styles['tedi-map-button--selected'],
-    dropdownItems && styles['tedi-map-button--dropdown'],
+    (dropdownItems || showDropdownIndicator) && styles['tedi-map-button--dropdown'],
     isActive && styles['tedi-map-button--is-active'],
     isHovered && styles['tedi-map-button--is-hovered'],
     underline && styles['tedi-map-button--underline'],
@@ -86,12 +97,20 @@ export const MapButton = forwardRef<HTMLButtonElement, MapButtonProps>((props, r
     className
   );
 
+  const resolveIconSize = () => {
+    if (iconSize) {
+      return iconSize;
+    }
+
+    return size === 'small' ? 24 : 18;
+  };
+
   const buttonContent = (
     <>
       {isLoading ? (
         <Spinner size={size === 'small' ? 16 : 18} className={styles['tedi-map-button__icon']} />
       ) : (
-        icon && <Icon name={icon} className={styles['tedi-map-button__icon']} size={size === 'small' ? 24 : 18} />
+        icon && <Icon name={icon} className={styles['tedi-map-button__icon']} size={resolveIconSize()} />
       )}
       {hideLabel ? (
         <span className="sr-only">{children}</span>

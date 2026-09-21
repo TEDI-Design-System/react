@@ -19,11 +19,24 @@ type TextGroupListBreakpointProps =
        */
       labelAlign?: TextAlign;
       /**
+       * Alignment for the value text. `'right'` grows the value so it sits flush
+       * against the trailing edge (numeric / summary columns). Horizontal only.
+       * @default left
+       */
+      valueAlign?: TextAlign;
+      /**
        * Width for the label column (e.g., `'200px'`, `'30%'`, or a `number`
        * interpreted as a percent).
        * @default auto
        */
       labelWidth?: string | number;
+      /**
+       * Vertical alignment of the label against its value within each row.
+       * `'center'` aligns them on the cross axis (useful when a value is taller,
+       * e.g. a `StatusBadge`). Horizontal layout only.
+       * @default 'start'
+       */
+      rowAlign?: 'start' | 'center';
     }
   | {
       /**
@@ -36,6 +49,14 @@ type TextGroupListBreakpointProps =
        * @default left
        */
       labelAlign?: 'left';
+      /**
+       * Value alignment is horizontal-only; not available in vertical layout.
+       */
+      valueAlign?: never;
+      /**
+       * Row alignment is horizontal-only; not available in vertical layout.
+       */
+      rowAlign?: never;
       /**
        * Width for the label column (e.g., `'200px'`, `'30%'`, or a `number`
        * interpreted as a percent).
@@ -61,10 +82,20 @@ export interface TextGroupListItem {
    */
   labelAlign?: TextAlign;
   /**
+   * Per-row override of the list-level `valueAlign`. Falls back to the list's
+   * value when omitted.
+   */
+  valueAlign?: TextAlign;
+  /**
    * Per-row override of the list-level `labelWidth`. Falls back to the list's
    * value when omitted.
    */
   labelWidth?: string | number;
+  /**
+   * In a multi-column layout (`columns > 1`), span this row across N grid
+   * columns. Ignored in single-column layouts. Clamped to the column count.
+   */
+  colSpan?: number;
 }
 
 export type TextGroupListProps = BreakpointSupport<TextGroupListBreakpointProps> & {
@@ -74,6 +105,17 @@ export type TextGroupListProps = BreakpointSupport<TextGroupListBreakpointProps>
    * `<TextGroup>`s would break.
    */
   items: TextGroupListItem[];
+  /**
+   * Lay the pairs out in this many equal-width columns (CSS grid, filling
+   * left-to-right, top-to-bottom). `1` keeps the plain stacked list.
+   * @default 1
+   */
+  columns?: number;
+  /**
+   * Vertical gap between rows. Accepts any CSS length (a `number` is treated as
+   * pixels). Defaults to the component's compact spacing.
+   */
+  rowGap?: string | number;
   /**
    * Additional class name(s) to apply to the root `<dl>` element.
    */
@@ -101,30 +143,52 @@ export const TextGroupList = (props: TextGroupListProps): JSX.Element => {
     className,
     type = 'vertical',
     labelAlign = 'left',
+    valueAlign = 'left',
+    columns = 1,
+    rowGap,
+    rowAlign = 'start',
   } = getCurrentBreakpointProps<TextGroupListProps>(props);
 
   const listBEM = cn(
     styles['tedi-text-group'],
     styles['tedi-text-group--list'],
     styles[`tedi-text-group--${type}`],
+    { [styles['tedi-text-group--columns']]: columns > 1 },
+    { [styles['tedi-text-group--row-align-center']]: type === 'horizontal' && rowAlign === 'center' },
     className
   );
   const listLabelWidth = resolveLabelWidth(labelWidth);
+  const listStyle = {
+    '--label-width': listLabelWidth,
+    ...(columns > 1 ? { '--tedi-text-group-columns': columns } : {}),
+    ...(rowGap !== undefined
+      ? { '--tedi-text-group-list-gap': typeof rowGap === 'number' ? `${rowGap}px` : rowGap }
+      : {}),
+  } as React.CSSProperties;
 
   return (
-    <dl className={listBEM} style={{ '--label-width': listLabelWidth } as React.CSSProperties}>
+    <dl className={listBEM} style={listStyle}>
       {items.map((item, index) => {
         const rowLabelAlign = item.labelAlign ?? labelAlign;
-        const rowStyle: React.CSSProperties | undefined =
-          item.labelWidth !== undefined
-            ? ({ '--label-width': resolveLabelWidth(item.labelWidth) } as React.CSSProperties)
-            : undefined;
+        const rowValueAlign = item.valueAlign ?? valueAlign;
+        const rowStyle: React.CSSProperties = {};
+        if (item.labelWidth !== undefined) {
+          (rowStyle as Record<string, string>)['--label-width'] = resolveLabelWidth(item.labelWidth);
+        }
+        if (columns > 1 && item.colSpan && item.colSpan > 1) {
+          rowStyle.gridColumn = `span ${Math.min(item.colSpan, columns)}`;
+        }
+        const hasRowStyle = Object.keys(rowStyle).length > 0;
         return (
-          <div key={index} className={styles['tedi-text-group__row']} style={rowStyle}>
+          <div key={index} className={styles['tedi-text-group__row']} style={hasRowStyle ? rowStyle : undefined}>
             <dt className={cn(styles['tedi-text-group__label'], styles[`tedi-text-group--align-${rowLabelAlign}`])}>
               {renderLabelContent(item.label)}
             </dt>
-            <dd className={cn(styles['tedi-text-group__value'])}>{item.value}</dd>
+            <dd
+              className={cn(styles['tedi-text-group__value'], styles[`tedi-text-group__value--align-${rowValueAlign}`])}
+            >
+              {item.value}
+            </dd>
           </div>
         );
       })}

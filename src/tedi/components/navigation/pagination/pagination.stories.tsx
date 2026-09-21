@@ -104,6 +104,7 @@ export const WithoutDropdown: Story = {
  * Controlled mode — the consumer owns `page` state explicitly.
  */
 export const ControlledPage: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: function ControlledPage() {
     const [page, setPage] = useState(3);
     return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
