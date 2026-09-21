@@ -20,19 +20,17 @@ const isDateRange = (val: SelectedValueLike): val is DateRange =>
   !!val && !Array.isArray(val) && !(val instanceof Date) && 'from' in val;
 
 /**
- * Range-selection click resolver. react-day-picker's default `addToRange`
- * keeps a completed `{ from, to }` range and only moves one of its ends when
- * the user clicks again — so after picking a start and an end, clicking a new
- * start instead drags the existing end. That surprises users who expect a
- * fresh click to begin a new range.
+ * Range-selection click resolver that fixes two quirks in react-day-picker's default `addToRange`:
+ * clicking on a completed range drags an existing end instead of starting over, and the first click
+ * on an empty range returns a same-day `{ from, to }` that reads as already-complete (issue #813).
  *
- * This normalises that: once a range is complete, the next click starts over
- * with `from` set to the clicked day and `to` cleared. While the range is
- * still being built (or empty), DayPicker's own result is passed through.
+ * So: a click on a complete range starts a new one (`from` set, `to` cleared); the first click on an
+ * empty range becomes a `to`-less start (re-clicking the same day keeps a single-day range);
+ * otherwise DayPicker's result passes through.
  *
  * @param computed - the range react-day-picker derived from the click
- * @param previous - the range that was selected before this click
- * @param clickedDay - the day the user just clicked
+ * @param previous - the range selected before this click
+ * @param clickedDay - the day just clicked
  */
 export const resolveRangeSelection = (
   computed: SelectedValueLike,
@@ -42,15 +40,19 @@ export const resolveRangeSelection = (
   if (clickedDay && isDateRange(previous) && previous.from && previous.to) {
     return { from: clickedDay, to: undefined };
   }
-  return isDateRange(computed) ? computed : undefined;
+  if (!isDateRange(computed)) return undefined;
+
+  const isSameDayRange = !!computed.from && !!computed.to && computed.from.getTime() === computed.to.getTime();
+  const hasInProgressStart = isDateRange(previous) && !!previous.from && !previous.to;
+  if (isSameDayRange && !hasInProgressStart) {
+    return { from: computed.from, to: undefined };
+  }
+  return computed;
 };
 
 /**
- * Resolves the month the calendar should start on for any selection
- * shape. Used by both `DateField` (single / multiple / range Date(s)) and
- * `DateTimeField` (single Date or `{from, to}` range). For arrays the
- * earliest date wins; for ranges the `from` (or `to` if `from` is unset)
- * wins. Falls back to the explicit `fallback` and finally `new Date()`.
+ * Resolves the month the calendar should open on for any selection shape: a single `Date`, an array
+ * (earliest date wins), or a range (`from`, else `to`). Falls back to `fallback`, then `new Date()`.
  */
 export const getInitialMonth = (val: SelectedValueLike, fallback?: Date): Date => {
   if (val instanceof Date) return val;
@@ -101,10 +103,8 @@ export const buildDisabledMatchers = (inputs: DisabledMatcherInputs): Matcher[] 
 };
 
 /**
- * Field order + literal separators extracted from a locale's date format,
- * derived via `Intl.DateTimeFormat.formatToParts`. Used by parsers in
- * `DateField` (date-only) and `DateTimeField` (date + " HH:mm") to build
- * a regex that round-trips the displayed value in any locale.
+ * Field order + literal separators extracted from a locale's date format (via
+ * `Intl.DateTimeFormat.formatToParts`), used to build a locale-aware parsing regex.
  */
 export interface LocaleDateParts {
   fieldOrder: ('day' | 'month' | 'year')[];

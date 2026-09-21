@@ -100,6 +100,10 @@ type CardBreakpointProps = {
 
 export interface CardProps extends BreakpointSupport<CardBreakpointProps> {
   children?: React.ReactNode;
+  /**
+   * Id applied to the root element (forwarded to the underlying `div`).
+   */
+  id?: string;
 }
 
 const CardComponent = forwardRef<HTMLDivElement, CardProps>((props, ref): JSX.Element => {

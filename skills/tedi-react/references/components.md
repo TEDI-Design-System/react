@@ -132,6 +132,9 @@ files. This is the part of this document worth maintaining by hand.
   *separate*, Modal-backed variant used internally by `CardStepper` and
   `TableOfContents.Collapsible`; it is **not** a sub-component of `Sheet`, so don't reach for it when
   composing one.
+- **`TableCard` is `Table`'s readable mobile form.** Below a breakpoint, render a list of
+  `TableCard` (each row a stacked `<dl>` of label / value pairs with its own title / status /
+  actions) instead of collapsing columns; swap via `useBreakpoint` + `isBreakpointBelow(bp, 'md')`.
 
 ### Composition constraints
 
@@ -168,6 +171,9 @@ files. This is the part of this document worth maintaining by hand.
   `overflow: hidden` clips to its own radius, so a header-only override would be invisible anyway.
   It's breakpoint-aware (`radius="none" md={{ radius: 'card' }}`); for any value outside the three
   keywords, set `--tedi-sheet-radius` through `style`.
+- **`TableCard`'s `collapsible` needs a `title`.** The header becomes the disclosure toggle; `rows`,
+  `summary` and `children` collapse together while the `actions` footer stays visible. `layout`
+  (`horizontal` key/value vs `vertical` stacked) and the column / grid props are breakpoint-aware.
 
 ### Responsive behaviour that isn't a prop
 
