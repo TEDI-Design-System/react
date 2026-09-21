@@ -10,6 +10,32 @@ import styles from '../sidenav/sidenav.module.scss';
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
+/**
+ * A `position: fixed` element is positioned relative to the viewport unless an ancestor
+ * establishes a containing block (via `transform`, `perspective`, `filter`, `will-change`, or
+ * `contain`). `offsetParent` is always `null` for fixed elements, so walk the ancestors to find
+ * that block. This keeps the overlay aligned under its header both in a normal app (no such
+ * ancestor → viewport) and when several instances share one document inside a transformed wrapper
+ * (e.g. Storybook's Docs page, which stacks stories in a single scroll container).
+ */
+const findFixedContainingBlock = (element: HTMLElement | null): HTMLElement | null => {
+  let node = element?.parentElement ?? null;
+  while (node) {
+    const style = getComputedStyle(node);
+    if (
+      style.transform !== 'none' ||
+      style.perspective !== 'none' ||
+      (style.filter !== '' && style.filter !== 'none') ||
+      /\b(transform|perspective|filter)\b/.test(style.willChange) ||
+      /\b(layout|paint|strict|content)\b/.test(style.contain)
+    ) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+};
+
 type NavigationLevel<C extends React.ElementType> = {
   items: SideNavItemProps<C>[];
   parent?: SideNavItemProps<C>;
@@ -49,21 +75,32 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
   useIsomorphicLayoutEffect(() => {
     if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
 
-    const scope: ParentNode = overlayRef.current?.parentElement ?? document;
-    const header = scope.querySelector('header') ?? document.querySelector('header');
+    const block = findFixedContainingBlock(overlayRef.current);
+    const header = (block ?? document).querySelector('header') ?? document.querySelector('header');
 
     if (!header) {
       setOverlayTop('var(--layout-header-height)');
       return undefined;
     }
 
-    const measure = () => setOverlayTop(`${Math.max(0, Math.round(header.getBoundingClientRect().bottom))}px`);
+    const measure = () => {
+      const blockTop = block ? block.getBoundingClientRect().top : 0;
+      setOverlayTop(`${Math.max(0, Math.round(header.getBoundingClientRect().bottom - blockTop))}px`);
+    };
     measure();
 
-    if (typeof ResizeObserver === 'undefined') return undefined;
-    const observer = new ResizeObserver(measure);
-    observer.observe(header);
-    return () => observer.disconnect();
+    window.addEventListener('resize', measure);
+    let observer: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(measure);
+      observer.observe(header);
+      if (block) observer.observe(block);
+    }
+
+    return () => {
+      window.removeEventListener('resize', measure);
+      observer?.disconnect();
+    };
   }, [isOpen, showOverlay]);
 
   useEffect(() => {
