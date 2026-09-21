@@ -252,10 +252,10 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
               'aria-labelledby': ariaLabelledBy,
               'aria-label': ariaLabel,
               'aria-modal': trapFocus,
-              'data-status': status,
               style: panelStyle,
               className: panelClassName,
             })}
+            data-status={status}
           >
             {showHandle && (
               <div
