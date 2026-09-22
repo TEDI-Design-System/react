@@ -641,10 +641,10 @@ export const Example: Story = {
 
     const textRow = (label: string, id: string, value: string, onChange: (v: string) => void): JSX.Element => (
       <Row alignItems="center" gutter={2}>
-        <Col xs={12} sm={4}>
+        <Col width={4}>
           <Label style={{ display: 'block', textAlign: 'right' }}>{label}</Label>
         </Col>
-        <Col xs={12} sm={8}>
+        <Col width={8}>
           <InlineEdit<string>
             label={label}
             value={value}
@@ -671,10 +671,10 @@ export const Example: Story = {
               {textRow('Allkirjastaja', 'ctx-signer', signer, setSigner)}
 
               <Row alignItems="center" gutter={2}>
-                <Col xs={12} sm={4}>
+                <Col width={4}>
                   <Label style={{ display: 'block', textAlign: 'right' }}>Olek</Label>
                 </Col>
-                <Col xs={12} sm={8}>
+                <Col width={8}>
                   <InlineEdit<ISelectOption | null>
                     label="Olek"
                     value={status}
