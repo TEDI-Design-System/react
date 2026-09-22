@@ -149,6 +149,10 @@ $sheet-fade-duration: 200ms;
   background: var(--sheet-body-default);
 }
 
+.tedi-sheet__body--no-padding {
+  padding: 0;
+}
+
 .tedi-sheet__footer {
   display: flex;
   gap: var(--layout-grid-gutters-08);
@@ -162,8 +166,26 @@ $sheet-fade-duration: 200ms;
   justify-content: space-between;
 }
 
-.tedi-sheet__footer--start {
+.tedi-sheet__footer--left {
   justify-content: flex-start;
+}
+
+.tedi-sheet__footer--center {
+  justify-content: center;
+}
+
+.tedi-sheet__footer--right {
+  justify-content: flex-end;
+}
+
+.tedi-sheet__footer--full-width {
+  .tedi-sheet__footer-side {
+    flex: 1 1 auto;
+
+    > * {
+      flex: 1 1 0;
+    }
+  }
 }
 
 .tedi-sheet__footer-side {

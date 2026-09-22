@@ -107,11 +107,23 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   initialFocus?: ComponentProps<typeof FloatingFocusManager>['initialFocus'];
   /**
+   * Minimum height of the sheet panel (any CSS length, e.g. `'60dvh'`). Keeps the sheet from
+   * shrinking as its content shrinks - useful when a search or filter reduces the body but the
+   * sheet should stay put rather than collapsing around the results.
+   */
+  minHeight?: CSSProperties['minHeight'];
+  /**
+   * Maximum height of the sheet panel (any CSS length, e.g. `'80dvh'`). Defaults to `90dvh`; when
+   * the content is taller than this the body scrolls and the panel never exceeds the viewport.
+   * Ignored while `snapPoints` are set (the tallest snap caps the height instead).
+   */
+  maxHeight?: CSSProperties['maxHeight'];
+  /**
    * Additional class name on the sheet panel.
    */
   className?: string;
   /**
-   * Inline style applied to the sheet panel - handy for a custom `maxHeight` / `maxWidth`.
+   * Inline style applied to the sheet panel - handy for a custom `maxWidth`.
    */
   style?: CSSProperties;
 }
@@ -130,6 +142,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     keepMounted = false,
     visuallyHiddenDismiss = true,
     initialFocus,
+    minHeight,
+    maxHeight,
     className,
     style,
   } = props;
@@ -212,6 +226,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const radiusOverride = radius === 'card' ? 'var(--card-radius-rounded)' : radius === 'none' ? '0' : undefined;
   const panelStyle: CSSProperties = {
     ...(radiusOverride ? ({ '--tedi-sheet-radius': radiusOverride } as CSSProperties) : undefined),
+    ...(minHeight !== undefined ? { minHeight } : undefined),
+    ...(maxHeight !== undefined && !hasSnaps ? { maxHeight } : undefined),
     ...style,
   };
   if (hasSnaps) {

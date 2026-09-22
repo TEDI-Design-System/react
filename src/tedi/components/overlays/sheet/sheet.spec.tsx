@@ -473,6 +473,68 @@ describe('Sheet', () => {
     expect(document.querySelector('[class*="tedi-sheet__footer-side--right"]')).toBeInTheDocument();
   });
 
+  it('aligns footer actions via the align prop', () => {
+    const { rerender } = render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Footer align="center">
+            <button type="button">Save</button>
+          </Sheet.Footer>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(document.querySelector('[class*="tedi-sheet__footer--center"]')).toBeInTheDocument();
+
+    rerender(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Footer align="right">
+            <button type="button">Save</button>
+          </Sheet.Footer>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(document.querySelector('[class*="tedi-sheet__footer--right"]')).toBeInTheDocument();
+  });
+
+  it('stretches footer actions to full width', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Footer fullWidth>
+            <button type="button">Save</button>
+          </Sheet.Footer>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(document.querySelector('[class*="tedi-sheet__footer--full-width"]')).toBeInTheDocument();
+  });
+
+  it('removes body padding when padding="none"', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body padding="none">Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(document.querySelector('[class*="tedi-sheet__body--no-padding"]')).toBeInTheDocument();
+  });
+
+  it('applies minHeight and maxHeight to the panel', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content minHeight="200px" maxHeight="400px">
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(screen.getByRole('dialog')).toHaveStyle({ minHeight: '200px', maxHeight: '400px' });
+  });
+
   it('snaps to the nearest snap point on drag end', () => {
     const onSnapPointChange = jest.fn();
     render(
