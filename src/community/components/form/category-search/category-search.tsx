@@ -266,8 +266,12 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                         onChange={changeQuery}
                         onClear={clearSearch}
                         onSearch={submitSearch}
-                        onIconClick={submitSearch}
-                        iconButtonProps={{ 'aria-label': labels.search }}
+                        button={{
+                          icon: 'search',
+                          size,
+                          disabled,
+                          'aria-label': labels.search,
+                        }}
                         input={{ 'aria-controls': panelVisible ? panelId : undefined }}
                       />
                     </InputGroup.Input>

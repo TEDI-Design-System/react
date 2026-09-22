@@ -841,14 +841,16 @@ describe('CategorySearch', () => {
     async (submitWith) => {
       const user = userEvent.setup();
       const onSearch = jest.fn((query: string) => [query]);
-      render(<CategorySearch categories={[createTextCategory(onSearch)]} />);
+      render(<CategorySearch categories={[createTextCategory(onSearch)]} labels={{ search: 'Find addresses' }} />);
       const input = screen.getByRole('searchbox');
+      const searchButton = screen.getByRole('button', { name: 'Find addresses' });
+      expect(searchButton).toBeInTheDocument();
       await user.type(input, 'Aa');
       expect(onSearch).toHaveBeenCalledTimes(2);
       expect(input).toHaveFocus();
 
       if (submitWith === 'Enter') await user.keyboard('{Enter}');
-      else await user.click(screen.getByRole('button', { name: 'Search' }));
+      else await user.click(searchButton);
 
       expect(onSearch).toHaveBeenCalledTimes(3);
       expect(onSearch).toHaveBeenLastCalledWith('Aa', { signal: expect.any(AbortSignal) });
@@ -1108,6 +1110,7 @@ describe('CategorySearch', () => {
       const input = screen.getByRole('searchbox');
 
       expect(input.closest('[data-name="textfield"]')).toHaveClass(`tedi-textfield--${expectedSize}`);
+      expect(screen.getByRole('button', { name: 'Search' })).toHaveClass(`tedi-btn--${expectedSize}`);
       await user.type(input, 'A');
       expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(`tedi-btn--${expectedSize}`);
 
