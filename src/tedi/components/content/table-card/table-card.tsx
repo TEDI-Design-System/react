@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -233,12 +233,15 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     onOpenChange?.(next);
   };
 
-  const toggleLabel = typeof title === 'string' ? title : ariaLabel;
+  const titleId = `${id}-title`;
   const headerRowRef = React.useRef<HTMLDivElement>(null);
   const isOpenRef = React.useRef(isOpen);
-  isOpenRef.current = isOpen;
   const openChangeRef = React.useRef(handleOpenChange);
-  openChangeRef.current = handleOpenChange;
+
+  useLayoutEffect(() => {
+    isOpenRef.current = isOpen;
+    openChangeRef.current = handleOpenChange;
+  });
 
   React.useEffect(() => {
     const element = headerRowRef.current;
@@ -331,6 +334,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
               <span className={styles['tedi-table-card__title-group']}>
                 {title && (
                   <Text
+                    id={titleId}
                     element={titleElement}
                     modifiers={titleModifiers}
                     className={cn(styles['tedi-table-card__title'], {
@@ -353,7 +357,8 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
                 open={isOpen}
                 onOpenChange={handleOpenChange}
                 aria-controls={bodyId}
-                aria-label={toggleLabel}
+                aria-labelledby={title ? titleId : undefined}
+                aria-label={title ? undefined : ariaLabel}
               />
             </div>
           ) : (

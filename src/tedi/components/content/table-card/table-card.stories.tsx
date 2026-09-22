@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { Button } from '../../buttons/button/button';
 import { Field } from '../../form/field/field';
-import { Select } from '../../form/select/select';
+import { ISelectOption, Select } from '../../form/select/select';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Dropdown } from '../../overlays/dropdown';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
@@ -123,26 +123,71 @@ export const SimpleCard: Story = {
   ),
 };
 
+type AppointmentValues = {
+  date: string;
+  time: string;
+  duration: string;
+  location: ISelectOption;
+};
+
+const locationOptions: ISelectOption[] = [
+  { label: 'Tallinn', value: 'tallinn' },
+  { label: 'Tartu', value: 'tartu' },
+  { label: 'Pärnu', value: 'parnu' },
+];
+
 /**
  * Edit-in-place: the same `TableCard` shows read-only rows with a **Muuda** action, and clicking it
  * swaps each row's value for an input and the footer for Katkesta / Salvesta. The row labels stay
  * put and name the inputs (via `Field`'s `aria-label` / `Select`'s `hideLabel`), so the card reads
- * as a form without duplicating labels.
+ * as a form without duplicating labels. Edits are held in a draft and only committed on Salvesta;
+ * Katkesta discards them.
  */
 const EditableAppointmentCard = (): JSX.Element => {
   const [editing, setEditing] = useState(false);
+  const [values, setValues] = useState<AppointmentValues>({
+    date: '22.03.2029 – 29.03.2029',
+    time: '11:14',
+    duration: '6 min',
+    location: locationOptions[0],
+  });
+  const [draft, setDraft] = useState<AppointmentValues>(values);
+
+  const startEditing = (): void => {
+    setDraft(values);
+    setEditing(true);
+  };
+  const save = (): void => {
+    setValues(draft);
+    setEditing(false);
+  };
 
   const readRows: TableCardRow[] = [
-    { label: 'Kuupäev', value: '22.03.2029 – 29.03.2029' },
-    { label: 'Kellaaeg', value: '11:14' },
-    { label: 'Kestus', value: '6 min' },
-    { label: 'Asukoht', value: 'Tallinn' },
+    { label: 'Kuupäev', value: values.date },
+    { label: 'Kellaaeg', value: values.time },
+    { label: 'Kestus', value: values.duration },
+    { label: 'Asukoht', value: values.location.label },
   ];
 
   const editRows: TableCardRow[] = [
-    { label: 'Kuupäev', value: <Field aria-label="Kuupäev" defaultValue="22.03.2029 – 29.03.2029" /> },
-    { label: 'Kellaaeg', value: <Field aria-label="Kellaaeg" defaultValue="11:14" /> },
-    { label: 'Kestus', value: <Field aria-label="Kestus" defaultValue="6 min" /> },
+    {
+      label: 'Kuupäev',
+      value: <Field aria-label="Kuupäev" value={draft.date} onChange={(date) => setDraft((d) => ({ ...d, date }))} />,
+    },
+    {
+      label: 'Kellaaeg',
+      value: <Field aria-label="Kellaaeg" value={draft.time} onChange={(time) => setDraft((d) => ({ ...d, time }))} />,
+    },
+    {
+      label: 'Kestus',
+      value: (
+        <Field
+          aria-label="Kestus"
+          value={draft.duration}
+          onChange={(duration) => setDraft((d) => ({ ...d, duration }))}
+        />
+      ),
+    },
     {
       label: 'Asukoht',
       value: (
@@ -151,12 +196,9 @@ const EditableAppointmentCard = (): JSX.Element => {
             id="wa-edit-location"
             label="Asukoht"
             hideLabel
-            options={[
-              { label: 'Tallinn', value: 'tallinn' },
-              { label: 'Tartu', value: 'tartu' },
-              { label: 'Pärnu', value: 'parnu' },
-            ]}
-            defaultValue={{ label: 'Tallinn', value: 'tallinn' }}
+            options={locationOptions}
+            value={draft.location}
+            onChange={(next) => setDraft((d) => ({ ...d, location: (next as ISelectOption | null) ?? d.location }))}
           />
         </div>
       ),
@@ -173,12 +215,12 @@ const EditableAppointmentCard = (): JSX.Element => {
             <Button visualType="neutral" fullWidth onClick={() => setEditing(false)}>
               Katkesta
             </Button>
-            <Button fullWidth onClick={() => setEditing(false)}>
+            <Button fullWidth onClick={save}>
               Salvesta
             </Button>
           </>
         ) : (
-          <Button visualType="neutral" fullWidth iconLeft="edit" onClick={() => setEditing(true)}>
+          <Button visualType="neutral" fullWidth iconLeft="edit" onClick={startEditing}>
             Muuda
           </Button>
         )
