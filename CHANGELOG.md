@@ -1,3 +1,10 @@
+# [19.1.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.17...react-19.1.0-rc.18) (2026-09-22)
+
+
+### Features
+
+* **search:** add autocomplete subcomponent, a11y improvements, docs [#830](https://github.com/TEDI-Design-System/react/issues/830) ([#836](https://github.com/TEDI-Design-System/react/issues/836)) ([cc09d31](https://github.com/TEDI-Design-System/react/commit/cc09d31dc187f0902e8420c100468e3aa5208eba))
+
 # [19.1.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.16...react-19.1.0-rc.17) (2026-09-21)
 
 
