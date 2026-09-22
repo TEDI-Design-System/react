@@ -72,9 +72,9 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
   const { onOpenChange, labelId, setHasTitle, collapsed, onCollapsedChange } = useSheetContext();
 
   useEffect(() => {
-    setHasTitle(Boolean(title));
+    setHasTitle(Boolean(title) && (children === undefined || children === null));
     return () => setHasTitle(false);
-  }, [title, setHasTitle]);
+  }, [title, children, setHasTitle]);
 
   return (
     <div

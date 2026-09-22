@@ -89,6 +89,24 @@ describe('Sheet', () => {
     expect(dialog).not.toHaveAttribute('aria-labelledby');
   });
 
+  it('keeps the Content aria-label when the header has both a title and custom children', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content aria-label="Custom labelled sheet">
+          <Sheet.Header title="Ignored title">
+            <span>Fully custom header</span>
+          </Sheet.Header>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(dialog).toHaveAttribute('aria-label', 'Custom labelled sheet');
+    expect(dialog).not.toHaveAttribute('aria-labelledby');
+  });
+
   it('falls back to aria-label when no header title is set', () => {
     render(
       <Sheet defaultOpen>
