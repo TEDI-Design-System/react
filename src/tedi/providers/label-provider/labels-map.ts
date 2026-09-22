@@ -620,6 +620,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'Edit',
     ru: 'Изменить',
   },
+  'search.loading': {
+    description: 'Loading row shown in the Search suggestions listbox while suggestions are being fetched',
+    components: ['Search'],
+    et: 'Otsin...',
+    en: 'Searching...',
+    ru: 'Поиск...',
+  },
+  'search.no-results': {
+    description: 'Text shown in the Search suggestions listbox when no suggestions match the query',
+    components: ['Search'],
+    et: 'Tulemusi ei leitud',
+    en: 'No results found',
+    ru: 'Результаты не найдены',
+  },
+  'search.results-count': {
+    description: 'Politely announced live-region text stating how many Search suggestions are available',
+    components: ['Search'],
+    et: (count: number) => `${count} ${count === 1 ? 'vaste' : 'vastet'}`,
+    en: (count: number) => `${count} ${count === 1 ? 'result' : 'results'}`,
+    ru: (count: number) => `Совпадений: ${count}`,
+  },
   'table.no-data': {
     description: 'Default placeholder shown in the Table body when `data` is empty.',
     components: ['Table'],
@@ -1040,7 +1061,7 @@ export const labelsMap = validateDefaultLabels({
     components: ['Table', 'Pagination'],
     et: (count?: number) => `${count ?? 0} ${count === 1 ? 'tulemus' : 'tulemust'}`,
     en: (count?: number) => `${count ?? 0} ${count === 1 ? 'result' : 'results'}`,
-    ru: (count?: number) => `${count ?? 0} ${count === 1 ? 'результат' : 'результа'}`,
+    ru: (count?: number) => `Результатов: ${count ?? 0}`,
   },
   'pagination.page-size': {
     description: 'Label of page size select',

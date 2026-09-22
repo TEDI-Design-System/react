@@ -1,3 +1,24 @@
+# [19.1.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.17...react-19.1.0-rc.18) (2026-09-22)
+
+
+### Features
+
+* **search:** add autocomplete subcomponent, a11y improvements, docs [#830](https://github.com/TEDI-Design-System/react/issues/830) ([#836](https://github.com/TEDI-Design-System/react/issues/836)) ([cc09d31](https://github.com/TEDI-Design-System/react/commit/cc09d31dc187f0902e8420c100468e3aa5208eba))
+
+# [19.1.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.16...react-19.1.0-rc.17) (2026-09-21)
+
+
+### Bug Fixes
+
+* **sidenav:** overlay content instead of push [#869](https://github.com/TEDI-Design-System/react/issues/869) ([#871](https://github.com/TEDI-Design-System/react/issues/871)) ([2f90b7a](https://github.com/TEDI-Design-System/react/commit/2f90b7a986312b55cf3b57cec24c67d460401761))
+
+# [19.1.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.15...react-19.1.0-rc.16) (2026-09-18)
+
+
+### Features
+
+* **dock-panel:** Add DockPanel Component [#198](https://github.com/TEDI-Design-System/react/issues/198) ([#895](https://github.com/TEDI-Design-System/react/issues/895)) ([cd8b3d7](https://github.com/TEDI-Design-System/react/commit/cd8b3d73aeaa90e0c07bff41532d6c5fe603e992))
+
 # [19.1.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.14...react-19.1.0-rc.15) (2026-09-17)
 
 
