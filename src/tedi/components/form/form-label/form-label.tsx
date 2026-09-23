@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { forwardRef } from 'react';
 
-import { Label } from '../../content/label/label';
+import { Label, LabelProps } from '../../content/label/label';
 import styles from './form-label.module.scss';
 
 export interface FormLabelProps {
@@ -45,10 +45,19 @@ export interface FormLabelProps {
    * If provided, an info button with a tooltip will be rendered.
    */
   tooltip?: React.ReactNode;
+  /**
+   * Additional props forwarded to the underlying `Label` component.
+   * Use `modifiers` to control how the label text wraps or breaks
+   * (e.g. `{ modifiers: 'nowrap' }`) so long labels don't distort the form layout.
+   */
+  labelProps?: Pick<LabelProps, 'modifiers'>;
 }
 
 export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
-  ({ label, hideLabel, required, id, renderWithoutLabel, size = 'default', className, tooltip, ...rest }, ref) => {
+  (
+    { label, hideLabel, required, id, renderWithoutLabel, size = 'default', className, tooltip, labelProps, ...rest },
+    ref
+  ) => {
     const FormLabelBEM = cn(
       styles['tedi-form-label'],
       styles[`tedi-form-label--${size}`],
@@ -67,6 +76,7 @@ export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
         required={required}
         isSmall={size === 'small'}
         tooltip={tooltip}
+        {...labelProps}
         {...rest}
       >
         {label}

@@ -481,6 +481,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       showRadioButtons = false,
       renderWithoutLabel,
       tooltip,
+      labelProps,
       classNames,
     } = props;
     const inputGroup = useOptionalInputGroup?.();
@@ -842,6 +843,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
               size={size}
               renderWithoutLabel={renderWithoutLabel}
               tooltip={tooltip}
+              labelProps={labelProps}
             />
           )}
           {renderReactSelect()}

@@ -74,3 +74,34 @@ const StructureTemplate: StoryFn = () => {
 export const Structure = {
   render: StructureTemplate,
 };
+
+/**
+ * By default a long label wraps onto multiple lines when the available width is
+ * constrained, which can distort form layouts. Use `labelProps.modifiers` to control
+ * the wrapping/breaking behavior — e.g. `'nowrap'` to keep it on a single line, or
+ * `'break-word'` / `'break-all'` to control where it breaks.
+ */
+const WrappingTemplate: StoryFn = () => {
+  const longLabel = 'This is an unusually long input label that would normally break across several lines';
+
+  return (
+    <Row cols={1} gap={5}>
+      <Col style={{ maxWidth: 220, border: '1px dashed var(--general-border-primary)', padding: 8 }}>
+        <b>Default (wraps)</b>
+        <FormLabel id="wrap-default" label={longLabel} />
+      </Col>
+      <Col style={{ maxWidth: 220, border: '1px dashed var(--general-border-primary)', padding: 8 }}>
+        <b>modifiers: &apos;nowrap&apos;</b>
+        <FormLabel id="wrap-nowrap" label={longLabel} labelProps={{ modifiers: 'nowrap' }} />
+      </Col>
+      <Col style={{ maxWidth: 220, border: '1px dashed var(--general-border-primary)', padding: 8 }}>
+        <b>modifiers: &apos;break-all&apos;</b>
+        <FormLabel id="wrap-break-all" label={longLabel} labelProps={{ modifiers: 'break-all' }} />
+      </Col>
+    </Row>
+  );
+};
+
+export const LabelWrapping = {
+  render: WrappingTemplate,
+};
