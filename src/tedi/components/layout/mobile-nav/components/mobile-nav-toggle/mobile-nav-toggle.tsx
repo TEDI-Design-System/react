@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { useLabels } from '../../../../../../tedi/providers/label-provider';
+import { warnDeprecated } from '../../../../../helpers/warn-deprecated/warn-deprecated';
 import { UnknownType } from '../../../../../types/commonTypes';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
@@ -128,7 +129,10 @@ export const MobileNavToggle = ({
 };
 
 /** @deprecated Use `MobileNavToggle` — same component, vendor-neutral name. */
-export const SidenavToggle = MobileNavToggle;
+export const SidenavToggle = (props: MobileNavToggleProps) => {
+  warnDeprecated('SidenavToggle', 'Use `MobileNavToggle` (same component, vendor-neutral name).');
+  return <MobileNavToggle {...props} />;
+};
 /** @deprecated Use `MobileNavToggleProps`. */
 export type SidenavToggleProps = MobileNavToggleProps;
 /** @deprecated Use `MobileNavToggleVariant`. */

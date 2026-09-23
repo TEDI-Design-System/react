@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 
 import { FloatingButton } from '../../../../tedi';
+import { warnDeprecated } from '../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import styles from './carousel.module.scss';
 
 /**
@@ -32,6 +33,7 @@ export interface CarouselProps {
  * bounded, edge-arrow pattern (plus keyboard and screen-reader support).
  */
 export const Carousel = (props: CarouselProps): JSX.Element => {
+  warnDeprecated('Community Carousel', 'Use `Carousel` from `@tedi-design-system/react/tedi` instead.');
   const { itemCountShown, children, className } = props;
   const [scrollIndex, setScrollIndex] = useState(0);
   const items = React.Children.toArray(children);

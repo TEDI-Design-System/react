@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import Print, { PrintProps } from '../../../../tedi/components/misc/print/print';
+import { warnDeprecated } from '../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { usePrint } from '../../../../tedi/providers/printing-provider';
 import { TabsContext } from '../tabs-context';
 import TabsItem, { TabsItemProps } from '../tabs-item/tabs-item';
@@ -49,6 +50,7 @@ export interface TabsProps {
  * @deprecated Use Tabs from `@tedi-design-system/react/tedi` instead.
  */
 export const Tabs = (props: TabsProps): JSX.Element => {
+  warnDeprecated('Community Tabs', 'Use Tabs from `@tedi-design-system/react/tedi` instead.');
   const isPrinting = usePrint();
   const { defaultCurrentTab, onTabChange, className, children, hideNavOnPrint = 'show' } = props;
   const [innerCurrentTab, setInnerCurrentTab] = React.useState(defaultCurrentTab || '');
