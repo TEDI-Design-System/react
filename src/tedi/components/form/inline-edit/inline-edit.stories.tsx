@@ -8,6 +8,7 @@ import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Tag } from '../../tags/tag/tag';
+import { FeedbackTextProps } from '../feedback-text/feedback-text';
 import { ISelectOption, Select } from '../select/select';
 import { TextField } from '../textfield/textfield';
 import { InlineEdit } from './inline-edit';
@@ -75,11 +76,13 @@ const NameInline = (props: {
   id: string;
   label?: string;
   defaultValue?: string;
-  disabled?: boolean;
+  readOnly?: boolean;
   placeholder?: string;
   size?: 'default' | 'small';
   editIconAlign?: 'following' | 'aligned';
   fullWidth?: boolean;
+  invalid?: boolean;
+  helper?: FeedbackTextProps | FeedbackTextProps[];
 }): JSX.Element => {
   const { id, label = 'Nimi', defaultValue = 'Mari Maasikas', placeholder, ...rest } = props;
   return (
@@ -131,9 +134,11 @@ const AlignExample = ({ align, idPrefix }: { align: 'following' | 'aligned'; idP
 
 const CountryInline = (props: {
   id: string;
-  disabled?: boolean;
+  readOnly?: boolean;
   size?: 'default' | 'small';
   fullWidth?: boolean;
+  invalid?: boolean;
+  helper?: FeedbackTextProps | FeedbackTextProps[];
 }): JSX.Element => {
   const { id, ...rest } = props;
   return (
@@ -144,12 +149,12 @@ const CountryInline = (props: {
       renderValue={(v) => (v ? (v.label as string) : '—')}
       {...rest}
     >
-      {({ value, onChange, commit, size: editorSize }) => (
+      {({ value, onChange, commit }) => (
         <Select
           id={`${id}-input`}
           label="Riik"
           hideLabel
-          size={editorSize === 'small' ? 'small' : undefined}
+          size="small"
           options={countryOptions}
           value={value}
           onChange={(next) => {
@@ -203,9 +208,9 @@ const meta: Meta<typeof InlineEdit> = {
       description: 'Whether the edit icon follows the value or aligns to the trailing edge.',
       table: { type: { summary: 'following | aligned' }, defaultValue: { summary: 'following' } },
     },
-    disabled: {
+    readOnly: {
       control: 'boolean',
-      description: 'Renders the value as static text with no edit affordance.',
+      description: 'Renders the value as static text (a text group) with no edit affordance.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     fullWidth: {
@@ -268,7 +273,7 @@ export const Default: Story = {
     placeholder: '—',
     size: 'default',
     editIconAlign: 'following',
-    disabled: false,
+    readOnly: false,
     fullWidth: false,
     hideEditIcon: false,
   },
@@ -280,7 +285,7 @@ export const Default: Story = {
         placeholder={args.placeholder}
         size={args.size}
         editIconAlign={args.editIconAlign}
-        disabled={args.disabled}
+        readOnly={args.readOnly}
         fullWidth={args.fullWidth}
         hideEditIcon={args.hideEditIcon}
         value={value}
@@ -313,7 +318,7 @@ export const Mobile: Story = {
     fullWidth: true,
     size: 'default',
     editIconAlign: 'aligned',
-    disabled: false,
+    readOnly: false,
     hideEditIcon: false,
   },
   parameters: {
@@ -327,7 +332,7 @@ export const Mobile: Story = {
         placeholder={args.placeholder}
         size={args.size}
         editIconAlign={args.editIconAlign}
-        disabled={args.disabled}
+        readOnly={args.readOnly}
         fullWidth={args.fullWidth}
         hideEditIcon={args.hideEditIcon}
         value={name}
@@ -400,6 +405,7 @@ export const SelectType: Story = {
               {({ value, onChange, commit }) => (
                 <Select
                   id="type-select"
+                  size="small"
                   label="Tüüp"
                   hideLabel
                   options={typeOptions}
@@ -436,6 +442,7 @@ export const SelectType: Story = {
               {({ value, onChange }) => (
                 <Select
                   id="keywords-select"
+                  size="small"
                   label="Märksõnad"
                   hideLabel
                   multiple
@@ -458,6 +465,7 @@ export const SelectType: Story = {
               {({ value, onChange, commit }) => (
                 <Select
                   id="olek-select"
+                  size="small"
                   label="Olek"
                   hideLabel
                   options={olekOptions}
@@ -483,6 +491,7 @@ export const SelectType: Story = {
               {({ value, onChange, commit }) => (
                 <Select
                   id="address-select"
+                  size="small"
                   label="Aadress"
                   hideLabel
                   options={addressOptions}
@@ -507,13 +516,13 @@ export const ReadOnly: Story = {
     <div style={{ maxWidth: '22rem' }}>
       <VerticalSpacing size={0.5}>
         <FieldRow label="Kuupäev">
-          <NameInline id="ro-date" label="Kuupäev" defaultValue="22.03.2026" disabled />
+          <NameInline id="ro-date" label="Kuupäev" defaultValue="22.03.2026" readOnly />
         </FieldRow>
         <FieldRow label="Kellaaeg">
-          <NameInline id="ro-time" label="Kellaaeg" defaultValue="08:00" disabled />
+          <NameInline id="ro-time" label="Kellaaeg" defaultValue="08:00" readOnly />
         </FieldRow>
         <FieldRow label="Kohtade arv">
-          <NameInline id="ro-seats" label="Kohtade arv" defaultValue="2" disabled />
+          <NameInline id="ro-seats" label="Kohtade arv" defaultValue="2" readOnly />
         </FieldRow>
       </VerticalSpacing>
     </div>
@@ -624,6 +633,28 @@ export const States: Story = {
           <CountryInline id="ie-state-focus-select" fullWidth />
         </Col>
       </Row>
+      <Row>
+        <Col width={2}>
+          <Text modifiers="bold">Invalid</Text>
+        </Col>
+        <Col>
+          <NameInline id="ie-state-invalid-text" fullWidth helper={{ text: 'Nimi on kohustuslik', type: 'error' }} />
+        </Col>
+        <Col>
+          <CountryInline id="ie-state-invalid-select" fullWidth helper={{ text: 'Vali riik', type: 'error' }} />
+        </Col>
+      </Row>
+      <Row>
+        <Col width={2}>
+          <Text modifiers="bold">Read-only</Text>
+        </Col>
+        <Col>
+          <NameInline id="ie-state-readonly-text" fullWidth readOnly />
+        </Col>
+        <Col>
+          <CountryInline id="ie-state-readonly-select" fullWidth readOnly />
+        </Col>
+      </Row>
     </VerticalSpacing>
   ),
 };
@@ -688,6 +719,7 @@ export const Example: Story = {
                     {({ value, onChange, commit }) => (
                       <Select
                         id="ctx-status"
+                        size="small"
                         label="Olek"
                         hideLabel
                         options={statusOptions}
@@ -725,6 +757,50 @@ export const CancelEdit: Story = {
             <InlineEdit<string> label="Nimi" value={name} onChange={setName} fullWidth renderValue={(v) => v || '—'}>
               {({ value, onChange, size }) => (
                 <TextField id="cancel-name" label="Nimi" hideLabel value={value} onChange={onChange} size={size} />
+              )}
+            </InlineEdit>
+          </FieldRow>
+        </VerticalSpacing>
+      </div>
+    );
+  },
+};
+
+/**
+ * With no value yet, the read view shows the `placeholder` (dimmed) instead of the empty-value
+ * fallback (`—`). Clicking still opens the editor. Set `placeholder` for "add a value" affordances.
+ */
+export const Placeholder: Story = {
+  render: function PlaceholderFields() {
+    const [address, setAddress] = useState<ISelectOption | null>(null);
+    return (
+      <div style={{ maxWidth: '22rem' }}>
+        <VerticalSpacing size={0.5}>
+          <FieldRow label="Nimi">
+            <NameInline id="ph-name" label="Nimi" defaultValue="" fullWidth placeholder="Sisesta nimi" />
+          </FieldRow>
+          <FieldRow label="Aadress">
+            <InlineEdit<ISelectOption | null>
+              label="Aadress"
+              value={address}
+              onChange={setAddress}
+              fullWidth
+              placeholder="Sisesta aadress"
+              renderValue={(v) => (v ? (v.label as string) : '')}
+            >
+              {({ value, onChange, commit }) => (
+                <Select
+                  id="ph-address"
+                  size="small"
+                  label="Aadress"
+                  hideLabel
+                  options={addressOptions}
+                  value={value}
+                  onChange={(next) => {
+                    onChange(next as ISelectOption | null);
+                    commit();
+                  }}
+                />
               )}
             </InlineEdit>
           </FieldRow>

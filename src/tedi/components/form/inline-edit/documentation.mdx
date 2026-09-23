@@ -194,6 +194,18 @@ Forward `size` to the control so a small field opens a small editor:
 }
 ```
 
+The read view is a compact 32px field. `TextField` (and controls built on it) is sized to match
+automatically. For a **`Select`** editor, render it at `size="small"` (its 32px variant) so it
+doesn't jump to the taller default height when editing starts:
+
+```tsx
+{
+  ({ value, onChange, commit }) => (
+    <Select id="riik" label="Riik" hideLabel size="small" options={options} value={value} onChange={/* … */} />
+  );
+}
+```
+
 ---
 
 ## `useInlineEdit` hook

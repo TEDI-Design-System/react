@@ -185,9 +185,9 @@ describe('InlineEdit', () => {
     expect(screen.getByRole('button', { name: /name/i }).querySelector('[class*="icon"]')).not.toBeInTheDocument();
   });
 
-  it('renders static text (no button) when disabled', () => {
+  it('renders static text (no button) when readOnly', () => {
     render(
-      <InlineEdit<string> label="Name" value="Locked" disabled>
+      <InlineEdit<string> label="Name" value="Locked" readOnly>
         {({ value, onChange }) => <TextField id="d" label="Name" hideLabel value={value} onChange={onChange} />}
       </InlineEdit>
     );
@@ -240,5 +240,36 @@ describe('InlineEdit', () => {
     expect(trigger).not.toHaveClass('tedi-inline-edit--small');
     expect(trigger).not.toHaveClass('tedi-inline-edit--icon-aligned');
     expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
+  });
+
+  describe('invalid / helper', () => {
+    it('marks the read trigger invalid via the invalid prop', () => {
+      render(<TextEditor invalid />);
+      expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--invalid');
+    });
+
+    it('renders helper feedback and links it to the trigger via aria-describedby', () => {
+      render(<TextEditor helper={{ text: 'Feedback text', type: 'error' }} />);
+
+      const trigger = screen.getByRole('button', { name: /name/i });
+      const describedBy = trigger.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
+      expect(document.getElementById(describedBy as string)).toHaveTextContent('Feedback text');
+    });
+
+    it('derives the invalid state from a helper item with type "error"', () => {
+      render(<TextEditor helper={{ text: 'Required', type: 'error' }} />);
+      expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--invalid');
+    });
+
+    it('does not mark the trigger invalid for a non-error helper', () => {
+      render(<TextEditor helper={{ text: 'Looks good', type: 'valid' }} />);
+      expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--invalid');
+    });
+
+    it('has no aria-describedby when there is no helper', () => {
+      render(<TextEditor />);
+      expect(screen.getByRole('button', { name: /name/i })).not.toHaveAttribute('aria-describedby');
+    });
   });
 });

@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
+import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text';
 import styles from './inline-edit.module.scss';
 
 export interface UseInlineEditOptions<T> {
@@ -84,8 +85,20 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   renderValue?: (value: T) => React.ReactNode;
   /** Shown in the read view when the value is empty. @default '—' */
   placeholder?: React.ReactNode;
-  /** Renders the value as static text with no edit affordance. */
-  disabled?: boolean;
+  /** Renders the value as static text (a text group) with no edit affordance. */
+  readOnly?: boolean;
+  /**
+   * Marks the row as invalid — the read trigger gets an error border and
+   * `aria-invalid`. `helper` items with `type: 'error'` set this automatically.
+   * @default false
+   */
+  invalid?: boolean;
+  /**
+   * Feedback text rendered below the field — a single `FeedbackTextProps` or an
+   * array. An `error` item also drives the invalid state (red border), a `valid`
+   * item the success state. Wired to the read trigger via `aria-describedby`.
+   */
+  helper?: FeedbackTextProps | FeedbackTextProps[];
   /**
    * Stretches the field (read trigger and editor) to the full width of its
    * container, so controls like `Select`, `Slider` or `TextField` fill the row
@@ -137,7 +150,9 @@ export function InlineEdit<T>({
   label,
   renderValue,
   placeholder = '—',
-  disabled = false,
+  readOnly = false,
+  invalid = false,
+  helper,
   fullWidth = false,
   hideEditIcon = false,
   size = 'default',
@@ -155,6 +170,42 @@ export function InlineEdit<T>({
   const fullWidthClass = fullWidth ? styles['tedi-inline-edit--full-width'] : undefined;
   const smallClass = size === 'small' ? styles['tedi-inline-edit--small'] : undefined;
 
+  const hasHelper = Array.isArray(helper) ? helper.length > 0 : Boolean(helper);
+  const isInvalid = React.useMemo(() => {
+    if (Array.isArray(helper)) return invalid || helper.some((item) => item.type === 'error');
+    return invalid || helper?.type === 'error';
+  }, [invalid, helper]);
+
+  const helperBaseId = `${fieldId}-helper`;
+  const describedBy = !hasHelper
+    ? undefined
+    : Array.isArray(helper)
+    ? helper.map((_, index) => `${helperBaseId}-${index}`).join(' ')
+    : helperBaseId;
+
+  const renderFeedback = (): React.ReactNode => {
+    if (!hasHelper) return null;
+    return (
+      <div className={styles['tedi-inline-edit__feedback']}>
+        {Array.isArray(helper) ? (
+          helper.map((item, index) => <FeedbackText key={index} {...item} id={`${helperBaseId}-${index}`} />)
+        ) : (
+          <FeedbackText {...(helper as FeedbackTextProps)} id={helperBaseId} />
+        )}
+      </div>
+    );
+  };
+
+  const withFeedback = (control: React.ReactNode): JSX.Element => {
+    if (!hasHelper) return <>{control}</>;
+    return (
+      <div className={cn(styles['tedi-inline-edit__field'], fullWidthClass)}>
+        {control}
+        {renderFeedback()}
+      </div>
+    );
+  };
+
   React.useEffect(() => {
     if (!isEditing) return;
     const editor = editorRef.current;
@@ -167,7 +218,7 @@ export function InlineEdit<T>({
   }, [isEditing]);
 
   if (isEditing) {
-    return (
+    return withFeedback(
       <div
         ref={editorRef}
         className={cn(
@@ -201,12 +252,12 @@ export function InlineEdit<T>({
   const display = renderValue ? renderValue(committedValue) : (committedValue as React.ReactNode);
   const empty = renderValue ? isEmpty(display) : isEmpty(committedValue);
 
-  if (disabled) {
-    return (
+  if (readOnly) {
+    return withFeedback(
       <span
         className={cn(
           styles['tedi-inline-edit'],
-          styles['tedi-inline-edit--disabled'],
+          styles['tedi-inline-edit--readonly'],
           fullWidthClass,
           smallClass,
           className
@@ -219,17 +270,19 @@ export function InlineEdit<T>({
     );
   }
 
-  return (
+  return withFeedback(
     <button
       type="button"
       id={fieldId}
       onClick={edit}
+      aria-describedby={describedBy}
       className={cn(
         styles['tedi-inline-edit'],
         styles['tedi-inline-edit__trigger'],
         fullWidthClass,
         smallClass,
         { [styles['tedi-inline-edit--icon-aligned']]: editIconAlign === 'aligned' },
+        { [styles['tedi-inline-edit--invalid']]: isInvalid },
         className
       )}
     >
