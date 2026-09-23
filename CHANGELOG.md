@@ -1,3 +1,10 @@
+# [19.1.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.18...react-19.1.0-rc.19) (2026-09-23)
+
+
+### Features
+
+* **category-search:** Add CategorySearch Component [#901](https://github.com/TEDI-Design-System/react/issues/901) ([#911](https://github.com/TEDI-Design-System/react/issues/911)) ([2ae6646](https://github.com/TEDI-Design-System/react/commit/2ae6646fa52c5f320de597a3a319086830c465c0))
+
 # [19.1.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.17...react-19.1.0-rc.18) (2026-09-22)
 
 
