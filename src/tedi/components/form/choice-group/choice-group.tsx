@@ -172,7 +172,7 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
         name={name}
         aria-describedby={helper && inputType !== 'radio' ? helperId : undefined}
       >
-        {label && typeof label === 'string' ? (
+        {label && (
           <FormLabel
             id={id}
             label={label}
@@ -181,8 +181,6 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
             renderWithoutLabel={true}
             labelProps={labelProps}
           />
-        ) : (
-          <label htmlFor={id}>{label}</label>
         )}
         <Row>
           <Col>
