@@ -2,6 +2,7 @@ import { FloatingOverlay } from '@floating-ui/react';
 import classNames from 'classnames';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { warnDeprecated } from '../../../helpers/warn-deprecated/warn-deprecated';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
@@ -302,6 +303,9 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
  * @deprecated Use `MobileNav` (same component, vendor-neutral name). Kept for
  * backward compatibility with the `SideNav.Mobile` sub-component alias.
  */
-export const SideNavMobile = MobileNav;
+export const SideNavMobile = <C extends React.ElementType = 'a'>(props: MobileNavProps<C>) => {
+  warnDeprecated('SideNavMobile', 'Use `MobileNav` (same component, vendor-neutral name).');
+  return <MobileNav<C> {...props} />;
+};
 /** @deprecated Use `MobileNavProps`. */
 export type SideNavMobileProps<C extends React.ElementType = 'a'> = MobileNavProps<C>;
