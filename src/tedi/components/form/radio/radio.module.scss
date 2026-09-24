@@ -64,10 +64,19 @@
     &--invalid {
       border-color: var(--form-general-feedback-error-border);
 
-      .tedi-radio__input:hover:not(:disabled) + &,
-      .tedi-radio__input:not(:disabled) + &:hover,
-      .tedi-radio__input:focus:not(:disabled) + & {
-        outline: 1px solid var(--form-general-feedback-error-border);
+      .tedi-radio__input:not(:disabled, :checked) + & {
+        background-color: var(--form-checkbox-radio-default-background-error);
+      }
+
+      .tedi-radio__input:hover:not(:disabled, :checked) + &,
+      .tedi-radio__input:not(:disabled, :checked) + &:hover,
+      .tedi-radio__input:focus:not(:disabled, :checked) + & {
+        outline: var(--tedi-borders-01) solid var(--form-general-feedback-error-border);
+        border-color: var(--form-general-feedback-error-border);
+      }
+
+      .tedi-radio__input:focus-visible:not(:disabled, :checked) + & {
+        outline: var(--form-general-feedback-error-border) solid var(--tedi-borders-02);
         border-color: var(--form-general-feedback-error-border);
       }
     }
@@ -85,9 +94,6 @@
       outline: 1px solid var(--form-checkbox-radio-default-border-hover);
       border: 1px solid var(--form-checkbox-radio-default-border-hover);
     }
-
-    // Unlike the checkbox (a fillable square), the radio keeps its circle background on press and
-    // only shifts the border — otherwise the fill would hide the selected dot.
     .tedi-radio__input:not(:disabled) + &:active:not(#{&}--invalid) {
       border-color: var(--form-checkbox-radio-default-border-active);
     }
