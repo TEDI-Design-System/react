@@ -555,6 +555,27 @@ export const labelsMap = validateDefaultLabels({
     en: 'Close modal',
     ru: 'Закрыть модальное окно',
   },
+  'sheet.close': {
+    description: 'Label for the Sheet close button',
+    components: ['Sheet'],
+    et: 'Sulge',
+    en: 'Close',
+    ru: 'Закрыть',
+  },
+  'sheet.collapse': {
+    description: 'Label for the Sheet collapse toggle when the sheet is expanded',
+    components: ['Sheet'],
+    et: 'Ahenda',
+    en: 'Collapse',
+    ru: 'Свернуть',
+  },
+  'sheet.expand': {
+    description: 'Label for the Sheet collapse toggle when the sheet is collapsed',
+    components: ['Sheet'],
+    et: 'Laienda',
+    en: 'Expand',
+    ru: 'Развернуть',
+  },
   'dateField.disabledDateError': {
     description:
       'Inline error shown when the user types a date that fails the disable matchers (`disablePast`, `disableFuture`, `minDate`, `maxDate`, `disabledMatchers`).',

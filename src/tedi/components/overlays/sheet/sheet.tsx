@@ -1,120 +1,137 @@
-import cn from 'classnames';
-import { ReactNode, useId } from 'react';
+import { useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
+import { ReactNode, useCallback, useEffect, useId, useMemo, useState } from 'react';
 
-import { Text } from '../../base/typography/text/text';
-import { ClosingButton } from '../../buttons/closing-button/closing-button';
-import { Modal } from '../modal/modal';
-import styles from './sheet.module.scss';
+import { SheetBody } from './components/sheet-body/sheet-body';
+import { SheetCloser } from './components/sheet-closer/sheet-closer';
+import { SheetContent } from './components/sheet-content/sheet-content';
+import { SheetFooter } from './components/sheet-footer/sheet-footer';
+import { SheetHeader } from './components/sheet-header/sheet-header';
+import { SheetTrigger } from './components/sheet-trigger/sheet-trigger';
+import { SheetContext, SheetContextValue } from './sheet-context';
 
-interface SheetBaseProps {
-  /** Controlled open state. Pair with `onToggle`; omit for uncontrolled use with `defaultOpen`. */
-  open?: boolean;
-  /** Called when the sheet opens or closes. */
-  onToggle?: (open: boolean) => void;
+export type SheetRole = 'dialog' | 'alertdialog';
+
+export interface SheetProps {
   /**
-   * Initial open state in uncontrolled mode. Ignored when `open` is provided.
+   * `Sheet.Trigger`, `Sheet.Content` and any other content.
+   */
+  children: ReactNode;
+  /**
+   * Initial open state for uncontrolled usage.
    * @default false
    */
   defaultOpen?: boolean;
   /**
-   * Whether the close button is shown next to the `title`. Only applies to the
-   * `title` layout — a custom `header` owns its own controls.
+   * Controlled open state. Provide together with `onToggle`.
+   */
+  open?: boolean;
+  /**
+   * Called whenever the sheet requests to open or close (trigger click, backdrop,
+   * Escape, close button). Required to react to changes in controlled mode.
+   */
+  onToggle?: (open: boolean) => void;
+  /**
+   * Close the sheet when the backdrop is clicked.
    * @default true
    */
-  closeButton?: boolean;
-  /** Extra class name applied to the sheet container. */
-  className?: string;
-  /** Sheet body content. */
-  children: ReactNode;
+  closeOnBackdropClick?: boolean;
+  /**
+   * Close the sheet when Escape is pressed.
+   * @default true
+   */
+  closeOnEscape?: boolean;
+  /**
+   * ARIA role of the sheet dialog. Use `alertdialog` for interruptive confirmations.
+   * @default dialog
+   */
+  role?: SheetRole;
 }
 
-/**
- * The dialog must always have an accessible name (WCAG 4.1.2). A plain `title` names it via
- * `aria-labelledby`; when no title is rendered (a custom `header`, or no title at all) an explicit
- * `ariaLabel` is required — the type enforces one of these.
- */
-export type SheetProps = SheetBaseProps &
-  (
-    | {
-        /**
-         * Plain header title, rendered as the sheet's bold heading (with a close button per
-         * `closeButton`) and wired to the dialog's `aria-labelledby`.
-         */
-        title: ReactNode;
-        header?: never;
-        /** Optional — the rendered `title` already names the dialog. */
-        ariaLabel?: string;
-      }
-    | {
-        /**
-         * Accessible name for the dialog. Required here because no plain `title` is rendered
-         * (a custom `header`, or no title).
-         */
-        ariaLabel: string;
-        /** Plain header title. Ignored when `header` is set. */
-        title?: ReactNode;
-        /**
-         * Full header override (custom controls, layout, …), rendered as `Modal.Header` children —
-         * replaces the default title/close-button layout, so the consumer owns any close control.
-         * Takes precedence over `title`.
-         */
-        header?: ReactNode;
-      }
+export const Sheet = (props: SheetProps): JSX.Element => {
+  const {
+    children,
+    defaultOpen = false,
+    open: controlledOpen,
+    onToggle,
+    closeOnBackdropClick = true,
+    closeOnEscape = true,
+    role = 'dialog',
+  } = props;
+
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const isControlled = typeof controlledOpen !== 'undefined';
+  const isOpen = isControlled ? controlledOpen : internalOpen;
+
+  const [collapsed, setCollapsed] = useState(false);
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!isControlled) setInternalOpen(next);
+      onToggle?.(next);
+    },
+    [isControlled, onToggle]
   );
 
-/**
- * ⚠️ Internal, temporary component — **not exported publicly**.
- *
- * A bottom-sheet overlay built on `Modal` (`position="bottom"` +
- * `fullscreen="edge"`), so the sheet sits flush to the screen edges with no
- * outer margin. It centralises that configuration for the mobile variants that
- * need a sheet (e.g. `TableOfContents.Collapsible`, `CardStepper`) until a real
- * `Sheet` component exists — at which point these usages migrate to it.
- */
-export const Sheet = ({
-  open,
-  onToggle,
-  defaultOpen,
-  title,
-  header,
-  closeButton = true,
-  ariaLabel,
-  className,
-  children,
-}: SheetProps): JSX.Element => {
-  const titleId = useId();
+  useEffect(() => {
+    if (!isOpen && collapsed) setCollapsed(false);
+  }, [isOpen, collapsed]);
 
-  return (
-    <Modal open={open} onToggle={onToggle} defaultOpen={defaultOpen}>
-      <Modal.Content
-        position="bottom"
-        fullscreen="edge"
-        aria-label={ariaLabel}
-        aria-labelledby={!header && title !== undefined && title !== null ? titleId : undefined}
-        className={cn(styles['tedi-sheet'], className)}
-      >
-        {header ? (
-          <Modal.Header>{header}</Modal.Header>
-        ) : (
-          <Modal.Header>
-            <div className={styles['tedi-sheet__header']}>
-              <Text id={titleId} modifiers="bold" color="secondary" className={styles['tedi-sheet__title']}>
-                {title}
-              </Text>
-              {closeButton && (
-                <Modal.Closer>
-                  <ClosingButton size="small" />
-                </Modal.Closer>
-              )}
-            </div>
-          </Modal.Header>
-        )}
-        <Modal.Body>{children}</Modal.Body>
-      </Modal.Content>
-    </Modal>
+  const { refs, context } = useFloating({
+    open: isOpen,
+    onOpenChange: handleOpenChange,
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    useClick(context),
+    useRole(context, { role }),
+    useDismiss(context, {
+      enabled: closeOnBackdropClick || closeOnEscape,
+      escapeKey: closeOnEscape,
+      outsidePress: closeOnBackdropClick,
+    }),
+  ]);
+
+  const baseId = useId();
+  const labelId = `${baseId}-label`;
+  const [hasTitle, setHasTitle] = useState(false);
+
+  const value = useMemo<SheetContextValue>(
+    () => ({
+      open: isOpen,
+      onOpenChange: handleOpenChange,
+      reference: refs.setReference,
+      floating: refs.setFloating,
+      getReferenceProps,
+      getFloatingProps,
+      context,
+      labelId: hasTitle ? labelId : '',
+      setHasTitle,
+      collapsed,
+      onCollapsedChange: setCollapsed,
+    }),
+    [
+      isOpen,
+      handleOpenChange,
+      refs.setReference,
+      refs.setFloating,
+      getReferenceProps,
+      getFloatingProps,
+      context,
+      hasTitle,
+      labelId,
+      collapsed,
+    ]
   );
+
+  return <SheetContext.Provider value={value}>{children}</SheetContext.Provider>;
 };
 
-Sheet.displayName = 'Sheet';
+Sheet.Trigger = SheetTrigger;
+Sheet.Content = SheetContent;
+Sheet.Header = SheetHeader;
+Sheet.Body = SheetBody;
+Sheet.Footer = SheetFooter;
+Sheet.Closer = SheetCloser;
 
+Sheet.displayName = 'Sheet';
 export default Sheet;
