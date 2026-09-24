@@ -1,3 +1,10 @@
+## [19.1.2-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.1...react-19.1.2-rc.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* **vertical-stepper:** fix collapse button size [#903](https://github.com/TEDI-Design-System/react/issues/903) ([#909](https://github.com/TEDI-Design-System/react/issues/909)) ([a8bf552](https://github.com/TEDI-Design-System/react/commit/a8bf552e9cb2d657b857bf5e70f355668fec90a2))
+
 ## [19.1.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.0...react-19.1.1) (2026-09-24)
 
 
