@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { forwardRef } from 'react';
 
-import { Label, LabelProps } from '../../content/label/label';
+import { Label, LabelModifierProps } from '../../content/label/label';
 import styles from './form-label.module.scss';
 
 export interface FormLabelProps {
@@ -49,8 +49,10 @@ export interface FormLabelProps {
    * Additional props forwarded to the underlying `Label` component.
    * Use `modifiers` to control how the label text wraps or breaks
    * (e.g. `{ modifiers: 'nowrap' }`) so long labels don't distort the form layout.
+   * Breakpoint keys are supported for responsive wrapping
+   * (e.g. `{ modifiers: 'nowrap', sm: { modifiers: 'break-word' } }`).
    */
-  labelProps?: Pick<LabelProps, 'modifiers'>;
+  labelProps?: LabelModifierProps;
 }
 
 export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(

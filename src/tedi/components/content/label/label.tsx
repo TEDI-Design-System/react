@@ -7,25 +7,21 @@ import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
 import styles from './label.module.scss';
 
 /**
- * Subset of {@link TextModifiers} that is meaningful for a label. Excludes heading
- * levels and size modifiers (Label handles size via `isSmall`), keeping wrapping,
- * alignment and text-transform controls that map to global `text-*` utilities.
+ * Subset of {@link TextModifiers} that is meaningful for a label. `.tedi-label` is
+ * `display: inline`, so text-alignment (`center`/`left`/`right`) and `::first-letter`
+ * (`capitalize-first`) have no effect and are intentionally excluded — only wrapping,
+ * text-transform and italic controls that actually apply to inline text remain.
  */
 export type LabelModifiers = Extract<
   TextModifiers,
-  | 'nowrap'
-  | 'break-all'
-  | 'break-word'
-  | 'break-spaces'
-  | 'center'
-  | 'left'
-  | 'right'
-  | 'italic'
-  | 'uppercase'
-  | 'lowercase'
-  | 'capitalize'
-  | 'capitalize-first'
+  'nowrap' | 'break-all' | 'break-word' | 'break-spaces' | 'italic' | 'uppercase' | 'lowercase' | 'capitalize'
 >;
+
+/**
+ * Breakpoint-aware `modifiers` for a label, so consumers can vary wrapping responsively
+ * (e.g. `{ modifiers: 'nowrap', sm: { modifiers: 'break-word' } }`).
+ */
+export type LabelModifierProps = BreakpointSupport<{ modifiers?: LabelModifiers[] | LabelModifiers }>;
 
 type LabelBreakpointProps = {
   /**
