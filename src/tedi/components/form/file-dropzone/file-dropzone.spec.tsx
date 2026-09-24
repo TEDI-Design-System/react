@@ -64,7 +64,8 @@ describe('FileDropzone', () => {
   it('renders the dropzone with an error message', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
-      uploadErrorHelper: { type: 'error', text: 'Error message' },
+      errorHelper: { type: 'error', text: 'Error message' },
+      restrictionsHint: undefined,
       onFileChange: jest.fn(),
       onFileRemove: jest.fn(),
       handleClear: jest.fn(),
@@ -102,10 +103,11 @@ describe('FileDropzone', () => {
     expect(firstDescribedBy).not.toBe(secondDescribedBy);
   });
 
-  it('applies invalid styling that matches the shown feedback, even with the hook default hint present', () => {
+  it('shows the error and the restrictions hint together, with invalid styling (#888)', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
-      uploadErrorHelper: { type: 'hint', text: 'Max 1 MB' },
+      errorHelper: undefined,
+      restrictionsHint: { type: 'hint', text: 'Max 1 MB' },
       onFileChange: jest.fn(),
       onFileRemove: jest.fn(),
       handleClear: jest.fn(),
@@ -114,7 +116,9 @@ describe('FileDropzone', () => {
 
     render(<FileDropzone id="9" name="file" label="Upload File" helper={{ type: 'error', text: 'Required' }} />);
 
+    // Both lines render: the red error and the gray restrictions hint.
     expect(screen.getByText('Required')).toBeInTheDocument();
+    expect(screen.getByText('Max 1 MB')).toBeInTheDocument();
     expect(screen.getByRole('button')).toHaveClass('tedi-file-dropzone--invalid');
   });
 
@@ -173,6 +177,13 @@ describe('FileDropzone', () => {
     );
 
     expect(onFileChange).not.toHaveBeenCalled();
+  });
+
+  it('forwards showRestrictions to the upload hook and never leaks it to the DOM (#888)', () => {
+    const { container } = render(<FileDropzone id="sr" name="file" label="Upload File" showRestrictions={false} />);
+
+    expect(mockUseFileUpload).toHaveBeenCalledWith(expect.objectContaining({ showRestrictions: false }));
+    expect(container.querySelector('[showrestrictions]')).toBeNull();
   });
 
   it('exposes the dropzone as a button whose description is wired to the helper', () => {

@@ -49,6 +49,71 @@ describe('FileUpload component', () => {
     expect(input.value).toBe('');
   });
 
+  it('accepts wildcard mime types like image/* (#888)', () => {
+    const onChange = jest.fn();
+    render(<FileUpload {...defaultProps} accept="image/*" onChange={onChange} />);
+    const input = screen.getByLabelText(/Upload files/i);
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ name: 'photo.png', isValid: true })]);
+  });
+
+  it('does not add the same file twice (#888)', () => {
+    const onChange = jest.fn();
+    render(<FileUpload {...defaultProps} onChange={onChange} />);
+    const input = screen.getByLabelText(/Upload files/i);
+    const file = new File(['x'], 'dup.png', { type: 'image/png' });
+
+    fireEvent.change(input, { target: { files: [file] } });
+    fireEvent.change(input, { target: { files: [file] } });
+
+    const lastCall = onChange.mock.calls.at(-1)?.[0];
+    expect(lastCall).toHaveLength(1);
+  });
+
+  it('clears the rejection error when the offending file is removed, even if valid files remain (#888)', () => {
+    render(
+      <FileUpload
+        {...defaultProps}
+        validateIndividually
+        maxSize={0.00001}
+        defaultFiles={[{ name: 'ok.jpg', id: 'v1' }]}
+      />
+    );
+    const input = screen.getByLabelText(/Upload files/i);
+    const bigFile = new File(['a'.repeat(2000)], 'big.jpg', { type: 'image/jpeg' });
+    fireEvent.change(input, { target: { files: [bigFile] } });
+
+    expect(screen.getByText(/file-upload.size-rejected/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /remove big.jpg/i }));
+
+    expect(screen.queryByText(/file-upload.size-rejected/i)).not.toBeInTheDocument();
+    expect(screen.getByText('ok.jpg')).toBeInTheDocument();
+  });
+
+  it('announces skipped duplicates to screen readers (#888)', async () => {
+    render(<FileUpload {...defaultProps} />);
+    const input = screen.getByLabelText(/Upload files/i);
+    const file = new File(['x'], 'dup.jpg', { type: 'image/jpeg' });
+
+    fireEvent.change(input, { target: { files: [file] } });
+    fireEvent.change(input, { target: { files: [file] } });
+
+    expect(await screen.findByText(/file-upload.duplicates-skipped/i)).toBeInTheDocument();
+  });
+
+  it('hides the auto restrictions hint when showRestrictions is false (#888)', () => {
+    render(<FileUpload {...defaultProps} showRestrictions={false} />);
+    expect(screen.queryByText(/file-upload.accept/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/file-upload.max-size/i)).not.toBeInTheDocument();
+  });
+
+  it('formats the max-size hint into readable units (#888)', () => {
+    render(<FileUpload {...defaultProps} accept={undefined} maxSize={0.5} />);
+    expect(screen.getByText(/file-upload.max-size 512 KB/i)).toBeInTheDocument();
+  });
+
   it('associates the helper text with the add button as a description', () => {
     render(<FileUpload {...defaultProps} helper={{ text: 'Some hint', id: 'my-helper' }} />);
     const addButton = screen.getByRole('button', { name: /file-upload.add/i });
@@ -143,7 +208,7 @@ describe('FileUpload component', () => {
     const props = { ...defaultProps, accept: '.jpg,.png', maxSize: 5 };
     render(<FileUpload {...props} />);
     expect(screen.getByText(/file-upload.accept .jpg, .png/i)).toBeInTheDocument();
-    expect(screen.getByText(/file-upload.max-size 5MB/i)).toBeInTheDocument();
+    expect(screen.getByText(/file-upload.max-size 5 MB/i)).toBeInTheDocument();
   });
 
   it('should not return helper text when accept and maxSize are not provided', () => {
