@@ -1,7 +1,11 @@
 import cn from 'classnames';
 
+import { warnDeprecated } from '../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import styles from './vertical-stepper.module.scss';
 
+/**
+ * @deprecated Use `VerticalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface VerticalStepperProps {
   /**
    * SubItem or Separator
@@ -15,7 +19,11 @@ export interface VerticalStepperProps {
   isCompact?: boolean;
 }
 
+/**
+ * @deprecated Use `VerticalStepper` from `@tedi-design-system/react/tedi` instead.
+ */
 export const VerticalStepper = (props: VerticalStepperProps): JSX.Element => {
+  warnDeprecated('Community VerticalStepper', 'Use `VerticalStepper` from `@tedi-design-system/react/tedi` instead.');
   const { className, children, isCompact } = props;
 
   const StepperBEM = cn(styles['stepper'], className, { [styles['stepper--compact']]: isCompact });

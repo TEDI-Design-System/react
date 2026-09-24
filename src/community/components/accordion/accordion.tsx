@@ -2,6 +2,7 @@ import cn from 'classnames';
 import React from 'react';
 
 import { VerticalSpacing, VerticalSpacingSize } from '../../../tedi/components/layout/vertical-spacing';
+import { warnDeprecated } from '../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import styles from './accordion.module.scss';
 
 export interface AccordionProps {
@@ -48,6 +49,10 @@ export const AccordionContext = React.createContext<IAccordionContext>({
  * @deprecated Use the TEDI-Ready `Accordion` from `@tedi-design-system/react/tedi` instead.
  */
 export const Accordion = (props: AccordionProps): JSX.Element => {
+  warnDeprecated(
+    'Community Accordion',
+    'Use the TEDI-Ready `Accordion` from `@tedi-design-system/react/tedi` instead.'
+  );
   const { children, className, openItem, gutter = 0.5, onToggleItem, defaultOpenItem = [], ...rest } = props;
   const openValues = openItem ? openItem : defaultOpenItem;
   const [innerOpenItem, setOpen] = React.useState<string[]>(openValues);

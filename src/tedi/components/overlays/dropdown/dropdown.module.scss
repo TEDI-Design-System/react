@@ -19,6 +19,19 @@
     transform: translateY(0) scale(1);
   }
 
+  &__scroll {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+
+    &:focus-visible {
+      outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+      outline-offset: calc(-1 * var(--tedi-borders-02));
+    }
+  }
+
   &--tree {
     .tedi-dropdown__item {
       position: relative;

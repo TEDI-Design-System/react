@@ -21,10 +21,6 @@ const meta: Meta<DateTimeFieldProps> = {
     locale: { control: false },
   },
   parameters: {
-    a11y: {
-      // TODO: [DateTimeField]: fix a11y violations #782
-      test: 'todo',
-    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=7895-221619&m=dev',
@@ -349,6 +345,7 @@ export const RangePredefinedTimeSlots: Story = {
  * (form integration, programmatic updates, etc.).
  */
 export const Controlled: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ControlledTemplate,
   args: {
     id: 'date-time-controlled',

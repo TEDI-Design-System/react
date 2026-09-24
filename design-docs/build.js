@@ -1,7 +1,9 @@
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { basename, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve, basename } from 'node:path';
-import { parseBarrel, extractStatus, mergeManifest } from './manifest.js';
+
+import { extractStatus, mergeManifest, parseBarrel } from './manifest.js';
+import { renderTokenTable, tokenFamilies } from './tokens.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..');
@@ -23,11 +25,7 @@ export function readCoreTokens() {
   return JSON.parse(readFileSync(coreTokens, 'utf8'));
 }
 
-// The table is a deliberately curated subset of the semantic tier: the role
-// tokens an application author writes in their own CSS. The rest of the semantic
-// tier is component-scoped (`button-*`, `card-*`, …) and is consumed by the
-// components themselves, so listing it here would bury the useful rows.
-const ROLE_PREFIXES = ['general-', 'form-'];
+export { renderTokenTable, tokenFamilies };
 
 const manifestPath = resolve(repoRoot, 'component.manifest.json');
 
@@ -36,8 +34,15 @@ export function generateManifest() {
   const fresh = parseBarrel(barrelSrc).map((row) => {
     const dir = resolve(repoRoot, row.sourcePath, '..');
     const base = basename(row.sourcePath);
-    const storyFile = resolve(dir, `${base}.stories.tsx`);
-    const status = existsSync(storyFile) ? extractStatus(readFileSync(storyFile, 'utf8')) : [];
+    // File-style components live at `<dir>/<base>.stories.tsx`; folder-exported
+    // compounds (e.g. input-group, search) keep the story at
+    // `<sourcePath>/<base>.stories.tsx`. Check both so folder compounds still
+    // pick up their status badges.
+    const storyFile = [
+      resolve(dir, `${base}.stories.tsx`),
+      resolve(repoRoot, row.sourcePath, `${base}.stories.tsx`),
+    ].find(existsSync);
+    const status = storyFile ? extractStatus(readFileSync(storyFile, 'utf8')) : [];
     return { ...row, status };
   });
   const existing = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')).components ?? [] : [];
@@ -45,16 +50,6 @@ export function generateManifest() {
 }
 
 const designMdPath = resolve(repoRoot, 'DESIGN.md');
-
-export function renderTokenTable(tokens) {
-  const semantic = tokens.themes?.default?.semantic ?? {};
-  const rows = Object.entries(semantic)
-    .filter(([name]) => ROLE_PREFIXES.some((prefix) => name.startsWith(prefix)))
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([name, token]) => `| \`${name}\` | \`${token.resolved}\` |`)
-    .join('\n');
-  return `| Semantic token | Default value |\n| --- | --- |\n${rows}`;
-}
 
 export function injectTokenTable(md, table) {
   return md.replace(
@@ -70,13 +65,17 @@ function main() {
 
   const tokens = readCoreTokens();
   const table = renderTokenTable(tokens);
-  const rowCount = table.split('\n').length - 2;
+  const families = tokenFamilies(tokens);
+  const rowCount = families.size;
+  const roleCount = [...families.values()].reduce((n, names) => n + names.length, 0);
   const semanticCount = Object.keys(tokens.themes?.default?.semantic ?? {}).length;
 
   if (existsSync(designMdPath)) {
     const md = readFileSync(designMdPath, 'utf8');
     writeFileSync(designMdPath, injectTokenTable(md, table), 'utf8');
-    console.log(`DESIGN.md token table injected (${rowCount} role tokens of ${semanticCount} semantic)`);
+    console.log(
+      `DESIGN.md token families injected (${rowCount} families, ${roleCount} role tokens of ${semanticCount} semantic)`
+    );
   }
 }
 

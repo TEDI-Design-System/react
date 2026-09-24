@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 
 import type { TableState } from './table';
@@ -701,6 +701,78 @@ describe('Table', () => {
       // Anna can expand → her row is exposed as a button; Jüri cannot, so his row stays a plain row.
       expect(screen.getByRole('cell', { name: 'Anna' }).closest('tr')).toHaveAttribute('role', 'button');
       expect(screen.getByRole('cell', { name: 'Jüri' }).closest('tr')).not.toHaveAttribute('role', 'button');
+    });
+
+    it('exposes the row as a disclosure (aria-expanded toggles) with no nested interactive control', () => {
+      render(
+        <Table<NestedPerson>
+          id="t-exp-row-aria"
+          data={nested}
+          columns={columns}
+          getSubRows={(row) => row.subRows}
+          expandTrigger="row"
+        />
+      );
+
+      const annaRow = screen.getByRole('cell', { name: 'Anna' }).closest('tr') as HTMLTableRowElement;
+      expect(annaRow).toHaveAttribute('aria-expanded', 'false');
+      // The whole row is the control, so the in-cell indicator must not be a nested interactive element.
+      expect(within(annaRow).queryByRole('button')).toBeNull();
+
+      fireEvent.click(annaRow);
+      expect(annaRow).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('points the row’s aria-controls at the disclosed panel when renderSubComponent is used', () => {
+      render(
+        <Table<Person>
+          id="t-exp-row-controls"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          expandTrigger="row"
+        />
+      );
+
+      const annaRow = screen.getByRole('cell', { name: 'Anna' }).closest('tr') as HTMLTableRowElement;
+      const panelId = annaRow.getAttribute('aria-controls');
+      expect(panelId).toBeTruthy();
+
+      fireEvent.click(annaRow);
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(document.getElementById(panelId as string)).toBeInTheDocument();
+    });
+  });
+
+  describe('accessibility', () => {
+    it('gives a blank utility header an accessible name (falls back to the column id)', () => {
+      const withActions: ColumnDef<Person>[] = [
+        ...columns,
+        { id: 'actions', header: '', cell: () => <button>Edit</button> },
+      ];
+      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+
+      expect(screen.getByRole('columnheader', { name: 'actions' })).toBeInTheDocument();
+    });
+
+    it('names the built-in expand column header', () => {
+      render(
+        <Table<Person>
+          id="t-expand-header"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>{row.original.name}</span>}
+        />
+      );
+
+      // `getLabel` returns the i18n key verbatim without a LabelProvider, so the resolved name is the key.
+      expect(screen.getByRole('columnheader', { name: 'table.expand-column' })).toBeInTheDocument();
+    });
+
+    it('makes the scroll wrapper keyboard-focusable', () => {
+      const { container } = render(<Table<Person> id="t-scroll" data={data} columns={columns} />);
+
+      expect(container.querySelector('.tedi-table__scroll')).toHaveAttribute('tabindex', '0');
     });
   });
 

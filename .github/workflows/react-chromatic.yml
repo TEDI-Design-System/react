@@ -1,0 +1,164 @@
+name: Chromatic React
+
+# One build per pull request, not one per push. A snapshot is billed whether
+# or not anything changed (copied snapshots still bill at 0.2 each), so a
+# build per push cost ~3.1 builds per PR for a review nobody read: these
+# builds post no status back to the PR. Approval is the point where the diff
+# is worth looking at, and it captures the state that is about to merge.
+#
+# PRs merged without an approval get no build here. They are covered by the
+# `rc` push build in react-release.yml, which is also what keeps the baseline
+# current for the next PR.
+on:
+  pull_request_review:
+    types: [submitted]
+  workflow_dispatch:
+
+# A second approval on the same PR supersedes the first while it is still
+# running; once it has finished, the `guard` job below is what stops a second
+# approval from paying for the same snapshots twice.
+concurrency:
+  group: chromatic-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Every approval fires this workflow, and most pull requests here collect two.
+  # The build is keyed to the head commit, so the second approval of an unchanged
+  # head would re-buy the same snapshots. The sticky comment records the commit it
+  # was built from; if that commit is still the head, there is nothing new to see.
+  # A push after the approval moves the head, so re-approving does rebuild.
+  guard:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    # `pull_request_review` has no `branches:` filter, so the base branch is
+    # checked here. Note the dependabot check reads the PR author, not
+    # `github.actor`, which on a review event is the reviewer.
+    if: |
+      github.event_name == 'workflow_dispatch' || (
+        github.event.review.state == 'approved' &&
+        (github.event.pull_request.base.ref == 'rc' || github.event.pull_request.base.ref == 'main') &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.draft == false &&
+        github.event.pull_request.user.login != 'dependabot[bot]'
+      )
+    outputs:
+      build: ${{ steps.check.outputs.build }}
+    steps:
+      - name: Has this head already been built?
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.eventName === 'workflow_dispatch') {
+              core.setOutput('build', 'yes');
+              return;
+            }
+            const { owner, repo } = context.repo;
+            const sha = context.payload.pull_request.head.sha;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: context.payload.pull_request.number,
+            });
+            const built = comments.some((c) => c.body?.includes(`chromatic-sha:${sha}`));
+            if (built) {
+              core.info(`${sha} already has a Chromatic build; skipping this approval.`);
+            }
+            core.setOutput('build', built ? 'no' : 'yes');
+
+  chromatic:
+    needs: guard
+    if: needs.guard.outputs.build == 'yes'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # the result is posted back to the PR
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: |
+          npm ci --cache .npm --prefer-offline
+
+      # chromaui/action rather than the raw CLI, for the build result as step
+      # outputs. Chromatic's GitHub App has never posted a UI Tests status on
+      # a PR head commit in this repo, only on rc, so without this the one
+      # build we now spend per PR would report nothing back to the PR.
+      - name: Publish to Chromatic
+        id: chromatic
+        uses: chromaui/action@v18
+        with:
+          projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          exitZeroOnChanges: true
+
+      - name: Comment the result on the pull request
+        if: github.event_name == 'pull_request_review' && steps.chromatic.outputs.changeCount != ''
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          CHANGE_COUNT: ${{ steps.chromatic.outputs.changeCount }}
+          BUILD_URL: ${{ steps.chromatic.outputs.buildUrl }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const sha = context.payload.pull_request.head.sha;
+            const marker = '<!-- chromatic-pr -->';
+            const count = Number(process.env.CHANGE_COUNT);
+            // The commit is named in the comment, and the machine-readable copy
+            // is what the `guard` job reads to skip a repeat build of this head.
+            const body = [
+              marker,
+              `<!-- chromatic-sha:${sha} -->`,
+              '## 🎨 Chromatic',
+              '',
+              count > 0 ? `${count} visual change(s) to review before merging.` : 'No visual changes.',
+              '',
+              `Built from \`${sha.slice(0, 7)}\`. Commits pushed after this are not covered; approve again to rebuild.`,
+              '',
+              `[View the build](${process.env.BUILD_URL})`,
+            ].join('\n');
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      # actualCaptureCount is what is billed at 1x and inheritedCaptureCount is
+      # what TurboSnap copied at 0.2x, so this is the real per-build cost
+      # against the monthly quota rather than an estimate.
+      - name: Record the snapshot usage
+        if: always()
+        env:
+          CAPTURED: ${{ steps.chromatic.outputs.actualCaptureCount }}
+          INHERITED: ${{ steps.chromatic.outputs.inheritedCaptureCount }}
+          CHANGES: ${{ steps.chromatic.outputs.changeCount }}
+          ERRORS: ${{ steps.chromatic.outputs.errorCount }}
+          SPECS: ${{ steps.chromatic.outputs.specCount }}
+          BUILD_URL: ${{ steps.chromatic.outputs.buildUrl }}
+        run: |
+          {
+            echo "### Chromatic"
+            echo ""
+            echo "| metric | value |"
+            echo "| --- | --- |"
+            echo "| Stories | ${SPECS:-n/a} |"
+            echo "| Captured (billed 1x) | ${CAPTURED:-n/a} |"
+            echo "| Inherited via TurboSnap (billed 0.2x) | ${INHERITED:-n/a} |"
+            echo "| Visual changes | ${CHANGES:-n/a} |"
+            echo "| Errored stories | ${ERRORS:-n/a} |"
+            echo "| Build | ${BUILD_URL:-n/a} |"
+          } >> "$GITHUB_STEP_SUMMARY"

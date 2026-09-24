@@ -4,6 +4,7 @@ import type { Dayjs } from 'dayjs';
 import React from 'react';
 
 import { TextFieldProps } from '../../../../../tedi/components/form/textfield/textfield';
+import { warnDeprecated } from '../../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import MuiInputTransition from '../mui-input-transition/mui-input-transition';
 
 export type TimePickerValue = Dayjs | null;
@@ -82,6 +83,7 @@ export interface TimePickerProps extends Omit<TextFieldProps, 'defaultValue' | '
  * @deprecated Use `TimeField` from `@tedi-design-system/react/tedi` instead.
  */
 export const TimePicker = (props: TimePickerProps): JSX.Element => {
+  warnDeprecated('Community TimePicker', 'Use `TimeField` from `@tedi-design-system/react/tedi` instead.');
   const {
     defaultValue,
     onChange,
