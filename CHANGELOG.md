@@ -1,3 +1,10 @@
+# [19.1.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.19...react-19.1.0-rc.20) (2026-09-24)
+
+
+### Features
+
+* added deprecation console warnings to deprecated components [#918](https://github.com/TEDI-Design-System/react/issues/918) ([#919](https://github.com/TEDI-Design-System/react/issues/919)) ([c030405](https://github.com/TEDI-Design-System/react/commit/c0304058837d536df6d01e41d32f57f32309741b))
+
 # [19.1.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-19.1.0-rc.18...react-19.1.0-rc.19) (2026-09-23)
 
 
