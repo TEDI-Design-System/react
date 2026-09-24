@@ -6,8 +6,9 @@
   &--card {
     display: flex;
     align-items: center;
-    min-height: 2.5rem;
-    padding: var(--form-checkbox-radio-card-checkbox-padding-y) var(--form-checkbox-radio-card-checkbox-padding-x);
+    min-height: var(--form-field-height);
+    padding: calc(var(--form-checkbox-radio-card-checkbox-padding-y) - var(--tedi-borders-01))
+      calc(var(--form-checkbox-radio-card-checkbox-padding-x) - var(--tedi-borders-01));
     margin-top: 0;
     border-radius: var(--form-checkbox-radio-card-radius);
 
@@ -47,9 +48,6 @@
       }
     }
 
-    // The outline fires when the card itself is focused (checkbox variant) or
-    // when the inner radio input is focused (radio variant — the wrapper has
-    // tabIndex=-1, so only the input receives focus).
     &:focus-visible,
     &:has(input:focus-visible) {
       z-index: 5;
