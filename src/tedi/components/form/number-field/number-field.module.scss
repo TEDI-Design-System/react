@@ -85,6 +85,10 @@
       min-height: var(--form-field-height-sm);
     }
 
+    .tedi-number-field__input-wrapper {
+      padding: var(--form-field-padding-y-sm) var(--form-field-padding-y-md-default);
+    }
+
     @include breakpoints.media-breakpoint-down(md) {
       width: 100%;
     }
@@ -98,7 +102,7 @@
   align-items: stretch;
   width: 5rem;
   height: var(--form-field-height);
-  padding: var(--form-field-padding-y-sm) var(--form-field-padding-y-md-default);
+  padding: var(--form-field-padding-y-md-default);
   background-color: var(--form-input-background-default);
   border: 1px solid var(--form-input-border-default);
 
