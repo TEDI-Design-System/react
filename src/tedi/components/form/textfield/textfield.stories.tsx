@@ -196,7 +196,7 @@ export const PasswordWithToggle: Story = {
         icon={isVisible ? 'visibility_off' : 'visibility'}
         onIconClick={() => setIsVisible((prev) => !prev)}
         iconButtonProps={{
-          'aria-label': isVisible ? 'Hide password' : 'Show password',
+          'aria-label': 'Show password',
           'aria-pressed': isVisible,
         }}
       />
