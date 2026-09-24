@@ -28,6 +28,7 @@ Orientation only. Verify the current roster against the installed package's barr
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
 | FileUpload | `FileUploadFile[]` | Multi-file, validation, loading states, `showRestrictions` hint toggle |
 | FileDropzone | `FileUploadFile[]` | Drag-and-drop, per-file validation, `showRestrictions` hint toggle |
+| InlineEdit | wraps any control (generic `T`) | Edit-in-place wrapper: read view → control on click; commit on blur, cancel on `Escape`; optional edit icon |
 
 ## Controlled vs Uncontrolled
 
@@ -456,4 +457,50 @@ TEDI form controls hand you the **parsed value**, not the raw DOM event. The con
 <TextField id="name" label="Name" disabled />
 <Select id="country" label="Country" disabled />
 <Checkbox id="agree" label="Agree" value="agree" disabled />
+```
+
+## InlineEdit (edit-in-place)
+
+`InlineEdit` wraps any TEDI form control so a value is shown read-only until clicked, then edited in place. It is control-agnostic — supply the control through a render function and wire it to the render props (`value`, `onChange`, `commit`, `cancel`).
+
+```tsx
+import { InlineEdit } from '@tedi-design-system/react/tedi';
+
+const [name, setName] = useState('Mari Maasikas');
+
+<InlineEdit<string> label="Name" value={name} onChange={setName} renderValue={(v) => v || '—'}>
+  {({ value, onChange }) => <TextField id="name" label="Name" hideLabel value={value} onChange={onChange} />}
+</InlineEdit>;
+```
+
+- **Commit / cancel:** commits when focus leaves the editor (click away / Tab out); `Escape` cancels. Focus moving into a floating popover the control opened (Select menu, DateField calendar) does **not** commit.
+- **Single-action vs multi-step controls (important):** only call `commit()` from a control's change handler when a single interaction completes the edit — e.g. picking a day in a single `DateField`, choosing one `Select` option, or flipping a `Toggle`. For **multi-step pickers** (`TimeField` hour+minute, `DateTimeField` date+time, multi-select `Select`, range `DateField`) do **not** call `commit()` on change — just update the draft and let the blur-commit fire when the picker closes. Committing on the first change closes the field mid-edit (e.g. after the hour, before the minute).
+- **Controlled or uncontrolled:** pass `value` + `onChange`, or `defaultValue`.
+- **`renderValue`:** formats the read view (e.g. format a `Date`, map an option to its label).
+- **`hideEditIcon`:** hides the pencil icon (shown by default, brand-coloured); the value stays clickable.
+- **`fullWidth`:** stretches the field so controls like `Select` / `Slider` fill the row.
+- **`disabled`:** renders the value as plain, non-interactive text (no dimming, no edit affordance).
+- **Headless:** use the `useInlineEdit` hook for the state machine (`isEditing`, `edit`, `commit`, `cancel`, `value`) without the built-in markup.
+
+Controls whose value API differs need a one-line adapter. Single-action pickers call `commit()` on select; multi-step pickers (e.g. `TimeField`) omit it and let blur commit:
+
+```tsx
+// Single DateField — one click completes the edit, so commit on select
+<InlineEdit<Date | undefined> label="Date" value={date} onChange={setDate} renderValue={formatDate}>
+  {({ value, onChange, commit }) => (
+    <DateField id="date" label="Date" mode="single" selected={value} onSelect={(d) => { onChange(d as Date); commit(); }} />
+  )}
+</InlineEdit>
+
+// TimeField (hour + minute) — no commit() on change; blur commits when the picker closes
+<InlineEdit<string> label="Time" value={time} onChange={setTime} renderValue={(v) => v || '—'}>
+  {({ value, onChange }) => <TimeField id="time" label="Time" value={value} onChange={onChange} />}
+</InlineEdit>
+
+// Toggle uses checked
+<InlineEdit<boolean> label="Notify" value={on} onChange={setOn} renderValue={(v) => (v ? 'On' : 'Off')}>
+  {({ value, onChange, commit }) => (
+    <Toggle id="notify" label="Notify" hideLabel checked={value} onChange={(c) => { onChange(c); commit(); }} />
+  )}
+</InlineEdit>
 ```

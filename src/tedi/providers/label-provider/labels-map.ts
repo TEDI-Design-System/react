@@ -613,6 +613,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'No options',
     ru: 'Нет вариантов',
   },
+  'inline-edit.edit': {
+    description: 'Screen-reader prefix on the InlineEdit read trigger, e.g. "Edit {label}".',
+    components: ['InlineEdit'],
+    et: 'Muuda',
+    en: 'Edit',
+    ru: 'Изменить',
+  },
   'search.loading': {
     description: 'Loading row shown in the Search suggestions listbox while suggestions are being fetched',
     components: ['Search'],

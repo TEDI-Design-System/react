@@ -1,0 +1,310 @@
+import cn from 'classnames';
+import React from 'react';
+
+import { useLabels } from '../../../providers/label-provider';
+import { Icon } from '../../base/icon/icon';
+import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text';
+import styles from './inline-edit.module.scss';
+
+export interface UseInlineEditOptions<T> {
+  /** Controlled committed value. Pair with `onChange`. */
+  value?: T;
+  /** Initial committed value for uncontrolled use. Ignored when `value` is set. */
+  defaultValue?: T;
+  /** Called with the draft when an edit is committed. */
+  onChange?: (value: T) => void;
+}
+
+export type InlineEditSize = 'default' | 'small';
+
+/** Props handed to the editor render function. */
+export interface InlineEditEditor<T> {
+  /** Current draft value — wire this to the control's `value`. */
+  value: T;
+  /** Update the draft — wire this to the control's `onChange`. */
+  onChange: (value: T) => void;
+  /** Commit the draft (fires `onChange`) and leave edit mode. */
+  commit: () => void;
+  /** Discard the draft and leave edit mode. */
+  cancel: () => void;
+}
+
+export interface UseInlineEditResult<T> extends InlineEditEditor<T> {
+  /** Whether the field is currently in edit mode. */
+  isEditing: boolean;
+  /** Enter edit mode (seeds the draft from the committed value). */
+  edit: () => void;
+  /** The last committed value (what the read view shows). */
+  committedValue: T;
+}
+
+/**
+ * Headless edit-in-place state: read/committed value + an inline-edit draft, with
+ * `edit` / `commit` / `cancel` transitions. Supports controlled and
+ * uncontrolled use. Use directly when you want full control of the markup;
+ * otherwise use `InlineEdit`.
+ */
+export function useInlineEdit<T>({ value, defaultValue, onChange }: UseInlineEditOptions<T>): UseInlineEditResult<T> {
+  const isControlled = value !== undefined;
+  const [innerValue, setInnerValue] = React.useState<T>((value ?? defaultValue) as T);
+  const committedValue = (isControlled ? value : innerValue) as T;
+
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [draft, setDraftState] = React.useState<T>(committedValue);
+  const draftRef = React.useRef<T>(draft);
+
+  const setDraft = React.useCallback((next: T) => {
+    draftRef.current = next;
+    setDraftState(next);
+  }, []);
+
+  const edit = React.useCallback(() => {
+    setDraft(committedValue);
+    setIsEditing(true);
+  }, [committedValue, setDraft]);
+
+  const cancel = React.useCallback(() => setIsEditing(false), []);
+
+  const commit = React.useCallback(() => {
+    const next = draftRef.current;
+    if (!isControlled) setInnerValue(next);
+    onChange?.(next);
+    setIsEditing(false);
+  }, [isControlled, onChange]);
+
+  return { isEditing, edit, commit, cancel, committedValue, value: draft, onChange: setDraft };
+}
+
+export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
+  /** Accessible label for the field (announced on the read trigger). */
+  label: string;
+  /**
+   * Renders the read view. Defaults to the value itself. Return a node — e.g.
+   * format a `Date`, or map a select option to its `label`.
+   */
+  renderValue?: (value: T) => React.ReactNode;
+  /** Shown in the read view when the value is empty. @default '—' */
+  placeholder?: React.ReactNode;
+  /** Renders the value as static text (a text group) with no edit affordance. */
+  readOnly?: boolean;
+  /**
+   * Marks the row as invalid — the read trigger gets an error border and
+   * `aria-invalid`. `helper` items with `type: 'error'` set this automatically.
+   * @default false
+   */
+  invalid?: boolean;
+  /**
+   * Feedback text rendered below the field — a single `FeedbackTextProps` or an
+   * array. An `error` item also drives the invalid state (red border), a `valid`
+   * item the success state. Wired to the read trigger via `aria-describedby`.
+   */
+  helper?: FeedbackTextProps | FeedbackTextProps[];
+  /**
+   * Stretches the field (read trigger and editor) to the full width of its
+   * container, so controls like `Select`, `Slider` or `TextField` fill the row
+   * instead of sizing to their content. @default false
+   */
+  fullWidth?: boolean;
+  /**
+   * Hides the edit (pencil) icon on the read trigger. The whole value stays
+   * clickable, but the pencil is the only visual cue that the value is editable.
+   *
+   * **Accessibility risk:** hiding it removes that affordance, so sighted users
+   * cannot perceive the field is interactive (fails WCAG 1.3.3 Sensory
+   * Characteristics / 3.2 affordance guidance). Only enable it when an adjacent
+   * element already signals editability — use at your own risk.
+   * @default false
+   */
+  hideEditIcon?: boolean;
+  /**
+   * Size of the read trigger and editor.
+   * - `default` — body text (16px) with an 18px edit icon.
+   * - `small` — smaller body text (14px) with a 16px edit icon, for dense layouts.
+   * @default default
+   */
+  size?: InlineEditSize;
+  /**
+   * Placement of the edit (pencil) icon on the read trigger.
+   * - `following` — the icon sits directly after the value.
+   * - `aligned` — the trigger fills its container and the icon is pushed to the
+   *   trailing edge, so icons line up across stacked rows.
+   * @default following
+   */
+  editIconAlign?: 'following' | 'aligned';
+  /** id applied to the read trigger. */
+  id?: string;
+  /** Additional class on the root element. */
+  className?: string;
+  /**
+   * Renders the edit view — return any TEDI control wired to the render props.
+   * The wrapper commits on focus leaving the editor and cancels on `Escape`.
+   * The editor also receives the field's `size` — forward it to the control so the
+   * editor matches the read view (a small field opens a small control).
+   */
+  children: (editor: InlineEditEditor<T> & { size: InlineEditSize }) => React.ReactNode;
+}
+
+const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
+
+export function InlineEdit<T>({
+  label,
+  renderValue,
+  placeholder = '—',
+  readOnly = false,
+  invalid = false,
+  helper,
+  fullWidth = false,
+  hideEditIcon = false,
+  size = 'default',
+  editIconAlign = 'following',
+  id,
+  className,
+  children,
+  ...options
+}: InlineEditProps<T>): JSX.Element {
+  const { getLabel } = useLabels();
+  const generatedId = React.useId();
+  const fieldId = id ?? generatedId;
+  const editorRef = React.useRef<HTMLDivElement>(null);
+  const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<T>(options);
+  const fullWidthClass = fullWidth ? styles['tedi-inline-edit--full-width'] : undefined;
+  const smallClass = size === 'small' ? styles['tedi-inline-edit--small'] : undefined;
+
+  const hasHelper = Array.isArray(helper) ? helper.length > 0 : Boolean(helper);
+  const isInvalid = React.useMemo(() => {
+    if (Array.isArray(helper)) return invalid || helper.some((item) => item.type === 'error');
+    return invalid || helper?.type === 'error';
+  }, [invalid, helper]);
+
+  const helperBaseId = `${fieldId}-helper`;
+  const describedBy = !hasHelper
+    ? undefined
+    : Array.isArray(helper)
+    ? helper.map((_, index) => `${helperBaseId}-${index}`).join(' ')
+    : helperBaseId;
+
+  const renderFeedback = (): React.ReactNode => {
+    if (!hasHelper) return null;
+    return (
+      <div className={styles['tedi-inline-edit__feedback']}>
+        {Array.isArray(helper) ? (
+          helper.map((item, index) => <FeedbackText key={index} {...item} id={`${helperBaseId}-${index}`} />)
+        ) : (
+          <FeedbackText {...(helper as FeedbackTextProps)} id={helperBaseId} />
+        )}
+      </div>
+    );
+  };
+
+  const withFeedback = (control: React.ReactNode): JSX.Element => {
+    if (!hasHelper) return <>{control}</>;
+    return (
+      <div className={cn(styles['tedi-inline-edit__field'], fullWidthClass)}>
+        {control}
+        {renderFeedback()}
+      </div>
+    );
+  };
+
+  React.useEffect(() => {
+    if (!isEditing) return;
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const target =
+      editor.querySelector<HTMLElement>('input, textarea, select, [contenteditable]') ??
+      editor.querySelector<HTMLElement>('[tabindex]:not([tabindex="-1"])');
+    target?.focus();
+  }, [isEditing]);
+
+  if (isEditing) {
+    return withFeedback(
+      <div
+        ref={editorRef}
+        className={cn(
+          styles['tedi-inline-edit'],
+          styles['tedi-inline-edit--editing'],
+          fullWidthClass,
+          smallClass,
+          className
+        )}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.stopPropagation();
+            cancel();
+          }
+        }}
+        onBlur={() => {
+          window.setTimeout(() => {
+            if (!editorRef.current) return;
+            const active = document.activeElement;
+            if (editorRef.current.contains(active)) return;
+            if (active?.closest('[data-floating-ui-portal]')) return;
+            commit();
+          }, 0);
+        }}
+      >
+        {children({ value, onChange, commit, cancel, size })}
+      </div>
+    );
+  }
+
+  const display = renderValue ? renderValue(committedValue) : (committedValue as React.ReactNode);
+  const empty = renderValue ? isEmpty(display) : isEmpty(committedValue);
+
+  if (readOnly) {
+    return withFeedback(
+      <span
+        className={cn(
+          styles['tedi-inline-edit'],
+          styles['tedi-inline-edit--readonly'],
+          fullWidthClass,
+          smallClass,
+          className
+        )}
+      >
+        <span className={empty ? styles['tedi-inline-edit__placeholder'] : undefined}>
+          {empty ? placeholder : display}
+        </span>
+      </span>
+    );
+  }
+
+  return withFeedback(
+    <button
+      type="button"
+      id={fieldId}
+      onClick={edit}
+      aria-describedby={describedBy}
+      className={cn(
+        styles['tedi-inline-edit'],
+        styles['tedi-inline-edit__trigger'],
+        fullWidthClass,
+        smallClass,
+        { [styles['tedi-inline-edit--icon-aligned']]: editIconAlign === 'aligned' },
+        { [styles['tedi-inline-edit--invalid']]: isInvalid },
+        className
+      )}
+    >
+      <span className={styles['tedi-inline-edit__prefix']}>
+        {getLabel('inline-edit.edit')} {label}:{' '}
+      </span>
+      <span className={empty ? styles['tedi-inline-edit__placeholder'] : styles['tedi-inline-edit__value']}>
+        {empty ? placeholder : display}
+      </span>
+      {!hideEditIcon && (
+        <Icon
+          name="edit"
+          size={size === 'small' ? 16 : 18}
+          color="brand"
+          aria-hidden
+          className={styles['tedi-inline-edit__icon']}
+        />
+      )}
+    </button>
+  );
+}
+
+InlineEdit.displayName = 'InlineEdit';
+
+export default InlineEdit;
