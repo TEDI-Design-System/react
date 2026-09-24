@@ -1,3 +1,10 @@
+## [19.1.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.0...react-19.1.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* **sheet,number-field:** replaced invalid css variables [#924](https://github.com/TEDI-Design-System/react/issues/924) ([#925](https://github.com/TEDI-Design-System/react/issues/925)) ([405d931](https://github.com/TEDI-Design-System/react/commit/405d931baadb34064c6b2b20c8206aa22ad0e685))
+
 # [19.1.0](https://github.com/TEDI-Design-System/react/compare/react-19.0.0...react-19.1.0) (2026-09-24)
 
 
