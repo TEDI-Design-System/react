@@ -98,8 +98,7 @@
   align-items: stretch;
   width: 5rem;
   height: var(--form-field-height);
-  padding-right: var(--form-field-padding-y-3-default);
-  padding-left: var(--form-field-padding-y-3-default);
+  padding: var(--form-field-padding-y-sm) var(--form-field-padding-y-md-default);
   background-color: var(--form-input-background-default);
   border: 1px solid var(--form-input-border-default);
 
