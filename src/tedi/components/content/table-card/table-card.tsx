@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -238,7 +238,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const isOpenRef = React.useRef(isOpen);
   const openChangeRef = React.useRef(handleOpenChange);
 
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     isOpenRef.current = isOpen;
     openChangeRef.current = handleOpenChange;
   });
