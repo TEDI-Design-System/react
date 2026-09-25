@@ -6,6 +6,7 @@ export * from './components/dropdown/dropdown';
 export * from './components/stepper';
 export * from './components/card';
 export * from './components/feedback/feedback';
+export * from './components/form/category-search';
 export * from './components/form/hidden-field/hidden-field';
 export * from './components/form/choice-group';
 export * from './components/form/check/check';
@@ -60,3 +61,23 @@ export * from './components/map-components/map-select/map-select';
 export * from './components/map-components/sheet/sheet';
 export * from './components/map-components/split-pane/split-pane';
 export * from './components/map-components/timeline/timeline';
+export {
+  Anchor,
+  Breadcrumbs,
+  Button,
+  Card,
+  ChoiceGroup,
+  DatePicker,
+  DateTimePicker,
+  Footer,
+  Header,
+  ModalProvider,
+  Placeholder,
+  Radio,
+  Select,
+  SideNav,
+  Table,
+  Tag,
+  ToggleOpen,
+  Tooltip,
+} from './deprecated-exports';

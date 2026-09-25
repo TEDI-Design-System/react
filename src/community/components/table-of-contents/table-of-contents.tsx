@@ -3,6 +3,7 @@ import React from 'react';
 import { Affix } from '../../../tedi/components/misc/affix/affix';
 import ScrollVisibility from '../../../tedi/components/misc/scroll-visibility/scroll-visibility';
 import { StretchContent } from '../../../tedi/components/misc/stretch-content/stretch-content';
+import { warnDeprecated } from '../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import { Layouts, useLayout } from '../../helpers';
 import { Card, CardContent } from '../card';
@@ -92,6 +93,7 @@ export const TableOfContentsContext = React.createContext<TableOfContentsContext
  * @deprecated Use TableOfContents from `@tedi-design-system/react/tedi` instead.
  */
 export const TableOfContents = (props: TableOfContentsProps) => {
+  warnDeprecated('Community TableOfContents', 'Use TableOfContents from `@tedi-design-system/react/tedi` instead.');
   const { getLabel } = useLabels();
   const { breakToMobile = ['mobile'], heading = getLabel('table-of-contents.title'), hideOnScroll = true } = props;
   const isMobileLayout = useLayout(breakToMobile);

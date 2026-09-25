@@ -3,6 +3,7 @@ import cn from 'classnames';
 import type { Dayjs } from 'dayjs';
 import React from 'react';
 
+import { warnDeprecated } from '../../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import styles from './calendar.module.scss';
 
 export type CalendarValue = Dayjs | null;
@@ -101,6 +102,7 @@ export interface CalendarProps {
  * @deprecated Use `Calendar` from `@tedi-design-system/react/tedi` instead.
  */
 export const Calendar = (props: CalendarProps): JSX.Element => {
+  warnDeprecated('Community Calendar', 'Use `Calendar` from `@tedi-design-system/react/tedi` instead.');
   const {
     value,
     defaultValue,
