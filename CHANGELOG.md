@@ -1,3 +1,10 @@
+## [19.1.2-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.2...react-19.1.2-rc.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* **table-card:** fix examples, replace custom chevron with Collapse [#900](https://github.com/TEDI-Design-System/react/issues/900) ([#907](https://github.com/TEDI-Design-System/react/issues/907)) ([82e4b0d](https://github.com/TEDI-Design-System/react/commit/82e4b0d40118c235ac114c37328c7b5221f70c42))
+
 ## [19.1.2-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.1...react-19.1.2-rc.2) (2026-09-25)
 
 
