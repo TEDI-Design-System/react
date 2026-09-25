@@ -1,5 +1,14 @@
 import cn from 'classnames';
-import { Children, createContext, isValidElement, type ReactElement, type ReactNode, useMemo } from 'react';
+import {
+  Children,
+  createContext,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -114,6 +123,12 @@ interface TableOfContentsContextValue {
   activeTrail: Set<string>;
   defaultOpen?: boolean;
   scrollActiveIntoView?: boolean;
+  /**
+   * True only on renders where `activeId` genuinely changed from its previously committed value
+   * (never on the initial render, including Strict Mode's mount-effect replay). Rows use it to
+   * scroll into view only on a real transition — not when a selected child first mounts on load.
+   */
+  activeIdChanged?: boolean;
 }
 
 export const TableOfContentsContext = createContext<TableOfContentsContextValue>({
@@ -181,10 +196,24 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
 
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
+  const prevActiveIdRef = useRef(activeId);
+  const activeIdChanged = prevActiveIdRef.current !== activeId;
+  useEffect(() => {
+    prevActiveIdRef.current = activeId;
+  }, [activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen, scrollActiveIntoView }),
-    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen, scrollActiveIntoView]
+    () => ({
+      activeId,
+      numbered,
+      headingLevel,
+      ariaLabel,
+      activeTrail,
+      defaultOpen,
+      scrollActiveIntoView,
+      activeIdChanged,
+    }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen, scrollActiveIntoView, activeIdChanged]
   );
 
   const list = (
@@ -192,7 +221,6 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
         [styles['tedi-table-of-contents--bordered']]: bordered,
-        [styles['tedi-table-of-contents--scroll-active']]: scrollActiveIntoView,
       })}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />
