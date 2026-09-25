@@ -205,7 +205,7 @@ export const DropdownItem = ({
   };
 
   const itemProps = navigation
-    ? { ...baseProps, tabIndex: disabled ? -1 : 0, role }
+    ? { ...baseProps, onKeyDown: undefined, tabIndex: disabled ? -1 : 0, role }
     : asChild && closeOnSelect === false
     ? { ...baseProps, role }
     : getItemProps({

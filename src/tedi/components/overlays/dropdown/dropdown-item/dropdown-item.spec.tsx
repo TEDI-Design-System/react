@@ -5,6 +5,7 @@ import { DropdownItem } from './dropdown-item';
 
 const mockSetOpen = jest.fn();
 const mockOnClick = jest.fn();
+let mockContextOverrides: Record<string, UnknownType> = {};
 
 jest.mock('../dropdown-context', () => ({
   useDropdownContext: () => ({
@@ -14,6 +15,7 @@ jest.mock('../dropdown-context', () => ({
     activeIndex: 0,
     divided: false,
     variant: 'default',
+    ...mockContextOverrides,
   }),
 }));
 
@@ -21,6 +23,7 @@ describe('DropdownItem', () => {
   beforeEach(() => {
     mockSetOpen.mockClear();
     mockOnClick.mockClear();
+    mockContextOverrides = {};
   });
 
   it('calls onClick and closes dropdown on click', () => {
@@ -338,6 +341,43 @@ describe('DropdownItem', () => {
       expect(mockOnClick).not.toHaveBeenCalled();
       expect(childClick).not.toHaveBeenCalled();
       expect(mockSetOpen).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('navigation mode', () => {
+    it('does not intercept Space on a navigation link, leaving native link behavior', () => {
+      mockContextOverrides = { navigation: true };
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+
+      const link = screen.getByRole('link', { name: 'Go' });
+      const notPrevented = fireEvent.keyDown(link, { key: ' ' });
+
+      expect(childClick).not.toHaveBeenCalled();
+      expect(mockOnClick).not.toHaveBeenCalled();
+      expect(mockSetOpen).not.toHaveBeenCalled();
+      expect(notPrevented).toBe(true);
+    });
+
+    it('still lets the navigation link handle its own click', () => {
+      mockContextOverrides = { navigation: true };
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+
+      fireEvent.click(screen.getByRole('link', { name: 'Go' }));
+      expect(childClick).toHaveBeenCalledTimes(1);
     });
   });
 });
