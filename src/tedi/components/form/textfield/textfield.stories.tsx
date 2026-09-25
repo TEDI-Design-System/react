@@ -211,3 +211,17 @@ export const Placeholder: Story = {
     placeholder: 'Text value',
   },
 };
+
+/**
+ * `showClearOnInteraction` reveals the clear (×) button only while the field is hovered or focused
+ * (keyboard focus included), instead of whenever it has a value. Requires `isClearable`.
+ */
+export const ClearButtonOnHover: Story = {
+  args: {
+    id: 'example-clear-on-hover',
+    label: 'Label',
+    defaultValue: 'Text value',
+    isClearable: true,
+    showClearOnInteraction: true,
+  },
+};

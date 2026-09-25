@@ -5,7 +5,8 @@ import { FeedbackTextProps } from '../feedback-text/feedback-text';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './textarea.module.scss';
 
-export interface TextareaProps extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'onClear'> {
+export interface TextareaProps
+  extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'showClearOnInteraction' | 'onClear'> {
   /**
    * Maximum number of characters allowed in the textarea.
    */
