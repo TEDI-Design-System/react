@@ -30,6 +30,16 @@ type TableOfContentsBreakpointProps = {
    * @default true
    */
   sticky?: boolean;
+  /**
+   * Keep the active item visible inside a scrollable table of contents. When the `activeId`
+   * changes, the active item's row is scrolled into view within the nearest scroll container
+   * (the sticky card, or a scrollable wrapper you provide) using "nearest" semantics — it only
+   * scrolls when the row is out of view, leaving ~8px of margin. Positions on the row itself,
+   * not its expanded children. Has no effect in non-scrollable layouts and respects
+   * `prefers-reduced-motion`.
+   * @default false
+   */
+  scrollActiveIntoView?: boolean;
 };
 
 export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsBreakpointProps> {
@@ -103,6 +113,7 @@ interface TableOfContentsContextValue {
   ariaLabel?: string;
   activeTrail: Set<string>;
   defaultOpen?: boolean;
+  scrollActiveIntoView?: boolean;
 }
 
 export const TableOfContentsContext = createContext<TableOfContentsContextValue>({
@@ -162,6 +173,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     sticky = true,
     variant = 'default',
     bordered = false,
+    scrollActiveIntoView = false,
     className,
   } = getCurrentBreakpointProps<TableOfContentsProps>(props);
 
@@ -171,8 +183,8 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen }),
-    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen]
+    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen, scrollActiveIntoView }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen, scrollActiveIntoView]
   );
 
   const list = (
@@ -180,6 +192,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
         [styles['tedi-table-of-contents--bordered']]: bordered,
+        [styles['tedi-table-of-contents--scroll-active']]: scrollActiveIntoView,
       })}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />

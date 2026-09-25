@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import Separator from '../../../../misc/separator/separator';
 import { TableOfContentsContext, type TableOfContentsNode } from '../../table-of-contents';
@@ -14,13 +14,32 @@ interface TableOfContentsRowProps {
 }
 
 export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOfContentsRowProps): JSX.Element => {
-  const { activeId, numbered, activeTrail, defaultOpen } = useContext(TableOfContentsContext);
+  const { activeId, numbered, activeTrail, defaultOpen, scrollActiveIntoView } = useContext(TableOfContentsContext);
   const { id, content, children, separator, slot } = node;
 
   const hasChildren = !!children?.length;
   const isSelected = !!id && id === activeId;
   const isOpen = hasChildren && (defaultOpen || (!!id && activeTrail.has(id)));
   const level = Math.min(depth, 2);
+
+  const rowRef = useRef<HTMLDivElement>(null);
+  const hasMountedRef = useRef(false);
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    if (!scrollActiveIntoView || !isSelected) return;
+
+    const row = rowRef.current;
+    if (!row || typeof row.scrollIntoView !== 'function') return;
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+    row.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }, [scrollActiveIntoView, isSelected]);
 
   const numberBase = numberPrefix ? `${numberPrefix}.${index + 1}` : `${index + 1}`;
   const ordinal = numberPrefix ? numberBase : `${numberBase}.`;
@@ -34,7 +53,10 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
         [styles['tedi-table-of-contents__item--selected']]: isSelected,
       })}
     >
-      <div className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}>
+      <div
+        ref={rowRef}
+        className={cn(styles['tedi-table-of-contents__row'], styles[`tedi-table-of-contents__row--level-${level}`])}
+      >
         {numbered && (
           <span className={styles['tedi-table-of-contents__number']} aria-hidden="true">
             {ordinal}

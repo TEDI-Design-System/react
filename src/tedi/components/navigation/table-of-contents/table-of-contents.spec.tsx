@@ -23,6 +23,7 @@ const Tree = (props: {
   numbered?: boolean;
   variant?: 'default' | 'transparent';
   defaultOpen?: boolean;
+  scrollActiveIntoView?: boolean;
 }) => (
   <TableOfContents {...props}>
     <TableOfContents.Item id="a">
@@ -253,5 +254,60 @@ describe('TableOfContents', () => {
       </TableOfContents>
     );
     expect(container.querySelector('.tedi-table-of-contents--sticky')).not.toBeInTheDocument();
+  });
+
+  describe('scrollActiveIntoView', () => {
+    let scrollIntoView: jest.Mock;
+
+    beforeEach(() => {
+      scrollIntoView = jest.fn();
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    });
+
+    it('does not scroll on initial render', () => {
+      render(<Tree activeId="a" scrollActiveIntoView />);
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+
+    it('scrolls the newly active row into view when activeId changes', () => {
+      const { rerender } = render(<Tree activeId="a" scrollActiveIntoView />);
+      rerender(<Tree activeId="c" scrollActiveIntoView />);
+
+      expect(scrollIntoView).toHaveBeenCalledTimes(1);
+      expect(scrollIntoView).toHaveBeenCalledWith(
+        expect.objectContaining({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
+      );
+    });
+
+    it('scrolls the active row element, not the list item wrapper with its children', () => {
+      const { rerender } = render(<Tree activeId="a" scrollActiveIntoView />);
+      rerender(<Tree activeId="b" scrollActiveIntoView />);
+
+      const scrolledElement = scrollIntoView.mock.instances[0] as HTMLElement;
+      expect(scrolledElement).toHaveClass('tedi-table-of-contents__row');
+    });
+
+    it('does not scroll when the prop is not set', () => {
+      const { rerender } = render(<Tree activeId="a" />);
+      rerender(<Tree activeId="c" />);
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+
+    it('respects prefers-reduced-motion', () => {
+      (window.matchMedia as jest.Mock).mockImplementation((query: string) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }));
+
+      const { rerender } = render(<Tree activeId="a" scrollActiveIntoView />);
+      rerender(<Tree activeId="c" scrollActiveIntoView />);
+
+      expect(scrollIntoView).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'auto' }));
+    });
   });
 });
