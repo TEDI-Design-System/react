@@ -83,6 +83,26 @@ export interface UseFileUploadProps {
   showRestrictions?: boolean;
 }
 
+/**
+ * Formats a byte count into a readable size (`512 KB`, `2.5 MB`, …). Uses 1024-based
+ * units to stay consistent with the size validation (`maxSize * 1024 ** 2`), and rolls
+ * sub-1-unit values down so `0.5 MB` reads as `512 KB` rather than `0.5MB` (#888).
+ */
+export const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let value = bytes / 1024;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${Math.round(value * 10) / 10} ${units[unitIndex]}`;
+};
+
 const getDefaultHelpers = (
   { accept, maxSize }: Partial<UseFileUploadProps>,
   getLabel: ILabelContext['getLabel']
@@ -91,7 +111,7 @@ const getDefaultHelpers = (
 
   const text = [
     accept && `${getLabel('file-upload.accept')} ${accept.replaceAll(',', ', ')}`,
-    maxSize && `${getLabel('file-upload.max-size')} ${maxSize}MB`,
+    maxSize && `${getLabel('file-upload.max-size')} ${formatFileSize(maxSize * 1024 ** 2)}`,
   ]
     .filter(Boolean)
     .join('. ');
@@ -100,6 +120,10 @@ const getDefaultHelpers = (
 };
 
 const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+/** Two files are considered the same when name, size and lastModified all match (#888). */
+const isSameFile = (a: FileUploadFile, b: FileUploadFile): boolean =>
+  a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
 
 const ANNOUNCEMENT_RESET_DELAY = 100;
 
@@ -166,7 +190,14 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     const fileExtension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase()}` : '';
     const fileMimeType = file.type.toLowerCase();
 
-    return fileTypes.includes(fileExtension) || fileTypes.includes(fileMimeType);
+    return fileTypes.some((type) => {
+      if (type === fileExtension || type === fileMimeType) return true;
+
+      if (type.endsWith('/*')) {
+        return fileMimeType.startsWith(`${type.slice(0, type.indexOf('/'))}/`);
+      }
+      return false;
+    });
   };
 
   const getUploadErrorHelperText = (rejectedFiles: RejectedFile[]): string => {
@@ -210,14 +241,32 @@ export const useFileUpload = (props: UseFileUploadProps) => {
         });
       });
 
+      const dedupe = (candidates: FileUploadFile[]): FileUploadFile[] =>
+        candidates.filter(
+          (file, index) =>
+            !actualFiles.some((existing) => isSameFile(existing, file)) &&
+            candidates.findIndex((candidate) => isSameFile(candidate, file)) === index
+        );
+
+      const duplicateNames = multiple
+        ? Array.from(
+            new Set(
+              uploadedFiles
+                .filter((file) => actualFiles.some((existing) => isSameFile(existing, file)))
+                .map((file) => file.name ?? '')
+            )
+          )
+        : [];
+
       let newFiles: FileUploadFile[];
 
       if (!multiple) {
         newFiles = uploadedFiles.length > 0 && uploadedFiles[0].isValid ? [uploadedFiles[0]] : actualFiles;
       } else if (validateIndividually) {
-        newFiles = [...actualFiles, ...uploadedFiles];
+        const addable = dedupe(uploadedFiles);
+        newFiles = addable.length > 0 ? [...actualFiles, ...addable] : actualFiles;
       } else {
-        const validFiles = uploadedFiles.filter((file) => file.isValid);
+        const validFiles = dedupe(uploadedFiles.filter((file) => file.isValid));
         newFiles = validFiles.length > 0 ? [...actualFiles, ...validFiles] : actualFiles;
       }
 
@@ -235,8 +284,14 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       } else {
         setErrorHelper(undefined);
 
-        if (addedCount > 0) {
-          announce(getLabel('file-upload.success-added', addedCount.toString()));
+        const messages = [
+          addedCount > 0 && getLabel('file-upload.success-added', addedCount.toString()),
+          duplicateNames.length &&
+            getLabel('file-upload.duplicates-skipped', duplicateNames.map((name) => `'${name}'`).join(', ')),
+        ].filter(Boolean) as string[];
+
+        if (messages.length) {
+          announce(messages.join('. '));
         }
       }
 
@@ -256,7 +311,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onDelete?.(file);
     onChange?.(newFiles);
 
-    if (newFiles.length === 0) {
+    if (file.isValid === false && !newFiles.some((f) => f.isValid === false)) {
       setErrorHelper(undefined);
     }
 
@@ -289,6 +344,8 @@ export const useFileUpload = (props: UseFileUploadProps) => {
   return {
     innerFiles: actualFiles,
     uploadErrorHelper,
+    errorHelper,
+    restrictionsHint,
     onFileChange,
     onFileRemove,
     handleClear,

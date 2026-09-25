@@ -9,14 +9,18 @@ import { Button } from '../../buttons/button/button';
 import { List } from '../../content/list';
 import { Attachment, AttachmentProps } from '../../misc/attachment/attachment';
 import FeedbackText, { FeedbackTextProps } from '../feedback-text/feedback-text';
-import FormLabel, { FormLabelProps } from '../form-label/form-label';
+import FormLabel from '../form-label/form-label';
 import styles from './file-dropzone.module.scss';
 
 export type FileDropzoneAttachmentProps =
   | Partial<Omit<AttachmentProps, 'name'>>
   | ((file: FileUploadFile) => Partial<Omit<AttachmentProps, 'name'>>);
 
-export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLabel' | 'label'>, UseFileUploadProps {
+export interface FileDropzoneProps extends UseFileUploadProps {
+  /**
+   * Unique identifier for the underlying file input. Auto-generated when omitted.
+   */
+  id?: string;
   /**
    * Additional CSS class names to apply to the dropzone for custom styling
    */
@@ -26,9 +30,13 @@ export interface FileDropzoneProps extends Omit<FormLabelProps, 'size' | 'hideLa
    */
   name: string;
   /**
+   * Marks the field as required — adds the required indicator to the label.
+   */
+  required?: boolean;
+  /**
    * The text label displayed for the file dropzone, providing context for users.
    * Defaults to the `LabelProvider`'s localised `file-dropzone.label` (e.g. "Lohista
-   * failid siia või klõpsa, et sirvida" in Estonian).
+   * failid siia või klõpsa failide valimiseks" in Estonian).
    */
   label?: string;
   /**
@@ -83,6 +91,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     helper,
     id,
     name,
+    required,
     attachmentProps,
     accept,
     maxSize,
@@ -93,9 +102,9 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     onChange,
     onDelete,
     announcementTimeout,
-    ...rest
+    showRestrictions,
   } = props;
-  const { innerFiles, uploadErrorHelper, onFileChange, onFileRemove, announcement } = useFileUpload({
+  const { innerFiles, errorHelper, restrictionsHint, onFileChange, onFileRemove, announcement } = useFileUpload({
     accept,
     maxSize,
     multiple,
@@ -105,6 +114,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     onChange,
     onDelete,
     announcementTimeout,
+    showRestrictions,
   });
 
   const generatedId = React.useId();
@@ -134,16 +144,18 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     },
   });
 
-  const feedback = uploadErrorHelper?.type === 'error' ? uploadErrorHelper : helper ?? uploadErrorHelper;
-  const helperId = feedback ? feedback.id ?? `${resolvedId}-helper` : undefined;
+  const errorFeedback = errorHelper ?? (helper?.type === 'error' ? helper : undefined);
+  const hintFeedback = helper && helper.type !== 'error' ? helper : restrictionsHint;
+
+  const errorId = errorFeedback ? errorFeedback.id ?? `${resolvedId}-error` : undefined;
+  const hintId = hintFeedback ? hintFeedback.id ?? `${resolvedId}-helper` : undefined;
+  const describedBy = [errorId, hintId].filter(Boolean).join(' ') || undefined;
 
   const fileDropzoneBEM = cn(
     styles['tedi-file-dropzone'],
     { [styles['tedi-file-dropzone--disabled']]: disabled },
-    // Drive the visual state from the same `feedback` that is rendered, so the
-    // invalid/valid styling never diverges from the message shown.
-    { [styles['tedi-file-dropzone--invalid']]: feedback?.type === 'error' },
-    { [styles['tedi-file-dropzone--valid']]: feedback?.type === 'valid' },
+    { [styles['tedi-file-dropzone--invalid']]: !!errorFeedback },
+    { [styles['tedi-file-dropzone--valid']]: !errorFeedback && hintFeedback?.type === 'valid' },
     { [styles['tedi-file-dropzone--drop-over']]: isDragActive },
     className
   );
@@ -155,7 +167,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           role: 'button',
           tabIndex: disabled ? -1 : 0,
           'aria-disabled': disabled,
-          'aria-describedby': helperId,
+          'aria-describedby': describedBy,
         })}
         className={fileDropzoneBEM}
       >
@@ -168,12 +180,12 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
         />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
           <FormLabel
-            {...rest}
             id={resolvedId}
+            required={required}
             label={
               <>
                 <Icon
-                  color={disabled ? 'tertiary' : 'secondary'}
+                  color={disabled ? 'inherit' : 'secondary'}
                   size={24}
                   name="attach_file"
                   display="inline"
@@ -186,7 +198,12 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           />
         </div>
       </div>
-      {feedback && <FeedbackText {...feedback} id={helperId} />}
+      {(errorFeedback || hintFeedback) && (
+        <div className={styles['tedi-file-dropzone__feedback']}>
+          {errorFeedback && <FeedbackText {...errorFeedback} id={errorId} />}
+          {hintFeedback && <FeedbackText {...hintFeedback} id={hintId} />}
+        </div>
+      )}
       {!!innerFiles.length && (
         <List
           className={styles['tedi-file-dropzone__file-list']}

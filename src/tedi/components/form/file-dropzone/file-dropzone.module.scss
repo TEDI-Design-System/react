@@ -2,17 +2,20 @@
 
 .tedi-file-dropzone {
   padding: var(--file-dropzone-padding-y) var(--file-dropzone-padding-x);
-  margin-bottom: var(--layout-grid-gutters-04);
   text-align: center;
   cursor: pointer;
   background-color: var(--file-dropzone-background-default);
-  border: 2px dotted var(--file-dropzone-border-default);
+  border: var(--tedi-borders-02) dotted var(--file-dropzone-border-default);
   border-radius: var(--form-field-radius);
   transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 
-  &:hover {
+  &:hover:not(#{&}--invalid, #{&}--valid, #{&}--drop-over) {
     background-color: var(--file-dropzone-background-hover);
     border-color: var(--file-dropzone-border-hover);
+  }
+
+  &:active:not(#{&}--invalid, #{&}--valid, #{&}--drop-over, #{&}--disabled) {
+    border-color: var(--file-dropzone-border-active);
   }
 
   .tedi-file-dropzone__label-wrapper {
@@ -59,13 +62,17 @@
   }
 
   &:focus-visible {
-    outline: 2px solid var(--file-dropzone-border-hover);
-    outline-offset: 1px;
+    outline: var(--tedi-borders-02) solid var(--file-dropzone-border-focus);
+    outline-offset: var(--tedi-borders-01);
   }
 }
 
 .tedi-file-dropzone__input {
   display: none;
+}
+
+.tedi-file-dropzone__feedback {
+  margin-top: var(--layout-grid-gutters-04);
 }
 
 .tedi-file-dropzone__file-list {
