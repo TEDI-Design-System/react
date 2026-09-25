@@ -68,7 +68,7 @@ type TextFieldBreakpointProps = {
    * a value. Requires `isClearable`.
    * @default false
    */
-  showClearButtonOnHover?: boolean;
+  showClearOnInteraction?: boolean;
   /**
    * Additional CSS class name applied to the root container (`<div>`).
    *
@@ -277,7 +277,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     placeholder,
     isArrowsHidden = true,
     isClearable,
-    showClearButtonOnHover,
+    showClearOnInteraction,
     onClear,
     onChange,
     onChangeEvent,
@@ -463,7 +463,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     { [styles['tedi-textfield--invalid']]: isInvalid },
     { [styles['tedi-textfield--valid']]: isValid },
     { [styles['tedi-textfield--clearable']]: showClearButton },
-    { [styles['tedi-textfield--clear-on-hover']]: showClearButton && showClearButtonOnHover },
+    { [styles['tedi-textfield--clear-on-hover']]: showClearButton && showClearOnInteraction },
     className
   );
 

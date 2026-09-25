@@ -751,7 +751,7 @@ export const DeferKeyboardOnTouch: Story = {
 };
 
 /**
- * `showClearButtonOnHover` reveals the clear (×) indicator only while the control is hovered or
+ * `showClearOnInteraction` reveals the clear (×) indicator only while the control is hovered or
  * focused (keyboard focus included), instead of whenever a value is selected. Requires
  * `isClearIndicatorVisible`.
  */
@@ -762,6 +762,6 @@ export const ClearButtonOnHover: Story = {
     defaultValue: options[1],
     options: options,
     isClearIndicatorVisible: true,
-    showClearButtonOnHover: true,
+    showClearOnInteraction: true,
   },
 };

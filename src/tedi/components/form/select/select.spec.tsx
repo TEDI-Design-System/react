@@ -86,14 +86,14 @@ describe('Select component', () => {
     expect(screen.getByLabelText('Choose a fruit')).toBeDisabled();
   });
 
-  it('adds the reveal-on-hover modifier only with a visible clear indicator and showClearButtonOnHover', () => {
+  it('adds the reveal-on-hover modifier only with a visible clear indicator and showClearOnInteraction', () => {
     const root = () => document.querySelector('[data-name="select"]') as HTMLElement;
     const { rerender } = render(
-      <Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible showClearButtonOnHover />
+      <Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible showClearOnInteraction />
     );
     expect(root().className).toContain('tedi-select--clear-on-hover');
 
-    rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} showClearButtonOnHover />);
+    rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} showClearOnInteraction />);
     expect(root().className).not.toContain('tedi-select--clear-on-hover');
 
     rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible />);

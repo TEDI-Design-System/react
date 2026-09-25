@@ -6,7 +6,7 @@ import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/tex
 import styles from './textarea.module.scss';
 
 export interface TextareaProps
-  extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'showClearButtonOnHover' | 'onClear'> {
+  extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'showClearOnInteraction' | 'onClear'> {
   /**
    * Maximum number of characters allowed in the textarea.
    */

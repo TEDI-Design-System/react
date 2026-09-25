@@ -293,7 +293,7 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    * value is selected. Requires `isClearIndicatorVisible`.
    * @default false
    */
-  showClearButtonOnHover?: boolean;
+  showClearOnInteraction?: boolean;
   /**
    * Allow filtering the option list by typing. Set to `false` for a pure
    * dropdown with no search input (e.g. color/icon pickers).
@@ -472,7 +472,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       autoFocus = false,
       isClearable = true,
       isClearIndicatorVisible = false,
-      showClearButtonOnHover = false,
+      showClearOnInteraction = false,
       isSearchable = true,
       openKeyboardOnTouch = true,
       menuIsOpen,
@@ -834,7 +834,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       { [styles[`tedi-select--${size}`]]: size },
       { [styles[`tedi-select--tags-${tagsDirection}`]]: tagsDirection },
       { [styles['tedi-select--searchable']]: isSearchable },
-      { [styles['tedi-select--clear-on-hover']]: isClearIndicatorVisible && showClearButtonOnHover },
+      { [styles['tedi-select--clear-on-hover']]: isClearIndicatorVisible && showClearOnInteraction },
       { [styles['tedi-select--disabled']]: disabled }
     );
 

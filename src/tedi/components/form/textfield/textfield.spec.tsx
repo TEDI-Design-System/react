@@ -66,16 +66,16 @@ describe('TextField component', () => {
     expect(input).toHaveValue('');
   });
 
-  it('adds the reveal-on-hover modifier only with showClearButtonOnHover and a filled clearable field', () => {
+  it('adds the reveal-on-hover modifier only with showClearOnInteraction and a filled clearable field', () => {
     const container = () => document.querySelector('[data-name="textfield"]') as HTMLElement;
     const noop = () => undefined;
     const { rerender } = render(
-      <TextField {...defaultProps} isClearable showClearButtonOnHover value="x" onChange={noop} />
+      <TextField {...defaultProps} isClearable showClearOnInteraction value="x" onChange={noop} />
     );
     expect(container()).toHaveClass('tedi-textfield--clear-on-hover');
     expect(screen.getByTitle(/clear/i)).toBeInTheDocument();
 
-    rerender(<TextField {...defaultProps} isClearable showClearButtonOnHover value="" onChange={noop} />);
+    rerender(<TextField {...defaultProps} isClearable showClearOnInteraction value="" onChange={noop} />);
     expect(container()).not.toHaveClass('tedi-textfield--clear-on-hover');
 
     rerender(<TextField {...defaultProps} isClearable value="x" onChange={noop} />);
