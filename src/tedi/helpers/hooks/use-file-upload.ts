@@ -311,7 +311,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onDelete?.(file);
     onChange?.(newFiles);
 
-    if (!newFiles.some((f) => f.isValid === false)) {
+    if (file.isValid === false && !newFiles.some((f) => f.isValid === false)) {
       setErrorHelper(undefined);
     }
 

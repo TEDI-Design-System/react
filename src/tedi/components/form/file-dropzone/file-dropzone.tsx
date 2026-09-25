@@ -155,7 +155,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     styles['tedi-file-dropzone'],
     { [styles['tedi-file-dropzone--disabled']]: disabled },
     { [styles['tedi-file-dropzone--invalid']]: !!errorFeedback },
-    { [styles['tedi-file-dropzone--valid']]: hintFeedback?.type === 'valid' },
+    { [styles['tedi-file-dropzone--valid']]: !errorFeedback && hintFeedback?.type === 'valid' },
     { [styles['tedi-file-dropzone--drop-over']]: isDragActive },
     className
   );
