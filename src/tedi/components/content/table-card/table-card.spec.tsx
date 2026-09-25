@@ -137,6 +137,11 @@ describe('TableCard', () => {
       expect(screen.getByRole('button', { name: 'Broneering 22.03' })).toBeInTheDocument();
     });
 
+    it('names the toggle from a JSX title via aria-labelledby (not the generic open/close label)', () => {
+      render(<TableCard rows={rows} collapsible title={<span>Broneering 22.03</span>} />);
+      expect(screen.getByRole('button', { name: 'Broneering 22.03' })).toBeInTheDocument();
+    });
+
     it('respects controlled `open` and calls onOpenChange without self-toggling', () => {
       const onOpenChange = jest.fn();
       render(
