@@ -29,7 +29,6 @@ const meta: Meta<typeof ChoiceGroup> = {
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/ChoiceGroup',
   subcomponents: { 'ChoiceGroup.Item': ChoiceGroup.Item } as never,
   parameters: {
-    a11y: { test: 'todo' },
     docs: {
       source: {
         transform: (code: string) => {
