@@ -1,3 +1,10 @@
+## [19.1.2-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.1...react-19.1.2-rc.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* **choice-group:** fix height and a11y violations [#914](https://github.com/TEDI-Design-System/react/issues/914) ([#922](https://github.com/TEDI-Design-System/react/issues/922)) ([0357829](https://github.com/TEDI-Design-System/react/commit/035782941364404f30e5b2230edd4095425cf47b))
+
 ## [19.1.2-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.1...react-19.1.2-rc.1) (2026-09-24)
 
 
