@@ -3,6 +3,7 @@ import React, { forwardRef } from 'react';
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { PolymorphicRef } from '../../../helpers/polymorphic/types';
 import { UnknownType } from '../../../types/commonTypes';
+import { Print } from '../../misc/print/print';
 import ButtonContent, { ButtonContentProps } from '../button-content/button-content';
 
 export type ButtonType = 'primary' | 'secondary' | 'neutral' | 'link';
@@ -42,16 +43,18 @@ const ButtonComponent = forwardRef(
     const ComponentAs = as || 'button';
 
     return (
-      <ButtonContent
-        data-name="button"
-        {...(rest as UnknownType)}
-        type={type}
-        formNoValidate={formNoValidate}
-        ref={ref}
-        as={ComponentAs}
-      >
-        {children}
-      </ButtonContent>
+      <Print visibility="hide">
+        <ButtonContent
+          data-name="button"
+          {...(rest as UnknownType)}
+          type={type}
+          formNoValidate={formNoValidate}
+          ref={ref}
+          as={ComponentAs}
+        >
+          {children}
+        </ButtonContent>
+      </Print>
     );
   }
 );
