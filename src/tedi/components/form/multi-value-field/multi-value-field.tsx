@@ -14,7 +14,7 @@ import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { ClosingButton } from '../../buttons/closing-button/closing-button';
 import Separator from '../../misc/separator/separator';
 import { Tag } from '../../tags/tag/tag';
-import FormLabel from '../form-label/form-label';
+import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './multi-value-field.module.scss';
 
 // Gap between tags (matches `--layout-grid-gutters-04`) and the width reserved
@@ -31,6 +31,12 @@ export interface MultiValueFieldProps {
    * Optional label displayed above the field.
    */
   label?: string;
+  /**
+   * Additional props forwarded to the underlying `Label` component.
+   * Use `modifiers` to control how the label text wraps or breaks
+   * (e.g. `{ modifiers: 'nowrap' }`).
+   */
+  labelProps?: FormLabelProps['labelProps'];
   /**
    * Name attribute for the hidden input. When provided, the field value
    * will be submitted as a JSON string in forms.
@@ -105,6 +111,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   const {
     id,
     label,
+    labelProps,
     name,
     values: externalValues,
     onChange,
@@ -236,7 +243,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
 
   return (
     <div className={classNames(styles['tedi-multi-value-field'], className)}>
-      {label && <FormLabel id={id} label={label} required={required} />}
+      {label && <FormLabel id={id} label={label} required={required} labelProps={labelProps} />}
       <div
         ref={innerRef}
         className={classNames(styles['tedi-multi-value-field__inner'], {

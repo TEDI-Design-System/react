@@ -2,8 +2,26 @@ import cn from 'classnames';
 import { ElementType, forwardRef, LabelHTMLAttributes, ReactNode } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import type { TextModifiers } from '../../base/typography/text/text';
 import { InfoTooltip } from '../../overlays/tooltip/info-tooltip';
 import styles from './label.module.scss';
+
+/**
+ * Subset of {@link TextModifiers} that is meaningful for a label. `.tedi-label` is
+ * `display: inline`, so text-alignment (`center`/`left`/`right`) and `::first-letter`
+ * (`capitalize-first`) have no effect and are intentionally excluded — only wrapping,
+ * text-transform and italic controls that actually apply to inline text remain.
+ */
+export type LabelModifiers = Extract<
+  TextModifiers,
+  'nowrap' | 'break-all' | 'break-word' | 'break-spaces' | 'italic' | 'uppercase' | 'lowercase' | 'capitalize'
+>;
+
+/**
+ * Breakpoint-aware `modifiers` for a label, so consumers can vary wrapping responsively
+ * (e.g. `{ modifiers: 'nowrap', sm: { modifiers: 'break-word' } }`).
+ */
+export type LabelModifierProps = BreakpointSupport<{ modifiers?: LabelModifiers[] | LabelModifiers }>;
 
 type LabelBreakpointProps = {
   /**
@@ -16,6 +34,13 @@ type LabelBreakpointProps = {
    * @default false
    */
   isSmall?: boolean;
+  /**
+   * Text modifiers that control how the label text is rendered, e.g. wrapping and
+   * line-breaking behavior (`'nowrap'`, `'break-word'`, `'break-all'`, `'break-spaces'`).
+   * Reuses the same modifiers as the `Text` component. Useful to prevent long labels
+   * from breaking across multiple lines and distorting form layouts.
+   */
+  modifiers?: LabelModifiers[] | LabelModifiers;
 };
 
 export interface LabelProps
@@ -50,15 +75,19 @@ export const Label = forwardRef<HTMLLabelElement | HTMLSpanElement, LabelProps>(
     className,
     isBold,
     isSmall,
+    modifiers,
     required,
     tooltip,
     ...rest
   } = getCurrentBreakpointProps<LabelProps>(props);
 
+  const modifiersArray = typeof modifiers === 'string' ? [modifiers] : modifiers;
+
   const labelBEM = cn(
     styles['tedi-label'],
     isBold && styles['tedi-label--bold'],
     isSmall && styles['tedi-label--small'],
+    modifiersArray?.map((modifier) => `text-${modifier}`),
     className
   );
 

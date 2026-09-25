@@ -62,6 +62,25 @@ describe('FormLabel component', () => {
     expect(getByText('Form Label Text')).toBeInTheDocument();
   });
 
+  it('forwards labelProps.modifiers to the underlying label', () => {
+    const { container } = render(
+      <FormLabel id="test-id" label="A very long label that should not wrap" labelProps={{ modifiers: 'nowrap' }} />
+    );
+
+    const label = container.querySelector('.tedi-form-label');
+    expect(label).toHaveClass('text-nowrap');
+  });
+
+  it('forwards multiple labelProps.modifiers to the underlying label', () => {
+    const { container } = render(
+      <FormLabel id="test-id" label="Long label" labelProps={{ modifiers: ['break-word', 'uppercase'] }} />
+    );
+
+    const label = container.querySelector('.tedi-form-label');
+    expect(label).toHaveClass('text-break-word');
+    expect(label).toHaveClass('text-uppercase');
+  });
+
   it('renders a ReactNode label correctly', () => {
     const { getByTestId } = render(
       <FormLabel

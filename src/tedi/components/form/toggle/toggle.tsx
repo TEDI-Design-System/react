@@ -4,7 +4,7 @@ import React, { forwardRef, useState } from 'react';
 import { Icon } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
 import FeedbackText, { FeedbackTextProps } from '../feedback-text/feedback-text';
-import FormLabel from '../form-label/form-label';
+import FormLabel, { FormLabelProps } from '../form-label/form-label';
 import styles from './toggle.module.scss';
 
 export interface ToggleProps {
@@ -94,6 +94,12 @@ export interface ToggleProps {
    * Useful for providing extra explanation without cluttering the UI.
    */
   tooltip?: string;
+  /**
+   * Additional props forwarded to the underlying `Label` component.
+   * Use `modifiers` to control how the label text wraps or breaks
+   * (e.g. `{ modifiers: 'nowrap' }`).
+   */
+  labelProps?: FormLabelProps['labelProps'];
 }
 
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => {
@@ -114,6 +120,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
     disabled = false,
     isLoading = false,
     tooltip,
+    labelProps,
     ...rest
   } = props;
   const helperId = helper ? `${id}-helper` : undefined;
@@ -158,6 +165,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>((props, ref) => 
             hideLabel={hideLabel}
             label={label}
             tooltip={tooltip}
+            labelProps={labelProps}
           />
         )}
 

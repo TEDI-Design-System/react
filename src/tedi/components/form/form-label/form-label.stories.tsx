@@ -1,7 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
-import { Label } from '../../content/label/label';
+import { Text } from '../../base/typography/text/text';
+import { Label, LabelModifierProps } from '../../content/label/label';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import FormLabel from './form-label';
 
 const meta: Meta<typeof FormLabel> = {
@@ -73,4 +75,52 @@ const StructureTemplate: StoryFn = () => {
 
 export const Structure = {
   render: StructureTemplate,
+};
+
+/**
+ * By default a long label wraps onto multiple lines when the available width is
+ * constrained, which can distort form layouts. Use `labelProps.modifiers` to control
+ * the wrapping/breaking behavior — e.g. `'nowrap'` to keep it on a single line, or
+ * `'break-word'` / `'break-all'` to control where it breaks. `modifiers` also accepts
+ * breakpoint keys for responsive wrapping.
+ */
+const WrappingTemplate: StoryFn = () => {
+  const longLabel = 'This-is-an-unusually-long-input-label-that-would-normally-break-across-several-lines';
+
+  const examples: { caption: string; labelProps?: LabelModifierProps }[] = [
+    { caption: 'Default (wraps)' },
+    { caption: 'modifiers: nowrap', labelProps: { modifiers: 'nowrap' } },
+    { caption: 'modifiers: break-all', labelProps: { modifiers: 'break-all' } },
+    {
+      caption: 'Responsive: break-word, nowrap from sm up',
+      labelProps: { modifiers: 'break-word', sm: { modifiers: 'nowrap' } },
+    },
+  ];
+
+  return (
+    <VerticalSpacing size={1.5}>
+      {examples.map(({ caption, labelProps }, index) => (
+        <div key={index}>
+          <Text element="p" modifiers="bold">
+            {caption}
+          </Text>
+          {/* Constrain width and clip so a nowrap label can't overflow into the next example. */}
+          <div
+            style={{
+              maxWidth: 220,
+              overflow: 'hidden',
+              border: '1px dashed var(--general-border-primary)',
+              padding: 8,
+            }}
+          >
+            <FormLabel id={`wrap-${index}`} label={longLabel} labelProps={labelProps} />
+          </div>
+        </div>
+      ))}
+    </VerticalSpacing>
+  );
+};
+
+export const LabelWrapping = {
+  render: WrappingTemplate,
 };
