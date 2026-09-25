@@ -174,10 +174,10 @@ files. This is the part of this document worth maintaining by hand.
   `TextField` with `input={{ type: 'password' }}`. The `input` prop's own JSDoc ("Additional
   attributes for the input element") does not tell you this is the *only* route.
 - **`Textarea`, not `TextArea`.** Renamed; the old casing is gone.
-- **`showClearButtonOnHover` reveals the clear (×) only on hover/focus** (keyboard focus included),
-  once the field is clearable and filled — instead of showing it whenever there's a value. It's a
-  top-level prop on `TextField`, `Search`, `MultiValueField` and `Select`; on `DateField` /
-  `TimeField` / `DateTimeField` pass it via `inputProps={{ showClearButtonOnHover: true }}`. On
+- **`showClearOnInteraction` reveals the clear (×) only on hover/focus/active** (keyboard focus
+  included), once the field is clearable and filled — instead of showing it whenever there's a value.
+  It's a top-level prop on `TextField`, `Search`, `MultiValueField` and `Select`; on `DateField` /
+  `TimeField` / `DateTimeField` pass it via `inputProps={{ showClearOnInteraction: true }}`. On
   `Select` it *also* needs `isClearIndicatorVisible` (Select hides it by default). `Textarea` has no
   clear button, so it doesn't take it.
 - **File rejections are observable.** A file failing `accept` or `maxSize` surfaces a localised
