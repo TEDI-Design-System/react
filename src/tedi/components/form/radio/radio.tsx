@@ -1,21 +1,30 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
+import { Icon } from '../../base/icon/icon';
 import { Col, Row } from '../../layout/grid';
 import { ChoiceInputProps } from '../choice-input.types';
 import FeedbackText from '../feedback-text/feedback-text';
 import FormLabel from '../form-label/form-label';
 import styles from './radio.module.scss';
+import { RadioGroupContext } from './radio-group/radio-group-context';
 
-export type RadioProps = ChoiceInputProps;
+export type RadioProps = BreakpointSupport<ChoiceInputProps>;
 
-export const Radio = (props: RadioProps): JSX.Element => {
+interface RadioComponent {
+  (props: RadioProps): JSX.Element;
+  displayName?: string;
+}
+
+export const Radio = ((props: RadioProps): JSX.Element => {
+  const group = React.useContext(RadioGroupContext);
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     id,
     label,
     value,
     className,
-    disabled,
     onChange,
     hideLabel,
     helper,
@@ -24,28 +33,125 @@ export const Radio = (props: RadioProps): JSX.Element => {
     hover,
     name,
     tooltip,
-    size = 'default',
-    invalid,
-    required,
+    description,
+    icon,
+    size: sizeProp,
+    variant: variantProp,
+    cardVariant: cardVariantProp,
+    disabled: disabledProp,
+    invalid: invalidProp,
+    required: requiredProp,
     ...rest
-  } = props;
+  } = getCurrentBreakpointProps<ChoiceInputProps>(props);
+
+  const size = sizeProp ?? group?.size ?? 'default';
+  const variant = variantProp ?? group?.variant ?? 'default';
+  const cardVariant = cardVariantProp ?? group?.cardVariant ?? 'primary';
+  const disabled = disabledProp ?? group?.disabled ?? false;
+  const invalid = invalidProp ?? group?.invalid;
+  const required = requiredProp ?? group?.required;
+
+  if (variant === 'card' && !!tooltip) {
+    console.warn('Radio: `tooltip` is not supported with `variant="card"` and will be ignored. Use `description`.');
+  }
+
+  const generatedId = React.useId();
+  const resolvedId = id ?? generatedId;
+  const resolvedName = name ?? group?.name;
 
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
   const labelRef = React.useRef<HTMLLabelElement>(null);
 
+  const isGrouped = group !== null;
   const getChecked = React.useMemo((): boolean => {
+    if (isGrouped) return group?.value === value;
     return onChange && typeof checked !== 'undefined' ? checked : innerChecked;
-  }, [onChange, innerChecked, checked]);
+  }, [isGrouped, group, value, onChange, checked, innerChecked]);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    if (typeof checked === 'undefined') {
+    if (isGrouped) {
+      group?.onValueChange(value);
+    } else if (typeof checked === 'undefined') {
       setInnerChecked(event?.target.checked);
     }
     onChange?.(value, event?.target.checked);
   };
 
-  const helperId = helper ? helper.id ?? `${id}-helper` : undefined;
-  const tooltipId = tooltip ? `${id}-tooltip` : undefined;
+  const helperId = helper ? helper.id ?? `${resolvedId}-helper` : undefined;
+  const describedBy = helperId;
+
+  const input = (
+    <input
+      id={resolvedId}
+      value={value}
+      name={resolvedName}
+      type="radio"
+      disabled={disabled}
+      checked={getChecked}
+      required={required}
+      onChange={onChangeHandler}
+      className={styles['tedi-radio__input']}
+      aria-describedby={describedBy}
+    />
+  );
+
+  const indicator = (
+    <span
+      aria-hidden="true"
+      className={cn(
+        styles['tedi-radio__indicator'],
+        { [styles['tedi-radio__indicator--hover']]: hover },
+        { [styles[`tedi-radio__indicator--size-${size}`]]: size },
+        { [styles['tedi-radio__indicator--invalid']]: invalid }
+      )}
+      data-testid="radio-indicator"
+    />
+  );
+
+  if (variant === 'card') {
+    // The whole card is a <label> for click convenience, but that would fold the
+    // description and helper text into the control's accessible NAME. Name the
+    // input from the choice text only (aria-labelledby), and expose the
+    // description + helper as its accessible DESCRIPTION (aria-describedby).
+    const cardLabelId = `${resolvedId}-label`;
+    const cardDescriptionId = description ? `${resolvedId}-description` : undefined;
+    const cardDescribedBy = [cardDescriptionId, helperId].filter(Boolean).join(' ') || undefined;
+
+    return (
+      <label
+        data-name="radio"
+        className={cn(
+          styles['tedi-radio'],
+          styles['tedi-radio--card'],
+          styles[`tedi-radio--card-${cardVariant}`],
+          { [styles['tedi-radio--card-with-icon']]: !!icon },
+          { [styles['tedi-radio--disabled']]: disabled },
+          className
+        )}
+        {...rest}
+      >
+        <span className={styles['tedi-radio__card-control']}>
+          {React.cloneElement(input, {
+            'aria-labelledby': label ? cardLabelId : undefined,
+            'aria-describedby': cardDescribedBy,
+          })}
+          {indicator}
+          {icon && <Icon name={icon} size={size === 'default' ? 18 : 24} className={styles['tedi-radio__card-icon']} />}
+          <span id={cardLabelId} className={cn(styles['tedi-radio__card-label'], { 'sr-only': hideLabel })}>
+            {label}
+          </span>
+        </span>
+        {description && (
+          <span id={cardDescriptionId} className={styles['tedi-radio__card-description']}>
+            {description}
+          </span>
+        )}
+        {helper && (
+          <FeedbackText id={helperId} {...helper} className={cn(styles['tedi-radio__helper'], helper.className)} />
+        )}
+      </label>
+    );
+  }
 
   const LabelBEM = cn(styles['tedi-radio__label'], { [styles['tedi-radio--disabled']]: disabled });
 
@@ -58,30 +164,11 @@ export const Radio = (props: RadioProps): JSX.Element => {
       <Row gutter={0}>
         <Col width="auto">
           <div className={styles['tedi-radio__outer-indicator-wrapper']}>
-            <input
-              id={id}
-              value={value}
-              name={name}
-              type="radio"
-              disabled={disabled}
-              checked={getChecked}
-              onChange={onChangeHandler}
-              className={styles['tedi-radio__input']}
-              aria-describedby={[helperId, tooltipId].filter(Boolean).join(' ')}
-              required={required}
-            />
-            <div
-              aria-hidden="true"
-              onClick={() => labelRef.current?.click()}
-              className={cn(
-                styles['tedi-radio__indicator'],
-                { [styles['tedi-radio__indicator--hover']]: hover },
-                { [styles[`tedi-radio__indicator--size-${size}`]]: size },
-                { [styles['tedi-radio__indicator--invalid']]: invalid },
-                className
-              )}
-              data-testid="radio-indicator"
-            />
+            {input}
+            {React.cloneElement(indicator, {
+              onClick: () => labelRef.current?.click(),
+              className: cn(indicator.props.className, className),
+            })}
           </div>
         </Col>
         {label && (
@@ -89,12 +176,12 @@ export const Radio = (props: RadioProps): JSX.Element => {
             <FormLabel
               ref={labelRef}
               className={LabelBEM}
-              id={id}
+              id={resolvedId}
               data-testid="radio-label"
               hideLabel={hideLabel}
               label={label}
               tooltip={tooltip}
-              required={required}
+              required={requiredProp}
             />
           </Col>
         )}
@@ -105,6 +192,8 @@ export const Radio = (props: RadioProps): JSX.Element => {
       )}
     </div>
   );
-};
+}) as RadioComponent;
+
+Radio.displayName = 'Radio';
 
 export default Radio;
