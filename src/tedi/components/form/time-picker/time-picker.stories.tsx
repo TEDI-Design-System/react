@@ -81,3 +81,4 @@ export const ControlledExample: StoryFn<TimePickerProps> = () => {
     </Row>
   );
 };
+ControlledExample.parameters = { chromatic: { disableSnapshot: true } };

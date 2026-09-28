@@ -12,10 +12,16 @@
   border: 1px solid var(--button-primary-border-default);
   border-radius: var(--button-radius-sm);
 
-  &--is-hovered:not(:disabled, [aria-disabled='true']),
-  &:hover:not(:disabled, [aria-disabled='true']) {
+  &--is-hovered:not(:disabled, [aria-disabled='true']) {
     background-color: var(--button-primary-background-hover);
     border-color: var(--button-primary-border-hover);
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled, [aria-disabled='true']) {
+      background-color: var(--button-primary-background-hover);
+      border-color: var(--button-primary-border-hover);
+    }
   }
 
   &--is-active:not(:disabled, [aria-disabled='true']),

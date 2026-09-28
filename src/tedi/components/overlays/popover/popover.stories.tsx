@@ -32,10 +32,6 @@ const meta: Meta<PopoverProps> = {
   } as never,
   title: 'TEDI-Ready/Components/Overlay/Popover',
   parameters: {
-    a11y: {
-      // TODO: [Popover]: Review storybook a11y violations #817
-      test: 'todo',
-    },
     docs: {
       source: {
         transform: (code: string) => {
@@ -577,36 +573,43 @@ export const Default: StoryObj = {
 };
 
 export const ContentExamples: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ContentExamplesTemplate,
   args: {},
 };
 
 export const Heading: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: HeadingTemplate,
   args: {},
 };
 
 export const Trigger: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: TriggerTemplate,
   args: {},
 };
 
 export const ArrowPosition: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ArrowPositionTemplate,
   args: {},
 };
 
 export const WithProminentBorder: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: WithProminentBorderTemplate,
   args: {},
 };
 
 export const Size: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: SizeTemplate,
   args: {},
 };
 
 export const ClosingButton: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ClosingButtonTemplate,
   args: {},
 };
@@ -617,6 +620,7 @@ export const NotDismissible: Story = {
     dismissible: false,
   },
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -633,6 +637,7 @@ export const NotDismissible: Story = {
 };
 
 export const ScrollLocked: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: ScrollLockedTemplate,
   args: {
     scrollLock: true,
@@ -676,6 +681,7 @@ export const FocusLocked: Story = {
     );
   },
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -714,6 +720,7 @@ export const AccessibilityBaseline: Story = {
     </Popover>
   ),
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -745,6 +752,7 @@ export const NoTitleAccessibleName: Story = {
     </Popover>
   ),
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -778,6 +786,7 @@ export const ReadAllStressTest: Story = {
     </Popover>
   ),
   parameters: {
+    chromatic: { disableSnapshot: true },
     docs: {
       description: {
         story: `
@@ -792,4 +801,143 @@ export const ReadAllStressTest: Story = {
       },
     },
   },
+};
+
+// `Popover.Content` only wires `aria-labelledby` when it has a `title`, and an open `role="dialog"`
+// without an accessible name is an axe violation, so every open popover below carries one.
+const SHORT_TEXT = 'Jääkaru elab Arktikas.';
+
+const VERTICAL_PLACEMENTS = ['top-start', 'top', 'top-end', 'bottom-start', 'bottom', 'bottom-end'] as const;
+const HORIZONTAL_PLACEMENTS = ['left-start', 'left', 'left-end', 'right-start', 'right', 'right-end'] as const;
+
+// Each open popover needs a slot it can grow into, or it lands on its neighbour and floating-ui
+// flips or shifts it away from the placement being tested. The trigger sits at the far edge of
+// its slot so the content grows inwards: a `top-*` popover opens upwards, a `bottom-*` downwards.
+// The placements are split across two stories for the same reason: `shift()` keeps content inside
+// the viewport, so a story taller than the viewport would drag its lowest popovers back up.
+const verticalSlotStyle = (placement: string): CSSProperties => ({
+  height: 150,
+  display: 'flex',
+  alignItems: placement.startsWith('top') ? 'flex-end' : 'flex-start',
+});
+
+const horizontalSlotStyle: CSSProperties = { height: 220, display: 'flex', alignItems: 'center' };
+
+/**
+ * Visual-regression only. The other stories all start closed, so the popover body, its
+ * arrow and its border are never captured. `defaultOpen` renders it open from props alone.
+ */
+export const OpenForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Popover defaultOpen placement="bottom">
+      <Popover.Trigger>
+        <Button>Popover Trigger</Button>
+      </Popover.Trigger>
+      <Popover.Content title="Pealkiri" width="medium" close>
+        {POLAR_BEAR_TEXT}
+      </Popover.Content>
+    </Popover>
+  ),
+};
+
+/**
+ * Visual-regression only. The arrow is drawn per placement and its offset from the corner differs
+ * on `-start` / `-end`, none of which is captured while the popover is closed.
+ */
+export const OpenVerticalPlacementsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <div style={{ paddingTop: 120 }}>
+      <Row>
+        {VERTICAL_PLACEMENTS.map((placement) => (
+          <Col key={placement} xs={4} className="flex justify-content-center">
+            <div style={verticalSlotStyle(placement)}>
+              <Popover defaultOpen placement={placement}>
+                <Popover.Trigger>{placement}</Popover.Trigger>
+                <Popover.Content title={placement} width="small">
+                  {SHORT_TEXT}
+                </Popover.Content>
+              </Popover>
+            </div>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  ),
+};
+
+/**
+ * Visual-regression only. Side placements put the arrow on the left or right edge, where it is
+ * centred by `-start` / `-end` against the content's own height rather than its width.
+ */
+export const OpenHorizontalPlacementsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Row>
+      {HORIZONTAL_PLACEMENTS.map((placement) => (
+        <Col key={placement} xs={6} className="flex justify-content-center">
+          <div style={horizontalSlotStyle}>
+            <Popover defaultOpen placement={placement}>
+              <Popover.Trigger>{placement}</Popover.Trigger>
+              <Popover.Content title={placement} width="small">
+                {SHORT_TEXT}
+              </Popover.Content>
+            </Popover>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  ),
+};
+
+/**
+ * Visual-regression only. `width` only takes effect on an open popover. Stacked rather than placed
+ * side by side because `none` and `large` are wider than a quarter of the canvas.
+ */
+export const OpenWidthsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Row>
+      {(['none', 'small', 'medium', 'large'] as const).map((width) => (
+        <Col key={width} xs={12}>
+          <div style={{ height: 200 }}>
+            <Popover defaultOpen placement="bottom-start">
+              <Popover.Trigger>{width}</Popover.Trigger>
+              <Popover.Content title={width} width={width}>
+                {POLAR_BEAR_TEXT}
+              </Popover.Content>
+            </Popover>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  ),
+};
+
+/**
+ * Visual-regression only. `withBorder` adds the illustrative border on the arrow side and widens
+ * the arrow padding so the arrow clears the rounded corner; both are only visible open, and the
+ * `-start` / `-end` placements are where the extra padding matters.
+ */
+export const OpenWithBorderForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <div style={{ paddingTop: 120 }}>
+      <Row>
+        {(['bottom-start', 'bottom', 'top-end'] as const).map((placement) => (
+          <Col key={placement} xs={4} className="flex justify-content-center">
+            <div style={verticalSlotStyle(placement)}>
+              <Popover defaultOpen withBorder placement={placement}>
+                <Popover.Trigger>{placement}</Popover.Trigger>
+                <Popover.Content title="Pealkiri" width="small" close>
+                  {POLAR_BEAR_TEXT}
+                </Popover.Content>
+              </Popover>
+            </div>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  ),
 };

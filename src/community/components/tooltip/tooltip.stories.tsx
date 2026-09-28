@@ -50,6 +50,7 @@ export const Default: Story = {
 };
 
 export const OpenWithClick: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -75,6 +76,7 @@ export const OuterControlled: Story = {
 };
 
 export const TriggerIcon: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -83,6 +85,7 @@ export const TriggerIcon: Story = {
 };
 
 export const TriggerButton: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -91,6 +94,7 @@ export const TriggerButton: Story = {
 };
 
 export const TriggerAnchor: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -99,6 +103,7 @@ export const TriggerAnchor: Story = {
 };
 
 export const TriggerToggle: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -115,6 +120,7 @@ export const TriggerToggle: Story = {
 };
 
 export const TriggerCardCustomContent: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -150,6 +156,7 @@ export const TriggerCardCustomContent: Story = {
  * **Note**: It is added to use in HeaderDropdown, use it with caution.
  */
 export const WithCardBorder: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -210,6 +217,8 @@ export const TooltipWidth: StoryFn = () => {
   );
 };
 
+TooltipWidth.parameters = { chromatic: { disableSnapshot: true } };
+
 export const TooltipPosition: StoryFn = () => {
   const tooltiptext = 'Lorem ipsum dolor sit amet';
 
@@ -254,6 +263,8 @@ export const TooltipPosition: StoryFn = () => {
   );
 };
 
+TooltipPosition.parameters = { chromatic: { disableSnapshot: true } };
+
 export const ScrollableRowInCard: StoryFn = () => {
   return (
     <Row justifyContent="center">
@@ -279,3 +290,4 @@ export const ScrollableRowInCard: StoryFn = () => {
     </Row>
   );
 };
+ScrollableRowInCard.parameters = { chromatic: { disableSnapshot: true } };

@@ -87,6 +87,7 @@ export const Default: Story = {
 };
 
 export const Width12: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -96,6 +97,7 @@ export const Width12: Story = {
 };
 
 export const Width10: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -105,6 +107,7 @@ export const Width10: Story = {
 };
 
 export const Width8: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -125,6 +128,7 @@ export const OpenByDefault: Story = {
 };
 
 export const WithoutHeader: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -135,6 +139,7 @@ export const WithoutHeader: Story = {
 };
 
 export const ErrorTopModal: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -147,6 +152,7 @@ export const ErrorTopModal: Story = {
 };
 
 export const SuccessTopModal: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -159,6 +165,7 @@ export const SuccessTopModal: Story = {
 };
 
 export const WarningTopModal: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -214,6 +221,8 @@ export const Position: StoryFn<ModalProps> = () => {
   );
 };
 
+Position.parameters = { chromatic: { disableSnapshot: true } };
+
 export const ControlledOutside = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -239,7 +248,10 @@ export const ControlledOutside = () => {
   );
 };
 
+ControlledOutside.parameters = { chromatic: { disableSnapshot: true } };
+
 export const TrapFocusFalse: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -251,6 +263,7 @@ export const TrapFocusFalse: Story = {
 };
 
 export const NotDismissibleModal: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -267,6 +280,7 @@ export const NotDismissibleModal: Story = {
 };
 
 export const ScrollNotLocked: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -277,6 +291,7 @@ export const ScrollNotLocked: Story = {
 };
 
 export const NoOverlay: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {
@@ -287,6 +302,7 @@ export const NoOverlay: Story = {
 };
 
 export const CookieConsentModal: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
 
   args: {

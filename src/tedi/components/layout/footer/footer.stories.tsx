@@ -186,7 +186,7 @@ const DeviceFrame = ({
         )}
         <iframe
           ref={ref}
-          title={label}
+          title={label || `Jaluse eelvaade (${width} px)`}
           scrolling="no"
           src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
           style={{ display: 'block', width: '100%', height, border: 0, marginTop: '1rem' }}
@@ -206,7 +206,7 @@ const DeviceFrame = ({
         <div style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
           <iframe
             ref={ref}
-            title={label}
+            title={label || `Jaluse eelvaade (${width} px)`}
             scrolling="no"
             src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
             style={{ display: 'block', width: '100%', height, border: 0 }}
@@ -345,197 +345,203 @@ export const LogoPosition: Story = {
     );
 
     return (
-      <VerticalSpacing size={2}>
-        <Example label="Responsive (breakpoint props) — logo on the left on desktop, drops to the bottom from tablet down. Resize to see.">
-          <DeviceFrame storyId={LOGO_BREAKPOINT_SOURCE_ID} width={1138} theme={theme} fluid />
-        </Example>
+      <section aria-label="Logo position examples">
+        <VerticalSpacing size={2}>
+          <Example label="Responsive (breakpoint props) — logo on the left on desktop, drops to the bottom from tablet down. Resize to see.">
+            <DeviceFrame storyId={LOGO_BREAKPOINT_SOURCE_ID} width={1138} theme={theme} fluid />
+          </Example>
 
-        <Example label="Right on desktop · bottom on tablet and mobile (placement=end, mobileBreakpoint=lg)">
-          <Footer mobileBreakpoint="lg">
-            <Footer.Body>
-              <StandardSections />
-            </Footer.Body>
-            <Footer.Side placement="end">
-              <LogoPlaceholder />
-            </Footer.Side>
-          </Footer>
-        </Example>
+          <Example label="Right on desktop · bottom on tablet and mobile (placement=end, mobileBreakpoint=lg)">
+            <Footer mobileBreakpoint="lg">
+              <Footer.Body>
+                <StandardSections />
+              </Footer.Body>
+              <Footer.Side placement="end">
+                <LogoPlaceholder />
+              </Footer.Side>
+            </Footer>
+          </Example>
 
-        <Example label="Right, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start)">
-          <Footer mobileBreakpoint="lg">
-            <Footer.Body>
-              <StandardSections />
-            </Footer.Body>
-            <Footer.Side placement="end" position="start">
-              <LogoPlaceholder />
-            </Footer.Side>
-          </Footer>
-        </Example>
+          <Example label="Right, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start)">
+            <Footer mobileBreakpoint="lg">
+              <Footer.Body>
+                <StandardSections />
+              </Footer.Body>
+              <Footer.Side placement="end" position="start">
+                <LogoPlaceholder />
+              </Footer.Side>
+            </Footer>
+          </Example>
 
-        <Example label="Left on desktop · bottom on tablet and mobile (placement=end, lg={ placement: start })">
-          <Footer mobileBreakpoint="lg">
-            <Footer.Side placement="end" lg={{ placement: 'start' }}>
-              <LogoPlaceholder />
-            </Footer.Side>
-            <Footer.Body>
-              <StandardSections />
-            </Footer.Body>
-          </Footer>
-        </Example>
+          <Example label="Left on desktop · bottom on tablet and mobile (placement=end, lg={ placement: start })">
+            <Footer mobileBreakpoint="lg">
+              <Footer.Side placement="end" lg={{ placement: 'start' }}>
+                <LogoPlaceholder />
+              </Footer.Side>
+              <Footer.Body>
+                <StandardSections />
+              </Footer.Body>
+            </Footer>
+          </Example>
 
-        <Example label="Left, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start, lg={ placement: start })">
-          <Footer mobileBreakpoint="lg">
-            <Footer.Side placement="end" position="start" lg={{ placement: 'start' }}>
-              <LogoPlaceholder />
-            </Footer.Side>
-            <Footer.Body>
-              <StandardSections />
-            </Footer.Body>
-          </Footer>
-        </Example>
-      </VerticalSpacing>
+          <Example label="Left, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start, lg={ placement: start })">
+            <Footer mobileBreakpoint="lg">
+              <Footer.Side placement="end" position="start" lg={{ placement: 'start' }}>
+                <LogoPlaceholder />
+              </Footer.Side>
+              <Footer.Body>
+                <StandardSections />
+              </Footer.Body>
+            </Footer>
+          </Example>
+        </VerticalSpacing>
+      </section>
     );
   },
 };
 
 export const WithBottomSection: Story = {
   render: () => (
-    <VerticalSpacing size={2}>
-      <Footer mobileBreakpoint="lg">
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-        <Footer.Bottom>
-          <Link href="#" color="inverted">
-            Facebook
-          </Link>
-          <Link href="#" color="inverted">
-            Instagram
-          </Link>
-          <Link href="#" color="inverted">
-            LinkedIn
-          </Link>
-        </Footer.Bottom>
-      </Footer>
-      <Footer mobileBreakpoint="lg">
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-        <Footer.Bottom separator>
-          <Link href="#" color="inverted">
-            Facebook
-          </Link>
-          <Link href="#" color="inverted">
-            Instagram
-          </Link>
-          <Link href="#" color="inverted">
-            LinkedIn
-          </Link>
-        </Footer.Bottom>
-      </Footer>
+    <section aria-label="Footer bottom section examples">
+      <VerticalSpacing size={2}>
+        <Footer mobileBreakpoint="lg">
+          <Footer.Body>
+            <StandardSections />
+          </Footer.Body>
+          <Footer.Side placement="end">
+            <LogoPlaceholder />
+          </Footer.Side>
+          <Footer.Bottom>
+            <Link href="#" color="inverted">
+              Facebook
+            </Link>
+            <Link href="#" color="inverted">
+              Instagram
+            </Link>
+            <Link href="#" color="inverted">
+              LinkedIn
+            </Link>
+          </Footer.Bottom>
+        </Footer>
+        <Footer mobileBreakpoint="lg">
+          <Footer.Body>
+            <StandardSections />
+          </Footer.Body>
+          <Footer.Side placement="end">
+            <LogoPlaceholder />
+          </Footer.Side>
+          <Footer.Bottom separator>
+            <Link href="#" color="inverted">
+              Facebook
+            </Link>
+            <Link href="#" color="inverted">
+              Instagram
+            </Link>
+            <Link href="#" color="inverted">
+              LinkedIn
+            </Link>
+          </Footer.Bottom>
+        </Footer>
 
-      <Footer mobileBreakpoint="lg">
-        <Footer.Body>
-          <StandardSections />
-        </Footer.Body>
-        <Footer.Side placement="end">
-          <LogoPlaceholder />
-        </Footer.Side>
-        <Footer.Bottom>
-          <StatusBadge color="success" variant="filled-bordered">
-            TEDI poolt heaks kiidetud
-          </StatusBadge>
-        </Footer.Bottom>
-      </Footer>
-    </VerticalSpacing>
+        <Footer mobileBreakpoint="lg">
+          <Footer.Body>
+            <StandardSections />
+          </Footer.Body>
+          <Footer.Side placement="end">
+            <LogoPlaceholder />
+          </Footer.Side>
+          <Footer.Bottom>
+            <StatusBadge color="success" variant="filled-bordered">
+              TEDI poolt heaks kiidetud
+            </StatusBadge>
+          </Footer.Bottom>
+        </Footer>
+      </VerticalSpacing>
+    </section>
   ),
 };
 
 export const CustomContent: Story = {
   render: () => (
-    <VerticalSpacing size={2}>
-      <Footer>
-        <Footer.Body>
-          <Footer.Section icon="call" heading="Kontakt">
-            <ContactLinks />
-          </Footer.Section>
-          <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'center' }}>
-            <Link href="#" color="inverted" aria-label="Facebook">
-              <FacebookIcon />
-            </Link>
-            <Link href="#" color="inverted" aria-label="Instagram">
-              <InstagramIcon />
-            </Link>
-          </div>
-        </Footer.Body>
-      </Footer>
-
-      <Footer>
-        <Footer.Body>
-          <Footer.Section heading="Uuri lähemalt">
-            <Link href="#" color="inverted">
-              Privaatsuspoliitika
-            </Link>
-            <Link href="#" color="inverted">
-              Küpsised
-            </Link>
-            <Link href="#" color="inverted">
-              Korduma kippuvad küsimused
-            </Link>
-          </Footer.Section>
-          <Footer.Section heading="Sotsiaalmeedia">
-            <Link href="#" color="inverted">
-              Jälgi meid Twitteris
-            </Link>
-            <Link href="#" color="inverted">
-              Jälgi meid Facebookis
-            </Link>
-            <Link href="#" color="inverted">
-              Liitu meie kogukonnaga
-            </Link>
-          </Footer.Section>
-          <Footer.Section heading="Uudised">
-            <Link href="#" color="inverted">
-              Uudiskirja tellimine
-            </Link>
-          </Footer.Section>
-          <Footer.Section icon="call" heading="Kontakt">
-            <ContactLinks />
-          </Footer.Section>
-        </Footer.Body>
-        <Footer.Bottom>
-          <img src="TEHIK_logo.svg" alt="TEHIK" style={{ height: '2.5rem' }} />
-        </Footer.Bottom>
-      </Footer>
-
-      <Footer>
-        <Footer.Body>
-          <div style={{ alignSelf: 'center' }}>
-            <Footer.Section heading="Osale meie terviseuuringus">
-              <Text element="p" modifiers="small" color="white">
-                Liitu meie uuringuga ja avasta uut enda tervise kohta!
-              </Text>
-            </Footer.Section>
-          </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-            <img
-              src="https://picsum.photos/seed/tedi-footer/128"
-              alt=""
-              style={{ flexShrink: 0, width: '4rem', height: '4rem', borderRadius: '50%', objectFit: 'cover' }}
-            />
-            <Footer.Section heading="Kontakt">
+    <section aria-label="Footer custom content examples">
+      <VerticalSpacing size={2}>
+        <Footer>
+          <Footer.Body>
+            <Footer.Section icon="call" heading="Kontakt">
               <ContactLinks />
             </Footer.Section>
-          </div>
-        </Footer.Body>
-      </Footer>
-    </VerticalSpacing>
+            <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'center' }}>
+              <Link href="#" color="inverted" aria-label="Facebook">
+                <FacebookIcon />
+              </Link>
+              <Link href="#" color="inverted" aria-label="Instagram">
+                <InstagramIcon />
+              </Link>
+            </div>
+          </Footer.Body>
+        </Footer>
+
+        <Footer>
+          <Footer.Body>
+            <Footer.Section heading="Uuri lähemalt">
+              <Link href="#" color="inverted">
+                Privaatsuspoliitika
+              </Link>
+              <Link href="#" color="inverted">
+                Küpsised
+              </Link>
+              <Link href="#" color="inverted">
+                Korduma kippuvad küsimused
+              </Link>
+            </Footer.Section>
+            <Footer.Section heading="Sotsiaalmeedia">
+              <Link href="#" color="inverted">
+                Jälgi meid Twitteris
+              </Link>
+              <Link href="#" color="inverted">
+                Jälgi meid Facebookis
+              </Link>
+              <Link href="#" color="inverted">
+                Liitu meie kogukonnaga
+              </Link>
+            </Footer.Section>
+            <Footer.Section heading="Uudised">
+              <Link href="#" color="inverted">
+                Uudiskirja tellimine
+              </Link>
+            </Footer.Section>
+            <Footer.Section icon="call" heading="Kontakt">
+              <ContactLinks />
+            </Footer.Section>
+          </Footer.Body>
+          <Footer.Bottom>
+            <img src="TEHIK_logo.svg" alt="TEHIK" style={{ height: '2.5rem' }} />
+          </Footer.Bottom>
+        </Footer>
+
+        <Footer>
+          <Footer.Body>
+            <div style={{ alignSelf: 'center' }}>
+              <Footer.Section heading="Osale meie terviseuuringus">
+                <Text element="p" modifiers="small" color="white">
+                  Liitu meie uuringuga ja avasta uut enda tervise kohta!
+                </Text>
+              </Footer.Section>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <img
+                src="https://picsum.photos/seed/tedi-footer/128"
+                alt=""
+                style={{ flexShrink: 0, width: '4rem', height: '4rem', borderRadius: '50%', objectFit: 'cover' }}
+              />
+              <Footer.Section heading="Kontakt">
+                <ContactLinks />
+              </Footer.Section>
+            </div>
+          </Footer.Body>
+        </Footer>
+      </VerticalSpacing>
+    </section>
   ),
 };
 

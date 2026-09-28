@@ -12,6 +12,7 @@ import {
   useFloatingNodeId,
   useInteractions,
   useListNavigation,
+  useMergeRefs,
   useRole,
 } from '@floating-ui/react';
 import cn from 'classnames';
@@ -19,6 +20,7 @@ import classNames from 'classnames';
 import React, { cloneElement, JSX } from 'react';
 
 import { useLabels } from '../../../../tedi';
+import { getElementRef } from '../../../../tedi/helpers/get-element-ref';
 import styles from './map-dropdown.module.scss';
 
 export type MapDropdownItem = {
@@ -184,6 +186,8 @@ export const MapDropdown = (props: MapDropdownProps) => {
     }),
   ]);
 
+  const triggerRef = useMergeRefs([refs.setReference, trigger ? getElementRef(trigger) : null]);
+
   const renderDropdown = (): JSX.Element | null => {
     if (!isOpen) return null;
 
@@ -264,14 +268,15 @@ export const MapDropdown = (props: MapDropdownProps) => {
   );
 
   const triggerWithProps = trigger
-    ? cloneElement(trigger, {
-        ...getReferenceProps({
-          ref: refs.setReference,
+    ? cloneElement(
+        trigger,
+        getReferenceProps({
           tabIndex: 0,
           // @ts-expect-error: 'rest' props do not fully match Anchor's expected props, but they are validated elsewhere
           ...trigger.props,
-        }),
-      })
+          ref: triggerRef,
+        })
+      )
     : null;
 
   return (

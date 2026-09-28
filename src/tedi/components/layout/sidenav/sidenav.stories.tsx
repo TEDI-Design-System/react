@@ -1,8 +1,10 @@
-import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { Decorator, Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../grid';
+import { Header } from '../header';
+import { HideAt } from '../hide-at/hide-at';
 import { SideNavItem } from './components/sidenav-item/sidenav-item';
 import {
   exampleDefaultOpen,
@@ -32,10 +34,7 @@ const meta: Meta<typeof SideNav> = {
     'SideNav.Mobile': SideNav.Mobile,
   },
   parameters: {
-    a11y: {
-      // TODO: [SideNav]: Review storybook a11y violations #816
-      test: 'todo',
-    },
+    layout: 'fullscreen',
     docs: {
       source: {
         transform: (code: string) => {
@@ -57,13 +56,29 @@ const meta: Meta<typeof SideNav> = {
 export default meta;
 type Story = StoryObj<typeof SideNav>;
 
-const Template: StoryFn<typeof SideNav> = (args) => {
-  const [isOpen, setIsOpen] = useState(true);
+/**
+ * Wraps a story in a fixed-height box that establishes a containing block (via `transform`) for
+ * SideNav's `position: fixed` mobile overlay. On the Docs page — where every story shares one scroll
+ * container — this scopes the overlay to its own story so it opens under the right header instead of
+ * drifting; in Canvas it just frames the story at a realistic viewport height.
+ */
+const mobileViewportDecorator: Decorator = (Story) => (
+  <div style={{ height: 1024, position: 'relative', overflow: 'hidden', transform: 'translateZ(0)' }}>
+    <Story />
+  </div>
+);
+
+const Template: StoryFn<typeof SideNav> = (args, { viewMode }) => {
+  const [isOpen, setIsOpen] = useState(viewMode !== 'docs');
 
   return (
     <>
-      <SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />
-      <SideNav {...args} isMobileOpen={isOpen} />
+      <HideAt lg>
+        <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+          <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
+        </Header>
+      </HideAt>
+      <SideNav {...args} isMobileOpen={isOpen} onMenuToggle={setIsOpen} />
     </>
   );
 };
@@ -74,13 +89,7 @@ export const Default: Story = {
     navItems: exampleNavItems,
     ariaLabel: 'Menu title',
   },
-  decorators: [
-    (Story) => (
-      <div style={{ height: '1024px' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [mobileViewportDecorator],
 };
 
 const stateArray = ['Default', 'Hover', 'Focus', 'Active'];
@@ -189,13 +198,7 @@ export const SecondLevelMenuItems: Story = {
     navItems: exampleNavCollapsibleItems,
     ariaLabel: 'Menu title',
   },
-  decorators: [
-    (Story) => (
-      <div style={{ height: '1024px' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [mobileViewportDecorator],
 };
 
 export const SecondLevelMenuItemsParentsAreLinks: Story = {
@@ -204,13 +207,7 @@ export const SecondLevelMenuItemsParentsAreLinks: Story = {
     navItems: exampleNavCollapsibleItemsWithLinks,
     ariaLabel: 'Menu title',
   },
-  decorators: [
-    (Story) => (
-      <div style={{ height: '1024px' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [mobileViewportDecorator],
 };
 
 export const ThirdLevelMenuItems: Story = {
@@ -219,13 +216,7 @@ export const ThirdLevelMenuItems: Story = {
     navItems: exampleThirdLevelMenuItems,
     ariaLabel: 'Menu title',
   },
-  decorators: [
-    (Story) => (
-      <div style={{ height: '1024px' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [mobileViewportDecorator],
 };
 
 export const ThirdLevelMenuItemsParentsAreLinks: Story = {
@@ -234,25 +225,30 @@ export const ThirdLevelMenuItemsParentsAreLinks: Story = {
     navItems: exampleThirdLevelMenuItemsLinks,
     ariaLabel: 'Menu title',
   },
-  decorators: [
-    (Story) => (
-      <div style={{ height: '1024px' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [mobileViewportDecorator],
 };
 
-export const CollapsibleToggle: React.FC = () => {
+export const CollapsibleToggle: StoryFn<typeof SideNav> = (_args, { viewMode }) => {
+  const [isOpen, setIsOpen] = useState(viewMode !== 'docs');
+
   return (
-    <SideNav
-      ariaLabel="Collapsible menu"
-      navItems={exampleThirdLevelMenuItems}
-      isCollapsed={true}
-      isMobileOpen={true}
-    />
+    <>
+      <HideAt lg>
+        <Header toggle={<SideNav.Toggle menuOpen={isOpen} toggleMenu={() => setIsOpen(!isOpen)} />}>
+          <Header.Logo logo={<img src="header-logo.svg" alt="Logo" />} />
+        </Header>
+      </HideAt>
+      <SideNav
+        ariaLabel="Collapsible menu"
+        navItems={exampleThirdLevelMenuItems}
+        isCollapsed={true}
+        isMobileOpen={isOpen}
+        onMenuToggle={setIsOpen}
+      />
+    </>
   );
 };
+CollapsibleToggle.decorators = [mobileViewportDecorator];
 
 /**
  * Works only for desktop
@@ -264,6 +260,7 @@ export const DefaultOpen: Story = {
     ariaLabel: 'Default open menu',
     isMobileOpen: true,
   },
+  decorators: [mobileViewportDecorator],
 };
 
 export const MediumSideNavItems: Story = {
@@ -273,6 +270,7 @@ export const MediumSideNavItems: Story = {
     ariaLabel: 'Default open menu',
     sideNavItemSize: 'medium',
   },
+  decorators: [mobileViewportDecorator],
 };
 
 export const SmallSideNavItems: Story = {
@@ -282,6 +280,7 @@ export const SmallSideNavItems: Story = {
     ariaLabel: 'Default open menu',
     sideNavItemSize: 'small',
   },
+  decorators: [mobileViewportDecorator],
 };
 
 export const SubTitles: Story = {
@@ -289,4 +288,5 @@ export const SubTitles: Story = {
   args: {
     navItems: exampleThirdLevelMenuItemsLinksWithSubTitles,
   },
+  decorators: [mobileViewportDecorator],
 };

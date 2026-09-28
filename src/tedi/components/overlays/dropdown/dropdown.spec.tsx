@@ -216,6 +216,35 @@ describe('Dropdown component', () => {
     expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
   });
 
+  it('exposes asChild buttons as focusable menuitems with roving tabindex', () => {
+    renderDropdown(
+      { children: <span>Open</span> },
+      <>
+        <Dropdown.Item index={0}>Result</Dropdown.Item>
+        <Dropdown.Item asChild index={1}>
+          <button type="button">Action A</button>
+        </Dropdown.Item>
+        <Dropdown.Item asChild index={2}>
+          <button type="button">Action B</button>
+        </Dropdown.Item>
+      </>,
+      { defaultActiveIndex: 1 }
+    );
+
+    fireEvent.click(screen.getByText('Open'));
+
+    const actionA = screen.getByRole('menuitem', { name: 'Action A' });
+    const actionB = screen.getByRole('menuitem', { name: 'Action B' });
+    const result = screen.getByRole('menuitem', { name: 'Result' });
+
+    expect(actionA.tagName).toBe('BUTTON');
+    expect(actionB.tagName).toBe('BUTTON');
+    expect(actionA).toHaveAttribute('tabindex', '0');
+    expect(actionB).toHaveAttribute('tabindex', '-1');
+    expect(result).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByRole('menu')).toHaveAttribute('aria-activedescendant', 'dropdown-item-1');
+  });
+
   it('applies pixel width when width is a number', () => {
     renderDropdown({ children: <span>Trigger</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
       width: 300,
@@ -276,5 +305,30 @@ describe('Dropdown component', () => {
     fireEvent.click(screen.getByText('Trigger'));
 
     expect(screen.getByRole('menu')).toHaveStyle({ width: '500px' });
+  });
+
+  it('does not wrap content in a scroll body when maxHeight is unset', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>);
+    fireEvent.click(screen.getByText('Open menu'));
+    expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).not.toBeInTheDocument();
+  });
+
+  it('restricts the body height with a scrollable wrapper when maxHeight is a number (px)', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      maxHeight: 200,
+    });
+    fireEvent.click(screen.getByText('Open menu'));
+    const scroll = document.querySelector(`.${styles['tedi-dropdown__scroll']}`);
+    expect(scroll).toBeInTheDocument();
+    expect(scroll).toHaveStyle({ maxHeight: '200px' });
+    expect(scroll).toContainElement(screen.getByText('Item'));
+  });
+
+  it('accepts a CSS length string for maxHeight', () => {
+    renderDropdown({ children: <span>Open menu</span> }, <Dropdown.Item index={0}>Item</Dropdown.Item>, {
+      maxHeight: '20rem',
+    });
+    fireEvent.click(screen.getByText('Open menu'));
+    expect(document.querySelector(`.${styles['tedi-dropdown__scroll']}`)).toHaveStyle({ maxHeight: '20rem' });
   });
 });

@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactNode, useContext } from 'react';
+import { type CSSProperties, ReactNode, useContext } from 'react';
 import StickyBox from 'react-sticky-box';
 
 import { LayoutContext } from '../../../../community/components/layout';
@@ -70,7 +70,17 @@ export const Affix = (props: AffixProps): JSX.Element => {
   const offsetBottom = (typeof bottom === 'number' ? bottom : 0) * 16;
 
   return (
-    <StickyBox offsetTop={offsetTop} offsetBottom={offsetBottom} className={BEM}>
+    <StickyBox
+      offsetTop={offsetTop}
+      offsetBottom={offsetBottom}
+      className={BEM}
+      style={
+        {
+          '--tedi-affix-offset-top': `${offsetTop}px`,
+          '--tedi-affix-offset-bottom': `${offsetBottom}px`,
+        } as CSSProperties
+      }
+    >
       {children}
     </StickyBox>
   );

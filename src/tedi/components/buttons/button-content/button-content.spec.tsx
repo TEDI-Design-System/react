@@ -1,10 +1,21 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { useIsTouchDevice } from '../../../helpers';
 import ButtonContent, { ButtonContentProps } from './button-content';
 
 import '@testing-library/jest-dom';
 
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useIsTouchDevice: jest.fn(),
+}));
+
 describe('ButtonContent component', () => {
+  beforeEach(() => {
+    // The icon-only tooltip defaults to hover on non-touch devices (see Overlay's isTouchDevice-aware default).
+    (useIsTouchDevice as jest.Mock).mockReturnValue(false);
+  });
+
   // eslint-disable-next-line @typescript-eslint/ban-types
   const defaultProps: ButtonContentProps<'button', {}, {}> = {
     children: 'Click Me',

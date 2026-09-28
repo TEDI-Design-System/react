@@ -179,8 +179,8 @@ describe('TopNav', () => {
       </TopNav>
     );
     expect(screen.queryByRole('separator')).not.toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Dashboard' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
   });
 
   it('passes submenu groups and sub-items into the mobile drawer', () => {
@@ -208,9 +208,9 @@ describe('TopNav', () => {
 
     const familyButton = screen.getByRole('button', { name: /Family/ });
     fireEvent.click(familyButton);
-    expect(screen.getByRole('menuitem', { name: 'Get married' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Divorce' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Adoption' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Get married' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Divorce' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Adoption' })).toBeInTheDocument();
   });
 
   it('falls through to the shared Sidenav mobile drawer below the breakpoint', () => {
@@ -222,8 +222,8 @@ describe('TopNav', () => {
       </TopNav>
     );
     expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Home' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Docs' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Docs' })).toBeInTheDocument();
   });
 
   it('applies maxWidth as inline style on the inner list and submenu inner', () => {
@@ -474,7 +474,7 @@ describe('TopNav', () => {
     expect(screen.getByRole('link', { name: 'B-item' })).toBeInTheDocument();
   });
 
-  it('renders the parent as <button> with aria-haspopup/aria-expanded when it has a submenu but no href', () => {
+  it('renders the parent as <button> with aria-expanded/aria-controls (disclosure) when it has a submenu but no href', () => {
     render(
       <TopNav ariaLabel="Primary">
         <TopNav.Item
@@ -491,8 +491,9 @@ describe('TopNav', () => {
     );
     const trigger = screen.getByRole('button', { name: /Family/ });
     expect(trigger).toHaveAttribute('type', 'button');
-    expect(trigger).toHaveAttribute('aria-haspopup', 'true');
+    expect(trigger).not.toHaveAttribute('aria-haspopup');
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(trigger).toHaveAttribute('aria-controls');
     expect(trigger).not.toHaveAttribute('href');
   });
 
@@ -510,7 +511,7 @@ describe('TopNav', () => {
         </TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('button', { name: /Family/ })).toHaveAttribute('aria-haspopup', 'true');
+    expect(screen.getByRole('button', { name: /Family/ })).toHaveAttribute('aria-controls');
     expect(screen.queryByRole('link', { name: /Family/ })).not.toBeInTheDocument();
   });
 
@@ -609,7 +610,7 @@ describe('TopNav', () => {
       );
       const trigger = screen.getByRole('button', { name: /Family/ });
       expect(trigger).toHaveAttribute('type', 'button');
-      expect(trigger).toHaveAttribute('aria-haspopup', 'true');
+      expect(trigger).not.toHaveAttribute('aria-haspopup');
       expect(trigger).toHaveAttribute('aria-expanded', 'false');
     });
 

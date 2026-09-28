@@ -3,6 +3,7 @@ import React, { forwardRef } from 'react';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Spinner } from '../../../../tedi/components/loaders/spinner/spinner';
+import { warnDeprecated } from '../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import Button, { ButtonProps } from '../../button/button';
 import styles from './toggle.module.scss';
 
@@ -74,6 +75,7 @@ export interface ToggleProps {
  * @deprecated Use `Toggle` from `@tedi-design-system/react/tedi` instead.
  */
 export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>((props, ref) => {
+  warnDeprecated('Community Toggle', 'Use `Toggle` from `@tedi-design-system/react/tedi` instead.');
   const {
     ariaLabel,
     className,

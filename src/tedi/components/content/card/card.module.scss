@@ -18,14 +18,13 @@ $card-colors: (
   'warning-primary': '--general-status-warning-background-light',
   'warning-secondary': '--general-status-warning-background-dark',
 );
+$card-blocks: '.tedi-card__header, .tedi-card__content, .tedi-card__notification-content';
 
 @mixin reset-corner($corner) {
   border-#{$corner}-radius: 0;
 
-  > .tedi-card__header:first-of-type,
-  > .tedi-card__content:first-of-type,
-  > .tedi-card__header:last-child,
-  > .tedi-card__content:last-child {
+  > :nth-child(1 of #{$card-blocks}),
+  > :nth-last-child(1 of #{$card-blocks}) {
     border-#{$corner}-radius: 0;
   }
 }
@@ -41,6 +40,18 @@ $card-colors: (
   flex-direction: column;
   border: 1px solid var(--card-border-primary);
   border-radius: var(--card-radius-rounded);
+
+  --card-inner-radius: calc(var(--card-radius-rounded) - 1px);
+
+  > :nth-child(1 of #{$card-blocks}) {
+    border-start-start-radius: var(--card-inner-radius);
+    border-start-end-radius: var(--card-inner-radius);
+  }
+
+  > :nth-last-child(1 of #{$card-blocks}) {
+    border-end-start-radius: var(--card-inner-radius);
+    border-end-end-radius: var(--card-inner-radius);
+  }
 
   @mixin card-color($name, $color-var) {
     &--background--#{$name} {
@@ -63,6 +74,12 @@ $card-colors: (
     border-right-color: var(--card-border-primary);
     border-bottom-color: var(--card-border-primary);
     border-left: 4px solid var(--card-border-color);
+
+    > :nth-child(1 of #{$card-blocks}),
+    > :nth-last-child(1 of #{$card-blocks}) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
   }
 
   &--border-top {
@@ -70,10 +87,28 @@ $card-colors: (
     border-right-color: var(--card-border-primary);
     border-bottom-color: var(--card-border-primary);
     border-left-color: var(--card-border-primary);
+
+    > :nth-child(1 of #{$card-blocks}) {
+      border-start-start-radius: 0;
+      border-start-end-radius: 0;
+    }
   }
 
   &--borderless {
     border: none;
+
+    // No border to sit inside of — blocks trace the full outer radius.
+    --card-inner-radius: var(--card-radius-rounded);
+
+    > :nth-child(1 of #{$card-blocks}) {
+      border-start-start-radius: var(--card-inner-radius);
+      border-start-end-radius: var(--card-inner-radius);
+    }
+
+    > :nth-last-child(1 of #{$card-blocks}) {
+      border-end-start-radius: var(--card-inner-radius);
+      border-end-end-radius: var(--card-inner-radius);
+    }
   }
 
   &--no-radius-tl {
@@ -116,7 +151,6 @@ $card-colors: (
 }
 
 .tedi-card__header {
-  z-index: 1;
   flex: 0;
 
   @include card-padding;
@@ -125,30 +159,5 @@ $card-colors: (
     color: var(--general-text-primary);
     background: var(--card-background-primary);
     border-bottom: 1px solid var(--card-border-primary);
-  }
-}
-
-.tedi-card__header:first-of-type,
-.tedi-card__content:first-of-type {
-  border-start-start-radius: var(--card-radius-rounded);
-  border-start-end-radius: var(--card-radius-rounded);
-
-  .tedi-card--border-top & {
-    border-start-start-radius: 0;
-    border-start-end-radius: 0;
-  }
-}
-
-.tedi-card__header:last-child,
-.tedi-card__content:last-child {
-  border-end-start-radius: var(--card-radius-rounded);
-  border-end-end-radius: var(--card-radius-rounded);
-}
-
-.tedi-card__header,
-.tedi-card__content {
-  .tedi-card--border-left & {
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
   }
 }

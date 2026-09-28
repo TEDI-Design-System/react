@@ -1,14 +1,7 @@
 import cn from 'classnames';
-import {
-  Children,
-  createContext,
-  type CSSProperties,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-  useMemo,
-} from 'react';
+import { Children, createContext, isValidElement, type ReactElement, type ReactNode, useMemo } from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Card, CardContent } from '../../content/card';
 import { Affix } from '../../misc/affix/affix';
@@ -20,10 +13,26 @@ import {
 import { TableOfContentsList } from './components/table-of-contents-list/table-of-contents-list';
 import styles from './table-of-contents.module.scss';
 
-/** Semantic level of the `TableOfContents` heading element. */
 export type TableOfContentsHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
-export interface TableOfContentsProps {
+type TableOfContentsBreakpointProps = {
+  /**
+   * Visual variant:
+   * - `default` — rendered inside a bordered `Card`.
+   * - `transparent` — no card chrome (border / background); the list sits
+   *   directly on the page, with a continuous grey left rail (the active item's
+   *   segment turns blue).
+   * @default default
+   */
+  variant?: 'default' | 'transparent';
+  /**
+   * Stick the card to the viewport while scrolling.
+   * @default true
+   */
+  sticky?: boolean;
+};
+
+export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsBreakpointProps> {
   /**
    * `TableOfContents.Item` elements. An item's non-`Item` children are its
    * link / label; nested `TableOfContents.Item` children become its sub-items.
@@ -49,36 +58,29 @@ export interface TableOfContentsProps {
    */
   ariaLabel?: string;
   /**
-   * Visual variant:
-   * - `default` — rendered inside a bordered `Card`.
-   * - `transparent` — no card chrome (border / background); the list sits
-   *   directly on the page, with a continuous grey left rail (the active item's
-   *   segment turns blue).
-   * @default default
-   */
-  variant?: 'default' | 'transparent';
-  /**
-   * Inner padding of the container, in rem — the spacing between the card edge and the
-   * heading / items. Defaults to the card's medium padding token.
-   */
-  padding?: number;
-  /**
    * Id of the currently active item. The active item gets the left accent bar
-   * and active link colour; the branch leading to it auto-expands its nested
-   * children.
+   * and active link colour. When `defaultOpen` is `false`, the branch leading
+   * to it is the only one kept expanded.
    */
   activeId?: string;
+  /**
+   * Draws a divider between items so the list reads as a set of separated rows. The last item has no
+   * divider — the card border closes the list.
+   * @default false
+   */
+  bordered?: boolean;
+  /**
+   * Whether every item's sub-items are expanded by default. Set `false` to make the list behave like
+   * an accordion: only the branch leading to `activeId` keeps its nested children visible.
+   * @default true
+   */
+  defaultOpen?: boolean;
   /**
    * Render the list as an ordered list with auto-generated hierarchical numbers
    * (`1.`, `2.`, `2.1`, …) shown before each item.
    * @default false
    */
   numbered?: boolean;
-  /**
-   * Stick the card to the viewport while scrolling.
-   * @default true
-   */
-  sticky?: boolean;
   /**
    * Additional class name on the root element.
    */
@@ -91,6 +93,7 @@ export interface TableOfContentsNode {
   content: ReactNode;
   children?: TableOfContentsNode[];
   separator?: boolean;
+  slot?: ReactNode;
 }
 
 interface TableOfContentsContextValue {
@@ -99,6 +102,7 @@ interface TableOfContentsContextValue {
   headingLevel?: TableOfContentsHeadingLevel;
   ariaLabel?: string;
   activeTrail: Set<string>;
+  defaultOpen?: boolean;
 }
 
 export const TableOfContentsContext = createContext<TableOfContentsContextValue>({
@@ -112,13 +116,14 @@ export const childrenToNodes = (children: ReactNode): TableOfContentsNode[] =>
   Children.toArray(children)
     .filter(isItemElement)
     .map((element) => {
-      const { id, separator, children: itemChildren } = element.props;
+      const { id, separator, slot, children: itemChildren } = element.props;
       const childArray = Children.toArray(itemChildren);
       const subItems = childArray.filter(isItemElement);
       const content = childArray.filter((child) => !isItemElement(child));
       return {
         id,
         separator,
+        slot,
         content: <>{content}</>,
         children: subItems.length ? childrenToNodes(itemChildren) : undefined,
       };
@@ -145,18 +150,20 @@ export const buildActiveTrail = (nodes: TableOfContentsNode[], activeId?: string
 
 export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const { getLabel } = useLabels();
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     children,
     heading,
     headingLevel = 'h3',
     ariaLabel,
     activeId,
+    defaultOpen = true,
     numbered = false,
     sticky = true,
     variant = 'default',
-    padding,
+    bordered = false,
     className,
-  } = props;
+  } = getCurrentBreakpointProps<TableOfContentsProps>(props);
 
   const resolvedHeading = heading === undefined ? getLabel('table-of-contents.title') : heading;
 
@@ -164,19 +171,16 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail }),
-    [activeId, numbered, headingLevel, ariaLabel, activeTrail]
+    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen]
   );
-
-  const rootStyle =
-    padding !== undefined ? ({ '--tedi-table-of-contents-padding': `${padding}rem` } as CSSProperties) : undefined;
 
   const list = (
     <div
       className={cn(styles['tedi-table-of-contents'], {
         [styles['tedi-table-of-contents--transparent']]: variant === 'transparent',
+        [styles['tedi-table-of-contents--bordered']]: bordered,
       })}
-      style={rootStyle}
     >
       <TableOfContentsList nodes={nodes} heading={resolvedHeading} />
     </div>

@@ -18,5 +18,6 @@ type Story = StoryObj<typeof Field>;
 export const Default: Story = {
   args: {
     id: 'field-1',
+    'aria-label': 'Väli',
   },
 };

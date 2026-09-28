@@ -107,6 +107,11 @@ export interface FilterProps extends BreakpointSupport<FilterBreakpointProps> {
   placement?: React.ComponentProps<typeof Dropdown>['placement'];
   /** Accessible label for the search input. Falls back to `text`. */
   searchLabel?: string;
+  /**
+   * Caps the height of the dropdown's option list. The list scrolls when it's taller, while the
+   * search and "Clear selection" stay pinned. `number` = px, `string` = any CSS length.
+   */
+  maxHeight?: React.ComponentProps<typeof Dropdown>['maxHeight'];
 }
 
 const sizeToIconSize = (size: FilterSize) => (size === 'large' ? 24 : 18);
@@ -150,11 +155,14 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
     variant = 'primary',
     size = 'default',
     searchLabel,
+    maxHeight,
   } = getCurrentBreakpointProps<FilterProps>(props);
 
   const { getLabel } = useLabels();
   const selectAllLabel = selectAllLabelProp ?? getLabel('filter.select-all');
   const clearLabel = clearLabelProp ?? getLabel('filter.clear-selection');
+  const resolvedMaxHeight =
+    maxHeight === undefined ? undefined : typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight;
 
   const group = useContext(FilterGroupContext);
   const baseId = useBaseId(id);
@@ -415,7 +423,14 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
         <Dropdown.Content>
           {hasCustomContent ? (
             <>
-              <div className={styles['tedi-filter-dropdown__custom-content']}>{children}</div>
+              <div
+                className={cn(styles['tedi-filter-dropdown__custom-content'], {
+                  [styles['tedi-filter-dropdown__options']]: resolvedMaxHeight !== undefined,
+                })}
+                style={resolvedMaxHeight !== undefined ? { maxHeight: resolvedMaxHeight } : undefined}
+              >
+                {children}
+              </div>
               {showClear && (
                 <>
                   <Dropdown.Separator />
@@ -460,7 +475,13 @@ export const Filter = forwardRef<HTMLButtonElement, FilterProps>((props, ref) =>
                   <Dropdown.Separator />
                 </>
               )}
-              {renderOptions()}
+              {resolvedMaxHeight !== undefined ? (
+                <div className={styles['tedi-filter-dropdown__options']} style={{ maxHeight: resolvedMaxHeight }}>
+                  {renderOptions()}
+                </div>
+              ) : (
+                renderOptions()
+              )}
               {showClear && (
                 <>
                   <Dropdown.Separator />

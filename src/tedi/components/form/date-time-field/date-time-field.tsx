@@ -718,6 +718,17 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     ? [...consumerHelper, errorHelper]
     : [consumerHelper, errorHelper];
 
+  const openCalendarLabel = getLabel('dateField.openCalendar');
+
+  const calendarTriggerProps: React.ButtonHTMLAttributes<HTMLButtonElement> = useNative
+    ? { 'aria-label': openCalendarLabel }
+    : {
+        'aria-label': openCalendarLabel,
+        'aria-haspopup': 'dialog',
+        'aria-expanded': open,
+        'aria-controls': open ? context.floatingId : undefined,
+      };
+
   const textFieldProps: TextFieldProps = {
     ...(inputProps as TextFieldProps),
     id,
@@ -732,6 +743,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     invalid: hasDisabledDateError || (inputProps as TextFieldProps)?.invalid,
     helper: mergedHelper,
     onIconClick: handleIconClick,
+    iconButtonProps: calendarTriggerProps,
     onChange: handleInputChange,
     className: cn(styles['tedi-date-time-field__textfield'], inputProps?.className, {
       [styles['tedi-date-time-field__icon--disabled']]: disabled,
@@ -739,14 +751,13 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     input: {
       ...(inputProps?.input as UnknownType),
       type: useNative ? 'datetime-local' : 'text',
-      'aria-expanded': useNative ? undefined : open,
     },
   };
 
   return (
     <>
-      <div className={cn(styles['tedi-date-time-field__container'], className)} aria-haspopup="dialog">
-        <TextField ref={setTextFieldRef} aria-expanded={useNative ? undefined : open} {...textFieldProps} />
+      <div className={cn(styles['tedi-date-time-field__container'], className)}>
+        <TextField ref={setTextFieldRef} {...textFieldProps} />
       </div>
 
       {!useNative && (

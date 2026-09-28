@@ -245,6 +245,7 @@ export const ExtensionAndSizeLimit: Story = {
 };
 
 export const ControlledClearing: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: (args) => {
     const [files, setFiles] = React.useState<FileUploadFile[]>([
       { name: 'report.pdf' },

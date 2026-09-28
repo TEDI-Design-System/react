@@ -119,7 +119,6 @@ const TopNavItemComponent = forwardRef(
       ? {
           type: 'button',
           disabled,
-          'aria-haspopup': true,
           'aria-expanded': submenuOpen,
           'aria-controls': panelId,
         }

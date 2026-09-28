@@ -4,7 +4,7 @@ import React from 'react';
 import { Icon, IconProps } from '../../../base/icon/icon';
 import styles from '../tabs.module.scss';
 import { useTabsContext } from '../tabs-context';
-import { navigateTablist } from '../tabs-helpers';
+import { navigateTablist, scrollTabIntoView } from '../tabs-helpers';
 
 export interface TabsTriggerProps {
   /**
@@ -36,9 +36,10 @@ export const TabsTrigger = (props: TabsTriggerProps) => {
   const { currentTab, setCurrentTab } = useTabsContext();
   const isSelected = currentTab === id;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled) {
       setCurrentTab(id);
+      scrollTabIntoView(e.currentTarget);
     }
   };
 

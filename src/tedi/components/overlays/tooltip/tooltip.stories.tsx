@@ -1,5 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { CSSProperties, useState } from 'react';
 
 import {
   getPrimaryComponentProps,
@@ -253,21 +253,25 @@ export const Default: StoryObj = {
 };
 
 export const ArrowPosition: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: PositionTemplate,
   args: {},
 };
 
 export const TooltipWidth: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: WidthTemplate,
   args: {},
 };
 
 export const Triggers: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: TriggerTemplate,
   args: {},
 };
 
 export const OpenWithClick: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: Template,
   args: {
     openWith: 'click',
@@ -286,4 +290,90 @@ export const ControlledOpen: Story = {
   args: {
     open: true,
   },
+};
+
+const VERTICAL_PLACEMENTS = ['top-start', 'top', 'top-end', 'bottom-start', 'bottom', 'bottom-end'] as const;
+const HORIZONTAL_PLACEMENTS = ['left-start', 'left', 'left-end', 'right-start', 'right', 'right-end'] as const;
+
+// Each open tooltip needs a slot it can grow into, or it lands on its neighbour and floating-ui
+// flips or shifts it away from the placement being tested. The trigger sits at the far edge of its
+// slot so the content grows inwards. Vertical and horizontal placements are split across two
+// stories because `shift()` keeps content inside the viewport: a story taller than the viewport
+// would drag its lowest tooltips back up.
+const verticalSlotStyle = (placement: string): CSSProperties => ({
+  height: 90,
+  display: 'flex',
+  alignItems: placement.startsWith('top') ? 'flex-end' : 'flex-start',
+});
+
+const horizontalSlotStyle: CSSProperties = { height: 90, display: 'flex', alignItems: 'center' };
+
+/**
+ * Visual-regression only. `ArrowPosition` renders closed triggers, so the bubble and its arrow were
+ * never captured. `defaultOpen` renders them open from props alone.
+ */
+export const OpenVerticalPlacementsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <div style={{ paddingTop: 80 }}>
+      <Row>
+        {VERTICAL_PLACEMENTS.map((placement) => (
+          <Col key={placement} xs={4} className="flex justify-content-center">
+            <div style={verticalSlotStyle(placement)}>
+              <Tooltip defaultOpen placement={placement}>
+                <Tooltip.Trigger>{placement}</Tooltip.Trigger>
+                <Tooltip.Content>Tooltip Content</Tooltip.Content>
+              </Tooltip>
+            </div>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  ),
+};
+
+/**
+ * Visual-regression only. Side placements put the arrow on the left or right edge of the bubble.
+ */
+export const OpenHorizontalPlacementsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Row>
+      {HORIZONTAL_PLACEMENTS.map((placement) => (
+        <Col key={placement} xs={6} className="flex justify-content-center">
+          <div style={horizontalSlotStyle}>
+            <Tooltip defaultOpen placement={placement}>
+              <Tooltip.Trigger>{placement}</Tooltip.Trigger>
+              <Tooltip.Content>Tooltip Content</Tooltip.Content>
+            </Tooltip>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  ),
+};
+
+/**
+ * Visual-regression only. `maxWidth` decides where the text wraps, which is only visible once the
+ * bubble is open. Stacked rather than placed side by side because `none` and `large` are wider
+ * than a quarter of the canvas.
+ */
+export const OpenWidthsForVisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Row>
+      {(['none', 'small', 'medium', 'large'] as const).map((maxWidth) => (
+        <Col key={maxWidth} xs={12}>
+          <div style={{ height: 180 }}>
+            <Tooltip defaultOpen placement="bottom-start">
+              <Tooltip.Trigger>{maxWidth}</Tooltip.Trigger>
+              <Tooltip.Content maxWidth={maxWidth}>
+                The polar bear (Ursus maritimus) is a large bear native to the Arctic and nearby areas.
+              </Tooltip.Content>
+            </Tooltip>
+          </div>
+        </Col>
+      ))}
+    </Row>
+  ),
 };

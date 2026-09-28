@@ -1,4 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -171,6 +172,35 @@ export const Password: Story = {
     id: 'example-4',
     input: { type: 'password' },
     value: '123456789',
+  },
+};
+
+/**
+ * A password field with a show/hide toggle. The trailing `icon` becomes a button via `onIconClick`;
+ * clicking it swaps the input `type` between `password` and `text` and updates the icon. Give the
+ * icon button an `aria-label` and `aria-pressed` (through `iconButtonProps`) so screen-reader users
+ * know it toggles password visibility and its current state.
+ */
+export const PasswordWithToggle: Story = {
+  render: function PasswordWithToggle() {
+    const [isVisible, setIsVisible] = useState(false);
+    const [value, setValue] = useState('SuperSecret123');
+
+    return (
+      <TextField
+        id="example-password-toggle"
+        label="Password"
+        value={value}
+        onChange={setValue}
+        input={{ type: isVisible ? 'text' : 'password', autoComplete: 'current-password' }}
+        icon={isVisible ? 'visibility_off' : 'visibility'}
+        onIconClick={() => setIsVisible((prev) => !prev)}
+        iconButtonProps={{
+          'aria-label': 'Show password',
+          'aria-pressed': isVisible,
+        }}
+      />
+    );
   },
 };
 

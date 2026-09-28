@@ -28,9 +28,9 @@ describe('SideNavItem', () => {
 
   describe('basic item (no children)', () => {
     test('renders correctly', () => {
-      renderWithProviders(<SideNavItem {...defaultProps} />);
+      renderWithProviders(<SideNavItem {...defaultProps} href="/test" />);
       expect(screen.getByText('Test Item')).toBeInTheDocument();
-      expect(screen.getByRole('menuitem')).toBeInTheDocument();
+      expect(screen.getByRole('link')).toBeInTheDocument();
     });
 
     test('calls onItemClick when clicked', async () => {
@@ -53,15 +53,15 @@ describe('SideNavItem', () => {
     });
 
     test('applies active styles when isActive=true', () => {
-      renderWithProviders(<SideNavItem {...defaultProps} isActive />);
-      expect(screen.getByRole('menuitem').parentElement).toHaveClass('tedi-sidenav__item--current');
+      renderWithProviders(<SideNavItem {...defaultProps} href="/test" isActive />);
+      expect(screen.getByRole('link').parentElement).toHaveClass('tedi-sidenav__item--current');
     });
   });
 
   describe('collapsed mode (isCollapsed = true)', () => {
     test('uses aria-label when collapsed', () => {
-      renderWithProviders(<SideNavItem {...defaultProps} isCollapsed />);
-      expect(screen.getByRole('menuitem')).toHaveAttribute('aria-label', 'Test Item');
+      renderWithProviders(<SideNavItem {...defaultProps} href="/test" isCollapsed />);
+      expect(screen.getByRole('link')).toHaveAttribute('aria-label', 'Test Item');
     });
 
     test('renders SideNavDropdown when has children & collapsed', () => {
@@ -101,7 +101,7 @@ describe('SideNavItem', () => {
         <SideNavItem {...defaultProps} href="/dashboard" subItems={[{ children: 'Dash' }]} isDefaultOpen />
       );
 
-      const link = screen.getByRole('menuitem', { name: /Test Item/ });
+      const link = screen.getByRole('link', { name: /Test Item/ });
       expect(link).toHaveAttribute('href', '/dashboard');
       expect(screen.getByText('Dash')).toBeInTheDocument();
     });
@@ -148,24 +148,24 @@ describe('SideNavItem', () => {
 
   test('handles accessibility attributes', () => {
     renderWithProviders(
-      <SideNavItem {...defaultProps} isActive={true} isCollapsed={true}>
+      <SideNavItem {...defaultProps} href="/test" isActive={true} isCollapsed={true}>
         Active Item
       </SideNavItem>
     );
 
-    const item = screen.getByRole('menuitem');
+    const item = screen.getByRole('link');
     expect(item).toHaveAttribute('aria-current', 'page');
     expect(item).toHaveAttribute('aria-label', 'Active Item');
   });
 
   test('handles accessibility attributes', () => {
     renderWithProviders(
-      <SideNavItem {...defaultProps} isActive={true} isCollapsed={true}>
+      <SideNavItem {...defaultProps} href="/test" isActive={true} isCollapsed={true}>
         Active Item
       </SideNavItem>
     );
 
-    const item = screen.getByRole('menuitem');
+    const item = screen.getByRole('link');
     expect(item).toHaveAttribute('aria-current', 'page');
     expect(item).toHaveAttribute('aria-label', 'Active Item');
   });
@@ -197,13 +197,12 @@ describe('SideNavItem', () => {
     expect(screen.getByText('Hidden Child')).toBeInTheDocument();
   });
 
-  test('sets aria attributes for linked parent with children', () => {
+  test('sets disclosure aria attributes on the toggle button of a linked parent', () => {
     renderWithProviders(<SideNavItem {...defaultProps} href="/parent" subItems={[{ children: 'Child' }]} />);
 
-    const link = screen.getByRole('menuitem', { name: /test item/i });
-    expect(link).toHaveAttribute('aria-haspopup', 'true');
-    expect(link).toHaveAttribute('aria-expanded');
-    expect(link).toHaveAttribute('aria-controls');
+    const toggle = screen.getByRole('button');
+    expect(toggle).toHaveAttribute('aria-expanded');
+    expect(toggle).toHaveAttribute('aria-controls');
   });
 
   test('updates dropdown open state when SideNavDropdown opens', async () => {
