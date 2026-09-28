@@ -1,3 +1,10 @@
+## [19.1.2-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.3...react-19.1.2-rc.4) (2026-09-28)
+
+
+### Bug Fixes
+
+* **breadcrumbs:** 9.4.1.2 and 9.1.4.1 criteria improvements [#22](https://github.com/TEDI-Design-System/react/issues/22) ([#930](https://github.com/TEDI-Design-System/react/issues/930)) ([8bed3e0](https://github.com/TEDI-Design-System/react/commit/8bed3e018342db9358b6c8dc96955590959e7cab))
+
 ## [19.1.2-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.2...react-19.1.2-rc.3) (2026-09-25)
 
 
