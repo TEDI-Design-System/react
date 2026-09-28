@@ -435,13 +435,17 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
-    const measure = (): void => {
-      setViewportWidth(viewport.clientWidth);
+    const measure = (width: number): void => {
+      setViewportWidth(width);
       setRootFontSize(parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
     };
-    measure();
+    const styles = getComputedStyle(viewport);
+    const horizontalPadding = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+    measure(viewport.clientWidth - horizontalPadding);
 
-    const observer = new ResizeObserver(measure);
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) measure(entry.contentRect.width);
+    });
     observer.observe(viewport);
     return () => observer.disconnect();
   }, []);
