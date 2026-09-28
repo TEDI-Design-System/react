@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { useId, useState } from 'react';
 
+import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import styles from './rating.module.scss';
 
@@ -17,24 +18,25 @@ const DEFAULT_ICONS = [
 export interface RatingProps {
   /**
    * Accessible name for the rating group (`radiogroup`). Required so screen readers announce what
-   * is being rated.
+   * is being rated. In `readOnly` mode it prefixes the summary's accessible name.
    */
   label: string;
   /**
    * Visual style of the scale.
-   * - `star` — outlined / filled stars, cumulative (every item up to the value fills).
-   * - `number` — numbered circles, cumulative, with optional start / end captions.
-   * - `icon` — a single highlighted icon (e.g. sentiment faces) with per-item captions.
+   * - `star` - outlined / filled stars, cumulative (every item up to the value fills).
+   * - `number` - numbered circles, cumulative, with optional start / end captions.
+   * - `icon` - a single highlighted icon (e.g. sentiment faces) with per-item captions.
    * @default star
    */
   type?: RatingType;
   /**
-   * Number of items in the scale.
+   * Number of items in the scale (the maximum rating).
    * @default 5 (`star` / `icon`), 10 (`number`)
    */
   count?: number;
   /**
    * Selected value (1-based; `0` means no rating). Provide with `onChange` for controlled use.
+   * In `readOnly` mode this is the (possibly fractional) average, e.g. `3.5`.
    */
   value?: number;
   /**
@@ -43,31 +45,50 @@ export interface RatingProps {
    */
   defaultValue?: number;
   /**
-   * Fired with the chosen value (1-based) when the selection changes.
+   * Fired with the chosen value (1-based) when the selection changes. Not called in `readOnly` mode.
    */
   onChange?: (value: number) => void;
   /**
    * Per-item labels (length should match `count`). Used as each item's accessible name and:
-   * - `icon` — shown as a caption under every item.
-   * - `number` — the first and last are shown as start / end captions.
-   * - `star` — the selected (or hovered) item's label is shown as a single caption below the row.
+   * - `icon` - shown as a caption under every item.
+   * - `number` - the first and last are shown as start / end captions.
+   * - `star` - the selected (or hovered) item's label is shown as a single caption below the row.
    */
   itemLabels?: string[];
   /**
-   * Icon glyph names for `type="icon"` (length should match `count`). Defaults to the five
-   * sentiment faces when `count` is 5.
+   * Custom glyph(s), as Material Symbol names.
+   * - `type="icon"` — an array, one glyph per item (length should match `count`); defaults to the
+   *   five sentiment faces when `count` is 5.
+   * - `type="star"` — a single glyph string (e.g. `'favorite'`, `'thumb_up'`) to swap the cumulative
+   *   star; an array uses its first entry. Defaults to `kid_star`.
    */
-  icons?: string[];
+  icons?: string | string[];
   /**
    * Disable interaction and mute the colours.
    * @default false
    */
   disabled?: boolean;
   /**
-   * Show the value without allowing changes.
+   * Render a compact, non-interactive summary of an aggregate rating instead of the interactive
+   * scale: a single filled visual (`star`, or `icon` for the rounded value; `number` shows none)
+   * followed by `{value}/{count}` and, when {@link ratingsCount} is set, the localised rater count
+   * (e.g. `3,5/5 - 271 hindajat`). `value` may be fractional here.
    * @default false
    */
   readOnly?: boolean;
+  /**
+   * Number of ratings behind the average, shown in the `readOnly` summary (e.g. `271 hindajat`).
+   * Ignored outside `readOnly` mode; the count is omitted when not provided.
+   */
+  ratingsCount?: number;
+  /**
+   * How the `readOnly` rating is displayed. Ignored when not `readOnly`.
+   * - `summary` - a single filled visual + `{value}/{count}` text (compact aggregate).
+   * - `scale` - the whole star scale with the boundary star filled to the fraction (`3.5` → three
+   *   full, one half, one empty), then the text. `star` only; other types fall back to `summary`.
+   * @default summary
+   */
+  readOnlyVariant?: 'summary' | 'scale';
   /**
    * `name` for the underlying radio inputs (form submission). Defaults to a generated id.
    */
@@ -90,10 +111,13 @@ export const Rating = (props: RatingProps): JSX.Element => {
     icons,
     disabled = false,
     readOnly = false,
+    ratingsCount,
+    readOnlyVariant = 'summary',
     name,
     className,
   } = props;
 
+  const { getLabel, locale } = useLabels();
   const generatedName = useId();
   const groupName = name ?? generatedName;
   const total = count ?? (type === 'number' ? 10 : 5);
@@ -104,9 +128,12 @@ export const Rating = (props: RatingProps): JSX.Element => {
 
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const interactive = !disabled && !readOnly;
-  const displayValue = interactive && hoverValue !== null ? hoverValue : currentValue;
+  const isHovering = interactive && hoverValue !== null;
+  const displayValue = isHovering ? (hoverValue as number) : currentValue;
 
-  const resolvedIcons = icons ?? (total === DEFAULT_ICONS.length ? [...DEFAULT_ICONS] : undefined);
+  const iconList = Array.isArray(icons) ? icons : icons !== undefined ? [icons] : undefined;
+  const resolvedIcons = iconList ?? (total === DEFAULT_ICONS.length ? [...DEFAULT_ICONS] : undefined);
+  const starGlyph = iconList?.[0] ?? 'kid_star';
 
   const setValue = (next: number): void => {
     if (!isControlled) setInternalValue(next);
@@ -118,13 +145,16 @@ export const Rating = (props: RatingProps): JSX.Element => {
 
   const itemLabel = (position: number): string => itemLabels?.[position - 1] || `${position} of ${total}`;
 
+  const positions = Array.from({ length: total }, (_, index) => index + 1);
+
   const renderVisual = (position: number, active: boolean): React.ReactNode => {
+    const filledActive = active && !disabled;
     if (type === 'star') {
       return (
         <Icon
-          name="kid_star"
-          filled={active}
-          color={disabled ? 'tertiary' : 'brand'}
+          name={starGlyph}
+          filled={filledActive}
+          color="inherit"
           size={24}
           className={styles['tedi-rating__star']}
         />
@@ -136,17 +166,67 @@ export const Rating = (props: RatingProps): JSX.Element => {
         {type === 'number' ? (
           position
         ) : (
-          <Icon
-            name={resolvedIcons?.[position - 1] ?? 'circle'}
-            color={active ? 'white' : disabled ? 'tertiary' : 'brand'}
-            size={18}
-          />
+          <Icon name={resolvedIcons?.[position - 1] ?? 'circle'} color={filledActive ? 'white' : 'inherit'} size={18} />
         )}
       </span>
     );
   };
 
-  const positions = Array.from({ length: total }, (_, index) => index + 1);
+  if (readOnly) {
+    const formattedValue = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(currentValue);
+    const valueText = `${formattedValue}/${total}`;
+    const countText = ratingsCount !== undefined ? ` - ${getLabel('rating.raters', ratingsCount)}` : '';
+    const summary = `${valueText}${countText}`;
+    const iconPosition = Math.min(total, Math.max(1, Math.round(currentValue)));
+    const isStarScale = type === 'star' && readOnlyVariant === 'scale';
+    const readOnlyVisual = isStarScale ? (
+      <span className={styles['tedi-rating__stars']}>
+        {positions.map((position) => {
+          const fill = Math.max(0, Math.min(1, currentValue - (position - 1))) * 100;
+          return (
+            <span key={position} className={styles['tedi-rating__star-partial']}>
+              <Icon name={starGlyph} color="inherit" size={24} className={styles['tedi-rating__star']} />
+              {fill > 0 && (
+                <span
+                  className={styles['tedi-rating__star-partial-fill']}
+                  style={{ '--tedi-rating-star-fill': `${fill}%` } as React.CSSProperties}
+                >
+                  <Icon name={starGlyph} filled color="inherit" size={24} className={styles['tedi-rating__star']} />
+                </span>
+              )}
+            </span>
+          );
+        })}
+      </span>
+    ) : type === 'star' ? (
+      <Icon name={starGlyph} filled color="inherit" size={24} className={styles['tedi-rating__star']} />
+    ) : type === 'icon' ? (
+      <span className={cn(styles['tedi-rating__circle'], styles['tedi-rating__circle--filled'])}>
+        <Icon name={resolvedIcons?.[iconPosition - 1] ?? 'circle'} color="white" size={18} />
+      </span>
+    ) : null;
+
+    return (
+      <div
+        role="img"
+        aria-label={`${label}: ${summary}`}
+        className={cn(
+          styles['tedi-rating'],
+          styles['tedi-rating--readonly'],
+          styles[`tedi-rating--${type}`],
+          className
+        )}
+      >
+        <div className={styles['tedi-rating__summary']} aria-hidden="true">
+          {readOnlyVisual}
+          <span className={styles['tedi-rating__summary-text']}>
+            <span className={styles['tedi-rating__summary-value']}>{valueText}</span>
+            {countText && <span className={styles['tedi-rating__summary-count']}>{countText}</span>}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -156,6 +236,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
         styles['tedi-rating'],
         styles[`tedi-rating--${type}`],
         { [styles['tedi-rating--disabled']]: disabled },
+        { [styles['tedi-rating--hovering']]: isHovering },
         className
       )}
     >

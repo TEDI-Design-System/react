@@ -1442,6 +1442,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Visibility',
     ru: 'Видимость',
   },
+  'rating.raters': {
+    description: 'Suffix in the read-only Rating summary showing how many people rated, e.g. "271 hindajat"',
+    components: ['Rating'],
+    et: (count: number) => `${count} hindajat`,
+    en: (count: number) => `${count} ratings`,
+    ru: (count: number) => `${count} оценок`,
+  },
 });
 
 type DefaultLabels = typeof labelsMap;

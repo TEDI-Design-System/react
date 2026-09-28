@@ -12,15 +12,19 @@ import { Textarea } from '../textarea/textarea';
 import { Rating, RatingType } from './rating';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.63.78?node-id=15548-139123&m=dev" target="_BLANK">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.76.92?node-id=15548-139124&m=dev" target="_BLANK">Figma ↗</a>
  */
 const meta: Meta<typeof Rating> = {
   component: Rating,
   title: 'TEDI-Ready/Components/Form/Rating',
+  args: {
+    label: 'Hinnang',
+    type: 'star',
+  },
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.63.78?node-id=15548-139123&m=dev',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.76.92?node-id=15548-139124&m=dev',
     },
   },
 };
@@ -58,21 +62,71 @@ const ScaleShowcase = ({
         <div style={{ width: '5rem', flexShrink: 0 }}>
           <Text modifiers="bold">{rowLabel(value, max)}</Text>
         </div>
-        <Rating
-          type={type}
-          count={max}
-          defaultValue={value}
-          readOnly
-          itemLabels={itemLabels}
-          label={rowLabel(value, max)}
-        />
+        <Rating type={type} count={max} defaultValue={value} itemLabels={itemLabels} label={rowLabel(value, max)} />
       </div>
     ))}
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem' }}>
+      <div style={{ width: '5rem', flexShrink: 0 }}>
+        <Text modifiers="bold">Read only</Text>
+      </div>
+      <Rating type={type} count={max} readOnly value={3.5} ratingsCount={271} label={`${type} read-only rating`} />
+    </div>
   </VerticalSpacing>
 );
 
 export const Default: Story = {
-  render: (args) => <Rating {...args} defaultValue={3} itemLabels={STAR_LABELS} />,
+  render: (args) => <Rating {...args} />,
+};
+
+export const States: Story = {
+  parameters: {
+    controls: { disable: true },
+    pseudo: { hover: '#rating-hover label', focusVisible: '#rating-focus input' },
+  },
+  render: () => {
+    const rows: { label: string; id?: string; props: Partial<Parameters<typeof Rating>[0]> }[] = [
+      { label: 'Not selected', props: { defaultValue: 0 } },
+      { label: 'Selected', props: { defaultValue: 1 } },
+      { label: 'Hover', id: 'rating-hover', props: { defaultValue: 1 } },
+      { label: 'Disabled', props: { defaultValue: 1, disabled: true } },
+      { label: 'Focus', id: 'rating-focus', props: { defaultValue: 0 } },
+    ];
+
+    return (
+      <table style={{ borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th />
+            {(['star', 'number', 'icon'] as const).map((type) => (
+              <th key={type} style={{ padding: '0.5rem 1.5rem', textAlign: 'left' }}>
+                <Text modifiers="bold">{type[0].toUpperCase() + type.slice(1)}</Text>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label} id={row.id}>
+              <th style={{ padding: '0.5rem 1.5rem 0.5rem 0', textAlign: 'left' }}>
+                <Text modifiers="bold">{row.label}</Text>
+              </th>
+              {(['star', 'number', 'icon'] as const).map((type) => (
+                <td key={type} style={{ padding: '0.5rem 1.5rem' }}>
+                  <Rating
+                    {...row.props}
+                    type={type}
+                    count={1}
+                    icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
+                    label={`${type} ${row.label}`}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  },
 };
 
 export const Stars: Story = {
@@ -90,54 +144,6 @@ export const Icons: Story = {
   render: () => <ScaleShowcase type="icon" max={5} itemLabels={ICON_LABELS} />,
 };
 
-export const Indicator: Story = {
-  parameters: { controls: { disable: true } },
-  render: () => {
-    const cell = (type: RatingType, value: number) => (
-      <Rating
-        type={type}
-        count={1}
-        defaultValue={value}
-        readOnly
-        icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
-        label={`${type} ${value ? 'selected' : 'not selected'}`}
-      />
-    );
-
-    return (
-      <table style={{ borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th />
-            {(['star', 'number', 'icon'] as const).map((type) => (
-              <th key={type} style={{ padding: '0.5rem 1.5rem', textAlign: 'left' }}>
-                <Text modifiers="bold">{type[0].toUpperCase() + type.slice(1)}</Text>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { label: 'Not selected', value: 0 },
-            { label: 'Selected', value: 1 },
-          ].map((row) => (
-            <tr key={row.label}>
-              <th style={{ padding: '0.5rem 1.5rem 0.5rem 0', textAlign: 'left' }}>
-                <Text modifiers="bold">{row.label}</Text>
-              </th>
-              {(['star', 'number', 'icon'] as const).map((type) => (
-                <td key={type} style={{ padding: '0.5rem 1.5rem' }}>
-                  {cell(type, row.value)}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  },
-};
-
 export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState(2);
@@ -150,14 +156,51 @@ export const Controlled: Story = {
   },
 };
 
-export const States: Story = {
+/**
+ * The read-only `scale` variant renders the whole star scale with the boundary star filled to the
+ * fraction (e.g. `3,5` → three full, one half, one empty), followed by the summary text. Use it to
+ * show an aggregate rating inline; the default `summary` variant shows a single star instead.
+ */
+export const ReadOnlyScale: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
-    <VerticalSpacing size={2}>
-      <Rating type="star" label="No rating" itemLabels={STAR_LABELS} />
-      <Rating type="star" label="Read-only" defaultValue={3} readOnly itemLabels={STAR_LABELS} />
-      <Rating type="star" label="Disabled" defaultValue={3} disabled itemLabels={STAR_LABELS} />
-      <Rating type="icon" label="Disabled icons" defaultValue={2} disabled itemLabels={ICON_LABELS} />
+    <VerticalSpacing size={1}>
+      {[4.8, 3.5, 2.5, 1.2].map((value) => (
+        <Rating
+          key={value}
+          type="star"
+          readOnly
+          readOnlyVariant="scale"
+          value={value}
+          ratingsCount={271}
+          label="Teenuse hinnang"
+        />
+      ))}
+    </VerticalSpacing>
+  ),
+};
+
+/**
+ * Swap glyphs via `icons`:
+ * - `type="icon"` takes an array (one per item) for a single-highlight scale — here a weather scale.
+ * - `type="star"` takes a single string to change the cumulative glyph (e.g. a pointier `star` or a
+ *   `favorite` heart), keeping the fill and hover/focus behaviour.
+ *
+ * Pair with `itemLabels` for accessible names / captions.
+ */
+export const CustomIcons: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <VerticalSpacing size={1}>
+      <Rating
+        type="icon"
+        icons={['thunderstorm', 'rainy', 'cloud', 'partly_cloudy_day', 'sunny']}
+        itemLabels={['Väga halb', 'Halb', 'Keskmine', 'Hea', 'Väga hea']}
+        defaultValue={4}
+        label="Ilmahinnang"
+      />
+      <Rating type="star" icons="star" defaultValue={3} itemLabels={STAR_LABELS} label="Pointier star" />
+      <Rating type="star" icons="favorite" defaultValue={4} label="Favourite" />
     </VerticalSpacing>
   ),
 };
