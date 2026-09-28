@@ -49,7 +49,7 @@ describe('FileUpload component', () => {
     expect(input.value).toBe('');
   });
 
-  it('accepts wildcard mime types like image/* (#888)', () => {
+  it('accepts wildcard mime types like image/*', () => {
     const onChange = jest.fn();
     render(<FileUpload {...defaultProps} accept="image/*" onChange={onChange} />);
     const input = screen.getByLabelText(/Upload files/i);
@@ -58,7 +58,7 @@ describe('FileUpload component', () => {
     expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ name: 'photo.png', isValid: true })]);
   });
 
-  it('does not add the same file twice (#888)', () => {
+  it('does not add the same file twice', () => {
     const onChange = jest.fn();
     render(<FileUpload {...defaultProps} onChange={onChange} />);
     const input = screen.getByLabelText(/Upload files/i);
@@ -71,7 +71,7 @@ describe('FileUpload component', () => {
     expect(lastCall).toHaveLength(1);
   });
 
-  it('clears the rejection error when the offending file is removed, even if valid files remain (#888)', () => {
+  it('clears the rejection error when the offending file is removed, even if valid files remain', () => {
     render(
       <FileUpload
         {...defaultProps}
@@ -92,7 +92,7 @@ describe('FileUpload component', () => {
     expect(screen.getByText('ok.jpg')).toBeInTheDocument();
   });
 
-  it('announces skipped duplicates to screen readers (#888)', async () => {
+  it('announces skipped duplicates to screen readers', async () => {
     render(<FileUpload {...defaultProps} />);
     const input = screen.getByLabelText(/Upload files/i);
     const file = new File(['x'], 'dup.jpg', { type: 'image/jpeg' });
@@ -103,13 +103,13 @@ describe('FileUpload component', () => {
     expect(await screen.findByText(/file-upload.duplicates-skipped/i)).toBeInTheDocument();
   });
 
-  it('hides the auto restrictions hint when showRestrictions is false (#888)', () => {
+  it('hides the auto restrictions hint when showRestrictions is false', () => {
     render(<FileUpload {...defaultProps} showRestrictions={false} />);
     expect(screen.queryByText(/file-upload.accept/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/file-upload.max-size/i)).not.toBeInTheDocument();
   });
 
-  it('formats the max-size hint into readable units (#888)', () => {
+  it('formats the max-size hint into readable units', () => {
     render(<FileUpload {...defaultProps} accept={undefined} maxSize={0.5} />);
     expect(screen.getByText(/file-upload.max-size 512 KB/i)).toBeInTheDocument();
   });
@@ -490,7 +490,7 @@ describe('FileUpload component', () => {
     }
   });
 
-  describe('showRestrictions (#786)', () => {
+  describe('showRestrictions', () => {
     it('shows the auto-generated restrictions hint by default', () => {
       render(<FileUpload {...defaultProps} />);
       expect(screen.getByText(/file-upload\.accept/)).toBeInTheDocument();
@@ -519,7 +519,7 @@ describe('FileUpload component', () => {
     });
   });
 
-  describe('single-file rejection observability (#786)', () => {
+  describe('single-file rejection observability', () => {
     it('fires onChange for a rejected single file so the parent can react', () => {
       const onChange = jest.fn();
       render(<FileUpload {...defaultProps} multiple={false} onChange={onChange} />);

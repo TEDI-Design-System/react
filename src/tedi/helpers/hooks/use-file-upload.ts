@@ -191,12 +191,9 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     const fileMimeType = file.type.toLowerCase();
 
     return fileTypes.some((type) => {
-      if (type === fileExtension || type === fileMimeType) return true;
-
-      if (type.endsWith('/*')) {
-        return fileMimeType.startsWith(`${type.slice(0, type.indexOf('/'))}/`);
-      }
-      return false;
+      if (type === '*' || type === '*/*') return true;
+      if (type.endsWith('/*')) return fileMimeType.startsWith(type.slice(0, -1));
+      return type === fileExtension || type === fileMimeType;
     });
   };
 
@@ -311,7 +308,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     onDelete?.(file);
     onChange?.(newFiles);
 
-    if (file.isValid === false && !newFiles.some((f) => f.isValid === false)) {
+    if (newFiles.length === 0 || (file.isValid === false && !newFiles.some((f) => f.isValid === false))) {
       setErrorHelper(undefined);
     }
 

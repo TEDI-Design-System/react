@@ -4,6 +4,7 @@ import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { FileDropzone, FileDropzoneProps } from './file-dropzone';
+import styles from './file-dropzone.module.scss';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.63.78?node-id=11335-185781&m=dev" target="_BLANK">Figma ↗</a><br />
@@ -120,44 +121,10 @@ export const IndividualValidation: Story = {
   render: (args) => (
     <Row>
       <Col md={6}>
-        <FileDropzone {...args} />
-      </Col>
-    </Row>
-  ),
-};
-
-/**
- * Per-file validation with `attachmentProps` — derives `fileSize` and a per-file error
- * `feedback` from each file, shown inline under the failed rows.
- */
-export const MultipleWithIndividualValidationAndAttachmentProps: Story = {
-  args: {
-    id: 'file-dropzone-multiple-individual-validation-attachment-props',
-    name: 'file-multiple-individual-validation-attachment-props',
-    multiple: true,
-    maxSize: 0.01,
-    accept: '.pdf,.txt',
-    validateIndividually: true,
-    defaultFiles: [
-      { id: '1', name: 'taotlus_scan_lk_1.pdf', size: 18_600, isValid: false },
-      { id: '2', name: 'taotlus_scan_lk_2.pdf', size: 7_100 },
-      { id: '3', name: 'taotlus_scan_lk_3.pdf', size: 31_200, isValid: false },
-      { id: '4', name: 'taotlus_scan_lk_4.pdf', size: 9_200 },
-      { id: '5', name: 'taotlus_scan_lk_5.pdf', size: 24_500, isValid: false },
-    ],
-  },
-  render: (args) => (
-    <Row>
-      <Col md={6}>
         <FileDropzone
           {...args}
-          onChange={(files) => {
-            console.log('Uploaded files:', files);
-          }}
           attachmentProps={(file) => ({
-            icon: 'picture_as_pdf',
-            fileSize: formatBytes(file.size),
-            feedback: file.isValid === false ? { text: 'Fail on liiga suur', type: 'error' } : undefined,
+            feedback: file.isValid === false ? { type: 'error', text: 'Fail on liiga suur' } : undefined,
           })}
         />
       </Col>
@@ -215,7 +182,7 @@ const stateRows: Array<{ label: string; className?: string; props?: Partial<File
     label: 'Error',
     props: { helper: { type: 'error', text: 'Fail on liiga suur. Valige mõni teine fail või vähendage suurust.' } },
   },
-  { label: 'Drop over', className: 'dz-drop-over' },
+  { label: 'Drop over', className: styles['tedi-file-dropzone--drop-over'] },
   { label: 'Disabled', props: { disabled: true } },
   { label: 'Focus', className: 'dz-focus' },
 ];
@@ -223,15 +190,6 @@ const stateRows: Array<{ label: string; className?: string; props?: Partial<File
 export const States: Story = {
   render: () => (
     <>
-      {/* drop-over cannot be forced via props (it comes from react-dropzone's isDragActive), so
-          preview it with the same drop-over design tokens the component uses. */}
-      <style>
-        {`.dz-drop-over {
-            color: var(--file-dropzone-text-drop-over);
-            background-color: var(--file-dropzone-background-drop-over);
-            border-color: var(--file-dropzone-border-drop-over);
-          }`}
-      </style>
       <VerticalSpacing size={1}>
         {stateRows.map(({ label, className, props }) => (
           <Row key={label}>

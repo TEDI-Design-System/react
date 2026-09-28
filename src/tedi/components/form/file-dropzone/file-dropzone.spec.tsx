@@ -76,6 +76,45 @@ describe('FileDropzone', () => {
     expect(screen.getByText('Error message')).toBeInTheDocument();
   });
 
+  it('does not render the aggregate hook error under the dropzone with individual validation', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [],
+      errorHelper: { type: 'error', text: 'Aggregate error' },
+      restrictionsHint: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(<FileDropzone id="3b" name="file" label="Upload File" validateIndividually />);
+
+    expect(screen.queryByText('Aggregate error')).not.toBeInTheDocument();
+  });
+
+  it('still renders a consumer-provided error helper under the dropzone with individual validation', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [],
+      errorHelper: undefined,
+      restrictionsHint: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(
+      <FileDropzone
+        id="3c"
+        name="file"
+        label="Upload File"
+        validateIndividually
+        helper={{ type: 'error', text: 'Required' }}
+      />
+    );
+    expect(screen.getByText('Required')).toBeInTheDocument();
+  });
+
   it('gives each instance a unique helper association when no id is provided', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
@@ -103,7 +142,7 @@ describe('FileDropzone', () => {
     expect(firstDescribedBy).not.toBe(secondDescribedBy);
   });
 
-  it('shows the error and the restrictions hint together, with invalid styling (#888)', () => {
+  it('shows the error and the restrictions hint together, with invalid styling', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
       errorHelper: undefined,
@@ -179,7 +218,7 @@ describe('FileDropzone', () => {
     expect(onFileChange).not.toHaveBeenCalled();
   });
 
-  it('forwards showRestrictions to the upload hook and never leaks it to the DOM (#888)', () => {
+  it('forwards showRestrictions to the upload hook and never leaks it to the DOM', () => {
     const { container } = render(<FileDropzone id="sr" name="file" label="Upload File" showRestrictions={false} />);
 
     expect(mockUseFileUpload).toHaveBeenCalledWith(expect.objectContaining({ showRestrictions: false }));

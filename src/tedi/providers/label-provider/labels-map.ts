@@ -475,11 +475,11 @@ export const labelsMap = validateDefaultLabels({
   },
 
   'file-upload.duplicates-skipped': {
-    description: 'Announced to screen readers when already-added files are skipped as duplicates',
+    description: 'Announced when files already in the list are skipped on a repeat selection',
     components: ['FileUpload', 'FileDropzone'],
-    et: (names: string) => `Juba lisatud, jäeti vahele: ${names}`,
-    en: (names: string) => `Already added, skipped: ${names}`,
-    ru: (names: string) => `Уже добавлены, пропущены: ${names}`,
+    et: (files: string) => `Fail(id) ${files} on juba lisatud`,
+    en: (files: string) => `File(s) ${files} have already been added`,
+    ru: (files: string) => `Файл(ы) ${files} уже добавлены`,
   },
 
   'file-upload.failed-some': {
