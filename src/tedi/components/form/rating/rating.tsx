@@ -16,51 +16,33 @@ const DEFAULT_ICONS = [
 ] as const;
 
 export interface RatingProps {
-  /**
-   * Accessible name for the rating group (`radiogroup`). Required so screen readers announce what
-   * is being rated. In `readOnly` mode it prefixes the summary's accessible name.
-   */
+  /** Accessible name for the group; also prefixes the `readOnly` summary. */
   label: string;
   /**
-   * Visual style of the scale.
-   * - `star` - outlined / filled stars, cumulative (every item up to the value fills).
-   * - `number` - numbered circles, cumulative, with optional start / end captions.
-   * - `icon` - a single highlighted icon (e.g. sentiment faces) with per-item captions.
+   * Visual style. `star` / `number` fill cumulatively; `icon` highlights a single item.
    * @default star
    */
   type?: RatingType;
   /**
-   * Number of items in the scale (the maximum rating).
+   * Number of items (the max rating).
    * @default 5 (`star` / `icon`), 10 (`number`)
    */
   count?: number;
-  /**
-   * Selected value (1-based; `0` means no rating). Provide with `onChange` for controlled use.
-   * In `readOnly` mode this is the (possibly fractional) average, e.g. `3.5`.
-   */
+  /** Selected value (1-based; `0` = none). Use with `onChange` for controlled mode. In `readOnly`, the (possibly fractional) average. */
   value?: number;
   /**
-   * Initial value for uncontrolled use.
+   * Initial value for uncontrolled mode.
    * @default 0
    */
   defaultValue?: number;
-  /**
-   * Fired with the chosen value (1-based) when the selection changes. Not called in `readOnly` mode.
-   */
+  /** Called with the chosen value when the selection changes. */
   onChange?: (value: number) => void;
-  /**
-   * Per-item labels (length should match `count`). Used as each item's accessible name and:
-   * - `icon` - shown as a caption under every item.
-   * - `number` - the first and last are shown as start / end captions.
-   * - `star` - the selected (or hovered) item's label is shown as a single caption below the row.
-   */
+  /** Per-item labels (length = `count`); used as each item's accessible name and as captions. */
   itemLabels?: string[];
   /**
-   * Custom glyph(s), as Material Symbol names.
-   * - `type="icon"` — an array, one glyph per item (length should match `count`); defaults to the
-   *   five sentiment faces when `count` is 5.
-   * - `type="star"` — a single glyph string (e.g. `'favorite'`, `'thumb_up'`) to swap the cumulative
-   *   star; an array uses its first entry. Defaults to `kid_star`.
+   * Custom Material Symbol glyph(s): an array (one per item) for `type="icon"`, or a single string to
+   * swap the `type="star"` glyph.
+   * @default sentiment faces (`icon`) / `kid_star` (`star`)
    */
   icons?: string | string[];
   /**
@@ -69,33 +51,20 @@ export interface RatingProps {
    */
   disabled?: boolean;
   /**
-   * Render a compact, non-interactive summary of an aggregate rating instead of the interactive
-   * scale: a single filled visual (`star`, or `icon` for the rounded value; `number` shows none)
-   * followed by `{value}/{count}` and, when {@link ratingsCount} is set, the localised rater count
-   * (e.g. `3,5/5 - 271 hindajat`). `value` may be fractional here.
+   * Show a compact read-only summary (visual + `{value}/{count}` text) instead of the interactive scale.
    * @default false
    */
   readOnly?: boolean;
-  /**
-   * Number of ratings behind the average, shown in the `readOnly` summary (e.g. `271 hindajat`).
-   * Ignored outside `readOnly` mode; the count is omitted when not provided.
-   */
+  /** Number of ratings shown in the `readOnly` summary (e.g. `271 hindajat`); omitted when unset. */
   ratingsCount?: number;
   /**
-   * How the `readOnly` rating is displayed. Ignored when not `readOnly`.
-   * - `summary` - a single filled visual + `{value}/{count}` text (compact aggregate).
-   * - `scale` - the whole star scale with the boundary star filled to the fraction (`3.5` → three
-   *   full, one half, one empty), then the text. `star` only; other types fall back to `summary`.
+   * `readOnly` layout: `summary` (single visual) or `scale` (full star scale with fractional fill).
    * @default summary
    */
   readOnlyVariant?: 'summary' | 'scale';
-  /**
-   * `name` for the underlying radio inputs (form submission). Defaults to a generated id.
-   */
+  /** `name` for the radio inputs (form submission). Defaults to a generated id. */
   name?: string;
-  /**
-   * Additional class name on the root element.
-   */
+  /** Additional class name on the root element. */
   className?: string;
 }
 
