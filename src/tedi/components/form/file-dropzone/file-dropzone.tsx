@@ -144,7 +144,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     },
   });
 
-  const autoError = validateIndividually ? undefined : errorHelper;
+  const autoError = validateIndividually && multiple ? undefined : errorHelper;
   const errorFeedback = autoError ?? (helper?.type === 'error' ? helper : undefined);
   const hintFeedback = helper && helper.type !== 'error' ? helper : restrictionsHint;
 
