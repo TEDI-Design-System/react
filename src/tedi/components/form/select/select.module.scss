@@ -113,15 +113,15 @@ div.tedi-select__control {
   }
 }
 
-.tedi-select--clear-on-hover .tedi-select__clear-indicator,
-.tedi-select--clear-on-hover .tedi-select__separator {
+.tedi-select--clear-on-interaction .tedi-select__clear-indicator,
+.tedi-select--clear-on-interaction .tedi-select__separator {
   visibility: hidden;
 }
 
-.tedi-select--clear-on-hover .tedi-select__control:hover .tedi-select__clear-indicator,
-.tedi-select--clear-on-hover .tedi-select__control:hover .tedi-select__separator,
-.tedi-select--clear-on-hover .tedi-select__control:focus-within .tedi-select__clear-indicator,
-.tedi-select--clear-on-hover .tedi-select__control:focus-within .tedi-select__separator {
+.tedi-select--clear-on-interaction .tedi-select__control:hover .tedi-select__clear-indicator,
+.tedi-select--clear-on-interaction .tedi-select__control:hover .tedi-select__separator,
+.tedi-select--clear-on-interaction .tedi-select__control:focus-within .tedi-select__clear-indicator,
+.tedi-select--clear-on-interaction .tedi-select__control:focus-within .tedi-select__separator {
   visibility: visible;
 }
 

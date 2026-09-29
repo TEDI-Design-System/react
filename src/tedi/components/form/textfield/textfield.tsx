@@ -463,7 +463,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     { [styles['tedi-textfield--invalid']]: isInvalid },
     { [styles['tedi-textfield--valid']]: isValid },
     { [styles['tedi-textfield--clearable']]: showClearButton },
-    { [styles['tedi-textfield--clear-on-hover']]: showClearButton && showClearOnInteraction },
+    { [styles['tedi-textfield--clear-on-interaction']]: showClearButton && showClearOnInteraction },
     className
   );
 

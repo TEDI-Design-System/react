@@ -72,14 +72,14 @@ describe('TextField component', () => {
     const { rerender } = render(
       <TextField {...defaultProps} isClearable showClearOnInteraction value="x" onChange={noop} />
     );
-    expect(container()).toHaveClass('tedi-textfield--clear-on-hover');
+    expect(container()).toHaveClass('tedi-textfield--clear-on-interaction');
     expect(screen.getByTitle(/clear/i)).toBeInTheDocument();
 
     rerender(<TextField {...defaultProps} isClearable showClearOnInteraction value="" onChange={noop} />);
-    expect(container()).not.toHaveClass('tedi-textfield--clear-on-hover');
+    expect(container()).not.toHaveClass('tedi-textfield--clear-on-interaction');
 
     rerender(<TextField {...defaultProps} isClearable value="x" onChange={noop} />);
-    expect(container()).not.toHaveClass('tedi-textfield--clear-on-hover');
+    expect(container()).not.toHaveClass('tedi-textfield--clear-on-interaction');
   });
 
   it('renders helper text when provided', () => {

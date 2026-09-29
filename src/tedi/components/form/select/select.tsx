@@ -834,7 +834,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       { [styles[`tedi-select--${size}`]]: size },
       { [styles[`tedi-select--tags-${tagsDirection}`]]: tagsDirection },
       { [styles['tedi-select--searchable']]: isSearchable },
-      { [styles['tedi-select--clear-on-hover']]: isClearIndicatorVisible && showClearOnInteraction },
+      { [styles['tedi-select--clear-on-interaction']]: isClearIndicatorVisible && showClearOnInteraction },
       { [styles['tedi-select--disabled']]: disabled }
     );
 

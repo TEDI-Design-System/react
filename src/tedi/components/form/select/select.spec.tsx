@@ -91,13 +91,13 @@ describe('Select component', () => {
     const { rerender } = render(
       <Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible showClearOnInteraction />
     );
-    expect(root().className).toContain('tedi-select--clear-on-hover');
+    expect(root().className).toContain('tedi-select--clear-on-interaction');
 
     rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} showClearOnInteraction />);
-    expect(root().className).not.toContain('tedi-select--clear-on-hover');
+    expect(root().className).not.toContain('tedi-select--clear-on-interaction');
 
     rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible />);
-    expect(root().className).not.toContain('tedi-select--clear-on-hover');
+    expect(root().className).not.toContain('tedi-select--clear-on-interaction');
   });
 
   it('renders with grouped options', async () => {

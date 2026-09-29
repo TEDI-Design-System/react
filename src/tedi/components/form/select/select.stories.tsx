@@ -755,9 +755,9 @@ export const DeferKeyboardOnTouch: Story = {
  * focused (keyboard focus included), instead of whenever a value is selected. Requires
  * `isClearIndicatorVisible`.
  */
-export const ClearButtonOnHover: Story = {
+export const ClearButtonOnInteraction: Story = {
   args: {
-    id: 'example-clear-on-hover',
+    id: 'example-clear-on-interaction',
     label: 'Label',
     defaultValue: options[1],
     options: options,

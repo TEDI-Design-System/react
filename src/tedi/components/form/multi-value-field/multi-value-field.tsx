@@ -244,7 +244,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   return (
     <div
       className={classNames(styles['tedi-multi-value-field'], className, {
-        [styles['tedi-multi-value-field--clear-on-hover']]: showClear && showClearOnInteraction,
+        [styles['tedi-multi-value-field--clear-on-interaction']]: showClear && showClearOnInteraction,
       })}
     >
       {label && <FormLabel id={id} label={label} required={required} />}
