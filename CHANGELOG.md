@@ -1,3 +1,10 @@
+# [19.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.2...react-19.2.0-rc.3) (2026-09-29)
+
+
+### Bug Fixes
+
+* **carousel:** prevent edge clipping at fractional viewport widths [#933](https://github.com/TEDI-Design-System/react/issues/933) ([#936](https://github.com/TEDI-Design-System/react/issues/936)) ([77668d8](https://github.com/TEDI-Design-System/react/commit/77668d8a41d798fd41743ce44f84d5e951868e32))
+
 # [19.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.1...react-19.2.0-rc.2) (2026-09-29)
 
 
