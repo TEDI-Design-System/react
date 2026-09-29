@@ -1,3 +1,10 @@
+# [19.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.1...react-19.2.0-rc.2) (2026-09-29)
+
+
+### Features
+
+* **file-dropzone:** improvements [#888](https://github.com/TEDI-Design-System/react/issues/888) ([#929](https://github.com/TEDI-Design-System/react/issues/929)) ([26084b3](https://github.com/TEDI-Design-System/react/commit/26084b395fac06ee13dff460ae8df0417a1a61a1))
+
 # [19.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.4...react-19.2.0-rc.1) (2026-09-29)
 
 
