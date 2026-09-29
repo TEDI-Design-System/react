@@ -2,6 +2,7 @@
 
 .tedi-file-dropzone {
   padding: var(--file-dropzone-padding-y) var(--file-dropzone-padding-x);
+  color: var(--file-dropzone-text-default);
   text-align: center;
   cursor: pointer;
   background-color: var(--file-dropzone-background-default);
@@ -26,7 +27,7 @@
     justify-content: center;
 
     .tedi-file-dropzone__label {
-      color: var(--file-dropzone-text-default);
+      color: inherit;
 
       &:hover {
         cursor: pointer;
