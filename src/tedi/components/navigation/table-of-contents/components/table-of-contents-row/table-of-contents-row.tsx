@@ -29,7 +29,7 @@ export const TableOfContentsRow = ({ node, depth, index, numberPrefix }: TableOf
 
   return (
     <li
-      aria-current={isSelected ? 'true' : undefined}
+      aria-current={isSelected ? 'location' : undefined}
       className={cn(styles['tedi-table-of-contents__item'], {
         [styles['tedi-table-of-contents__item--selected']]: isSelected,
       })}
