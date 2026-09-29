@@ -1,3 +1,10 @@
+# [19.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.4...react-19.2.0-rc.1) (2026-09-29)
+
+
+### Features
+
+* **textfield,select,multi-value-field:** add showClearButtonOnHover prop [#766](https://github.com/TEDI-Design-System/react/issues/766) ([#882](https://github.com/TEDI-Design-System/react/issues/882)) ([af18a5f](https://github.com/TEDI-Design-System/react/commit/af18a5f27fd353bceb561f54ecc26539c8015251))
+
 ## [19.1.2-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.3...react-19.1.2-rc.4) (2026-09-28)
 
 
