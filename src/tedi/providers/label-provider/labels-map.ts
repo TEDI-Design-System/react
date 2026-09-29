@@ -474,6 +474,14 @@ export const labelsMap = validateDefaultLabels({
     ru: (count: string) => `${count} файл(ы) успешно добавлены`,
   },
 
+  'file-upload.duplicates-skipped': {
+    description: 'Announced when files already in the list are skipped on a repeat selection',
+    components: ['FileUpload', 'FileDropzone'],
+    et: (files: string) => `Fail(id) ${files} on juba lisatud`,
+    en: (files: string) => `File(s) ${files} have already been added`,
+    ru: (files: string) => `Файл(ы) ${files} уже добавлены`,
+  },
+
   'file-upload.failed-some': {
     description: 'Error label for rejected files (wrong extension)',
     components: ['FileUpload'],
@@ -501,7 +509,7 @@ export const labelsMap = validateDefaultLabels({
   'file-dropzone.label': {
     description: 'Default label for dropzone',
     components: ['FileDropzone'],
-    et: 'Lohista failid siia või klõpsa, et sirvida',
+    et: 'Lohista failid siia või klõpsa failide valimiseks',
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },

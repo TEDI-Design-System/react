@@ -92,6 +92,12 @@ export interface MultiValueFieldProps {
    */
   isClearable?: boolean;
   /**
+   * Show the clear (×) button only while the field is hovered or focused, instead of whenever values
+   * exist. Requires `isClearable`.
+   * @default false
+   */
+  showClearOnInteraction?: boolean;
+  /**
    * Marks the field as required.
    * Adds required indicator to label and applies native required validation to the hidden input.
    */
@@ -122,6 +128,7 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
     onIconClick,
     iconButtonProps,
     isClearable = true,
+    showClearOnInteraction,
     required,
     disabled,
   } = props;
@@ -242,7 +249,11 @@ export const MultiValueField = forwardRef<MultiValueFieldRef, MultiValueFieldPro
   };
 
   return (
-    <div className={classNames(styles['tedi-multi-value-field'], className)}>
+    <div
+      className={classNames(styles['tedi-multi-value-field'], className, {
+        [styles['tedi-multi-value-field--clear-on-interaction']]: showClear && showClearOnInteraction,
+      })}
+    >
       {label && <FormLabel id={id} label={label} required={required} labelProps={labelProps} />}
       <div
         ref={innerRef}

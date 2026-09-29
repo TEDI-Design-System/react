@@ -64,6 +64,12 @@ type TextFieldBreakpointProps = {
    */
   isClearable?: boolean;
   /**
+   * Show the clear (×) button only while the field is hovered or focused, instead of whenever it has
+   * a value. Requires `isClearable`.
+   * @default false
+   */
+  showClearOnInteraction?: boolean;
+  /**
    * Additional CSS class name applied to the root container (`<div>`).
    *
    * Use this for layout adjustments, custom spacing, or theming the entire text field wrapper.
@@ -272,6 +278,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     placeholder,
     isArrowsHidden = true,
     isClearable,
+    showClearOnInteraction,
     onClear,
     onChange,
     onChangeEvent,
@@ -457,6 +464,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     { [styles['tedi-textfield--invalid']]: isInvalid },
     { [styles['tedi-textfield--valid']]: isValid },
     { [styles['tedi-textfield--clearable']]: showClearButton },
+    { [styles['tedi-textfield--clear-on-interaction']]: showClearButton && showClearOnInteraction },
     className
   );
 
