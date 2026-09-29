@@ -1,3 +1,10 @@
+# [19.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.3...react-19.2.0-rc.4) (2026-09-29)
+
+
+### Bug Fixes
+
+* **table-of-contents:** accessibility fixes for aria-current and empty heading [#897](https://github.com/TEDI-Design-System/react/issues/897) ([#938](https://github.com/TEDI-Design-System/react/issues/938)) ([f546118](https://github.com/TEDI-Design-System/react/commit/f54611859fb9cecddb2de58bcfd7f1f23065c71c))
+
 # [19.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.2...react-19.2.0-rc.3) (2026-09-29)
 
 
