@@ -19,8 +19,8 @@ export const globalTypes = {
     toolbar: {
       icon: 'paintbrush',
       items: [
-        { value: 'default', title: 'Default' },
-        { value: 'dark', title: 'Dark' },
+        { value: 'default', title: 'Light mode (default)' },
+        { value: 'dark', title: 'Dark mode' },
       ],
       showName: true,
     },
@@ -66,9 +66,9 @@ const preview: Preview = {
     },
     backgrounds: {
       options: {
-        default: { name: 'default', value: 'var(--general-surface-primary)' },
-        inverted: { name: 'inverted', value: 'var(--general-surface-inverted-primary)' },
-        brand: { name: 'brand', value: 'var(--general-surface-brand-primary)' },
+        default: { name: 'Default', value: 'var(--general-surface-primary)' },
+        inverted: { name: 'Inverted', value: 'var(--general-surface-inverted-primary)' },
+        brand: { name: 'Brand', value: 'var(--general-surface-brand-primary)' },
       },
     },
     docs: {
