@@ -16,9 +16,13 @@ jest.mock('../../../helpers/hooks/use-breakpoint', () => ({
 const originalResizeObserver = global.ResizeObserver;
 const originalSetPointerCapture = Element.prototype.setPointerCapture;
 const originalReleasePointerCapture = Element.prototype.releasePointerCapture;
+let resizeObserverCallback: ResizeObserverCallback;
 
 beforeAll(() => {
   class MockResizeObserver {
+    constructor(callback: ResizeObserverCallback) {
+      resizeObserverCallback = callback;
+    }
     observe = jest.fn();
     unobserve = jest.fn();
     disconnect = jest.fn();
@@ -354,6 +358,48 @@ describe('Carousel', () => {
       const track = container.querySelector('[class*="track"]') as HTMLElement;
 
       expect(track.style.transform).toMatch(/translate3d\(-\d/);
+    });
+
+    it('uses a fractional ResizeObserver width after the initial measurement', () => {
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => 1422 });
+      const { container } = renderCarousel(3, { loop: false, slidesPerView: 2, gap: 0 });
+      const track = container.querySelector('[class*="track"]') as HTMLElement;
+      const translateX = (): number => Number(track.style.transform.match(/translate3d\((-?[\d.]+)px/)?.[1]);
+
+      fireEvent.click(screen.getByRole('button', { name: 'carousel.move-forward' }));
+      expect(translateX()).toBeCloseTo(-711);
+
+      act(() => {
+        resizeObserverCallback([{ contentRect: { width: 1422.39 } } as ResizeObserverEntry], {} as ResizeObserver);
+      });
+      expect(translateX()).toBeCloseTo(-711.195);
+    });
+
+    it('measures the content width consistently when the viewport has horizontal padding', () => {
+      const style = document.createElement('style');
+      style.textContent = '.padded-carousel-content { padding-left: 20px; padding-right: 30px; }';
+      document.head.appendChild(style);
+
+      try {
+        const { container } = renderCarousel(3, {
+          className: 'padded-carousel-content',
+          loop: false,
+          slidesPerView: 2,
+          gap: 0,
+        });
+        const track = container.querySelector('[class*="track"]') as HTMLElement;
+        const translateX = (): number => Number(track.style.transform.match(/translate3d\((-?[\d.]+)px/)?.[1]);
+
+        fireEvent.click(screen.getByRole('button', { name: 'carousel.move-forward' }));
+        expect(translateX()).toBeCloseTo(-475);
+
+        act(() => {
+          resizeObserverCallback([{ contentRect: { width: 950 } } as ResizeObserverEntry], {} as ResizeObserver);
+        });
+        expect(translateX()).toBeCloseTo(-475);
+      } finally {
+        style.remove();
+      }
     });
   });
 });
