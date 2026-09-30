@@ -15,6 +15,7 @@ import {
 import cn from 'classnames';
 import React from 'react';
 
+import { warnDeprecated } from '../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { useLabels } from '../../../tedi/providers/label-provider';
 import { Button, ButtonProps } from '../button/button';
 import styles from './dropdown.module.scss';
@@ -66,6 +67,7 @@ export type DropdownProps = {
  * @deprecated Use `Dropdown` from `@tedi-design-system/react/tedi` instead.
  */
 export const Dropdown = (props: DropdownProps) => {
+  warnDeprecated('Community Dropdown', 'Use `Dropdown` from `@tedi-design-system/react/tedi` instead.');
   const { getLabel } = useLabels();
   const { button, items, onItemClick, closeMenuOnClick = true, ...rest } = props;
   const { initialFocus = -1, modal = false, ...restFocusManager } = props.focusManager ?? {};

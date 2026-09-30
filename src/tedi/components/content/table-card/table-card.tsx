@@ -3,8 +3,8 @@ import React from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
-import { Icon } from '../../base/icon/icon';
 import { Text, TextModifiers } from '../../base/typography/text/text';
+import { CollapseButton } from '../../buttons/collapse-button/collapse-button';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { Card, CardContentPadding } from '../card/card';
 import { Label } from '../label/label';
@@ -101,6 +101,14 @@ export interface TableCardProps extends BreakpointSupport<TableCardBreakpointPro
   open?: boolean;
   /** Called with the next open state when the header toggles. */
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Style of the collapse indicator (only applies when `collapsible`), mirroring `CollapseButton`'s
+   * `arrowType`:
+   * - `default` — a plain chevron.
+   * - `secondary` — a circular, outlined arrow.
+   * @default default
+   */
+  arrowType?: 'default' | 'secondary';
   /** Footer content (e.g. `Button`s), divided from the body. */
   actions?: React.ReactNode;
   /** Emphasised summary / total row after the body, on a muted background. */
@@ -181,6 +189,7 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
     defaultOpen = true,
     open,
     onOpenChange,
+    arrowType = 'default',
     actions,
     summary,
     selectable = false,
@@ -219,11 +228,31 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const isControlled = open !== undefined;
   const isOpen = collapsible ? (isControlled ? open : internalOpen) : true;
 
-  const handleToggle = () => {
-    const next = !isOpen;
+  const handleOpenChange = (next: boolean) => {
     if (!isControlled) setInternalOpen(next);
     onOpenChange?.(next);
   };
+
+  const titleId = `${id}-title`;
+  const headerRowRef = React.useRef<HTMLDivElement>(null);
+  const isOpenRef = React.useRef(isOpen);
+  const openChangeRef = React.useRef(handleOpenChange);
+
+  React.useLayoutEffect(() => {
+    isOpenRef.current = isOpen;
+    openChangeRef.current = handleOpenChange;
+  });
+
+  React.useEffect(() => {
+    const element = headerRowRef.current;
+    if (!collapsible || !element) return undefined;
+    const onClick = (event: MouseEvent): void => {
+      if ((event.target as HTMLElement).closest('a, button, input, select, textarea, label')) return;
+      openChangeRef.current(!isOpenRef.current);
+    };
+    element.addEventListener('click', onClick);
+    return () => element.removeEventListener('click', onClick);
+  }, [collapsible]);
 
   const [internalSelected, setInternalSelected] = React.useState(defaultSelected);
   const isSelectedControlled = selected !== undefined;
@@ -237,7 +266,6 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
   const HeadingTag = titleElement;
 
   if (collapsible && !title && !ariaLabel) {
-    // The toggle is otherwise nameless (its only content is the aria-hidden chevron).
     console.warn(
       'TableCard: a `collapsible` card needs a `title` or `ariaLabel` so its toggle has an accessible name.'
     );
@@ -302,43 +330,37 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
             selectionCheckbox
           )}
           {collapsible ? (
-            <HeadingTag className={styles['tedi-table-card__heading']}>
-              <button
-                type="button"
-                className={styles['tedi-table-card__toggle']}
-                aria-expanded={isOpen}
+            <div ref={headerRowRef} className={styles['tedi-table-card__collapse-row']}>
+              <span className={styles['tedi-table-card__title-group']}>
+                {title && (
+                  <Text
+                    id={titleId}
+                    element={titleElement}
+                    modifiers={titleModifiers}
+                    className={cn(styles['tedi-table-card__title'], {
+                      [styles['tedi-table-card__title--body']]: !titleModifiers,
+                    })}
+                  >
+                    {title}
+                  </Text>
+                )}
+                {subtitle && (
+                  <Text element="span" color="secondary" modifiers="small">
+                    {subtitle}
+                  </Text>
+                )}
+              </span>
+              {endSlot && <span className={styles['tedi-table-card__end-slot']}>{endSlot}</span>}
+              <CollapseButton
+                hideText
+                arrowType={arrowType}
+                open={isOpen}
+                onOpenChange={handleOpenChange}
                 aria-controls={bodyId}
-                aria-label={title ? undefined : ariaLabel ?? getLabel(isOpen ? 'close' : 'open')}
-                onClick={handleToggle}
-              >
-                <span className={styles['tedi-table-card__title-group']}>
-                  {title && (
-                    <Text
-                      element="span"
-                      modifiers={titleModifiers}
-                      className={cn(styles['tedi-table-card__title'], {
-                        [styles['tedi-table-card__title--body']]: !titleModifiers,
-                      })}
-                    >
-                      {title}
-                    </Text>
-                  )}
-                  {subtitle && (
-                    <Text element="span" color="secondary" modifiers="small">
-                      {subtitle}
-                    </Text>
-                  )}
-                </span>
-                {endSlot && <span className={styles['tedi-table-card__end-slot']}>{endSlot}</span>}
-                <span
-                  className={cn(styles['tedi-table-card__chevron'], {
-                    [styles['tedi-table-card__chevron--open']]: isOpen,
-                  })}
-                >
-                  <Icon name="expand_more" size={24} color="inherit" />
-                </span>
-              </button>
-            </HeadingTag>
+                aria-labelledby={title ? titleId : undefined}
+                aria-label={title ? undefined : ariaLabel}
+              />
+            </div>
           ) : (
             <>
               {(title || subtitle) && !titleAsSelectionLabel && (
@@ -395,18 +417,19 @@ export const TableCard = (props: TableCardProps): JSX.Element => {
 
         {children}
 
-        {hasSummary && (
+        {summary && (
           <Card.Content padding={1} background="tertiary" hasSeparator={summaryHasSeparator}>
             <TextGroupList
               type="horizontal"
-              labelAlign="left"
+              labelAlign={resolvedLabelAlign}
               valueAlign="right"
+              labelWidth={resolvedLabelWidth}
               items={[
                 {
-                  label: summary?.label,
+                  label: renderRowLabel(summary.label, labelSize === 'small'),
                   value: (
                     <Text element="span" modifiers="bold">
-                      {summary?.value}
+                      {summary.value}
                     </Text>
                   ),
                 },

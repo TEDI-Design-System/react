@@ -1,14 +1,10 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
-import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
-import { DateField } from '../../form/date-field/date-field';
 import { Field } from '../../form/field/field';
-import { InputGroup } from '../../form/input-group/input-group';
-import { Select } from '../../form/select/select';
-import { TimeField } from '../../form/time-field/time-field';
+import { ISelectOption, Select } from '../../form/select/select';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import { Separator } from '../../misc/separator/separator';
 import { Dropdown } from '../../overlays/dropdown';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { Card } from '../card/card';
@@ -59,11 +55,6 @@ const benefitRows: TableCardRow[] = [
   { label: 'Summa (€)', value: '0.00 €', bold: true },
 ];
 
-const benefitStatementItems = benefitRows.map((row) => ({
-  label: <Label isSmall>{row.label as string}</Label>,
-  value: row.bold ? <Text modifiers="bold">{row.value}</Text> : row.value,
-}));
-
 export const Default: Story = {
   args: {
     rows: benefitRows,
@@ -75,28 +66,7 @@ export const Default: Story = {
 export const SimpleCard: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <Card padding={0}>
-        {[0, 1, 2, 3].map((block) => (
-          <Card.Content key={block} padding={1} hasSeparator>
-            <TextGroup.List
-              type="horizontal"
-              labelAlign="right"
-              valueAlign="right"
-              labelWidth="var(--text-group-label-width-sm)"
-              items={benefitStatementItems}
-            />
-          </Card.Content>
-        ))}
-        <Card.Content padding={1} background="tertiary">
-          <TextGroup.List
-            type="horizontal"
-            labelAlign="right"
-            valueAlign="right"
-            labelWidth="var(--text-group-label-width-sm)"
-            items={[{ label: <Label isSmall>Ülekande summa</Label>, value: <Text modifiers="bold">0.00 €</Text> }]}
-          />
-        </Card.Content>
-      </Card>
+      <TableCard rows={benefitRows} summary={{ label: 'Ülekande summa', value: '0.00 €' }} labelSize="small" />
 
       <TableCard
         title="ID kaart"
@@ -153,6 +123,112 @@ export const SimpleCard: Story = {
   ),
 };
 
+type AppointmentValues = {
+  date: string;
+  time: string;
+  duration: string;
+  location: ISelectOption;
+};
+
+const locationOptions: ISelectOption[] = [
+  { label: 'Tallinn', value: 'tallinn' },
+  { label: 'Tartu', value: 'tartu' },
+  { label: 'Pärnu', value: 'parnu' },
+];
+
+/**
+ * Edit-in-place: the same `TableCard` shows read-only rows with a **Muuda** action, and clicking it
+ * swaps each row's value for an input and the footer for Katkesta / Salvesta. The row labels stay
+ * put and name the inputs (via `Field`'s `aria-label` / `Select`'s `hideLabel`), so the card reads
+ * as a form without duplicating labels. Edits are held in a draft and only committed on Salvesta;
+ * Katkesta discards them.
+ */
+const EditableAppointmentCard = (): JSX.Element => {
+  const [editing, setEditing] = useState(false);
+  const [values, setValues] = useState<AppointmentValues>({
+    date: '22.03.2029 – 29.03.2029',
+    time: '11:14',
+    duration: '6 min',
+    location: locationOptions[0],
+  });
+  const [draft, setDraft] = useState<AppointmentValues>(values);
+
+  const startEditing = (): void => {
+    setDraft(values);
+    setEditing(true);
+  };
+  const save = (): void => {
+    setValues(draft);
+    setEditing(false);
+  };
+
+  const readRows: TableCardRow[] = [
+    { label: 'Kuupäev', value: values.date },
+    { label: 'Kellaaeg', value: values.time },
+    { label: 'Kestus', value: values.duration },
+    { label: 'Asukoht', value: values.location.label },
+  ];
+
+  const editRows: TableCardRow[] = [
+    {
+      label: 'Kuupäev',
+      value: <Field aria-label="Kuupäev" value={draft.date} onChange={(date) => setDraft((d) => ({ ...d, date }))} />,
+    },
+    {
+      label: 'Kellaaeg',
+      value: <Field aria-label="Kellaaeg" value={draft.time} onChange={(time) => setDraft((d) => ({ ...d, time }))} />,
+    },
+    {
+      label: 'Kestus',
+      value: (
+        <Field
+          aria-label="Kestus"
+          value={draft.duration}
+          onChange={(duration) => setDraft((d) => ({ ...d, duration }))}
+        />
+      ),
+    },
+    {
+      label: 'Asukoht',
+      value: (
+        <div style={{ width: '100%' }}>
+          <Select
+            id="wa-edit-location"
+            label="Asukoht"
+            hideLabel
+            options={locationOptions}
+            value={draft.location}
+            onChange={(next) => setDraft((d) => ({ ...d, location: (next as ISelectOption | null) ?? d.location }))}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <TableCard
+      layout="vertical"
+      rows={editing ? editRows : readRows}
+      actions={
+        editing ? (
+          <>
+            <Button visualType="neutral" fullWidth onClick={() => setEditing(false)}>
+              Katkesta
+            </Button>
+            <Button fullWidth onClick={save}>
+              Salvesta
+            </Button>
+          </>
+        ) : (
+          <Button visualType="neutral" fullWidth iconLeft="edit" onClick={startEditing}>
+            Muuda
+          </Button>
+        )
+      }
+    />
+  );
+};
+
 /**
  * Cards with a footer `actions` slot — a single action, primary / secondary buttons, icon-only
  * actions, or text actions — plus selectable rows with status badges.
@@ -165,78 +241,33 @@ export const WithActions: StoryFn = () => {
   ];
   return (
     <VerticalSpacing size={1}>
+      <EditableAppointmentCard />
+
       <TableCard
         layout="vertical"
         rows={[
-          { label: 'Kuupäev', value: '22.03.2029 – 29.03.2029' },
-          { label: 'Kellaaeg', value: '11:14' },
-          { label: 'Kestus', value: '6 min' },
-          { label: 'Asukoht', value: 'Tallinn' },
+          { label: 'Teenus', value: 'Ortopeedia' },
+          { label: 'Arst', value: 'Pille Paunküla' },
+          { label: 'Maksumus', value: '45.50 €/h' },
+          {
+            label: 'Asukoht',
+            value: (
+              <Dropdown>
+                <Dropdown.Trigger>
+                  <Button visualType="neutral" size="small" iconRight="expand_more">
+                    Tallinn
+                  </Button>
+                </Dropdown.Trigger>
+                <Dropdown.Content>
+                  <Dropdown.Item index={0}>Tallinn</Dropdown.Item>
+                  <Dropdown.Item index={1}>Tartu</Dropdown.Item>
+                  <Dropdown.Item index={2}>Pärnu</Dropdown.Item>
+                </Dropdown.Content>
+              </Dropdown>
+            ),
+          },
         ]}
-        actions={
-          <Button visualType="neutral" fullWidth iconLeft="edit">
-            Muuda
-          </Button>
-        }
       />
-
-      <Card padding={0}>
-        <Card.Content padding={1}>
-          <TextGroup.List
-            type="vertical"
-            items={[
-              { label: 'Teenus', value: 'Ortopeedia' },
-              { label: 'Arst', value: 'Pille Paunküla' },
-              { label: 'Maksumus', value: '45.50 €/h' },
-            ]}
-          />
-          <Separator spacing={{ top: 1, bottom: 0.5 }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--layout-grid-gutters-08)' }}>
-            <Label isSmall>Asukoht</Label>
-            <Dropdown>
-              <Dropdown.Trigger>
-                <Button visualType="neutral" size="small" iconRight="expand_more">
-                  Tallinn
-                </Button>
-              </Dropdown.Trigger>
-              <Dropdown.Content>
-                <Dropdown.Item index={0}>Tallinn</Dropdown.Item>
-                <Dropdown.Item index={1}>Tartu</Dropdown.Item>
-                <Dropdown.Item index={2}>Pärnu</Dropdown.Item>
-              </Dropdown.Content>
-            </Dropdown>
-          </div>
-        </Card.Content>
-      </Card>
-
-      <Card padding={0}>
-        <Card.Content padding={1} hasSeparator>
-          <VerticalSpacing size={1}>
-            <DateField id="tc-date" label="Kuupäev" mode="single" placeholder="pp.kk.aaaa" />
-            <TimeField id="tc-time" label="Kellaaeg" defaultValue="11:15" />
-            <InputGroup id="tc-dur" label="Kestus">
-              <InputGroup.Input>
-                <Field defaultValue="10" />
-              </InputGroup.Input>
-              <InputGroup.Suffix>min</InputGroup.Suffix>
-            </InputGroup>
-            <Select
-              id="tc-loc"
-              label="Asukoht"
-              options={[{ label: 'Tallinn', value: 'tallinn' }]}
-              defaultValue={{ label: 'Tallinn', value: 'tallinn' }}
-            />
-          </VerticalSpacing>
-        </Card.Content>
-        <Card.Content padding={{ vertical: 0.5, horizontal: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button visualType="neutral" fullWidth>
-              Katkesta
-            </Button>
-            <Button fullWidth>Salvesta</Button>
-          </div>
-        </Card.Content>
-      </Card>
 
       <TableCard
         layout="vertical"
@@ -287,7 +318,7 @@ export const WithActions: StoryFn = () => {
           { label: 'Periood', value: '01.02 - 14.01.2024' },
           { label: 'Liik', value: 'Haigusleht' },
           { label: 'Pikkus', value: '14 päeva' },
-          { label: 'Staatus', value: <StatusBadge color="neutral">Ülekanne tehtud</StatusBadge> },
+          { label: 'Staatus', value: <StatusBadge color="brand">Ülekanne tehtud</StatusBadge> },
           { label: 'Hüvitis', value: '120.34 €', bold: true },
         ]}
         actions={
@@ -370,13 +401,14 @@ WithActions.parameters = {
 
 /**
  * Collapsible cards (`collapsible`) — the header toggles the body. Combine with a `subtitle`,
- * a header `endSlot`, an `actions` footer, or multiple `columns`.
+ * a header `endSlot`, an `actions` footer, or multiple `columns`. The toggle is a `CollapseButton`;
+ * set `arrowType="secondary"` (as on the "Mari Maasikas" card) for the circular, outlined arrow.
  */
 export const IsAccordion: StoryFn = () => {
   const rows: TableCardRow[] = [
     { label: 'Vanus', value: '25' },
     { label: 'Külastuste arv', value: '6' },
-    { label: 'Taotluse olek', value: <StatusBadge color="neutral">Menetluses</StatusBadge> },
+    { label: 'Taotluse olek', value: <StatusBadge color="brand">Menetluses</StatusBadge> },
   ];
   return (
     <VerticalSpacing size={1}>
@@ -422,6 +454,7 @@ export const IsAccordion: StoryFn = () => {
         endSlot={<StatusBadge color="success">Verifitseeritud</StatusBadge>}
         subtitle="Vanus: 25"
         collapsible
+        arrowType="secondary"
         defaultOpen={false}
         layout="horizontal"
         labelAlign="left"
@@ -454,7 +487,7 @@ export const IsAccordion: StoryFn = () => {
         rows={[
           { label: 'Vanus', value: '25' },
           { label: 'Külastuste arv', value: '6' },
-          { label: 'Olek', value: <StatusBadge color="success">Kehtiv</StatusBadge> },
+          { label: 'Olek', value: <StatusBadge color="brand">Kehtiv</StatusBadge> },
         ]}
       />
     </VerticalSpacing>
@@ -574,4 +607,29 @@ export const HasChildrenRows: StoryFn = () => {
       </TableCard>
     </VerticalSpacing>
   );
+};
+
+/**
+ * Uses `md={{ columns: 2 }}` to switch from one column to two at the `md` viewport breakpoint.
+ * Labels stay above their values. Resize the preview to see the configured layout change.
+ */
+export const WithResponsiveLayout: Story = {
+  args: {
+    title: 'ID kaart',
+    titleElement: 'h4',
+    titleModifiers: 'h4',
+    endSlot: <StatusBadge color="success">Kehtib 13.08.2027</StatusBadge>,
+    layout: 'vertical',
+    labelSize: 'small',
+    columns: 1,
+    md: { columns: 2 },
+    rows: [
+      { label: 'Eesnimi', value: 'Mari' },
+      { label: 'Sünniaeg', value: '15.08.1987' },
+      { label: 'Perenimi', value: 'Maasikas' },
+      { label: 'Isikukood', value: '41234567891' },
+      { label: 'Dokumendi number', value: 'AS0000226' },
+      { label: 'Sugu', value: 'Naine' },
+    ],
+  },
 };

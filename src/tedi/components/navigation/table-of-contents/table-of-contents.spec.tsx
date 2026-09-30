@@ -53,7 +53,7 @@ describe('TableOfContents', () => {
 
   it('marks the active item with aria-current', () => {
     render(<Tree activeId="a" />);
-    expect(screen.getByRole('link', { name: 'Alpha' }).closest('li')).toHaveAttribute('aria-current', 'true');
+    expect(screen.getByRole('link', { name: 'Alpha' }).closest('li')).toHaveAttribute('aria-current', 'location');
     expect(screen.getByRole('link', { name: 'Bravo' }).closest('li')).not.toHaveAttribute('aria-current');
   });
 

@@ -12,14 +12,19 @@ export type DropdownTriggerProps = {
 };
 
 export const DropdownTrigger = ({ children }: DropdownTriggerProps) => {
-  const { refs, getReferenceProps } = useDropdownContext();
+  const { refs, getReferenceProps, navigation, open, contentId } = useDropdownContext();
   const childRef = getElementRef(children);
   const mergedRef = useMergeRefs([refs.setReference, childRef]);
+
+  const navigationProps = navigation
+    ? { 'aria-expanded': open, 'aria-controls': open ? contentId : undefined }
+    : undefined;
 
   return cloneElement(
     children,
     getReferenceProps({
       ...children.props,
+      ...navigationProps,
       ref: mergedRef,
     })
   );
