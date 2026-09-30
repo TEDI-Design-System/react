@@ -31,8 +31,8 @@
 
   &--top {
     align-self: flex-start;
-    border-bottom-right-radius: var(--sheet-header-radiu);
-    border-bottom-left-radius: var(--sheet-header-radiu);
+    border-bottom-right-radius: var(--sheet-header-radius);
+    border-bottom-left-radius: var(--sheet-header-radius);
     transform: translateY(-100%);
 
     &.is-visible {

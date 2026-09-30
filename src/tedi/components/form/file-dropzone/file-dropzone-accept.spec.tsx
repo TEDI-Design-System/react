@@ -16,7 +16,7 @@ jest.mock('../../../helpers/hooks/use-file-upload', () => ({
   }),
 }));
 
-describe('FileDropzone accept mapping (#783)', () => {
+describe('FileDropzone accept mapping', () => {
   const acceptAttr = (accept: string): string | null => {
     const { container } = render(<FileDropzone id="fd" name="file" label="Upload" accept={accept} multiple />);
     return container.querySelector<HTMLInputElement>('input[type="file"]')?.getAttribute('accept') ?? null;
@@ -50,8 +50,7 @@ describe('FileDropzone accept mapping (#783)', () => {
 
   it('has no unnamed-input or nested-interactive a11y violations', async () => {
     const { container } = render(<FileDropzone id="fd" name="file" label="Upload files" accept=".pdf,.txt" multiple />);
-    // The input is hidden via the SCSS-module class `.tedi-file-dropzone__input`, which jsdom
-    // doesn't apply — inject the rule so axe evaluates the real (display:none) state.
+
     const style = document.createElement('style');
     style.textContent = '.tedi-file-dropzone__input { display: none; }';
     document.head.appendChild(style);
