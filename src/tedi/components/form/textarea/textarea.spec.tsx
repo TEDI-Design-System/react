@@ -33,6 +33,11 @@ describe('Textarea component', () => {
     expect(textarea).toHaveAttribute('name', 'testTextarea');
   });
 
+  it('shows no clear button, even with a value', () => {
+    render(<Textarea {...defaultProps} value="Some text" onChange={jest.fn()} />);
+    expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
+  });
+
   it('applies the correct CSS classes', () => {
     render(<Textarea {...defaultProps} className="custom-class" />);
     const wrapper = screen.getByRole('textbox').closest('div[data-name="textarea"]');

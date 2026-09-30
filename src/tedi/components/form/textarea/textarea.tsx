@@ -193,6 +193,7 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
         [styles['tedi-textarea__input--auto-grow']]: autoGrow,
       })}
       isTextArea={true}
+      isClearable={false}
       className={cn(styles['tedi-textarea'], className)}
       value={value}
       onChange={handleInputChange}

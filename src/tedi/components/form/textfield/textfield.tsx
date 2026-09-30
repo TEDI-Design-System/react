@@ -59,8 +59,9 @@ type TextFieldBreakpointProps = {
    * When `true`, displays a clear (×) button on the right side when the field has a value.
    *
    * Clicking the button clears the input and calls `onClear` (if provided).
+   * Hidden while the field is read-only.
    *
-   * @default false
+   * @default true
    */
   isClearable?: boolean;
   /**
@@ -276,7 +277,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     size = 'default',
     placeholder,
     isArrowsHidden = true,
-    isClearable,
+    isClearable = true,
     showClearOnInteraction,
     onClear,
     onChange,
@@ -306,7 +307,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   const [innerValue, setInnerValue] = React.useState(externalValue ?? defaultValue ?? '');
 
   const value = externalValue ?? innerValue;
-  const showClearButton = Boolean(isClearable && value && !readOnly);
+  const isReadOnly = readOnly || input?.readOnly;
+  const showClearButton = Boolean(isClearable && value && !isReadOnly);
 
   const inputGroup = useOptionalInputGroup?.();
   const generatedId = React.useId();
@@ -428,7 +430,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       onChange={handleChange}
       onChangeEvent={onChangeEvent}
       disabled={disabled}
-      readOnly={readOnly || input?.readOnly}
+      readOnly={isReadOnly}
       required={required}
       invalid={isInvalid}
       placeholder={placeholder}
