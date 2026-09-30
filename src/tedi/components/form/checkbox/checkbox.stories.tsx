@@ -17,6 +17,9 @@ const meta: Meta<typeof Checkbox> = {
   component: Checkbox,
   subcomponents: { 'Checkbox.Group': CheckboxGroup },
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/Checkbox',
+  argTypes: {
+    tooltip: { control: false },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -289,6 +292,25 @@ export const CheckWithLongTitle = () => {
   );
 };
 
+/** Compose checkboxes inside `Checkbox.Group`, which owns the selected values. */
+export const Group: StoryObj = {
+  render: () => {
+    const [values, setValues] = useState<string[]>(['kartul']);
+    return (
+      <Checkbox.Group
+        label="Tooraine"
+        value={values}
+        onChange={setValues}
+        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
+      >
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="piim" label="Piim" />
+        <Checkbox value="banaanid" label="Banaanid" />
+      </Checkbox.Group>
+    );
+  },
+};
+
 /**
  * A `required` group means "at least one must be selected". It's conveyed via the
  * group's accessible name (legend), not native `required` on each box — that would
@@ -322,25 +344,6 @@ export const GroupInvalid: StoryObj = {
         value={values}
         onChange={setValues}
         helper={{ text: 'Vali vähemalt üks', type: 'error' }}
-      >
-        <Checkbox value="kartul" label="Kartul" />
-        <Checkbox value="piim" label="Piim" />
-        <Checkbox value="banaanid" label="Banaanid" />
-      </Checkbox.Group>
-    );
-  },
-};
-
-/** Compose checkboxes inside `Checkbox.Group`, which owns the selected values. */
-export const Group: StoryObj = {
-  render: () => {
-    const [values, setValues] = useState<string[]>(['kartul']);
-    return (
-      <Checkbox.Group
-        label="Tooraine"
-        value={values}
-        onChange={setValues}
-        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
       >
         <Checkbox value="kartul" label="Kartul" />
         <Checkbox value="piim" label="Piim" />
@@ -386,9 +389,9 @@ export const Controlled = () => {
         checked={checked}
         onChange={(value, checked) => setChecked(checked)}
       />
-      <Text>Valitud: {checked ? 'jah' : 'ei'}</Text>
+      <Text>Selected: {checked ? 'yes' : 'no'}</Text>
       <Button visualType="secondary" onClick={() => setChecked((prev) => !prev)}>
-        Lülita väljastpoolt
+        Toggle from outside
       </Button>
     </VerticalSpacing>
   );

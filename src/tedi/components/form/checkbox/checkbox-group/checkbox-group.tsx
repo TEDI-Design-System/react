@@ -23,6 +23,7 @@ interface CheckboxGroupBreakpointProps {
   hideLabel?: boolean;
   /** Helper / feedback text rendered below the group. */
   helper?: FeedbackTextProps;
+  /** Additional class name(s) applied to the fieldset. */
   className?: string;
   /** Controlled selected values. Pair with `onChange`. */
   value?: string[];
@@ -30,8 +31,11 @@ interface CheckboxGroupBreakpointProps {
   defaultValue?: string[];
   /** Fires with the full new list of selected values. */
   onChange?: (value: string[]) => void;
+  /** Disables the whole group and every checkbox within it. */
   disabled?: boolean;
+  /** Marks the group as invalid, forwarding the error state to each checkbox. */
   invalid?: boolean;
+  /** Marks the group as required, adding a required indicator to the legend. */
   required?: boolean;
   /** Size forwarded to every checkbox. @default 'default' */
   size?: 'default' | 'large';
@@ -66,6 +70,7 @@ interface CheckboxGroupBreakpointProps {
   indeterminateCheckProps?: Partial<
     Omit<CheckboxBaseProps, 'value' | 'label' | 'checked' | 'indeterminate' | 'onChange'>
   >;
+  /** The `Checkbox` items that make up the group. */
   children: React.ReactNode;
 }
 

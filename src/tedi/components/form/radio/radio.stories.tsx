@@ -16,6 +16,9 @@ const meta: Meta<typeof Radio> = {
   component: Radio,
   subcomponents: { 'Radio.Group': RadioGroup },
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/Radio',
+  argTypes: {
+    tooltip: { control: false },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],

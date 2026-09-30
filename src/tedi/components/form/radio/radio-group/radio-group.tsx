@@ -21,6 +21,7 @@ interface RadioGroupBreakpointProps {
   hideLabel?: boolean;
   /** Helper / feedback text rendered below the group. */
   helper?: FeedbackTextProps;
+  /** Additional class name(s) applied to the fieldset. */
   className?: string;
   /** Controlled selected value. Pair with `onChange`. */
   value?: string | null;
@@ -28,8 +29,11 @@ interface RadioGroupBreakpointProps {
   defaultValue?: string | null;
   /** Fires with the newly selected value. */
   onChange?: (value: string) => void;
+  /** Disables the whole group and every radio within it. */
   disabled?: boolean;
+  /** Marks the group as invalid, forwarding the error state to each radio. */
   invalid?: boolean;
+  /** Marks the group as required, adding a required indicator to the legend. */
   required?: boolean;
   /** Size forwarded to every radio. @default 'default' */
   size?: 'default' | 'large';
@@ -46,6 +50,7 @@ interface RadioGroupBreakpointProps {
    * @default separated
    */
   layout?: 'separated' | 'segmented';
+  /** The `Radio` items that make up the group. */
   children: React.ReactNode;
 }
 

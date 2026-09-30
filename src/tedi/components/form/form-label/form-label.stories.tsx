@@ -7,6 +7,9 @@ import FormLabel from './form-label';
 const meta: Meta<typeof FormLabel> = {
   component: FormLabel,
   title: 'TEDI-Ready/Components/Form/FormLabel',
+  argTypes: {
+    tooltip: { control: false },
+  },
   parameters: {
     status: {
       type: 'internalComponent',

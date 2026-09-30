@@ -10,6 +10,9 @@ import { Label, LabelProps } from './label';
 const meta: Meta<typeof Label> = {
   component: Label,
   title: 'TEDI-Ready/Content/Label',
+  argTypes: {
+    tooltip: { control: false },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
