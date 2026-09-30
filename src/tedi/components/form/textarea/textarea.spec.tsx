@@ -2,7 +2,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useBreakpointProps } from '../../../helpers';
-import { UnknownType } from '../../../types/commonTypes';
 import Textarea, { TextareaProps } from './textarea';
 
 import '@testing-library/jest-dom';
@@ -123,7 +122,7 @@ describe('Textarea component', () => {
     if (originalScrollHeightDescriptor) {
       Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', originalScrollHeightDescriptor);
     } else {
-      delete (HTMLTextAreaElement.prototype as UnknownType).scrollHeight;
+      Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'scrollHeight');
     }
   });
 
@@ -205,7 +204,7 @@ describe('Textarea component', () => {
       if (originalScrollHeightDescriptor) {
         Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', originalScrollHeightDescriptor);
       } else {
-        delete (HTMLTextAreaElement.prototype as UnknownType).scrollHeight;
+        Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'scrollHeight');
       }
     });
 
@@ -252,7 +251,7 @@ describe('Textarea component', () => {
       });
 
       afterEach(() => {
-        delete (HTMLTextAreaElement.prototype as UnknownType).clientHeight;
+        Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'clientHeight');
       });
 
       it('includes the border in the height so content fits without scrolling', async () => {
@@ -333,6 +332,48 @@ describe('Textarea component', () => {
 
         unmount();
         expect(disconnect).toHaveBeenCalled();
+      } finally {
+        global.ResizeObserver = originalResizeObserver;
+      }
+    });
+
+    it('recalculates height when shown again at the same width after the value changed while hidden', async () => {
+      let resizeCallback: ResizeObserverCallback = () => undefined;
+      class MockResizeObserver {
+        constructor(callback: ResizeObserverCallback) {
+          resizeCallback = callback;
+        }
+        observe = jest.fn();
+        unobserve = jest.fn();
+        disconnect = jest.fn();
+      }
+      const originalResizeObserver = global.ResizeObserver;
+      global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+      // A hidden (display: none) textarea has no layout, so scrollHeight is 0
+      let isHidden = false;
+      mockScrollHeight((textarea) => (isHidden ? 0 : textarea.value.split('\n').length * LINE_HEIGHT + PADDING * 2));
+      const resize = (width: number) =>
+        act(() => {
+          resizeCallback([{ contentRect: { width } } as ResizeObserverEntry], {} as ResizeObserver);
+        });
+
+      try {
+        render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={12} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+        resize(600);
+        expect(textarea.style.height).toBe(rowsToHeight(3));
+
+        isHidden = true;
+        resize(0);
+        fireEvent.change(textarea, { target: { value: '1\n2\n3\n4\n5\n6' } });
+        await flush();
+        expect(textarea.style.height).toBe(rowsToHeight(3));
+
+        isHidden = false;
+        resize(600);
+        expect(textarea.style.height).toBe(rowsToHeight(6));
       } finally {
         global.ResizeObserver = originalResizeObserver;
       }

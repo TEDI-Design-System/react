@@ -143,8 +143,10 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     let lastWidth = textarea.clientWidth;
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? 0;
-      if (width > 0 && width !== lastWidth) {
-        lastWidth = width;
+      // Record every width (including 0 while hidden), so showing it again at the same width still recalculates
+      const widthChanged = width !== lastWidth;
+      lastWidth = width;
+      if (width > 0 && widthChanged) {
         calculateHeight();
       }
     });
