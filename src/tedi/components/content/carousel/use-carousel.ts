@@ -1,4 +1,4 @@
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useBreakpoint } from '../../../helpers/hooks/use-breakpoint';
 import { useLabels } from '../../../providers/label-provider';
@@ -31,7 +31,19 @@ const DEFAULT_CONFIG: CarouselConfig = {
   centered: false,
 };
 
+// Wheel movement is measured in slide widths; smaller movements snap to the nearest position.
+const WHEEL_DIRECTIONAL_SNAP_THRESHOLD = 0.3;
+// Treat negligible fractional end positions as whole-slide positions.
+const MAX_INDEX_ROUNDING_TOLERANCE = 1e-6;
+
 const mod = (value: number, length: number): number => ((value % length) + length) % length;
+
+const closestPositionIndex = (positions: number[], index: number): number =>
+  positions.reduce(
+    (closest, position, candidate) =>
+      Math.abs(position - index) < Math.abs(positions[closest] - index) ? candidate : closest,
+    0
+  );
 
 export interface CarouselApi {
   viewportRef: React.RefObject<HTMLDivElement>;
@@ -40,7 +52,8 @@ export interface CarouselApi {
   setConfig: (config: CarouselConfig) => void;
   setSlidesCount: (count: number) => void;
   slidesCount: number;
-  slideIndex: number;
+  positions: number[];
+  activePositionIndex: number;
   canPrev: boolean;
   canNext: boolean;
   renderedIndices: number[];
@@ -117,10 +130,20 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const loop = config.loop;
 
-  const maxIndex = useMemo(
-    () => Math.max(0, slidesCount - Math.ceil(currentSlidesPerView)),
-    [slidesCount, currentSlidesPerView]
-  );
+  const maxIndex = useMemo(() => {
+    const rawMaxIndex = Math.max(0, slidesCount - currentSlidesPerView);
+    const nearestWhole = Math.round(rawMaxIndex);
+    return Math.abs(rawMaxIndex - nearestWhole) < MAX_INDEX_ROUNDING_TOLERANCE ? nearestWhole : rawMaxIndex;
+  }, [slidesCount, currentSlidesPerView]);
+
+  const positions = useMemo(() => {
+    if (!slidesCount) return [];
+    if (loop) return Array.from({ length: slidesCount }, (_, i) => i);
+    const whole = Math.floor(maxIndex);
+    const reachable = Array.from({ length: whole + 1 }, (_, i) => i);
+    if (maxIndex > whole) reachable.push(maxIndex);
+    return reachable;
+  }, [slidesCount, loop, maxIndex]);
 
   const clampIndex = useCallback(
     (value: number): number => (loop ? value : Math.min(Math.max(value, 0), maxIndex)),
@@ -129,16 +152,24 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const buffer = loop ? slidesCount : 0;
 
-  const slideIndex = useMemo(() => {
-    if (slidesCount === 0) return 0;
+  const activePositionIndex = useMemo(() => {
+    if (!positions.length) return 0;
     if (loop) return mod(Math.floor(trackIndex), slidesCount);
-    return Math.min(Math.max(Math.round(trackIndex), 0), slidesCount - 1);
-  }, [trackIndex, slidesCount, loop]);
+    return closestPositionIndex(positions, trackIndex);
+  }, [positions, trackIndex, slidesCount, loop]);
 
-  const renderedActiveIndex = loop ? trackIndex - windowBase + buffer : trackIndex;
+  const renderedActiveIndex = loop ? trackIndex - windowBase + buffer : Math.ceil(trackIndex);
 
-  const canPrev = loop || trackIndex > 0.001;
-  const canNext = loop || trackIndex < maxIndex - 0.001;
+  const canPrev = slidesCount > 0 && (loop || trackIndex > 0);
+  const canNext = slidesCount > 0 && (loop || trackIndex < maxIndex);
+
+  useLayoutEffect(() => {
+    if (loop) return;
+    clearTimeout(wheelTimeoutRef.current);
+    scrollDeltaRef.current = 0;
+    trackIndexRef.current = clampIndex(trackIndexRef.current);
+    setTrackIndex((index) => clampIndex(index));
+  }, [loop, maxIndex, clampIndex]);
 
   const renderedIndices = useMemo(() => {
     if (!slidesCount) return [];
@@ -184,10 +215,11 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const isSlideVisible = useCallback(
     (renderedIndex: number): boolean => {
+      if (!loop) return renderedIndex + 1 > trackIndex && renderedIndex < trackIndex + currentSlidesPerView;
       const slidesPerView = Math.ceil(currentSlidesPerView);
       return renderedIndex >= renderedActiveIndex && renderedIndex < renderedActiveIndex + slidesPerView;
     },
-    [currentSlidesPerView, renderedActiveIndex]
+    [currentSlidesPerView, renderedActiveIndex, loop, trackIndex]
   );
 
   const contentClassName = useCallback(
@@ -211,7 +243,7 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
       if (!mountedRef.current || !slidesCount) return;
       const current = loop
         ? mod(Math.floor(trackIndexRef.current), slidesCount)
-        : Math.min(Math.max(Math.round(trackIndexRef.current), 0), slidesCount - 1);
+        : Math.min(Math.max(Math.ceil(trackIndexRef.current), 0), slidesCount - 1);
       setAnnouncement(getLabel('carousel.slide', current + 1, slidesCount));
     }, 100);
   }, [getLabel, slidesCount, loop]);
@@ -225,28 +257,30 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const focusActiveSlide = useCallback((): void => {
     setTimeout(() => {
-      const activeIndex = trackIndexRef.current - windowBaseRef.current + buffer;
+      const activeIndex = loop
+        ? trackIndexRef.current - windowBaseRef.current + buffer
+        : Math.ceil(trackIndexRef.current);
       slideRefs.current[activeIndex]?.focus({ preventScroll: true });
     });
-  }, [buffer]);
+  }, [buffer, loop]);
 
   const next = useCallback((): void => {
     if (!slidesCount || lockedRef.current) return;
-    if (!loop && trackIndexRef.current >= maxIndex - 0.001) return;
+    if (!loop && trackIndexRef.current >= maxIndex) return;
     setAnimate(true);
-    setTrackIndex((index) => clampIndex(index + 1));
+    setTrackIndex((index) => (loop ? index + 1 : positions.find((position) => position > index) ?? maxIndex));
     lockNavigation();
     announceSlideChange();
-  }, [slidesCount, loop, maxIndex, clampIndex, lockNavigation, announceSlideChange]);
+  }, [slidesCount, loop, maxIndex, positions, lockNavigation, announceSlideChange]);
 
   const prev = useCallback((): void => {
     if (!slidesCount || lockedRef.current) return;
-    if (!loop && trackIndexRef.current <= 0.001) return;
+    if (!loop && trackIndexRef.current <= 0) return;
     setAnimate(true);
-    setTrackIndex((index) => clampIndex(index - 1));
+    setTrackIndex((index) => (loop ? index - 1 : [...positions].reverse().find((position) => position < index) ?? 0));
     lockNavigation();
     announceSlideChange();
-  }, [slidesCount, loop, clampIndex, lockNavigation, announceSlideChange]);
+  }, [slidesCount, loop, positions, lockNavigation, announceSlideChange]);
 
   const goToIndex = useCallback(
     (index: number, options?: { focusSlide?: boolean }): void => {
@@ -326,15 +360,29 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
       wheelTimeoutRef.current = setTimeout(() => {
         setAnimate(true);
         const direction = Math.sign(scrollDeltaRef.current);
+        const snapInScrollDirection = Math.abs(scrollDeltaRef.current) > WHEEL_DIRECTIONAL_SNAP_THRESHOLD;
         const currentIndex = trackIndexRef.current;
-        let snapIndex = Math.round(currentIndex);
-
-        if (Math.abs(scrollDeltaRef.current) > 0.3) {
-          snapIndex = direction > 0 ? Math.ceil(currentIndex) : Math.floor(currentIndex);
-        }
-        if (wasClamped) {
-          if (currentIndex <= min) snapIndex = Math.ceil(min);
-          if (currentIndex >= max) snapIndex = Math.floor(max);
+        let snapIndex: number;
+        if (loop) {
+          snapIndex = Math.round(currentIndex);
+          if (snapInScrollDirection) {
+            snapIndex = direction > 0 ? Math.ceil(currentIndex) : Math.floor(currentIndex);
+          }
+          if (wasClamped) {
+            if (currentIndex <= min) snapIndex = Math.ceil(min);
+            if (currentIndex >= max) snapIndex = Math.floor(max);
+          }
+        } else if (wasClamped && currentIndex >= max) {
+          snapIndex = max;
+        } else if (wasClamped && currentIndex <= min) {
+          snapIndex = min;
+        } else if (snapInScrollDirection) {
+          snapIndex =
+            direction > 0
+              ? positions.find((position) => position >= currentIndex) ?? max
+              : [...positions].reverse().find((position) => position <= currentIndex) ?? min;
+        } else {
+          snapIndex = positions[closestPositionIndex(positions, currentIndex)];
         }
 
         const finalIndex = Math.min(Math.max(snapIndex, min), max);
@@ -342,7 +390,7 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
         scrollDeltaRef.current = 0;
       }, 120);
     },
-    [slidesCount, cellWidth, buffer, windowBase, loop, maxIndex]
+    [slidesCount, cellWidth, buffer, windowBase, loop, maxIndex, positions]
   );
 
   const onKeyDown = useCallback(
@@ -364,13 +412,13 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
           break;
         case 'End':
           event.preventDefault();
-          goToIndex(slidesCount - 1);
+          goToIndex(loop ? slidesCount - 1 : maxIndex);
           break;
         default:
           break;
       }
     },
-    [next, prev, goToIndex, slidesCount]
+    [next, prev, goToIndex, slidesCount, loop, maxIndex]
   );
 
   const onPointerDown = useCallback(
@@ -417,19 +465,27 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     setAnimate(true);
 
     const width = cellWidth();
-    const rounded = Math.round(trackIndexRef.current);
-    let target = rounded;
+    const currentIndex = trackIndexRef.current;
+    const startIndex = startIndexRef.current;
+    const startPosition = loop ? Math.round(startIndex) : startIndex;
+    let target = loop ? Math.round(currentIndex) : positions[closestPositionIndex(positions, currentIndex)];
 
     const elapsed = lastTimeRef.current - startTimeRef.current;
     const velocity = elapsed > 0 && width ? -(lastXRef.current - startXRef.current) / width / elapsed : 0;
     const FLICK_VELOCITY = 0.0015;
 
-    if (Math.abs(velocity) > FLICK_VELOCITY && rounded === Math.round(startIndexRef.current)) {
-      target = Math.round(startIndexRef.current) + (velocity > 0 ? 1 : -1);
+    if (Math.abs(velocity) > FLICK_VELOCITY && target === startPosition) {
+      if (loop) {
+        target = startPosition + Math.sign(velocity);
+      } else if (velocity > 0) {
+        target = positions.find((position) => position > startIndex) ?? maxIndex;
+      } else {
+        target = [...positions].reverse().find((position) => position < startIndex) ?? 0;
+      }
     }
 
     setTrackIndex(clampIndex(target));
-  }, [cellWidth, clampIndex]);
+  }, [cellWidth, clampIndex, loop, positions, maxIndex]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -465,7 +521,8 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     setConfig,
     setSlidesCount,
     slidesCount,
-    slideIndex,
+    positions,
+    activePositionIndex,
     canPrev,
     canNext,
     renderedIndices,
