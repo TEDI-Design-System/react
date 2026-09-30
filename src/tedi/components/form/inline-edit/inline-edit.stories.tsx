@@ -264,9 +264,6 @@ const meta: Meta<typeof InlineEdit> = {
 export default meta;
 type Story = StoryObj<typeof InlineEdit>;
 
-/**
- * The minimal usage: the read view shows the value, clicking it opens the editor. Use the playground controls to try the props.
- */
 export const Default: Story = {
   args: {
     label: 'Väärtus',
