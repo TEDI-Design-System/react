@@ -1,3 +1,10 @@
+# [19.2.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.4...react-19.2.0-rc.5) (2026-09-30)
+
+
+### Bug Fixes
+
+* **button:** fix important and positive button styles after token migration [#943](https://github.com/TEDI-Design-System/react/issues/943) ([#944](https://github.com/TEDI-Design-System/react/issues/944)) ([dce1596](https://github.com/TEDI-Design-System/react/commit/dce1596e038fdabe351b58dfe6aaa1e802263456))
+
 # [19.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.3...react-19.2.0-rc.4) (2026-09-29)
 
 
