@@ -163,11 +163,11 @@ $btn-height-small: 2.25rem;
 
   &.btn--primary {
     @include button-variant(
-      var(--general-status-danger-background-primary),
-      var(--general-status-danger-background-primary),
+      var(--general-status-danger-background-secondary),
+      var(--general-status-danger-background-secondary),
       var(--general-text-white),
-      var(--general-status-danger-background-secondary),
-      var(--general-status-danger-background-secondary),
+      var(--general-status-danger-background-tertiary),
+      var(--general-status-danger-background-tertiary),
       var(--general-text-white)
     );
   }
@@ -175,9 +175,9 @@ $btn-height-small: 2.25rem;
   &.btn--secondary {
     @include button-secondary-variant(
       var(--general-border-secondary),
-      var(--general-status-danger-background-primary),
-      var(--general-status-danger-background-primary),
       var(--general-status-danger-background-secondary),
+      var(--general-status-danger-background-tertiary),
+      var(--general-status-danger-background-tertiary),
       $btn-important-opacity-bg
     );
   }
@@ -186,10 +186,10 @@ $btn-height-small: 2.25rem;
     @include button-variant(
       transparent,
       transparent,
-      var(--general-status-danger-background-primary),
+      var(--general-status-danger-background-secondary),
       $btn-important-opacity-bg,
       $btn-important-opacity-bg,
-      var(--general-status-danger-background-secondary)
+      var(--general-status-danger-background-tertiary)
     );
   }
 }
@@ -199,11 +199,11 @@ $btn-height-small: 2.25rem;
 
   &.btn--primary {
     @include button-variant(
-      var(--general-status-success-background-primary),
-      var(--general-status-success-background-primary),
+      var(--general-status-success-background-secondary),
+      var(--general-status-success-background-secondary),
       var(--general-text-white),
-      var(--general-status-success-background-secondary),
-      var(--general-status-success-background-secondary),
+      var(--general-status-success-background-tertiary),
+      var(--general-status-success-background-tertiary),
       var(--general-text-white)
     );
   }
@@ -211,9 +211,9 @@ $btn-height-small: 2.25rem;
   &.btn--secondary {
     @include button-secondary-variant(
       var(--general-border-secondary),
-      var(--general-status-success-background-primary),
-      var(--general-status-success-background-primary),
       var(--general-status-success-background-secondary),
+      var(--general-status-success-background-tertiary),
+      var(--general-status-success-background-tertiary),
       $btn-positive-opacity-bg
     );
   }
@@ -222,10 +222,10 @@ $btn-height-small: 2.25rem;
     @include button-variant(
       transparent,
       transparent,
-      var(--general-status-success-background-primary),
+      var(--general-status-success-background-secondary),
       $btn-positive-opacity-bg,
       $btn-positive-opacity-bg,
-      var(--general-status-success-background-secondary)
+      var(--general-status-success-background-tertiary)
     );
   }
 }
