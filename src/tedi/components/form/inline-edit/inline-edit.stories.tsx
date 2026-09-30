@@ -194,7 +194,7 @@ const meta: Meta<typeof InlineEdit> = {
     placeholder: {
       control: 'text',
       description: 'Shown in the read view when the value is empty.',
-      table: { type: { summary: 'ReactNode' }, defaultValue: { summary: '—' } },
+      table: { type: { summary: 'ReactNode' } },
     },
     size: {
       control: 'radio',
@@ -298,48 +298,6 @@ export const Default: Story = {
             onChange={onChange}
             size={editorSize}
           />
-        )}
-      </InlineEdit>
-    );
-  },
-};
-
-/**
- * On narrow (mobile) layouts pair `InlineEdit` with `fullWidth` so the whole row is a comfortable tap target and the
- * value/edit icon span the available width. The playground controls apply to the field below.
- */
-export const Mobile: Story = {
-  args: {
-    label: 'Nimi',
-    placeholder: '—',
-    fullWidth: true,
-    size: 'default',
-    editIconPosition: 'end',
-    readOnly: false,
-    hideEditIcon: false,
-  },
-  parameters: {
-    viewport: { defaultViewport: 'mobile1' },
-  },
-  render: function MobileField(args) {
-    const [name, setName] = useState('Väärtus');
-    return (
-      <InlineEdit<string>
-        label={args.label}
-        placeholder={args.placeholder}
-        size={args.size}
-        editIconPosition={args.editIconPosition}
-        readOnly={args.readOnly}
-        fullWidth={args.fullWidth}
-        hideEditIcon={args.hideEditIcon}
-        value={name}
-        onChange={setName}
-        // Return the raw value (not a `—` fallback) so an empty value falls through to the
-        // `placeholder` prop — otherwise the placeholder control could never be exercised.
-        renderValue={(v) => v}
-      >
-        {({ value, onChange, size: editorSize }) => (
-          <TextField id="ie-mobile" label={args.label} hideLabel value={value} onChange={onChange} size={editorSize} />
         )}
       </InlineEdit>
     );
@@ -545,6 +503,46 @@ export const EditIconAlignment: Story = {
       </Col>
     </Row>
   ),
+};
+
+/**
+ * On narrow (mobile) layouts pair `InlineEdit` with `fullWidth` so the whole row is a comfortable tap target and the
+ * value/edit icon span the available width. The playground controls apply to the field below.
+ */
+export const Mobile: Story = {
+  args: {
+    label: 'Nimi',
+    placeholder: '—',
+    fullWidth: true,
+    size: 'default',
+    editIconPosition: 'end',
+    readOnly: false,
+    hideEditIcon: false,
+  },
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+  },
+  render: function MobileField(args) {
+    const [name, setName] = useState('Väärtus');
+    return (
+      <InlineEdit<string>
+        label={args.label}
+        placeholder={args.placeholder}
+        size={args.size}
+        editIconPosition={args.editIconPosition}
+        readOnly={args.readOnly}
+        fullWidth={args.fullWidth}
+        hideEditIcon={args.hideEditIcon}
+        value={name}
+        onChange={setName}
+        renderValue={(v) => v}
+      >
+        {({ value, onChange, size: editorSize }) => (
+          <TextField id="ie-mobile" label={args.label} hideLabel value={value} onChange={onChange} size={editorSize} />
+        )}
+      </InlineEdit>
+    );
+  },
 };
 
 export const States: Story = {
@@ -767,8 +765,8 @@ export const CancelEdit: Story = {
 };
 
 /**
- * With no value yet, the read view shows the `placeholder` (dimmed) instead of the empty-value
- * fallback (`—`). Clicking still opens the editor. Set `placeholder` for "add a value" affordances.
+ * With no value yet, the read view shows the `placeholder` (dimmed). There is no default — supply
+ * `placeholder` for an "add a value" affordance. Clicking still opens the editor.
  */
 export const Placeholder: Story = {
   render: function PlaceholderFields() {

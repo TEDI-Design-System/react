@@ -83,7 +83,7 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    * format a `Date`, or map a select option to its `label`.
    */
   renderValue?: (value: T) => React.ReactNode;
-  /** Shown in the read view when the value is empty. Defaults to `DEFAULT_PLACEHOLDER` (`'—'`). */
+  /** Shown in the read view when the value is empty. No default — supply one if you want an empty-state hint. */
   placeholder?: React.ReactNode;
   /** Renders the value as static text (a text group) with no edit affordance. */
   readOnly?: boolean;
@@ -146,13 +146,10 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
 
 const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
 
-/** Em dash shown in the read view when the value is empty and no `placeholder` is supplied. */
-const DEFAULT_PLACEHOLDER = '—';
-
 export function InlineEdit<T>({
   label,
   renderValue,
-  placeholder = DEFAULT_PLACEHOLDER,
+  placeholder,
   readOnly = false,
   invalid = false,
   helper,
