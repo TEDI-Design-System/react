@@ -83,7 +83,7 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    * format a `Date`, or map a select option to its `label`.
    */
   renderValue?: (value: T) => React.ReactNode;
-  /** Shown in the read view when the value is empty. @default '—' */
+  /** Shown in the read view when the value is empty. Defaults to `DEFAULT_PLACEHOLDER` (`'—'`). */
   placeholder?: React.ReactNode;
   /** Renders the value as static text (a text group) with no edit affordance. */
   readOnly?: boolean;
@@ -125,12 +125,12 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   size?: InlineEditSize;
   /**
    * Placement of the edit (pencil) icon on the read trigger.
-   * - `following` — the icon sits directly after the value.
-   * - `aligned` — the trigger fills its container and the icon is pushed to the
+   * - `inline` — the icon sits directly after the value.
+   * - `end` — the trigger fills its container and the icon is pushed to the
    *   trailing edge, so icons line up across stacked rows.
-   * @default following
+   * @default inline
    */
-  editIconAlign?: 'following' | 'aligned';
+  editIconPosition?: 'inline' | 'end';
   /** id applied to the read trigger. */
   id?: string;
   /** Additional class on the root element. */
@@ -146,17 +146,20 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
 
 const isEmpty = (value: unknown): boolean => value === undefined || value === null || value === '';
 
+/** Em dash shown in the read view when the value is empty and no `placeholder` is supplied. */
+const DEFAULT_PLACEHOLDER = '—';
+
 export function InlineEdit<T>({
   label,
   renderValue,
-  placeholder = '—',
+  placeholder = DEFAULT_PLACEHOLDER,
   readOnly = false,
   invalid = false,
   helper,
   fullWidth = false,
   hideEditIcon = false,
   size = 'default',
-  editIconAlign = 'following',
+  editIconPosition = 'inline',
   id,
   className,
   children,
@@ -232,6 +235,16 @@ export function InlineEdit<T>({
           if (event.key === 'Escape') {
             event.stopPropagation();
             cancel();
+            return;
+          }
+
+          if (event.key === 'Enter' && !event.shiftKey) {
+            const target = event.target as HTMLElement;
+            const isMultiline = target.tagName === 'TEXTAREA';
+            const isWidgetInput = !!target.closest('[role="combobox"], [role="listbox"]');
+            if (isMultiline || isWidgetInput) return;
+            event.preventDefault();
+            commit();
           }
         }}
         onBlur={() => {
@@ -281,7 +294,7 @@ export function InlineEdit<T>({
         styles['tedi-inline-edit__trigger'],
         fullWidthClass,
         smallClass,
-        { [styles['tedi-inline-edit--icon-aligned']]: editIconAlign === 'aligned' },
+        { [styles['tedi-inline-edit--icon-end']]: editIconPosition === 'end' },
         { [styles['tedi-inline-edit--invalid']]: isInvalid },
         className
       )}
@@ -293,13 +306,7 @@ export function InlineEdit<T>({
         {empty ? placeholder : display}
       </span>
       {!hideEditIcon && (
-        <Icon
-          name="edit"
-          size={size === 'small' ? 16 : 18}
-          color="brand"
-          aria-hidden
-          className={styles['tedi-inline-edit__icon']}
-        />
+        <Icon name="edit" size={18} color="brand" aria-hidden className={styles['tedi-inline-edit__icon']} />
       )}
     </button>
   );

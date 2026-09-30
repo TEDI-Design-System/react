@@ -12,6 +12,7 @@ render props (`value`, `onChange`, `commit`, `cancel`).
 The wrapper owns the read ↔ edit toggle, focus management, and keyboard handling:
 
 - Clicking the read view (the value) enters edit mode and focuses the control.
+- Pressing `Enter` in a single-line control **commits** the draft (multi-line inputs keep `Enter` for newlines, and listbox/combobox controls keep it for selecting an option).
 - Clicking away - focus leaving the editor - **commits** the draft.
 - Pressing `Escape` **cancels** and restores the last committed value.
 

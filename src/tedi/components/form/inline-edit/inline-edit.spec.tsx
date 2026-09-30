@@ -79,6 +79,20 @@ describe('InlineEdit', () => {
     expect(screen.getByRole('button', { name: /name/i })).toHaveTextContent('John Mets');
   });
 
+  it('commits the draft on Enter from a single-line control', async () => {
+    const onChange = jest.fn();
+    const user = userEvent.setup();
+    render(<TextEditor onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    const input = screen.getByRole('textbox');
+    await user.clear(input);
+    await user.type(input, 'Mari Maasikas{Enter}');
+
+    expect(onChange).toHaveBeenLastCalledWith('Mari Maasikas');
+    await waitFor(() => expect(screen.queryByRole('textbox')).not.toBeInTheDocument());
+  });
+
   it('supports uncontrolled use via defaultValue', async () => {
     const user = userEvent.setup();
     render(
@@ -195,7 +209,7 @@ describe('InlineEdit', () => {
     expect(screen.getByText('Locked')).toBeInTheDocument();
   });
 
-  it('applies the small size class and a 16px edit icon', () => {
+  it('applies the small size class and keeps the 18px edit icon', () => {
     render(
       <InlineEdit<string> label="Name" value="Mari" size="small" renderValue={(v) => v}>
         {({ value, onChange }) => <TextField id="s" label="Name" hideLabel value={value} onChange={onChange} />}
@@ -203,7 +217,8 @@ describe('InlineEdit', () => {
     );
     const trigger = screen.getByRole('button', { name: /name/i });
     expect(trigger).toHaveClass('tedi-inline-edit--small');
-    expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-16');
+    // The edit icon is 18px for both Default and Small sizes (matches Figma).
+    expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
   });
 
   it('exposes its size to the editor render function so a small field opens a small control', async () => {
@@ -221,16 +236,16 @@ describe('InlineEdit', () => {
     expect(receivedSize).toBe('small');
   });
 
-  it('aligns the edit icon to the trailing edge with editIconAlign="aligned"', () => {
+  it('aligns the edit icon to the trailing edge with editIconPosition="end"', () => {
     render(
-      <InlineEdit<string> label="Name" value="Mari" editIconAlign="aligned" renderValue={(v) => v}>
+      <InlineEdit<string> label="Name" value="Mari" editIconPosition="end" renderValue={(v) => v}>
         {({ value, onChange }) => <TextField id="a" label="Name" hideLabel value={value} onChange={onChange} />}
       </InlineEdit>
     );
-    expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--icon-aligned');
+    expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--icon-end');
   });
 
-  it('defaults to the following alignment and default size (no modifier classes)', () => {
+  it('defaults to the inline icon position and default size (no modifier classes)', () => {
     render(
       <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
         {({ value, onChange }) => <TextField id="def" label="Name" hideLabel value={value} onChange={onChange} />}
@@ -238,7 +253,7 @@ describe('InlineEdit', () => {
     );
     const trigger = screen.getByRole('button', { name: /name/i });
     expect(trigger).not.toHaveClass('tedi-inline-edit--small');
-    expect(trigger).not.toHaveClass('tedi-inline-edit--icon-aligned');
+    expect(trigger).not.toHaveClass('tedi-inline-edit--icon-end');
     expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
   });
 

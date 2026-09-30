@@ -79,7 +79,7 @@ const NameInline = (props: {
   readOnly?: boolean;
   placeholder?: string;
   size?: 'default' | 'small';
-  editIconAlign?: 'following' | 'aligned';
+  editIconPosition?: 'inline' | 'end';
   fullWidth?: boolean;
   invalid?: boolean;
   helper?: FeedbackTextProps | FeedbackTextProps[];
@@ -108,7 +108,7 @@ const alignFields: { label: string; value: string }[] = [
   { label: 'Aadress', value: 'Tulbi tn 6, Tallinn' },
 ];
 
-const AlignExample = ({ align, idPrefix }: { align: 'following' | 'aligned'; idPrefix: string }): JSX.Element => (
+const AlignExample = ({ align, idPrefix }: { align: 'inline' | 'end'; idPrefix: string }): JSX.Element => (
   <Card>
     <CardContent>
       <VerticalSpacing size={0.25}>
@@ -122,7 +122,7 @@ const AlignExample = ({ align, idPrefix }: { align: 'following' | 'aligned'; idP
                 id={`${idPrefix}-${index}`}
                 label={field.label}
                 defaultValue={field.value}
-                editIconAlign={align}
+                editIconPosition={align}
               />
             </Col>
           </Row>
@@ -202,11 +202,11 @@ const meta: Meta<typeof InlineEdit> = {
       description: 'Size of the read trigger and editor.',
       table: { type: { summary: 'default | small' }, defaultValue: { summary: 'default' } },
     },
-    editIconAlign: {
+    editIconPosition: {
       control: 'radio',
-      options: ['following', 'aligned'],
-      description: 'Whether the edit icon follows the value or aligns to the trailing edge.',
-      table: { type: { summary: 'following | aligned' }, defaultValue: { summary: 'following' } },
+      options: ['inline', 'end'],
+      description: 'Whether the edit icon sits inline after the value or is pushed to the trailing edge.',
+      table: { type: { summary: 'inline | end' }, defaultValue: { summary: 'inline' } },
     },
     readOnly: {
       control: 'boolean',
@@ -272,7 +272,7 @@ export const Default: Story = {
     label: 'Väärtus',
     placeholder: '—',
     size: 'default',
-    editIconAlign: 'following',
+    editIconPosition: 'inline',
     readOnly: false,
     fullWidth: false,
     hideEditIcon: false,
@@ -284,13 +284,13 @@ export const Default: Story = {
         label={args.label}
         placeholder={args.placeholder}
         size={args.size}
-        editIconAlign={args.editIconAlign}
+        editIconPosition={args.editIconPosition}
         readOnly={args.readOnly}
         fullWidth={args.fullWidth}
         hideEditIcon={args.hideEditIcon}
         value={value}
         onChange={setValue}
-        renderValue={(v) => v || '—'}
+        renderValue={(v) => v}
       >
         {({ value: draft, onChange, size: editorSize }) => (
           <TextField
@@ -317,7 +317,7 @@ export const Mobile: Story = {
     placeholder: '—',
     fullWidth: true,
     size: 'default',
-    editIconAlign: 'aligned',
+    editIconPosition: 'end',
     readOnly: false,
     hideEditIcon: false,
   },
@@ -331,13 +331,15 @@ export const Mobile: Story = {
         label={args.label}
         placeholder={args.placeholder}
         size={args.size}
-        editIconAlign={args.editIconAlign}
+        editIconPosition={args.editIconPosition}
         readOnly={args.readOnly}
         fullWidth={args.fullWidth}
         hideEditIcon={args.hideEditIcon}
         value={name}
         onChange={setName}
-        renderValue={(v) => v || '—'}
+        // Return the raw value (not a `—` fallback) so an empty value falls through to the
+        // `placeholder` prop — otherwise the placeholder control could never be exercised.
+        renderValue={(v) => v}
       >
         {({ value, onChange, size: editorSize }) => (
           <TextField id="ie-mobile" label={args.label} hideLabel value={value} onChange={onChange} size={editorSize} />
@@ -366,7 +368,7 @@ export const Sizes: Story = {
 };
 
 export const TextFieldType: Story = {
-  name: 'Text field',
+  name: 'With TextField',
   render: function TextFieldType() {
     const [name, setName] = useState('Mari Maasikas');
     return (
@@ -384,7 +386,7 @@ export const TextFieldType: Story = {
 };
 
 export const SelectType: Story = {
-  name: 'Select',
+  name: 'With Select',
   render: function SelectType() {
     const [type, setType] = useState<ISelectOption | null>(typeOptions[0]);
     const [keywords, setKeywords] = useState<ISelectOption[]>(keywordOptions);
@@ -535,13 +537,13 @@ export const EditIconAlignment: Story = {
       <Col xs={12} md={6}>
         <VerticalSpacing size={0.5}>
           <Text modifiers="bold">Following</Text>
-          <AlignExample align="following" idPrefix="ie-align-following" />
+          <AlignExample align="inline" idPrefix="ie-align-inline" />
         </VerticalSpacing>
       </Col>
       <Col xs={12} md={6}>
         <VerticalSpacing size={0.5}>
           <Text modifiers="bold">Aligned</Text>
-          <AlignExample align="aligned" idPrefix="ie-align-aligned" />
+          <AlignExample align="end" idPrefix="ie-align-end" />
         </VerticalSpacing>
       </Col>
     </Row>
@@ -635,7 +637,7 @@ export const States: Story = {
       </Row>
       <Row>
         <Col width={2}>
-          <Text modifiers="bold">Invalid</Text>
+          <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
           <NameInline id="ie-state-invalid-text" fullWidth helper={{ text: 'Nimi on kohustuslik', type: 'error' }} />
@@ -665,7 +667,7 @@ export const States: Story = {
  */
 export const Example: Story = {
   render: function DocumentDetails() {
-    const [creator, setCreator] = useState('Mari Maasika');
+    const [creator, setCreator] = useState('Mari Maasikas');
     const [performer, setPerformer] = useState('Kalle Kullerkupp');
     const [signer, setSigner] = useState('Mart Tamm');
     const [status, setStatus] = useState<ISelectOption | null>(statusOptions[0]);
@@ -681,7 +683,7 @@ export const Example: Story = {
             value={value}
             onChange={onChange}
             fullWidth
-            editIconAlign="aligned"
+            editIconPosition="end"
             renderValue={(v) => v || '—'}
           >
             {({ value: draft, onChange: setDraft }) => (
@@ -711,7 +713,7 @@ export const Example: Story = {
                     value={status}
                     onChange={setStatus}
                     fullWidth
-                    editIconAlign="aligned"
+                    editIconPosition="end"
                     renderValue={(v) =>
                       v ? <StatusBadge color={statusColor[v.value as string]}>{v.label}</StatusBadge> : '—'
                     }
@@ -743,8 +745,9 @@ export const Example: Story = {
 
 /**
  * Editing is non-destructive until it is committed. Click the value, change it, then press `Escape` to discard the draft
- * and restore the last committed value - the read view snaps back untouched. Committing instead happens on click-away
- * (focus leaving the editor). The committed value shown below updates only on commit, never on cancel.
+ * and restore the last committed value - the read view snaps back untouched. Committing instead happens on `Enter`
+ * (single-line controls) or on click-away (focus leaving the editor). The committed value shown below updates only on
+ * commit, never on cancel.
  */
 export const CancelEdit: Story = {
   name: 'Cancel edit',
