@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
 import TextField, { TextFieldProps } from './textfield';
@@ -64,6 +65,38 @@ describe('TextField component', () => {
     fireEvent.click(clearButton);
     expect(handleClear).toHaveBeenCalledTimes(1);
     expect(input).toHaveValue('');
+  });
+
+  it('calls onChange, onChangeEvent and onClear once when cleared', () => {
+    const handleChange = jest.fn();
+    const handleChangeEvent = jest.fn();
+    const handleClear = jest.fn();
+    render(
+      <TextField {...defaultProps} onChange={handleChange} onChangeEvent={handleChangeEvent} onClear={handleClear} />
+    );
+    const input = screen.getByPlaceholderText(/enter text/i);
+    fireEvent.change(input, { target: { value: 'To Be Cleared' } });
+    handleChange.mockClear();
+    handleChangeEvent.mockClear();
+
+    fireEvent.click(screen.getByTitle(/clear/i));
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith('');
+    expect(handleChangeEvent).toHaveBeenCalledTimes(1);
+    expect(handleChangeEvent.mock.calls[0][0].target.value).toBe('');
+    expect(handleClear).toHaveBeenCalledTimes(1);
+    expect(input).toHaveValue('');
+  });
+
+  it('clears a controlled field through onChange', () => {
+    const Controlled = () => {
+      const [value, setValue] = React.useState('Controlled');
+      return <TextField {...defaultProps} value={value} onChange={setValue} />;
+    };
+    render(<Controlled />);
+    fireEvent.click(screen.getByTitle(/clear/i));
+    expect(screen.getByPlaceholderText(/enter text/i)).toHaveValue('');
   });
 
   it('is clearable by default', () => {

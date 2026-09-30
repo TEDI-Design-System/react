@@ -351,8 +351,14 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   );
 
   const clearInput = useCallback(() => {
-    if (!isControlled) setInnerValue('');
-    onChange?.('');
+    const element = fieldRef.current;
+    if (element) {
+      Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+    } else {
+      if (!isControlled) setInnerValue('');
+      onChange?.('');
+    }
     onClear?.();
   }, [isControlled, onChange, onClear]);
 
