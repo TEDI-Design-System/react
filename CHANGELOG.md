@@ -1,3 +1,10 @@
+# [19.2.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.5...react-19.2.0-rc.6) (2026-09-30)
+
+
+### Bug Fixes
+
+* **carousel:** support fractional end positions in bounded mode [#932](https://github.com/TEDI-Design-System/react/issues/932) ([#934](https://github.com/TEDI-Design-System/react/issues/934)) ([53d7387](https://github.com/TEDI-Design-System/react/commit/53d7387f19fb4888349e5dd1f80ce5537c68b641))
+
 # [19.2.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.4...react-19.2.0-rc.5) (2026-09-30)
 
 
