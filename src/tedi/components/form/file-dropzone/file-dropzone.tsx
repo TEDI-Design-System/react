@@ -96,7 +96,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     accept,
     maxSize,
     multiple,
-    validateIndividually,
+    keepRejectedFiles,
     defaultFiles,
     files,
     onChange,
@@ -108,7 +108,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     accept,
     maxSize,
     multiple,
-    validateIndividually,
+    keepRejectedFiles,
     defaultFiles,
     files,
     onChange,
@@ -124,7 +124,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     disabled,
     accept: toDropzoneAccept(accept),
     multiple,
-    maxSize: maxSize ? maxSize * 1024 ** 2 : undefined,
+    maxSize,
     onDrop: (acceptedFiles, fileRejections = []) => {
       if (disabled) return;
 
@@ -144,7 +144,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     },
   });
 
-  const autoError = validateIndividually && multiple ? undefined : errorHelper;
+  const autoError = keepRejectedFiles && multiple ? undefined : errorHelper;
   const errorFeedback = autoError ?? (helper?.type === 'error' ? helper : undefined);
   const hintFeedback = helper && helper.type !== 'error' ? helper : restrictionsHint;
 
