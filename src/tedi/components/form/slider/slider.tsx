@@ -6,7 +6,7 @@ import { Tooltip } from '../../overlays/tooltip/tooltip';
 import { TooltipContent } from '../../overlays/tooltip/tooltip-content';
 import { TooltipTrigger } from '../../overlays/tooltip/tooltip-trigger';
 import { FeedbackText, FeedbackTextProps } from '../feedback-text/feedback-text';
-import { FormLabel } from '../form-label/form-label';
+import { FormLabel, FormLabelProps } from '../form-label/form-label';
 import styles from './slider.module.scss';
 
 type SliderBreakpointProps = {
@@ -69,6 +69,12 @@ export interface SliderProps extends BreakpointSupport<SliderBreakpointProps> {
    */
   hideLabel?: boolean | 'keep-space';
   /**
+   * Additional props forwarded to the underlying `Label` component.
+   * Use `modifiers` to control how the label text wraps or breaks
+   * (e.g. `{ modifiers: 'nowrap' }`).
+   */
+  labelProps?: FormLabelProps['labelProps'];
+  /**
    * Marks the field as required.
    */
   required?: boolean;
@@ -129,6 +135,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
     name,
     label,
     hideLabel,
+    labelProps,
     required,
     min = 0,
     max = 100,
@@ -227,7 +234,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>((props, ref) => 
 
   return (
     <div data-name="slider" className={SliderBEM}>
-      {label && <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} />}
+      {label && <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} labelProps={labelProps} />}
       <div className={styles['tedi-slider__container']}>
         <div className={styles['tedi-slider__track-row']}>
           {minLabel !== undefined && minLabel !== null && (

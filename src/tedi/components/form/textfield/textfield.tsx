@@ -269,6 +269,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     disabled,
     required,
     hideLabel,
+    labelProps,
     invalid,
     readOnly,
     icon,
@@ -492,7 +493,14 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   return (
     <div data-name="textfield" {...rest} className={TextFieldBEM}>
       {!shouldHideLabel && (
-        <FormLabel id={resolvedId} label={label} required={required} hideLabel={hideLabel} size={labelSize} />
+        <FormLabel
+          id={resolvedId}
+          label={label}
+          required={required}
+          hideLabel={hideLabel}
+          size={labelSize}
+          labelProps={labelProps}
+        />
       )}
 
       <div

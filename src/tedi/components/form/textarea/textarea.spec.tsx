@@ -2,7 +2,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useBreakpointProps } from '../../../helpers';
-import { UnknownType } from '../../../types/commonTypes';
 import Textarea, { TextareaProps } from './textarea';
 
 import '@testing-library/jest-dom';
@@ -128,7 +127,7 @@ describe('Textarea component', () => {
     if (originalScrollHeightDescriptor) {
       Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', originalScrollHeightDescriptor);
     } else {
-      delete (HTMLTextAreaElement.prototype as UnknownType).scrollHeight;
+      Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'scrollHeight');
     }
   });
 
@@ -168,6 +167,222 @@ describe('Textarea component', () => {
     expect(height).toBeLessThan(200);
 
     window.getComputedStyle = originalGetComputedStyle;
+  });
+
+  describe('autoGrow height recalculation', () => {
+    const LINE_HEIGHT = 20;
+    const PADDING = 8;
+    const rowsToHeight = (rows: number) => `${rows * LINE_HEIGHT + PADDING * 2}px`;
+
+    let originalGetComputedStyle: typeof window.getComputedStyle;
+    let originalScrollHeightDescriptor: PropertyDescriptor | undefined;
+
+    const mockScrollHeight = (getContentHeight: (textarea: HTMLTextAreaElement) => number) => {
+      Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
+        configurable: true,
+        get(this: HTMLTextAreaElement) {
+          // Like a real browser, scrollHeight is never smaller than clientHeight (falls back to style height in jsdom)
+          const boxHeight = this.clientHeight || parseFloat(this.style.height) || 0;
+          return Math.max(getContentHeight(this), boxHeight);
+        },
+      });
+    };
+
+    const flush = () =>
+      act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+
+    beforeEach(() => {
+      originalGetComputedStyle = window.getComputedStyle;
+      window.getComputedStyle = jest.fn().mockImplementation((el) => ({
+        ...originalGetComputedStyle(el),
+        lineHeight: `${LINE_HEIGHT}px`,
+        paddingTop: `${PADDING}px`,
+        paddingBottom: `${PADDING}px`,
+      }));
+      originalScrollHeightDescriptor = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'scrollHeight');
+    });
+
+    afterEach(() => {
+      window.getComputedStyle = originalGetComputedStyle;
+      if (originalScrollHeightDescriptor) {
+        Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', originalScrollHeightDescriptor);
+      } else {
+        Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'scrollHeight');
+      }
+    });
+
+    it('shrinks back when content is removed', async () => {
+      const user = userEvent.setup();
+      mockScrollHeight((textarea) => textarea.value.split('\n').length * LINE_HEIGHT + PADDING * 2);
+
+      render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={10} />);
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      await flush();
+      expect(textarea.style.height).toBe(rowsToHeight(3));
+
+      await user.type(textarea, '1\n2\n3\n4\n5\n6\n7');
+      await flush();
+      expect(textarea.style.height).toBe(rowsToHeight(7));
+
+      await user.clear(textarea);
+      await flush();
+      expect(textarea.style.height).toBe(rowsToHeight(3));
+    });
+
+    describe('with border-box sizing', () => {
+      const BORDER = 1;
+
+      beforeEach(() => {
+        window.getComputedStyle = jest.fn().mockImplementation((el) => ({
+          ...originalGetComputedStyle(el),
+          lineHeight: `${LINE_HEIGHT}px`,
+          paddingTop: `${PADDING}px`,
+          paddingBottom: `${PADDING}px`,
+          boxSizing: 'border-box',
+          borderTopWidth: `${BORDER}px`,
+          borderBottomWidth: `${BORDER}px`,
+        }));
+        mockScrollHeight((textarea) => textarea.value.split('\n').length * LINE_HEIGHT + PADDING * 2);
+        Object.defineProperty(HTMLTextAreaElement.prototype, 'clientHeight', {
+          configurable: true,
+          get(this: HTMLTextAreaElement) {
+            const height = parseFloat(this.style.height) || 0;
+            const maxHeight = parseFloat(this.style.maxHeight) || Infinity;
+            return Math.min(height, maxHeight) - BORDER * 2;
+          },
+        });
+      });
+
+      afterEach(() => {
+        Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'clientHeight');
+      });
+
+      it('includes the border in the height so content fits without scrolling', async () => {
+        render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={5} defaultValue={'1\n2\n3\n4'} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+
+        expect(textarea.style.height).toBe(`${4 * LINE_HEIGHT + PADDING * 2 + BORDER * 2}px`);
+        expect(textarea.style.overflowY).toBe('hidden');
+      });
+
+      it('does not show a scrollbar when content exactly fills maxRows', async () => {
+        render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={5} defaultValue={'1\n2\n3\n4\n5'} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+
+        expect(textarea.style.overflowY).toBe('hidden');
+      });
+
+      it('shows a scrollbar once content exceeds maxRows', async () => {
+        render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={5} defaultValue={'1\n2\n3\n4\n5\n6'} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+
+        expect(textarea.style.height).toBe(`${5 * LINE_HEIGHT + PADDING * 2 + BORDER * 2}px`);
+        expect(textarea.style.overflowY).toBe('auto');
+      });
+
+      it('shows a scrollbar when maxHeight clips the content before maxRows', async () => {
+        render(
+          <Textarea
+            {...defaultProps}
+            autoGrow
+            minRows={3}
+            maxRows={12}
+            maxHeight="100px"
+            defaultValue={'1\n2\n3\n4\n5\n6'}
+          />
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+
+        expect(textarea.style.overflowY).toBe('auto');
+      });
+    });
+
+    it('recalculates height when the textarea width changes', async () => {
+      let resizeCallback: ResizeObserverCallback = () => undefined;
+      const disconnect = jest.fn();
+      class MockResizeObserver {
+        constructor(callback: ResizeObserverCallback) {
+          resizeCallback = callback;
+        }
+        observe = jest.fn();
+        unobserve = jest.fn();
+        disconnect = disconnect;
+      }
+      const originalResizeObserver = global.ResizeObserver;
+      global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+      // Narrow (e.g. hidden) container makes the placeholder wrap onto many lines
+      let isNarrow = true;
+      mockScrollHeight(() => (isNarrow ? 1000 : LINE_HEIGHT + PADDING * 2));
+
+      try {
+        const { unmount } = render(
+          <Textarea {...defaultProps} autoGrow minRows={3} maxRows={12} placeholder="Placeholder text" />
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+        expect(textarea.style.height).toBe(rowsToHeight(12));
+
+        isNarrow = false;
+        act(() => {
+          resizeCallback([{ contentRect: { width: 600 } } as ResizeObserverEntry], {} as ResizeObserver);
+        });
+        expect(textarea.style.height).toBe(rowsToHeight(3));
+
+        unmount();
+        expect(disconnect).toHaveBeenCalled();
+      } finally {
+        global.ResizeObserver = originalResizeObserver;
+      }
+    });
+
+    it('recalculates height when shown again at the same width after the value changed while hidden', async () => {
+      let resizeCallback: ResizeObserverCallback = () => undefined;
+      class MockResizeObserver {
+        constructor(callback: ResizeObserverCallback) {
+          resizeCallback = callback;
+        }
+        observe = jest.fn();
+        unobserve = jest.fn();
+        disconnect = jest.fn();
+      }
+      const originalResizeObserver = global.ResizeObserver;
+      global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+      // A hidden (display: none) textarea has no layout, so scrollHeight is 0
+      let isHidden = false;
+      mockScrollHeight((textarea) => (isHidden ? 0 : textarea.value.split('\n').length * LINE_HEIGHT + PADDING * 2));
+      const resize = (width: number) =>
+        act(() => {
+          resizeCallback([{ contentRect: { width } } as ResizeObserverEntry], {} as ResizeObserver);
+        });
+
+      try {
+        render(<Textarea {...defaultProps} autoGrow minRows={3} maxRows={12} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+        resize(600);
+        expect(textarea.style.height).toBe(rowsToHeight(3));
+
+        isHidden = true;
+        resize(0);
+        fireEvent.change(textarea, { target: { value: '1\n2\n3\n4\n5\n6' } });
+        await flush();
+        expect(textarea.style.height).toBe(rowsToHeight(3));
+
+        isHidden = false;
+        resize(600);
+        expect(textarea.style.height).toBe(rowsToHeight(6));
+      } finally {
+        global.ResizeObserver = originalResizeObserver;
+      }
+    });
   });
 
   it('applies maxHeight when autoGrow=true', () => {
