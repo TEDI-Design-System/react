@@ -1,3 +1,10 @@
+# [19.2.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.8...react-19.2.0-rc.9) (2026-10-01)
+
+
+### Bug Fixes
+
+* **textarea:** fix autoGrow height not following content [#946](https://github.com/TEDI-Design-System/react/issues/946) ([#947](https://github.com/TEDI-Design-System/react/issues/947)) ([558e97a](https://github.com/TEDI-Design-System/react/commit/558e97ac3a222bc214618e3ab6c4fd26a9f91690))
+
 # [19.2.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.7...react-19.2.0-rc.8) (2026-10-01)
 
 
