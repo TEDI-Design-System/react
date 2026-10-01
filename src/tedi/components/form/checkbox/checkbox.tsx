@@ -69,7 +69,6 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
   const resolvedName = name ?? group?.name;
 
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
-  const labelRef = React.useRef<HTMLLabelElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const isGrouped = group !== null;
 
@@ -114,10 +113,9 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
     />
   );
 
-  const renderIndicator = (extraClassName?: string, onClick?: () => void) => (
+  const renderIndicator = (extraClassName?: string) => (
     <div
       aria-hidden="true"
-      onClick={onClick}
       className={cn(
         styles['tedi-checkbox__indicator'],
         {
@@ -202,13 +200,12 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
         <Col width="auto">
           <div className={styles['tedi-checkbox__outer-indicator-wrapper']}>
             {input}
-            {renderIndicator(className, () => labelRef.current?.click())}
+            {renderIndicator(className)}
           </div>
         </Col>
         {label && (
           <Col>
             <FormLabel
-              ref={labelRef}
               className={LabelBEM}
               id={resolvedId}
               data-testid="checkbox-label"

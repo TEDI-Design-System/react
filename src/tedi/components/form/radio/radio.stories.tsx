@@ -278,7 +278,7 @@ export const Group: StoryObj = {
 
 /**
  * In controlled mode the parent owns the selected value. Because it lives outside the radios, it
- * can be changed programmatically — the **Tühjenda valik** button clears the selection, something a
+ * can be changed programmatically — the **Clear selection** button clears the selection, something a
  * user can't do to a radio and an uncontrolled radio can't offer. The current value is shown below.
  */
 export const Controlled = () => {
@@ -302,9 +302,9 @@ export const Controlled = () => {
           onChange={(value) => setSelected(value)}
         />
       ))}
-      <Text>Valitud: {selected ?? '—'}</Text>
+      <Text>Selected: {selected ?? '—'}</Text>
       <Button visualType="secondary" onClick={() => setSelected(null)} disabled={selected === null}>
-        Tühjenda valik
+        Clear selection
       </Button>
     </VerticalSpacing>
   );

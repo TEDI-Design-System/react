@@ -194,19 +194,18 @@ describe('Checkbox component', () => {
     expect(input.indeterminate).toBe(false);
   });
 
-  it('calls labelRef.current.click() when clicked', () => {
-    const { getByTestId } = render(
-      <Checkbox id="check-id" label="Checkbox Label" value="check-value" name="check-group" />
+  it('toggles via the input, with the indicator kept decorative', () => {
+    const onChange = jest.fn();
+    render(
+      <Checkbox id="check-id" label="Checkbox Label" value="check-value" name="check-group" onChange={onChange} />
     );
 
-    const label = getByTestId('checkbox-label');
-    const indicator = getByTestId('checkbox-indicator');
+    // The real input overlays the indicator and is the interactive control; the indicator is
+    // decorative (so a mouse click lands on the input and Chrome keeps the focus ring keyboard-only).
+    expect(screen.getByTestId('checkbox-indicator')).toHaveAttribute('aria-hidden', 'true');
 
-    jest.spyOn(label, 'click').mockImplementation(() => {});
-
-    fireEvent.click(indicator);
-
-    expect(label.click).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(onChange).toHaveBeenCalledWith('check-value', true);
   });
 
   it('renders required indicator when required prop is true', () => {

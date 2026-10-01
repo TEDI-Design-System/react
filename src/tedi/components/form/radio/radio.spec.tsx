@@ -211,17 +211,14 @@ describe('Radio component', () => {
     expect(indicator).toBeInTheDocument();
   });
 
-  it('calls labelRef.current.click() when clicked', () => {
-    const { getByTestId } = render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" />);
+  it('toggles via the input, with the indicator kept decorative', () => {
+    const onChange = jest.fn();
+    render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" onChange={onChange} />);
 
-    const label = getByTestId('radio-label');
-    const indicator = getByTestId('radio-indicator');
+    expect(screen.getByTestId('radio-indicator')).toHaveAttribute('aria-hidden', 'true');
 
-    jest.spyOn(label, 'click').mockImplementation(() => {});
-
-    fireEvent.click(indicator);
-
-    expect(label.click).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('radio'));
+    expect(onChange).toHaveBeenCalledWith('radio-value', true);
   });
 
   it('renders required indicator when required prop is true', () => {
@@ -242,8 +239,6 @@ describe('Radio component', () => {
     expect(screen.getByRole('radio')).not.toBeRequired();
   });
 
-  // `aria-required`/`aria-invalid` are not supported on the `radio` role — they
-  // belong on the radiogroup — so they must not be set on the input.
   it('does not put aria-required or aria-invalid on the radio input', () => {
     render(<Radio id="radio-id" label="Radio Label" value="radio-value" name="radio-group" required invalid />);
 

@@ -16,7 +16,17 @@
   }
 
   &__input {
-    @include mixins.visually-hidden;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    opacity: 0;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 
   &__indicator {
@@ -68,6 +78,13 @@
         background-color: var(--form-checkbox-radio-default-background-error);
       }
 
+      .tedi-radio__input:hover:not(:disabled, :checked) + &,
+      .tedi-radio__input:not(:disabled, :checked) + &:hover,
+      .tedi-radio__input:active:not(:disabled, :checked) + & {
+        outline: var(--tedi-borders-01) solid var(--form-general-feedback-error-border);
+        border-color: var(--form-general-feedback-error-border);
+      }
+
       .tedi-radio__input:focus-visible:not(:disabled, :checked) + & {
         outline: var(--form-general-feedback-error-border) solid var(--tedi-borders-02);
         outline-offset: var(--tedi-borders-02);
@@ -83,8 +100,12 @@
 
     .tedi-radio__input:not(:disabled, :checked) + &--hover:not(#{&}--invalid),
     .tedi-radio__input:hover:not(:disabled, :checked) + &:not(#{&}--invalid),
-    .tedi-radio__input:not(:disabled, :checked) + &:not(#{&}--invalid):hover,
-    .tedi-radio__input:focus:not(:disabled) + &:not(#{&}--invalid) {
+    .tedi-radio__input:not(:disabled, :checked) + &:not(#{&}--invalid):hover {
+      outline: 1px solid var(--form-checkbox-radio-default-border-hover);
+      border: 1px solid var(--form-checkbox-radio-default-border-hover);
+    }
+
+    .tedi-radio__input:focus-visible:not(:disabled) + &:not(#{&}--invalid) {
       outline: 1px solid var(--form-checkbox-radio-default-border-hover);
       border: 1px solid var(--form-checkbox-radio-default-border-hover);
     }
@@ -118,6 +139,7 @@
   }
 
   &__outer-indicator-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
     height: var(--form-checkbox-radio-indicator-container-height);
@@ -148,6 +170,10 @@
   background-color: var(--_card-bg);
   border: var(--tedi-borders-01) solid var(--_card-border);
   border-radius: var(--form-checkbox-radio-card-radius);
+
+  .tedi-radio__input {
+    @include mixins.visually-hidden;
+  }
 
   .tedi-radio__card-control {
     display: flex;

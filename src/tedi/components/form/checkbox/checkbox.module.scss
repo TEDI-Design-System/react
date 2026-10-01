@@ -16,10 +16,21 @@
   }
 
   &__input {
-    @include mixins.visually-hidden;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    opacity: 0;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 
   &__outer-indicator-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
     height: var(--form-checkbox-radio-indicator-container-height);
@@ -81,8 +92,7 @@
 
   .tedi-checkbox__input:not(:disabled, :checked) + &--hover:not(#{&}--indeterminate, #{&}--invalid),
   .tedi-checkbox__input:hover:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid),
-  .tedi-checkbox__input:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid):hover,
-  .tedi-checkbox__input:focus:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid) {
+  .tedi-checkbox__input:not(:disabled, :checked) + &:not(#{&}--indeterminate, #{&}--invalid):hover {
     outline: 1px solid var(--form-checkbox-radio-default-border-selected);
     border-color: var(--form-checkbox-radio-default-border-selected);
   }
@@ -104,6 +114,13 @@
 
     .tedi-checkbox__input:not(:disabled, :checked, :indeterminate) + & {
       background-color: var(--form-checkbox-radio-default-background-error);
+    }
+
+    .tedi-checkbox__input:hover:not(:disabled, :checked) + &,
+    .tedi-checkbox__input:not(:disabled, :checked) + &:hover,
+    .tedi-checkbox__input:active:not(:disabled, :checked) + & {
+      outline: var(--tedi-borders-01) solid var(--form-general-feedback-error-border);
+      border-color: var(--form-general-feedback-error-border);
     }
 
     .tedi-checkbox__input:focus-visible:not(:disabled, :checked) + & {
@@ -148,6 +165,10 @@
   background-color: var(--_card-bg);
   border: var(--tedi-borders-01) solid var(--_card-border);
   border-radius: var(--form-checkbox-radio-card-radius);
+
+  .tedi-checkbox__input {
+    @include mixins.visually-hidden;
+  }
 
   .tedi-checkbox__card-control {
     display: flex;

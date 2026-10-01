@@ -60,7 +60,6 @@ export const Radio = ((props: RadioProps): JSX.Element => {
   const resolvedName = name ?? group?.name;
 
   const [innerChecked, setInnerChecked] = React.useState<boolean>(defaultChecked || false);
-  const labelRef = React.useRef<HTMLLabelElement>(null);
 
   const isGrouped = group !== null;
   const getChecked = React.useMemo((): boolean => {
@@ -166,7 +165,6 @@ export const Radio = ((props: RadioProps): JSX.Element => {
           <div className={styles['tedi-radio__outer-indicator-wrapper']}>
             {input}
             {React.cloneElement(indicator, {
-              onClick: () => labelRef.current?.click(),
               className: cn(indicator.props.className, className),
             })}
           </div>
@@ -174,7 +172,6 @@ export const Radio = ((props: RadioProps): JSX.Element => {
         {label && (
           <Col>
             <FormLabel
-              ref={labelRef}
               className={LabelBEM}
               id={resolvedId}
               data-testid="radio-label"
