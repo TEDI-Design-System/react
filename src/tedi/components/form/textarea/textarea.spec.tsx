@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
+import { TextFieldForwardRef } from '../textfield/textfield';
 import Textarea, { TextareaProps } from './textarea';
 
 import '@testing-library/jest-dom';
@@ -30,6 +32,18 @@ describe('Textarea component', () => {
     expect(textarea).toBeInTheDocument();
     expect(textarea).toHaveAttribute('id', 'test-textarea');
     expect(textarea).toHaveAttribute('name', 'testTextarea');
+  });
+
+  it('forwards the ref to a callback ref', () => {
+    const ref = jest.fn();
+    render(<Textarea {...defaultProps} ref={ref} />);
+    expect(ref).toHaveBeenCalledWith(expect.objectContaining({ input: expect.any(HTMLTextAreaElement) }));
+  });
+
+  it('forwards the ref to an object ref', () => {
+    const ref = React.createRef<TextFieldForwardRef>();
+    render(<Textarea {...defaultProps} ref={ref} />);
+    expect(ref.current?.input).toBeInstanceOf(HTMLTextAreaElement);
   });
 
   it('shows no clear button, even with a value', () => {

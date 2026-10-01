@@ -298,7 +298,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     startSlot,
     endSlot,
     ...rest
-  } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
+  } = getCurrentBreakpointProps<TextFieldProps>(props);
 
   const { getLabel } = useLabels();
 
@@ -352,16 +352,12 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   );
 
   const clearInput = useCallback(() => {
-    const element = fieldRef.current;
-    if (element) {
-      Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
-      element.dispatchEvent(new Event('input', { bubbles: true }));
-    } else {
-      if (!isControlled) setInnerValue('');
-      onChange?.('');
-    }
+    // The clear button only renders once the field has mounted, so the element is there to clear.
+    const element = fieldRef.current as FieldElement;
+    Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
+    element.dispatchEvent(new Event('input', { bubbles: true }));
     onClear?.();
-  }, [isControlled, onChange, onClear]);
+  }, [onClear]);
 
   const renderIcon = useCallback(() => {
     if (!icon) return null;
@@ -422,7 +418,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         {showClearButton && icon && (
           <Separator color="primary" axis="vertical" className={styles['tedi-textfield__separator']} />
         )}
-        {icon && renderIcon()}
+        {renderIcon()}
       </div>
     );
   }, [showClearButton, icon, renderClearButton, renderIcon]);
