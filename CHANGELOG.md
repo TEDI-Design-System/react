@@ -1,3 +1,10 @@
+# [19.2.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.7...react-19.2.0-rc.8) (2026-10-01)
+
+
+### Features
+
+* **radio,checkbox:** add compound group and card variant, deprecate ChoiceGroup [#485](https://github.com/TEDI-Design-System/react/issues/485) ([#832](https://github.com/TEDI-Design-System/react/issues/832)) ([873531c](https://github.com/TEDI-Design-System/react/commit/873531c06f934ef23a9bdad06769376dc52f314a)), closes [#642](https://github.com/TEDI-Design-System/react/issues/642)
+
 # [19.2.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.6...react-19.2.0-rc.7) (2026-10-01)
 
 
