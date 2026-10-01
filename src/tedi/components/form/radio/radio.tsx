@@ -24,6 +24,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
     hover,
     name,
     tooltip,
+    labelProps,
     size = 'default',
     invalid,
     required,
@@ -95,6 +96,7 @@ export const Radio = (props: RadioProps): JSX.Element => {
               label={label}
               tooltip={tooltip}
               required={required}
+              labelProps={labelProps}
             />
           </Col>
         )}

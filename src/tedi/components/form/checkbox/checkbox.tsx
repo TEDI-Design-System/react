@@ -32,6 +32,7 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
     hover,
     name,
     tooltip,
+    labelProps,
     invalid,
     size = 'default',
     required,
@@ -121,6 +122,7 @@ export const Checkbox = (props: CheckboxProps): JSX.Element => {
               label={label}
               tooltip={tooltip}
               required={required}
+              labelProps={labelProps}
             />
           </Col>
         )}

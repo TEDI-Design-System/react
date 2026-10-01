@@ -1,4 +1,5 @@
 import { FeedbackTextProps } from './feedback-text/feedback-text';
+import { FormLabelProps } from './form-label/form-label';
 
 export interface ChoiceInputProps {
   /**
@@ -54,6 +55,12 @@ export interface ChoiceInputProps {
    * not just a plain string.
    */
   tooltip?: React.ReactNode;
+  /**
+   * Additional props forwarded to the underlying `Label` component.
+   * Use `modifiers` to control how the label text wraps or breaks
+   * (e.g. `{ modifiers: 'nowrap' }`).
+   */
+  labelProps?: FormLabelProps['labelProps'];
   /**
    *  Input size
    */

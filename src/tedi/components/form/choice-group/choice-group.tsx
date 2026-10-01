@@ -64,6 +64,7 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
     defaultValue,
     onChange,
     hideLabel,
+    labelProps,
     indeterminateCheck,
     indeterminateCheckProps = {},
     color,
@@ -171,10 +172,15 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
         name={name}
         aria-describedby={helper && inputType !== 'radio' ? helperId : undefined}
       >
-        {label && typeof label === 'string' ? (
-          <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} renderWithoutLabel={true} />
-        ) : (
-          <label htmlFor={id}>{label}</label>
+        {label && (
+          <FormLabel
+            id={id}
+            label={label}
+            required={required}
+            hideLabel={hideLabel}
+            renderWithoutLabel={true}
+            labelProps={labelProps}
+          />
         )}
         <Row>
           <Col>
