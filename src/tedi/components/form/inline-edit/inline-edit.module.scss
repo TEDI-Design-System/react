@@ -57,7 +57,7 @@
   background-color: var(--form-hidden-default);
   border-radius: var(--form-field-radius);
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: var(--form-hidden-hover);
   }
 
@@ -67,6 +67,15 @@
 
   &:focus-visible {
     @include mixins.focus-element;
+  }
+
+  &:disabled {
+    color: var(--form-input-text-disabled);
+    cursor: not-allowed;
+
+    .tedi-inline-edit__icon {
+      color: var(--general-text-disabled);
+    }
   }
 }
 

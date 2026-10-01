@@ -88,6 +88,14 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   /** Renders the value as static text (a text group) with no edit affordance. */
   readOnly?: boolean;
   /**
+   * Disables editing while keeping the trigger and edit icon visible but greyed — use for
+   * transient states (saving/pending) or when the field depends on another. Clicking and keyboard
+   * activation are blocked and the trigger leaves the tab order, but a controlled `value` update
+   * still re-renders. Differs from `readOnly`, which drops the edit affordance entirely.
+   * @default false
+   */
+  disabled?: boolean;
+  /**
    * Marks the row as invalid — the read trigger gets an error border and
    * `aria-invalid`. `helper` items with `type: 'error'` set this automatically.
    * @default false
@@ -151,6 +159,7 @@ export function InlineEdit<T>({
   renderValue,
   placeholder,
   readOnly = false,
+  disabled = false,
   invalid = false,
   helper,
   fullWidth = false,
@@ -285,6 +294,7 @@ export function InlineEdit<T>({
       type="button"
       id={fieldId}
       onClick={edit}
+      disabled={disabled}
       aria-describedby={describedBy}
       className={cn(
         styles['tedi-inline-edit'],

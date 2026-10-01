@@ -77,6 +77,7 @@ const NameInline = (props: {
   label?: string;
   defaultValue?: string;
   readOnly?: boolean;
+  disabled?: boolean;
   placeholder?: string;
   size?: 'default' | 'small';
   editIconPosition?: 'inline' | 'end';
@@ -135,6 +136,7 @@ const AlignExample = ({ align, idPrefix }: { align: 'inline' | 'end'; idPrefix: 
 const CountryInline = (props: {
   id: string;
   readOnly?: boolean;
+  disabled?: boolean;
   size?: 'default' | 'small';
   fullWidth?: boolean;
   invalid?: boolean;
@@ -213,6 +215,12 @@ const meta: Meta<typeof InlineEdit> = {
       description: 'Renders the value as static text (a text group) with no edit affordance.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
+    disabled: {
+      control: 'boolean',
+      description:
+        'Disables editing while keeping the trigger and edit icon visible but greyed (for saving/pending or dependent fields). Differs from `readOnly`, which drops the edit affordance entirely.',
+      table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
+    },
     fullWidth: {
       control: 'boolean',
       description:
@@ -271,6 +279,7 @@ export const Default: Story = {
     size: 'default',
     editIconPosition: 'inline',
     readOnly: false,
+    disabled: false,
     fullWidth: false,
     hideEditIcon: false,
   },
@@ -283,6 +292,7 @@ export const Default: Story = {
         size={args.size}
         editIconPosition={args.editIconPosition}
         readOnly={args.readOnly}
+        disabled={args.disabled}
         fullWidth={args.fullWidth}
         hideEditIcon={args.hideEditIcon}
         value={value}
@@ -486,18 +496,18 @@ export const ReadOnly: Story = {
   ),
 };
 
-export const EditIconAlignment: Story = {
+export const EditIconPosition: Story = {
   render: () => (
     <Row gutter={4}>
       <Col xs={12} md={6}>
         <VerticalSpacing size={0.5}>
-          <Text modifiers="bold">Following</Text>
+          <Text modifiers="bold">Inline</Text>
           <AlignExample align="inline" idPrefix="ie-align-inline" />
         </VerticalSpacing>
       </Col>
       <Col xs={12} md={6}>
         <VerticalSpacing size={0.5}>
-          <Text modifiers="bold">Aligned</Text>
+          <Text modifiers="bold">End</Text>
           <AlignExample align="end" idPrefix="ie-align-end" />
         </VerticalSpacing>
       </Col>
@@ -650,6 +660,17 @@ export const States: Story = {
         </Col>
         <Col>
           <CountryInline id="ie-state-readonly-select" fullWidth readOnly />
+        </Col>
+      </Row>
+      <Row>
+        <Col width={2}>
+          <Text modifiers="bold">Disabled</Text>
+        </Col>
+        <Col>
+          <NameInline id="ie-state-disabled-text" fullWidth disabled />
+        </Col>
+        <Col>
+          <CountryInline id="ie-state-disabled-select" fullWidth disabled />
         </Col>
       </Row>
     </VerticalSpacing>

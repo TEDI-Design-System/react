@@ -209,6 +209,22 @@ describe('InlineEdit', () => {
     expect(screen.getByText('Locked')).toBeInTheDocument();
   });
 
+  it('keeps the trigger (disabled) but blocks editing when disabled', async () => {
+    const user = userEvent.setup();
+    render(
+      <InlineEdit<string> label="Name" value="Locked" disabled>
+        {({ value, onChange }) => <TextField id="dis" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+
+    const trigger = screen.getByRole('button', { name: /name/i });
+    // Unlike readOnly, the trigger still renders — just disabled (so it's out of the tab order).
+    expect(trigger).toBeDisabled();
+
+    await user.click(trigger);
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
   it('applies the small size class and keeps the 18px edit icon', () => {
     render(
       <InlineEdit<string> label="Name" value="Mari" size="small" renderValue={(v) => v}>
