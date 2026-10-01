@@ -35,6 +35,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
     tooltip,
     description,
     icon,
+    labelProps,
     size: sizeProp,
     variant: variantProp,
     cardVariant: cardVariantProp,
@@ -179,6 +180,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
               label={label}
               tooltip={tooltip}
               required={requiredProp}
+              labelProps={labelProps}
             />
           </Col>
         )}

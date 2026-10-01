@@ -1,3 +1,11 @@
+# [19.2.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.6...react-19.2.0-rc.7) (2026-10-01)
+
+
+### Features
+
+* **form-label:** add configurable Label wrapping via labelProps [#912](https://github.com/TEDI-Design-System/react/issues/912) ([#915](https://github.com/TEDI-Design-System/react/issues/915)) ([aba3540](https://github.com/TEDI-Design-System/react/commit/aba35400470e658edaaf476279cb8213fa910091))
+* **table-of-contents:** add scrollActiveIntoView prop [#896](https://github.com/TEDI-Design-System/react/issues/896) ([#931](https://github.com/TEDI-Design-System/react/issues/931)) ([514dd6b](https://github.com/TEDI-Design-System/react/commit/514dd6b8f4f32e7738a0a738d904be0ce92bb440))
+
 # [19.2.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.5...react-19.2.0-rc.6) (2026-09-30)
 
 

@@ -44,6 +44,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
     tooltip,
     description,
     icon,
+    labelProps,
     size: sizeProp,
     variant: variantProp,
     cardVariant: cardVariantProp,
@@ -213,6 +214,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
               label={label}
               tooltip={tooltip}
               required={required}
+              labelProps={labelProps}
             />
           </Col>
         )}

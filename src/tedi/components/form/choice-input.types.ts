@@ -1,4 +1,5 @@
 import { FeedbackTextProps } from './feedback-text/feedback-text';
+import { FormLabelProps } from './form-label/form-label';
 
 export type ChoiceInputVariant = 'default' | 'card';
 export type ChoiceInputCardVariant = 'primary' | 'secondary';
@@ -65,6 +66,12 @@ interface ChoiceInputBaseProps {
    * If the item should be in hover state
    */
   hover?: boolean;
+  /**
+   * Additional props forwarded to the underlying `Label` component.
+   * Use `modifiers` to control how the label text wraps or breaks
+   * (e.g. `{ modifiers: 'nowrap' }`).
+   */
+  labelProps?: FormLabelProps['labelProps'];
   /**
    *  Input size
    */
