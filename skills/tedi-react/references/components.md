@@ -147,6 +147,12 @@ files. This is the part of this document worth maintaining by hand.
   prop. Children win when both are given.
 - **`TableOfContents.Item` children must be direct children.** Don't wrap them in another
   component. Pass `underline={false}` on the `Link` inside an item to match the design.
+- **`TableOfContents`'s `scrollActiveIntoView` needs a scroll container to do anything.** It keeps
+  the active row visible as `activeId` changes, but only ever scrolls the TOC's *own* scroll area —
+  never the page. That area is the sticky card (`sticky` is on by default) or, when `sticky={false}`,
+  a scrollable wrapper *you* put around the component. With neither, there's nothing to scroll and the
+  prop is a no-op. It reacts only to genuine `activeId` transitions (not the initial render), scrolls
+  the active row itself (not its expanded children), and respects `prefers-reduced-motion`.
 - **`TableCard`'s `collapsible` needs a `title`.** The header becomes the disclosure toggle; `rows`,
   `summary` and `children` collapse together while the `actions` footer stays visible. `layout`
   (`horizontal` key/value vs `vertical` stacked) and the column / grid props are breakpoint-aware.
