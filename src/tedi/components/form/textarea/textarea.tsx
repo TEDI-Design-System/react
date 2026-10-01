@@ -76,9 +76,8 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
   const value = React.useMemo(() => externalValue ?? innerValue, [externalValue, innerValue]);
 
   const calculateHeight = React.useCallback(() => {
-    if (!autoGrow || !textareaRef.current) return;
-
-    const textarea = textareaRef.current;
+    // Only called with autoGrow on, after the textarea has mounted and set the ref.
+    const textarea = textareaRef.current as HTMLTextAreaElement;
 
     const originalOverflow = textarea.style.overflow;
 
@@ -119,7 +118,7 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     textarea.style.overflow = originalOverflow;
     // Only scroll once content overflows (past maxRows, or clipped by maxHeight); 1px tolerance for rounding
     textarea.style.overflowY = textarea.scrollHeight - textarea.clientHeight > 1 ? 'auto' : 'hidden';
-  }, [autoGrow, minRows, maxRows]);
+  }, [minRows, maxRows]);
 
   useEffect(() => {
     if (autoGrow) {
@@ -221,6 +220,7 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
         [styles['tedi-textarea__input--auto-grow']]: autoGrow,
       })}
       isTextArea={true}
+      isClearable={false}
       className={cn(styles['tedi-textarea'], className)}
       value={value}
       onChange={handleInputChange}

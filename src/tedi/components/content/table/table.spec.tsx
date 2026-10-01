@@ -853,6 +853,18 @@ describe('Table', () => {
       expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
     });
 
+    it('resets the column filter from the clear button', () => {
+      render(<Table<Person> id="t-filter-clear" data={data} columns={columns} enableColumnFilters />);
+
+      fireEvent.change(screen.getByLabelText('Filter Name'), { target: { value: 'Anna' } });
+      expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByTitle(/clear/i));
+
+      expect(screen.getByLabelText('Filter Name')).toHaveValue('');
+      expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
+    });
+
     it('forwards meta.filterProps (e.g. maxLength) to the built-in column filter input', () => {
       const filterColumns: ColumnDef<Person>[] = [
         { id: 'name', header: 'Name', accessorKey: 'name', meta: { filterProps: { input: { maxLength: 40 } } } },
