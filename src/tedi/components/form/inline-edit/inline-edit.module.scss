@@ -61,7 +61,7 @@
     background-color: var(--form-hidden-hover);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     box-shadow: inset 0 0 0 var(--tedi-borders-02) var(--form-input-border-active);
   }
 
@@ -82,13 +82,14 @@
 .tedi-inline-edit--invalid.tedi-inline-edit__trigger {
   box-shadow: inset 0 0 0 var(--tedi-borders-01) var(--form-general-feedback-error-border);
 
-  &:active {
+  &:active:not(:disabled) {
     box-shadow: inset 0 0 0 var(--tedi-borders-02) var(--form-general-feedback-error-border);
   }
 }
 
-.tedi-inline-edit__trigger.tedi-inline-edit:active {
+.tedi-inline-edit__trigger.tedi-inline-edit:active:not(:disabled) {
   outline: none;
+  background-color: var(--form-hidden-default);
 }
 
 .tedi-inline-edit__trigger.tedi-inline-edit:focus-visible:not(:active) {

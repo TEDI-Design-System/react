@@ -55,12 +55,13 @@ provided by `children`.
     <tr>
       <td>Choice</td>
       <td>
-        <code>Select</code>, <code>ChoiceGroup</code>
+        <code>Select</code>, <code>Radio.Group</code>, <code>Checkbox.Group</code>
       </td>
       <td>
-        Single-action controls (single <code>Select</code>, <code>ChoiceGroup</code>) call <code>commit()</code> inside{' '}
-        <code>onChange</code> to commit on pick. A multi-select <code>Select</code> instead only updates the draft on
-        each pick and commits on blur, so the user can choose several options before it closes.
+        Single-action controls (single <code>Select</code>, <code>Radio.Group</code>) call <code>commit()</code> inside{' '}
+        <code>onChange</code> to commit on pick. A multi-select <code>Select</code> or <code>Checkbox.Group</code>{' '}
+        instead only updates the draft on each pick and commits on blur, so the user can choose several options before it
+        closes.
       </td>
     </tr>
     <tr>
@@ -85,11 +86,11 @@ provided by `children`.
 </table>
 
 **Not a fit:** `FileUpload` / `FileDropzone` (no single committed value), and standalone `Checkbox` / `Radio` (use
-`ChoiceGroup` instead).
+`Checkbox.Group` / `Radio.Group` instead).
 
 ### Committing on pick
 
-For **single-action** controls — a single-select `Select`, `ChoiceGroup`, or `Toggle` — commit as soon as the user
+For **single-action** controls — a single-select `Select`, `Radio.Group`, or `Toggle` — commit as soon as the user
 makes a selection rather than waiting for blur. (A multi-select `Select` should _not_ do this: call `onChange` only and
 let the commit happen on blur, otherwise the field closes after the first pick.)
 
