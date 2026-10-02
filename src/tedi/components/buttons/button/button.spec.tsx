@@ -73,4 +73,9 @@ describe('Button component', () => {
     fireEvent.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('is hidden when printing', () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('no-print');
+  });
 });

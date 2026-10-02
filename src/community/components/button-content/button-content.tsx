@@ -3,7 +3,6 @@ import React, { forwardRef } from 'react';
 
 import { Icon, IconProps } from '../../../tedi/components/base/icon/icon';
 import { Spinner } from '../../../tedi/components/loaders/spinner/spinner';
-import Print from '../../../tedi/components/misc/print/print';
 import { AllowedHTMLTags, PolymorphicComponentPropWithRef, PolymorphicRef } from '../../helpers/polymorphic/types';
 import { IntentionalAny } from '../../types';
 import { ButtonColor, ButtonType } from '../button/button';
@@ -168,18 +167,16 @@ const InternalButtonContent = forwardRef(
     };
 
     return (
-      <Print visibility="hide">
-        <Component
-          data-name="button-content"
-          {...rest}
-          aria-disabled={isLoading || rest['aria-disabled']}
-          onClick={onClickHandler}
-          ref={ref}
-          className={BEM}
-        >
-          {!noStyle ? renderContent() : children}
-        </Component>
-      </Print>
+      <Component
+        data-name="button-content"
+        {...rest}
+        aria-disabled={isLoading || rest['aria-disabled']}
+        onClick={onClickHandler}
+        ref={ref}
+        className={BEM}
+      >
+        {!noStyle ? renderContent() : children}
+      </Component>
     );
   }
 );

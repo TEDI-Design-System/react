@@ -76,4 +76,9 @@ describe('Link component', () => {
     const link = screen.getByRole('link');
     expect(link).not.toHaveClass('tedi-btn--link--icon-standalone');
   });
+
+  it('is printed, unlike buttons', () => {
+    render(<Link href="#terms">Terms</Link>);
+    expect(screen.getByRole('link', { name: 'Terms' })).not.toHaveClass('no-print');
+  });
 });
