@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -69,7 +69,27 @@ const ScaleShowcase = ({
       <div style={{ width: '5rem', flexShrink: 0 }}>
         <Text modifiers="bold">Read only</Text>
       </div>
-      <Rating type={type} count={max} readOnly value={3.5} ratingsCount={271} label={`${type} read-only rating`} />
+      {/* Three count modes: full raters label, number only (showRatingsCountLabel={false}), and none. */}
+      <VerticalSpacing size={0.5}>
+        <Rating
+          type={type}
+          count={max}
+          readOnly
+          value={3.5}
+          ratingsCount={271}
+          label={`${type} read-only, with raters`}
+        />
+        <Rating
+          type={type}
+          count={max}
+          readOnly
+          value={3.5}
+          ratingsCount={271}
+          showRatingsCountLabel={false}
+          label={`${type} read-only, count only`}
+        />
+        <Rating type={type} count={max} readOnly value={3.5} label={`${type} read-only, no count`} />
+      </VerticalSpacing>
     </div>
   </VerticalSpacing>
 );
@@ -84,23 +104,37 @@ export const States: Story = {
     pseudo: { hover: '#rating-hover label', focusVisible: '#rating-focus input' },
   },
   render: () => {
-    const rows: { label: string; id?: string; props: Partial<Parameters<typeof Rating>[0]> }[] = [
-      { label: 'Not selected', props: { defaultValue: 0 } },
-      { label: 'Selected', props: { defaultValue: 1 } },
-      { label: 'Hover', id: 'rating-hover', props: { defaultValue: 1 } },
-      { label: 'Disabled', props: { defaultValue: 1, disabled: true } },
-      { label: 'Focus', id: 'rating-focus', props: { defaultValue: 0 } },
+    const types = ['star', 'number', 'icon'] as const;
+    // Each type has a Default (unselected) and a Selected sub-column; rows are the item states.
+    const rows: { label: string; id?: string; disabled?: boolean }[] = [
+      { label: 'Default' },
+      { label: 'Hover', id: 'rating-hover' },
+      { label: 'Disabled', disabled: true },
+      { label: 'Focus', id: 'rating-focus' },
     ];
+    const cell = { padding: '0.5rem 1.5rem', textAlign: 'left' as const };
 
     return (
       <table style={{ borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th />
-            {(['star', 'number', 'icon'] as const).map((type) => (
-              <th key={type} style={{ padding: '0.5rem 1.5rem', textAlign: 'left' }}>
+            <th rowSpan={2} />
+            {types.map((type) => (
+              <th key={type} colSpan={2} style={cell}>
                 <Text modifiers="bold">{type[0].toUpperCase() + type.slice(1)}</Text>
               </th>
+            ))}
+          </tr>
+          <tr>
+            {types.map((type) => (
+              <Fragment key={type}>
+                <th style={cell}>
+                  <Text modifiers="bold">Default</Text>
+                </th>
+                <th style={cell}>
+                  <Text modifiers="bold">Selected</Text>
+                </th>
+              </Fragment>
             ))}
           </tr>
         </thead>
@@ -110,16 +144,21 @@ export const States: Story = {
               <th style={{ padding: '0.5rem 1.5rem 0.5rem 0', textAlign: 'left' }}>
                 <Text modifiers="bold">{row.label}</Text>
               </th>
-              {(['star', 'number', 'icon'] as const).map((type) => (
-                <td key={type} style={{ padding: '0.5rem 1.5rem' }}>
-                  <Rating
-                    {...row.props}
-                    type={type}
-                    count={1}
-                    icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
-                    label={`${type} ${row.label}`}
-                  />
-                </td>
+              {types.map((type) => (
+                <Fragment key={type}>
+                  {[0, 1].map((selected) => (
+                    <td key={selected} style={cell}>
+                      <Rating
+                        type={type}
+                        count={1}
+                        defaultValue={selected}
+                        disabled={row.disabled}
+                        icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
+                        label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
+                      />
+                    </td>
+                  ))}
+                </Fragment>
               ))}
             </tr>
           ))}

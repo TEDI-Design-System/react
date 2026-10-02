@@ -78,30 +78,39 @@
   border-radius: 50%;
 }
 
-.tedi-rating--icon .tedi-rating__circle {
+.tedi-rating--icon .tedi-rating__circle,
+.tedi-rating--number .tedi-rating__circle {
   color: var(--general-text-brand);
 }
 
 .tedi-rating__item--active .tedi-rating__circle,
 .tedi-rating__circle--filled {
   color: var(--general-text-white);
-  background-color: var(--feedback-background-default);
-  border-color: var(--feedback-background-default);
+  background-color: var(--general-surface-brand-primary);
+  border-color: var(--general-surface-brand-primary);
 }
 
 .tedi-rating--hovering .tedi-rating__item--active .tedi-rating__star,
-.tedi-rating__item:hover .tedi-rating__star {
-  color: var(--feedback-background-hover);
+.tedi-rating:not(.tedi-rating--disabled) .tedi-rating__item:hover .tedi-rating__star {
+  color: var(--general-icon-brand-dark);
 }
 
 .tedi-rating--hovering .tedi-rating__item--active .tedi-rating__circle,
-.tedi-rating__item--active:hover .tedi-rating__circle {
-  background-color: var(--feedback-background-hover);
-  border-color: var(--feedback-background-hover);
+.tedi-rating:not(.tedi-rating--disabled) .tedi-rating__item--active:hover .tedi-rating__circle {
+  background-color: var(--general-icon-brand-dark);
+  border-color: var(--general-icon-brand-dark);
+}
+
+// Hover on an unselected circle - light-blue tint with a brand-dark border/number (per the states).
+.tedi-rating:not(.tedi-rating--disabled) .tedi-rating__item:not(.tedi-rating__item--active):hover .tedi-rating__circle {
+  color: var(--general-icon-brand-dark);
+  background-color: var(--general-surface-brand-quaternary);
+  border-color: var(--general-icon-brand-dark);
 }
 
 .tedi-rating__caption {
-  font-size: var(--body-small-regular-size);
+  font-size: var(--body-extra-small-size);
+  line-height: var(--body-extra-small-line-height);
   color: var(--general-text-secondary);
   text-align: center;
 }
@@ -129,11 +138,15 @@
     color: var(--general-text-disabled);
   }
 
-  .tedi-rating__circle,
-  .tedi-rating__item--active .tedi-rating__circle {
+  .tedi-rating__circle {
     color: var(--general-text-disabled);
-    background-color: var(--general-surface-primary);
-    border-color: var(--general-text-disabled);
+    background-color: transparent;
+    border-color: var(--general-border-primary);
+  }
+
+  .tedi-rating__item--active .tedi-rating__circle {
+    background-color: var(--general-surface-tertiary);
+    border-color: var(--general-border-primary);
   }
 }
 
@@ -167,18 +180,12 @@
   overflow: hidden;
 }
 
+// The whole read-only summary (value + rater count) is one bold H6, per Figma.
 .tedi-rating__summary-text {
   font-size: var(--heading-h6-size);
+  font-weight: var(--heading-h6-weight);
   line-height: var(--heading-h6-line-height);
   color: var(--general-text-secondary);
-}
-
-.tedi-rating__summary-value {
-  font-weight: var(--heading-h6-weight);
-}
-
-.tedi-rating__summary-count {
-  font-weight: var(--body-regular-weight);
 }
 
 @include breakpoints.media-breakpoint-down(md) {

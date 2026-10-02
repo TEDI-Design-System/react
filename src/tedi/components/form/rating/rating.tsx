@@ -58,6 +58,12 @@ export interface RatingProps {
   /** Number of ratings shown in the `readOnly` summary (e.g. `271 hindajat`); omitted when unset. */
   ratingsCount?: number;
   /**
+   * Show the descriptive raters label next to `ratingsCount` (e.g. `271 hindajat`). Set `false` to
+   * show the number only (`271`).
+   * @default true
+   */
+  showRatingsCountLabel?: boolean;
+  /**
    * `readOnly` layout: `summary` (single visual) or `scale` (full star scale with fractional fill).
    * @default summary
    */
@@ -81,6 +87,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
     disabled = false,
     readOnly = false,
     ratingsCount,
+    showRatingsCountLabel = true,
     readOnlyVariant = 'summary',
     name,
     className,
@@ -144,7 +151,14 @@ export const Rating = (props: RatingProps): JSX.Element => {
   if (readOnly) {
     const formattedValue = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(currentValue);
     const valueText = `${formattedValue}/${total}`;
-    const countText = ratingsCount !== undefined ? ` - ${getLabel('rating.raters', ratingsCount)}` : '';
+    const countText =
+      ratingsCount !== undefined
+        ? ` - ${
+            showRatingsCountLabel
+              ? getLabel('rating.raters', ratingsCount)
+              : new Intl.NumberFormat(locale).format(ratingsCount)
+          }`
+        : '';
     const summary = `${valueText}${countText}`;
     const iconPosition = Math.min(total, Math.max(1, Math.round(currentValue)));
     const isStarScale = type === 'star' && readOnlyVariant === 'scale';
@@ -188,10 +202,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
       >
         <div className={styles['tedi-rating__summary']} aria-hidden="true">
           {readOnlyVisual}
-          <span className={styles['tedi-rating__summary-text']}>
-            <span className={styles['tedi-rating__summary-value']}>{valueText}</span>
-            {countText && <span className={styles['tedi-rating__summary-count']}>{countText}</span>}
-          </span>
+          <span className={styles['tedi-rating__summary-text']}>{summary}</span>
         </div>
       </div>
     );

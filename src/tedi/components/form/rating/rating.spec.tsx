@@ -76,6 +76,13 @@ describe('Rating', () => {
       expect(screen.getByRole('img')).toHaveAccessibleName('Hinnang: 4/5');
     });
 
+    it('shows the count number without the raters label when showRatingsCountLabel is false', () => {
+      renderWithLabels(
+        <Rating label="Hinnang" count={5} value={3.5} ratingsCount={271} showRatingsCountLabel={false} readOnly />
+      );
+      expect(screen.getByRole('img')).toHaveAccessibleName(/^Hinnang: 3[.,]5\/5 - 271$/);
+    });
+
     it('partially fills the boundary star in the scale variant (3.5 -> 3 full, 1 half, 1 empty)', () => {
       const { container } = renderWithLabels(
         <Rating label="Hinnang" type="star" count={5} value={3.5} readOnly readOnlyVariant="scale" />
