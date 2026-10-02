@@ -5,7 +5,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
-import { Sheet } from '../../overlays/sheet/sheet';
+import { SheetModal } from '../../overlays/sheet/components/sheet-modal/sheet-modal';
 import { VerticalStepper } from '../vertical-stepper/vertical-stepper';
 import styles from './card-stepper.module.scss';
 import { CardStepperStep, CardStepperStepProps } from './card-stepper-step';
@@ -342,7 +342,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
       {current.bottomSlot && <div className={styles['tedi-card-stepper__bottom-slot']}>{current.bottomSlot}</div>}
 
       {showStepList && (
-        <Sheet open={modalOpen} onToggle={setModalOpen} title={resolvedLabels.modalHeading}>
+        <SheetModal open={modalOpen} onToggle={setModalOpen} title={resolvedLabels.modalHeading}>
           <VerticalStepper aria-label={resolvedLabels.modalHeading}>
             {steps.map((step, index) => {
               const navigable = isStepNavigable(index);
@@ -386,7 +386,7 @@ const CardStepperInner = forwardRef<HTMLDivElement, CardStepperProps>((props, re
               );
             })}
           </VerticalStepper>
-        </Sheet>
+        </SheetModal>
       )}
     </div>
   );

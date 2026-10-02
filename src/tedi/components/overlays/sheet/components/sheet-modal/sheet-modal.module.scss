@@ -1,0 +1,19 @@
+.tedi-sheet.tedi-sheet {
+  height: auto;
+  max-height: 80dvh;
+  border-top: var(--tedi-borders-01) solid var(--card-border-primary);
+  border-top-left-radius: var(--modal-radius);
+  border-top-right-radius: var(--modal-radius);
+}
+
+.tedi-sheet__header {
+  display: flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tedi-sheet__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
