@@ -4,6 +4,20 @@
   position: relative;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+
+  &__mobile-body {
+    display: grid;
+    gap: var(--layout-grid-gutters-08);
+
+    .tedi-category-search__suffix {
+      min-width: 0;
+    }
+
+    .tedi-category-search__actions {
+      border-radius: var(--form-field-radius);
+    }
+  }
 
   &__bar {
     position: relative;
@@ -29,8 +43,6 @@
   }
 
   &__suffix {
-    max-width: 45%;
-
     > button {
       display: flex;
       gap: var(--tedi-dimensions-01);
@@ -38,13 +50,22 @@
       justify-content: space-between;
       width: 100%;
       height: 100%;
-      white-space: normal;
+      white-space: nowrap;
     }
   }
 
   &__category-label {
+    display: grid;
+    align-items: center;
     min-width: 0;
-    overflow-wrap: anywhere;
+
+    > span {
+      grid-area: 1 / 1;
+    }
+
+    &--hidden {
+      visibility: hidden;
+    }
   }
 
   & &__suffix > button {
@@ -101,7 +122,7 @@
     position: absolute;
     z-index: var(--z-index-dropdown);
     box-sizing: border-box;
-    width: var(--category-search-panel-width);
+    width: var(--category-search-text-results-panel-width);
     max-height: var(--category-search-panel-max-height);
     padding: var(--layout-grid-gutters-08);
     margin-block-start: var(--tedi-dimensions-01);

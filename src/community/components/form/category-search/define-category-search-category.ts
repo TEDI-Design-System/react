@@ -29,6 +29,7 @@ export function defineCategorySearchCategory<Filters, Result>(
       ...common,
       mode: 'search',
       placeholder: definition.placeholder,
+      showSearchButton: definition.showSearchButton,
       initialValue: () => definition.initialQuery ?? '',
       onSearch: (value, context) => definition.onSearch(value as string, context),
       renderResults: ({ result, value, selectResult }) =>
@@ -40,6 +41,7 @@ export function defineCategorySearchCategory<Filters, Result>(
     ...common,
     mode: 'category',
     initialValue: definition.initialFilters,
+    validationMessage: definition.validationMessage,
     renderFilters: ({ values, onChange, disabled, size }) =>
       definition.renderFilters({ values: values as Filters, onChange, disabled, size }),
     onSearch: (value, context) => definition.onSearch(value as Filters, context),
