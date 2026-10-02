@@ -90,8 +90,9 @@ export interface FileUploadProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   maxSize?: number;
   /**
-   * Only applies when `multiple` is set. When `true`, files that fail validation stay in the
-   * list marked invalid instead of being discarded; when `false`, only valid files are added.
+   * When `true`, files that fail validation stay in the list marked invalid instead of being
+   * discarded, so the failing file is shown; when `false`, only valid files are added. Applies to
+   * both single and multiple uploads.
    * @default false
    */
   keepRejectedFiles?: boolean;

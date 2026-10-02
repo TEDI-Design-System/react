@@ -46,9 +46,10 @@ export interface UseFileUploadProps {
    */
   multiple?: boolean;
   /**
-   * Only applies when `multiple` is set. When `true`, files that fail validation (wrong type
-   * or over `maxSize`) stay in the list marked invalid instead of being discarded; when
-   * `false`, only valid files are added. Files are validated individually either way.
+   * When `true`, files that fail validation (wrong type or over `maxSize`) stay in the list marked
+   * invalid instead of being discarded, so the failing file is shown under the dropzone; when
+   * `false`, only valid files are added. Applies to both single and multiple uploads; files are
+   * validated individually either way.
    * @default false
    */
   keepRejectedFiles?: boolean;
@@ -261,7 +262,10 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       let newFiles: FileUploadFile[];
 
       if (!multiple) {
-        newFiles = uploadedFiles.length > 0 && uploadedFiles[0].isValid ? [uploadedFiles[0]] : actualFiles;
+        // Single upload replaces the current file. Keep an invalid pick (shown under the dropzone)
+        // only when `keepRejectedFiles` is set; otherwise drop it and leave the list unchanged.
+        const [picked] = uploadedFiles;
+        newFiles = picked && (picked.isValid || keepRejectedFiles) ? [picked] : actualFiles;
       } else if (keepRejectedFiles) {
         const addable = dedupe(uploadedFiles);
         newFiles = addable.length > 0 ? [...actualFiles, ...addable] : actualFiles;

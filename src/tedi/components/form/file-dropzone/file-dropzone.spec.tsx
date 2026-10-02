@@ -92,7 +92,7 @@ describe('FileDropzone', () => {
     expect(screen.queryByText('Aggregate error')).not.toBeInTheDocument();
   });
 
-  it('still shows the aggregate error for single-file individual validation (rejected file is not listed)', () => {
+  it('suppresses the aggregate hook error for single-file keepRejectedFiles too (the kept file carries it)', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
       errorHelper: { type: 'error', text: 'Aggregate error' },
@@ -105,7 +105,7 @@ describe('FileDropzone', () => {
 
     render(<FileDropzone id="3d" name="file" label="Upload File" keepRejectedFiles />);
 
-    expect(screen.getByText('Aggregate error')).toBeInTheDocument();
+    expect(screen.queryByText('Aggregate error')).not.toBeInTheDocument();
   });
 
   it('still renders a consumer-provided error helper under the dropzone with individual validation', () => {
