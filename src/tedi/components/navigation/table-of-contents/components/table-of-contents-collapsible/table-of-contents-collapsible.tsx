@@ -97,7 +97,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
   }, [open, listElement]);
 
   const resolvedHeading = heading === undefined ? getLabel('table-of-contents.title') : heading;
-  const title = resolvedHeading ?? getLabel('table-of-contents.title');
+  const title = resolvedHeading || getLabel('table-of-contents.title');
   const navLabel = ariaLabel || title;
 
   const nodes = useMemo(() => childrenToNodes(children), [children]);

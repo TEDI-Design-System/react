@@ -31,6 +31,7 @@ Load the appropriate reference based on what you're doing:
 | WCAG audit or accessibility review | [a11y-review.md](references/a11y-review.md) |
 | Renaming, restructuring, extracting, merging | [refactoring.md](references/refactoring.md) |
 | Creating or updating Storybook stories | [stories.md](references/stories.md) |
+| Deprecating a component, removing its docs, or removing it from code | [deprecation.md](references/deprecation.md) |
 | Need to check coding patterns | [best-practices.md](references/best-practices.md) |
 | Refreshing `DESIGN.md` / `component.manifest.json` after a component or core change | [update-design-docs](../update-design-docs/SKILL.md) |
 
@@ -97,7 +98,8 @@ Also update, in the same pass:
 - `SKILL.md`'s pitfalls list when you have found a *new* way for consumers to get it wrong.
 
 **Deprecations** go in the manifest's `status` field and an `@deprecated` JSDoc tag pointing at the
-replacement, not into a hand-written list.
+replacement, not into a hand-written list. The full procedure (runtime warning, docs removal, code
+removal) is in [deprecation.md](references/deprecation.md).
 
 **Deleting entries counts.** If you fix the source so a documented trap no longer exists, or make it
 expressible in JSDoc, remove its entry from `components.md` in the same PR. That section is only

@@ -53,7 +53,8 @@ Only if the refactor changed the public API. See **SKILL.md → Consumer-Facing 
 contract.
 
 1. **Update the JSDoc** on every prop you renamed, retyped, or whose default changed. Add
-   `@deprecated` with the replacement to anything you deprecated rather than removed.
+   `@deprecated` with the replacement to anything you deprecated rather than removed. A deprecated
+   component also needs a runtime warning and the rest of step 1 in [deprecation.md](deprecation.md).
 2. **Regenerate**: `npm run design:build`. A renamed or removed component changes the manifest's
    roster; a rename also needs its `description` and `keyProps` carried over to the new entry.
    Validate with `npm test -- design-docs/ --coverage=false`.
