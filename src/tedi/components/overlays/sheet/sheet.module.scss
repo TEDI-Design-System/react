@@ -35,6 +35,9 @@ $sheet-fade-duration: 200ms;
 }
 
 .tedi-sheet__panel {
+  // Padding scale (default). Core 6.9.0 doesn't publish the semantic `--sheet-*-padding-md/-sm`
+  // tokens yet - they resolve to empty, which collapses the padding - so these use the primitive
+  // dimension tokens (1rem / 0.5rem) for now. Swap to the semantic sheet tokens once core is updated.
   --tedi-sheet-radius: var(--tedi-dimensions-13);
   --tedi-sheet-padding-x: var(--tedi-dimensions-10);
   --tedi-sheet-padding-y: var(--tedi-dimensions-05);
@@ -55,6 +58,14 @@ $sheet-fade-duration: 200ms;
   &[data-status='open'] {
     transform: translateY(0);
   }
+}
+
+.tedi-sheet__panel--padding-small {
+  // Tighter padding scale (small) - header, body and footer all read these panel-level custom
+  // properties, so the whole sheet shrinks together.
+  // TODO: uses the primitive dimension token (0.5rem) because core 6.9.0 has no `--sheet-*-padding-sm`
+  // token yet - replace with `var(--sheet-footer-padding-sm)` (and header/body) once core is updated.
+  --tedi-sheet-padding-x: var(--tedi-dimensions-05);
 }
 
 @media (prefers-reduced-motion: reduce) {

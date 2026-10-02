@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useState } from 'react';
 
+import { Icon } from '../../base/icon/icon';
+import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
+import ClosingButton from '../../buttons/closing-button/closing-button';
 import { Filter, FilterGroup } from '../../filter/filter';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { ChoiceGroup } from '../../form/choice-group/choice-group';
@@ -97,25 +100,6 @@ const MeasurementSheetContent = (): JSX.Element => (
             <Text modifiers="bold">34,23 km</Text>
           </div>
         </VerticalSpacing>
-        <Separator spacing={0} />
-        <VerticalSpacing size={0.75}>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button visualType="secondary" iconLeft="edit">
-              Muuda
-            </Button>
-            <Button visualType="secondary" iconLeft="delete">
-              Kustuta ükshaaval
-            </Button>
-          </div>
-        </VerticalSpacing>
-        <div style={{ display: 'flex', gap: '1.5rem' }}>
-          <Button visualType="link" iconLeft="undo">
-            Võta tagasi
-          </Button>
-          <Button visualType="link" iconRight="redo">
-            Võta edasi
-          </Button>
-        </div>
       </VerticalSpacing>
     </Sheet.Body>
     <Sheet.Footer
@@ -133,11 +117,61 @@ const MeasurementSheetContent = (): JSX.Element => (
   </>
 );
 
+const profileDetails = [
+  { label: 'Eesnimi', value: 'Tiina' },
+  { label: 'Sünniaeg', value: '15.08.1987' },
+  { label: 'Perekonnanimi', value: 'Tamm' },
+  { label: 'Isikukood', value: '41234567891' },
+  { label: 'Dokumendi number', value: 'AS0000226' },
+  { label: 'Sugu', value: 'Naine' },
+];
+
+const ProfileSheetContent = (): JSX.Element => (
+  <Sheet.Body>
+    <VerticalSpacing size={1.5}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+        <img
+          src="custom_accordion_1.png"
+          alt="Tiina Tamm"
+          width={120}
+          height={120}
+          style={{ borderRadius: '50%', objectFit: 'cover' }}
+        />
+        <Button visualType="secondary">Vaheta pilt</Button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        {profileDetails.map((detail) => (
+          <div key={detail.label}>
+            <Text modifiers="small" color="secondary">
+              {detail.label}
+            </Text>
+            <Text modifiers="bold">{detail.value}</Text>
+          </div>
+        ))}
+      </div>
+    </VerticalSpacing>
+  </Sheet.Body>
+);
+
 export const Default: Story = {
   render: (args) => (
     <Sheet {...args}>
       <Sheet.Trigger>
-        <Button>Ava mõõtmine</Button>
+        <Button iconLeft="person">Ava profiil</Button>
+      </Sheet.Trigger>
+      <Sheet.Content>
+        <Sheet.Header title="Profiil" variant="default" />
+        <ProfileSheetContent />
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const Measurement: Story = {
+  render: () => (
+    <Sheet>
+      <Sheet.Trigger>
+        <Button iconLeft="straighten">Ava mõõtmine</Button>
       </Sheet.Trigger>
       <Sheet.Content>
         <Sheet.Header title="Mõõtmine" variant="brand" />
@@ -147,69 +181,166 @@ export const Default: Story = {
   ),
 };
 
+const FILTER_SENDERS = [
+  { id: 'mari-maasikas', label: 'Mari Maasikas' },
+  { id: 'mait-muru', label: 'Mait Muru' },
+  { id: 'kadri-kaasik', label: 'Kadri Kaasik' },
+  { id: 'lenna-laasik', label: 'Lenna Laasik' },
+  { id: 'jaan-jogi', label: 'Jaan Jõgi' },
+  { id: 'kati-kask', label: 'Kati Kask' },
+  { id: 'arvo-aru', label: 'Arvo Aru' },
+  { id: 'tiina-tamm', label: 'Tiina Tamm' },
+  { id: 'kristjan-koppel', label: 'Kristjan Koppel' },
+];
+
 export const HeaderNotCollapsible: Story = {
   name: 'Header is not collapsible',
-  render: () => (
-    <Sheet>
-      <Sheet.Trigger>
-        <Button>Ava filtrid</Button>
-      </Sheet.Trigger>
-      <Sheet.Content>
-        <Sheet.Header title="Filtreerimine" variant="default" />
-        <Sheet.Body>
-          <VerticalSpacing size={1}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-              <Text>Saatja</Text>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Tag color="primary">2</Tag>
-                <Button visualType="neutral" icon="arrow_forward">
-                  Vali saatja
+  render: function HeaderNotCollapsible() {
+    const [step, setStep] = useState<'filters' | 'senders'>('filters');
+    const [senders, setSenders] = useState<string[]>(['mari-maasikas', 'tiina-tamm']);
+    const [query, setQuery] = useState('');
+
+    const visibleSenders = FILTER_SENDERS.filter((sender) =>
+      sender.label.toLowerCase().includes(query.trim().toLowerCase())
+    );
+
+    const toggleSender = (id: string) =>
+      setSenders((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+
+    return (
+      // Reopen always starts on the filter step; the current step is kept during the close animation.
+      <Sheet
+        onToggle={(open) => {
+          if (open) setStep('filters');
+        }}
+      >
+        <Sheet.Trigger>
+          <Button visualType="neutral" iconLeft="tune">
+            Ava filtrid
+          </Button>
+        </Sheet.Trigger>
+        <Sheet.Content>
+          {/* The header stays "Filtreeri" across both steps; back navigation lives in the footer. */}
+          <Sheet.Header title="Filtreeri" variant="default" />
+          {step === 'filters' ? (
+            <>
+              <Sheet.Body>
+                <VerticalSpacing size={1}>
+                  {/* The whole "Saatja" row is the clickable target (per Figma); it drills into the
+                      sender-selection step. */}
+                  <button
+                    type="button"
+                    onClick={() => setStep('senders')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '0.5rem',
+                      width: '100%',
+                      padding: 0,
+                      font: 'inherit',
+                      color: 'inherit',
+                      cursor: 'pointer',
+                      background: 'none',
+                      border: 'none',
+                    }}
+                  >
+                    <Text>Saatja</Text>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {senders.length > 0 && <Tag color="primary">{senders.length}</Tag>}
+                      <Icon name="arrow_forward" color="brand" />
+                    </span>
+                  </button>
+                  <Separator spacing={0} />
+                  <ChoiceGroup
+                    id="sheet-default-status"
+                    name="sheet-default-status"
+                    label="Kirjade olek"
+                    hideLabel
+                    inputType="radio"
+                    defaultValue="all"
+                    items={[
+                      { id: 'sheet-default-status-all', label: 'Kõik', value: 'all' },
+                      { id: 'sheet-default-status-unread', label: 'Ainult lugemata', value: 'unread' },
+                    ]}
+                  />
+                  <Separator spacing={0} />
+                  <ChoiceGroup
+                    id="sheet-default-sort"
+                    name="sheet-default-sort"
+                    label="Järjestus"
+                    hideLabel
+                    inputType="radio"
+                    defaultValue="unread-top"
+                    items={[
+                      { id: 'sheet-default-sort-unread', label: 'Lugemata kõige üleval', value: 'unread-top' },
+                      { id: 'sheet-default-sort-date', label: 'Kuupäeva järgi', value: 'date' },
+                    ]}
+                  />
+                </VerticalSpacing>
+              </Sheet.Body>
+              <Sheet.Footer
+                right={
+                  <Button visualType="neutral" icon="more_vert">
+                    Rohkem valikuid
+                  </Button>
+                }
+              >
+                <Sheet.Closer>
+                  <Button visualType="secondary">Tühista</Button>
+                </Sheet.Closer>
+                <Button>Rakenda</Button>
+              </Sheet.Footer>
+            </>
+          ) : (
+            <>
+              <Sheet.Body padding="none">
+                <div style={{ padding: '1rem' }}>
+                  <Search id="filter-senders-search" label="Saatja" value={query} onChange={setQuery} />
+                </div>
+                {visibleSenders.map((sender, index) => {
+                  const isSelected = senders.includes(sender.id);
+                  return (
+                    <Fragment key={sender.id}>
+                      {index > 0 && <Separator spacing={0} />}
+                      {/* Plain selectable name row - a check marks the chosen senders. */}
+                      <button
+                        type="button"
+                        onClick={() => toggleSender(sender.id)}
+                        aria-pressed={isSelected}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '1rem',
+                          width: '100%',
+                          padding: '0.75rem 1rem',
+                          font: 'inherit',
+                          textAlign: 'left',
+                          color: 'inherit',
+                          cursor: 'pointer',
+                          background: 'none',
+                          border: 'none',
+                        }}
+                      >
+                        <Text>{sender.label}</Text>
+                        {isSelected && <Icon name="check" color="brand" />}
+                      </button>
+                    </Fragment>
+                  );
+                })}
+              </Sheet.Body>
+              <Sheet.Footer align="center">
+                <Button visualType="link" iconLeft="arrow_back" onClick={() => setStep('filters')}>
+                  Tagasi
                 </Button>
-              </div>
-            </div>
-            <Separator spacing={0} />
-            <ChoiceGroup
-              id="sheet-default-status"
-              name="sheet-default-status"
-              label="Kirjade olek"
-              hideLabel
-              inputType="radio"
-              defaultValue="all"
-              items={[
-                { id: 'sheet-default-status-all', label: 'Kõik', value: 'all' },
-                { id: 'sheet-default-status-unread', label: 'Ainult lugemata', value: 'unread' },
-              ]}
-            />
-            <Separator spacing={0} />
-            <ChoiceGroup
-              id="sheet-default-sort"
-              name="sheet-default-sort"
-              label="Järjestus"
-              hideLabel
-              inputType="radio"
-              defaultValue="unread-top"
-              items={[
-                { id: 'sheet-default-sort-unread', label: 'Lugemata kõige üleval', value: 'unread-top' },
-                { id: 'sheet-default-sort-date', label: 'Kuupäeva järgi', value: 'date' },
-              ]}
-            />
-          </VerticalSpacing>
-        </Sheet.Body>
-        <Sheet.Footer
-          right={
-            <Button visualType="neutral" icon="more_vert">
-              Rohkem valikuid
-            </Button>
-          }
-        >
-          <Sheet.Closer>
-            <Button visualType="secondary">Tühista</Button>
-          </Sheet.Closer>
-          <Button>Rakenda</Button>
-        </Sheet.Footer>
-      </Sheet.Content>
-    </Sheet>
-  ),
+              </Sheet.Footer>
+            </>
+          )}
+        </Sheet.Content>
+      </Sheet>
+    );
+  },
 };
 
 export const Collapsible: Story = {
@@ -217,7 +348,9 @@ export const Collapsible: Story = {
   render: () => (
     <Sheet>
       <Sheet.Trigger>
-        <Button>Ava mõõtmine</Button>
+        <Button visualType="neutral" iconLeft="straighten">
+          Mõõtmine
+        </Button>
       </Sheet.Trigger>
       <Sheet.Content>
         <Sheet.Header title="Mõõtmine" variant="brand" collapsible />
@@ -263,6 +396,7 @@ export const WithoutActionButtons: Story = {
               label="Näita pikkusi"
               defaultChecked
             />
+            <Separator spacing={0} />
             <Checkbox id="sheet-show-angles" name="show-angles" value="angles" label="Näita nurki" />
           </VerticalSpacing>
         </Sheet.Body>
@@ -271,73 +405,211 @@ export const WithoutActionButtons: Story = {
   ),
 };
 
-const headerExample = (trigger: string, content: JSX.Element) => (
-  <Sheet key={trigger}>
-    <Sheet.Trigger>
-      <Button visualType="secondary">{trigger}</Button>
-    </Sheet.Trigger>
-    {content}
-  </Sheet>
+type HeaderTriggerVariant = 'primary' | 'secondary' | 'neutral';
+
+interface TriggerSpec {
+  /** Button text - hints at what the sheet opens (the buttons are absent from Figma, so invented). */
+  label?: string;
+  /** Leading Material icon on the trigger button. */
+  icon?: string;
+  visualType?: HeaderTriggerVariant;
+}
+
+/**
+ * A sheet trigger with the demoed example / functionality named in a caption above the button. The
+ * trigger buttons are absent from Figma, so they carry an invented, content-hinting Estonian label +
+ * icon while the caption documents the demo - the same label-above pattern is reused across the
+ * gallery stories below.
+ */
+const labeledTrigger = (caption: string, content: JSX.Element, trigger: TriggerSpec = {}) => {
+  const { label = 'Ava seaded', icon = 'tune', visualType = 'secondary' } = trigger;
+  return (
+    <VerticalSpacing size={0.25} key={caption}>
+      <Text modifiers="small" color="secondary">
+        {caption}
+      </Text>
+      <Sheet>
+        <Sheet.Trigger>
+          <Button visualType={visualType} iconLeft={icon}>
+            {label}
+          </Button>
+        </Sheet.Trigger>
+        {content}
+      </Sheet>
+    </VerticalSpacing>
+  );
+};
+
+interface HeaderExample extends TriggerSpec {
+  caption: string;
+  content: JSX.Element;
+}
+
+/**
+ * One labelled "example list" panel: a bordered card with a shared trigger-button style, so each
+ * subgroup reads as a distinct segment rather than one flat wall of identical buttons. Pass a
+ * per-example `visualType` to override the group default.
+ */
+const exampleGroup = (label: string, visualType: HeaderTriggerVariant, examples: HeaderExample[]) => (
+  <VerticalSpacing size={0.5} key={label}>
+    <Text modifiers="bold">{label}</Text>
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        gap: '0.5rem',
+        padding: '1rem',
+        border: '1px solid var(--general-border-primary)',
+        borderRadius: '0.5rem',
+      }}
+    >
+      {examples.map((ex) =>
+        labeledTrigger(ex.caption, ex.content, {
+          label: ex.label,
+          icon: ex.icon,
+          visualType: ex.visualType ?? visualType,
+        })
+      )}
+    </div>
+  </VerticalSpacing>
 );
 
-const headerBody = <Text>Kaardikihtide ja mõõtühikute seaded.</Text>;
+// Realistic gallery body - a small settings group rather than a lone sentence of filler text.
+const headerBody = (
+  <VerticalSpacing size={0.5}>
+    <Checkbox id="sheet-body-hybrid" name="sheet-body-hybrid" value="hybrid" label="Hübriidkaart" defaultChecked />
+    <Separator spacing={0} />
+    <Checkbox id="sheet-body-relief" name="sheet-body-relief" value="relief" label="Reljeef" />
+    <Separator spacing={0} />
+    <Checkbox id="sheet-body-cadastre" name="sheet-body-cadastre" value="cadastre" label="Katastriüksused" />
+  </VerticalSpacing>
+);
+
+// Leading (left) content. There's no first-class left slot - `slot` sits on the trailing side next
+// to the actions. For a leading element, pass `children` (which replaces the default title / actions
+// layout) and re-add the close button via `Sheet.Closer`; the dialog is named through
+// `aria-labelledby` pointing at the custom heading.
+const leadingTagHeader = (
+  <Sheet.Content aria-labelledby="sheet-leading-tag-title">
+    <Sheet.Header variant="default">
+      <Tag color="primary">2</Tag>
+      <Heading element="h6" modifiers="h6" id="sheet-leading-tag-title" style={{ flex: '1 1 auto', margin: 0 }}>
+        Teated
+      </Heading>
+      <Sheet.Closer>
+        <ClosingButton size="small" color="primary" />
+      </Sheet.Closer>
+    </Sheet.Header>
+    <Sheet.Body>{headerBody}</Sheet.Body>
+  </Sheet.Content>
+);
+
+const leadingBackHeader = (
+  <Sheet.Content aria-labelledby="sheet-leading-back-title">
+    <Sheet.Header variant="default">
+      <Button visualType="neutral" icon="arrow_back" aria-label="Tagasi" />
+      <Heading
+        element="h6"
+        modifiers="h6"
+        id="sheet-leading-back-title"
+        style={{ flex: '1 1 auto', margin: 0, textAlign: 'center' }}
+      >
+        Teated
+      </Heading>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Tag color="primary">2</Tag>
+        <Sheet.Closer>
+          <ClosingButton size="small" color="primary" />
+        </Sheet.Closer>
+      </div>
+    </Sheet.Header>
+    <Sheet.Body>{headerBody}</Sheet.Body>
+  </Sheet.Content>
+);
 
 export const Header: Story = {
   render: () => (
-    <VerticalSpacing size={2}>
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Variant</Text>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-          {headerExample(
-            'Primary',
+    <VerticalSpacing size={1.5}>
+      {exampleGroup('Variant', 'secondary', [
+        {
+          caption: 'Primary',
+          label: 'Kaardi seaded',
+          icon: 'tune',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Brand',
+          ),
+        },
+        {
+          caption: 'Brand',
+          label: 'Mõõtmine',
+          icon: 'straighten',
+          visualType: 'primary',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="brand" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-        </div>
-      </VerticalSpacing>
-
-      <VerticalSpacing size={0.5}>
-        <Text modifiers="bold">Type</Text>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-          {headerExample(
-            'Default',
+          ),
+        },
+      ])}
+      {exampleGroup('Type', 'primary', [
+        {
+          caption: 'Default',
+          label: 'Seaded',
+          icon: 'settings',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Collapsible',
+          ),
+        },
+        {
+          caption: 'Collapsible',
+          label: 'Kihid',
+          icon: 'layers',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" collapsible />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Title center',
+          ),
+        },
+      ])}
+      {exampleGroup('Title', 'secondary', [
+        {
+          caption: 'Title center',
+          label: 'Marsruut',
+          icon: 'route',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" centerTitle />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Without closing button',
+          ),
+        },
+      ])}
+      {exampleGroup('Closing button', 'neutral', [
+        {
+          caption: 'Without closing button',
+          label: 'Teavitused',
+          icon: 'notifications',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" centerTitle closeButton={false} />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Different closing button',
+          ),
+        },
+        {
+          caption: 'Different closing button',
+          label: 'Ekspordi',
+          icon: 'download',
+          content: (
             <Sheet.Content>
               <Sheet.Header
                 title="Seaded"
@@ -354,9 +626,15 @@ export const Header: Story = {
               />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Extra action',
+          ),
+        },
+      ])}
+      {exampleGroup('Actions & slot', 'secondary', [
+        {
+          caption: 'Extra action',
+          label: 'Metsateatised',
+          icon: 'forest',
+          content: (
             <Sheet.Content>
               <Sheet.Header
                 title="Seaded"
@@ -370,30 +648,46 @@ export const Header: Story = {
               />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'With slot',
+          ),
+        },
+        {
+          caption: 'With slot',
+          label: 'Teated',
+          icon: 'mail',
+          content: (
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" slot={<Tag color="primary">2</Tag>} />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'With handle',
+          ),
+        },
+        { caption: 'Leading tag', label: 'Teated', icon: 'mail', content: leadingTagHeader },
+        { caption: 'Leading back button', label: 'Teadete filter', icon: 'filter_list', content: leadingBackHeader },
+      ])}
+      {exampleGroup('Handle', 'neutral', [
+        {
+          caption: 'With handle',
+          label: 'Kaardikihid',
+          icon: 'layers',
+          content: (
             <Sheet.Content showHandle>
               <Sheet.Header title="Seaded" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-          {headerExample(
-            'Without handle',
+          ),
+        },
+        {
+          caption: 'Without handle',
+          label: 'Kaardikihid',
+          icon: 'layers',
+          content: (
             <Sheet.Content showHandle={false}>
               <Sheet.Header title="Seaded" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
-          )}
-        </div>
-      </VerticalSpacing>
+          ),
+        },
+      ])}
     </VerticalSpacing>
   ),
 };
@@ -402,12 +696,10 @@ export const FooterActions: Story = {
   render: () => {
     const alignments = ['left', 'center', 'right'] as const;
     return (
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-        {alignments.map((align) => (
-          <Sheet key={align}>
-            <Sheet.Trigger>
-              <Button visualType="secondary">align=&quot;{align}&quot;</Button>
-            </Sheet.Trigger>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: '0.5rem' }}>
+        {alignments.map((align) =>
+          labeledTrigger(
+            `align="${align}"`,
             <Sheet.Content>
               <Sheet.Header title="Seaded" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
@@ -417,13 +709,12 @@ export const FooterActions: Story = {
                 </Sheet.Closer>
                 <Button>Salvesta</Button>
               </Sheet.Footer>
-            </Sheet.Content>
-          </Sheet>
-        ))}
-        <Sheet key="full-width">
-          <Sheet.Trigger>
-            <Button visualType="secondary">fullWidth</Button>
-          </Sheet.Trigger>
+            </Sheet.Content>,
+            { label: 'Vaate seaded', icon: 'tune' }
+          )
+        )}
+        {labeledTrigger(
+          'fullWidth',
           <Sheet.Content>
             <Sheet.Header title="Seaded" variant="default" />
             <Sheet.Body>{headerBody}</Sheet.Body>
@@ -433,12 +724,11 @@ export const FooterActions: Story = {
               </Sheet.Closer>
               <Button>Salvesta</Button>
             </Sheet.Footer>
-          </Sheet.Content>
-        </Sheet>
-        <Sheet key="split">
-          <Sheet.Trigger>
-            <Button visualType="secondary">split (right)</Button>
-          </Sheet.Trigger>
+          </Sheet.Content>,
+          { label: 'Vaate seaded', icon: 'tune' }
+        )}
+        {labeledTrigger(
+          'split (right)',
           <Sheet.Content>
             <Sheet.Header title="Seaded" variant="default" />
             <Sheet.Body>{headerBody}</Sheet.Body>
@@ -454,8 +744,9 @@ export const FooterActions: Story = {
               </Sheet.Closer>
               <Button>Salvesta</Button>
             </Sheet.Footer>
-          </Sheet.Content>
-        </Sheet>
+          </Sheet.Content>,
+          { label: 'Vaate seaded', icon: 'tune' }
+        )}
       </div>
     );
   },
@@ -463,27 +754,53 @@ export const FooterActions: Story = {
 
 export const Radius: Story = {
   render: () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-      {(['default', 'card', 'none'] as const).map((radius) => (
-        <Sheet key={radius}>
-          <Sheet.Trigger>
-            <Button visualType="secondary">radius=&quot;{radius}&quot;</Button>
-          </Sheet.Trigger>
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: '0.5rem' }}>
+      {(['default', 'card', 'none'] as const).map((radius) =>
+        labeledTrigger(
+          `radius="${radius}"`,
           <Sheet.Content radius={radius}>
             <Sheet.Header title="Seaded" variant="default" />
             <Sheet.Body>{headerBody}</Sheet.Body>
-          </Sheet.Content>
-        </Sheet>
-      ))}
-      <Sheet key="responsive">
-        <Sheet.Trigger>
-          <Button visualType="secondary">none → card @ md</Button>
-        </Sheet.Trigger>
+          </Sheet.Content>,
+          { label: 'Kaardi stiil', icon: 'map' }
+        )
+      )}
+      {labeledTrigger(
+        'none → card @ md',
         <Sheet.Content radius="none" md={{ radius: 'card' }}>
           <Sheet.Header title="Seaded" variant="default" />
           <Sheet.Body>{headerBody}</Sheet.Body>
-        </Sheet.Content>
-      </Sheet>
+        </Sheet.Content>,
+        { label: 'Kaardi stiil', icon: 'map' }
+      )}
+    </div>
+  ),
+};
+
+/**
+ * **Padding.** `Sheet.Content`'s `padding` sets the sheet-wide padding scale - header, body and
+ * footer tighten together: `default` (1rem) or `small` (0.5rem). For edge-to-edge body content,
+ * reach for `Sheet.Body padding="none"` instead.
+ */
+export const Padding: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: '0.5rem' }}>
+      {(['default', 'small'] as const).map((padding) =>
+        labeledTrigger(
+          `padding="${padding}"`,
+          <Sheet.Content padding={padding}>
+            <Sheet.Header title="Seaded" variant="default" slot={<Tag color="primary">2</Tag>} />
+            <Sheet.Body>{headerBody}</Sheet.Body>
+            <Sheet.Footer>
+              <Sheet.Closer>
+                <Button visualType="secondary">Tühista</Button>
+              </Sheet.Closer>
+              <Button>Salvesta</Button>
+            </Sheet.Footer>
+          </Sheet.Content>,
+          { label: 'Vaate seaded', icon: 'tune' }
+        )
+      )}
     </div>
   ),
 };
@@ -499,23 +816,28 @@ export const EdgeToEdge: Story = {
         <Sheet.Content>
           <Sheet.Header title="Tegevused" variant="default" />
           <Sheet.Body padding="none">
-            <Sheet.Closer>
-              <Button visualType="neutral" fullWidth iconLeft="download">
-                Laadi alla
-              </Button>
-            </Sheet.Closer>
-            <Separator spacing={0} />
-            <Sheet.Closer>
-              <Button visualType="neutral" fullWidth iconLeft="share">
-                Jaga
-              </Button>
-            </Sheet.Closer>
-            <Separator spacing={0} />
-            <Sheet.Closer>
-              <Button visualType="neutral" fullWidth iconLeft="delete">
-                Kustuta
-              </Button>
-            </Sheet.Closer>
+            {/* Edge-to-edge action list: full-width neutral buttons, left-aligned (icon + label) so
+                the rows read like menu items. Neutral buttons have no horizontal padding, so add the
+                sheet's standard 1rem inset to keep the content off the edge. */}
+            {[
+              { icon: 'download', label: 'Laadi alla' },
+              { icon: 'share', label: 'Jaga' },
+              { icon: 'delete', label: 'Kustuta' },
+            ].map((action, index) => (
+              <Fragment key={action.label}>
+                {index > 0 && <Separator spacing={0} />}
+                <Sheet.Closer>
+                  <Button
+                    visualType="neutral"
+                    fullWidth
+                    iconLeft={action.icon}
+                    style={{ justifyContent: 'flex-start', paddingLeft: '1rem', paddingRight: '1rem' }}
+                  >
+                    {action.label}
+                  </Button>
+                </Sheet.Closer>
+              </Fragment>
+            ))}
           </Sheet.Body>
         </Sheet.Content>
       </Sheet>
@@ -612,7 +934,9 @@ function LayerListSheet(): JSX.Element {
       <Sheet.Trigger>
         <Button visualType="secondary">Teemakaart</Button>
       </Sheet.Trigger>
-      <Sheet.Content>
+      {/* minHeight keeps the sheet from collapsing as the search narrows the result list - the dev
+          opts into a stable height instead of the sheet shrinking to its content. */}
+      <Sheet.Content minHeight="60dvh">
         <Sheet.Header title="Teemakaart" variant="default" />
         <Sheet.Body padding="none">
           <div style={{ padding: '1rem' }}>
@@ -664,7 +988,8 @@ function LayerListSheet(): JSX.Element {
                   )}
                 </div>
                 {isExpanded && layer.description && (
-                  <div style={{ padding: '0 1rem 1rem' }}>
+                  // Top padding so the expanded detail isn't cramped against the row that toggles it.
+                  <div style={{ padding: '0.5rem 1rem 1rem' }}>
                     <Text element="p" modifiers="small" color="secondary">
                       {layer.description}
                     </Text>
@@ -765,12 +1090,13 @@ export const KeepMounted: Story = {
 };
 
 /**
- * **Non-modal peek.** `showOverlay`, `trapFocus` and `lockScroll` off (plus
- * `closeOnBackdropClick={false}`) keep a `collapsible` sheet docked as a header peek while the page
- * behind stays usable and clicks don't dismiss it.
+ * **Docked peek.** With `showOverlay`, `trapFocus` and `lockScroll` off (plus
+ * `closeOnBackdropClick={false}`), a `collapsible` sheet stays docked as a header peek while the page
+ * behind stays fully usable and clicks don't dismiss it (a non-modal sheet).
  */
-export const NonModalPeek: Story = {
-  render: function NonModalPeek() {
+export const DockedPeek: Story = {
+  name: 'Docked peek',
+  render: function DockedPeek() {
     return (
       <VerticalSpacing size={1}>
         <Sheet closeOnBackdropClick={false}>
@@ -813,8 +1139,8 @@ const PLACES: ISelectOption[] = [
 
 /**
  * A larger desktop layout: a table-style input view inside the sheet. The header carries an extra
- * fullscreen action alongside collapse / close, and the footer splits an **Lisa rida** link on the
- * start edge from the grouped **Tühista** / **Salvesta** actions on the end.
+ * fullscreen action alongside collapse / close, and the footer groups the **Lisa rida** link
+ * together with the **Tühista** / **Salvesta** actions on the end edge.
  */
 export const DesktopTable: Story = {
   name: 'Desktop table input',
@@ -854,16 +1180,7 @@ export const DesktopTable: Story = {
               ))}
             </VerticalSpacing>
           </Sheet.Body>
-          <Sheet.Footer
-            right={
-              <>
-                <Sheet.Closer>
-                  <Button visualType="secondary">Tühista</Button>
-                </Sheet.Closer>
-                <Button>Salvesta</Button>
-              </>
-            }
-          >
+          <Sheet.Footer align="right">
             <Button
               visualType="link"
               iconLeft="add"
@@ -871,6 +1188,10 @@ export const DesktopTable: Story = {
             >
               Lisa rida
             </Button>
+            <Sheet.Closer>
+              <Button visualType="secondary">Tühista</Button>
+            </Sheet.Closer>
+            <Button>Salvesta</Button>
           </Sheet.Footer>
         </Sheet.Content>
       </Sheet>

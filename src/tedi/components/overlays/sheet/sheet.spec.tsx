@@ -541,6 +541,26 @@ describe('Sheet', () => {
     expect(document.querySelector('[class*="tedi-sheet__body--no-padding"]')).toBeInTheDocument();
   });
 
+  it('tightens the sheet padding when padding="small"', () => {
+    const { rerender } = render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(document.querySelector('[class*="tedi-sheet__panel--padding-small"]')).not.toBeInTheDocument();
+
+    rerender(
+      <Sheet defaultOpen>
+        <Sheet.Content padding="small">
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(document.querySelector('[class*="tedi-sheet__panel--padding-small"]')).toBeInTheDocument();
+  });
+
   it('applies minHeight and maxHeight to the panel', () => {
     render(
       <Sheet defaultOpen>

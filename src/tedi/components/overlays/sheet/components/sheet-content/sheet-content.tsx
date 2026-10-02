@@ -119,6 +119,16 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   maxHeight?: CSSProperties['maxHeight'];
   /**
+   * Padding scale for the whole sheet - header, body and footer tighten together.
+   * - `default` - the standard sheet padding (`1rem`).
+   * - `small` - a denser layout (`0.5rem`), for compact or data-heavy sheets.
+   *
+   * Note: this is the sheet-wide padding *size*. To drop body padding entirely (edge-to-edge
+   * content) use `Sheet.Body`'s own `padding="none"`.
+   * @default default
+   */
+  padding?: 'default' | 'small';
+  /**
    * Additional class name on the sheet panel.
    */
   className?: string;
@@ -144,6 +154,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     initialFocus,
     minHeight,
     maxHeight,
+    padding = 'default',
     className,
     style,
   } = props;
@@ -216,7 +227,11 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
 
   if (!isMounted && !keepMounted) return null;
 
-  const panelClassName = cn(styles['tedi-sheet__panel'], className);
+  const panelClassName = cn(
+    styles['tedi-sheet__panel'],
+    { [styles['tedi-sheet__panel--padding-small']]: padding === 'small' },
+    className
+  );
 
   const active = isMounted;
 

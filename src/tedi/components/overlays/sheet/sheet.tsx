@@ -73,8 +73,8 @@ export const Sheet = (props: SheetProps): JSX.Element => {
   );
 
   useEffect(() => {
-    if (!isOpen && collapsed) setCollapsed(false);
-  }, [isOpen, collapsed]);
+    if (isOpen) setCollapsed(false);
+  }, [isOpen]);
 
   const { refs, context } = useFloating({
     open: isOpen,

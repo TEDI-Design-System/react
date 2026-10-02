@@ -97,8 +97,8 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
             {collapsible && (
               <CollapseButton
                 hideText
-                open={collapsed}
-                onOpenChange={onCollapsedChange}
+                open={!collapsed}
+                onOpenChange={(next) => onCollapsedChange(!next)}
                 inverted={variant === 'brand'}
                 aria-label={getLabel(collapsed ? 'sheet.expand' : 'sheet.collapse')}
               />
