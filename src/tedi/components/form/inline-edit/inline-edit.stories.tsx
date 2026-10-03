@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Card, CardContent } from '../../content/card';
 import { Label } from '../../content/label/label';
@@ -321,8 +322,12 @@ export const Sizes: Story = {
     <div className="example-list">
       {sizeArray.map((size, key) => (
         <Row className={`${key === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={size}>
-          <Col className="flex align-items-center w-50 text-capitalize">{size}</Col>
-          <Col className="flex align-items-center gap-3">
+          <Col xs={12} md={2} className="flex align-items-center">
+            <Text modifiers="bold" className="text-capitalize">
+              {size}
+            </Text>
+          </Col>
+          <Col xs={12} md={10} className="flex flex-column flex-md-row gap-3">
             <NameInline id={`ie-size-${size}-text`} size={size} />
             <CountryInline id={`ie-size-${size}-select`} size={size} />
           </Col>
@@ -585,96 +590,60 @@ export const States: Story = {
       return <Story />;
     },
   ],
-  render: () => (
-    <VerticalSpacing>
-      <Row>
-        <Col width={2}>&nbsp;</Col>
-        <Col>
-          <Text modifiers="bold">Text field</Text>
-        </Col>
-        <Col>
-          <Text modifiers="bold">Select</Text>
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Default</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-default-text" fullWidth />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-default-select" fullWidth />
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Hover</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-hover-text" fullWidth />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-hover-select" fullWidth />
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Active</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-active-text" fullWidth />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-active-select" fullWidth />
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Focus</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-focus-text" fullWidth />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-focus-select" fullWidth />
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Error</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-invalid-text" fullWidth helper={{ text: 'Nimi on kohustuslik', type: 'error' }} />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-invalid-select" fullWidth helper={{ text: 'Vali riik', type: 'error' }} />
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Read-only</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-readonly-text" fullWidth readOnly />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-readonly-select" fullWidth readOnly />
-        </Col>
-      </Row>
-      <Row>
-        <Col width={2}>
-          <Text modifiers="bold">Disabled</Text>
-        </Col>
-        <Col>
-          <NameInline id="ie-state-disabled-text" fullWidth disabled />
-        </Col>
-        <Col>
-          <CountryInline id="ie-state-disabled-select" fullWidth disabled />
-        </Col>
-      </Row>
-    </VerticalSpacing>
-  ),
+  render: function States() {
+    const breakpoint = useBreakpoint();
+    const isMobile = isBreakpointBelow(breakpoint, 'md');
+
+    const stateRows: {
+      label: string;
+      key: string;
+      shared?: { readOnly?: boolean; disabled?: boolean };
+      textProps?: { helper?: FeedbackTextProps };
+      selectProps?: { helper?: FeedbackTextProps };
+    }[] = [
+      { label: 'Default', key: 'default' },
+      { label: 'Hover', key: 'hover' },
+      { label: 'Active', key: 'active' },
+      { label: 'Focus', key: 'focus' },
+      {
+        label: 'Error',
+        key: 'invalid',
+        textProps: { helper: { text: 'Nimi on kohustuslik', type: 'error' } },
+        selectProps: { helper: { text: 'Vali riik', type: 'error' } },
+      },
+      { label: 'Read-only', key: 'readonly', shared: { readOnly: true } },
+      { label: 'Disabled', key: 'disabled', shared: { disabled: true } },
+    ];
+
+    return (
+      <VerticalSpacing>
+        {!isMobile && (
+          <Row>
+            <Col md={2}>&nbsp;</Col>
+            <Col md={5}>
+              <Text modifiers="bold">Text field</Text>
+            </Col>
+            <Col md={5}>
+              <Text modifiers="bold">Select</Text>
+            </Col>
+          </Row>
+        )}
+        {stateRows.map((row) => (
+          <Row key={row.key} gutterY={2} md={{ gutterY: 0 }}>
+            <Col xs={12} md={2}>
+              <Text modifiers="bold">{row.label}</Text>
+            </Col>
+            <Col xs={12} md={5}>
+              <NameInline id={`ie-state-${row.key}-text`} fullWidth {...row.shared} {...row.textProps} />
+            </Col>
+            <Col xs={12} md={5}>
+              <CountryInline id={`ie-state-${row.key}-select`} fullWidth {...row.shared} {...row.selectProps} />
+            </Col>
+          </Row>
+        ))}
+      </VerticalSpacing>
+    );
+  },
 };
 
 /**

@@ -111,6 +111,14 @@
   flex: none;
 }
 
+.tedi-inline-edit__trigger .tedi-inline-edit__icon {
+  color: var(--button-main-neutral-text-default);
+}
+
+.tedi-inline-edit__trigger:active:not(:disabled) .tedi-inline-edit__icon {
+  display: none;
+}
+
 .tedi-inline-edit__value {
   overflow: hidden;
   text-overflow: ellipsis;

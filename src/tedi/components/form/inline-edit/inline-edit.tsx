@@ -313,7 +313,7 @@ export function InlineEdit<T>({
         {empty ? placeholder : display}
       </span>
       {!hideEditIcon && (
-        <Icon name="edit" size={18} color="brand" aria-hidden className={styles['tedi-inline-edit__icon']} />
+        <Icon name="edit" size={18} color="inherit" aria-hidden className={styles['tedi-inline-edit__icon']} />
       )}
     </button>
   );
