@@ -162,12 +162,17 @@
     },
     {
       "id": "content/table-card",
-      "name": null,
+      "name": "TableCard",
       "category": "content",
       "sourcePath": "src/tedi/components/content/table-card",
       "status": [],
-      "description": null,
-      "keyProps": []
+      "description": "Turn a single table row into a stacked card of label / value pairs — the readable mobile counterpart of a Table.",
+      "keyProps": [
+        "rows",
+        "layout",
+        "columns",
+        "labelWidth"
+      ]
     },
     {
       "id": "content/calendar/calendar",
@@ -601,7 +606,9 @@
       "name": "TableOfContents",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/table-of-contents",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Navigational table of contents for long pages or multistep forms, composed from nestable TableOfContents.Item entries.",
       "keyProps": [
         "activeId",
@@ -625,21 +632,29 @@
     },
     {
       "id": "navigation/vertical-stepper",
-      "name": null,
+      "name": "VerticalStepper",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/vertical-stepper",
       "status": [],
-      "description": null,
-      "keyProps": []
+      "description": "Render a vertical multi-step progress indicator with auto-numbered, selectable VerticalStepper.Item steps.",
+      "keyProps": [
+        "children",
+        "compact"
+      ]
     },
     {
       "id": "navigation/card-stepper",
-      "name": null,
+      "name": "CardStepper",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/card-stepper",
       "status": [],
-      "description": null,
-      "keyProps": []
+      "description": "Compact single-card stepper showing the active step, an N / M counter, a segmented progress bar and navigation.",
+      "keyProps": [
+        "steps",
+        "activeStep",
+        "onStepChange",
+        "showNavigation"
+      ]
     },
     {
       "id": "form/textfield/textfield",
@@ -737,6 +752,21 @@
         "button",
         "suggestions",
         "onSuggestionSelect"
+      ]
+    },
+    {
+      "id": "form/inline-edit/inline-edit",
+      "name": "InlineEdit",
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/inline-edit/inline-edit",
+      "status": [],
+      "description": "Edit-in-place field: shows a value that becomes an inline editor on click. Control-agnostic via a children render function.",
+      "keyProps": [
+        "label",
+        "value",
+        "onChange",
+        "renderValue",
+        "children"
       ]
     },
     {
