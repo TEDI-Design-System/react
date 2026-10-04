@@ -601,7 +601,9 @@
       "name": "TableOfContents",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/table-of-contents",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Navigational table of contents for long pages or multistep forms, composed from nestable TableOfContents.Item entries.",
       "keyProps": [
         "activeId",
@@ -744,7 +746,9 @@
       "name": "Radio",
       "category": "form",
       "sourcePath": "src/tedi/components/form/radio",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Single-select radio input with a label and helper text; supports a selectable card variant and grouping via Radio.Group.",
       "keyProps": [
         "id",
@@ -852,7 +856,9 @@
       "name": "Checkbox",
       "category": "form",
       "sourcePath": "src/tedi/components/form/checkbox",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Checkbox input with a label and helper text; supports an indeterminate state, a selectable card variant, and grouping via Checkbox.Group.",
       "keyProps": [
         "id",
@@ -1156,6 +1162,17 @@
         "icon",
         "indicatorSemantics"
       ]
+    },
+    {
+      "id": "form/rating/rating",
+      "name": null,
+      "category": "form",
+      "sourcePath": "src/tedi/components/form/rating/rating",
+      "status": [
+        "breakpointSupport"
+      ],
+      "description": null,
+      "keyProps": []
     },
     {
       "id": "layout/sidenav",

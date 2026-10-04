@@ -133,7 +133,9 @@ files. This is the part of this document worth maintaining by hand.
   keyboard-navigable (arrow keys) and form-submittable like any radio group. `value` is **1-based**
   (`0` = no rating), and `type` changes the fill: `star` / `number` fill cumulatively up to the
   value, while `icon` highlights only the single selected item (defaults to the five sentiment
-  faces at `count={5}`).
+  faces at `count={5}`). Pass `readOnly` for a compact aggregate summary (or `readOnlyVariant="scale"`
+  for a fractional star scale with `ratingsCount`), and `orientation` is breakpoint-aware
+  (`orientation="vertical" md={{ orientation: 'horizontal' }}`) for narrow layouts.
 
 ### Composition constraints
 

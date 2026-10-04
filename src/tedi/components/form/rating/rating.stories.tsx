@@ -146,7 +146,9 @@ export const States: Story = {
             <table style={{ borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  <th />
+                  <th>
+                    <span className="sr-only">State</span>
+                  </th>
                   <th style={cell}>
                     <Text modifiers="bold">Default</Text>
                   </th>
