@@ -99,6 +99,19 @@ describe('TableOfContents.Collapsible', () => {
     expect(within(dialog).getByRole('navigation', { name: 'Sisukord' })).toBeInTheDocument();
   });
 
+  it('falls back to the localised title for the nav landmark when heading is an empty string', () => {
+    render(
+      <TableOfContents.Collapsible heading="" activeId="x">
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents.Collapsible>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
+  });
+
   it('names the sheet navigation with ariaLabel, taking precedence over the heading', () => {
     render(
       <TableOfContents.Collapsible heading="Sisukord" ariaLabel="Section navigation">

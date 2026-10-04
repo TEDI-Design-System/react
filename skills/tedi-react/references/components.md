@@ -152,6 +152,17 @@ files. This is the part of this document worth maintaining by hand.
   prop. Children win when both are given.
 - **`TableOfContents.Item` children must be direct children.** Don't wrap them in another
   component. Pass `underline={false}` on the `Link` inside an item to match the design.
+- **`Checkbox` / `Radio` pair with `Checkbox.Group` / `Radio.Group`.** The `.Group` owns selection
+  (`value` / `onChange`) and the shared props (`variant`, `size`, `name`); items inside inherit
+  `name` and auto-generate their `id`, so don't hand-wire those. `variant="card"` + `layout`
+  (`separated` / `segmented`) switches to the card styling, and `Checkbox.Group`'s `indeterminateCheck`
+  adds a select-all whose checkbox shows the indeterminate ("some selected") state.
+- **`TableOfContents`'s `scrollActiveIntoView` needs a scroll container to do anything.** It keeps
+  the active row visible as `activeId` changes, but only ever scrolls the TOC's *own* scroll area —
+  never the page. That area is the sticky card (`sticky` is on by default) or, when `sticky={false}`,
+  a scrollable wrapper *you* put around the component. With neither, there's nothing to scroll and the
+  prop is a no-op. It reacts only to genuine `activeId` transitions (not the initial render), scrolls
+  the active row itself (not its expanded children), and respects `prefers-reduced-motion`.
 - **`TableCard`'s `collapsible` needs a `title`.** The header becomes the disclosure toggle; `rows`,
   `summary` and `children` collapse together while the `actions` footer stays visible. `layout`
   (`horizontal` key/value vs `vertical` stacked) and the column / grid props are breakpoint-aware.
@@ -179,6 +190,12 @@ files. This is the part of this document worth maintaining by hand.
   `TextField` with `input={{ type: 'password' }}`. The `input` prop's own JSDoc ("Additional
   attributes for the input element") does not tell you this is the *only* route.
 - **`Textarea`, not `TextArea`.** Renamed; the old casing is gone.
+- **`showClearOnInteraction` reveals the clear (×) only on hover/focus/active** (keyboard focus
+  included), once the field is clearable and filled — instead of showing it whenever there's a value.
+  It's a top-level prop on `TextField`, `Search`, `MultiValueField` and `Select`; on `DateField` /
+  `TimeField` / `DateTimeField` pass it via `inputProps={{ showClearOnInteraction: true }}`. On
+  `Select` it *also* needs `isClearIndicatorVisible` (Select hides it by default). `Textarea` has no
+  clear button, so it doesn't take it.
 - **File rejections are observable.** A file failing `accept` or `maxSize` surfaces a localised
   message whether it was dragged or picked, and `onChange` fires even for a fully-rejected drop
   (with the unchanged list), so single-file rejections aren't silent. Don't re-implement validation

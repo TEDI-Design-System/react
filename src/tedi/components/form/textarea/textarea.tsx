@@ -5,7 +5,8 @@ import { FeedbackTextProps } from '../feedback-text/feedback-text';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './textarea.module.scss';
 
-export interface TextareaProps extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'onClear'> {
+export interface TextareaProps
+  extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'showClearOnInteraction' | 'onClear'> {
   /**
    * Maximum number of characters allowed in the textarea.
    */
@@ -96,19 +97,28 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     const paddingTop = parseFloat(computedStyle.paddingTop);
     const paddingBottom = parseFloat(computedStyle.paddingBottom);
 
+    // With border-box sizing the border is part of the height; leaving it out makes the box 2px too short
+    const borderHeight =
+      computedStyle.boxSizing === 'border-box'
+        ? (parseFloat(computedStyle.borderTopWidth) || 0) + (parseFloat(computedStyle.borderBottomWidth) || 0)
+        : 0;
+
+    // Reset height so scrollHeight reflects the content, not the current box — otherwise it can never shrink
+    textarea.style.height = 'auto';
     const scrollHeight = textarea.scrollHeight;
     const contentHeight = scrollHeight - paddingTop - paddingBottom;
 
-    let rowCount = Math.ceil(contentHeight / lineHeight);
+    // 1px tolerance: scrollHeight is rounded, so fractional line heights shouldn't add a phantom row
+    const contentRows = Math.ceil((contentHeight - 1) / lineHeight);
+    const rowCount = Math.min(Math.max(contentRows, minRows), maxRows);
 
-    rowCount = Math.min(Math.max(rowCount, minRows), maxRows);
-
-    const nextHeight = `${rowCount * lineHeight + paddingTop + paddingBottom}px`;
+    const nextHeight = `${rowCount * lineHeight + paddingTop + paddingBottom + borderHeight}px`;
     textarea.style.height = nextHeight;
     setTextareaHeight(nextHeight);
 
     textarea.style.overflow = originalOverflow;
-    textarea.style.overflowY = textarea.scrollHeight > textarea.clientHeight ? 'auto' : 'hidden';
+    // Only scroll once content overflows (past maxRows, or clipped by maxHeight); 1px tolerance for rounding
+    textarea.style.overflowY = textarea.scrollHeight - textarea.clientHeight > 1 ? 'auto' : 'hidden';
   }, [autoGrow, minRows, maxRows]);
 
   useEffect(() => {
@@ -123,6 +133,25 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     if (autoGrow && textareaRef.current) {
       calculateHeight();
     }
+  }, [autoGrow, calculateHeight]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!autoGrow || !textarea || typeof ResizeObserver === 'undefined') return undefined;
+
+    // Recalculate when the width changes (e.g. window resize), since line wrapping depends on it
+    let lastWidth = textarea.clientWidth;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      // Record every width (including 0 while hidden), so showing it again at the same width still recalculates
+      const widthChanged = width !== lastWidth;
+      lastWidth = width;
+      if (width > 0 && widthChanged) {
+        calculateHeight();
+      }
+    });
+    observer.observe(textarea);
+    return () => observer.disconnect();
   }, [autoGrow, calculateHeight]);
 
   const handleRef = React.useCallback(

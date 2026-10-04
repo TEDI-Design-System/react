@@ -7,9 +7,8 @@
      (.sb-show-main) can be shorter than the content, exposing the iframe's default grey behind it.
      Painting <html> makes the surface propagate across the whole scroll area; !important beats
      Storybook's own preview body background. The token resolves per the theme class on <html>. */
-  html,
-  body {
-    min-height: 100vh;
+  html.tedi-theme--default,
+  html.tedi-theme--dark {
     background-color: var(--general-surface-primary) !important;
   }
 

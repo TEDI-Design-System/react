@@ -64,7 +64,8 @@ describe('FileDropzone', () => {
   it('renders the dropzone with an error message', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
-      uploadErrorHelper: { type: 'error', text: 'Error message' },
+      errorHelper: { type: 'error', text: 'Error message' },
+      restrictionsHint: undefined,
       onFileChange: jest.fn(),
       onFileRemove: jest.fn(),
       handleClear: jest.fn(),
@@ -73,6 +74,61 @@ describe('FileDropzone', () => {
 
     render(<FileDropzone id="3" name="file" label="Upload File" />);
     expect(screen.getByText('Error message')).toBeInTheDocument();
+  });
+
+  it('does not render the aggregate hook error under the dropzone with individual validation', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [],
+      errorHelper: { type: 'error', text: 'Aggregate error' },
+      restrictionsHint: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(<FileDropzone id="3b" name="file" label="Upload File" multiple validateIndividually />);
+
+    expect(screen.queryByText('Aggregate error')).not.toBeInTheDocument();
+  });
+
+  it('still shows the aggregate error for single-file individual validation (rejected file is not listed)', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [],
+      errorHelper: { type: 'error', text: 'Aggregate error' },
+      restrictionsHint: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(<FileDropzone id="3d" name="file" label="Upload File" validateIndividually />);
+
+    expect(screen.getByText('Aggregate error')).toBeInTheDocument();
+  });
+
+  it('still renders a consumer-provided error helper under the dropzone with individual validation', () => {
+    mockUseFileUpload.mockReturnValue({
+      innerFiles: [],
+      errorHelper: undefined,
+      restrictionsHint: undefined,
+      onFileChange: jest.fn(),
+      onFileRemove: jest.fn(),
+      handleClear: jest.fn(),
+      fileInputRef: { current: null },
+    });
+
+    render(
+      <FileDropzone
+        id="3c"
+        name="file"
+        label="Upload File"
+        validateIndividually
+        helper={{ type: 'error', text: 'Required' }}
+      />
+    );
+    expect(screen.getByText('Required')).toBeInTheDocument();
   });
 
   it('gives each instance a unique helper association when no id is provided', () => {
@@ -102,10 +158,11 @@ describe('FileDropzone', () => {
     expect(firstDescribedBy).not.toBe(secondDescribedBy);
   });
 
-  it('applies invalid styling that matches the shown feedback, even with the hook default hint present', () => {
+  it('shows the error and the restrictions hint together, with invalid styling', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
-      uploadErrorHelper: { type: 'hint', text: 'Max 1 MB' },
+      errorHelper: undefined,
+      restrictionsHint: { type: 'hint', text: 'Max 1 MB' },
       onFileChange: jest.fn(),
       onFileRemove: jest.fn(),
       handleClear: jest.fn(),
@@ -114,7 +171,9 @@ describe('FileDropzone', () => {
 
     render(<FileDropzone id="9" name="file" label="Upload File" helper={{ type: 'error', text: 'Required' }} />);
 
+    // Both lines render: the red error and the gray restrictions hint.
     expect(screen.getByText('Required')).toBeInTheDocument();
+    expect(screen.getByText('Max 1 MB')).toBeInTheDocument();
     expect(screen.getByRole('button')).toHaveClass('tedi-file-dropzone--invalid');
   });
 
@@ -173,6 +232,13 @@ describe('FileDropzone', () => {
     );
 
     expect(onFileChange).not.toHaveBeenCalled();
+  });
+
+  it('forwards showRestrictions to the upload hook and never leaks it to the DOM', () => {
+    const { container } = render(<FileDropzone id="sr" name="file" label="Upload File" showRestrictions={false} />);
+
+    expect(mockUseFileUpload).toHaveBeenCalledWith(expect.objectContaining({ showRestrictions: false }));
+    expect(container.querySelector('[showrestrictions]')).toBeNull();
   });
 
   it('exposes the dropzone as a button whose description is wired to the helper', () => {

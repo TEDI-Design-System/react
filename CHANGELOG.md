@@ -1,3 +1,88 @@
+# [19.2.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.8...react-19.2.0-rc.9) (2026-10-01)
+
+
+### Bug Fixes
+
+* **textarea:** fix autoGrow height not following content [#946](https://github.com/TEDI-Design-System/react/issues/946) ([#947](https://github.com/TEDI-Design-System/react/issues/947)) ([558e97a](https://github.com/TEDI-Design-System/react/commit/558e97ac3a222bc214618e3ab6c4fd26a9f91690))
+
+# [19.2.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.7...react-19.2.0-rc.8) (2026-10-01)
+
+
+### Features
+
+* **radio,checkbox:** add compound group and card variant, deprecate ChoiceGroup [#485](https://github.com/TEDI-Design-System/react/issues/485) ([#832](https://github.com/TEDI-Design-System/react/issues/832)) ([873531c](https://github.com/TEDI-Design-System/react/commit/873531c06f934ef23a9bdad06769376dc52f314a)), closes [#642](https://github.com/TEDI-Design-System/react/issues/642)
+
+# [19.2.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.6...react-19.2.0-rc.7) (2026-10-01)
+
+
+### Features
+
+* **form-label:** add configurable Label wrapping via labelProps [#912](https://github.com/TEDI-Design-System/react/issues/912) ([#915](https://github.com/TEDI-Design-System/react/issues/915)) ([aba3540](https://github.com/TEDI-Design-System/react/commit/aba35400470e658edaaf476279cb8213fa910091))
+* **table-of-contents:** add scrollActiveIntoView prop [#896](https://github.com/TEDI-Design-System/react/issues/896) ([#931](https://github.com/TEDI-Design-System/react/issues/931)) ([514dd6b](https://github.com/TEDI-Design-System/react/commit/514dd6b8f4f32e7738a0a738d904be0ce92bb440))
+
+# [19.2.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.5...react-19.2.0-rc.6) (2026-09-30)
+
+
+### Bug Fixes
+
+* **carousel:** support fractional end positions in bounded mode [#932](https://github.com/TEDI-Design-System/react/issues/932) ([#934](https://github.com/TEDI-Design-System/react/issues/934)) ([53d7387](https://github.com/TEDI-Design-System/react/commit/53d7387f19fb4888349e5dd1f80ce5537c68b641))
+
+# [19.2.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.4...react-19.2.0-rc.5) (2026-09-30)
+
+
+### Bug Fixes
+
+* **button:** fix important and positive button styles after token migration [#943](https://github.com/TEDI-Design-System/react/issues/943) ([#944](https://github.com/TEDI-Design-System/react/issues/944)) ([dce1596](https://github.com/TEDI-Design-System/react/commit/dce1596e038fdabe351b58dfe6aaa1e802263456))
+
+# [19.2.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.3...react-19.2.0-rc.4) (2026-09-29)
+
+
+### Bug Fixes
+
+* **table-of-contents:** accessibility fixes for aria-current and empty heading [#897](https://github.com/TEDI-Design-System/react/issues/897) ([#938](https://github.com/TEDI-Design-System/react/issues/938)) ([f546118](https://github.com/TEDI-Design-System/react/commit/f54611859fb9cecddb2de58bcfd7f1f23065c71c))
+
+# [19.2.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.2...react-19.2.0-rc.3) (2026-09-29)
+
+
+### Bug Fixes
+
+* **carousel:** prevent edge clipping at fractional viewport widths [#933](https://github.com/TEDI-Design-System/react/issues/933) ([#936](https://github.com/TEDI-Design-System/react/issues/936)) ([77668d8](https://github.com/TEDI-Design-System/react/commit/77668d8a41d798fd41743ce44f84d5e951868e32))
+
+# [19.2.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.1...react-19.2.0-rc.2) (2026-09-29)
+
+
+### Features
+
+* **file-dropzone:** improvements [#888](https://github.com/TEDI-Design-System/react/issues/888) ([#929](https://github.com/TEDI-Design-System/react/issues/929)) ([26084b3](https://github.com/TEDI-Design-System/react/commit/26084b395fac06ee13dff460ae8df0417a1a61a1))
+
+# [19.2.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.4...react-19.2.0-rc.1) (2026-09-29)
+
+
+### Features
+
+* **textfield,select,multi-value-field:** add showClearButtonOnHover prop [#766](https://github.com/TEDI-Design-System/react/issues/766) ([#882](https://github.com/TEDI-Design-System/react/issues/882)) ([af18a5f](https://github.com/TEDI-Design-System/react/commit/af18a5f27fd353bceb561f54ecc26539c8015251))
+
+## [19.1.2-rc.4](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.3...react-19.1.2-rc.4) (2026-09-28)
+
+
+### Bug Fixes
+
+* **breadcrumbs:** 9.4.1.2 and 9.1.4.1 criteria improvements [#22](https://github.com/TEDI-Design-System/react/issues/22) ([#930](https://github.com/TEDI-Design-System/react/issues/930)) ([8bed3e0](https://github.com/TEDI-Design-System/react/commit/8bed3e018342db9358b6c8dc96955590959e7cab))
+
+## [19.1.2-rc.3](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.2...react-19.1.2-rc.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* **table-card:** fix examples, replace custom chevron with Collapse [#900](https://github.com/TEDI-Design-System/react/issues/900) ([#907](https://github.com/TEDI-Design-System/react/issues/907)) ([82e4b0d](https://github.com/TEDI-Design-System/react/commit/82e4b0d40118c235ac114c37328c7b5221f70c42))
+
+## [19.1.2-rc.2](https://github.com/TEDI-Design-System/react/compare/react-19.1.2-rc.1...react-19.1.2-rc.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* **choice-group:** fix height and a11y violations [#914](https://github.com/TEDI-Design-System/react/issues/914) ([#922](https://github.com/TEDI-Design-System/react/issues/922)) ([0357829](https://github.com/TEDI-Design-System/react/commit/035782941364404f30e5b2230edd4095425cf47b))
+
 ## [19.1.2-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.1.1...react-19.1.2-rc.1) (2026-09-24)
 
 

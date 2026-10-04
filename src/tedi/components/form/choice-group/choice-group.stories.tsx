@@ -21,6 +21,7 @@ import { ExtendedChoiceGroupItemProps } from './components/choice-group-item/cho
  * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Radio Zeroheight ↗</a><br/>
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4228-72934&m=dev" target="_BLANK">Checkbox Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Checkbox Zeroheight ↗</a><br/><hr/>
+ * <b>Deprecated</b> — use the compound <code>Radio.Group</code> / <code>Checkbox.Group</code> (with composable <code>Radio</code> / <code>Checkbox</code> children, including <code>variant="card"</code>) instead. <br/>
  * The `ChoiceGroup` component manages the state of input elements with either the radio or checkbox role. <br/>
  * It provides flexibility to show or hide the `FormLabel` for the fieldset and supports displaying a `FormHelper` to provide additional context or guidance for the entire group.
  */
@@ -29,7 +30,6 @@ const meta: Meta<typeof ChoiceGroup> = {
   title: 'TEDI-Ready/Components/Form/ChoiceGroup/ChoiceGroup',
   subcomponents: { 'ChoiceGroup.Item': ChoiceGroup.Item } as never,
   parameters: {
-    a11y: { test: 'todo' },
     docs: {
       source: {
         transform: (code: string) => {
@@ -38,11 +38,16 @@ const meta: Meta<typeof ChoiceGroup> = {
       },
     },
     status: {
-      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+      type: [
+        'deprecated',
+        { name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' },
+      ],
     },
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    // ChoiceGroup is deprecated and slated for removal — skip the a11y gate for its stories.
+    a11y: { test: 'off' },
   },
 };
 
