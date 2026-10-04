@@ -1138,14 +1138,15 @@ const PLACES: ISelectOption[] = [
 ];
 
 /**
- * A larger desktop layout: a table-style input view inside the sheet. The header carries an extra
- * fullscreen action alongside collapse / close, and the footer groups the **Lisa rida** link
- * together with the **Tühista** / **Salvesta** actions on the end edge.
+ * A larger desktop layout: a table-style input view inside the sheet. `maxHeight` caps the panel, so
+ * the body scrolls once enough **Lisa rida** rows are added instead of the sheet growing without
+ * bound. The header carries an extra fullscreen action alongside collapse / close, and the footer
+ * groups the **Kopeeri** and **Lisa rida** links together with the **Tühista** / **Salvesta** actions.
  */
 export const DesktopTable: Story = {
   name: 'Desktop table input',
   render: function DesktopTable() {
-    const [rows, setRows] = useState([0, 1, 2]);
+    const [rows, setRows] = useState([0, 1, 2, 3]);
     const columnStyle = { display: 'grid', gridTemplateColumns: 'repeat(8, minmax(6rem, 1fr))', gap: '0.5rem' };
 
     return (
@@ -1153,16 +1154,13 @@ export const DesktopTable: Story = {
         <Sheet.Trigger>
           <Button>Ava metsateatised</Button>
         </Sheet.Trigger>
-        <Sheet.Content radius="none">
+        {/* maxHeight caps the panel so the table body scrolls once more rows are added. */}
+        <Sheet.Content radius="none" maxHeight="32rem">
           <Sheet.Header
             title="Minu üksuste metsateatised"
             variant="default"
             collapsible
-            slot={
-              <Button visualType="neutral" icon="fullscreen">
-                Täisekraan
-              </Button>
-            }
+            slot={<Button visualType="neutral" icon="fullscreen" aria-label="Täisekraan" />}
           />
           <Sheet.Body>
             <VerticalSpacing size={0.75}>
@@ -1182,7 +1180,7 @@ export const DesktopTable: Story = {
           </Sheet.Body>
           <Sheet.Footer align="right">
             <Button
-              visualType="link"
+              visualType="neutral"
               iconLeft="add"
               onClick={() => setRows((prev) => [...prev, prev.length ? Math.max(...prev) + 1 : 0])}
             >
