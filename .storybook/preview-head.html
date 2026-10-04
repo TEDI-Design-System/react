@@ -3,6 +3,16 @@
     max-width: 1200px;
   }
 
+  /* When a story is taller than a sized viewport, the element the backgrounds addon colours
+     (.sb-show-main) can be shorter than the content, exposing the iframe's default grey behind it.
+     Painting <html> makes the surface propagate across the whole scroll area; !important beats
+     Storybook's own preview body background. The token resolves per the theme class on <html>. */
+  html,
+  body {
+    min-height: 100vh;
+    background-color: var(--general-surface-primary) !important;
+  }
+
   html.tedi-theme--dark .sb-show-main,
   html.tedi-theme--dark .docs-story,
   html.tedi-theme--dark .docs-story > div,

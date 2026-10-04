@@ -1,11 +1,23 @@
 import cn from 'classnames';
 import React, { useId, useState } from 'react';
 
+import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import styles from './rating.module.scss';
 
 export type RatingType = 'star' | 'number' | 'icon';
+
+export interface RatingBreakpointProps {
+  /**
+   * Lay the scale out horizontally or stack it vertically (icon + caption per row; number scale
+   * stacked with the endpoint captions bracketing it). Use `vertical` on narrow layouts for
+   * `type="icon"` with long `itemLabels`, or for a number scale that would otherwise overflow.
+   * Breakpoint-aware: e.g. `orientation="vertical" md={{ orientation: 'horizontal' }}`.
+   * @default horizontal
+   */
+  orientation?: 'horizontal' | 'vertical';
+}
 
 const DEFAULT_ICONS = [
   'sentiment_very_dissatisfied',
@@ -15,7 +27,7 @@ const DEFAULT_ICONS = [
   'sentiment_very_satisfied',
 ] as const;
 
-export interface RatingProps {
+export interface RatingProps extends BreakpointSupport<RatingBreakpointProps> {
   /** Accessible name for the group; also prefixes the `readOnly` summary. */
   label: string;
   /**
@@ -75,6 +87,7 @@ export interface RatingProps {
 }
 
 export const Rating = (props: RatingProps): JSX.Element => {
+  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
   const {
     label,
     type = 'star',
@@ -89,9 +102,10 @@ export const Rating = (props: RatingProps): JSX.Element => {
     ratingsCount,
     showRatingsCountLabel = true,
     readOnlyVariant = 'summary',
+    orientation = 'horizontal',
     name,
     className,
-  } = props;
+  } = getCurrentBreakpointProps<RatingProps>(props);
 
   const { getLabel, locale } = useLabels();
   const generatedName = useId();
@@ -124,16 +138,12 @@ export const Rating = (props: RatingProps): JSX.Element => {
   const positions = Array.from({ length: total }, (_, index) => index + 1);
 
   const renderVisual = (position: number, active: boolean): React.ReactNode => {
+    // A selected star stays filled even when disabled (CSS tints it grey); `filledActive` only drives
+    // the icon's white glyph, which must drop to grey when disabled.
     const filledActive = active && !disabled;
     if (type === 'star') {
       return (
-        <Icon
-          name={starGlyph}
-          filled={filledActive}
-          color="inherit"
-          size={24}
-          className={styles['tedi-rating__star']}
-        />
+        <Icon name={starGlyph} filled={active} color="inherit" size={24} className={styles['tedi-rating__star']} />
       );
     }
 
@@ -215,6 +225,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
       className={cn(
         styles['tedi-rating'],
         styles[`tedi-rating--${type}`],
+        { [styles['tedi-rating--vertical']]: orientation === 'vertical' },
         { [styles['tedi-rating--disabled']]: disabled },
         { [styles['tedi-rating--hovering']]: isHovering },
         className
@@ -223,6 +234,8 @@ export const Rating = (props: RatingProps): JSX.Element => {
       <div className={styles['tedi-rating__items']} onMouseLeave={() => setHoverValue(null)}>
         {positions.map((position) => {
           const active = isItemActive(position);
+          const isEndpoint = position === 1 || position === total;
+          const showCaption = !!itemLabels?.[position - 1] && (type === 'icon' || (type === 'number' && isEndpoint));
           return (
             <label
               key={position}
@@ -242,20 +255,11 @@ export const Rating = (props: RatingProps): JSX.Element => {
               <span className={styles['tedi-rating__visual']} aria-hidden="true">
                 {renderVisual(position, active)}
               </span>
-              {type === 'icon' && itemLabels?.[position - 1] && (
-                <span className={styles['tedi-rating__caption']}>{itemLabels[position - 1]}</span>
-              )}
+              {showCaption && <span className={styles['tedi-rating__caption']}>{itemLabels?.[position - 1]}</span>}
             </label>
           );
         })}
       </div>
-
-      {type === 'number' && (itemLabels?.[0] || itemLabels?.[total - 1]) && (
-        <div className={styles['tedi-rating__endpoints']}>
-          <span>{itemLabels?.[0]}</span>
-          <span>{itemLabels?.[total - 1]}</span>
-        </div>
-      )}
 
       {type === 'star' && itemLabels?.some(Boolean) && (
         <div className={styles['tedi-rating__star-caption']}>

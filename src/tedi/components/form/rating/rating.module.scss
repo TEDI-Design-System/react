@@ -16,6 +16,7 @@
 
 .tedi-rating--number .tedi-rating__items,
 .tedi-rating--icon .tedi-rating__items {
+  flex-wrap: wrap;
   gap: var(--layout-grid-gutters-08);
 }
 
@@ -30,6 +31,21 @@
 
 .tedi-rating--disabled .tedi-rating__item {
   cursor: not-allowed;
+}
+
+.tedi-rating--vertical .tedi-rating__items {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.tedi-rating--vertical .tedi-rating__item {
+  flex-direction: row;
+  gap: var(--layout-grid-gutters-08);
+  justify-content: flex-start;
+}
+
+.tedi-rating--vertical .tedi-rating__caption {
+  text-align: left;
 }
 
 .tedi-rating__input {
@@ -124,29 +140,44 @@
   text-align: center;
 }
 
-.tedi-rating__endpoints {
-  display: flex;
-  align-self: stretch;
-  justify-content: space-between;
-  font-size: var(--body-extra-small-size);
-  line-height: var(--body-extra-small-line-height);
-  color: var(--general-text-secondary);
+.tedi-rating--number:not(.tedi-rating--vertical) {
+  .tedi-rating__items {
+    row-gap: var(--layout-grid-gutters-24);
+    padding-bottom: var(--layout-grid-gutters-24);
+  }
+
+  .tedi-rating__caption {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: var(--layout-grid-gutters-04);
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
 }
 
+// Disabled colours map to Figma's form/rating/* tokens, which aren't in the published core yet.
+// TODO: drop the hex fallbacks once @tedi-design-system/core ships these semantic tokens.
 .tedi-rating--disabled {
+  // Unselected disabled star: outline drawn in the disabled border/stroke tone.
   .tedi-rating__star {
-    color: var(--general-text-disabled);
+    color: var(--form-rating-unselected-border-disabled, #e1e2e5);
+  }
+
+  .tedi-rating__item--active .tedi-rating__star {
+    color: var(--form-rating-selected-background-disabled, #f0f0f2);
   }
 
   .tedi-rating__circle {
-    color: var(--general-text-disabled);
-    background-color: transparent;
-    border-color: var(--general-border-primary);
+    color: var(--form-rating-unselected-text-disabled, #9293a4);
+    background-color: var(--form-rating-unselected-background-disabled, #0000);
+    border-color: var(--form-rating-unselected-border-disabled, #e1e2e5);
   }
 
   .tedi-rating__item--active .tedi-rating__circle {
-    background-color: var(--general-surface-tertiary);
-    border-color: var(--general-border-primary);
+    color: var(--form-rating-selected-text-disabled, #9293a4);
+    background-color: var(--form-rating-selected-background-disabled, #f0f0f2);
+    border-color: var(--form-rating-selected-border-disabled, #e1e2e5);
   }
 }
 
@@ -180,7 +211,6 @@
   overflow: hidden;
 }
 
-// The whole read-only summary (value + rater count) is one bold H6, per Figma.
 .tedi-rating__summary-text {
   font-size: var(--heading-h6-size);
   font-weight: var(--heading-h6-weight);
@@ -189,15 +219,7 @@
 }
 
 @include breakpoints.media-breakpoint-down(md) {
-  .tedi-rating--number:not(.tedi-rating--readonly) {
-    .tedi-rating__items {
-      display: grid;
-      grid-template-columns: repeat(5, auto);
-    }
-
-    .tedi-rating__circle {
-      width: var(--button-md-height);
-      height: var(--button-md-height);
-    }
+  .tedi-rating--number:not(.tedi-rating--readonly, .tedi-rating--vertical) .tedi-rating__items {
+    column-gap: var(--layout-grid-gutters-04);
   }
 }

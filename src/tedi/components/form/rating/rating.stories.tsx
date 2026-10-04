@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -22,6 +22,12 @@ const meta: Meta<typeof Rating> = {
     type: 'star',
   },
   parameters: {
+    status: {
+      type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
+    },
+    controls: {
+      exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.76.92?node-id=15548-139124&m=dev',
@@ -58,18 +64,18 @@ const ScaleShowcase = ({
 }): JSX.Element => (
   <VerticalSpacing size={1}>
     {Array.from({ length: max + 1 }, (_, value) => (
-      <div key={value} style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem' }}>
+      // Row label sits on top on mobile (so the scale gets the full width) and moves to a left column from md up.
+      <div key={value} className="flex flex-column flex-md-row gap-3 align-items-start">
         <div style={{ width: '5rem', flexShrink: 0 }}>
           <Text modifiers="bold">{rowLabel(value, max)}</Text>
         </div>
         <Rating type={type} count={max} defaultValue={value} itemLabels={itemLabels} label={rowLabel(value, max)} />
       </div>
     ))}
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem' }}>
+    <div className="flex flex-column flex-md-row gap-3 align-items-start">
       <div style={{ width: '5rem', flexShrink: 0 }}>
         <Text modifiers="bold">Read only</Text>
       </div>
-      {/* Three count modes: full raters label, number only (showRatingsCountLabel={false}), and none. */}
       <VerticalSpacing size={0.5}>
         <Rating
           type={type}
@@ -98,76 +104,6 @@ export const Default: Story = {
   render: (args) => <Rating {...args} />,
 };
 
-export const States: Story = {
-  parameters: {
-    controls: { disable: true },
-    pseudo: { hover: '#rating-hover label', focusVisible: '#rating-focus input' },
-  },
-  render: () => {
-    const types = ['star', 'number', 'icon'] as const;
-    // Each type has a Default (unselected) and a Selected sub-column; rows are the item states.
-    const rows: { label: string; id?: string; disabled?: boolean }[] = [
-      { label: 'Default' },
-      { label: 'Hover', id: 'rating-hover' },
-      { label: 'Disabled', disabled: true },
-      { label: 'Focus', id: 'rating-focus' },
-    ];
-    const cell = { padding: '0.5rem 1.5rem', textAlign: 'left' as const };
-
-    return (
-      <table style={{ borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th rowSpan={2} />
-            {types.map((type) => (
-              <th key={type} colSpan={2} style={cell}>
-                <Text modifiers="bold">{type[0].toUpperCase() + type.slice(1)}</Text>
-              </th>
-            ))}
-          </tr>
-          <tr>
-            {types.map((type) => (
-              <Fragment key={type}>
-                <th style={cell}>
-                  <Text modifiers="bold">Default</Text>
-                </th>
-                <th style={cell}>
-                  <Text modifiers="bold">Selected</Text>
-                </th>
-              </Fragment>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.label} id={row.id}>
-              <th style={{ padding: '0.5rem 1.5rem 0.5rem 0', textAlign: 'left' }}>
-                <Text modifiers="bold">{row.label}</Text>
-              </th>
-              {types.map((type) => (
-                <Fragment key={type}>
-                  {[0, 1].map((selected) => (
-                    <td key={selected} style={cell}>
-                      <Rating
-                        type={type}
-                        count={1}
-                        defaultValue={selected}
-                        disabled={row.disabled}
-                        icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
-                        label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
-                      />
-                    </td>
-                  ))}
-                </Fragment>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  },
-};
-
 export const Stars: Story = {
   parameters: { controls: { disable: true } },
   render: () => <ScaleShowcase type="star" max={5} itemLabels={STAR_LABELS} />,
@@ -181,6 +117,89 @@ export const Numbers: Story = {
 export const Icons: Story = {
   parameters: { controls: { disable: true } },
   render: () => <ScaleShowcase type="icon" max={5} itemLabels={ICON_LABELS} />,
+};
+
+export const States: Story = {
+  parameters: {
+    controls: { disable: true },
+    pseudo: { hover: '[id^="rating-hover"] label', focusVisible: '[id^="rating-focus"] input' },
+  },
+  render: () => {
+    const types = ['star', 'number', 'icon'] as const;
+    // Rows are the item states. Each type gets its own compact Default / Selected table; the three
+    // tables sit side by side as columns from lg up and stack under each other on smaller screens.
+    const rows: { label: string; state?: 'hover' | 'focus'; disabled?: boolean }[] = [
+      { label: 'Default' },
+      { label: 'Hover', state: 'hover' },
+      { label: 'Disabled', disabled: true },
+      { label: 'Focus', state: 'focus' },
+    ];
+    const cell = { padding: '0.5rem 1rem', textAlign: 'left' as const };
+
+    return (
+      <div className="flex flex-column flex-lg-row gap-5 align-items-start">
+        {types.map((type) => (
+          <VerticalSpacing size={0.5} key={type}>
+            <Heading element="h3" modifiers="h5">
+              {type[0].toUpperCase() + type.slice(1)}
+            </Heading>
+            <table style={{ borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th />
+                  <th style={cell}>
+                    <Text modifiers="bold">Default</Text>
+                  </th>
+                  <th style={cell}>
+                    <Text modifiers="bold">Selected</Text>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.label} id={row.state ? `rating-${row.state}-${type}` : undefined}>
+                    <th style={{ padding: '0.5rem 1rem 0.5rem 0', textAlign: 'left' }}>
+                      <Text modifiers="bold">{row.label}</Text>
+                    </th>
+                    {[0, 1].map((selected) => (
+                      <td key={selected} style={cell}>
+                        <Rating
+                          type={type}
+                          count={1}
+                          defaultValue={selected}
+                          disabled={row.disabled}
+                          icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
+                          label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </VerticalSpacing>
+        ))}
+      </div>
+    );
+  },
+};
+
+/**
+ * `orientation="vertical"` stacks the scale and puts each icon beside its caption, so long labels fit
+ * on narrow (mobile) layouts where the horizontal row would overflow.
+ */
+export const VerticalIcons: Story = {
+  name: 'Vertical (icons)',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Rating
+      type="icon"
+      orientation="vertical"
+      itemLabels={['Väga halb kogemus', 'Halb kogemus', 'Keskmine kogemus', 'Hea kogemus', 'Väga hea kogemus']}
+      defaultValue={4}
+      label="Teenuse hinnang"
+    />
+  ),
 };
 
 export const Controlled: Story = {
