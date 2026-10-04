@@ -110,7 +110,8 @@ export const Rating = (props: RatingProps): JSX.Element => {
   const { getLabel, locale } = useLabels();
   const generatedName = useId();
   const groupName = name ?? generatedName;
-  const total = count ?? (type === 'number' ? 10 : 5);
+  const defaultCount = type === 'number' ? 10 : 5;
+  const total = count !== undefined && Number.isInteger(count) && count > 0 ? count : defaultCount;
 
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState(defaultValue);
@@ -133,13 +134,12 @@ export const Rating = (props: RatingProps): JSX.Element => {
   const isItemActive = (position: number): boolean =>
     type === 'icon' ? position === displayValue : position <= displayValue;
 
-  const itemLabel = (position: number): string => itemLabels?.[position - 1] || `${position} of ${total}`;
+  // Language-neutral fallback (matches the read-only `value/total` summary format) when no itemLabels given.
+  const itemLabel = (position: number): string => itemLabels?.[position - 1] || `${position}/${total}`;
 
   const positions = Array.from({ length: total }, (_, index) => index + 1);
 
   const renderVisual = (position: number, active: boolean): React.ReactNode => {
-    // A selected star stays filled even when disabled (CSS tints it grey); `filledActive` only drives
-    // the icon's white glyph, which must drop to grey when disabled.
     const filledActive = active && !disabled;
     if (type === 'star') {
       return (
@@ -171,6 +171,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
         : '';
     const summary = `${valueText}${countText}`;
     const iconPosition = Math.min(total, Math.max(1, Math.round(currentValue)));
+    const hasValue = currentValue > 0;
     const isStarScale = type === 'star' && readOnlyVariant === 'scale';
     const readOnlyVisual = isStarScale ? (
       <span className={styles['tedi-rating__stars']}>
@@ -192,10 +193,10 @@ export const Rating = (props: RatingProps): JSX.Element => {
         })}
       </span>
     ) : type === 'star' ? (
-      <Icon name={starGlyph} filled color="inherit" size={24} className={styles['tedi-rating__star']} />
+      <Icon name={starGlyph} filled={hasValue} color="inherit" size={24} className={styles['tedi-rating__star']} />
     ) : type === 'icon' ? (
-      <span className={cn(styles['tedi-rating__circle'], styles['tedi-rating__circle--filled'])}>
-        <Icon name={resolvedIcons?.[iconPosition - 1] ?? 'circle'} color="white" size={18} />
+      <span className={cn(styles['tedi-rating__circle'], { [styles['tedi-rating__circle--filled']]: hasValue })}>
+        <Icon name={resolvedIcons?.[iconPosition - 1] ?? 'circle'} color={hasValue ? 'white' : 'inherit'} size={18} />
       </span>
     ) : null;
 

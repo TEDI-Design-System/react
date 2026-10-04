@@ -20,25 +20,36 @@ describe('Rating', () => {
     expect(screen.getAllByRole('radio')).toHaveLength(10);
   });
 
+  it('falls back to the type default when count is not a positive integer', () => {
+    const { rerender } = render(<Rating label="Feedback" type="star" count={0} />);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
+
+    rerender(<Rating label="Feedback" type="star" count={-3} />);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
+
+    rerender(<Rating label="Feedback" type="star" count={3.5} />);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
+  });
+
   it('marks the selected radio from defaultValue (uncontrolled)', () => {
     render(<Rating label="Feedback" defaultValue={3} count={5} />);
-    expect(screen.getByRole('radio', { name: '3 of 5' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '3/5' })).toBeChecked();
   });
 
   it('fires onChange and updates selection when an item is chosen', () => {
     const onChange = jest.fn();
     render(<Rating label="Feedback" count={5} onChange={onChange} />);
-    fireEvent.click(screen.getByRole('radio', { name: '4 of 5' }));
+    fireEvent.click(screen.getByRole('radio', { name: '4/5' }));
     expect(onChange).toHaveBeenCalledWith(4);
-    expect(screen.getByRole('radio', { name: '4 of 5' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '4/5' })).toBeChecked();
   });
 
   it('respects the controlled value and does not self-update', () => {
     const onChange = jest.fn();
     render(<Rating label="Feedback" count={5} value={2} onChange={onChange} />);
-    fireEvent.click(screen.getByRole('radio', { name: '5 of 5' }));
+    fireEvent.click(screen.getByRole('radio', { name: '5/5' }));
     expect(onChange).toHaveBeenCalledWith(5);
-    expect(screen.getByRole('radio', { name: '2 of 5' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '2/5' })).toBeChecked();
   });
 
   it('uses itemLabels as accessible names', () => {
@@ -54,7 +65,7 @@ describe('Rating', () => {
     radios.forEach((radio) => expect(radio).toHaveAccessibleName(/.+/));
     expect(screen.getByRole('radio', { name: 'Low' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'High' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: '5 of 10' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '5/10' })).toBeInTheDocument();
   });
 
   it('disables every radio when disabled', () => {
@@ -69,6 +80,11 @@ describe('Rating', () => {
       const summary = screen.getByRole('img');
 
       expect(summary).toHaveAccessibleName(/^Teenuse hinnang: 3[.,]5\/5 - 271 hindajat$/);
+    });
+
+    it('uses the singular rater form when there is exactly one rating', () => {
+      renderWithLabels(<Rating label="Hinnang" count={5} value={4} ratingsCount={1} readOnly />);
+      expect(screen.getByRole('img')).toHaveAccessibleName('Hinnang: 4/5 - 1 hindaja');
     });
 
     it('omits the rater count when ratingsCount is not provided', () => {
@@ -98,6 +114,15 @@ describe('Rating', () => {
     it('renders a single star (no partial-fill overlays) in the default summary variant', () => {
       const { container } = renderWithLabels(<Rating label="Hinnang" type="star" count={5} value={3.5} readOnly />);
       expect(container.querySelectorAll('.tedi-rating__star-partial-fill')).toHaveLength(0);
+    });
+
+    it('renders an unselected visual for a zero rating so it agrees with the 0/total summary', () => {
+      const zero = renderWithLabels(<Rating label="Hinnang" type="icon" count={5} value={0} readOnly />);
+      expect(zero.getByRole('img')).toHaveAccessibleName('Hinnang: 0/5');
+      expect(zero.container.querySelector('.tedi-rating__circle--filled')).toBeNull();
+
+      const rated = renderWithLabels(<Rating label="Hinnang" type="icon" count={5} value={3} readOnly />);
+      expect(rated.container.querySelector('.tedi-rating__circle--filled')).not.toBeNull();
     });
 
     it('does not render the interactive scale in readOnly mode', () => {

@@ -1467,9 +1467,24 @@ export const labelsMap = validateDefaultLabels({
   'rating.raters': {
     description: 'Suffix in the read-only Rating summary showing how many people rated, e.g. "271 hindajat"',
     components: ['Rating'],
-    et: (count: number) => `${count} hindajat`,
-    en: (count: number) => `${count} ratings`,
-    ru: (count: number) => `${count} оценок`,
+    et: (count: number) => `${count} ${count === 1 ? 'hindaja' : 'hindajat'}`,
+    en: (count: number) => `${count} ${count === 1 ? 'rating' : 'ratings'}`,
+    ru: (count: number) => {
+      const lastDigit = count % 10;
+      const lastTwoDigits = count % 100;
+      const isSingular = lastDigit === 1 && lastTwoDigits !== 11;
+      const isFew = lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
+
+      if (isSingular) {
+        return `${count} оценка`;
+      }
+
+      if (isFew) {
+        return `${count} оценки`;
+      }
+
+      return `${count} оценок`;
+    },
   },
 });
 
