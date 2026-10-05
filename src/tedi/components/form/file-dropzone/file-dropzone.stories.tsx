@@ -68,13 +68,14 @@ export const Multiple: Story = {
 };
 
 /**
- * Batch validation (default): rejected files are discarded and all rejections are summarised
- * in a single error message. Only valid files are kept.
+ * Discarding rejected files (the default): valid files are still added and the ones that fail
+ * validation are dropped, with their rejections summarised in a single error message.
  */
-export const BatchValidation: Story = {
+export const ValidationDiscardingRejectedFiles: Story = {
+  name: 'Validation: discarding rejected files',
   args: {
-    id: 'file-dropzone-batch-validation',
-    name: 'file-batch-validation',
+    id: 'file-dropzone-discarding-rejected-files',
+    name: 'file-discarding-rejected-files',
     maxSize: 1024 ** 2,
     accept: '.pdf,.txt',
     multiple: true,
@@ -96,13 +97,15 @@ export const BatchValidation: Story = {
 };
 
 /**
- * `keepRejectedFiles` (needs `multiple`): files that fail validation stay in the list with their
- * own invalid state instead of being discarded, so the user can see and remove the ones that failed.
+ * Keeping rejected files (`keepRejectedFiles`): files that fail validation stay in the list with
+ * their own invalid state instead of being discarded, so the user can see and remove the ones that
+ * failed. Applies to both single and multiple uploads; files are validated individually either way.
  */
-export const IndividualValidation: Story = {
+export const ValidationKeepingRejectedFiles: Story = {
+  name: 'Validation: keeping rejected files',
   args: {
-    id: 'file-dropzone-individual-validation',
-    name: 'file-individual-validation',
+    id: 'file-dropzone-keeping-rejected-files',
+    name: 'file-keeping-rejected-files',
     multiple: true,
     maxSize: 1024 ** 2,
     accept: '.pdf,.txt',
