@@ -499,8 +499,10 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                       styles['tedi-category-search__mobile-body']
                     )}
                   >
-                    <div className={styles['tedi-category-search__suffix']}>{categorySelector}</div>
-                    {searchBar}
+                    <div className={styles['tedi-category-search__mobile-controls']}>
+                      <div className={styles['tedi-category-search__suffix']}>{categorySelector}</div>
+                      {searchBar}
+                    </div>
                     {panel}
                     {announcement}
                   </div>

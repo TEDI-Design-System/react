@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
-
 .tedi-category-search {
   position: relative;
   width: 100%;
@@ -8,7 +6,7 @@
 
   &__mobile-body {
     display: grid;
-    gap: var(--layout-grid-gutters-08);
+    gap: var(--layout-grid-gutters-16);
 
     .tedi-category-search__suffix {
       min-width: 0;
@@ -17,6 +15,13 @@
     .tedi-category-search__actions {
       border-radius: var(--form-field-radius);
     }
+  }
+
+  &__mobile-controls {
+    display: grid;
+    gap: var(--layout-grid-gutters-08);
+    padding-block-end: var(--layout-grid-gutters-16);
+    border-block-end: 1px solid var(--general-border-primary);
   }
 
   &__bar {
@@ -164,13 +169,5 @@
     white-space: nowrap;
     border: 0;
     clip-path: inset(50%);
-  }
-
-  @include breakpoints.media-breakpoint-down(sm) {
-    &__actions {
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-    }
   }
 }
