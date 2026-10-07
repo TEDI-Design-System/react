@@ -265,15 +265,24 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       <Dropdown
         defaultActiveIndex={categories.indexOf(category)}
         modal={false}
-        placement="bottom-end"
+        width={isMobile ? 'trigger' : undefined}
+        placement={isMobile ? 'bottom-start' : 'bottom-end'}
         className={cn(styles['tedi-category-search__menu'], styles[`tedi-category-search__menu--${size}`])}
       >
         <Dropdown.Trigger>
-          <Button noStyle size={size} disabled={disabled} aria-label={`${labels.category}: ${category.label}`}>
+          <Button
+            noStyle={!isMobile}
+            visualType={isMobile ? 'secondary' : undefined}
+            fullWidth={isMobile}
+            iconLeft={isMobile ? 'menu' : undefined}
+            size={size}
+            disabled={disabled}
+            aria-label={`${labels.category}: ${category.label}`}
+          >
             <span className={styles['tedi-category-search__category-label']}>
               {renderCategoryLabel(categories, category, isMobile)}
             </span>
-            <Icon name="arrow_drop_down" color="inherit" />
+            {!isMobile && <Icon name="arrow_drop_down" color="inherit" />}
           </Button>
         </Dropdown.Trigger>
         <Dropdown.Content>
@@ -330,20 +339,22 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
               </InputGroup.Input>
             ) : (
               <div className={styles['tedi-category-search__actions']}>
-                <Button
-                  id={`${rootId}-input`}
-                  ref={triggerRef}
-                  size={size}
-                  visualType="link"
-                  iconLeft="tune"
-                  disabled={disabled}
-                  aria-expanded={panelVisible}
-                  aria-controls={panelVisible ? panelId : undefined}
-                  onClick={toggleView}
-                >
-                  {toggleLabel}
-                  {showResultCount && count !== undefined ? ` (${count})` : ''}
-                </Button>
+                {(!isMobile || canShowResults) && (
+                  <Button
+                    id={`${rootId}-input`}
+                    ref={triggerRef}
+                    size={size}
+                    visualType="link"
+                    iconLeft="tune"
+                    disabled={disabled}
+                    aria-expanded={panelVisible}
+                    aria-controls={panelVisible ? panelId : undefined}
+                    onClick={toggleView}
+                  >
+                    {toggleLabel}
+                    {showResultCount && count !== undefined ? ` (${count})` : ''}
+                  </Button>
+                )}
                 {hasSearch && (
                   <Button
                     size={size}
@@ -352,7 +363,8 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                     disabled={disabled}
                     onClick={() => {
                       clearSearch();
-                      focusSearchControl();
+                      if (isMobile) panelRef.current?.focus();
+                      else focusSearchControl();
                     }}
                   >
                     {labels.cancelFilter}
@@ -500,8 +512,8 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                     )}
                   >
                     <div className={styles['tedi-category-search__mobile-controls']}>
-                      <div className={styles['tedi-category-search__suffix']}>{categorySelector}</div>
-                      {searchBar}
+                      {categorySelector}
+                      {(textMode || hasSearch) && searchBar}
                     </div>
                     {panel}
                     {announcement}

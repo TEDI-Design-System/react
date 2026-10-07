@@ -119,7 +119,12 @@ describe('CategorySearch', () => {
 
       expect(within(panel).getByRole('textbox', { name: 'Parcels owner' })).toHaveValue('');
       expect(screen.getByRole('button', { name: 'Search category: Parcels' })).toBeVisible();
-      if (presentation === 'desktop') expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      if (presentation === 'mobile') {
+        expect(within(panel).queryByRole('button', { name: 'Filter' })).not.toBeInTheDocument();
+      } else {
+        expect(screen.getByRole('button', { name: 'Filter' })).toBeVisible();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      }
     }
   );
 
@@ -334,6 +339,15 @@ describe('CategorySearch', () => {
     expect(input).toHaveValue('Aasa');
     expect(screen.getByRole('alert').closest('form')).toBe(input.closest('form'));
     expect(screen.queryByText('Found parcel')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Filter' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Show results/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Clear filter' })).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Clear filter' }));
+    expect(screen.getByRole('dialog', { name: 'Search' })).toBeVisible();
+    expect(screen.getByText('Backend advice')).toBeVisible();
+    expect(input).toHaveValue('');
+    expect(screen.queryByRole('button', { name: 'Clear filter' })).not.toBeInTheDocument();
   });
 
   it('opens a labelled, non-modal filter region from the initially closed search bar', async () => {
@@ -907,15 +921,24 @@ describe('CategorySearch', () => {
     expect(screen.queryByText('Parcels: Aasa')).not.toBeInTheDocument();
   });
 
-  it('clears completed results and restores the filter form with Clear filter', async () => {
+  it.each([false, true])('clears results and restores filters with Clear filter when mobile is %s', async (mobile) => {
     const user = userEvent.setup();
-    render(<CategorySearch categories={[createCategory()]} defaultOpen />);
+    render(<CategorySearch categories={[createCategory()]} mobile={mobile} defaultOpen />);
+    if (mobile) {
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Close' })[0]).toHaveFocus());
+    }
     await user.type(screen.getByRole('textbox'), 'Aasa');
     await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(await screen.findByText('Parcels: Aasa')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Clear filter' }));
 
-    expect(screen.getByRole('button', { name: 'Filter' })).toHaveFocus();
+    if (mobile) {
+      expect(screen.getByRole('dialog', { name: 'Search' })).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Filter' })).not.toBeInTheDocument();
+      expect(screen.getByRole('region', { name: 'Parcels: Filter' })).toHaveFocus();
+    } else {
+      expect(screen.getByRole('button', { name: 'Filter' })).toHaveFocus();
+    }
     expect(screen.getByRole('region', { name: 'Parcels: Filter' })).toBeVisible();
     expect(screen.getByRole('textbox')).toHaveValue('');
     expect(screen.queryByText('Parcels: Aasa')).not.toBeInTheDocument();

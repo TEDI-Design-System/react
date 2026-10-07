@@ -8,12 +8,14 @@
     display: grid;
     gap: var(--layout-grid-gutters-16);
 
-    .tedi-category-search__suffix {
-      min-width: 0;
-    }
-
     .tedi-category-search__actions {
-      border-radius: var(--form-field-radius);
+      background-color: transparent;
+      border: 0;
+      border-radius: 0;
+
+      > button:last-child {
+        margin-inline-start: auto;
+      }
     }
   }
 
@@ -21,7 +23,13 @@
     display: grid;
     gap: var(--layout-grid-gutters-08);
     padding-block-end: var(--layout-grid-gutters-16);
+    padding-inline: var(--modal-body-padding);
+    margin-inline: calc(-1 * var(--modal-body-padding));
     border-block-end: 1px solid var(--general-border-primary);
+
+    > button {
+      --button-radius-default: var(--form-field-radius);
+    }
   }
 
   &__bar {
