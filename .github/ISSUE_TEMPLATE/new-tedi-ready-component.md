@@ -3,7 +3,7 @@ name: New TEDI-READY component
 about: This template is for new TEDI-Ready component creation and development
 title: "[Component_name]:"
 labels: tedi-ready
-assignees: airikej
+assignees: ''
 
 ---
 

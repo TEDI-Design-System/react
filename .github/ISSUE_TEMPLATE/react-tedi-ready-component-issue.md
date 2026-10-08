@@ -4,7 +4,7 @@ about: Use this template if the issue is on the React TEDI-READY side, bug, enha
   etc
 title: "[Component_name]:"
 labels: tedi-ready
-assignees: airikej
+assignees: ''
 
 ---
 
