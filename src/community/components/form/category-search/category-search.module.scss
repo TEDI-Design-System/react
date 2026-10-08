@@ -1,9 +1,36 @@
-@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
-
 .tedi-category-search {
   position: relative;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+
+  &__mobile-body {
+    display: grid;
+    gap: var(--layout-grid-gutters-16);
+
+    .tedi-category-search__actions {
+      background-color: transparent;
+      border: 0;
+      border-radius: 0;
+
+      > button:last-child {
+        margin-inline-start: auto;
+      }
+    }
+  }
+
+  &__mobile-controls {
+    display: grid;
+    gap: var(--layout-grid-gutters-08);
+    padding-block-end: var(--layout-grid-gutters-16);
+    padding-inline: var(--modal-body-padding);
+    margin-inline: calc(-1 * var(--modal-body-padding));
+    border-block-end: 1px solid var(--general-border-primary);
+
+    > button {
+      --button-radius-default: var(--form-field-radius);
+    }
+  }
 
   &__bar {
     position: relative;
@@ -29,8 +56,6 @@
   }
 
   &__suffix {
-    max-width: 45%;
-
     > button {
       display: flex;
       gap: var(--tedi-dimensions-01);
@@ -38,13 +63,22 @@
       justify-content: space-between;
       width: 100%;
       height: 100%;
-      white-space: normal;
+      white-space: nowrap;
     }
   }
 
   &__category-label {
+    display: grid;
+    align-items: center;
     min-width: 0;
-    overflow-wrap: anywhere;
+
+    > span {
+      grid-area: 1 / 1;
+    }
+
+    &--hidden {
+      visibility: hidden;
+    }
   }
 
   & &__suffix > button {
@@ -101,7 +135,7 @@
     position: absolute;
     z-index: var(--z-index-dropdown);
     box-sizing: border-box;
-    width: var(--category-search-panel-width);
+    width: var(--category-search-text-results-panel-width);
     max-height: var(--category-search-panel-max-height);
     padding: var(--layout-grid-gutters-08);
     margin-block-start: var(--tedi-dimensions-01);
@@ -143,13 +177,5 @@
     white-space: nowrap;
     border: 0;
     clip-path: inset(50%);
-  }
-
-  @include breakpoints.media-breakpoint-down(sm) {
-    &__actions {
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-    }
   }
 }
