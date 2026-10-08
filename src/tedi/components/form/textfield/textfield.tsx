@@ -59,8 +59,9 @@ type TextFieldBreakpointProps = {
    * When `true`, displays a clear (×) button on the right side when the field has a value.
    *
    * Clicking the button clears the input and calls `onClear` (if provided).
+   * Hidden while the field is read-only.
    *
-   * @default false
+   * @default true
    */
   isClearable?: boolean;
   /**
@@ -277,7 +278,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     size = 'default',
     placeholder,
     isArrowsHidden = true,
-    isClearable,
+    isClearable = true,
     showClearOnInteraction,
     onClear,
     onChange,
@@ -297,7 +298,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     startSlot,
     endSlot,
     ...rest
-  } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
+  } = getCurrentBreakpointProps<TextFieldProps>(props);
 
   const { getLabel } = useLabels();
 
@@ -307,7 +308,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   const [innerValue, setInnerValue] = React.useState(externalValue ?? defaultValue ?? '');
 
   const value = externalValue ?? innerValue;
-  const showClearButton = Boolean(isClearable && value && !readOnly);
+  const isReadOnly = readOnly || input?.readOnly;
+  const showClearButton = Boolean(isClearable && value && !isReadOnly);
 
   const inputGroup = useOptionalInputGroup?.();
   const generatedId = React.useId();
@@ -350,10 +352,12 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   );
 
   const clearInput = useCallback(() => {
-    if (!isControlled) setInnerValue('');
-    onChange?.('');
+    // The clear button only renders once the field has mounted, so the element is there to clear.
+    const element = fieldRef.current as FieldElement;
+    Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
+    element.dispatchEvent(new Event('input', { bubbles: true }));
     onClear?.();
-  }, [isControlled, onChange, onClear]);
+  }, [onClear]);
 
   const renderIcon = useCallback(() => {
     if (!icon) return null;
@@ -414,7 +418,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         {showClearButton && icon && (
           <Separator color="primary" axis="vertical" className={styles['tedi-textfield__separator']} />
         )}
-        {icon && renderIcon()}
+        {renderIcon()}
       </div>
     );
   }, [showClearButton, icon, renderClearButton, renderIcon]);
@@ -429,7 +433,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       onChange={handleChange}
       onChangeEvent={onChangeEvent}
       disabled={disabled}
-      readOnly={readOnly || input?.readOnly}
+      readOnly={isReadOnly}
       required={required}
       invalid={isInvalid}
       placeholder={placeholder}
