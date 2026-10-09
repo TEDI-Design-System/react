@@ -1,5 +1,3 @@
-@use '@tedi-design-system/core/mixins';
-
 .tedi-choice-group-item {
   position: relative;
 
@@ -21,19 +19,6 @@
     &__feedback-text {
       color: var(--general-text-secondary);
       cursor: unset;
-    }
-
-    &__label {
-      box-sizing: border-box;
-      display: block;
-      width: 100%;
-      cursor: pointer;
-
-      .tedi-choice-group-item__input:focus-visible + & {
-        @include mixins.focus-element;
-
-        border-radius: var(--form-checkbox-radio-card-radius);
-      }
     }
 
     &.tedi-choice-group-item--disabled {
