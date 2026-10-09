@@ -23,6 +23,7 @@ Orientation only. Verify the current roster against the installed package's barr
 | Radio | `boolean` (via onChange) | `Radio.Group`, card variant, segmented layout |
 | ChoiceGroup | `ChoiceGroupValue` | **Deprecated** — use `Radio.Group` / `Checkbox.Group` |
 | Search | `string` | Search button, onSearch callback |
+| Rating | `number` (1-based; `0` = none) | Star / number / icon scale, native `radiogroup`, `readOnly` summary/scale, breakpoint-aware `orientation`, `itemLabels` |
 | DateField | `Date \| Date[] \| DateRange` | Single/multiple/range, manual input, min/max, native picker, clearable, breakpoint-aware |
 | TimeField | `string` (`"HH:mm"`) | Wheel / grid picker, native fallback, stepMinutes, availableTimes, clearable |
 | Filter | `boolean \| string \| string[]` | Pill-shaped toggle / dropdown filter — single, multi-select, custom panel; pairs with `FilterGroup` |
@@ -456,6 +457,7 @@ TEDI form controls hand you the **parsed value**, not the raw DOM event. The con
 - **Select** calls `onChange` with the selected option object(s), or `null` when cleared.
 - **DateField** uses `onSelect`; the value shape follows the active `mode` (single `Date`, `Date[]`, or a range).
 - **TimeField / TimePicker** call `onChange` with a `"HH:mm"` 24-hour string (empty when cleared).
+- **Rating** calls `onChange` with the selected 1-based number (`0` means no rating).
 
 ## Disabled State
 

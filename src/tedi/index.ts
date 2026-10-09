@@ -77,6 +77,7 @@ export * from './components/misc/attachment';
 export * from './components/misc/ellipsis/ellipsis';
 export * from './components/misc/timeline';
 export * from './components/misc/option-content/option-content';
+export * from './components/form/rating/rating';
 export * from './components/layout/sidenav';
 export * from './components/layout/footer';
 export * from './components/layout/header';

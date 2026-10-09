@@ -129,6 +129,13 @@ files. This is the part of this document worth maintaining by hand.
 - **`TableCard` is `Table`'s readable mobile form.** Below a breakpoint, render a list of
   `TableCard` (each row a stacked `<dl>` of label / value pairs with its own title / status /
   actions) instead of collapsing columns; swap via `useBreakpoint` + `isBreakpointBelow(bp, 'md')`.
+- **`Rating` is a native `radiogroup`, not a decorative widget.** It renders real radios, so it's
+  keyboard-navigable (arrow keys) and form-submittable like any radio group. `value` is **1-based**
+  (`0` = no rating), and `type` changes the fill: `star` / `number` fill cumulatively up to the
+  value, while `icon` highlights only the single selected item (defaults to the five sentiment
+  faces at `count={5}`). Pass `readOnly` for a compact aggregate summary (or `readOnlyVariant="scale"`
+  for a fractional star scale with `ratingsCount`), and `orientation` is breakpoint-aware
+  (`orientation="vertical" md={{ orientation: 'horizontal' }}`) for narrow layouts.
 
 ### Composition constraints
 
