@@ -63,7 +63,7 @@
   display: inline-flex;
 }
 
-.tedi-rating__star {
+.tedi-rating .tedi-rating__star {
   position: relative; // paint above the absolutely positioned backdrop
   line-height: 1;
   color: var(--general-text-brand);
@@ -75,7 +75,7 @@
 }
 
 // Filled glyph stacked under the outlined one; transparent unless the star is hovered while unselected.
-.tedi-rating__star-backdrop {
+.tedi-rating .tedi-rating__star-backdrop {
   position: absolute;
   inset: var(--feedback-star-inner-spacing);
   color: transparent;
