@@ -29,8 +29,10 @@
       width: 100%;
       cursor: pointer;
 
-      .tedi-choice-group-item__input:focus + & {
+      .tedi-choice-group-item__input:focus-visible + & {
         @include mixins.focus-element;
+
+        border-radius: var(--form-checkbox-radio-card-radius);
       }
     }
 

@@ -17,7 +17,7 @@
   border: 1px solid var(--general-surface-disabled);
   border-radius: var(--tedi-radius-02-default);
 
-  .light-item__input:focus + & {
+  .light-item__input:focus-visible + & {
     @include mixins.focus-element;
   }
 
