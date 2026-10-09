@@ -15,12 +15,14 @@
       "import": "./community.es.js",
       "require": "./community.cjs.js"
     },
-    "./index.css": "./index.css"
+    "./index.css": "./index.css",
+    "./index-without-icons.css": "./index-without-icons.css",
+    "./icons/*.css": "./icons/*.css"
   },
   "scripts": {
     "prepare": "husky",
     "start": "storybook dev -p 4400 -c .storybook",
-    "build": "rm -rf dist && vite build --config vite.lib.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css --isRegex",
+    "build": "rm -rf dist && vite build --config vite.lib.config.ts && replace-in-file //fonts//g \"./fonts/\" dist/index.css dist/index-without-icons.css --isRegex",
     "build:sb": "storybook build -c .storybook -o dist/storybook-static --stats-json && replace-in-file //fonts//g \"../fonts/\" \"dist/storybook-static/assets/*.css\" --isRegex",
     "lint": "npx stylelint \"src/**/*.scss\" --fix && eslint \"src/**/*.{ts,tsx}\" --no-ignore --fix",
     "lint:ci": "npx stylelint \"src/**/*.scss\" --quiet && npx eslint . --quiet",
@@ -47,7 +49,7 @@
     "@mui/material": "^5.15.13",
     "@mui/x-date-pickers": "^5.0.20",
     "@tanstack/react-table": "^8.13.2",
-    "@tedi-design-system/core": "^6.9.0",
+    "@tedi-design-system/core": "6.11.2",
     "classnames": "^2.5.1",
     "draft-js": "^0.11.7",
     "draftjs-md-converter": "^1.5.2",

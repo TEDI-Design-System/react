@@ -98,3 +98,43 @@ currently not supported — if you need to, please reach out on Slack.
 When using SSR you can pass the `defaultServerBreakpoint` prop to every component that uses
 [BreakpointProps](/docs/helpers-usebreakpointprops--usebreakpointprops). This lets you declare which
 breakpoint the component should render at on the server, avoiding layout shifts.
+
+### Icon fonts
+
+`Icon` renders [Material Symbols](https://fonts.google.com/icons) in three styles (`outlined`,
+`rounded`, `sharp`), each a separate font file of roughly 350–430 KB. `index.css` declares all three,
+so every style stays available. Use **one icon style** throughout your application and load only that
+font:
+
+```tsx
+// Everything except the icon fonts…
+import '@tedi-design-system/react/index-without-icons.css';
+// …plus the one style you use (outlined is the Icon default).
+import '@tedi-design-system/react/icons/outlined.css';
+```
+
+| Import                                         | Font file loaded                  |
+| ---------------------------------------------- | --------------------------------- |
+| `@tedi-design-system/react/icons/outlined.css` | `material-symbols-outlined.woff2` |
+| `@tedi-design-system/react/icons/rounded.css`  | `material-symbols-rounded.woff2`  |
+| `@tedi-design-system/react/icons/sharp.css`    | `material-symbols-sharp.woff2`    |
+| `@tedi-design-system/react/icons/all.css`      | all three                         |
+
+An `Icon` whose `type` has no imported style renders its ligature text instead of the glyph.
+
+Browsers only download an icon font once a glyph uses it, so in a regular web app the unused styles
+cost nothing at runtime. In a **PWA**, the service worker precaches every matching build asset,
+including fonts your CSS never references. Exclude the unused styles from the precache, for example
+with `vite-plugin-pwa`:
+
+```ts
+VitePWA({
+  workbox: {
+    globPatterns: ['**/*.{js,css,html,woff2}'],
+    globIgnores: ['**/material-symbols-{rounded,sharp}.woff2'],
+  },
+});
+```
+
+See the [core icons guide](https://github.com/TEDI-Design-System/core/blob/rc/docs/icons.md) for
+SCSS usage and custom font paths.
