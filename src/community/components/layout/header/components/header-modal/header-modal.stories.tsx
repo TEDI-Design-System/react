@@ -15,6 +15,11 @@ import HeaderModal from './header-modal';
 const meta: Meta<typeof HeaderModal> = {
   component: HeaderModal,
   title: 'Community/Layout/Header/HeaderModal',
+  parameters: {
+    status: {
+      type: ['deprecated'],
+    },
+  },
 };
 
 export default meta;

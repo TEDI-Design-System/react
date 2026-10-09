@@ -40,6 +40,9 @@ export interface HeaderDropdownProps {
   onToggle?: (open: boolean) => void;
 }
 
+/**
+ * @deprecated Use `HeaderProfile` for account menus, or `Popover` for other content, from `@tedi-design-system/react/tedi` instead.
+ */
 export const HeaderDropdown = (props: HeaderDropdownProps) => {
   const { children, triggerProps, defaultOpen, open, onToggle, shouldAnimate, tooltipProps } = props;
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);

@@ -38,6 +38,9 @@ export interface HeaderModalProps {
   onToggle?: (open: boolean) => void;
 }
 
+/**
+ * @deprecated Use `HeaderProfile` for account menus, or `Modal` with `position="right"` for other content, from `@tedi-design-system/react/tedi` instead.
+ */
 export const HeaderModal = (props: HeaderModalProps) => {
   const { triggerProps, defaultOpen, open, onToggle, children, ariaLabelledby } = props;
   const { getLabel } = useLabels();
