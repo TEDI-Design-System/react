@@ -59,26 +59,26 @@
 }
 
 .tedi-rating__visual {
+  position: relative;
   display: inline-flex;
 }
 
-.tedi-rating__input:focus-visible + .tedi-rating__visual {
-  border-radius: var(--button-radius-default);
-  box-shadow: 0 0 0 1px var(--general-effect-colors-focus-outset-inner-shadow),
-    0 0 0 3px var(--general-effect-colors-focus-outset-outer-shadow);
-}
-
 .tedi-rating__star {
+  position: relative; // paint above the absolutely positioned backdrop
   line-height: 1;
   color: var(--general-text-brand);
   text-align: center;
 }
 
 .tedi-rating--star .tedi-rating__visual {
-  align-items: center;
-  justify-content: center;
-  width: var(--feedback-star-size);
-  height: var(--feedback-star-size);
+  padding: var(--feedback-star-inner-spacing);
+}
+
+// Filled glyph stacked under the outlined one; transparent unless the star is hovered while unselected.
+.tedi-rating__star-backdrop {
+  position: absolute;
+  inset: var(--feedback-star-inner-spacing);
+  color: transparent;
 }
 
 .tedi-rating__circle {
@@ -88,40 +88,52 @@
   width: var(--button-sm-height);
   height: var(--button-sm-height);
   font-size: var(--body-small-regular-size);
-  color: var(--general-text-secondary);
+  color: var(--general-text-brand);
   background-color: var(--general-surface-primary);
   border: var(--tedi-borders-01) solid var(--general-border-secondary);
   border-radius: 50%;
 }
 
-.tedi-rating--icon .tedi-rating__circle,
-.tedi-rating--number .tedi-rating__circle {
-  color: var(--general-text-brand);
-}
-
-.tedi-rating__item--active .tedi-rating__circle,
+.tedi-rating__visual--selected .tedi-rating__circle,
 .tedi-rating__circle--filled {
   color: var(--general-text-white);
   background-color: var(--general-surface-brand-primary);
   border-color: var(--general-surface-brand-primary);
 }
 
-.tedi-rating--hovering .tedi-rating__item--active .tedi-rating__star,
-.tedi-rating:not(.tedi-rating--disabled) .tedi-rating__item:hover .tedi-rating__star {
-  color: var(--general-icon-brand-dark);
+.tedi-rating:not(.tedi-rating--disabled) {
+  .tedi-rating__visual--hover,
+  .tedi-rating__item:hover > .tedi-rating__visual {
+    .tedi-rating__star {
+      color: var(--general-icon-brand-dark);
+    }
+
+    .tedi-rating__star-backdrop {
+      color: var(--general-surface-brand-quaternary);
+    }
+
+    .tedi-rating__circle {
+      color: var(--general-icon-brand-dark);
+      background-color: var(--general-surface-brand-quaternary);
+      border-color: var(--general-icon-brand-dark);
+    }
+
+    &.tedi-rating__visual--selected .tedi-rating__circle {
+      color: var(--general-text-white);
+      background-color: var(--general-icon-brand-dark);
+      border-color: var(--general-icon-brand-dark);
+    }
+  }
 }
 
-.tedi-rating--hovering .tedi-rating__item--active .tedi-rating__circle,
-.tedi-rating:not(.tedi-rating--disabled) .tedi-rating__item--active:hover .tedi-rating__circle {
-  background-color: var(--general-icon-brand-dark);
-  border-color: var(--general-icon-brand-dark);
-}
-
-// Hover on an unselected circle - light-blue tint with a brand-dark border/number (per the states).
-.tedi-rating:not(.tedi-rating--disabled) .tedi-rating__item:not(.tedi-rating__item--active):hover .tedi-rating__circle {
-  color: var(--general-icon-brand-dark);
-  background-color: var(--general-surface-brand-quaternary);
-  border-color: var(--general-icon-brand-dark);
+.tedi-rating__input:focus-visible + .tedi-rating__visual::after {
+  position: absolute;
+  inset: -3px;
+  pointer-events: none;
+  content: '';
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--general-effect-colors-focus-outset-outer-shadow),
+    inset 0 0 0 3px var(--general-effect-colors-focus-outset-inner-shadow);
 }
 
 .tedi-rating__caption {
@@ -141,7 +153,7 @@
 }
 
 .tedi-rating--number:not(.tedi-rating--vertical) {
-  .tedi-rating__items {
+  .tedi-rating__items--captioned {
     row-gap: var(--layout-grid-gutters-24);
     padding-bottom: var(--layout-grid-gutters-24);
   }
@@ -156,28 +168,23 @@
   }
 }
 
-// Disabled colours map to Figma's form/rating/* tokens, which aren't in the published core yet.
-// TODO: drop the hex fallbacks once @tedi-design-system/core ships these semantic tokens.
 .tedi-rating--disabled {
-  // Unselected disabled star: outline drawn in the disabled border/stroke tone.
   .tedi-rating__star {
-    color: var(--form-rating-unselected-border-disabled, #e1e2e5);
+    color: var(--form-general-border-disabled);
   }
 
-  .tedi-rating__item--active .tedi-rating__star {
-    color: var(--form-rating-selected-background-disabled, #f0f0f2);
+  .tedi-rating__visual--selected .tedi-rating__star {
+    color: var(--form-general-background-disabled);
   }
 
   .tedi-rating__circle {
-    color: var(--form-rating-unselected-text-disabled, #9293a4);
-    background-color: var(--form-rating-unselected-background-disabled, #0000);
-    border-color: var(--form-rating-unselected-border-disabled, #e1e2e5);
+    color: var(--general-text-disabled);
+    background-color: transparent;
+    border-color: var(--form-general-border-disabled);
   }
 
-  .tedi-rating__item--active .tedi-rating__circle {
-    color: var(--form-rating-selected-text-disabled, #9293a4);
-    background-color: var(--form-rating-selected-background-disabled, #f0f0f2);
-    border-color: var(--form-rating-selected-border-disabled, #e1e2e5);
+  .tedi-rating__visual--selected .tedi-rating__circle {
+    background-color: var(--form-general-background-disabled);
   }
 }
 

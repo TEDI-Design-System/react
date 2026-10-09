@@ -3,7 +3,7 @@ import React, { useId, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
-import { Icon } from '../../base/icon/icon';
+import { Icon, IconSize } from '../../base/icon/icon';
 import styles from './rating.module.scss';
 
 export type RatingType = 'star' | 'number' | 'icon';
@@ -18,6 +18,11 @@ export interface RatingBreakpointProps {
    */
   orientation?: 'horizontal' | 'vertical';
 }
+
+/** Star glyph size (matches `--feedback-star-size`). */
+const STAR_ICON_SIZE: IconSize = 24;
+/** Glyph size inside the circular number/icon items. */
+const CIRCLE_ICON_SIZE: IconSize = 18;
 
 const DEFAULT_ICONS = [
   'sentiment_very_dissatisfied',
@@ -131,19 +136,34 @@ export const Rating = (props: RatingProps): JSX.Element => {
     onChange?.(next);
   };
 
-  const isItemActive = (position: number): boolean =>
-    type === 'icon' ? position === displayValue : position <= displayValue;
+  const isInRange = (position: number, target: number): boolean =>
+    type === 'icon' ? position === target : position <= target;
 
   // Language-neutral fallback (matches the read-only `value/total` summary format) when no itemLabels given.
   const itemLabel = (position: number): string => itemLabels?.[position - 1] || `${position}/${total}`;
 
   const positions = Array.from({ length: total }, (_, index) => index + 1);
 
-  const renderVisual = (position: number, active: boolean): React.ReactNode => {
-    const filledActive = active && !disabled;
+  const renderVisual = (position: number, selected: boolean): React.ReactNode => {
     if (type === 'star') {
       return (
-        <Icon name={starGlyph} filled={active} color="inherit" size={24} className={styles['tedi-rating__star']} />
+        <>
+          {/* Filled copy behind the glyph; tinted only on hover so the outlined star gets a light fill. */}
+          <Icon
+            name={starGlyph}
+            filled
+            color="inherit"
+            size={STAR_ICON_SIZE}
+            className={styles['tedi-rating__star-backdrop']}
+          />
+          <Icon
+            name={starGlyph}
+            filled={selected}
+            color="inherit"
+            size={STAR_ICON_SIZE}
+            className={styles['tedi-rating__star']}
+          />
+        </>
       );
     }
 
@@ -152,7 +172,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
         {type === 'number' ? (
           position
         ) : (
-          <Icon name={resolvedIcons?.[position - 1] ?? 'circle'} color={filledActive ? 'white' : 'inherit'} size={18} />
+          <Icon name={resolvedIcons?.[position - 1] ?? 'circle'} color="inherit" size={CIRCLE_ICON_SIZE} />
         )}
       </span>
     );
@@ -171,7 +191,6 @@ export const Rating = (props: RatingProps): JSX.Element => {
         : '';
     const summary = `${valueText}${countText}`;
     const iconPosition = Math.min(total, Math.max(1, Math.round(currentValue)));
-    const hasValue = currentValue > 0;
     const isStarScale = type === 'star' && readOnlyVariant === 'scale';
     const readOnlyVisual = isStarScale ? (
       <span className={styles['tedi-rating__stars']}>
@@ -179,13 +198,19 @@ export const Rating = (props: RatingProps): JSX.Element => {
           const fill = Math.max(0, Math.min(1, currentValue - (position - 1))) * 100;
           return (
             <span key={position} className={styles['tedi-rating__star-partial']}>
-              <Icon name={starGlyph} color="inherit" size={24} className={styles['tedi-rating__star']} />
+              <Icon name={starGlyph} color="inherit" size={STAR_ICON_SIZE} className={styles['tedi-rating__star']} />
               {fill > 0 && (
                 <span
                   className={styles['tedi-rating__star-partial-fill']}
                   style={{ '--tedi-rating-star-fill': `${fill}%` } as React.CSSProperties}
                 >
-                  <Icon name={starGlyph} filled color="inherit" size={24} className={styles['tedi-rating__star']} />
+                  <Icon
+                    name={starGlyph}
+                    filled
+                    color="inherit"
+                    size={STAR_ICON_SIZE}
+                    className={styles['tedi-rating__star']}
+                  />
                 </span>
               )}
             </span>
@@ -193,10 +218,10 @@ export const Rating = (props: RatingProps): JSX.Element => {
         })}
       </span>
     ) : type === 'star' ? (
-      <Icon name={starGlyph} filled={hasValue} color="inherit" size={24} className={styles['tedi-rating__star']} />
+      <Icon name={starGlyph} filled color="inherit" size={STAR_ICON_SIZE} className={styles['tedi-rating__star']} />
     ) : type === 'icon' ? (
-      <span className={cn(styles['tedi-rating__circle'], { [styles['tedi-rating__circle--filled']]: hasValue })}>
-        <Icon name={resolvedIcons?.[iconPosition - 1] ?? 'circle'} color={hasValue ? 'white' : 'inherit'} size={18} />
+      <span className={cn(styles['tedi-rating__circle'], styles['tedi-rating__circle--filled'])}>
+        <Icon name={resolvedIcons?.[iconPosition - 1] ?? 'circle'} color="inherit" size={CIRCLE_ICON_SIZE} />
       </span>
     ) : null;
 
@@ -228,19 +253,24 @@ export const Rating = (props: RatingProps): JSX.Element => {
         styles[`tedi-rating--${type}`],
         { [styles['tedi-rating--vertical']]: orientation === 'vertical' },
         { [styles['tedi-rating--disabled']]: disabled },
-        { [styles['tedi-rating--hovering']]: isHovering },
         className
       )}
     >
-      <div className={styles['tedi-rating__items']} onMouseLeave={() => setHoverValue(null)}>
+      <div
+        className={cn(styles['tedi-rating__items'], {
+          [styles['tedi-rating__items--captioned']]: type !== 'star' && itemLabels?.some(Boolean),
+        })}
+        onMouseLeave={() => setHoverValue(null)}
+      >
         {positions.map((position) => {
-          const active = isItemActive(position);
+          const previewed = isHovering && isInRange(position, hoverValue as number);
+          const selected = isInRange(position, currentValue) && (!isHovering || previewed || type === 'icon');
           const isEndpoint = position === 1 || position === total;
           const showCaption = !!itemLabels?.[position - 1] && (type === 'icon' || (type === 'number' && isEndpoint));
           return (
             <label
               key={position}
-              className={cn(styles['tedi-rating__item'], { [styles['tedi-rating__item--active']]: active })}
+              className={styles['tedi-rating__item']}
               onMouseEnter={interactive ? () => setHoverValue(position) : undefined}
             >
               <input
@@ -253,8 +283,14 @@ export const Rating = (props: RatingProps): JSX.Element => {
                 onChange={() => setValue(position)}
                 aria-label={itemLabel(position)}
               />
-              <span className={styles['tedi-rating__visual']} aria-hidden="true">
-                {renderVisual(position, active)}
+              <span
+                className={cn(styles['tedi-rating__visual'], {
+                  [styles['tedi-rating__visual--selected']]: selected,
+                  [styles['tedi-rating__visual--hover']]: previewed,
+                })}
+                aria-hidden="true"
+              >
+                {renderVisual(position, selected)}
               </span>
               {showCaption && <span className={styles['tedi-rating__caption']}>{itemLabels?.[position - 1]}</span>}
             </label>

@@ -126,61 +126,65 @@ export const States: Story = {
   },
   render: () => {
     const types = ['star', 'number', 'icon'] as const;
-    // Rows are the item states. Each type gets its own compact Default / Selected table; the three
-    // tables sit side by side as columns from lg up and stack under each other on smaller screens.
     const rows: { label: string; state?: 'hover' | 'focus'; disabled?: boolean }[] = [
       { label: 'Default' },
       { label: 'Hover', state: 'hover' },
       { label: 'Disabled', disabled: true },
       { label: 'Focus', state: 'focus' },
     ];
-    const cell = { padding: '0.5rem 1rem', textAlign: 'left' as const };
+    const cell = { padding: '0.5rem 1rem', textAlign: 'left' as const, verticalAlign: 'middle' as const };
 
     return (
-      <div className="flex flex-column flex-lg-row gap-5 align-items-start">
-        {types.map((type) => (
-          <VerticalSpacing size={0.5} key={type}>
-            <Heading element="h3" modifiers="h5">
-              {type[0].toUpperCase() + type.slice(1)}
-            </Heading>
-            <table style={{ borderCollapse: 'collapse' }}>
-              <thead>
-                <tr>
-                  <th>
-                    <span className="sr-only">State</span>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <td />
+              {types.map((type) => (
+                <th key={type} colSpan={2} scope="colgroup" style={cell}>
+                  <Heading element="h3" modifiers="h5">
+                    {type[0].toUpperCase() + type.slice(1)}
+                  </Heading>
+                </th>
+              ))}
+            </tr>
+            <tr>
+              <th>
+                <span className="sr-only">State</span>
+              </th>
+              {types.map((type) =>
+                ['Default', 'Selected'].map((column) => (
+                  <th key={`${type}-${column}`} scope="col" style={cell}>
+                    <Text modifiers="bold">{column}</Text>
                   </th>
-                  <th style={cell}>
-                    <Text modifiers="bold">Default</Text>
-                  </th>
-                  <th style={cell}>
-                    <Text modifiers="bold">Selected</Text>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.label} id={row.state ? `rating-${row.state}-${type}` : undefined}>
-                    <th style={{ padding: '0.5rem 1rem 0.5rem 0', textAlign: 'left' }}>
-                      <Text modifiers="bold">{row.label}</Text>
-                    </th>
-                    {[0, 1].map((selected) => (
-                      <td key={selected} style={cell}>
-                        <Rating
-                          type={type}
-                          count={1}
-                          defaultValue={selected}
-                          disabled={row.disabled}
-                          icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
-                          label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </VerticalSpacing>
-        ))}
+                ))
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.label} id={row.state ? `rating-${row.state}` : undefined}>
+                <th scope="row" style={{ ...cell, paddingLeft: 0 }}>
+                  <Text modifiers="bold">{row.label}</Text>
+                </th>
+                {types.map((type) =>
+                  [0, 1].map((selected) => (
+                    <td key={`${type}-${selected}`} style={cell}>
+                      <Rating
+                        type={type}
+                        count={1}
+                        defaultValue={selected}
+                        disabled={row.disabled}
+                        icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
+                        label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
+                      />
+                    </td>
+                  ))
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   },

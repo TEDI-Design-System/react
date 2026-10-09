@@ -68,6 +68,58 @@ describe('Rating', () => {
     expect(screen.getByRole('radio', { name: '5/10' })).toBeInTheDocument();
   });
 
+  describe('hover preview', () => {
+    const visuals = (container: HTMLElement) =>
+      Array.from(container.querySelectorAll<HTMLElement>('.tedi-rating__visual'));
+    const isSelected = (el: HTMLElement) => el.classList.contains('tedi-rating__visual--selected');
+    const isHovered = (el: HTMLElement) => el.classList.contains('tedi-rating__visual--hover');
+
+    it('marks the hovered range as hover and keeps only committed items in it selected', () => {
+      const { container } = render(<Rating label="Feedback" count={5} defaultValue={2} />);
+      fireEvent.mouseEnter(screen.getByRole('radio', { name: '4/5' }).closest('label') as HTMLElement);
+
+      const items = visuals(container);
+      expect(items.map(isHovered)).toEqual([true, true, true, true, false]);
+      expect(items.map(isSelected)).toEqual([true, true, false, false, false]);
+    });
+
+    it('shows committed items outside the hovered range as unselected, and restores them on leave', () => {
+      const { container } = render(<Rating label="Feedback" count={5} defaultValue={4} />);
+      const label = screen.getByRole('radio', { name: '2/5' }).closest('label') as HTMLElement;
+
+      fireEvent.mouseEnter(label);
+      expect(visuals(container).map(isSelected)).toEqual([true, true, false, false, false]);
+
+      fireEvent.mouseLeave(label.parentElement as HTMLElement);
+      expect(visuals(container).map(isSelected)).toEqual([true, true, true, true, false]);
+      expect(visuals(container).some(isHovered)).toBe(false);
+    });
+
+    it('previews only the hovered item for the icon type', () => {
+      const { container } = render(<Rating label="Feedback" type="icon" count={5} defaultValue={3} />);
+      fireEvent.mouseEnter(screen.getByRole('radio', { name: '3/5' }).closest('label') as HTMLElement);
+
+      const items = visuals(container);
+      expect(items.map(isHovered)).toEqual([false, false, true, false, false]);
+      expect(items.map(isSelected)).toEqual([false, false, true, false, false]);
+    });
+
+    it('keeps the current pick selected while hovering another icon', () => {
+      const { container } = render(<Rating label="Feedback" type="icon" count={5} defaultValue={3} />);
+      fireEvent.mouseEnter(screen.getByRole('radio', { name: '5/5' }).closest('label') as HTMLElement);
+
+      const items = visuals(container);
+      expect(items.map(isHovered)).toEqual([false, false, false, false, true]);
+      expect(items.map(isSelected)).toEqual([false, false, true, false, false]);
+    });
+
+    it('does not preview while disabled', () => {
+      const { container } = render(<Rating label="Feedback" count={5} disabled />);
+      fireEvent.mouseEnter(screen.getByRole('radio', { name: '3/5' }).closest('label') as HTMLElement);
+      expect(visuals(container).some(isHovered)).toBe(false);
+    });
+  });
+
   it('disables every radio when disabled', () => {
     render(<Rating label="Feedback" count={5} disabled />);
     screen.getAllByRole('radio').forEach((radio) => expect(radio).toBeDisabled());
@@ -116,13 +168,10 @@ describe('Rating', () => {
       expect(container.querySelectorAll('.tedi-rating__star-partial-fill')).toHaveLength(0);
     });
 
-    it('renders an unselected visual for a zero rating so it agrees with the 0/total summary', () => {
+    it('always renders the summary visual filled, even for a zero rating', () => {
       const zero = renderWithLabels(<Rating label="Hinnang" type="icon" count={5} value={0} readOnly />);
       expect(zero.getByRole('img')).toHaveAccessibleName('Hinnang: 0/5');
-      expect(zero.container.querySelector('.tedi-rating__circle--filled')).toBeNull();
-
-      const rated = renderWithLabels(<Rating label="Hinnang" type="icon" count={5} value={3} readOnly />);
-      expect(rated.container.querySelector('.tedi-rating__circle--filled')).not.toBeNull();
+      expect(zero.container.querySelector('.tedi-rating__circle--filled')).not.toBeNull();
     });
 
     it('does not render the interactive scale in readOnly mode', () => {
