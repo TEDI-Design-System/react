@@ -15,4 +15,10 @@
   html.tedi-theme--dark [data-story='true'] {
     background-color: var(--general-surface-primary) !important;
   }
+
+  /* Stories with `docs.story.inline: false` render in an inline iframe; its
+     baseline gap overflows the docs wrapper and adds a stray scrollbar. */
+  .docs-story iframe {
+    display: block;
+  }
 </style>
