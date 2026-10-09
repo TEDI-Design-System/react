@@ -5,6 +5,7 @@ import StorybookDecorator from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
+import '../node_modules/@tedi-design-system/core/icons/_all.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
 
 import { PrintingProvider } from '../src/tedi/providers/printing-provider';
