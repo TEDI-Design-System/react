@@ -68,7 +68,8 @@ export interface RatingProps extends BreakpointSupport<RatingBreakpointProps> {
    */
   disabled?: boolean;
   /**
-   * Show a compact read-only summary (visual + `{value}/{count}` text) instead of the interactive scale.
+   * Show a compact read-only summary (visual + `{value}/{count}` text; text only for `type="number"`) instead
+   * of the interactive scale.
    * @default false
    */
   readOnly?: boolean;
