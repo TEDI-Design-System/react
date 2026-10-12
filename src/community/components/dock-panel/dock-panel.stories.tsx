@@ -5,15 +5,7 @@ import { useArgs } from 'storybook/preview-api';
 import { Button } from '../../../tedi/components/buttons/button/button';
 import { TextField } from '../../../tedi/components/form/textfield/textfield';
 import { Col, Row } from '../../../tedi/components/layout/grid';
-import { Resizer } from '../map-components/resizer/resizer';
-import {
-  DockPanel,
-  DockPanelDimensionPreset,
-  DockPanelLabels,
-  DockPanelLayout,
-  DockPanelPlacement,
-  DockPanelProps,
-} from './dock-panel';
+import { DockPanel, DockPanelDimensionPreset, DockPanelLabels, DockPanelLayout, DockPanelProps } from './dock-panel';
 
 const labels: DockPanelLabels = {
   collapse: 'Minimize panel',
@@ -77,7 +69,6 @@ const Workspace = ({ children, height = '36rem' }: { children: ReactNode; height
   const [count, setCount] = useState(0);
   return (
     <DockPanelLayout
-      data-dock-panel-workspace=""
       panel={children}
       style={{
         height,
@@ -205,13 +196,13 @@ There is no dimmed backdrop, background click interception, focus trap or body-s
 Opening is owned by the application: render the panel to show it, remove it to close it.
 Minimizing leaves a restore strip and **keeps the content mounted**.
 The four inward arrows (\`zoom_in_map\`) minimize; four outward arrows (\`zoom_out_map\`) restore the
-configured size, **not fullscreen**. Collapsed side titles read bottom-to-top in smaller text.
+configured or resized size, **not fullscreen**. Collapsed side titles read bottom-to-top in smaller text.
 
 ### Required props
 
 | Prop | Purpose |
 | --- | --- |
-| \`title\` | Visible heading and default accessible name. |
+| \`title\` | Visible heading and accessible name. |
 | \`children\` | Any application-provided React content. |
 | \`labels\` | Translated button names: \`{ collapse, expand, close }\`. All three strings are required by this API. |
 
@@ -242,12 +233,17 @@ They do not select a width or height and do not shrink the application-provided 
 
 Width and height use the **same DockPanel percentage scale**, not fixed-pixel Modal width tokens.
 An \`xl\` side panel leaves 20% of the workspace visible beside it, just as an \`xl\` top/bottom panel
-leaves 20% above or below it. Presets resize proportionally with their containing workspace.
+leaves 20% above or below it. Without resizing enabled, presets resize proportionally with their containing workspace.
 You can still use numbers (pixels), CSS lengths and percentages, or \`height="auto"\`.
 Use \`width="100%"\` or \`height="100%"\` explicitly when the full available dimension is intended.
 Omitted dimensions use side width \`xs\` (25%), side height 100%, and top/bottom height 50%.
 Width is ignored for top/bottom panels, which fill the workspace width.
 Custom dimensions remain capped by the workspace but are not restricted to the preset scale.
+
+Enable \`resizable\` to drag the edge facing the workspace. The configured preset or custom dimension
+is measured once to initialize Resizer in pixels. The initial workspace dimensions provide its maximum
+bounds. Minimize/restore preserves the resized dimensions and mounted content; closing and remounting
+starts again from the configured size.
 
 ### Content height and containment
 
@@ -255,8 +251,7 @@ DockPanelLayout needs a defined height, either through its parent or its own sty
 It is a layout-only companion, not a map component. Its required \`children\` are the underlying workspace;
 its optional \`panel\` is a DockPanel or a layout-aware wrapper containing it. Omit the panel to close it.
 When minimized, it reserves exactly the rail width/height. A custom wrapper must participate in the grid
-when collapsed rather than remain absolutely positioned. The Resizer examples demonstrate this with a
-story-owned layout wrapper and the unchanged Community Resizer.
+when collapsed rather than remain absolutely positioned. DockPanel handles this when \`resizable\` is enabled.
 A canvas-based map may need its own documented resize/update call when its container changes size.
 \`height="auto" maxHeight="calc(100% - 4rem)"\` keeps background visible below a side panel.
 At the height limit, only the body scrolls; the header and footer remain outside that scrolling area.
@@ -272,29 +267,33 @@ The minimize/restore button exposes \`aria-expanded\` and \`aria-controls\`; hid
 Minimize/restore and Close remain grouped, including in the minimized rail.
 Example footers contain **Cancel** and **Save** buttons. Cancel closes the example; Save only updates a
 local demo status (no backend call). Footer state survives minimization. All actions remain application-owned.
-Standard div attributes and a forwarded div ref are supported. Use \`headingElement\` for the correct heading level.
+Use \`id\` to connect external controls, \`className\`/\`style\` for styling, and \`headingElement\` for the heading level.
+The required title names the panel.
 
 ### Examples
 
 Like the TEDI-Ready Modal documentation, examples begin with **opening buttons** rather than permanently open panels.
 **Size**, **Width** and **Height** let you compare variants. **Position** demonstrates all four edges,
 including their minimized layouts: use the header controls rather than separate minimized examples.
-The remaining examples cover custom dimensions, content height, overflow, controlled state
-and composition with the existing Community Resizer.
+The remaining examples cover custom dimensions, content height, overflow, controlled state,
+external minimization through \`minimizeCounter\` and resizing through \`resizable\`.
 The default preview also provides live Controls. Select a story's Canvas for more preview space.
 `;
 
 const publicProps = [
   'title',
+  'description',
   'children',
   'labels',
   'placement',
   'size',
+  'resizable',
   'width',
   'height',
   'maxHeight',
   'collapsed',
   'defaultCollapsed',
+  'minimizeCounter',
   'onCollapsedChange',
   'onClose',
   'headerActions',
@@ -303,8 +302,6 @@ const publicProps = [
   'id',
   'className',
   'style',
-  'aria-labelledby',
-  'aria-describedby',
 ];
 
 const meta = {
@@ -327,8 +324,19 @@ const meta = {
     title: {
       control: 'text',
       type: { name: 'string', required: true },
-      description: 'Required. Visible heading and default accessible name.',
+      description: 'Required. Visible heading and accessible name.',
       table: { category: 'Required props', type: { summary: 'string' } },
+    },
+    description: {
+      control: 'text',
+      description:
+        'Text below the title, styled like Modal.Header. Hidden while minimized; omitted or empty text adds no spacing.',
+      table: {
+        category: 'Optional props',
+        subcategory: 'Content',
+        type: { summary: 'string' },
+        defaultValue: { summary: 'undefined' },
+      },
     },
     children: {
       control: false,
@@ -357,6 +365,12 @@ const meta = {
       description:
         'Optional. Panel density, independent of width/height. Uses TEDI Modal padding tokens. The title defaults to h3 for default and h4 for small, unless headingElement is supplied.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'default' } },
+    },
+    resizable: {
+      control: 'boolean',
+      description:
+        'Enables dragging the workspace-facing edge. The configured dimension supplies the initial pixel size; minimize/restore preserves the resized dimensions.',
+      table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'false' } },
     },
     width: {
       control: 'text',
@@ -407,10 +421,21 @@ const meta = {
         'Optional. Initial internal state only; ignored when collapsed is supplied. In examples it is reapplied on opening, not while editing an open panel.',
       table: { category: 'Optional props', subcategory: 'State', defaultValue: { summary: 'false' } },
     },
+    minimizeCounter: {
+      control: 'number',
+      description:
+        'Application-owned minimize counter. The initial value is ignored. Changes in either direction request minimization only while expanded; unchanged values do nothing. Restoring does not require changing the counter. In controlled mode, apply onCollapsedChange(true).',
+      table: {
+        category: 'Optional props',
+        subcategory: 'State',
+        type: { summary: 'number' },
+        defaultValue: { summary: 'undefined' },
+      },
+    },
     onCollapsedChange: {
       control: false,
       description:
-        'Optional. Requests/notifies the next minimized state. In controlled mode, update collapsed with this value.',
+        'Receives the next minimized state requested by the toggle or minimizeCounter. In controlled mode, update collapsed with this value.',
       table: {
         category: 'Optional props',
         subcategory: 'Events',
@@ -432,7 +457,7 @@ const meta = {
     headerActions: {
       control: false,
       description:
-        'Optional. React content before the grouped minimize/restore and Close controls. Hidden while minimized.',
+        'React content before the grouped minimize/restore and Close controls. Hidden but kept mounted while minimized.',
       table: {
         category: 'Optional props',
         subcategory: 'Content',
@@ -473,26 +498,6 @@ const meta = {
         defaultValue: { summary: 'Generated unique id' },
       },
     },
-    'aria-labelledby': {
-      control: 'text',
-      description: 'Optional. Override the labelling element id. Normally the panel wires its own title automatically.',
-      table: {
-        category: 'Optional props',
-        subcategory: 'Accessibility',
-        type: { summary: 'string' },
-        defaultValue: { summary: 'Panel title id' },
-      },
-    },
-    'aria-describedby': {
-      control: 'text',
-      description: 'Optional. Id of additional descriptive text, supplied by the application.',
-      table: {
-        category: 'Optional props',
-        subcategory: 'Accessibility',
-        type: { summary: 'string' },
-        defaultValue: { summary: 'undefined' },
-      },
-    },
     className: {
       control: 'text',
       description: 'Optional. Additional class names on the panel root.',
@@ -525,7 +530,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { onClose: undefined },
+  args: { onClose: undefined, description: 'Additional information about this item.' },
   render: function Render(args) {
     const [, updateArgs] = useArgs<DockPanelProps>();
     return <PanelExample args={args} closable={false} onStateChange={(collapsed) => updateArgs({ collapsed })} />;
@@ -552,6 +557,7 @@ export function Example() {
       <DockPanelLayout style={{ height: '36rem' }} panel={open ? (
         <DockPanel
           title="Details"
+          description="Additional information about this item."
           labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
           footer={<Button visualType="secondary" onClick={() => setOpen(false)}>Cancel</Button>}
         >
@@ -909,6 +915,7 @@ const usePanelVisibility = (onClose: DockPanelProps['onClose']) => {
 
 const ControlledExample = (args: DockPanelProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [minimizeCounter, setMinimizeCounter] = useState(0);
   const [message, setMessage] = useState('No header action yet.');
   const { open, setOpen, openButtonRef, handleClose } = usePanelVisibility(args.onClose);
 
@@ -930,8 +937,8 @@ const ControlledExample = (args: DockPanelProps) => {
         >
           Open / restore panel
         </Button>
-        <Button visualType="secondary" disabled={!open} onClick={() => setCollapsed(true)}>
-          Minimize from the application
+        <Button visualType="secondary" disabled={!open} onClick={() => setMinimizeCounter((counter) => counter + 1)}>
+          Minimize panel
         </Button>
       </div>
       {open && (
@@ -939,6 +946,7 @@ const ControlledExample = (args: DockPanelProps) => {
           <DockPanel
             {...args}
             collapsed={collapsed}
+            minimizeCounter={minimizeCounter}
             onCollapsedChange={handleCollapsedChange}
             onClose={handleClose}
             headerActions={
@@ -956,194 +964,37 @@ const ControlledExample = (args: DockPanelProps) => {
 ControlledExample.displayName = 'DockPanelControlledExample';
 
 export const Controlled: Story = {
-  argTypes: { collapsed: { control: false }, defaultCollapsed: { control: false } },
+  argTypes: {
+    collapsed: { control: false },
+    defaultCollapsed: { control: false },
+    minimizeCounter: { control: false },
+  },
   render: (args) => <ControlledExample {...args} />,
   parameters: {
     docs: {
       description: {
         story:
-          'The application controls collapsed state and dismissal. Minimizing preserves child state. ' +
-          'Closing unmounts the panel in this example, so reopening creates fresh child state.',
+          'The external Minimize panel button increments minimizeCounter. DockPanel requests onCollapsedChange(true), ' +
+          'and this example applies it to controlled collapsed state. Restore using the panel control or Open / restore panel; ' +
+          'the counter does not need to change. Minimize again while already minimized to verify that it stays minimized. ' +
+          'Minimizing preserves child state. Closing unmounts the panel, so reopening creates fresh child state.',
       },
     },
   },
 };
 
-// Resize from the edge facing into the workspace, not the docked edge.
-const resizeHandlePositions: Record<DockPanelPlacement, DockPanelPlacement> = {
-  right: 'left',
-  left: 'right',
-  bottom: 'top',
-  top: 'bottom',
-};
-
-// These classes belong to this example. Resizer's handle, indicator, styles and
-// mouse listeners remain untouched. Its public className only controls flex placement.
-const resizableExampleStyles = `
-.dock-panel-resizer-demo {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  min-width: 0;
-  min-height: 0;
-  pointer-events: none;
-}
-.dock-panel-resizer-demo__resizer {
-  flex: 0 1 auto;
-  min-width: 0;
-  min-height: 0;
-  max-width: 100%;
-  max-height: 100%;
-  pointer-events: auto;
-}
-.dock-panel-resizer-demo__content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.dock-panel-resizer-demo__panel {
-  pointer-events: auto;
-}
-.dock-panel-resizer-demo[data-placement='right'] {
-  justify-content: flex-end;
-}
-.dock-panel-resizer-demo[data-placement='left'] {
-  justify-content: flex-start;
-}
-.dock-panel-resizer-demo[data-placement='top'] .dock-panel-resizer-demo__resizer,
-.dock-panel-resizer-demo[data-placement='bottom'] .dock-panel-resizer-demo__resizer {
-  flex: 1 1 0;
-}
-.dock-panel-resizer-demo[data-placement='top'] .dock-panel-resizer-demo__resizer {
-  align-self: flex-start;
-}
-.dock-panel-resizer-demo[data-placement='bottom'] .dock-panel-resizer-demo__resizer {
-  align-self: flex-end;
-}
-.dock-panel-resizer-demo[data-collapsed='true'] {
-  position: relative;
-  inset: auto;
-  overflow: clip;
-}
-.dock-panel-resizer-demo[data-collapsed='true'] .dock-panel-resizer-demo__resizer {
-  max-width: none;
-  max-height: none;
-  pointer-events: none;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='left'],
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='right'] {
-  width: var(--dock-panel-rail-size);
-  height: 100%;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='left'] .dock-panel-resizer-demo__resizer,
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='right'] .dock-panel-resizer-demo__resizer {
-  flex: 0 0 auto;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='left'] {
-  grid-area: 2 / 1;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='right'] {
-  grid-area: 2 / 3;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='top'],
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='bottom'] {
-  width: 100%;
-  height: var(--dock-panel-rail-size);
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='top'] {
-  grid-area: 1 / 1 / 2 / 4;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='bottom'] {
-  grid-area: 3 / 1 / 4 / 4;
-}
-`;
-
-const ResizableExample = (args: DockPanelProps) => {
-  const { placement = 'right', defaultCollapsed = false, onCollapsedChange } = args;
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
-  const { open, setOpen, openButtonRef, handleClose } = usePanelVisibility(args.onClose);
-
-  const handleCollapsedChange = (next: boolean): void => {
-    setCollapsed(next);
-    onCollapsedChange?.(next);
-  };
-
-  return (
-    <div style={{ display: 'grid', gap: 'var(--tedi-dimensions-08)' }}>
-      <style>{resizableExampleStyles}</style>
-      <div>
-        <Button
-          visualType="secondary"
-          ref={openButtonRef}
-          onClick={() => {
-            setOpen(true);
-            setCollapsed(false);
-          }}
-        >
-          Open / restore panel
-        </Button>
-      </div>
-      {open && (
-        <Workspace>
-          <div className="dock-panel-resizer-demo" data-placement={placement} data-collapsed={collapsed}>
-            <Resizer
-              className="dock-panel-resizer-demo__resizer"
-              handlePosition={resizeHandlePositions[placement]}
-              initialWidth={480}
-              minWidth={320}
-              maxWidth={800}
-              initialHeight={320}
-              minHeight={160}
-              maxHeight={520}
-              showIndicator={false}
-            >
-              <div className="dock-panel-resizer-demo__content">
-                <DockPanel
-                  {...args}
-                  className={['dock-panel-resizer-demo__panel', args.className].filter(Boolean).join(' ')}
-                  placement={placement}
-                  width="100%"
-                  height="100%"
-                  maxHeight="100%"
-                  collapsed={collapsed}
-                  onCollapsedChange={handleCollapsedChange}
-                  onClose={handleClose}
-                  footer={args.footer === undefined ? <ExampleFooter onCancel={handleClose} /> : args.footer}
-                />
-              </div>
-            </Resizer>
-          </div>
-        </Workspace>
-      )}
-    </div>
-  );
-};
-ResizableExample.displayName = 'DockPanelResizableExample';
-
 export const ResizeWidth: Story = {
   name: 'Resize width',
-  args: { placement: 'right', title: 'Resizable details' },
-  // Resizer owns the dimensions in this example; DockPanel fills its container.
-  argTypes: {
-    collapsed: { control: false },
-    defaultCollapsed: { control: false },
-    width: { control: false },
-    height: { control: false },
-    maxHeight: { control: false },
-  },
-  render: (args) => <ResizableExample {...args} />,
+  args: { placement: 'right', title: 'Resizable details', resizable: true, width: 'md' },
+  argTypes: { collapsed: { control: false } },
+  render: (args) => <PanelExample args={args} />,
   parameters: {
     docs: {
       description: {
         story:
-          'Uses the unchanged Community Resizer in its Drag Indicator mode (showIndicator=false). Drag the LEFT edge of the right-docked panel. ' +
-          'Initial width: 480px; limits: 320–800px, constrained to the workspace width. ' +
-          'The panel fills the workspace height. Minimizing keeps both components mounted, preserving ' +
-          'the resized width and child state. Closing removes the panel and resize handle; reopening resets the size. ' +
-          'The small tab, hover accent and mouse-drag behaviour are exactly those of Resizer’s existing Drag Indicator story. ' +
-          'No ribbon is forced on permanently. The story does not change Resizer or its internal styles. ' +
-          'While minimized, the story-owned wrapper reserves a grid track and clips the unused expanded area and resize edge; the panel and Resizer stay mounted.',
+          'Drag the left edge of the right-docked panel. width="md" starts at 50% of the workspace width; dragging then uses pixels. ' +
+          'Edit the form, resize, then minimize and restore to check that both the content and resized width are preserved. ' +
+          'The minimized rail reserves workspace space and hides the resize handle. Closing and reopening resets the size.',
       },
     },
   },
@@ -1151,26 +1002,16 @@ export const ResizeWidth: Story = {
 
 export const ResizeHeight: Story = {
   name: 'Resize height',
-  args: { placement: 'bottom', title: 'Resizable details' },
-  argTypes: {
-    collapsed: { control: false },
-    defaultCollapsed: { control: false },
-    width: { control: false },
-    height: { control: false },
-    maxHeight: { control: false },
-  },
-  render: (args) => <ResizableExample {...args} />,
+  args: { placement: 'bottom', title: 'Resizable details', resizable: true, height: 'md' },
+  argTypes: { collapsed: { control: false } },
+  render: (args) => <PanelExample args={args} />,
   parameters: {
     docs: {
       description: {
         story:
-          'Uses the unchanged Community Resizer in its Drag Indicator mode (showIndicator=false). Drag the TOP edge of the bottom-docked panel. ' +
-          'Initial height: 320px; limits: 160–520px, constrained to the workspace height. ' +
-          'The panel fills the workspace width. Minimizing keeps both components mounted, preserving ' +
-          'the resized height and child state. Closing removes the panel and resize handle; reopening resets the size. ' +
-          'The small tab, hover accent and mouse-drag behaviour are exactly those of Resizer’s existing Drag Indicator story. ' +
-          'No ribbon is forced on permanently. The story does not change Resizer or its internal styles. ' +
-          'While minimized, the story-owned wrapper reserves a grid track and clips the unused expanded area and resize edge; the panel and Resizer stay mounted.',
+          'Drag the top edge of the bottom-docked panel. height="md" starts at 50% of the workspace height; dragging then uses pixels. ' +
+          'Edit the form, resize, then minimize and restore to check that both the content and resized height are preserved. ' +
+          'The minimized rail reserves workspace space and hides the resize handle. Closing and reopening resets the size.',
       },
     },
   },
