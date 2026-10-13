@@ -184,6 +184,7 @@ describe('CategorySearch', () => {
       await user.click(screen.getByRole('searchbox', { name: 'Search' }));
       const dialog = await screen.findByRole('dialog', { name: 'Search' });
       const input = within(dialog).getByRole('combobox', { name: 'Search' });
+      await waitFor(() => expect(within(dialog).getAllByRole('button', { name: 'Close' })[0]).toHaveFocus());
       await user.type(input, 'A');
       await screen.findByRole('option', { name: 'Saved address' });
       await user.type(input, 'b');
