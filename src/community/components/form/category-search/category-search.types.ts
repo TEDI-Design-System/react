@@ -1,5 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 
+import type { IconSize } from '../../../../tedi/components/base/icon/icon';
+import type { SearchProps, SearchSuggestion } from '../../../../tedi/components/form/search/search';
+
 export type CategorySearchSize = 'small' | 'default' | 'large';
 
 export interface CategorySearchRequestContext {
@@ -46,7 +49,7 @@ export interface CategorySearchFilterDefinition<Filters, Result> {
   getResultCount?: (result: Result) => number;
 }
 
-export interface CategorySearchTextDefinition<Result> {
+export interface CategorySearchTextDefinition {
   /** Stable and unique within one CategorySearch instance. */
   id: string;
   /** Category name shown in the selector and used to name the panel. */
@@ -60,16 +63,11 @@ export interface CategorySearchTextDefinition<Result> {
   /** Show the submit button beside the text input. Defaults to true. */
   showSearchButton?: boolean;
   /** Search on each non-empty text change and explicit submission; honor signal when supported. */
-  onSearch: (query: string, context: CategorySearchRequestContext) => Result | Promise<Result>;
-  /** Render the last successful result alongside the query that produced it. */
-  renderResults: (context: {
-    result: Result;
-    query: string;
-    /** Put a result label in the input, close the panel, and cancel any pending lookup. */
-    selectResult: (text: string) => void;
-  }) => ReactNode;
-  /** Supply this when the result is paginated or is not a plain array. */
-  getResultCount?: (result: Result) => number;
+  onSearch: (query: string, context: CategorySearchRequestContext) => SearchSuggestion[] | Promise<SearchSuggestion[]>;
+  /** Called after saving the selected string label, or value when the label is not a string. */
+  onSuggestionSelect?: SearchProps['onSuggestionSelect'];
+  /** Customize suggestion row content using TEDI Search's renderer. */
+  renderSuggestionContent?: SearchProps['renderSuggestionContent'];
 }
 
 /**
@@ -87,6 +85,10 @@ export interface CategorySearchCategory {
   placeholder?: string;
   /** Show the submit button beside the text input. Defaults to true. */
   showSearchButton?: boolean;
+  /** @internal Handle selection from a text category. */
+  onSuggestionSelect?: SearchProps['onSuggestionSelect'];
+  /** @internal Customize text suggestion rows. */
+  renderSuggestionContent?: SearchProps['renderSuggestionContent'];
   /** @internal Create an initial or reset draft. */
   initialValue: () => unknown;
   /** @internal Render the normalized category filter fields. */
@@ -96,7 +98,7 @@ export interface CategorySearchCategory {
   /** @internal Execute a search with the normalized submitted draft. */
   onSearch: (value: unknown, context: CategorySearchRequestContext) => unknown;
   /** @internal Render completed results and their normalized submitted draft. */
-  renderResults: (context: { result: unknown; value: unknown; selectResult: (text: string) => void }) => ReactNode;
+  renderResults?: (context: { result: unknown; value: unknown }) => ReactNode;
   /** @internal Return the number of matching results for the summary. */
   getResultCount?: (result: unknown) => number;
 }
@@ -124,7 +126,7 @@ export interface CategorySearchLabels {
   results: string;
   /** Status while a search is running. */
   loading: string;
-  /** Message after a successful search with zero results. */
+  /** Empty-state message after a successful filter search with zero results. */
   noResults: string;
   /** Generic visible message after a failed search. */
   searchError: string;
@@ -152,20 +154,20 @@ export interface CategorySearchProps {
   mobile?: boolean;
   /** Initially selected ID, used only on mount. Defaults to the first category. */
   defaultCategoryId?: string;
-  /**
-   * Initial panel or modal visibility, used only on mount. Defaults to false.
-   * Desktop text results also require a non-empty input and a pending search, completed search, or error.
-   */
+  /** Initial filter-panel or mobile-modal visibility, used only on mount. Defaults to false. */
   defaultOpen?: boolean;
   /**
    * Application-owned minimize counter. The initial value is ignored.
-   * Later changes hide the panel or modal without clearing saved state or restoring focus.
+   * Later changes hide the filter panel or mobile modal without clearing saved state or restoring focus.
+   * Does not control TEDI Search's autocomplete popup.
    */
   minimizeCounter?: number;
   /** Disable category selection, filter fields, and submission. Defaults to false. */
   disabled?: boolean;
   /** Size of the search field and buttons; also provided to renderFilters. Defaults to 'default'. */
   size?: CategorySearchSize;
+  /** Search-button icon size. Defaults to TEDI's 18 for small/default buttons and 24 for large buttons. */
+  searchButtonIconSize?: IconSize;
   /** Place validation content before or after the filter fields. Defaults to 'before'. */
   validationPosition?: 'before' | 'after';
   /** Override visible and accessible labels for localization. */
@@ -173,18 +175,12 @@ export interface CategorySearchProps {
   /** Width of the whole search bar, including the category selector. Defaults to '100%' and fits within its parent. */
   searchBarWidth?: CSSProperties['width'];
   /**
-   * Desktop text-results panel width. May exceed the search bar; constrained to the available viewport space.
-   * Defaults to '100%' of the whole search bar. Does not set filter-category panel width.
-   * The mobile modal fills the viewport width.
-   */
-  textResultsPanelWidth?: CSSProperties['width'];
-  /**
    * Match desktop filter forms and their results to the full bar, including the category selector.
    * Defaults to false: panels match the bar excluding the selector.
    * Does not affect text-search results or the mobile modal.
    */
   fullWidthFilterPanel?: boolean;
-  /** Maximum desktop panel height. Defaults to 'min(32rem, 70dvh)'. The mobile modal fills the viewport height. */
+  /** Maximum desktop filter-panel height. Defaults to 'min(32rem, 70dvh)'. Does not size autocomplete or the mobile modal. */
   maxPanelHeight?: CSSProperties['maxHeight'];
   /** Additional CSS class applied to the outer component element. */
   className?: string;

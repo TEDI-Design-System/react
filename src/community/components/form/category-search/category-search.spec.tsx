@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createRef, type ReactNode, useState } from 'react';
 
 import { Button } from '../../../../tedi/components/buttons/button/button';
+import type { SearchSuggestion } from '../../../../tedi/components/form/search/search';
 import { TextField } from '../../../../tedi/components/form/textfield/textfield';
 import { Alert } from '../../../../tedi/components/notifications/alert/alert';
 import { CategorySearch } from './category-search';
@@ -59,27 +60,15 @@ const createCategory = (
   });
 
 const createTextCategory = (
-  onSearch: CategorySearchTextDefinition<string[]>['onSearch'] = (query) => [query],
+  onSearch: CategorySearchTextDefinition['onSearch'] = (query) => [{ value: query }],
   showSearchButton?: boolean
 ) =>
-  defineCategorySearchCategory<string[]>({
+  defineCategorySearchCategory({
     id: 'addresses',
     label: 'Addresses',
     mode: 'search',
     showSearchButton,
     onSearch,
-    renderResults: ({ result, query, selectResult }) => (
-      <>
-        <p>Submitted query: {query}</p>
-        <ul aria-label="Address matches">
-          {result.map((address) => (
-            <li key={address}>
-              <Button onClick={() => selectResult(address)}>{address}</Button>
-            </li>
-          ))}
-        </ul>
-      </>
-    ),
   });
 
 const selectCategory = async (user: ReturnType<typeof userEvent.setup>, label: string) => {
@@ -143,14 +132,17 @@ describe('CategorySearch', () => {
     expect(onSearch).not.toHaveBeenCalled();
   });
 
-  it('orders the mobile controls and reopens saved results after selection or closing', async () => {
+  it('uses autocomplete below the mobile controls and preserves selection when reopening', async () => {
     const user = userEvent.setup();
-    const onSearch = jest.fn(() => ['Aasa 1', 'Aasa 2']);
+    const onSearch = jest.fn(() => [
+      { value: 'aasa-1', label: 'Aasa 1' },
+      { value: 'aasa-2', label: 'Aasa 2' },
+    ]);
     render(<CategorySearch categories={[createTextCategory(onSearch)]} mobile />);
     await user.click(screen.getByRole('searchbox', { name: 'Search' }));
 
     const dialog = await screen.findByRole('dialog', { name: 'Search' });
-    const input = within(dialog).getByRole('searchbox', { name: 'Search' });
+    const input = within(dialog).getByRole('combobox', { name: 'Search' });
     const selector = within(dialog).getByRole('button', { name: 'Search category: Addresses' });
     const heading = within(dialog).getByRole('heading', { name: 'Search' });
     const close = within(dialog).getAllByRole('button', { name: 'Close' })[0];
@@ -160,41 +152,40 @@ describe('CategorySearch', () => {
     expect(input).not.toHaveAttribute('readonly');
     expect(Boolean(selector.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
     await user.type(input, 'A');
-    const results = await within(dialog).findByRole('list', { name: 'Address matches' });
-    expect(Boolean(input.compareDocumentPosition(results) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
-    await user.click(within(dialog).getByRole('button', { name: 'Aasa 1' }));
+    await user.click(await screen.findByRole('option', { name: 'Aasa 1' }));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('searchbox', { name: 'Search' })).toHaveValue('Aasa 1');
-    expect(screen.getByRole('searchbox', { name: 'Search' })).toHaveFocus();
-    await user.click(screen.getByRole('searchbox', { name: 'Search' }));
+    const launcher = screen.getByRole('searchbox', { name: 'Search' });
+    expect(launcher).toHaveValue('Aasa 1');
+    expect(launcher).toHaveFocus();
+    await user.click(launcher);
     const reopened = await screen.findByRole('dialog', { name: 'Search' });
-    expect(within(reopened).getByRole('searchbox', { name: 'Search' })).toHaveValue('Aasa 1');
-    expect(within(reopened).getByRole('button', { name: 'Aasa 1' })).toBeVisible();
-    expect(within(reopened).getByRole('button', { name: 'Aasa 2' })).toBeVisible();
+    const reopenedInput = within(reopened).getByRole('combobox', { name: 'Search' });
+    expect(reopenedInput).toHaveValue('Aasa 1');
+    await user.click(reopenedInput);
+    expect(await screen.findByRole('option', { name: 'Aasa 1' })).toBeVisible();
+    expect(screen.getByRole('option', { name: 'Aasa 2' })).toBeVisible();
     expect(onSearch).toHaveBeenCalledTimes(1);
     await user.click(within(reopened).getAllByRole('button', { name: 'Close' })[0]);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: 'Search' })).toHaveFocus();
-    await user.click(screen.getByRole('searchbox', { name: 'Search' }));
-    await screen.findByRole('dialog', { name: 'Search' });
-    await user.keyboard('{Escape}');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(onSearch).toHaveBeenCalledTimes(1);
   });
 
   it.each(['Clear', 'deleting the text'] as const)(
-    'keeps Modal open after %s without restoring cleared results',
+    'keeps Modal open after %s without restoring cleared suggestions',
     async (clearWith) => {
       const user = userEvent.setup();
-      const pending = deferred<string[]>();
-      const onSearch = jest.fn().mockResolvedValueOnce(['Saved address']).mockReturnValueOnce(pending.promise);
+      const pending = deferred<SearchSuggestion[]>();
+      const onSearch = jest
+        .fn()
+        .mockResolvedValueOnce([{ value: 'Saved address' }])
+        .mockReturnValueOnce(pending.promise);
       render(<CategorySearch categories={[createTextCategory(onSearch)]} mobile />);
       await user.click(screen.getByRole('searchbox', { name: 'Search' }));
       const dialog = await screen.findByRole('dialog', { name: 'Search' });
-      const input = within(dialog).getByRole('searchbox', { name: 'Search' });
+      const input = within(dialog).getByRole('combobox', { name: 'Search' });
       await user.type(input, 'A');
-      await within(dialog).findByRole('button', { name: 'Saved address' });
+      await screen.findByRole('option', { name: 'Saved address' });
       await user.type(input, 'b');
       if (clearWith === 'Clear') await user.click(within(dialog).getByRole('button', { name: /^clear$/i }));
       else await user.clear(input);
@@ -203,12 +194,14 @@ describe('CategorySearch', () => {
       expect(input).toHaveValue('');
       expect(onSearch.mock.calls[1][1].signal.aborted).toBe(true);
       await act(async () => {
-        pending.resolve(['Cancelled address']);
+        pending.resolve([{ value: 'Cancelled address' }]);
       });
-      expect(within(dialog).queryByRole('list')).not.toBeInTheDocument();
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
       await user.click(within(dialog).getAllByRole('button', { name: 'Close' })[0]);
       await user.click(screen.getByRole('searchbox', { name: 'Search' }));
-      expect(within(await screen.findByRole('dialog', { name: 'Search' })).queryByRole('list')).not.toBeInTheDocument();
+      await screen.findByRole('dialog', { name: 'Search' });
+      await user.click(screen.getByRole('combobox', { name: 'Search' }));
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
       expect(onSearch).toHaveBeenCalledTimes(2);
     }
   );
@@ -1202,47 +1195,23 @@ describe('CategorySearch', () => {
     expect(screen.getByText('Submitted Parcels: Aasa')).toBeVisible();
   });
 
-  it.each(['category', 'search'] as const)(
-    'reopens the first pending search and its error in %s mode',
-    async (mode) => {
-      const user = userEvent.setup();
-      const pending = deferred<string[]>();
-      const category =
-        mode === 'category'
-          ? createCategory('parcels', 'Parcels', () => pending.promise)
-          : defineCategorySearchCategory<string[]>({
-              id: 'addresses',
-              label: 'Addresses',
-              mode: 'search',
-              onSearch: () => pending.promise,
-              renderResults: ({ result }) => <p>{result[0]}</p>,
-            });
-      render(<CategorySearch categories={[category]} defaultOpen />);
-      if (mode === 'category') await user.click(screen.getByRole('button', { name: 'Search' }));
-      else await user.type(screen.getByRole('searchbox'), 'Aasa{Enter}');
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      if (mode === 'category') {
-        await user.click(screen.getByRole('button', { name: 'Show results' }));
-      } else {
-        expect(screen.queryByRole('button', { name: /Show results/ })).not.toBeInTheDocument();
-        await selectCategory(user, 'Addresses');
-      }
-      expect(screen.getByText('Searching…')).toBeVisible();
+  it('reopens the first pending filter search and its error', async () => {
+    const user = userEvent.setup();
+    const pending = deferred<string[]>();
+    render(<CategorySearch categories={[createCategory('parcels', 'Parcels', () => pending.promise)]} defaultOpen />);
+    await user.click(screen.getByRole('button', { name: 'Search' }));
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click(screen.getByRole('button', { name: 'Show results' }));
+    expect(screen.getByText('Searching…')).toBeVisible();
 
-      await act(async () => {
-        pending.reject(new Error('First search failed'));
-      });
-      expect(await screen.findByRole('alert')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      if (mode === 'category') {
-        await user.click(screen.getByRole('button', { name: 'Show results' }));
-      } else {
-        expect(screen.queryByRole('button', { name: /Show results/ })).not.toBeInTheDocument();
-        await selectCategory(user, 'Addresses');
-      }
-      expect(screen.getByRole('alert')).toHaveTextContent('The search failed. Please try again.');
-    }
-  );
+    await act(async () => {
+      pending.reject(new Error('First search failed'));
+    });
+    expect(await screen.findByRole('alert')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click(screen.getByRole('button', { name: 'Show results' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('The search failed. Please try again.');
+  });
 
   it('aborts outstanding searches when unmounted', async () => {
     const user = userEvent.setup();
@@ -1307,24 +1276,23 @@ describe('CategorySearch', () => {
 
   it('uses initialQuery only for initial population and leaves Clear empty', async () => {
     const user = userEvent.setup();
-    const category = defineCategorySearchCategory<string[]>({
+    const category = defineCategorySearchCategory({
       id: 'cities',
       label: 'Cities',
       mode: 'search',
       initialQuery: 'Tartu',
-      onSearch: (query) => [query],
-      renderResults: ({ result }) => <p>{result[0]}</p>,
+      onSearch: (query) => [{ value: query }],
     });
     render(<CategorySearch categories={[category]} />);
-    const input = screen.getByRole('searchbox', { name: 'Search' });
+    const input = screen.getByRole('combobox', { name: 'Search' });
     expect(input).toHaveValue('Tartu');
     await user.clear(input);
-    await user.type(input, 'Tallinn{Enter}');
-    expect(await screen.findByText('Tallinn')).toBeVisible();
+    await user.type(input, 'Tallinn');
+    expect(await screen.findByRole('option', { name: 'Tallinn' })).toBeVisible();
     await user.click(screen.getByRole('button', { name: /^clear$/i }));
     expect(input).toHaveValue('');
     expect(input).toHaveFocus();
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Show results/ })).not.toBeInTheDocument();
   });
 
@@ -1346,28 +1314,25 @@ describe('CategorySearch', () => {
     expect(screen.getByRole('button', { name: 'Map action' })).toHaveFocus();
   });
 
-  it('searches every nonempty text edit with the current query while keeping focus in the input', async () => {
+  it('searches every nonempty text edit and passes suggestions to TEDI Search', async () => {
     const user = userEvent.setup();
-    const onSearch = jest.fn((query: string) => [query]);
+    const onSearch = jest.fn((query: string) => [{ value: query }]);
     render(<CategorySearch categories={[createTextCategory(onSearch)]} />);
-    const input = screen.getByRole('searchbox', { name: 'Search' });
+    const input = screen.getByRole('combobox', { name: 'Search' });
 
     await user.type(input, 'Aasa');
 
     expect(onSearch.mock.calls.map(([query]) => query)).toEqual(['A', 'Aa', 'Aas', 'Aasa']);
-    expect(await screen.findByRole('button', { name: 'Aasa' })).toBeVisible();
-    expect(screen.getByText('Submitted query: Aasa')).toBeVisible();
-    expect(screen.getByRole('region', { name: 'Addresses: Results' })).toBeVisible();
-    expect(input).toHaveAttribute('aria-controls', screen.getByRole('region').id);
+    expect(await screen.findByRole('option', { name: 'Aasa' })).toBeVisible();
     expect(input).toHaveValue('Aasa');
     expect(input).toHaveFocus();
-    expect(screen.queryByText('Filters edited since searching.')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
   });
 
   it.each([undefined, true, false])('respects showSearchButton=%s for text categories', async (showSearchButton) => {
     const user = userEvent.setup();
     render(<CategorySearch categories={[createTextCategory(undefined, showSearchButton)]} />);
-    const input = screen.getByRole('searchbox');
+    const input = screen.getByRole('combobox');
     const searchButton = screen.queryByRole('button', { name: 'Search', hidden: true });
 
     if (showSearchButton === false) {
@@ -1384,14 +1349,14 @@ describe('CategorySearch', () => {
 
   it('submits Enter once and keeps filter submission when the text search button is hidden', async () => {
     const user = userEvent.setup();
-    const onSearch = jest.fn(() => ['Aasa 1', 'Aasa 2']);
+    const onSearch = jest.fn(() => [{ value: 'Aasa 1' }, { value: 'Aasa 2' }]);
     const filterSearch = jest.fn(({ owner }: Filters) => [owner]);
     render(
       <CategorySearch
         categories={[createTextCategory(onSearch, false), createCategory('parcels', 'Parcels', filterSearch)]}
       />
     );
-    const input = screen.getByRole('searchbox');
+    const input = screen.getByRole('combobox');
     await user.type(input, 'Aa');
     expect(onSearch).toHaveBeenCalledTimes(2);
     await user.keyboard('{Enter}');
@@ -1406,57 +1371,77 @@ describe('CategorySearch', () => {
     expect(filterSearch).toHaveBeenCalledWith({ owner: 'Kask' }, { signal: expect.any(AbortSignal) });
   });
 
-  it.each(['click', 'tap'] as const)('reopens the full saved text results with an input %s', async (interaction) => {
+  it.each([
+    { label: 'Aasa 1', expectedQuery: 'Aasa 1' },
+    { label: <strong>Aasa 1</strong>, expectedQuery: 'aasa-1' },
+  ])('saves the selected query as $expectedQuery and notifies the application', async ({ label, expectedQuery }) => {
     const user = userEvent.setup();
-    const onSearch = jest.fn(() => ['Aasa 1', 'Aasa 2']);
-    render(<CategorySearch categories={[createTextCategory(onSearch)]} />);
-    const input = screen.getByRole('searchbox');
+    const suggestion = { value: 'aasa-1', label, description: 'Harju county' };
+    const onSearch = jest.fn(() => [suggestion]);
+    const onSuggestionSelect = jest.fn();
+    const renderSuggestionContent = jest.fn((item: SearchSuggestion, { query }: { query: string }) => (
+      <span>
+        {item.label} ({query})
+      </span>
+    ));
+    render(
+      <CategorySearch
+        categories={[
+          defineCategorySearchCategory({
+            id: 'addresses',
+            label: 'Addresses',
+            mode: 'search',
+            onSearch,
+            onSuggestionSelect,
+            renderSuggestionContent,
+          }),
+        ]}
+      />
+    );
+    const input = screen.getByRole('combobox');
     await user.type(input, 'A');
-    await user.click(await screen.findByRole('button', { name: 'Aasa 1' }));
+    await user.click(await screen.findByRole('option', { name: 'Aasa 1 (A)' }));
 
-    expect(input).toHaveValue('Aasa 1');
+    expect(onSuggestionSelect).toHaveBeenCalledWith(suggestion);
+    expect(renderSuggestionContent).toHaveBeenCalledWith(suggestion, { active: expect.any(Boolean), query: 'A' });
+    expect(input).toHaveValue(expectedQuery);
     expect(input).toHaveFocus();
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
-    if (interaction === 'tap') await user.pointer({ keys: '[TouchA]', target: input });
-    else await user.click(input);
-
-    expect(screen.getByRole('button', { name: 'Aasa 1' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Aasa 2' })).toBeVisible();
-    expect(screen.getByText('Submitted query: A')).toBeVisible();
-    expect(input).toHaveValue('Aasa 1');
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(onSearch).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps saved text results independent when reopening categories', async () => {
+  it('keeps saved queries and suggestions independent between text categories', async () => {
     const user = userEvent.setup();
-    const addressSearch = jest.fn(() => ['Aasa 1', 'Aasa 2']);
-    const citySearch = jest.fn(() => ['Tallinn', 'Tartu']);
+    const addressSearch = jest.fn(() => [{ value: 'Aasa 1' }, { value: 'Aasa 2' }]);
+    const citySearch = jest.fn(() => [{ value: 'Tallinn' }, { value: 'Tartu' }]);
     const cities = { ...createTextCategory(citySearch), id: 'cities', label: 'Cities' };
     render(<CategorySearch categories={[createTextCategory(addressSearch), cities]} />);
-    const input = screen.getByRole('searchbox');
-    await user.type(input, 'A');
-    await user.click(await screen.findByRole('button', { name: 'Aasa 1' }));
+    await user.type(screen.getByRole('combobox'), 'A');
+    await user.click(await screen.findByRole('option', { name: 'Aasa 1' }));
 
     await selectCategory(user, 'Cities');
-    expect(input).toHaveValue('');
-    await user.click(input);
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    const cityInput = screen.getByRole('combobox');
+    expect(cityInput).toHaveValue('');
+    await user.click(cityInput);
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(citySearch).not.toHaveBeenCalled();
-    await user.type(input, 'T');
-    await user.click(await screen.findByRole('button', { name: 'Tartu' }));
-    await user.click(input);
-    expect(input).toHaveValue('Tartu');
-    expect(screen.getByRole('button', { name: 'Tallinn' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Tartu' })).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Aasa 1' })).not.toBeInTheDocument();
+    await user.type(cityInput, 'T');
+    await user.click(await screen.findByRole('option', { name: 'Tartu' }));
 
     await selectCategory(user, 'Addresses');
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-    await user.click(input);
-    expect(input).toHaveValue('Aasa 1');
-    expect(screen.getByRole('button', { name: 'Aasa 1' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Aasa 2' })).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Tartu' })).not.toBeInTheDocument();
+    const addressInput = screen.getByRole('combobox');
+    expect(addressInput).toHaveValue('Aasa 1');
+    await user.click(addressInput);
+    expect(await screen.findByRole('option', { name: 'Aasa 1' })).toBeVisible();
+    expect(screen.getByRole('option', { name: 'Aasa 2' })).toBeVisible();
+    expect(screen.queryByRole('option', { name: 'Tartu' })).not.toBeInTheDocument();
+
+    await selectCategory(user, 'Cities');
+    expect(screen.getByRole('combobox')).toHaveValue('Tartu');
+    await user.click(screen.getByRole('combobox'));
+    expect(await screen.findByRole('option', { name: 'Tallinn' })).toBeVisible();
+    expect(screen.getByRole('option', { name: 'Tartu' })).toBeVisible();
+    expect(screen.queryByRole('option', { name: 'Aasa 1' })).not.toBeInTheDocument();
     expect(addressSearch).toHaveBeenCalledTimes(1);
     expect(citySearch).toHaveBeenCalledTimes(1);
   });
@@ -1465,11 +1450,10 @@ describe('CategorySearch', () => {
     'explicitly submits the latest text query with %s without moving focus',
     async (submitWith) => {
       const user = userEvent.setup();
-      const onSearch = jest.fn((query: string) => [query]);
+      const onSearch = jest.fn((query: string) => [{ value: query }]);
       render(<CategorySearch categories={[createTextCategory(onSearch)]} labels={{ search: 'Find addresses' }} />);
-      const input = screen.getByRole('searchbox');
+      const input = screen.getByRole('combobox');
       const searchButton = screen.getByRole('button', { name: 'Find addresses' });
-      expect(searchButton).toBeInTheDocument();
       await user.type(input, 'Aa');
       expect(onSearch).toHaveBeenCalledTimes(2);
       expect(input).toHaveFocus();
@@ -1479,7 +1463,6 @@ describe('CategorySearch', () => {
 
       expect(onSearch).toHaveBeenCalledTimes(3);
       expect(onSearch).toHaveBeenLastCalledWith('Aa', { signal: expect.any(AbortSignal) });
-      expect(screen.getByRole('region', { name: 'Addresses: Results' })).toBeVisible();
       expect(submitWith === 'Enter' ? input : searchButton).toHaveFocus();
     }
   );
@@ -1491,19 +1474,19 @@ describe('CategorySearch', () => {
     ['Clear', 'reject'],
   ] as const)('clears text with %s and ignores a late %s', async (clearWith, settle) => {
     const user = userEvent.setup();
-    const pending = deferred<string[]>();
-    const next = deferred<string[]>();
+    const pending = deferred<SearchSuggestion[]>();
+    const next = deferred<SearchSuggestion[]>();
     const onSearch = jest
       .fn()
-      .mockResolvedValueOnce(['Saved address'])
+      .mockResolvedValueOnce([{ value: 'Saved address' }])
       .mockReturnValueOnce(pending.promise)
       .mockReturnValueOnce(next.promise);
     render(<CategorySearch categories={[createTextCategory(onSearch)]} />);
-    const input = screen.getByRole('searchbox');
+    const input = screen.getByRole('combobox');
     await user.type(input, 'A');
-    expect(await screen.findByRole('button', { name: 'Saved address' })).toBeVisible();
+    expect(await screen.findByRole('option', { name: 'Saved address' })).toBeVisible();
     await user.type(input, 'b');
-    expect(within(screen.getByRole('region')).getByRole('status')).toBeVisible();
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
 
     if (clearWith === 'Clear') await user.click(screen.getByRole('button', { name: /^clear$/i }));
     else await user.clear(input);
@@ -1511,158 +1494,186 @@ describe('CategorySearch', () => {
     expect(onSearch.mock.calls[1][1].signal.aborted).toBe(true);
     expect(input).toHaveValue('');
     expect(input).toHaveFocus();
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
-    await user.click(input);
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     await user.keyboard('{Enter}');
     await user.click(screen.getByRole('button', { name: 'Search' }));
     expect(onSearch).toHaveBeenCalledTimes(2);
-    await selectCategory(user, 'Addresses');
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
-
     await user.type(input, 'N');
 
     expect(onSearch).toHaveBeenLastCalledWith('N', { signal: expect.any(AbortSignal) });
-    expect(within(screen.getByRole('region')).getByRole('status')).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Saved address' })).not.toBeInTheDocument();
-    expect(screen.queryByText('Submitted query: A')).not.toBeInTheDocument();
-
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
+    expect(screen.queryByRole('option', { name: 'Saved address' })).not.toBeInTheDocument();
     await act(async () => {
-      if (settle === 'resolve') pending.resolve(['Cancelled address']);
+      if (settle === 'resolve') pending.resolve([{ value: 'Cancelled address' }]);
       else pending.reject(new Error('Cancelled failure'));
     });
 
-    expect(within(screen.getByRole('region')).getByRole('status')).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Cancelled address' })).not.toBeInTheDocument();
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
+    expect(screen.queryByRole('option', { name: 'Cancelled address' })).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(input).toHaveValue('N');
     expect(input).toHaveFocus();
-
     await act(async () => {
-      next.resolve(['Current address']);
+      next.resolve([{ value: 'Current address' }]);
     });
-
-    expect(await screen.findByRole('button', { name: 'Current address' })).toBeVisible();
-    expect(screen.getByText('Submitted query: N')).toBeVisible();
+    expect(await screen.findByRole('option', { name: 'Current address' })).toBeVisible();
   });
 
-  it('retains text results after a failed replacement and restores input focus when retry disappears', async () => {
+  it('hides saved suggestions while loading and retains them with an error after a failed replacement', async () => {
     const user = userEvent.setup();
-    const pending = deferred<string[]>();
+    const pending = deferred<SearchSuggestion[]>();
     const onSearch = jest
       .fn()
-      .mockResolvedValueOnce(['Saved address'])
+      .mockResolvedValueOnce([{ value: 'Saved address' }])
       .mockReturnValueOnce(pending.promise)
-      .mockResolvedValueOnce(['Recovered address']);
+      .mockResolvedValueOnce([{ value: 'Recovered address' }]);
     render(<CategorySearch categories={[createTextCategory(onSearch)]} />);
-    const input = screen.getByRole('searchbox');
+    const input = screen.getByRole('combobox');
     await user.type(input, 'A');
-    expect(await screen.findByRole('button', { name: 'Saved address' })).toBeVisible();
+    expect(await screen.findByRole('option', { name: 'Saved address' })).toBeVisible();
     await user.type(input, 'b');
 
-    expect(within(screen.getByRole('region')).getByRole('status')).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Saved address' })).not.toBeInTheDocument();
-    expect(screen.queryByText('Submitted query: A')).not.toBeInTheDocument();
-    expect(screen.queryByText('Filters edited since searching.')).not.toBeInTheDocument();
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
+    expect(screen.queryByRole('option', { name: 'Saved address' })).not.toBeInTheDocument();
     await act(async () => {
       pending.reject(new Error('Replacement failed'));
     });
 
     expect(screen.getByRole('alert')).toHaveTextContent('The search failed. Please try again.');
-    expect(screen.getByRole('button', { name: 'Saved address' })).toBeVisible();
-    expect(screen.getByText('Submitted query: A')).toBeVisible();
-    expect(screen.queryByText('Filters edited since searching.')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Saved address' })).toBeVisible();
     expect(input).toHaveValue('Ab');
     expect(input).toHaveFocus();
+    await user.type(input, 'c');
 
-    await user.click(within(screen.getByRole('region')).getByRole('button', { name: 'Search' }));
-
-    expect(await screen.findByRole('button', { name: 'Recovered address' })).toBeVisible();
-    expect(screen.getByText('Submitted query: Ab')).toBeVisible();
+    expect(await screen.findByRole('option', { name: 'Recovered address' })).toBeVisible();
+    expect(screen.queryByRole('option', { name: 'Saved address' })).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(input).toHaveFocus();
   });
 
-  it.each(['Escape', 'minimizeCounter'] as const)(
-    'keeps a text panel closed after %s when a pending live search finishes',
-    async (closeWith) => {
-      const user = userEvent.setup();
-      const pending = deferred<string[]>();
-      const onSearch = jest.fn().mockReturnValue(pending.promise);
-      const category = createTextCategory(onSearch);
-      const { rerender } = render(<CategorySearch categories={[category]} />);
-      const input = screen.getByRole('searchbox');
-      await user.type(input, 'A');
+  it('distinguishes a failed autocomplete request from a successful empty search', async () => {
+    const user = userEvent.setup();
+    const pending = deferred<SearchSuggestion[]>();
+    const onSearch = jest.fn().mockReturnValueOnce(pending.promise).mockRejectedValueOnce(undefined);
+    render(
+      <CategorySearch categories={[createTextCategory(onSearch)]} labels={{ searchError: 'Address search failed' }} />
+    );
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'A');
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
+    expect(screen.queryByText('search.no-results')).not.toBeInTheDocument();
+    await act(async () => {
+      pending.resolve([]);
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('search.no-results');
+    expect(screen.queryByText('Address search failed')).not.toBeInTheDocument();
 
-      if (closeWith === 'Escape') await user.keyboard('{Escape}');
-      else rerender(<CategorySearch categories={[category]} minimizeCounter={1} />);
+    await user.type(input, 'b');
 
-      expect(screen.queryByRole('region')).not.toBeInTheDocument();
-      expect(input).toHaveValue('A');
-      expect(input).toHaveFocus();
-      expect(onSearch.mock.calls[0][1].signal.aborted).toBe(false);
-      await act(async () => {
-        pending.resolve(['Found address']);
-      });
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Address search failed'));
+    expect(screen.queryByText('search.no-results')).not.toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
 
-      expect(screen.queryByRole('region')).not.toBeInTheDocument();
-      expect(input).toHaveFocus();
-      await user.click(input);
-      expect(screen.getByRole('button', { name: 'Found address' })).toBeVisible();
-      expect(screen.getByText('Submitted query: A')).toBeVisible();
-      expect(onSearch).toHaveBeenCalledTimes(1);
-    }
-  );
+  it('does not connect minimizeCounter to desktop autocomplete', async () => {
+    const user = userEvent.setup();
+    const pending = deferred<SearchSuggestion[]>();
+    const onSearch = jest.fn().mockReturnValue(pending.promise);
+    const categories = [createTextCategory(onSearch)];
+    const { rerender } = render(<CategorySearch categories={categories} minimizeCounter={1} />);
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'A');
+
+    rerender(<CategorySearch categories={categories} minimizeCounter={2} />);
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
+    expect(input).toHaveFocus();
+    expect(onSearch.mock.calls[0][1].signal.aborted).toBe(false);
+    await act(async () => {
+      pending.resolve([{ value: 'Found address' }]);
+    });
+
+    expect(await screen.findByRole('option', { name: 'Found address' })).toBeVisible();
+    expect(input).toHaveValue('A');
+    expect(onSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['resolve', 'reject'] as const)('ignores an outdated autocomplete %s', async (settle) => {
+    const user = userEvent.setup();
+    const older = deferred<SearchSuggestion[]>();
+    const newer = deferred<SearchSuggestion[]>();
+    const onSearch = jest.fn().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
+    render(<CategorySearch categories={[createTextCategory(onSearch)]} />);
+    await user.type(screen.getByRole('combobox'), 'Aa');
+    expect(onSearch.mock.calls[0][1].signal.aborted).toBe(true);
+
+    await act(async () => {
+      if (settle === 'resolve') older.resolve([{ value: 'Outdated address' }]);
+      else older.reject(new Error('Outdated failure'));
+    });
+    expect(within(screen.getByRole('search')).getByRole('status')).toHaveTextContent('Searching…');
+    expect(screen.queryByRole('option')).not.toBeInTheDocument();
+    expect(screen.queryByText('The search failed. Please try again.')).not.toBeInTheDocument();
+    await act(async () => {
+      newer.resolve([{ value: 'Current address' }]);
+    });
+    expect(await screen.findByRole('option', { name: 'Current address' })).toBeVisible();
+    expect(screen.queryByRole('option', { name: 'Outdated address' })).not.toBeInTheDocument();
+  });
 
   it('stores a live text result without switching categories or moving focus', async () => {
     const user = userEvent.setup();
-    const pending = deferred<string[]>();
+    const pending = deferred<SearchSuggestion[]>();
     const onSearch = jest.fn().mockReturnValue(pending.promise);
     render(<CategorySearch categories={[createTextCategory(onSearch), createCategory()]} />);
-    await user.type(screen.getByRole('searchbox'), 'A');
+    await user.type(screen.getByRole('combobox'), 'A');
     await selectCategory(user, 'Parcels');
     const owner = screen.getByRole('textbox', { name: 'Parcels owner' });
     await user.type(owner, 'Kask');
 
     await act(async () => {
-      pending.resolve(['Found address']);
+      pending.resolve([{ value: 'Found address' }]);
     });
 
     expect(screen.getByRole('region', { name: 'Parcels: Filter' })).toBeVisible();
     expect(owner).toHaveValue('Kask');
     expect(owner).toHaveFocus();
-    expect(screen.queryByRole('button', { name: 'Found address' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Found address' })).not.toBeInTheDocument();
     await selectCategory(user, 'Addresses');
-    expect(screen.getByRole('searchbox')).toHaveValue('A');
-    expect(screen.getByRole('button', { name: 'Found address' })).toBeVisible();
+    expect(screen.getByRole('combobox')).toHaveValue('A');
+    await user.click(screen.getByRole('combobox'));
+    expect(await screen.findByRole('option', { name: 'Found address' })).toBeVisible();
     expect(onSearch).toHaveBeenCalledTimes(1);
   });
 
-  it('does not move focus from the application when live text results arrive', async () => {
+  it('keeps autocomplete closed when a response arrives after focus leaves the search', async () => {
     const user = userEvent.setup();
-    const pending = deferred<string[]>();
+    const pending = deferred<SearchSuggestion[]>();
+    const onSearch = jest.fn(() => pending.promise);
     render(
       <>
-        <CategorySearch categories={[createTextCategory(() => pending.promise)]} />
+        <CategorySearch categories={[createTextCategory(onSearch)]} />
         <Button>Map action</Button>
       </>
     );
-    await user.type(screen.getByRole('searchbox'), 'A');
+    await user.type(screen.getByRole('combobox'), 'A');
     await user.click(screen.getByRole('button', { name: 'Map action' }));
 
     await act(async () => {
-      pending.resolve(['Found address']);
+      pending.resolve([{ value: 'Found address' }]);
     });
 
-    expect(screen.getByRole('button', { name: 'Found address' })).toBeVisible();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Map action' })).toHaveFocus();
+    await user.click(screen.getByRole('combobox'));
+    expect(await screen.findByRole('option', { name: 'Found address' })).toBeVisible();
+    expect(onSearch).toHaveBeenCalledTimes(1);
   });
 
   it('does not run live or submitted text searches while disabled', async () => {
     const user = userEvent.setup();
     const onSearch = jest.fn();
     render(<CategorySearch categories={[createTextCategory(onSearch)]} disabled />);
-    const input = screen.getByRole('searchbox');
+    const input = screen.getByRole('combobox');
 
     expect(input).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Search' })).toBeDisabled();
@@ -1670,7 +1681,7 @@ describe('CategorySearch', () => {
     await user.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(onSearch).not.toHaveBeenCalled();
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it.each([undefined, 'small', 'default', 'large'] as const)(
@@ -1697,12 +1708,11 @@ describe('CategorySearch', () => {
         renderResults: ({ result }) => <p>{result[0]}</p>,
       });
       render(<CategorySearch categories={[createTextCategory(), category]} size={size} />);
-      const input = screen.getByRole('searchbox');
+      const input = screen.getByRole('combobox');
 
       expect(input.closest('[data-name="textfield"]')).toHaveClass(`tedi-textfield--${expectedSize}`);
       expect(screen.getByRole('button', { name: 'Search' })).toHaveClass(`tedi-btn--${expectedSize}`);
       await user.type(input, 'A');
-      expect(screen.getByRole('button', { name: 'Close' })).toHaveClass(`tedi-btn--${expectedSize}`);
 
       await selectCategory(user, 'Parcels');
 
@@ -1735,7 +1745,7 @@ describe('CategorySearch', () => {
     expect(onSearch).toHaveBeenCalledTimes(1);
   });
 
-  it('forwards the root ref and applies independent bar and text-results dimensions', async () => {
+  it('forwards the root ref and applies search-bar width and filter-panel height', async () => {
     const ref = createRef<HTMLDivElement>();
     render(
       <CategorySearch
@@ -1743,7 +1753,6 @@ describe('CategorySearch', () => {
         id="parcel-search"
         categories={[createCategory()]}
         searchBarWidth="30rem"
-        textResultsPanelWidth={420}
         maxPanelHeight="60vh"
         className="map-search"
         defaultOpen
@@ -1753,7 +1762,6 @@ describe('CategorySearch', () => {
     expect(ref.current).toHaveClass('map-search');
     expect(ref.current).toHaveStyle({ width: '30rem' });
     expect(ref.current).toContainElement(await screen.findByRole('region', { name: 'Parcels: Filter' }));
-    expect(ref.current?.style.getPropertyValue('--category-search-text-results-panel-width')).toBe('420px');
     expect(ref.current?.style.getPropertyValue('--category-search-panel-max-height')).toBe('60vh');
   });
 });

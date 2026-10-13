@@ -23,28 +23,23 @@ const addresses = [
   'Männimetsa põik 42, Päikeseküla, Näidise vald, Tartu maakond, 54321',
 ];
 
-const addressSearch = defineCategorySearchCategory<string[]>({
+const addressSearch = defineCategorySearchCategory({
   id: 'addresses',
   label: 'Addresses',
   mode: 'search',
   placeholder: 'Search addresses',
-  onSearch: (query) => addresses.filter((address) => address.toLowerCase().includes(query.trim().toLowerCase())),
-  renderResults: ({ result, selectResult }) => (
-    <div>
-      {result.map((address) => (
-        <div key={address} style={{ display: 'flex', overflowWrap: 'anywhere' }}>
-          <Button visualType="link" onClick={() => selectResult(address)}>
-            {address}
-          </Button>
-        </div>
-      ))}
-    </div>
-  ),
+  onSearch: async (query) => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return addresses
+      .filter((address) => address.toLowerCase().includes(query.trim().toLowerCase()))
+      .map((address) => ({ value: address, label: address }));
+  },
 });
 
 function AddressSearchExample(props: Partial<CategorySearchProps> = {}) {
   const id = useId();
   const [showSearchButton, setShowSearchButton] = useState(true);
+  const [extraSmallSearchIcon, setExtraSmallSearchIcon] = useState(false);
 
   return (
     <div>
@@ -55,12 +50,18 @@ function AddressSearchExample(props: Partial<CategorySearchProps> = {}) {
           checked={showSearchButton}
           onChange={setShowSearchButton}
         />
+        <Toggle
+          id={`${id}-extra-small-search-icon`}
+          label="Extra small search icon"
+          checked={extraSmallSearchIcon}
+          onChange={setExtraSmallSearchIcon}
+        />
       </div>
       <CategorySearch
         size="default"
         searchBarWidth="30rem"
-        textResultsPanelWidth="48rem"
         {...props}
+        searchButtonIconSize={extraSmallSearchIcon ? 12 : undefined}
         categories={[{ ...addressSearch, showSearchButton }]}
       />
     </div>
@@ -153,23 +154,15 @@ function OrganisationFields({ values, onChange, disabled, size }: CategorySearch
   );
 }
 
-const citySearch = defineCategorySearchCategory<string[]>({
+const citySearch = defineCategorySearchCategory({
   id: 'cities',
   label: 'Cities',
   mode: 'search',
   placeholder: 'Search cities',
-  onSearch: (query) => cities.filter((city) => city.toLowerCase().includes(query.trim().toLowerCase())),
-  renderResults: ({ result, selectResult }) => (
-    <div>
-      {result.map((city) => (
-        <div key={city} style={{ display: 'flex', overflowWrap: 'anywhere' }}>
-          <Button visualType="link" onClick={() => selectResult(city)}>
-            {city}
-          </Button>
-        </div>
-      ))}
-    </div>
-  ),
+  onSearch: (query) =>
+    cities
+      .filter((city) => city.toLowerCase().includes(query.trim().toLowerCase()))
+      .map((city) => ({ value: city, label: city })),
 });
 
 function PeopleAndCitiesSearchExample({
@@ -313,7 +306,7 @@ function exampleSource(name: string, imports: string) {
 }
 
 const componentDescription = `
-A search bar with live text search and category-specific filter forms. Desktop panels keep the page
+A search bar with TEDI autocomplete and category-specific filter forms. Desktop panels keep the page
 interactive; mobile uses a full-screen TEDI Modal.
 
 ### Category definitions and callbacks
@@ -323,7 +316,7 @@ each category's filters and results typed, even when different types share one a
 
 | Mode | Application provides |
 | --- | --- |
-| \`search\` | \`onSearch(query, context)\`, \`renderResults({ query, result, selectResult })\`, and optional \`initialQuery\`, \`placeholder\` and \`showSearchButton\`. |
+| \`search\` | \`onSearch(query, context)\` returning TEDI \`SearchSuggestion[]\`, and optional \`onSuggestionSelect\` and \`renderSuggestionContent\`. |
 | \`category\` | \`initialFilters()\`, \`renderFilters({ values, onChange, disabled, size })\`, \`onSearch(filters, context)\`, and \`renderResults({ filters, result })\`. |
 
 Return fields only from \`renderFilters\`: CategorySearch supplies the form and action buttons.
@@ -332,20 +325,25 @@ including fresh nested objects when editing them; do not mutate the supplied val
 
 \`onSearch\` may return a result or a promise. Its second argument contains an \`AbortSignal\` for fetch.
 A newer search, selection, Clear, deleting all text or unmounting cancels that category's pending request;
-outdated responses are ignored. Closing, minimizing and category switching let requests finish without
-reopening the panel or changing the active category.
+outdated responses are ignored. Closing a filter panel or the mobile modal and switching categories let
+requests finish without reopening them or changing the active category.
 
-Arrays are counted automatically. Use \`getResultCount(result)\` for other result shapes.
-A successful search with zero results shows TEDI EmptyState with \`labels.noResults\`; initial, loading
-and failed states do not. Other results are rendered by the application.
+Filter-category arrays are counted automatically. Use \`getResultCount(result)\` for other result shapes.
+A successful filter search with zero results shows TEDI EmptyState with \`labels.noResults\`; initial,
+loading and failed states do not. Other filter results are rendered by the application.
 
 ### Text search and saved results
 
-Typing searches immediately. Enter and the optional search button submit explicitly.
-\`showSearchButton: false\` hides only the text-category submit button.
-Call \`selectResult(text)\` from a result row to set the input text and close the panel without another search.
-Click or tap the input to reopen its complete saved list, including when the input already has focus.
-Returning focus alone does not reopen it.
+Typing searches immediately. TEDI Search handles the suggestion popup, keyboard selection and
+focus-based opening/closing. Enter submits when no suggestion is active; the optional search button
+also submits. \`showSearchButton: false\` hides only the text-category submit button.
+
+Return suggestions with a stable \`value\`, optional \`label\` and optional \`description\`.
+Selecting a suggestion saves its string label (or value) as the query without another search.
+Use \`onSuggestionSelect(suggestion)\` for application actions and \`renderSuggestionContent(suggestion, state)\`
+for custom rows; \`state\` contains \`active\` and \`query\`.
+Search displays loading and request-failure feedback in its popup, with its standard localized
+no-results message.
 
 Each category retains its draft, last submitted values and successful results while mounted.
 Closing, switching category or changing presentation preserves them. Clear and deleting all text remove
@@ -355,7 +353,7 @@ Keep category IDs stable while mounted; definitions and callbacks may change.
 
 Editing filters, including during a pending search, preserves the submitted values paired with saved
 results. **Filters edited since searching.** uses object identity, so editing back to the original field
-values still leaves the notice until another search. A failed replacement search keeps earlier results.
+values still leaves the notice until another search. A failed filter search keeps earlier results.
 
 ### Application validation
 
@@ -380,14 +378,15 @@ focused filter form with results recovers focus to the panel.
 \`searchBarWidth\` sets the whole bar's width, including the category dropdown, within its parent.
 The desktop dropdown keeps the width of its widest label without wrapping; the input uses the remaining bar width.
 
-Desktop text results use \`textResultsPanelWidth\`, constrained to available viewport space. Filter panels match the
-bar's left action area by default. Set \`fullWidthFilterPanel\` to include the category selector in the
-width of filter forms and their results. \`maxPanelHeight\` limits desktop panel height.
-\`textResultsPanelWidth\` and \`maxPanelHeight\` accept CSS lengths or pixel numbers; neither changes the full-screen mobile modal.
+Text suggestions use Search's standard popup width, including inside the mobile modal.
+Desktop filter panels match the bar's left action area by default. Set \`fullWidthFilterPanel\` to
+include the category selector in the width of filter forms and their results. \`maxPanelHeight\`
+limits desktop filter-panel height using a CSS length or pixel number.
 
-Every later change to \`minimizeCounter\` hides the panel without restoring focus or discarding state.
-Its initial and unchanged values do nothing. Pending results and validation leave a minimized panel closed;
-the user can reopen normally.
+Every later change to \`minimizeCounter\` hides the filter panel or mobile modal without restoring focus
+or discarding state. Its initial and unchanged values do nothing. Pending results and validation leave
+them closed; the user can reopen normally. Desktop autocomplete uses Search's own visibility behaviour
+and is not connected to the counter.
 
 Use \`labels\` for action/status text and \`resultCount\` formatting. \`labels.searchInput\` also names the
 mobile modal. The forwarded ref points to the outer div. Story controls for size and presentation keep
@@ -474,6 +473,17 @@ const meta = {
       description: 'Control size, also passed to renderFilters.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'default' } },
     },
+    searchButtonIconSize: {
+      control: false,
+      description:
+        'Magnifying-glass size, independent of the button and input size. The first example has an Extra small search icon switch: 12 px when on, TEDI default when off.',
+      table: {
+        category: 'Optional props',
+        subcategory: 'Layout',
+        type: { summary: 'IconSize' },
+        defaultValue: { summary: '18 (small/default), 24 (large)' },
+      },
+    },
     mobile: {
       control: 'inline-radio',
       options: ['Automatic', 'Mobile', 'Desktop'],
@@ -493,12 +503,12 @@ const meta = {
     },
     defaultOpen: {
       control: false,
-      description: 'Initial visibility. Desktop text results also need a search.',
+      description: 'Initial visibility of the filter panel or mobile modal.',
       table: { category: 'Optional props', subcategory: 'State', defaultValue: { summary: 'false' } },
     },
     minimizeCounter: {
       control: false,
-      description: 'Application-owned counter. Later changes hide the panel without clearing state or restoring focus.',
+      description: 'Later changes hide the filter panel or mobile modal without clearing state or restoring focus.',
       table: { category: 'Optional props', subcategory: 'State' },
     },
     disabled: {
@@ -521,11 +531,6 @@ const meta = {
       description: 'Whole search-bar width, including the category dropdown. Use a CSS length such as 480px.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: '100%' } },
     },
-    textResultsPanelWidth: {
-      control: 'text',
-      description: 'Desktop text-results width. Use a CSS length such as 480px in this text control.',
-      table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: '100%' } },
-    },
     fullWidthFilterPanel: {
       control: false,
       description:
@@ -534,7 +539,7 @@ const meta = {
     },
     maxPanelHeight: {
       control: 'text',
-      description: 'Maximum desktop panel height; longer content scrolls inside it.',
+      description: 'Maximum desktop filter-panel height; longer content scrolls inside it.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'min(32rem, 70dvh)' } },
     },
     id: {
@@ -566,21 +571,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   name: 'Search',
-  args: {
-    textResultsPanelWidth: '48rem',
-  },
   play: async ({ canvasElement, args }) => {
     if (args.disabled) return;
     const canvas = within(canvasElement);
     const page = within(canvasElement.ownerDocument.body);
-    const launcher = canvas.getByRole('searchbox', { name: 'Search' });
-    const mobile = launcher.hasAttribute('readonly');
-    if (mobile) await userEvent.click(launcher);
-    const search = mobile ? within(await page.findByRole('dialog', { name: 'Search' })) : canvas;
-    await userEvent.type(search.getByRole('searchbox', { name: 'Search' }), 'Kase');
+    const launcher = canvas.queryByRole('searchbox', { name: 'Search' });
+    if (launcher) await userEvent.click(launcher);
+    const search = launcher ? within(await page.findByRole('dialog', { name: 'Search' })) : canvas;
+    await userEvent.type(search.getByRole('combobox', { name: 'Search' }), 'Kase');
     await waitFor(async () => {
-      await expect(search.getByRole('button', { name: addresses[0] })).toBeVisible();
-      await expect(search.getByRole('button', { name: addresses[1] })).toBeVisible();
+      await expect(page.getByRole('option', { name: addresses[0] })).toBeVisible();
+      await expect(page.getByRole('option', { name: addresses[1] })).toBeVisible();
     });
   },
   parameters: {
@@ -591,13 +592,13 @@ export const Default: Story = {
         code: exampleSource(
           'Address',
           `import { useId, useState } from 'react';
-import { Button, Toggle } from '@tedi-design-system/react/tedi';
+import { Toggle } from '@tedi-design-system/react/tedi';
 import { CategorySearch, defineCategorySearchCategory, type CategorySearchProps } from '@tedi-design-system/react/community';`
         ),
       },
       description: {
         story:
-          'Type Kase to find two addresses, or No match for the empty state. Select an address and click the input to reopen the full saved list. Show search button tries both input variants; desktop results may be wider than the bar.',
+          'Type Kase to load two address suggestions after a short delay, or No match for the no-results message. Select an address to update the input. Blur and refocus to see the saved suggestions; on mobile, reopen the modal first. Show search button tries both input variants.',
       },
     },
   },
@@ -644,7 +645,7 @@ import {
       },
       description: {
         story:
-          'People and Organisations return matching rows immediately; Cities searches as you type. Try Name Anna or School, leave fields empty for all rows, or enter No match for an empty result. Minimize all hides the panel while retaining values and results.',
+          'People and Organisations return matching rows immediately; Cities searches as you type. Try Name Anna or School, leave fields empty for all rows, or enter No match for an empty result. Minimize all hides the filter panel or mobile modal while retaining values and results.',
       },
     },
   },

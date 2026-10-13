@@ -1,4 +1,4 @@
-import { autoUpdate, shift, size as sizePanel, useFloating } from '@floating-ui/react';
+import { autoUpdate, size as sizePanel, useFloating } from '@floating-ui/react';
 import cn from 'classnames';
 import React, { forwardRef, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 
@@ -6,7 +6,7 @@ import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Button } from '../../../../tedi/components/buttons/button/button';
 import { EmptyState } from '../../../../tedi/components/content/empty-state/empty-state';
 import { InputGroup } from '../../../../tedi/components/form/input-group/input-group';
-import { Search } from '../../../../tedi/components/form/search/search';
+import { Search, type SearchSuggestion } from '../../../../tedi/components/form/search/search';
 import type { TextFieldForwardRef } from '../../../../tedi/components/form/textfield/textfield';
 import { Dropdown } from '../../../../tedi/components/overlays/dropdown/dropdown';
 import { Modal } from '../../../../tedi/components/overlays/modal/modal';
@@ -57,9 +57,9 @@ const defaultLabels: CategorySearchLabels = {
 };
 
 /**
- * Search categories with independent drafts and results in a desktop panel or full-screen mobile modal.
- * The desktop panel is non-modal. Closing, switching categories, or changing presentation
- * preserves drafts and results; clearing or emptying text resets only the active category.
+ * Text autocomplete and filter searches with independent drafts and results.
+ * Filter panels are non-modal on desktop; mobile searches use a full-screen modal.
+ * Closing, switching categories, or changing presentation preserves saved state.
  */
 export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
   (
@@ -72,10 +72,10 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       mobile,
       disabled = false,
       size = 'default',
+      searchButtonIconSize,
       validationPosition = 'before',
       labels: labelOverrides,
       searchBarWidth = '100%',
-      textResultsPanelWidth = '100%',
       fullWidthFilterPanel = false,
       maxPanelHeight = 'min(32rem, 70dvh)',
       className,
@@ -114,11 +114,19 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     const hasError = categoryState.status === 'error';
     const hasSearch = Boolean(completedSearch || loading || hasError);
     const textMode = category.mode === 'search';
+    const suggestions = textMode && completedSearch ? (completedSearch.result as SearchSuggestion[]) : [];
     const fullWidthPanel = !textMode && fullWidthFilterPanel;
     const hasValidationMessage = !textMode && Boolean(category.validationMessage);
     const canShowResults = hasSearch && !hasValidationMessage;
     const searchButton =
-      category.showSearchButton === false ? undefined : { icon: 'search', size, disabled, 'aria-label': labels.search };
+      category.showSearchButton === false
+        ? undefined
+        : {
+            icon: searchButtonIconSize === undefined ? 'search' : { name: 'search', size: searchButtonIconSize },
+            size,
+            disabled,
+            'aria-label': labels.search,
+          };
 
     useEffect(() => {
       if (open && hasValidationMessage && !keepFiltersVisible) {
@@ -127,10 +135,8 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     }, [keepFiltersVisible, hasValidationMessage, open]);
 
     let panelView: 'closed' | 'filters' | 'results' = 'closed';
-    if (open) {
-      if (textMode) {
-        if (categoryState.draft && hasSearch) panelView = 'results';
-      } else if (canShowResults && !keepFiltersVisible) {
+    if (open && !textMode) {
+      if (canShowResults && !keepFiltersVisible) {
         panelView = 'results';
       } else {
         panelView = 'filters';
@@ -148,17 +154,9 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       placement: 'bottom-start',
       whileElementsMounted: autoUpdate,
       middleware: [
-        textMode && shift(),
         sizePanel({
-          apply({ rects, availableWidth, elements }) {
-            // Text results may be wider; filter panels match their reference.
-            if (textMode) {
-              elements.floating.style.width = '';
-              elements.floating.style.maxWidth = `${Math.max(0, availableWidth)}px`;
-            } else {
-              elements.floating.style.width = `${rects.reference.width}px`;
-              elements.floating.style.maxWidth = '';
-            }
+          apply({ rects, elements }) {
+            elements.floating.style.width = `${rects.reference.width}px`;
           },
         }),
       ],
@@ -205,7 +203,6 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
 
     function changeQuery(query: string) {
       if (disabled) return;
-      setOpen(isMobile || query.length > 0);
 
       if (!query) {
         clear(category);
@@ -217,22 +214,22 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       void search(category, query);
     }
 
-    function selectResult(text: string) {
-      if (!textMode || disabled) return;
-      select(category.id, text);
-      closePanel();
+    function selectSuggestion(suggestion: SearchSuggestion) {
+      if (disabled) return;
+      select(category.id, typeof suggestion.label === 'string' ? suggestion.label : suggestion.value);
+      if (isMobile) setOpen(false);
+      category.onSuggestionSelect?.(suggestion);
     }
 
     function submitSearch() {
       if (disabled || (textMode && !categoryState.draft)) return;
-      // Recover focus before the submitted form or text retry button disappears.
-      const panel = panelRef.current;
-      if (!hasValidationMessage && panel?.contains(document.activeElement)) {
-        if (textMode) focusSearchControl();
-        else panel.focus();
+      if (!textMode) {
+        // Recover focus before the submitted filter form disappears.
+        const panel = panelRef.current;
+        if (!hasValidationMessage && panel?.contains(document.activeElement)) panel.focus();
+        setKeepFiltersVisible(false);
+        setOpen(true);
       }
-      setKeepFiltersVisible(false);
-      setOpen(true);
       void search(category, categoryState.draft);
     }
 
@@ -329,12 +326,14 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                   onClear={focusSearchControl}
                   onSearch={submitSearch}
                   button={searchButton}
-                  input={{
-                    'aria-controls': panelVisible ? panelId : undefined,
-                    onClick: () => {
-                      if (!disabled && completedSearch) setOpen(true);
-                    },
-                  }}
+                  suggestions={suggestions}
+                  loading={loading}
+                  loadingText={labels.loading}
+                  noResultsText={hasError ? labels.searchError : undefined}
+                  resultsCountText={labels.resultCount}
+                  onSuggestionSelect={selectSuggestion}
+                  renderSuggestionContent={category.renderSuggestionContent}
+                  footer={hasError && suggestions.length > 0 ? <p role="alert">{labels.searchError}</p> : undefined}
                 />
               </InputGroup.Input>
             ) : (
@@ -429,14 +428,13 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
             {hasError && <p role="alert">{labels.searchError}</p>}
             {!loading && completedSearch && (
               <div aria-label={labels.results}>
-                {!textMode && categoryState.draft !== completedSearch.input && <p>{labels.filtersChanged}</p>}
-                {!textMode && count !== undefined && count > 0 && <p>{labels.resultCount(count)}</p>}
+                {categoryState.draft !== completedSearch.input && <p>{labels.filtersChanged}</p>}
+                {count !== undefined && count > 0 && <p>{labels.resultCount(count)}</p>}
                 {showEmptyState && <EmptyState type="inside">{labels.noResults}</EmptyState>}
                 {count !== 0 &&
-                  category.renderResults({
+                  category.renderResults?.({
                     value: completedSearch.input,
                     result: completedSearch.result,
-                    selectResult,
                   })}
               </div>
             )}
@@ -444,18 +442,13 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
               <Button size={size} visualType="link" onClick={closePanel}>
                 {labels.close}
               </Button>
-              {textMode && hasError && (
-                <Button size={size} disabled={disabled} onClick={submitSearch}>
-                  {labels.search}
-                </Button>
-              )}
             </div>
           </>
         )}
       </section>
     );
 
-    const announcement = (
+    const announcement = !textMode && (
       <span className={styles['tedi-category-search__sr-only']} role="status" aria-live="polite" aria-atomic="true">
         {panelVisible && !loading && !hasError && completedSearch
           ? `${category.label}: ${count !== undefined ? labels.resultCount(count) : labels.results}`
@@ -471,8 +464,6 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
         style={
           {
             width: searchBarWidth,
-            '--category-search-text-results-panel-width':
-              typeof textResultsPanelWidth === 'number' ? `${textResultsPanelWidth}px` : textResultsPanelWidth,
             '--category-search-panel-max-height':
               typeof maxPanelHeight === 'number' ? `${maxPanelHeight}px` : maxPanelHeight,
           } as React.CSSProperties
