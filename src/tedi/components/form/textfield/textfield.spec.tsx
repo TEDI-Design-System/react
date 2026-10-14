@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
+import InputGroup from '../input-group/input-group';
 import TextField, { TextFieldProps } from './textfield';
 
 import '@testing-library/jest-dom';
@@ -64,6 +66,93 @@ describe('TextField component', () => {
     fireEvent.click(clearButton);
     expect(handleClear).toHaveBeenCalledTimes(1);
     expect(input).toHaveValue('');
+  });
+
+  it('calls onChange, onChangeEvent and onClear once when cleared', () => {
+    const handleChange = jest.fn();
+    const handleChangeEvent = jest.fn();
+    const handleClear = jest.fn();
+    render(
+      <TextField {...defaultProps} onChange={handleChange} onChangeEvent={handleChangeEvent} onClear={handleClear} />
+    );
+    const input = screen.getByPlaceholderText(/enter text/i);
+    fireEvent.change(input, { target: { value: 'To Be Cleared' } });
+    handleChange.mockClear();
+    handleChangeEvent.mockClear();
+
+    fireEvent.click(screen.getByTitle(/clear/i));
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith('');
+    expect(handleChangeEvent).toHaveBeenCalledTimes(1);
+    expect(handleChangeEvent.mock.calls[0][0].target.value).toBe('');
+    expect(handleClear).toHaveBeenCalledTimes(1);
+    expect(input).toHaveValue('');
+  });
+
+  it('clears a controlled field through onChange', () => {
+    const Controlled = () => {
+      const [value, setValue] = React.useState('Controlled');
+      return <TextField {...defaultProps} value={value} onChange={setValue} />;
+    };
+    render(<Controlled />);
+    fireEvent.click(screen.getByTitle(/clear/i));
+    expect(screen.getByPlaceholderText(/enter text/i)).toHaveValue('');
+  });
+
+  it('generates an id when none is given', () => {
+    render(<TextField label="Generated" />);
+    const input = screen.getByRole('textbox');
+    expect(input.id).not.toBe('');
+    expect(screen.getByText('Generated')).toHaveAttribute('for', input.id);
+  });
+
+  it('takes the id from the input group when none is given', () => {
+    // Search renders a TextField inside an InputGroup this way; the group provides the id.
+    render(
+      <InputGroup id="group-id" label="Group">
+        <TextField label="In group" />
+      </InputGroup>
+    );
+    expect(screen.getByRole('textbox')).toHaveAttribute('id', 'group-id');
+  });
+
+  it.each([
+    ['large', 24],
+    ['small', 16],
+    ['default', 18],
+  ] as const)('sizes the icon for size=%s', (size, iconSize) => {
+    render(<TextField {...defaultProps} size={size} icon="search" />);
+    expect(screen.getByText('search')).toHaveClass(`tedi-icon--size-${iconSize}`);
+  });
+
+  it('disables the clear button of a disabled field', () => {
+    const handleClear = jest.fn();
+    render(<TextField {...defaultProps} value="x" disabled onClear={handleClear} />);
+    const clearButton = screen.getByTitle(/clear/i);
+    expect(clearButton).toBeDisabled();
+    fireEvent.click(clearButton);
+    expect(handleClear).not.toHaveBeenCalled();
+    expect(screen.getByPlaceholderText(/enter text/i)).toHaveValue('x');
+  });
+
+  it('is clearable by default', () => {
+    render(<TextField {...defaultProps} value="x" />);
+    expect(screen.getByTitle(/clear/i)).toBeInTheDocument();
+  });
+
+  it('shows no clear button with isClearable={false}', () => {
+    render(<TextField {...defaultProps} value="x" isClearable={false} />);
+    expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['readOnly', { readOnly: true }],
+    ['input.readOnly', { input: { readOnly: true } }],
+  ])('shows no clear button when read-only through %s', (_, props) => {
+    render(<TextField {...defaultProps} value="x" {...props} />);
+    expect(screen.getByPlaceholderText(/enter text/i)).toHaveAttribute('readonly');
+    expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
   });
 
   it('adds the reveal-on-hover modifier only with showClearOnInteraction and a filled clearable field', () => {
