@@ -1,0 +1,232 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+
+.tedi-rating {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-grid-gutters-04);
+  align-items: flex-start;
+  width: fit-content;
+}
+
+.tedi-rating__items {
+  display: flex;
+  gap: var(--feedback-star-inner-spacing);
+  align-items: flex-start;
+}
+
+.tedi-rating--number .tedi-rating__items,
+.tedi-rating--icon .tedi-rating__items {
+  flex-wrap: wrap;
+  gap: var(--layout-grid-gutters-08);
+}
+
+.tedi-rating__item {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--layout-grid-gutters-04);
+  align-items: center;
+  cursor: pointer;
+}
+
+.tedi-rating--disabled .tedi-rating__item {
+  cursor: not-allowed;
+}
+
+.tedi-rating--vertical .tedi-rating__items {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.tedi-rating--vertical .tedi-rating__item {
+  flex-direction: row;
+  gap: var(--layout-grid-gutters-08);
+  justify-content: flex-start;
+}
+
+.tedi-rating--vertical .tedi-rating__caption {
+  text-align: left;
+}
+
+.tedi-rating__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: inherit;
+  opacity: 0;
+}
+
+.tedi-rating__visual {
+  position: relative;
+  display: inline-flex;
+}
+
+.tedi-rating .tedi-rating__star {
+  position: relative; // paint above the absolutely positioned backdrop
+  line-height: 1;
+  color: var(--general-text-brand);
+  text-align: center;
+}
+
+.tedi-rating--star .tedi-rating__visual {
+  padding: var(--feedback-star-inner-spacing);
+}
+
+// Filled glyph stacked under the outlined one; transparent unless the star is hovered while unselected.
+.tedi-rating .tedi-rating__star-backdrop {
+  position: absolute;
+  inset: var(--feedback-star-inner-spacing);
+  color: transparent;
+}
+
+.tedi-rating__circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-sm-height);
+  height: var(--button-sm-height);
+  font-size: var(--body-small-regular-size);
+  color: var(--general-text-brand);
+  background-color: var(--general-surface-primary);
+  border: var(--tedi-borders-01) solid var(--general-border-secondary);
+  border-radius: 50%;
+}
+
+.tedi-rating__visual--selected .tedi-rating__circle,
+.tedi-rating__circle--filled {
+  color: var(--general-text-white);
+  background-color: var(--general-surface-brand-primary);
+  border-color: var(--general-surface-brand-primary);
+}
+
+.tedi-rating:not(.tedi-rating--disabled) {
+  .tedi-rating__visual--hover,
+  .tedi-rating__item:hover > .tedi-rating__visual {
+    .tedi-rating__star {
+      color: var(--general-icon-brand-dark);
+    }
+
+    .tedi-rating__star-backdrop {
+      color: var(--general-surface-brand-quaternary);
+    }
+
+    .tedi-rating__circle {
+      color: var(--general-icon-brand-dark);
+      background-color: var(--general-surface-brand-quaternary);
+      border-color: var(--general-icon-brand-dark);
+    }
+
+    &.tedi-rating__visual--selected .tedi-rating__circle {
+      color: var(--general-text-white);
+      background-color: var(--general-icon-brand-dark);
+      border-color: var(--general-icon-brand-dark);
+    }
+  }
+}
+
+.tedi-rating__input:focus-visible + .tedi-rating__visual::after {
+  position: absolute;
+  inset: -3px;
+  pointer-events: none;
+  content: '';
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--general-effect-colors-focus-outset-outer-shadow),
+    inset 0 0 0 3px var(--general-effect-colors-focus-outset-inner-shadow);
+}
+
+.tedi-rating__caption {
+  font-size: var(--body-extra-small-size);
+  line-height: var(--body-extra-small-line-height);
+  color: var(--general-text-secondary);
+  text-align: center;
+}
+
+.tedi-rating__star-caption {
+  align-self: stretch;
+  min-height: var(--body-extra-small-line-height);
+  font-size: var(--body-extra-small-size);
+  line-height: var(--body-extra-small-line-height);
+  color: var(--general-text-secondary);
+  text-align: center;
+}
+
+.tedi-rating--number:not(.tedi-rating--vertical) {
+  .tedi-rating__items--captioned {
+    row-gap: var(--layout-grid-gutters-24);
+    padding-bottom: var(--layout-grid-gutters-24);
+  }
+
+  .tedi-rating__caption {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: var(--layout-grid-gutters-04);
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+}
+
+.tedi-rating--disabled {
+  .tedi-rating__star {
+    color: var(--form-general-border-disabled);
+  }
+
+  .tedi-rating__visual--selected .tedi-rating__star {
+    color: var(--form-general-background-disabled);
+  }
+
+  .tedi-rating__circle {
+    color: var(--general-text-disabled);
+    background-color: transparent;
+    border-color: var(--form-general-border-disabled);
+  }
+
+  .tedi-rating__visual--selected .tedi-rating__circle {
+    background-color: var(--form-general-background-disabled);
+  }
+}
+
+.tedi-rating--readonly {
+  flex-direction: row;
+  align-items: center;
+}
+
+.tedi-rating__summary {
+  display: inline-flex;
+  gap: var(--layout-grid-gutters-08);
+  align-items: center;
+}
+
+.tedi-rating__stars {
+  display: inline-flex;
+  gap: var(--feedback-star-inner-spacing);
+}
+
+.tedi-rating__star-partial {
+  position: relative;
+  display: inline-flex;
+}
+
+.tedi-rating__star-partial-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: inline-flex;
+  width: var(--tedi-rating-star-fill);
+  overflow: hidden;
+}
+
+.tedi-rating__summary-text {
+  font-size: var(--heading-h6-size);
+  font-weight: var(--heading-h6-weight);
+  line-height: var(--heading-h6-line-height);
+  color: var(--general-text-secondary);
+}
+
+@include breakpoints.media-breakpoint-down(md) {
+  .tedi-rating--number:not(.tedi-rating--readonly, .tedi-rating--vertical) .tedi-rating__items {
+    column-gap: var(--layout-grid-gutters-04);
+  }
+}

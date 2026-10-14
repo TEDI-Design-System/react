@@ -242,7 +242,7 @@ const [email, setEmail] = useState('');
 </Radio.Group>
 ```
 
-Form controls: `TextField`, `Select`, `Textarea`, `NumberField`, `Checkbox` (+ `Checkbox.Group`), `Radio` (+ `Radio.Group`), `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`. `ChoiceGroup` is **deprecated** — use `Radio.Group` / `Checkbox.Group`. Verify the roster and per-control usage against [references/forms.md](references/forms.md) and the installed package (see Authoritative Sources).
+Form controls: `TextField`, `Select`, `Textarea`, `NumberField`, `Checkbox` (+ `Checkbox.Group`), `Radio` (+ `Radio.Group`), `Search`, `Rating`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`. `ChoiceGroup` is **deprecated** — use `Radio.Group` / `Checkbox.Group`. Verify the roster and per-control usage against [references/forms.md](references/forms.md) and the installed package (see Authoritative Sources).
 
 ## Theming
 
