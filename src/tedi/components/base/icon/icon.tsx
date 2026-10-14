@@ -33,7 +33,8 @@ export interface IconSharedProps {
   className?: string;
   /**
    * Type of icon
-   * It is recommended to only use one type throughout your app
+   * It is recommended to only use one type throughout your app, and to load only that type's font
+   * (`icons/<type>.css` with `index-without-icons.css`) instead of all three via `index.css`.
    * @default outlined
    */
   type?: IconType;
