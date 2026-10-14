@@ -9,6 +9,11 @@ import HeaderContent from './header-content';
 const meta: Meta<typeof HeaderContent> = {
   component: HeaderContent,
   title: 'Community/Layout/Header/HeaderContent',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;
