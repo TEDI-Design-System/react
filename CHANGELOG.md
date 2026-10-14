@@ -1,3 +1,16 @@
+# [20.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.9...react-20.0.0-rc.1) (2026-10-14)
+
+
+### Features
+
+* **category-search:** Improve Search Behaviour And Simplify API [#955](https://github.com/TEDI-Design-System/react/issues/955) ([#960](https://github.com/TEDI-Design-System/react/issues/960)) ([80868d4](https://github.com/TEDI-Design-System/react/commit/80868d4be386e7184f89c0f368fcf0cc1082a786))
+
+
+### BREAKING CHANGES
+
+* **category-search:** Remove open, categoryId, onOpenChange and
+onCategoryChange. Categories can no longer be added or removed after mounting.
+
 # [19.2.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.8...react-19.2.0-rc.9) (2026-10-01)
 
 
