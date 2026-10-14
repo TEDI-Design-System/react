@@ -113,12 +113,12 @@ import '@tedi-design-system/react/index-without-icons.css';
 import '@tedi-design-system/react/icons/outlined.css';
 ```
 
-| Import                                         | Font file loaded                  |
-| ---------------------------------------------- | --------------------------------- |
-| `@tedi-design-system/react/icons/outlined.css` | `material-symbols-outlined.woff2` |
-| `@tedi-design-system/react/icons/rounded.css`  | `material-symbols-rounded.woff2`  |
-| `@tedi-design-system/react/icons/sharp.css`    | `material-symbols-sharp.woff2`    |
-| `@tedi-design-system/react/icons/all.css`      | all three                         |
+Each import loads one font file:
+
+- `@tedi-design-system/react/icons/outlined.css`: `material-symbols-outlined.woff2`
+- `@tedi-design-system/react/icons/rounded.css`: `material-symbols-rounded.woff2`
+- `@tedi-design-system/react/icons/sharp.css`: `material-symbols-sharp.woff2`
+- `@tedi-design-system/react/icons/all.css`: all three
 
 An `Icon` whose `type` has no imported style renders its ligature text instead of the glyph.
 
