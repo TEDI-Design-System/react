@@ -1,3 +1,15 @@
+# [20.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.1...react-20.0.0-rc.2) (2026-10-14)
+
+
+### Features
+
+* **file-upload,file-dropzone:** rename reject prop and switch max size to bytes [#889](https://github.com/TEDI-Design-System/react/issues/889) ([#949](https://github.com/TEDI-Design-System/react/issues/949)) ([472ca22](https://github.com/TEDI-Design-System/react/commit/472ca22c04ce0d6859263652a397f495d79a2308))
+
+
+### BREAKING CHANGES
+
+* **file-upload,file-dropzone:** validateIndividually renamed to keepRejectedFiles; maxSize is now in bytes.
+
 # [20.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.9...react-20.0.0-rc.1) (2026-10-14)
 
 
