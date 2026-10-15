@@ -39,15 +39,17 @@ Components live in two tiers: `src/tedi/` (TEDI-READY, must meet the [Definition
 
 ## Accessibility check
 
-Every pull request runs an automated accessibility check (axe, through the Storybook test runner) on all `src/tedi/` stories. Violations in components the pull request changes fail the check. Violations elsewhere are reported as warnings.
+Every pull request to `rc` or `main` runs an automated accessibility check (axe, through the Storybook test runner) on all `src/tedi/` stories. Violations in components the pull request changes fail the check. Violations elsewhere are reported as warnings.
 
 To run it locally:
 
 ```bash
-npx playwright install chromium
+npx playwright install --with-deps chromium
 STORYBOOK_EXCLUDE_COMMUNITY=true npm run build:sb
 npm run test-storybook:ci
 ```
+
+This runs the raw tests, so every violation fails, including ones outside the components you changed. Only CI separates failures from warnings.
 
 A story with a known, tracked accessibility issue can be marked with `parameters: { a11y: { test: 'todo' } }` so it warns instead of failing. Link the tracking issue in a comment next to it.
 
