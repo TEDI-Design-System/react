@@ -78,8 +78,7 @@ This will launch a local Storybook instance for component development.
 
 ## Contributing
 
-Check the [wiki](https://github.com/TEDI-Design-System/general/wiki) for component guidelines and coding standards.  
-Report issues or contribute via [GitHub Issues](https://github.com/TEDI-Design-System/react/issues).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to report issues, set up the repository and open a pull request. Component guidelines and coding standards are in the [wiki](https://github.com/TEDI-Design-System/general/wiki).
 
 ---
 
