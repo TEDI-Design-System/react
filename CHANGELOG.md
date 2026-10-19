@@ -1,3 +1,10 @@
+# [20.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.3...react-20.0.0-rc.4) (2026-10-19)
+
+
+### Bug Fixes
+
+* **header:** add missing deprecation markers to community Header subcomponents [#965](https://github.com/TEDI-Design-System/react/issues/965) ([#991](https://github.com/TEDI-Design-System/react/issues/991)) ([4cedd29](https://github.com/TEDI-Design-System/react/commit/4cedd2921ef55dd36617737a215ed991a356d4c1))
+
 # [20.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.2...react-20.0.0-rc.3) (2026-10-19)
 
 
