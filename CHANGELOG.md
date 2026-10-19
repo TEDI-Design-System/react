@@ -1,3 +1,10 @@
+# [20.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.4...react-20.0.0-rc.5) (2026-10-19)
+
+
+### Features
+
+* **dock-panel:** add internal resizing and simplify component and optional header description [#961](https://github.com/TEDI-Design-System/react/issues/961) ([#995](https://github.com/TEDI-Design-System/react/issues/995)) ([83fa60e](https://github.com/TEDI-Design-System/react/commit/83fa60e77d918e2f89b9be755fa150fa6ec61429))
+
 # [20.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.3...react-20.0.0-rc.4) (2026-10-19)
 
 
