@@ -24,7 +24,7 @@ reviews:
     - path: "**"
       instructions: |
         Read and enforce the project conventions from these files:
-        - `CLAUDE.md` — project overview, architecture, component patterns, styling rules, testing setup, and "Do NOT" list.
+        - `AGENTS.md` — project overview, architecture, component patterns, styling rules, testing setup, and "Do NOT" list.
         - `.claude/skills/contributing/references/best-practices.md` — detailed coding patterns for components, SCSS, testing, stories, and barrel exports.
 
         Key things to NOT flag as issues:
