@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
 import react from '@vitejs/plugin-react';
+import { appendFileSync, copyFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import preserveDirectives from 'rollup-plugin-preserve-directives';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, UserConfig } from 'vite';
+import { defineConfig, Plugin, UserConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
@@ -11,6 +12,25 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import packageJson from './package.json' with { type: 'json' };
 
 const externalDependencies = [...Object.keys(packageJson.peerDependencies), 'react/jsx-runtime'];
+
+const coreIconsDir = './node_modules/@tedi-design-system/core/icons';
+
+/**
+ * The bundled CSS has no icon fonts (styles use core's index-without-icons). Keep index.css
+ * backward compatible by appending all three Material Symbols styles to it, and ship the
+ * icon-less bundle as index-without-icons.css so apps can pair it with one icons/<style>.css.
+ * Font URLs are written as /fonts/ to match the rest of the bundle; the build script rewrites them.
+ */
+const iconStylesheets = (): Plugin => ({
+  name: 'tedi-icon-stylesheets',
+  apply: 'build',
+  closeBundle() {
+    const indexCss = resolve(__dirname, 'dist/index.css');
+    copyFileSync(indexCss, resolve(__dirname, 'dist/index-without-icons.css'));
+    const allIcons = readFileSync(resolve(__dirname, coreIconsDir, 'all.css'), 'utf8');
+    appendFileSync(indexCss, allIcons.replace(/\.\.\/fonts\//g, '/fonts/'));
+  },
+});
 
 const config: UserConfig = {
   define: {
@@ -47,8 +67,13 @@ const config: UserConfig = {
           src: './node_modules/@tedi-design-system/core/fonts',
           dest: './',
         },
+        {
+          src: `${coreIconsDir}/*.css`,
+          dest: './icons',
+        },
       ],
     }),
+    iconStylesheets(),
   ],
   css: {
     modules: {
