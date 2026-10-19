@@ -1,3 +1,10 @@
+# [20.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.2...react-20.0.0-rc.3) (2026-10-19)
+
+
+### Features
+
+* **icon:** Allow Loading A Single Icon Font Style [#41](https://github.com/TEDI-Design-System/react/issues/41) ([#994](https://github.com/TEDI-Design-System/react/issues/994)) ([26ca797](https://github.com/TEDI-Design-System/react/commit/26ca797a2f768c67acd74df80b64c466eb237f01))
+
 # [20.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.1...react-20.0.0-rc.2) (2026-10-14)
 
 
