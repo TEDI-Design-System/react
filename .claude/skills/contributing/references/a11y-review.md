@@ -2,6 +2,10 @@
 
 Target component: `$ARGUMENTS`
 
+## Standard
+
+TEDI follows EN 301 549 and, for web content, **WCAG 2.2 level AA**. Review against WCAG 2.2 AA. Components released before TEDI moved to WCAG 2.2 were built against WCAG 2.1 AA, so check the criteria new in 2.2 explicitly (2.4.11 Focus Not Obscured, 2.5.7 Dragging Movements, 2.5.8 Target Size) and report a failure as a Major finding like any other AA violation. The [accessibility page on tedi.ee](https://www.tedi.ee/1ee8444b7/p/33df89-sissejuhatus/b/05a2e8) is the canonical statement.
+
 ## Audit Procedure
 
 ### 1. Read the Component
@@ -39,6 +43,7 @@ Check against WAI-ARIA Authoring Practices for the component pattern:
 - [ ] Focus returns to trigger element when overlay closes
 - [ ] `tabIndex={-1}` used for programmatically focusable non-interactive elements
 - [ ] No focus on hidden/invisible elements
+- [ ] Focused element is not fully hidden behind sticky headers, overlays or other content (WCAG 2.4.11, AA)
 - [ ] Uses `FloatingFocusManager` for overlay focus trapping (floating-ui pattern)
 
 ### 5. Visual & Motion
@@ -51,8 +56,8 @@ Check against WAI-ARIA Authoring Practices for the component pattern:
 
 ### 6. Touch & Pointer
 
-- [ ] Touch targets minimum 44x44 CSS pixels
-- [ ] Adequate spacing between touch targets
+- [ ] Touch targets at least 24x24 CSS pixels, or enough spacing around smaller targets (WCAG 2.5.8, AA); prefer 44x44 (WCAG 2.5.5, AAA)
+- [ ] Anything done by dragging also works with a single click or tap (WCAG 2.5.7, AA)
 - [ ] No functionality dependent on hover alone (touch devices can't hover)
 - [ ] Uses `useIsTouchDevice()` hook where applicable for touch-specific behavior
 
