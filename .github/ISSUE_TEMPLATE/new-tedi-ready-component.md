@@ -23,6 +23,7 @@ Design:
 - [ ] The component has passed **Chromatic visual review**
 - [ ] The component has passed the **automated accessibility tests** _(axe checks on the Storybook stories, run in CI)_
 - [ ] The component has been manually tested against **WCAG 2.2 AA** _(see [Ligipääsetavus](https://www.tedi.ee/1ee8444b7/p/33df89-sissejuhatus/b/05a2e8))_
+- [ ] The component has been manually tested in **Chrome, Firefox, Safari and Edge**, and on **iOS and Android** devices
 - [ ] **Storybook stories** are created:
   - [ ] Cover all Figma variations
   - [ ] Include edge cases, empty/error states
