@@ -21,6 +21,7 @@ Design:
 - [ ] CodeCov passes its threshold _(80% on the changed code, with 10% tolerance — a separate gate from the Jest one above)_
 - [ ] The component has passed **code review**
 - [ ] The component has passed **Chromatic visual review**
+- [ ] The component has passed the **automated accessibility tests** _(axe checks on the Storybook stories, run in CI)_
 - [ ] The component has been manually tested against **WCAG 2.2 AA** _(see [Ligipääsetavus](https://www.tedi.ee/1ee8444b7/p/33df89-sissejuhatus/b/05a2e8))_
 - [ ] **Storybook stories** are created:
   - [ ] Cover all Figma variations
