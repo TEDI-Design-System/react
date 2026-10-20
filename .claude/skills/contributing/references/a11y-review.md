@@ -56,7 +56,7 @@ Check against WAI-ARIA Authoring Practices for the component pattern:
 
 ### 6. Touch & Pointer
 
-- [ ] Touch targets at least 24x24 CSS pixels, or enough spacing around smaller targets (WCAG 2.5.8, AA); prefer 44x44 (WCAG 2.5.5, AAA)
+- [ ] Pointer targets (mouse, touch, stylus) at least 24x24 CSS pixels, or enough spacing around smaller targets (WCAG 2.5.8, AA); prefer 44x44 (WCAG 2.5.5, AAA)
 - [ ] Anything done by dragging can also be done with a single pointer without dragging, e.g. clicks or taps, possibly several (WCAG 2.5.7, AA). Exceptions: dragging is essential, or the behavior comes from the browser and is not modified by the component
 - [ ] No functionality dependent on hover alone (touch devices can't hover)
 - [ ] Uses `useIsTouchDevice()` hook where applicable for touch-specific behavior
