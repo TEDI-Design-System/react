@@ -206,12 +206,9 @@ const SearchCategoryPrefixRow = () => {
 export const StartDynamic: Story = {
   parameters: {
     a11y: {
-      config: {
+      options: {
         // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
-        rules: [
-          { id: 'color-contrast', enabled: false },
-          { id: 'target-size', enabled: false },
-        ],
+        rules: { 'target-size': { enabled: false } },
       },
     },
   },

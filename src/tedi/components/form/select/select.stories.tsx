@@ -261,9 +261,9 @@ const iconPickerOptions: ISelectOption<IconData>[] = (
 export const ValueType: Story = {
   parameters: {
     a11y: {
-      config: {
+      options: {
         // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
-        rules: [{ id: 'target-size', enabled: false }],
+        rules: { 'target-size': { enabled: false } },
       },
     },
   },
@@ -353,9 +353,9 @@ export const ValueType: Story = {
 export const EllipsisTags: Story = {
   parameters: {
     a11y: {
-      config: {
+      options: {
         // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
-        rules: [{ id: 'target-size', enabled: false }],
+        rules: { 'target-size': { enabled: false } },
       },
     },
   },
@@ -695,9 +695,9 @@ export const Examples: Story = {
 export const MultipleHandled: Story = {
   parameters: {
     a11y: {
-      config: {
+      options: {
         // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
-        rules: [{ id: 'target-size', enabled: false }],
+        rules: { 'target-size': { enabled: false } },
       },
     },
   },
