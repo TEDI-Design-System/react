@@ -60,7 +60,7 @@ const config: UserConfig = {
     viteStaticCopy({
       targets: [
         {
-          src: ['package.json', 'README.md', 'component.manifest.json', 'DESIGN.md'],
+          src: ['package.json', 'README.md', 'LICENSE', 'NOTICE.md', 'component.manifest.json', 'DESIGN.md'],
           dest: './',
         },
         {
