@@ -35,8 +35,8 @@ assignees: ''
   - [ ] Cover all Figma variations
   - [ ] Include edge cases, empty/error states
 - [ ] Component’s **API (props, slots, events)** is documented
-- [ ] **ZeroHeight is updated** with design/development guidelines
-- [ ] WCAG guidelines for the component are documented in ZeroHeight
+- [ ] **Zeroheight is updated** with design/development guidelines
+- [ ] WCAG guidelines for the component are documented in Zeroheight
 - [ ] **External dependencies** used in the component are documented in **Storybook and Zeroheight**, with rationale
 - [ ] **Semantic commit format** `type(scope): Subject text #issue-ref` is used (for `semantic-release`), with the **issue reference required** - see [Commit convention](https://github.com/TEDI-Design-System/general/wiki/Commit-convention)
 - [ ] External libraries **comply with [validated open source licenses](https://github.com/TEDI-Design-System/general/wiki/Definition-of-Done#validated-open-source-component-licences)**
