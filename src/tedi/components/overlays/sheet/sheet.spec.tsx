@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { useRef, useState } from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
@@ -390,6 +390,30 @@ describe('Sheet', () => {
     const title = screen.getByRole('heading', { name: 'Layers' });
     expect(left.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Layers');
+  });
+
+  it('renders extra actions between the collapse and close buttons', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header
+            title="Layers"
+            collapsible
+            right={<span>Right content</span>}
+            actions={<button type="button">Fullscreen</button>}
+          />
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const header = screen.getByRole('heading', { name: 'Layers' }).parentElement as HTMLElement;
+    const buttons = within(header)
+      .getAllByRole('button')
+      .map((button) => button.getAttribute('aria-label') ?? button.textContent);
+    expect(buttons).toEqual(['Mocked label: sheet.collapse', 'Fullscreen', 'Close']);
+    const right = screen.getByText('Right content');
+    const collapse = screen.getByRole('button', { name: 'Mocked label: sheet.collapse' });
+    expect(right.compareDocumentPosition(collapse) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('renders right content before the actions', () => {

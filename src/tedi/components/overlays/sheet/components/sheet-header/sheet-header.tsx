@@ -39,11 +39,15 @@ export interface SheetHeaderProps {
    */
   left?: ReactNode;
   /**
-   * Trailing content shown before the collapse / close actions - e.g. a count `Tag` or an extra
-   * icon-only action. Use `Button` `size="small"` for icon-only actions so they match the collapse
-   * and close buttons.
+   * Trailing content shown before the collapse / close actions - e.g. a count `Tag`.
    */
   right?: ReactNode;
+  /**
+   * Extra header actions, placed inside the action group between the collapse and close buttons -
+   * e.g. a fullscreen toggle. Use `Button` `size="small"` for icon-only actions so they match the
+   * collapse and close buttons.
+   */
+  actions?: ReactNode;
   /**
    * Show the close button.
    * @default true
@@ -71,6 +75,7 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
     collapsible = false,
     left,
     right,
+    actions,
     closeButton = true,
     closeButtonProps,
     children,
@@ -113,6 +118,7 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
                 aria-label={getLabel(collapsed ? 'sheet.expand' : 'sheet.collapse')}
               />
             )}
+            {actions}
             {closeButton && (
               <ClosingButton
                 {...closeButtonProps}
