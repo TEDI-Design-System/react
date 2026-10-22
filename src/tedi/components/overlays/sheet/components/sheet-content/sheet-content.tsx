@@ -166,7 +166,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
 
   const { snapPoints, defaultSnapPoint, onSnapPointChange } = props;
   const snaps = useMemo(() => (snapPoints ? [...snapPoints].sort((a, b) => a - b) : []), [snapPoints]);
-  const hasSnaps = snaps.length > 0;
+  // Snap points are suspended while collapsed, so the panel shrinks to its header and an upward drag expands it.
+  const hasSnaps = snaps.length > 0 && !collapsed;
   const maxSnap = snaps[snaps.length - 1] ?? 1;
   const [snapIndex, setSnapIndex] = useState(() =>
     defaultSnapPoint !== undefined ? defaultSnapPoint : Math.max(0, snaps.length - 1)

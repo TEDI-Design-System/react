@@ -1,5 +1,5 @@
 import { useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { ReactNode, useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { SheetBody } from './components/sheet-body/sheet-body';
 import { SheetCloser } from './components/sheet-closer/sheet-closer';
@@ -41,6 +41,21 @@ export interface SheetProps {
    */
   closeOnEscape?: boolean;
   /**
+   * Initial collapsed state for uncontrolled usage. The sheet returns to this state each time it opens.
+   * @default false
+   */
+  defaultCollapsed?: boolean;
+  /**
+   * Controlled collapsed state - collapsed to just its header (docked peek). Collapsing only hides the
+   * body and footer, so their content and state are kept, unlike closing. Provide together with
+   * `onCollapsedChange` to collapse or expand the sheet from outside (e.g. after a map interaction).
+   */
+  collapsed?: boolean;
+  /**
+   * Called whenever the sheet requests to collapse or expand (header toggle, drag handle).
+   */
+  onCollapsedChange?: (collapsed: boolean) => void;
+  /**
    * ARIA role of the sheet dialog. Use `alertdialog` for interruptive confirmations.
    * @default dialog
    */
@@ -55,6 +70,9 @@ export const Sheet = (props: SheetProps): JSX.Element => {
     onToggle,
     closeOnBackdropClick = true,
     closeOnEscape = true,
+    defaultCollapsed = false,
+    collapsed: controlledCollapsed,
+    onCollapsedChange,
     role = 'dialog',
   } = props;
 
@@ -62,7 +80,9 @@ export const Sheet = (props: SheetProps): JSX.Element => {
   const isControlled = typeof controlledOpen !== 'undefined';
   const isOpen = isControlled ? controlledOpen : internalOpen;
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
+  const isCollapsedControlled = controlledCollapsed !== undefined;
+  const collapsed = isCollapsedControlled ? controlledCollapsed : internalCollapsed;
 
   const handleOpenChange = useCallback(
     (next: boolean) => {
@@ -72,9 +92,22 @@ export const Sheet = (props: SheetProps): JSX.Element => {
     [isControlled, onToggle]
   );
 
+  const handleCollapsedChange = useCallback(
+    (next: boolean) => {
+      if (!isCollapsedControlled) setInternalCollapsed(next);
+      onCollapsedChange?.(next);
+    },
+    [isCollapsedControlled, onCollapsedChange]
+  );
+
+  // An uncontrolled sheet returns to `defaultCollapsed` each time it opens (not on mount, so a
+  // `defaultOpen` + `defaultCollapsed` sheet starts collapsed).
+  const wasOpenRef = useRef(isOpen);
+
   useEffect(() => {
-    if (isOpen) setCollapsed(false);
-  }, [isOpen]);
+    if (isOpen && !wasOpenRef.current && !isCollapsedControlled) setInternalCollapsed(defaultCollapsed);
+    wasOpenRef.current = isOpen;
+  }, [isOpen, isCollapsedControlled, defaultCollapsed]);
 
   const { refs, context } = useFloating({
     open: isOpen,
@@ -107,7 +140,7 @@ export const Sheet = (props: SheetProps): JSX.Element => {
       labelId: hasTitle ? labelId : '',
       setHasTitle,
       collapsed,
-      onCollapsedChange: setCollapsed,
+      onCollapsedChange: handleCollapsedChange,
     }),
     [
       isOpen,
@@ -120,6 +153,7 @@ export const Sheet = (props: SheetProps): JSX.Element => {
       hasTitle,
       labelId,
       collapsed,
+      handleCollapsedChange,
     ]
   );
 

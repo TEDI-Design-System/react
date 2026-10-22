@@ -178,13 +178,114 @@ describe('Sheet', () => {
       </Sheet>
     );
 
-    expect(screen.getByText('Body content')).toBeInTheDocument();
+    expect(screen.getByText('Body content')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
-    expect(screen.queryByText('Body content')).not.toBeInTheDocument();
-    expect(screen.queryByText('Footer content')).not.toBeInTheDocument();
+    expect(screen.getByText('Body content')).not.toBeVisible();
+    expect(screen.getByText('Footer content')).not.toBeVisible();
 
     fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.expand' }));
-    expect(screen.getByText('Body content')).toBeInTheDocument();
+    expect(screen.getByText('Body content')).toBeVisible();
+  });
+
+  it('keeps body state across collapse and expand', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>
+            <input aria-label="Note" />
+          </Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    fireEvent.change(screen.getByLabelText('Note'), { target: { value: 'kept' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.expand' }));
+    expect(screen.getByLabelText('Note')).toHaveValue('kept');
+  });
+
+  it('reports the real expanded state on the collapse toggle', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    expect(screen.getByRole('button', { name: 'Mocked label: sheet.expand' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
+  });
+
+  it('starts collapsed with defaultCollapsed and returns to it on reopen', async () => {
+    render(
+      <Sheet defaultCollapsed>
+        <Sheet.Trigger>
+          <button type="button">Open</button>
+        </Sheet.Trigger>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByText('Body content')).not.toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.expand' }));
+    expect(screen.getByText('Body content')).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByText('Body content')).not.toBeVisible();
+    // Let the open transition settle so its state update lands inside act().
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveAttribute('data-status', 'open'));
+  });
+
+  it('supports controlled collapsed state', () => {
+    const onCollapsedChange = jest.fn();
+    const ControlledCollapse = () => {
+      const [collapsed, setCollapsed] = useState(true);
+      return (
+        <>
+          <button type="button" onClick={() => setCollapsed(false)}>
+            Expand from outside
+          </button>
+          <Sheet
+            defaultOpen
+            collapsed={collapsed}
+            onCollapsedChange={(next) => {
+              onCollapsedChange(next);
+              setCollapsed(next);
+            }}
+          >
+            <Sheet.Content trapFocus={false}>
+              <Sheet.Header title="Layers" collapsible />
+              <Sheet.Body>Body content</Sheet.Body>
+            </Sheet.Content>
+          </Sheet>
+        </>
+      );
+    };
+    render(<ControlledCollapse />);
+
+    expect(screen.getByText('Body content')).not.toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Expand from outside' }));
+    expect(screen.getByText('Body content')).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    expect(onCollapsedChange).toHaveBeenCalledWith(true);
+    expect(screen.getByText('Body content')).not.toBeVisible();
   });
 
   it('expands a collapsed sheet when the drag handle is pulled up', () => {
@@ -198,7 +299,7 @@ describe('Sheet', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
-    expect(screen.queryByText('Body content')).not.toBeInTheDocument();
+    expect(screen.getByText('Body content')).not.toBeVisible();
 
     const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
     fireEvent.pointerDown(handle, { clientY: 500, pointerId: 1 });
@@ -276,17 +377,34 @@ describe('Sheet', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('renders header slot content before the actions', () => {
+  it('renders left content before the title and keeps the dialog named by the title', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" slot={<span>Slot content</span>} />
+          <Sheet.Header title="Layers" left={<span>Left content</span>} />
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const left = screen.getByText('Left content');
+    const title = screen.getByRole('heading', { name: 'Layers' });
+    expect(left.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Layers');
+  });
+
+  it('renders right content before the actions', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" right={<span>Right content</span>} />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
     );
 
-    expect(screen.getByText('Slot content')).toBeInTheDocument();
+    const right = screen.getByText('Right content');
+    const close = screen.getByRole('button', { name: 'Close' });
+    expect(right.compareDocumentPosition(close) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('applies the centre-title modifier only when centerTitle is set', () => {
@@ -349,6 +467,28 @@ describe('Sheet', () => {
     );
 
     const panel = document.querySelector<HTMLElement>('[class*="tedi-sheet__panel"]');
+    expect(panel).toHaveStyle({ height: '90dvh' });
+  });
+
+  it('drops the snap height while collapsed and restores it on expand', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[0.4, 0.9]}>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const panel = screen.getByRole('dialog');
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    expect(panel.style.height).toBe('');
+
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerDown(handle, { clientY: 500, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientY: 440, pointerId: 1 });
+    fireEvent.pointerUp(handle, { clientY: 440, pointerId: 1 });
+    expect(screen.getByText('Body')).toBeVisible();
     expect(panel).toHaveStyle({ height: '90dvh' });
   });
 

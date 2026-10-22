@@ -34,9 +34,16 @@ export interface SheetHeaderProps {
    */
   collapsible?: boolean;
   /**
-   * Trailing content shown before the collapse / close actions - e.g. a count `Tag` or a small action button.
+   * Leading content shown before the title - e.g. a back button or a count `Tag`. Stays pinned to the
+   * start edge when `centerTitle` is set.
    */
-  slot?: ReactNode;
+  left?: ReactNode;
+  /**
+   * Trailing content shown before the collapse / close actions - e.g. a count `Tag` or an extra
+   * icon-only action. Use `Button` `size="small"` for icon-only actions so they match the collapse
+   * and close buttons.
+   */
+  right?: ReactNode;
   /**
    * Show the close button.
    * @default true
@@ -62,7 +69,8 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
     variant = 'brand',
     centerTitle = false,
     collapsible = false,
-    slot,
+    left,
+    right,
     closeButton = true,
     closeButtonProps,
     children,
@@ -87,15 +95,17 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
     >
       {children ?? (
         <>
+          {left && <div className={styles['tedi-sheet__header-left']}>{left}</div>}
           {title && (
             <Heading element="h6" modifiers="h6" id={labelId} className={styles['tedi-sheet__title']}>
               {title}
             </Heading>
           )}
           <div className={styles['tedi-sheet__header-actions']}>
-            {slot}
+            {right}
             {collapsible && (
               <CollapseButton
+                className={styles['tedi-sheet__collapse-toggle']}
                 hideText
                 open={!collapsed}
                 onOpenChange={(next) => onCollapsedChange(!next)}
@@ -105,7 +115,6 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
             )}
             {closeButton && (
               <ClosingButton
-                size="small"
                 {...closeButtonProps}
                 color={variant === 'brand' ? 'white' : 'primary'}
                 onClick={() => onOpenChange(false)}
