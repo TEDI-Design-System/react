@@ -7,8 +7,13 @@ export interface PopoverContextValue {
    * classes.
    */
   withBorder: boolean;
+  /**
+   * If false, `Popover.Content` renders without the arrow.
+   */
+  withArrow: boolean;
 }
 
 export const PopoverContext = createContext<PopoverContextValue>({
   withBorder: false,
+  withArrow: true,
 });
