@@ -501,7 +501,11 @@ const leadingBackHeader = (
       title="Teated"
       variant="default"
       centerTitle
-      left={<Button visualType="neutral" size="small" icon="arrow_back" aria-label="Tagasi" />}
+      left={
+        <Button visualType="neutral" size="small" icon="arrow_back">
+          Tagasi
+        </Button>
+      }
       right={<Tag color="primary">2</Tag>}
     />
     <Sheet.Body>{headerBody}</Sheet.Body>
@@ -620,7 +624,11 @@ export const Header: Story = {
                 title="Seaded"
                 variant="default"
                 collapsible
-                right={<Button visualType="neutral" size="small" icon="fullscreen" aria-label="Täisekraan" />}
+                actions={
+                  <Button visualType="neutral" size="small" icon="fullscreen">
+                    Täisekraan
+                  </Button>
+                }
               />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
@@ -1170,7 +1178,7 @@ const PLACES: ISelectOption[] = [
 /**
  * A larger desktop layout: a table-style input view inside the sheet. `maxHeight` caps the panel, so
  * the body scrolls once enough **Lisa rida** rows are added instead of the sheet growing without
- * bound. The header carries an extra neutral icon-only action alongside collapse / close, and the footer
+ * bound. The header carries an extra neutral icon-only action between collapse and close, and the footer
  * groups the **Kopeeri** and **Lisa rida** links together with the **Tühista** / **Salvesta** actions.
  */
 export const DesktopTable: Story = {
@@ -1190,7 +1198,11 @@ export const DesktopTable: Story = {
             title="Minu üksuste metsateatised"
             variant="default"
             collapsible
-            right={<Button visualType="neutral" size="small" icon="drag_handle" aria-label="Muuda suurust" />}
+            actions={
+              <Button visualType="neutral" size="small" icon="drag_handle">
+                Muuda suurust
+              </Button>
+            }
           />
           <Sheet.Body>
             <VerticalSpacing size={0.75}>
@@ -1209,6 +1221,9 @@ export const DesktopTable: Story = {
             </VerticalSpacing>
           </Sheet.Body>
           <Sheet.Footer align="right">
+            <Button visualType="neutral" iconLeft="content_copy">
+              Kopeeri
+            </Button>
             <Button
               visualType="neutral"
               iconLeft="add"
