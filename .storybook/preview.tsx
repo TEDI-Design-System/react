@@ -1,3 +1,4 @@
+import './fixed-date';
 import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
 import { Preview, StoryContext } from '@storybook/react-vite';
 
