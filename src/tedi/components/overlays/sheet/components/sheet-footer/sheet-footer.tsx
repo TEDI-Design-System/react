@@ -39,14 +39,14 @@ export const SheetFooter = ({
   fullWidth = false,
   right,
   className,
-}: SheetFooterProps): JSX.Element | null => {
+}: SheetFooterProps): JSX.Element => {
   const { collapsed } = useSheetContext();
 
-  if (collapsed) return null;
-
   const isSplit = Boolean(right);
+  // Hidden rather than unmounted while collapsed, matching `Sheet.Body`.
   return (
     <div
+      hidden={collapsed}
       className={cn(
         styles['tedi-sheet__footer'],
         styles[isSplit ? 'tedi-sheet__footer--split' : `tedi-sheet__footer--${align}`],

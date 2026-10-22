@@ -2,10 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
-import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
-import ClosingButton from '../../buttons/closing-button/closing-button';
+import { TextGroup } from '../../content/text-group/text-group';
 import { Filter, FilterGroup } from '../../filter/filter';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { ChoiceGroup } from '../../form/choice-group/choice-group';
@@ -128,25 +127,22 @@ const profileDetails = [
 
 const ProfileSheetContent = (): JSX.Element => (
   <Sheet.Body>
-    <VerticalSpacing size={1.5}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+    <VerticalSpacing size={1}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
         <img
-          src="custom_accordion_1.png"
+          src="sheet-profile.jpg"
           alt="Tiina Tamm"
-          width={120}
-          height={120}
+          width={150}
+          height={150}
           style={{ borderRadius: '50%', objectFit: 'cover' }}
         />
-        <Button visualType="secondary">Vaheta pilt</Button>
+        <Button visualType="secondary" size="small">
+          Vaheta pilt
+        </Button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem 1rem' }}>
         {profileDetails.map((detail) => (
-          <div key={detail.label}>
-            <Text modifiers="small" color="secondary">
-              {detail.label}
-            </Text>
-            <Text modifiers="bold">{detail.value}</Text>
-          </div>
+          <TextGroup key={detail.label} type="vertical" label={detail.label} value={detail.value} />
         ))}
       </div>
     </VerticalSpacing>
@@ -193,6 +189,35 @@ const FILTER_SENDERS = [
   { id: 'kristjan-koppel', label: 'Kristjan Koppel' },
 ];
 
+// Selectable rows styled like `Dropdown.Item` (which needs a surrounding `Dropdown`, so it can't be
+// reused inside a sheet directly). `--bleed` stretches a row over the body padding to the sheet edges.
+const exampleRowStyles = `
+  .sheet-example-row {
+    display: flex;
+    gap: var(--layout-grid-gutters-08);
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--dropdown-item-padding-y) var(--tedi-sheet-padding-x);
+    font: inherit;
+    color: var(--dropdown-item-default-text);
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  .sheet-example-row:hover {
+    color: var(--dropdown-item-hover-text);
+    background: var(--dropdown-item-hover-background);
+  }
+
+  .sheet-example-row--bleed {
+    width: calc(100% + 2 * var(--tedi-sheet-padding-x));
+    margin-inline: calc(-1 * var(--tedi-sheet-padding-x));
+  }
+`;
+
 export const HeaderNotCollapsible: Story = {
   name: 'Header is not collapsible',
   render: function HeaderNotCollapsible() {
@@ -214,6 +239,7 @@ export const HeaderNotCollapsible: Story = {
           if (open) setStep('filters');
         }}
       >
+        <style>{exampleRowStyles}</style>
         <Sheet.Trigger>
           <Button visualType="neutral" iconLeft="tune">
             Ava filtrid
@@ -227,23 +253,11 @@ export const HeaderNotCollapsible: Story = {
               <Sheet.Body>
                 <VerticalSpacing size={1}>
                   {/* The whole "Saatja" row is the clickable target (per Figma); it drills into the
-                      sender-selection step. */}
+                      sender-selection step. Styled as a dropdown item that bleeds to the sheet edges. */}
                   <button
                     type="button"
                     onClick={() => setStep('senders')}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '0.5rem',
-                      width: '100%',
-                      padding: 0,
-                      font: 'inherit',
-                      color: 'inherit',
-                      cursor: 'pointer',
-                      background: 'none',
-                      border: 'none',
-                    }}
+                    className="sheet-example-row sheet-example-row--bleed"
                   >
                     <Text>Saatja</Text>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -308,20 +322,7 @@ export const HeaderNotCollapsible: Story = {
                         type="button"
                         onClick={() => toggleSender(sender.id)}
                         aria-pressed={isSelected}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: '1rem',
-                          width: '100%',
-                          padding: '0.75rem 1rem',
-                          font: 'inherit',
-                          textAlign: 'left',
-                          color: 'inherit',
-                          cursor: 'pointer',
-                          background: 'none',
-                          border: 'none',
-                        }}
+                        className="sheet-example-row"
                       >
                         <Text>{sender.label}</Text>
                         {isSelected && <Icon name="check" color="brand" />}
@@ -486,44 +487,23 @@ const headerBody = (
   </VerticalSpacing>
 );
 
-// Leading (left) content. There's no first-class left slot - `slot` sits on the trailing side next
-// to the actions. For a leading element, pass `children` (which replaces the default title / actions
-// layout) and re-add the close button via `Sheet.Closer`; the dialog is named through
-// `aria-labelledby` pointing at the custom heading.
+// Leading (`left`) and trailing (`right`) header content, matching the Figma header's left / right slots.
 const leadingTagHeader = (
-  <Sheet.Content aria-labelledby="sheet-leading-tag-title">
-    <Sheet.Header variant="default">
-      <Tag color="primary">2</Tag>
-      <Heading element="h6" modifiers="h6" id="sheet-leading-tag-title" style={{ flex: '1 1 auto', margin: 0 }}>
-        Teated
-      </Heading>
-      <Sheet.Closer>
-        <ClosingButton size="small" color="primary" />
-      </Sheet.Closer>
-    </Sheet.Header>
+  <Sheet.Content>
+    <Sheet.Header title="Teated" variant="default" left={<Tag color="primary">2</Tag>} />
     <Sheet.Body>{headerBody}</Sheet.Body>
   </Sheet.Content>
 );
 
 const leadingBackHeader = (
-  <Sheet.Content aria-labelledby="sheet-leading-back-title">
-    <Sheet.Header variant="default">
-      <Button visualType="neutral" icon="arrow_back" aria-label="Tagasi" />
-      <Heading
-        element="h6"
-        modifiers="h6"
-        id="sheet-leading-back-title"
-        style={{ flex: '1 1 auto', margin: 0, textAlign: 'center' }}
-      >
-        Teated
-      </Heading>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Tag color="primary">2</Tag>
-        <Sheet.Closer>
-          <ClosingButton size="small" color="primary" />
-        </Sheet.Closer>
-      </div>
-    </Sheet.Header>
+  <Sheet.Content>
+    <Sheet.Header
+      title="Teated"
+      variant="default"
+      centerTitle
+      left={<Button visualType="neutral" size="small" icon="arrow_back" aria-label="Tagasi" />}
+      right={<Tag color="primary">2</Tag>}
+    />
     <Sheet.Body>{headerBody}</Sheet.Body>
   </Sheet.Content>
 );
@@ -616,7 +596,7 @@ export const Header: Story = {
                 variant="default"
                 centerTitle
                 closeButton={false}
-                slot={
+                right={
                   <Sheet.Closer>
                     <Button visualType="secondary" icon="close">
                       Sulge
@@ -629,7 +609,7 @@ export const Header: Story = {
           ),
         },
       ])}
-      {exampleGroup('Actions & slot', 'secondary', [
+      {exampleGroup('Actions & slots', 'secondary', [
         {
           caption: 'Extra action',
           label: 'Metsateatised',
@@ -640,29 +620,25 @@ export const Header: Story = {
                 title="Seaded"
                 variant="default"
                 collapsible
-                slot={
-                  <Button visualType="neutral" icon="fullscreen">
-                    Täisekraan
-                  </Button>
-                }
+                right={<Button visualType="neutral" size="small" icon="fullscreen" aria-label="Täisekraan" />}
               />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
         },
         {
-          caption: 'With slot',
+          caption: 'Right slot',
           label: 'Teated',
           icon: 'mail',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" slot={<Tag color="primary">2</Tag>} />
+              <Sheet.Header title="Seaded" variant="default" right={<Tag color="primary">2</Tag>} />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
         },
-        { caption: 'Leading tag', label: 'Teated', icon: 'mail', content: leadingTagHeader },
-        { caption: 'Leading back button', label: 'Teadete filter', icon: 'filter_list', content: leadingBackHeader },
+        { caption: 'Left slot', label: 'Teated', icon: 'mail', content: leadingTagHeader },
+        { caption: 'Left and right slots', label: 'Teadete filter', icon: 'filter_list', content: leadingBackHeader },
       ])}
       {exampleGroup('Handle', 'neutral', [
         {
@@ -789,7 +765,7 @@ export const Padding: Story = {
         labeledTrigger(
           `padding="${padding}"`,
           <Sheet.Content padding={padding}>
-            <Sheet.Header title="Seaded" variant="default" slot={<Tag color="primary">2</Tag>} />
+            <Sheet.Header title="Seaded" variant="default" right={<Tag color="primary">2</Tag>} />
             <Sheet.Body>{headerBody}</Sheet.Body>
             <Sheet.Footer>
               <Sheet.Closer>
@@ -1047,7 +1023,8 @@ export const Controlled: Story = {
 /**
  * **Snap points.** `snapPoints={[0.4, 0.9]}` lets the bottom sheet rest at 40% or 90% of the
  * viewport. Drag the handle to move between them - releasing snaps to the nearest, and dragging
- * below the lowest point dismisses.
+ * below the lowest point dismisses. Collapsing the header shrinks the sheet to its header; expanding
+ * returns it to the snap point it was at.
  */
 export const SnapPoints: Story = {
   render: () => (
@@ -1056,7 +1033,7 @@ export const SnapPoints: Story = {
         <Button>Ava kihid</Button>
       </Sheet.Trigger>
       <Sheet.Content snapPoints={[0.4, 0.9]}>
-        <Sheet.Header title="Kihid" variant="default" />
+        <Sheet.Header title="Kihid" variant="default" collapsible />
         <Sheet.Body>
           <VerticalSpacing size={0.5}>
             {MAP_LAYERS.concat(MAP_LAYERS).map((layer, i) => (
@@ -1119,6 +1096,59 @@ export const DockedPeek: Story = {
   },
 };
 
+/**
+ * **Controlled collapse.** `collapsed` + `onCollapsedChange` let the page collapse or expand the sheet
+ * from outside - e.g. collapse it while the user draws on the map, then pop it back open once the
+ * drawing is confirmed. Collapsing only hides the body, so the form keeps its values; closing removes it.
+ */
+export const ControlledCollapse: Story = {
+  name: 'Controlled collapse',
+  render: function ControlledCollapse() {
+    const [open, setOpen] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
+
+    return (
+      <VerticalSpacing size={1}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <Button
+            visualType="neutral"
+            iconLeft="edit"
+            onClick={() => {
+              setOpen(true);
+              setCollapsed(true);
+            }}
+          >
+            Alusta joonistamist
+          </Button>
+          <Button visualType="neutral" iconLeft="check" onClick={() => setCollapsed(false)} disabled={!open}>
+            Kinnita joonis
+          </Button>
+        </div>
+        <Sheet
+          open={open}
+          onToggle={setOpen}
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          closeOnBackdropClick={false}
+        >
+          <Sheet.Content showOverlay={false} trapFocus={false} lockScroll={false}>
+            <Sheet.Header title="Uus ala" variant="brand" collapsible />
+            <Sheet.Body>
+              <TextField id="sheet-controlled-collapse-name" label="Ala nimi" />
+            </Sheet.Body>
+            <Sheet.Footer>
+              <Sheet.Closer>
+                <Button visualType="secondary">Tühista</Button>
+              </Sheet.Closer>
+              <Button>Salvesta</Button>
+            </Sheet.Footer>
+          </Sheet.Content>
+        </Sheet>
+      </VerticalSpacing>
+    );
+  },
+};
+
 const FOREST_TYPES: ISelectOption[] = [
   { value: 'commercial', label: 'Majandusmets' },
   { value: 'protected', label: 'Kaitsemets' },
@@ -1140,7 +1170,7 @@ const PLACES: ISelectOption[] = [
 /**
  * A larger desktop layout: a table-style input view inside the sheet. `maxHeight` caps the panel, so
  * the body scrolls once enough **Lisa rida** rows are added instead of the sheet growing without
- * bound. The header carries an extra fullscreen action alongside collapse / close, and the footer
+ * bound. The header carries an extra neutral icon-only action alongside collapse / close, and the footer
  * groups the **Kopeeri** and **Lisa rida** links together with the **Tühista** / **Salvesta** actions.
  */
 export const DesktopTable: Story = {
@@ -1160,7 +1190,7 @@ export const DesktopTable: Story = {
             title="Minu üksuste metsateatised"
             variant="default"
             collapsible
-            slot={<Button visualType="neutral" icon="fullscreen" aria-label="Täisekraan" />}
+            right={<Button visualType="neutral" size="small" icon="drag_handle" aria-label="Muuda suurust" />}
           />
           <Sheet.Body>
             <VerticalSpacing size={0.75}>

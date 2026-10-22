@@ -25,13 +25,13 @@ export interface SheetBodyProps {
   className?: string;
 }
 
-export const SheetBody = ({ children, padding = 'default', className }: SheetBodyProps): JSX.Element | null => {
+export const SheetBody = ({ children, padding = 'default', className }: SheetBodyProps): JSX.Element => {
   const { collapsed } = useSheetContext();
 
-  if (collapsed) return null;
-
+  // Hidden rather than unmounted while collapsed, so form values and other state survive a collapse.
   return (
     <div
+      hidden={collapsed}
       className={cn(
         styles['tedi-sheet__body'],
         { [styles['tedi-sheet__body--no-padding']]: padding === 'none' },
