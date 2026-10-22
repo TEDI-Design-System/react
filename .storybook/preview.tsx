@@ -64,6 +64,12 @@ const preview: Preview = {
     viewMode: 'docs',
     a11y: {
       test: 'error',
+      // axe leaves target-size (WCAG 2.2, 2.5.8) off by default. Set via options.rules, not
+      // config.rules, so stories that override config.rules don't drop it. To turn it off in a
+      // story, use options.rules too: config.rules can't override it.
+      options: {
+        rules: { 'target-size': { enabled: true } },
+      },
     },
     backgrounds: {
       options: {
