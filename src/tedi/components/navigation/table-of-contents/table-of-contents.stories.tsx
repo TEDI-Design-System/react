@@ -4,7 +4,6 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
-import { Col, Row } from '../../layout/grid';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -303,7 +302,7 @@ export const Bordered: Story = {
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et ' +
   'dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ' +
-  'ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
+  'ea commodo consequat.';
 
 interface LayoutNode {
   id: string;
@@ -311,44 +310,16 @@ interface LayoutNode {
   children?: LayoutNode[];
 }
 
-const layoutTree: LayoutNode[] = [
-  { id: 'sec-1', label: 'Sissejuhatus' },
-  {
-    id: 'sec-2',
-    label: 'Taust',
+const layoutTree: LayoutNode[] = Array.from({ length: 30 }, (_, i) => ({
+  id: `chapter-${i + 1}`,
+  label: `Peatükk ${i + 1}`,
+  ...(i === 2 && {
     children: [
-      { id: 'sec-2-1', label: 'Varasem uurimus' },
-      { id: 'sec-2-2', label: 'Probleemipüstitus' },
+      { id: 'chapter-3-1', label: 'Peatükk 3.1' },
+      { id: 'chapter-3-2', label: 'Peatükk 3.2' },
     ],
-  },
-  {
-    id: 'sec-3',
-    label: 'Meetodid',
-    children: [
-      { id: 'sec-3-1', label: 'Andmete kogumine' },
-      { id: 'sec-3-2', label: 'Analüüs' },
-    ],
-  },
-  {
-    id: 'sec-4',
-    label: 'Tulemused',
-    children: [
-      { id: 'sec-4-1', label: 'Joonised' },
-      { id: 'sec-4-2', label: 'Tabelid' },
-    ],
-  },
-  { id: 'sec-5', label: 'Arutelu' },
-  {
-    id: 'sec-6',
-    label: 'Järeldused',
-    children: [
-      { id: 'sec-6-1', label: 'Piirangud' },
-      { id: 'sec-6-2', label: 'Edasine töö' },
-    ],
-  },
-  { id: 'sec-7', label: 'Kokkuvõte' },
-  { id: 'sec-8', label: 'Viited' },
-];
+  }),
+}));
 
 // Depth-tagged flat list, used for the scroll-spy observer and the content sections.
 const layoutFlat = layoutTree.flatMap((node) => [
@@ -358,32 +329,39 @@ const layoutFlat = layoutTree.flatMap((node) => [
 const layoutIds = layoutFlat.map((node) => node.id);
 
 /**
- * Both panes are fixed-height scroll regions of the same height (`24rem`): the content on the left and
- * the sidebar list on the right. Add as many `TableOfContents.Item`s as you like — the sidebar scrolls
- * inside its own scrollbar instead of stretching past its frame. `scrollActiveIntoView` keeps the
- * active item visible as you read: when the active section changes, its row is scrolled into view
- * within the sidebar's scrollbar. Below `lg` the list collapses into `TableOfContents.Collapsible`.
+ * A documentation page with a sticky table-of-contents sidebar. The page scrolls, and the sticky TOC
+ * stays alongside it, scrolling on its own when it is taller than the viewport. `scrollActiveIntoView`
+ * keeps the active item visible as you read: when the active section changes, its row is scrolled into
+ * view within the card. Below `lg` the list collapses into `TableOfContents.Collapsible`.
+ *
+ * The component is controlled via `activeId`, so the consumer owns scroll behavior: this demo wires an
+ * `IntersectionObserver` to highlight the section in view (scroll-spy) and scrolls the page to a
+ * section when its item is clicked.
  */
 export const StickyInLayout: Story = {
-  parameters: { fullWidth: true },
+  parameters: {
+    layout: 'fullscreen',
+    fullWidth: true,
+    // Own iframe, so the window scrolls and the default 100dvh max height applies.
+    docs: { story: { inline: false, height: '30rem' } },
+  },
   render: function StickyInLayout() {
+    // Mobile scroll area; on desktop the window scrolls.
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [activeId, setActiveId] = useState('sec-1');
+    const [activeId, setActiveId] = useState(layoutIds[0]);
     const isMobile = isBreakpointBelow(useBreakpoint(), 'lg');
 
     useEffect(() => {
-      const container = scrollRef.current;
       if (typeof IntersectionObserver === 'undefined') return undefined;
-      if (!isMobile && !container) return undefined;
-
-      const observerRoot = isMobile ? null : container;
+      const container = isMobile ? scrollRef.current : null;
+      if (isMobile && !container) return undefined;
 
       const ids = layoutIds;
       const visibility = new Map<string, boolean>();
       const atBottom = (): boolean =>
-        isMobile
-          ? window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
-          : !!container && container.scrollTop + container.clientHeight >= container.scrollHeight - 2;
+        container
+          ? container.scrollTop + container.clientHeight >= container.scrollHeight - 2
+          : window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
 
       const pickActive = (): void => {
         if (atBottom()) {
@@ -400,7 +378,7 @@ export const StickyInLayout: Story = {
           entries.forEach((entry) => visibility.set(entry.target.id, entry.isIntersecting));
           pickActive();
         },
-        { root: observerRoot, rootMargin: '0px 0px -55% 0px' }
+        { root: container, rootMargin: '0px 0px -55% 0px' }
       );
 
       ids.forEach((id) => {
@@ -408,7 +386,7 @@ export const StickyInLayout: Story = {
         if (el) observer.observe(el);
       });
 
-      const scroller: HTMLElement | Window = isMobile ? window : (container as HTMLElement);
+      const scroller: HTMLElement | Window = container ?? window;
       scroller.addEventListener('scroll', pickActive, { passive: true });
 
       return () => {
@@ -417,20 +395,20 @@ export const StickyInLayout: Story = {
       };
     }, [isMobile]);
 
+    // `scrollTo` rather than `scrollIntoView`, which would also scroll the Storybook docs page around
+    // the iframe.
     const selectSection = (id: string) => (event: React.MouseEvent) => {
       event.preventDefault();
       const target = document.getElementById(id);
       if (!target) return;
 
-      if (isMobile) {
-        target.scrollIntoView({ block: 'start' });
+      const container = scrollRef.current;
+      const offset = target.getBoundingClientRect().top;
+      if (isMobile && container) {
+        const paddingTop = parseFloat(getComputedStyle(container).paddingTop) || 0;
+        container.scrollTo({ top: container.scrollTop + offset - container.getBoundingClientRect().top - paddingTop });
       } else {
-        const root = scrollRef.current;
-        if (!root) return;
-        const paddingTop = parseFloat(getComputedStyle(root).paddingTop) || 0;
-        root.scrollTo({
-          top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - paddingTop,
-        });
+        window.scrollTo({ top: window.scrollY + offset });
       }
       setActiveId(id);
     };
@@ -447,46 +425,60 @@ export const StickyInLayout: Story = {
 
     const items = renderItems(layoutTree);
 
-    return (
+    const content = (
       <>
-        <Row alignItems="start">
-          <Col xs={12} md={8}>
-            <div
-              ref={scrollRef}
-              style={isMobile ? { paddingBottom: '5rem' } : { maxHeight: '24rem', overflowY: 'auto' }}
-              {...(isMobile ? {} : { tabIndex: 0, role: 'region' as const, 'aria-label': 'Artikli sisu' })}
-            >
-              <VerticalSpacing size={1.5}>
-                {layoutFlat.map(({ id, label, depth }) => (
-                  <section key={id} id={id} tabIndex={-1}>
-                    <VerticalSpacing size={0.5}>
-                      <Heading element={depth === 0 ? 'h2' : 'h3'} modifiers={depth === 0 ? 'h3' : 'h4'}>
-                        {label}
-                      </Heading>
-                      <Text>{LOREM}</Text>
-                    </VerticalSpacing>
-                  </section>
-                ))}
-              </VerticalSpacing>
-            </div>
-          </Col>
-          <ShowAt lg>
-            <Col md={4}>
-              <div style={{ maxHeight: '24rem', overflowY: 'auto' }}>
-                <TableOfContents heading="Sisukord" sticky={false} numbered activeId={activeId} scrollActiveIntoView>
-                  {items}
-                </TableOfContents>
-              </div>
-            </Col>
-          </ShowAt>
-        </Row>
+        <div style={{ marginBottom: '1rem' }}>
+          <Heading element="h1" modifiers="h1">
+            Pealkiri
+          </Heading>
+        </div>
+        {layoutFlat.map(({ id, label, depth }) => (
+          <section
+            key={id}
+            id={id}
+            tabIndex={-1}
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: '2rem' }}
+          >
+            <Heading element={depth === 0 ? 'h2' : 'h3'} modifiers={depth === 0 ? 'h3' : 'h4'}>
+              {label}
+            </Heading>
+            <Text>{LOREM}</Text>
+            {depth === 0 && <Text>{LOREM}</Text>}
+          </section>
+        ))}
+      </>
+    );
 
-        <HideAt lg>
-          <TableOfContents.Collapsible heading="Sisukord" numbered activeId={activeId}>
+    if (isMobile) {
+      // The content scrolls above the static bar, so the scrollbar ends before it.
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <div
+            ref={scrollRef}
+            style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', padding: '2rem' }}
+            tabIndex={0}
+            role="region"
+            aria-label="Artikli sisu"
+          >
+            {content}
+          </div>
+          <TableOfContents.Collapsible heading="Sisukord" activeId={activeId} sticky={false}>
             {items}
           </TableOfContents.Collapsible>
-        </HideAt>
-      </>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 16rem', gap: '2rem', padding: '2rem' }}>
+        <div>{content}</div>
+        {/* The sticky card needs a tall parent to move within; as a grid item it would fill the row. */}
+        <div>
+          <TableOfContents heading="Sisukord" activeId={activeId} scrollActiveIntoView>
+            {items}
+          </TableOfContents>
+        </div>
+      </div>
     );
   },
 };
