@@ -5,6 +5,7 @@ import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Card, CardContent } from '../../content/card';
+import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ChoiceGroup } from '../choice-group/choice-group';
 import { ChoiceGroupValue } from '../choice-group/choice-group.types';
@@ -101,7 +102,8 @@ const ScaleShowcase = ({
 );
 
 export const Default: Story = {
-  render: (args) => <Rating {...args} />,
+  // `defaultValue` is only read on mount; the key remounts so the control takes effect.
+  render: (args) => <Rating key={args.defaultValue} {...args} />,
 };
 
 export const Stars: Story = {
@@ -134,58 +136,52 @@ export const States: Story = {
     ];
     const cell = { padding: '0.5rem 1rem', textAlign: 'left' as const, verticalAlign: 'middle' as const };
 
+    // One table per type, side by side from md up and stacked on mobile so nothing scrolls sideways.
     return (
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <td />
-              {types.map((type) => (
-                <th key={type} colSpan={2} scope="colgroup" style={cell}>
-                  <Heading element="h3" modifiers="h5">
-                    {type[0].toUpperCase() + type.slice(1)}
-                  </Heading>
-                </th>
-              ))}
-            </tr>
-            <tr>
-              <th>
-                <span className="sr-only">State</span>
-              </th>
-              {types.map((type) =>
-                ['Default', 'Selected'].map((column) => (
-                  <th key={`${type}-${column}`} scope="col" style={cell}>
-                    <Text modifiers="bold">{column}</Text>
+      <Row gutterY={5}>
+        {types.map((type) => (
+          <Col key={type} xs={12} md={4}>
+            <Heading element="h3" modifiers="h5">
+              {type[0].toUpperCase() + type.slice(1)}
+            </Heading>
+            <table style={{ borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th>
+                    <span className="sr-only">State</span>
                   </th>
-                ))
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.label} id={row.state ? `rating-${row.state}` : undefined}>
-                <th scope="row" style={{ ...cell, paddingLeft: 0 }}>
-                  <Text modifiers="bold">{row.label}</Text>
-                </th>
-                {types.map((type) =>
-                  [0, 1].map((selected) => (
-                    <td key={`${type}-${selected}`} style={cell}>
-                      <Rating
-                        type={type}
-                        count={1}
-                        defaultValue={selected}
-                        disabled={row.disabled}
-                        icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
-                        label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
-                      />
-                    </td>
-                  ))
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  {['Default', 'Selected'].map((column) => (
+                    <th key={column} scope="col" style={cell}>
+                      <Text modifiers="bold">{column}</Text>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.label} id={row.state ? `rating-${row.state}-${type}` : undefined}>
+                    <th scope="row" style={{ ...cell, paddingLeft: 0 }}>
+                      <Text modifiers="bold">{row.label}</Text>
+                    </th>
+                    {[0, 1].map((selected) => (
+                      <td key={selected} style={cell}>
+                        <Rating
+                          type={type}
+                          count={1}
+                          defaultValue={selected}
+                          disabled={row.disabled}
+                          icons={type === 'icon' ? ['sentiment_satisfied'] : undefined}
+                          label={`${type} ${row.label} ${selected ? 'selected' : 'default'}`}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Col>
+        ))}
+      </Row>
     );
   },
 };

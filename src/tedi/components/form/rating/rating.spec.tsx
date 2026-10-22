@@ -63,9 +63,37 @@ describe('Rating', () => {
     );
     const radios = screen.getAllByRole('radio');
     radios.forEach((radio) => expect(radio).toHaveAccessibleName(/.+/));
-    expect(screen.getByRole('radio', { name: 'Low' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'High' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '1, Low' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '10, High' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: '5/10' })).toBeInTheDocument();
+  });
+
+  it('ignores non-array itemLabels and icons instead of crashing', () => {
+    const notArray = {} as unknown as string[];
+    render(<Rating label="Feedback" type="icon" count={5} itemLabels={notArray} icons={notArray} />);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
+    expect(screen.getByRole('radio', { name: '1/5' })).toBeInTheDocument();
+  });
+
+  it('warns when type="icon" has no icons for a count other than 5', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(<Rating label="Feedback" type="icon" count={3} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Pass `icons` for count=3'));
+    warn.mockRestore();
+  });
+
+  it('restores defaultValue when the surrounding form is reset', () => {
+    render(
+      <form data-testid="form">
+        <Rating label="Feedback" defaultValue={2} count={5} />
+      </form>
+    );
+    fireEvent.click(screen.getByRole('radio', { name: '5/5' }));
+    expect(screen.getByRole('radio', { name: '5/5' })).toBeChecked();
+
+    fireEvent.reset(screen.getByTestId('form'));
+    expect(screen.getByRole('radio', { name: '2/5' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '5/5' })).not.toBeChecked();
   });
 
   describe('hover preview', () => {

@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -25,11 +25,11 @@ const STAR_ICON_SIZE: IconSize = 24;
 const CIRCLE_ICON_SIZE: IconSize = 18;
 
 const DEFAULT_ICONS = [
-  'sentiment_very_dissatisfied',
+  'sentiment_sad',
   'sentiment_dissatisfied',
   'sentiment_neutral',
   'sentiment_satisfied',
-  'sentiment_very_satisfied',
+  'mood',
 ] as const;
 
 export interface RatingProps extends BreakpointSupport<RatingBreakpointProps> {
@@ -101,7 +101,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
     value,
     defaultValue = 0,
     onChange,
-    itemLabels,
+    itemLabels: itemLabelsProp,
     icons,
     disabled = false,
     readOnly = false,
@@ -123,13 +123,33 @@ export const Rating = (props: RatingProps): JSX.Element => {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const currentValue = isControlled ? value : internalValue;
 
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // A native form reset restores the radios' initial `checked` state; follow it so the visual selection
+  // and the submitted value don't drift apart.
+  useEffect(() => {
+    const form = rootRef.current?.closest('form');
+    if (!form || isControlled) return;
+
+    const handleReset = (): void => setInternalValue(defaultValue);
+    form.addEventListener('reset', handleReset);
+    return () => form.removeEventListener('reset', handleReset);
+  }, [isControlled, defaultValue]);
+
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const interactive = !disabled && !readOnly;
   const isHovering = interactive && hoverValue !== null;
   const displayValue = isHovering ? (hoverValue as number) : currentValue;
 
-  const iconList = Array.isArray(icons) ? icons : icons !== undefined ? [icons] : undefined;
+  const itemLabels = Array.isArray(itemLabelsProp) ? itemLabelsProp : undefined;
+  const iconList = Array.isArray(icons) ? icons : typeof icons === 'string' ? [icons] : undefined;
   const resolvedIcons = iconList ?? (total === DEFAULT_ICONS.length ? [...DEFAULT_ICONS] : undefined);
+
+  if (type === 'icon' && !iconList && total !== DEFAULT_ICONS.length) {
+    console.warn(
+      `Rating: type="icon" provides default icons only for count=${DEFAULT_ICONS.length}. Pass \`icons\` for count=${total}.`
+    );
+  }
   const starGlyph = iconList?.[0] ?? 'kid_star';
 
   const setValue = (next: number): void => {
@@ -141,7 +161,12 @@ export const Rating = (props: RatingProps): JSX.Element => {
     type === 'icon' ? position === target : position <= target;
 
   // Language-neutral fallback (matches the read-only `value/total` summary format) when no itemLabels given.
-  const itemLabel = (position: number): string => itemLabels?.[position - 1] || `${position}/${total}`;
+  // The number scale shows the digit, so it leads the name for speech users targeting the visible text.
+  const itemLabel = (position: number): string => {
+    const itemText = itemLabels?.[position - 1];
+    if (!itemText) return `${position}/${total}`;
+    return type === 'number' ? `${position}, ${itemText}` : itemText;
+  };
 
   const positions = Array.from({ length: total }, (_, index) => index + 1);
 
@@ -247,6 +272,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
 
   return (
     <div
+      ref={rootRef}
       role="radiogroup"
       aria-label={label}
       className={cn(
