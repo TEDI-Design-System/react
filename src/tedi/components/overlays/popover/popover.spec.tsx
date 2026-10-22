@@ -136,7 +136,7 @@ describe('Popover component', () => {
 
     it('omits the arrow when withArrow is false', () => {
       openPopover(false);
-      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.queryByTestId('overlay-arrow')).not.toBeInTheDocument();
     });
   });
