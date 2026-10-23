@@ -181,7 +181,7 @@
 
 .tedi-vertical-stepper__item--disabled {
   .tedi-vertical-stepper__indicator {
-    background-color: var(--stepper-step-disabled-bg);
+    background-color: var(--stepper-step-disabled-background);
     border-color: var(--stepper-step-disabled-border);
   }
 
@@ -254,7 +254,7 @@
 
 .tedi-vertical-stepper__sub-item--informative {
   .tedi-vertical-stepper__sub-dot {
-    background-color: var(--stepper-step-disabled-bg);
+    background-color: var(--stepper-step-disabled-background);
     border-color: var(--stepper-step-disabled-border);
   }
 
@@ -265,7 +265,7 @@
 
 .tedi-vertical-stepper__sub-item--disabled {
   .tedi-vertical-stepper__sub-dot {
-    background-color: var(--stepper-step-disabled-bg);
+    background-color: var(--stepper-step-disabled-background);
     border-color: var(--stepper-step-disabled-border);
   }
 

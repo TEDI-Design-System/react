@@ -42,20 +42,20 @@
   width: var(--form-checkbox-radio-size-responsive);
   height: var(--form-checkbox-radio-size-responsive);
   pointer-events: none;
-  background-color: var(--form-checkbox-radio-default-background-default);
-  border: var(--tedi-borders-01) solid var(--form-checkbox-radio-default-border-default);
+  background-color: var(--form-choice-checkbox-unselected-default);
+  border: var(--tedi-borders-01) solid var(--form-choice-checkbox-unselected-border-default);
 }
 
 .tedi-option-content__checkbox {
   border-radius: var(--form-checkbox-radio-indicator-radius-checkbox);
 
   &--checked {
-    background-color: var(--form-checkbox-radio-default-background-selected);
-    border-color: var(--form-checkbox-radio-default-border-selected);
+    background-color: var(--form-choice-checkbox-selected-default);
+    border-color: var(--form-choice-checkbox-selected-border-default);
   }
 
   .tedi-option-content__check-icon {
-    color: var(--form-checkbox-radio-default-check-indicator-default);
+    color: var(--form-choice-checkbox-selected-indicator-default);
   }
 }
 
@@ -64,7 +64,7 @@
   border-radius: var(--form-checkbox-radio-indicator-radius-radio);
 
   &--checked {
-    border-color: var(--form-checkbox-radio-default-border-selected);
+    border-color: var(--form-choice-radio-selected-border-default);
 
     &::before {
       position: absolute;
@@ -73,7 +73,7 @@
       width: calc(var(--form-checkbox-radio-size-responsive) * 0.625);
       height: calc(var(--form-checkbox-radio-size-responsive) * 0.625);
       content: '';
-      background: var(--form-checkbox-radio-default-border-selected);
+      background: var(--form-choice-radio-selected-indicator-default);
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
@@ -83,7 +83,7 @@
 .tedi-option-content:not(.tedi-option-content--disabled):hover {
   .tedi-option-content__checkbox:not(.tedi-option-content__checkbox--checked),
   .tedi-option-content__radio:not(.tedi-option-content__radio--checked) {
-    border-color: var(--form-checkbox-radio-default-border-hover);
+    border-color: var(--form-choice-radio-unselected-border-hover);
   }
 }
 

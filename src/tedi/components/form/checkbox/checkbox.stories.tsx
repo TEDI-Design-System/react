@@ -1,11 +1,13 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
+import FeedbackText from '../feedback-text/feedback-text';
 import Checkbox, { CheckboxGroup, CheckboxProps } from '.';
 
 /**
@@ -83,132 +85,139 @@ export const Sizes: Story = {
   render: TemplateSizes,
 };
 
-export const States = () => {
-  const [checked, setChecked] = useState<boolean>(true);
-  const [indeterminate, setIndeterminate] = useState<boolean>(true);
+const stateRows: { label: string; id: string; props?: Partial<CheckboxProps>; unselected?: boolean }[] = [
+  { label: 'Default', id: 'default' },
+  { label: 'Hover', id: 'hover', props: { hover: true } },
+  { label: 'Active', id: 'active' },
+  { label: 'Focus', id: 'focus' },
+  { label: 'Disabled', id: 'disabled', props: { disabled: true } },
+  { label: 'Error', id: 'invalid', props: { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } },
+  { label: 'Mandatory', id: 'required', props: { required: true } },
+  { label: 'Indeterminate', id: 'indeterminate', props: { indeterminate: true }, unselected: false },
+];
+
+/**
+ * Lays a state matrix out on a grid whose columns never wrap into the row labels.
+ * Below `md` it restacks to fit a phone: `mobileLayout="rows"` puts each row label on its
+ * own line above cells that share the width; `mobileLayout="columns"` splits the matrix into
+ * one section per column, for matrices too wide to keep side by side.
+ * `desktopGrid` sets a minimum column width, row height and gaps for the desktop layout.
+ */
+const StateMatrix = ({
+  headers,
+  rows,
+  alignItems = 'start',
+  mobileLayout = 'rows',
+  desktopGrid,
+}: {
+  headers: React.ReactNode[];
+  rows: { label: string; cells: React.ReactNode[] }[];
+  alignItems?: React.CSSProperties['alignItems'];
+  mobileLayout?: 'rows' | 'columns';
+  desktopGrid?: { columnWidth: string; rowHeight: string; columnGap: string; rowGap: string };
+}) => {
+  const stacked = isBreakpointBelow(useBreakpoint(), 'md');
+  const fixedGrid = stacked ? undefined : desktopGrid;
+  const gridStyle = (gridTemplateColumns: string): React.CSSProperties => ({
+    display: 'grid',
+    gridTemplateColumns,
+    gridAutoRows: fixedGrid ? `minmax(${fixedGrid.rowHeight}, auto)` : undefined,
+    columnGap: fixedGrid?.columnGap ?? 'var(--layout-grid-gutters-24)',
+    rowGap: fixedGrid?.rowGap ?? 'var(--layout-grid-gutters-16)',
+    alignItems,
+  });
+  const labelTrack = fixedGrid ? `minmax(${fixedGrid.columnWidth}, max-content)` : 'max-content';
+  const cellTrack = fixedGrid ? `minmax(${fixedGrid.columnWidth}, max-content)` : 'minmax(min-content, max-content)';
+
+  if (stacked && mobileLayout === 'columns') {
+    return (
+      <VerticalSpacing size={2}>
+        {headers.map((header, column) => (
+          <VerticalSpacing key={column}>
+            <Text modifiers="bold">{header}</Text>
+            <div style={gridStyle('max-content minmax(0, 1fr)')}>
+              {rows.map(({ label, cells }) => (
+                <React.Fragment key={label}>
+                  <Text modifiers="bold">{label}</Text>
+                  <div>{cells[column]}</div>
+                </React.Fragment>
+              ))}
+            </div>
+          </VerticalSpacing>
+        ))}
+      </VerticalSpacing>
+    );
+  }
 
   return (
-    <Row>
-      <Col lg={6} md={12}>
-        <VerticalSpacing>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Default</Text>
-            </Col>
-            <Col>
-              <Checkbox id="check-default" label="Tekst" name="check-default" value="check" />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Hover</Text>
-            </Col>
-            <Col>
-              <Checkbox id="check-hover" label="Tekst" name="check-hover" value="check" hover />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Selected</Text>
-            </Col>
-            <Col>
-              <Checkbox
-                id="check-checked"
-                label="Tekst"
-                name="check-checked"
-                value="check"
-                checked={checked}
-                onChange={(value, checked) => setChecked(checked)}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Active</Text>
-            </Col>
-            <Col>
-              <Checkbox id="check-active" label="Tekst" name="check-active" value="check" defaultChecked />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Focus</Text>
-            </Col>
-            <Col>
-              <Checkbox id="check-focus" label="Tekst" name="check-focus" value="check" />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Disabled</Text>
-            </Col>
-            <Col>
-              <Checkbox id="check-disabled" label="Tekst" name="check-disabled" value="check" disabled />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Disabled selected</Text>
-            </Col>
-            <Col>
-              <Checkbox
-                id="check-disabled-checked"
-                label="Tekst"
-                name="check-disabled-checked"
-                value="check"
-                disabled
-                defaultChecked
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Indeterminate</Text>
-            </Col>
-            <Col>
-              <Checkbox
-                id="check-indeterminate"
-                label="Tekst"
-                name="check-indeterminate"
-                value="check"
-                indeterminate={indeterminate}
-                onChange={() => setIndeterminate(false)}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Error</Text>
-            </Col>
-            <Col>
-              <Checkbox
-                id="check-invalid"
-                label="Tekst"
-                name="check-invalid"
-                value="check"
-                invalid
-                helper={{ text: 'Tagasiside tekst', type: 'error' }}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Required</Text>
-            </Col>
-            <Col>
-              <Checkbox id="check-required" label="Tekst" name="check-required" value="check" required />
-            </Col>
-          </Row>
-        </VerticalSpacing>
-      </Col>
-    </Row>
+    <div
+      style={gridStyle(
+        stacked ? `repeat(${headers.length}, minmax(0, 1fr))` : `${labelTrack} repeat(${headers.length}, ${cellTrack})`
+      )}
+    >
+      {!stacked && <span />}
+      {headers.map((header, index) => (
+        <Text key={index} modifiers="bold">
+          {header}
+        </Text>
+      ))}
+      {rows.map(({ label, cells }) => (
+        <React.Fragment key={label}>
+          <div style={stacked ? { gridColumn: '1 / -1', marginTop: 'var(--layout-grid-gutters-08)' } : undefined}>
+            <Text modifiers="bold">{label}</Text>
+          </div>
+          {cells.map((cell, index) => (
+            <div key={index}>{cell}</div>
+          ))}
+        </React.Fragment>
+      ))}
+    </div>
   );
 };
 
+/** Gives the States matrix more room between columns and rows on desktop. */
+const STATES_DESKTOP_GRID = {
+  columnWidth: '10.375rem',
+  rowHeight: '2.5rem',
+  columnGap: 'var(--layout-grid-gutters-16)',
+  rowGap: 'var(--layout-grid-gutters-08)',
+};
+
+export const States: StoryFn = () => (
+  <StateMatrix
+    alignItems="center"
+    desktopGrid={STATES_DESKTOP_GRID}
+    headers={['Unselected', 'Selected']}
+    rows={stateRows.map(({ label, id, props, unselected = true }) => ({
+      label,
+      cells: [
+        unselected ? (
+          <Checkbox
+            id={`check-${id}-unselected`}
+            label="Tekst"
+            name={`check-${id}-unselected`}
+            value="check"
+            {...props}
+          />
+        ) : null,
+        <Checkbox
+          key="selected"
+          id={`check-${id}-selected`}
+          label="Tekst"
+          name={`check-${id}-selected`}
+          value="check"
+          defaultChecked
+          {...props}
+        />,
+      ],
+    }))}
+  />
+);
+
 States.parameters = {
   pseudo: {
-    active: '#check-active + *',
-    focusVisible: '#check-focus',
+    active: ['#check-active-unselected + *', '#check-active-selected + *'],
+    focusVisible: ['#check-focus-unselected', '#check-focus-selected'],
   },
 };
 
@@ -503,59 +512,97 @@ export const ResponsiveVariant: StoryObj = {
   ),
 };
 
-const CARD_STATES: Array<{ state: string; props: Partial<CheckboxProps> }> = [
-  { state: 'Default', props: {} },
-  { state: 'Hover', props: {} },
-  { state: 'Selected', props: { defaultChecked: true } },
-  { state: 'Focus', props: {} },
+const CARD_STATES: Array<{ state: string; props?: Partial<CheckboxProps> }> = [
+  { state: 'Default' },
+  { state: 'Hover' },
+  { state: 'Active' },
+  { state: 'Focus' },
   { state: 'Disabled', props: { disabled: true } },
-  { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
 ];
 
-const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
+const cardStateId = (cardVariant: string, state: string, selected: boolean) =>
+  `card-${cardVariant}-${state.toLowerCase()}-${selected ? 'selected' : 'unselected'}`;
+
+const cardStatesPseudo = (cardVariant: string) => {
+  const ids = (state: string) => [true, false].map((selected) => `#${cardStateId(cardVariant, state, selected)}`);
+  return { hover: ids('Hover'), active: ids('Active'), focusVisible: ids('Focus') };
+};
 
 /**
- * Every card state across the primary and secondary variants. Hover and focus are forced
- * with the pseudo-states addon so all states are visible at once.
+ * Places the error message under a card group. The cards keep their natural width, while the
+ * message may widen the column to stay on one line, and wraps only when the matrix runs out of room.
  */
-export const CardStates: StoryObj = {
-  parameters: {
-    pseudo: {
-      hover: ['#card-primary-hover', '#card-secondary-hover'],
-      focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
-    },
-  },
-  render: () => (
-    <VerticalSpacing size={0.5}>
-      <Row>
-        <Col width={4} />
-        <Col width={4}>
-          <Text modifiers="bold">Primary</Text>
-        </Col>
-        <Col width={4}>
-          <Text modifiers="bold">Secondary</Text>
-        </Col>
-      </Row>
-      {CARD_STATES.map(({ state, props }) => (
-        <Row key={state}>
-          <Col width={4} className="flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
-          </Col>
-          {(['primary', 'secondary'] as const).map((cardVariant) => (
-            <Col width={4} key={cardVariant}>
-              <Checkbox
-                variant="card"
-                cardVariant={cardVariant}
-                id={`card-${cardVariant}-${cardStateSlug(state)}`}
-                name={`card-${cardVariant}-${cardStateSlug(state)}`}
-                value="check"
-                label="Tekst"
-                {...props}
-              />
-            </Col>
-          ))}
-        </Row>
-      ))}
-    </VerticalSpacing>
-  ),
+const CardErrorCell = ({ message, children }: { message: string; children: React.ReactNode }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-04)' }}>
+    <div style={{ width: 'max-content' }}>{children}</div>
+    <FeedbackText text={message} type="error" />
+  </div>
+);
+
+const renderCardStates = (cardVariant: 'primary' | 'secondary') => (
+  <StateMatrix
+    alignItems="center"
+    mobileLayout="columns"
+    headers={['Unselected', 'Selected']}
+    rows={[
+      ...CARD_STATES.map(({ state, props }) => ({
+        label: state,
+        cells: [false, true].map((selected) => (
+          <Checkbox
+            key={String(selected)}
+            variant="card"
+            cardVariant={cardVariant}
+            id={cardStateId(cardVariant, state, selected)}
+            name={cardStateId(cardVariant, state, selected)}
+            value="check"
+            label="Tekst"
+            defaultChecked={selected}
+            {...props}
+          />
+        )),
+      })),
+      {
+        label: 'Error',
+        cells: [
+          <CardErrorCell key="unselected" message="Kohustuslik on valida vähemalt 1 väärtus">
+            <Checkbox.Group
+              label="Error unselected"
+              hideLabel
+              variant="card"
+              cardVariant={cardVariant}
+              direction="row"
+              invalid
+            >
+              <Checkbox value="a" label="Tekst" />
+              <Checkbox value="b" label="Tekst" />
+            </Checkbox.Group>
+          </CardErrorCell>,
+          <CardErrorCell key="selected" message="Kohustuslik on valida vähemalt 2 väärtust">
+            <Checkbox.Group
+              label="Error selected"
+              hideLabel
+              variant="card"
+              cardVariant={cardVariant}
+              direction="row"
+              invalid
+              defaultValue={['a']}
+            >
+              <Checkbox value="a" label="Tekst" />
+              <Checkbox value="b" label="Tekst" />
+            </Checkbox.Group>
+          </CardErrorCell>,
+        ],
+      },
+    ]}
+  />
+);
+
+export const CardStatesPrimary: StoryObj = {
+  parameters: { pseudo: cardStatesPseudo('primary') },
+  render: () => renderCardStates('primary'),
+};
+
+export const CardStatesSecondary: StoryObj = {
+  parameters: { pseudo: cardStatesPseudo('secondary') },
+  render: () => renderCardStates('secondary'),
 };

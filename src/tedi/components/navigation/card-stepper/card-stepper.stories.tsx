@@ -381,7 +381,7 @@ const stepIndicatorStyle = (state: ButtonStepState): CSSProperties => {
   return {
     ...base,
     color: 'var(--stepper-item-vertical-text-disabled)',
-    backgroundColor: 'var(--stepper-step-disabled-bg)',
+    backgroundColor: 'var(--stepper-step-disabled-background)',
     border: 'var(--tedi-borders-01) solid var(--stepper-step-disabled-border)',
   };
 };
@@ -489,7 +489,7 @@ const semanticIndicatorStyle = (semantic: ButtonStepSemantic, disabled = false):
     return {
       ...base,
       color: 'var(--stepper-item-vertical-text-disabled)',
-      backgroundColor: 'var(--stepper-step-disabled-bg)',
+      backgroundColor: 'var(--stepper-step-disabled-background)',
       border: 'var(--tedi-borders-01) solid var(--stepper-step-disabled-border)',
     };
   }

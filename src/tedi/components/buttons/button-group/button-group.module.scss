@@ -52,9 +52,9 @@
 
   &--primary {
     .tedi-button-group__item {
-      color: var(--button-group-primary-inactive-text);
-      background-color: var(--button-group-primary-inactive-background);
-      border: 1px solid var(--button-group-primary-inactive-border);
+      color: var(--button-group-primary-unselected-text);
+      background-color: var(--button-group-primary-unselected-background);
+      border: 1px solid var(--button-group-primary-unselected-border);
 
       &--disabled:disabled {
         color: var(--button-group-primary-disabled-text);
@@ -76,18 +76,18 @@
       }
 
       &:focus-visible:not(:disabled, .tedi-button-group__item--active) {
-        color: var(--button-group-primary-inactive-text);
-        background-color: var(--button-group-primary-inactive-background);
-        border: 1px solid var(--button-group-primary-inactive-border);
+        color: var(--button-group-primary-unselected-text);
+        background-color: var(--button-group-primary-unselected-background);
+        border: 1px solid var(--button-group-primary-unselected-border);
       }
     }
   }
 
   &--secondary {
     .tedi-button-group__item {
-      color: var(--button-group-secondary-inactive-text);
-      background-color: var(--button-group-secondary-inactive-background);
-      border: 1px solid var(--button-group-secondary-inactive-border);
+      color: var(--button-group-secondary-unselected-text);
+      background-color: var(--button-group-secondary-unselected-background);
+      border: 1px solid var(--button-group-secondary-unselected-border);
 
       &--disabled:disabled {
         color: var(--button-group-secondary-disabled-text);
@@ -110,9 +110,9 @@
       }
 
       &:focus-visible:not(:disabled) {
-        color: var(--button-group-secondary-inactive-text);
-        background-color: var(--button-group-secondary-inactive-background);
-        border: 1px solid var(--button-group-secondary-inactive-border);
+        color: var(--button-group-secondary-unselected-text);
+        background-color: var(--button-group-secondary-unselected-background);
+        border: 1px solid var(--button-group-secondary-unselected-border);
       }
     }
   }
