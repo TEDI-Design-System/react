@@ -349,17 +349,17 @@ export const Collapsible: Story = {
   render: () => (
     <Sheet>
       <Sheet.Trigger>
-        <Button visualType="neutral" iconLeft="straighten">
-          Mõõtmine
+        <Button visualType="neutral" iconLeft="calendar_month">
+          Vali aeg
         </Button>
       </Sheet.Trigger>
       <Sheet.Content>
-        <Sheet.Header title="Mõõtmine" variant="brand" collapsible />
+        <Sheet.Header title="Vali aeg" variant="brand" collapsible />
         <Sheet.Body>
           <VerticalSpacing size={1}>
             <DateField id="sheet-collapsible-date" label="Kuupäev" />
             <TimeField id="sheet-collapsible-time" label="Aeg" />
-            <Checkbox id="sheet-collapsible-shadows" name="shadows" value="shadows" label="Hoonete varjud" />
+            <Checkbox id="sheet-collapsible-reminder" name="reminder" value="reminder" label="Lisa meeldetuletus" />
           </VerticalSpacing>
         </Sheet.Body>
         <Sheet.Footer
@@ -476,7 +476,7 @@ const exampleGroup = (label: string, visualType: HeaderTriggerVariant, examples:
   </VerticalSpacing>
 );
 
-// Realistic gallery body - a small settings group rather than a lone sentence of filler text.
+// Each header variant uses the same map-layer example so its trigger, title and body agree.
 const headerBody = (
   <VerticalSpacing size={0.5}>
     <Checkbox id="sheet-body-hybrid" name="sheet-body-hybrid" value="hybrid" label="Hübriidkaart" defaultChecked />
@@ -488,25 +488,21 @@ const headerBody = (
 );
 
 // Leading (`left`) and trailing (`right`) header content, matching the Figma header's left / right slots.
-const leadingTagHeader = (
+const leadingIconHeader = (
   <Sheet.Content>
-    <Sheet.Header title="Teated" variant="default" left={<Tag color="primary">2</Tag>} />
+    <Sheet.Header title="Kaardikihid" variant="default" left={<Icon name="layers" color="brand" />} />
     <Sheet.Body>{headerBody}</Sheet.Body>
   </Sheet.Content>
 );
 
-const leadingBackHeader = (
+const leadingIconAndCountHeader = (
   <Sheet.Content>
     <Sheet.Header
-      title="Teated"
+      title="Kaardikihid"
       variant="default"
       centerTitle
-      left={
-        <Button visualType="neutral" size="small" icon="arrow_back">
-          Tagasi
-        </Button>
-      }
-      right={<Tag color="primary">2</Tag>}
+      left={<Icon name="layers" color="brand" />}
+      right={<Tag color="primary">3</Tag>}
     />
     <Sheet.Body>{headerBody}</Sheet.Body>
   </Sheet.Content>
@@ -518,23 +514,23 @@ export const Header: Story = {
       {exampleGroup('Variant', 'secondary', [
         {
           caption: 'Primary',
-          label: 'Kaardi seaded',
-          icon: 'tune',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" />
+              <Sheet.Header title="Kaardikihid" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
         },
         {
           caption: 'Brand',
-          label: 'Mõõtmine',
-          icon: 'straighten',
+          label: 'Kaardikihid',
+          icon: 'layers',
           visualType: 'primary',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="brand" />
+              <Sheet.Header title="Kaardikihid" variant="brand" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
@@ -543,22 +539,22 @@ export const Header: Story = {
       {exampleGroup('Type', 'primary', [
         {
           caption: 'Default',
-          label: 'Seaded',
-          icon: 'settings',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" />
+              <Sheet.Header title="Kaardikihid" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
         },
         {
           caption: 'Collapsible',
-          label: 'Kihid',
+          label: 'Kaardikihid',
           icon: 'layers',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" collapsible />
+              <Sheet.Header title="Kaardikihid" variant="default" collapsible />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
@@ -567,11 +563,11 @@ export const Header: Story = {
       {exampleGroup('Title', 'secondary', [
         {
           caption: 'Title center',
-          label: 'Marsruut',
-          icon: 'route',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" centerTitle />
+              <Sheet.Header title="Kaardikihid" variant="default" centerTitle />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
@@ -580,23 +576,23 @@ export const Header: Story = {
       {exampleGroup('Closing button', 'neutral', [
         {
           caption: 'Without closing button',
-          label: 'Teavitused',
-          icon: 'notifications',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" centerTitle closeButton={false} />
+              <Sheet.Header title="Kaardikihid" variant="default" centerTitle closeButton={false} />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
         },
         {
           caption: 'Different closing button',
-          label: 'Ekspordi',
-          icon: 'download',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
               <Sheet.Header
-                title="Seaded"
+                title="Kaardikihid"
                 variant="default"
                 centerTitle
                 closeButton={false}
@@ -616,12 +612,12 @@ export const Header: Story = {
       {exampleGroup('Actions & slots', 'secondary', [
         {
           caption: 'Extra action',
-          label: 'Metsateatised',
-          icon: 'forest',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
               <Sheet.Header
-                title="Seaded"
+                title="Kaardikihid"
                 variant="default"
                 collapsible
                 actions={
@@ -636,17 +632,17 @@ export const Header: Story = {
         },
         {
           caption: 'Right slot',
-          label: 'Teated',
-          icon: 'mail',
+          label: 'Kaardikihid',
+          icon: 'layers',
           content: (
             <Sheet.Content>
-              <Sheet.Header title="Seaded" variant="default" right={<Tag color="primary">2</Tag>} />
+              <Sheet.Header title="Kaardikihid" variant="default" right={<Tag color="primary">3</Tag>} />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
         },
-        { caption: 'Left slot', label: 'Teated', icon: 'mail', content: leadingTagHeader },
-        { caption: 'Left and right slots', label: 'Teadete filter', icon: 'filter_list', content: leadingBackHeader },
+        { caption: 'Left slot', label: 'Kaardikihid', icon: 'layers', content: leadingIconHeader },
+        { caption: 'Left and right slots', label: 'Kaardikihid', icon: 'layers', content: leadingIconAndCountHeader },
       ])}
       {exampleGroup('Handle', 'neutral', [
         {
@@ -655,7 +651,7 @@ export const Header: Story = {
           icon: 'layers',
           content: (
             <Sheet.Content showHandle>
-              <Sheet.Header title="Seaded" variant="default" />
+              <Sheet.Header title="Kaardikihid" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
@@ -666,7 +662,7 @@ export const Header: Story = {
           icon: 'layers',
           content: (
             <Sheet.Content showHandle={false}>
-              <Sheet.Header title="Seaded" variant="default" />
+              <Sheet.Header title="Kaardikihid" variant="default" />
               <Sheet.Body>{headerBody}</Sheet.Body>
             </Sheet.Content>
           ),
