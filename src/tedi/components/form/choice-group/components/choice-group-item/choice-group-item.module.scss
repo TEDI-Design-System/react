@@ -83,6 +83,12 @@
       background-color: var(--form-choice-card-primary-selected-background-disabled);
       border-color: var(--form-choice-card-primary-selected-background-disabled);
     }
+
+    &.tedi-choice-group-item--disabled label,
+    &.tedi-choice-group-item--disabled .tedi-choice-group-item__label,
+    &.tedi-choice-group-item--disabled .tedi-choice-group-item__feedback-text {
+      color: var(--form-choice-card-primary-selected-text-disabled);
+    }
   }
 }
 

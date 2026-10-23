@@ -61,6 +61,8 @@
 
 .tedi-option-content__radio {
   position: relative;
+  background-color: var(--form-choice-radio-unselected-background-default);
+  border-color: var(--form-choice-radio-unselected-border-default);
   border-radius: var(--form-checkbox-radio-indicator-radius-radio);
 
   &--checked {
@@ -81,7 +83,10 @@
 }
 
 .tedi-option-content:not(.tedi-option-content--disabled):hover {
-  .tedi-option-content__checkbox:not(.tedi-option-content__checkbox--checked),
+  .tedi-option-content__checkbox:not(.tedi-option-content__checkbox--checked) {
+    border-color: var(--form-choice-checkbox-unselected-border-hover);
+  }
+
   .tedi-option-content__radio:not(.tedi-option-content__radio--checked) {
     border-color: var(--form-choice-radio-unselected-border-hover);
   }
