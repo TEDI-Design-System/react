@@ -286,7 +286,7 @@ export const WithTooltip: Story = {
   },
 };
 
-export const CheckWithLongTitle = () => {
+export const WithLongTitle: StoryFn = () => {
   return (
     <Row>
       <Col lg={6} md={12}>
@@ -469,12 +469,17 @@ export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['tram']}>
-        <Checkbox value="tram" label="Trammiga" icon="tram" />
+        <Checkbox value="tram" label="Trammiga" icon="directions_subway" />
         <Checkbox value="foot" label="Jalgsi" icon="directions_walk" />
         <Checkbox value="car" label="Autoga" icon="directions_car" />
       </Checkbox.Group>
       <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['tram']}>
-        <Checkbox value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Checkbox
+          value="tram"
+          label="Trammiga"
+          description="Soovitatud variant, vähendab ummikuid"
+          icon="directions_subway"
+        />
         <Checkbox
           value="foot"
           label="Jalgsi"

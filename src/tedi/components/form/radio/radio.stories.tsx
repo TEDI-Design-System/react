@@ -278,7 +278,7 @@ export const WithTooltip: Story = {
   },
 };
 
-export const RadioWithLongTitle = () => {
+export const WithLongTitle: StoryFn = () => {
   return (
     <Row>
       <Col width={12} lg={6}>
@@ -413,12 +413,17 @@ export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="tram">
-        <Radio value="tram" label="Trammiga" icon="tram" />
+        <Radio value="tram" label="Trammiga" icon="directions_subway" />
         <Radio value="walk" label="Jalgsi" icon="directions_walk" />
         <Radio value="car" label="Autoga" icon="directions_car" />
       </Radio.Group>
       <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="tram">
-        <Radio value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Radio
+          value="tram"
+          label="Trammiga"
+          description="Soovitatud variant, vähendab ummikuid"
+          icon="directions_subway"
+        />
         <Radio value="walk" label="Jalgsi" description="Soovitatud variant, vähendab ummikuid" icon="directions_walk" />
         <Radio
           value="car"
@@ -435,15 +440,17 @@ export const CardsWithIcons: StoryObj = {
 export const CardsSegmented: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="kodu">
-        <Radio value="kodu" label="Kodu" />
-        <Radio value="too" label="Töö" />
-        <Radio value="muu" label="Muu" />
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="peet">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="kapsas" label="Kapsas" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kaalikas" label="Kaalikas" />
       </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kodu">
-        <Radio value="kodu" label="Kodu" />
-        <Radio value="too" label="Töö" />
-        <Radio value="muu" label="Muu" />
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kapsas">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="kapsas" label="Kapsas" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kaalikas" label="Kaalikas" />
       </Radio.Group>
     </VerticalSpacing>
   ),

@@ -397,7 +397,7 @@ $indicator-border-inset: calc(var(--tedi-borders-02) - var(--tedi-borders-01));
     }
 
     &:has(.tedi-radio__input:disabled:not(:checked)) {
-      --_card-border: var(--form-choice-card-secondary-unselected-border-disabled);
+      --_card-border: var(--form-choice-card-primary-unselected-border-disabled);
     }
 
     &:has(.tedi-radio__input:disabled:checked) {
