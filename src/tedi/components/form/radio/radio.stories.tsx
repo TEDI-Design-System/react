@@ -1,11 +1,13 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
+import FeedbackText from '../feedback-text/feedback-text';
 import Radio, { RadioGroup, RadioProps } from '.';
 
 /**
@@ -82,98 +84,132 @@ export const Sizes: Story = {
   render: TemplateSizes,
 };
 
-export const States = () => {
+const stateRows: { label: string; id: string; props?: Partial<RadioProps> }[] = [
+  { label: 'Default', id: 'default' },
+  { label: 'Hover', id: 'hover', props: { hover: true } },
+  { label: 'Active', id: 'active' },
+  { label: 'Disabled', id: 'disabled', props: { disabled: true } },
+  { label: 'Focus', id: 'focus' },
+  { label: 'Error', id: 'invalid', props: { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } },
+  { label: 'Mandatory', id: 'required', props: { required: true } },
+];
+
+/**
+ * Lays a state matrix out on a grid whose columns never wrap into the row labels.
+ * Below `md` it restacks to fit a phone: `mobileLayout="rows"` puts each row label on its
+ * own line above cells that share the width; `mobileLayout="columns"` splits the matrix into
+ * one section per column, for matrices too wide to keep side by side.
+ * `desktopGrid` sets a minimum column width, row height and gaps for the desktop layout.
+ */
+const StateMatrix = ({
+  headers,
+  rows,
+  alignItems = 'start',
+  mobileLayout = 'rows',
+  desktopGrid,
+}: {
+  headers: React.ReactNode[];
+  rows: { label: string; cells: React.ReactNode[] }[];
+  alignItems?: React.CSSProperties['alignItems'];
+  mobileLayout?: 'rows' | 'columns';
+  desktopGrid?: { columnWidth: string; rowHeight: string; columnGap: string; rowGap: string };
+}) => {
+  const stacked = isBreakpointBelow(useBreakpoint(), 'md');
+  const fixedGrid = stacked ? undefined : desktopGrid;
+  const gridStyle = (gridTemplateColumns: string): React.CSSProperties => ({
+    display: 'grid',
+    gridTemplateColumns,
+    gridAutoRows: fixedGrid ? `minmax(${fixedGrid.rowHeight}, auto)` : undefined,
+    columnGap: fixedGrid?.columnGap ?? 'var(--layout-grid-gutters-24)',
+    rowGap: fixedGrid?.rowGap ?? 'var(--layout-grid-gutters-16)',
+    alignItems,
+  });
+  const labelTrack = fixedGrid ? `minmax(${fixedGrid.columnWidth}, max-content)` : 'max-content';
+  const cellTrack = fixedGrid ? `minmax(${fixedGrid.columnWidth}, max-content)` : 'minmax(min-content, max-content)';
+
+  if (stacked && mobileLayout === 'columns') {
+    return (
+      <VerticalSpacing size={2}>
+        {headers.map((header, column) => (
+          <VerticalSpacing key={column}>
+            <Text modifiers="bold">{header}</Text>
+            <div style={gridStyle('max-content minmax(0, 1fr)')}>
+              {rows.map(({ label, cells }) => (
+                <React.Fragment key={label}>
+                  <Text modifiers="bold">{label}</Text>
+                  <div>{cells[column]}</div>
+                </React.Fragment>
+              ))}
+            </div>
+          </VerticalSpacing>
+        ))}
+      </VerticalSpacing>
+    );
+  }
+
   return (
-    <Row>
-      <Col lg={6} md={12}>
-        <VerticalSpacing>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Default</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-default" label="Tekst" name="radio-default" value="radio" />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Hover</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-hover" label="Tekst" name="radio-hover" value="radio" hover />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Selected</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-checked" label="Tekst" name="radio-checked" value="radio" defaultChecked />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Active</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-active" label="Tekst" name="radio-active" value="radio" defaultChecked />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Disabled</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-disabled" label="Tekst" name="radio-disabled" value="radio" disabled />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Disabled selected</Text>
-            </Col>
-            <Col>
-              <Radio
-                id="radio-disabled-checked"
-                label="Tekst"
-                name="radio-disabled-checked"
-                value="radio"
-                disabled
-                defaultChecked
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Error</Text>
-            </Col>
-            <Col>
-              <Radio
-                id="radio-invalid"
-                label="Tekst"
-                name="radio-invalid"
-                value="radio"
-                invalid
-                helper={{ text: 'Tagasiside tekst', type: 'error' }}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Required</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-required" label="Tekst" name="radio-required" value="radio" required />
-            </Col>
-          </Row>
-        </VerticalSpacing>
-      </Col>
-    </Row>
+    <div
+      style={gridStyle(
+        stacked ? `repeat(${headers.length}, minmax(0, 1fr))` : `${labelTrack} repeat(${headers.length}, ${cellTrack})`
+      )}
+    >
+      {!stacked && <span />}
+      {headers.map((header, index) => (
+        <Text key={index} modifiers="bold">
+          {header}
+        </Text>
+      ))}
+      {rows.map(({ label, cells }) => (
+        <React.Fragment key={label}>
+          <div style={stacked ? { gridColumn: '1 / -1', marginTop: 'var(--layout-grid-gutters-08)' } : undefined}>
+            <Text modifiers="bold">{label}</Text>
+          </div>
+          {cells.map((cell, index) => (
+            <div key={index}>{cell}</div>
+          ))}
+        </React.Fragment>
+      ))}
+    </div>
   );
 };
 
+/** Gives the States matrix more room between columns and rows on desktop. */
+const STATES_DESKTOP_GRID = {
+  columnWidth: '10.375rem',
+  rowHeight: '2.5rem',
+  columnGap: 'var(--layout-grid-gutters-16)',
+  rowGap: 'var(--layout-grid-gutters-08)',
+};
+
+export const States: StoryFn = () => (
+  <StateMatrix
+    alignItems="center"
+    desktopGrid={STATES_DESKTOP_GRID}
+    headers={['Unselected', 'Selected']}
+    rows={stateRows.map(({ label, id, props }) => ({
+      label,
+      cells: [false, true].map((selected) => {
+        const radioId = `radio-${id}-${selected ? 'selected' : 'unselected'}`;
+        return (
+          <Radio
+            key={radioId}
+            id={radioId}
+            label="Tekst"
+            name={radioId}
+            value="radio"
+            defaultChecked={selected}
+            {...props}
+          />
+        );
+      }),
+    }))}
+  />
+);
+
 States.parameters = {
   pseudo: {
-    active: '#radio-active + *',
+    active: ['#radio-active-unselected + *', '#radio-active-selected + *'],
+    focusVisible: ['#radio-focus-unselected', '#radio-focus-selected'],
   },
 };
 
@@ -242,7 +278,7 @@ export const WithTooltip: Story = {
   },
 };
 
-export const RadioWithLongTitle = () => {
+export const WithLongTitle: StoryFn = () => {
   return (
     <Row>
       <Col width={12} lg={6}>
@@ -377,12 +413,17 @@ export const CardsWithIcons: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
       <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="tram">
-        <Radio value="tram" label="Trammiga" icon="tram" />
+        <Radio value="tram" label="Trammiga" icon="directions_subway" />
         <Radio value="walk" label="Jalgsi" icon="directions_walk" />
         <Radio value="car" label="Autoga" icon="directions_car" />
       </Radio.Group>
       <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="tram">
-        <Radio value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
+        <Radio
+          value="tram"
+          label="Trammiga"
+          description="Soovitatud variant, vähendab ummikuid"
+          icon="directions_subway"
+        />
         <Radio value="walk" label="Jalgsi" description="Soovitatud variant, vähendab ummikuid" icon="directions_walk" />
         <Radio
           value="car"
@@ -399,15 +440,17 @@ export const CardsWithIcons: StoryObj = {
 export const CardsSegmented: StoryObj = {
   render: () => (
     <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="kodu">
-        <Radio value="kodu" label="Kodu" />
-        <Radio value="too" label="Töö" />
-        <Radio value="muu" label="Muu" />
+      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="peet">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="kapsas" label="Kapsas" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kaalikas" label="Kaalikas" />
       </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kodu">
-        <Radio value="kodu" label="Kodu" />
-        <Radio value="too" label="Töö" />
-        <Radio value="muu" label="Muu" />
+      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kapsas">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="kapsas" label="Kapsas" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kaalikas" label="Kaalikas" />
       </Radio.Group>
     </VerticalSpacing>
   ),
@@ -433,59 +476,117 @@ export const ResponsiveVariant: StoryObj = {
   ),
 };
 
-const CARD_STATES: Array<{ state: string; props: Partial<RadioProps> }> = [
-  { state: 'Default', props: {} },
-  { state: 'Hover', props: {} },
-  { state: 'Selected', props: { defaultChecked: true } },
-  { state: 'Focus', props: {} },
+const CARD_STATES: Array<{ state: string; props?: Partial<RadioProps> }> = [
+  { state: 'Default' },
+  { state: 'Hover' },
+  { state: 'Active' },
+  { state: 'Focus' },
   { state: 'Disabled', props: { disabled: true } },
-  { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
 ];
 
-const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
+type CardColumn = 'unselected' | 'borderless' | 'selected' | 'grouped';
+
+const CARD_COLUMNS: Record<'primary' | 'secondary', Array<{ column: CardColumn; title: string }>> = {
+  primary: [
+    { column: 'unselected', title: 'Unselected' },
+    { column: 'borderless', title: 'Unselected borderless' },
+    { column: 'selected', title: 'Selected' },
+    { column: 'grouped', title: 'Grouped' },
+  ],
+  secondary: [
+    { column: 'unselected', title: 'Unselected' },
+    { column: 'selected', title: 'Selected' },
+    { column: 'grouped', title: 'Grouped' },
+  ],
+};
+
+const cardStateId = (cardVariant: string, column: CardColumn, state: string) =>
+  `radio-card-${cardVariant}-${column}-${state.toLowerCase()}`;
+
+const cardStatesPseudo = (cardVariant: 'primary' | 'secondary') => {
+  const ids = (state: string) =>
+    CARD_COLUMNS[cardVariant].map(({ column }) => `#${cardStateId(cardVariant, column, state)}`);
+  return { hover: ids('Hover'), active: ids('Active'), focusVisible: ids('Focus') };
+};
 
 /**
- * Every card state across the primary and secondary variants. Hover and focus are forced
- * with the pseudo-states addon so all states are visible at once.
+ * Places the error message under a card group. The cards keep their natural width, while the
+ * message may widen the column to stay on one line, and wraps only when the matrix runs out of room.
  */
-export const CardStates: StoryObj = {
-  parameters: {
-    pseudo: {
-      hover: ['#card-primary-hover', '#card-secondary-hover'],
-      focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
-    },
-  },
-  render: () => (
-    <VerticalSpacing size={0.5}>
-      <Row>
-        <Col width={4} />
-        <Col width={4}>
-          <Text modifiers="bold">Primary</Text>
-        </Col>
-        <Col width={4}>
-          <Text modifiers="bold">Secondary</Text>
-        </Col>
-      </Row>
-      {CARD_STATES.map(({ state, props }) => (
-        <Row key={state}>
-          <Col width={4} className="flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
-          </Col>
-          {(['primary', 'secondary'] as const).map((cardVariant) => (
-            <Col width={4} key={cardVariant}>
-              <Radio
-                variant="card"
-                cardVariant={cardVariant}
-                id={`card-${cardVariant}-${cardStateSlug(state)}`}
-                name={`card-${cardVariant}-${cardStateSlug(state)}`}
-                value="radio"
-                label="Tekst"
-                {...props}
-              />
-            </Col>
-          ))}
-        </Row>
-      ))}
-    </VerticalSpacing>
-  ),
+const CardErrorCell = ({ message, children }: { message: string; children: React.ReactNode }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-04)' }}>
+    <div style={{ width: 'max-content' }}>{children}</div>
+    <FeedbackText text={message} type="error" />
+  </div>
+);
+
+const renderCardCell = (
+  cardVariant: 'primary' | 'secondary',
+  column: CardColumn,
+  state: string,
+  props: Partial<RadioProps> = {}
+) => {
+  const id = cardStateId(cardVariant, column, state);
+  const isError = state === 'Error';
+  const selected = column === 'selected' || column === 'grouped';
+  const bordered = column === 'unselected';
+
+  if (column === 'grouped' || isError) {
+    const errorText = selected ? 'Valitud väärtus ei sobi ajavahemikuga' : 'Kohustuslik on valida vähemalt 1 väärtus';
+    const group = (
+      <Radio.Group
+        label={`${column} ${state}`}
+        hideLabel
+        name={id}
+        variant="card"
+        cardVariant={cardVariant}
+        layout={column === 'grouped' ? 'segmented' : 'separated'}
+        direction="row"
+        bordered={bordered}
+        defaultValue={selected ? 'a' : null}
+        invalid={isError}
+        disabled={props.disabled}
+      >
+        <Radio id={isError ? undefined : id} value="a" label="Tekst" />
+        <Radio value="b" label="Tekst" />
+      </Radio.Group>
+    );
+    return isError ? <CardErrorCell message={errorText}>{group}</CardErrorCell> : group;
+  }
+
+  return (
+    <Radio
+      variant="card"
+      cardVariant={cardVariant}
+      bordered={bordered}
+      id={id}
+      name={id}
+      value="radio"
+      label="Tekst"
+      defaultChecked={selected}
+      {...props}
+    />
+  );
+};
+
+const renderCardStates = (cardVariant: 'primary' | 'secondary') => (
+  <StateMatrix
+    alignItems="center"
+    mobileLayout="columns"
+    headers={CARD_COLUMNS[cardVariant].map(({ title }) => title)}
+    rows={[...CARD_STATES, { state: 'Error', props: undefined }].map(({ state, props }) => ({
+      label: state,
+      cells: CARD_COLUMNS[cardVariant].map(({ column }) => renderCardCell(cardVariant, column, state, props)),
+    }))}
+  />
+);
+
+export const CardStatesPrimary: StoryObj = {
+  parameters: { pseudo: cardStatesPseudo('primary') },
+  render: () => renderCardStates('primary'),
+};
+
+export const CardStatesSecondary: StoryObj = {
+  parameters: { pseudo: cardStatesPseudo('secondary') },
+  render: () => renderCardStates('secondary'),
 };

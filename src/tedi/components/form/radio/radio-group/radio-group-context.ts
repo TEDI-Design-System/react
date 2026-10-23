@@ -15,6 +15,7 @@ export interface RadioGroupContextValue {
   size?: 'default' | 'large';
   variant?: ChoiceInputVariant;
   cardVariant?: ChoiceInputCardVariant;
+  bordered?: boolean;
 }
 
 /**
