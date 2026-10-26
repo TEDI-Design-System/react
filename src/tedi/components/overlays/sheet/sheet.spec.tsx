@@ -693,6 +693,23 @@ describe('Sheet', () => {
     expect(document.querySelector('[class*="tedi-sheet__footer--full-width"]')).toBeInTheDocument();
   });
 
+  it('keeps fullWidth together with right content', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Footer fullWidth right={<button type="button">More</button>}>
+            <button type="button">Save</button>
+          </Sheet.Footer>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const footer = document.querySelector('[class*="tedi-sheet__footer--full-width"]');
+    expect(footer).toBeInTheDocument();
+    expect(footer).toHaveClass(/tedi-sheet__footer--split/);
+    expect(screen.getByRole('button', { name: 'More' }).parentElement).toHaveClass(/tedi-sheet__footer-side--right/);
+  });
+
   it('removes body padding when padding="none"', () => {
     render(
       <Sheet defaultOpen>

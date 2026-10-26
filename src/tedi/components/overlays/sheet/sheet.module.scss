@@ -217,7 +217,7 @@ $sheet-fade-duration: 200ms;
 }
 
 .tedi-sheet__footer--full-width {
-  .tedi-sheet__footer-side {
+  .tedi-sheet__footer-side:not(.tedi-sheet__footer-side--right) {
     flex: 1 1 auto;
 
     > * {

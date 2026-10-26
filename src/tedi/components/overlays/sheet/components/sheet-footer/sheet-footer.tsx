@@ -8,8 +8,7 @@ export type SheetFooterAlign = 'left' | 'center' | 'right';
 
 export interface SheetFooterProps {
   /**
-   * Footer content - typically the primary actions. Positioned by `align`; when `right`
-   * is set they stay on the `align` edge and `right` is pushed to the opposite edge.
+   * Main footer actions. Positioned by `align`, or at the start when `right` is set.
    */
   children?: ReactNode;
   /**
@@ -19,7 +18,8 @@ export interface SheetFooterProps {
    */
   align?: SheetFooterAlign;
   /**
-   * Stretch the actions to fill the footer width - each button grows to an equal share.
+   * Stretch the actions to fill the footer width - each button grows to an equal share. With `right`
+   * set, only the main actions stretch and the `right` content keeps its natural width.
    * @default false
    */
   fullWidth?: boolean;
@@ -50,7 +50,7 @@ export const SheetFooter = ({
       className={cn(
         styles['tedi-sheet__footer'],
         styles[isSplit ? 'tedi-sheet__footer--split' : `tedi-sheet__footer--${align}`],
-        { [styles['tedi-sheet__footer--full-width']]: fullWidth && !isSplit },
+        { [styles['tedi-sheet__footer--full-width']]: fullWidth },
         className
       )}
     >
