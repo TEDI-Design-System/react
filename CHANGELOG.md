@@ -1,3 +1,10 @@
+# [20.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.5...react-20.0.0-rc.6) (2026-10-22)
+
+
+### Bug Fixes
+
+* **print:** print links instead of hiding them [#908](https://github.com/TEDI-Design-System/react/issues/908) ([#910](https://github.com/TEDI-Design-System/react/issues/910)) ([2c8c25f](https://github.com/TEDI-Design-System/react/commit/2c8c25fd403c695f81b30aae337d4f8214c4edbc))
+
 # [20.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.4...react-20.0.0-rc.5) (2026-10-19)
 
 

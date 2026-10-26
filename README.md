@@ -10,6 +10,14 @@ Usage instructions and detailed documentation for using the components in your a
 
 ---
 
+## Accessibility
+
+TEDI follows EN 301 549 and, for web content, WCAG 2.2 level AA. Components released before TEDI moved to WCAG 2.2 were built and tested against WCAG 2.1 AA and are being reviewed for the new criteria.
+
+The [accessibility page on tedi.ee](https://www.tedi.ee/1ee8444b7/p/33df89-sissejuhatus/b/05a2e8) (in Estonian) describes how components are tested, what TEDI covers and what stays with your project, and how to report an accessibility issue.
+
+---
+
 ## Getting Started (Using the package)
 
 If you are installing `@tedi-design-system/react` in your own project, follow the
