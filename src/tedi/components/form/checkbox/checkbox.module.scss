@@ -14,6 +14,11 @@ $selected-border-inset: calc(var(--general-border-width-selected) - var(--tedi-b
     cursor: pointer;
   }
 
+  // Label defaults to secondary text; option labels use the component's color
+  .tedi-checkbox__label {
+    color: inherit;
+  }
+
   &--disabled {
     color: var(--general-text-disabled);
     cursor: not-allowed;

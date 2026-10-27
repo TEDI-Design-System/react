@@ -15,6 +15,11 @@ $indicator-border-inset: calc(var(--tedi-borders-02) - var(--tedi-borders-01));
     cursor: pointer;
   }
 
+  // Label defaults to secondary text; option labels use the component's color
+  .tedi-radio__label {
+    color: inherit;
+  }
+
   &--disabled {
     color: var(--general-text-disabled);
     cursor: not-allowed;

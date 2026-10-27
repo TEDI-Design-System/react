@@ -187,6 +187,21 @@ describe('Checkbox.Group', () => {
     expect(box).not.toHaveAttribute('aria-invalid');
   });
 
+  it('keeps the boxes in their default look when only the group is invalid', () => {
+    const { container } = render(
+      <Checkbox.Group label="Toppings" invalid>
+        <Checkbox value="cheese" label="Cheese" />
+        <Checkbox value="ham" label="Ham" invalid />
+      </Checkbox.Group>
+    );
+
+    const invalidIndicators = container.querySelectorAll('.tedi-checkbox__indicator--invalid');
+    expect(invalidIndicators).toHaveLength(1);
+    expect(screen.getByRole('checkbox', { name: 'Ham' }).parentElement).toContainElement(
+      invalidIndicators[0] as HTMLElement
+    );
+  });
+
   it('disables every checkbox when the group is disabled', () => {
     render(
       <Checkbox.Group label="Toppings" disabled>

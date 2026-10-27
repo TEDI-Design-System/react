@@ -89,6 +89,21 @@ describe('Radio.Group', () => {
     expect(group).toHaveAttribute('aria-invalid', 'true');
   });
 
+  it('keeps the radios in their default look when only the group is invalid', () => {
+    const { container } = render(
+      <Radio.Group label="Plan" invalid>
+        <Radio value="a" label="A" />
+        <Radio value="b" label="B" invalid />
+      </Radio.Group>
+    );
+
+    const invalidIndicators = container.querySelectorAll('.tedi-radio__indicator--invalid');
+    expect(invalidIndicators).toHaveLength(1);
+    expect(screen.getByRole('radio', { name: 'B' }).parentElement).toContainElement(
+      invalidIndicators[0] as HTMLElement
+    );
+  });
+
   it('shows the required asterisk on the legend only, not repeated on every option', () => {
     const { container } = render(
       <Radio.Group label="Plan" required>

@@ -11,7 +11,8 @@ import FeedbackText from '../feedback-text/feedback-text';
 import Checkbox, { CheckboxGroup, CheckboxProps } from '.';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4228-72934&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65246-120117&m=dev" target="_BLANK">Checkbox Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65246-120490&m=dev" target="_BLANK">Checkbox card Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/796203-checkbox" target="_BLANK">Zeroheight ↗</a>
  */
 
@@ -85,22 +86,28 @@ export const Sizes: Story = {
   render: TemplateSizes,
 };
 
-const stateRows: { label: string; id: string; props?: Partial<CheckboxProps>; unselected?: boolean }[] = [
+const stateRows: {
+  label: string;
+  id: string;
+  props?: Partial<CheckboxProps>;
+  unselected?: boolean;
+  error?: boolean;
+}[] = [
   { label: 'Default', id: 'default' },
   { label: 'Hover', id: 'hover', props: { hover: true } },
   { label: 'Active', id: 'active' },
   { label: 'Focus', id: 'focus' },
   { label: 'Disabled', id: 'disabled', props: { disabled: true } },
-  { label: 'Error', id: 'invalid', props: { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } },
-  { label: 'Mandatory', id: 'required', props: { required: true } },
-  { label: 'Indeterminate', id: 'indeterminate', props: { indeterminate: true }, unselected: false },
+  { label: 'Mandatory', id: 'required', props: { required: true }, error: false },
+  { label: 'Indeterminate', id: 'indeterminate', props: { indeterminate: true }, unselected: false, error: false },
 ];
 
 /**
  * Lays a state matrix out on a grid whose columns never wrap into the row labels.
  * Below `md` it restacks to fit a phone: `mobileLayout="rows"` puts each row label on its
  * own line above cells that share the width; `mobileLayout="columns"` splits the matrix into
- * one section per column, for matrices too wide to keep side by side.
+ * one section per column, for matrices too wide to keep side by side, leaving out rows that
+ * have no cell in that column.
  * `desktopGrid` sets a minimum column width, row height and gaps for the desktop layout.
  */
 const StateMatrix = ({
@@ -136,12 +143,14 @@ const StateMatrix = ({
           <VerticalSpacing key={column}>
             <Text modifiers="bold">{header}</Text>
             <div style={gridStyle('max-content minmax(0, 1fr)')}>
-              {rows.map(({ label, cells }) => (
-                <React.Fragment key={label}>
-                  <Text modifiers="bold">{label}</Text>
-                  <div>{cells[column]}</div>
-                </React.Fragment>
-              ))}
+              {rows
+                .filter(({ cells }) => cells[column])
+                .map(({ label, cells }) => (
+                  <React.Fragment key={label}>
+                    <Text modifiers="bold">{label}</Text>
+                    <div>{cells[column]}</div>
+                  </React.Fragment>
+                ))}
             </div>
           </VerticalSpacing>
         ))}
@@ -183,41 +192,43 @@ const STATES_DESKTOP_GRID = {
   rowGap: 'var(--layout-grid-gutters-08)',
 };
 
+const STATE_COLUMNS = [
+  { suffix: 'unselected', selected: false, error: false },
+  { suffix: 'selected', selected: true, error: false },
+  { suffix: 'error-unselected', selected: false, error: true },
+  { suffix: 'error-selected', selected: true, error: true },
+];
+
 export const States: StoryFn = () => (
   <StateMatrix
     alignItems="center"
+    mobileLayout="columns"
     desktopGrid={STATES_DESKTOP_GRID}
-    headers={['Unselected', 'Selected']}
-    rows={stateRows.map(({ label, id, props, unselected = true }) => ({
+    headers={['Unselected', 'Selected', 'Error unselected', 'Error selected']}
+    rows={stateRows.map(({ label, id, props, unselected = true, error: hasError = true }) => ({
       label,
-      cells: [
-        unselected ? (
+      cells: STATE_COLUMNS.map(({ suffix, selected, error }) =>
+        (!selected && !unselected) || (error && !hasError) ? null : (
           <Checkbox
-            id={`check-${id}-unselected`}
+            key={suffix}
+            id={`check-${id}-${suffix}`}
             label="Tekst"
-            name={`check-${id}-unselected`}
+            name={`check-${id}-${suffix}`}
             value="check"
+            defaultChecked={selected}
             {...props}
+            {...(error ? { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } : {})}
           />
-        ) : null,
-        <Checkbox
-          key="selected"
-          id={`check-${id}-selected`}
-          label="Tekst"
-          name={`check-${id}-selected`}
-          value="check"
-          defaultChecked
-          {...props}
-        />,
-      ],
+        )
+      ),
     }))}
   />
 );
 
 States.parameters = {
   pseudo: {
-    active: ['#check-active-unselected + *', '#check-active-selected + *'],
-    focusVisible: ['#check-focus-unselected', '#check-focus-selected'],
+    active: STATE_COLUMNS.map(({ suffix }) => `#check-active-${suffix} + *`),
+    focusVisible: STATE_COLUMNS.map(({ suffix }) => `#check-focus-${suffix}`),
   },
 };
 
@@ -339,9 +350,9 @@ export const GroupRequired: StoryObj = {
 };
 
 /**
- * An `invalid` group marks the fieldset `aria-invalid` and paints every box in the
- * error state, but does not mark each box `aria-invalid` (no single box's value is
- * wrong). Pair it with an error `helper` so the reason is announced.
+ * An `invalid` group marks the fieldset `aria-invalid`. The boxes keep their default look
+ * and are not marked `aria-invalid` (no single box's value is wrong); the error `helper`
+ * shows and announces the reason.
  */
 export const GroupInvalid: StoryObj = {
   render: () => {
@@ -407,20 +418,54 @@ export const Controlled = () => {
 };
 
 /** `variant="card"` renders each checkbox as a card. `cardVariant` sets primary / secondary. */
-export const Cards: StoryObj = {
+export const CardsDefault: StoryObj = {
   render: () => (
-    <VerticalSpacing size={1.5}>
-      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
-        <Checkbox value="a" label="Kartul" />
-        <Checkbox value="b" label="Peet" />
-        <Checkbox value="c" label="Kapsas" />
+    <Row cols={1} md={{ cols: 2 }} gutterY={3}>
+      <Col>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Primary</Text>
+          <Checkbox.Group label="Juurvili" hideLabel variant="card" cardVariant="primary" defaultValue={['a']}>
+            <Checkbox value="a" label="Kartul" />
+            <Checkbox value="b" label="Peet" />
+            <Checkbox value="c" label="Kapsas" />
+          </Checkbox.Group>
+        </VerticalSpacing>
+      </Col>
+      <Col>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Secondary</Text>
+          <Checkbox.Group label="Juurvili" hideLabel variant="card" cardVariant="secondary" defaultValue={['a']}>
+            <Checkbox value="a" label="Kartul" />
+            <Checkbox value="b" label="Peet" />
+            <Checkbox value="c" label="Kapsas" />
+          </Checkbox.Group>
+        </VerticalSpacing>
+      </Col>
+    </Row>
+  ),
+};
+
+/** Checkbox cards in a labelled `Checkbox.Group`, with and without an error message. */
+export const CardsWithLabel: StoryObj = {
+  render: () => (
+    <div className="flex flex-wrap gap-4">
+      <Checkbox.Group label="Juurvili" variant="card" cardVariant="primary" defaultValue={['kartul']}>
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="peet" label="Peet" />
+        <Checkbox value="kapsas" label="Kapsas" />
       </Checkbox.Group>
-      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
-        <Checkbox value="a" label="Kartul" />
-        <Checkbox value="b" label="Peet" />
-        <Checkbox value="c" label="Kapsas" />
+      <Checkbox.Group
+        label="Juurvili"
+        variant="card"
+        cardVariant="primary"
+        invalid
+        helper={{ text: 'Valik on kohustuslik', type: 'error' }}
+      >
+        <Checkbox value="kartul" label="Kartul" />
+        <Checkbox value="peet" label="Peet" />
+        <Checkbox value="kapsas" label="Kapsas" />
       </Checkbox.Group>
-    </VerticalSpacing>
+    </div>
   ),
 };
 
@@ -451,12 +496,18 @@ export const CardsWithDescription: StoryObj = {
     );
     return (
       <VerticalSpacing size={1.5}>
-        <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['a']}>
-          {cards()}
-        </Checkbox.Group>
-        <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['a']}>
-          {cards()}
-        </Checkbox.Group>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Primary</Text>
+          <Checkbox.Group label="Juurvili" hideLabel variant="card" cardVariant="primary" defaultValue={['a']}>
+            {cards()}
+          </Checkbox.Group>
+        </VerticalSpacing>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Secondary</Text>
+          <Checkbox.Group label="Juurvili" hideLabel variant="card" cardVariant="secondary" defaultValue={['a']}>
+            {cards()}
+          </Checkbox.Group>
+        </VerticalSpacing>
       </VerticalSpacing>
     );
   },
@@ -466,35 +517,59 @@ export const CardsWithDescription: StoryObj = {
  * Add a leading `icon` (Material icon name), optionally with a `description`.
  */
 export const CardsWithIcons: StoryObj = {
-  render: () => (
-    <VerticalSpacing size={1.5}>
-      <Checkbox.Group label="Primary" variant="card" cardVariant="primary" defaultValue={['tram']}>
-        <Checkbox value="tram" label="Trammiga" icon="directions_subway" />
-        <Checkbox value="foot" label="Jalgsi" icon="directions_walk" />
-        <Checkbox value="car" label="Autoga" icon="directions_car" />
-      </Checkbox.Group>
-      <Checkbox.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue={['tram']}>
-        <Checkbox
-          value="tram"
-          label="Trammiga"
-          description="Soovitatud variant, vähendab ummikuid"
-          icon="directions_subway"
-        />
-        <Checkbox
-          value="foot"
-          label="Jalgsi"
-          description="Soovitatud variant, vähendab ummikuid"
-          icon="directions_walk"
-        />
-        <Checkbox
-          value="car"
-          label="Autoga"
-          description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
-          icon="directions_car"
-        />
-      </Checkbox.Group>
-    </VerticalSpacing>
-  ),
+  render: () => {
+    const items = [
+      {
+        value: 'tram',
+        label: 'Trammiga',
+        icon: 'directions_subway',
+        description: 'Soovitatud variant, vähendab ummikuid',
+      },
+      { value: 'foot', label: 'Jalgsi', icon: 'directions_walk', description: 'Soovitatud variant, vähendab ummikuid' },
+      {
+        value: 'car',
+        label: 'Autoga',
+        icon: 'directions_car',
+        description: 'Kui soovid kiiremini kohale jõuda, tekitab ummikuid',
+      },
+    ];
+
+    const group = (title: string, cardVariant: 'primary' | 'secondary', withDescription = false) => (
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">{title}</Text>
+        <Checkbox.Group label="Liikumisviis" hideLabel variant="card" cardVariant={cardVariant} defaultValue={['tram']}>
+          {withDescription ? (
+            <Row className="w-100" gutter={2}>
+              {items.map((item) => (
+                <Col key={item.value} xs={12} md={4}>
+                  <Checkbox
+                    value={item.value}
+                    label={item.label}
+                    icon={item.icon}
+                    description={item.description}
+                    className="w-100"
+                  />
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            items.map((item) => <Checkbox key={item.value} value={item.value} label={item.label} icon={item.icon} />)
+          )}
+        </Checkbox.Group>
+      </VerticalSpacing>
+    );
+
+    return (
+      <VerticalSpacing size={1.5}>
+        <Row cols={1} md={{ cols: 2 }} gutterY={3}>
+          <Col>{group('Primary', 'primary')}</Col>
+          <Col>{group('Secondary', 'secondary')}</Col>
+        </Row>
+        {group('Primary with description', 'primary', true)}
+        {group('Secondary with description', 'secondary', true)}
+      </VerticalSpacing>
+    );
+  },
 };
 
 /**

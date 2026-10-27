@@ -62,7 +62,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
     console.warn('Checkbox: `tooltip` is not supported with `variant="card"` and will be ignored. Use `description`.');
   }
   const disabled = disabledProp ?? group?.disabled ?? false;
-  const invalid = invalidProp ?? group?.invalid;
+  const invalid = invalidProp;
   const required = requiredProp;
 
   const generatedId = React.useId();

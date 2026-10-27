@@ -61,7 +61,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
   const cardVariant = cardVariantProp ?? group?.cardVariant ?? 'primary';
   const bordered = borderedProp ?? group?.bordered ?? false;
   const disabled = disabledProp ?? group?.disabled ?? false;
-  const invalid = invalidProp ?? group?.invalid;
+  const invalid = invalidProp;
   const required = requiredProp ?? group?.required;
 
   if (variant === 'card' && !!tooltip) {

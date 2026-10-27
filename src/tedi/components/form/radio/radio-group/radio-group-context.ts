@@ -10,7 +10,6 @@ export interface RadioGroupContextValue {
   /** Called by a `Radio` when it is selected. */
   onValueChange: (value: string) => void;
   disabled?: boolean;
-  invalid?: boolean;
   required?: boolean;
   size?: 'default' | 'large';
   variant?: ChoiceInputVariant;

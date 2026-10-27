@@ -11,7 +11,8 @@ import FeedbackText from '../feedback-text/feedback-text';
 import Radio, { RadioGroup, RadioProps } from '.';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4598-78103&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65724-11106&m=dev" target="_BLANK">Radio Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65725-251541&m=dev" target="_BLANK">Radio card Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Radio> = {
@@ -84,21 +85,21 @@ export const Sizes: Story = {
   render: TemplateSizes,
 };
 
-const stateRows: { label: string; id: string; props?: Partial<RadioProps> }[] = [
+const stateRows: { label: string; id: string; props?: Partial<RadioProps>; error?: boolean }[] = [
   { label: 'Default', id: 'default' },
   { label: 'Hover', id: 'hover', props: { hover: true } },
   { label: 'Active', id: 'active' },
   { label: 'Disabled', id: 'disabled', props: { disabled: true } },
   { label: 'Focus', id: 'focus' },
-  { label: 'Error', id: 'invalid', props: { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } },
-  { label: 'Mandatory', id: 'required', props: { required: true } },
+  { label: 'Mandatory', id: 'required', props: { required: true }, error: false },
 ];
 
 /**
  * Lays a state matrix out on a grid whose columns never wrap into the row labels.
  * Below `md` it restacks to fit a phone: `mobileLayout="rows"` puts each row label on its
  * own line above cells that share the width; `mobileLayout="columns"` splits the matrix into
- * one section per column, for matrices too wide to keep side by side.
+ * one section per column, for matrices too wide to keep side by side, leaving out rows that
+ * have no cell in that column.
  * `desktopGrid` sets a minimum column width, row height and gaps for the desktop layout.
  */
 const StateMatrix = ({
@@ -134,12 +135,14 @@ const StateMatrix = ({
           <VerticalSpacing key={column}>
             <Text modifiers="bold">{header}</Text>
             <div style={gridStyle('max-content minmax(0, 1fr)')}>
-              {rows.map(({ label, cells }) => (
-                <React.Fragment key={label}>
-                  <Text modifiers="bold">{label}</Text>
-                  <div>{cells[column]}</div>
-                </React.Fragment>
-              ))}
+              {rows
+                .filter(({ cells }) => cells[column])
+                .map(({ label, cells }) => (
+                  <React.Fragment key={label}>
+                    <Text modifiers="bold">{label}</Text>
+                    <div>{cells[column]}</div>
+                  </React.Fragment>
+                ))}
             </div>
           </VerticalSpacing>
         ))}
@@ -181,15 +184,24 @@ const STATES_DESKTOP_GRID = {
   rowGap: 'var(--layout-grid-gutters-08)',
 };
 
+const STATE_COLUMNS = [
+  { suffix: 'unselected', selected: false, error: false },
+  { suffix: 'selected', selected: true, error: false },
+  { suffix: 'error-unselected', selected: false, error: true },
+  { suffix: 'error-selected', selected: true, error: true },
+];
+
 export const States: StoryFn = () => (
   <StateMatrix
     alignItems="center"
+    mobileLayout="columns"
     desktopGrid={STATES_DESKTOP_GRID}
-    headers={['Unselected', 'Selected']}
-    rows={stateRows.map(({ label, id, props }) => ({
+    headers={['Unselected', 'Selected', 'Error unselected', 'Error selected']}
+    rows={stateRows.map(({ label, id, props, error: hasError = true }) => ({
       label,
-      cells: [false, true].map((selected) => {
-        const radioId = `radio-${id}-${selected ? 'selected' : 'unselected'}`;
+      cells: STATE_COLUMNS.map(({ suffix, selected, error }) => {
+        if (error && !hasError) return null;
+        const radioId = `radio-${id}-${suffix}`;
         return (
           <Radio
             key={radioId}
@@ -199,6 +211,7 @@ export const States: StoryFn = () => (
             value="radio"
             defaultChecked={selected}
             {...props}
+            {...(error ? { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } : {})}
           />
         );
       }),
@@ -208,8 +221,8 @@ export const States: StoryFn = () => (
 
 States.parameters = {
   pseudo: {
-    active: ['#radio-active-unselected + *', '#radio-active-selected + *'],
-    focusVisible: ['#radio-focus-unselected', '#radio-focus-selected'],
+    active: STATE_COLUMNS.map(({ suffix }) => `#radio-active-${suffix} + *`),
+    focusVisible: STATE_COLUMNS.map(({ suffix }) => `#radio-focus-${suffix}`),
   },
 };
 

@@ -31,7 +31,7 @@ interface RadioGroupBreakpointProps {
   onChange?: (value: string) => void;
   /** Disables the whole group and every radio within it. */
   disabled?: boolean;
-  /** Marks the group as invalid, forwarding the error state to each radio. */
+  /** Marks the group as invalid. The radios keep their default look; pair with an error `helper`. */
   invalid?: boolean;
   /** Marks the group as required, adding a required indicator to the legend. */
   required?: boolean;
@@ -112,14 +112,13 @@ export const RadioGroup = (props: RadioGroupProps): JSX.Element => {
       value: currentValue,
       onValueChange: handleValueChange,
       disabled,
-      invalid,
       required,
       size,
       variant,
       cardVariant,
       bordered,
     }),
-    [resolvedName, currentValue, handleValueChange, disabled, invalid, required, size, variant, cardVariant, bordered]
+    [resolvedName, currentValue, handleValueChange, disabled, required, size, variant, cardVariant, bordered]
   );
 
   return (
