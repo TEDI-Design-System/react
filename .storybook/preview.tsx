@@ -1,3 +1,4 @@
+import './fixed-date';
 import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
 import { Preview, StoryContext } from '@storybook/react-vite';
 
@@ -5,6 +6,7 @@ import StorybookDecorator from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
+import '../node_modules/@tedi-design-system/core/icons/_all.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
 
 import { PrintingProvider } from '../src/tedi/providers/printing-provider';
@@ -63,6 +65,12 @@ const preview: Preview = {
     viewMode: 'docs',
     a11y: {
       test: 'error',
+      // axe leaves target-size (WCAG 2.2, 2.5.8) off by default. Set via options.rules, not
+      // config.rules, so stories that override config.rules don't drop it. To turn it off in a
+      // story, use options.rules too: config.rules can't override it.
+      options: {
+        rules: { 'target-size': { enabled: true } },
+      },
     },
     backgrounds: {
       options: {

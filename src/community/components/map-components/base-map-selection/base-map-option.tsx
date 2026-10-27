@@ -1,10 +1,9 @@
 import classNames from 'classnames';
-import { JSX, useEffect, useRef, useState } from 'react';
+import { JSX } from 'react';
 
 import { Icon } from '../../../../tedi/components/base/icon/icon';
 import Button from '../../../../tedi/components/buttons/button/button';
 import { Tooltip } from '../../../../tedi/components/overlays/tooltip';
-import { useElementSize } from '../../../../tedi/helpers';
 import styles from './base-map-selection.module.scss';
 
 export type BaseMapOptionType = 'button' | 'historical' | 'selection';
@@ -55,8 +54,8 @@ export interface BaseMapOptionProps {
   disabled?: boolean;
   /**
    * Text shown in a tooltip. When set, an info icon is rendered in the middle of the
-   * option and hovering anywhere on the option reveals this text. A title too long to
-   * fit is shown above it in the same tooltip rather than in a second, competing one.
+   * option and hovering anywhere on the option reveals this text below the title, which
+   * the tooltip always shows.
    */
   tooltipText?: string;
   /**
@@ -84,18 +83,6 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
     tooltipText,
     tooltipType = 'info',
   } = props;
-
-  const titleRef = useRef<HTMLDivElement>(null);
-  const titleSize = useElementSize(titleRef);
-  const [isTruncated, setIsTruncated] = useState(false);
-
-  useEffect(() => {
-    const node = titleRef.current;
-
-    if (node) {
-      setIsTruncated(node.scrollWidth > node.clientWidth);
-    }
-  }, [titleSize, title]);
 
   const handleSelect = () => {
     if (disabled) {
@@ -136,28 +123,16 @@ export const BaseMapOption = (props: BaseMapOptionProps): JSX.Element => {
           />
         </span>
       )}
-      <div ref={titleRef} className={styles['tedi-base-map-selection__title']}>
-        {title}
-      </div>
+      <div className={styles['tedi-base-map-selection__title']}>{title}</div>
     </Button>
   );
-
-  if (!tooltipText && !isTruncated) {
-    return option;
-  }
 
   return (
     <Tooltip ariaHidden={!tooltipText} openWith="hover">
       <Tooltip.Trigger>{option}</Tooltip.Trigger>
       <Tooltip.Content>
-        {tooltipText ? (
-          <>
-            {isTruncated && <div aria-hidden>{title}</div>}
-            {tooltipText}
-          </>
-        ) : (
-          title
-        )}
+        <div aria-hidden>{title}</div>
+        {tooltipText}
       </Tooltip.Content>
     </Tooltip>
   );

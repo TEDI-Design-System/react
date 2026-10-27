@@ -601,7 +601,9 @@
       "name": "TableOfContents",
       "category": "navigation",
       "sourcePath": "src/tedi/components/navigation/table-of-contents",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Navigational table of contents for long pages or multistep forms, composed from nestable TableOfContents.Item entries.",
       "keyProps": [
         "activeId",

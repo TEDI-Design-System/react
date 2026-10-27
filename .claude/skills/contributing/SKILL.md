@@ -14,7 +14,7 @@ You are a senior React and TypeScript engineer specializing in accessible UI com
 
 ## Before Any Code
 
-1. Read `CLAUDE.md` at the project root for commands, architecture, and conventions.
+1. Read `AGENTS.md` at the project root for commands, architecture, and conventions.
 2. Read [best-practices](references/best-practices.md) for coding patterns.
 3. If creating or modifying a component, check if TEDI Angular (`../angular/tedi/components/`) has an equivalent — use as behavioral reference.
 4. Check TEDI Core (`../core/src/`) for available design tokens, mixins, and shared styles.

@@ -9,9 +9,13 @@ interface CategorySearchState {
 }
 
 export function useCategorySearch(categories: readonly CategorySearchCategory[]) {
-  const [states, setStates] = useState<ReadonlyMap<string, CategorySearchState>>(
-    () => new Map(categories.map((category) => [category.id, { draft: category.initialValue(), status: 'idle' }]))
-  );
+  const [states, setStates] = useState<ReadonlyMap<string, CategorySearchState>>(() => {
+    const initialStates = new Map<string, CategorySearchState>(
+      categories.map((category) => [category.id, { draft: category.initialValue(), status: 'idle' }])
+    );
+    if (initialStates.size !== categories.length) throw new Error('CategorySearch category IDs must be unique.');
+    return initialStates;
+  });
   const requests = useRef(new Map<string, AbortController>());
 
   useEffect(() => {
@@ -22,41 +26,9 @@ export function useCategorySearch(categories: readonly CategorySearchCategory[])
     };
   }, []);
 
-  // Keeping an ID preserves its input and results; removing it also invalidates its request.
-  useEffect(() => {
-    const ids = new Set(categories.map((category) => category.id));
-    if (ids.size !== categories.length) throw new Error('CategorySearch category IDs must be unique.');
-
-    requests.current.forEach((controller, categoryId) => {
-      if (!ids.has(categoryId)) {
-        controller.abort();
-        requests.current.delete(categoryId);
-      }
-    });
-
-    setStates((previous) => {
-      const next = new Map(previous);
-      let changed = false;
-      for (const category of categories) {
-        if (!next.has(category.id)) {
-          next.set(category.id, { draft: category.initialValue(), status: 'idle' });
-          changed = true;
-        }
-      }
-      for (const categoryId of previous.keys()) {
-        if (!ids.has(categoryId)) {
-          next.delete(categoryId);
-          changed = true;
-        }
-      }
-      return changed ? next : previous;
-    });
-  }, [categories]);
-
   function updateState(categoryId: string, changes: Partial<CategorySearchState>) {
     setStates((previous) => {
-      const current = previous.get(categoryId);
-      if (!current) return previous;
+      const current = previous.get(categoryId)!;
       const next = new Map(previous);
       next.set(categoryId, { ...current, ...changes });
       return next;
@@ -70,12 +42,20 @@ export function useCategorySearch(categories: readonly CategorySearchCategory[])
   function cancel(categoryId: string) {
     requests.current.get(categoryId)?.abort();
     requests.current.delete(categoryId);
-    updateState(categoryId, { status: 'idle' });
   }
 
   function clear(category: CategorySearchCategory) {
     cancel(category.id);
-    updateState(category.id, { draft: category.initialValue(), completedSearch: undefined, status: 'idle' });
+    updateState(category.id, {
+      draft: category.mode === 'search' ? '' : category.initialValue(),
+      completedSearch: undefined,
+      status: 'idle',
+    });
+  }
+
+  function select(categoryId: string, text: string) {
+    cancel(categoryId);
+    updateState(categoryId, { draft: text, status: 'idle' });
   }
 
   async function search(category: CategorySearchCategory, input: unknown) {
@@ -99,5 +79,5 @@ export function useCategorySearch(categories: readonly CategorySearchCategory[])
     }
   }
 
-  return { states, changeDraft, search, clear, cancel };
+  return { states, changeDraft, search, clear, select };
 }

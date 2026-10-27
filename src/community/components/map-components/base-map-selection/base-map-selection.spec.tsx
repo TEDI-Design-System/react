@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // The `src/tedi` barrel transitively imports react-sticky-box (ESM-only), which Jest does not transform.
@@ -13,12 +13,6 @@ jest.mock('../../../../tedi/helpers', () => ({
   useIsTouchDevice: jest.fn(),
   useBreakpoint: jest.fn(),
 }));
-
-// `useElementSize` measures through a 20ms lodash debounce, so it lands a setState
-// shortly after mount. Synchronous `fireEvent` tests finish first, but `userEvent`
-// yields to the event loop - flush the debounce inside act() so that late update
-// does not trip React's act(...) warning.
-const settleElementSize = () => act(async () => void (await new Promise((resolve) => setTimeout(resolve, 25))));
 
 // The transparency controls take their accessible name from the label provider, so the
 // component must be wrapped the way a consuming app wraps it.
@@ -230,7 +224,6 @@ describe('BaseMapOption', () => {
       />
     );
     const option = screen.getByRole('button', { name: /Streets/ });
-    await settleElementSize();
 
     await user.click(option);
     option.focus();
@@ -265,7 +258,6 @@ describe('BaseMapOption', () => {
       />
     );
     const option = screen.getByRole('button', { name: /Streets/ });
-    await settleElementSize();
 
     await user.click(option);
     option.focus();
@@ -275,39 +267,26 @@ describe('BaseMapOption', () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  describe('title truncation tooltip', () => {
-    const stubTitleWidths = (scrollWidth: number, clientWidth: number) => {
-      Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, value: scrollWidth });
-      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, value: clientWidth });
-    };
+  describe('title tooltip', () => {
+    it('shows the title in a tooltip on hover', () => {
+      render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
 
-    afterEach(() => {
-      stubTitleWidths(0, 0);
-    });
-
-    it('shows the full title in a tooltip on hover when the title is truncated', () => {
-      stubTitleWidths(200, 100);
-      const title = 'A Very Long Base Map Title';
-      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
-
-      expect(screen.getAllByText(title)).toHaveLength(1);
+      expect(screen.getAllByText('Streets')).toHaveLength(1);
 
       fireEvent.mouseEnter(screen.getByRole('button'));
 
-      expect(screen.getAllByText(title)).toHaveLength(2);
+      expect(screen.getAllByText('Streets')).toHaveLength(2);
     });
 
     it('does not describe the trigger with a title-only tooltip, which would announce the title twice', () => {
-      stubTitleWidths(200, 100);
-      const title = 'A Very Long Base Map Title';
-      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+      render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
 
       const option = screen.getByRole('button');
       fireEvent.mouseEnter(option);
 
       // Visible in the tooltip, but not wired up as a description: the title already *is*
       // the button's accessible name.
-      expect(screen.getAllByText(title)).toHaveLength(2);
+      expect(screen.getAllByText('Streets')).toHaveLength(2);
       expect(option).not.toHaveAttribute('aria-describedby');
     });
 
@@ -329,33 +308,19 @@ describe('BaseMapOption', () => {
       expect(document.getElementById(describedBy as string)).toHaveTextContent('Kaardikiht ei ole hetkel saadaval.');
     });
 
-    it('stays closed when the title fits and there is no tooltip text', () => {
-      stubTitleWidths(100, 100);
-      const title = 'Streets';
-      render(<BaseMapOption id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
-
-      fireEvent.mouseEnter(screen.getByRole('button'));
-
-      expect(screen.getAllByText(title)).toHaveLength(1);
-    });
-
     it('opens the tooltip on a disabled option too', () => {
-      stubTitleWidths(200, 100);
-      const title = 'A Very Long Base Map Title';
-      render(<BaseMapOption disabled id="streets" title={title} content={<img src="streets.png" alt="Streets" />} />);
+      render(<BaseMapOption disabled id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
 
       fireEvent.mouseEnter(screen.getByRole('button'));
 
-      expect(screen.getAllByText(title)).toHaveLength(2);
+      expect(screen.getAllByText('Streets')).toHaveLength(2);
     });
 
-    it('merges a truncated title into the info tooltip instead of opening a second one', () => {
-      stubTitleWidths(200, 100);
-      const title = 'A Very Long Base Map Title';
+    it('shows the title above the tooltip text in a single tooltip', () => {
       render(
         <BaseMapOption
           id="streets"
-          title={title}
+          title="Streets"
           tooltipText="Additional information"
           content={<img src="streets.png" alt="Streets" />}
         />
@@ -364,18 +329,9 @@ describe('BaseMapOption', () => {
       fireEvent.mouseEnter(screen.getByRole('button'));
 
       const tooltip = screen.getByRole('tooltip');
-      expect(tooltip).toHaveTextContent(title);
+      expect(tooltip).toHaveTextContent('Streets');
       expect(tooltip).toHaveTextContent('Additional information');
-      expect(screen.getAllByText(title)).toHaveLength(2);
-    });
-
-    it('does not render a tooltip when the title fits', () => {
-      stubTitleWidths(100, 100);
-      render(<BaseMapOption id="streets" title="Streets" content={<img src="streets.png" alt="Streets" />} />);
-
-      fireEvent.mouseEnter(screen.getByRole('button'));
-
-      expect(screen.getAllByText('Streets')).toHaveLength(1);
+      expect(screen.getAllByText('Streets')).toHaveLength(2);
     });
   });
 
@@ -431,7 +387,6 @@ describe('BaseMapOption', () => {
           content={<img src="streets.png" alt="Streets" />}
         />
       );
-      await settleElementSize();
 
       await user.tab();
 
@@ -450,7 +405,6 @@ describe('BaseMapOption', () => {
           content={<img src="streets.png" alt="Streets" />}
         />
       );
-      await settleElementSize();
 
       await user.tab();
 
@@ -476,7 +430,6 @@ describe('BaseMapOption', () => {
           content={<img src="streets.png" alt="Streets" />}
         />
       );
-      await settleElementSize();
 
       await user.tab();
       await user.keyboard('{Enter}');
