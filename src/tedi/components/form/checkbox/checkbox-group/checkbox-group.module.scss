@@ -33,9 +33,10 @@
   padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-inner-spacing));
 }
 
+// Items keep their own content height by default; stretch them where equal heights are needed
 .tedi-checkbox-group--row .tedi-checkbox-group__items {
   flex-flow: row wrap;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .tedi-checkbox-group--card .tedi-checkbox-group__items {

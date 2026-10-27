@@ -400,7 +400,7 @@ export const CardsWithDescription: StoryObj = {
     const cards = () => (
       <Row className="w-100" gutter={2}>
         {items.map((item) => (
-          <Col key={item.value} xs={12} md={4}>
+          <Col key={item.value} className="flex" xs={12} md={4}>
             <Radio value={item.value} label={item.label} description={item.description} className="w-100" />
           </Col>
         ))}

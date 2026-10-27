@@ -196,7 +196,7 @@ $indicator-border-inset: calc(var(--tedi-borders-02) - var(--tedi-borders-01));
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: var(--form-field-height);
   padding: calc(var(--form-checkbox-radio-card-radio-padding-y) - var(--tedi-borders-01))
     calc(var(--form-checkbox-radio-card-radio-padding-x) - var(--tedi-borders-01));
@@ -206,6 +206,15 @@ $indicator-border-inset: calc(var(--tedi-borders-02) - var(--tedi-borders-01));
   border: var(--tedi-borders-01) solid var(--_card-border);
   border-radius: var(--form-checkbox-radio-card-radius);
   box-shadow: var(--_card-inset), var(--_card-ring);
+
+  &::before,
+  &::after {
+    flex: 1 1 0;
+    max-height: calc(
+      (var(--form-field-height) - var(--body-regular-line-height)) / 2 - var(--form-checkbox-radio-card-radio-padding-y)
+    );
+    content: '';
+  }
 
   .tedi-radio__input {
     @include mixins.visually-hidden;
