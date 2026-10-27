@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { useRef, useState } from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
@@ -288,6 +289,45 @@ describe('Sheet', () => {
     expect(screen.getByText('Body content')).not.toBeVisible();
   });
 
+  it.each(['click', 'tab'] as const)('keeps a non-modal sheet open when focus leaves via %s', async (interaction) => {
+    const user = userEvent.setup();
+    const onToggle = jest.fn();
+    render(
+      <>
+        <Sheet closeOnBackdropClick={false} onToggle={onToggle}>
+          <Sheet.Trigger>
+            <button type="button">Open</button>
+          </Sheet.Trigger>
+          <Sheet.Content trapFocus={false} showOverlay={false} lockScroll={false}>
+            <Sheet.Header title="Layers" closeButton={false} />
+            <Sheet.Body>
+              <input aria-label="Note" />
+            </Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+        <button type="button">Confirm drawing</button>
+      </>
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Note' })).toHaveFocus());
+    const panel = screen.getByRole('dialog');
+    await waitFor(() => expect(panel).toHaveAttribute('data-status', 'open'));
+    onToggle.mockClear();
+
+    const outsideButton = screen.getByRole('button', { name: 'Confirm drawing' });
+    if (interaction === 'click') {
+      await user.click(outsideButton);
+    } else {
+      await user.tab();
+    }
+
+    expect(outsideButton).toHaveFocus();
+    expect(panel).toHaveAttribute('data-status', 'open');
+    expect(panel).toBeVisible();
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
   it('expands a collapsed sheet when the drag handle is pulled up', () => {
     render(
       <Sheet defaultOpen>
@@ -307,7 +347,7 @@ describe('Sheet', () => {
     fireEvent.pointerUp(handle, { clientY: 440, pointerId: 1 });
 
     // Dragging the peek upward past the threshold expands it back to full height.
-    expect(screen.getByText('Body content')).toBeInTheDocument();
+    expect(screen.getByText('Body content')).toBeVisible();
   });
 
   it('closes a collapsed sheet when the drag handle is swiped down', async () => {

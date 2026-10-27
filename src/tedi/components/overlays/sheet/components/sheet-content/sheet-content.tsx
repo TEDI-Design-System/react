@@ -274,6 +274,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
           context={context}
           disabled={!active}
           modal={trapFocus}
+          closeOnFocusOut={false}
           returnFocus={returnFocus}
           initialFocus={initialFocus}
           visuallyHiddenDismiss={trapFocus && visuallyHiddenDismiss && active ? getLabel('sheet.close') : undefined}
