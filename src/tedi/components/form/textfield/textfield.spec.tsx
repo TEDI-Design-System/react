@@ -126,14 +126,9 @@ describe('TextField component', () => {
     expect(screen.getByText('search')).toHaveClass(`tedi-icon--size-${iconSize}`);
   });
 
-  it('disables the clear button of a disabled field', () => {
-    const handleClear = jest.fn();
-    render(<TextField {...defaultProps} value="x" disabled onClear={handleClear} />);
-    const clearButton = screen.getByTitle(/clear/i);
-    expect(clearButton).toBeDisabled();
-    fireEvent.click(clearButton);
-    expect(handleClear).not.toHaveBeenCalled();
-    expect(screen.getByPlaceholderText(/enter text/i)).toHaveValue('x');
+  it('hides the clear button of a disabled field', () => {
+    render(<TextField {...defaultProps} value="x" disabled />);
+    expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
   });
 
   it('is clearable by default', () => {

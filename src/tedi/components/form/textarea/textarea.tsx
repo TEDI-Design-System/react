@@ -5,8 +5,7 @@ import { FeedbackTextProps } from '../feedback-text/feedback-text';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './textarea.module.scss';
 
-export interface TextareaProps
-  extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'showClearOnInteraction' | 'onClear'> {
+export interface TextareaProps extends Omit<TextFieldProps, 'icon'> {
   /**
    * Maximum number of characters allowed in the textarea.
    */
@@ -17,13 +16,13 @@ export interface TextareaProps
    */
   autoGrow?: boolean;
   /**
-   * Minimum number of rows (only used when autoGrow = true).
+   * Minimum number of rows (only used when autoGrow = true). Values below 1 are treated as 1.
    * @default 3
    */
   minRows?: number;
   /**
    * Maximum number of rows before scrolling (only used when autoGrow = true).
-   * @default 12
+   * Unset, the textarea grows without a row limit.
    */
   maxRows?: number;
   /**
@@ -52,13 +51,15 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     value: externalValue,
     defaultValue,
     autoGrow = false,
-    minRows = 3,
-    maxRows = 12,
+    minRows: minRowsProp = 3,
+    maxRows,
     height = '7.5rem',
     maxHeight,
     ...rest
   } = props;
 
+  // Below one row the field is shorter than its own line of text and scrolls while empty.
+  const minRows = Math.max(1, minRowsProp);
   const [innerValue, setInnerValue] = React.useState(defaultValue ?? '');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [textareaHeight, setTextareaHeight] = React.useState<string | number>('auto');
@@ -109,7 +110,7 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
 
     // 1px tolerance: scrollHeight is rounded, so fractional line heights shouldn't add a phantom row
     const contentRows = Math.ceil((contentHeight - 1) / lineHeight);
-    const rowCount = Math.min(Math.max(contentRows, minRows), maxRows);
+    const rowCount = Math.min(Math.max(contentRows, minRows), maxRows ?? Infinity);
 
     const nextHeight = `${rowCount * lineHeight + paddingTop + paddingBottom + borderHeight}px`;
     textarea.style.height = nextHeight;
@@ -220,7 +221,6 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
         [styles['tedi-textarea__input--auto-grow']]: autoGrow,
       })}
       isTextArea={true}
-      isClearable={false}
       className={cn(styles['tedi-textarea'], className)}
       value={value}
       onChange={handleInputChange}

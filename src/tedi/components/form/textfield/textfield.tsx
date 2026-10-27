@@ -59,7 +59,7 @@ type TextFieldBreakpointProps = {
    * When `true`, displays a clear (×) button on the right side when the field has a value.
    *
    * Clicking the button clears the input and calls `onClear` (if provided).
-   * Hidden while the field is read-only.
+   * Hidden while the field is read-only or disabled.
    *
    * @default true
    */
@@ -185,7 +185,7 @@ export interface TextFieldProps
    *
    * When `true`:
    * - Input becomes non-editable and non-focusable
-   * - Clear button and icon are disabled
+   * - Clear button is hidden and icon is disabled
    * - Visual disabled styles are applied
    */
   disabled?: boolean;
@@ -309,7 +309,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   const value = externalValue ?? innerValue;
   const isReadOnly = readOnly || input?.readOnly;
-  const showClearButton = Boolean(isClearable && value && !isReadOnly);
+  const showClearButton = Boolean(isClearable && value && !isReadOnly && !disabled);
 
   const inputGroup = useOptionalInputGroup?.();
   const generatedId = React.useId();
@@ -356,6 +356,8 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     const element = fieldRef.current as FieldElement;
     Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
     element.dispatchEvent(new Event('input', { bubbles: true }));
+    // The button unmounts once the value is gone, so focus would otherwise drop to the page.
+    element.focus();
     onClear?.();
   }, [onClear]);
 
@@ -401,13 +403,12 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     return (
       <ClosingButton
         iconSize={iconSizes[size === 'large' ? 'large' : 'default']}
-        onClick={disabled ? undefined : clearInput}
-        disabled={disabled}
+        onClick={clearInput}
         title={getLabel('clear')}
         className={styles['tedi-textfield__clear-button']}
       />
     );
-  }, [showClearButton, size, disabled, clearInput, getLabel]);
+  }, [showClearButton, size, clearInput, getLabel]);
 
   const renderRightArea = useMemo(() => {
     if (!showClearButton && !icon) return null;
@@ -465,6 +466,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     styles['tedi-textfield'],
     { [styles[`tedi-textfield--${size}`]]: size },
     { [styles['tedi-textfield--with-icon']]: icon },
+    { [styles['tedi-textfield--textarea']]: isTextArea },
     { [styles['tedi-textfield--invalid']]: isInvalid },
     { [styles['tedi-textfield--valid']]: isValid },
     { [styles['tedi-textfield--clearable']]: showClearButton },
