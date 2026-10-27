@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { forwardRef, useCallback, useMemo } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -304,6 +304,22 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   const innerRef = React.useRef<HTMLDivElement>(null);
   const fieldRef = React.useRef<FieldElement>(null);
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
+
+  // A textarea's scrollbar sits under the clear button and icon, so measure it and move them clear of it.
+  // The content box narrows when a scrollbar appears, so the observer also catches overflow starting or stopping.
+  useEffect(() => {
+    const field = fieldRef.current;
+    if (!isTextArea || !field || typeof ResizeObserver === 'undefined') return undefined;
+
+    const observer = new ResizeObserver(() => {
+      const style = window.getComputedStyle(field);
+      const borders = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+      setScrollbarWidth(Math.max(0, field.offsetWidth - field.clientWidth - borders));
+    });
+    observer.observe(field);
+    return () => observer.disconnect();
+  }, [isTextArea]);
 
   const [innerValue, setInnerValue] = React.useState(externalValue ?? defaultValue ?? '');
 
@@ -356,6 +372,9 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     const element = fieldRef.current as FieldElement;
     Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
     element.dispatchEvent(new Event('input', { bubbles: true }));
+    // The prototype setter above bypasses anything watching the element's own value (React's tracker,
+    // which is why it is used, but also testing tools), so set it there too now that React has seen the change.
+    element.value = '';
     // The button unmounts once the value is gone, so focus would otherwise drop to the page.
     element.focus();
     onClear?.();
@@ -414,7 +433,10 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     if (!showClearButton && !icon) return null;
 
     return (
-      <div className={styles['tedi-textfield__right-area']}>
+      <div
+        className={styles['tedi-textfield__right-area']}
+        style={scrollbarWidth ? { right: scrollbarWidth } : undefined}
+      >
         {renderClearButton}
         {showClearButton && icon && (
           <Separator color="primary" axis="vertical" className={styles['tedi-textfield__separator']} />
@@ -422,7 +444,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
         {renderIcon()}
       </div>
     );
-  }, [showClearButton, icon, renderClearButton, renderIcon]);
+  }, [showClearButton, icon, renderClearButton, renderIcon, scrollbarWidth]);
 
   const renderInputElement = (
     <Field
@@ -440,6 +462,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       placeholder={placeholder}
       className={cn(styles['tedi-textfield__input'], inputClassName, {
         [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
+        [styles['tedi-textfield__input--textarea']]: isTextArea,
       })}
       onFocus={(e) => {
         (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);

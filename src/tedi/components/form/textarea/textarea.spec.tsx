@@ -65,7 +65,27 @@ describe('Textarea component', () => {
 
     expect(onChange).toHaveBeenCalledWith('');
     expect(onClear).toHaveBeenCalled();
+    expect(screen.getByRole('textbox')).toHaveValue('');
     expect(screen.getByRole('textbox')).toHaveFocus();
+  });
+
+  it('moves the clear button clear of the scrollbar', () => {
+    const originalResizeObserver = window.ResizeObserver;
+    const callbacks: ResizeObserverCallback[] = [];
+    window.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
+      callbacks.push(callback);
+      return { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
+    }) as unknown as typeof ResizeObserver;
+
+    render(<Textarea {...defaultProps} value="Some text" onChange={jest.fn()} />);
+    const textarea = screen.getByRole('textbox');
+    Object.defineProperty(textarea, 'offsetWidth', { configurable: true, value: 217 });
+    Object.defineProperty(textarea, 'clientWidth', { configurable: true, value: 200 });
+    textarea.style.border = '1px solid';
+    act(() => callbacks.forEach((callback) => callback([], {} as ResizeObserver)));
+
+    expect(screen.getByTitle(/clear/i).parentElement).toHaveStyle({ right: '15px' });
+    window.ResizeObserver = originalResizeObserver;
   });
 
   it('applies the correct CSS classes', () => {

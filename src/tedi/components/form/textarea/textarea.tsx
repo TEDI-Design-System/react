@@ -66,12 +66,12 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
 
   const handleInputChange = React.useCallback(
     (inputValue: string) => {
-      if (!externalValue && !(onChange || onChangeEvent)) {
+      if (externalValue === undefined) {
         setInnerValue(inputValue);
       }
       onChange?.(inputValue);
     },
-    [externalValue, onChange, onChangeEvent]
+    [externalValue, onChange]
   );
 
   const value = React.useMemo(() => externalValue ?? innerValue, [externalValue, innerValue]);
