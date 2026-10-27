@@ -27,13 +27,16 @@ describe('Sheet', () => {
   beforeAll(() => {
     class PointerEventPolyfill extends MouseEvent {
       pointerId: number;
+      pointerType: string;
       constructor(type: string, params: PointerEventInit = {}) {
         super(type, params);
         this.pointerId = params.pointerId ?? 0;
+        this.pointerType = params.pointerType ?? '';
       }
     }
     window.PointerEvent = PointerEventPolyfill as unknown as typeof PointerEvent;
     HTMLElement.prototype.setPointerCapture = jest.fn();
+    HTMLElement.prototype.hasPointerCapture = jest.fn(() => true);
     HTMLElement.prototype.releasePointerCapture = jest.fn();
   });
 
@@ -369,6 +372,164 @@ describe('Sheet', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
+  it.each([
+    { button: 2, ctrlKey: false },
+    { button: 1, ctrlKey: false },
+    { button: 0, ctrlKey: true },
+  ])('does not start a drag with button $button and ctrlKey $ctrlKey', (press) => {
+    const onSnapPointChange = jest.fn();
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[0.4, 0.9]} onSnapPointChange={onSnapPointChange}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    const pointer = { pointerId: 1, pointerType: 'mouse' };
+    fireEvent.pointerDown(handle, { ...pointer, ...press, clientY: 100 });
+    fireEvent.pointerMove(handle, { ...pointer, buttons: 1, clientY: 450 });
+    fireEvent.pointerUp(handle, { ...pointer, clientY: 450 });
+
+    expect(screen.getByRole('dialog')).toHaveStyle({ height: '90dvh' });
+    expect(onSnapPointChange).not.toHaveBeenCalled();
+  });
+
+  it.each([{ snapPoints: undefined }, { snapPoints: [0.4, 0.9] }])(
+    'clears a missed mouse release with snapPoints $snapPoints',
+    ({ snapPoints }) => {
+      const onToggle = jest.fn();
+      const onSnapPointChange = jest.fn();
+      render(
+        <Sheet defaultOpen onToggle={onToggle}>
+          <Sheet.Content snapPoints={snapPoints} onSnapPointChange={onSnapPointChange}>
+            <Sheet.Body>Body</Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      );
+      const panel = screen.getByRole('dialog');
+      const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+      const pointer = { pointerId: 1, pointerType: 'mouse' };
+      fireEvent.pointerDown(handle, { ...pointer, buttons: 1, clientY: 100 });
+      fireEvent.pointerMove(handle, { ...pointer, buttons: 1, clientY: 180 });
+      expect(panel.style.transition).toBe('none');
+
+      fireEvent.pointerMove(handle, { ...pointer, buttons: 0, clientY: 450 });
+      fireEvent.pointerMove(handle, { ...pointer, buttons: 0, clientY: 500 });
+      fireEvent.pointerUp(handle, { ...pointer, clientY: 500 });
+
+      expect(panel.style.transition).toBe('');
+      expect(panel.style.transform).toBe('');
+      expect(panel.style.height).toBe(snapPoints ? '90dvh' : '');
+      expect(onToggle).not.toHaveBeenCalled();
+      expect(onSnapPointChange).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(['pointerCancel', 'lostPointerCapture', 'contextMenu', 'blur'] as const)(
+    'cancels a drag on %s without dismissing or changing the snap point',
+    (interruption) => {
+      const onToggle = jest.fn();
+      const onSnapPointChange = jest.fn();
+      render(
+        <Sheet defaultOpen onToggle={onToggle}>
+          <Sheet.Content snapPoints={[0.4, 0.9]} onSnapPointChange={onSnapPointChange}>
+            <Sheet.Body>Body</Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      );
+      const panel = screen.getByRole('dialog');
+      const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+      const pointer = { pointerId: 1, pointerType: 'mouse' };
+      fireEvent.pointerDown(handle, { ...pointer, buttons: 1, clientY: 100 });
+      fireEvent.pointerMove(handle, { ...pointer, buttons: 1, clientY: 700 });
+      if (interruption === 'blur') {
+        fireEvent.blur(window);
+      } else {
+        fireEvent[interruption](handle, { ...pointer, clientY: 700 });
+      }
+      fireEvent.pointerMove(handle, { ...pointer, buttons: 1, clientY: 750 });
+      fireEvent.pointerUp(handle, { ...pointer, clientY: 750 });
+
+      expect(panel).toHaveStyle({ height: '90dvh' });
+      expect(panel.style.transition).toBe('');
+      expect(onToggle).not.toHaveBeenCalled();
+      expect(onSnapPointChange).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([false, true])('clears a drag across close and reopen with keepMounted=%s', async (keepMounted) => {
+    render(
+      <Sheet>
+        <Sheet.Trigger>
+          <button type="button">Open</button>
+        </Sheet.Trigger>
+        <Sheet.Content keepMounted={keepMounted}>
+          <Sheet.Header title="Layers" />
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    const pointer = { pointerId: 1, pointerType: 'mouse', buttons: 1 };
+    fireEvent.pointerDown(handle, { ...pointer, clientY: 100 });
+    fireEvent.pointerMove(handle, { ...pointer, clientY: 180 });
+    expect(screen.getByRole('dialog')).toHaveStyle({ transform: 'translateY(80px)' });
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const reopenedHandle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerMove(reopenedHandle, { ...pointer, buttons: 0, clientY: 300 });
+
+    expect(screen.getByRole('dialog').style.transform).toBe('');
+    expect(screen.getByRole('dialog').style.transition).toBe('');
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveAttribute('data-status', 'open'));
+  });
+
+  it.each(['collapse', 'hide handle'] as const)('clears a drag when the sheet changes to %s', (change) => {
+    const renderSheet = (changed: boolean) => (
+      <Sheet defaultOpen collapsed={changed && change === 'collapse'}>
+        <Sheet.Content showHandle={!(changed && change === 'hide handle')}>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const { rerender } = render(renderSheet(false));
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    const pointer = { pointerId: 1, pointerType: 'mouse', buttons: 1 };
+    fireEvent.pointerDown(handle, { ...pointer, clientY: 100 });
+    fireEvent.pointerMove(handle, { ...pointer, clientY: 180 });
+    rerender(renderSheet(true));
+    expect(screen.getByRole('dialog').style.transform).toBe('');
+    rerender(renderSheet(false));
+    const restoredHandle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerMove(restoredHandle, { ...pointer, clientY: 300 });
+    expect(screen.getByRole('dialog').style.transform).toBe('');
+  });
+
+  it('keeps the active touch drag when another pointer moves or releases', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    const touch = { pointerType: 'touch', buttons: 1 };
+    fireEvent.pointerDown(handle, { ...touch, pointerId: 1, clientY: 100 });
+    fireEvent.pointerDown(handle, { ...touch, pointerId: 2, clientY: 500 });
+    fireEvent.pointerMove(handle, { ...touch, pointerId: 2, clientY: 700 });
+    fireEvent.pointerUp(handle, { ...touch, pointerId: 2, clientY: 700 });
+    fireEvent.lostPointerCapture(handle, { ...touch, pointerId: 2 });
+    fireEvent.pointerMove(handle, { ...touch, pointerId: 1, clientY: 160 });
+    expect(screen.getByRole('dialog')).toHaveStyle({ transform: 'translateY(60px)' });
+    fireEvent.pointerUp(handle, { ...touch, pointerId: 1, clientY: 160 });
+    expect(screen.getByRole('dialog').style.transform).toBe('');
+  });
+
   it('closes via Sheet.Closer while calling the child onClick first', async () => {
     const onClick = jest.fn();
     render(
@@ -532,6 +693,48 @@ describe('Sheet', () => {
 
     const panel = document.querySelector<HTMLElement>('[class*="tedi-sheet__panel"]');
     expect(panel).toHaveStyle({ height: '90dvh' });
+  });
+
+  it.each([
+    { defaultSnapPoint: -1, expectedHeight: '40dvh' },
+    { defaultSnapPoint: 0, expectedHeight: '40dvh' },
+    { defaultSnapPoint: 99, expectedHeight: '90dvh' },
+  ])('clamps defaultSnapPoint $defaultSnapPoint to $expectedHeight', ({ defaultSnapPoint, expectedHeight }) => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[0.4, 0.9]} defaultSnapPoint={defaultSnapPoint}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(screen.getByRole('dialog')).toHaveStyle({ height: expectedHeight });
+  });
+
+  it('retains the selected snap point across close and reopen', async () => {
+    render(
+      <Sheet>
+        <Sheet.Trigger>
+          <button type="button">Open</button>
+        </Sheet.Trigger>
+        <Sheet.Content snapPoints={[0.4, 0.9]} defaultSnapPoint={0}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByRole('dialog')).toHaveStyle({ height: '40dvh' });
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    const pointer = { pointerId: 1, pointerType: 'mouse' };
+    fireEvent.pointerDown(handle, { ...pointer, buttons: 1, clientY: 500 });
+    fireEvent.pointerMove(handle, { ...pointer, buttons: 1, clientY: 100 });
+    fireEvent.pointerUp(handle, { ...pointer, clientY: 100 });
+    expect(screen.getByRole('dialog')).toHaveStyle({ height: '90dvh' });
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    expect(screen.getByRole('dialog')).toHaveStyle({ height: '90dvh' });
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveAttribute('data-status', 'open'));
   });
 
   it('drops the snap height while collapsed and restores it on expand', () => {

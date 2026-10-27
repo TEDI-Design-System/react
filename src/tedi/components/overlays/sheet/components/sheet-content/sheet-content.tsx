@@ -5,6 +5,8 @@ import {
   CSSProperties,
   PointerEvent as ReactPointerEvent,
   ReactNode,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -77,7 +79,8 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   snapPoints?: number[];
   /**
-   * Index into `snapPoints` for the initial rest position. Defaults to the tallest (last) snap.
+   * Index into the sorted `snapPoints` for the initial rest position, clamped to the available range.
+   * Defaults to the tallest (last) snap. The selected snap point is retained across close / reopen.
    */
   defaultSnapPoint?: number;
   /**
@@ -160,7 +163,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   } = props;
 
   const { getLabel } = useLabels();
-  const { floating, getFloatingProps, context, labelId, onOpenChange, collapsed, onCollapsedChange } =
+  const { open, floating, getFloatingProps, context, labelId, onOpenChange, collapsed, onCollapsedChange } =
     useSheetContext();
   const { isMounted, status } = useTransitionStatus(context, { duration: { open: 350, close: 300 } });
 
@@ -172,34 +175,61 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const [snapIndex, setSnapIndex] = useState(() =>
     defaultSnapPoint !== undefined ? defaultSnapPoint : Math.max(0, snaps.length - 1)
   );
-  const currentSnap = snaps[Math.min(snapIndex, snaps.length - 1)] ?? maxSnap;
+  const currentSnap = snaps[Math.max(0, Math.min(snapIndex, snaps.length - 1))] ?? maxSnap;
 
   const viewportHeight = () => (typeof window !== 'undefined' ? window.innerHeight : 0);
   const snapHeightPx = (snap: number) => snap * viewportHeight();
 
-  const dragStartRef = useRef<number | null>(null);
+  const dragRef = useRef<{ pointerId: number; startY: number; target: HTMLDivElement } | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
 
+  const resetDrag = useCallback(() => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    dragRef.current = null;
+    setDragging(false);
+    setDragOffset(0);
+    if (drag.target.hasPointerCapture(drag.pointerId)) {
+      drag.target.releasePointerCapture(drag.pointerId);
+    }
+  }, []);
+
+  useEffect(() => {
+    resetDrag();
+  }, [open, collapsed, showHandle, resetDrag]);
+
+  useEffect(() => {
+    if (!dragging) return;
+    const ownerWindow = dragRef.current?.target.ownerDocument.defaultView;
+    ownerWindow?.addEventListener('blur', resetDrag);
+    return () => ownerWindow?.removeEventListener('blur', resetDrag);
+  }, [dragging, resetDrag]);
+
   const handleDragStart = (event: ReactPointerEvent<HTMLDivElement>) => {
-    dragStartRef.current = event.clientY;
+    if (!open || event.button !== 0 || event.ctrlKey || dragRef.current !== null) return;
+    dragRef.current = { pointerId: event.pointerId, startY: event.clientY, target: event.currentTarget };
     setDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const handleDragMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (dragStartRef.current === null) return;
-    const delta = event.clientY - dragStartRef.current;
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (event.pointerType === 'mouse' && (event.buttons & 1) === 0) {
+      resetDrag();
+      return;
+    }
+    const delta = event.clientY - drag.startY;
 
     setDragOffset(hasSnaps ? delta : Math.max(0, delta));
   };
 
   const handleDragEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (dragStartRef.current === null) return;
-    const delta = event.clientY - dragStartRef.current;
-    dragStartRef.current = null;
-    setDragging(false);
-    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const delta = event.clientY - drag.startY;
+    resetDrag();
 
     if (hasSnaps) {
       const height = snapHeightPx(currentSnap) - delta;
@@ -223,7 +253,10 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     } else if (delta > DRAG_DISMISS_THRESHOLD) {
       onOpenChange(false);
     }
-    setDragOffset(0);
+  };
+
+  const handleDragCancel = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (dragRef.current?.pointerId === event.pointerId) resetDrag();
   };
 
   if (!isMounted && !keepMounted) return null;
@@ -299,7 +332,9 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
                 onPointerDown={handleDragStart}
                 onPointerMove={handleDragMove}
                 onPointerUp={handleDragEnd}
-                onPointerCancel={handleDragEnd}
+                onPointerCancel={handleDragCancel}
+                onLostPointerCapture={handleDragCancel}
+                onContextMenu={resetDrag}
               >
                 <span className={styles['tedi-sheet__handle']} />
               </div>
