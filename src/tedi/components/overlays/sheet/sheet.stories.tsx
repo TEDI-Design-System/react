@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ReactNode, useState } from 'react';
+import { expect, waitFor, within } from 'storybook/test';
 
 import {
   getPrimaryComponentProps,
@@ -42,6 +43,7 @@ const meta: Meta<typeof Sheet> = {
   },
   title: 'TEDI-Ready/Components/Overlay/Sheet',
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: FIGMA_URL,
@@ -51,6 +53,14 @@ const meta: Meta<typeof Sheet> = {
 
 export default meta;
 type Story = StoryObj<typeof Sheet>;
+
+const visualTest: Story = {
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
+  play: async ({ canvasElement }) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await waitFor(() => expect(body.getByRole('dialog')).toHaveAttribute('data-status', 'open'));
+  },
+};
 
 // Dropdown-style rows without Dropdown's menu context.
 const exampleRowStyles = `
@@ -409,6 +419,16 @@ const dockedSheetProps: Partial<SheetProps> = { closeOnBackdropClick: false };
 const dockedContentProps: Partial<SheetContentProps> = { showOverlay: false, trapFocus: false, lockScroll: false };
 
 const MAP_LAYERS = ['Hübriidkaart', 'Reljeef', 'Katastriüksused', 'Kitsendused', 'Aadressandmed'];
+
+const scrollableForm = (
+  <VerticalSpacing size={1}>
+    {['Eesnimi', 'Perekonnanimi', 'E-post', 'Telefon', 'Aadress', 'Sihtnumber', 'Linn', 'Maakond', 'Lisainfo'].map(
+      (label, index) => (
+        <TextField key={label} id={`sheet-scroll-field-${index}`} label={label} />
+      )
+    )}
+  </VerticalSpacing>
+);
 
 export const Default: StoryObj = {
   argTypes: {
@@ -897,36 +917,141 @@ export const ContentNavigation: Story = {
  */
 export const ScrollableContent: Story = {
   name: 'Scrollable content',
-  render: function ScrollableContent() {
-    const fields = [
-      'Eesnimi',
-      'Perekonnanimi',
-      'E-post',
-      'Telefon',
-      'Aadress',
-      'Sihtnumber',
-      'Linn',
-      'Maakond',
-      'Lisainfo',
-    ];
+  render: () => (
+    <Sheet>
+      <Sheet.Trigger>
+        <Button iconLeft="edit">Ava vorm</Button>
+      </Sheet.Trigger>
+      <Sheet.Content maxHeight="32rem">
+        <Sheet.Header title="Andmete sisestamine" variant="default" />
+        <Sheet.Body>{scrollableForm}</Sheet.Body>
+        <ApplyFooter />
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
 
-    return (
-      <Sheet>
-        <Sheet.Trigger>
-          <Button iconLeft="edit">Ava vorm</Button>
-        </Sheet.Trigger>
-        <Sheet.Content maxHeight="32rem">
-          <Sheet.Header title="Andmete sisestamine" variant="default" />
-          <Sheet.Body>
-            <VerticalSpacing size={1}>
-              {fields.map((label, index) => (
-                <TextField key={label} id={`sheet-scroll-field-${index}`} label={label} />
-              ))}
-            </VerticalSpacing>
-          </Sheet.Body>
-          <ApplyFooter />
-        </Sheet.Content>
-      </Sheet>
-    );
-  },
+export const OpenForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen>
+      <Sheet.Content>
+        <Sheet.Header title="Filtreerimine" variant="default" />
+        <Sheet.Body padding="none">{filterChoices('sheet-visual-default')}</Sheet.Body>
+        <ApplyFooter more />
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const OpenBrandForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen>
+      <Sheet.Content>
+        <Sheet.Header title="Vali aeg" variant="brand" collapsible />
+        <Sheet.Body>{dateTimeBody('sheet-visual-brand')}</Sheet.Body>
+        <ApplyFooter />
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const OpenSmallForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen>
+      <Sheet.Content padding="small" radius="card">
+        <Sheet.Header title="Teated" variant="default" left={<Tag color="primary">2</Tag>} />
+        <Sheet.Body>{notificationsBody}</Sheet.Body>
+        <Sheet.Footer align="right">
+          <Sheet.Closer>
+            <Button visualType="secondary">Tühista</Button>
+          </Sheet.Closer>
+          <Button>Rakenda</Button>
+        </Sheet.Footer>
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const OpenWithoutHandleForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen>
+      <Sheet.Content showHandle={false} radius="none">
+        <Sheet.Header
+          title="Seaded"
+          variant="default"
+          centerTitle
+          closeButton={false}
+          actions={
+            <Sheet.Closer>
+              <Button visualType="secondary" icon="close">
+                Sulge
+              </Button>
+            </Sheet.Closer>
+          }
+        />
+        <Sheet.Body>{settingsBody('sheet-visual-no-handle')}</Sheet.Body>
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const CollapsedForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen defaultCollapsed {...dockedSheetProps}>
+      <Sheet.Content {...dockedContentProps}>
+        <Sheet.Header title="Vali aeg" variant="brand" collapsible />
+        <Sheet.Body>{dateTimeBody('sheet-visual-collapsed')}</Sheet.Body>
+        <ApplyFooter />
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const OpenSnapPointForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen>
+      <Sheet.Content snapPoints={[0.4, 0.9]} defaultSnapPoint={0}>
+        <Sheet.Header title="Kihid" variant="default" collapsible />
+        <Sheet.Body>
+          <VerticalSpacing size={0.5}>
+            {MAP_LAYERS.concat(MAP_LAYERS).map((layer, index) => (
+              <Checkbox
+                key={index}
+                id={`visual-layer-${index}`}
+                name={`visual-layer-${index}`}
+                value={layer}
+                label={layer}
+              />
+            ))}
+          </VerticalSpacing>
+        </Sheet.Body>
+      </Sheet.Content>
+    </Sheet>
+  ),
+};
+
+export const OpenScrollableForVisualTest: Story = {
+  ...visualTest,
+  tags: ['!dev', '!autodocs'],
+  render: () => (
+    <Sheet defaultOpen>
+      <Sheet.Content maxHeight="32rem">
+        <Sheet.Header title="Andmete sisestamine" variant="default" />
+        <Sheet.Body>{scrollableForm}</Sheet.Body>
+        <ApplyFooter />
+      </Sheet.Content>
+    </Sheet>
+  ),
 };
