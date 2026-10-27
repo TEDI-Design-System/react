@@ -1,6 +1,10 @@
+:where(.tedi-sheet) {
+  --tedi-sheet-modal-max-height: 90dvh;
+}
+
 .tedi-sheet.tedi-sheet {
   height: auto;
-  max-height: 80dvh;
+  max-height: var(--tedi-sheet-modal-max-height);
   border-top: var(--tedi-borders-01) solid var(--card-border-primary);
   border-top-left-radius: var(--modal-radius);
   border-top-right-radius: var(--modal-radius);

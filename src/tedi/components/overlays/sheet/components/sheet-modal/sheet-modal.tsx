@@ -22,7 +22,10 @@ interface SheetModalBaseProps {
    * @default true
    */
   closeButton?: boolean;
-  /** Extra class name applied to the sheet container. */
+  /**
+   * Extra class name applied to the sheet container.
+   * Override `--tedi-sheet-modal-max-height` to change the default `90dvh` height limit.
+   */
   className?: string;
   /** Sheet body content. */
   children: ReactNode;
