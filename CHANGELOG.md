@@ -1,3 +1,10 @@
+# [20.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.7...react-20.0.0-rc.8) (2026-10-28)
+
+
+### Features
+
+* **checkbox,radio:** apply new variables to Checkbox and Radio [#1002](https://github.com/TEDI-Design-System/react/issues/1002) ([#1023](https://github.com/TEDI-Design-System/react/issues/1023)) ([faab626](https://github.com/TEDI-Design-System/react/commit/faab6266be79ebde9367eaf69e1eeceb30eeef3a))
+
 # [20.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.6...react-20.0.0-rc.7) (2026-10-28)
 
 
