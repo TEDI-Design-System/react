@@ -1,7 +1,7 @@
-import './fixed-date';
 import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
 import { Preview, StoryContext } from '@storybook/react-vite';
 
+import { freezeDateInChromatic } from './fixed-date';
 import StorybookDecorator from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
@@ -12,6 +12,8 @@ import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
 import { PrintingProvider } from '../src/tedi/providers/printing-provider';
 import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
 import { useEffect } from 'react';
+
+freezeDateInChromatic();
 
 export const globalTypes = {
   theme: {

@@ -5,7 +5,13 @@ import isChromatic from 'chromatic/isChromatic';
 // Noon keeps the calendar day the same in every timezone.
 const FIXED_NOW = new Date(2026, 9, 22, 12).getTime();
 
-if (isChromatic()) {
+// Exported and called from preview.tsx rather than run on import: package.json declares
+// "sideEffects": false, so the production Storybook build tree-shakes a bare `import './fixed-date'`.
+export const freezeDateInChromatic = () => {
+  if (!isChromatic()) {
+    return;
+  }
+
   const RealDate = Date;
 
   class FixedDate extends RealDate {
@@ -23,4 +29,4 @@ if (isChromatic()) {
   }
 
   globalThis.Date = FixedDate as DateConstructor;
-}
+};
