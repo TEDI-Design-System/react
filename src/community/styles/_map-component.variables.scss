@@ -29,7 +29,7 @@
   --button-neutral-background-active: var(--general-surface-brand-tertiary);
   --button-neutral-background-default: var(--tedi-alpha-01);
   --button-neutral-background-focus: var(--tedi-alpha-01);
-  --button-neutral-background-hover: var(--general-surface-hover);
+  --button-neutral-background-hover: var(--general-state-hover);
   --button-neutral-border-default: var(--tedi-alpha-01);
   --button-neutral-text-active: var(--tedi-primary-800);
   --button-neutral-text-default: var(--tedi-primary-600);
@@ -38,7 +38,7 @@
   --button-primary-background-active: var(--general-surface-brand-tertiary);
   --button-primary-background-default: var(--tedi-neutral-100);
   --button-primary-background-focus: var(--tedi-neutral-100);
-  --button-primary-background-hover: var(--general-surface-hover);
+  --button-primary-background-hover: var(--general-state-hover);
   --button-primary-border-active: var(--tedi-primary-700);
   --button-primary-border-default: var(--general-border-primary);
   --button-primary-border-focus: var(--tedi-primary-600);
@@ -97,7 +97,7 @@
   --sidepanel-item-brand-background-open: var(--general-surface-brand-secondary);
   --sidepanel-item-brand-border-bottom: var(--tedi-primary-800);
   --sidepanel-item-white-background-default: var(--general-surface-primary);
-  --sidepanel-item-white-background-hover: var(--general-surface-hover);
+  --sidepanel-item-white-background-hover: var(--general-state-hover);
   --sidepanel-tree-default: var(--general-border-primary);
   --sidepanel-tree-hover: var(--tedi-primary-200);
   --timeline-indicator-border: var(--tedi-primary-600);
