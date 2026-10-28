@@ -7,7 +7,7 @@
 
 .tedi-radio-group__legend {
   padding: 0;
-  margin-bottom: var(--tedi-dimensions-05);
+  margin-bottom: var(--form-checkbox-radio-label-gutter-y);
   font-family: var(--family-default);
   font-size: var(--body-regular-size);
   font-weight: var(--body-regular-weight);
@@ -22,7 +22,7 @@
 
 .tedi-radio-group__items {
   display: flex;
-  gap: var(--form-checkbox-radio-gutter-y);
+  gap: var(--form-checkbox-radio-gutter-y) var(--form-checkbox-radio-gutter-x);
 }
 
 .tedi-radio-group--column .tedi-radio-group__items {

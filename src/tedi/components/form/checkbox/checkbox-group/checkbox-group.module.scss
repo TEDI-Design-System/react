@@ -22,7 +22,7 @@
 
 .tedi-checkbox-group__items {
   display: flex;
-  gap: var(--form-checkbox-radio-gutter-y);
+  gap: var(--form-checkbox-radio-gutter-y) var(--form-checkbox-radio-gutter-x);
 }
 
 .tedi-checkbox-group--column .tedi-checkbox-group__items {

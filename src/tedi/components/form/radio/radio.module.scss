@@ -235,12 +235,6 @@ $indicator-border-inset: calc(var(--tedi-borders-02) - var(--tedi-borders-01));
   .tedi-radio__indicator {
     flex-shrink: 0;
     margin-right: 0;
-
-    &::after {
-      inset: 0;
-      margin: auto;
-      transform: none;
-    }
   }
 
   .tedi-radio__card-icon {
