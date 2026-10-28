@@ -1,3 +1,10 @@
+# [20.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.6...react-20.0.0-rc.7) (2026-10-28)
+
+
+### Bug Fixes
+
+* **storybook:** Apply Date Freeze In Production Builds [#1018](https://github.com/TEDI-Design-System/react/issues/1018) ([93b56c7](https://github.com/TEDI-Design-System/react/commit/93b56c7372d9fb6a611cf8c8100e10ffd12a0e42))
+
 # [20.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.5...react-20.0.0-rc.6) (2026-10-22)
 
 
