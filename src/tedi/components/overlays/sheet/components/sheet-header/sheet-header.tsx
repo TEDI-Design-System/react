@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useLayoutEffect } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
 import { Heading } from '../../../../base/typography/heading/heading';
@@ -82,12 +82,17 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
     className,
   } = props;
   const { getLabel } = useLabels();
-  const { onOpenChange, labelId, setHasTitle, collapsed, onCollapsedChange } = useSheetContext();
+  const { onOpenChange, titleId, setHasTitle, collapsed, onCollapsedChange } = useSheetContext();
 
-  useEffect(() => {
-    setHasTitle(Boolean(title) && (children === undefined || children === null));
+  // Explicit checks rather than truthiness, so a numeric title such as `0` still renders as the heading.
+  const hasTitle = title !== undefined && title !== null && title !== false && title !== '';
+
+  // Layout effect: the dialog's `aria-labelledby` is set before the first paint, so it is never
+  // announced without a name.
+  useLayoutEffect(() => {
+    setHasTitle(hasTitle && (children === undefined || children === null));
     return () => setHasTitle(false);
-  }, [title, children, setHasTitle]);
+  }, [hasTitle, children, setHasTitle]);
 
   return (
     <div
@@ -101,8 +106,8 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
       {children ?? (
         <>
           {left && <div className={styles['tedi-sheet__header-left']}>{left}</div>}
-          {title && (
-            <Heading element="h6" modifiers="h6" id={labelId} className={styles['tedi-sheet__title']}>
+          {hasTitle && (
+            <Heading element="h6" modifiers="h6" id={titleId} className={styles['tedi-sheet__title']}>
               {title}
             </Heading>
           )}

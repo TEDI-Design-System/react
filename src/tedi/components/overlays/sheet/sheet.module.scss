@@ -22,6 +22,11 @@ $sheet-fade-duration: 200ms;
   }
 }
 
+.tedi-sheet__overlay--hidden {
+  // A `keepMounted` sheet stays in the DOM while closed.
+  display: none;
+}
+
 .tedi-sheet__overlay--no-overlay {
   pointer-events: none;
 

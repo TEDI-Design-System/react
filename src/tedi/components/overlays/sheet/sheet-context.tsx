@@ -9,7 +9,10 @@ export interface SheetContextValue {
   getReferenceProps: (userProps?: React.HTMLProps<HTMLElement>) => Record<string, unknown>;
   getFloatingProps: (userProps?: React.HTMLProps<HTMLElement>) => Record<string, unknown>;
   context: FloatingContext<ReferenceType>;
+  /** Id the dialog is labelled by - `''` until `Sheet.Header` has registered a title. */
   labelId: string;
+  /** Stable id for the header title element, available from the first render. */
+  titleId: string;
   setHasTitle: (hasTitle: boolean) => void;
   /** Whether the sheet is collapsed to just its header (bottom-sheet peek state). */
   collapsed: boolean;

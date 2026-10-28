@@ -1,5 +1,5 @@
 import { useClick, useDismiss, useFloating, useInteractions, useRole } from '@floating-ui/react';
-import { ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { ReactNode, useCallback, useId, useMemo, useState } from 'react';
 
 import { SheetBody } from './components/sheet-body/sheet-body';
 import { SheetCloser } from './components/sheet-closer/sheet-closer';
@@ -101,13 +101,13 @@ export const Sheet = (props: SheetProps): JSX.Element => {
   );
 
   // An uncontrolled sheet returns to `defaultCollapsed` each time it opens (not on mount, so a
-  // `defaultOpen` + `defaultCollapsed` sheet starts collapsed).
-  const wasOpenRef = useRef(isOpen);
-
-  useEffect(() => {
-    if (isOpen && !wasOpenRef.current && !isCollapsedControlled) setInternalCollapsed(defaultCollapsed);
-    wasOpenRef.current = isOpen;
-  }, [isOpen, isCollapsedControlled, defaultCollapsed]);
+  // `defaultOpen` + `defaultCollapsed` sheet starts collapsed). Adjusted during render rather than in
+  // an effect, so the first painted frame after reopening already shows the reset state.
+  const [prevOpen, setPrevOpen] = useState(isOpen);
+  if (isOpen !== prevOpen) {
+    setPrevOpen(isOpen);
+    if (isOpen && !isCollapsedControlled) setInternalCollapsed(defaultCollapsed);
+  }
 
   const { refs, context } = useFloating({
     open: isOpen,
@@ -138,6 +138,7 @@ export const Sheet = (props: SheetProps): JSX.Element => {
       getFloatingProps,
       context,
       labelId: hasTitle ? labelId : '',
+      titleId: labelId,
       setHasTitle,
       collapsed,
       onCollapsedChange: handleCollapsedChange,

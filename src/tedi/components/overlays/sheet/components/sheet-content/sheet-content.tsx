@@ -57,6 +57,10 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
   returnFocus?: boolean;
   /**
    * Render the dimmed backdrop. `false` keeps portal + focus management but no overlay.
+   *
+   * On its own this only removes the backdrop: scroll stays locked and a click on the page still
+   * closes the sheet. For a non-modal sheet the page stays usable behind (docked peek), also set
+   * `trapFocus={false}`, `lockScroll={false}` and `Sheet`'s `closeOnBackdropClick={false}`.
    * @default true
    */
   showOverlay?: boolean;
@@ -172,10 +176,11 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   // Snap points are suspended while collapsed, so the panel shrinks to its header and an upward drag expands it.
   const hasSnaps = snaps.length > 0 && !collapsed;
   const maxSnap = snaps[snaps.length - 1] ?? 1;
-  const [snapIndex, setSnapIndex] = useState(() =>
-    defaultSnapPoint !== undefined ? defaultSnapPoint : Math.max(0, snaps.length - 1)
-  );
-  const currentSnap = snaps[Math.max(0, Math.min(snapIndex, snaps.length - 1))] ?? maxSnap;
+  // `null` until the user drags: the default (tallest snap) is then resolved against the current
+  // `snapPoints`, so snap points that arrive after mount still open at the tallest one.
+  const [snapIndex, setSnapIndex] = useState<number | null>(defaultSnapPoint ?? null);
+  const resolvedSnapIndex = snapIndex ?? snaps.length - 1;
+  const currentSnap = snaps[Math.max(0, Math.min(resolvedSnapIndex, snaps.length - 1))] ?? maxSnap;
 
   const viewportHeight = () => (typeof window !== 'undefined' ? window.innerHeight : 0);
   const snapHeightPx = (snap: number) => snap * viewportHeight();
@@ -275,7 +280,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const radiusOverride = radius === 'card' ? 'var(--card-radius-rounded)' : radius === 'none' ? '0' : undefined;
   const panelStyle: CSSProperties = {
     ...(radiusOverride ? ({ '--tedi-sheet-radius': radiusOverride } as CSSProperties) : undefined),
-    ...(minHeight !== undefined ? { minHeight } : undefined),
+    // Like snap points, `minHeight` is dropped while collapsed so the panel can shrink to its header.
+    ...(minHeight !== undefined && !collapsed ? { minHeight } : undefined),
     ...(maxHeight !== undefined && !hasSnaps ? { maxHeight } : undefined),
     ...style,
   };
@@ -297,10 +303,12 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     <FloatingPortal>
       <FloatingOverlay
         lockScroll={lockScroll && active}
-        style={{ overflow: 'clip', display: active ? undefined : 'none' }}
+        // `FloatingOverlay` sets `overflow: auto` inline, so overriding it needs an inline style too.
+        style={{ overflow: 'clip' }}
         data-status={status}
         className={cn(styles['tedi-sheet__overlay'], {
           [styles['tedi-sheet__overlay--no-overlay']]: !showOverlay,
+          [styles['tedi-sheet__overlay--hidden']]: !active,
         })}
       >
         <FloatingFocusManager

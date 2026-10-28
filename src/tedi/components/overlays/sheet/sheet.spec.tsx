@@ -1032,4 +1032,139 @@ describe('Sheet', () => {
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
+  it('drops minHeight while collapsed so the panel shrinks to its header', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content minHeight="60dvh">
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    const panel = screen.getByRole('dialog');
+    expect(panel.style.minHeight).toBe('60dvh');
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    expect(panel.style.minHeight).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.expand' }));
+    expect(panel.style.minHeight).toBe('60dvh');
+  });
+
+  it('renders a reopened uncontrolled sheet expanded from its first render', async () => {
+    const renders: boolean[] = [];
+    const Recorder = () => {
+      const { open, collapsed } = useSheet();
+      if (open) renders.push(collapsed);
+      return null;
+    };
+    render(
+      <Sheet>
+        <Sheet.Trigger>
+          <button type="button">Open</button>
+        </Sheet.Trigger>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" collapsible />
+          <Sheet.Body>
+            <Recorder />
+          </Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Mocked label: sheet.collapse' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    renders.length = 0;
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    // Every render of the reopened sheet sees the reset state - no stale collapsed frame first.
+    expect(renders.length).toBeGreaterThan(0);
+    expect(renders).not.toContain(true);
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveAttribute('data-status', 'open'));
+  });
+
+  it('gives the title a stable id from the first render and names the dialog with it', () => {
+    // Records every change to an `id` attribute along with its previous value.
+    const observer = new MutationObserver(() => undefined);
+    observer.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['id'],
+      attributeOldValue: true,
+    });
+
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" />
+        </Sheet.Content>
+      </Sheet>
+    );
+    const idChanges = observer.takeRecords().filter((record) => (record.target as Element).tagName === 'H6');
+    observer.disconnect();
+
+    const heading = screen.getByRole('heading', { name: 'Layers' });
+    expect(heading.id).not.toBe('');
+    // The heading is inserted with its final id - it never starts out empty and gets patched later.
+    expect(idChanges).toHaveLength(0);
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-labelledby', heading.id);
+  });
+
+  it('renders a numeric 0 title as the heading and dialog name', () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title={0} />
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(screen.getByRole('heading', { name: '0' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('0');
+  });
+
+  it('opens at the tallest snap point when snapPoints arrive after mount', () => {
+    const { rerender } = render(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[]}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    rerender(
+      <Sheet defaultOpen>
+        <Sheet.Content snapPoints={[0.4, 0.9]}>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+
+    expect(screen.getByRole('dialog')).toHaveStyle({ height: '90dvh' });
+  });
+
+  it('keeps the trigger child ref attached across re-renders', () => {
+    const calls: (HTMLElement | null)[] = [];
+    const childRef = (node: HTMLElement | null) => {
+      calls.push(node);
+    };
+    const Host = ({ count }: { count: number }) => (
+      <Sheet>
+        <Sheet.Trigger>
+          <button type="button" ref={childRef}>
+            Open {count}
+          </button>
+        </Sheet.Trigger>
+        <Sheet.Content>
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const { rerender } = render(<Host count={0} />);
+    for (let count = 1; count <= 5; count++) rerender(<Host count={count} />);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toBeInstanceOf(HTMLButtonElement);
+  });
 });
