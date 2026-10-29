@@ -10,7 +10,6 @@ export interface CheckboxGroupContextValue {
   /** Called by a `Checkbox` when it is toggled. */
   onToggle: (value: string, checked: boolean) => void;
   disabled?: boolean;
-  invalid?: boolean;
   size?: 'default' | 'large';
   variant?: ChoiceInputVariant;
   cardVariant?: ChoiceInputCardVariant;

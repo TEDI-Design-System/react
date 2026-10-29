@@ -1,3 +1,24 @@
+# [20.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.8...react-20.0.0-rc.9) (2026-10-29)
+
+
+### Bug Fixes
+
+* **storybook:** Pin Storybook Packages To 10.5.10 [#1029](https://github.com/TEDI-Design-System/react/issues/1029) ([#1030](https://github.com/TEDI-Design-System/react/issues/1030)) ([6822820](https://github.com/TEDI-Design-System/react/commit/6822820b6d1f711f950fcb9ddd25dd16a764dc1d))
+
+# [20.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.7...react-20.0.0-rc.8) (2026-10-28)
+
+
+### Features
+
+* **checkbox,radio:** apply new variables to Checkbox and Radio [#1002](https://github.com/TEDI-Design-System/react/issues/1002) ([#1023](https://github.com/TEDI-Design-System/react/issues/1023)) ([faab626](https://github.com/TEDI-Design-System/react/commit/faab6266be79ebde9367eaf69e1eeceb30eeef3a))
+
+# [20.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.6...react-20.0.0-rc.7) (2026-10-28)
+
+
+### Bug Fixes
+
+* **storybook:** Apply Date Freeze In Production Builds [#1018](https://github.com/TEDI-Design-System/react/issues/1018) ([93b56c7](https://github.com/TEDI-Design-System/react/commit/93b56c7372d9fb6a611cf8c8100e10ffd12a0e42))
+
 # [20.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.5...react-20.0.0-rc.6) (2026-10-22)
 
 
