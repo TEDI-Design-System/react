@@ -173,6 +173,11 @@ $sheet-fade-duration: 200ms;
   align-items: center;
 }
 
+.tedi-sheet__panel--draggable .tedi-sheet__header {
+  touch-action: none;
+  user-select: none;
+}
+
 .tedi-sheet__collapse-toggle > * {
   scale: 1 -1;
 }

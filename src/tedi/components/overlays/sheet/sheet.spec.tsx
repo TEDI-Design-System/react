@@ -530,6 +530,86 @@ describe('Sheet', () => {
     expect(screen.getByRole('dialog').style.transform).toBe('');
   });
 
+  describe('dragging from the header', () => {
+    const touch = { pointerId: 1, pointerType: 'touch', buttons: 1 };
+    const renderHeaderSheet = (contentProps: { showHandle?: boolean } = {}) =>
+      render(
+        <Sheet defaultOpen>
+          <Sheet.Content {...contentProps}>
+            <Sheet.Header title="Layers" right={<span>3 items</span>} />
+            <Sheet.Body>Body content</Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      );
+    const swipe = (element: HTMLElement, to: { clientX?: number; clientY: number }) => {
+      fireEvent.pointerDown(element, { ...touch, clientX: 0, clientY: 100 });
+      fireEvent.pointerMove(element, { ...touch, clientX: 0, ...to });
+      fireEvent.pointerUp(element, { ...touch, clientX: 0, ...to });
+    };
+
+    it('closes the sheet when the header title is swiped down', async () => {
+      renderHeaderSheet();
+      swipe(screen.getByRole('heading', { name: 'Layers' }), { clientY: 300 });
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('drags from non-interactive slot content', () => {
+      renderHeaderSheet();
+      const label = screen.getByText('3 items');
+      fireEvent.pointerDown(label, { ...touch, clientX: 0, clientY: 100 });
+      fireEvent.pointerMove(label, { ...touch, clientX: 0, clientY: 150 });
+
+      expect(screen.getByRole('dialog')).toHaveStyle({ transform: 'translateY(50px)' });
+    });
+
+    it('treats a press that moves less than the start threshold as a tap', () => {
+      (HTMLElement.prototype.setPointerCapture as jest.Mock).mockClear();
+      renderHeaderSheet();
+      const title = screen.getByRole('heading', { name: 'Layers' });
+      fireEvent.pointerDown(title, { ...touch, clientX: 0, clientY: 100 });
+      fireEvent.pointerMove(title, { ...touch, clientX: 0, clientY: 106 });
+
+      expect(screen.getByRole('dialog').style.transform).toBe('');
+      expect(HTMLElement.prototype.setPointerCapture).not.toHaveBeenCalled();
+
+      fireEvent.pointerMove(title, { ...touch, clientX: 0, clientY: 140 });
+      expect(screen.getByRole('dialog')).toHaveStyle({ transform: 'translateY(40px)' });
+    });
+
+    it('ignores a mostly horizontal swipe', () => {
+      renderHeaderSheet();
+      const title = screen.getByRole('heading', { name: 'Layers' });
+      swipe(title, { clientX: 200, clientY: 250 });
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      fireEvent.pointerMove(title, { ...touch, clientX: 0, clientY: 300 });
+      expect(screen.getByRole('dialog').style.transform).toBe('');
+    });
+
+    it('does not drag from the close button', () => {
+      renderHeaderSheet();
+      swipe(screen.getByRole('button', { name: 'Close' }), { clientY: 300 });
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByRole('dialog').style.transform).toBe('');
+    });
+
+    it('does not drag from the body', () => {
+      renderHeaderSheet();
+      swipe(screen.getByText('Body content'), { clientY: 300 });
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('does not drag from the header when the handle is hidden', () => {
+      renderHeaderSheet({ showHandle: false });
+      swipe(screen.getByRole('heading', { name: 'Layers' }), { clientY: 300 });
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
   it('closes via Sheet.Closer while calling the child onClick first', async () => {
     const onClick = jest.fn();
     render(

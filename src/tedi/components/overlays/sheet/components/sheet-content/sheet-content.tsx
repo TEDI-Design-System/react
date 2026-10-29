@@ -19,6 +19,28 @@ import { useSheetContext } from '../../sheet-context';
 
 const DRAG_DISMISS_THRESHOLD = 120;
 const DRAG_EXPAND_THRESHOLD = 40;
+// A press only becomes a drag after moving this far, so a tap on the header stays a tap.
+const DRAG_START_THRESHOLD_TOUCH = 10;
+const DRAG_START_THRESHOLD_MOUSE = 2;
+const DRAG_ZONE_SELECTOR = `.${styles['tedi-sheet__handle-zone']}, .${styles['tedi-sheet__header']}`;
+// Presses on interactive header content never drag.
+const NO_DRAG_SELECTOR = [
+  'a[href]',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  'label',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[role="button"]',
+  '[role="link"]',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+const closestInside = (target: Element, selector: string, panel: Element) => {
+  const match = target.closest(selector);
+  return match !== null && match !== panel && panel.contains(match);
+};
 
 type SheetContentBreakpointProps = {
   /**
@@ -41,7 +63,8 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
    */
   children: ReactNode;
   /**
-   * Show the drag handle at the top.
+   * Show the drag handle at the top. While it's shown, the sheet can be dragged from the handle or
+   * from anywhere on `<Sheet.Header>` except its interactive content.
    * @default true
    */
   showHandle?: boolean;
@@ -78,7 +101,7 @@ export interface SheetContentProps extends BreakpointSupport<SheetContentBreakpo
   keepMounted?: boolean;
   /**
    * Rest positions for the sheet, as fractions of the viewport height (`0`–`1`), e.g. `[0.4, 0.9]`.
-   * Drag the handle to move between them; releasing snaps to the nearest, and dragging below the
+   * Drag the handle or header to move between them; releasing snaps to the nearest, and dragging below the
    * lowest point dismisses.
    */
   snapPoints?: number[];
@@ -185,7 +208,13 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const viewportHeight = () => (typeof window !== 'undefined' ? window.innerHeight : 0);
   const snapHeightPx = (snap: number) => snap * viewportHeight();
 
-  const dragRef = useRef<{ pointerId: number; startY: number; target: HTMLDivElement } | null>(null);
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    target: HTMLDivElement;
+    started: boolean;
+  } | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
 
@@ -212,29 +241,53 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   }, [dragging, resetDrag]);
 
   const handleDragStart = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!open || event.button !== 0 || event.ctrlKey || dragRef.current !== null) return;
-    dragRef.current = { pointerId: event.pointerId, startY: event.clientY, target: event.currentTarget };
-    setDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (!open || !showHandle || event.button !== 0 || event.ctrlKey || dragRef.current !== null) return;
+
+    const { target, currentTarget } = event;
+    if (!(target instanceof Element) || !closestInside(target, DRAG_ZONE_SELECTOR, currentTarget)) return;
+    if (closestInside(target, NO_DRAG_SELECTOR, currentTarget)) return;
+
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      target: currentTarget,
+      started: false,
+    };
   };
 
   const handleDragMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (drag?.pointerId !== event.pointerId) return;
     if (event.pointerType === 'mouse' && (event.buttons & 1) === 0) {
       resetDrag();
       return;
     }
     const delta = event.clientY - drag.startY;
 
+    if (!drag.started) {
+      const deltaX = event.clientX - drag.startX;
+      const threshold = event.pointerType === 'touch' ? DRAG_START_THRESHOLD_TOUCH : DRAG_START_THRESHOLD_MOUSE;
+      if (Math.max(Math.abs(delta), Math.abs(deltaX)) < threshold) return;
+      // A mostly horizontal swipe isn't a sheet drag.
+      if (Math.abs(deltaX) > Math.abs(delta)) {
+        resetDrag();
+        return;
+      }
+      drag.started = true;
+      setDragging(true);
+      drag.target.setPointerCapture(drag.pointerId);
+    }
+
     setDragOffset(hasSnaps ? delta : Math.max(0, delta));
   };
 
   const handleDragEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
-    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (drag?.pointerId !== event.pointerId) return;
     const delta = event.clientY - drag.startY;
     resetDrag();
+    if (!drag.started) return;
 
     if (hasSnaps) {
       const height = snapHeightPx(currentSnap) - delta;
@@ -268,7 +321,10 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
 
   const panelClassName = cn(
     styles['tedi-sheet__panel'],
-    { [styles['tedi-sheet__panel--padding-small']]: padding === 'small' },
+    {
+      [styles['tedi-sheet__panel--padding-small']]: padding === 'small',
+      [styles['tedi-sheet__panel--draggable']]: showHandle,
+    },
     className
   );
 
@@ -329,21 +385,17 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
               'aria-modal': trapFocus,
               style: panelStyle,
               className: panelClassName,
+              onPointerDown: handleDragStart,
+              onPointerMove: handleDragMove,
+              onPointerUp: handleDragEnd,
+              onPointerCancel: handleDragCancel,
+              onLostPointerCapture: handleDragCancel,
+              onContextMenu: resetDrag,
             })}
             data-status={status}
           >
             {showHandle && (
-              <div
-                className={styles['tedi-sheet__handle-zone']}
-                data-name="sheet-handle"
-                aria-hidden="true"
-                onPointerDown={handleDragStart}
-                onPointerMove={handleDragMove}
-                onPointerUp={handleDragEnd}
-                onPointerCancel={handleDragCancel}
-                onLostPointerCapture={handleDragCancel}
-                onContextMenu={resetDrag}
-              >
+              <div className={styles['tedi-sheet__handle-zone']} data-name="sheet-handle" aria-hidden="true">
                 <span className={styles['tedi-sheet__handle']} />
               </div>
             )}
