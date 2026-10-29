@@ -9,8 +9,13 @@ import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Tag } from '../../tags/tag/tag';
+import { Checkbox } from '../checkbox';
+import { DateField } from '../date-field/date-field';
 import { FeedbackTextProps } from '../feedback-text/feedback-text';
+import { NumberField } from '../number-field/number-field';
+import { Radio } from '../radio';
 import { ISelectOption, Select } from '../select/select';
+import { Textarea } from '../textarea/textarea';
 import { TextField } from '../textfield/textfield';
 import { InlineEdit } from './inline-edit';
 
@@ -19,20 +24,6 @@ const countryOptions: ISelectOption[] = [
   { value: 'fi', label: 'Soome' },
   { value: 'se', label: 'Rootsi' },
 ];
-
-const statusOptions: ISelectOption[] = [
-  { value: 'done', label: 'Teostatud' },
-  { value: 'in-progress', label: 'Menetluses' },
-  { value: 'submitted', label: 'Esitatud' },
-  { value: 'rejected', label: 'Tagasi lükatud' },
-];
-
-const statusColor: Record<string, StatusBadgeColor> = {
-  done: 'success',
-  'in-progress': 'warning',
-  submitted: 'brand',
-  rejected: 'danger',
-};
 
 const typeOptions: ISelectOption[] = [
   { value: 'prototype', label: 'Prototüüp' },
@@ -82,7 +73,8 @@ const NameInline = (props: {
   placeholder?: string;
   size?: 'default' | 'small';
   editIconPosition?: 'inline' | 'end';
-  fullWidth?: boolean;
+  contentWidth?: boolean;
+  defaultEditing?: boolean;
   invalid?: boolean;
   helper?: FeedbackTextProps | FeedbackTextProps[];
 }): JSX.Element => {
@@ -139,7 +131,9 @@ const CountryInline = (props: {
   readOnly?: boolean;
   disabled?: boolean;
   size?: 'default' | 'small';
-  fullWidth?: boolean;
+  contentWidth?: boolean;
+  editIconPosition?: 'inline' | 'end';
+  defaultEditing?: boolean;
   invalid?: boolean;
   helper?: FeedbackTextProps | FeedbackTextProps[];
 }): JSX.Element => {
@@ -171,13 +165,15 @@ const CountryInline = (props: {
 };
 
 /**
- * `InlineEdit` is an edit-in-place wrapper: it shows a value that becomes an inline-edit control when clicked. It is
- * control-agnostic — supply any TEDI form control through the `children` render function and wire it to the render props
- * (`value`, `onChange`, `commit`, `cancel`).
+ * Displays a value as text with an edit icon. Activate it to edit the value in place.
  *
- * See the <a href="?path=/docs/tedi-ready-components-form-inlineedit--documentation">Documentation</a> page for the full guide, supported form elements, and the `useInlineEdit` hook.
+ * Supply any TEDI form control through the `children` render function and wire it to the render props (`value`,
+ * `onChange`, `commit`, `cancel`).
  *
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.75.92?node-id=5881-57032&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * See <a href="?path=/docs/tedi-ready-components-form-inlineedit--render-props-hook">Render props & hook</a> for the
+ * editor render props, committing on pick, and the headless `useInlineEdit` hook.
+ *
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.106.103?node-id=65952-130950&m=dev" target="_BLANK">Figma ↗</a><br/>
  */
 const meta: Meta<typeof InlineEdit> = {
   title: 'TEDI-Ready/Components/Form/InlineEdit',
@@ -185,7 +181,7 @@ const meta: Meta<typeof InlineEdit> = {
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.75.92?node-id=5881-57033&m=dev',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.106.103?node-id=65952-130950&m=dev',
     },
   },
   argTypes: {
@@ -207,13 +203,15 @@ const meta: Meta<typeof InlineEdit> = {
     },
     editIconPosition: {
       control: 'radio',
-      options: ['inline', 'end'],
-      description: 'Whether the edit icon sits inline after the value or is pushed to the trailing edge.',
-      table: { type: { summary: 'inline | end' }, defaultValue: { summary: 'inline' } },
+      options: ['end', 'inline'],
+      description:
+        'Whether the edit icon is pushed to the trailing edge or sits straight after the value. Hidden while the row is invalid.',
+      table: { type: { summary: 'end | inline' }, defaultValue: { summary: 'end' } },
     },
     readOnly: {
       control: 'boolean',
-      description: 'Renders the value as static text (a text group) with no edit affordance.',
+      description:
+        'Renders the value as plain text with no edit affordance, lined up with editable rows. For a block that is entirely read-only, use `TextGroup` instead.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     disabled: {
@@ -222,16 +220,15 @@ const meta: Meta<typeof InlineEdit> = {
         'Disables editing while keeping the trigger and edit icon visible but greyed (for saving/pending or dependent fields). Differs from `readOnly`, which drops the edit affordance entirely.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
-    fullWidth: {
+    contentWidth: {
       control: 'boolean',
       description:
-        'Stretches the field to the full width of its container so controls (Select, Slider, inputs) fill the row.',
+        'Sizes the row to its value rather than filling its container. The row then changes width when the editor opens, so it is reserved for a value edited inside running text.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
-    hideEditIcon: {
-      control: 'boolean',
-      description:
-        'Hides the edit (pencil) icon on the read trigger; the value stays clickable. Accessibility risk: the pencil is the only visual cue that the value is editable, so hiding it fails WCAG (1.3.3 Sensory Characteristics) unless something adjacent signals editability. Use at your own risk.',
+    defaultEditing: {
+      control: false,
+      description: 'Starts in edit mode. An editor that starts open does not take focus.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     value: {
@@ -275,42 +272,93 @@ type Story = StoryObj<typeof InlineEdit>;
 
 export const Default: Story = {
   args: {
-    label: 'Väärtus',
-    placeholder: '—',
+    label: 'Nimi',
+    placeholder: 'Sisesta nimi',
     size: 'default',
-    editIconPosition: 'inline',
+    editIconPosition: 'end',
     readOnly: false,
     disabled: false,
-    fullWidth: false,
-    hideEditIcon: false,
+    contentWidth: false,
   },
   render: function DefaultField(args) {
-    const [value, setValue] = useState('Väärtus');
+    const [value, setValue] = useState('Mari Maasikas');
     return (
-      <InlineEdit<string>
-        label={args.label}
-        placeholder={args.placeholder}
-        size={args.size}
-        editIconPosition={args.editIconPosition}
-        readOnly={args.readOnly}
-        disabled={args.disabled}
-        fullWidth={args.fullWidth}
-        hideEditIcon={args.hideEditIcon}
-        value={value}
-        onChange={setValue}
-        renderValue={(v) => v}
-      >
-        {({ value: draft, onChange, size: editorSize }) => (
-          <TextField
-            id="default-value"
-            label={args.label}
-            hideLabel
-            value={draft}
-            onChange={onChange}
-            size={editorSize}
-          />
-        )}
-      </InlineEdit>
+      <div style={{ maxWidth: '218px' }}>
+        <InlineEdit<string>
+          label={args.label}
+          placeholder={args.placeholder}
+          size={args.size}
+          editIconPosition={args.editIconPosition}
+          readOnly={args.readOnly}
+          disabled={args.disabled}
+          contentWidth={args.contentWidth}
+          value={value}
+          onChange={setValue}
+          renderValue={(v) => v}
+        >
+          {({ value: draft, onChange, size: editorSize }) => (
+            <TextField
+              id="default-value"
+              label={args.label}
+              hideLabel
+              value={draft}
+              onChange={onChange}
+              size={editorSize}
+            />
+          )}
+        </InlineEdit>
+      </div>
+    );
+  },
+};
+
+const NamedRow = ({ name, children }: { name: string; children: React.ReactNode }): JSX.Element => (
+  <Row alignItems="center" gutter={2}>
+    <Col width="auto">
+      <div style={{ width: '6.5rem' }}>
+        <Text modifiers="bold">{name}</Text>
+      </div>
+    </Col>
+    <Col>{children}</Col>
+  </Row>
+);
+
+/**
+ * The editor is any TEDI form control, wired to the render props. Give it its own accessible label — a visible label
+ * linked by `id`, or `hideLabel`. `InlineEdit`'s `label` names only the read trigger.
+ */
+export const Type: Story = {
+  render: function Type() {
+    const [type, setType] = useState<ISelectOption | null>(typeOptions[0]);
+    return (
+      <VerticalSpacing size={0.5} style={{ maxWidth: '338px' }}>
+        <NamedRow name="Text field">
+          <NameInline id="ie-type-text" />
+        </NamedRow>
+        <NamedRow name="Select">
+          <InlineEdit<ISelectOption | null>
+            label="Tüüp"
+            value={type}
+            onChange={setType}
+            renderValue={(v) => (v ? (v.label as string) : '—')}
+          >
+            {({ value, onChange, commit }) => (
+              <Select
+                id="ie-type-select"
+                size="small"
+                label="Tüüp"
+                hideLabel
+                options={typeOptions}
+                value={value}
+                onChange={(next) => {
+                  onChange(next as ISelectOption | null);
+                  commit();
+                }}
+              />
+            )}
+          </InlineEdit>
+        </NamedRow>
+      </VerticalSpacing>
     );
   },
 };
@@ -319,49 +367,27 @@ const sizeArray: ('default' | 'small')[] = ['default', 'small'];
 
 export const Sizes: Story = {
   render: () => (
-    <div className="example-list">
-      {sizeArray.map((size, key) => (
-        <Row className={`${key === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={size}>
-          <Col xs={12} md={2} className="flex align-items-center">
-            <Text modifiers="bold" className="text-capitalize">
-              {size}
-            </Text>
-          </Col>
-          <Col xs={12} md={10} className="flex flex-column flex-md-row gap-3">
-            <NameInline id={`ie-size-${size}-text`} size={size} />
-            <CountryInline id={`ie-size-${size}-select`} size={size} />
-          </Col>
-        </Row>
+    <VerticalSpacing size={0.5} style={{ maxWidth: '338px' }}>
+      {sizeArray.map((size) => (
+        <NamedRow key={size} name={size === 'default' ? 'Default' : 'Small'}>
+          <NameInline id={`ie-size-${size}`} label="Kuupäev" defaultValue="22.03.2026" size={size} />
+        </NamedRow>
       ))}
-    </div>
+    </VerticalSpacing>
   ),
 };
 
-export const TextFieldType: Story = {
-  name: 'With TextField',
-  render: function TextFieldType() {
-    const [name, setName] = useState('Mari Maasikas');
-    return (
-      <div style={{ maxWidth: '22rem' }}>
-        <FieldRow label="Nimi">
-          <InlineEdit<string> label="Nimi" value={name} onChange={setName} fullWidth renderValue={(v) => v || '—'}>
-            {({ value, onChange }) => (
-              <TextField id="type-name" label="Nimi" hideLabel value={value} onChange={onChange} />
-            )}
-          </InlineEdit>
-        </FieldRow>
-      </div>
-    );
-  },
-};
-
-export const SelectType: Story = {
-  name: 'With Select',
-  render: function SelectType() {
+/**
+ * The read view is plain text by default — or the placeholder while the value is empty. For values a string cannot
+ * express, such as tags or a status badge, return them from `renderValue`.
+ */
+export const ValueType: Story = {
+  name: 'Value type',
+  render: function ValueType() {
     const [type, setType] = useState<ISelectOption | null>(typeOptions[0]);
+    const [address, setAddress] = useState<ISelectOption | null>(null);
     const [keywords, setKeywords] = useState<ISelectOption[]>(keywordOptions);
     const [olek, setOlek] = useState<ISelectOption | null>(olekOptions[0]);
-    const [address, setAddress] = useState<ISelectOption | null>(null);
 
     return (
       <div style={{ maxWidth: '28rem' }}>
@@ -371,7 +397,6 @@ export const SelectType: Story = {
               label="Tüüp"
               value={type}
               onChange={setType}
-              fullWidth
               renderValue={(v) => (v ? (v.label as string) : '—')}
             >
               {({ value, onChange, commit }) => (
@@ -390,13 +415,35 @@ export const SelectType: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-
+          <FieldRow label="Aadress">
+            <InlineEdit<ISelectOption | null>
+              label="Aadress"
+              value={address}
+              onChange={setAddress}
+              placeholder="Sisesta aadress"
+              renderValue={(v) => (v ? (v.label as string) : '')}
+            >
+              {({ value, onChange, commit }) => (
+                <Select
+                  id="address-select"
+                  size="small"
+                  label="Aadress"
+                  hideLabel
+                  options={addressOptions}
+                  value={value}
+                  onChange={(next) => {
+                    onChange(next as ISelectOption | null);
+                    commit();
+                  }}
+                />
+              )}
+            </InlineEdit>
+          </FieldRow>
           <FieldRow label="Märksõnad">
             <InlineEdit<ISelectOption[]>
               label="Märksõnad"
               value={keywords}
               onChange={setKeywords}
-              fullWidth
               renderValue={(v) =>
                 v.length ? (
                   <span style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-05)' }}>
@@ -425,13 +472,11 @@ export const SelectType: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-
           <FieldRow label="Olek">
             <InlineEdit<ISelectOption | null>
               label="Olek"
               value={olek}
               onChange={setOlek}
-              fullWidth
               renderValue={(v) => (v ? <StatusBadge color={olekColor[v.value as string]}>{v.label}</StatusBadge> : '—')}
             >
               {({ value, onChange, commit }) => (
@@ -450,57 +495,16 @@ export const SelectType: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-
-          <FieldRow label="Aadress">
-            <InlineEdit<ISelectOption | null>
-              label="Aadress"
-              value={address}
-              onChange={setAddress}
-              fullWidth
-              placeholder="Sisesta aadress"
-              renderValue={(v) => (v ? (v.label as string) : '')}
-            >
-              {({ value, onChange, commit }) => (
-                <Select
-                  id="address-select"
-                  size="small"
-                  label="Aadress"
-                  hideLabel
-                  options={addressOptions}
-                  value={value}
-                  onChange={(next) => {
-                    onChange(next as ISelectOption | null);
-                    commit();
-                  }}
-                />
-              )}
-            </InlineEdit>
-          </FieldRow>
         </VerticalSpacing>
       </div>
     );
   },
 };
 
-export const ReadOnly: Story = {
-  name: 'Read-only',
-  render: () => (
-    <div style={{ maxWidth: '22rem' }}>
-      <VerticalSpacing size={0.5}>
-        <FieldRow label="Kuupäev">
-          <NameInline id="ro-date" label="Kuupäev" defaultValue="22.03.2026" readOnly />
-        </FieldRow>
-        <FieldRow label="Kellaaeg">
-          <NameInline id="ro-time" label="Kellaaeg" defaultValue="08:00" readOnly />
-        </FieldRow>
-        <FieldRow label="Kohtade arv">
-          <NameInline id="ro-seats" label="Kohtade arv" defaultValue="2" readOnly />
-        </FieldRow>
-      </VerticalSpacing>
-    </div>
-  ),
-};
-
+/**
+ * The edit icon is what identifies the value as editable, so it is always shown. By default it sits at the row's
+ * trailing edge, lining the icons up down a column; `inline` puts it straight after the value.
+ */
 export const EditIconPosition: Story = {
   render: () => (
     <Row gutter={4}>
@@ -521,24 +525,22 @@ export const EditIconPosition: Story = {
 };
 
 /**
- * On narrow (mobile) layouts pair `InlineEdit` with `fullWidth` so the whole row is a comfortable tap target and the
- * value/edit icon span the available width. The playground controls apply to the field below.
+ * The row fills its container, so on narrow layouts the whole row is a comfortable tap target rather than just the
+ * value. The playground controls apply to the field below.
  */
-export const Mobile: Story = {
+export const Responsiveness: Story = {
   args: {
     label: 'Nimi',
     placeholder: '—',
-    fullWidth: true,
     size: 'default',
     editIconPosition: 'end',
     readOnly: false,
-    hideEditIcon: false,
   },
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
   },
-  render: function MobileField(args) {
-    const [name, setName] = useState('Väärtus');
+  render: function ResponsiveField(args) {
+    const [name, setName] = useState('Mari Maasikas');
     return (
       <InlineEdit<string>
         label={args.label}
@@ -546,8 +548,7 @@ export const Mobile: Story = {
         size={args.size}
         editIconPosition={args.editIconPosition}
         readOnly={args.readOnly}
-        fullWidth={args.fullWidth}
-        hideEditIcon={args.hideEditIcon}
+        contentWidth={args.contentWidth}
         value={name}
         onChange={setName}
         renderValue={(v) => v}
@@ -560,12 +561,15 @@ export const Mobile: Story = {
   },
 };
 
+/**
+ * Active is the open editor. An invalid row drops the edit icon. Read-only and Disabled have no Figma counterpart yet.
+ */
 export const States: Story = {
   parameters: {
     pseudo: {
       hover: ['#ie-state-hover-text', '#ie-state-hover-select'],
-      active: ['#ie-state-active-text', '#ie-state-active-select'],
       focusVisible: ['#ie-state-focus-text', '#ie-state-focus-select'],
+      focus: ['#ie-state-active-text-input', '#ie-state-active-cell [class*="select__control"]'],
     },
   },
   decorators: [
@@ -597,26 +601,26 @@ export const States: Story = {
     const stateRows: {
       label: string;
       key: string;
-      shared?: { readOnly?: boolean; disabled?: boolean };
+      shared?: { readOnly?: boolean; disabled?: boolean; defaultEditing?: boolean };
       textProps?: { helper?: FeedbackTextProps };
       selectProps?: { helper?: FeedbackTextProps };
     }[] = [
       { label: 'Default', key: 'default' },
       { label: 'Hover', key: 'hover' },
-      { label: 'Active', key: 'active' },
-      { label: 'Focus', key: 'focus' },
+      { label: 'Active', key: 'active', shared: { defaultEditing: true } },
       {
         label: 'Error',
         key: 'invalid',
-        textProps: { helper: { text: 'Nimi on kohustuslik', type: 'error' } },
-        selectProps: { helper: { text: 'Vali riik', type: 'error' } },
+        textProps: { helper: { text: 'Nimi sisaldab lubamatuid märke', type: 'error' } },
+        selectProps: { helper: { text: 'Palun vali sobiv väärtus', type: 'error' } },
       },
+      { label: 'Focus', key: 'focus' },
       { label: 'Read-only', key: 'readonly', shared: { readOnly: true } },
       { label: 'Disabled', key: 'disabled', shared: { disabled: true } },
     ];
 
     return (
-      <VerticalSpacing>
+      <VerticalSpacing style={{ maxWidth: '640px' }}>
         {!isMobile && (
           <Row>
             <Col md={2}>&nbsp;</Col>
@@ -634,10 +638,12 @@ export const States: Story = {
               <Text modifiers="bold">{row.label}</Text>
             </Col>
             <Col xs={12} md={5}>
-              <NameInline id={`ie-state-${row.key}-text`} fullWidth {...row.shared} {...row.textProps} />
+              <NameInline id={`ie-state-${row.key}-text`} {...row.shared} {...row.textProps} />
             </Col>
             <Col xs={12} md={5}>
-              <CountryInline id={`ie-state-${row.key}-select`} fullWidth {...row.shared} {...row.selectProps} />
+              <div id={`ie-state-${row.key}-cell`}>
+                <CountryInline id={`ie-state-${row.key}-select`} {...row.shared} {...row.selectProps} />
+              </div>
             </Col>
           </Row>
         ))}
@@ -647,85 +653,30 @@ export const States: Story = {
 };
 
 /**
- * A realistic document-details card: right-aligned labels with values that turn into the matching control on click.
- * The edit icons align to the trailing edge (`fullWidth`), and the status row reads as a `StatusBadge` and edits via `Select`.
+ * `readOnly` renders the value as plain text with no edit affordance. It keeps an editable row's inset so it still lines
+ * up when mixed in with editable ones, which is what it is for — the odd fixed value among the rest. When a whole block
+ * is fixed, reach for <a href="./?path=/docs/tedi-ready-content-textgroup--docs" target="_top"><code>TextGroup</code></a>
+ * instead.
+ *
+ * Differs from `disabled`, which keeps the greyed trigger and icon for transient states such as saving.
  */
-export const Example: Story = {
-  render: function DocumentDetails() {
-    const [creator, setCreator] = useState('Mari Maasikas');
-    const [performer, setPerformer] = useState('Kalle Kullerkupp');
-    const [signer, setSigner] = useState('Mart Tamm');
-    const [status, setStatus] = useState<ISelectOption | null>(statusOptions[0]);
-
-    const textRow = (label: string, id: string, value: string, onChange: (v: string) => void): JSX.Element => (
-      <Row alignItems="center" gutter={2}>
-        <Col width={4}>
-          <Label style={{ display: 'block', textAlign: 'right' }}>{label}</Label>
-        </Col>
-        <Col width={8}>
-          <InlineEdit<string>
-            label={label}
-            value={value}
-            onChange={onChange}
-            fullWidth
-            editIconPosition="end"
-            renderValue={(v) => v || '—'}
-          >
-            {({ value: draft, onChange: setDraft }) => (
-              <TextField id={id} label={label} hideLabel value={draft} onChange={setDraft} />
-            )}
-          </InlineEdit>
-        </Col>
-      </Row>
-    );
-
-    return (
-      <div style={{ maxWidth: '25rem' }}>
-        <Card>
-          <CardContent>
-            <VerticalSpacing size={0.5}>
-              {textRow('Looja', 'ctx-creator', creator, setCreator)}
-              {textRow('Teostaja', 'ctx-performer', performer, setPerformer)}
-              {textRow('Allkirjastaja', 'ctx-signer', signer, setSigner)}
-
-              <Row alignItems="center" gutter={2}>
-                <Col width={4}>
-                  <Label style={{ display: 'block', textAlign: 'right' }}>Olek</Label>
-                </Col>
-                <Col width={8}>
-                  <InlineEdit<ISelectOption | null>
-                    label="Olek"
-                    value={status}
-                    onChange={setStatus}
-                    fullWidth
-                    editIconPosition="end"
-                    renderValue={(v) =>
-                      v ? <StatusBadge color={statusColor[v.value as string]}>{v.label}</StatusBadge> : '—'
-                    }
-                  >
-                    {({ value, onChange, commit }) => (
-                      <Select
-                        id="ctx-status"
-                        size="small"
-                        label="Olek"
-                        hideLabel
-                        options={statusOptions}
-                        value={value}
-                        onChange={(next) => {
-                          onChange(next as ISelectOption | null);
-                          commit();
-                        }}
-                      />
-                    )}
-                  </InlineEdit>
-                </Col>
-              </Row>
-            </VerticalSpacing>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  },
+export const ReadOnly: Story = {
+  name: 'Read-only',
+  render: () => (
+    <div style={{ maxWidth: '22rem' }}>
+      <VerticalSpacing size={0.5}>
+        <FieldRow label="Kuupäev">
+          <NameInline id="ro-date" label="Kuupäev" defaultValue="22.03.2026" />
+        </FieldRow>
+        <FieldRow label="Kellaaeg">
+          <NameInline id="ro-time" label="Kellaaeg" defaultValue="08:00" readOnly />
+        </FieldRow>
+        <FieldRow label="Kohtade arv">
+          <NameInline id="ro-seats" label="Kohtade arv" defaultValue="2" />
+        </FieldRow>
+      </VerticalSpacing>
+    </div>
+  ),
 };
 
 /**
@@ -742,7 +693,7 @@ export const CancelEdit: Story = {
       <div style={{ maxWidth: '22rem' }}>
         <VerticalSpacing size={0.5}>
           <FieldRow label="Nimi">
-            <InlineEdit<string> label="Nimi" value={name} onChange={setName} fullWidth renderValue={(v) => v || '—'}>
+            <InlineEdit<string> label="Nimi" value={name} onChange={setName} renderValue={(v) => v || '—'}>
               {({ value, onChange, size }) => (
                 <TextField id="cancel-name" label="Nimi" hideLabel value={value} onChange={onChange} size={size} />
               )}
@@ -764,10 +715,10 @@ export const Disabled: Story = {
     <div style={{ maxWidth: '22rem' }}>
       <VerticalSpacing size={0.5}>
         <FieldRow label="Kuupäev">
-          <NameInline id="dis-date" label="Kuupäev" defaultValue="22.03.2026" fullWidth disabled />
+          <NameInline id="dis-date" label="Kuupäev" defaultValue="22.03.2026" disabled />
         </FieldRow>
         <FieldRow label="Kellaaeg">
-          <NameInline id="dis-time" label="Kellaaeg" defaultValue="08:00" fullWidth disabled />
+          <NameInline id="dis-time" label="Kellaaeg" defaultValue="08:00" disabled />
         </FieldRow>
       </VerticalSpacing>
     </div>
@@ -787,7 +738,6 @@ export const Invalid: Story = {
             id="inv-email"
             label="E-post"
             defaultValue="mari.maasikas"
-            fullWidth
             helper={{ text: 'Sisesta korrektne e-posti aadress', type: 'error' }}
           />
         </FieldRow>
@@ -807,14 +757,13 @@ export const Placeholder: Story = {
       <div style={{ maxWidth: '22rem' }}>
         <VerticalSpacing size={0.5}>
           <FieldRow label="Nimi">
-            <NameInline id="ph-name" label="Nimi" defaultValue="" fullWidth placeholder="Sisesta nimi" />
+            <NameInline id="ph-name" label="Nimi" defaultValue="" placeholder="Sisesta nimi" />
           </FieldRow>
           <FieldRow label="Aadress">
             <InlineEdit<ISelectOption | null>
               label="Aadress"
               value={address}
               onChange={setAddress}
-              fullWidth
               placeholder="Sisesta aadress"
               renderValue={(v) => (v ? (v.label as string) : '')}
             >
@@ -831,6 +780,116 @@ export const Placeholder: Story = {
                     commit();
                   }}
                 />
+              )}
+            </InlineEdit>
+          </FieldRow>
+        </VerticalSpacing>
+      </div>
+    );
+  },
+};
+
+/**
+ * Use `InlineEdit` with these TEDI controls:
+ *
+ * - Text: `TextField`, `Textarea`, `Search`
+ * - Numeric: `NumberField`, `Slider`
+ * - Choice: `Select` (single or multiple), `Radio.Group`, `Checkbox.Group`
+ * - Date and time: `DateField`, `TimeField`, `TimePicker`
+ * - Boolean: `Toggle`
+ *
+ * The render prop hands each editor the draft `value`, an `onChange` to update it
+ * and `commit`/`cancel`. Bind `renderValue` to the same source, formatted for the
+ * read view, and give the editor its own accessible label — `InlineEdit`'s `label`
+ * names only the read trigger. Enter commits, except in a textarea or an open
+ * listbox, where it belongs to the control.
+ *
+ * For file management use `FileUpload` or `FileDropzone` separately; for checkbox and radio choices, use
+ * `Checkbox.Group` / `Radio.Group` rather than a standalone `Checkbox` or `Radio`.
+ */
+export const SupportedControls: Story = {
+  name: 'Supported controls',
+  render: function SupportedControlsExample() {
+    const [date, setDate] = useState<Date | undefined>(new Date(2026, 2, 22));
+    const [seats, setSeats] = useState<number | undefined>(2);
+    const [note, setNote] = useState('Palun helista enne saabumist');
+    const [transport, setTransport] = useState('bus');
+    const [extras, setExtras] = useState<string[]>(['breakfast']);
+
+    const transportLabels: Record<string, string> = { bus: 'Buss', train: 'Rong' };
+    const extrasLabels: Record<string, string> = { breakfast: 'Hommikusöök', parking: 'Parkimine' };
+
+    return (
+      <div style={{ maxWidth: '24rem' }}>
+        <VerticalSpacing size={0.5}>
+          <FieldRow label="Kuupäev">
+            <InlineEdit<Date | undefined>
+              label="Kuupäev"
+              value={date}
+              onChange={setDate}
+              renderValue={(v) => (v ? v.toLocaleDateString('et-EE') : '—')}
+            >
+              {({ value, onChange }) => (
+                <DateField
+                  id="ie-supported-date"
+                  label="Kuupäev"
+                  inputProps={{ hideLabel: true }}
+                  selected={value}
+                  onSelect={(next) => onChange(next as Date | undefined)}
+                />
+              )}
+            </InlineEdit>
+          </FieldRow>
+
+          <FieldRow label="Kohtade arv">
+            <InlineEdit<number | undefined>
+              label="Kohtade arv"
+              value={seats}
+              onChange={setSeats}
+              renderValue={(v) => (v === undefined ? '—' : String(v))}
+            >
+              {({ value, onChange }) => (
+                <NumberField id="ie-supported-seats" label="Kohtade arv" hideLabel value={value} onChange={onChange} />
+              )}
+            </InlineEdit>
+          </FieldRow>
+
+          <FieldRow label="Märkus">
+            <InlineEdit<string> label="Märkus" value={note} onChange={setNote} renderValue={(v) => v || '—'}>
+              {({ value, onChange }) => (
+                <Textarea id="ie-supported-note" label="Märkus" hideLabel value={value} onChange={onChange} />
+              )}
+            </InlineEdit>
+          </FieldRow>
+
+          <FieldRow label="Transport">
+            <InlineEdit<string>
+              label="Transport"
+              value={transport}
+              onChange={setTransport}
+              renderValue={(v) => transportLabels[v] ?? '—'}
+            >
+              {({ value, onChange }) => (
+                <Radio.Group id="ie-supported-transport" label="Transport" hideLabel value={value} onChange={onChange}>
+                  <Radio value="bus" label="Buss" />
+                  <Radio value="train" label="Rong" />
+                </Radio.Group>
+              )}
+            </InlineEdit>
+          </FieldRow>
+
+          <FieldRow label="Lisad">
+            <InlineEdit<string[]>
+              label="Lisad"
+              value={extras}
+              onChange={setExtras}
+              renderValue={(v) => v.map((x) => extrasLabels[x]).join(', ') || '—'}
+            >
+              {({ value, onChange }) => (
+                <Checkbox.Group id="ie-supported-extras" label="Lisad" hideLabel value={value} onChange={onChange}>
+                  <Checkbox value="breakfast" label="Hommikusöök" />
+                  <Checkbox value="parking" label="Parkimine" />
+                </Checkbox.Group>
               )}
             </InlineEdit>
           </FieldRow>

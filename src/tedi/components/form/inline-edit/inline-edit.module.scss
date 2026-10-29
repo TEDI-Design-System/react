@@ -1,14 +1,15 @@
 @use '@tedi-design-system/core/mixins';
 
 .tedi-inline-edit__field {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   gap: var(--tedi-dimensions-02);
+  width: 100%;
   max-width: 100%;
 
-  &.tedi-inline-edit--full-width {
-    display: flex;
-    width: 100%;
+  &.tedi-inline-edit--content-width {
+    display: inline-flex;
+    width: auto;
   }
 }
 
@@ -17,24 +18,25 @@
   --_inline-edit-line-height: var(--body-regular-line-height);
   --_inline-edit-height: calc(var(--_inline-edit-line-height) + 2 * var(--form-field-padding-y-sm));
 
-  display: inline-flex;
+  display: flex;
   gap: var(--tedi-dimensions-02);
   align-items: center;
+  width: 100%;
   max-width: 100%;
   font-size: var(--_inline-edit-font-size);
   line-height: var(--_inline-edit-line-height);
-}
-
-.tedi-inline-edit--full-width {
-  display: flex;
-  width: 100%;
-
-  &.tedi-inline-edit__trigger {
-    justify-content: space-between;
-  }
 
   &.tedi-inline-edit--editing {
     display: block;
+  }
+}
+
+.tedi-inline-edit--content-width {
+  display: inline-flex;
+  width: auto;
+
+  &.tedi-inline-edit--editing {
+    display: inline-block;
   }
 }
 
@@ -132,9 +134,7 @@
 }
 
 .tedi-inline-edit--icon-end.tedi-inline-edit__trigger {
-  display: flex;
   justify-content: space-between;
-  width: 100%;
 }
 
 .tedi-inline-edit__icon {
@@ -145,8 +145,11 @@
   color: var(--button-main-neutral-text-default);
 }
 
+// The pressed trigger previews the open editor, which has no pencil. Hidden
+// with opacity, not `display`: taking the icon out of flow on press shrinks
+// the button out from under the pointer, and the click then misses it.
 .tedi-inline-edit__trigger:active:not(:disabled) .tedi-inline-edit__icon {
-  display: none;
+  opacity: 0;
 }
 
 .tedi-inline-edit__value {
