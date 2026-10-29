@@ -8,25 +8,25 @@ export type SheetFooterAlign = 'left' | 'center' | 'right';
 
 export interface SheetFooterProps {
   /**
-   * Main footer actions. Positioned by `align`, or at the start when `right` is set.
+   * Main footer actions. Positioned by `align`, or at the start when `endSlot` is set.
    */
   children?: ReactNode;
   /**
-   * Horizontal placement of the main actions. Ignored when `right` is set (the split
-   * layout pins `children` to the start and `right` to the end).
+   * Horizontal placement of the main actions. Ignored when `endSlot` is set (the split
+   * layout pins `children` to the start and `endSlot` to the end).
    * @default left
    */
   align?: SheetFooterAlign;
   /**
-   * Stretch the actions to fill the footer width - each button grows to an equal share. With `right`
-   * set, only the main actions stretch and the `right` content keeps its natural width.
+   * Stretch the actions to fill the footer width - each button grows to an equal share. With `endSlot`
+   * set, only the main actions stretch and the `endSlot` content keeps its natural width.
    * @default false
    */
   fullWidth?: boolean;
   /**
-   * Content pinned to the right edge - e.g. an overflow menu button.
+   * Content pinned to the end edge - e.g. an overflow menu button.
    */
-  right?: ReactNode;
+  endSlot?: ReactNode;
   /**
    * Additional class name.
    */
@@ -37,12 +37,12 @@ export const SheetFooter = ({
   children,
   align = 'left',
   fullWidth = false,
-  right,
+  endSlot,
   className,
 }: SheetFooterProps): JSX.Element => {
   const { collapsed } = useSheetContext();
 
-  const isSplit = Boolean(right);
+  const isSplit = Boolean(endSlot);
   // Hidden rather than unmounted while collapsed, matching `Sheet.Body`.
   return (
     <div
@@ -56,7 +56,7 @@ export const SheetFooter = ({
     >
       <div className={styles['tedi-sheet__footer-side']}>{children}</div>
       {isSplit && (
-        <div className={cn(styles['tedi-sheet__footer-side'], styles['tedi-sheet__footer-side--right'])}>{right}</div>
+        <div className={cn(styles['tedi-sheet__footer-side'], styles['tedi-sheet__footer-side--end'])}>{endSlot}</div>
       )}
     </div>
   );

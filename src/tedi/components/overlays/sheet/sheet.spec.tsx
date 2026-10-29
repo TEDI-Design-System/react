@@ -536,7 +536,7 @@ describe('Sheet', () => {
       render(
         <Sheet defaultOpen>
           <Sheet.Content {...contentProps}>
-            <Sheet.Header title="Layers" right={<span>3 items</span>} />
+            <Sheet.Header title="Layers" endSlot={<span>3 items</span>} />
             <Sheet.Body>Body content</Sheet.Body>
           </Sheet.Content>
         </Sheet>
@@ -658,18 +658,18 @@ describe('Sheet', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('renders left content before the title and keeps the dialog named by the title', () => {
+  it('renders startSlot content before the title and keeps the dialog named by the title', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" left={<span>Left content</span>} />
+          <Sheet.Header title="Layers" startSlot={<span>Start content</span>} />
         </Sheet.Content>
       </Sheet>
     );
 
-    const left = screen.getByText('Left content');
+    const start = screen.getByText('Start content');
     const title = screen.getByRole('heading', { name: 'Layers' });
-    expect(left.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(start.compareDocumentPosition(title) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Layers');
   });
 
@@ -680,7 +680,7 @@ describe('Sheet', () => {
           <Sheet.Header
             title="Layers"
             collapsible
-            right={<span>Right content</span>}
+            endSlot={<span>End content</span>}
             actions={<button type="button">Fullscreen</button>}
           />
         </Sheet.Content>
@@ -692,27 +692,27 @@ describe('Sheet', () => {
       .getAllByRole('button')
       .map((button) => button.getAttribute('aria-label') ?? button.textContent);
     expect(buttons).toEqual(['Mocked label: sheet.collapse', 'Fullscreen', 'Close']);
-    const right = screen.getByText('Right content');
+    const end = screen.getByText('End content');
     const collapse = screen.getByRole('button', { name: 'Mocked label: sheet.collapse' });
-    expect(right.compareDocumentPosition(collapse) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(end.compareDocumentPosition(collapse) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('renders right content before the actions', () => {
+  it('renders endSlot content before the actions', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" right={<span>Right content</span>} />
+          <Sheet.Header title="Layers" endSlot={<span>End content</span>} />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
     );
 
-    const right = screen.getByText('Right content');
+    const end = screen.getByText('End content');
     const close = screen.getByRole('button', { name: 'Close' });
-    expect(right.compareDocumentPosition(close) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(end.compareDocumentPosition(close) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('applies the centre-title modifier only when centerTitle is set', () => {
+  it('centres the title only when titlePosition is center', () => {
     const { rerender } = render(
       <Sheet defaultOpen>
         <Sheet.Content>
@@ -726,12 +726,35 @@ describe('Sheet', () => {
     rerender(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Header title="Layers" centerTitle />
+          <Sheet.Header title="Layers" titlePosition="center" />
           <Sheet.Body>Body</Sheet.Body>
         </Sheet.Content>
       </Sheet>
     );
     expect(document.querySelector('[class*="tedi-sheet__header--center"]')).toBeInTheDocument();
+  });
+
+  it('renders the title as an h3 by default and at the requested headingLevel', () => {
+    const { rerender } = render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" />
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    expect(screen.getByRole('heading', { name: 'Layers', level: 3 })).toBeInTheDocument();
+
+    rerender(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" headingLevel="h2" />
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const heading = screen.getByRole('heading', { name: 'Layers', level: 2 });
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-labelledby', heading.id);
   });
 
   it('removes the panel from the DOM while closed by default', () => {
@@ -960,12 +983,12 @@ describe('Sheet', () => {
     expect(screen.getByTestId('probe')).toHaveTextContent('BUTTON');
   });
 
-  it('renders a split footer with right-aligned content', () => {
+  it('renders a split footer with endSlot content', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
           <Sheet.Body>Body</Sheet.Body>
-          <Sheet.Footer right={<button type="button">Confirm</button>}>
+          <Sheet.Footer endSlot={<button type="button">Confirm</button>}>
             <button type="button">Cancel</button>
           </Sheet.Footer>
         </Sheet.Content>
@@ -975,7 +998,7 @@ describe('Sheet', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
     expect(document.querySelector('[class*="tedi-sheet__footer--split"]')).toBeInTheDocument();
-    expect(document.querySelector('[class*="tedi-sheet__footer-side--right"]')).toBeInTheDocument();
+    expect(document.querySelector('[class*="tedi-sheet__footer-side--end"]')).toBeInTheDocument();
   });
 
   it('aligns footer actions via the align prop', () => {
@@ -1016,11 +1039,11 @@ describe('Sheet', () => {
     expect(document.querySelector('[class*="tedi-sheet__footer--full-width"]')).toBeInTheDocument();
   });
 
-  it('keeps fullWidth together with right content', () => {
+  it('keeps fullWidth together with endSlot content', () => {
     render(
       <Sheet defaultOpen>
         <Sheet.Content>
-          <Sheet.Footer fullWidth right={<button type="button">More</button>}>
+          <Sheet.Footer fullWidth endSlot={<button type="button">More</button>}>
             <button type="button">Save</button>
           </Sheet.Footer>
         </Sheet.Content>
@@ -1030,7 +1053,7 @@ describe('Sheet', () => {
     const footer = document.querySelector('[class*="tedi-sheet__footer--full-width"]');
     expect(footer).toBeInTheDocument();
     expect(footer).toHaveClass(/tedi-sheet__footer--split/);
-    expect(screen.getByRole('button', { name: 'More' }).parentElement).toHaveClass(/tedi-sheet__footer-side--right/);
+    expect(screen.getByRole('button', { name: 'More' }).parentElement).toHaveClass(/tedi-sheet__footer-side--end/);
   });
 
   it('removes body padding when padding="none"', () => {

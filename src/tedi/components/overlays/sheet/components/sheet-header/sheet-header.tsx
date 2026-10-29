@@ -9,12 +9,20 @@ import styles from '../../sheet.module.scss';
 import { useSheetContext } from '../../sheet-context';
 
 export type SheetHeaderVariant = 'brand' | 'default';
+export type SheetHeaderTitlePosition = 'start' | 'center';
+export type SheetHeaderHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export interface SheetHeaderProps {
   /**
-   * Header title. Rendered as an `<h6>` and wired to the dialog's `aria-labelledby`.
+   * Header title. Rendered as a heading (see `headingLevel`) and wired to the dialog's `aria-labelledby`.
    */
   title?: ReactNode;
+  /**
+   * Semantic heading level of the `title`; the visual style stays H6 regardless. The sheet opens over
+   * arbitrary page content, so set it to fit the host page's heading outline (WCAG 1.3.1).
+   * @default h3
+   */
+  headingLevel?: SheetHeaderHeadingLevel;
   /**
    * Colour scheme.
    * - `brand` - brand-blue background with white content.
@@ -23,11 +31,12 @@ export interface SheetHeaderProps {
    */
   variant?: SheetHeaderVariant;
   /**
-   * Centre the title within the header instead of aligning it to the start. The action buttons stay
-   * pinned to the trailing edge.
-   * @default false
+   * Where the title sits in the header.
+   * - `start` - aligned to the start edge, after the `startSlot` content.
+   * - `center` - centred within the header; `startSlot` and the action buttons stay pinned to the edges.
+   * @default start
    */
-  centerTitle?: boolean;
+  titlePosition?: SheetHeaderTitlePosition;
   /**
    * Show a collapse toggle that peeks the sheet down to just its header.
    * @default false
@@ -35,13 +44,13 @@ export interface SheetHeaderProps {
   collapsible?: boolean;
   /**
    * Leading content shown before the title - e.g. a back button or a count `Tag`. Stays pinned to the
-   * start edge when `centerTitle` is set.
+   * start edge when `titlePosition` is `center`.
    */
-  left?: ReactNode;
+  startSlot?: ReactNode;
   /**
    * Trailing content shown before the collapse / close actions - e.g. a count `Tag`.
    */
-  right?: ReactNode;
+  endSlot?: ReactNode;
   /**
    * Extra header actions, placed inside the action group between the collapse and close buttons -
    * e.g. a fullscreen toggle. Use `Button` `size="small"` for icon-only actions so they match the
@@ -70,11 +79,12 @@ export interface SheetHeaderProps {
 export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
   const {
     title,
+    headingLevel = 'h3',
     variant = 'brand',
-    centerTitle = false,
+    titlePosition = 'start',
     collapsible = false,
-    left,
-    right,
+    startSlot,
+    endSlot,
     actions,
     closeButton = true,
     closeButtonProps,
@@ -99,20 +109,20 @@ export const SheetHeader = (props: SheetHeaderProps): JSX.Element => {
       className={cn(
         styles['tedi-sheet__header'],
         styles[`tedi-sheet__header--${variant}`],
-        { [styles['tedi-sheet__header--center']]: centerTitle },
+        { [styles['tedi-sheet__header--center']]: titlePosition === 'center' },
         className
       )}
     >
       {children ?? (
         <>
-          {left && <div className={styles['tedi-sheet__header-left']}>{left}</div>}
+          {startSlot && <div className={styles['tedi-sheet__header-start']}>{startSlot}</div>}
           {hasTitle && (
-            <Heading element="h6" modifiers="h6" id={titleId} className={styles['tedi-sheet__title']}>
+            <Heading element={headingLevel} modifiers="h6" id={titleId} className={styles['tedi-sheet__title']}>
               {title}
             </Heading>
           )}
           <div className={styles['tedi-sheet__header-actions']}>
-            {right}
+            {endSlot}
             {collapsible && (
               <CollapseButton
                 className={styles['tedi-sheet__collapse-toggle']}

@@ -29,7 +29,8 @@ import { Sheet, SheetProps } from './sheet';
 const FIGMA_URL = 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65376-125297&m=dev';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65376-125297&m=dev" target="_blank">Figma ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65376-125297&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/502b36-sheet" target="_blank">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Sheet> = {
   component: Sheet,
@@ -101,7 +102,7 @@ const moreActions = (
 );
 
 const ApplyFooter = ({ more = false }: { more?: boolean }): JSX.Element => (
-  <Sheet.Footer fullWidth right={more ? moreActions : undefined}>
+  <Sheet.Footer fullWidth endSlot={more ? moreActions : undefined}>
     <Sheet.Closer>
       <Button visualType="secondary">Tühista</Button>
     </Sheet.Closer>
@@ -368,7 +369,7 @@ function ContentNavigationSheet(): JSX.Element {
         <Sheet.Header
           title={step === 'filters' ? 'Filtreerimine' : 'Saatja'}
           variant="default"
-          left={
+          startSlot={
             step === 'senders' ? (
               <Button visualType="neutral" size="small" icon="arrow_back" onClick={() => setStep('filters')}>
                 Tagasi
@@ -440,7 +441,7 @@ export const Default: StoryObj = {
     ...subcomponentArgTypes(Sheet.Header, {
       category: 'Sheet.Header',
       prefix: 'header',
-      include: ['title', 'variant', 'centerTitle', 'collapsible', 'closeButton'],
+      include: ['title', 'headingLevel', 'variant', 'titlePosition', 'collapsible', 'closeButton'],
     }),
     ...subcomponentArgTypes(Sheet.Footer, {
       category: 'Sheet.Footer',
@@ -463,7 +464,7 @@ export const Default: StoryObj = {
       <Sheet.Content {...getSubcomponentProps<SheetContentProps>(args, 'content')}>
         <Sheet.Header {...getSubcomponentProps<SheetHeaderProps>(args, 'header')} />
         <Sheet.Body padding="none">{filterChoices('sheet-default')}</Sheet.Body>
-        <Sheet.Footer {...getSubcomponentProps<SheetFooterProps>(args, 'footer')} right={moreActions}>
+        <Sheet.Footer {...getSubcomponentProps<SheetFooterProps>(args, 'footer')} endSlot={moreActions}>
           <Sheet.Closer>
             <Button visualType="secondary">Tühista</Button>
           </Sheet.Closer>
@@ -588,14 +589,17 @@ export const HeaderType: Story = {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-collapsible-center',
-            <Sheet.Header title="Seaded" variant="default" centerTitle collapsible />
+            <Sheet.Header title="Seaded" variant="default" titlePosition="center" collapsible />
           ),
         },
       ])}
       {exampleGroup('Heading center', [
         {
           caption: 'Heading center',
-          content: headerExample('sheet-type-center', <Sheet.Header title="Seaded" variant="default" centerTitle />),
+          content: headerExample(
+            'sheet-type-center',
+            <Sheet.Header title="Seaded" variant="default" titlePosition="center" />
+          ),
         },
       ])}
       {exampleGroup('Without closing button', [
@@ -610,7 +614,7 @@ export const HeaderType: Story = {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-no-close-center',
-            <Sheet.Header title="Seaded" variant="default" centerTitle closeButton={false} />
+            <Sheet.Header title="Seaded" variant="default" titlePosition="center" closeButton={false} />
           ),
         },
       ])}
@@ -625,7 +629,7 @@ export const HeaderType: Story = {
           caption: 'Heading center',
           content: headerExample(
             'sheet-type-no-handle-center',
-            <Sheet.Header title="Seaded" variant="default" centerTitle />,
+            <Sheet.Header title="Seaded" variant="default" titlePosition="center" />,
             { showHandle: false }
           ),
         },
@@ -638,7 +642,7 @@ export const HeaderType: Story = {
             <Sheet.Header
               title="Seaded"
               variant="default"
-              centerTitle
+              titlePosition="center"
               closeButton={false}
               actions={
                 <Sheet.Closer>
@@ -657,7 +661,7 @@ export const HeaderType: Story = {
           label: 'Teated',
           icon: 'notifications',
           content: notificationsExample(
-            <Sheet.Header title="Teated" variant="default" right={<Tag color="primary">2 uut teadet</Tag>} />
+            <Sheet.Header title="Teated" variant="default" endSlot={<Tag color="primary">2 uut teadet</Tag>} />
           ),
         },
         {
@@ -665,7 +669,7 @@ export const HeaderType: Story = {
           label: 'Teated',
           icon: 'notifications',
           content: notificationsExample(
-            <Sheet.Header title="Teated" variant="default" left={<Tag color="primary">2</Tag>} />
+            <Sheet.Header title="Teated" variant="default" startSlot={<Tag color="primary">2</Tag>} />
           ),
         },
         {
@@ -676,15 +680,15 @@ export const HeaderType: Story = {
             <Sheet.Header
               title="Teated"
               variant="default"
-              centerTitle
-              left={
+              titlePosition="center"
+              startSlot={
                 <Sheet.Closer>
                   <Button visualType="neutral" size="small" icon="arrow_back">
                     Tagasi
                   </Button>
                 </Sheet.Closer>
               }
-              right={<Tag color="primary">2</Tag>}
+              endSlot={<Tag color="primary">2</Tag>}
             />
           ),
         },
@@ -965,7 +969,7 @@ export const OpenSmallForVisualTest: Story = {
   render: () => (
     <Sheet defaultOpen>
       <Sheet.Content padding="small" radius="card">
-        <Sheet.Header title="Teated" variant="default" left={<Tag color="primary">2</Tag>} />
+        <Sheet.Header title="Teated" variant="default" startSlot={<Tag color="primary">2</Tag>} />
         <Sheet.Body>{notificationsBody}</Sheet.Body>
         <Sheet.Footer align="right">
           <Sheet.Closer>
@@ -987,7 +991,7 @@ export const OpenWithoutHandleForVisualTest: Story = {
         <Sheet.Header
           title="Seaded"
           variant="default"
-          centerTitle
+          titlePosition="center"
           closeButton={false}
           actions={
             <Sheet.Closer>
