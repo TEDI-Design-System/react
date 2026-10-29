@@ -198,20 +198,33 @@ describe('InlineEdit', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('shows the edit icon by default and hides it with hideEditIcon', () => {
-    const { rerender } = render(
+  it('shows the edit icon', () => {
+    render(
       <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
         {({ value, onChange }) => <TextField id="i" label="Name" hideLabel value={value} onChange={onChange} />}
       </InlineEdit>
     );
-    expect(screen.getByRole('button', { name: /name/i }).querySelector('svg, i, [class*="icon"]')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /name/i }).textContent).toContain('edit');
+  });
 
-    rerender(
-      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} hideEditIcon>
+  it('hides the edit icon while invalid', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} invalid>
         {({ value, onChange }) => <TextField id="i" label="Name" hideLabel value={value} onChange={onChange} />}
       </InlineEdit>
     );
-    expect(screen.getByRole('button', { name: /name/i }).querySelector('[class*="icon"]')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /name/i }).querySelector('.tedi-inline-edit__icon')).toBeNull();
+  });
+
+  it('starts open with defaultEditing without taking focus', () => {
+    render(
+      <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v} defaultEditing>
+        {({ value, onChange }) => <TextField id="open" label="Name" hideLabel value={value} onChange={onChange} />}
+      </InlineEdit>
+    );
+    const input = screen.getByRole('textbox', { name: /name/i });
+    expect(input).toHaveValue('Mari');
+    expect(input).not.toHaveFocus();
   });
 
   it('renders static text (no button) when readOnly', () => {
@@ -267,16 +280,16 @@ describe('InlineEdit', () => {
     expect(receivedSize).toBe('small');
   });
 
-  it('aligns the edit icon to the trailing edge with editIconPosition="end"', () => {
+  it('keeps the edit icon beside the value with editIconPosition="inline"', () => {
     render(
-      <InlineEdit<string> label="Name" value="Mari" editIconPosition="end" renderValue={(v) => v}>
+      <InlineEdit<string> label="Name" value="Mari" editIconPosition="inline" renderValue={(v) => v}>
         {({ value, onChange }) => <TextField id="a" label="Name" hideLabel value={value} onChange={onChange} />}
       </InlineEdit>
     );
-    expect(screen.getByRole('button', { name: /name/i })).toHaveClass('tedi-inline-edit--icon-end');
+    expect(screen.getByRole('button', { name: /name/i })).not.toHaveClass('tedi-inline-edit--icon-end');
   });
 
-  it('defaults to the inline icon position and default size (no modifier classes)', () => {
+  it('defaults to the end icon position and default size', () => {
     render(
       <InlineEdit<string> label="Name" value="Mari" renderValue={(v) => v}>
         {({ value, onChange }) => <TextField id="def" label="Name" hideLabel value={value} onChange={onChange} />}
@@ -284,7 +297,7 @@ describe('InlineEdit', () => {
     );
     const trigger = screen.getByRole('button', { name: /name/i });
     expect(trigger).not.toHaveClass('tedi-inline-edit--small');
-    expect(trigger).not.toHaveClass('tedi-inline-edit--icon-end');
+    expect(trigger).toHaveClass('tedi-inline-edit--icon-end');
     expect(trigger.querySelector('.tedi-inline-edit__icon')).toHaveClass('tedi-icon--size-18');
   });
 

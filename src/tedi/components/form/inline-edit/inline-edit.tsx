@@ -13,6 +13,8 @@ export interface UseInlineEditOptions<T> {
   defaultValue?: T;
   /** Called with the draft when an edit is committed. */
   onChange?: (value: T) => void;
+  /** Starts in edit mode. An editor that starts open does not take focus. @default false */
+  defaultEditing?: boolean;
 }
 
 export type InlineEditSize = 'default' | 'small';
@@ -44,12 +46,17 @@ export interface UseInlineEditResult<T> extends InlineEditEditor<T> {
  * uncontrolled use. Use directly when you want full control of the markup;
  * otherwise use `InlineEdit`.
  */
-export function useInlineEdit<T>({ value, defaultValue, onChange }: UseInlineEditOptions<T>): UseInlineEditResult<T> {
+export function useInlineEdit<T>({
+  value,
+  defaultValue,
+  onChange,
+  defaultEditing = false,
+}: UseInlineEditOptions<T>): UseInlineEditResult<T> {
   const isControlled = value !== undefined;
   const [innerValue, setInnerValue] = React.useState<T>((value ?? defaultValue) as T);
   const committedValue = (isControlled ? value : innerValue) as T;
 
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(defaultEditing);
   const [draft, setDraftState] = React.useState<T>(committedValue);
   const draftRef = React.useRef<T>(draft);
 
@@ -85,7 +92,10 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   renderValue?: (value: T) => React.ReactNode;
   /** Shown in the read view when the value is empty. No default — supply one if you want an empty-state hint. */
   placeholder?: React.ReactNode;
-  /** Renders the value as static text (a text group) with no edit affordance. */
+  /**
+   * Renders the value as plain text with no edit affordance, keeping the row's inset so a fixed value lines up among
+   * editable ones. For a block that is entirely read-only, use `TextGroup` instead.
+   */
   readOnly?: boolean;
   /**
    * Disables editing while keeping the trigger and edit icon visible but greyed — use for
@@ -108,22 +118,11 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   helper?: FeedbackTextProps | FeedbackTextProps[];
   /**
-   * Stretches the field (read trigger and editor) to the full width of its
-   * container, so controls like `Select`, `Slider` or `TextField` fill the row
-   * instead of sizing to their content. @default false
+   * Sizes the row to its value rather than filling its container. The row then
+   * changes width when the editor opens, because the control brings its own
+   * width — use it only for a value edited inside running text. @default false
    */
-  fullWidth?: boolean;
-  /**
-   * Hides the edit (pencil) icon on the read trigger. The whole value stays
-   * clickable, but the pencil is the only visual cue that the value is editable.
-   *
-   * **Accessibility risk:** hiding it removes that affordance, so sighted users
-   * cannot perceive the field is interactive (fails WCAG 1.3.3 Sensory
-   * Characteristics / 3.2 affordance guidance). Only enable it when an adjacent
-   * element already signals editability — use at your own risk.
-   * @default false
-   */
-  hideEditIcon?: boolean;
+  contentWidth?: boolean;
   /**
    * Size of the read trigger and editor.
    * - `default` — regular body text.
@@ -133,11 +132,12 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   size?: InlineEditSize;
   /**
-   * Placement of the edit (pencil) icon on the read trigger.
+   * Placement of the edit (pencil) icon on the read trigger. Hidden while the
+   * row is invalid.
+   * - `end` — the icon is pushed to the trailing edge, so icons line up across
+   *   stacked rows.
    * - `inline` — the icon sits directly after the value.
-   * - `end` — the trigger fills its container and the icon is pushed to the
-   *   trailing edge, so icons line up across stacked rows.
-   * @default inline
+   * @default end
    */
   editIconPosition?: 'inline' | 'end';
   /** id applied to the read trigger. */
@@ -163,10 +163,9 @@ export function InlineEdit<T>({
   disabled = false,
   invalid = false,
   helper,
-  fullWidth = false,
-  hideEditIcon = false,
+  contentWidth = false,
   size = 'default',
-  editIconPosition = 'inline',
+  editIconPosition = 'end',
   id,
   className,
   children,
@@ -179,7 +178,7 @@ export function InlineEdit<T>({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const restoreFocus = React.useRef(false);
   const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<T>(options);
-  const fullWidthClass = fullWidth ? styles['tedi-inline-edit--full-width'] : undefined;
+  const contentWidthClass = contentWidth ? styles['tedi-inline-edit--content-width'] : undefined;
   const smallClass = size === 'small' ? styles['tedi-inline-edit--small'] : undefined;
 
   const hasHelper = Array.isArray(helper) ? helper.length > 0 : Boolean(helper);
@@ -211,21 +210,26 @@ export function InlineEdit<T>({
   const withFeedback = (control: React.ReactNode): JSX.Element => {
     if (!hasHelper) return <>{control}</>;
     return (
-      <div className={cn(styles['tedi-inline-edit__field'], fullWidthClass)}>
+      <div className={cn(styles['tedi-inline-edit__field'], contentWidthClass)}>
         {control}
         {renderFeedback()}
       </div>
     );
   };
 
+  // An editor that starts open does not take focus; every later open does.
+  const focusOnOpen = React.useRef(!isEditing);
+
   React.useEffect(() => {
     if (!isEditing) {
+      focusOnOpen.current = true;
       if (restoreFocus.current) {
         restoreFocus.current = false;
         triggerRef.current?.focus();
       }
       return;
     }
+    if (!focusOnOpen.current) return;
     const editor = editorRef.current;
     if (!editor) return;
 
@@ -252,7 +256,7 @@ export function InlineEdit<T>({
         className={cn(
           styles['tedi-inline-edit'],
           styles['tedi-inline-edit--editing'],
-          fullWidthClass,
+          contentWidthClass,
           smallClass,
           className
         )}
@@ -298,7 +302,7 @@ export function InlineEdit<T>({
         className={cn(
           styles['tedi-inline-edit'],
           styles['tedi-inline-edit--readonly'],
-          fullWidthClass,
+          contentWidthClass,
           smallClass,
           className
         )}
@@ -321,7 +325,7 @@ export function InlineEdit<T>({
       className={cn(
         styles['tedi-inline-edit'],
         styles['tedi-inline-edit__trigger'],
-        fullWidthClass,
+        contentWidthClass,
         smallClass,
         { [styles['tedi-inline-edit--icon-end']]: editIconPosition === 'end' },
         { [styles['tedi-inline-edit--invalid']]: isInvalid },
@@ -334,7 +338,7 @@ export function InlineEdit<T>({
       <span className={empty ? styles['tedi-inline-edit__placeholder'] : styles['tedi-inline-edit__value']}>
         {empty ? placeholder : display}
       </span>
-      {!hideEditIcon && (
+      {!isInvalid && (
         <Icon name="edit" size={18} color="inherit" aria-hidden className={styles['tedi-inline-edit__icon']} />
       )}
     </button>
