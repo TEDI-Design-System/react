@@ -20,6 +20,15 @@ describe('Rating', () => {
     expect(screen.getAllByRole('radio')).toHaveLength(10);
   });
 
+  it.each([
+    [6, '6'],
+    [7, '4'],
+    [10, '5'],
+  ])('splits a %i-item number scale into %s mobile columns', (count, columns) => {
+    render(<Rating label="Feedback" type="number" count={count} />);
+    expect(screen.getByRole('radiogroup').style.getPropertyValue('--tedi-rating-columns')).toBe(columns);
+  });
+
   it('falls back to the type default when count is not a positive integer', () => {
     const { rerender } = render(<Rating label="Feedback" type="star" count={0} />);
     expect(screen.getAllByRole('radio')).toHaveLength(5);
@@ -84,16 +93,33 @@ describe('Rating', () => {
 
   it('restores defaultValue when the surrounding form is reset', () => {
     render(
-      <form data-testid="form">
+      <form aria-label="Rating form">
         <Rating label="Feedback" defaultValue={2} count={5} />
       </form>
     );
     fireEvent.click(screen.getByRole('radio', { name: '5/5' }));
     expect(screen.getByRole('radio', { name: '5/5' })).toBeChecked();
 
-    fireEvent.reset(screen.getByTestId('form'));
+    fireEvent.reset(screen.getByRole('form', { name: 'Rating form' }));
     expect(screen.getByRole('radio', { name: '2/5' })).toBeChecked();
     expect(screen.getByRole('radio', { name: '5/5' })).not.toBeChecked();
+  });
+
+  it('restores defaultValue on form reset after switching from readOnly to interactive', () => {
+    const { rerender } = render(
+      <form aria-label="Rating form">
+        <Rating label="Feedback" defaultValue={2} count={5} readOnly />
+      </form>
+    );
+    rerender(
+      <form aria-label="Rating form">
+        <Rating label="Feedback" defaultValue={2} count={5} />
+      </form>
+    );
+    fireEvent.click(screen.getByRole('radio', { name: '5/5' }));
+
+    fireEvent.reset(screen.getByRole('form', { name: 'Rating form' }));
+    expect(screen.getByRole('radio', { name: '2/5' })).toBeChecked();
   });
 
   describe('hover preview', () => {

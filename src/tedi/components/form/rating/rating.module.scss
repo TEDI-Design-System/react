@@ -52,6 +52,11 @@
   text-align: left;
 }
 
+.tedi-rating--icon.tedi-rating--vertical .tedi-rating__caption {
+  font-size: var(--body-small-regular-size);
+  line-height: var(--body-small-regular-line-height);
+}
+
 .tedi-rating__input {
   position: absolute;
   inset: 0;
@@ -70,8 +75,13 @@
 .tedi-rating .tedi-rating__star {
   position: relative; // paint above the absolutely positioned backdrop
   line-height: 1;
-  color: var(--button-main-secondary-text-default); // TODO: --form-rating-unselected-text-default (core update #1002)
+  color: var(--form-rating-unselected-text-default);
   text-align: center;
+}
+
+.tedi-rating .tedi-rating__visual--selected .tedi-rating__star,
+.tedi-rating .tedi-rating__star-partial-fill .tedi-rating__star {
+  color: var(--form-rating-selected-background-default);
 }
 
 .tedi-rating--star .tedi-rating__visual {
@@ -92,42 +102,44 @@
   width: var(--button-sm-height);
   height: var(--button-sm-height);
   font-size: var(--body-small-regular-size);
-  color: var(--general-text-brand);
-  background-color: var(--general-surface-primary);
-  border: var(--tedi-borders-01) solid var(--general-border-secondary);
+  color: var(--form-rating-unselected-text-default);
+  background-color: var(--form-rating-unselected-background-default);
+  border: var(--tedi-borders-01) solid var(--form-rating-unselected-border-default);
   border-radius: 50%;
 }
 
 .tedi-rating__visual--selected .tedi-rating__circle,
 .tedi-rating__circle--filled {
-  color: var(--general-text-white);
-  background-color: var(--general-surface-brand-primary);
-  border-color: var(--general-surface-brand-primary);
+  color: var(--form-rating-selected-text-default);
+  background-color: var(--form-rating-selected-background-default);
+  border-color: var(--form-rating-selected-border-default);
 }
 
 .tedi-rating:not(.tedi-rating--disabled) {
   .tedi-rating__visual--hover,
   .tedi-rating__item:hover > .tedi-rating__visual {
     .tedi-rating__star {
-      color: var(
-        --button-main-primary-background-hover
-      ); // TODO: --form-rating-selected-border-hover (core update #1002)
+      color: var(--form-rating-unselected-border-hover);
     }
 
     .tedi-rating__star-backdrop {
-      color: var(--general-surface-brand-quaternary);
+      color: var(--form-rating-unselected-background-hover);
     }
 
     .tedi-rating__circle {
-      color: var(--general-icon-brand-dark);
-      background-color: var(--general-surface-brand-quaternary);
-      border-color: var(--general-icon-brand-dark);
+      color: var(--form-rating-unselected-text-hover);
+      background-color: var(--form-rating-unselected-background-hover);
+      border-color: var(--form-rating-unselected-border-hover);
+    }
+
+    &.tedi-rating__visual--selected .tedi-rating__star {
+      color: var(--form-rating-selected-background-hover);
     }
 
     &.tedi-rating__visual--selected .tedi-rating__circle {
-      color: var(--general-text-white);
-      background-color: var(--general-icon-brand-dark);
-      border-color: var(--general-icon-brand-dark);
+      color: var(--form-rating-selected-text-hover);
+      background-color: var(--form-rating-selected-background-hover);
+      border-color: var(--form-rating-selected-border-hover);
     }
   }
 }
@@ -181,21 +193,23 @@
 
 .tedi-rating--disabled {
   .tedi-rating__star {
-    color: var(--form-general-border-disabled);
+    color: var(--form-rating-unselected-border-disabled);
   }
 
   .tedi-rating__visual--selected .tedi-rating__star {
-    color: var(--form-general-background-disabled);
+    color: var(--form-rating-selected-background-disabled);
   }
 
   .tedi-rating__circle {
-    color: var(--general-text-disabled);
-    background-color: transparent;
-    border-color: var(--form-general-border-disabled);
+    color: var(--form-rating-unselected-text-disabled);
+    background-color: var(--form-rating-unselected-background-disabled);
+    border-color: var(--form-rating-unselected-border-disabled);
   }
 
   .tedi-rating__visual--selected .tedi-rating__circle {
-    background-color: var(--form-general-background-disabled);
+    color: var(--form-rating-selected-text-disabled);
+    background-color: var(--form-rating-selected-background-disabled);
+    border-color: var(--form-rating-selected-border-disabled);
   }
 }
 
@@ -236,8 +250,22 @@
   color: var(--general-text-secondary);
 }
 
+// Narrow screens: split the number scale evenly over two rows (10 → 5/5, 7 → 4/3; up to 6 stays on one row),
+// letting the gaps shrink to fit while capping them at the desktop gap.
 @include breakpoints.media-breakpoint-down(md) {
-  .tedi-rating--number:not(.tedi-rating--readonly, .tedi-rating--vertical) .tedi-rating__items {
-    column-gap: var(--layout-grid-gutters-04);
+  .tedi-rating--number:not(.tedi-rating--readonly, .tedi-rating--vertical) {
+    width: 100%;
+    max-width: calc(
+      var(--tedi-rating-columns) * var(--button-sm-height) + (var(--tedi-rating-columns) - 1) *
+        var(--layout-grid-gutters-24)
+    );
+
+    .tedi-rating__items {
+      display: grid;
+      grid-template-columns: repeat(var(--tedi-rating-columns), var(--button-sm-height));
+      column-gap: 0;
+      justify-content: space-between;
+      width: 100%;
+    }
   }
 }

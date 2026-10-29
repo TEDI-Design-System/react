@@ -126,7 +126,8 @@ export const Rating = (props: RatingProps): JSX.Element => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   // A native form reset restores the radios' initial `checked` state; follow it so the visual selection
-  // and the submitted value don't drift apart.
+  // and the submitted value don't drift apart. `readOnly` re-runs it: the radios (and rootRef) only exist
+  // in the interactive render.
   useEffect(() => {
     const form = rootRef.current?.closest('form');
     if (!form || isControlled) return;
@@ -134,7 +135,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
     const handleReset = (): void => setInternalValue(defaultValue);
     form.addEventListener('reset', handleReset);
     return () => form.removeEventListener('reset', handleReset);
-  }, [isControlled, defaultValue]);
+  }, [isControlled, defaultValue, readOnly]);
 
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const interactive = !disabled && !readOnly;
@@ -169,6 +170,8 @@ export const Rating = (props: RatingProps): JSX.Element => {
   };
 
   const positions = Array.from({ length: total }, (_, index) => index + 1);
+  // Narrow screens split a number scale longer than 6 evenly over two rows (see the SCSS).
+  const mobileColumns = total > 6 ? Math.ceil(total / 2) : total;
 
   const renderVisual = (position: number, selected: boolean): React.ReactNode => {
     if (type === 'star') {
@@ -282,6 +285,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
         { [styles['tedi-rating--disabled']]: disabled },
         className
       )}
+      style={type === 'number' ? ({ '--tedi-rating-columns': mobileColumns } as React.CSSProperties) : undefined}
     >
       <div
         className={cn(styles['tedi-rating__items'], {
