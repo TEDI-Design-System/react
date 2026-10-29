@@ -1,31 +1,39 @@
 'use client';
 
 import cn from 'classnames';
-import { CSSProperties, forwardRef, HTMLAttributes, ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { CSSProperties, JSX, ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { Heading, HeadingProps } from '../../../tedi/components/base/typography/heading/heading';
 import { Button } from '../../../tedi/components/buttons/button/button';
+import { Resizer } from '../map-components/resizer/resizer';
 import styles from './dock-panel.module.scss';
 
 export type DockPanelPlacement = 'left' | 'right' | 'top' | 'bottom';
 export type DockPanelSize = 'default' | 'small';
-export type DockPanelDimensionPreset = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+/** Percentages of the workspace dimension: xs=25%, sm=35%, md=50%, lg=65%, xl=80%. */
+export type DockPanelDimensionPreset = keyof typeof DIMENSION_PERCENTAGES;
 export type DockPanelWidth = DockPanelDimensionPreset | CSSProperties['width'];
 export type DockPanelHeight = DockPanelDimensionPreset | CSSProperties['height'];
 
-const DIMENSION_PRESETS: readonly DockPanelDimensionPreset[] = ['xs', 'sm', 'md', 'lg', 'xl'];
-const DIMENSION_PERCENTAGES: Record<DockPanelDimensionPreset, string> = {
+const DIMENSION_PERCENTAGES = {
   xs: '25%',
   sm: '35%',
   md: '50%',
   lg: '65%',
   xl: '80%',
+} as const;
+
+const resizeHandleByPlacement: Record<DockPanelPlacement, DockPanelPlacement> = {
+  left: 'right',
+  right: 'left',
+  top: 'bottom',
+  bottom: 'top',
 };
 
 const isDimensionPreset = (value: DockPanelWidth | DockPanelHeight): value is DockPanelDimensionPreset =>
-  typeof value === 'string' && (DIMENSION_PRESETS as readonly string[]).includes(value);
+  typeof value === 'string' && Object.prototype.hasOwnProperty.call(DIMENSION_PERCENTAGES, value);
 
-const getCssDimension = (value: DockPanelWidth | DockPanelHeight): string | undefined => {
+const resolveCssDimension = (value: DockPanelWidth | DockPanelHeight): string | undefined => {
   if (isDimensionPreset(value)) {
     return DIMENSION_PERCENTAGES[value];
   }
@@ -38,110 +46,118 @@ const getCssDimension = (value: DockPanelWidth | DockPanelHeight): string | unde
 };
 
 export interface DockPanelLabels {
-  /** Accessible name for the minimize button. Supply translated text. */
+  /** Accessible name for the minimize button. */
   collapse: string;
-  /** Accessible name for the restore button. Supply translated text. */
+  /** Accessible name for the restore button. */
   expand: string;
-  /** Accessible name for the optional close button. Supply translated text. */
+  /** Accessible name for the close button. */
   close: string;
 }
 
-export interface DockPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
-  /** Required. Visible heading and default accessible name of the panel. */
+export interface DockPanelProps {
+  /** Visible heading and accessible name. */
   title: string;
-  /** Required. Application-provided React content. Kept mounted while minimized. */
+  /** Text below the title, hidden while minimized. Omitted or empty text adds no spacing. */
+  description?: string;
+  /** Panel content, kept mounted while minimized. */
   children: ReactNode;
-  /**
-   * Required. Translated accessible button names: { collapse, expand, close }.
-   * All three strings are required by this interface, including close when onClose is omitted.
-   * Providing labels.close alone does not display a close button.
-   */
+  /** Translated accessible names for the panel controls. */
   labels: DockPanelLabels;
   /**
-   * Optional. Edge of the containing workspace, not necessarily the browser viewport.
-   * Place the panel in DockPanelLayout to overlay when expanded and reserve space when minimized.
+   * Edge of the containing workspace.
    * @default right
    */
   placement?: DockPanelPlacement;
   /**
-   * Optional. Panel density, using TEDI Modal padding tokens for the header, content and footer.
-   * The title defaults to h3 for default and h4 for small, including its text size when expanded.
-   * Set headingElement to override both. Minimized titles always use compact text.
-   * This is independent of width/height: small does not mean a narrower panel.
+   * Header, content and footer padding using TEDI Modal density tokens, independent of dimensions.
    * @default default
    */
   size?: DockPanelSize;
   /**
-   * Optional. Controlled minimized state. Supply onCollapsedChange and apply the requested value.
-   * When omitted, the component manages its own state, initialized from defaultCollapsed.
+   * Enables resizing from the workspace-facing edge.
+   * The configured width/height supplies the initial size; dragging then uses pixels.
+   * Minimize/restore preserves content and resized dimensions.
+   * @default false
+   */
+  resizable?: boolean;
+  /**
+   * Controlled minimized state. Apply changes requested by onCollapsedChange.
+   * Omit to use internal state initialized from defaultCollapsed.
    */
   collapsed?: boolean;
   /**
-   * Optional. Initial minimized state in uncontrolled mode; ignored when collapsed is supplied.
-   * Changes after mounting do not reset the state.
+   * Initial uncontrolled minimized state; ignored when collapsed is supplied.
+   * Later changes have no effect.
    * @default false
    */
   defaultCollapsed?: boolean;
-  /** Optional. Requests/notifies a minimize/restore change. Receives the next collapsed value. */
+  /**
+   * Application-owned minimize counter. The initial value is ignored.
+   * Later changes request minimization only while expanded.
+   * In controlled mode, the parent applies onCollapsedChange(true).
+   */
+  minimizeCounter?: number;
+  /** Receives the next minimized state requested by the toggle or minimizeCounter. */
   onCollapsedChange?: (collapsed: boolean) => void;
   /**
-   * Optional. Displays the close button and requests dismissal when clicked.
-   * The application owns removal, unsaved-change confirmation and focus restoration.
-   * Omit this callback to hide the close button. Closing is separate from minimizing.
+   * Shows the close button and requests dismissal without changing the minimized state.
+   * The application handles removal, unsaved-change confirmation and focus restoration.
    */
   onClose?: () => void;
-  /** Optional. React content before the grouped panel controls. Hidden, not unmounted, when minimized. */
+  /** Content before the controls. Hidden but kept mounted while minimized. */
   headerActions?: ReactNode;
-  /** Optional. React content below the scrolling body. Hidden, not unmounted, when minimized. */
+  /** Content below the scroll area. Hidden but kept mounted while minimized. */
   footer?: ReactNode;
   /**
-   * Optional. Expanded width for left/right placement; ignored for top/bottom.
-   * Presets share the height scale: xs=25%, sm=35%, md=50%, lg=65%, xl=80% of workspace width.
-   * Every named preset leaves some workspace visible beside the panel, including xl.
-   * Also accepts a CSS length or a number in pixels, limited to the workspace width.
-   * Use 100% explicitly to fill the workspace. An omitted width defaults to xs (25%) via CSS.
+   * Expanded width for left/right placement; ignored for top/bottom.
+   * Accepts presets, CSS lengths or pixel numbers, limited to the workspace width.
    * @default xs
    */
   width?: DockPanelWidth;
   /**
-   * Optional. Expanded height for any placement. Numbers mean pixels; CSS lengths and auto work too.
-   * Presets share the width scale: xs=25%, sm=35%, md=50%, lg=65%, xl=80% of workspace height.
-   * Named presets leave workspace visible; use 100% explicitly for the full available height.
-   * Defaults to 100% for left/right and 50% for top/bottom.
-   * Use auto for content height, with maxHeight to leave background visible underneath.
-   * A minimized side rail keeps an explicit height, or fits its title and controls for auto.
+   * Expanded height for any placement. Accepts presets, CSS lengths, pixel numbers or auto.
+   * Use auto with maxHeight for content height with a scrolling limit.
+   * Minimized side rails keep an explicit height or fit their content with auto.
+   * @default 100% for left/right; 50% for top/bottom
    */
   height?: DockPanelHeight;
   /**
-   * Optional. Maximum height as a CSS length or number in pixels; not a preset.
-   * For example, calc(100% - 4rem) reserves space below a side panel.
-   * At the limit, the body scrolls while the header and footer remain visible.
+   * Maximum height as a CSS length or pixel number, without presets.
+   * Content scrolls at this limit while the header and footer remain visible.
    * @default 100%
    */
   maxHeight?: CSSProperties['maxHeight'];
   /**
-   * Optional. Overrides the title's HTML heading tag and expanded text size.
-   * When omitted, uses h3 for default and h4 for small. Minimized titles always use compact text.
+   * Title heading tag and expanded text size. Minimized titles always use compact text.
    * @default h3 (h4 when size is small)
    */
   headingElement?: HeadingProps['element'];
+  /** Panel id for external controls. Generated when omitted. */
+  id?: string;
+  /** Additional panel class names. */
+  className?: string;
+  /** Panel styles, including stacking order and CSS custom properties. */
+  style?: CSSProperties;
 }
 
-type PanelStyle = CSSProperties & {
+type DockPanelStyle = CSSProperties & {
   '--dock-panel-width'?: string;
   '--dock-panel-height'?: string;
   '--dock-panel-max-height'?: string;
 };
 
-export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>((props, ref) => {
+export const DockPanel = (props: DockPanelProps): JSX.Element => {
   const {
     title,
+    description,
     children,
     labels,
     placement = 'right',
     size = 'default',
+    resizable = false,
     collapsed,
     defaultCollapsed = false,
+    minimizeCounter,
     onCollapsedChange,
     onClose,
     headerActions,
@@ -153,7 +169,6 @@ export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>((props, ref)
     id,
     className,
     style,
-    ...rest
   } = props;
 
   const generatedId = useId();
@@ -163,172 +178,202 @@ export const DockPanel = forwardRef<HTMLDivElement, DockPanelProps>((props, ref)
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
   const isControlled = collapsed !== undefined;
   const isCollapsed = collapsed ?? internalCollapsed;
-  const toggleButtonRef = useRef<HTMLButtonElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const headerActionsRef = useRef<HTMLDivElement>(null);
+  const previousMinimizeCounter = useRef(minimizeCounter);
+  const resizeMeasurementRef = useRef<HTMLDivElement>(null);
+  const [initialResizeMeasurements, setInitialResizeMeasurements] = useState<{
+    width: number;
+    height: number;
+    maxWidth: number;
+    maxHeight: number;
+  }>();
 
-  // Remember focus before React hides the body, including programmatic collapse.
-  // A document-level listener also notices focus moving outside this panel.
-  const focusWasInCollapsibleAreaRef = useRef(false);
-  useEffect(() => {
-    const ownerDocument = toggleButtonRef.current?.ownerDocument;
-    if (!ownerDocument) return;
-
-    const handleDocumentFocusIn = (): void => {
-      const activeElement = ownerDocument.activeElement;
-      const isFocusInCollapsibleArea = Boolean(
-        activeElement && (bodyRef.current?.contains(activeElement) || headerActionsRef.current?.contains(activeElement))
-      );
-      // Hiding a focused element can temporarily move focus to the document body.
-      // Preserve the previous location in that case until the restore button is focused.
-      if (isFocusInCollapsibleArea || activeElement !== ownerDocument.body || !bodyRef.current?.hidden) {
-        focusWasInCollapsibleAreaRef.current = isFocusInCollapsibleArea;
-      }
-    };
-
-    const handleDocumentFocusOut = (): void => {
-      if (!bodyRef.current?.hidden) focusWasInCollapsibleAreaRef.current = false;
-    };
-
-    handleDocumentFocusIn();
-    ownerDocument.addEventListener('focusin', handleDocumentFocusIn);
-    ownerDocument.addEventListener('focusout', handleDocumentFocusOut);
-    return () => {
-      ownerDocument.removeEventListener('focusin', handleDocumentFocusIn);
-      ownerDocument.removeEventListener('focusout', handleDocumentFocusOut);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isCollapsed && focusWasInCollapsibleAreaRef.current) {
-      toggleButtonRef.current?.focus();
-      focusWasInCollapsibleAreaRef.current = false;
+  useLayoutEffect(() => {
+    if (resizable && !initialResizeMeasurements && resizeMeasurementRef.current) {
+      const measurement = resizeMeasurementRef.current;
+      const { width, height } = measurement.getBoundingClientRect();
+      const workspace = measurement.offsetParent as HTMLElement;
+      setInitialResizeMeasurements({
+        width,
+        height,
+        maxWidth: workspace.clientWidth,
+        maxHeight: workspace.clientHeight,
+      });
     }
-  }, [isCollapsed]);
+  }, [resizable, initialResizeMeasurements]);
 
-  const handleToggle = (): void => {
+  const handleCollapseToggle = (): void => {
     const nextCollapsed = !isCollapsed;
-    // Some browsers do not focus a button on pointer activation.
-    toggleButtonRef.current?.focus();
     if (!isControlled) setInternalCollapsed(nextCollapsed);
     onCollapsedChange?.(nextCollapsed);
   };
 
-  const panelStyle: PanelStyle = { ...style };
+  useEffect(() => {
+    if (previousMinimizeCounter.current !== minimizeCounter) {
+      previousMinimizeCounter.current = minimizeCounter;
+      if (!isCollapsed) {
+        if (!isControlled) setInternalCollapsed(true);
+        onCollapsedChange?.(true);
+      }
+    }
+  }, [minimizeCounter, isCollapsed, isControlled, onCollapsedChange]);
+
+  const panelStyle: DockPanelStyle = { ...style, zIndex: resizable ? undefined : style?.zIndex };
   if (width !== undefined) {
-    panelStyle['--dock-panel-width'] = getCssDimension(width);
+    panelStyle['--dock-panel-width'] = resolveCssDimension(width);
   }
   if (height !== undefined) {
-    panelStyle['--dock-panel-height'] = getCssDimension(height);
+    panelStyle['--dock-panel-height'] = resolveCssDimension(height);
   }
   if (maxHeight !== undefined) {
     panelStyle['--dock-panel-max-height'] = typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight;
   }
 
-  const defaultHeadingTag = size === 'small' ? 'h4' : 'h3';
-  const titleHeadingTag = headingElement ?? defaultHeadingTag;
-  const titleTextStyle = isCollapsed ? 'small' : undefined;
+  const titleElement = headingElement ?? (size === 'small' ? 'h4' : 'h3');
   const toggleButtonLabel = isCollapsed ? labels.expand : labels.collapse;
   const toggleButtonIcon = isCollapsed ? 'zoom_out_map' : 'zoom_in_map';
-  const hasHeaderActions = headerActions !== null && headerActions !== undefined;
-  const hasFooter = footer !== null && footer !== undefined;
+  const hasHeaderActions = headerActions !== null && headerActions !== undefined && typeof headerActions !== 'boolean';
+  const hasFooter = footer !== null && footer !== undefined && typeof footer !== 'boolean';
 
-  return (
+  const panel = (
     <div
-      {...rest}
-      ref={ref}
       id={panelId}
       role="region"
-      aria-labelledby={rest['aria-labelledby'] ?? titleId}
-      data-dock-panel=""
+      aria-labelledby={titleId}
       data-placement={placement}
       data-size={size}
       data-collapsed={isCollapsed}
+      data-resizable={resizable}
       className={cn(styles['tedi-dock-panel'], className)}
       style={panelStyle}
     >
       <div className={styles['tedi-dock-panel__header']}>
-        <Heading
-          id={titleId}
-          element={titleHeadingTag}
-          modifiers={titleTextStyle}
-          className={styles['tedi-dock-panel__title']}
-        >
-          {title}
-        </Heading>
-
-        {hasHeaderActions && (
-          <div ref={headerActionsRef} className={styles['tedi-dock-panel__header-actions']} hidden={isCollapsed}>
-            {headerActions}
-          </div>
-        )}
-
-        <div className={styles['tedi-dock-panel__controls']}>
-          <Button
-            ref={toggleButtonRef}
-            className={styles['tedi-dock-panel__toggle']}
-            type="button"
-            visualType="neutral"
-            icon={toggleButtonIcon}
-            title={toggleButtonLabel}
-            aria-expanded={!isCollapsed}
-            aria-controls={bodyId}
-            onClick={handleToggle}
+        <div className={styles['tedi-dock-panel__header-row']}>
+          <Heading
+            id={titleId}
+            element={titleElement}
+            modifiers={isCollapsed ? 'small' : undefined}
+            className={styles['tedi-dock-panel__title']}
           >
-            {toggleButtonLabel}
-          </Button>
+            {title}
+          </Heading>
 
-          {onClose && (
+          {hasHeaderActions && (
+            <div className={styles['tedi-dock-panel__header-actions']} hidden={isCollapsed}>
+              {headerActions}
+            </div>
+          )}
+
+          <div className={styles['tedi-dock-panel__controls']}>
             <Button
-              className={styles['tedi-dock-panel__close']}
+              className={styles['tedi-dock-panel__toggle']}
               type="button"
               visualType="neutral"
-              icon="close"
-              title={labels.close}
-              onClick={onClose}
+              icon={toggleButtonIcon}
+              title={toggleButtonLabel}
+              aria-expanded={!isCollapsed}
+              aria-controls={bodyId}
+              onClick={handleCollapseToggle}
             >
-              {labels.close}
+              {toggleButtonLabel}
             </Button>
-          )}
+
+            {onClose && (
+              <Button
+                className={styles['tedi-dock-panel__close']}
+                type="button"
+                visualType="neutral"
+                icon="close"
+                title={labels.close}
+                onClick={onClose}
+              >
+                {labels.close}
+              </Button>
+            )}
+          </div>
         </div>
+        {description && (
+          <div className={styles['tedi-dock-panel__description']} hidden={isCollapsed}>
+            {description}
+          </div>
+        )}
       </div>
 
-      <div ref={bodyRef} id={bodyId} className={styles['tedi-dock-panel__body']} hidden={isCollapsed}>
-        <div className={styles['tedi-dock-panel__content']}>
-          <div className={styles['tedi-dock-panel__content-inner']}>{children}</div>
+      <div id={bodyId} className={styles['tedi-dock-panel__body']} hidden={isCollapsed}>
+        <div className={styles['tedi-dock-panel__scroll-area']}>
+          <div className={styles['tedi-dock-panel__content']}>{children}</div>
         </div>
         {hasFooter && <div className={styles['tedi-dock-panel__footer']}>{footer}</div>}
       </div>
     </div>
   );
-});
 
-DockPanel.displayName = 'DockPanel';
+  if (!resizable) return panel;
+
+  if (!initialResizeMeasurements) {
+    return (
+      <div
+        ref={resizeMeasurementRef}
+        aria-hidden="true"
+        data-placement={placement}
+        className={cn(styles['tedi-dock-panel'], styles['tedi-dock-panel__resize-measurement'], className)}
+        style={panelStyle}
+      />
+    );
+  }
+
+  const resizeLayoutStyle: DockPanelStyle = {
+    height: placement === 'left' || placement === 'right' ? panelStyle['--dock-panel-height'] : undefined,
+    maxHeight: panelStyle['--dock-panel-max-height'],
+    zIndex: style?.zIndex,
+    '--dock-panel-gap': panelStyle['--dock-panel-gap'],
+    '--dock-panel-rail-size': panelStyle['--dock-panel-rail-size'],
+    '--dock-panel-layer': panelStyle['--dock-panel-layer'],
+  };
+
+  return (
+    <div
+      className={styles['tedi-dock-panel__resize-layout']}
+      data-placement={placement}
+      data-collapsed={isCollapsed}
+      style={resizeLayoutStyle}
+    >
+      <Resizer
+        className={styles['tedi-dock-panel__resizer']}
+        handlePosition={resizeHandleByPlacement[placement]}
+        initialWidth={initialResizeMeasurements.width}
+        initialHeight={initialResizeMeasurements.height}
+        minWidth={0}
+        minHeight={0}
+        maxWidth={initialResizeMeasurements.maxWidth}
+        maxHeight={initialResizeMeasurements.maxHeight}
+        showIndicator={false}
+      >
+        {panel}
+      </Resizer>
+    </div>
+  );
+};
 
 /**
- * Shared layout for one DockPanel and its underlying application content.
- * Expanded panels are out of flow. A minimized panel occupies a separate grid track,
- * so the workspace resizes without being obscured by the rail.
- * Keep the layout mounted when opening/closing the panel to preserve application state.
+ * Expanded panels overlay the workspace; minimized panels reserve a grid track.
+ * Keep the layout mounted when opening/closing panels to preserve workspace state.
  */
-export interface DockPanelLayoutProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** Required. Underlying application content, such as a map, editor or table. */
+export interface DockPanelLayoutProps {
+  /** Underlying application content. */
   children: ReactNode;
-  /** Optional. One DockPanel, or a layout-aware wrapper containing it. Null means closed. */
+  /** One DockPanel or a layout-aware wrapper containing it. Null means closed. */
   panel?: ReactNode;
+  /** Additional workspace layout class names. */
+  className?: string;
+  /** Workspace layout styles, including its height. */
+  style?: CSSProperties;
 }
 
-export const DockPanelLayout = forwardRef<HTMLDivElement, DockPanelLayoutProps>(
-  ({ children, panel, className, ...rest }, ref) => (
-    <div {...rest} ref={ref} className={cn(styles['tedi-dock-panel-layout'], className)}>
-      <div className={styles['tedi-dock-panel-layout__content']} data-dock-panel-layout-content="">
-        {children}
-      </div>
-      {panel}
-    </div>
-  )
+export const DockPanelLayout = ({ children, panel, className, style }: DockPanelLayoutProps): JSX.Element => (
+  <div className={cn(styles['tedi-dock-panel-layout'], className)} style={style}>
+    <div className={styles['tedi-dock-panel-layout__content']}>{children}</div>
+    {panel}
+  </div>
 );
-
-DockPanelLayout.displayName = 'DockPanelLayout';
 
 export default DockPanel;

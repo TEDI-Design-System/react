@@ -95,6 +95,11 @@ export interface DateFieldProps
    */
   label: string;
   /**
+   * Props forwarded to the field's label (e.g. `{ modifiers: 'nowrap' }` to control
+   * how a long label wraps). Breakpoint keys are supported for responsive wrapping.
+   */
+  labelProps?: TextFieldProps['labelProps'];
+  /**
    * Determines the selection mode of the calendar.
    * - `'single'` (default) – only one date can be selected. The `selected` prop should be a `Date` object or `undefined`.
    * - `'multiple'` – multiple individual dates can be selected. The `selected` prop should be an array of `Date` objects.
@@ -363,6 +368,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
     id,
     mode = 'single',
     label,
+    labelProps,
     selected,
     onSelect,
     disabled,
@@ -859,6 +865,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             ref={multiValueRef}
             id={id}
             label={label}
+            labelProps={labelProps ?? (inputProps as MultiValueFieldProps)?.labelProps}
             tagsDirection={tagsDirection}
             values={formattedDatesWithIds.map((item) => item.label)}
             icon="calendar_today"
@@ -886,6 +893,7 @@ export const DateField = React.forwardRef<TextFieldForwardRef, DateFieldProps>((
             ref={setTextFieldRef}
             id={id}
             label={label}
+            labelProps={labelProps ?? (inputProps as TextFieldProps)?.labelProps}
             readOnly={readOnly}
             value={shouldUseNativePicker ? nativeValue : inputValue}
             placeholder={placeholder}

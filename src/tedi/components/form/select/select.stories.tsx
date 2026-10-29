@@ -259,6 +259,14 @@ const iconPickerOptions: ISelectOption<IconData>[] = (
 ).map((d, i) => ({ value: String(i + 1), label: d.name, customData: d }));
 
 export const ValueType: Story = {
+  parameters: {
+    a11y: {
+      options: {
+        // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
+        rules: { 'target-size': { enabled: false } },
+      },
+    },
+  },
   render: () => (
     <VerticalSpacing>
       <Select id="value-no-value" label="No value" options={options} isClearable={false} />
@@ -343,6 +351,14 @@ export const ValueType: Story = {
  * label shows in a popover on hover/focus.
  */
 export const EllipsisTags: Story = {
+  parameters: {
+    a11y: {
+      options: {
+        // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
+        rules: { 'target-size': { enabled: false } },
+      },
+    },
+  },
   render: () => {
     const longOptions: ISelectOption[] = [
       { value: 'a', label: 'A fairly long option label that does not fit' },
@@ -677,6 +693,14 @@ export const Examples: Story = {
  * needs to be lifted (form integration, programmatic updates, etc.).
  */
 export const MultipleHandled: Story = {
+  parameters: {
+    a11y: {
+      options: {
+        // react-select's whole control is the pointer target, so axe flagging its inner input is a false positive.
+        rules: { 'target-size': { enabled: false } },
+      },
+    },
+  },
   render: MultipleHandledTemplate,
   args: {
     id: 'multiple-handled-example',
@@ -747,5 +771,21 @@ export const DeferKeyboardOnTouch: Story = {
     options: options,
     openKeyboardOnTouch: false,
     isSearchable: true,
+  },
+};
+
+/**
+ * `showClearOnInteraction` reveals the clear (×) indicator only while the control is hovered or
+ * focused (keyboard focus included), instead of whenever a value is selected. Requires
+ * `isClearIndicatorVisible`.
+ */
+export const ClearButtonOnInteraction: Story = {
+  args: {
+    id: 'example-clear-on-interaction',
+    label: 'Label',
+    defaultValue: options[1],
+    options: options,
+    isClearIndicatorVisible: true,
+    showClearOnInteraction: true,
   },
 };

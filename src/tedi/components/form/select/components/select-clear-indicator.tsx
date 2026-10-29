@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import { ClearIndicatorProps } from 'react-select';
 
 import { useLabels } from '../../../../../tedi/providers/label-provider';
@@ -17,7 +18,13 @@ export const SelectClearIndicator = ({
 
   return isClearIndicatorVisible ? (
     <>
-      <ClosingButton tabIndex={0} ref={ref} iconSize={18} {...(restInnerProps as UnknownType)}>
+      <ClosingButton
+        tabIndex={0}
+        ref={ref}
+        iconSize={18}
+        {...(restInnerProps as UnknownType)}
+        className={cn(styles['tedi-select__clear-indicator'], (restInnerProps as UnknownType).className)}
+      >
         {getLabel('clear')}
       </ClosingButton>
       <Separator color="primary" axis="vertical" className={styles['tedi-select__separator']} />

@@ -1,5 +1,14 @@
 import cn from 'classnames';
-import { Children, createContext, isValidElement, type ReactElement, type ReactNode, useMemo } from 'react';
+import {
+  Children,
+  createContext,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -30,6 +39,16 @@ type TableOfContentsBreakpointProps = {
    * @default true
    */
   sticky?: boolean;
+  /**
+   * Keep the active item visible inside a scrollable table of contents. When the `activeId`
+   * changes, the active item's row is scrolled into view within the nearest scroll container
+   * (the sticky card, or a scrollable wrapper you provide) using "nearest" semantics — it only
+   * scrolls when the row is out of view, leaving ~8px of margin. Positions on the row itself,
+   * not its expanded children. Has no effect in non-scrollable layouts and respects
+   * `prefers-reduced-motion`.
+   * @default false
+   */
+  scrollActiveIntoView?: boolean;
 };
 
 export interface TableOfContentsProps extends BreakpointSupport<TableOfContentsBreakpointProps> {
@@ -103,6 +122,13 @@ interface TableOfContentsContextValue {
   ariaLabel?: string;
   activeTrail: Set<string>;
   defaultOpen?: boolean;
+  scrollActiveIntoView?: boolean;
+  /**
+   * True only on renders where `activeId` genuinely changed from its previously committed value
+   * (never on the initial render, including Strict Mode's mount-effect replay). Rows use it to
+   * scroll into view only on a real transition — not when a selected child first mounts on load.
+   */
+  activeIdChanged?: boolean;
 }
 
 export const TableOfContentsContext = createContext<TableOfContentsContextValue>({
@@ -162,6 +188,7 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
     sticky = true,
     variant = 'default',
     bordered = false,
+    scrollActiveIntoView = false,
     className,
   } = getCurrentBreakpointProps<TableOfContentsProps>(props);
 
@@ -169,10 +196,24 @@ export function TableOfContents(props: TableOfContentsProps): JSX.Element {
 
   const nodes = useMemo(() => childrenToNodes(children), [children]);
   const activeTrail = useMemo(() => buildActiveTrail(nodes, activeId), [nodes, activeId]);
+  const prevActiveIdRef = useRef(activeId);
+  const activeIdChanged = prevActiveIdRef.current !== activeId;
+  useEffect(() => {
+    prevActiveIdRef.current = activeId;
+  }, [activeId]);
 
   const contextValue = useMemo<TableOfContentsContextValue>(
-    () => ({ activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen }),
-    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen]
+    () => ({
+      activeId,
+      numbered,
+      headingLevel,
+      ariaLabel,
+      activeTrail,
+      defaultOpen,
+      scrollActiveIntoView,
+      activeIdChanged,
+    }),
+    [activeId, numbered, headingLevel, ariaLabel, activeTrail, defaultOpen, scrollActiveIntoView, activeIdChanged]
   );
 
   const list = (

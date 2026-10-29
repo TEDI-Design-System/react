@@ -118,6 +118,11 @@ export interface DateTimeFieldProps extends BreakpointSupport<DateTimeFieldBreak
    */
   label: string;
   /**
+   * Props forwarded to the field's label (e.g. `{ modifiers: 'nowrap' }` to control
+   * how a long label wraps). Breakpoint keys are supported for responsive wrapping.
+   */
+  labelProps?: TextFieldProps['labelProps'];
+  /**
    * Placeholder shown in the input when no value is selected.
    */
   placeholder?: string;
@@ -309,6 +314,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
   const {
     id,
     label,
+    labelProps,
     placeholder,
     className,
     value,
@@ -733,6 +739,7 @@ export const DateTimeField = React.forwardRef<TextFieldForwardRef, DateTimeField
     ...(inputProps as TextFieldProps),
     id,
     label,
+    labelProps: labelProps ?? (inputProps as TextFieldProps)?.labelProps,
     value: useNative ? formatNativeValue(singleValue) : inputText,
     placeholder,
     readOnly: readOnly || (!useNative && !!availableTimes && !!currentValue),

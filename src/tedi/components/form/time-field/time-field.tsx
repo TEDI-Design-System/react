@@ -80,6 +80,11 @@ export interface TimeFieldProps extends BreakpointSupport<TimeFieldBreakpointPro
    */
   label: string;
   /**
+   * Props forwarded to the field's label (e.g. `{ modifiers: 'nowrap' }` to control
+   * how a long label wraps). Breakpoint keys are supported for responsive wrapping.
+   */
+  labelProps?: TextFieldProps['labelProps'];
+  /**
    * Current value of the time field (controlled).
    */
   value?: string;
@@ -161,6 +166,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
   const {
     id,
     label,
+    labelProps,
     value,
     defaultValue,
     onChange,
@@ -307,6 +313,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
     ...(inputProps as TextFieldProps),
     id,
     label,
+    labelProps: labelProps ?? (inputProps as TextFieldProps)?.labelProps,
     value: currentValue,
     placeholder,
     readOnly: readOnly || (!shouldUseNativePicker && isInputTrigger),

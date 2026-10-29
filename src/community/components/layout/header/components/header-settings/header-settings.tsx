@@ -34,6 +34,9 @@ export interface HeaderSettingsProps {
   closeOnAction?: boolean;
 }
 
+/**
+ * @deprecated Use `HeaderProfile`, `HeaderLogin` or `HeaderLogout` from `@tedi-design-system/react/tedi` instead.
+ */
 export const HeaderSettings: React.FC<HeaderSettingsProps> = (props) => {
   const { children, onActionClick, closeOnAction = true, iconName } = props;
   const [isOpen, setIsOpen] = React.useState(false);

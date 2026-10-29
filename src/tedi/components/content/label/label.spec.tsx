@@ -75,6 +75,31 @@ describe('Label component', () => {
     expect(label).toHaveClass('tedi-label--small');
   });
 
+  it('applies a single text modifier class', () => {
+    const { container } = render(<Label modifiers="nowrap">Label</Label>);
+    const label = container.querySelector('.tedi-label');
+    expect(label).toHaveClass('text-nowrap');
+  });
+
+  it('applies multiple text modifier classes', () => {
+    const { container } = render(<Label modifiers={['break-word', 'uppercase']}>Label</Label>);
+    const label = container.querySelector('.tedi-label');
+    expect(label).toHaveClass('text-break-word');
+    expect(label).toHaveClass('text-uppercase');
+  });
+
+  it('handles breakpoint props correctly for modifiers', () => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn(() => ({
+        modifiers: 'nowrap',
+      })),
+    });
+
+    const { container } = render(<Label>Label</Label>);
+    const label = container.querySelector('.tedi-label');
+    expect(label).toHaveClass('text-nowrap');
+  });
+
   it('renders required symbol when required is true', () => {
     const { container } = render(<Label required>Label</Label>);
     const required = container.querySelector('.tedi-label__required');

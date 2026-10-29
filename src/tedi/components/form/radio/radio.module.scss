@@ -1,5 +1,10 @@
 @use '@tedi-design-system/core/mixins';
 
+$focus-ring: 0 0 0 var(--tedi-borders-01) var(--general-effect-colors-focus-outset-inner-shadow),
+  0 0 0 var(--tedi-borders-03) var(--general-effect-colors-focus-outset-outer-shadow);
+$selected-border-inset: calc(var(--general-border-width-selected) - var(--tedi-borders-01));
+$indicator-border-inset: calc(var(--tedi-borders-02) - var(--tedi-borders-01));
+
 .tedi-radio {
   position: relative;
   color: var(--general-text-primary);
@@ -10,32 +15,53 @@
     cursor: pointer;
   }
 
+  // Label defaults to secondary text; option labels use the component's color
+  .tedi-radio__label {
+    color: inherit;
+  }
+
   &--disabled {
     color: var(--general-text-disabled);
     cursor: not-allowed;
   }
 
   &__input {
-    @include mixins.visually-hidden;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    opacity: 0;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 
   &__indicator {
+    --_indicator-bg: var(--form-choice-radio-unselected-background-default);
+    --_indicator-border: var(--form-choice-radio-unselected-border-default);
+    --_indicator-dot: transparent;
+    --_indicator-inset: 0 0 0 0 transparent;
+    --_indicator-ring: 0 0 0 0 transparent;
+
     position: relative;
     display: block;
     margin-right: var(--form-checkbox-radio-inner-spacing);
-    background-color: var(--form-checkbox-radio-default-background-default);
-    border: 1px solid var(--form-checkbox-radio-default-border-default);
+    background-color: var(--_indicator-bg);
+    border: var(--tedi-borders-01) solid var(--_indicator-border);
     border-radius: var(--form-checkbox-radio-indicator-radius-radio);
-    transition: border-color 150ms ease;
+    box-shadow: var(--_indicator-inset), var(--_indicator-ring);
+    transition: border-color 150ms ease, background-color 150ms ease;
 
     &::after {
       position: absolute;
       top: 50%;
       left: 50%;
       content: '';
-      background: var(--tedi-alpha-01);
-      border: 1px solid var(--tedi-alpha-01);
-      border-radius: 50%;
+      background: var(--_indicator-dot);
+      border: var(--tedi-borders-01) solid var(--_indicator-dot);
       border-radius: var(--form-checkbox-radio-indicator-radius-radio);
       transform: translate(-50%, -50%);
       transition: background-color 150ms ease, border-color 150ms ease;
@@ -61,46 +87,92 @@
       }
     }
 
-    &--invalid {
-      border-color: var(--form-general-feedback-error-border);
-    }
-
     .tedi-radio__input:not(:disabled) + &--hover,
     .tedi-radio__input:hover:not(:disabled) + &,
     .tedi-radio__input:not(:disabled) + &:hover {
       cursor: pointer;
     }
 
+    // Unselected
     .tedi-radio__input:not(:disabled, :checked) + &--hover,
     .tedi-radio__input:hover:not(:disabled, :checked) + &,
-    .tedi-radio__input:not(:disabled, :checked) + &:hover,
-    .tedi-radio__input:focus:not(:disabled) + & {
-      outline: 1px solid var(--form-checkbox-radio-default-border-hover);
-      border: 1px solid var(--form-checkbox-radio-default-border-hover);
+    .tedi-radio__input:not(:disabled, :checked) + &:hover {
+      --_indicator-border: var(--form-choice-radio-unselected-border-hover);
+      --_indicator-inset: inset 0 0 0 #{$indicator-border-inset} var(--_indicator-border);
     }
 
-    [type='radio']:checked + &::after {
-      background: var(--form-checkbox-radio-default-background-selected);
-      border-color: var(--form-checkbox-radio-default-background-selected);
+    .tedi-radio__input:active:not(:disabled, :checked) + &,
+    .tedi-radio__input:not(:disabled, :checked) + &:active {
+      --_indicator-border: var(--form-choice-radio-unselected-border-active);
+      --_indicator-inset: inset 0 0 0 #{$indicator-border-inset} var(--_indicator-border);
     }
 
-    .tedi-radio__input:disabled + & {
-      background-color: var(--form-input-background-disabled);
-      border-color: var(--form-input-border-disabled);
+    .tedi-radio__input:focus-visible:not(:disabled) + & {
+      --_indicator-ring: #{$focus-ring};
+    }
+
+    .tedi-radio__input:focus-visible:not(:disabled, :checked) + & {
+      --_indicator-border: var(--form-choice-radio-unselected-border-focus);
+    }
+
+    // Selected
+    [type='radio']:checked + & {
+      --_indicator-bg: var(--form-choice-radio-selected-background-default);
+      --_indicator-border: var(--form-choice-radio-selected-border-default);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-default);
+    }
+
+    .tedi-radio__input:checked:not(:disabled) + &--hover,
+    .tedi-radio__input:hover:checked:not(:disabled) + &,
+    .tedi-radio__input:checked:not(:disabled) + &:hover {
+      --_indicator-border: var(--form-choice-radio-selected-border-hover);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-hover);
+    }
+
+    .tedi-radio__input:active:checked:not(:disabled) + &,
+    .tedi-radio__input:checked:not(:disabled) + &:active {
+      --_indicator-border: var(--form-choice-radio-selected-border-active);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-active);
+    }
+
+    .tedi-radio__input:focus-visible:checked:not(:disabled) + & {
+      --_indicator-border: var(--form-choice-radio-selected-border-focus);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-focus);
+    }
+
+    // Error (selected state keeps its regular colors)
+    .tedi-radio__input:not(:checked) + &--invalid {
+      --_indicator-border: var(--form-choice-radio-unselected-border-error);
+    }
+
+    .tedi-radio__input:hover:not(:disabled, :checked) + &--invalid,
+    .tedi-radio__input:not(:disabled, :checked) + &--invalid#{&}--hover,
+    .tedi-radio__input:not(:disabled, :checked) + &--invalid:hover,
+    .tedi-radio__input:active:not(:disabled, :checked) + &--invalid,
+    .tedi-radio__input:not(:disabled, :checked) + &--invalid:active {
+      --_indicator-border: var(--form-choice-radio-unselected-border-error);
+      --_indicator-inset: inset 0 0 0 #{$indicator-border-inset} var(--_indicator-border);
+    }
+
+    .tedi-radio__input:focus-visible:not(:disabled, :checked) + &--invalid {
+      --_indicator-border: var(--form-choice-radio-unselected-border-error);
+    }
+
+    // Disabled
+    .tedi-radio__input:disabled:not(:checked) + & {
+      --_indicator-bg: var(--form-choice-radio-unselected-background-disabled);
+      --_indicator-border: var(--form-choice-radio-unselected-border-disabled);
     }
 
     .tedi-radio__input:disabled:checked + & {
-      background-color: var(--form-checkbox-radio-default-background-default);
-      border-color: var(--form-checkbox-radio-default-border-selected-disabled);
-
-      &::after {
-        background-color: var(--form-checkbox-radio-default-background-selected-disabled);
-        border-color: var(--form-checkbox-radio-default-background-selected-disabled);
-      }
+      --_indicator-bg: var(--form-choice-radio-selected-background-default);
+      --_indicator-border: var(--form-choice-radio-selected-border-disabled);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-disabled);
     }
   }
 
   &__outer-indicator-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
     height: var(--form-checkbox-radio-indicator-container-height);
@@ -109,5 +181,336 @@
   &__helper {
     padding-left: var(--form-checkbox-radio-size-responsive);
     margin-left: var(--form-checkbox-radio-inner-spacing);
+  }
+}
+
+.tedi-radio--card {
+  --_card-bg: transparent;
+  --_card-text: inherit;
+  --_card-border: transparent;
+  --_card-inset: 0 0 0 0 transparent;
+  --_card-ring: 0 0 0 0 transparent;
+  --form-checkbox-radio-size-responsive: var(--form-checkbox-radio-size-fixed);
+
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: var(--form-field-height);
+  padding: calc(var(--form-checkbox-radio-card-radio-padding-y) - var(--tedi-borders-01))
+    calc(var(--form-checkbox-radio-card-radio-padding-x) - var(--tedi-borders-01));
+  color: var(--_card-text);
+  cursor: pointer;
+  background-color: var(--_card-bg);
+  border: var(--tedi-borders-01) solid var(--_card-border);
+  border-radius: var(--form-checkbox-radio-card-radius);
+  box-shadow: var(--_card-inset), var(--_card-ring);
+
+  &::before,
+  &::after {
+    flex: 1 1 0;
+    max-height: calc(
+      (var(--form-field-height) - var(--body-regular-line-height)) / 2 - var(--form-checkbox-radio-card-radio-padding-y)
+    );
+    content: '';
+  }
+
+  .tedi-radio__input {
+    @include mixins.visually-hidden;
+  }
+
+  .tedi-radio__card-control {
+    display: flex;
+    gap: var(--form-checkbox-radio-card-inner-spacing);
+    align-items: center;
+    min-width: 0;
+  }
+
+  .tedi-radio__card-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tedi-radio__indicator {
+    flex-shrink: 0;
+    margin-right: 0;
+  }
+
+  .tedi-radio__card-icon {
+    flex-shrink: 0;
+    color: inherit;
+  }
+
+  .tedi-radio__card-description {
+    padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing));
+    font-size: var(--body-small-regular-size);
+    line-height: var(--body-small-regular-line-height);
+    color: inherit;
+    overflow-wrap: anywhere;
+  }
+
+  &.tedi-radio--card-with-icon .tedi-radio__card-description {
+    padding-left: calc(
+      (var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing)) * 2
+    );
+  }
+
+  .tedi-radio__helper {
+    padding-left: calc(var(--form-checkbox-radio-size-responsive) + var(--form-checkbox-radio-card-inner-spacing));
+    margin-left: 0;
+    color: inherit;
+  }
+
+  &.tedi-radio--disabled {
+    cursor: not-allowed;
+  }
+
+  // The focus ring goes on the card, not on the indicator
+  &:has(.tedi-radio__input:focus-visible) {
+    --_card-ring: #{$focus-ring};
+  }
+
+  .tedi-radio__input:focus-visible + .tedi-radio__indicator {
+    --_indicator-ring: 0 0 0 0 transparent;
+  }
+}
+
+.tedi-radio--card-primary {
+  --_card-bg: var(--form-choice-card-primary-unselected-background-default);
+  --_card-text: var(--form-choice-card-primary-unselected-text-default);
+  --_card-border: var(--form-choice-card-primary-unselected-border-borderless);
+
+  &:has(.tedi-radio__input:hover:not(:disabled, :checked)) {
+    --_card-bg: var(--form-choice-card-primary-unselected-background-hover);
+    --_card-text: var(--form-choice-card-primary-unselected-text-hover);
+    --_card-border: var(--form-choice-card-primary-unselected-border-hover);
+  }
+
+  &:has(.tedi-radio__input:active:not(:disabled, :checked)) {
+    --_card-bg: var(--form-choice-card-primary-unselected-background-active);
+    --_card-text: var(--form-choice-card-primary-unselected-text-active);
+    --_card-border: var(--form-choice-card-primary-unselected-border-active);
+  }
+
+  &:has(.tedi-radio__input:focus-visible:not(:hover, :active, :disabled, :checked)) {
+    --_card-bg: var(--form-choice-card-primary-unselected-background-focus);
+    --_card-text: var(--form-choice-card-primary-unselected-text-focus);
+  }
+
+  &:has(.tedi-radio__input:checked) {
+    --_card-bg: var(--form-choice-card-primary-selected-background-default);
+    --_card-text: var(--form-choice-card-primary-selected-text-default);
+    --_card-border: var(--_card-bg);
+
+    .tedi-radio__input + .tedi-radio__indicator {
+      --_indicator-bg: var(--form-choice-inverted-indicator-default);
+      --_indicator-border: var(--form-choice-radio-selected-border-inverted);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-inverted);
+    }
+  }
+
+  &:has(.tedi-radio__input:checked:hover:not(:disabled)) {
+    --_card-bg: var(--form-choice-card-primary-selected-background-hover);
+    --_card-text: var(--form-choice-card-primary-selected-text-hover);
+
+    .tedi-radio__input + .tedi-radio__indicator {
+      --_indicator-bg: var(--form-choice-inverted-indicator-hover);
+    }
+  }
+
+  &:has(.tedi-radio__input:checked:active:not(:disabled)) {
+    --_card-bg: var(--form-choice-card-primary-selected-background-active);
+    --_card-text: var(--form-choice-card-primary-selected-text-active);
+
+    .tedi-radio__input + .tedi-radio__indicator {
+      --_indicator-bg: var(--form-choice-inverted-indicator-active);
+    }
+  }
+
+  &:has(.tedi-radio__input:checked:focus-visible:not(:hover, :active, :disabled)) {
+    --_card-bg: var(--form-choice-card-primary-selected-background-focus);
+    --_card-text: var(--form-choice-card-primary-selected-text-focus);
+
+    .tedi-radio__input + .tedi-radio__indicator {
+      --_indicator-bg: var(--form-choice-inverted-indicator-focus);
+    }
+  }
+
+  &:has(.tedi-radio__input:disabled:not(:checked)) {
+    --_card-bg: var(--form-choice-card-primary-unselected-background-disabled);
+    --_card-text: var(--form-choice-card-primary-unselected-text-disabled);
+    --_card-border: var(--form-choice-card-primary-unselected-border-disabled);
+  }
+
+  &:has(.tedi-radio__input:disabled:checked) {
+    --_card-bg: var(--form-choice-card-primary-selected-background-disabled);
+    --_card-text: var(--form-choice-card-primary-selected-text-disabled);
+    --_card-border: var(--_card-bg);
+
+    .tedi-radio__input + .tedi-radio__indicator {
+      --_indicator-bg: var(--form-choice-inverted-indicator-disabled);
+      --_indicator-border: var(--form-choice-radio-selected-border-inverted);
+      --_indicator-dot: var(--form-choice-radio-selected-indicator-inverted);
+    }
+  }
+}
+
+.tedi-radio--card-primary.tedi-radio--card-bordered {
+  --_card-border: var(--form-choice-card-primary-unselected-border-default);
+
+  &:has(.tedi-radio__input:hover:not(:disabled, :checked)) {
+    --_card-border: var(--form-choice-card-primary-unselected-border-hover);
+  }
+
+  &:has(.tedi-radio__input:active:not(:disabled, :checked)) {
+    --_card-border: var(--form-choice-card-primary-unselected-border-active);
+  }
+
+  &:has(.tedi-radio__input:checked) {
+    --_card-border: var(--_card-bg);
+  }
+
+  &:has(.tedi-radio__input:disabled:not(:checked)) {
+    --_card-border: var(--form-choice-card-primary-unselected-border-disabled);
+  }
+}
+
+[data-layout='segmented'] {
+  .tedi-radio--card {
+    border-radius: 0;
+  }
+
+  .tedi-radio--card-primary {
+    --_card-border: var(--form-choice-card-primary-unselected-border-default);
+
+    &:has(.tedi-radio__input:hover:not(:disabled, :checked)) {
+      --_card-border: var(--form-choice-card-primary-unselected-border-group-hover);
+    }
+
+    &:has(.tedi-radio__input:active:not(:disabled, :checked)) {
+      --_card-border: var(--form-choice-card-primary-unselected-border-group-active);
+    }
+
+    &:has(.tedi-radio__input:checked) {
+      --_card-border: var(--form-choice-card-primary-selected-border-default);
+    }
+
+    &:has(.tedi-radio__input:checked:hover:not(:disabled)) {
+      --_card-border: var(--form-choice-card-primary-selected-border-group-hover);
+    }
+
+    &:has(.tedi-radio__input:checked:active:not(:disabled)) {
+      --_card-border: var(--form-choice-card-primary-selected-border-group-active);
+    }
+
+    &:has(.tedi-radio__input:disabled:not(:checked)) {
+      --_card-border: var(--form-choice-card-primary-unselected-border-disabled);
+    }
+
+    &:has(.tedi-radio__input:disabled:checked) {
+      --_card-border: var(--form-choice-card-primary-selected-border-group-disabled);
+    }
+  }
+
+  .tedi-radio--card:has(.tedi-radio__input:checked),
+  .tedi-radio--card:has(.tedi-radio__input:hover:not(:disabled)),
+  .tedi-radio--card:has(.tedi-radio__input:focus-visible) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+[data-layout='segmented'][data-direction='row'] {
+  .tedi-radio--card:not(:first-child) {
+    margin-left: calc(var(--tedi-borders-01) * -1);
+  }
+
+  .tedi-radio--card:first-child {
+    border-top-left-radius: var(--form-checkbox-radio-card-radius);
+    border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
+  }
+
+  .tedi-radio--card:last-child {
+    border-top-right-radius: var(--form-checkbox-radio-card-radius);
+    border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
+  }
+}
+
+[data-layout='segmented'][data-direction='column'] {
+  .tedi-radio--card:not(:first-child) {
+    margin-top: calc(var(--tedi-borders-01) * -1);
+  }
+
+  .tedi-radio--card:first-child {
+    border-top-left-radius: var(--form-checkbox-radio-card-radius);
+    border-top-right-radius: var(--form-checkbox-radio-card-radius);
+  }
+
+  .tedi-radio--card:last-child {
+    border-bottom-right-radius: var(--form-checkbox-radio-card-radius);
+    border-bottom-left-radius: var(--form-checkbox-radio-card-radius);
+  }
+}
+
+.tedi-radio--card-secondary {
+  --_card-bg: var(--form-choice-card-secondary-unselected-background-default);
+  --_card-text: var(--form-choice-card-secondary-unselected-text-default);
+  --_card-border: var(--form-choice-card-secondary-unselected-border-default);
+
+  &:has(.tedi-radio__input:hover:not(:disabled, :checked)) {
+    --_card-bg: var(--form-choice-card-secondary-unselected-background-hover);
+    --_card-text: var(--form-choice-card-secondary-unselected-text-hover);
+    --_card-border: var(--form-choice-card-secondary-unselected-border-hover);
+  }
+
+  &:has(.tedi-radio__input:active:not(:disabled, :checked)) {
+    --_card-bg: var(--form-choice-card-secondary-unselected-background-active);
+    --_card-text: var(--form-choice-card-secondary-unselected-text-active);
+    --_card-border: var(--form-choice-card-secondary-unselected-border-active);
+  }
+
+  &:has(.tedi-radio__input:focus-visible:not(:hover, :active, :disabled, :checked)) {
+    --_card-bg: var(--form-choice-card-secondary-unselected-background-focus);
+    --_card-text: var(--form-choice-card-secondary-unselected-text-focus);
+    --_card-border: var(--form-choice-card-secondary-unselected-border-focus);
+  }
+
+  &:has(.tedi-radio__input:checked) {
+    --_card-bg: var(--form-choice-card-secondary-selected-background-default);
+    --_card-text: var(--form-choice-card-secondary-selected-text-default);
+    --_card-border: var(--form-choice-card-secondary-selected-border-default);
+    --_card-inset: inset 0 0 0 #{$selected-border-inset} var(--_card-border);
+  }
+
+  &:has(.tedi-radio__input:checked:hover:not(:disabled)) {
+    --_card-bg: var(--form-choice-card-secondary-selected-background-hover);
+    --_card-text: var(--form-choice-card-secondary-selected-text-hover);
+    --_card-border: var(--form-choice-card-secondary-selected-border-hover);
+  }
+
+  &:has(.tedi-radio__input:checked:active:not(:disabled)) {
+    --_card-bg: var(--form-choice-card-secondary-selected-background-active);
+    --_card-text: var(--form-choice-card-secondary-selected-text-active);
+    --_card-border: var(--form-choice-card-secondary-selected-border-active);
+  }
+
+  &:has(.tedi-radio__input:checked:focus-visible:not(:hover, :active, :disabled)) {
+    --_card-bg: var(--form-choice-card-secondary-selected-background-focus);
+    --_card-text: var(--form-choice-card-secondary-selected-text-focus);
+    --_card-border: var(--form-choice-card-secondary-selected-border-focus);
+  }
+
+  &:has(.tedi-radio__input:disabled:not(:checked)) {
+    --_card-bg: var(--form-choice-card-secondary-unselected-background-disabled);
+    --_card-text: var(--form-choice-card-secondary-unselected-text-disabled);
+    --_card-border: var(--form-choice-card-secondary-unselected-border-disabled);
+  }
+
+  &:has(.tedi-radio__input:disabled:checked) {
+    --_card-bg: var(--form-choice-card-secondary-selected-background-disabled);
+    --_card-text: var(--form-choice-card-secondary-selected-text-disabled);
+    --_card-border: var(--form-choice-card-secondary-selected-border-disabled);
+    --_card-inset: inset 0 0 0 #{$selected-border-inset} var(--_card-border);
   }
 }

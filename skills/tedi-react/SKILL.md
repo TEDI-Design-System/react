@@ -132,6 +132,13 @@ function App() {
 import '@tedi-design-system/react/index.css';
 ```
 
+`index.css` declares all three Material Symbols fonts. When the app uses one `Icon` `type` (recommended), load only that font instead:
+
+```tsx
+import '@tedi-design-system/react/index-without-icons.css';
+import '@tedi-design-system/react/icons/outlined.css'; // or rounded.css / sharp.css
+```
+
 Or in SCSS:
 ```scss
 @use '@tedi-design-system/core/scss' as tedi;
@@ -209,7 +216,7 @@ import { Card, Dropdown, Tooltip } from '@tedi-design-system/react/tedi';
 TEDI form controls support both **controlled** and **uncontrolled** modes:
 
 ```tsx
-import { TextField, Select, Checkbox, ChoiceGroup } from '@tedi-design-system/react/tedi';
+import { TextField, Select, Checkbox, Radio } from '@tedi-design-system/react/tedi';
 
 // Controlled
 const [email, setEmail] = useState('');
@@ -234,9 +241,15 @@ const [email, setEmail] = useState('');
 
 // Checkbox
 <Checkbox id="agree" label="I agree" value="agree" onChange={(val, checked) => setAgreed(checked)} />
+
+// Grouped inputs — compound Radio.Group / Checkbox.Group (supports variant="card")
+<Radio.Group label="Size" value={size} onChange={setSize}>
+  <Radio value="sm" label="Small" />
+  <Radio value="lg" label="Large" />
+</Radio.Group>
 ```
 
-Form controls: `TextField`, `Select`, `Textarea`, `NumberField`, `Checkbox`, `Radio`, `ChoiceGroup`, `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`. Verify the roster and per-control usage against [references/forms.md](references/forms.md) and the installed package (see Authoritative Sources).
+Form controls: `TextField`, `Select`, `Textarea`, `NumberField`, `Checkbox` (+ `Checkbox.Group`), `Radio` (+ `Radio.Group`), `Search`, `DateField`, `TimeField`, `Filter` (+ `FilterGroup`), `FileUpload`, `FileDropzone`. `ChoiceGroup` is **deprecated** — use `Radio.Group` / `Checkbox.Group`. Verify the roster and per-control usage against [references/forms.md](references/forms.md) and the installed package (see Authoritative Sources).
 
 ## Theming
 
@@ -272,7 +285,7 @@ sendNotification({ type: 'success', title: 'Done', children: 'Task completed' })
 
 A handful of mistakes account for most TEDI integration issues. Avoid them up front:
 
-- **Import from `/tedi` or `/community`, never the package root.** `@tedi-design-system/react` is not a valid import path — the package has explicit entry points (`@tedi-design-system/react/tedi`, `@tedi-design-system/react/community`, `@tedi-design-system/react/index.css`). Importing from the root will fail or silently miss types.
+- **Import from `/tedi` or `/community`, never the package root.** `@tedi-design-system/react` is not a valid import path — the package has explicit entry points (`@tedi-design-system/react/tedi`, `@tedi-design-system/react/community`, `@tedi-design-system/react/index.css`, `@tedi-design-system/react/index-without-icons.css`, `@tedi-design-system/react/icons/*.css`). Importing from the root will fail or silently miss types.
 - **Prefer TEDI-Ready over Community whenever possible.** Several Community components are deprecated in favor of TEDI-Ready equivalents, and the set with no TEDI-Ready alternative yet shifts over time — check the manifest's `status` field and the component JSDoc for the current deprecation status before reaching into Community. See [references/components.md](references/components.md).
 - **Always pass `id` to form controls.** `TextField`, `Select`, `Checkbox`, `Radio`, etc. require it — it's how the label/helper/aria wiring works. There is no auto-generated fallback.
 - **Use design tokens, not hardcoded colors.** Prefer the semantic roles (`var(--general-surface-primary)`, `var(--general-text-secondary)`) and drop to a `--tedi-*` primitive only when no semantic token fits. This is what makes theme switching and brand overrides work. Look names up in `node_modules/@tedi-design-system/core/tokens.json` rather than recalling them — see [references/theming.md](references/theming.md).

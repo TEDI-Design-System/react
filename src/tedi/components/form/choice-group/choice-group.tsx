@@ -42,8 +42,19 @@ interface ChoiceGroupAllProps extends Omit<FormLabelProps, 'id' | 'label'> {
   >;
 }
 
+/**
+ * @deprecated Use the compound `Radio.Group` / `Checkbox.Group` (with composable
+ * `Radio` / `Checkbox` children, including `variant="card"`) instead. `ChoiceGroup`
+ * remains for backwards compatibility and will be removed in a future major version.
+ */
 export interface ChoiceGroupProps extends BreakpointSupport<ChoiceGroupAllProps> {}
 
+/**
+ * @deprecated Use the compound `Radio.Group` / `Checkbox.Group` instead — e.g.
+ * `<Radio.Group label="…"><Radio value="a" label="A" /></Radio.Group>`, with
+ * `variant="card"` for the card layout. `ChoiceGroup` stays for backwards
+ * compatibility and will be removed in a future major version.
+ */
 export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
   const { getLabel } = useLabels();
   const currentBreakpoint = useBreakpoint(props.defaultServerBreakpoint);
@@ -64,6 +75,7 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
     defaultValue,
     onChange,
     hideLabel,
+    labelProps,
     indeterminateCheck,
     indeterminateCheckProps = {},
     color,
@@ -171,10 +183,15 @@ export const ChoiceGroup = (props: ChoiceGroupProps): React.ReactElement => {
         name={name}
         aria-describedby={helper && inputType !== 'radio' ? helperId : undefined}
       >
-        {label && typeof label === 'string' ? (
-          <FormLabel id={id} label={label} required={required} hideLabel={hideLabel} renderWithoutLabel={true} />
-        ) : (
-          <label htmlFor={id}>{label}</label>
+        {label && (
+          <FormLabel
+            id={id}
+            label={label}
+            required={required}
+            hideLabel={hideLabel}
+            renderWithoutLabel={true}
+            labelProps={labelProps}
+          />
         )}
         <Row>
           <Col>

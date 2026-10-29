@@ -360,8 +360,9 @@ const layoutIds = layoutFlat.map((node) => node.id);
 /**
  * Both panes are fixed-height scroll regions of the same height (`24rem`): the content on the left and
  * the sidebar list on the right. Add as many `TableOfContents.Item`s as you like — the sidebar scrolls
- * inside its own scrollbar instead of stretching past its frame. Below `lg` the list collapses into
- * `TableOfContents.Collapsible`.
+ * inside its own scrollbar instead of stretching past its frame. `scrollActiveIntoView` keeps the
+ * active item visible as you read: when the active section changes, its row is scrolled into view
+ * within the sidebar's scrollbar. Below `lg` the list collapses into `TableOfContents.Collapsible`.
  */
 export const StickyInLayout: Story = {
   parameters: { fullWidth: true },
@@ -471,9 +472,8 @@ export const StickyInLayout: Story = {
           </Col>
           <ShowAt lg>
             <Col md={4}>
-              {/* Same fixed height as the content pane, so the long list scrolls in its own scrollbar. */}
               <div style={{ maxHeight: '24rem', overflowY: 'auto' }}>
-                <TableOfContents heading="Sisukord" sticky={false} numbered activeId={activeId}>
+                <TableOfContents heading="Sisukord" sticky={false} numbered activeId={activeId} scrollActiveIntoView>
                   {items}
                 </TableOfContents>
               </div>

@@ -128,13 +128,17 @@ describe('Breadcrumbs', () => {
       </Breadcrumbs>
     );
     const trigger = screen.getByRole('button', { name: 'breadcrumbs.show-more' });
+    expect(trigger).not.toHaveAttribute('aria-haspopup', 'menu');
     fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
 
-    const itemB = screen.getByRole('menuitem', { name: 'B' });
+    const itemB = screen.getByRole('link', { name: 'B' });
     expect(itemB.tagName).toBe('A');
     expect(itemB).toHaveAttribute('href', '/b');
-    expect(screen.getByRole('menuitem', { name: 'C' })).toHaveAttribute('href', '/c');
-    expect(screen.getByRole('menuitem', { name: 'D' })).toHaveAttribute('href', '/d');
+    expect(itemB).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('link', { name: 'C' })).toHaveAttribute('href', '/c');
+    expect(screen.getByRole('link', { name: 'D' })).toHaveAttribute('href', '/d');
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
   it('skips collapse when maxItems is not exceeded', () => {

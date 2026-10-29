@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
 import { CollapseButton } from '../../../../buttons/collapse-button/collapse-button';
-import { Sheet } from '../../../../overlays/sheet/sheet';
+import { SheetModal } from '../../../../overlays/sheet/components/sheet-modal/sheet-modal';
 import {
   buildActiveTrail,
   childrenToNodes,
@@ -97,7 +97,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
   }, [open, listElement]);
 
   const resolvedHeading = heading === undefined ? getLabel('table-of-contents.title') : heading;
-  const title = resolvedHeading ?? getLabel('table-of-contents.title');
+  const title = resolvedHeading || getLabel('table-of-contents.title');
   const navLabel = ariaLabel || title;
 
   const nodes = useMemo(() => childrenToNodes(children), [children]);
@@ -125,7 +125,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         <CollapseButton open={open} onOpenChange={setOpen} underline={false} aria-haspopup="dialog" />
       </div>
 
-      <Sheet
+      <SheetModal
         open={open}
         onToggle={setOpen}
         ariaLabel={title}
@@ -147,7 +147,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         >
           <TableOfContentsList nodes={nodes} heading={null} />
         </div>
-      </Sheet>
+      </SheetModal>
     </TableOfContentsContext.Provider>
   );
 };

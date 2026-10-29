@@ -35,6 +35,12 @@ $input-padding-right-map: (
       outline: none;
       border-color: $border-color;
       box-shadow: inset 0 0 0 1px $border-color;
+
+      &.tedi-textfield__input--textarea {
+        outline: 2px solid $border-color;
+        outline-offset: -2px;
+        box-shadow: none;
+      }
     }
   } @else {
     &:focus,
@@ -145,6 +151,23 @@ $input-padding-right-map: (
   }
 }
 
+// A textarea's floor is one line of text, not the single-line field height, which is
+// shorter once the textarea's border is added and would scroll an empty field.
+.tedi-textfield--textarea .tedi-textfield__input {
+  min-height: calc(1lh + 2 * var(--form-field-padding-y-md-default) + 2 * var(--tedi-borders-01));
+}
+
+.tedi-textfield--textarea.tedi-textfield--small .tedi-textfield__input {
+  min-height: calc(1lh + 2 * var(--form-field-padding-y-sm) + 2 * var(--tedi-borders-01));
+}
+
+// Wrapped lines run under the clear button, so keep them one inner gap clear of it.
+.tedi-textfield--textarea.tedi-textfield--clearable .tedi-textfield__input {
+  padding-right: calc(
+    var(--form-field-padding-x-md-default) + var(--form-field-inner-spacing) + var(--form-field-button-height-sm)
+  );
+}
+
 .tedi-textfield__right-area {
   position: absolute;
   top: 0;
@@ -162,6 +185,20 @@ $input-padding-right-map: (
   .tedi-textfield--large & {
     padding: var(--form-field-padding-y-lg) var(--form-field-padding-x-lg);
   }
+
+  // Sit on the first row of a textarea and leave its resize grip uncovered.
+  .tedi-textfield--textarea & {
+    height: auto;
+  }
+}
+
+.tedi-textfield--clear-on-interaction .tedi-textfield__clear-button {
+  visibility: hidden;
+}
+
+.tedi-textfield--clear-on-interaction .tedi-textfield__inner:hover .tedi-textfield__clear-button,
+.tedi-textfield--clear-on-interaction .tedi-textfield__inner:focus-within .tedi-textfield__clear-button {
+  visibility: visible;
 }
 
 .tedi-textfield__icon-wrapper {

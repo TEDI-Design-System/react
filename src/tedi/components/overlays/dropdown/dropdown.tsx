@@ -107,6 +107,14 @@ export interface DropdownProps extends BreakpointSupport<DropdownBreakpointProps
    * the user has to press an arrow key to start navigating.
    */
   defaultActiveIndex?: number;
+  /**
+   * Navigation mode — use when the dropdown lists **links** (e.g. collapsed breadcrumbs) rather than
+   * menu commands. Drops the `menu` / `menuitem` roles, `aria-haspopup="menu"` and roving tabindex, so
+   * screen readers announce the items as links and each is a normal Tab stop. Keep it `false` (default)
+   * for action menus.
+   * @default false
+   */
+  navigation?: boolean;
   /*
    * Additional class name(s) to apply to the dropdown container
    * @default undefined
@@ -128,10 +136,12 @@ export const Dropdown = (props: DropdownProps) => {
     defaultActiveIndex,
     placement = 'bottom-start',
     maxHeight,
+    navigation = false,
     className,
   } = getCurrentBreakpointProps<DropdownProps>(props);
   const { getLabel } = useLabels();
   const nodeId = useFloatingNodeId();
+  const contentId = React.useId();
 
   const listItemsRef = React.useRef<Array<HTMLButtonElement | null>>([]);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(defaultActiveIndex ?? null);
@@ -167,7 +177,9 @@ export const Dropdown = (props: DropdownProps) => {
 
   const interactions = useInteractions([
     useClick(context),
-    useRole(context, { role: 'menu' }),
+    // In navigation mode the popup is a list of links, not a menu — disable the menu role and the
+    // roving-tabindex list navigation so items stay plain, tabbable links.
+    useRole(context, { role: 'menu', enabled: !navigation }),
     useDismiss(context),
     useListNavigation(context, {
       listRef: listItemsRef,
@@ -176,6 +188,7 @@ export const Dropdown = (props: DropdownProps) => {
       loop: true,
       selectedIndex: defaultActiveIndex ?? null,
       focusItemOnOpen: defaultActiveIndex !== null ? true : 'auto',
+      enabled: !navigation,
     }),
   ]);
 
@@ -191,6 +204,8 @@ export const Dropdown = (props: DropdownProps) => {
     setContent,
     divided,
     variant,
+    navigation,
+    contentId,
     ...interactions,
   };
 
@@ -230,9 +245,13 @@ export const Dropdown = (props: DropdownProps) => {
                   top: y ?? 0,
                   width: resolveDropdownWidth(width, triggerWidth, containerWidth),
                 },
-                role: 'menu',
-                'aria-orientation': 'vertical',
-                'aria-activedescendant': activeIndex !== null ? `dropdown-item-${activeIndex}` : undefined,
+                ...(navigation
+                  ? { id: contentId }
+                  : {
+                      role: 'menu',
+                      'aria-orientation': 'vertical',
+                      'aria-activedescendant': activeIndex !== null ? `dropdown-item-${activeIndex}` : undefined,
+                    }),
               })}
               data-placement={placement}
               data-state={open ? 'open' : 'closed'}

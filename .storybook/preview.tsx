@@ -1,15 +1,19 @@
 import { Controls, Description, Primary, Stories, Subtitle, Title } from '@storybook/addon-docs/blocks';
 import { Preview, StoryContext } from '@storybook/react-vite';
 
+import { freezeDateInChromatic } from './fixed-date';
 import StorybookDecorator from './storybook-decorator';
 
 import '../src/tedi/styles/index.scss';
 import '../src/community/styles/index.scss';
+import '../node_modules/@tedi-design-system/core/icons/_all.scss';
 import '../node_modules/@tedi-design-system/core/tedi-storybook-styles.scss';
 
 import { PrintingProvider } from '../src/tedi/providers/printing-provider';
 import { ThemeProvider } from '../src/tedi/providers/theme-provider/theme-provider';
 import { useEffect } from 'react';
+
+freezeDateInChromatic();
 
 export const globalTypes = {
   theme: {
@@ -19,8 +23,8 @@ export const globalTypes = {
     toolbar: {
       icon: 'paintbrush',
       items: [
-        { value: 'default', title: 'Default' },
-        { value: 'dark', title: 'Dark' },
+        { value: 'default', title: 'Light mode (default)' },
+        { value: 'dark', title: 'Dark mode' },
       ],
       showName: true,
     },
@@ -63,12 +67,18 @@ const preview: Preview = {
     viewMode: 'docs',
     a11y: {
       test: 'error',
+      // axe leaves target-size (WCAG 2.2, 2.5.8) off by default. Set via options.rules, not
+      // config.rules, so stories that override config.rules don't drop it. To turn it off in a
+      // story, use options.rules too: config.rules can't override it.
+      options: {
+        rules: { 'target-size': { enabled: true } },
+      },
     },
     backgrounds: {
       options: {
-        default: { name: 'default', value: 'var(--general-surface-primary)' },
-        inverted: { name: 'inverted', value: 'var(--general-surface-inverted-primary)' },
-        brand: { name: 'brand', value: 'var(--general-surface-brand-primary)' },
+        default: { name: 'Default', value: 'var(--general-surface-primary)' },
+        inverted: { name: 'Inverted', value: 'var(--general-surface-inverted-primary)' },
+        brand: { name: 'Brand', value: 'var(--general-surface-brand-primary)' },
       },
     },
     docs: {

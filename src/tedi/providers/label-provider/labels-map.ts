@@ -474,6 +474,14 @@ export const labelsMap = validateDefaultLabels({
     ru: (count: string) => `${count} файл(ы) успешно добавлены`,
   },
 
+  'file-upload.duplicates-skipped': {
+    description: 'Announced when files already in the list are skipped on a repeat selection',
+    components: ['FileUpload', 'FileDropzone'],
+    et: (files: string) => `Fail(id) ${files} on juba lisatud`,
+    en: (files: string) => `File(s) ${files} have already been added`,
+    ru: (files: string) => `Файл(ы) ${files} уже добавлены`,
+  },
+
   'file-upload.failed-some': {
     description: 'Error label for rejected files (wrong extension)',
     components: ['FileUpload'],
@@ -501,7 +509,7 @@ export const labelsMap = validateDefaultLabels({
   'file-dropzone.label': {
     description: 'Default label for dropzone',
     components: ['FileDropzone'],
-    et: 'Lohista failid siia või klõpsa, et sirvida',
+    et: 'Lohista failid siia või klõpsa failide valimiseks',
     en: 'Drop files here, or click to browse',
     ru: 'Перетащите файлы сюда или нажмите, чтобы выбрать',
   },
@@ -554,6 +562,27 @@ export const labelsMap = validateDefaultLabels({
     et: 'Sulge modaal',
     en: 'Close modal',
     ru: 'Закрыть модальное окно',
+  },
+  'sheet.close': {
+    description: 'Label for the Sheet close button',
+    components: ['Sheet'],
+    et: 'Sulge',
+    en: 'Close',
+    ru: 'Закрыть',
+  },
+  'sheet.collapse': {
+    description: 'Label for the Sheet collapse toggle when the sheet is expanded',
+    components: ['Sheet'],
+    et: 'Ahenda',
+    en: 'Collapse',
+    ru: 'Свернуть',
+  },
+  'sheet.expand': {
+    description: 'Label for the Sheet collapse toggle when the sheet is collapsed',
+    components: ['Sheet'],
+    et: 'Laienda',
+    en: 'Expand',
+    ru: 'Развернуть',
   },
   'dateField.disabledDateError': {
     description:
@@ -916,6 +945,20 @@ export const labelsMap = validateDefaultLabels({
   'table.filter.remove-all': {
     description: 'Label for removing all',
     components: ['Table', 'TableFilter'],
+    et: 'Eemalda kõik',
+    en: 'Remove all',
+    ru: 'Удалить все',
+  },
+  'checkbox-group.select-all': {
+    description: 'Label for the CheckboxGroup select-all checkbox when not all options are selected',
+    components: ['Checkbox'],
+    et: 'Vali kõik',
+    en: 'Select all',
+    ru: 'Выбрать все',
+  },
+  'checkbox-group.remove-all': {
+    description: 'Label for the CheckboxGroup select-all checkbox when every option is selected',
+    components: ['Checkbox'],
     et: 'Eemalda kõik',
     en: 'Remove all',
     ru: 'Удалить все',

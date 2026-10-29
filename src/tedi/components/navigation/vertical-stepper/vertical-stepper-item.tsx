@@ -202,7 +202,6 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
               <CollapseButton
                 id={`${subListId}-toggle`}
                 hideText
-                size="small"
                 open={isOpen}
                 onOpenChange={handleToggle}
                 aria-controls={subListId}

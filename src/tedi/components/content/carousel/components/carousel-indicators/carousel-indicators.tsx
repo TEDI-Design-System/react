@@ -31,7 +31,7 @@ export const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsP
   ({ withArrows = false, variant = 'dots', className }, ref) => {
     const { getLabel } = useLabels();
     const carousel = useCarouselContext();
-    const { slidesCount, slideIndex } = carousel;
+    const { positions, activePositionIndex } = carousel;
 
     return (
       <div ref={ref} className={cn(styles['tedi-carousel__indicators'], className)}>
@@ -42,25 +42,25 @@ export const CarouselIndicators = forwardRef<HTMLDivElement, CarouselIndicatorsP
         )}
 
         {variant === 'dots'
-          ? Array.from({ length: slidesCount }, (_, index) => (
+          ? positions.map((position, index) => (
               <button
                 key={index}
                 type="button"
                 aria-label={getLabel('carousel.show-slide', index + 1)}
-                aria-current={index === slideIndex ? 'true' : undefined}
+                aria-current={index === activePositionIndex ? 'true' : undefined}
                 className={cn(styles['tedi-carousel__indicator'], {
-                  [styles['tedi-carousel__indicator--active']]: index === slideIndex,
+                  [styles['tedi-carousel__indicator--active']]: index === activePositionIndex,
                 })}
-                onClick={() => carousel.goToIndex(index, { focusSlide: true })}
+                onClick={() => carousel.goToIndex(position, { focusSlide: true })}
               />
             ))
-          : slidesCount > 0 && (
+          : positions.length > 0 && (
               <div>
                 <Text element="span" modifiers="bold" color="brand">
-                  {slideIndex + 1}
+                  {activePositionIndex + 1}
                 </Text>
                 <Text element="span" color="tertiary">
-                  {` / ${slidesCount}`}
+                  {` / ${positions.length}`}
                 </Text>
               </div>
             )}

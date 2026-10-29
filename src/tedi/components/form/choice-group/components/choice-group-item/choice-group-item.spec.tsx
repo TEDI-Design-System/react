@@ -126,18 +126,24 @@ describe('ChoiceGroupItem', () => {
     expect(mockInputClick).not.toHaveBeenCalled();
   });
 
-  it('makes the outer wrapper non-tabbable for radio type (arrow-navigated group)', () => {
-    const { container } = renderWithContext({ type: 'radio', variant: 'card' });
-    const card = container.querySelector('.tedi-choice-group-item') as HTMLElement;
-    expect(card).toHaveAttribute('tabIndex', '-1');
-    expect(card).not.toHaveAttribute('role');
-    expect(card).not.toHaveAttribute('aria-checked');
-  });
+  it.each(['radio', 'checkbox'] as ChoiceGroupItemType[])(
+    'does not turn the card wrapper into a nested interactive widget (%s)',
+    (type) => {
+      const { container } = renderWithContext({ type, variant: 'card' });
+      const card = container.querySelector('.tedi-choice-group-item') as HTMLElement;
+      expect(card).not.toHaveAttribute('role');
+      expect(card).not.toHaveAttribute('tabindex');
+      expect(card).not.toHaveAttribute('aria-checked');
+    }
+  );
 
-  it('keeps the outer wrapper tabbable with role=checkbox for checkbox type', () => {
-    const { container } = renderWithContext({ type: 'checkbox', variant: 'card' });
-    const card = container.querySelector('.tedi-choice-group-item') as HTMLElement;
-    expect(card).toHaveAttribute('tabIndex', '0');
-    expect(card).toHaveAttribute('role', 'checkbox');
+  it('keeps the native input as the focusable control in the card variant', () => {
+    renderWithContext(
+      { type: 'checkbox', variant: 'card' },
+      { currentValue: '', name: 'test-name', onChange: jest.fn(), inputType: 'checkbox' }
+    );
+    const input = screen.getByLabelText('Test Label');
+    expect(input).toHaveAttribute('type', 'checkbox');
+    expect(input).not.toHaveAttribute('tabindex', '-1');
   });
 });
