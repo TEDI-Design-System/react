@@ -1,3 +1,11 @@
+# [20.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.10...react-20.0.0-rc.11) (2026-10-29)
+
+
+### Features
+
+* **category-search:** Restore external control and improve search behaviour [#1016](https://github.com/TEDI-Design-System/react/issues/1016) ([#1028](https://github.com/TEDI-Design-System/react/issues/1028)) ([aaefeec](https://github.com/TEDI-Design-System/react/commit/aaefeeccfa4dea0e9ddda7bbad5107c3cf3280ea))
+* **sheet:** deprecate community map Sheet [#736](https://github.com/TEDI-Design-System/react/issues/736) ([#1033](https://github.com/TEDI-Design-System/react/issues/1033)) ([03bf242](https://github.com/TEDI-Design-System/react/commit/03bf24239a12e61619e1980dbf444fba79f85b2e))
+
 # [20.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.9...react-20.0.0-rc.10) (2026-10-29)
 
 
