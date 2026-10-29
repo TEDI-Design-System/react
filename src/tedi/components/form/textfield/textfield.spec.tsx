@@ -141,13 +141,16 @@ describe('TextField component', () => {
     expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
   });
 
-  it.each([
-    ['readOnly', { readOnly: true }],
-    ['input.readOnly', { input: { readOnly: true } }],
-  ])('shows no clear button when read-only through %s', (_, props) => {
-    render(<TextField {...defaultProps} value="x" {...props} />);
+  it('shows no clear button when readOnly', () => {
+    render(<TextField {...defaultProps} value="x" readOnly />);
     expect(screen.getByPlaceholderText(/enter text/i)).toHaveAttribute('readonly');
     expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps the clear button when only input.readOnly blocks typing', () => {
+    render(<TextField {...defaultProps} value="x" input={{ readOnly: true }} />);
+    expect(screen.getByPlaceholderText(/enter text/i)).toHaveAttribute('readonly');
+    expect(screen.getByTitle(/clear/i)).toBeInTheDocument();
   });
 
   it('adds the reveal-on-hover modifier only with showClearOnInteraction and a filled clearable field', () => {

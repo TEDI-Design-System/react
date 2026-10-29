@@ -59,7 +59,8 @@ type TextFieldBreakpointProps = {
    * When `true`, displays a clear (×) button on the right side when the field has a value.
    *
    * Clicking the button clears the input and calls `onClear` (if provided).
-   * Hidden while the field is read-only or disabled.
+   * Hidden while the field is `readOnly` or disabled. `input.readOnly` only blocks typing, so the button
+   * stays for fields whose value changes another way, like a calendar-only DateField range.
    *
    * @default true
    */
@@ -201,7 +202,7 @@ export interface TextFieldProps
    * Makes the field read-only.
    *
    * User can focus and select text, but cannot modify the value.
-   * Useful for pre-filled data that should not be changed.
+   * Useful for pre-filled data that should not be changed. Hides the clear button.
    */
   readOnly?: boolean;
   /**
@@ -325,7 +326,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
 
   const value = externalValue ?? innerValue;
   const isReadOnly = readOnly || input?.readOnly;
-  const showClearButton = Boolean(isClearable && value && !isReadOnly && !disabled);
+  const showClearButton = Boolean(isClearable && value && !readOnly && !disabled);
 
   const inputGroup = useOptionalInputGroup?.();
   const generatedId = React.useId();
