@@ -31,16 +31,23 @@ interface RadioGroupBreakpointProps {
   onChange?: (value: string) => void;
   /** Disables the whole group and every radio within it. */
   disabled?: boolean;
-  /** Marks the group as invalid, forwarding the error state to each radio. */
+  /** Marks the group as invalid. The radios keep their default look; pair with an error `helper`. */
   invalid?: boolean;
   /** Marks the group as required, adding a required indicator to the legend. */
   required?: boolean;
-  /** Size forwarded to every radio. @default 'default' */
+  /** Size forwarded to every radio. @default default */
   size?: 'default' | 'large';
-  /** Visual variant forwarded to every radio. @default 'default' */
+  /** Visual variant forwarded to every radio. @default default */
   variant?: ChoiceInputVariant;
-  /** Card colour variant forwarded to every radio (only applies to `variant="card"`). @default 'primary' */
+  /** Card colour variant forwarded to every radio (only applies to `variant="card"`). @default primary */
   cardVariant?: ChoiceInputCardVariant;
+  /**
+   * Gives primary cards a border in the unselected state, forwarded to every radio.
+   * Only applies to `variant="card"` with `cardVariant="primary"` and `layout="separated"`;
+   * segmented cards always have a border.
+   * @default false
+   */
+  bordered?: boolean;
   /** Layout direction of the radios. Defaults to `row` for cards, `column` otherwise. */
   direction?: 'row' | 'column';
   /**
@@ -74,6 +81,7 @@ export const RadioGroup = (props: RadioGroupProps): JSX.Element => {
     size,
     variant = 'default',
     cardVariant = 'primary',
+    bordered,
     direction = variant === 'card' ? 'row' : 'column',
     layout = 'separated',
     children,
@@ -104,13 +112,13 @@ export const RadioGroup = (props: RadioGroupProps): JSX.Element => {
       value: currentValue,
       onValueChange: handleValueChange,
       disabled,
-      invalid,
       required,
       size,
       variant,
       cardVariant,
+      bordered,
     }),
-    [resolvedName, currentValue, handleValueChange, disabled, invalid, required, size, variant, cardVariant]
+    [resolvedName, currentValue, handleValueChange, disabled, required, size, variant, cardVariant, bordered]
   );
 
   return (

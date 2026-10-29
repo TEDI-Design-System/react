@@ -10,7 +10,17 @@ import FormLabel from '../form-label/form-label';
 import styles from './radio.module.scss';
 import { RadioGroupContext } from './radio-group/radio-group-context';
 
-export type RadioProps = BreakpointSupport<ChoiceInputProps>;
+type RadioBreakpointProps = ChoiceInputProps & {
+  /**
+   * Gives a primary card a border in the unselected state.
+   * Only applies to `variant="card"` with `cardVariant="primary"`; has no effect inside a
+   * `layout="segmented"` group, where cards always have a border.
+   * @default false
+   */
+  bordered?: boolean;
+};
+
+export type RadioProps = BreakpointSupport<RadioBreakpointProps>;
 
 interface RadioComponent {
   (props: RadioProps): JSX.Element;
@@ -39,17 +49,19 @@ export const Radio = ((props: RadioProps): JSX.Element => {
     size: sizeProp,
     variant: variantProp,
     cardVariant: cardVariantProp,
+    bordered: borderedProp,
     disabled: disabledProp,
     invalid: invalidProp,
     required: requiredProp,
     ...rest
-  } = getCurrentBreakpointProps<ChoiceInputProps>(props);
+  } = getCurrentBreakpointProps<RadioBreakpointProps>(props);
 
   const size = sizeProp ?? group?.size ?? 'default';
   const variant = variantProp ?? group?.variant ?? 'default';
   const cardVariant = cardVariantProp ?? group?.cardVariant ?? 'primary';
+  const bordered = borderedProp ?? group?.bordered ?? false;
   const disabled = disabledProp ?? group?.disabled ?? false;
-  const invalid = invalidProp ?? group?.invalid;
+  const invalid = invalidProp;
   const required = requiredProp ?? group?.required;
 
   if (variant === 'card' && !!tooltip) {
@@ -102,7 +114,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
         styles['tedi-radio__indicator'],
         { [styles['tedi-radio__indicator--hover']]: hover },
         { [styles[`tedi-radio__indicator--size-${size}`]]: size },
-        { [styles['tedi-radio__indicator--invalid']]: invalid }
+        { [styles['tedi-radio__indicator--invalid']]: invalid && variant !== 'card' }
       )}
       data-testid="radio-indicator"
     />
@@ -124,6 +136,7 @@ export const Radio = ((props: RadioProps): JSX.Element => {
           styles['tedi-radio'],
           styles['tedi-radio--card'],
           styles[`tedi-radio--card-${cardVariant}`],
+          { [styles['tedi-radio--card-bordered']]: bordered },
           { [styles['tedi-radio--card-with-icon']]: !!icon },
           { [styles['tedi-radio--disabled']]: disabled },
           className

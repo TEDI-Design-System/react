@@ -14,6 +14,11 @@ import HeaderDropdown from './header-dropdown';
 const meta: Meta<typeof HeaderDropdown> = {
   component: HeaderDropdown,
   title: 'Community/Layout/Header/HeaderDropdown',
+  parameters: {
+    status: {
+      type: ['deprecated'],
+    },
+  },
 };
 
 export default meta;

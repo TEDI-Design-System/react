@@ -21,6 +21,11 @@ import HeaderSettings from './header-settings';
 const meta: Meta<typeof HeaderSettings> = {
   component: HeaderSettings,
   title: 'Community/Layout/Header/HeaderSettings',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

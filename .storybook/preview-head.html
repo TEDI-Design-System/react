@@ -19,4 +19,13 @@
   html.tedi-theme--dark [data-story='true'] {
     background-color: var(--general-surface-primary) !important;
   }
+
+  /* The global styles set `html, body { height: 100% }`, which caps the canvas body at the
+     viewport height: taller stories then overflow past it and lose the bottom padding. */
+  body.sb-show-main {
+    height: auto !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
 </style>

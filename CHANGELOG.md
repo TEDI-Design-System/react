@@ -1,3 +1,77 @@
+# [20.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.8...react-20.0.0-rc.9) (2026-10-29)
+
+
+### Bug Fixes
+
+* **storybook:** Pin Storybook Packages To 10.5.10 [#1029](https://github.com/TEDI-Design-System/react/issues/1029) ([#1030](https://github.com/TEDI-Design-System/react/issues/1030)) ([6822820](https://github.com/TEDI-Design-System/react/commit/6822820b6d1f711f950fcb9ddd25dd16a764dc1d))
+
+# [20.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.7...react-20.0.0-rc.8) (2026-10-28)
+
+
+### Features
+
+* **checkbox,radio:** apply new variables to Checkbox and Radio [#1002](https://github.com/TEDI-Design-System/react/issues/1002) ([#1023](https://github.com/TEDI-Design-System/react/issues/1023)) ([faab626](https://github.com/TEDI-Design-System/react/commit/faab6266be79ebde9367eaf69e1eeceb30eeef3a))
+
+# [20.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.6...react-20.0.0-rc.7) (2026-10-28)
+
+
+### Bug Fixes
+
+* **storybook:** Apply Date Freeze In Production Builds [#1018](https://github.com/TEDI-Design-System/react/issues/1018) ([93b56c7](https://github.com/TEDI-Design-System/react/commit/93b56c7372d9fb6a611cf8c8100e10ffd12a0e42))
+
+# [20.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.5...react-20.0.0-rc.6) (2026-10-22)
+
+
+### Bug Fixes
+
+* **print:** print links instead of hiding them [#908](https://github.com/TEDI-Design-System/react/issues/908) ([#910](https://github.com/TEDI-Design-System/react/issues/910)) ([2c8c25f](https://github.com/TEDI-Design-System/react/commit/2c8c25fd403c695f81b30aae337d4f8214c4edbc))
+
+# [20.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.4...react-20.0.0-rc.5) (2026-10-19)
+
+
+### Features
+
+* **dock-panel:** add internal resizing and simplify component and optional header description [#961](https://github.com/TEDI-Design-System/react/issues/961) ([#995](https://github.com/TEDI-Design-System/react/issues/995)) ([83fa60e](https://github.com/TEDI-Design-System/react/commit/83fa60e77d918e2f89b9be755fa150fa6ec61429))
+
+# [20.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.3...react-20.0.0-rc.4) (2026-10-19)
+
+
+### Bug Fixes
+
+* **header:** add missing deprecation markers to community Header subcomponents [#965](https://github.com/TEDI-Design-System/react/issues/965) ([#991](https://github.com/TEDI-Design-System/react/issues/991)) ([4cedd29](https://github.com/TEDI-Design-System/react/commit/4cedd2921ef55dd36617737a215ed991a356d4c1))
+
+# [20.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.2...react-20.0.0-rc.3) (2026-10-19)
+
+
+### Features
+
+* **icon:** Allow Loading A Single Icon Font Style [#41](https://github.com/TEDI-Design-System/react/issues/41) ([#994](https://github.com/TEDI-Design-System/react/issues/994)) ([26ca797](https://github.com/TEDI-Design-System/react/commit/26ca797a2f768c67acd74df80b64c466eb237f01))
+
+# [20.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.1...react-20.0.0-rc.2) (2026-10-14)
+
+
+### Features
+
+* **file-upload,file-dropzone:** rename reject prop and switch max size to bytes [#889](https://github.com/TEDI-Design-System/react/issues/889) ([#949](https://github.com/TEDI-Design-System/react/issues/949)) ([472ca22](https://github.com/TEDI-Design-System/react/commit/472ca22c04ce0d6859263652a397f495d79a2308))
+
+
+### BREAKING CHANGES
+
+* **file-upload,file-dropzone:** validateIndividually renamed to keepRejectedFiles; maxSize is now in bytes.
+
+# [20.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.9...react-20.0.0-rc.1) (2026-10-14)
+
+
+### Features
+
+* **category-search:** Improve Search Behaviour And Simplify API [#955](https://github.com/TEDI-Design-System/react/issues/955) ([#960](https://github.com/TEDI-Design-System/react/issues/960)) ([80868d4](https://github.com/TEDI-Design-System/react/commit/80868d4be386e7184f89c0f368fcf0cc1082a786))
+
+
+### BREAKING CHANGES
+
+* **category-search:** Remove open, categoryId, onOpenChange and
+onCategoryChange. Categories can no longer be added or removed after mounting.
+
 # [19.2.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-19.2.0-rc.8...react-19.2.0-rc.9) (2026-10-01)
 
 
