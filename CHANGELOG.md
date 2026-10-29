@@ -1,3 +1,10 @@
+# [20.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.9...react-20.0.0-rc.10) (2026-10-29)
+
+
+### Features
+
+* **sheet:** new TEDI-Ready component [#736](https://github.com/TEDI-Design-System/react/issues/736) ([#905](https://github.com/TEDI-Design-System/react/issues/905)) ([44bea48](https://github.com/TEDI-Design-System/react/commit/44bea48a30684146fef74af188c93a3895df685c))
+
 # [20.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.8...react-20.0.0-rc.9) (2026-10-29)
 
 
