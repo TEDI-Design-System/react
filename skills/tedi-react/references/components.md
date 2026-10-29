@@ -211,10 +211,10 @@ files. This is the part of this document worth maintaining by hand.
 - **`Textarea`, not `TextArea`.** Renamed; the old casing is gone.
 - **`showClearOnInteraction` reveals the clear (×) only on hover/focus/active** (keyboard focus
   included), once the field is clearable and filled — instead of showing it whenever there's a value.
-  It's a top-level prop on `TextField`, `Search`, `MultiValueField` and `Select`; on `DateField` /
-  `TimeField` / `DateTimeField` pass it via `inputProps={{ showClearOnInteraction: true }}`. On
-  `Select` it *also* needs `isClearIndicatorVisible` (Select hides it by default). `Textarea` has no
-  clear button, so it doesn't take it.
+  It's a top-level prop on `TextField`, `Textarea`, `Search`, `MultiValueField` and `Select`; on
+  `DateField` / `TimeField` / `DateTimeField` pass it via
+  `inputProps={{ showClearOnInteraction: true }}`. On `Select` it *also* needs
+  `isClearIndicatorVisible` (Select hides it by default).
 - **File rejections are observable.** A file failing `accept` or `maxSize` surfaces a localised
   message whether it was dragged or picked, and `onChange` fires even for a fully-rejected drop
   (with the unchanged list), so single-file rejections aren't silent. Don't re-implement validation
