@@ -1,3 +1,10 @@
+# [20.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.8...react-20.0.0-rc.9) (2026-10-29)
+
+
+### Bug Fixes
+
+* **storybook:** Pin Storybook Packages To 10.5.10 [#1029](https://github.com/TEDI-Design-System/react/issues/1029) ([#1030](https://github.com/TEDI-Design-System/react/issues/1030)) ([6822820](https://github.com/TEDI-Design-System/react/commit/6822820b6d1f711f950fcb9ddd25dd16a764dc1d))
+
 # [20.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.7...react-20.0.0-rc.8) (2026-10-28)
 
 
