@@ -4,6 +4,17 @@ import type { MuiPickersAdapter } from '@mui/x-date-pickers/internals/models';
 
 import type { DatepickerValue, TimePickerValue } from '../../../../src/community/components/form/pickers';
 
+const ruPluralRules = new Intl.PluralRules('ru');
+
+/**
+ * Picks the Russian plural form for `count` (1 файл, 2 файла, 5 файлов; 21 → one, 11–14 → many).
+ * Fractions (`other`) take the genitive singular, the same as `few`.
+ */
+const pluralizeRu = (count: number, forms: { one: string; few: string; many: string }): string => {
+  const category = ruPluralRules.select(count);
+  return category === 'one' ? forms.one : category === 'many' ? forms.many : forms.few;
+};
+
 type LabelBaseEntry = {
   description?: string;
   components?: string[];
@@ -539,22 +550,12 @@ export const labelsMap = validateDefaultLabels({
     components: ['FileDropzone', 'FileUpload'],
     et: (files: number) => (files === 1 ? `${files} fail valitud` : `${files} faili valitud`),
     en: (files: number) => (files === 1 ? `${files} file selected` : `${files} files selected`),
-    ru: (files: number) => {
-      const lastDigit = files % 10;
-      const lastTwoDigits = files % 100;
-      const isSingular = lastDigit === 1 && lastTwoDigits !== 11;
-      const isFew = lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
-
-      if (isSingular) {
-        return `${files} выбранный файл`;
-      }
-
-      if (isFew) {
-        return `${files} выбранных файла`;
-      }
-
-      return `${files} выбранных файлов`;
-    },
+    ru: (files: number) =>
+      pluralizeRu(files, {
+        one: `${files} выбранный файл`,
+        few: `${files} выбранных файла`,
+        many: `${files} выбранных файлов`,
+      }),
   },
   'modal.close': {
     description: 'Label for modals close button',
@@ -1463,6 +1464,14 @@ export const labelsMap = validateDefaultLabels({
     et: 'Nähtavus',
     en: 'Visibility',
     ru: 'Видимость',
+  },
+  'rating.raters': {
+    description: 'Suffix in the read-only Rating summary showing how many people rated, e.g. "271 hindajat"',
+    components: ['Rating'],
+    et: (count: number) => `${count} ${count === 1 ? 'hindaja' : 'hindajat'}`,
+    en: (count: number) => `${count} ${count === 1 ? 'rating' : 'ratings'}`,
+    ru: (count: number) =>
+      pluralizeRu(count, { one: `${count} оценка`, few: `${count} оценки`, many: `${count} оценок` }),
   },
 });
 
