@@ -1,3 +1,23 @@
+# [20.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.11...react-20.0.0-rc.12) (2026-10-29)
+
+
+### Features
+
+* **text-field:** isClearable defaults to true [#945](https://github.com/TEDI-Design-System/react/issues/945) ([#948](https://github.com/TEDI-Design-System/react/issues/948)) ([c6d58a8](https://github.com/TEDI-Design-System/react/commit/c6d58a8c6f633199da3586c8338d82de2d7f80b0))
+
+
+### BREAKING CHANGES
+
+* **text-field:** TextField's isClearable now defaults to true, so text
+fields that showed no clear button now show one once they have a value.
+Pass isClearable={false} to opt out. Table column filters get a clear
+button too.
+* **text-field:** Textarea is now clearable by default and shows a clear
+button once it has a value. Pass isClearable={false} to opt out.
+* **text-field:** Textarea's maxRows no longer defaults to 12, so an
+autoGrow textarea grows without a row limit. Set maxRows or maxHeight to
+cap it.
+
 # [20.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-20.0.0-rc.10...react-20.0.0-rc.11) (2026-10-29)
 
 
