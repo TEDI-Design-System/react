@@ -85,13 +85,18 @@ describe('DockPanel', () => {
       </DockPanel>
     );
 
+    await user.click(screen.getByRole('heading', { name: 'Details' }));
+    expect(onChange).not.toHaveBeenCalled();
+
     await user.click(screen.getByRole('button', { name: labels.collapse }));
     expect(screen.getByRole('button', { name: labels.expand })).toHaveAttribute('aria-expanded', 'false');
     expect(screen.getByText('Content')).not.toBeVisible();
+    expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith(true);
 
     await user.click(screen.getByRole('button', { name: labels.expand }));
     expect(screen.getByText('Content')).toBeVisible();
+    expect(onChange).toHaveBeenCalledTimes(2);
     expect(onChange).toHaveBeenLastCalledWith(false);
   });
 
@@ -532,24 +537,15 @@ describe('DockPanel', () => {
     'sets content height and a height limit for %s placement',
     (placement) => {
       render(
-        <DockPanel title="Details" labels={labels} placement={placement} height="auto" maxHeight="calc(100% - 4rem)">
+        <DockPanel title="Details" labels={labels} placement={placement} height="auto" maxHeight={480}>
           Content
         </DockPanel>
       );
       const panel = screen.getByRole('region');
       expect(panel.style.getPropertyValue('--dock-panel-height')).toBe('auto');
-      expect(panel.style.getPropertyValue('--dock-panel-max-height')).toBe('calc(100% - 4rem)');
+      expect(panel.style.getPropertyValue('--dock-panel-max-height')).toBe('480px');
     }
   );
-
-  it('converts a numeric maximum height to pixels', () => {
-    render(
-      <DockPanel title="Details" labels={labels} height="auto" maxHeight={480}>
-        Content
-      </DockPanel>
-    );
-    expect(screen.getByRole('region').style.getPropertyValue('--dock-panel-max-height')).toBe('480px');
-  });
 
   it('leaves placement-specific default heights to CSS when dimensions are omitted', () => {
     render(
@@ -565,7 +561,7 @@ describe('DockPanel', () => {
   it('preserves the editor and sizing options through content-height minimization', async () => {
     const user = userEvent.setup();
     render(
-      <DockPanel title="Details" labels={labels} height="auto" maxHeight="80%" onClose={jest.fn()}>
+      <DockPanel title="Details" labels={labels} height="auto" maxHeight={480} onClose={jest.fn()}>
         <Editor />
       </DockPanel>
     );
@@ -580,12 +576,12 @@ describe('DockPanel', () => {
     expect(screen.getByRole('textbox')).toBe(input);
     expect(input).toHaveValue('Keep my changes');
     expect(screen.getByRole('region').style.getPropertyValue('--dock-panel-height')).toBe('auto');
-    expect(screen.getByRole('region').style.getPropertyValue('--dock-panel-max-height')).toBe('80%');
+    expect(screen.getByRole('region').style.getPropertyValue('--dock-panel-max-height')).toBe('480px');
   });
 
   it('updates sizing without remounting content and removes an omitted height limit', () => {
     const { rerender } = render(
-      <DockPanel title="Details" labels={labels} height="auto" maxHeight="80%">
+      <DockPanel title="Details" labels={labels} height="auto" maxHeight={480}>
         <Editor />
       </DockPanel>
     );
@@ -638,6 +634,10 @@ describe('DockPanel', () => {
   );
 
   describe('resizing', () => {
+    let workspace: HTMLDivElement;
+    let notifyWorkspaceResize: () => void;
+    let workspaceObserver: ResizeObserver;
+
     const measurePanel = () => ({
       width: 500,
       height: 400,
@@ -651,16 +651,23 @@ describe('DockPanel', () => {
     });
 
     beforeEach(() => {
-      const workspace = document.createElement('div');
+      workspace = document.createElement('div');
       Object.defineProperties(workspace, {
-        clientWidth: { value: 1000 },
-        clientHeight: { value: 800 },
+        clientWidth: { value: 1000, configurable: true },
+        clientHeight: { value: 800, configurable: true },
+      });
+      jest.spyOn(globalThis, 'ResizeObserver').mockImplementation((callback) => {
+        workspaceObserver = {
+          observe: jest.fn(),
+          unobserve: jest.fn(),
+          disconnect: jest.fn(),
+        };
+        notifyWorkspaceResize = () => callback([], workspaceObserver);
+        return workspaceObserver;
       });
       const getBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
       jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
-        return this.classList.contains('tedi-dock-panel__resize-measurement')
-          ? measurePanel()
-          : getBoundingClientRect.call(this);
+        return this.classList.contains('tedi-dock-panel') ? measurePanel() : getBoundingClientRect.call(this);
       });
       jest.spyOn(HTMLElement.prototype, 'offsetParent', 'get').mockReturnValue(workspace);
     });
@@ -668,11 +675,11 @@ describe('DockPanel', () => {
     afterEach(() => jest.restoreAllMocks());
 
     it.each([
-      ['left', 200, 100, '600px', 'auto'],
-      ['right', 0, 100, '600px', 'auto'],
-      ['top', 100, 200, '500px', '500px'],
-      ['bottom', 100, 0, '500px', '500px'],
-    ] as const)('resizes %s placement from its workspace-facing edge', async (placement, x, y, width, height) => {
+      ['left', 200, 100, '600px'],
+      ['right', 0, 100, '600px'],
+      ['top', 100, 200, '500px'],
+      ['bottom', 100, 0, '500px'],
+    ] as const)('resizes %s placement from its workspace-facing edge', async (placement, x, y, size) => {
       const user = userEvent.setup();
       const { container } = render(
         <DockPanel title="Details" labels={labels} placement={placement} width="md" height="md" resizable>
@@ -681,16 +688,15 @@ describe('DockPanel', () => {
       );
       const resizer = container.querySelector('.tedi-dock-panel__resizer') as HTMLElement;
       const handle = resizer.querySelector('[data-show-indicator]') as HTMLElement;
-      expect(resizer.style.width).toBe('500px');
-      expect(resizer.style.height).toBe(placement === 'left' || placement === 'right' ? 'auto' : '400px');
+      const dimension = placement === 'left' || placement === 'right' ? 'width' : 'height';
+      expect(resizer.style[dimension]).toBe(dimension === 'width' ? '500px' : '400px');
 
       await user.pointer([
         { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
         { coords: { x, y } },
         { keys: '[/MouseLeft]' },
       ]);
-      expect(resizer.style.width).toBe(width);
-      expect(resizer.style.height).toBe(height);
+      expect(resizer.style[dimension]).toBe(size);
     });
 
     it.each(['right', 'bottom'] as const)(
@@ -717,16 +723,20 @@ describe('DockPanel', () => {
 
         await user.click(screen.getByRole('button', { name: labels.expand }));
         expect(screen.getByText('Content')).toBeVisible();
-        expect(container.querySelector('.tedi-dock-panel__resizer')).toHaveStyle({
-          width: '500px',
-          height: placement === 'right' ? 'auto' : '400px',
-        });
+        expect(container.querySelector('.tedi-dock-panel__resizer')).toHaveStyle(
+          placement === 'right' ? { width: '500px' } : { height: '400px' }
+        );
       }
     );
 
-    it.each(['right', 'bottom'] as const)(
-      'keeps %s resizing between zero and the measured workspace size',
-      async (placement) => {
+    it.each([
+      ['left', 2100, -2000],
+      ['right', -2000, 2100],
+      ['top', 2100, -2000],
+      ['bottom', -2000, 2100],
+    ] as const)(
+      'keeps %s resizing between 8% and 92% of the measured workspace size',
+      async (placement, growTo, shrinkTo) => {
         const user = userEvent.setup();
         const { container } = render(
           <DockPanel title="Details" labels={labels} placement={placement} resizable>
@@ -735,21 +745,205 @@ describe('DockPanel', () => {
         );
         const resizer = container.querySelector('.tedi-dock-panel__resizer') as HTMLElement;
         const handle = resizer.querySelector('[data-show-indicator]') as HTMLElement;
+        const dimension = placement === 'left' || placement === 'right' ? 'width' : 'height';
+
+        await user.pointer([
+          { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
+          { coords: { x: growTo, y: growTo } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        expect(resizer.style[dimension]).toBe(dimension === 'width' ? '920px' : '736px');
+
+        await user.pointer([
+          { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
+          { coords: { x: shrinkTo, y: shrinkTo } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        expect(resizer.style[dimension]).toBe(dimension === 'width' ? '80px' : '64px');
+      }
+    );
+
+    it.each([
+      ['right', 1500, 1000, '1380px', '120px'],
+      ['bottom', 1500, 1000, '920px', '80px'],
+      ['right', 800, 600, '736px', '64px'],
+      ['bottom', 800, 600, '552px', '48px'],
+    ] as const)(
+      'updates %s drag limits when the workspace becomes %s by %s',
+      async (placement, workspaceWidth, workspaceHeight, maximum, minimum) => {
+        const user = userEvent.setup();
+        const { container, unmount } = render(
+          <DockPanel title="Details" labels={labels} placement={placement} resizable>
+            <Editor />
+          </DockPanel>
+        );
+        const input = screen.getByRole('textbox');
+        const resizer = container.querySelector('.tedi-dock-panel__resizer') as HTMLElement;
+        const handle = resizer.querySelector('[data-show-indicator]') as HTMLElement;
         const dimension = placement === 'right' ? 'width' : 'height';
+        expect(workspaceObserver.observe).toHaveBeenCalledWith(workspace);
+
+        await user.pointer([
+          { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
+          { coords: { x: 50, y: 50 } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        const chosenSize = resizer.style[dimension];
+
+        act(() => {
+          Object.defineProperties(workspace, {
+            clientWidth: { value: workspaceWidth },
+            clientHeight: { value: workspaceHeight },
+          });
+          notifyWorkspaceResize();
+        });
+        expect(resizer.style[dimension]).toBe(chosenSize);
+        expect(screen.getByRole('textbox')).toBe(input);
 
         await user.pointer([
           { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
           { coords: { x: -2000, y: -2000 } },
           { keys: '[/MouseLeft]' },
         ]);
-        expect(resizer.style[dimension]).toBe(placement === 'right' ? '1000px' : '800px');
+        expect(resizer.style[dimension]).toBe(maximum);
 
         await user.pointer([
           { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
           { coords: { x: 2100, y: 2100 } },
           { keys: '[/MouseLeft]' },
         ]);
-        expect(resizer.style[dimension]).toBe('0px');
+        expect(resizer.style[dimension]).toBe(minimum);
+
+        expect(workspaceObserver.disconnect).not.toHaveBeenCalled();
+        unmount();
+        expect(workspaceObserver.disconnect).toHaveBeenCalledTimes(1);
+      }
+    );
+
+    it.each([
+      ['right', -2000, 600, 400, 552, 110],
+      ['bottom', -2000, 600, 400, 368, 110],
+      ['right', 2100, 1500, 1200, 120, 90],
+      ['bottom', 2100, 1500, 1200, 96, 90],
+    ] as const)(
+      'resets an invalid %s size without replacing content after a workspace resize',
+      async (placement, dragTo, workspaceWidth, workspaceHeight, clampedSize, nextDragTo) => {
+        const user = userEvent.setup();
+        const { container } = render(
+          <DockPanel title="Details" labels={labels} placement={placement} resizable>
+            <Editor />
+          </DockPanel>
+        );
+        const input = screen.getByRole('textbox');
+        const originalResizer = container.querySelector('.tedi-dock-panel__resizer') as HTMLElement;
+        const handle = originalResizer.querySelector('[data-show-indicator]') as HTMLElement;
+        const dimension = placement === 'right' ? 'width' : 'height';
+        await user.pointer([
+          { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
+          { coords: { x: dragTo, y: dragTo } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        await user.clear(input);
+        await user.type(input, 'Keep edited content');
+
+        act(() => {
+          Object.defineProperties(workspace, {
+            clientWidth: { value: workspaceWidth },
+            clientHeight: { value: workspaceHeight },
+          });
+          notifyWorkspaceResize();
+        });
+
+        const resizer = container.querySelector('.tedi-dock-panel__resizer') as HTMLElement;
+        expect(originalResizer).not.toBeInTheDocument();
+        expect(resizer.style[dimension]).toBe(`${clampedSize}px`);
+        expect(screen.getByRole('textbox')).toBe(input);
+        expect(input).toHaveValue('Keep edited content');
+        expect(input).toHaveFocus();
+
+        await user.pointer([
+          {
+            target: resizer.querySelector('[data-show-indicator]') as HTMLElement,
+            keys: '[MouseLeft>]',
+            coords: { x: 100, y: 100 },
+          },
+          { coords: { x: nextDragTo, y: nextDragTo } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        expect(resizer.style[dimension]).toBe(`${clampedSize + 100 - nextDragTo}px`);
+      }
+    );
+
+    it.each([
+      ['right', 50, undefined, 50, 920],
+      ['right', undefined, 950, 80, 950],
+      ['bottom', 25, undefined, 25, 736],
+      ['bottom', undefined, 780, 64, 780],
+      ['right', 560, 400, 400, 400],
+      ['right', 0, 1200, 0, 1000],
+    ] as const)(
+      'uses explicit %s limits independently: minimum %s, maximum %s',
+      async (placement, minimum, maximum, expectedMinimum, expectedMaximum) => {
+        const user = userEvent.setup();
+        const side = placement === 'right';
+        const { container } = render(
+          <DockPanel
+            title="Details"
+            labels={labels}
+            placement={placement}
+            resizable
+            minWidth={side ? minimum : undefined}
+            maxWidth={side ? maximum : undefined}
+            minHeight={side ? undefined : minimum}
+            maxHeight={side ? undefined : maximum}
+          >
+            Content
+          </DockPanel>
+        );
+        const resizer = container.querySelector('.tedi-dock-panel__resizer') as HTMLElement;
+        const handle = resizer.querySelector('[data-show-indicator]') as HTMLElement;
+        const dimension = side ? 'width' : 'height';
+        await user.pointer([
+          { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
+          { coords: { x: 2100, y: 2100 } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        expect(resizer.style[dimension]).toBe(`${expectedMinimum}px`);
+        await user.pointer([
+          { target: handle, keys: '[MouseLeft>]', coords: { x: 100, y: 100 } },
+          { coords: { x: -2000, y: -2000 } },
+          { keys: '[/MouseLeft]' },
+        ]);
+        expect(resizer.style[dimension]).toBe(`${expectedMaximum}px`);
+      }
+    );
+
+    it.each(['left', 'right', 'top', 'bottom'] as const)(
+      'removes %s height limits while minimized and restores them when expanded',
+      async (placement) => {
+        const user = userEvent.setup();
+        const expandedHeight = placement === 'left' || placement === 'right' ? '360px' : '';
+        const { container } = render(
+          <DockPanel title="Details" labels={labels} placement={placement} height={360} maxHeight={20} resizable>
+            <Editor />
+          </DockPanel>
+        );
+        const input = screen.getByRole('textbox');
+        const layout = container.querySelector('.tedi-dock-panel__resize-layout') as HTMLElement;
+        expect(layout.style.height).toBe(expandedHeight);
+        expect(layout.style.maxHeight).toBe('20px');
+
+        await user.click(screen.getByRole('button', { name: labels.collapse }));
+        expect(layout.style.height).toBe('');
+        expect(layout.style.maxHeight).toBe('');
+        expect(input).toBeInTheDocument();
+        expect(input).not.toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: labels.expand }));
+        expect(layout.style.height).toBe(expandedHeight);
+        expect(layout.style.maxHeight).toBe('20px');
+        expect(screen.getByRole('textbox')).toBe(input);
+        expect(input).toBeVisible();
       }
     );
 
@@ -773,10 +967,7 @@ describe('DockPanel', () => {
           { coords: { x: 50, y: 50 } },
           { keys: '[/MouseLeft]' },
         ]);
-        const dimensions = {
-          width: placement === 'right' ? '550px' : '500px',
-          height: placement === 'right' ? 'auto' : '450px',
-        };
+        const dimensions = placement === 'right' ? { width: '550px' } : { height: '450px' };
         expect(resizer).toHaveStyle(dimensions);
 
         await user.click(screen.getByRole('button', { name: labels.collapse }));
@@ -903,14 +1094,14 @@ describe('DockPanel', () => {
 
     it('still accepts custom CSS dimensions and numeric pixels', () => {
       render(
-        <DockPanel title="Details" labels={labels} width="calc(100% - 4rem)" height={360} maxHeight="90%">
+        <DockPanel title="Details" labels={labels} width="calc(100% - 4rem)" height={360} maxHeight={480}>
           Content
         </DockPanel>
       );
       const panel = screen.getByRole('region');
       expect(panel.style.getPropertyValue('--dock-panel-width')).toBe('calc(100% - 4rem)');
       expect(panel.style.getPropertyValue('--dock-panel-height')).toBe('360px');
-      expect(panel.style.getPropertyValue('--dock-panel-max-height')).toBe('90%');
+      expect(panel.style.getPropertyValue('--dock-panel-max-height')).toBe('480px');
     });
 
     it('converts zero dimensions to pixels', () => {
@@ -933,14 +1124,14 @@ describe('DockPanel', () => {
         '--dock-panel-max-height': '30rem',
       };
       const { rerender } = render(
-        <DockPanel title="Details" labels={labels} style={style} width="sm" height={360} maxHeight="90%">
+        <DockPanel title="Details" labels={labels} style={style} width="sm" height={360} maxHeight={480}>
           Content
         </DockPanel>
       );
       const panel = screen.getByRole('region');
       expect(panel.style.getPropertyValue('--dock-panel-width')).toBe('35%');
       expect(panel.style.getPropertyValue('--dock-panel-height')).toBe('360px');
-      expect(panel.style.getPropertyValue('--dock-panel-max-height')).toBe('90%');
+      expect(panel.style.getPropertyValue('--dock-panel-max-height')).toBe('480px');
       expect(panel.style.color).toBe('red');
 
       rerender(
