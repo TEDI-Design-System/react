@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
+import { TextFieldForwardRef } from '../textfield/textfield';
 import Textarea, { TextareaProps } from './textarea';
 
 import '@testing-library/jest-dom';
@@ -30,6 +32,60 @@ describe('Textarea component', () => {
     expect(textarea).toBeInTheDocument();
     expect(textarea).toHaveAttribute('id', 'test-textarea');
     expect(textarea).toHaveAttribute('name', 'testTextarea');
+  });
+
+  it('forwards the ref to a callback ref', () => {
+    const ref = jest.fn();
+    render(<Textarea {...defaultProps} ref={ref} />);
+    expect(ref).toHaveBeenCalledWith(expect.objectContaining({ input: expect.any(HTMLTextAreaElement) }));
+  });
+
+  it('forwards the ref to an object ref', () => {
+    const ref = React.createRef<TextFieldForwardRef>();
+    render(<Textarea {...defaultProps} ref={ref} />);
+    expect(ref.current?.input).toBeInstanceOf(HTMLTextAreaElement);
+  });
+
+  it('shows a clear button once it has a value', () => {
+    render(<Textarea {...defaultProps} value="Some text" onChange={jest.fn()} />);
+    expect(screen.getByTitle(/clear/i)).toBeInTheDocument();
+  });
+
+  it('shows no clear button when isClearable is false', () => {
+    render(<Textarea {...defaultProps} value="Some text" onChange={jest.fn()} isClearable={false} />);
+    expect(screen.queryByTitle(/clear/i)).not.toBeInTheDocument();
+  });
+
+  it('clears the value from the clear button', async () => {
+    const onChange = jest.fn();
+    const onClear = jest.fn();
+    render(<Textarea {...defaultProps} defaultValue="Some text" onChange={onChange} onClear={onClear} />);
+
+    await userEvent.click(screen.getByTitle(/clear/i));
+
+    expect(onChange).toHaveBeenCalledWith('');
+    expect(onClear).toHaveBeenCalled();
+    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(screen.getByRole('textbox')).toHaveFocus();
+  });
+
+  it('moves the clear button clear of the scrollbar', () => {
+    const originalResizeObserver = window.ResizeObserver;
+    const callbacks: ResizeObserverCallback[] = [];
+    window.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
+      callbacks.push(callback);
+      return { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
+    }) as unknown as typeof ResizeObserver;
+
+    render(<Textarea {...defaultProps} value="Some text" onChange={jest.fn()} />);
+    const textarea = screen.getByRole('textbox');
+    Object.defineProperty(textarea, 'offsetWidth', { configurable: true, value: 217 });
+    Object.defineProperty(textarea, 'clientWidth', { configurable: true, value: 200 });
+    textarea.style.border = '1px solid';
+    act(() => callbacks.forEach((callback) => callback([], {} as ResizeObserver)));
+
+    expect(screen.getByTitle(/clear/i).parentElement).toHaveStyle({ right: '15px' });
+    window.ResizeObserver = originalResizeObserver;
   });
 
   it('applies the correct CSS classes', () => {
@@ -80,6 +136,11 @@ describe('Textarea component', () => {
     render(<Textarea {...defaultProps} autoGrow minRows={5} />);
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea).toHaveAttribute('rows', '5');
+  });
+
+  it('treats minRows below 1 as 1', () => {
+    render(<Textarea {...defaultProps} autoGrow minRows={0} />);
+    expect(screen.getByRole('textbox')).toHaveAttribute('rows', '1');
   });
 
   it('grows height when typing with autoGrow=true', async () => {
@@ -268,6 +329,16 @@ describe('Textarea component', () => {
         const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
         await flush();
 
+        expect(textarea.style.overflowY).toBe('hidden');
+      });
+
+      it('grows without a row limit when maxRows is not set', async () => {
+        const lines = Array.from({ length: 20 }, (_, i) => i + 1).join('\n');
+        render(<Textarea {...defaultProps} autoGrow minRows={3} defaultValue={lines} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await flush();
+
+        expect(textarea.style.height).toBe(`${20 * LINE_HEIGHT + PADDING * 2 + BORDER * 2}px`);
         expect(textarea.style.overflowY).toBe('hidden');
       });
 

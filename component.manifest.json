@@ -1019,6 +1019,21 @@
       ]
     },
     {
+      "id": "overlays/sheet",
+      "name": "Sheet",
+      "category": "overlays",
+      "sourcePath": "src/tedi/components/overlays/sheet",
+      "status": [],
+      "description": "Bottom sheet dialog that slides up from the screen edge, with drag-to-dismiss, snap points, and a collapsible peek state, composed from Sheet.Trigger, Sheet.Content, Sheet.Header, Sheet.Body, Sheet.Footer, and Sheet.Closer.",
+      "keyProps": [
+        "open",
+        "defaultOpen",
+        "onToggle",
+        "collapsed",
+        "onCollapsedChange"
+      ]
+    },
+    {
       "id": "misc/separator/separator",
       "name": "Separator",
       "category": "misc",
