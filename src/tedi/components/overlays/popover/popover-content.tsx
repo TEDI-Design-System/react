@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { CSSProperties, useContext } from 'react';
+import { CSSProperties, ReactNode, useContext } from 'react';
 import { useId } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
@@ -27,7 +27,11 @@ const resolvePopoverPadding = (padding: CardContentPadding | undefined): CSSProp
   } as CSSProperties;
 };
 
-export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames'> {
+export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames' | 'withArrow' | 'children'> {
+  /**
+   * Popover body. Optional, so a popover can show only a `title`.
+   */
+  children?: ReactNode | ReactNode[];
   /**
    * Popover title.
    */
@@ -74,7 +78,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
     padding,
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
-  const { withBorder } = useContext(PopoverContext);
+  const { withBorder, withArrow } = useContext(PopoverContext);
   const titleId = useId();
   const hasDescription = Boolean(children);
   const descriptionId = useId();
@@ -95,6 +99,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
       labelledBy={title ? titleId : undefined}
       describedBy={hasDescription ? descriptionId : undefined}
       contentStyle={resolvePopoverPadding(padding)}
+      withArrow={withArrow}
     >
       {(title || close) && (
         <div className={cn(styles['tedi-popover__header'], { [styles['tedi-popover__header--no-title']]: !title })}>

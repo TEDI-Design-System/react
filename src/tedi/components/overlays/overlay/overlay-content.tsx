@@ -50,10 +50,16 @@ export interface OverlayContentProps {
    * Used to pass through consumer-controlled values such as padding CSS variables.
    */
   contentStyle?: CSSProperties;
+
+  /**
+   * Render the arrow pointing to the trigger.
+   * @default true
+   */
+  withArrow?: boolean;
 }
 
 export const OverlayContent = (props: OverlayContentProps) => {
-  const { children, classNames, labelledBy, describedBy, contentStyle } = props;
+  const { children, classNames, labelledBy, describedBy, contentStyle, withArrow = true } = props;
   const {
     open,
     x,
@@ -110,14 +116,16 @@ export const OverlayContent = (props: OverlayContentProps) => {
       data-placement={placement}
       data-testid="overlay-content"
     >
-      <FloatingArrow
-        ref={(el) => (arrowRef.current = el)}
-        context={context}
-        className={classNames?.arrow}
-        height={arrow?.height}
-        width={arrow?.width}
-        data-testid="overlay-arrow"
-      />
+      {withArrow && (
+        <FloatingArrow
+          ref={(el) => (arrowRef.current = el)}
+          context={context}
+          className={classNames?.arrow}
+          height={arrow?.height}
+          width={arrow?.width}
+          data-testid="overlay-arrow"
+        />
+      )}
       {children}
     </div>
   );
