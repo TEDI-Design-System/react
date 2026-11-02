@@ -8,7 +8,7 @@ import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { InfoTooltip } from '../../overlays/tooltip';
 import Separator from '../separator/separator';
-import { Timeline } from './timeline';
+import { Timeline, TimelineProps } from './timeline';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=11335-186480&m=dev" target="_blank">Figma ↗</a><br/>
@@ -27,6 +27,7 @@ const meta: Meta<typeof Timeline> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=11335-186480&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
   argTypes: {
     activeIndex: { control: 'number' },
@@ -426,5 +427,36 @@ export const TimelineCard: Story = {
         </Collapse>
       </Timeline.Item>
     </Timeline>
+  ),
+};
+
+const visualTestStories: { label: string; story: Story }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Position', story: Position },
+  { label: 'Title only', story: TitleOnly },
+  { label: 'With description', story: WithDescription },
+  { label: 'Custom text color', story: CustomTextColor },
+  { label: 'With info tooltip', story: WithInfoTooltip },
+  { label: 'Without title', story: WithoutTitle },
+  { label: 'With action', story: WithAction },
+  { label: 'With date', story: WithDate },
+  { label: 'With date description', story: WithDateDescription },
+  { label: 'Example', story: Example },
+  { label: 'Timeline card', story: TimelineCard },
+];
+
+/** Chromatic snapshot for Timeline: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestStories.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {story.render?.({ ...story.args } as TimelineProps, {} as never)}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
   ),
 };

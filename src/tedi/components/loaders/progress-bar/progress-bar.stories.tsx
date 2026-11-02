@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { ProgressBar, ProgressBarProps } from './progress-bar';
 
 const HINT = { text: 'Üleslaadimine', type: 'hint' } as const;
@@ -26,6 +27,7 @@ const meta: Meta<typeof ProgressBar> = {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    chromatic: { disableSnapshot: true },
   },
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 } },
@@ -238,6 +240,7 @@ export const Responsive: Story = {
     helper: HINT,
     md: { labelPosition: 'horizontal', valuePosition: 'horizontal' },
   },
+  parameters: { chromatic: { disableSnapshot: false } },
 };
 
 /**
@@ -256,4 +259,65 @@ export const Animated: Story = {
     }, []);
     return <ProgressBar value={value} label="Üleslaadimine..." />;
   },
+  parameters: { chromatic: { disableSnapshot: false } },
+};
+
+/** Chromatic snapshot for ProgressBar: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <ProgressBar value={60} ariaLabel="Edenemisriba pealkiri" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <MatrixTable rows={sizeRows} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Position</Text>
+        <MatrixTable rows={positionRows} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With label</Text>
+        <ProgressBar
+          value={40}
+          label="Progress"
+          required
+          valuePosition="bottom"
+          helper={{ text: 'Üleslaadimine', type: 'hint' }}
+        />
+        <ProgressBar
+          value={40}
+          label="Küsitluses osalenutest olid vanuses 15-18"
+          labelPosition="top"
+          md={{ labelPosition: 'horizontal' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Regular</Text>
+        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" />
+        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valueLabel="1 / 5" />
+        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valuePosition="bottom" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" helper={HINT} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With error</Text>
+        <ProgressBar
+          value={40}
+          ariaLabel="Edenemisriba pealkiri"
+          helper={{ text: 'Üleslaadimine ebaõnnestus, fail on liiga suur', type: 'error' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Value hidden</Text>
+        <ProgressBar value={60} ariaLabel="Edenemisriba pealkiri" showValue={false} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

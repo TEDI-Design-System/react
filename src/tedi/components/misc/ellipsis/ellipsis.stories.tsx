@@ -1,5 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Popover from '../../overlays/popover/popover';
 import Ellipsis, { EllipsisProps } from './ellipsis';
 
@@ -14,6 +16,7 @@ const meta: Meta<typeof Ellipsis> = {
     status: {
       type: ['devComponent'],
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -43,6 +46,7 @@ export const Default: Story = {
  * Resize the window to see that the ellipsis and popover appear only when content doesn't fit
  */
 export const ResponsiveExample: Story = {
+  parameters: { chromatic: { disableSnapshot: false } },
   args: {
     lineClamp: 1,
     children: (
@@ -72,6 +76,7 @@ export const LeadingStart: Story = {
  * Use this when you want to show popover always or with custom content
  */
 export const ResponsiveWithCustomPopover: Story = {
+  parameters: { chromatic: { disableSnapshot: false } },
   args: {
     lineClamp: 1,
     popover: false,
@@ -87,4 +92,22 @@ export const ResponsiveWithCustomPopover: Story = {
       </Popover>
     ),
   },
+};
+
+/** Chromatic snapshot for Ellipsis: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Template {...(Default.args as EllipsisProps)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Leading start</Text>
+        <Template {...(LeadingStart.args as EllipsisProps)} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

@@ -18,6 +18,7 @@ const meta: Meta<ToggleProps> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.68?node-id=4536-77367&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -291,4 +292,109 @@ export const WithFeedbackText: Story = {
       type: 'error',
     },
   },
+};
+
+const visualTestStateVariants: { label: string; idPrefix: string; props: Partial<ToggleProps> }[] = [
+  { label: 'Primary', idPrefix: 'primary', props: {} },
+  { label: 'Primary outlined', idPrefix: 'primary-outlined', props: { type: 'outlined' } },
+  { label: 'Colored', idPrefix: 'colored', props: { color: 'colored' } },
+  { label: 'Colored outlined', idPrefix: 'colored-outlined', props: { color: 'colored', type: 'outlined' } },
+];
+
+const visualTestToggles: Partial<ToggleProps>[] = [
+  {},
+  { defaultChecked: true },
+  { size: 'large' },
+  { size: 'large', defaultChecked: true },
+  { size: 'large', icon: true },
+  { size: 'large', icon: true, defaultChecked: true },
+];
+
+const visualTestToggleId = (variant: string, state: string, index: number) => `toggle-vt-${variant}-${state}-${index}`;
+
+const visualTestPseudoIds = (state: string) =>
+  visualTestStateVariants.flatMap(({ idPrefix }) =>
+    visualTestToggles.map((_, index) => `#${visualTestToggleId(idPrefix, state, index)}`)
+  );
+
+/** Chromatic snapshot for Toggle: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: visualTestPseudoIds('Hover'),
+      active: visualTestPseudoIds('Active'),
+      focusVisible: visualTestPseudoIds('Focus'),
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Toggle id="toggle-vt-default" label="Toggle" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Size</Text>
+        <div className="example-list">
+          {sizeArray.map((size, index) => (
+            <Row className={`${index === sizeArray.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={size}>
+              <Col width={12} sm={2}>
+                <Text modifiers="bold">{size.charAt(0).toUpperCase() + size.slice(1)}</Text>
+              </Col>
+              <Col width={12} sm={10} className="d-flex">
+                <Toggle id={`toggle-vt-size-${size}`} label="Toggle" size={size} hideLabel />
+              </Col>
+            </Row>
+          ))}
+        </div>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Type</Text>
+        <Type />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Label position</Text>
+        <LabelPosition />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <States />
+      </VerticalSpacing>
+      {visualTestStateVariants.map(({ label, idPrefix, props }) => (
+        <VerticalSpacing size={0.5} key={idPrefix}>
+          <Text modifiers="bold">{label}</Text>
+          <VerticalSpacing size={1}>
+            {stateArray.map((state) => (
+              <Row key={state}>
+                <Col lg={1} md={2} className="flex align-items-center">
+                  <Text modifiers="bold">{state}</Text>
+                </Col>
+                {[0, 2, 4].map((start) => (
+                  <Col width="auto" className="flex align-items-center gap-3" key={start}>
+                    {visualTestToggles.slice(start, start + 2).map((toggleProps, offset) => (
+                      <Toggle
+                        key={offset}
+                        {...props}
+                        {...toggleProps}
+                        id={visualTestToggleId(idPrefix, state, start + offset)}
+                        label="Toggle"
+                        hideLabel
+                        disabled={state === 'Disabled'}
+                        isLoading={state === 'Loading'}
+                      />
+                    ))}
+                  </Col>
+                ))}
+              </Row>
+            ))}
+          </VerticalSpacing>
+        </VerticalSpacing>
+      ))}
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With feedback text</Text>
+        <Toggle id="toggle-vt-feedback" label="Label" helper={{ text: 'Something went wrong', type: 'error' }} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

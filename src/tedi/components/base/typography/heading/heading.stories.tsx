@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Col, Row } from '../../../layout/grid';
+import { VerticalSpacing } from '../../../layout/vertical-spacing';
 import { HeadingModifiers, Text } from '../text/text';
 import { Heading } from './heading';
 
@@ -13,6 +14,7 @@ const meta: Meta<typeof Heading> = {
   title: 'Tedi-Ready/Base/Typography/Heading',
   component: Heading,
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?node-id=115-11630&m=dev',
@@ -57,20 +59,22 @@ export const Headings: Story = {
   render: TemplateHeadings,
 };
 
+const CustomModifierTemplate = () => (
+  <>
+    <Heading element="h4" modifiers={['h1', 'bold']} color="warning">
+      H4 heading with H1 styles and warning color
+    </Heading>
+    <Heading element="h2" modifiers={['normal', 'bold']} color="brand">
+      H2 heading with normal bold text and brand color
+    </Heading>
+    <Heading element="h1" modifiers={['normal']}>
+      H1 element with normal text styles
+    </Heading>
+  </>
+);
+
 export const CustomModifier: Story = {
-  render: () => (
-    <>
-      <Heading element="h4" modifiers={['h1', 'bold']} color="warning">
-        H4 heading with H1 styles and warning color
-      </Heading>
-      <Heading element="h2" modifiers={['normal', 'bold']} color="brand">
-        H2 heading with normal bold text and brand color
-      </Heading>
-      <Heading element="h1" modifiers={['normal']}>
-        H1 element with normal text styles
-      </Heading>
-    </>
-  ),
+  render: CustomModifierTemplate,
 };
 
 export const SemanticHeadings: Story = {
@@ -125,5 +129,27 @@ export const SemanticHeadings: Story = {
         </Col>
       </Row>
     </>
+  ),
+};
+
+/** Chromatic snapshot for Heading: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Heading>Heading</Heading>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Headings</Text>
+        <TemplateHeadings />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom modifier</Text>
+        <CustomModifierTemplate />
+      </VerticalSpacing>
+    </VerticalSpacing>
   ),
 };

@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
 import { Label } from '../../content/label/label';
 import { TextGroup } from '../../content/text-group/text-group';
 import { Col, Row } from '../../layout/grid';
@@ -22,6 +23,7 @@ const meta: Meta<typeof InfoButton> = {
   component: InfoButton,
   title: 'Tedi-Ready/Components/Buttons/InfoButton',
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4514-72997&m=dev',
@@ -41,10 +43,11 @@ const buttonStateArray = ['Default', 'Hover', 'Active', 'Focus'];
 type TemplateMultipleProps = {
   array: typeof buttonStateArray;
   color?: 'default' | 'inverted';
+  idPrefix?: string;
 };
 
 const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, color = 'default', ...buttonProps } = args;
+  const { array, color = 'default', idPrefix = '', ...buttonProps } = args;
 
   return (
     <VerticalSpacing>
@@ -56,7 +59,7 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
             </Text>
           </Col>
           <Col xs={2} md={1} className="text-center">
-            <InfoButton color={color} {...buttonProps} aria-label={`Info button ${state}`} id={state} />
+            <InfoButton color={color} {...buttonProps} aria-label={`Info button ${state}`} id={`${idPrefix}${state}`} />
           </Col>
         </Row>
       ))}
@@ -102,74 +105,115 @@ const labelStyle: React.CSSProperties = {
   gap: 'var(--layout-grid-gutters-04)',
 };
 
+const UsageTemplate = () => {
+  const bloodGroup = (
+    <TextGroup
+      type="vertical"
+      label={
+        <span style={labelStyle}>
+          <Label>Veregrupp</Label>
+          <Tooltip>
+            <Tooltip.Trigger>
+              <InfoButton aria-label="Rohkem infot veregrupi kohta" />
+            </Tooltip.Trigger>
+            <Tooltip.Content>Veregrupp määratakse vereanalüüsiga ning see ei muutu elu jooksul.</Tooltip.Content>
+          </Tooltip>
+        </span>
+      }
+      value="AB-"
+    />
+  );
+
+  const dentalBenefit = (
+    <TextGroup
+      type="vertical"
+      label={
+        <span style={labelStyle}>
+          <Label>Hambaravihüvitise jääk</Label>
+          <Popover>
+            <Popover.Trigger>
+              <InfoButton aria-label="Rohkem infot hüvitise kohta" />
+            </Popover.Trigger>
+            <Popover.Content width="medium">
+              <VerticalSpacing size={0.5}>
+                <Text>
+                  Hambaravihüvitist saab kasutada jooksva kalendriaasta jooksul. Kasutamata jääk järgmisesse aastasse ei
+                  kandu.
+                </Text>
+                <div style={{ textAlign: 'right' }}>
+                  <Link href="#" underline={false} iconRight="arrow_forward">
+                    Loe rohkem
+                  </Link>
+                </div>
+              </VerticalSpacing>
+            </Popover.Content>
+          </Popover>
+        </span>
+      }
+      value="24€"
+    />
+  );
+
+  return (
+    <>
+      <ShowAt md>
+        <div style={{ display: 'flex', gap: '1.5rem' }}>
+          {bloodGroup}
+          <Separator axis="vertical" isStretched />
+          {dentalBenefit}
+        </div>
+      </ShowAt>
+      <HideAt md>
+        <VerticalSpacing size={1}>
+          {bloodGroup}
+          {dentalBenefit}
+        </VerticalSpacing>
+      </HideAt>
+    </>
+  );
+};
+
 export const UsageWithTooltipAndPopover: Story = {
   name: 'Usage with tooltip and popover',
   parameters: { controls: { disable: true } },
-  render: () => {
-    const bloodGroup = (
-      <TextGroup
-        type="vertical"
-        label={
-          <span style={labelStyle}>
-            <Label>Veregrupp</Label>
-            <Tooltip>
-              <Tooltip.Trigger>
-                <InfoButton aria-label="Rohkem infot veregrupi kohta" />
-              </Tooltip.Trigger>
-              <Tooltip.Content>Veregrupp määratakse vereanalüüsiga ning see ei muutu elu jooksul.</Tooltip.Content>
-            </Tooltip>
-          </span>
-        }
-        value="AB-"
-      />
-    );
+  render: () => <UsageTemplate />,
+};
 
-    const dentalBenefit = (
-      <TextGroup
-        type="vertical"
-        label={
-          <span style={labelStyle}>
-            <Label>Hambaravihüvitise jääk</Label>
-            <Popover>
-              <Popover.Trigger>
-                <InfoButton aria-label="Rohkem infot hüvitise kohta" />
-              </Popover.Trigger>
-              <Popover.Content width="medium">
-                <VerticalSpacing size={0.5}>
-                  <Text>
-                    Hambaravihüvitist saab kasutada jooksva kalendriaasta jooksul. Kasutamata jääk järgmisesse aastasse
-                    ei kandu.
-                  </Text>
-                  <div style={{ textAlign: 'right' }}>
-                    <Link href="#" underline={false} iconRight="arrow_forward">
-                      Loe rohkem
-                    </Link>
-                  </div>
-                </VerticalSpacing>
-              </Popover.Content>
-            </Popover>
-          </span>
-        }
-        value="24€"
-      />
-    );
-
-    return (
-      <>
-        <ShowAt md>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
-            {bloodGroup}
-            <Separator axis="vertical" isStretched />
-            {dentalBenefit}
-          </div>
-        </ShowAt>
-        <HideAt md>
-          <VerticalSpacing size={1}>
-            {bloodGroup}
-            {dentalBenefit}
-          </VerticalSpacing>
-        </HideAt>
-      </>
-    );
+/** Chromatic snapshot for InfoButton: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: ['#vt-states-Hover', '#vt-inverted-Hover'],
+      active: ['#vt-states-Active', '#vt-inverted-Active'],
+      focusVisible: ['#vt-states-Focus', '#vt-inverted-Focus'],
+    },
   },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <InfoButton aria-label="Rohkem infot" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <TemplateColumn array={buttonStateArray} idPrefix="vt-states-" />
+      </VerticalSpacing>
+      <Card background="brand-primary" borderless>
+        <Card.Content>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold" color="white">
+              Inverted
+            </Text>
+            <TemplateColumn array={buttonStateArray} color="inverted" idPrefix="vt-inverted-" />
+          </VerticalSpacing>
+        </Card.Content>
+      </Card>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Usage with tooltip and popover</Text>
+        <UsageTemplate />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

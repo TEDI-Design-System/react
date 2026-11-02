@@ -30,6 +30,7 @@ const meta: Meta<typeof HorizontalStepper> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.51.75?node-id=11201-120696&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -83,7 +84,7 @@ const TYPE_COLS: { key: string; label: string; props: Partial<HorizontalStepperI
   { key: 'selected', label: 'Selected', props: { selected: true }, rows: ['default'] },
 ];
 
-const StatesMatrix = ({ compact }: { compact: boolean }) => {
+const StatesMatrix = ({ compact, labelPrefix = '' }: { compact: boolean; labelPrefix?: string }) => {
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, 'md');
 
@@ -107,7 +108,7 @@ const StatesMatrix = ({ compact }: { compact: boolean }) => {
                   </div>
                   <div style={{ width: 'fit-content', maxWidth: '100%' }}>
                     <HorizontalStepper
-                      aria-label={`${col.label} – ${row.label}`}
+                      aria-label={`${labelPrefix}${col.label} – ${row.label}`}
                       background="transparent"
                       compact={compact}
                     >
@@ -146,7 +147,7 @@ const StatesMatrix = ({ compact }: { compact: boolean }) => {
             col.rows.includes(row.key) ? (
               <div key={col.key} data-stepper-state={row.key}>
                 <HorizontalStepper
-                  aria-label={`${col.label} – ${row.label}`}
+                  aria-label={`${labelPrefix}${col.label} – ${row.label}`}
                   background="transparent"
                   compact={compact}
                 >
@@ -376,4 +377,104 @@ export const States: Story = {
 export const CompactStates: Story = {
   parameters: statesPseudo,
   render: () => <StatesMatrix compact />,
+};
+
+/** Chromatic snapshot for HorizontalStepper: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false }, ...statesPseudo },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <HorizontalStepper aria-label="Default" background="default" compact="sm">
+          <HorizontalStepper.Item label="Kutse" selected />
+          <HorizontalStepper.Item label="Tahteavaldus" />
+          <HorizontalStepper.Item label="Geenianalüüs" />
+          <HorizontalStepper.Item label="Vastus" />
+        </HorizontalStepper>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Second step</Text>
+        <HorizontalStepper aria-label="Second step" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" selected />
+          <HorizontalStepper.Item label="Geenianalüüs" />
+          <HorizontalStepper.Item label="Vastus" />
+        </HorizontalStepper>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Third step</Text>
+        <HorizontalStepper aria-label="Third step" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" completed />
+          <HorizontalStepper.Item label="Geenianalüüs" selected />
+          <HorizontalStepper.Item label="Vastus" />
+        </HorizontalStepper>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With errors</Text>
+        <HorizontalStepper aria-label="Vorm vigadega" compact="lg">
+          <HorizontalStepper.Item label="Kutse" error />
+          <HorizontalStepper.Item label="Tahteavaldus" selected />
+          <HorizontalStepper.Item label="Geenianalüüs" />
+          <HorizontalStepper.Item label="Vastus" />
+        </HorizontalStepper>
+        <HorizontalStepper aria-label="Vorm vea kirjeldusega" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" error description="Sammus esinevad vead" />
+          <HorizontalStepper.Item label="Geenianalüüs" selected />
+          <HorizontalStepper.Item label="Vastus" />
+        </HorizontalStepper>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With descriptions</Text>
+        <HorizontalStepper aria-label="Descriptions, Kutse selected" compact="lg">
+          <HorizontalStepper.Item label="Kutse" selected />
+          <HorizontalStepper.Item label="Tahteavaldus" />
+          <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
+          <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
+        </HorizontalStepper>
+        <HorizontalStepper aria-label="Descriptions, Tahteavaldus selected" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" selected />
+          <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
+          <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
+        </HorizontalStepper>
+        <HorizontalStepper aria-label="Descriptions, Geenianalüüs selected" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" completed />
+          <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
+          <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
+        </HorizontalStepper>
+        <HorizontalStepper aria-label="Descriptions, Vastus selected" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" completed />
+          <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />
+          <HorizontalStepper.Item label="Vastus" selected description="Ametnik täidab" />
+        </HorizontalStepper>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Transparent background</Text>
+        <HorizontalStepper aria-label="Transparent background" background="transparent" compact="lg">
+          <HorizontalStepper.Item label="Kutse" completed />
+          <HorizontalStepper.Item label="Tahteavaldus" selected />
+          <HorizontalStepper.Item label="Geenianalüüs" />
+          <HorizontalStepper.Item label="Vastus" />
+        </HorizontalStepper>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact</Text>
+        {Compact.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <StatesMatrix compact={false} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact states</Text>
+        <StatesMatrix compact labelPrefix="Compact: " />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

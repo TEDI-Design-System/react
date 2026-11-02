@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Heading } from '../typography/heading/heading';
+import { Text } from '../typography/text/text';
 import { Icon, IconProps } from './icon';
 
 /**
@@ -21,6 +22,7 @@ const meta: Meta<typeof Icon> = {
   title: 'Tedi-Ready/Base/Icon',
   component: Icon,
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=45-30752&mode=dev',
@@ -245,46 +247,90 @@ export const Backgrounds: Story = {
   name: 'Icon background colors',
 };
 
+const UsedInsideTextTemplate = (args: { name: IconProps['name'] }) => {
+  return (
+    <VerticalSpacing size={0.25}>
+      <Heading element="h1">
+        <Icon name={args.name} display="inline" />
+        This is level 1 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h2">
+        <Icon name={args.name} display="inline" />
+        This is level 2 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h3">
+        <Icon name={args.name} display="inline" />
+        This is level 3 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h4">
+        <Icon name={args.name} display="inline" />
+        This is level 4 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h5">
+        <Icon name={args.name} display="inline" />
+        This is level 5 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <Heading element="h6">
+        <Icon name={args.name} display="inline" />
+        This is level 6 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </Heading>
+      <p>
+        <Icon name={args.name} display="inline" />
+        This is paragraph text with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </p>
+      <small>
+        <Icon name={args.name} display="inline" />
+        This is small text with inline <Icon color="brand" name={args.name} display="inline" /> icon
+      </small>
+    </VerticalSpacing>
+  );
+};
+
 export const UsedInsideText: Story = {
-  render: (args: { name: IconProps['name'] }) => {
-    return (
-      <VerticalSpacing size={0.25}>
-        <Heading element="h1">
-          <Icon name={args.name} display="inline" />
-          This is level 1 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h2">
-          <Icon name={args.name} display="inline" />
-          This is level 2 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h3">
-          <Icon name={args.name} display="inline" />
-          This is level 3 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h4">
-          <Icon name={args.name} display="inline" />
-          This is level 4 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h5">
-          <Icon name={args.name} display="inline" />
-          This is level 5 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <Heading element="h6">
-          <Icon name={args.name} display="inline" />
-          This is level 6 heading with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </Heading>
-        <p>
-          <Icon name={args.name} display="inline" />
-          This is paragraph text with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </p>
-        <small>
-          <Icon name={args.name} display="inline" />
-          This is small text with inline <Icon color="brand" name={args.name} display="inline" /> icon
-        </small>
-      </VerticalSpacing>
-    );
-  },
+  render: UsedInsideTextTemplate,
   args: {
     name: 'account_circle',
   },
+};
+
+/** Chromatic snapshot for Icon: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Icon name="account_circle" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon size</Text>
+        <TemplateColumn name="account_circle" property="size" color="primary" array={sizeArray} items={[]} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon size inside background</Text>
+        <TemplateColumnWithMultipleVariants
+          name="info"
+          property="size"
+          array={[]}
+          items={[
+            { name: 'info', property: 'size', color: 'brand', background: 'brand-secondary', size: 16 },
+            { name: 'vaccines', property: 'size', color: 'brand', background: 'brand-secondary', size: 24 },
+          ]}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon colors</Text>
+        <TemplateRow name="account_circle" property="color" array={colorArray} size={48} items={[]} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon background colors</Text>
+        <TemplateColumnWithBackgroundCircleVarians name="" property="name" array={[]} items={[]} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Used inside text</Text>
+        <UsedInsideTextTemplate name="account_circle" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

@@ -25,6 +25,7 @@ const meta: Meta<typeof Separator> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=3518-32729&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -432,4 +433,148 @@ export const VerticalDottedSmallCardExample: Story = {
     dotPosition: 1.25,
     md: { axis: 'vertical' },
   },
+};
+
+const visualTestBlocks: { label: string; content: JSX.Element }[] = [
+  { label: 'Default', content: <Separator spacing={1} /> },
+  { label: 'Horizontal spacings', content: <SpacingHorizontal axis="horizontal" /> },
+  { label: 'Horizontal thickness', content: <ColorsAndThickness /> },
+  { label: 'Vertical', content: <Separator axis="vertical" height={3} /> },
+  { label: 'Vertical spacings', content: <SpacingVertical axis="vertical" height={3} display="inline-block" /> },
+  { label: 'Vertical thickness', content: <ColorsAndThickness axis="vertical" height={3} display="inline" /> },
+  {
+    label: 'Dotted line horizontal',
+    content: <Separator axis="horizontal" variant="dotted" color="accent" dotPosition="center" />,
+  },
+  {
+    label: 'Dotted line vertical',
+    content: <Separator axis="vertical" variant="dotted" color="accent" height={5} dotPosition="center" />,
+  },
+  { label: 'Sizes', content: <SizesTemplate property="dotSize" array={sizeArray} /> },
+  {
+    label: 'Spacing top default',
+    content: (
+      <Row>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition="center" color="accent" dotSize="large" />
+        </Col>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition="center" color="accent" dotSize="medium" />
+        </Col>
+      </Row>
+    ),
+  },
+  {
+    label: 'Spacing top small',
+    content: (
+      <Row>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition={0.5} color="accent" dotSize="large" />
+        </Col>
+        <Col width="auto">
+          <Separator axis="vertical" variant="dotted" height={2} dotPosition={0.75} color="accent" dotSize="medium" />
+        </Col>
+      </Row>
+    ),
+  },
+  {
+    label: 'Position',
+    content: (
+      <Row>
+        {(
+          [
+            ['Start', 'start', 2],
+            ['Center', 'center', 1],
+            ['End', 'end', 1],
+          ] as const
+        ).map(([title, dotPosition, height]) => (
+          <Col width="auto" key={title}>
+            <VerticalSpacing>
+              <Text>{title}</Text>
+              <Row className="text-center">
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={height}
+                    dotPosition={dotPosition}
+                    color="accent"
+                    dotSize="large"
+                  />
+                </Col>
+                <Col width="auto">
+                  <Separator
+                    axis="vertical"
+                    variant="dotted"
+                    height={height}
+                    dotPosition={dotPosition}
+                    color="accent"
+                    dotSize="medium"
+                  />
+                </Col>
+              </Row>
+            </VerticalSpacing>
+          </Col>
+        ))}
+      </Row>
+    ),
+  },
+  {
+    label: 'Dot filled',
+    content: <Separator axis="horizontal" variant="dot-only" dotSize="large" dotStyle="filled" color="secondary" />,
+  },
+  {
+    label: 'Dot outlined',
+    content: <Separator axis="horizontal" variant="dot-only" dotSize="large" dotStyle="outlined" color="secondary" />,
+  },
+  {
+    label: 'Dotted sizes',
+    content: <DottedSizesTemplate property="dotSize" array={['extra-small', 'small', 'medium', 'large']} />,
+  },
+  { label: 'Inline separator usage', content: <InlineSeparatorTemplate axis="vertical" display="inline" /> },
+  {
+    label: 'Vertical dotted card example',
+    content: (
+      <TemplateVertical
+        axis="horizontal"
+        variant="dotted"
+        color="accent"
+        spacing={1}
+        isStretched
+        dotPosition={1.25}
+        md={{ axis: 'vertical' }}
+      />
+    ),
+  },
+  {
+    label: 'Vertical dotted small card example',
+    content: (
+      <TemplateVertical
+        axis="horizontal"
+        spacing={1}
+        variant="dotted"
+        dotSize="medium"
+        color="accent"
+        isStretched
+        dotPosition={1.25}
+        md={{ axis: 'vertical' }}
+      />
+    ),
+  },
+];
+
+/** Chromatic snapshot for Separator: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

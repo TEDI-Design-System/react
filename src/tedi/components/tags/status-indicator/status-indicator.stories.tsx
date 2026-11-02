@@ -2,6 +2,7 @@ import { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { StatusIndicator } from './status-indicator';
 
 /**
@@ -15,6 +16,7 @@ const meta: Meta<typeof StatusIndicator> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=2405-53326&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -69,5 +71,27 @@ export const Examples: Story = {
       Lugemata teated&nbsp;
       <StatusIndicator type="danger" position="top-right" />
     </span>
+  ),
+};
+
+/** Chromatic snapshot for StatusIndicator: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <StatusIndicator type="success" size="sm" hasBorder={false} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">All variants</Text>
+        {AllVariants.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Examples</Text>
+        <div>{Examples.render?.({} as never, {} as never)}</div>
+      </VerticalSpacing>
+    </VerticalSpacing>
   ),
 };
