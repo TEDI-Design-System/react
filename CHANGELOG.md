@@ -1,3 +1,10 @@
+# [20.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-20.0.0...react-20.1.0-rc.1) (2026-11-02)
+
+
+### Features
+
+* **dock-panel:** Improve Resize Limits And Minimized Panels [#1040](https://github.com/TEDI-Design-System/react/issues/1040) ([#1041](https://github.com/TEDI-Design-System/react/issues/1041)) ([19d1d2f](https://github.com/TEDI-Design-System/react/commit/19d1d2fba5ba71dc3f69382d6b8cece4fd734c86))
+
 # [20.0.0](https://github.com/TEDI-Design-System/react/compare/react-19.1.1...react-20.0.0) (2026-10-29)
 
 
