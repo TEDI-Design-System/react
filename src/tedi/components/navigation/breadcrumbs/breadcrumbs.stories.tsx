@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from '../../base/icon/icon';
+import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Link } from '../link/link';
 import Breadcrumbs, { BreadcrumbsProps } from './breadcrumbs';
@@ -47,6 +48,7 @@ export default {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=2409-21799&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 } as Meta;
 
@@ -148,6 +150,7 @@ export const Condensed: Story = {
  */
 export const ResponsiveVariant: Story = {
   render: Template,
+  parameters: { chromatic: { disableSnapshot: false } },
   args: {
     variant: 'short',
     md: { variant: 'long' },
@@ -189,6 +192,50 @@ export const CustomSeparator: Story = {
         <Link href="#">Documents</Link>
         <span aria-current="page">Restrictions</span>
       </Breadcrumbs>
+    </VerticalSpacing>
+  ),
+};
+
+/** Chromatic snapshot for Breadcrumbs: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Breadcrumbs ariaLabel="Default trail">
+          <Link href="#">Dashboard</Link>
+          <Link href="#">Applications</Link>
+          <span aria-current="page">Application nr 506</span>
+        </Breadcrumbs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Long</Text>
+        {Long.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Short</Text>
+        <Breadcrumbs variant="short" ariaLabel="Short trail">
+          <Link href="#">Dashboard</Link>
+          <span aria-current="page">Current page</span>
+        </Breadcrumbs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Condensed</Text>
+        <Breadcrumbs maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2} ariaLabel="Condensed trail">
+          <Link href="#">Dashboard</Link>
+          <Link href="#">Patients</Link>
+          <Link href="#">Anna Tamm</Link>
+          <Link href="#">Visits</Link>
+          <Link href="#">2024-05-12</Link>
+          <span aria-current="page">Restrictions</span>
+        </Breadcrumbs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom separator</Text>
+        {CustomSeparator.render?.({} as never, {} as never)}
+      </VerticalSpacing>
     </VerticalSpacing>
   ),
 };

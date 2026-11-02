@@ -33,6 +33,7 @@ const meta: Meta<typeof Tabs> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=3419-38773&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -192,7 +193,6 @@ export const States: StoryObj<TemplateStateProps> = {
 };
 
 export const Controlled: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [currentTab, setCurrentTab] = useState('tab-1');
 
@@ -252,6 +252,7 @@ export const WithDisabledTab: Story = {
 };
 
 export const OverflowBehavior: Story = {
+  parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={2}>
       <Text modifiers="bold">Dropdown (default)</Text>
@@ -386,4 +387,184 @@ export const WithSubTabs: Story = {
       </Tabs>
     );
   },
+};
+
+/** Chromatic snapshot for Tabs: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    a11y: {
+      config: {
+        rules: [
+          { id: 'aria-required-parent', enabled: false },
+          { id: 'aria-valid-attr-value', enabled: false },
+        ],
+      },
+    },
+    pseudo: {
+      hover: '#Hover-tab',
+      active: '#Active-tab',
+      focusVisible: '#Focus-tab',
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Tabs defaultValue="tab-1-vt-1">
+          <Tabs.List aria-label="Tervise sakid">
+            <Tabs.Trigger id="tab-1-vt-1">Terviseteekond</Tabs.Trigger>
+            <Tabs.Trigger id="tab-2-vt-1">Haiguste kulg</Tabs.Trigger>
+            <Tabs.Trigger id="tab-3-vt-1">Ravimite ajalugu</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="tab-1-vt-1">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.healthTimeline}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-2-vt-1">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.diseaseCourse}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-3-vt-1">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.medication}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With icons</Text>
+        <Tabs defaultValue="tab-1-vt-2">
+          <Tabs.List aria-label="Ikoonidega sakid">
+            <Tabs.Trigger id="tab-1-vt-2" icon="table_chart">
+              Tabel
+            </Tabs.Trigger>
+            <Tabs.Trigger id="tab-2-vt-2" icon="grid_on">
+              Ruudustik
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="tab-1-vt-2">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.table}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-2-vt-2">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.grid}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With status badge</Text>
+        <Tabs defaultValue="tab-1-vt-3">
+          <Tabs.List aria-label="Olekumärgisega sakid">
+            <Tabs.Trigger id="tab-1-vt-3">
+              <Ellipsis lineClamp={1} popover={true}>
+                Terviseteekond
+              </Ellipsis>{' '}
+              <StatusBadge color="brand">Esitatud</StatusBadge>
+            </Tabs.Trigger>
+            <Tabs.Trigger id="tab-2-vt-3">
+              <span style={{ position: 'relative' }}>
+                Lugemata teated&nbsp;
+                <StatusIndicator type="danger" position="top-right" />
+              </span>
+            </Tabs.Trigger>
+            <Tabs.Trigger id="tab-3-vt-3">Ravimite ajalugu</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="tab-1-vt-3">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.healthTimeline}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-2-vt-3">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.unreadMessages}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-3-vt-3">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.medication}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        {States.render?.({ array: stateArray } as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With disabled tab</Text>
+        <Tabs defaultValue="tab-1-vt-4">
+          <Tabs.List aria-label="Keelatud sakiga sakid">
+            <Tabs.Trigger id="tab-1-vt-4">Terviseteekond</Tabs.Trigger>
+            <Tabs.Trigger id="tab-2-vt-4">Haiguste kulg</Tabs.Trigger>
+            <Tabs.Trigger id="tab-3-vt-4" disabled>
+              Ravimite ajalugu
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="tab-1-vt-4">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.healthTimeline}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-2-vt-4">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.diseaseCourse}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-3-vt-4">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.medication}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With sub tabs</Text>
+        <Tabs defaultValue="tab-3-vt-5">
+          <Tabs.List aria-label="Töötervishoiu ja -ohutuse sakid">
+            <Tabs.Trigger id="tab-1-vt-5">Käimasolevad menetlused</Tabs.Trigger>
+            <Tabs.Trigger id="tab-2-vt-5">Planeeritavad menetlused</Tabs.Trigger>
+            <Tabs.Trigger id="tab-3-vt-5">Õnnetused ja haigused</Tabs.Trigger>
+            <Tabs.Trigger id="tab-4-vt-5">Kalender</Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content id="tab-1-vt-5">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.proceduresInProgress}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-2-vt-5">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.proceduresInPlanning}</Text>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-3-vt-5">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <VerticalSpacing size={1.5}>
+                <ButtonGroup type="secondary" ariaLabel="Õnnetuste ja haiguste alamnavigatsioon" enableMobileDropdown>
+                  <Button id="work-accidents-vt" isActive>
+                    Tööõnnetused
+                  </Button>
+                  <Button id="occupational-diseases-vt">Kutsehaigused</Button>
+                  <Button id="work-related-illnesses-vt">Tööga seotud haigused</Button>
+                </ButtonGroup>
+                <Heading element="h2">Tööõnnetused</Heading>
+                <Text>Tööõnnetuste juhtumid ja nende menetluse seis.</Text>
+              </VerticalSpacing>
+            </CardContent>
+          </Tabs.Content>
+          <Tabs.Content id="tab-4-vt-5">
+            <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+              <Text>{content.calendar}</Text>
+            </CardContent>
+          </Tabs.Content>
+        </Tabs>
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

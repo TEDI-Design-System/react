@@ -1,6 +1,8 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Tag, TagProps } from './tag';
 
 /**
@@ -22,6 +24,7 @@ export default {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2405-49832&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 } as Meta;
 type Story = StoryObj<TagProps>;
@@ -113,5 +116,37 @@ export const Ellipsis: Story = {
         start, a fairly long tag label
       </Tag>
     </div>
+  ),
+};
+
+/** Chromatic snapshot for Tag: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Primary</Text>
+        <ColorTemplate color="primary" isLoading onClose={() => undefined}>
+          Tag
+        </ColorTemplate>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Secondary</Text>
+        <ColorTemplate color="secondary" isLoading onClose={() => undefined}>
+          Tag
+        </ColorTemplate>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Danger</Text>
+        <ColorTemplate color="danger" onClose={() => undefined}>
+          Tag
+        </ColorTemplate>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Ellipsis</Text>
+        {Ellipsis.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+    </VerticalSpacing>
   ),
 };

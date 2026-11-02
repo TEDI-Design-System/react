@@ -3,12 +3,14 @@ import { Meta, StoryObj } from '@storybook/react-vite';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import Collapse from './collapse';
+import { Card } from '../card';
+import Collapse, { CollapseProps } from './collapse';
 
 const meta: Meta<typeof Collapse> = {
   component: Collapse,
   title: 'TEDI-Ready/Content/Collapse',
   parameters: {
+    chromatic: { disableSnapshot: true },
     status: {
       type: [
         'devComponent',
@@ -126,4 +128,46 @@ export const Nested: Story = {
       </VerticalSpacing>
     ),
   },
+};
+
+const storyArgs = (story: Story) => story.args as CollapseProps;
+
+/** Chromatic snapshot for Collapse: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Collapse {...storyArgs(Default)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon only</Text>
+        <Collapse {...storyArgs(IconOnly)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Secondary arrow</Text>
+        <Collapse {...storyArgs(SecondaryArrow)} />
+      </VerticalSpacing>
+      <Card background="brand-primary" borderless>
+        <Card.Content>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold" color="white">
+              Inverted
+            </Text>
+            <Collapse {...storyArgs(Inverted)} />
+          </VerticalSpacing>
+        </Card.Content>
+      </Card>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without underline</Text>
+        <Collapse {...storyArgs(WithoutUnderline)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Nested</Text>
+        <Collapse {...storyArgs(Nested)} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

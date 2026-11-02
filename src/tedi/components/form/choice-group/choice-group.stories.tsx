@@ -48,6 +48,7 @@ const meta: Meta<typeof ChoiceGroup> = {
     },
     // ChoiceGroup is deprecated and slated for removal — skip the a11y gate for its stories.
     a11y: { test: 'off' },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -415,6 +416,7 @@ export const WithExtraContent: Story = {
 };
 
 export const Responsive: Story = {
+  parameters: { chromatic: { disableSnapshot: false } },
   args: {
     inputType: 'radio',
     label: 'Choose an option:',
@@ -569,4 +571,64 @@ export const CustomItemHTMLLabels: Story = {
       },
     ],
   },
+};
+
+const VisualTestStory = ({ story }: { story: Story }) =>
+  story.render ? (
+    <>{story.render({ ...story.args } as ChoiceGroupProps, {} as never)}</>
+  ) : (
+    <ChoiceGroup {...(story.args as ChoiceGroupProps)} />
+  );
+
+const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
+  { label: 'Radio', content: <VisualTestStory story={Radio as Story} /> },
+  { label: 'Radio row', content: <VisualTestStory story={RadioRow} /> },
+  { label: 'Checkbox', content: <VisualTestStory story={Checkbox} /> },
+  { label: 'Checkbox row', content: <VisualTestStory story={CheckboxRow} /> },
+  { label: 'Radio card segmented', content: <RadioCardSegmented /> },
+  { label: 'Radio card separated', content: <RadioCardSeparated /> },
+  { label: 'Checkbox card', content: <CheckboxCard /> },
+  { label: 'Radio card with icon', content: <VisualTestStory story={RadioCardWithIcon} /> },
+  { label: 'Checkbox card with icon', content: <VisualTestStory story={CheckboxCardWithIcon} /> },
+  { label: 'With error', content: <VisualTestStory story={WithError} /> },
+  {
+    label: 'With default value',
+    content: (
+      <VisualTestStory
+        story={{
+          args: { ...WithDefaultValue.args, id: 'example-2-vt-default-value', name: 'check-2-vt-default-value' },
+        }}
+      />
+    ),
+  },
+  {
+    label: 'With indeterminate',
+    content: (
+      <VisualTestStory
+        story={{
+          args: { ...WithIndeterminate.args, id: 'example-2-vt-indeterminate', name: 'check-2-vt-indeterminate' },
+        }}
+      />
+    ),
+  },
+  { label: 'With extra content', content: <VisualTestStory story={WithExtraContent} /> },
+  { label: 'Custom label', content: <VisualTestStory story={CustomLabel} /> },
+  { label: 'Custom item labels', content: <VisualTestStory story={CustomItemLabels} /> },
+  { label: 'Custom item HTML labels', content: <VisualTestStory story={CustomItemHTMLLabels} /> },
+];
+
+/** Chromatic snapshot for ChoiceGroup: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

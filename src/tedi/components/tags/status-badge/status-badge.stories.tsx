@@ -26,6 +26,7 @@ const meta: Meta<typeof StatusBadge> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2385-24154&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -198,4 +199,38 @@ export const WithTooltip: StoryFn<StatusBadgeProps> = () => {
       </Tooltip.Content>
     </Tooltip>
   );
+};
+
+/** Chromatic snapshot for StatusBadge: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <StatusBadge color="neutral" variant="filled">
+          Text
+        </StatusBadge>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateColumn array={sizeArray} color="neutral">
+          Draft
+        </TemplateColumn>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Colors</Text>
+        <TemplateAllCombos />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Status indicator</Text>
+        <TemplateStatusGrid color="neutral" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With tooltip</Text>
+        <WithTooltip />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

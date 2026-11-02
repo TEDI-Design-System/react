@@ -32,6 +32,7 @@ const meta: Meta<typeof VerticalStepper> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.54.75?node-id=4375-57530&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -316,6 +317,7 @@ const RESPONSIVE_STEPS: CardStepperStepProps[] = [
  * toolbar) to see it switch.
  */
 export const Responsive: Story = {
+  parameters: { chromatic: { disableSnapshot: false } },
   render: function ResponsiveExample() {
     const [step, setStep] = useState(2);
 
@@ -358,4 +360,61 @@ export const Responsive: Story = {
       </>
     );
   },
+};
+
+/** Chromatic snapshot for VerticalStepper: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: { hover: ['.vs-hover a', '.vs-hover button'] },
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'landmark-unique', enabled: false },
+        ],
+      },
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        {Default.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With descriptions</Text>
+        {WithDescriptions.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With status badges</Text>
+        {WithStatusBadges.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With button</Text>
+        {WithButton.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With links</Text>
+        {WithLinks.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact</Text>
+        {Compact.render?.({} as never, {} as never)}
+      </VerticalSpacing>
+      <VerticalSpacing size={1}>
+        <Text modifiers="bold">States: default</Text>
+        <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(false, props)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={1}>
+        <Text modifiers="bold">States: compact</Text>
+        <StateMatrix states={ITEM_STATES} renderCell={(props) => itemCell(true, props)} />
+      </VerticalSpacing>
+      <VerticalSpacing size={1}>
+        <Text modifiers="bold">States: has subitems</Text>
+        <StateMatrix states={SUB_STATES} renderCell={subCell} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

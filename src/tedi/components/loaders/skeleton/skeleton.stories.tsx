@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -40,6 +41,7 @@ const meta: Meta<typeof Skeleton> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2188-34298&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -194,4 +196,43 @@ export const Accessibility: Story = {
       </VerticalSpacing>
     );
   },
+};
+
+/** Chromatic snapshot for Skeleton: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Skeleton label="Loading something">
+          <Skeleton.Block width={50} height="h2" />
+        </Skeleton>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Height</Text>
+        <Skeleton label="Loading something">
+          <VerticalSpacing>
+            <Skeleton.Block height="p" />
+            <Skeleton.Block height="h3" />
+            <Skeleton.Block height="h2" />
+            <Skeleton.Block height="h1" />
+            <Skeleton.Block height={100} />
+          </VerticalSpacing>
+        </Skeleton>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Width</Text>
+        <Skeleton label="Loading something">
+          <VerticalSpacing>
+            <Skeleton.Block width={50} height="p" />
+            <Skeleton.Block width={75} height="h3" />
+            <Skeleton.Block width="36px" height="h2" />
+            <Skeleton.Block width="auto" height="h1" />
+          </VerticalSpacing>
+        </Skeleton>
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

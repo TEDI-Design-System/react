@@ -159,6 +159,7 @@ Rules:
 - [ ] Controlled example included if the component is a form control
 - [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts
+- [ ] Component has a `VisualTest` story? Every new visual story adds its variant there too (see §8)
 - [ ] Use `CardContent` with `padding` prop to add content padding in story examples (components should not hardcode content padding)
 
 ### 7. Parameters Convention
@@ -172,7 +173,47 @@ parameters: {
 }
 ```
 
-### 8. Verify
+### 8. Chromatic Snapshots (`VisualTest`)
+
+Chromatic bills per story, not per pixel. A simple component therefore keeps its snapshots in one
+hidden `VisualTest` story instead of one per docs story.
+
+- **Meta** sets `chromatic: { disableSnapshot: true }` in `parameters`, so docs stories are not snapshotted.
+- **`VisualTest`** is the last story. It has `tags: ['!dev', '!autodocs']` (hidden from sidebar and
+  docs, still run by Chromatic and the test-runner; never add `!test`) and
+  `parameters: { chromatic: { disableSnapshot: false } }`. It renders every visual variant of the docs
+  stories with fixed props, reusing their templates, each block under a bold `Text` label.
+- **Separate snapshots** stay separate: stories that need a viewport, a `play` function, an open
+  overlay, animation, scrolling or sticky/fixed positioning. Give them
+  `chromatic: { disableSnapshot: false }` and keep them out of `VisualTest`.
+- **Behaviour-only stories** (they look the same as another story) get no place in `VisualTest`.
+- **Unique within the story**: every `id`, `htmlFor`, `aria-labelledby` and radio `name`, and an
+  `aria-label` on each repeated landmark. Pass an id prefix into shared templates.
+- **Pseudo states** target selectors that only match inside their block, e.g.
+  `hover: ['#vt-states-Hover', '#vt-inverted-Hover']`.
+- **Inverted variants** sit on `<Card background="brand-primary" borderless>`, since story `globals`
+  apply to the whole composite.
+
+```tsx
+/** Chromatic snapshot for Button: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false }, pseudo: { hover: ['#vt-primary-Hover'] } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Primary</Text>
+        <TemplateColumn idPrefix="vt-primary-" visualType="primary" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
+};
+```
+
+**A new visual story on a component with `VisualTest` adds its variant to `VisualTest` too**;
+otherwise Chromatic never sees it.
+
+### 9. Verify
 
 Run Storybook to visually confirm stories render correctly:
 ```

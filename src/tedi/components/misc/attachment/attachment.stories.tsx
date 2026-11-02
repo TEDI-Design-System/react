@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
@@ -26,6 +27,7 @@ const meta: Meta<AttachmentProps> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.59.78?node-id=30427-154342&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -246,3 +248,40 @@ export const LabeledActions: StoryFn<AttachmentProps> = () => (
     />
   </div>
 );
+
+const visualTestArgs: AttachmentProps = { name: 'Kodukülastusakt_Triin.pdf' };
+
+const visualTestBlocks: { label: string; content: JSX.Element }[] = [
+  {
+    label: 'Default',
+    content: renderWithDelete(visualTestArgs, {} as never),
+  },
+  { label: 'Read only', content: <ReadOnly {...visualTestArgs} /> },
+  { label: 'With progress', content: <WithProgress {...visualTestArgs} /> },
+  {
+    label: 'With file size',
+    content: renderWithDelete({ ...visualTestArgs, fileSize: '0,9 MB' }, {} as never),
+  },
+  { label: 'With icon', content: <WithIcon {...visualTestArgs} /> },
+  { label: 'Without delete button', content: <WithoutDeleteButton {...visualTestArgs} /> },
+  { label: 'With different actions', content: <WithDifferentActions {...visualTestArgs} /> },
+  { label: 'Vertical', content: <Vertical {...visualTestArgs} /> },
+  { label: 'With error', content: <WithError {...visualTestArgs} /> },
+  { label: 'Labeled actions', content: <LabeledActions {...visualTestArgs} /> },
+];
+
+/** Chromatic snapshot for Attachment: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
+};

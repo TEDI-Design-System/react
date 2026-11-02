@@ -25,6 +25,7 @@ const meta: Meta<typeof TextField> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=3486-37649&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -224,4 +225,61 @@ export const ClearButtonOnInteraction: Story = {
     isClearable: true,
     showClearOnInteraction: true,
   },
+};
+
+/** Chromatic snapshot for TextField: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <TextField id="textfield-vt-default" label="Label" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateColumn id="textfield-vt-size" label="Label" property="size" value="Text value" array={sizeArray} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <TemplateColumnWithStates array={stateArray} label="Label" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <TextField
+          id="textfield-vt-hint"
+          label="Label"
+          helper={{ id: 'textfield-vt-hint', text: 'Hint text', type: 'hint' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Password</Text>
+        <TextField id="textfield-vt-password" label="Label" input={{ type: 'password' }} value="123456789" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Password with toggle</Text>
+        <TextField
+          id="textfield-vt-password-toggle"
+          label="Password"
+          value="SuperSecret123"
+          input={{ type: 'password', autoComplete: 'current-password' }}
+          icon="visibility"
+          onIconClick={() => undefined}
+          iconButtonProps={{ 'aria-label': 'Show password', 'aria-pressed': false }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Placeholder</Text>
+        <TextField id="textfield-vt-placeholder" label="Label" placeholder="Text value" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

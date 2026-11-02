@@ -30,6 +30,7 @@ const meta: Meta<typeof Checkbox> = {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -557,6 +558,7 @@ export const CardsWithIcons: StoryObj = {
  * regular checkboxes from `md` up — resize the canvas to see it switch.
  */
 export const ResponsiveVariant: StoryObj = {
+  parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <Checkbox.Group
       label="Tooraine"
@@ -698,4 +700,57 @@ export const CardStatesPrimary: StoryObj = {
 export const CardStatesSecondary: StoryObj = {
   parameters: { pseudo: cardStatesPseudo('secondary') },
   render: () => renderCardStates('secondary'),
+};
+
+const VisualTestStory = ({ story }: { story: StoryObj }) => <>{story.render?.({ ...story.args }, {} as never)}</>;
+
+const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
+  { label: 'Default', content: <VisualTestStory story={Default as StoryObj} /> },
+  { label: 'Sizes', content: <VisualTestStory story={Sizes as StoryObj} /> },
+  { label: 'Hidden label', content: <VisualTestStory story={HiddenLabel as StoryObj} /> },
+  { label: 'With helper', content: <VisualTestStory story={WithHelper as StoryObj} /> },
+  { label: 'With tooltip', content: <VisualTestStory story={WithTooltip as StoryObj} /> },
+  { label: 'With long title', content: <WithLongTitle /> },
+  { label: 'Group', content: <VisualTestStory story={Group} /> },
+  { label: 'Group required', content: <VisualTestStory story={GroupRequired} /> },
+  { label: 'Group invalid', content: <VisualTestStory story={GroupInvalid} /> },
+  { label: 'With select all', content: <VisualTestStory story={WithSelectAll} /> },
+  { label: 'Cards default', content: <VisualTestStory story={CardsDefault} /> },
+  { label: 'Cards with label', content: <VisualTestStory story={CardsWithLabel} /> },
+  { label: 'Cards with description', content: <VisualTestStory story={CardsWithDescription} /> },
+  { label: 'Cards with icons', content: <VisualTestStory story={CardsWithIcons} /> },
+  { label: 'States', content: <States /> },
+  { label: 'Card states primary', content: renderCardStates('primary') },
+  { label: 'Card states secondary', content: renderCardStates('secondary') },
+];
+
+/** Chromatic snapshot for Checkbox: add every new visual variant here too. */
+export const VisualTest: StoryObj = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: [...cardStatesPseudo('primary').hover, ...cardStatesPseudo('secondary').hover],
+      active: [
+        ...STATE_COLUMNS.map(({ suffix }) => `#check-active-${suffix} + *`),
+        ...cardStatesPseudo('primary').active,
+        ...cardStatesPseudo('secondary').active,
+      ],
+      focusVisible: [
+        ...STATE_COLUMNS.map(({ suffix }) => `#check-focus-${suffix}`),
+        ...cardStatesPseudo('primary').focusVisible,
+        ...cardStatesPseudo('secondary').focusVisible,
+      ],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

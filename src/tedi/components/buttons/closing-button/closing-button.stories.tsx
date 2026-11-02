@@ -1,7 +1,9 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
 import { Text } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import ClosingButton, { ClosingButtonProps } from './closing-button';
 
 /**
@@ -13,6 +15,7 @@ const meta: Meta<typeof ClosingButton> = {
   component: ClosingButton,
   title: 'Tedi-Ready/Components/Buttons/ClosingButton',
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4514-63815&m=dev',
@@ -43,7 +46,7 @@ const SizeTemplate: StoryFn = () => {
 
 const stateArray = ['Default', 'Hover', 'Active', 'Focus'];
 
-const StatesTemplate: StoryFn = (args) => {
+const StatesTemplate: StoryFn = ({ idPrefix = '', ...args }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '200px' }}>
       {stateArray.map((state) => (
@@ -54,7 +57,7 @@ const StatesTemplate: StoryFn = (args) => {
             </Text>
           </Col>
           <Col>
-            <ClosingButton id={state} {...args} />
+            <ClosingButton id={`${idPrefix}${state}`} {...args} />
           </Col>
         </Row>
       ))}
@@ -147,4 +150,51 @@ export const ColorInverted: Story = {
     },
   },
   globals: { backgrounds: { value: 'brand' } },
+};
+
+/** Chromatic snapshot for ClosingButton: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: ['.hover', '#vt-states-Hover', '#vt-brand-Hover', '#vt-inverted-Hover'],
+      active: ['#vt-states-Active', '#vt-brand-Active', '#vt-inverted-Active'],
+      focusVisible: ['#vt-states-Focus', '#vt-brand-Focus', '#vt-inverted-Focus'],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <ClosingButton title="close" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Size</Text>
+        <SizeTemplate />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon sizes</Text>
+        <IconSizeTemplate />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <StatesTemplate idPrefix="vt-states-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Color brand</Text>
+        <StatesTemplate idPrefix="vt-brand-" color="brand" />
+      </VerticalSpacing>
+      <Card background="brand-primary" borderless>
+        <Card.Content>
+          <VerticalSpacing size={0.5}>
+            <Text modifiers="bold" color="white">
+              Color inverted
+            </Text>
+            <StatesTemplate idPrefix="vt-inverted-" color="white" />
+          </VerticalSpacing>
+        </Card.Content>
+      </Card>
+    </VerticalSpacing>
+  ),
 };

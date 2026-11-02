@@ -1,5 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Label, LabelProps } from './label';
 
 /**
@@ -14,6 +16,7 @@ const meta: Meta<typeof Label> = {
     tooltip: { control: false },
   },
   parameters: {
+    chromatic: { disableSnapshot: true },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -98,4 +101,30 @@ export const DefaultSmallBold: Story = {
     isBold: true,
     isSmall: true,
   },
+};
+
+const visualTestVariants: { label: string; props: Omit<LabelProps, 'children'> }[] = [
+  { label: 'Default', props: {} },
+  { label: 'Required field', props: { required: true } },
+  { label: 'Bold', props: { isBold: true } },
+  { label: 'Bold required field', props: { required: true, isBold: true } },
+  { label: 'Info button', props: { required: true, tooltip: 'Lisainfo' } },
+  { label: 'Small', props: { isSmall: true } },
+  { label: 'Small bold', props: { isBold: true, isSmall: true } },
+];
+
+/** Chromatic snapshot for Label: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={1}>
+      {visualTestVariants.map(({ label, props }) => (
+        <VerticalSpacing key={label} size={0.25}>
+          <Text modifiers="bold">{label}</Text>
+          <Label {...props}>Toimeaine</Label>
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };
