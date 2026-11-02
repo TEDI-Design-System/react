@@ -7,6 +7,7 @@
 
 .tedi-dock-panel {
   --dock-panel-width: 25%;
+  --dock-panel-max-width: 100%;
   --dock-panel-height: 100%;
   --dock-panel-max-height: 100%;
   --dock-panel-layer: 1;
@@ -22,7 +23,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  max-width: 100%;
+  max-width: min(100%, var(--dock-panel-max-width));
   min-height: 0;
   max-height: var(--dock-panel-max-height);
   overflow: visible;
@@ -74,6 +75,24 @@
   flex: 0 0 auto;
 }
 
+.tedi-dock-panel[data-collapsed='false'] {
+  .tedi-dock-panel__header {
+    max-height: calc(100% - 1px);
+    overflow: auto;
+  }
+
+  .tedi-dock-panel__header-row,
+  .tedi-dock-panel__header-actions,
+  .tedi-dock-panel__controls {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  .tedi-dock-panel__title {
+    flex-basis: 0;
+  }
+}
+
 .tedi-dock-panel__body {
   display: flex;
   flex: 1 1 auto;
@@ -105,9 +124,9 @@
   border-top: 1px solid var(--general-border-primary);
 }
 
-.tedi-dock-panel__resize-measurement {
-  visibility: hidden;
-  pointer-events: none;
+.tedi-dock-panel__resize-measurement > .tedi-dock-panel__resize-frame {
+  flex: 1;
+  height: 100%;
 }
 
 .tedi-dock-panel__resize-layout {
@@ -121,6 +140,12 @@
   pointer-events: none;
 }
 
+.tedi-dock-panel__resize-frame {
+  position: relative;
+  display: flex;
+}
+
+.tedi-dock-panel__resize-frame,
 .tedi-dock-panel__resizer {
   flex: 0 1 auto;
   min-width: 0;
@@ -205,9 +230,27 @@
   padding: var(--dock-panel-gap);
 }
 
+/* Extend the Restore button across the minimized bar, keeping Close separately clickable. */
+.tedi-dock-panel[data-collapsed='true'] .tedi-dock-panel__toggle {
+  position: static;
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+  }
+}
+
+.tedi-dock-panel[data-collapsed='true'] .tedi-dock-panel__close {
+  z-index: 1;
+}
+
 .tedi-dock-panel[data-collapsed='true'][data-placement='left'],
 .tedi-dock-panel[data-collapsed='true'][data-placement='right'] {
   width: var(--dock-panel-rail-size);
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
 
   .tedi-dock-panel__header,
   .tedi-dock-panel__header-row {
@@ -235,6 +278,7 @@
 .tedi-dock-panel[data-collapsed='true'][data-placement='top'],
 .tedi-dock-panel[data-collapsed='true'][data-placement='bottom'] {
   height: var(--dock-panel-rail-size);
+  max-height: 100%;
 }
 
 .tedi-dock-panel[data-resizable='true'] {
@@ -251,19 +295,21 @@
   justify-content: flex-end;
 }
 
-.tedi-dock-panel__resize-layout[data-placement='top'] > .tedi-dock-panel__resizer,
-.tedi-dock-panel__resize-layout[data-placement='bottom'] > .tedi-dock-panel__resizer {
+.tedi-dock-panel__resize-layout[data-placement='top'] > .tedi-dock-panel__resize-frame,
+.tedi-dock-panel__resize-layout[data-placement='bottom'] > .tedi-dock-panel__resize-frame,
+.tedi-dock-panel__resize-layout[data-placement='top'] > .tedi-dock-panel__resize-frame > .tedi-dock-panel__resizer,
+.tedi-dock-panel__resize-layout[data-placement='bottom'] > .tedi-dock-panel__resize-frame > .tedi-dock-panel__resizer {
   flex: 1 1 0;
 }
 
-.tedi-dock-panel__resize-layout[data-placement='top'] > .tedi-dock-panel__resizer {
+.tedi-dock-panel__resize-layout[data-placement='top'] > .tedi-dock-panel__resize-frame {
   align-self: flex-start;
 }
 
 .tedi-dock-panel__resize-layout[data-placement='bottom'] {
   top: auto;
 
-  > .tedi-dock-panel__resizer {
+  > .tedi-dock-panel__resize-frame {
     align-self: flex-end;
   }
 }
@@ -271,7 +317,17 @@
 .tedi-dock-panel__resize-layout[data-collapsed='true'] {
   overflow: clip;
 
-  > .tedi-dock-panel__resizer {
+  > .tedi-dock-panel__resize-frame {
+    min-width: 100%;
+    min-height: 100%;
+  }
+
+  > .tedi-dock-panel__resize-frame > .tedi-dock-panel__resizer {
+    visibility: hidden;
+  }
+
+  > .tedi-dock-panel__resize-frame,
+  > .tedi-dock-panel__resize-frame > .tedi-dock-panel__resizer {
     flex-shrink: 0;
     max-width: none;
     max-height: none;

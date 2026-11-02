@@ -114,19 +114,25 @@ export interface DockPanelProps {
    * @default xs
    */
   width?: DockPanelWidth;
+  /** Minimum side-panel resize width in pixels. Defaults to 8% of the workspace width. */
+  minWidth?: number;
+  /** Maximum side-panel width in pixels. Defaults to 92% when resizable; otherwise the workspace width. */
+  maxWidth?: number;
   /**
    * Expanded height for any placement. Accepts presets, CSS lengths, pixel numbers or auto.
    * Use auto with maxHeight for content height with a scrolling limit.
-   * Minimized side rails keep an explicit height or fit their content with auto.
+   * Minimized side rails always fill the workspace height.
    * @default 100% for left/right; 50% for top/bottom
    */
   height?: DockPanelHeight;
+  /** Minimum top/bottom resize height in pixels. Defaults to 8% of the workspace height. */
+  minHeight?: number;
   /**
-   * Maximum height as a CSS length or pixel number, without presets.
-   * Content scrolls at this limit while the header and footer remain visible.
-   * @default 100%
+   * Maximum expanded height in pixels.
+   * Body content scrolls at this limit. Very shallow panels also scroll the header.
+   * @default 92% of workspace height for top/bottom resizing; otherwise the workspace height
    */
-  maxHeight?: CSSProperties['maxHeight'];
+  maxHeight?: number;
   /**
    * Title heading tag and expanded text size. Minimized titles always use compact text.
    * @default h3 (h4 when size is small)
@@ -142,6 +148,7 @@ export interface DockPanelProps {
 
 type DockPanelStyle = CSSProperties & {
   '--dock-panel-width'?: string;
+  '--dock-panel-max-width'?: string;
   '--dock-panel-height'?: string;
   '--dock-panel-max-height'?: string;
 };
@@ -164,7 +171,6 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
     footer,
     width,
     height,
-    maxHeight,
     headingElement,
     id,
     className,
@@ -177,29 +183,69 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
   const bodyId = `${panelId}-body`;
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
   const isControlled = collapsed !== undefined;
-  const isCollapsed = collapsed ?? internalCollapsed;
   const previousMinimizeCounter = useRef(minimizeCounter);
-  const resizeMeasurementRef = useRef<HTMLDivElement>(null);
-  const [initialResizeMeasurements, setInitialResizeMeasurements] = useState<{
-    width: number;
-    height: number;
-    maxWidth: number;
-    maxHeight: number;
+  const resizeContainerRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [resizerResetKey, setResizerResetKey] = useState(0);
+  const [workspaceDimensions, setWorkspaceDimensions] = useState<{
+    workspaceWidth: number;
+    workspaceHeight: number;
   }>();
 
+  const isMeasuring = resizable && !workspaceDimensions;
+  const isCollapsed = !isMeasuring && (collapsed ?? internalCollapsed);
+  const isSidePanel = placement === 'left' || placement === 'right';
+  const resizeDimension = isSidePanel ? 'width' : 'height';
+
+  const getResizeLimits = (workspaceWidth: number, workspaceHeight: number) => {
+    const {
+      minWidth = workspaceWidth * 0.08,
+      maxWidth = workspaceWidth * 0.92,
+      minHeight = workspaceHeight * 0.08,
+      maxHeight = workspaceHeight * 0.92,
+    } = props;
+    const workspaceSize = isSidePanel ? workspaceWidth : workspaceHeight;
+    const maximumSize = Math.min(workspaceSize, isSidePanel ? maxWidth : maxHeight);
+    const minimumSize = Math.min(isSidePanel ? minWidth : minHeight, maximumSize);
+    return { minimumSize, maximumSize };
+  };
+
   useLayoutEffect(() => {
-    if (resizable && !initialResizeMeasurements && resizeMeasurementRef.current) {
-      const measurement = resizeMeasurementRef.current;
-      const { width, height } = measurement.getBoundingClientRect();
-      const workspace = measurement.offsetParent as HTMLElement;
-      setInitialResizeMeasurements({
-        width,
-        height,
-        maxWidth: workspace.clientWidth,
-        maxHeight: workspace.clientHeight,
+    if (!resizable) return;
+
+    const workspace = resizeContainerRef.current?.offsetParent;
+    if (!workspace) return;
+
+    const updateWorkspaceSize = (): void => {
+      const workspaceWidth = workspace.clientWidth;
+      const workspaceHeight = workspace.clientHeight;
+
+      setWorkspaceDimensions((current) => {
+        if (current?.workspaceWidth === workspaceWidth && current.workspaceHeight === workspaceHeight) {
+          return current;
+        }
+
+        return { workspaceWidth, workspaceHeight };
       });
-    }
-  }, [resizable, initialResizeMeasurements]);
+
+      const resizerElement = panelRef.current?.previousElementSibling;
+      if (resizerElement instanceof HTMLElement) {
+        // Resizer's inline style contains its saved size before any CSS limits.
+        const savedSize = Number.parseFloat(resizerElement.style[resizeDimension]);
+        const { minimumSize, maximumSize } = getResizeLimits(workspaceWidth, workspaceHeight);
+        if (savedSize < minimumSize || savedSize > maximumSize) {
+          setResizerResetKey((key) => key + 1);
+        }
+      }
+    };
+
+    updateWorkspaceSize();
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(updateWorkspaceSize);
+    observer.observe(workspace);
+    return () => observer.disconnect();
+  }, [resizable]);
 
   const handleCollapseToggle = (): void => {
     const nextCollapsed = !isCollapsed;
@@ -221,11 +267,14 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
   if (width !== undefined) {
     panelStyle['--dock-panel-width'] = resolveCssDimension(width);
   }
+  if (!resizable && isSidePanel && props.maxWidth !== undefined) {
+    panelStyle['--dock-panel-max-width'] = `${props.maxWidth}px`;
+  }
   if (height !== undefined) {
     panelStyle['--dock-panel-height'] = resolveCssDimension(height);
   }
-  if (maxHeight !== undefined) {
-    panelStyle['--dock-panel-max-height'] = typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight;
+  if (props.maxHeight !== undefined) {
+    panelStyle['--dock-panel-max-height'] = `${props.maxHeight}px`;
   }
 
   const titleElement = headingElement ?? (size === 'small' ? 'h4' : 'h3');
@@ -236,13 +285,14 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
 
   const panel = (
     <div
+      ref={panelRef}
       id={panelId}
       role="region"
       aria-labelledby={titleId}
       data-placement={placement}
       data-size={size}
       data-collapsed={isCollapsed}
-      data-resizable={resizable}
+      data-resizable={resizable && !isMeasuring}
       className={cn(styles['tedi-dock-panel'], className)}
       style={panelStyle}
     >
@@ -309,47 +359,64 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
 
   if (!resizable) return panel;
 
-  if (!initialResizeMeasurements) {
-    return (
-      <div
-        ref={resizeMeasurementRef}
-        aria-hidden="true"
-        data-placement={placement}
-        className={cn(styles['tedi-dock-panel'], styles['tedi-dock-panel__resize-measurement'], className)}
-        style={panelStyle}
-      />
-    );
-  }
+  const resizerElement = panelRef.current?.previousElementSibling;
+  const panelSize =
+    resizerElement instanceof HTMLElement
+      ? Number.parseFloat(resizerElement.style[resizeDimension])
+      : panelRef.current?.getBoundingClientRect()[resizeDimension] ?? 0;
+  const { minimumSize, maximumSize } = getResizeLimits(
+    workspaceDimensions?.workspaceWidth ?? 0,
+    workspaceDimensions?.workspaceHeight ?? 0
+  );
+  const sizeWithinLimits = Math.min(Math.max(panelSize, minimumSize), maximumSize);
 
   const resizeLayoutStyle: DockPanelStyle = {
-    height: placement === 'left' || placement === 'right' ? panelStyle['--dock-panel-height'] : undefined,
+    height: isSidePanel ? panelStyle['--dock-panel-height'] : undefined,
     maxHeight: panelStyle['--dock-panel-max-height'],
     zIndex: style?.zIndex,
+    visibility: isMeasuring && (collapsed ?? internalCollapsed) ? 'hidden' : undefined,
     '--dock-panel-gap': panelStyle['--dock-panel-gap'],
     '--dock-panel-rail-size': panelStyle['--dock-panel-rail-size'],
     '--dock-panel-layer': panelStyle['--dock-panel-layer'],
   };
 
+  // Measure against the full workspace; minimized bars also ignore expanded height limits.
+  if (isCollapsed || isMeasuring) {
+    resizeLayoutStyle.height = undefined;
+    resizeLayoutStyle.maxHeight = undefined;
+  }
+
   return (
     <div
-      className={styles['tedi-dock-panel__resize-layout']}
+      ref={resizeContainerRef}
+      className={cn(
+        styles['tedi-dock-panel__resize-layout'],
+        isMeasuring && styles['tedi-dock-panel__resize-measurement']
+      )}
       data-placement={placement}
       data-collapsed={isCollapsed}
       style={resizeLayoutStyle}
     >
-      <Resizer
-        className={styles['tedi-dock-panel__resizer']}
-        handlePosition={resizeHandleByPlacement[placement]}
-        initialWidth={initialResizeMeasurements.width}
-        initialHeight={initialResizeMeasurements.height}
-        minWidth={0}
-        minHeight={0}
-        maxWidth={initialResizeMeasurements.maxWidth}
-        maxHeight={initialResizeMeasurements.maxHeight}
-        showIndicator={false}
-      >
+      <div className={styles['tedi-dock-panel__resize-frame']}>
+        {workspaceDimensions && (
+          <Resizer
+            key={resizerResetKey}
+            className={styles['tedi-dock-panel__resizer']}
+            handlePosition={resizeHandleByPlacement[placement]}
+            initialWidth={isSidePanel ? sizeWithinLimits : undefined}
+            initialHeight={isSidePanel ? undefined : sizeWithinLimits}
+            minWidth={isSidePanel ? minimumSize : undefined}
+            minHeight={isSidePanel ? undefined : minimumSize}
+            maxWidth={isSidePanel ? maximumSize : undefined}
+            maxHeight={isSidePanel ? undefined : maximumSize}
+            showIndicator={false}
+          >
+            {null}
+          </Resizer>
+        )}
+        {/* Keep content mounted when only Resizer needs a new starting size. */}
         {panel}
-      </Resizer>
+      </div>
     </div>
   );
 };
