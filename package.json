@@ -82,7 +82,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@etchteam/storybook-addon-status": "^8.1.0",
     "@faker-js/faker": "^10.3.0",
-    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^13.1.5",
