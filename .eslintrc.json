@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["node_modules", "dist", "coverage", "design-docs", ".husky", "public"],
+  "ignorePatterns": ["node_modules", "dist", "coverage", "design-docs", ".husky", "public", "ds-bundle", ".ds-sync"],
   "env": {
     "node": true
   },
@@ -21,9 +21,7 @@
       {
         "groups": [
           ["^@?\\w"], // Packages
-          ["^@ria."], // Imports from @ria scope
           ["^\\."], // Relative imports
-          ["^[^.]"], // Absolute imports
           ["^\\u0000"] // Side-effect imports
         ]
       }

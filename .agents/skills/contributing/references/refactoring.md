@@ -1,6 +1,6 @@
 # Safe Refactor TEDI React Component
 
-Target: `$ARGUMENTS`
+Target: the component given in the task.
 
 ## Step 1: Understand the Blast Radius
 
@@ -22,7 +22,7 @@ If any tests fail before your changes, note them — they are pre-existing failu
 
 ## Step 3: Plan
 
-Enter plan mode. The plan must cover:
+Write a plan and get it approved before changing code. It covers:
 
 - **What changes** — exact files and what changes in each
 - **Consumer impact** — which files need updating and why
@@ -42,7 +42,7 @@ Apply changes in this order:
 
 ## Step 5: Verify
 
-1. Run the specific component test: `npm test -- --testPathPattern="<component-name>"`
+1. Run the specific component test: `npm test -- --testPathPattern="<component-name>" --coverage=false`
 2. Run the full test suite: `npm test`
 3. Run lint: `npm run lint`
 4. Compare test results with the baseline from Step 2 — no new failures allowed.
@@ -66,10 +66,15 @@ contract.
    - **You created one.** A behaviour change that callers cannot see in the types needs a new entry.
 4. **Renamed or removed a token?** Update `skills/tedi-react/references/theming.md`, including the
    legacy mapping table if consumers need a migration path.
-5. **Breaking change?** It also needs a consumer migration guide; see the `tedi-migration-guide`
-   skill rather than burying it in the reference docs.
+5. **Breaking change?** It also needs a consumer migration guide in the rc release description, not
+   a buried reference-doc edit.
 
-## Step 7: Report
+## Step 7: Code Review
+
+Run [pr-review.md](pr-review.md). Fix every finding confirmed against the current code that keeps
+behaviour and the public API, note why you skipped any other, then repeat Step 5.
+
+## Step 8: Report
 
 Summarize:
 - Files changed (with brief description of each change)

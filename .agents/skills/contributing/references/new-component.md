@@ -2,19 +2,19 @@
 
 ## Prerequisites
 
-A Figma link MUST be provided: `$ARGUMENTS`
+A Figma link MUST be provided with the task.
 
 If no Figma link was provided, stop immediately and ask the user for one. Do not proceed without design reference.
 
 ## Step 1: Gather Context
 
-1. Use `figma-desktop` MCP to fetch design context, screenshots, and metadata from the Figma link.
-2. Check if TEDI Angular (`../angular/tedi/components/`) has an equivalent component — use as behavioral reference.
+1. Use the Figma MCP server to fetch design context, screenshots, and metadata from the Figma link.
+2. Check if TEDI Angular (`../angular/src/tedi/components/`) has an equivalent component; use it as a behavioural reference.
 3. Check TEDI Core (`../core/src/`) for available design tokens and shared styles.
 
 ## Step 2: Plan
 
-Enter plan mode and create a detailed plan covering:
+Write a plan and get it approved before writing code. It covers:
 
 - **Component name** and export name (PascalCase)
 - **Category** — which folder under `src/tedi/components/` it belongs to
@@ -62,7 +62,7 @@ export * from './components/<category>/<component-name>/<component-name>';
 
 ## Step 6: Verify
 
-1. Run tests: `npm test -- --testPathPattern="<component-name>"`
+1. Run tests: `npm test -- --testPathPattern="<component-name>" --coverage=false`
 2. Fix any failures.
 3. Run lint: `npm run lint`
 4. Fix any lint errors.
@@ -72,9 +72,11 @@ export * from './components/<category>/<component-name>/<component-name>';
 Consumers read the component out of the published package, so the work here is mostly making sure
 the generated docs pick it up. See **SKILL.md → Consumer-Facing Docs** for the full contract.
 
-1. **Check the JSDoc is complete** before anything else. Every public prop needs a one-line
-   description and an `@default` where it has a default. This JSDoc ships in the `.d.ts` and is what
-   a consuming agent reads to write correct code, so an undocumented prop is an invisible prop.
+1. **Check the JSDoc is complete** before anything else. Every public prop needs JSDoc and an
+   `@default` where it has a default
+   ([best-practices.md → Comments and JSDoc](best-practices.md#comments-and-jsdoc)). This JSDoc
+   ships in the `.d.ts` and is what a consuming agent reads to write correct code, so an
+   undocumented prop is an invisible prop.
    Document the props interface, not the implementation.
 2. **Regenerate the catalog**: `npm run design:build`. The new component appears in
    `component.manifest.json` with a `null` description.
@@ -89,3 +91,8 @@ the generated docs pick it up. See **SKILL.md → Consumer-Facing Docs** for the
    well-documented component with no surprises needs **no** entry. Do not add a prop table.
 6. **If it is a form control**, add a row and the value-shape / event convention to
    `skills/tedi-react/references/forms.md`.
+
+## Step 8: Code Review
+
+Run [pr-review.md](pr-review.md). Fix every finding confirmed against the current code that keeps
+behaviour and the public API, note why you skipped any other, then repeat Step 6.
