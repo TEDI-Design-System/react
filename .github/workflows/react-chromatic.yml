@@ -27,10 +27,16 @@ jobs:
   # head would re-buy the same snapshots. The sticky comment records the commit it
   # was built from; if that commit is still the head, there is nothing new to see.
   # A push after the approval moves the head, so re-approving does rebuild.
+  #
+  # A change under `.storybook/` makes Chromatic snapshot every story in full,
+  # and the `rc` build after the merge has to do the same full build again.
+  # So such a PR gets no approval build: the `rc` build is the one full build,
+  # and it comments its result on the merged PR. Run the workflow by hand to
+  # see the diff before merging.
   guard:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read
+      pull-requests: write # the skip notice is posted to the PR
     # `pull_request_review` has no `branches:` filter, so the base branch is
     # checked here. Note the dependabot check reads the PR author, not
     # `github.actor`, which on a review event is the reviewer.
@@ -44,8 +50,9 @@ jobs:
       )
     outputs:
       build: ${{ steps.check.outputs.build }}
+      previous: ${{ steps.check.outputs.previous }}
     steps:
-      - name: Has this head already been built?
+      - name: Does this head need a build?
         id: check
         uses: actions/github-script@v7
         with:
@@ -55,17 +62,68 @@ jobs:
               return;
             }
             const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
             const sha = context.payload.pull_request.head.sha;
-            const { data: comments } = await github.rest.issues.listComments({
-              owner,
-              repo,
-              issue_number: context.payload.pull_request.number,
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
             });
-            const built = comments.some((c) => c.body?.includes(`chromatic-sha:${sha}`));
-            if (built) {
-              core.info(`${sha} already has a Chromatic build; skipping this approval.`);
+            const built = new Set();
+            for (const c of comments) {
+              for (const m of c.body?.matchAll(/chromatic-sha:([0-9a-f]{40})/g) ?? []) built.add(m[1]);
             }
-            core.setOutput('build', built ? 'no' : 'yes');
+            // Commits of this PR's earlier builds, so the build job can fetch them
+            // when a force-push has removed them from the branch.
+            const previous = new Set(built);
+            // A force-push removes the old head from the branch, and Chromatic may
+            // have built it (by hand, or before the comment was updated). The PR
+            // timeline keeps every commit a force-push replaced.
+            try {
+              const { repository } = await github.graphql(
+                `query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    pullRequest(number: $number) {
+                      timelineItems(itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT], last: 100) {
+                        nodes { ... on HeadRefForcePushedEvent { beforeCommit { oid } afterCommit { oid } } }
+                      }
+                    }
+                  }
+                }`,
+              { owner, repo, number: issue_number },
+            );
+              for (const e of repository.pullRequest.timelineItems.nodes) {
+                for (const c of [e.beforeCommit, e.afterCommit]) if (c?.oid) previous.add(c.oid);
+              }
+            } catch (error) {
+              core.warning(`Could not read the force-push history: ${error.message}`);
+            }
+            previous.delete(sha);
+            core.setOutput('previous', [...previous].join(' '));
+            if (built.has(sha)) {
+              core.info(`${sha} already has a Chromatic build; skipping this approval.`);
+              core.setOutput('build', 'no');
+              return;
+            }
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number: issue_number, per_page: 100,
+            });
+            const config = files.map((f) => f.filename).filter((name) => name.startsWith('.storybook/'));
+            if (config.length === 0) {
+              core.setOutput('build', 'yes');
+              return;
+            }
+            core.info(`Skipping: this PR changes ${config.join(', ')}, which forces a full build.`);
+            core.setOutput('build', 'no');
+            const marker = '<!-- chromatic-skip -->';
+            const body = [
+              marker,
+              '## 🎨 Chromatic',
+              '',
+              'This pull request changes `.storybook/`, which makes Chromatic snapshot every story. The approval build is skipped so that full build is paid for once: the `rc` build after the merge runs it and comments its result here.',
+              '',
+              'To see the visual diff before merging, run the **Chromatic React** workflow by hand on this branch.',
+            ].join('\n');
+            const existing = comments.find((c) => c.body?.includes(marker));
+            if (!existing) await github.rest.issues.createComment({ owner, repo, issue_number, body });
 
   chromatic:
     needs: guard
@@ -90,6 +148,20 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --cache .npm --prefer-offline
+
+      # Chromatic compares against this PR's previous build. After a
+      # force-push its commit is no longer on the branch, so Chromatic would
+      # fall back to a much older build and rebuild everything. GitHub still
+      # serves the commit by SHA.
+      - name: Fetch the commit of the previous build
+        if: needs.guard.outputs.previous != ''
+        continue-on-error: true
+        env:
+          SHAS: ${{ needs.guard.outputs.previous }}
+        run: |
+          for sha in $SHAS; do
+            git fetch --no-tags origin "$sha" || echo "::warning::Could not fetch ${sha}"
+          done
 
       # chromaui/action rather than the raw CLI, for the build result as step
       # outputs. Chromatic's GitHub App has never posted a UI Tests status on

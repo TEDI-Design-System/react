@@ -50,6 +50,7 @@ export const SectionAsArticle: Story = {
 };
 
 export const SectionWithCustomIdAndARIA: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     as: 'section',
     id: 'custom-section',

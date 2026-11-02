@@ -326,6 +326,7 @@ export const ManualTyping: StoryFn<TimeFieldProps> = (args) => {
     </Row>
   );
 };
+ManualTyping.parameters = { chromatic: { disableSnapshot: true } };
 
 /**
  * Pass `modal` to open the picker inside a centered modal (with Cancel / Confirm

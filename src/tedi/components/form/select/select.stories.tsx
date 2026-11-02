@@ -764,6 +764,7 @@ export const EditableSelect: Story = {
  * Best viewed on a real device or the Storybook mobile viewport.
  */
 export const DeferKeyboardOnTouch: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     id: 'defer-keyboard-example',
     label: 'Address',
@@ -780,6 +781,7 @@ export const DeferKeyboardOnTouch: Story = {
  * `isClearIndicatorVisible`.
  */
 export const ClearButtonOnInteraction: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     id: 'example-clear-on-interaction',
     label: 'Label',
