@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { useEffect, useRef } from 'react';
 
-import { Modal } from '../../../overlays/modal/modal';
+import { Sheet } from '../../../overlays/sheet/sheet';
 import styles from './pagination-mobile-modal.module.scss';
 
 export interface PaginationMobileModalOption {
@@ -14,28 +14,28 @@ export interface PaginationMobileModalOption {
 }
 
 export interface PaginationMobileModalProps {
-  /** Whether the modal is open. */
+  /** Whether the sheet is open. */
   open: boolean;
-  /** Callback when the modal opens or closes (e.g. dismiss via backdrop or Escape). */
+  /** Callback when the sheet opens or closes (e.g. dismiss via backdrop, Escape or drag). */
   onOpenChange: (open: boolean) => void;
   /** Options listed in the picker. */
   options: PaginationMobileModalOption[];
   /** Currently selected value — drives the active row styling. */
   selectedValue: number;
-  /** Fires with the chosen value. The modal closes automatically. */
+  /** Fires with the chosen value. The sheet closes automatically. */
   onSelect: (value: number) => void;
-  /** Accessible name for the modal dialog (used when `title` is omitted). */
+  /** Accessible name for the sheet dialog (used when `title` is omitted). */
   ariaLabel: string;
-  /** Optional heading rendered in the modal header. */
+  /** Optional heading rendered in the sheet header. */
   title?: string;
   /** `aria-current` value set on the selected row. @default 'true' */
   ariaCurrent?: 'page' | 'step' | 'true';
 }
 
 /**
- * Mobile option-picker modal — one row per option with a radio-style indicator
- * on the active one. Used by `Pagination` below `md` for both the page picker
- * and the page-size picker.
+ * Mobile option picker in a bottom sheet — one row per option with a radio-style
+ * indicator on the active one. Used by `Pagination` below `md` for both the page
+ * picker and the page-size picker.
  */
 export const PaginationMobileModal = (props: PaginationMobileModalProps): JSX.Element => {
   const { open, onOpenChange, options, selectedValue, onSelect, ariaLabel, title, ariaCurrent = 'true' } = props;
@@ -58,16 +58,10 @@ export const PaginationMobileModal = (props: PaginationMobileModalProps): JSX.El
   };
 
   return (
-    <Modal open={open} onToggle={onOpenChange}>
-      <Modal.Content
-        size="small"
-        position="bottom"
-        initialFocus={selectedItemRef}
-        aria-label={title ? undefined : ariaLabel}
-        className={styles['tedi-pagination-mobile-modal__content']}
-      >
-        <Modal.Header title={title} closeButtonProps={{ className: styles['tedi-pagination-mobile-modal__close'] }} />
-        <Modal.Body>
+    <Sheet open={open} onToggle={onOpenChange}>
+      <Sheet.Content initialFocus={selectedItemRef} aria-label={title ? undefined : ariaLabel}>
+        <Sheet.Header title={title} variant="default" />
+        <Sheet.Body padding="none">
           <ul className={styles['tedi-pagination-mobile-modal__list']}>
             {options.map((option) => {
               const isSelected = option.value === selectedValue;
@@ -95,9 +89,9 @@ export const PaginationMobileModal = (props: PaginationMobileModalProps): JSX.El
               );
             })}
           </ul>
-        </Modal.Body>
-      </Modal.Content>
-    </Modal>
+        </Sheet.Body>
+      </Sheet.Content>
+    </Sheet>
   );
 };
 
