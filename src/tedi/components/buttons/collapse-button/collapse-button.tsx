@@ -43,6 +43,11 @@ export interface CollapseButtonProps
    */
   arrowType?: CollapseButtonArrowType;
   /**
+   * Direction the chevron points when collapsed; reverses when expanded.
+   * @default down
+   */
+  expandDirection?: 'down' | 'up';
+  /**
    * Visual size.
    * @default default
    */
@@ -74,6 +79,7 @@ const CollapseButtonComponent = React.forwardRef<HTMLButtonElement, CollapseButt
     closeText,
     hideText = false,
     arrowType = 'default',
+    expandDirection = 'down',
     size = 'default',
     inverted = false,
     underline = true,
@@ -86,6 +92,7 @@ const CollapseButtonComponent = React.forwardRef<HTMLButtonElement, CollapseButt
   const { getLabel } = useLabels();
 
   const label = open ? closeText ?? getLabel('close') : openText ?? getLabel('open');
+  const iconName = expandDirection === 'up' ? 'expand_less' : 'expand_more';
 
   const resolvedAriaLabel = hideText ? ariaLabelProp ?? label : ariaLabelProp;
 
@@ -123,18 +130,12 @@ const CollapseButtonComponent = React.forwardRef<HTMLButtonElement, CollapseButt
       {hideText ? (
         arrowType === 'secondary' ? (
           <span className={styles['tedi-collapse-button__icon-wrapper']}>
-            <Icon
-              className={styles['tedi-collapse-button__icon']}
-              name="expand_more"
-              color="inherit"
-              filled
-              size={24}
-            />
+            <Icon className={styles['tedi-collapse-button__icon']} name={iconName} color="inherit" filled size={24} />
           </span>
         ) : (
           <Icon
             className={styles['tedi-collapse-button__icon']}
-            name="expand_more"
+            name={iconName}
             color="inherit"
             filled
             size={size === 'small' ? 18 : 24}
@@ -144,7 +145,7 @@ const CollapseButtonComponent = React.forwardRef<HTMLButtonElement, CollapseButt
         <span className={styles['tedi-collapse-button__icon-pad']}>
           <Icon
             className={styles['tedi-collapse-button__icon']}
-            name="expand_more"
+            name={iconName}
             color="inherit"
             size={size === 'small' ? 16 : 18}
           />
