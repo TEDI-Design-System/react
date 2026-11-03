@@ -603,6 +603,11 @@ describe('Sheet', () => {
       fireEvent.pointerDown(screen.getByRole('heading', { name: 'Layers' }), { ...touch, clientX: 0, clientY: 100 });
 
       expect(HTMLElement.prototype.setPointerCapture).toHaveBeenCalledWith(1);
+
+      // A captured pointer's events go to the panel wherever the pointer is.
+      const panel = screen.getByRole('dialog');
+      fireEvent.pointerMove(panel, { ...touch, clientX: 0, clientY: 150 });
+      expect(panel).toHaveStyle({ transform: 'translateY(50px)' });
     });
 
     it('treats a press that moves less than the start threshold as a tap', () => {
