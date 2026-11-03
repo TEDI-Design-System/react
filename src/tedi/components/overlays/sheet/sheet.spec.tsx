@@ -137,6 +137,23 @@ describe('Sheet', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
+  it('makes the sheet inert while it animates out', async () => {
+    render(
+      <Sheet defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header title="Layers" />
+          <Sheet.Body>Body</Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
+    );
+    const overlay = () => document.querySelector('[class*="tedi-sheet__overlay"]');
+    expect(overlay()).not.toHaveAttribute('inert');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(overlay()).toHaveAttribute('inert'));
+    await waitFor(() => expect(overlay()).not.toBeInTheDocument());
+  });
+
   it('closes on Escape', async () => {
     render(
       <Sheet defaultOpen>
@@ -563,15 +580,38 @@ describe('Sheet', () => {
       expect(screen.getByRole('dialog')).toHaveStyle({ transform: 'translateY(50px)' });
     });
 
-    it('treats a press that moves less than the start threshold as a tap', () => {
+    it('shows the grabbing cursor from the press until the release', () => {
+      renderHeaderSheet();
+      const title = screen.getByRole('heading', { name: 'Layers' });
+      fireEvent.pointerDown(title, { ...touch, clientX: 0, clientY: 100 });
+      expect(screen.getByRole('dialog')).toHaveClass(/tedi-sheet__panel--grabbing/);
+
+      fireEvent.pointerUp(title, { ...touch, clientX: 0, clientY: 100 });
+      expect(screen.getByRole('dialog')).not.toHaveClass(/tedi-sheet__panel--grabbing/);
+    });
+
+    it('keeps the normal cursor on a press that cannot drag', () => {
+      renderHeaderSheet();
+      fireEvent.pointerDown(screen.getByRole('button', { name: 'Close' }), { ...touch, clientX: 0, clientY: 100 });
+
+      expect(screen.getByRole('dialog')).not.toHaveClass(/tedi-sheet__panel--grabbing/);
+    });
+
+    it('captures the pointer on press, so a quick flick off the header still drags', () => {
       (HTMLElement.prototype.setPointerCapture as jest.Mock).mockClear();
+      renderHeaderSheet();
+      fireEvent.pointerDown(screen.getByRole('heading', { name: 'Layers' }), { ...touch, clientX: 0, clientY: 100 });
+
+      expect(HTMLElement.prototype.setPointerCapture).toHaveBeenCalledWith(1);
+    });
+
+    it('treats a press that moves less than the start threshold as a tap', () => {
       renderHeaderSheet();
       const title = screen.getByRole('heading', { name: 'Layers' });
       fireEvent.pointerDown(title, { ...touch, clientX: 0, clientY: 100 });
       fireEvent.pointerMove(title, { ...touch, clientX: 0, clientY: 106 });
 
       expect(screen.getByRole('dialog').style.transform).toBe('');
-      expect(HTMLElement.prototype.setPointerCapture).not.toHaveBeenCalled();
 
       fireEvent.pointerMove(title, { ...touch, clientX: 0, clientY: 140 });
       expect(screen.getByRole('dialog')).toHaveStyle({ transform: 'translateY(40px)' });
