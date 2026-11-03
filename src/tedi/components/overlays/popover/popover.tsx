@@ -4,6 +4,7 @@ import Overlay, { OverlayOpenWith, OverlayProps } from '../overlay/overlay';
 import { PopoverContent } from './popover-content';
 import { PopoverContext } from './popover-context';
 import { PopoverTrigger } from './popover-trigger';
+import { addArrowGap } from './popover-utils';
 
 const ARROW_WIDTH = 34 as const;
 const ARROW_HEIGHT = 17 as const;
@@ -11,23 +12,8 @@ const ARROW_PADDING_BORDERED = 12 as const;
 const ARROW_PADDING_DEFAULT = 4 as const;
 const GAP = 3 as const;
 
-/** A number or `{ mainAxis, crossAxis, alignmentAxis }` — `OffsetOptions` minus its function variant. */
-type OffsetValue = Exclude<OffsetOptions, (...args: never[]) => unknown>;
-
-const addToMainAxis = (value: OffsetValue, extra: number): OffsetValue =>
-  typeof value === 'number' ? value + extra : { ...value, mainAxis: (value.mainAxis ?? 0) + extra };
-
-/**
- * Adds the arrow's height to the gap, whatever form `offset` takes.
- * @internal
- */
-export const addArrowGap = (offset: OffsetOptions, arrowHeight: number): OffsetOptions => {
-  if (arrowHeight === 0) return offset;
-  if (typeof offset === 'function') return (state) => addToMainAxis(offset(state), arrowHeight);
-  return addToMainAxis(offset, arrowHeight);
-};
-
-export interface PopoverProps extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset' | 'arrowPadding'> {
+export interface PopoverProps
+  extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset' | 'offsetDeps' | 'arrowPadding'> {
   /**
    * Adds correct event listeners that change the open state.
    * @default click
@@ -58,11 +44,14 @@ export const Popover = (props: PopoverProps) => {
   const { openWith = 'click', withBorder = false, withArrow = true, offset = GAP, ...rest } = props;
 
   return (
-    <PopoverContext.Provider value={{ withBorder, withArrow }}>
+    <PopoverContext.Provider value={{ withBorder }}>
       <Overlay
         {...rest}
         arrowDimensions={withArrow ? { width: ARROW_WIDTH, height: ARROW_HEIGHT } : undefined}
         offset={addArrowGap(offset, withArrow ? ARROW_HEIGHT : 0)}
+        // The wrapper `addArrowGap` returns for a function offset always has the same source text,
+        // so compare the consumer's own value instead.
+        offsetDeps={[offset, withArrow]}
         arrowPadding={withBorder ? ARROW_PADDING_BORDERED : ARROW_PADDING_DEFAULT}
         openWith={openWith}
         role="dialog"

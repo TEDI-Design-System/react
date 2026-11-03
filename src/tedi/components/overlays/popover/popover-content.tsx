@@ -27,7 +27,7 @@ const resolvePopoverPadding = (padding: CardContentPadding | undefined): CSSProp
   } as CSSProperties;
 };
 
-export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames' | 'withArrow' | 'children'> {
+export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames' | 'children'> {
   /**
    * Popover body. Optional, so a popover can show only a `title`.
    */
@@ -78,7 +78,7 @@ export const PopoverContent = (props: PopoverContentProps) => {
     padding,
   } = props;
   const { onOpenChange } = useContext(OverlayContext);
-  const { withBorder, withArrow } = useContext(PopoverContext);
+  const { withBorder } = useContext(PopoverContext);
   const titleId = useId();
   const hasDescription = Boolean(children);
   const descriptionId = useId();
@@ -99,7 +99,6 @@ export const PopoverContent = (props: PopoverContentProps) => {
       labelledBy={title ? titleId : undefined}
       describedBy={hasDescription ? descriptionId : undefined}
       contentStyle={resolvePopoverPadding(padding)}
-      withArrow={withArrow}
     >
       {(title || close) && (
         <div className={cn(styles['tedi-popover__header'], { [styles['tedi-popover__header--no-title']]: !title })}>

@@ -1,8 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
-import Popover, { addArrowGap } from './popover';
+import Popover from './popover';
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: jest.fn(() => ({
@@ -141,24 +141,23 @@ describe('Popover component', () => {
     });
   });
 
-  describe('addArrowGap', () => {
-    it('returns the offset unchanged without an arrow', () => {
-      expect(addArrowGap(4, 0)).toBe(4);
-    });
+  describe('offset prop', () => {
+    const renderWithOffset = (offset: () => number) => (
+      <Popover open onToggle={jest.fn()} placement="bottom" offset={offset}>
+        <Popover.Trigger>Trigger</Popover.Trigger>
+        <Popover.Content>Content</Popover.Content>
+      </Popover>
+    );
 
-    it('adds the arrow height to a numeric offset', () => {
-      expect(addArrowGap(4, 17)).toBe(21);
-    });
+    // Floating UI compares function offsets by source text, and the arrow-gap wrapper's text never
+    // changes, so the consumer's function has to reach the middleware's deps for a swap to apply.
+    it('repositions when a function offset is swapped for another', async () => {
+      const { rerender } = render(renderWithOffset(() => 2));
+      const content = screen.getByTestId('overlay-content');
+      await waitFor(() => expect(content.style.top).toBe('19px'));
 
-    it('adds the arrow height to mainAxis of an object offset', () => {
-      expect(addArrowGap({ crossAxis: 8 }, 17)).toEqual({ crossAxis: 8, mainAxis: 17 });
-      expect(addArrowGap({ mainAxis: 4, alignmentAxis: 2 }, 17)).toEqual({ mainAxis: 21, alignmentAxis: 2 });
-    });
-
-    it('adds the arrow height to the value a function offset returns', () => {
-      const offset = addArrowGap(() => 4, 17);
-      expect(typeof offset).toBe('function');
-      expect((offset as (state: never) => number)({} as never)).toBe(21);
+      rerender(renderWithOffset(() => 12));
+      await waitFor(() => expect(content.style.top).toBe('29px'));
     });
   });
 });

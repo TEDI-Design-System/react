@@ -101,6 +101,13 @@ export interface OverlayProps {
    */
   offset?: OffsetOptions;
   /**
+   * Values `offset` depends on, passed to Floating UI's `offset()` middleware. Floating UI compares
+   * function offsets by their source text, so a component that wraps the consumer's function must
+   * pass the original here for a swapped function to be picked up.
+   * @internal
+   */
+  offsetDeps?: unknown[];
+  /**
    * Re-measure the floating element every animation frame while mounted.
    *
    * Enable this when the trigger/reference element's position can change without a
@@ -191,6 +198,7 @@ export const Overlay = (props: OverlayProps) => {
     ariaHidden = false,
     arrowDimensions,
     offset: offsetOptions = GAP + (arrowDimensions?.height ?? 0),
+    offsetDeps,
     arrowPadding = 4,
     focusManager,
     dismissible,
@@ -226,7 +234,7 @@ export const Overlay = (props: OverlayProps) => {
     open: isOpen,
     onOpenChange,
     middleware: [
-      offset(offsetOptions),
+      offset(offsetOptions, offsetDeps),
       flip(),
       shift({ padding: 8 }),
       arrow({

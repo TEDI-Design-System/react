@@ -50,16 +50,10 @@ export interface OverlayContentProps {
    * Used to pass through consumer-controlled values such as padding CSS variables.
    */
   contentStyle?: CSSProperties;
-
-  /**
-   * Render the arrow pointing to the trigger.
-   * @default true
-   */
-  withArrow?: boolean;
 }
 
 export const OverlayContent = (props: OverlayContentProps) => {
-  const { children, classNames, labelledBy, describedBy, contentStyle, withArrow = true } = props;
+  const { children, classNames, labelledBy, describedBy, contentStyle } = props;
   const {
     open,
     x,
@@ -116,7 +110,8 @@ export const OverlayContent = (props: OverlayContentProps) => {
       data-placement={placement}
       data-testid="overlay-content"
     >
-      {withArrow && (
+      {/* No arrow when the overlay has no `arrowDimensions`, e.g. a Popover with `withArrow={false}`. */}
+      {arrow?.width !== undefined && (
         <FloatingArrow
           ref={(el) => (arrowRef.current = el)}
           context={context}
