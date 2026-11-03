@@ -7,7 +7,7 @@
 
 .tedi-radio-group__legend {
   padding: 0;
-  margin-bottom: var(--tedi-dimensions-05);
+  margin-bottom: var(--form-checkbox-radio-label-gutter-y);
   font-family: var(--family-default);
   font-size: var(--body-regular-size);
   font-weight: var(--body-regular-weight);
@@ -22,23 +22,26 @@
 
 .tedi-radio-group__items {
   display: flex;
-  gap: var(--form-checkbox-radio-gutter-y);
+  gap: var(--form-checkbox-radio-gutter-y) var(--form-checkbox-radio-gutter-x);
 }
 
 .tedi-radio-group--column .tedi-radio-group__items {
   flex-direction: column;
 }
 
+// Items keep their own content height by default; stretch them where equal heights are needed
 .tedi-radio-group--row .tedi-radio-group__items {
   flex-flow: row wrap;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .tedi-radio-group--card .tedi-radio-group__items {
   gap: var(--layout-grid-gutters-08);
 }
 
+// Segmented cards share borders, so they always fill the row height
 .tedi-radio-group--segmented .tedi-radio-group__items {
   flex-wrap: nowrap;
   gap: 0;
+  align-items: stretch;
 }

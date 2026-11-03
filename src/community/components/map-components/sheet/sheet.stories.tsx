@@ -20,6 +20,9 @@ const meta: Meta<typeof Sheet> = {
     },
   },
   parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
     viewport: {
       defaultViewport: 'mobile1',
     },

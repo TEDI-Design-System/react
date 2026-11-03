@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { act, useState } from 'react';
 
+import { Icon } from '../../base/icon/icon';
 import Radio from './radio';
 import styles from './radio.module.scss';
 import RadioGroup from './radio-group/radio-group';
@@ -295,5 +296,35 @@ describe('Radio component', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
 
     warn.mockRestore();
+  });
+  it('card variant: adds the bordered modifier from the prop or the group', () => {
+    const { rerender } = render(<Radio id="radio-bordered" variant="card" label="Kartul" value="a" bordered />);
+    expect(screen.getByText('Kartul').closest('label')).toHaveClass(styles['tedi-radio--card-bordered']);
+
+    rerender(
+      <RadioGroup label="Toit" name="food" variant="card" bordered>
+        <Radio value="a" label="Peet" />
+      </RadioGroup>
+    );
+    expect(screen.getByText('Peet').closest('label')).toHaveClass(styles['tedi-radio--card-bordered']);
+  });
+
+  it('card variant: is not bordered by default', () => {
+    render(<Radio id="radio-borderless" variant="card" label="Kartul" value="a" />);
+    expect(screen.getByText('Kartul').closest('label')).not.toHaveClass(styles['tedi-radio--card-bordered']);
+  });
+  it('card variant: renders the icon sized to match the radio size', () => {
+    jest.mocked(Icon).mockClear();
+    const { rerender } = render(<Radio id="radio-card-icon" variant="card" label="Kartul" value="a" icon="eco" />);
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'eco', size: 18 }), expect.anything());
+
+    jest.mocked(Icon).mockClear();
+    rerender(<Radio id="radio-card-icon" variant="card" label="Kartul" value="a" icon="eco" size="large" />);
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'eco', size: 24 }), expect.anything());
+  });
+
+  it('card variant: does not point aria-labelledby at a missing label', () => {
+    render(<Radio id="radio-card-unlabelled" variant="card" label="" value="a" />);
+    expect(screen.getByRole('radio')).not.toHaveAttribute('aria-labelledby');
   });
 });

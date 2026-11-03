@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 
+import Print from '../../../tedi/components/misc/print/print';
 import { PolymorphicRef } from '../../helpers/polymorphic/types';
 import { IntentionalAny } from '../../types';
 import ButtonContent, { ButtonContentProps } from '../button-content/button-content';
@@ -54,26 +55,28 @@ const InternalButton = forwardRef(
     const ComponentAs = as || 'button';
 
     return (
-      <ButtonContent
-        data-name="button"
-        {...(rest as IntentionalAny)}
-        type={type || 'button'}
-        formNoValidate={formNoValidate ?? type === 'submit' ? true : undefined}
-        ref={ref}
-        as={ComponentAs}
-        visualType={visualType}
-        color={color}
-        size={size}
-        icon={icon}
-        iconLeft={iconLeft}
-        iconRight={iconRight}
-        underline={underline}
-        isHovered={isHovered}
-        isActive={isActive}
-        noStyle={noStyle}
-      >
-        {children}
-      </ButtonContent>
+      <Print visibility="hide">
+        <ButtonContent
+          data-name="button"
+          {...(rest as IntentionalAny)}
+          type={type || 'button'}
+          formNoValidate={formNoValidate ?? type === 'submit' ? true : undefined}
+          ref={ref}
+          as={ComponentAs}
+          visualType={visualType}
+          color={color}
+          size={size}
+          icon={icon}
+          iconLeft={iconLeft}
+          iconRight={iconRight}
+          underline={underline}
+          isHovered={isHovered}
+          isActive={isActive}
+          noStyle={noStyle}
+        >
+          {children}
+        </ButtonContent>
+      </Print>
     );
   }
 );

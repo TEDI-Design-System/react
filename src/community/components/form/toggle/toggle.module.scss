@@ -52,8 +52,8 @@ $toggle-transition-timing-function: ease-out;
 
   &.toggle--disabled {
     cursor: auto;
-    background-color: var(--general-surface-disabled);
-    border-color: var(--general-surface-disabled);
+    background-color: var(--_toggle-neutral);
+    border-color: var(--_toggle-neutral);
   }
 
   // GHOST
@@ -143,10 +143,10 @@ $toggle-transition-timing-function: ease-out;
     var(--general-text-white),
     var(--general-text-disabled)
   );
-  @include toggle-icon-variant($icon-color, $icon-color-active, var(--general-surface-disabled));
+  @include toggle-icon-variant($icon-color, $icon-color-active, var(--_toggle-neutral));
 
   &.toggle--ghost {
-    @include toggle-dot-variant($bg, $bg-hover, $bg-active, $bg-active-hover, var(--general-surface-disabled));
+    @include toggle-dot-variant($bg, $bg-hover, $bg-active, $bg-active-hover, var(--_toggle-neutral));
     @include toggle-icon-variant($icon-color-ghost, $icon-color-ghost-active, var(--general-text-disabled));
   }
 }
@@ -161,13 +161,20 @@ $toggle-transition-timing-function: ease-out;
 button.toggle {
   @include mixins.button-reset;
 
+  // Keeps the colors `--general-surface-disabled` had before core 6.12 lightened it
+  --_toggle-neutral: var(--tedi-neutral-400);
+
+  :global(.tedi-theme--dark) & {
+    --_toggle-neutral: var(--tedi-neutral-850);
+  }
+
   position: relative;
   border: 1px solid;
   border-radius: 1.5rem;
   transition: background-color, $toggle-transition-duration, $toggle-transition-timing-function;
 
   @include toggle-color-variant(
-    var(--general-surface-disabled),
+    var(--_toggle-neutral),
     var(--general-surface-brand-primary),
     var(--general-text-disabled),
     var(--general-surface-brand-secondary),

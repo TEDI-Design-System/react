@@ -33,7 +33,7 @@ interface CheckboxGroupBreakpointProps {
   onChange?: (value: string[]) => void;
   /** Disables the whole group and every checkbox within it. */
   disabled?: boolean;
-  /** Marks the group as invalid, forwarding the error state to each checkbox. */
+  /** Marks the group as invalid. The checkboxes keep their default look; pair with an error `helper`. */
   invalid?: boolean;
   /** Marks the group as required, adding a required indicator to the legend. */
   required?: boolean;
@@ -135,12 +135,11 @@ export const CheckboxGroup = (props: CheckboxGroupProps): JSX.Element => {
       values: currentValues,
       onToggle: handleToggle,
       disabled,
-      invalid,
       size,
       variant,
       cardVariant,
     }),
-    [name, currentValues, handleToggle, disabled, invalid, size, variant, cardVariant]
+    [name, currentValues, handleToggle, disabled, size, variant, cardVariant]
   );
 
   const enabledValues = React.useMemo(() => {

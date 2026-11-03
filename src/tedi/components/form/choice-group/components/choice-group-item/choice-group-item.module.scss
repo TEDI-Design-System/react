@@ -23,7 +23,7 @@
 
     &.tedi-choice-group-item--disabled {
       background-color: var(--form-general-background-disabled);
-      border-color: var(--form-checkbox-radio-card-secondary-disabled-default-border);
+      border-color: var(--form-choice-card-secondary-unselected-border-disabled);
 
       &:hover {
         cursor: unset;
@@ -39,94 +39,100 @@
     &:focus-visible,
     &:has(input:focus-visible) {
       z-index: 5;
-      outline: 2px solid var(--form-checkbox-radio-default-border-selected);
-      outline-offset: 2px;
+      box-shadow: 0 0 0 var(--tedi-borders-01) var(--general-effect-colors-focus-outset-inner-shadow),
+        0 0 0 var(--tedi-borders-03) var(--general-effect-colors-focus-outset-outer-shadow);
     }
   }
 }
 
 .tedi-choice-group-item--card-primary {
-  background-color: var(--form-checkbox-radio-card-primary-default-background);
-  border: 1px solid var(--form-checkbox-radio-card-primary-default-border-group);
+  background-color: var(--form-choice-card-primary-unselected-background-default);
+  border: var(--tedi-borders-01) solid var(--form-choice-card-primary-unselected-border-default);
 
   &.tedi-choice-group-item--checked {
-    background-color: var(--form-checkbox-radio-card-primary-selected-background);
-    border-color: var(--form-checkbox-radio-card-primary-hover-border);
+    background-color: var(--form-choice-card-primary-selected-background-default);
+    border-color: var(--form-choice-card-primary-unselected-border-hover);
 
     [type='checkbox']:checked + .tedi-choice-group-item__indicator {
-      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
+      border-color: var(--form-choice-checkbox-selected-border-inverted);
     }
 
     [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
-      background-color: var(--form-checkbox-radio-default-background-inverted);
-      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
+      background-color: var(--form-choice-inverted-indicator-default);
+      border-color: var(--form-choice-radio-selected-border-inverted);
     }
 
     [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator::after {
-      background-color: var(--form-checkbox-radio-default-background-selected-inverted);
-      border-color: var(--form-checkbox-radio-default-border-selected-inverted);
+      background-color: var(--form-choice-radio-selected-indicator-inverted);
+      border-color: var(--form-choice-radio-selected-indicator-inverted);
     }
 
     [type='radio']:checked:disabled + .tedi-choice-group-item__indicator::after {
-      background-color: var(--form-checkbox-radio-default-background-selected-disabled);
-      border-color: var(--form-checkbox-radio-default-background-selected-disabled);
+      background-color: var(--form-choice-radio-selected-indicator-disabled);
+      border-color: var(--form-choice-radio-selected-indicator-disabled);
     }
 
     label,
     .tedi-choice-group-item__label,
     .tedi-choice-group-item__feedback-text {
-      color: var(--form-checkbox-radio-card-primary-selected-text);
+      color: var(--form-choice-card-primary-selected-text-default);
     }
 
     &.tedi-choice-group-item--disabled {
-      color: var(--form-checkbox-radio-card-primary-disabled-selected-text);
-      background-color: var(--form-checkbox-radio-default-background-selected-disabled);
-      border-color: var(--form-checkbox-radio-default-background-selected-disabled);
-    }
-  }
-}
-
-.tedi-choice-group-item--card-secondary {
-  background-color: var(--form-checkbox-radio-card-secondary-default-background);
-  border: 1px solid var(--form-checkbox-radio-card-secondary-default-border);
-
-  &.tedi-choice-group-item--checked {
-    outline: 2px solid var(--form-checkbox-radio-card-secondary-selected-border);
-    outline-offset: -2px;
-
-    &:not(:last-child) {
-      border-right: 2px solid var(--form-checkbox-radio-card-secondary-selected-border);
-    }
-
-    [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
-      border-color: var(--form-checkbox-radio-default-border-selected);
-    }
-
-    [type='radio']:checked:disabled + .tedi-choice-group-item__indicator {
-      border-color: var(--form-checkbox-radio-default-border-selected-disabled);
-    }
-
-    label,
-    .tedi-choice-group-item__label,
-    .tedi-choice-group-item__feedback-text {
-      color: var(--form-checkbox-radio-card-secondary-selected-text);
-    }
-
-    &.tedi-choice-group-item--disabled {
-      outline-color: var(--form-checkbox-radio-card-secondary-disabled-selected-border);
-      background-color: var(--form-checkbox-radio-card-secondary-disabled-selected-background);
+      color: var(--form-choice-card-primary-selected-text-disabled);
+      background-color: var(--form-choice-card-primary-selected-background-disabled);
+      border-color: var(--form-choice-card-primary-selected-background-disabled);
     }
 
     &.tedi-choice-group-item--disabled label,
     &.tedi-choice-group-item--disabled .tedi-choice-group-item__label,
     &.tedi-choice-group-item--disabled .tedi-choice-group-item__feedback-text {
-      color: var(--form-checkbox-radio-card-secondary-disabled-selected-text);
+      color: var(--form-choice-card-primary-selected-text-disabled);
+    }
+  }
+}
+
+.tedi-choice-group-item--card-secondary {
+  background-color: var(--form-choice-card-secondary-unselected-background-default);
+  border: var(--tedi-borders-01) solid var(--form-choice-card-secondary-unselected-border-default);
+
+  &.tedi-choice-group-item--checked {
+    outline: var(--general-border-width-selected) solid var(--form-choice-card-secondary-selected-border-default);
+    outline-offset: calc(var(--general-border-width-selected) * -1);
+
+    &:not(:last-child) {
+      border-right: var(--general-border-width-selected) solid var(--form-choice-card-secondary-selected-border-default);
+    }
+
+    [type='radio']:checked:not(:disabled) + .tedi-choice-group-item__indicator {
+      border-color: var(--form-choice-radio-selected-border-default);
+    }
+
+    [type='radio']:checked:disabled + .tedi-choice-group-item__indicator {
+      border-color: var(--form-choice-radio-selected-border-disabled);
+    }
+
+    label,
+    .tedi-choice-group-item__label,
+    .tedi-choice-group-item__feedback-text {
+      color: var(--form-choice-card-secondary-selected-text-default);
+    }
+
+    &.tedi-choice-group-item--disabled {
+      outline-color: var(--form-choice-card-secondary-selected-border-disabled);
+      background-color: var(--form-choice-card-secondary-selected-background-disabled);
+    }
+
+    &.tedi-choice-group-item--disabled label,
+    &.tedi-choice-group-item--disabled .tedi-choice-group-item__label,
+    &.tedi-choice-group-item--disabled .tedi-choice-group-item__feedback-text {
+      color: var(--form-choice-card-secondary-selected-text-disabled);
     }
   }
 
   &.tedi-choice-group-item--disabled {
-    color: var(--form-checkbox-radio-card-primary-disabled-default-text);
-    background-color: var(--form-checkbox-radio-card-secondary-disabled-default-background);
+    color: var(--form-choice-card-primary-unselected-text-disabled);
+    background-color: var(--form-choice-card-secondary-unselected-background-disabled);
   }
 }
 
@@ -152,7 +158,7 @@
 
     &:not(:first-of-type) .tedi-choice-group-item--disabled {
       margin-top: 1px;
-      border-top-color: var(--form-checkbox-radio-card-secondary-disabled-default-border);
+      border-top-color: var(--form-choice-card-secondary-unselected-border-disabled);
     }
   }
 
@@ -177,7 +183,7 @@
 
     &:not(:first-of-type) .tedi-choice-group-item--disabled {
       margin-bottom: 1px;
-      border-bottom-color: var(--form-checkbox-radio-card-secondary-disabled-default-border);
+      border-bottom-color: var(--form-choice-card-secondary-unselected-border-disabled);
     }
   }
 
@@ -190,11 +196,11 @@
       margin-left: 0;
 
       &.tedi-choice-group-item--card-primary {
-        border-left-color: var(--form-checkbox-radio-card-secondary-disabled-default-border);
+        border-left-color: var(--form-choice-card-secondary-unselected-border-disabled);
       }
 
       &.tedi-choice-group-item--card-secondary {
-        border-left-color: var(--form-checkbox-radio-card-secondary-default-background);
+        border-left-color: var(--form-choice-card-secondary-unselected-background-default);
       }
     }
 
@@ -209,8 +215,8 @@
     }
 
     .tedi-choice-group-item--disabled.tedi-choice-group-item--card-secondary {
-      color: var(--form-checkbox-radio-card-primary-disabled-default-text);
-      background-color: var(--form-checkbox-radio-card-secondary-disabled-default-background);
+      color: var(--form-choice-card-primary-unselected-text-disabled);
+      background-color: var(--form-choice-card-secondary-unselected-background-disabled);
     }
   }
 
@@ -223,11 +229,11 @@
       margin-right: 0;
 
       &.tedi-choice-group-item--card-primary {
-        border-right-color: var(--form-checkbox-radio-card-secondary-disabled-default-border);
+        border-right-color: var(--form-choice-card-secondary-unselected-border-disabled);
       }
 
       &.tedi-choice-group-item--card-secondary {
-        border-right-color: var(--form-checkbox-radio-card-secondary-default-background);
+        border-right-color: var(--form-choice-card-secondary-unselected-background-default);
       }
     }
 
@@ -242,78 +248,78 @@
     }
 
     .tedi-choice-group-item--disabled.tedi-choice-group-item--card-secondary {
-      color: var(--form-checkbox-radio-card-primary-disabled-default-text);
-      background-color: var(--form-checkbox-radio-card-secondary-disabled-default-background);
+      color: var(--form-choice-card-primary-unselected-text-disabled);
+      background-color: var(--form-choice-card-secondary-unselected-background-disabled);
     }
   }
 
   .tedi-choice-group-item--card-primary:not(.tedi-choice-group-item--disabled):hover {
-    background-color: var(--form-checkbox-radio-card-primary-hover-background);
-    border-color: var(--form-checkbox-radio-card-primary-hover-border);
+    background-color: var(--form-choice-card-primary-unselected-background-hover);
+    border-color: var(--form-choice-card-primary-unselected-border-hover);
 
     label,
     .tedi-choice-group-item__label,
     .tedi-choice-group-item__feedback-text {
-      color: var(--form-checkbox-radio-card-primary-hover-text);
+      color: var(--form-choice-card-primary-unselected-text-hover);
     }
   }
 
   .tedi-choice-group-item--card-primary .tedi-choice-group-item--checked {
-    outline: 1px solid var(--form-checkbox-radio-card-primary-selected-background);
+    outline: var(--tedi-borders-01) solid var(--form-choice-card-primary-selected-background-default);
   }
 
   .tedi-choice-group-item--card-secondary:not(.tedi-choice-group-item--disabled):hover {
-    background-color: var(--form-checkbox-radio-card-secondary-hover-background);
-    border-color: var(--form-checkbox-radio-card-secondary-hover-border);
+    background-color: var(--form-choice-card-secondary-unselected-background-hover);
+    border-color: var(--form-choice-card-secondary-unselected-border-hover);
 
     label,
     .tedi-choice-group-item__label,
     .tedi-choice-group-item__feedback-text {
-      color: var(--form-checkbox-radio-card-secondary-hover-text);
+      color: var(--form-choice-card-secondary-unselected-text-hover);
     }
   }
 }
 
 .tedi-choice-group-item--separated {
   .tedi-choice-group-item--card-primary {
-    border: 1px solid var(--form-checkbox-radio-card-primary-default-background);
+    border: var(--tedi-borders-01) solid var(--form-choice-card-primary-unselected-background-default);
 
     .tedi-choice-group-item--checked {
-      border: 1px solid var(--form-checkbox-radio-card-primary-selected-background);
+      border: var(--tedi-borders-01) solid var(--form-choice-card-primary-selected-background-default);
     }
 
     &:not(.tedi-choice-group-item--disabled):hover {
-      background-color: var(--form-checkbox-radio-card-primary-hover-background);
-      border-color: var(--form-checkbox-radio-card-primary-hover-border);
+      background-color: var(--form-choice-card-primary-unselected-background-hover);
+      border-color: var(--form-choice-card-primary-unselected-border-hover);
 
       label,
       .tedi-choice-group-item__label,
       .tedi-choice-group-item__feedback-text {
-        color: var(--form-checkbox-radio-card-primary-hover-text);
+        color: var(--form-choice-card-primary-unselected-text-hover);
       }
     }
 
     &.tedi-choice-group-item--radio {
-      border-color: var(--form-checkbox-radio-card-primary-default-border-group);
+      border-color: var(--form-choice-card-primary-unselected-border-default);
     }
   }
 
   .tedi-choice-group-item--card-secondary {
     &:not(.tedi-choice-group-item--disabled):hover {
-      outline: 2px solid var(--form-checkbox-radio-card-secondary-hover-border);
-      outline-offset: -2px;
-      background-color: var(--form-checkbox-radio-card-secondary-hover-background);
+      outline: var(--tedi-borders-01) solid var(--form-choice-card-secondary-unselected-border-hover);
+      outline-offset: calc(var(--tedi-borders-01) * -1);
+      background-color: var(--form-choice-card-secondary-unselected-background-hover);
 
       label,
       .tedi-choice-group-item__label,
       .tedi-choice-group-item__feedback-text {
-        color: var(--form-checkbox-radio-card-secondary-hover-text);
+        color: var(--form-choice-card-secondary-unselected-text-hover);
       }
     }
 
     &.tedi-choice-group-item--disabled {
-      color: var(--form-checkbox-radio-card-primary-disabled-default-text);
-      background-color: var(--form-checkbox-radio-card-secondary-disabled-default-background);
+      color: var(--form-choice-card-primary-unselected-text-disabled);
+      background-color: var(--form-choice-card-secondary-unselected-background-disabled);
     }
   }
 }
