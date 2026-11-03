@@ -1,21 +1,9 @@
-/* eslint-disable react/display-name */
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { PropsWithChildren } from 'react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 
 import { PrintingProvider } from '../../../providers/printing-provider/printing-provider';
 import { CardStepper, CardStepperStepProps } from './card-stepper';
 
 import '@testing-library/jest-dom';
-
-jest.mock('../../overlays/modal/modal', () => {
-  const Modal = ({ open, children }: PropsWithChildren<{ open?: boolean }>) =>
-    open ? <div role="dialog">{children}</div> : null;
-  Modal.Content = ({ children }: PropsWithChildren) => <div>{children}</div>;
-  Modal.Header = ({ children }: PropsWithChildren) => <h2>{children}</h2>;
-  Modal.Body = ({ children }: PropsWithChildren) => <div>{children}</div>;
-  Modal.Closer = ({ children }: PropsWithChildren) => <>{children}</>;
-  return { Modal };
-});
 
 const STEPS: CardStepperStepProps[] = [
   { title: 'Personal data', state: 'completed' },
@@ -106,7 +94,7 @@ describe('CardStepper', () => {
     expect(screen.getByRole('heading', { name: 'Contacts' })).toBeInTheDocument();
   });
 
-  it('opens the step-list modal and lets the user jump to a step', () => {
+  it('opens the step-list sheet and lets the user jump to a step', async () => {
     const onStepChange = jest.fn();
     render(<CardStepper steps={STEPS} activeStep={1} onStepChange={onStepChange} aria-label="Wizard" />);
 
@@ -116,7 +104,7 @@ describe('CardStepper', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: /Review/ }));
     expect(onStepChange).toHaveBeenCalledWith(2);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('keeps the parent open but not current when one of its sub-steps is current', () => {
