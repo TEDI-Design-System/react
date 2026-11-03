@@ -72,9 +72,12 @@
   }
 
   &:focus-visible {
-    color: var(--file-dropzone-text-focus);
     outline: var(--tedi-borders-02) solid var(--file-dropzone-border-focus);
     outline-offset: var(--tedi-borders-01);
+  }
+
+  &:focus-visible:not(#{&}--drop-over, #{&}--disabled) {
+    color: var(--file-dropzone-text-focus);
   }
 
   &:focus-visible:not(#{&}--invalid, #{&}--valid, #{&}--drop-over, #{&}--disabled) {
