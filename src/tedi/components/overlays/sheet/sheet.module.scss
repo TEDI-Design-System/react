@@ -171,6 +171,9 @@ $sheet-fade-duration: 200ms;
   flex-shrink: 0;
   gap: var(--layout-grid-gutters-08);
   align-items: center;
+
+  // Stays at the end edge when the header has no title to push it there.
+  margin-inline-start: auto;
 }
 
 .tedi-sheet__panel--draggable .tedi-sheet__header {
