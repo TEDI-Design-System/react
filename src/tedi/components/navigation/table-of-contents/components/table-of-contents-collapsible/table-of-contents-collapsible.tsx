@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
 import { CollapseButton } from '../../../../buttons/collapse-button/collapse-button';
-import { SheetModal } from '../../../../overlays/sheet/components/sheet-modal/sheet-modal';
+import { Sheet } from '../../../../overlays/sheet/sheet';
 import {
   buildActiveTrail,
   childrenToNodes,
@@ -125,29 +125,26 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         <CollapseButton open={open} onOpenChange={setOpen} underline={false} aria-haspopup="dialog" />
       </div>
 
-      <SheetModal
-        open={open}
-        onToggle={setOpen}
-        ariaLabel={title}
-        className={styles['tedi-table-of-contents__sheet']}
-        header={
-          <div className={styles['tedi-table-of-contents__sheet-header']}>
-            <Text modifiers="bold" className={styles['tedi-table-of-contents__bar-title']}>
-              {title}
-            </Text>
-            <CollapseButton open={open} onOpenChange={setOpen} underline={false} />
-          </div>
-        }
-      >
-        <div
-          ref={setListElement}
-          className={cn(styles['tedi-table-of-contents'], {
-            [styles['tedi-table-of-contents--bordered']]: bordered,
-          })}
-        >
-          <TableOfContentsList nodes={nodes} heading={null} />
-        </div>
-      </SheetModal>
+      <Sheet open={open} onToggle={setOpen}>
+        <Sheet.Content>
+          <Sheet.Header
+            title={title}
+            variant="default"
+            closeButton={false}
+            actions={<CollapseButton open={open} onOpenChange={setOpen} underline={false} />}
+          />
+          <Sheet.Body padding="none">
+            <div
+              ref={setListElement}
+              className={cn(styles['tedi-table-of-contents'], {
+                [styles['tedi-table-of-contents--bordered']]: bordered,
+              })}
+            >
+              <TableOfContentsList nodes={nodes} heading={null} />
+            </div>
+          </Sheet.Body>
+        </Sheet.Content>
+      </Sheet>
     </TableOfContentsContext.Provider>
   );
 };
