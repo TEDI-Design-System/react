@@ -1839,7 +1839,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   return (
                     <Fragment key={row.id}>
                       <TableDataRowBody {...rowProps2} />
-                      {renderSubComponent && row.getIsExpanded() && (
+                      {/* `expanded: true` marks every row expanded in TanStack, so gate on getCanExpand too. */}
+                      {renderSubComponent && row.getCanExpand() && row.getIsExpanded() && (
                         <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--sub-component'])}>
                           {/* No `region` role: one landmark per open row would pile up (axe `landmark-unique`).
                               The toggle's `aria-controls` already points here. */}
