@@ -131,25 +131,23 @@ $sheet-fade-duration: 200ms;
 }
 
 .tedi-sheet__header--center {
-  position: relative;
+  // Equal side columns keep a short title centred; a long one stops short of the start content and actions.
+  display: grid;
+  grid-template-columns: 1fr minmax(0, auto) 1fr;
+
+  .tedi-sheet__header-start {
+    grid-column: 1;
+    justify-self: start;
+  }
 
   .tedi-sheet__title {
+    grid-column: 2;
     text-align: center;
   }
 
-  .tedi-sheet__header-start,
   .tedi-sheet__header-actions {
-    position: absolute;
-    inset-block-start: 50%;
-    transform: translateY(-50%);
-  }
-
-  .tedi-sheet__header-start {
-    inset-inline-start: var(--tedi-sheet-padding-x);
-  }
-
-  .tedi-sheet__header-actions {
-    inset-inline-end: var(--tedi-sheet-padding-x);
+    grid-column: 3;
+    justify-self: end;
   }
 }
 
