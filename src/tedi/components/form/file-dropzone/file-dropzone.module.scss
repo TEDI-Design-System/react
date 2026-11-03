@@ -1,3 +1,4 @@
+@use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 @use '@tedi-design-system/core/mixins';
 
 .tedi-file-dropzone {
@@ -11,6 +12,7 @@
   transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 
   &:hover:not(#{&}--drop-over) {
+    color: var(--file-dropzone-text-hover);
     background-color: var(--file-dropzone-background-hover);
   }
 
@@ -19,15 +21,23 @@
   }
 
   &:active:not(#{&}--invalid, #{&}--valid, #{&}--drop-over, #{&}--disabled) {
+    color: var(--file-dropzone-text-active);
+    background-color: var(--file-dropzone-background-active);
     border-color: var(--file-dropzone-border-active);
   }
 
   .tedi-file-dropzone__label-wrapper {
     display: flex;
+    align-items: flex-start;
     justify-content: center;
+
+    @include breakpoints.media-breakpoint-down(md) {
+      gap: var(--layout-grid-gutters-04);
+    }
 
     .tedi-file-dropzone__label {
       color: inherit;
+      text-align: left;
 
       &:hover {
         cursor: pointer;
@@ -36,19 +46,15 @@
 
     .tedi-file-dropzone__label-icon {
       font-size: 1.5rem;
-      vertical-align: bottom;
     }
   }
 
   &--disabled {
+    color: var(--file-dropzone-text-disabled);
     pointer-events: none;
     cursor: not-allowed;
     background-color: var(--file-dropzone-background-disabled);
     border-color: var(--file-dropzone-border-disabled);
-
-    .tedi-file-dropzone__label-wrapper .tedi-file-dropzone__label {
-      color: var(--general-text-disabled);
-    }
   }
 
   &--invalid {
@@ -66,8 +72,13 @@
   }
 
   &:focus-visible {
+    color: var(--file-dropzone-text-focus);
     outline: var(--tedi-borders-02) solid var(--file-dropzone-border-focus);
     outline-offset: var(--tedi-borders-01);
+  }
+
+  &:focus-visible:not(#{&}--invalid, #{&}--valid, #{&}--drop-over, #{&}--disabled) {
+    border-color: var(--file-dropzone-border-focus);
   }
 }
 
