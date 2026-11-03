@@ -6,6 +6,10 @@ A Figma link MUST be provided with the task.
 
 If no Figma link was provided, stop immediately and ask the user for one. Do not proceed without design reference.
 
+Only links to the TEDI Figma file (`figma.com/design/jWiRIXhHRxwVdMSimKX2FF/...`) go into the stories.
+A design in any other Figma file can't be opened by readers of the docs: use it for implementation
+and leave the Figma link out of the stories ([stories.md](stories.md)).
+
 ## Step 1: Gather Context
 
 1. Use the Figma MCP server to fetch design context, screenshots, and metadata from the Figma link.

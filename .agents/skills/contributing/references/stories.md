@@ -101,6 +101,10 @@ export default {
 type Story = StoryObj;
 ```
 
+**Figma link (TEDI file only).** Add the JSDoc link and `parameters.design` only when the design is in
+the TEDI Figma file (`figma.com/design/jWiRIXhHRxwVdMSimKX2FF/...`). A design in another team's or
+project's Figma file can't be opened by readers of the docs, so that story gets neither.
+
 ### 5. Compound Components — Live Subcomponent Controls
 
 Storybook's Controls panel only binds live controls to the story's primary `component`.
@@ -168,7 +172,8 @@ Rules:
 - [ ] Compound component? Sub-component props are live controls on the primary story via `subcomponentArgTypes` (not a separate `Playground`)
 - [ ] States story covers all visual states shown in Figma (default, hover, active, focus, disabled)
 - [ ] Controlled example included if the component is a form control
-- [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`
+- [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`,
+      and only when it points to the TEDI Figma file (see section 4)
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts
 - [ ] Use `CardContent` with `padding` prop to add content padding in story examples (components should not hardcode content padding)
 - [ ] No inline `style` in story markup, and no story docblock that restates what renders (see section 8)
