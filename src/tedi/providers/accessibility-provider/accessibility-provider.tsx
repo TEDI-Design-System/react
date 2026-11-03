@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useWhatInput } from '../../helpers';
+import { useWhatInput } from '../../helpers/hooks/use-what-input';
 
 export interface LoaderObj {
   id: string;

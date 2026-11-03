@@ -28,11 +28,12 @@ jobs:
   # was built from; if that commit is still the head, there is nothing new to see.
   # A push after the approval moves the head, so re-approving does rebuild.
   #
-  # A change under `.storybook/` makes Chromatic snapshot every story in full,
-  # and the `rc` build after the merge has to do the same full build again.
-  # So such a PR gets no approval build: the `rc` build is the one full build,
-  # and it comments its result on the merged PR. Run the workflow by hand to
-  # see the diff before merging.
+  # A change under `.storybook/`, to a file `preview.tsx` imports, or to the
+  # version of a package it imports makes Chromatic snapshot every story in
+  # full, and the `rc` build after the merge has to do the same full build
+  # again. So such a PR gets no approval build: the `rc` build is the one full
+  # build, and it comments on the merged PR if it finds visual changes. Run
+  # the workflow by hand to see the diff before merging.
   guard:
     runs-on: ubuntu-latest
     permissions:
@@ -52,6 +53,15 @@ jobs:
       build: ${{ steps.check.outputs.build }}
       previous: ${{ steps.check.outputs.previous }}
     steps:
+      # Only the shared script is needed, from the head being approved.
+      - name: Checkout
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+          sparse-checkout: .github/scripts
+
       - name: Does this head need a build?
         id: check
         uses: actions/github-script@v7
@@ -64,38 +74,8 @@ jobs:
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const sha = context.payload.pull_request.head.sha;
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner, repo, issue_number, per_page: 100,
-            });
-            const built = new Set();
-            for (const c of comments) {
-              for (const m of c.body?.matchAll(/chromatic-sha:([0-9a-f]{40})/g) ?? []) built.add(m[1]);
-            }
-            // Commits of this PR's earlier builds, so the build job can fetch them
-            // when a force-push has removed them from the branch.
-            const previous = new Set(built);
-            // A force-push removes the old head from the branch, and Chromatic may
-            // have built it (by hand, or before the comment was updated). The PR
-            // timeline keeps every commit a force-push replaced.
-            try {
-              const { repository } = await github.graphql(
-                `query($owner: String!, $repo: String!, $number: Int!) {
-                  repository(owner: $owner, name: $repo) {
-                    pullRequest(number: $number) {
-                      timelineItems(itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT], last: 100) {
-                        nodes { ... on HeadRefForcePushedEvent { beforeCommit { oid } afterCommit { oid } } }
-                      }
-                    }
-                  }
-                }`,
-              { owner, repo, number: issue_number },
-            );
-              for (const e of repository.pullRequest.timelineItems.nodes) {
-                for (const c of [e.beforeCommit, e.afterCommit]) if (c?.oid) previous.add(c.oid);
-              }
-            } catch (error) {
-              core.warning(`Could not read the force-push history: ${error.message}`);
-            }
+            const baseline = require('./.github/scripts/chromatic-baseline.cjs');
+            const { comments, built, previous } = await baseline({ github, context, core }, issue_number);
             previous.delete(sha);
             core.setOutput('previous', [...previous].join(' '));
             if (built.has(sha)) {
@@ -106,7 +86,31 @@ jobs:
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner, repo, pull_number: issue_number, per_page: 100,
             });
-            const config = files.map((f) => f.filename).filter((name) => name.startsWith('.storybook/'));
+            // The `src/` files `.storybook/preview.tsx` imports, read from
+            // preview-stats.json. TurboSnap traces a change to any of them up to
+            // the preview and rebuilds every story. A new preview import belongs
+            // here too; missing one only costs a second full build.
+            const previewImports = [
+              'src/community/styles/index.scss',
+              'src/tedi/helpers/hooks/use-what-input.ts',
+              'src/tedi/providers/accessibility-provider/accessibility-provider.tsx',
+              'src/tedi/providers/label-provider/index.ts',
+              'src/tedi/providers/label-provider/label-provider.tsx',
+              'src/tedi/providers/label-provider/labels-map.ts',
+              'src/tedi/providers/label-provider/use-labels.tsx',
+              'src/tedi/providers/printing-provider/index.ts',
+              'src/tedi/providers/printing-provider/printing-provider.tsx',
+              'src/tedi/providers/theme-provider/theme-provider.tsx',
+              'src/tedi/styles/index.scss',
+            ];
+            // The packages the preview reaches that a PR would upgrade.
+            const previewPackages =
+              /^[-+]\s*"(react|react-dom|storybook|dayjs|@storybook\/[^"]+|@mui\/[^"]+|@emotion\/[^"]+|@tedi-design-system\/core)"/m;
+            const forcesFullBuild = (f) =>
+              f.filename.startsWith('.storybook/') ||
+              previewImports.includes(f.filename) ||
+              (f.filename === 'package.json' && previewPackages.test(f.patch ?? ''));
+            const config = files.filter(forcesFullBuild).map((f) => f.filename);
             if (config.length === 0) {
               core.setOutput('build', 'yes');
               return;
@@ -118,7 +122,7 @@ jobs:
               marker,
               '## 🎨 Chromatic',
               '',
-              'This pull request changes `.storybook/`, which makes Chromatic snapshot every story. The approval build is skipped so that full build is paid for once: the `rc` build after the merge runs it and comments its result here.',
+              `This pull request changes ${config.map((name) => `\`${name}\``).join(', ')}, which makes Chromatic snapshot every story. The approval build is skipped so that full build is paid for once: the \`rc\` build after the merge runs it and comments its result here if it finds visual changes.`,
               '',
               'To see the visual diff before merging, run the **Chromatic React** workflow by hand on this branch.',
             ].join('\n');
@@ -201,7 +205,9 @@ jobs:
               '',
               `[View the build](${process.env.BUILD_URL})`,
             ].join('\n');
-            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            });
             const existing = comments.find((c) => c.body?.includes(marker));
             if (existing) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });

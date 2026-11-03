@@ -781,7 +781,6 @@ export const DeferKeyboardOnTouch: Story = {
  * `isClearIndicatorVisible`.
  */
 export const ClearButtonOnInteraction: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     id: 'example-clear-on-interaction',
     label: 'Label',
