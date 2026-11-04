@@ -1,14 +1,14 @@
 # Create TEDI React Storybook Stories
 
-Target component: `$ARGUMENTS`
+Target: the component given in the task.
 
 ## Workflow
 
 ### 1. Understand the Component
 
 1. Read the component's `.tsx` to understand all props, types, and variants.
-2. **Figma is the source of truth for stories.** If the component or its stories file contains a Figma link, use `figma-desktop` MCP to fetch the design. If no link exists, ask the user for one.
-3. Check if TEDI Angular (`../angular/tedi/components/`) has stories for the equivalent component — use as reference for story coverage.
+2. **Figma is the source of truth for stories.** If the component or its stories file contains a Figma link, use the Figma MCP server to fetch the design. If no link exists, ask the user for one.
+3. Check if TEDI Angular (`../angular/src/tedi/components/`) has stories for the equivalent component; use them as a reference for story coverage.
 
 ### 2. Map Figma Sections to Stories
 
@@ -47,6 +47,17 @@ Rules:
     },
   };
   ```
+
+- **Composition, not inline styles.** Lay out examples with core utility classes (`flex`,
+  `align-items-center`, `gap-3`) or `Row`/`Col`, never `style={{ ... }}`. Compose with the TEDI
+  components the Figma example instances (a label/value pair is `TextGroup`). If the same layout keeps
+  coming back, the component is missing a sub-component. Wide responsive content (tabs, tables) goes
+  in a flex `div`, not a `Col`: a `Col` is a flex item with `min-width: auto`, so it can't shrink
+  below its content and the component never gets a narrow width to collapse into.
+- **No component machinery in a stories file.** If a story needs hand-written ARIA wiring, keyboard
+  handling, overlay positioning or focus management, the component is missing that behaviour. Raise
+  it instead of building it in the story: stories have no tests or API review. Never put a code
+  snippet in `docs.source` that you haven't run.
 
 ### 3. Determine the Story Category
 
@@ -89,6 +100,10 @@ export default {
 
 type Story = StoryObj;
 ```
+
+**Figma link (TEDI file only).** Add the JSDoc link and `parameters.design` only when the design is in
+the TEDI Figma file (`figma.com/design/jWiRIXhHRxwVdMSimKX2FF/...`). A design in another team's or
+project's Figma file can't be opened by readers of the docs, so that story gets neither.
 
 ### 5. Compound Components — Live Subcomponent Controls
 
@@ -157,9 +172,12 @@ Rules:
 - [ ] Compound component? Sub-component props are live controls on the primary story via `subcomponentArgTypes` (not a separate `Playground`)
 - [ ] States story covers all visual states shown in Figma (default, hover, active, focus, disabled)
 - [ ] Controlled example included if the component is a form control
-- [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`
+- [ ] Figma link is in the meta `parameters.design` and in the JSDoc comment above `export default`,
+      and only when it points to the TEDI Figma file (see section 4)
 - [ ] When multiple instances of the same component appear in one story, use unique IDs per instance to avoid conflicts
 - [ ] Use `CardContent` with `padding` prop to add content padding in story examples (components should not hardcode content padding)
+- [ ] No inline `style` in story markup, and no story docblock that restates what renders (see section 8)
+- [ ] Disabled, loading, error and empty states the component supports have a story, even if Figma omits them; place these after the Figma-ordered stories
 
 ### 7. Parameters Convention
 
@@ -172,7 +190,18 @@ parameters: {
 }
 ```
 
-### 8. Verify
+### 8. Prose: default to none
+
+The bar for a story docblock is **"is this invisible in the rendered story?"** A story that looks like
+what its name says (`Disabled`, `WithIcon`) needs no docblock. Add one only for behaviour the reader
+can't see: a state that appears after an interaction, a prop with no visible effect. One sentence, two
+at most. Don't compare to other components, describe internal wiring, or restate the story name. The
+meta docblock holds the Figma link and only what a consumer can't learn from the types.
+
+Prop descriptions in the controls table come from the props' JSDoc, so fix them there
+([best-practices.md → Comments and JSDoc](best-practices.md#comments-and-jsdoc)), not in `argTypes`.
+
+### 9. Verify
 
 Run Storybook to visually confirm stories render correctly:
 ```

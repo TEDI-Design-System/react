@@ -25,11 +25,12 @@ reviews:
       instructions: |
         Read and enforce the project conventions from these files:
         - `AGENTS.md` — project overview, architecture, component patterns, styling rules, testing setup, and "Do NOT" list.
-        - `.claude/skills/contributing/references/best-practices.md` — detailed coding patterns for components, SCSS, testing, stories, and barrel exports.
+        - `.agents/skills/contributing/references/best-practices.md`: detailed coding patterns for components, prop API, comments and JSDoc, SCSS, and barrel exports.
+        - `.agents/skills/contributing/references/testing.md`: test patterns and query priority.
+        - `.agents/skills/contributing/references/stories.md`: story structure, controls, composition and prose rules.
+        - `.agents/skills/contributing/references/pr-review.md`: review checklist. Enforce its Prop API and Prose sections, except the TEDI Angular parity item (the sibling repo isn't available in CI).
 
-        Key things to NOT flag as issues:
-        - Missing CSS `var()` fallback values — intentionally omitted.
-        - `community/` code not following TEDI patterns — community components have lighter standards.
+        Don't flag anything listed under "Key things to not flag" in `AGENTS.md`.
 
 chat:
   auto_reply: true

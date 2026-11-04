@@ -118,6 +118,59 @@ const getChecked = React.useMemo((): boolean => {
 | CSS classes | BEM with `tedi-` prefix | `.tedi-button__icon--large` |
 | Hooks | `use-kebab-case.ts` | `use-breakpoint-props.ts` |
 
+## Prop API
+
+Check every public prop before it ships. Each one is API that consumers will depend on, so removing
+it later is a breaking change.
+
+- **Every prop has a consumer who needs it.** If its own JSDoc has to explain that it does nothing
+  useful, delete the prop.
+- **Match sibling components.** Compare with components in the same category: names, controlled
+  and uncontrolled pairs (`value` / `defaultValue`), callback signatures (see Event Handler
+  Conventions), and how helper text and feedback are passed.
+- **Check parity with TEDI Angular** (`../angular/src/tedi/components/`) for names, units and
+  defaults. Read the Angular source before writing down any claim about how Angular differs.
+- **The documented `@default` is the real default.** A prop left `undefined` so a parent or context
+  can supply it is documented as inheriting, not with the value it ends up resolving to.
+
+## Comments and JSDoc
+
+Apply the deletion test to every line: *if I delete this, what does the reader get wrong?* No
+concrete answer means delete it.
+
+**Prop JSDoc** is one sentence, at most three lines not counting block tags (`@default`,
+`@deprecated`). A non-obvious default may get one clause of why. Leave out:
+
+- How it works inside, such as which hook computes it. (With two class props, saying which part
+  each one styles is fine.)
+- Advice that applies to every React prop.
+- The same caveat repeated on several props. If it applies to more than one, it belongs in the
+  consumer skill once.
+- Telling the consumer to use something else. That is composition guidance (`@deprecated` naming the replacement is the exception), so it
+  goes in the
+  consumer skill.
+- Behaviour that is logically necessary, comparisons to other components, and restating the prop's
+  name (`/** Disables the button. */` above `disabled`).
+
+```tsx
+// ❌
+/**
+ * Additional class names appended to the inner dropzone element
+ * (`tedi-file-upload`) — the content area that holds the file list and the
+ * upload button. Use this to tweak the dropzone itself (border, padding,
+ * background) without affecting the surrounding container.
+ */
+className?: string;
+
+// ✅
+/** Class name for the dropzone, inside the outer container. */
+className?: string;
+```
+
+**Comments in code and SCSS** explain a *why* the code can't show, in one line where possible. Don't
+comment a variable, function or selector whose name already says what it does (`// Primary variant`
+above `&--primary`).
+
 ## Styling
 
 ### CSS Modules + SCSS
@@ -129,135 +182,28 @@ const getChecked = React.useMemo((): boolean => {
 - Use design tokens from `@tedi-design-system/core` — never hardcode colors
 - Never use fallback values in CSS `var()` — write `var(--token-name)`, not `var(--token-name, fallback)`
 - Use `@use '@tedi-design-system/core/bootstrap-utility/breakpoints'` for responsive styles
-- No obvious comments — do not add comments that restate what a selector, class name, or variable already says (e.g., `// Primary variant` above `&--primary`, or `// Disabled state` above `&:disabled`). Only comment when the logic isn't self-evident.
 
 ### Example
 ```scss
 .tedi-button {
   display: inline-flex;
   align-items: center;
-  gap: var(--tedi-spacing-2);
+  gap: var(--layout-grid-gutters-04);
 
   &__icon {
     flex-shrink: 0;
   }
 
   &--primary {
-    background-color: var(--color-primary);
+    background-color: var(--button-main-primary-background-default);
   }
 }
 ```
 
-## Testing Patterns
+## Testing and Storybook
 
-### Basic Component Test
-```tsx
-import { fireEvent, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-
-describe('ComponentName', () => {
-  it('renders with default properties', () => {
-    render(<ComponentName id="test" label="Test" />);
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
-});
-```
-
-### Mocking Breakpoint Hook
-```tsx
-jest.mock('../../../helpers', () => ({
-  useBreakpointProps: jest.fn(),
-}));
-
-beforeEach(() => {
-  (useBreakpointProps as jest.Mock).mockReturnValue({
-    getCurrentBreakpointProps: jest.fn((props) => props),
-  });
-});
-```
-
-### Testing Form Controls
-```tsx
-it('calls onChange when value changes', () => {
-  const handleChange = jest.fn();
-  render(<TextField id="test" label="Test" onChange={handleChange} />);
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'new' } });
-  expect(handleChange).toHaveBeenCalledWith('new');
-});
-
-it('works in uncontrolled mode', () => {
-  render(<TextField id="test" label="Test" defaultValue="initial" />);
-  const input = screen.getByRole('textbox');
-  expect(input).toHaveValue('initial');
-  fireEvent.change(input, { target: { value: 'updated' } });
-  expect(input).toHaveValue('updated');
-});
-```
-
-### Testing Controlled vs Uncontrolled
-```tsx
-it('changes state when clicked if not controlled', async () => {
-  const TestComponent = () => {
-    const [isChecked, setIsChecked] = useState(false);
-    return (
-      <Checkbox
-        id="test"
-        label="Test"
-        defaultChecked={isChecked}
-        onChange={() => setIsChecked(!isChecked)}
-      />
-    );
-  };
-
-  render(<TestComponent />);
-  const checkbox = screen.getByRole('checkbox');
-  expect(checkbox).not.toBeChecked();
-  await act(async () => { fireEvent.click(checkbox); });
-  expect(checkbox).toBeChecked();
-});
-```
-
-### Query Priority
-Use semantic queries in this order:
-1. `getByRole` (preferred)
-2. `getByLabelText`
-3. `getByPlaceholderText`
-4. `getByText`
-5. `getByTestId` (last resort)
-
-## Storybook Stories
-
-### Structure
-```tsx
-import { Meta, StoryFn, StoryObj } from '@storybook/react';
-
-const meta: Meta<typeof ComponentName> = {
-  component: ComponentName,
-  title: 'TEDI-Ready/Components/Category/ComponentName', // Content/Layout/Base groups skip the Components/ segment
-  parameters: {
-    status: { type: [{ name: 'breakpointSupport', url: '...' }] },
-    design: { type: 'figma', url: 'https://www.figma.com/...' },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof ComponentName>;
-
-const Template: StoryFn<ComponentNameProps> = (args) => <ComponentName {...args} />;
-
-export const Default: Story = {
-  render: Template,
-  args: { children: 'Content' },
-};
-```
-
-### Story Coverage
-Every story file must include:
-- **Default** — component with default props
-- One story **per visual variant** (e.g., primary, secondary, ghost)
-- One story **per significant state** (disabled, loading, error, empty)
-- **Controlled examples** — form controls with React state
-- Stories matching **all variants visible in Figma**
+Test patterns are in [testing.md](testing.md); story structure, controls and composition rules are in
+[stories.md](stories.md).
 
 ## Barrel Exports
 
@@ -286,11 +232,9 @@ export * from './components/category/component-name';
 
 ## Import Order
 Enforced by `simple-import-sort`:
-1. External packages (`react`, `@floating-ui/react`)
-2. `@ria.*` scope imports
-3. Relative imports (`./`, `../`)
-4. Absolute imports
-5. Side-effect imports
+1. Packages and absolute paths (`react`, `@floating-ui/react`)
+2. Relative imports (`./`, `../`)
+3. Side-effect imports
 
 ## Key File Locations
 
