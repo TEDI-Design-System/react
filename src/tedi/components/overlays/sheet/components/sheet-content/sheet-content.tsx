@@ -217,11 +217,14 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   } | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
+  // From the press, not the drag threshold: the panel holds the pointer from then on, so its cursor shows.
+  const [grabbing, setGrabbing] = useState(false);
 
   const resetDrag = useCallback(() => {
     const drag = dragRef.current;
     if (!drag) return;
     dragRef.current = null;
+    setGrabbing(false);
     setDragging(false);
     setDragOffset(0);
     if (drag.target.hasPointerCapture(drag.pointerId)) {
@@ -254,6 +257,9 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
       target: currentTarget,
       started: false,
     };
+    setGrabbing(true);
+    // Captured from the press, so a quick flick that leaves the small collapsed header still reaches the panel.
+    currentTarget.setPointerCapture(event.pointerId);
   };
 
   const handleDragMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -276,7 +282,6 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
       }
       drag.started = true;
       setDragging(true);
-      drag.target.setPointerCapture(drag.pointerId);
     }
 
     setDragOffset(hasSnaps ? delta : Math.max(0, delta));
@@ -324,6 +329,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
     {
       [styles['tedi-sheet__panel--padding-small']]: padding === 'small',
       [styles['tedi-sheet__panel--draggable']]: showHandle,
+      [styles['tedi-sheet__panel--grabbing']]: grabbing,
     },
     className
   );
@@ -362,6 +368,8 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
         // `FloatingOverlay` sets `overflow: auto` inline, so overriding it needs an inline style too.
         style={{ overflow: 'clip' }}
         data-status={status}
+        // Out of the Tab order, the accessibility tree and pointer input while it animates out.
+        {...(status === 'close' && { inert: '' })}
         className={cn(styles['tedi-sheet__overlay'], {
           [styles['tedi-sheet__overlay--no-overlay']]: !showOverlay,
           [styles['tedi-sheet__overlay--hidden']]: !active,
