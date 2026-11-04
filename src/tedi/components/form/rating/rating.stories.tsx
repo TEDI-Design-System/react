@@ -22,6 +22,10 @@ const meta: Meta<typeof Rating> = {
     label: 'Hinnang',
     type: 'star',
   },
+  argTypes: {
+    value: { control: { type: 'number', min: 0, step: 0.5 } },
+    defaultValue: { control: { type: 'number', min: 0, step: 0.5 } },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],

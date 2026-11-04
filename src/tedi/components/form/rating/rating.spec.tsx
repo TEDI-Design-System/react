@@ -29,6 +29,14 @@ describe('Rating', () => {
     expect(screen.getByRole('radiogroup').style.getPropertyValue('--tedi-rating-columns')).toBe(columns);
   });
 
+  it('applies the vertical orientation to non-star scales only', () => {
+    const { rerender } = render(<Rating label="Feedback" type="icon" orientation="vertical" />);
+    expect(screen.getByRole('radiogroup').className).toContain('tedi-rating--vertical');
+
+    rerender(<Rating label="Feedback" type="star" orientation="vertical" />);
+    expect(screen.getByRole('radiogroup').className).not.toContain('tedi-rating--vertical');
+  });
+
   it('falls back to the type default when count is not a positive integer', () => {
     const { rerender } = render(<Rating label="Feedback" type="star" count={0} />);
     expect(screen.getAllByRole('radio')).toHaveLength(5);

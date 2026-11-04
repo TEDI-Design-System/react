@@ -13,6 +13,7 @@ export interface RatingBreakpointProps {
    * Lay the scale out horizontally or stack it vertically (icon + caption per row; number scale
    * stacked with the endpoint captions bracketing it). Use `vertical` on narrow layouts for
    * `type="icon"` with long `itemLabels`, or for a number scale that would otherwise overflow.
+   * Ignored for `type="star"`, which is always horizontal.
    * Breakpoint-aware: e.g. `orientation="vertical" md={{ orientation: 'horizontal' }}`.
    * @default horizontal
    */
@@ -281,7 +282,7 @@ export const Rating = (props: RatingProps): JSX.Element => {
       className={cn(
         styles['tedi-rating'],
         styles[`tedi-rating--${type}`],
-        { [styles['tedi-rating--vertical']]: orientation === 'vertical' },
+        { [styles['tedi-rating--vertical']]: type !== 'star' && orientation === 'vertical' },
         { [styles['tedi-rating--disabled']]: disabled },
         className
       )}
