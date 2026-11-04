@@ -1,6 +1,6 @@
 ---
 name: tedi-reviewer
-description: Reviews the current branch's changes since rc using the contributing skill's PR review checklist. Use before opening a PR, from a fresh context.
+description: Reviews the current branch's changes since its base branch (the PR target, or rc) using the contributing skill's PR review checklist. Use before opening a PR, from a fresh context.
 tools: Read, Grep, Glob, Bash
 ---
 

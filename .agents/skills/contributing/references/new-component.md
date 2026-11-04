@@ -66,7 +66,7 @@ export * from './components/<category>/<component-name>/<component-name>';
 
 ## Step 6: Verify
 
-1. Run tests: `npm test -- --testPathPattern="<component-name>" --coverage=false`
+1. Run tests: `npx jest --testPathPattern="<component-name>" --coverage=false`
 2. Fix any failures.
 3. Run lint: `npm run lint`
 4. Fix any lint errors.
@@ -87,7 +87,7 @@ the generated docs pick it up. See **SKILL.md → Consumer-Facing Docs** for the
 3. **Fill in its manifest entry**: a one-line `description` saying what it is for, the canonical
    `name`, and 2 to 5 `keyProps`. The `update-design-docs` skill covers this; do not touch
    `category`, `sourcePath` or `status`, which the generator owns.
-4. **Validate**: `npm test -- design-docs/ --coverage=false`, then run `npm run design:build` a second
+4. **Validate**: `npx jest design-docs/ --coverage=false`, then run `npm run design:build` a second
    time and confirm it produces no diff.
 5. **Add a hand-written entry to `skills/tedi-react/references/components.md` only if** the component
    has behaviour the types cannot express: a composition constraint, layout that restacks on its own,
@@ -98,5 +98,6 @@ the generated docs pick it up. See **SKILL.md → Consumer-Facing Docs** for the
 
 ## Step 8: Code Review
 
-Run [pr-review.md](pr-review.md). Fix every finding confirmed against the current code that keeps
-behaviour and the public API, note why you skipped any other, then repeat Step 6.
+Run [pr-review.md](pr-review.md). Fix every finding confirmed against the current code, including
+ones that change behaviour or the API: the component isn't released yet. If you leave one unfixed,
+give the reason and raise it with the user. Then repeat Step 6.

@@ -42,7 +42,7 @@ Apply changes in this order:
 
 ## Step 5: Verify
 
-1. Run the specific component test: `npm test -- --testPathPattern="<component-name>" --coverage=false`
+1. Run the specific component test: `npx jest --testPathPattern="<component-name>" --coverage=false`
 2. Run the full test suite: `npm test`
 3. Run lint: `npm run lint`
 4. Compare test results with the baseline from Step 2 — no new failures allowed.
@@ -57,7 +57,7 @@ contract.
    component also needs a runtime warning and the rest of step 1 in [deprecation.md](deprecation.md).
 2. **Regenerate**: `npm run design:build`. A renamed or removed component changes the manifest's
    roster; a rename also needs its `description` and `keyProps` carried over to the new entry.
-   Validate with `npm test -- design-docs/ --coverage=false`.
+   Validate with `npx jest design-docs/ --coverage=false`.
 3. **Reconcile `skills/tedi-react/references/components.md`.** Its "Behaviour the types don't tell
    you" entries reference component and prop names, so a rename can leave them pointing at nothing:
    grep the file for the old names. Two cases are easy to miss:

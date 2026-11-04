@@ -20,7 +20,7 @@ TEDI Design System React — a React component library (`@tedi-design-system/rea
 npm start                # Storybook dev server on port 4400
 npm run build            # Production build with Vite
 npm test                 # Run all Jest tests
-npm test -- --testPathPattern="button" --coverage=false  # Run tests matching path pattern
+npx jest --testPathPattern="button" --coverage=false  # Run tests matching path pattern (npm test passes on no match)
 npm run lint             # ESLint + Stylelint with auto-fix
 npm run test:coverage    # Same as npm test; both enforce the 80% coverage threshold
 npm run build:sb         # Build static Storybook
