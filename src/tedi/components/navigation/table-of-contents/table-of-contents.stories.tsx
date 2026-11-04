@@ -4,16 +4,17 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
-import { Col, Row } from '../../layout/grid';
+import { Button } from '../../buttons/button/button';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Popover } from '../../overlays/popover/popover';
 import { Tag } from '../../tags/tag/tag';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.108.103?m=dev&node-id=8826-63667" target="_blank">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/467bb3-table-of-contents" target="_blank">Zeroheight ↗</a>
  */
 const meta: Meta<typeof TableOfContents> = {
@@ -29,9 +30,17 @@ const meta: Meta<typeof TableOfContents> = {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
     controls: { exclude: ['children', 'sm', 'md', 'lg', 'xl', 'xxl', 'defaultServerBreakpoint'] },
+    docs: {
+      source: {
+        transform: (code: string) =>
+          code
+            .replaceAll('TableOfContentsItem', 'TableOfContents.Item')
+            .replaceAll('TableOfContentsCollapsible', 'TableOfContents.Collapsible'),
+      },
+    },
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.108.103?m=dev&node-id=8826-63667',
     },
   },
   decorators: [
@@ -46,42 +55,55 @@ const meta: Meta<typeof TableOfContents> = {
 export default meta;
 type Story = StoryObj<TableOfContentsProps>;
 
-const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
+const renderedSource = { docs: { source: { type: 'dynamic' } } } as const;
 
-const subSections: Record<number, string[]> = {
-  2: ['Andmete kogumine', 'Analüüs'],
-  3: ['Joonised', 'Tabelid'],
-};
-
-const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
-  sections.map((label, index) => (
-    <TableOfContents.Item
-      key={label}
-      id={`section-${index + 1}`}
-      separator={separatorBeforeLast && index === sections.length - 2}
-    >
-      <Link
-        href={`#section-${index + 1}`}
-        underline={false}
-        iconLeft={index === sections.length - 1 ? lastIcon : undefined}
-        iconStandalone={index === sections.length - 1 && !!lastIcon}
-      >
-        {label}
+const tocItems = ({ icon = false, separator = false, slot = false } = {}) => [
+  <TableOfContents.Item key="intro" id="intro">
+    <Link href="#intro" underline={false}>
+      Sissejuhatus
+    </Link>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="methods" id="methods">
+    <Link href="#methods" underline={false}>
+      Meetodid
+    </Link>
+    <TableOfContents.Item id="methods-1">
+      <Link href="#methods-1" underline={false}>
+        Andmete kogumine
       </Link>
-      {subSections[index]?.map((childLabel, childIndex) => (
-        <TableOfContents.Item key={childLabel} id={`section-${index + 1}-${childIndex + 1}`}>
-          <Link href={`#section-${index + 1}-${childIndex + 1}`} underline={false}>
-            {childLabel}
-          </Link>
-        </TableOfContents.Item>
-      ))}
     </TableOfContents.Item>
-  ));
+    <TableOfContents.Item id="methods-2">
+      <Link href="#methods-2" underline={false}>
+        Analüüs
+      </Link>
+    </TableOfContents.Item>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="results" id="results">
+    <Link href="#results" underline={false}>
+      Tulemused
+    </Link>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="discussion" id="discussion" separator={separator || undefined}>
+    <Link href="#discussion" underline={false}>
+      Arutelu
+    </Link>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="conclusion" id="conclusion" slot={slot ? <Tag>43 tulemust</Tag> : undefined}>
+    <Link
+      href="#conclusion"
+      underline={false}
+      iconLeft={icon ? 'description' : undefined}
+      iconStandalone={icon || undefined}
+    >
+      Kokkuvõte
+    </Link>
+  </TableOfContents.Item>,
+];
 
 export const Default: Story = {
   args: {
     heading: 'Sisukord',
-    activeId: 'section-3',
+    activeId: 'methods',
     variant: 'default',
     headingLevel: 'h3',
     sticky: false,
@@ -89,7 +111,7 @@ export const Default: Story = {
     bordered: false,
     defaultOpen: true,
   },
-  render: (args) => <TableOfContents {...args}>{sectionItems()}</TableOfContents>,
+  render: (args) => <TableOfContents {...args}>{tocItems()}</TableOfContents>,
 };
 
 export const ItemStates: Story = {
@@ -157,9 +179,10 @@ export const ItemStates: Story = {
 };
 
 export const Transparent: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="section-3">
-      {sectionItems()}
+    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="methods">
+      {tocItems()}
     </TableOfContents>
   ),
 };
@@ -170,108 +193,37 @@ export const Transparent: Story = {
  * link's accessible name.
  */
 export const WithSlot: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sections.map((label, index) => (
-        <TableOfContents.Item
-          key={label}
-          id={`section-${index + 1}`}
-          slot={index === sections.length - 1 ? <Tag color="primary">43 tulemust</Tag> : undefined}
-        >
-          <Link href={`#section-${index + 1}`} underline={false}>
-            {label}
-          </Link>
-          {index === 2 && [
-            <TableOfContents.Item key="collection" id="section-3-1" slot={<Tag color="primary">12</Tag>}>
-              <Link href="#section-3-1" underline={false}>
-                Andmete kogumine
-              </Link>
-            </TableOfContents.Item>,
-            <TableOfContents.Item key="analysis" id="section-3-2">
-              <Link href="#section-3-2" underline={false}>
-                Analüüs
-              </Link>
-            </TableOfContents.Item>,
-          ]}
-        </TableOfContents.Item>
-      ))}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+      {tocItems({ slot: true })}
     </TableOfContents>
   ),
 };
 
 export const Numbered: Story = {
+  parameters: renderedSource,
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} numbered activeId="methods">
-      <TableOfContents.Item id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-      </TableOfContents.Item>
+      {tocItems()}
     </TableOfContents>
   ),
 };
 
 export const WithIcon: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      <TableOfContents.Item id="section-1">
-        <Link href="#section-1" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-2">
-        <Link href="#section-2" underline={false}>
-          Taust
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-3">
-        <Link href="#section-3" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="section-3-1">
-          <Link href="#section-3-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="section-3-2">
-          <Link href="#section-3-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-6">
-        <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+      {tocItems({ icon: true })}
     </TableOfContents>
   ),
 };
 
 export const Headless: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading={null} sticky={false} numbered activeId="section-3">
-      {sectionItems()}
+    <TableOfContents heading={null} sticky={false} numbered activeId="methods">
+      {tocItems()}
     </TableOfContents>
   ),
 };
@@ -281,9 +233,10 @@ export const Headless: Story = {
  * or "back to top" entry apart from the section list. It can follow any item, not just the last one.
  */
 export const WithSeparator: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sectionItems('description', true)}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+      {tocItems({ icon: true, separator: true })}
     </TableOfContents>
   ),
 };
@@ -293,17 +246,44 @@ export const WithSeparator: Story = {
  * list reads as separated rows.
  */
 export const Bordered: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
-      {sectionItems('description')}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods" bordered>
+      {tocItems({ icon: true })}
     </TableOfContents>
   ),
+};
+
+/**
+ * The table of contents inside a popover, opened by a button. Use the `transparent` variant so the
+ * list doesn't add a second card inside the popover, and set `sticky` to `false` so the popover
+ * positions the list.
+ */
+export const InPopover: Story = {
+  render: function InPopover() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <Popover open={open} onToggle={setOpen} placement="bottom-start" withArrow={false} offset={4}>
+        <Popover.Trigger>
+          <Button visualType="neutral" iconLeft="list">
+            {open ? 'Sulge sisukord' : 'Ava sisukord'}
+          </Button>
+        </Popover.Trigger>
+        <Popover.Content padding={{ top: 0, right: 1, bottom: 1, left: 1 }}>
+          <TableOfContents variant="transparent" sticky={false} activeId="methods">
+            {tocItems()}
+          </TableOfContents>
+        </Popover.Content>
+      </Popover>
+    );
+  },
 };
 
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et ' +
   'dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ' +
-  'ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
+  'ea commodo consequat.';
 
 interface LayoutNode {
   id: string;
@@ -311,44 +291,16 @@ interface LayoutNode {
   children?: LayoutNode[];
 }
 
-const layoutTree: LayoutNode[] = [
-  { id: 'sec-1', label: 'Sissejuhatus' },
-  {
-    id: 'sec-2',
-    label: 'Taust',
+const layoutTree: LayoutNode[] = Array.from({ length: 30 }, (_, i) => ({
+  id: `chapter-${i + 1}`,
+  label: `Peatükk ${i + 1}`,
+  ...(i === 2 && {
     children: [
-      { id: 'sec-2-1', label: 'Varasem uurimus' },
-      { id: 'sec-2-2', label: 'Probleemipüstitus' },
+      { id: 'chapter-3-1', label: 'Peatükk 3.1' },
+      { id: 'chapter-3-2', label: 'Peatükk 3.2' },
     ],
-  },
-  {
-    id: 'sec-3',
-    label: 'Meetodid',
-    children: [
-      { id: 'sec-3-1', label: 'Andmete kogumine' },
-      { id: 'sec-3-2', label: 'Analüüs' },
-    ],
-  },
-  {
-    id: 'sec-4',
-    label: 'Tulemused',
-    children: [
-      { id: 'sec-4-1', label: 'Joonised' },
-      { id: 'sec-4-2', label: 'Tabelid' },
-    ],
-  },
-  { id: 'sec-5', label: 'Arutelu' },
-  {
-    id: 'sec-6',
-    label: 'Järeldused',
-    children: [
-      { id: 'sec-6-1', label: 'Piirangud' },
-      { id: 'sec-6-2', label: 'Edasine töö' },
-    ],
-  },
-  { id: 'sec-7', label: 'Kokkuvõte' },
-  { id: 'sec-8', label: 'Viited' },
-];
+  }),
+}));
 
 // Depth-tagged flat list, used for the scroll-spy observer and the content sections.
 const layoutFlat = layoutTree.flatMap((node) => [
@@ -358,32 +310,39 @@ const layoutFlat = layoutTree.flatMap((node) => [
 const layoutIds = layoutFlat.map((node) => node.id);
 
 /**
- * Both panes are fixed-height scroll regions of the same height (`24rem`): the content on the left and
- * the sidebar list on the right. Add as many `TableOfContents.Item`s as you like — the sidebar scrolls
- * inside its own scrollbar instead of stretching past its frame. `scrollActiveIntoView` keeps the
- * active item visible as you read: when the active section changes, its row is scrolled into view
- * within the sidebar's scrollbar. Below `lg` the list collapses into `TableOfContents.Collapsible`.
+ * A documentation page with a sticky table-of-contents sidebar. The page scrolls, and the sticky TOC
+ * stays alongside it, scrolling on its own when it is taller than the viewport. `scrollActiveIntoView`
+ * keeps the active item visible as you read: when the active section changes, its row is scrolled into
+ * view within the card. Below `lg` the list collapses into `TableOfContents.Collapsible`.
+ *
+ * The component is controlled via `activeId`, so the consumer owns scroll behavior: this demo wires an
+ * `IntersectionObserver` to highlight the section in view (scroll-spy) and scrolls the page to a
+ * section when its item is clicked.
  */
 export const StickyInLayout: Story = {
-  parameters: { fullWidth: true },
+  parameters: {
+    layout: 'fullscreen',
+    fullWidth: true,
+    // Own iframe, so the window scrolls and the default 100dvh max height applies.
+    docs: { story: { inline: false, height: '30rem' } },
+  },
   render: function StickyInLayout() {
+    // Mobile scroll area; on desktop the window scrolls.
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [activeId, setActiveId] = useState('sec-1');
+    const [activeId, setActiveId] = useState(layoutIds[0]);
     const isMobile = isBreakpointBelow(useBreakpoint(), 'lg');
 
     useEffect(() => {
-      const container = scrollRef.current;
       if (typeof IntersectionObserver === 'undefined') return undefined;
-      if (!isMobile && !container) return undefined;
-
-      const observerRoot = isMobile ? null : container;
+      const container = isMobile ? scrollRef.current : null;
+      if (isMobile && !container) return undefined;
 
       const ids = layoutIds;
       const visibility = new Map<string, boolean>();
       const atBottom = (): boolean =>
-        isMobile
-          ? window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
-          : !!container && container.scrollTop + container.clientHeight >= container.scrollHeight - 2;
+        container
+          ? container.scrollTop + container.clientHeight >= container.scrollHeight - 2
+          : window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
 
       const pickActive = (): void => {
         if (atBottom()) {
@@ -400,7 +359,7 @@ export const StickyInLayout: Story = {
           entries.forEach((entry) => visibility.set(entry.target.id, entry.isIntersecting));
           pickActive();
         },
-        { root: observerRoot, rootMargin: '0px 0px -55% 0px' }
+        { root: container, rootMargin: '0px 0px -55% 0px' }
       );
 
       ids.forEach((id) => {
@@ -408,7 +367,7 @@ export const StickyInLayout: Story = {
         if (el) observer.observe(el);
       });
 
-      const scroller: HTMLElement | Window = isMobile ? window : (container as HTMLElement);
+      const scroller: HTMLElement | Window = container ?? window;
       scroller.addEventListener('scroll', pickActive, { passive: true });
 
       return () => {
@@ -417,20 +376,20 @@ export const StickyInLayout: Story = {
       };
     }, [isMobile]);
 
+    // `scrollTo` rather than `scrollIntoView`, which would also scroll the Storybook docs page around
+    // the iframe.
     const selectSection = (id: string) => (event: React.MouseEvent) => {
       event.preventDefault();
       const target = document.getElementById(id);
       if (!target) return;
 
-      if (isMobile) {
-        target.scrollIntoView({ block: 'start' });
+      const container = scrollRef.current;
+      const offset = target.getBoundingClientRect().top;
+      if (isMobile && container) {
+        const paddingTop = parseFloat(getComputedStyle(container).paddingTop) || 0;
+        container.scrollTo({ top: container.scrollTop + offset - container.getBoundingClientRect().top - paddingTop });
       } else {
-        const root = scrollRef.current;
-        if (!root) return;
-        const paddingTop = parseFloat(getComputedStyle(root).paddingTop) || 0;
-        root.scrollTo({
-          top: root.scrollTop + target.getBoundingClientRect().top - root.getBoundingClientRect().top - paddingTop,
-        });
+        window.scrollTo({ top: window.scrollY + offset });
       }
       setActiveId(id);
     };
@@ -447,46 +406,60 @@ export const StickyInLayout: Story = {
 
     const items = renderItems(layoutTree);
 
-    return (
+    const content = (
       <>
-        <Row alignItems="start">
-          <Col xs={12} md={8}>
-            <div
-              ref={scrollRef}
-              style={isMobile ? { paddingBottom: '5rem' } : { maxHeight: '24rem', overflowY: 'auto' }}
-              {...(isMobile ? {} : { tabIndex: 0, role: 'region' as const, 'aria-label': 'Artikli sisu' })}
-            >
-              <VerticalSpacing size={1.5}>
-                {layoutFlat.map(({ id, label, depth }) => (
-                  <section key={id} id={id} tabIndex={-1}>
-                    <VerticalSpacing size={0.5}>
-                      <Heading element={depth === 0 ? 'h2' : 'h3'} modifiers={depth === 0 ? 'h3' : 'h4'}>
-                        {label}
-                      </Heading>
-                      <Text>{LOREM}</Text>
-                    </VerticalSpacing>
-                  </section>
-                ))}
-              </VerticalSpacing>
-            </div>
-          </Col>
-          <ShowAt lg>
-            <Col md={4}>
-              <div style={{ maxHeight: '24rem', overflowY: 'auto' }}>
-                <TableOfContents heading="Sisukord" sticky={false} numbered activeId={activeId} scrollActiveIntoView>
-                  {items}
-                </TableOfContents>
-              </div>
-            </Col>
-          </ShowAt>
-        </Row>
+        <div style={{ marginBottom: '1rem' }}>
+          <Heading element="h1" modifiers="h1">
+            Pealkiri
+          </Heading>
+        </div>
+        {layoutFlat.map(({ id, label, depth }) => (
+          <section
+            key={id}
+            id={id}
+            tabIndex={-1}
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: '2rem' }}
+          >
+            <Heading element={depth === 0 ? 'h2' : 'h3'} modifiers={depth === 0 ? 'h3' : 'h4'}>
+              {label}
+            </Heading>
+            <Text>{LOREM}</Text>
+            {depth === 0 && <Text>{LOREM}</Text>}
+          </section>
+        ))}
+      </>
+    );
 
-        <HideAt lg>
-          <TableOfContents.Collapsible heading="Sisukord" numbered activeId={activeId}>
+    if (isMobile) {
+      // The content scrolls above the static bar, so the scrollbar ends before it.
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <div
+            ref={scrollRef}
+            style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', padding: '2rem' }}
+            tabIndex={0}
+            role="region"
+            aria-label="Artikli sisu"
+          >
+            {content}
+          </div>
+          <TableOfContents.Collapsible heading="Sisukord" activeId={activeId} sticky={false}>
             {items}
           </TableOfContents.Collapsible>
-        </HideAt>
-      </>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 16rem', gap: '2rem', padding: '2rem' }}>
+        <div>{content}</div>
+        {/* The sticky card needs a tall parent to move within; as a grid item it would fill the row. */}
+        <div>
+          <TableOfContents heading="Sisukord" activeId={activeId} scrollActiveIntoView>
+            {items}
+          </TableOfContents>
+        </div>
+      </div>
     );
   },
 };
@@ -501,48 +474,7 @@ export const StickyInLayout: Story = {
 export const Collapsible: Story = {
   parameters: { layout: 'fullscreen', fullWidth: true },
   render: () => {
-    const items = [
-      <TableOfContents.Item key="intro" id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="methods" id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="results" id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-        <TableOfContents.Item id="results-1">
-          <Link href="#results-1" underline={false}>
-            Joonised
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="discussion" id="discussion">
-        <Link href="#discussion" underline={false}>
-          Arutelu
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="conclusion" id="conclusion">
-        <Link href="#conclusion" underline={false} iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>,
-    ];
+    const items = tocItems();
 
     const intro = (
       <VerticalSpacing size={0.5}>
@@ -634,48 +566,7 @@ export const CollapsibleHideOnScroll: Story = {
   name: 'Collapsible: hide on scroll',
   parameters: { layout: 'fullscreen', fullWidth: true },
   render: () => {
-    const items = [
-      <TableOfContents.Item key="intro" id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="methods" id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="results" id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-        <TableOfContents.Item id="results-1">
-          <Link href="#results-1" underline={false}>
-            Joonised
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="discussion" id="discussion">
-        <Link href="#discussion" underline={false}>
-          Arutelu
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="conclusion" id="conclusion">
-        <Link href="#conclusion" underline={false} iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>,
-    ];
+    const items = tocItems();
 
     const intro = (
       <VerticalSpacing size={0.5}>

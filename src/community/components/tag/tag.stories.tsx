@@ -62,7 +62,7 @@ const Template: StoryFn<TagTemplateProps> = (args) => {
 
 /**
  * <b>Community Tag is now deprecated</b><br/>
- * Use TEDI-Ready <a href="/docs/tedi-ready-components-tag--docs">Tag</a> or <a href="/docs/tedi-ready-components-statusbadge--docs">StatusBadge</a> instead
+ * Use TEDI-Ready <a href="?path=/docs/tedi-ready-components-tag-tag--docs">Tag</a> or <a href="?path=/docs/tedi-ready-components-tag-statusbadge--docs">StatusBadge</a> instead
  */
 const meta: Meta<TagTemplateProps> = {
   component: Tag,
@@ -74,7 +74,7 @@ const meta: Meta<TagTemplateProps> = {
   render: Template,
   parameters: {
     status: {
-      type: 'deprecated',
+      type: ['deprecated', 'ExistsInTediReady'],
     },
   },
 };
