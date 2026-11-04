@@ -142,6 +142,24 @@ describe('Footer', () => {
     expect(bottomInner.style.maxWidth).toBe('1280px');
   });
 
+  it.each([
+    { maxWidth: '1280', expected: '1280px' },
+    { maxWidth: '80rem', expected: '80rem' },
+    { maxWidth: '', expected: '' },
+  ])('treats number-only `maxWidth` strings as pixels ($maxWidth)', ({ maxWidth, expected }) => {
+    const { container } = render(
+      <Footer maxWidth={maxWidth}>
+        <Footer.Body>
+          <Footer.Section heading="Heading">
+            <a href="#">Link</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect((container.querySelector('.tedi-footer__container') as HTMLElement).style.maxWidth).toBe(expected);
+  });
+
   it('lays the body out as a grid with the given column count above the mobile breakpoint', () => {
     mockUseBreakpoint.mockReturnValue('lg');
     const { container } = render(
@@ -184,6 +202,28 @@ describe('Footer', () => {
     expect(body.className).not.toMatch(/--grid/);
     expect(body.className).toMatch(/--mobile/);
     expect(body.style.gridTemplateColumns).toBe('');
+  });
+
+  it('marks sections as mobile only below the footer mobile breakpoint', () => {
+    const renderFooter = () =>
+      render(
+        <Footer mobileBreakpoint="md">
+          <Footer.Body>
+            <Footer.Section heading="A">
+              <a href="#">A</a>
+            </Footer.Section>
+          </Footer.Body>
+        </Footer>
+      );
+
+    mockUseBreakpoint.mockReturnValue('md');
+    const { container, unmount } = renderFooter();
+    expect((container.querySelector('.tedi-footer-section') as HTMLElement).className).not.toMatch(/--mobile/);
+    unmount();
+
+    mockUseBreakpoint.mockReturnValue('sm');
+    const { container: mobile } = renderFooter();
+    expect((mobile.querySelector('.tedi-footer-section') as HTMLElement).className).toMatch(/--mobile/);
   });
 
   it('Footer.Bottom with `separator` inserts a decorative dot between items', () => {
