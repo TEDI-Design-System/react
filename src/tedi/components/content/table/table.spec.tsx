@@ -656,6 +656,22 @@ describe('Table', () => {
       expect(screen.getByText(/details for Jüri/)).toBeInTheDocument();
       expect(screen.queryAllByRole('region')).toHaveLength(0);
     });
+
+    it('renders the sub-component only for rows that can expand when expanded is true', () => {
+      render(
+        <Table<Person>
+          id="t-exp-all"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          getRowCanExpand={(row) => row.original.name === 'Anna'}
+          defaultState={{ expanded: true }}
+        />
+      );
+
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(screen.queryByText(/details for Jüri/)).not.toBeInTheDocument();
+    });
   });
 
   describe('expandTrigger="row"', () => {
