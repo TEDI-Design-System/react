@@ -32,8 +32,8 @@ export interface FooterProps {
   mobileBreakpoint?: Breakpoint;
   /**
    * Caps the inner content — the column row and the bottom strip's content — to a maximum width
-   * and centers it, while the dark backgrounds stay full-bleed. Pass any CSS length (e.g. `1280`,
-   * `'1280px'`, `'80rem'`). Omit to let the content fill the full width (with the 40px padding).
+   * and centers it, while the dark backgrounds stay full-bleed. Numbers, including number-only strings, are pixels;
+   * other strings are CSS lengths (e.g. `1280`, `'1280px'`, `'80rem'`). Omit to let the content fill the full width.
    */
   maxWidth?: number | string;
   /**
@@ -42,7 +42,18 @@ export interface FooterProps {
   className?: string;
 }
 
-export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth }: FooterProps): JSX.Element => {
+const resolveMaxWidth = (maxWidth: number | string | undefined): number | string | undefined => {
+  if (maxWidth === '') return undefined;
+  return typeof maxWidth === 'string' && /^\d+(\.\d+)?$/.test(maxWidth) ? Number(maxWidth) : maxWidth;
+};
+
+export const Footer = ({
+  children,
+  className,
+  mobileBreakpoint = 'sm',
+  maxWidth: maxWidthProp,
+}: FooterProps): JSX.Element => {
+  const maxWidth = resolveMaxWidth(maxWidthProp);
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
   const { getCurrentBreakpointProps } = useBreakpointProps();
