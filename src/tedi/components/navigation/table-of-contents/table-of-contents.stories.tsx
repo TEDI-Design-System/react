@@ -14,7 +14,7 @@ import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev" target="_blank">Figma ↗</a><br/>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.108.103?m=dev&node-id=8826-63667" target="_blank">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/467bb3-table-of-contents" target="_blank">Zeroheight ↗</a>
  */
 const meta: Meta<typeof TableOfContents> = {
@@ -40,7 +40,7 @@ const meta: Meta<typeof TableOfContents> = {
     },
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.108.103?m=dev&node-id=8826-63667',
     },
   },
   decorators: [
@@ -257,14 +257,15 @@ export const Bordered: Story = {
 /**
  * The table of contents inside a popover, opened by a button. Use the `transparent` variant so the
  * list doesn't add a second card inside the popover, and set `sticky` to `false` — the popover
- * positions the list. With `bottom-start` the popover lines up with the button like a dropdown.
+ * positions the list. Without the arrow and with `bottom-start` the popover lines up with the button
+ * like a dropdown.
  */
 export const InPopover: Story = {
   render: function InPopover() {
     const [open, setOpen] = useState(false);
 
     return (
-      <Popover open={open} onToggle={setOpen} placement="bottom-start">
+      <Popover open={open} onToggle={setOpen} placement="bottom-start" withArrow={false} offset={4}>
         <Popover.Trigger>
           <Button visualType="neutral" iconLeft="list">
             {open ? 'Sulge sisukord' : 'Ava sisukord'}
