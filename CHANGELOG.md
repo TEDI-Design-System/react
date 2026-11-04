@@ -1,3 +1,10 @@
+# [20.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.1...react-20.1.0-rc.2) (2026-11-04)
+
+
+### Bug Fixes
+
+* **sheet:** correct design tokens and refine dragging [#1051](https://github.com/TEDI-Design-System/react/issues/1051) ([#1056](https://github.com/TEDI-Design-System/react/issues/1056)) ([e766649](https://github.com/TEDI-Design-System/react/commit/e766649c12c8d6268bbfba441640294a42aec1e8))
+
 # [20.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-20.0.0...react-20.1.0-rc.1) (2026-11-02)
 
 
