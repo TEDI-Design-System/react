@@ -256,9 +256,8 @@ export const Bordered: Story = {
 
 /**
  * The table of contents inside a popover, opened by a button. Use the `transparent` variant so the
- * list doesn't add a second card inside the popover, and set `sticky` to `false` — the popover
- * positions the list. Without the arrow and with `bottom-start` the popover lines up with the button
- * like a dropdown.
+ * list doesn't add a second card inside the popover, and set `sticky` to `false` so the popover
+ * positions the list.
  */
 export const InPopover: Story = {
   render: function InPopover() {
