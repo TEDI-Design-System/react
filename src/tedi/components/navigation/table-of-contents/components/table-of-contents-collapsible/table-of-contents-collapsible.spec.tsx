@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 
 import { TableOfContents } from '../../table-of-contents';
@@ -67,18 +67,18 @@ describe('TableOfContents.Collapsible', () => {
     expect(within(dialog).getByRole('button', { name: 'Close' })).toBeInTheDocument();
   });
 
-  it('closes the sheet from the sheet header', () => {
+  it('closes the sheet from the sheet header', async () => {
     render(<Tree />);
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('closes the sheet when a list link is activated', () => {
+  it('closes the sheet when a list link is activated', async () => {
     render(<Tree />);
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('link', { name: 'Sissejuhatus' }));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('falls back to the localised title when no heading is provided', () => {

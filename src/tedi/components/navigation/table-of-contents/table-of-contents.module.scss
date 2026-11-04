@@ -186,16 +186,3 @@
 .tedi-table-of-contents__bar-title {
   margin: 0;
 }
-
-.tedi-table-of-contents__sheet {
-  --modal-body-padding: 0;
-  --modal-body-padding-sm: 0;
-}
-
-.tedi-table-of-contents__sheet-header {
-  display: flex;
-  flex: 1 1 auto;
-  gap: var(--layout-grid-gutters-08);
-  align-items: center;
-  justify-content: space-between;
-}
