@@ -191,23 +191,23 @@ describe('TableOfContents.Collapsible', () => {
     });
   });
 
-  describe('bordered', () => {
-    it('does not apply the bordered modifier by default', () => {
+  describe('divided', () => {
+    it('does not apply the divided modifier by default', () => {
       render(<Tree />);
       fireEvent.click(screen.getByRole('button', { name: 'Open' }));
-      expect(document.querySelector('[class*="tedi-table-of-contents--bordered"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[class*="tedi-table-of-contents--divided"]')).not.toBeInTheDocument();
     });
 
-    it('applies the bordered modifier to the sheet list when bordered', () => {
+    it('applies the divided modifier to the sheet list when divided', () => {
       render(
-        <TableOfContents.Collapsible heading="Sisukord" bordered>
+        <TableOfContents.Collapsible heading="Sisukord" divided>
           <TableOfContents.Item id="intro">
             <a href="#intro">Sissejuhatus</a>
           </TableOfContents.Item>
         </TableOfContents.Collapsible>
       );
       fireEvent.click(screen.getByRole('button', { name: 'Open' }));
-      expect(document.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
+      expect(document.querySelector('[class*="tedi-table-of-contents--divided"]')).toBeInTheDocument();
     });
   });
 
