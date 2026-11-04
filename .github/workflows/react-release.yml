@@ -60,6 +60,45 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --cache .npm --prefer-offline
+
+      # After a squash merge Chromatic also uses the pull request's last build
+      # as a baseline. That build's commit is not in this clone (the branch was
+      # squashed and deleted, or force-pushed), so Chromatic logs "Missing
+      # commit detected" and falls back to a much older build, and the diff to
+      # that build forces a full rebuild. GitHub still serves the commit by
+      # SHA, and the PR's sticky comment records it as `chromatic-sha:`.
+      - name: Find the merged pull request's Chromatic build
+        id: baseline
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner, repo, commit_sha: context.sha,
+            });
+            const pr = prs.find((p) => p.merged_at) ?? prs[0];
+            if (!pr) {
+              core.info('No pull request is associated with this commit.');
+              return;
+            }
+            const baseline = require('./.github/scripts/chromatic-baseline.cjs');
+            const { previous } = await baseline({ github, context, core }, pr.number);
+            core.setOutput('pr', String(pr.number));
+            core.setOutput('shas', [...previous].join(' '));
+
+      - name: Fetch the commits Chromatic compares against
+        if: steps.baseline.outputs.pr != ''
+        continue-on-error: true
+        env:
+          PR: ${{ steps.baseline.outputs.pr }}
+          SHAS: ${{ steps.baseline.outputs.shas }}
+        run: |
+          git fetch --no-tags origin "+refs/pull/${PR}/head:refs/remotes/origin/pull/${PR}" || echo "::warning::Could not fetch the head of #${PR}"
+          for sha in $SHAS; do
+            git fetch --no-tags origin "$sha" || echo "::warning::Could not fetch ${sha}"
+          done
+
       # chromaui/action rather than the raw CLI: it surfaces the build result
       # as step outputs (change count, build URL, capture counts), which the
       # two steps below need. exitZeroOnChanges keeps the release green: a
@@ -104,8 +143,8 @@ jobs:
               '',
               `[Review and accept them](${process.env.BUILD_URL})`,
             ].join('\n');
-            const { data: comments } = await github.rest.issues.listComments({
-              owner, repo, issue_number: pr.number,
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number, per_page: 100,
             });
             const existing = comments.find((c) => c.body?.includes(marker));
             if (existing) {
