@@ -110,14 +110,17 @@ export const OverlayContent = (props: OverlayContentProps) => {
       data-placement={placement}
       data-testid="overlay-content"
     >
-      <FloatingArrow
-        ref={(el) => (arrowRef.current = el)}
-        context={context}
-        className={classNames?.arrow}
-        height={arrow?.height}
-        width={arrow?.width}
-        data-testid="overlay-arrow"
-      />
+      {/* No arrow when the overlay has no `arrowDimensions`, e.g. a Popover with `withArrow={false}`. */}
+      {arrow?.width !== undefined && (
+        <FloatingArrow
+          ref={(el) => (arrowRef.current = el)}
+          context={context}
+          className={classNames?.arrow}
+          height={arrow?.height}
+          width={arrow?.width}
+          data-testid="overlay-arrow"
+        />
+      )}
       {children}
     </div>
   );
