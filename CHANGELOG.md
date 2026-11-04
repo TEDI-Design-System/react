@@ -1,3 +1,10 @@
+# [20.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.2...react-20.1.0-rc.3) (2026-11-04)
+
+
+### Bug Fixes
+
+* **timeline:** collapse empty title and description [#1059](https://github.com/TEDI-Design-System/react/issues/1059) ([#1060](https://github.com/TEDI-Design-System/react/issues/1060)) ([22734fa](https://github.com/TEDI-Design-System/react/commit/22734faef0e59def2732800b82cf694a8ae987c0))
+
 # [20.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.1...react-20.1.0-rc.2) (2026-11-04)
 
 
