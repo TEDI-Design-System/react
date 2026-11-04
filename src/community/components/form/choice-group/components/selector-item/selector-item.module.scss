@@ -24,7 +24,7 @@
   background-color: var(--general-surface-tertiary);
   border: 1px solid var(--general-border-secondary);
 
-  .selector-item__input:focus + & {
+  .selector-item__input:focus-visible + & {
     @include mixins.focus-element;
 
     border-radius: 0;

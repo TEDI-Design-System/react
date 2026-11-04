@@ -41,6 +41,17 @@ describe('useFileUpload — accept matching', () => {
 
     expect(onChange).toHaveBeenLastCalledWith([]);
   });
+
+  it('keeps a rejected single file (marked invalid) when keepRejectedFiles is set, even without multiple', () => {
+    const onChange = jest.fn();
+    const { result } = renderHook(() => useFileUpload({ accept: 'image/*', keepRejectedFiles: true, onChange }));
+
+    act(() => result.current.onFileChange(changeEvent([makeFile('doc.pdf', 'application/pdf')])));
+
+    expect(onChange).toHaveBeenLastCalledWith([expect.objectContaining({ name: 'doc.pdf', isValid: false })]);
+    expect(result.current.innerFiles).toHaveLength(1);
+    expect(result.current.errorHelper).toBeDefined();
+  });
 });
 
 describe('useFileUpload — onFileRemove error clearing', () => {

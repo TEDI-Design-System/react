@@ -187,6 +187,21 @@ describe('Checkbox.Group', () => {
     expect(box).not.toHaveAttribute('aria-invalid');
   });
 
+  it('keeps the boxes in their default look when only the group is invalid', () => {
+    const { container } = render(
+      <Checkbox.Group label="Toppings" invalid>
+        <Checkbox value="cheese" label="Cheese" />
+        <Checkbox value="ham" label="Ham" invalid />
+      </Checkbox.Group>
+    );
+
+    const invalidIndicators = container.querySelectorAll('.tedi-checkbox__indicator--invalid');
+    expect(invalidIndicators).toHaveLength(1);
+    expect(screen.getByRole('checkbox', { name: 'Ham' }).parentElement).toContainElement(
+      invalidIndicators[0] as HTMLElement
+    );
+  });
+
   it('disables every checkbox when the group is disabled', () => {
     render(
       <Checkbox.Group label="Toppings" disabled>
@@ -195,5 +210,66 @@ describe('Checkbox.Group', () => {
     );
 
     expect(screen.getByRole('checkbox', { name: 'Cheese' })).toBeDisabled();
+  });
+  it('links the helper through aria-describedby, using a generated id or the helper id', () => {
+    const { rerender } = render(
+      <Checkbox.Group id="toppings" label="Toppings" helper={{ text: 'Pick at least one' }}>
+        <Checkbox value="cheese" label="Cheese" />
+      </Checkbox.Group>
+    );
+    expect(screen.getByRole('group', { name: 'Toppings' })).toHaveAttribute('aria-describedby', 'toppings-helper');
+    expect(screen.getByText('Pick at least one')).toHaveAttribute('id', 'toppings-helper');
+
+    rerender(
+      <Checkbox.Group id="toppings" label="Toppings" helper={{ id: 'custom-helper', text: 'Pick at least one' }}>
+        <Checkbox value="cheese" label="Cheese" />
+      </Checkbox.Group>
+    );
+    expect(screen.getByRole('group', { name: 'Toppings' })).toHaveAttribute('aria-describedby', 'custom-helper');
+    expect(screen.getByText('Pick at least one')).toHaveAttribute('id', 'custom-helper');
+  });
+
+  it('ignores non-element children when selecting all', () => {
+    const onChange = jest.fn();
+    render(
+      <LabelProvider locale="en">
+        <Checkbox.Group label="Toppings" indeterminateCheck onChange={onChange}>
+          Pick your toppings
+          {null}
+          <Checkbox value="cheese" label="Cheese" />
+          <Checkbox value="ham" label="Ham" />
+        </Checkbox.Group>
+      </LabelProvider>
+    );
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select all' }));
+    expect(onChange).toHaveBeenLastCalledWith(['cheese', 'ham']);
+  });
+
+  it('uses a string indeterminateCheck as the fixed select-all label', () => {
+    render(
+      <Checkbox.Group label="Toppings" indeterminateCheck="All toppings">
+        <Checkbox value="cheese" label="Cheese" />
+      </Checkbox.Group>
+    );
+
+    expect(screen.getByRole('checkbox', { name: 'All toppings' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'All toppings' }));
+    expect(screen.getByRole('checkbox', { name: 'All toppings' })).toBeChecked();
+  });
+
+  it('derives the select-all label from a function indeterminateCheck', () => {
+    render(
+      <Checkbox.Group label="Toppings" indeterminateCheck={(state) => `Toppings: ${state}`}>
+        <Checkbox value="cheese" label="Cheese" />
+        <Checkbox value="ham" label="Ham" />
+      </Checkbox.Group>
+    );
+
+    expect(screen.getByRole('checkbox', { name: 'Toppings: none' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Cheese' }));
+    expect(screen.getByRole('checkbox', { name: 'Toppings: some' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Ham' }));
+    expect(screen.getByRole('checkbox', { name: 'Toppings: all' })).toBeInTheDocument();
   });
 });

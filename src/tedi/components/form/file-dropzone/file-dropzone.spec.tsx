@@ -87,12 +87,12 @@ describe('FileDropzone', () => {
       fileInputRef: { current: null },
     });
 
-    render(<FileDropzone id="3b" name="file" label="Upload File" multiple validateIndividually />);
+    render(<FileDropzone id="3b" name="file" label="Upload File" multiple keepRejectedFiles />);
 
     expect(screen.queryByText('Aggregate error')).not.toBeInTheDocument();
   });
 
-  it('still shows the aggregate error for single-file individual validation (rejected file is not listed)', () => {
+  it('suppresses the aggregate hook error for single-file keepRejectedFiles too (the kept file carries it)', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [],
       errorHelper: { type: 'error', text: 'Aggregate error' },
@@ -103,9 +103,9 @@ describe('FileDropzone', () => {
       fileInputRef: { current: null },
     });
 
-    render(<FileDropzone id="3d" name="file" label="Upload File" validateIndividually />);
+    render(<FileDropzone id="3d" name="file" label="Upload File" keepRejectedFiles />);
 
-    expect(screen.getByText('Aggregate error')).toBeInTheDocument();
+    expect(screen.queryByText('Aggregate error')).not.toBeInTheDocument();
   });
 
   it('still renders a consumer-provided error helper under the dropzone with individual validation', () => {
@@ -124,7 +124,7 @@ describe('FileDropzone', () => {
         id="3c"
         name="file"
         label="Upload File"
-        validateIndividually
+        keepRejectedFiles
         helper={{ type: 'error', text: 'Required' }}
       />
     );
@@ -188,7 +188,7 @@ describe('FileDropzone', () => {
       fileInputRef: { current: null },
     });
 
-    render(<FileDropzone id="5" name="file" label="Upload File" accept="image/png" multiple maxSize={5} />);
+    render(<FileDropzone id="5" name="file" label="Upload File" accept="image/png" multiple maxSize={5 * 1024 ** 2} />);
 
     const useDropzoneMock = useDropzone as jest.Mock;
     const dropzoneProps = useDropzoneMock.mock.calls[0][0];
@@ -324,9 +324,9 @@ describe('FileDropzone', () => {
         name="docs"
         label="Label"
         accept=".pdf,.txt"
-        maxSize={100}
+        maxSize={100 * 1024 ** 2}
         multiple
-        validateIndividually
+        keepRejectedFiles
         files={[]}
         defaultFiles={[]}
         onChange={() => undefined}
@@ -336,8 +336,8 @@ describe('FileDropzone', () => {
     );
 
     const label = container.querySelector('label');
-    ['accept', 'maxsize', 'files', 'name', 'defaultfiles', 'announcementtimeout', 'validateindividually'].forEach(
-      (attr) => expect(label).not.toHaveAttribute(attr)
+    ['accept', 'maxsize', 'files', 'name', 'defaultfiles', 'announcementtimeout', 'keeprejectedfiles'].forEach((attr) =>
+      expect(label).not.toHaveAttribute(attr)
     );
     expect(container.querySelector('input[type="file"]')).toHaveAttribute('name', 'docs');
   });

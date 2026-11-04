@@ -10,6 +10,14 @@ Usage instructions and detailed documentation for using the components in your a
 
 ---
 
+## Accessibility
+
+TEDI follows EN 301 549 and, for web content, WCAG 2.2 level AA. Components released before TEDI moved to WCAG 2.2 were built and tested against WCAG 2.1 AA and are being reviewed for the new criteria.
+
+The [accessibility page on tedi.ee](https://www.tedi.ee/1ee8444b7/p/33df89-sissejuhatus/b/05a2e8) (in Estonian) describes how components are tested, what TEDI covers and what stays with your project, and how to report an accessibility issue.
+
+---
+
 ## Getting Started (Using the package)
 
 If you are installing `@tedi-design-system/react` in your own project, follow the
@@ -78,8 +86,7 @@ This will launch a local Storybook instance for component development.
 
 ## Contributing
 
-Check the [wiki](https://github.com/TEDI-Design-System/general/wiki) for component guidelines and coding standards.  
-Report issues or contribute via [GitHub Issues](https://github.com/TEDI-Design-System/react/issues).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to report issues, set up the repository and open a pull request. Component guidelines and coding standards are in the [wiki](https://github.com/TEDI-Design-System/general/wiki).
 
 ---
 
@@ -114,3 +121,7 @@ Its token table is read straight from `@tedi-design-system/core/tokens.json` (co
 <a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
 
 We use [Chromatic](https://www.chromatic.com/) for visual testing, reviewing UI changes, and preventing visual regressions.
+
+## License
+
+[MIT](LICENSE). The bundled fonts and the logos in `public/` are not covered, see [NOTICE.md](NOTICE.md).

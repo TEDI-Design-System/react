@@ -18,7 +18,7 @@ describe('FileUpload component', () => {
     onDelete: jest.fn(),
     accept: '.jpg,.png',
     multiple: true,
-    maxSize: 5,
+    maxSize: 5 * 1024 ** 2,
     label: 'Upload files',
   };
 
@@ -75,8 +75,8 @@ describe('FileUpload component', () => {
     render(
       <FileUpload
         {...defaultProps}
-        validateIndividually
-        maxSize={0.00001}
+        keepRejectedFiles
+        maxSize={0.00001 * 1024 ** 2}
         defaultFiles={[{ name: 'ok.jpg', id: 'v1' }]}
       />
     );
@@ -110,7 +110,7 @@ describe('FileUpload component', () => {
   });
 
   it('formats the max-size hint into readable units', () => {
-    render(<FileUpload {...defaultProps} accept={undefined} maxSize={0.5} />);
+    render(<FileUpload {...defaultProps} accept={undefined} maxSize={0.5 * 1024 ** 2} />);
     expect(screen.getByText(/file-upload.max-size 512 KB/i)).toBeInTheDocument();
   });
 
@@ -205,7 +205,7 @@ describe('FileUpload component', () => {
   });
 
   it('should return helper text when accept and maxSize are provided', () => {
-    const props = { ...defaultProps, accept: '.jpg,.png', maxSize: 5 };
+    const props = { ...defaultProps, accept: '.jpg,.png', maxSize: 5 * 1024 ** 2 };
     render(<FileUpload {...props} />);
     expect(screen.getByText(/file-upload.accept .jpg, .png/i)).toBeInTheDocument();
     expect(screen.getByText(/file-upload.max-size 5 MB/i)).toBeInTheDocument();
@@ -305,8 +305,8 @@ describe('FileUpload component', () => {
     expect(screen.getByText('test.jpg')).toBeInTheDocument();
   });
 
-  it('should add valid files individually when validateIndividually is true', () => {
-    render(<FileUpload {...defaultProps} validateIndividually />);
+  it('should add valid files individually when keepRejectedFiles is true', () => {
+    render(<FileUpload {...defaultProps} keepRejectedFiles />);
     const input = screen.getByLabelText(/Upload files/i);
     const validFile = new File(['dummy content'], 'test.jpg', { type: 'image/jpeg' });
     const invalidFile = new File(['dummy content'], 'test.txt', { type: 'text/plain' });
@@ -338,7 +338,7 @@ describe('FileUpload component', () => {
   });
 
   it('should handle file size validation correctly', () => {
-    render(<FileUpload {...defaultProps} maxSize={5} />);
+    render(<FileUpload {...defaultProps} maxSize={5 * 1024 ** 2} />);
 
     const input = screen.getByLabelText(/Upload files/i);
     const largeFile = new File(['a'.repeat(6 * 1024 * 1024)], 'large.jpg', {

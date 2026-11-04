@@ -9,20 +9,4 @@
     gap: var(--tedi-dimensions-02);
     margin-block-end: var(--tedi-dimensions-04);
   }
-
-  &__results {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-
-    li {
-      display: flex;
-      padding-block: var(--tedi-dimensions-02);
-      overflow-wrap: anywhere;
-
-      + li {
-        border-block-start: 1px solid var(--general-border-primary);
-      }
-    }
-  }
 }

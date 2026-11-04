@@ -5,15 +5,7 @@ import { useArgs } from 'storybook/preview-api';
 import { Button } from '../../../tedi/components/buttons/button/button';
 import { TextField } from '../../../tedi/components/form/textfield/textfield';
 import { Col, Row } from '../../../tedi/components/layout/grid';
-import { Resizer } from '../map-components/resizer/resizer';
-import {
-  DockPanel,
-  DockPanelDimensionPreset,
-  DockPanelLabels,
-  DockPanelLayout,
-  DockPanelPlacement,
-  DockPanelProps,
-} from './dock-panel';
+import { DockPanel, DockPanelDimensionPreset, DockPanelLabels, DockPanelLayout, DockPanelProps } from './dock-panel';
 
 const labels: DockPanelLabels = {
   collapse: 'Minimize panel',
@@ -77,7 +69,6 @@ const Workspace = ({ children, height = '36rem' }: { children: ReactNode; height
   const [count, setCount] = useState(0);
   return (
     <DockPanelLayout
-      data-dock-panel-workspace=""
       panel={children}
       style={{
         height,
@@ -205,13 +196,14 @@ There is no dimmed backdrop, background click interception, focus trap or body-s
 Opening is owned by the application: render the panel to show it, remove it to close it.
 Minimizing leaves a restore strip and **keeps the content mounted**.
 The four inward arrows (\`zoom_in_map\`) minimize; four outward arrows (\`zoom_out_map\`) restore the
-configured size, **not fullscreen**. Collapsed side titles read bottom-to-top in smaller text.
+configured or resized size, **not fullscreen**. Collapsed side titles read bottom-to-top in smaller text.
+Click the minimized title, bar or Restore button to restore. Close dismisses the panel without restoring it.
 
 ### Required props
 
 | Prop | Purpose |
 | --- | --- |
-| \`title\` | Visible heading and default accessible name. |
+| \`title\` | Visible heading and accessible name. |
 | \`children\` | Any application-provided React content. |
 | \`labels\` | Translated button names: \`{ collapse, expand, close }\`. All three strings are required by this API. |
 
@@ -242,12 +234,21 @@ They do not select a width or height and do not shrink the application-provided 
 
 Width and height use the **same DockPanel percentage scale**, not fixed-pixel Modal width tokens.
 An \`xl\` side panel leaves 20% of the workspace visible beside it, just as an \`xl\` top/bottom panel
-leaves 20% above or below it. Presets resize proportionally with their containing workspace.
+leaves 20% above or below it. Without resizing enabled, presets resize proportionally with their containing workspace.
 You can still use numbers (pixels), CSS lengths and percentages, or \`height="auto"\`.
 Use \`width="100%"\` or \`height="100%"\` explicitly when the full available dimension is intended.
 Omitted dimensions use side width \`xs\` (25%), side height 100%, and top/bottom height 50%.
 Width is ignored for top/bottom panels, which fill the workspace width.
 Custom dimensions remain capped by the workspace but are not restricted to the preset scale.
+
+Enable \`resizable\` to drag the edge facing the workspace. The configured preset or custom dimension
+is measured once to initialize Resizer in pixels. Resizing defaults to 8–92% of the current workspace.
+Optional pixel limits (minWidth/maxWidth for sides, minHeight/maxHeight for top/bottom) replace each default independently.
+Limits stay within the workspace; the maximum wins if it is smaller than the minimum.
+Workspace resizing clamps an invalid saved size and preserves a valid one.
+A larger workspace permits further dragging; a saved size within the new limits stays unchanged.
+Minimize/restore preserves the resized dimensions and mounted content; closing and remounting
+starts again from the configured size.
 
 ### Content height and containment
 
@@ -255,12 +256,12 @@ DockPanelLayout needs a defined height, either through its parent or its own sty
 It is a layout-only companion, not a map component. Its required \`children\` are the underlying workspace;
 its optional \`panel\` is a DockPanel or a layout-aware wrapper containing it. Omit the panel to close it.
 When minimized, it reserves exactly the rail width/height. A custom wrapper must participate in the grid
-when collapsed rather than remain absolutely positioned. The Resizer examples demonstrate this with a
-story-owned layout wrapper and the unchanged Community Resizer.
+when collapsed rather than remain absolutely positioned. DockPanel handles this when \`resizable\` is enabled.
 A canvas-based map may need its own documented resize/update call when its container changes size.
-\`height="auto" maxHeight="calc(100% - 4rem)"\` keeps background visible below a side panel.
-At the height limit, only the body scrolls; the header and footer remain outside that scrolling area.
-A minimized side rail keeps the configured height, or fits its title and grouped controls for \`auto\`.
+\`height="auto" maxHeight={512}\` limits the expanded side panel to 512 pixels.
+At the height limit, the body scrolls independently of the header and footer.
+Header controls wrap in narrow panels; very shallow panels scroll the header internally.
+A minimized side rail fills the workspace height; restoring it restores the expanded height.
 A minimized top/bottom panel is always a compact horizontal strip.
 
 ### State and accessibility
@@ -272,29 +273,36 @@ The minimize/restore button exposes \`aria-expanded\` and \`aria-controls\`; hid
 Minimize/restore and Close remain grouped, including in the minimized rail.
 Example footers contain **Cancel** and **Save** buttons. Cancel closes the example; Save only updates a
 local demo status (no backend call). Footer state survives minimization. All actions remain application-owned.
-Standard div attributes and a forwarded div ref are supported. Use \`headingElement\` for the correct heading level.
+Use \`id\` to connect external controls, \`className\`/\`style\` for styling, and \`headingElement\` for the heading level.
+The required title names the panel.
 
 ### Examples
 
 Like the TEDI-Ready Modal documentation, examples begin with **opening buttons** rather than permanently open panels.
 **Size**, **Width** and **Height** let you compare variants. **Position** demonstrates all four edges,
 including their minimized layouts: use the header controls rather than separate minimized examples.
-The remaining examples cover custom dimensions, content height, overflow, controlled state
-and composition with the existing Community Resizer.
+The remaining examples cover custom dimensions, content height, overflow, controlled state,
+external minimization through \`minimizeCounter\` and resizing through \`resizable\`.
 The default preview also provides live Controls. Select a story's Canvas for more preview space.
 `;
 
 const publicProps = [
   'title',
+  'description',
   'children',
   'labels',
   'placement',
   'size',
+  'resizable',
   'width',
+  'minWidth',
+  'maxWidth',
   'height',
+  'minHeight',
   'maxHeight',
   'collapsed',
   'defaultCollapsed',
+  'minimizeCounter',
   'onCollapsedChange',
   'onClose',
   'headerActions',
@@ -303,8 +311,6 @@ const publicProps = [
   'id',
   'className',
   'style',
-  'aria-labelledby',
-  'aria-describedby',
 ];
 
 const meta = {
@@ -327,8 +333,19 @@ const meta = {
     title: {
       control: 'text',
       type: { name: 'string', required: true },
-      description: 'Required. Visible heading and default accessible name.',
+      description: 'Required. Visible heading and accessible name.',
       table: { category: 'Required props', type: { summary: 'string' } },
+    },
+    description: {
+      control: 'text',
+      description:
+        'Text below the title, styled like Modal.Header. Hidden while minimized; omitted or empty text adds no spacing.',
+      table: {
+        category: 'Optional props',
+        subcategory: 'Content',
+        type: { summary: 'string' },
+        defaultValue: { summary: 'undefined' },
+      },
     },
     children: {
       control: false,
@@ -358,6 +375,12 @@ const meta = {
         'Optional. Panel density, independent of width/height. Uses TEDI Modal padding tokens. The title defaults to h3 for default and h4 for small, unless headingElement is supplied.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'default' } },
     },
+    resizable: {
+      control: 'boolean',
+      description:
+        'Enables dragging the workspace-facing edge, within 8–92% of the workspace by default. Pixel min/max props replace the corresponding defaults. Minimize/restore preserves the resized dimensions.',
+      table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'false' } },
+    },
     width: {
       control: 'text',
       description:
@@ -380,15 +403,30 @@ const meta = {
         defaultValue: { summary: '100% (side); 50% (top/bottom)' },
       },
     },
+    minWidth: {
+      control: 'number',
+      description: 'Minimum side-panel resize width in pixels. Defaults to 8% of workspace width.',
+      table: { category: 'Optional props', subcategory: 'Layout', type: { summary: 'number' } },
+    },
+    maxWidth: {
+      control: 'number',
+      description: 'Maximum side-panel width in pixels. Defaults to 92% when resizable; otherwise workspace width.',
+      table: { category: 'Optional props', subcategory: 'Layout', type: { summary: 'number' } },
+    },
+    minHeight: {
+      control: 'number',
+      description: 'Minimum top/bottom resize height in pixels. Defaults to 8% of workspace height.',
+      table: { category: 'Optional props', subcategory: 'Layout', type: { summary: 'number' } },
+    },
     maxHeight: {
-      control: 'text',
+      control: 'number',
       description:
-        'Optional. CSS length or number, not a preset. calc(100% - 4rem) reserves space below a side panel. Body content scrolls at this limit.',
+        'Optional maximum expanded height in pixels. Defaults to 92% of workspace height for top/bottom resizing; otherwise the workspace height. Body content scrolls at this limit.',
       table: {
         category: 'Optional props',
         subcategory: 'Layout',
-        type: { summary: 'CSSProperties["maxHeight"]' },
-        defaultValue: { summary: '100%' },
+        type: { summary: 'number' },
+        defaultValue: { summary: '92% (top/bottom resizing); workspace height otherwise' },
       },
     },
     collapsed: {
@@ -407,10 +445,21 @@ const meta = {
         'Optional. Initial internal state only; ignored when collapsed is supplied. In examples it is reapplied on opening, not while editing an open panel.',
       table: { category: 'Optional props', subcategory: 'State', defaultValue: { summary: 'false' } },
     },
+    minimizeCounter: {
+      control: 'number',
+      description:
+        'Application-owned minimize counter. The initial value is ignored. Changes in either direction request minimization only while expanded; unchanged values do nothing. Restoring does not require changing the counter. In controlled mode, apply onCollapsedChange(true).',
+      table: {
+        category: 'Optional props',
+        subcategory: 'State',
+        type: { summary: 'number' },
+        defaultValue: { summary: 'undefined' },
+      },
+    },
     onCollapsedChange: {
       control: false,
       description:
-        'Optional. Requests/notifies the next minimized state. In controlled mode, update collapsed with this value.',
+        'Receives the next minimized state requested by the toggle or minimizeCounter. In controlled mode, update collapsed with this value.',
       table: {
         category: 'Optional props',
         subcategory: 'Events',
@@ -432,7 +481,7 @@ const meta = {
     headerActions: {
       control: false,
       description:
-        'Optional. React content before the grouped minimize/restore and Close controls. Hidden while minimized.',
+        'React content before the grouped minimize/restore and Close controls. Hidden but kept mounted while minimized.',
       table: {
         category: 'Optional props',
         subcategory: 'Content',
@@ -473,26 +522,6 @@ const meta = {
         defaultValue: { summary: 'Generated unique id' },
       },
     },
-    'aria-labelledby': {
-      control: 'text',
-      description: 'Optional. Override the labelling element id. Normally the panel wires its own title automatically.',
-      table: {
-        category: 'Optional props',
-        subcategory: 'Accessibility',
-        type: { summary: 'string' },
-        defaultValue: { summary: 'Panel title id' },
-      },
-    },
-    'aria-describedby': {
-      control: 'text',
-      description: 'Optional. Id of additional descriptive text, supplied by the application.',
-      table: {
-        category: 'Optional props',
-        subcategory: 'Accessibility',
-        type: { summary: 'string' },
-        defaultValue: { summary: 'undefined' },
-      },
-    },
     className: {
       control: 'text',
       description: 'Optional. Additional class names on the panel root.',
@@ -525,7 +554,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { onClose: undefined },
+  args: { onClose: undefined, description: 'Additional information about this item.' },
   render: function Render(args) {
     const [, updateArgs] = useArgs<DockPanelProps>();
     return <PanelExample args={args} closable={false} onStateChange={(collapsed) => updateArgs({ collapsed })} />;
@@ -538,27 +567,46 @@ export const Default: Story = {
       },
       source: {
         language: 'tsx',
-        code: `import { useState } from 'react';
-import { Button } from '@tedi-design-system/react/tedi';
+        type: 'code',
+        code: `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
 import { DockPanel, DockPanelLayout } from '@tedi-design-system/react/community';
 
 export function Example() {
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const inputId = useId();
+
+  function closePanel() {
+    setOpen(false);
+    openButtonRef.current?.focus();
+  }
+
   return (
     <>
-      <Button visualType="secondary" onClick={() => setOpen(!open)}>
-        {open ? 'Hide example' : 'Open DockPanel'}
-      </Button>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
+        <Button ref={openButtonRef} visualType="secondary" onClick={() => {
+          setOpen(true);
+          setCollapsed(false);
+        }}>
+          Open DockPanel
+        </Button>
+        <Button visualType="secondary" disabled={!open} onClick={closePanel}>Hide example</Button>
+      </div>
       <DockPanelLayout style={{ height: '36rem' }} panel={open ? (
         <DockPanel
           title="Details"
+          description="Additional information about this item."
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
           labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
-          footer={<Button visualType="secondary" onClick={() => setOpen(false)}>Cancel</Button>}
+          footer={<Button visualType="secondary" onClick={closePanel}>Cancel</Button>}
         >
-          <p>Application-provided panel content.</p>
+          <TextField id={inputId} label="Example value" defaultValue="Edit me, then minimize and restore" />
         </DockPanel>
       ) : null}>
-        <p>Your map, editor or other workspace.</p>
+        <p>Your workspace.</p>
       </DockPanelLayout>
     </>
   );
@@ -568,18 +616,19 @@ export function Example() {
   },
 };
 
-const presetExampleSource = (dimension: 'width' | 'height'): string => `import { useRef, useState } from 'react';
-import { Button } from '@tedi-design-system/react/tedi';
+const presetExampleSource = (dimension: 'width' | 'height'): string => `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
 import { DockPanel, DockPanelLayout, type DockPanelDimensionPreset } from '@tedi-design-system/react/community';
 
 export function Example() {
   const [preset, setPreset] = useState<DockPanelDimensionPreset>();
   const [collapsed, setCollapsed] = useState(false);
+  const inputId = useId();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const close = () => { setPreset(undefined); trigger.current?.focus(); };
   return (
     <>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
         {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map((value) => (
           <Button key={value} visualType="secondary" onClick={(event) => {
             trigger.current = event.currentTarget;
@@ -599,7 +648,7 @@ export function Example() {
           labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
           footer={<Button visualType="secondary" onClick={close}>Cancel</Button>}
         >
-          <p>Application-provided content.</p>
+          <TextField id={inputId} label="Name" defaultValue="Edit me, then switch examples" />
         </DockPanel>
       ) : null}>
         <p>Your underlying workspace.</p>
@@ -608,12 +657,14 @@ export function Example() {
   );
 }`;
 
-const sizeExampleSource = `import { useRef, useState } from 'react';
-import { Button } from '@tedi-design-system/react/tedi';
+const sizeExampleSource = `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
 import { DockPanel, DockPanelLayout, type DockPanelSize } from '@tedi-design-system/react/community';
 
 export function Example() {
   const [size, setSize] = useState<DockPanelSize>();
+  const [collapsed, setCollapsed] = useState(false);
+  const inputId = useId();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const close = () => { setSize(undefined); trigger.current?.focus(); };
   return (
@@ -622,15 +673,18 @@ export function Example() {
         <Button key={value} visualType="secondary" onClick={(event) => {
           trigger.current = event.currentTarget;
           setSize(value);
+          setCollapsed(false);
         }}>Open {value} DockPanel</Button>
       ))}
       <DockPanelLayout style={{ height: '36rem' }} panel={size ? (
-        <DockPanel title="Details" size={size} width="sm" height="auto" maxHeight="calc(100% - 4rem)"
+        <DockPanel title="Details" size={size} width="sm" height="auto" maxHeight={512}
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
           onClose={close}
           labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
           footer={<Button visualType="secondary" onClick={close}>Cancel</Button>}
         >
-          <p>Application-provided content.</p>
+          <TextField id={inputId} label="Name" defaultValue="Edit me, then switch examples" />
         </DockPanel>
       ) : null}>
         <p>Your underlying workspace.</p>
@@ -643,12 +697,12 @@ const sizeChoices: readonly PanelChoice[] = [
   {
     key: 'small',
     label: 'Open small DockPanel',
-    props: { size: 'small', title: 'Small DockPanel', width: 'sm', height: 'auto', maxHeight: 'calc(100% - 4rem)' },
+    props: { size: 'small', title: 'Small DockPanel', width: 'sm', height: 'auto', maxHeight: 512 },
   },
   {
     key: 'default',
     label: 'Open default DockPanel',
-    props: { size: 'default', title: 'Default DockPanel', width: 'sm', height: 'auto', maxHeight: 'calc(100% - 4rem)' },
+    props: { size: 'default', title: 'Default DockPanel', width: 'sm', height: 'auto', maxHeight: 512 },
   },
 ];
 
@@ -663,7 +717,7 @@ export const Size: Story = {
   render: (args) => <PanelExample args={args} choices={sizeChoices} />,
   parameters: {
     docs: {
-      source: { language: 'tsx', code: sizeExampleSource },
+      source: { language: 'tsx', type: 'code', code: sizeExampleSource },
       description: {
         story:
           'Small and default use the same width, content and footer. Small reduces panel padding using TEDI Modal density tokens. The title defaults to h3 for default and h4 for small, with matching text sizes. The form controls and minimized title styling are unchanged.',
@@ -684,7 +738,7 @@ export const Width: Story = {
   render: (args) => <PanelExample args={args} choices={widthChoices} />,
   parameters: {
     docs: {
-      source: { language: 'tsx', code: presetExampleSource('width') },
+      source: { language: 'tsx', type: 'code', code: presetExampleSource('width') },
       description: {
         story:
           'Click xs, sm, md, lg or xl to open a right-docked panel at 25%, 35%, 50%, 65% or 80% of workspace width. The scale matches Height. Even xl leaves 20% of the workspace visible and interactive beside the panel. Switching buttons while open preserves content, and resizing the workspace updates the panel proportionally.',
@@ -705,7 +759,7 @@ export const Height: Story = {
   render: (args) => <PanelExample args={args} choices={heightChoices} workspaceHeight="48rem" />,
   parameters: {
     docs: {
-      source: { language: 'tsx', code: presetExampleSource('height') },
+      source: { language: 'tsx', type: 'code', code: presetExampleSource('height') },
       description: {
         story:
           'This example uses a 48rem-high workspace to make the smallest panel usable. Click xs, sm, md, lg or xl to open a bottom DockPanel at 25%, 35%, 50%, 65%, or 80% of workspace height. The scale matches Width; xl leaves 20% of the workspace visible and interactive above the panel. The full-width panel has a scrolling body when its content needs more room; the header and footer stay visible.',
@@ -713,6 +767,332 @@ export const Height: Story = {
     },
   },
 };
+
+const positionExampleSource = `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
+import { DockPanel, DockPanelLayout, type DockPanelPlacement } from '@tedi-design-system/react/community';
+
+export function Example() {
+  const [placement, setPlacement] = useState<DockPanelPlacement>();
+  const [collapsed, setCollapsed] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const inputId = useId();
+
+  function closePanel() {
+    setPlacement(undefined);
+    triggerRef.current?.focus();
+  }
+
+  return (
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
+        {(['left', 'right', 'top', 'bottom'] as const).map((position) => (
+          <Button key={position} visualType="secondary" onClick={(event) => {
+            triggerRef.current = event.currentTarget;
+            setPlacement(position);
+            setCollapsed(false);
+          }}>
+            {position}
+          </Button>
+        ))}
+      </div>
+      <DockPanelLayout style={{ height: '36rem' }} panel={placement ? (
+        <DockPanel
+          title={'DockPanel: ' + placement}
+          placement={placement}
+          width="md"
+          height={placement === 'left' || placement === 'right' ? '100%' : 'md'}
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          onClose={closePanel}
+          labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
+          footer={<Button visualType="secondary" onClick={closePanel}>Cancel</Button>}
+        >
+          <TextField id={inputId} label="Name" defaultValue="Edit me, then change position" />
+        </DockPanel>
+      ) : null}>
+        <p>Your workspace.</p>
+      </DockPanelLayout>
+    </>
+  );
+}`;
+
+const customDimensionsExampleSource = `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
+import { DockPanel, DockPanelLayout } from '@tedi-design-system/react/community';
+
+export function Example() {
+  const [example, setExample] = useState<'side' | 'bottom'>();
+  const [collapsed, setCollapsed] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const inputId = useId();
+  const isSidePanel = example === 'side';
+
+  function openPanel(next: 'side' | 'bottom', trigger: HTMLButtonElement) {
+    triggerRef.current = trigger;
+    setExample(next);
+    setCollapsed(false);
+  }
+
+  function closePanel() {
+    setExample(undefined);
+    triggerRef.current?.focus();
+  }
+
+  return (
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
+        <Button visualType="secondary" onClick={(event) => openPanel('side', event.currentTarget)}>
+          Side: 420px × 70%
+        </Button>
+        <Button visualType="secondary" onClick={(event) => openPanel('bottom', event.currentTarget)}>
+          Bottom: 320px high
+        </Button>
+      </div>
+      <DockPanelLayout style={{ height: '36rem' }} panel={example ? (
+        <DockPanel
+          title="Custom dimensions"
+          placement={isSidePanel ? 'right' : 'bottom'}
+          width={isSidePanel ? 420 : undefined}
+          height={isSidePanel ? '70%' : 320}
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          onClose={closePanel}
+          labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
+          footer={<Button visualType="secondary" onClick={closePanel}>Cancel</Button>}
+        >
+          <TextField id={inputId} label="Name" defaultValue="Edit me, then switch examples" />
+        </DockPanel>
+      ) : null}>
+        <p>Your workspace.</p>
+      </DockPanelLayout>
+    </>
+  );
+}`;
+
+const contentHeightExampleSource = `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
+import { DockPanel, DockPanelLayout } from '@tedi-design-system/react/community';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [sectionCount, setSectionCount] = useState(0);
+  const [backgroundCount, setBackgroundCount] = useState(0);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const inputId = useId();
+
+  function closePanel() {
+    setOpen(false);
+    setSectionCount(0);
+    openButtonRef.current?.focus();
+  }
+
+  return (
+    <>
+      <Button ref={openButtonRef} visualType="secondary" onClick={() => {
+        setOpen(true);
+        setCollapsed(false);
+      }}>
+        Open DockPanel
+      </Button>
+      <DockPanelLayout style={{ height: '36rem' }} panel={open ? (
+        <DockPanel
+          title="Content-height details"
+          width={420}
+          height="auto"
+          maxHeight={512}
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          onClose={closePanel}
+          labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
+          footer={<Button visualType="secondary" onClick={closePanel}>Cancel</Button>}
+        >
+          <TextField id={inputId} label="Example value" defaultValue="Edit me" />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
+            <Button disabled={sectionCount >= 20} onClick={() => setSectionCount((count) => count + 1)}>
+              Add section
+            </Button>
+            <Button visualType="secondary" disabled={sectionCount === 0}
+              onClick={() => setSectionCount((count) => count - 1)}>
+              Remove section
+            </Button>
+          </div>
+          {Array.from({ length: sectionCount }, (_, index) => (
+            <p key={index}>Section {index + 1}. More content makes the panel grow until it reaches its limit.</p>
+          ))}
+        </DockPanel>
+      ) : null}>
+        <p>Your workspace stays interactive.</p>
+        <Button visualType="secondary" onClick={() => setBackgroundCount((count) => count + 1)}>
+          Background action ({backgroundCount})
+        </Button>
+      </DockPanelLayout>
+    </>
+  );
+}`;
+
+const controlledExampleSource = `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
+import { DockPanel, DockPanelLayout } from '@tedi-design-system/react/community';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [minimizeCounter, setMinimizeCounter] = useState(0);
+  const [message, setMessage] = useState('No header action yet.');
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const inputId = useId();
+
+  function closePanel() {
+    setOpen(false);
+    openButtonRef.current?.focus();
+  }
+
+  return (
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
+        <Button ref={openButtonRef} visualType="secondary" onClick={() => {
+          setOpen(true);
+          setCollapsed(false);
+        }}>
+          Open / restore panel
+        </Button>
+        <Button visualType="secondary" disabled={!open}
+          onClick={() => setMinimizeCounter((previous) => previous + 1)}>
+          Minimize panel
+        </Button>
+      </div>
+      <DockPanelLayout style={{ height: '36rem' }} panel={open ? (
+        <DockPanel
+          title="Details"
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          minimizeCounter={minimizeCounter}
+          onClose={closePanel}
+          labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
+          headerActions={
+            <Button visualType="secondary" size="small" onClick={() => setMessage('Header action clicked.')}>
+              Example action
+            </Button>
+          }
+          footer={<>
+            <span role="status">{message}</span>
+            <Button visualType="secondary" onClick={closePanel}>Cancel</Button>
+          </>}
+        >
+          <TextField id={inputId} label="Name" defaultValue="Edit me, then minimize and restore" />
+        </DockPanel>
+      ) : null}>
+        <p>Your workspace.</p>
+      </DockPanelLayout>
+    </>
+  );
+}`;
+
+const overflowExampleSource = (contentHeight: boolean): string => `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
+import { DockPanel, DockPanelLayout } from '@tedi-design-system/react/community';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const inputId = useId();
+
+  function closePanel() {
+    setOpen(false);
+    openButtonRef.current?.focus();
+  }
+
+  return (
+    <>
+      <Button ref={openButtonRef} visualType="secondary" onClick={() => {
+        setOpen(true);
+        setCollapsed(false);
+      }}>
+        Open DockPanel
+      </Button>
+      <DockPanelLayout style={{ height: '36rem' }} panel={open ? (
+        <DockPanel
+          ${
+            contentHeight
+              ? 'title="Long content, shorter panel"\n          width={420}\n          height="auto"\n          maxHeight={512}'
+              : 'title="Long content"'
+          }
+          collapsed={collapsed}
+          onCollapsedChange={setCollapsed}
+          onClose={closePanel}
+          labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
+          footer={<Button visualType="secondary" onClick={closePanel}>Cancel</Button>}
+        >
+          <TextField id={inputId} label="Example value" defaultValue="Edit me, then minimize and restore" />
+          {Array.from({ length: 20 }, (_, index) => (
+            <p key={index}>Paragraph {index + 1}. The body scrolls while the footer stays outside it.</p>
+          ))}
+        </DockPanel>
+      ) : null}>
+        <p>Your workspace.</p>
+      </DockPanelLayout>
+    </>
+  );
+}`;
+
+const resizeExampleSource = (dimension: 'width' | 'height'): string => `import { useId, useRef, useState } from 'react';
+import { Button, TextField } from '@tedi-design-system/react/tedi';
+import { DockPanel, DockPanelLayout } from '@tedi-design-system/react/community';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [isWorkspaceSmaller, setIsWorkspaceSmaller] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const inputId = useId();
+
+  function closePanel() {
+    setOpen(false);
+    openButtonRef.current?.focus();
+  }
+
+  return (
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-04)' }}>
+        <Button visualType="secondary" onClick={() => setIsWorkspaceSmaller((smaller) => !smaller)}>
+          {isWorkspaceSmaller ? 'Restore workspace size' : 'Make workspace smaller'}
+        </Button>
+        <Button ref={openButtonRef} visualType="secondary" onClick={() => {
+          setOpen(true);
+          setCollapsed(false);
+        }}>
+          Open DockPanel
+        </Button>
+      </div>
+      <div style={{ width: isWorkspaceSmaller ? '60%' : '100%' }}>
+        <DockPanelLayout style={{ height: isWorkspaceSmaller ? '24rem' : '36rem' }} panel={open ? (
+          <DockPanel
+            title="Resizable details"
+            ${
+              dimension === 'width'
+                ? 'placement="right"\n            width="md"\n            height="70%"'
+                : 'placement="bottom"\n            height="auto"'
+            }
+            resizable
+            collapsed={collapsed}
+            onCollapsedChange={setCollapsed}
+            onClose={closePanel}
+            labels={{ collapse: 'Minimize panel', expand: 'Restore panel', close: 'Close panel' }}
+            footer={<Button visualType="secondary" onClick={closePanel}>Cancel</Button>}
+          >
+            <TextField id={inputId} label="Example value" defaultValue="Edit me before resizing" />
+            <p>Drag the workspace-facing edge to resize the panel.</p>
+          </DockPanel>
+        ) : null}>
+          <p>Your workspace.</p>
+        </DockPanelLayout>
+      </div>
+    </>
+  );
+}`;
 
 const placementChoices: readonly PanelChoice[] = (['left', 'right', 'top', 'bottom'] as const).map((placement) => ({
   key: placement,
@@ -735,6 +1115,7 @@ export const Position: Story = {
   render: (args) => <PanelExample args={args} choices={placementChoices} />,
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: positionExampleSource },
       description: {
         story: `Choose **Left**, **Right**, **Top** or **Bottom** to open or move the same panel.
 This example uses \`md\` (50%) on the docking axis: side panels fill the workspace height;
@@ -780,6 +1161,7 @@ export const CustomDimensions: Story = {
   ),
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: customDimensionsExampleSource },
       description: {
         story:
           'Presets are optional. Numeric values are pixels; CSS values such as 70%, 30rem and calc(100% - 4rem) still work. A custom side height leaves the workspace visible and usable underneath.',
@@ -801,6 +1183,7 @@ export const LongContent: Story = {
   },
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: overflowExampleSource(false) },
       description: {
         story:
           'A long body scrolls independently of the header and footer. Minimize and restore to verify that the input and content counter are preserved.',
@@ -850,18 +1233,19 @@ export const ContentHeight: Story = {
     title: 'Content-height details',
     width: 420,
     height: 'auto',
-    maxHeight: 'calc(100% - 4rem)',
+    maxHeight: 512,
     children: <ContentHeightContent />,
   },
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: contentHeightExampleSource },
       description: {
         story:
-          'height="auto" fits the content. maxHeight="calc(100% - 4rem)" keeps at least 4rem of workspace visible below. ' +
+          'height="auto" fits the content. maxHeight={512} caps the panel at 512 pixels, leaving space below in this example. ' +
           'Add or remove sections to see the panel grow and shrink; only the content scrolls at the limit. ' +
           'Try the Background action below the panel: no invisible overlay intercepts it. ' +
           'Switch placement to left to try the same behaviour on the other side. ' +
-          'Minimizing fits the rail to its title and grouped controls, without resetting the content.',
+          'Minimizing fills the workspace height without resetting the content; restoring returns to the expanded height.',
       },
     },
   },
@@ -874,7 +1258,7 @@ export const ContentHeightOverflow: Story = {
     title: 'Long content, shorter panel',
     width: 420,
     height: 'auto',
-    maxHeight: 'calc(100% - 4rem)',
+    maxHeight: 512,
     children: (
       <>
         <ExampleContent />
@@ -886,10 +1270,11 @@ export const ContentHeightOverflow: Story = {
   },
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: overflowExampleSource(true) },
       description: {
         story:
           'Long content reaches maxHeight and scrolls internally. The header and footer remain visible, ' +
-          'and the reserved 4rem of background remains visible and interactive below the panel.',
+          'and the background below the 512-pixel panel remains visible and interactive.',
       },
     },
   },
@@ -909,6 +1294,7 @@ const usePanelVisibility = (onClose: DockPanelProps['onClose']) => {
 
 const ControlledExample = (args: DockPanelProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [minimizeCounter, setMinimizeCounter] = useState(0);
   const [message, setMessage] = useState('No header action yet.');
   const { open, setOpen, openButtonRef, handleClose } = usePanelVisibility(args.onClose);
 
@@ -930,8 +1316,8 @@ const ControlledExample = (args: DockPanelProps) => {
         >
           Open / restore panel
         </Button>
-        <Button visualType="secondary" disabled={!open} onClick={() => setCollapsed(true)}>
-          Minimize from the application
+        <Button visualType="secondary" disabled={!open} onClick={() => setMinimizeCounter((counter) => counter + 1)}>
+          Minimize panel
         </Button>
       </div>
       {open && (
@@ -939,6 +1325,7 @@ const ControlledExample = (args: DockPanelProps) => {
           <DockPanel
             {...args}
             collapsed={collapsed}
+            minimizeCounter={minimizeCounter}
             onCollapsedChange={handleCollapsedChange}
             onClose={handleClose}
             headerActions={
@@ -956,194 +1343,60 @@ const ControlledExample = (args: DockPanelProps) => {
 ControlledExample.displayName = 'DockPanelControlledExample';
 
 export const Controlled: Story = {
-  argTypes: { collapsed: { control: false }, defaultCollapsed: { control: false } },
+  argTypes: {
+    collapsed: { control: false },
+    defaultCollapsed: { control: false },
+    minimizeCounter: { control: false },
+  },
   render: (args) => <ControlledExample {...args} />,
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: controlledExampleSource },
       description: {
         story:
-          'The application controls collapsed state and dismissal. Minimizing preserves child state. ' +
-          'Closing unmounts the panel in this example, so reopening creates fresh child state.',
+          'The external Minimize panel button increments minimizeCounter. DockPanel requests onCollapsedChange(true), ' +
+          'and this example applies it to controlled collapsed state. Restore using the panel control or Open / restore panel; ' +
+          'the counter does not need to change. Minimize again while already minimized to verify that it stays minimized. ' +
+          'Minimizing preserves child state. Closing unmounts the panel, so reopening creates fresh child state.',
       },
     },
   },
 };
 
-// Resize from the edge facing into the workspace, not the docked edge.
-const resizeHandlePositions: Record<DockPanelPlacement, DockPanelPlacement> = {
-  right: 'left',
-  left: 'right',
-  bottom: 'top',
-  top: 'bottom',
-};
-
-// These classes belong to this example. Resizer's handle, indicator, styles and
-// mouse listeners remain untouched. Its public className only controls flex placement.
-const resizableExampleStyles = `
-.dock-panel-resizer-demo {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  min-width: 0;
-  min-height: 0;
-  pointer-events: none;
-}
-.dock-panel-resizer-demo__resizer {
-  flex: 0 1 auto;
-  min-width: 0;
-  min-height: 0;
-  max-width: 100%;
-  max-height: 100%;
-  pointer-events: auto;
-}
-.dock-panel-resizer-demo__content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.dock-panel-resizer-demo__panel {
-  pointer-events: auto;
-}
-.dock-panel-resizer-demo[data-placement='right'] {
-  justify-content: flex-end;
-}
-.dock-panel-resizer-demo[data-placement='left'] {
-  justify-content: flex-start;
-}
-.dock-panel-resizer-demo[data-placement='top'] .dock-panel-resizer-demo__resizer,
-.dock-panel-resizer-demo[data-placement='bottom'] .dock-panel-resizer-demo__resizer {
-  flex: 1 1 0;
-}
-.dock-panel-resizer-demo[data-placement='top'] .dock-panel-resizer-demo__resizer {
-  align-self: flex-start;
-}
-.dock-panel-resizer-demo[data-placement='bottom'] .dock-panel-resizer-demo__resizer {
-  align-self: flex-end;
-}
-.dock-panel-resizer-demo[data-collapsed='true'] {
-  position: relative;
-  inset: auto;
-  overflow: clip;
-}
-.dock-panel-resizer-demo[data-collapsed='true'] .dock-panel-resizer-demo__resizer {
-  max-width: none;
-  max-height: none;
-  pointer-events: none;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='left'],
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='right'] {
-  width: var(--dock-panel-rail-size);
-  height: 100%;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='left'] .dock-panel-resizer-demo__resizer,
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='right'] .dock-panel-resizer-demo__resizer {
-  flex: 0 0 auto;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='left'] {
-  grid-area: 2 / 1;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='right'] {
-  grid-area: 2 / 3;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='top'],
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='bottom'] {
-  width: 100%;
-  height: var(--dock-panel-rail-size);
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='top'] {
-  grid-area: 1 / 1 / 2 / 4;
-}
-.dock-panel-resizer-demo[data-collapsed='true'][data-placement='bottom'] {
-  grid-area: 3 / 1 / 4 / 4;
-}
-`;
-
-const ResizableExample = (args: DockPanelProps) => {
-  const { placement = 'right', defaultCollapsed = false, onCollapsedChange } = args;
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
-  const { open, setOpen, openButtonRef, handleClose } = usePanelVisibility(args.onClose);
-
-  const handleCollapsedChange = (next: boolean): void => {
-    setCollapsed(next);
-    onCollapsedChange?.(next);
-  };
+const ResizeExample = (args: DockPanelProps) => {
+  const [isWorkspaceSmaller, setIsWorkspaceSmaller] = useState(false);
 
   return (
-    <div style={{ display: 'grid', gap: 'var(--tedi-dimensions-08)' }}>
-      <style>{resizableExampleStyles}</style>
+    <div style={{ display: 'grid', gap: 'var(--tedi-dimensions-10)' }}>
       <div>
-        <Button
-          visualType="secondary"
-          ref={openButtonRef}
-          onClick={() => {
-            setOpen(true);
-            setCollapsed(false);
-          }}
-        >
-          Open / restore panel
+        <Button visualType="secondary" onClick={() => setIsWorkspaceSmaller((smaller) => !smaller)}>
+          {isWorkspaceSmaller ? 'Restore workspace size' : 'Make workspace smaller'}
         </Button>
       </div>
-      {open && (
-        <Workspace>
-          <div className="dock-panel-resizer-demo" data-placement={placement} data-collapsed={collapsed}>
-            <Resizer
-              className="dock-panel-resizer-demo__resizer"
-              handlePosition={resizeHandlePositions[placement]}
-              initialWidth={480}
-              minWidth={320}
-              maxWidth={800}
-              initialHeight={320}
-              minHeight={160}
-              maxHeight={520}
-              showIndicator={false}
-            >
-              <div className="dock-panel-resizer-demo__content">
-                <DockPanel
-                  {...args}
-                  className={['dock-panel-resizer-demo__panel', args.className].filter(Boolean).join(' ')}
-                  placement={placement}
-                  width="100%"
-                  height="100%"
-                  maxHeight="100%"
-                  collapsed={collapsed}
-                  onCollapsedChange={handleCollapsedChange}
-                  onClose={handleClose}
-                  footer={args.footer === undefined ? <ExampleFooter onCancel={handleClose} /> : args.footer}
-                />
-              </div>
-            </Resizer>
-          </div>
-        </Workspace>
-      )}
+      <div style={{ width: isWorkspaceSmaller ? '60%' : '100%' }}>
+        <PanelExample args={args} workspaceHeight={isWorkspaceSmaller ? '24rem' : '36rem'} />
+      </div>
     </div>
   );
 };
-ResizableExample.displayName = 'DockPanelResizableExample';
+ResizeExample.displayName = 'DockPanelResizeExample';
 
 export const ResizeWidth: Story = {
   name: 'Resize width',
-  args: { placement: 'right', title: 'Resizable details' },
-  // Resizer owns the dimensions in this example; DockPanel fills its container.
-  argTypes: {
-    collapsed: { control: false },
-    defaultCollapsed: { control: false },
-    width: { control: false },
-    height: { control: false },
-    maxHeight: { control: false },
-  },
-  render: (args) => <ResizableExample {...args} />,
+  args: { placement: 'right', title: 'Resizable details', resizable: true, width: 'md', height: '70%' },
+  argTypes: { collapsed: { control: false } },
+  render: (args) => <ResizeExample {...args} />,
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: resizeExampleSource('width') },
       description: {
         story:
-          'Uses the unchanged Community Resizer in its Drag Indicator mode (showIndicator=false). Drag the LEFT edge of the right-docked panel. ' +
-          'Initial width: 480px; limits: 320–800px, constrained to the workspace width. ' +
-          'The panel fills the workspace height. Minimizing keeps both components mounted, preserving ' +
-          'the resized width and child state. Closing removes the panel and resize handle; reopening resets the size. ' +
-          'The small tab, hover accent and mouse-drag behaviour are exactly those of Resizer’s existing Drag Indicator story. ' +
-          'No ribbon is forced on permanently. The story does not change Resizer or its internal styles. ' +
-          'While minimized, the story-owned wrapper reserves a grid track and clips the unused expanded area and resize edge; the panel and Resizer stay mounted.',
+          'Drag the left edge. width="md" starts at 50%; the default limits are 8–92% of the workspace width. ' +
+          'Edit the form, drag near the maximum, then make the workspace smaller: the width is clamped and your edits remain. ' +
+          'Restore the workspace size: the panel keeps its width, and you can drag it wider again. ' +
+          'Minimize this shorter panel: its rail fills the workspace height and hides the resize handle. ' +
+          'Click the minimized title or bar to restore its previous width and short height. Close only closes. ' +
+          'To try pixel limits, close the panel, set minWidth=240 and maxWidth=640 in Controls, then reopen.',
       },
     },
   },
@@ -1151,26 +1404,20 @@ export const ResizeWidth: Story = {
 
 export const ResizeHeight: Story = {
   name: 'Resize height',
-  args: { placement: 'bottom', title: 'Resizable details' },
-  argTypes: {
-    collapsed: { control: false },
-    defaultCollapsed: { control: false },
-    width: { control: false },
-    height: { control: false },
-    maxHeight: { control: false },
-  },
-  render: (args) => <ResizableExample {...args} />,
+  args: { placement: 'bottom', title: 'Resizable details', resizable: true, height: 'auto' },
+  argTypes: { collapsed: { control: false } },
+  render: (args) => <ResizeExample {...args} />,
   parameters: {
     docs: {
+      source: { language: 'tsx', type: 'code', code: resizeExampleSource('height') },
       description: {
         story:
-          'Uses the unchanged Community Resizer in its Drag Indicator mode (showIndicator=false). Drag the TOP edge of the bottom-docked panel. ' +
-          'Initial height: 320px; limits: 160–520px, constrained to the workspace height. ' +
-          'The panel fills the workspace width. Minimizing keeps both components mounted, preserving ' +
-          'the resized height and child state. Closing removes the panel and resize handle; reopening resets the size. ' +
-          'The small tab, hover accent and mouse-drag behaviour are exactly those of Resizer’s existing Drag Indicator story. ' +
-          'No ribbon is forced on permanently. The story does not change Resizer or its internal styles. ' +
-          'While minimized, the story-owned wrapper reserves a grid track and clips the unused expanded area and resize edge; the panel and Resizer stay mounted.',
+          'height="auto" starts at the content height, within the default 8–92% workspace limits. ' +
+          'Drag the top edge to resize. ' +
+          'Edit the form, drag near the maximum, then make the workspace smaller: the height is clamped and your edits remain. ' +
+          'Restore the workspace size: the panel keeps its height, and you can drag it taller again. ' +
+          'Minimize, then click the title or bar to restore the saved height. The handle is hidden while minimized. ' +
+          'To try pixel limits, close the panel, set minHeight=160 and maxHeight=400 in Controls, then reopen.',
       },
     },
   },

@@ -142,7 +142,8 @@ export const DropdownItem = ({
       'input[type="checkbox"], input[type="radio"]'
     );
     if (input) {
-      input.click();
+      // Clicks on the control or its label already toggle it natively
+      if (!(e.target as HTMLElement).closest('input, label')) input.click();
       return;
     }
 

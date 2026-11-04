@@ -62,7 +62,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
     console.warn('Checkbox: `tooltip` is not supported with `variant="card"` and will be ignored. Use `description`.');
   }
   const disabled = disabledProp ?? group?.disabled ?? false;
-  const invalid = invalidProp ?? group?.invalid;
+  const invalid = invalidProp;
   const required = requiredProp;
 
   const generatedId = React.useId();
@@ -123,7 +123,7 @@ export const Checkbox = ((props: CheckboxProps): JSX.Element => {
           [styles['tedi-checkbox__indicator--hover']]: hover,
           [styles['tedi-checkbox__indicator--indeterminate']]: indeterminate,
           [styles[`tedi-checkbox__indicator--size-${size}`]]: size,
-          [styles['tedi-checkbox__indicator--invalid']]: invalid,
+          [styles['tedi-checkbox__indicator--invalid']]: invalid && variant !== 'card',
         },
         extraClassName
       )}

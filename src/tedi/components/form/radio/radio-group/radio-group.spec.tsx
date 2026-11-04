@@ -89,6 +89,21 @@ describe('Radio.Group', () => {
     expect(group).toHaveAttribute('aria-invalid', 'true');
   });
 
+  it('keeps the radios in their default look when only the group is invalid', () => {
+    const { container } = render(
+      <Radio.Group label="Plan" invalid>
+        <Radio value="a" label="A" />
+        <Radio value="b" label="B" invalid />
+      </Radio.Group>
+    );
+
+    const invalidIndicators = container.querySelectorAll('.tedi-radio__indicator--invalid');
+    expect(invalidIndicators).toHaveLength(1);
+    expect(screen.getByRole('radio', { name: 'B' }).parentElement).toContainElement(
+      invalidIndicators[0] as HTMLElement
+    );
+  });
+
   it('shows the required asterisk on the legend only, not repeated on every option', () => {
     const { container } = render(
       <Radio.Group label="Plan" required>
@@ -135,5 +150,49 @@ describe('Radio.Group', () => {
     );
 
     expect(screen.getByRole('radio', { name: 'A' })).toBeDisabled();
+  });
+  it('treats value={null} as controlled with nothing selected', () => {
+    const onChange = jest.fn();
+    render(
+      <Radio.Group label="Plan" value={null} onChange={onChange}>
+        <Radio value="a" label="A" />
+        <Radio value="b" label="B" />
+      </Radio.Group>
+    );
+
+    expect(screen.getByRole('radio', { name: 'A' })).not.toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: 'A' }));
+    expect(onChange).toHaveBeenCalledWith('a');
+    // Controlled: the selection only changes when the parent passes a new value.
+    expect(screen.getByRole('radio', { name: 'A' })).not.toBeChecked();
+  });
+
+  it('links the helper through aria-describedby, using a generated id or the helper id', () => {
+    const { rerender } = render(
+      <Radio.Group id="plan" label="Plan" helper={{ text: 'Choose a plan' }}>
+        <Radio value="a" label="A" />
+      </Radio.Group>
+    );
+    expect(screen.getByRole('radiogroup', { name: 'Plan' })).toHaveAttribute('aria-describedby', 'plan-helper');
+    expect(screen.getByText('Choose a plan')).toHaveAttribute('id', 'plan-helper');
+
+    rerender(
+      <Radio.Group id="plan" label="Plan" helper={{ id: 'custom-helper', text: 'Choose a plan' }}>
+        <Radio value="a" label="A" />
+      </Radio.Group>
+    );
+    expect(screen.getByRole('radiogroup', { name: 'Plan' })).toHaveAttribute('aria-describedby', 'custom-helper');
+    expect(screen.getByText('Choose a plan')).toHaveAttribute('id', 'custom-helper');
+  });
+
+  it('renders no legend or aria-labelledby when the label is empty', () => {
+    const { container } = render(
+      <Radio.Group label="">
+        <Radio value="a" label="A" />
+      </Radio.Group>
+    );
+
+    expect(container.querySelector('legend')).not.toBeInTheDocument();
+    expect(screen.getByRole('radiogroup')).not.toHaveAttribute('aria-labelledby');
   });
 });

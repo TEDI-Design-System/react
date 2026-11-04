@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/TEDI-Design-System/react/security/advisories/new
+    about: Report privately. Please do not open a public issue.
+  - name: Ask a question
+    url: https://join.slack.com/t/tedisystem/shared_invite/zt-3hd8tnjf7-Z1smXI~ns0p8E2cxoFUKbQ
+    about: Questions about using TEDI go to the TEDI Slack.
+  - name: Propose a new component or feature
+    url: https://github.com/TEDI-Design-System/general/discussions
+    about: New components and improvement ideas start as a discussion.
+  - name: Report a design or UX problem
+    url: https://github.com/TEDI-Design-System/design/issues
+    about: Design problems in existing components are handled in the design repository.

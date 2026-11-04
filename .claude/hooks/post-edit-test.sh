@@ -42,8 +42,8 @@ fi
 
 # Run test if spec file exists
 if [[ -n "$SPEC" && -f "$SPEC" ]]; then
-  echo "Running: npm test -- --testPathPattern=\"$SPEC\""
-  npm test -- --testPathPattern="$SPEC" 2>&1
+  echo "Running: npm test -- --testPathPattern=\"$SPEC\" --coverage=false"
+  npm test -- --testPathPattern="$SPEC" --coverage=false 2>&1
 else
   echo "No spec file found at $SPEC — skipping auto-test."
 fi

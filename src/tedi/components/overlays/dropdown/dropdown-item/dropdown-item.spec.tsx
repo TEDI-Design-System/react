@@ -104,6 +104,30 @@ describe('DropdownItem', () => {
     expect(mockSetOpen).not.toHaveBeenCalled();
   });
 
+  it('toggles an inner checkbox once when the checkbox itself is clicked', () => {
+    render(
+      <DropdownItem asChild index={0} closeOnSelect={false}>
+        <input type="checkbox" id="chk-input" aria-label="Checkbox" />
+      </DropdownItem>
+    );
+    const input = screen.getByRole('checkbox', { name: 'Checkbox' });
+    fireEvent.click(input);
+    expect(input).toBeChecked();
+  });
+
+  it('toggles an inner checkbox once when its label is clicked', () => {
+    render(
+      <DropdownItem asChild index={0} closeOnSelect={false}>
+        <div>
+          <input type="checkbox" id="chk-label" />
+          <label htmlFor="chk-label">Checkbox label</label>
+        </div>
+      </DropdownItem>
+    );
+    fireEvent.click(screen.getByText('Checkbox label'));
+    expect(screen.getByLabelText('Checkbox label')).toBeChecked();
+  });
+
   it('applies indentation styles when indent is provided', () => {
     render(
       <DropdownItem index={0} indent={2}>

@@ -37,7 +37,7 @@ export interface UseFileUploadProps {
    */
   accept?: string;
   /**
-   * The maximum file size allowed for upload, in megabytes (MB).
+   * The maximum file size allowed for upload, in bytes (e.g. `5 * 1024 ** 2` for 5 MB).
    */
   maxSize?: number;
   /**
@@ -46,9 +46,13 @@ export interface UseFileUploadProps {
    */
   multiple?: boolean;
   /**
-   * If true, each file is validated separately instead of rejecting all at once.
+   * When `true`, files that fail validation (wrong type or over `maxSize`) stay in the list marked
+   * invalid instead of being discarded, so the failing file is shown under the dropzone; when
+   * `false`, only valid files are added. Applies to both single and multiple uploads; files are
+   * validated individually either way.
+   * @default false
    */
-  validateIndividually?: boolean;
+  keepRejectedFiles?: boolean;
   /**
    * An array of default files that are preloaded in the upload list.
    */
@@ -85,7 +89,7 @@ export interface UseFileUploadProps {
 
 /**
  * Formats a byte count into a readable size (`512 KB`, `2.5 MB`, …). Uses 1024-based
- * units to stay consistent with the size validation (`maxSize * 1024 ** 2`), and rolls
+ * units to stay consistent with the byte-based `maxSize` validation, and rolls
  * sub-1-unit values down so `0.5 MB` reads as `512 KB` rather than `0.5MB` (#888).
  */
 export const formatFileSize = (bytes: number): string => {
@@ -111,7 +115,7 @@ const getDefaultHelpers = (
 
   const text = [
     accept && `${getLabel('file-upload.accept')} ${accept.replaceAll(',', ', ')}`,
-    maxSize && `${getLabel('file-upload.max-size')} ${formatFileSize(maxSize * 1024 ** 2)}`,
+    maxSize && `${getLabel('file-upload.max-size')} ${formatFileSize(maxSize)}`,
   ]
     .filter(Boolean)
     .join('. ');
@@ -133,7 +137,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
     accept,
     maxSize,
     multiple = false,
-    validateIndividually = false,
+    keepRejectedFiles = false,
     defaultFiles = [],
     onChange,
     onDelete,
@@ -221,7 +225,7 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       const rejectedFiles: RejectedFile[] = [];
       const uploadedFiles = filesArray.map((file) => {
         const isValidExtension = validFileType(file);
-        const isValidSize = !maxSize || file.size <= maxSize * 1024 ** 2;
+        const isValidSize = !maxSize || file.size <= maxSize;
 
         if (!isValidExtension) rejectedFiles.push({ type: 'extension', file });
         if (!isValidSize) rejectedFiles.push({ type: 'size', file });
@@ -258,8 +262,11 @@ export const useFileUpload = (props: UseFileUploadProps) => {
       let newFiles: FileUploadFile[];
 
       if (!multiple) {
-        newFiles = uploadedFiles.length > 0 && uploadedFiles[0].isValid ? [uploadedFiles[0]] : actualFiles;
-      } else if (validateIndividually) {
+        // Single upload replaces the current file. Keep an invalid pick (shown under the dropzone)
+        // only when `keepRejectedFiles` is set; otherwise drop it and leave the list unchanged.
+        const [picked] = uploadedFiles;
+        newFiles = picked && (picked.isValid || keepRejectedFiles) ? [picked] : actualFiles;
+      } else if (keepRejectedFiles) {
         const addable = dedupe(uploadedFiles);
         newFiles = addable.length > 0 ? [...actualFiles, ...addable] : actualFiles;
       } else {

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { act, useState } from 'react';
 
+import { Icon } from '../../base/icon/icon';
 import Checkbox from './checkbox';
 import CheckboxGroup from './checkbox-group/checkbox-group';
 
@@ -289,5 +290,27 @@ describe('Checkbox component', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
 
     warn.mockRestore();
+  });
+  it('uses the larger check and indeterminate icons for size="large"', () => {
+    jest.mocked(Icon).mockClear();
+    render(<Checkbox id="check-large" label="Large" value="large" size="large" />);
+
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'check', size: 18 }), expect.anything());
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'remove', size: 18 }), expect.anything());
+  });
+
+  it('card variant: renders the icon sized to match the checkbox size', () => {
+    jest.mocked(Icon).mockClear();
+    const { rerender } = render(<Checkbox id="check-card-icon" variant="card" label="Kartul" value="a" icon="eco" />);
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'eco', size: 18 }), expect.anything());
+
+    jest.mocked(Icon).mockClear();
+    rerender(<Checkbox id="check-card-icon" variant="card" label="Kartul" value="a" icon="eco" size="large" />);
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'eco', size: 24 }), expect.anything());
+  });
+
+  it('card variant: does not point aria-labelledby at a missing label', () => {
+    render(<Checkbox id="check-card-unlabelled" variant="card" label="" value="a" />);
+    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-labelledby');
   });
 });

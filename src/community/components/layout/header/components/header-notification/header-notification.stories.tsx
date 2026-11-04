@@ -4,11 +4,17 @@ import { Text } from '../../../../../../tedi/components/base/typography/text/tex
 import HeaderNotification from './header-notification';
 
 /**
- * HeaderNotification can be used to display important system-wide messages to user.
+ * HeaderNotification can be used to display important system-wide messages to user.<br />
+ * **Deprecated**: use `Alert` with `isGlobal` from `@tedi-design-system/react/tedi`, rendered before `Header`, instead.
  */
 const meta: Meta<typeof HeaderNotification> = {
   component: HeaderNotification,
   title: 'Community/Layout/Header/HeaderNotification',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

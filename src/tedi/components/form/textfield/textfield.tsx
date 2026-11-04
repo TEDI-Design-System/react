@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { forwardRef, useCallback, useMemo } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
@@ -59,8 +59,10 @@ type TextFieldBreakpointProps = {
    * When `true`, displays a clear (×) button on the right side when the field has a value.
    *
    * Clicking the button clears the input and calls `onClear` (if provided).
+   * Hidden while the field is `readOnly` or disabled. `input.readOnly` only blocks typing, so the button
+   * stays for fields whose value changes another way, like a calendar-only DateField range.
    *
-   * @default false
+   * @default true
    */
   isClearable?: boolean;
   /**
@@ -184,7 +186,7 @@ export interface TextFieldProps
    *
    * When `true`:
    * - Input becomes non-editable and non-focusable
-   * - Clear button and icon are disabled
+   * - Clear button is hidden and icon is disabled
    * - Visual disabled styles are applied
    */
   disabled?: boolean;
@@ -200,7 +202,7 @@ export interface TextFieldProps
    * Makes the field read-only.
    *
    * User can focus and select text, but cannot modify the value.
-   * Useful for pre-filled data that should not be changed.
+   * Useful for pre-filled data that should not be changed. Hides the clear button.
    */
   readOnly?: boolean;
   /**
@@ -277,7 +279,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     size = 'default',
     placeholder,
     isArrowsHidden = true,
-    isClearable,
+    isClearable = true,
     showClearOnInteraction,
     onClear,
     onChange,
@@ -297,17 +299,34 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     startSlot,
     endSlot,
     ...rest
-  } = getCurrentBreakpointProps<TextFieldProps>(props) || {};
+  } = getCurrentBreakpointProps<TextFieldProps>(props);
 
   const { getLabel } = useLabels();
 
   const innerRef = React.useRef<HTMLDivElement>(null);
   const fieldRef = React.useRef<FieldElement>(null);
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
+
+  // A textarea's scrollbar sits under the clear button and icon, so measure it and move them clear of it.
+  // The content box narrows when a scrollbar appears, so the observer also catches overflow starting or stopping.
+  useEffect(() => {
+    const field = fieldRef.current;
+    if (!isTextArea || !field || typeof ResizeObserver === 'undefined') return undefined;
+
+    const observer = new ResizeObserver(() => {
+      const style = window.getComputedStyle(field);
+      const borders = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+      setScrollbarWidth(Math.max(0, field.offsetWidth - field.clientWidth - borders));
+    });
+    observer.observe(field);
+    return () => observer.disconnect();
+  }, [isTextArea]);
 
   const [innerValue, setInnerValue] = React.useState(externalValue ?? defaultValue ?? '');
 
   const value = externalValue ?? innerValue;
-  const showClearButton = Boolean(isClearable && value && !readOnly);
+  const isReadOnly = readOnly || input?.readOnly;
+  const showClearButton = Boolean(isClearable && value && !readOnly && !disabled);
 
   const inputGroup = useOptionalInputGroup?.();
   const generatedId = React.useId();
@@ -350,10 +369,17 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
   );
 
   const clearInput = useCallback(() => {
-    if (!isControlled) setInnerValue('');
-    onChange?.('');
+    // The clear button only renders once the field has mounted, so the element is there to clear.
+    const element = fieldRef.current as FieldElement;
+    Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set?.call(element, '');
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    // The prototype setter above bypasses anything watching the element's own value (React's tracker,
+    // which is why it is used, but also testing tools), so set it there too now that React has seen the change.
+    element.value = '';
+    // The button unmounts once the value is gone, so focus would otherwise drop to the page.
+    element.focus();
     onClear?.();
-  }, [isControlled, onChange, onClear]);
+  }, [onClear]);
 
   const renderIcon = useCallback(() => {
     if (!icon) return null;
@@ -397,27 +423,29 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     return (
       <ClosingButton
         iconSize={iconSizes[size === 'large' ? 'large' : 'default']}
-        onClick={disabled ? undefined : clearInput}
-        disabled={disabled}
+        onClick={clearInput}
         title={getLabel('clear')}
         className={styles['tedi-textfield__clear-button']}
       />
     );
-  }, [showClearButton, size, disabled, clearInput, getLabel]);
+  }, [showClearButton, size, clearInput, getLabel]);
 
   const renderRightArea = useMemo(() => {
     if (!showClearButton && !icon) return null;
 
     return (
-      <div className={styles['tedi-textfield__right-area']}>
+      <div
+        className={styles['tedi-textfield__right-area']}
+        style={scrollbarWidth ? { right: scrollbarWidth } : undefined}
+      >
         {renderClearButton}
         {showClearButton && icon && (
           <Separator color="primary" axis="vertical" className={styles['tedi-textfield__separator']} />
         )}
-        {icon && renderIcon()}
+        {renderIcon()}
       </div>
     );
-  }, [showClearButton, icon, renderClearButton, renderIcon]);
+  }, [showClearButton, icon, renderClearButton, renderIcon, scrollbarWidth]);
 
   const renderInputElement = (
     <Field
@@ -429,12 +457,13 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
       onChange={handleChange}
       onChangeEvent={onChangeEvent}
       disabled={disabled}
-      readOnly={readOnly || input?.readOnly}
+      readOnly={isReadOnly}
       required={required}
       invalid={isInvalid}
       placeholder={placeholder}
       className={cn(styles['tedi-textfield__input'], inputClassName, {
         [styles['tedi-textfield__input--hidden-arrows']]: isArrowsHidden,
+        [styles['tedi-textfield__input--textarea']]: isTextArea,
       })}
       onFocus={(e) => {
         (input?.onFocus as React.FocusEventHandler<FieldElement> | undefined)?.(e);
@@ -461,6 +490,7 @@ export const TextField = forwardRef<TextFieldForwardRef, TextFieldProps>((props,
     styles['tedi-textfield'],
     { [styles[`tedi-textfield--${size}`]]: size },
     { [styles['tedi-textfield--with-icon']]: icon },
+    { [styles['tedi-textfield--textarea']]: isTextArea },
     { [styles['tedi-textfield--invalid']]: isInvalid },
     { [styles['tedi-textfield--valid']]: isValid },
     { [styles['tedi-textfield--clearable']]: showClearButton },

@@ -1,15 +1,18 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
+import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Alert from '../../notifications/alert/alert';
-import Radio, { RadioGroup, RadioProps } from '.';
+import FeedbackText from '../feedback-text/feedback-text';
+import Radio, { RadioGroup, RadioGroupProps, RadioProps } from '.';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4598-78103&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65724-11106&m=dev" target="_BLANK">Radio Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?node-id=65725-251541&m=dev" target="_BLANK">Radio card Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/93e423-radio" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Radio> = {
@@ -82,100 +85,111 @@ export const Sizes: Story = {
   render: TemplateSizes,
 };
 
-export const States = () => {
+const stateRows: { label: string; id: string; props?: Partial<RadioProps>; error?: boolean }[] = [
+  { label: 'Default', id: 'default' },
+  { label: 'Hover', id: 'hover', props: { hover: true } },
+  { label: 'Active', id: 'active' },
+  { label: 'Disabled', id: 'disabled', props: { disabled: true } },
+  { label: 'Focus', id: 'focus' },
+  { label: 'Mandatory', id: 'required', props: { required: true }, error: false },
+];
+
+/**
+ * Lays a state matrix out on a grid whose columns never wrap into the row labels.
+ * Below `md` it restacks to fit a phone: `mobileLayout="rows"` puts each row label on its
+ * own line above cells that share the width; `mobileLayout="columns"` splits the matrix into
+ * one section per column, for matrices too wide to keep side by side, leaving out rows that
+ * have no cell in that column.
+ * `desktopGrid` sets a minimum column width, row height and gaps for the desktop layout.
+ */
+const StateMatrix = ({
+  headers,
+  rows,
+  alignItems = 'start',
+  mobileLayout = 'rows',
+  desktopGrid,
+}: {
+  headers: React.ReactNode[];
+  rows: { label: string; cells: React.ReactNode[] }[];
+  alignItems?: React.CSSProperties['alignItems'];
+  mobileLayout?: 'rows' | 'columns';
+  desktopGrid?: { columnWidth: string; rowHeight: string; columnGap: string; rowGap: string };
+}) => {
+  const stacked = isBreakpointBelow(useBreakpoint(), 'md');
+  const fixedGrid = stacked ? undefined : desktopGrid;
+  const gridStyle = (gridTemplateColumns: string): React.CSSProperties => ({
+    display: 'grid',
+    gridTemplateColumns,
+    gridAutoRows: fixedGrid ? `minmax(${fixedGrid.rowHeight}, auto)` : undefined,
+    columnGap: fixedGrid?.columnGap ?? 'var(--layout-grid-gutters-24)',
+    rowGap: fixedGrid?.rowGap ?? 'var(--layout-grid-gutters-16)',
+    alignItems,
+  });
+  const labelTrack = fixedGrid ? `minmax(${fixedGrid.columnWidth}, max-content)` : 'max-content';
+  const cellTrack = fixedGrid ? `minmax(${fixedGrid.columnWidth}, max-content)` : 'minmax(min-content, max-content)';
+
+  if (stacked && mobileLayout === 'columns') {
+    return (
+      <div className="flex flex-column gap-4">
+        {headers.map((header, column) => (
+          <VerticalSpacing key={column}>
+            <Text modifiers="bold">{header}</Text>
+            <div style={gridStyle('max-content minmax(0, 1fr)')}>
+              {rows
+                .filter(({ cells }) => cells[column])
+                .map(({ label, cells }) => (
+                  <React.Fragment key={label}>
+                    <Text modifiers="bold">{label}</Text>
+                    <div>{cells[column]}</div>
+                  </React.Fragment>
+                ))}
+            </div>
+          </VerticalSpacing>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <Row>
-      <Col lg={6} md={12}>
-        <VerticalSpacing>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Default</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-default" label="Tekst" name="radio-default" value="radio" />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Hover</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-hover" label="Tekst" name="radio-hover" value="radio" hover />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Selected</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-checked" label="Tekst" name="radio-checked" value="radio" defaultChecked />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Active</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-active" label="Tekst" name="radio-active" value="radio" defaultChecked />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Disabled</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-disabled" label="Tekst" name="radio-disabled" value="radio" disabled />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Disabled selected</Text>
-            </Col>
-            <Col>
-              <Radio
-                id="radio-disabled-checked"
-                label="Tekst"
-                name="radio-disabled-checked"
-                value="radio"
-                disabled
-                defaultChecked
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Error</Text>
-            </Col>
-            <Col>
-              <Radio
-                id="radio-invalid"
-                label="Tekst"
-                name="radio-invalid"
-                value="radio"
-                invalid
-                helper={{ text: 'Tagasiside tekst', type: 'error' }}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={3}>
-              <Text modifiers="bold">Required</Text>
-            </Col>
-            <Col>
-              <Radio id="radio-required" label="Tekst" name="radio-required" value="radio" required />
-            </Col>
-          </Row>
-        </VerticalSpacing>
-      </Col>
-    </Row>
+    <div
+      style={gridStyle(
+        stacked ? `repeat(${headers.length}, minmax(0, 1fr))` : `${labelTrack} repeat(${headers.length}, ${cellTrack})`
+      )}
+    >
+      {!stacked && <span />}
+      {headers.map((header, index) => (
+        <Text key={index} modifiers="bold">
+          {header}
+        </Text>
+      ))}
+      {rows.map(({ label, cells }) => (
+        <React.Fragment key={label}>
+          <div style={stacked ? { gridColumn: '1 / -1', marginTop: 'var(--layout-grid-gutters-08)' } : undefined}>
+            <Text modifiers="bold">{label}</Text>
+          </div>
+          {cells.map((cell, index) => (
+            <div key={index}>{cell}</div>
+          ))}
+        </React.Fragment>
+      ))}
+    </div>
   );
 };
 
-States.parameters = {
-  pseudo: {
-    active: '#radio-active + *',
-  },
+/** Gives the States matrix more room between columns and rows on desktop. */
+const STATES_DESKTOP_GRID = {
+  columnWidth: '10.375rem',
+  rowHeight: '2.5rem',
+  columnGap: 'var(--layout-grid-gutters-16)',
+  rowGap: 'var(--layout-grid-gutters-08)',
 };
+
+const STATE_COLUMNS = [
+  { suffix: 'unselected', selected: false, error: false },
+  { suffix: 'selected', selected: true, error: false },
+  { suffix: 'error-unselected', selected: false, error: true },
+  { suffix: 'error-selected', selected: true, error: true },
+];
 
 export const HiddenLabel: Story = {
   render: Template,
@@ -242,7 +256,7 @@ export const WithTooltip: Story = {
   },
 };
 
-export const RadioWithLongTitle = () => {
+export const WithLongTitle: StoryFn = () => {
   return (
     <Row>
       <Col width={12} lg={6}>
@@ -260,48 +274,43 @@ export const RadioWithLongTitle = () => {
 /** Compose radios inside `Radio.Group`, which owns the selection and shared props. */
 export const Group: StoryObj = {
   render: () => {
-    const [value, setValue] = useState('kartul');
-    return (
-      <Radio.Group
-        label="Tooraine"
-        value={value}
-        onChange={setValue}
-        helper={{ text: 'Tegemist on veidi veidra valikuga kuid vähemalt ühe baaselemendi peab valima' }}
-      >
+    const group = (direction: 'column' | 'row', helper: RadioGroupProps['helper'], invalid = false) => (
+      <Radio.Group label="Tooraine" direction={direction} invalid={invalid} helper={helper}>
         <Radio value="kartul" label="Kartul" />
         <Radio value="kapsas" label="Kapsas" />
         <Radio value="peet" label="Peet" />
       </Radio.Group>
     );
+    const error: RadioGroupProps['helper'] = { text: 'Vähemalt 1 tooraine on kohustuslik valida', type: 'error' };
+
+    return (
+      <Row cols={1} md={{ cols: 2 }} gutterY={3}>
+        <Col>
+          {group('column', { text: 'Tegemist on veidi veidra valikuga, kuid vähemalt ühe baaselemendi peab valima' })}
+        </Col>
+        <Col>{group('row', { text: 'Eestis levinud köögiviljad' })}</Col>
+        <Col>{group('column', error, true)}</Col>
+        <Col>{group('row', error, true)}</Col>
+      </Row>
+    );
   },
 };
 
 /**
- * In controlled mode the parent owns the selected value. Because it lives outside the radios, it
- * can be changed programmatically — the **Clear selection** button clears the selection, something a
- * user can't do to a radio and an uncontrolled radio can't offer. The current value is shown below.
+ * In controlled mode the parent owns the selected value through `Radio.Group`'s `value` and `onChange`.
+ * Because it lives outside the radios, it can be changed programmatically — the **Clear selection** button
+ * clears the selection, something a user can't do to a radio and an uncontrolled group can't offer. The
+ * current value is shown below.
  */
 export const Controlled = () => {
   const [selected, setSelected] = useState<string | null>(null);
 
-  const options = [
-    { value: 'email', label: 'E-post' },
-    { value: 'sms', label: 'SMS' },
-  ];
-
   return (
     <VerticalSpacing>
-      {options.map((option) => (
-        <Radio
-          key={option.value}
-          id={`controlled-${option.value}`}
-          label={option.label}
-          name="controlled-radio"
-          value={option.value}
-          checked={selected === option.value}
-          onChange={(value) => setSelected(value)}
-        />
-      ))}
+      <Radio.Group label="Teavitusviis" value={selected} onChange={setSelected}>
+        <Radio value="email" label="E-post" />
+        <Radio value="sms" label="SMS" />
+      </Radio.Group>
       <Text>Selected: {selected ?? '—'}</Text>
       <Button visualType="secondary" onClick={() => setSelected(null)} disabled={selected === null}>
         Clear selection
@@ -311,23 +320,113 @@ export const Controlled = () => {
 };
 
 /** `variant="card"` renders each radio as a card. `cardVariant` sets primary / secondary. */
-export const Cards: StoryObj = {
+export const CardsSeparate: StoryObj = {
   render: () => (
-    <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
-        <Radio value="kartul" label="Kartul" />
-        <Radio value="peet" label="Peet" />
-        <Radio value="kapsas" label="Kapsas" />
-      </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
-        <Radio value="kartul" label="Kartul" />
-        <Radio value="peet" label="Peet" />
-        <Radio value="kapsas" label="Kapsas" />
-      </Radio.Group>
-    </VerticalSpacing>
+    <Row cols={1} md={{ cols: 2 }} gutterY={3}>
+      <Col>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Primary</Text>
+          <Radio.Group label="Juurvili" hideLabel variant="card" cardVariant="primary" defaultValue="peet">
+            <Radio value="kartul" label="Kartul" />
+            <Radio value="kapsas" label="Kapsas" />
+            <Radio value="peet" label="Peet" />
+          </Radio.Group>
+        </VerticalSpacing>
+      </Col>
+      <Col>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Secondary</Text>
+          <Radio.Group label="Juurvili" hideLabel variant="card" cardVariant="secondary" defaultValue="peet">
+            <Radio value="kartul" label="Kartul" />
+            <Radio value="kapsas" label="Kapsas" />
+            <Radio value="peet" label="Peet" />
+          </Radio.Group>
+        </VerticalSpacing>
+      </Col>
+    </Row>
   ),
 };
 
+/** Radio cards in a labelled `Radio.Group`, with and without an error message. */
+export const CardsWithLabel: StoryObj = {
+  render: () => (
+    <div className="flex flex-wrap gap-4">
+      <Radio.Group label="Juurvili" variant="card" cardVariant="primary" defaultValue="kartul">
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kapsas" label="Kapsas" />
+      </Radio.Group>
+      <Radio.Group
+        label="Juurvili"
+        variant="card"
+        cardVariant="primary"
+        invalid
+        helper={{ text: 'Valik on kohustuslik', type: 'error' }}
+      >
+        <Radio value="kartul" label="Kartul" />
+        <Radio value="peet" label="Peet" />
+        <Radio value="kapsas" label="Kapsas" />
+      </Radio.Group>
+    </div>
+  ),
+};
+
+/** `bordered` gives separate primary cards a border in the unselected state. */
+export const CardsHasBorder: StoryObj = {
+  render: () => (
+    <Radio.Group label="Juurvili" hideLabel variant="card" cardVariant="primary" bordered defaultValue="peet">
+      <Radio value="kartul" label="Kartul" />
+      <Radio value="kapsas" label="Kapsas" />
+      <Radio value="peet" label="Peet" />
+    </Radio.Group>
+  ),
+};
+
+/** `layout="segmented"` joins the cards into one button-group surface (Figma "Grouped"). */
+export const CardsGrouped: StoryObj = {
+  render: () => (
+    <Row cols={1} md={{ cols: 2 }} gutterY={3}>
+      <Col>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Primary</Text>
+          <Radio.Group
+            label="Juurvili"
+            hideLabel
+            variant="card"
+            cardVariant="primary"
+            layout="segmented"
+            defaultValue="peet"
+          >
+            <Radio value="kartul" label="Kartul" />
+            <Radio value="kapsas" label="Kapsas" />
+            <Radio value="peet" label="Peet" />
+            <Radio value="kaalikas" label="Kaalikas" />
+          </Radio.Group>
+        </VerticalSpacing>
+      </Col>
+      <Col>
+        <VerticalSpacing size={0.5}>
+          <Text modifiers="bold">Secondary</Text>
+          <Radio.Group
+            label="Juurvili"
+            hideLabel
+            variant="card"
+            cardVariant="secondary"
+            layout="segmented"
+            defaultValue="kapsas"
+          >
+            <Radio value="kartul" label="Kartul" />
+            <Radio value="kapsas" label="Kapsas" />
+            <Radio value="peet" label="Peet" />
+            <Radio value="kaalikas" label="Kaalikas" />
+          </Radio.Group>
+        </VerticalSpacing>
+      </Col>
+    </Row>
+  ),
+};
+
+/** Radio cards with a `description` below the label text, shown separate and grouped for both variants. */
 export const CardsWithDescription: StoryObj = {
   render: () => {
     const items = [
@@ -348,24 +447,49 @@ export const CardsWithDescription: StoryObj = {
       },
     ];
 
-    const cards = () => (
-      <Row className="w-100" gutter={2}>
-        {items.map((item) => (
-          <Col key={item.value} xs={12} md={4}>
-            <Radio value={item.value} label={item.label} description={item.description} className="w-100" />
-          </Col>
-        ))}
-      </Row>
-    );
-    return (
-      <VerticalSpacing size={1.5}>
-        <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="kartul">
-          {cards()}
-        </Radio.Group>
-        <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="kartul">
-          {cards()}
+    const group = (title: string, cardVariant: 'primary' | 'secondary', layout: 'separated' | 'segmented') => (
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">{title}</Text>
+        <Radio.Group
+          label="Juurvili"
+          hideLabel
+          variant="card"
+          cardVariant={cardVariant}
+          layout={layout}
+          bordered={cardVariant === 'primary'}
+          defaultValue="peet"
+        >
+          {layout === 'segmented' ? (
+            // Every card starts at full width and shrinks by the same amount, so the joined cards stay equal width
+            items.map((item) => (
+              <Radio
+                key={item.value}
+                value={item.value}
+                label={item.label}
+                description={item.description}
+                className="w-100"
+              />
+            ))
+          ) : (
+            <Row className="flex-grow-1" gutter={2}>
+              {items.map((item) => (
+                <Col key={item.value} className="flex" xs={12} md={4}>
+                  <Radio value={item.value} label={item.label} description={item.description} className="w-100" />
+                </Col>
+              ))}
+            </Row>
+          )}
         </Radio.Group>
       </VerticalSpacing>
+    );
+
+    return (
+      <div className="flex flex-column gap-4">
+        {group('Primary', 'primary', 'separated')}
+        {group('Primary grouped', 'primary', 'segmented')}
+        {group('Secondary', 'secondary', 'separated')}
+        {group('Secondary grouped', 'secondary', 'segmented')}
+      </div>
     );
   },
 };
@@ -374,43 +498,66 @@ export const CardsWithDescription: StoryObj = {
  * Add a leading `icon` (Material icon name), optionally with a `description`.
  */
 export const CardsWithIcons: StoryObj = {
-  render: () => (
-    <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" defaultValue="tram">
-        <Radio value="tram" label="Trammiga" icon="tram" />
-        <Radio value="walk" label="Jalgsi" icon="directions_walk" />
-        <Radio value="car" label="Autoga" icon="directions_car" />
-      </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" defaultValue="tram">
-        <Radio value="tram" label="Trammiga" description="Soovitatud variant, vähendab ummikuid" icon="tram" />
-        <Radio value="walk" label="Jalgsi" description="Soovitatud variant, vähendab ummikuid" icon="directions_walk" />
-        <Radio
-          value="car"
-          label="Autoga"
-          description="Kui soovid kiiremini kohale jõuda, tekitab ummikuid"
-          icon="directions_car"
-        />
-      </Radio.Group>
-    </VerticalSpacing>
-  ),
-};
+  render: () => {
+    const items = [
+      {
+        value: 'tram',
+        label: 'Trammiga',
+        icon: 'directions_subway',
+        description: 'Soovitatud variant, vähendab ummikuid',
+      },
+      { value: 'walk', label: 'Jalgsi', icon: 'directions_walk', description: 'Soovitatud variant, vähendab ummikuid' },
+      {
+        value: 'car',
+        label: 'Autoga',
+        icon: 'directions_car',
+        description: 'Kui soovid kiiremini kohale jõuda, tekitab ummikuid',
+      },
+    ];
 
-/** `layout="segmented"` joins the cards into one button-group surface (Figma "Grouped"). */
-export const CardsSegmented: StoryObj = {
-  render: () => (
-    <VerticalSpacing size={1.5}>
-      <Radio.Group label="Primary" variant="card" cardVariant="primary" layout="segmented" defaultValue="kodu">
-        <Radio value="kodu" label="Kodu" />
-        <Radio value="too" label="Töö" />
-        <Radio value="muu" label="Muu" />
-      </Radio.Group>
-      <Radio.Group label="Secondary" variant="card" cardVariant="secondary" layout="segmented" defaultValue="kodu">
-        <Radio value="kodu" label="Kodu" />
-        <Radio value="too" label="Töö" />
-        <Radio value="muu" label="Muu" />
-      </Radio.Group>
-    </VerticalSpacing>
-  ),
+    const group = (title: string, cardVariant: 'primary' | 'secondary', withDescription = false) => (
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">{title}</Text>
+        <Radio.Group
+          label="Liikumisviis"
+          hideLabel
+          variant="card"
+          cardVariant={cardVariant}
+          bordered={cardVariant === 'primary'}
+          defaultValue="walk"
+        >
+          {withDescription ? (
+            <Row className="flex-grow-1" gutter={2}>
+              {items.map((item) => (
+                <Col key={item.value} className="flex" xs={12} md={4}>
+                  <Radio
+                    value={item.value}
+                    label={item.label}
+                    icon={item.icon}
+                    description={item.description}
+                    className="w-100"
+                  />
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            items.map((item) => <Radio key={item.value} value={item.value} label={item.label} icon={item.icon} />)
+          )}
+        </Radio.Group>
+      </VerticalSpacing>
+    );
+
+    return (
+      <div className="flex flex-column gap-4">
+        <Row cols={1} md={{ cols: 2 }} gutterY={3}>
+          <Col>{group('Primary', 'primary')}</Col>
+          <Col>{group('Secondary', 'secondary')}</Col>
+        </Row>
+        {group('Primary with description', 'primary', true)}
+        {group('Secondary with description', 'secondary', true)}
+      </div>
+    );
+  },
 };
 
 /**
@@ -433,59 +580,152 @@ export const ResponsiveVariant: StoryObj = {
   ),
 };
 
-const CARD_STATES: Array<{ state: string; props: Partial<RadioProps> }> = [
-  { state: 'Default', props: {} },
-  { state: 'Hover', props: {} },
-  { state: 'Selected', props: { defaultChecked: true } },
-  { state: 'Focus', props: {} },
+const CARD_STATES: Array<{ state: string; props?: Partial<RadioProps> }> = [
+  { state: 'Default' },
+  { state: 'Hover' },
+  { state: 'Active' },
+  { state: 'Focus' },
   { state: 'Disabled', props: { disabled: true } },
-  { state: 'Disabled selected', props: { disabled: true, defaultChecked: true } },
 ];
 
-const cardStateSlug = (state: string) => state.toLowerCase().replace(/\s+/g, '-');
+type CardColumn = 'unselected' | 'borderless' | 'selected' | 'grouped';
+
+const CARD_COLUMNS: Record<'primary' | 'secondary', Array<{ column: CardColumn; title: string }>> = {
+  primary: [
+    { column: 'unselected', title: 'Unselected' },
+    { column: 'borderless', title: 'Unselected borderless' },
+    { column: 'selected', title: 'Selected' },
+    { column: 'grouped', title: 'Grouped' },
+  ],
+  secondary: [
+    { column: 'unselected', title: 'Unselected' },
+    { column: 'selected', title: 'Selected' },
+    { column: 'grouped', title: 'Grouped' },
+  ],
+};
+
+const cardStateId = (cardVariant: string, column: CardColumn, state: string) =>
+  `radio-card-${cardVariant}-${column}-${state.toLowerCase()}`;
+
+const cardStatesPseudo = (cardVariant: 'primary' | 'secondary') => {
+  const ids = (state: string) =>
+    CARD_COLUMNS[cardVariant].map(({ column }) => `#${cardStateId(cardVariant, column, state)}`);
+  return { hover: ids('Hover'), active: ids('Active'), focusVisible: ids('Focus') };
+};
 
 /**
- * Every card state across the primary and secondary variants. Hover and focus are forced
- * with the pseudo-states addon so all states are visible at once.
+ * Places the error message under a card group. The cards keep their natural width, while the
+ * message may widen the column to stay on one line, and wraps only when the matrix runs out of room.
  */
-export const CardStates: StoryObj = {
-  parameters: {
-    pseudo: {
-      hover: ['#card-primary-hover', '#card-secondary-hover'],
-      focusVisible: ['#card-primary-focus', '#card-secondary-focus'],
-    },
+const CardErrorCell = ({ message, children }: { message: string; children: React.ReactNode }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-grid-gutters-04)' }}>
+    <div style={{ width: 'max-content' }}>{children}</div>
+    <FeedbackText text={message} type="error" />
+  </div>
+);
+
+const renderCardCell = (
+  cardVariant: 'primary' | 'secondary',
+  column: CardColumn,
+  state: string,
+  props: Partial<RadioProps> = {}
+) => {
+  const id = cardStateId(cardVariant, column, state);
+  const isError = state === 'Error';
+  const selected = column === 'selected' || column === 'grouped';
+  const bordered = column === 'unselected';
+
+  if (column === 'grouped' || isError) {
+    const errorText = selected ? 'Valitud väärtus ei sobi ajavahemikuga' : 'Kohustuslik on valida vähemalt 1 väärtus';
+    const group = (
+      <Radio.Group
+        label={`${column} ${state}`}
+        hideLabel
+        name={id}
+        variant="card"
+        cardVariant={cardVariant}
+        layout={column === 'grouped' ? 'segmented' : 'separated'}
+        direction="row"
+        bordered={bordered}
+        defaultValue={selected ? 'a' : null}
+        invalid={isError}
+        disabled={props.disabled}
+      >
+        <Radio id={isError ? undefined : id} value="a" label="Tekst" />
+        <Radio value="b" label="Tekst" />
+      </Radio.Group>
+    );
+    return isError ? <CardErrorCell message={errorText}>{group}</CardErrorCell> : group;
+  }
+
+  return (
+    <Radio
+      variant="card"
+      cardVariant={cardVariant}
+      bordered={bordered}
+      id={id}
+      name={id}
+      value="radio"
+      label="Tekst"
+      defaultChecked={selected}
+      {...props}
+    />
+  );
+};
+
+const renderCardStates = (cardVariant: 'primary' | 'secondary') => (
+  <StateMatrix
+    alignItems="center"
+    mobileLayout="columns"
+    headers={CARD_COLUMNS[cardVariant].map(({ title }) => title)}
+    rows={[...CARD_STATES, { state: 'Error', props: undefined }].map(({ state, props }) => ({
+      label: state,
+      cells: CARD_COLUMNS[cardVariant].map(({ column }) => renderCardCell(cardVariant, column, state, props)),
+    }))}
+  />
+);
+
+export const States: StoryFn = () => (
+  <StateMatrix
+    alignItems="center"
+    mobileLayout="columns"
+    desktopGrid={STATES_DESKTOP_GRID}
+    headers={['Unselected', 'Selected', 'Error unselected', 'Error selected']}
+    rows={stateRows.map(({ label, id, props, error: hasError = true }) => ({
+      label,
+      cells: STATE_COLUMNS.map(({ suffix, selected, error }) => {
+        if (error && !hasError) return null;
+        const radioId = `radio-${id}-${suffix}`;
+        return (
+          <Radio
+            key={radioId}
+            id={radioId}
+            label="Tekst"
+            name={radioId}
+            value="radio"
+            defaultChecked={selected}
+            {...props}
+            {...(error ? { invalid: true, helper: { text: 'Kohustuslik väli', type: 'error' } } : {})}
+          />
+        );
+      }),
+    }))}
+  />
+);
+
+States.parameters = {
+  pseudo: {
+    active: STATE_COLUMNS.map(({ suffix }) => `#radio-active-${suffix} + *`),
+    focusVisible: STATE_COLUMNS.map(({ suffix }) => `#radio-focus-${suffix}`),
   },
-  render: () => (
-    <VerticalSpacing size={0.5}>
-      <Row>
-        <Col width={4} />
-        <Col width={4}>
-          <Text modifiers="bold">Primary</Text>
-        </Col>
-        <Col width={4}>
-          <Text modifiers="bold">Secondary</Text>
-        </Col>
-      </Row>
-      {CARD_STATES.map(({ state, props }) => (
-        <Row key={state}>
-          <Col width={4} className="flex align-items-center">
-            <Text modifiers="bold">{state}</Text>
-          </Col>
-          {(['primary', 'secondary'] as const).map((cardVariant) => (
-            <Col width={4} key={cardVariant}>
-              <Radio
-                variant="card"
-                cardVariant={cardVariant}
-                id={`card-${cardVariant}-${cardStateSlug(state)}`}
-                name={`card-${cardVariant}-${cardStateSlug(state)}`}
-                value="radio"
-                label="Tekst"
-                {...props}
-              />
-            </Col>
-          ))}
-        </Row>
-      ))}
-    </VerticalSpacing>
-  ),
+};
+
+export const CardStatesPrimary: StoryObj = {
+  parameters: { pseudo: cardStatesPseudo('primary') },
+  render: () => renderCardStates('primary'),
+};
+
+export const CardStatesSecondary: StoryObj = {
+  parameters: { pseudo: cardStatesPseudo('secondary') },
+  render: () => renderCardStates('secondary'),
 };

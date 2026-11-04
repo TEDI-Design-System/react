@@ -11,7 +11,11 @@ import { Icon, IconProps } from './icon';
  * <a href="https://www.tedi.ee/1ee8444b7/p/28835d-icon" target="_blank">Zeroheight ↗</a><hr/>
  * <a href="https://fonts.google.com/icons?icon.set=Material+Icons" target="_blank">Official Google Material Icons homepage icons ↗</a><br/>
  * <a href="https://www.figma.com/community/file/1014241558898418245/material-design-icons?searchSessionId=lvxhc4l5-a6" target="_blank">Material Icons Figma ↗</a><br/>
- * <a href="https://www.figma.com/community/plugin/740272380439725040/material-design-icons" target="_blank">Figma Material Symbols plugin ↗</a>
+ * <a href="https://www.figma.com/community/plugin/740272380439725040/material-design-icons" target="_blank">Figma Material Symbols plugin ↗</a><hr/>
+ *
+ * Use a single icon `type` throughout your application. Each type is a separate font file, so import
+ * `index-without-icons.css` together with only the style you use (e.g. `icons/outlined.css`) instead of
+ * `index.css`. See [Get started](/docs/documentation-get-started--get-started) for details and the PWA precache note.
  */
 const meta: Meta<typeof Icon> = {
   title: 'Tedi-Ready/Base/Icon',

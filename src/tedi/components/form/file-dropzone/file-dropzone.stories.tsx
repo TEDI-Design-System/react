@@ -45,7 +45,7 @@ export const WithHint: Story = {
   args: {
     name: 'file',
     accept: '.jpg,.png,.pdf',
-    maxSize: 1,
+    maxSize: 1024 ** 2,
     helper: {
       text: 'JPG, PNG, PDF suurusega kuni 1 MB.',
     },
@@ -59,7 +59,7 @@ export const Multiple: Story = {
     name: 'file-multiple',
     multiple: true,
     accept: '.jpg,.png,.pdf',
-    maxSize: 1,
+    maxSize: 1024 ** 2,
     defaultFiles: [{ name: 'report.pdf' }, { name: 'report_1.pdf' }, { name: 'report_2.pdf' }],
     helper: {
       text: 'JPG, PNG, PDF suurusega kuni 1 MB.',
@@ -68,14 +68,15 @@ export const Multiple: Story = {
 };
 
 /**
- * Batch validation (default): rejected files are discarded and all rejections are summarised
- * in a single error message. Only valid files are kept.
+ * Discarding rejected files (the default): valid files are still added and the ones that fail
+ * validation are dropped, with their rejections summarised in a single error message.
  */
-export const BatchValidation: Story = {
+export const ValidationDiscardingRejectedFiles: Story = {
+  name: 'Validation: discarding rejected files',
   args: {
-    id: 'file-dropzone-batch-validation',
-    name: 'file-batch-validation',
-    maxSize: 1,
+    id: 'file-dropzone-discarding-rejected-files',
+    name: 'file-discarding-rejected-files',
+    maxSize: 1024 ** 2,
     accept: '.pdf,.txt',
     multiple: true,
     defaultFiles: [{ id: '1', name: 'taotlus.pdf' }],
@@ -96,17 +97,19 @@ export const BatchValidation: Story = {
 };
 
 /**
- * `validateIndividually`: each file is validated separately and kept with its own valid/invalid
- * state, so the user can see and remove the ones that failed.
+ * Keeping rejected files (`keepRejectedFiles`): files that fail validation stay in the list with
+ * their own invalid state instead of being discarded, so the user can see and remove the ones that
+ * failed. Applies to both single and multiple uploads; files are validated individually either way.
  */
-export const IndividualValidation: Story = {
+export const ValidationKeepingRejectedFiles: Story = {
+  name: 'Validation: keeping rejected files',
   args: {
-    id: 'file-dropzone-individual-validation',
-    name: 'file-individual-validation',
+    id: 'file-dropzone-keeping-rejected-files',
+    name: 'file-keeping-rejected-files',
     multiple: true,
-    maxSize: 1,
+    maxSize: 1024 ** 2,
     accept: '.pdf,.txt',
-    validateIndividually: true,
+    keepRejectedFiles: true,
     defaultFiles: [
       { id: '1', name: 'taotlus_scan_lk_1.pdf' },
       { id: '2', name: 'taotlus_scan_lk_2.pdf' },
@@ -143,7 +146,7 @@ export const WithAttachmentProps: Story = {
     id: 'file-dropzone-attachment-props',
     name: 'file-attachment-props',
     multiple: true,
-    maxSize: 200,
+    maxSize: 200 * 1024 ** 2,
     defaultFiles: [
       { id: '1', name: 'arve_2026_06.pdf', size: 1_200_000 },
       { id: '2', name: 'aastaaruanne_2025.pdf', size: 5_400_000 },
@@ -200,7 +203,7 @@ export const States: Story = {
               <FileDropzone
                 id={`state-${label}`}
                 name={`state-${label}`}
-                maxSize={30}
+                maxSize={30 * 1024 ** 2}
                 className={className}
                 {...props}
               />
