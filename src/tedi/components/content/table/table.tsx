@@ -1841,10 +1841,10 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       <TableDataRowBody {...rowProps2} />
                       {renderSubComponent && row.getIsExpanded() && (
                         <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--sub-component'])}>
+                          {/* No `region` role: one landmark per open row would pile up (axe `landmark-unique`).
+                              The toggle's `aria-controls` already points here. */}
                           <td
                             id={subRowId}
-                            role="region"
-                            aria-label={getLabel('table.row-details')}
                             colSpan={Math.max(1, leafColumnCount)}
                             className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--sub-component'])}
                           >
