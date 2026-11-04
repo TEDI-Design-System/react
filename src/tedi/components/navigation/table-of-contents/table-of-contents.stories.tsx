@@ -4,9 +4,11 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
+import { Button } from '../../buttons/button/button';
 import { HideAt } from '../../layout/hide-at/hide-at';
 import { ShowAt } from '../../layout/show-at/show-at';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
+import { Popover } from '../../overlays/popover/popover';
 import { Tag } from '../../tags/tag/tag';
 import { Link } from '../link/link';
 import { TableOfContents, TableOfContentsProps } from './table-of-contents';
@@ -28,6 +30,14 @@ const meta: Meta<typeof TableOfContents> = {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
     controls: { exclude: ['children', 'sm', 'md', 'lg', 'xl', 'xxl', 'defaultServerBreakpoint'] },
+    docs: {
+      source: {
+        transform: (code: string) =>
+          code
+            .replaceAll('TableOfContentsItem', 'TableOfContents.Item')
+            .replaceAll('TableOfContentsCollapsible', 'TableOfContents.Collapsible'),
+      },
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=8469-72329&m=dev',
@@ -45,42 +55,55 @@ const meta: Meta<typeof TableOfContents> = {
 export default meta;
 type Story = StoryObj<TableOfContentsProps>;
 
-const sections = ['Sissejuhatus', 'Taust', 'Meetodid', 'Tulemused', 'Arutelu', 'Kokkuvõte'];
+const renderedSource = { docs: { source: { type: 'dynamic' } } } as const;
 
-const subSections: Record<number, string[]> = {
-  2: ['Andmete kogumine', 'Analüüs'],
-  3: ['Joonised', 'Tabelid'],
-};
-
-const sectionItems = (lastIcon?: string, separatorBeforeLast = false) =>
-  sections.map((label, index) => (
-    <TableOfContents.Item
-      key={label}
-      id={`section-${index + 1}`}
-      separator={separatorBeforeLast && index === sections.length - 2}
-    >
-      <Link
-        href={`#section-${index + 1}`}
-        underline={false}
-        iconLeft={index === sections.length - 1 ? lastIcon : undefined}
-        iconStandalone={index === sections.length - 1 && !!lastIcon}
-      >
-        {label}
+const tocItems = ({ icon = false, separator = false, slot = false } = {}) => [
+  <TableOfContents.Item key="intro" id="intro">
+    <Link href="#intro" underline={false}>
+      Sissejuhatus
+    </Link>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="methods" id="methods">
+    <Link href="#methods" underline={false}>
+      Meetodid
+    </Link>
+    <TableOfContents.Item id="methods-1">
+      <Link href="#methods-1" underline={false}>
+        Andmete kogumine
       </Link>
-      {subSections[index]?.map((childLabel, childIndex) => (
-        <TableOfContents.Item key={childLabel} id={`section-${index + 1}-${childIndex + 1}`}>
-          <Link href={`#section-${index + 1}-${childIndex + 1}`} underline={false}>
-            {childLabel}
-          </Link>
-        </TableOfContents.Item>
-      ))}
     </TableOfContents.Item>
-  ));
+    <TableOfContents.Item id="methods-2">
+      <Link href="#methods-2" underline={false}>
+        Analüüs
+      </Link>
+    </TableOfContents.Item>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="results" id="results">
+    <Link href="#results" underline={false}>
+      Tulemused
+    </Link>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="discussion" id="discussion" separator={separator || undefined}>
+    <Link href="#discussion" underline={false}>
+      Arutelu
+    </Link>
+  </TableOfContents.Item>,
+  <TableOfContents.Item key="conclusion" id="conclusion" slot={slot ? <Tag>43 tulemust</Tag> : undefined}>
+    <Link
+      href="#conclusion"
+      underline={false}
+      iconLeft={icon ? 'description' : undefined}
+      iconStandalone={icon || undefined}
+    >
+      Kokkuvõte
+    </Link>
+  </TableOfContents.Item>,
+];
 
 export const Default: Story = {
   args: {
     heading: 'Sisukord',
-    activeId: 'section-3',
+    activeId: 'methods',
     variant: 'default',
     headingLevel: 'h3',
     sticky: false,
@@ -88,7 +111,7 @@ export const Default: Story = {
     bordered: false,
     defaultOpen: true,
   },
-  render: (args) => <TableOfContents {...args}>{sectionItems()}</TableOfContents>,
+  render: (args) => <TableOfContents {...args}>{tocItems()}</TableOfContents>,
 };
 
 export const ItemStates: Story = {
@@ -156,9 +179,10 @@ export const ItemStates: Story = {
 };
 
 export const Transparent: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="section-3">
-      {sectionItems()}
+    <TableOfContents heading="Sisukord" variant="transparent" sticky={false} activeId="methods">
+      {tocItems()}
     </TableOfContents>
   ),
 };
@@ -169,108 +193,37 @@ export const Transparent: Story = {
  * link's accessible name.
  */
 export const WithSlot: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sections.map((label, index) => (
-        <TableOfContents.Item
-          key={label}
-          id={`section-${index + 1}`}
-          slot={index === sections.length - 1 ? <Tag color="primary">43 tulemust</Tag> : undefined}
-        >
-          <Link href={`#section-${index + 1}`} underline={false}>
-            {label}
-          </Link>
-          {index === 2 && [
-            <TableOfContents.Item key="collection" id="section-3-1" slot={<Tag color="primary">12</Tag>}>
-              <Link href="#section-3-1" underline={false}>
-                Andmete kogumine
-              </Link>
-            </TableOfContents.Item>,
-            <TableOfContents.Item key="analysis" id="section-3-2">
-              <Link href="#section-3-2" underline={false}>
-                Analüüs
-              </Link>
-            </TableOfContents.Item>,
-          ]}
-        </TableOfContents.Item>
-      ))}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+      {tocItems({ slot: true })}
     </TableOfContents>
   ),
 };
 
 export const Numbered: Story = {
+  parameters: renderedSource,
   render: () => (
     <TableOfContents heading="Sisukord" sticky={false} numbered activeId="methods">
-      <TableOfContents.Item id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-      </TableOfContents.Item>
+      {tocItems()}
     </TableOfContents>
   ),
 };
 
 export const WithIcon: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      <TableOfContents.Item id="section-1">
-        <Link href="#section-1" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-2">
-        <Link href="#section-2" underline={false}>
-          Taust
-        </Link>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-3">
-        <Link href="#section-3" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="section-3-1">
-          <Link href="#section-3-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="section-3-2">
-          <Link href="#section-3-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>
-      <TableOfContents.Item id="section-6">
-        <Link href="#section-6" underline={false} iconLeft="description" iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+      {tocItems({ icon: true })}
     </TableOfContents>
   ),
 };
 
 export const Headless: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading={null} sticky={false} numbered activeId="section-3">
-      {sectionItems()}
+    <TableOfContents heading={null} sticky={false} numbered activeId="methods">
+      {tocItems()}
     </TableOfContents>
   ),
 };
@@ -280,9 +233,10 @@ export const Headless: Story = {
  * or "back to top" entry apart from the section list. It can follow any item, not just the last one.
  */
 export const WithSeparator: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3">
-      {sectionItems('description', true)}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods">
+      {tocItems({ icon: true, separator: true })}
     </TableOfContents>
   ),
 };
@@ -292,11 +246,38 @@ export const WithSeparator: Story = {
  * list reads as separated rows.
  */
 export const Bordered: Story = {
+  parameters: renderedSource,
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
-      {sectionItems('description')}
+    <TableOfContents heading="Sisukord" sticky={false} activeId="methods" bordered>
+      {tocItems({ icon: true })}
     </TableOfContents>
   ),
+};
+
+/**
+ * The table of contents inside a popover, opened by a button. Use the `transparent` variant so the
+ * list doesn't add a second card inside the popover, and set `sticky` to `false` — the popover
+ * positions the list. With `bottom-start` the popover lines up with the button like a dropdown.
+ */
+export const InPopover: Story = {
+  render: function InPopover() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <Popover open={open} onToggle={setOpen} placement="bottom-start">
+        <Popover.Trigger>
+          <Button visualType="neutral" iconLeft="list">
+            {open ? 'Sulge sisukord' : 'Ava sisukord'}
+          </Button>
+        </Popover.Trigger>
+        <Popover.Content padding={{ top: 0, right: 1, bottom: 1, left: 1 }}>
+          <TableOfContents variant="transparent" sticky={false} activeId="methods">
+            {tocItems()}
+          </TableOfContents>
+        </Popover.Content>
+      </Popover>
+    );
+  },
 };
 
 const LOREM =
@@ -493,48 +474,7 @@ export const StickyInLayout: Story = {
 export const Collapsible: Story = {
   parameters: { layout: 'fullscreen', fullWidth: true },
   render: () => {
-    const items = [
-      <TableOfContents.Item key="intro" id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="methods" id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="results" id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-        <TableOfContents.Item id="results-1">
-          <Link href="#results-1" underline={false}>
-            Joonised
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="discussion" id="discussion">
-        <Link href="#discussion" underline={false}>
-          Arutelu
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="conclusion" id="conclusion">
-        <Link href="#conclusion" underline={false} iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>,
-    ];
+    const items = tocItems();
 
     const intro = (
       <VerticalSpacing size={0.5}>
@@ -626,48 +566,7 @@ export const CollapsibleHideOnScroll: Story = {
   name: 'Collapsible: hide on scroll',
   parameters: { layout: 'fullscreen', fullWidth: true },
   render: () => {
-    const items = [
-      <TableOfContents.Item key="intro" id="intro">
-        <Link href="#intro" underline={false}>
-          Sissejuhatus
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="methods" id="methods">
-        <Link href="#methods" underline={false}>
-          Meetodid
-        </Link>
-        <TableOfContents.Item id="methods-1">
-          <Link href="#methods-1" underline={false}>
-            Andmete kogumine
-          </Link>
-        </TableOfContents.Item>
-        <TableOfContents.Item id="methods-2">
-          <Link href="#methods-2" underline={false}>
-            Analüüs
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="results" id="results">
-        <Link href="#results" underline={false}>
-          Tulemused
-        </Link>
-        <TableOfContents.Item id="results-1">
-          <Link href="#results-1" underline={false}>
-            Joonised
-          </Link>
-        </TableOfContents.Item>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="discussion" id="discussion">
-        <Link href="#discussion" underline={false}>
-          Arutelu
-        </Link>
-      </TableOfContents.Item>,
-      <TableOfContents.Item key="conclusion" id="conclusion">
-        <Link href="#conclusion" underline={false} iconStandalone>
-          Kokkuvõte
-        </Link>
-      </TableOfContents.Item>,
-    ];
+    const items = tocItems();
 
     const intro = (
       <VerticalSpacing size={0.5}>
