@@ -640,6 +640,22 @@ describe('Table', () => {
       fireEvent.click(collapse);
       expect(screen.queryByText(/details for Anna/)).not.toBeInTheDocument();
     });
+
+    it('does not turn open sub-component rows into landmarks', () => {
+      render(
+        <Table<Person>
+          id="t-exp-landmarks"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          defaultState={{ expanded: true }}
+        />
+      );
+
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(screen.getByText(/details for Jüri/)).toBeInTheDocument();
+      expect(screen.queryAllByRole('region')).toHaveLength(0);
+    });
   });
 
   describe('expandTrigger="row"', () => {
