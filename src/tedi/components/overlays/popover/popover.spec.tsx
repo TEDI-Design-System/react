@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
@@ -110,11 +110,54 @@ describe('Popover component', () => {
     });
 
     it('applies a per-side { top, right, bottom, left } padding', () => {
-      const content = openWithPadding({ top: 1, right: 2, bottom: 3, left: 4 });
+      const content = openWithPadding({ top: 1, right: 2, bottom: 3, left: 2.5 });
       expect(content.style.getPropertyValue('--popover-content-padding-top')).toBe('1rem');
       expect(content.style.getPropertyValue('--popover-content-padding-right')).toBe('2rem');
       expect(content.style.getPropertyValue('--popover-content-padding-bottom')).toBe('3rem');
-      expect(content.style.getPropertyValue('--popover-content-padding-left')).toBe('4rem');
+      expect(content.style.getPropertyValue('--popover-content-padding-left')).toBe('2.5rem');
+    });
+  });
+
+  describe('withArrow prop', () => {
+    const openPopover = (withArrow?: boolean) => {
+      render(
+        <Popover withArrow={withArrow}>
+          <Popover.Trigger>Trigger</Popover.Trigger>
+          <Popover.Content>Content</Popover.Content>
+        </Popover>
+      );
+      fireEvent.click(screen.getByText('Trigger'));
+    };
+
+    it('renders the arrow by default', () => {
+      openPopover();
+      expect(screen.getByTestId('overlay-arrow')).toBeInTheDocument();
+    });
+
+    it('omits the arrow when withArrow is false', () => {
+      openPopover(false);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.queryByTestId('overlay-arrow')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('offset prop', () => {
+    const renderWithOffset = (offset: () => number) => (
+      <Popover open onToggle={jest.fn()} placement="bottom" offset={offset}>
+        <Popover.Trigger>Trigger</Popover.Trigger>
+        <Popover.Content>Content</Popover.Content>
+      </Popover>
+    );
+
+    // Floating UI compares function offsets by source text, and the arrow-gap wrapper's text never
+    // changes, so the consumer's function has to reach the middleware's deps for a swap to apply.
+    it('repositions when a function offset is swapped for another', async () => {
+      const { rerender } = render(renderWithOffset(() => 2));
+      const content = screen.getByTestId('overlay-content');
+      await waitFor(() => expect(content.style.top).toBe('19px'));
+
+      rerender(renderWithOffset(() => 12));
+      await waitFor(() => expect(content.style.top).toBe('29px'));
     });
   });
 });
