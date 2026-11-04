@@ -71,7 +71,10 @@ export const FooterSection = ({
       data-name="footer-section"
       className={cn(
         styles['tedi-footer-section'],
-        { [styles['tedi-footer-section--collapsible']]: applyCollapse },
+        {
+          [styles['tedi-footer-section--mobile']]: isMobile,
+          [styles['tedi-footer-section--collapsible']]: applyCollapse,
+        },
         className
       )}
     >

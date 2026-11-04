@@ -1,16 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react';
 
+import {
+  getPrimaryComponentProps,
+  getSubcomponentProps,
+  subcomponentArgTypes,
+} from '../../../../../.storybook/subcomponent-controls';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import Link from '../../navigation/link/link';
-import { StatusBadge } from '../../tags/status-badge/status-badge';
 import { VerticalSpacing } from '../vertical-spacing';
-import { Footer } from './footer';
+import { Footer, FooterProps } from './footer';
+import { FooterContext } from './footer-context';
+import { FooterSectionProps } from './footer-section/footer-section';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6541-67240&m=dev" target="_BLANK">Figma ↗</a><br/>
- * <a href="https://www.tedi.ee/1ee8444b7/p/24148f-footer" target="_BLANK">Zeroheight ↗</a>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY?node-id=6459-181755&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.tedi.ee/1ee8444b7/p/512563-footer" target="_BLANK">Zeroheight ↗</a>
  */
 const meta: Meta<typeof Footer> = {
   component: Footer,
@@ -24,7 +30,7 @@ const meta: Meta<typeof Footer> = {
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=6541-67240&m=dev',
+      url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY?node-id=6459-181755&m=dev',
     },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
@@ -38,25 +44,38 @@ const meta: Meta<typeof Footer> = {
 export default meta;
 type Story = StoryObj<typeof Footer>;
 
-const LogoPlaceholder = () => {
-  const isMobile = isBreakpointBelow(useBreakpoint(), 'md');
+const LogoPlaceholder = ({ compact = false }: { compact?: boolean }) => {
+  const { mobileBreakpoint } = useContext(FooterContext);
+  const horizontal = isBreakpointBelow(useBreakpoint(), mobileBreakpoint);
+
+  const [width, height] = compact ? ['7rem', '2.5rem'] : horizontal ? ['9rem', '5.1875rem'] : ['4rem', '7rem'];
+
   return (
-    <img
-      src={isMobile ? 'sf_logod.jpg' : 'sf_logod_vertikaalne.jpg'}
-      alt="EU structural funds logo"
-      style={isMobile ? { width: '9rem', height: '5.25rem' } : { width: '3.75rem', height: '7rem' }}
-    />
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width,
+        height,
+        background: 'var(--general-surface-primary)',
+      }}
+    >
+      <Text element="span" modifiers={['small', 'italic']} color="tertiary">
+        Logo
+      </Text>
+    </span>
   );
 };
 
 const FacebookIcon = () => (
-  <svg viewBox="0 0 24 24" width="25" height="25" fill="currentColor" aria-hidden="true" style={{ display: 'block' }}>
+  <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" aria-hidden="true" style={{ display: 'block' }}>
     <path d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874V12h3.328l-.532 3.469h-2.796v8.385C19.612 22.954 24 17.99 24 12z" />
   </svg>
 );
 
 const InstagramIcon = () => (
-  <svg viewBox="0 0 24 24" width="25" height="25" fill="currentColor" aria-hidden="true" style={{ display: 'block' }}>
+  <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor" aria-hidden="true" style={{ display: 'block' }}>
     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
   </svg>
 );
@@ -75,15 +94,15 @@ const ContactLinks = () => (
   </>
 );
 
+type SectionOverrides = Partial<Pick<FooterSectionProps, 'collapsible' | 'defaultOpen' | 'iconBreakpoint'>>;
+
 const StandardSections = ({
-  collapsible = false,
+  contactIcon = 'call',
   firstOpen = false,
-}: {
-  collapsible?: boolean;
-  firstOpen?: boolean;
-}) => (
+  ...sectionProps
+}: SectionOverrides & { contactIcon?: string; firstOpen?: boolean }) => (
   <>
-    <Footer.Section icon="info" heading="Uuri lähemalt" collapsible={collapsible} defaultOpen={firstOpen}>
+    <Footer.Section icon="info" heading="Uuri lähemalt" defaultOpen={firstOpen} {...sectionProps}>
       <Link href="#" color="inverted">
         Privaatsuspoliitika
       </Link>
@@ -97,7 +116,7 @@ const StandardSections = ({
         Karjäärivõimalused
       </Link>
     </Footer.Section>
-    <Footer.Section icon="share" heading="Sotsiaalmeedia ja uuendused" collapsible={collapsible}>
+    <Footer.Section icon="share" heading="Sotsiaalmeedia ja uuendused" {...sectionProps}>
       <Link href="#" color="inverted">
         Uudiskirja tellimine
       </Link>
@@ -111,9 +130,23 @@ const StandardSections = ({
         Liitu meie kogukonnaga
       </Link>
     </Footer.Section>
-    <Footer.Section icon="call" heading="Kontakt" collapsible={collapsible}>
+    <Footer.Section icon={contactIcon} heading="Kontakt" {...sectionProps}>
       <ContactLinks />
     </Footer.Section>
+  </>
+);
+
+const BottomLinks = () => (
+  <>
+    <Link href="#" color="inverted" underline={false}>
+      Facebook
+    </Link>
+    <Link href="#" color="inverted" underline={false}>
+      Instagram
+    </Link>
+    <Link href="#" color="inverted" underline={false}>
+      LinkedIn
+    </Link>
   </>
 );
 
@@ -122,13 +155,11 @@ const DeviceFrame = ({
   label,
   width,
   theme,
-  fluid = false,
 }: {
   storyId: string;
   label?: string;
   width: number;
   theme: string;
-  fluid?: boolean;
 }) => {
   const ref = useRef<HTMLIFrameElement>(null);
   const outerRef = useRef<HTMLDivElement>(null);
@@ -141,17 +172,14 @@ const DeviceFrame = ({
 
     let observer: ResizeObserver | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const getFooter = () => iframe.contentDocument?.querySelector<HTMLElement>('[data-name="footer"]') ?? null;
-    const measure = (footer: HTMLElement) => setHeight(footer.offsetHeight);
-
     let attempts = 0;
     const poll = () => {
-      const footer = getFooter();
+      const footer = iframe.contentDocument?.querySelector<HTMLElement>('[data-name="footer"]');
       if (footer) {
         const body = iframe.contentDocument?.body;
         if (body) body.style.margin = '0';
-        measure(footer);
-        observer = new ResizeObserver(() => measure(footer));
+        setHeight(footer.offsetHeight);
+        observer = new ResizeObserver(() => setHeight(footer.offsetHeight));
         observer.observe(footer);
       } else if (attempts++ < 100) {
         timer = setTimeout(poll, 50);
@@ -166,7 +194,6 @@ const DeviceFrame = ({
   }, [storyId, theme]);
 
   useEffect(() => {
-    if (fluid) return undefined;
     const el = outerRef.current;
     if (!el) return undefined;
     const update = () => setScale(Math.min(1, el.clientWidth / width));
@@ -174,44 +201,30 @@ const DeviceFrame = ({
     const observer = new ResizeObserver(update);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [width, fluid]);
-
-  if (fluid) {
-    return (
-      <div ref={outerRef} style={{ width: '100%', maxWidth: width }}>
-        {label && (
-          <Text element="h5" color="secondary">
-            {label}
-          </Text>
-        )}
-        <iframe
-          ref={ref}
-          title={label || `Jaluse eelvaade (${width} px)`}
-          scrolling="no"
-          src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
-          style={{ display: 'block', width: '100%', height, border: 0, marginTop: '1rem' }}
-        />
-      </div>
-    );
-  }
+  }, [width]);
 
   return (
-    <div ref={outerRef} style={{ width, maxWidth: '100%', flexShrink: 0 }}>
+    <div ref={outerRef} style={{ flex: `0 1 ${width}px`, width: '100%', maxWidth: width, minWidth: 0 }}>
       {label && (
         <Text element="h5" color="secondary">
           {label}
         </Text>
       )}
-      <div style={{ height: height * scale, overflow: 'hidden', marginTop: '1rem' }}>
-        <div style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-          <iframe
-            ref={ref}
-            title={label || `Jaluse eelvaade (${width} px)`}
-            scrolling="no"
-            src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
-            style={{ display: 'block', width: '100%', height, border: 0 }}
-          />
-        </div>
+      <div style={{ height: height * scale, marginTop: 'var(--layout-grid-gutters-16)', overflow: 'hidden' }}>
+        <iframe
+          ref={ref}
+          title={label || `Jaluse eelvaade (${width} px)`}
+          scrolling="no"
+          src={`iframe.html?id=${storyId}&viewMode=story&globals=theme:${theme}`}
+          style={{
+            display: 'block',
+            width,
+            height,
+            border: 0,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+          }}
+        />
       </div>
     </div>
   );
@@ -220,15 +233,30 @@ const DeviceFrame = ({
 const DEVICE_FRAME_SOURCE_ID = 'tedi-ready-layout-footer--device-frame-source';
 const DEVICE_FRAME_SOURCE_ACCORDIONS_ID = 'tedi-ready-layout-footer--device-frame-source-accordions';
 const DEVICE_FRAME_SOURCE_ACCORDIONS_OPEN_ID = 'tedi-ready-layout-footer--device-frame-source-accordions-open';
-const LOGO_BREAKPOINT_SOURCE_ID = 'tedi-ready-layout-footer--logo-breakpoint-source';
 
-export const Default: Story = {
-  render: () => (
-    <Footer mobileBreakpoint="lg">
-      <Footer.Body>
-        <StandardSections />
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Footer.Body, { category: 'Footer.Body', prefix: 'body', include: ['columns'] }),
+    ...subcomponentArgTypes(Footer.Section, {
+      category: 'Footer.Section',
+      prefix: 'section',
+      include: ['collapsible', 'defaultOpen', 'iconBreakpoint'],
+    }),
+    ...subcomponentArgTypes(Footer.Side, {
+      category: 'Footer.Side',
+      prefix: 'side',
+      include: ['placement', 'position'],
+    }),
+  },
+  args: {
+    side__placement: 'end',
+  },
+  render: (args: Record<string, unknown>) => (
+    <Footer {...getPrimaryComponentProps<FooterProps>(args)}>
+      <Footer.Body {...getSubcomponentProps(args, 'body')}>
+        <StandardSections {...getSubcomponentProps<SectionOverrides>(args, 'section')} />
       </Footer.Body>
-      <Footer.Side placement="end">
+      <Footer.Side {...getSubcomponentProps(args, 'side')}>
         <LogoPlaceholder />
       </Footer.Side>
     </Footer>
@@ -236,37 +264,30 @@ export const Default: Story = {
 };
 
 export const DeviceSize: Story = {
+  parameters: { controls: { disable: true } },
   render: (_args, context) => {
     const theme = (context.globals.theme as string) ?? 'default';
     return (
-      <VerticalSpacing size={1}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
-          <Text element="h4" color="primary">
-            Desktop
-          </Text>
-          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} fluid />
-          <Text element="h4" color="primary">
-            Tablet
-          </Text>
-          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} fluid />
-          <Text element="h4" color="primary">
-            Mobile
-          </Text>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'flex-start' }}>
-            <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} label="Default" width={360} theme={theme} />
-            <DeviceFrame
-              storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_ID}
-              label="Compact view, accordions"
-              width={360}
-              theme={theme}
-            />
-            <DeviceFrame
-              storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_OPEN_ID}
-              label="Compact view, accordions (open)"
-              width={360}
-              theme={theme}
-            />
-          </div>
+      <VerticalSpacing size={1.5}>
+        <Text element="h4">Desktop</Text>
+        <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={1138} theme={theme} />
+        <Text element="h4">Tablet</Text>
+        <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} width={871} theme={theme} />
+        <Text element="h4">Mobile</Text>
+        <div className="flex flex-wrap align-items-start gap-3">
+          <DeviceFrame storyId={DEVICE_FRAME_SOURCE_ID} label="Default" width={360} theme={theme} />
+          <DeviceFrame
+            storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_ID}
+            label="Compact view, accordions"
+            width={360}
+            theme={theme}
+          />
+          <DeviceFrame
+            storyId={DEVICE_FRAME_SOURCE_ACCORDIONS_OPEN_ID}
+            label="Compact view, accordions (open)"
+            width={360}
+            theme={theme}
+          />
         </div>
       </VerticalSpacing>
     );
@@ -274,7 +295,7 @@ export const DeviceSize: Story = {
 };
 
 const DeviceFrameFooter = ({ collapsible, firstOpen }: { collapsible?: boolean; firstOpen?: boolean }) => (
-  <Footer mobileBreakpoint="md">
+  <Footer>
     <Footer.Body>
       <StandardSections collapsible={collapsible} firstOpen={firstOpen} />
     </Footer.Body>
@@ -304,156 +325,94 @@ export const DeviceFrameSourceAccordionsOpen: Story = {
   render: () => <DeviceFrameFooter collapsible firstOpen />,
 };
 
-export const LogoBreakpointSource: Story = {
-  tags: ['!dev', '!autodocs'],
-  parameters: deviceFrameSourceParams,
+const LogoFooter = ({ children }: { children: ReactNode }) => (
+  <Footer>
+    {children}
+    <Footer.Body>
+      <StandardSections contactIcon="location_on" />
+    </Footer.Body>
+  </Footer>
+);
+
+export const LogoPosition: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
-    <Footer mobileBreakpoint="lg">
-      <Footer.Side placement="end" lg={{ placement: 'start' }}>
-        <LogoPlaceholder />
-      </Footer.Side>
-      <Footer.Body>
-        <StandardSections />
-      </Footer.Body>
-    </Footer>
+    <section aria-label="Logo position examples">
+      <VerticalSpacing size={1.5}>
+        <Text element="h4">Right</Text>
+        <LogoFooter>
+          <Footer.Side placement="end">
+            <LogoPlaceholder />
+          </Footer.Side>
+        </LogoFooter>
+        <LogoFooter>
+          <Footer.Side placement="end" position="start">
+            <LogoPlaceholder />
+          </Footer.Side>
+        </LogoFooter>
+        <Text element="h4">Left</Text>
+        <LogoFooter>
+          <Footer.Side placement="start">
+            <LogoPlaceholder />
+          </Footer.Side>
+        </LogoFooter>
+        <LogoFooter>
+          <Footer.Side placement="start" position="start">
+            <LogoPlaceholder />
+          </Footer.Side>
+        </LogoFooter>
+      </VerticalSpacing>
+    </section>
   ),
 };
 
-/**
- * The logo always drops to the **bottom of the footer from tablet down** and only sits on the
- * side on desktop. Two props make that work together:
- * - `mobileBreakpoint="lg"` collapses the footer to its stacked layout at `md` and below
- *   (tablet + mobile), so the side slot lands below the sections.
- * - `placement="end"` keeps the logo last (the bottom slot) while stacked; a `lg` breakpoint
- *   override flips it to its desktop side — `lg={{ placement: 'start' }}` for a left logo, or no
- *   override at all to keep it on the right.
- *
- * `position` sets the vertical alignment within the side slot on desktop. Both `placement` and
- * `position` accept breakpoint props. The first example is shown in a resizable frame so you can
- * watch the logo move; the rest reflow with the window.
- */
-export const LogoPosition: Story = {
-  render: (_args, context) => {
-    const theme = (context.globals.theme as string) ?? 'default';
-    const Example = ({ label, children }: { label: string; children: React.ReactNode }) => (
-      <VerticalSpacing size={0.5}>
-        <Text element="h5" color="secondary">
-          {label}
-        </Text>
-        {children}
-      </VerticalSpacing>
-    );
-
-    return (
-      <section aria-label="Logo position examples">
-        <VerticalSpacing size={2}>
-          <Example label="Responsive (breakpoint props) — logo on the left on desktop, drops to the bottom from tablet down. Resize to see.">
-            <DeviceFrame storyId={LOGO_BREAKPOINT_SOURCE_ID} width={1138} theme={theme} fluid />
-          </Example>
-
-          <Example label="Right on desktop · bottom on tablet and mobile (placement=end, mobileBreakpoint=lg)">
-            <Footer mobileBreakpoint="lg">
-              <Footer.Body>
-                <StandardSections />
-              </Footer.Body>
-              <Footer.Side placement="end">
-                <LogoPlaceholder />
-              </Footer.Side>
-            </Footer>
-          </Example>
-
-          <Example label="Right, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start)">
-            <Footer mobileBreakpoint="lg">
-              <Footer.Body>
-                <StandardSections />
-              </Footer.Body>
-              <Footer.Side placement="end" position="start">
-                <LogoPlaceholder />
-              </Footer.Side>
-            </Footer>
-          </Example>
-
-          <Example label="Left on desktop · bottom on tablet and mobile (placement=end, lg={ placement: start })">
-            <Footer mobileBreakpoint="lg">
-              <Footer.Side placement="end" lg={{ placement: 'start' }}>
-                <LogoPlaceholder />
-              </Footer.Side>
-              <Footer.Body>
-                <StandardSections />
-              </Footer.Body>
-            </Footer>
-          </Example>
-
-          <Example label="Left, top-aligned on desktop · bottom on tablet and mobile (placement=end, position=start, lg={ placement: start })">
-            <Footer mobileBreakpoint="lg">
-              <Footer.Side placement="end" position="start" lg={{ placement: 'start' }}>
-                <LogoPlaceholder />
-              </Footer.Side>
-              <Footer.Body>
-                <StandardSections />
-              </Footer.Body>
-            </Footer>
-          </Example>
-        </VerticalSpacing>
-      </section>
-    );
-  },
-};
+const BottomSections = () => (
+  <>
+    <Footer.Section icon="info" heading="Uuri lähemalt">
+      <Link href="#" color="inverted">
+        Privaatsuspoliitika
+      </Link>
+      <Link href="#" color="inverted">
+        Küpsised
+      </Link>
+      <Link href="#" color="inverted">
+        Korduma kippuvad küsimused
+      </Link>
+      <Link href="#" color="inverted">
+        Karjäärivõimalused
+      </Link>
+    </Footer.Section>
+    <Footer.Section icon="location_on" heading="Kontakt">
+      <ContactLinks />
+    </Footer.Section>
+  </>
+);
 
 export const WithBottomSection: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <section aria-label="Footer bottom section examples">
-      <VerticalSpacing size={2}>
-        <Footer mobileBreakpoint="lg">
+      <VerticalSpacing size={1}>
+        <Footer>
           <Footer.Body>
-            <StandardSections />
+            <BottomSections />
           </Footer.Body>
           <Footer.Side placement="end">
             <LogoPlaceholder />
           </Footer.Side>
           <Footer.Bottom>
-            <Link href="#" color="inverted">
-              Facebook
-            </Link>
-            <Link href="#" color="inverted">
-              Instagram
-            </Link>
-            <Link href="#" color="inverted">
-              LinkedIn
-            </Link>
+            <BottomLinks />
           </Footer.Bottom>
         </Footer>
-        <Footer mobileBreakpoint="lg">
+        <Footer>
           <Footer.Body>
-            <StandardSections />
+            <BottomSections />
           </Footer.Body>
           <Footer.Side placement="end">
             <LogoPlaceholder />
           </Footer.Side>
           <Footer.Bottom separator>
-            <Link href="#" color="inverted">
-              Facebook
-            </Link>
-            <Link href="#" color="inverted">
-              Instagram
-            </Link>
-            <Link href="#" color="inverted">
-              LinkedIn
-            </Link>
-          </Footer.Bottom>
-        </Footer>
-
-        <Footer mobileBreakpoint="lg">
-          <Footer.Body>
-            <StandardSections />
-          </Footer.Body>
-          <Footer.Side placement="end">
-            <LogoPlaceholder />
-          </Footer.Side>
-          <Footer.Bottom>
-            <StatusBadge color="success" variant="filled-bordered">
-              TEDI poolt heaks kiidetud
-            </StatusBadge>
+            <BottomLinks />
           </Footer.Bottom>
         </Footer>
       </VerticalSpacing>
@@ -462,15 +421,16 @@ export const WithBottomSection: Story = {
 };
 
 export const CustomContent: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <section aria-label="Footer custom content examples">
-      <VerticalSpacing size={2}>
+      <VerticalSpacing size={1.5}>
         <Footer>
           <Footer.Body>
             <Footer.Section icon="call" heading="Kontakt">
               <ContactLinks />
             </Footer.Section>
-            <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'center' }}>
+            <div className="flex align-self-center gap-3">
               <Link href="#" color="inverted" aria-label="Facebook">
                 <FacebookIcon />
               </Link>
@@ -510,29 +470,29 @@ export const CustomContent: Story = {
                 Uudiskirja tellimine
               </Link>
             </Footer.Section>
-            <Footer.Section icon="call" heading="Kontakt">
-              <ContactLinks />
-            </Footer.Section>
+            <div style={{ flex: 'none' }}>
+              <Footer.Section icon="call" heading="Kontakt">
+                <ContactLinks />
+              </Footer.Section>
+            </div>
           </Footer.Body>
           <Footer.Bottom>
-            <img src="TEHIK_logo.svg" alt="TEHIK" style={{ height: '2.5rem' }} />
+            <LogoPlaceholder compact />
           </Footer.Bottom>
         </Footer>
 
         <Footer>
           <Footer.Body>
-            <div style={{ alignSelf: 'center' }}>
-              <Footer.Section heading="Osale meie terviseuuringus">
-                <Text element="p" modifiers="small" color="white">
-                  Liitu meie uuringuga ja avasta uut enda tervise kohta!
-                </Text>
-              </Footer.Section>
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+            <Footer.Section heading="Osale meie terviseuuringus" className="align-self-center">
+              <Text element="p" color="white">
+                Liitu meie uuringuga ja avasta uut enda tervise kohta!
+              </Text>
+            </Footer.Section>
+            <div className="flex align-items-start">
               <img
-                src="https://picsum.photos/seed/tedi-footer/128"
+                src="https://picsum.photos/seed/tedi-footer/152"
                 alt=""
-                style={{ flexShrink: 0, width: '4rem', height: '4rem', borderRadius: '50%', objectFit: 'cover' }}
+                style={{ flexShrink: 0, width: '4.75rem', height: '4.75rem', objectFit: 'cover', borderRadius: '50%' }}
               />
               <Footer.Section heading="Kontakt">
                 <ContactLinks />
@@ -546,16 +506,28 @@ export const CustomContent: Story = {
 };
 
 /**
- * On wide viewports the footer content can grow uncomfortably far apart. `maxWidth` caps the inner
- * content (the column row **and** the bottom strip) to a fixed width and centers it, while the dark
- * backgrounds stay full-bleed. `Footer.Body`'s `columns` lays the sections out as a fixed grid of
- * equal-width tracks instead of the default content-sized `space-between` row — and it accepts
- * per-breakpoint overrides. The keys are **mobile-first** (a value applies at that breakpoint and
- * up), so raise the count as the viewport widens — `columns={2} lg={{ columns: 4 }}` shows 2 columns
- * from `sm`, then 4 from `lg`. Below the footer's `mobileBreakpoint` the body always stacks into a
- * single column regardless of `columns`.
+ * The logo sits on the left from `lg` up and drops below the sections when the footer stacks; resize the window to see it move.
+ */
+export const WithResponsivePlacement: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Footer mobileBreakpoint="lg">
+      <Footer.Side placement="end" lg={{ placement: 'start' }}>
+        <LogoPlaceholder />
+      </Footer.Side>
+      <Footer.Body>
+        <StandardSections />
+      </Footer.Body>
+    </Footer>
+  ),
+};
+
+/**
+ * `columns` lays sections out as equal grid tracks with mobile-first breakpoint overrides, and `maxWidth` caps the
+ * content while the backgrounds stay full-bleed.
  */
 export const MaxWidthAndColumns: Story = {
+  parameters: { controls: { disable: true } },
   render: () => (
     <Footer maxWidth={1280}>
       <Footer.Body columns={2} lg={{ columns: 4 }}>
@@ -570,13 +542,13 @@ export const MaxWidthAndColumns: Story = {
         </Footer.Section>
       </Footer.Body>
       <Footer.Bottom separator>
-        <Link href="#" color="inverted">
+        <Link href="#" color="inverted" underline={false}>
           Privaatsuspoliitika
         </Link>
-        <Link href="#" color="inverted">
+        <Link href="#" color="inverted" underline={false}>
           Küpsised
         </Link>
-        <Link href="#" color="inverted">
+        <Link href="#" color="inverted" underline={false}>
           Ligipääsetavus
         </Link>
       </Footer.Bottom>
