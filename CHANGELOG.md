@@ -1,3 +1,23 @@
+# [21.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.3...react-21.0.0-rc.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* **table:** render sub-rows only for rows that can expand [#1064](https://github.com/TEDI-Design-System/react/issues/1064) ([#1065](https://github.com/TEDI-Design-System/react/issues/1065)) ([8d977f5](https://github.com/TEDI-Design-System/react/commit/8d977f548ce3e4d9a4d1e3e4c1ba6ef407541a2d))
+* **table:** scope modifier styles to their own table [#1062](https://github.com/TEDI-Design-System/react/issues/1062) ([#1063](https://github.com/TEDI-Design-System/react/issues/1063)) ([9764a90](https://github.com/TEDI-Design-System/react/commit/9764a90edb6b788d99003fe632272b10cd2800fb))
+
+
+### Features
+
+* **popover:** add withArrow prop and make offset exclude the arrow [#1017](https://github.com/TEDI-Design-System/react/issues/1017) ([#1020](https://github.com/TEDI-Design-System/react/issues/1020)) ([3873d0b](https://github.com/TEDI-Design-System/react/commit/3873d0bdce6014988029bba5d26c4aa7ab7b04aa))
+
+
+### BREAKING CHANGES
+
+* **popover:** Popover `offset` is now the visible gap only; the arrow's
+17px height is added automatically when `withArrow` is true. Subtract 17 from
+any custom offset to keep the same position.
+
 # [20.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.2...react-20.1.0-rc.3) (2026-11-04)
 
 
