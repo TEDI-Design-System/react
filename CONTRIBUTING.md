@@ -35,6 +35,16 @@ npm run test:coverage  # Jest with coverage (80% threshold)
 npm run build          # library build into dist/
 ```
 
+On Windows, enable symlinks before cloning. `.claude/skills/` links to `.agents/skills/`, and
+without symlinks Claude Code doesn't find the repository's skills. Turn on Developer Mode, then:
+
+```bash
+git clone -c core.symlinks=true <repo-url>
+```
+
+In an existing clone, run `git config core.symlinks true`, delete the files under
+`.claude/skills/` and run `git checkout -- .claude/skills`.
+
 Components live in two tiers: `src/tedi/` (TEDI-READY, must meet the [Definition of Done](https://github.com/TEDI-Design-System/general/wiki/Definition-of-Done)) and `src/community/` (looser requirements).
 
 ## Accessibility check
