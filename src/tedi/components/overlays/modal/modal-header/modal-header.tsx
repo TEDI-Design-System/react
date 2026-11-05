@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useLayoutEffect } from 'react';
 
 import { Heading } from '../../../base/typography/heading/heading';
 import { Text } from '../../../base/typography/text/text';
@@ -59,19 +59,24 @@ export interface ModalHeaderProps {
   className?: string;
 }
 
+const hasContent = (node: ReactNode) => node !== undefined && node !== null && node !== false && node !== '';
+
 export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
   const { title, description, closeButton = true, closeButtonProps, children, className } = props;
-  const { onOpenChange, labelId, descriptionId, setHasTitle, setHasDescription } = useModalContext();
+  const { onOpenChange, titleId, descriptionTextId, setHasTitle, setHasDescription } = useModalContext();
+  const hasTitle = hasContent(title);
+  const hasDescription = hasContent(description);
+  const hasChildren = Boolean(children);
 
-  useEffect(() => {
-    setHasTitle(Boolean(title) || Boolean(children));
+  useLayoutEffect(() => {
+    setHasTitle(hasTitle || hasChildren);
     return () => setHasTitle(false);
-  }, [title, children, setHasTitle]);
+  }, [hasTitle, hasChildren, setHasTitle]);
 
-  useEffect(() => {
-    setHasDescription(Boolean(description) || Boolean(children));
+  useLayoutEffect(() => {
+    setHasDescription(hasDescription || hasChildren);
     return () => setHasDescription(false);
-  }, [description, children, setHasDescription]);
+  }, [hasDescription, hasChildren, setHasDescription]);
 
   const handleClose = () => onOpenChange(false);
 
@@ -80,15 +85,15 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
       {children ?? (
         <>
           <div className={styles['tedi-modal__header-row']}>
-            {title && (
-              <Heading element="h3" modifiers="h3" id={labelId} className={styles['tedi-modal__header-title']}>
+            {hasTitle && (
+              <Heading element="h3" modifiers="h3" id={titleId} className={styles['tedi-modal__header-title']}>
                 {title}
               </Heading>
             )}
             {closeButton && <ClosingButton size="default" {...closeButtonProps} onClick={handleClose} />}
           </div>
-          {description && (
-            <Text id={descriptionId} className={styles['tedi-modal__header-description']}>
+          {hasDescription && (
+            <Text id={descriptionTextId} className={styles['tedi-modal__header-description']}>
               {description}
             </Text>
           )}
