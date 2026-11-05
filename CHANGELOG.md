@@ -1,3 +1,17 @@
+# [21.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.1...react-21.0.0-rc.2) (2026-11-05)
+
+
+### Features
+
+* **table-of-contents:** rename bordered prop to divided [#1067](https://github.com/TEDI-Design-System/react/issues/1067) ([#1070](https://github.com/TEDI-Design-System/react/issues/1070)) ([b4ecc5d](https://github.com/TEDI-Design-System/react/commit/b4ecc5d35e0923693c946d2b9670b82932372bee))
+
+
+### BREAKING CHANGES
+
+* **table-of-contents:** `bordered` on TableOfContents and TableOfContents.Collapsible
+is renamed to `divided`, and the `tedi-table-of-contents--bordered` class to
+`tedi-table-of-contents--divided`.
+
 # [21.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.3...react-21.0.0-rc.1) (2026-11-04)
 
 
