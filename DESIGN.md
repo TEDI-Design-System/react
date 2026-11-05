@@ -56,7 +56,8 @@ heavily-populated `form-<component>-*` families (`form-checkbox-*`, `form-toggle
 | Role family | Tokens | Example members |
 | --- | --- | --- |
 | `form-calendar-*` | 1 | `form-calendar-date-width` |
-| `form-checkbox-*` | 72 | `form-checkbox-radio-card-checkbox-icon-padding-y`, `form-checkbox-radio-card-checkbox-indicator-padding-y` |
+| `form-checkbox-*` | 22 | `form-checkbox-radio-card-checkbox-icon-padding-y`, `form-checkbox-radio-card-checkbox-indicator-padding-y` |
+| `form-choice-*` | 111 | `form-choice-card-primary-selected-background-active`, `form-choice-card-primary-selected-background-default` |
 | `form-datepicker-*` | 11 | `form-datepicker-date-active`, `form-datepicker-date-available` |
 | `form-field-*` | 18 | `form-field-button-height`, `form-field-button-height-sm` |
 | `form-general-*` | 9 | `form-general-background-action-background`, `form-general-background-default` |
@@ -64,17 +65,18 @@ heavily-populated `form-<component>-*` families (`form-checkbox-*`, `form-toggle
 | `form-input-*` | 10 | `form-input-background-default`, `form-input-background-disabled` |
 | `form-label-*` | 1 | `form-label` |
 | `form-number-*` | 2 | `form-number-input-min-width`, `form-number-min-width` |
+| `form-rating-*` | 18 | `form-rating-selected-background-default`, `form-rating-selected-background-disabled` |
 | `form-select-*` | 2 | `form-select-area-max-height`, `form-select-area-radius` |
 | `form-slider-*` | 23 | `form-slider-active-background-active`, `form-slider-active-background-default` |
 | `form-textarea-*` | 1 | `form-textarea-min-height` |
-| `form-toggle-*` | 34 | `form-toggle-colored-active-active`, `form-toggle-colored-active-default` |
-| `general-border-*` | 8 | `general-border-accent`, `general-border-brand` |
+| `form-toggle-*` | 34 | `form-toggle-colored-selected-active`, `form-toggle-colored-selected-default` |
+| `general-border-*` | 10 | `general-border-accent`, `general-border-brand` |
 | `general-effect-*` | 10 | `general-effect-colors-elevation-dropdown-area-drop-shadow`, `general-effect-colors-elevation-general-primary` |
 | `general-icon-*` | 15 | `general-icon-accent`, `general-icon-background-brand-primary` |
-| `general-separator-*` | 1 | `general-separator-primary` |
-| `general-status-*` | 23 | `general-status-danger-background-primary`, `general-status-danger-background-secondary` |
-| `general-surface-*` | 17 | `general-surface-accent`, `general-surface-active` |
-| `general-text-*` | 8 | `general-text-brand`, `general-text-dark` |
+| `general-state-*` | 4 | `general-state-active`, `general-state-hover` |
+| `general-status-*` | 22 | `general-status-danger-background-primary`, `general-status-danger-background-secondary` |
+| `general-surface-*` | 15 | `general-surface-accent`, `general-surface-brand-primary` |
+| `general-text-*` | 7 | `general-text-brand`, `general-text-dark` |
 <!-- tokens:end -->
 
 ## Colors, Typography, Shapes, Layout
@@ -95,29 +97,36 @@ spacing, radius, dimensions* below for when to reach for it directly.
 **Colour, by role.** Semantic colours are grouped by intent, so pick the role that matches meaning,
 not appearance:
 
-- **Text** — `general-text-*` (`primary`, `secondary`, `tertiary`, `brand`, `disabled`, `white`).
-- **Surface / background** — `general-surface-*` for panels and fills, `general-icon-background-*`
+- **Text**: `general-text-*` (`primary`, `secondary`, `tertiary`, `brand`, `dark`, `disabled`,
+  `white`).
+- **Surface / background**: `general-surface-*` for panels and fills, `general-icon-background-*`
   for icon chips.
-- **Border & separators** — `general-border-*` and `general-separator-primary`.
-- **Icons** — `general-icon-*` (`primary`, `brand`, `danger`, `success`, `warning`, …).
-- **Status** — `general-status-{info,success,warning,danger,neutral}-*` for feedback surfaces,
+- **Border**: `general-border-*`, also for dividers (there is no separate separator colour role;
+  prefer the `Separator` component).
+- **Interaction states**: `general-state-*` (`hover`, `active`, `selected`, `selected-hover`) for
+  hover and selection fills on your own interactive surfaces.
+- **Icons**: `general-icon-*` (`primary`, `brand`, `danger`, `success`, `warning`, …).
+- **Status**: `general-status-{info,success,warning,danger,neutral}-*` for feedback surfaces,
   borders and text.
-- **Forms** — `form-*` roles (`form-input-*`, `form-field-*`, `form-label`, `form-checkbox-radio-*`,
-  `form-toggle-*`, `form-slider-*`, `form-datepicker-*`) already drive the built-in form controls;
-  reuse them only when building form-adjacent UI.
+- **Forms**: `form-*` roles (`form-input-*`, `form-field-*`, `form-label`, `form-choice-*`,
+  `form-checkbox-*`, `form-toggle-*`, `form-slider-*`, `form-datepicker-*`, `form-rating-*`)
+  already drive the built-in form controls; reuse them only when building form-adjacent UI.
 
 **Typography, spacing, radius, dimensions.** These also come from tokens — sizing/spacing/radius
 values such as `form-field-height`, `form-field-radius` and role-level spacing like
 `form-field-inner-spacing` rather than hardcoded pixels. The underlying scale is
-`--tedi-dimensions-00` … `--tedi-dimensions-25` (`0` → `24rem`); prefer a semantic role token where
+`--tedi-dimensions-00` … `--tedi-dimensions-26` (`0` → `24rem`); prefer a semantic role token where
 one exists, and fall back to the dimensions scale for layout spacing that has no role. Use the
 token; do not invent a value.
 
-**Theming.** A theme is a CSS class on `<html>` (`tedi-theme--default`, `tedi-theme--dark`) set by
-`ThemeProvider`. Dark mode is a semantic-token override subset — see `themes.dark` in
-`@tedi-design-system/core/tokens.json`. Because you only ever reference semantic tokens, correctly built UI
-follows the active theme automatically. For the how-to (provider setup, custom themes, SCSS token
-usage) see `skills/tedi-react/references/theming.md`.
+**Theming.** A theme is a CSS class on `<html>`, `tedi-theme--<theme>`, set by `ThemeProvider`
+(which removes any other `tedi-theme--*` class, so exactly one is active). TEDI ships `default`
+and `dark`; dark mode overrides colours only (see `themes.dark` in
+`@tedi-design-system/core/tokens.json`). `theme` also accepts any other name, so an organisation
+theme loaded after TEDI's CSS (for example from the Figma TEDI Variables Exporter) is
+`theme="<brand>"` and `theme="<brand>-dark"`. Because you only ever reference semantic tokens,
+correctly built UI follows the active theme automatically. For the how-to (provider setup,
+custom themes, SCSS token usage) see `skills/tedi-react/references/theming.md`.
 <!-- /prose:foundations -->
 
 ## Components
@@ -133,12 +142,32 @@ paths) is `component.manifest.json`; all of them import from
 `skills/tedi-react/references/forms.md`. High-level rules for generation:
 
 - **Prefer composition.** Many components are compound (e.g. `Card.Header`, `Dropdown.Item`) or
-  polymorphic via an `as` prop — assemble from the provided parts rather than rebuilding markup.
+  polymorphic via an `as` prop; assemble from the provided parts rather than rebuilding markup.
 - **Prefer tedi-ready over community.** Only reach for `@tedi-design-system/react/community` when no
   tedi-ready equivalent exists.
 - **Forms follow standard React.** Every form control supports both **controlled** (`value` +
   `onChange`) and **uncontrolled** (`defaultValue`) modes; use inline feedback via the `helper` prop
-  rather than custom error markup. See the forms reference for the full control list.
+  (`{ text, type: 'hint' | 'valid' | 'error' }`) rather than custom error markup. See the forms
+  reference for the full control list.
+- **Responsive props, not media queries.** Most components take a partial props object per
+  breakpoint (`sm`, `md`, `lg`, `xl`, `xxl`), e.g. `<Button fullWidth lg={{ fullWidth: false }}>`.
+- **You own the page shell.** There is no `Layout` component and `SideNav` does not position
+  itself: it is `height: 100%`, so its row must be a stretching flex row and `main` must own
+  scrolling (`overflow-y: auto`, `min-width: 0`). Breaking this gives a wrong-looking page with no
+  error.
+- **The same concept has different prop names.** Open/close is `onToggle` (`Modal`, `Collapse`),
+  `onOpenChange` (`Dropdown`) or `onMenuToggle` (`SideNav`, `TopNav`); visual style is
+  `visualType` (`Button`, `Link`), `variant` (`StatusBadge`, `Checkbox`) or `type` (`Alert`).
+  Check the prop contract instead of guessing from a sibling. `Button`'s colour is a separate
+  `color` prop: `visualType="danger"` does not exist.
+- **Icon-only buttons still take `children`**: with `icon` set the label is visually hidden and is
+  the accessible name, so never pass an empty label.
+- **Toasts are imperative**: call `sendNotification()` and mount `ToastContainer` once; there is no
+  `Toast` component.
+
+The full version of these rules, with the page-shell template and a worked example, is the
+overview the Claude Design System artifact ships (built from `.design-sync/conventions.md` in this
+repository).
 <!-- /prose:components -->
 
 ## Do's and Don'ts
@@ -147,29 +176,42 @@ paths) is `component.manifest.json`; all of them import from
 **Do**
 
 - Import components from `@tedi-design-system/react/tedi`.
-- Wrap the app in `ThemeProvider` → `LabelProvider` → `StyleProvider`, and import the base styles
-  with `import '@tedi-design-system/react/index.css'` (or `@use '@tedi-design-system/core/scss'`).
+- Wrap the app in `ThemeProvider` → `PrintingProvider` → `LabelProvider`, and import the base
+  styles with `import '@tedi-design-system/react/index.css'` (or `@use '@tedi-design-system/core/scss'`).
+  `PrintingProvider` is required: `Collapse` and `SideNav` throw without it, and so does anything
+  that renders a `Collapse`. `LabelProvider` is required too: without it built-in labels render as
+  keys (`file-upload.add`). Add `AccessibilityProvider` when you use its loader hooks;
+  `StyleProvider` currently renders nothing and is optional.
 - Use semantic tokens (`general-*` / `form-*`) for every colour, spacing, radius and dimension.
 - Prefer tedi-ready components; assemble from compound/polymorphic parts instead of custom markup.
+- For layout glue between components, use `Row` / `Col` and `VerticalSpacing` first, then TEDI's
+  shipped utilities (`flex`, `gap-0` … `gap-5`, `align-items-*`, `justify-content-*`, with
+  breakpoint infixes such as `flex-lg-row`).
 - Wire forms as controlled or uncontrolled per `skills/tedi-react/references/forms.md`, and show
   validation via the `helper` prop.
 - Defer to the `tedi-react` skill for setup, theming and forms details.
 - In scaffolds that also ship a utility CSS framework (Tailwind in Figma Make), reach for a TEDI
-  component first and fall back to utilities only where TEDI has no equivalent — see
+  component first and fall back to utilities only where TEDI has no equivalent; see
   *Using TEDI in Figma Make*.
 
 **Don't**
 
 - Don't import from `@tedi-design-system/react/community` when a tedi-ready component exists.
 - Don't hardcode hex/rgb colours or pixel values, and don't reference raw `--tedi-*` primitive
-  tokens — go through the semantic layer. The one exception is the `--tedi-dimensions-*` scale,
+  tokens; go through the semantic layer. The one exception is the `--tedi-dimensions-*` scale,
   which semantic spacing roles are themselves built from: use it directly only for spacing that has
   no semantic role.
-- Don't add `var()` fallbacks — write `var(--token-name)`, not `var(--token-name, #fff)`.
+- Don't add `var()` fallbacks: write `var(--token-name)`, not `var(--token-name, #fff)`.
 - Don't hand-roll inputs, dropdowns, modals or date/time pickers that TEDI already provides.
-- Don't skip the providers or the stylesheet import — components render unstyled or without theming.
+- Don't skip the providers or the stylesheet import: components render unstyled, show label keys
+  or throw.
+- Don't write or target TEDI's component class names: they are hashed CSS Modules
+  (`tedi-btn-f8b478d7`), not an API. Utilities that don't exist (`fixed`, `sticky`, `h-full`,
+  `display-flex`) do nothing.
+- Don't style bare elements in app CSS (`a:hover { ... }`): element selectors beat TEDI's hashed
+  classes and recolour components such as `SideNav` and `Footer`. Scope them to your own container.
 - Don't rebuild a TEDI component out of utility classes, and don't restyle one with utility colour,
-  spacing or typography classes — both bypass the semantic token layer and drift from the system.
+  spacing or typography classes; both bypass the semantic token layer and drift from the system.
 <!-- /prose:dosdonts -->
 
 ## Where to look things up
@@ -211,8 +253,8 @@ artifact, pick it under **+ › Design system** in a Claude chat, or let Claude 
 is the organisation default; Claude Code reads it too. If not, publish one from
 [TEDI-Design-System/claude-design-system](https://github.com/TEDI-Design-System/claude-design-system).
 
-> **Do not run `/design-sync`.** As of Claude Code 2.1.318 it still uploads only to
-> standalone Claude Design projects and stops once a system has moved to Claude.
+> **Do not run `/design-sync`.** It uploads only to standalone Claude Design projects and
+> stops once a system has moved to Claude.
 >
 > **Do not import the design system from this repository's URL.** TEDI's class names are
 > hashed CSS Modules, so an importer reading source produces token-level styling and
@@ -234,7 +276,8 @@ claude
 
 Then ask Claude Code to "publish this TEDI design system to Claude", or, for a later release,
 to "update our TEDI design system: <artifact link>". It follows the repository's `AGENTS.md`;
-you approve the publishes. Pick the release line your applications are on.
+you approve the publishes. Pick the release line your applications are on. Until the first
+stable release after the move, only `rc` exists: clone with `--branch rc`.
 
 The artifact is **read-only on its page** (`"editing": "code"`): every update replaces its
 files, so changes belong in this repository (the components and stories,
@@ -263,7 +306,7 @@ primary surface, so check it before approving the publish.
 
 ### What you get
 
-**87 TEDI-Ready components**, each with its real TypeScript prop contract (including the
+**Every TEDI-Ready component** (plus the providers), each with its real TypeScript prop contract (including the
 shapes of referenced types), a live preview rendering the actual compiled component in
 light and dark, and per-component usage docs with the silent-failure gotchas. Tokens
 (colours in both themes, type styles, spacing, radius, borders, containers, z-index) come
@@ -309,8 +352,9 @@ tries to implement the prototype. Order of preference:
    (`var(--tedi-dimensions-10)`). Another library's own palette and scale are not TEDI's and will
    not follow the active theme.
 
-**Bare utility classes for spacing and flex layout are unsafe.** `index.css` ships 261 of TEDI's own
-Bootstrap-style utilities (`gap-*`, `flex-*`, `order-*`, `justify-content-*`, `align-items-*`), all
+**Bare utility classes for spacing and flex layout are unsafe next to another utility
+framework.** (Without one, TEDI's own utilities are the intended layout glue; see *Do's and
+Don'ts*.) `index.css` ships 261 of TEDI's own Bootstrap-style utilities (`gap-*`, `flex-*`, `order-*`, `justify-content-*`, `align-items-*`), all
 declared `!important`, and the names overlap common utility frameworks at different values — TEDI's
 `gap-3`/`gap-4`/`gap-5` are `1rem`/`1.5rem`/`3rem` against Tailwind's `0.75rem`/`1rem`/`1.25rem`,
 while `gap-0`–`gap-2` coincide. TEDI wins every collision regardless of import order, so the
@@ -325,8 +369,8 @@ of a prop as a signal that the design is off-system rather than a reason to over
 ### Keeping a kit healthy
 
 - **Import `@tedi-design-system/react/index.css`** and wrap the app in the provider chain
-  (`ThemeProvider` → `LabelProvider` → `StyleProvider`). Without these, components render unstyled
-  or unthemed — which pushes an agent toward rebuilding them in Tailwind.
+  (`ThemeProvider` → `PrintingProvider` → `LabelProvider`). Without these, components render
+  unstyled, show label keys or throw, which pushes an agent toward rebuilding them in Tailwind.
 - **Keep the kit's version pin current.** A caret range cannot cross a major boundary, so a kit
   pinned to an older major silently loses every component added since — and Make will invent
   Tailwind substitutes for them rather than fail. Bump the pin as part of the release checklist.
