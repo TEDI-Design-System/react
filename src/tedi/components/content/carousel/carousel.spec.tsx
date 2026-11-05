@@ -432,12 +432,13 @@ describe('Carousel', () => {
       type: string,
       clientX: number,
       timeStamp: number,
-      pointerType = 'touch'
+      pointerType = 'touch',
+      pointerId = 1
     ): void => {
       const event = new Event(type, { bubbles: true });
       Object.defineProperties(event, {
         clientX: { value: clientX },
-        pointerId: { value: 1 },
+        pointerId: { value: pointerId },
         pointerType: { value: pointerType },
         timeStamp: { value: timeStamp },
       });
@@ -780,6 +781,21 @@ describe('Carousel', () => {
           expect(trackPosition(container, 2.5)).toBeCloseTo(expected);
         });
 
+        it('reaches and leaves a final step shorter than 0.001 of a slide with a slow drag', () => {
+          const { container } = render(boundedCarousel(5, 2.9995));
+          const dots = screen.getAllByRole('button', { name: 'carousel.show-slide' });
+          fireEvent.click(dots[2]);
+
+          slowDrag(region(), -100);
+          expect(trackPosition(container, 2.9995)).toBeCloseTo(2.0005, 5);
+          expect(dots[3]).toHaveAttribute('aria-current', 'true');
+
+          // 100px is just under 0.3 of a slide, so it stops at 2 rather than going on to 1.
+          slowDrag(region(), 100);
+          expect(trackPosition(container, 2.9995)).toBeCloseTo(2, 5);
+          expect(dots[2]).toHaveAttribute('aria-current', 'true');
+        });
+
         it('stays at the end on a quick swipe towards it', () => {
           const { container } = render(boundedCarousel(5, 2.5));
           fireEvent.keyDown(region(), { key: 'End' });
@@ -861,6 +877,24 @@ describe('Carousel', () => {
             expect(activeDotIndex()).toBe(0);
           }
         );
+
+        it('follows only the pointer that started the drag', () => {
+          renderCarousel(5);
+          const x = 500 - 0.35 * SLIDE;
+          firePointer(region(), 'pointerdown', 500, 10000);
+          firePointer(region(), 'pointermove', x, 11000);
+
+          // A second finger drags the other way, then lifts or is cancelled.
+          firePointer(region(), 'pointerdown', 900, 11100, 'touch', 2);
+          firePointer(region(), 'pointermove', 1300, 11200, 'touch', 2);
+          firePointer(region(), 'pointercancel', 1300, 11300, 'touch', 2);
+          firePointer(region(), 'lostpointercapture', 1300, 11300, 'touch', 2);
+          firePointer(region(), 'pointerup', 1300, 11400, 'touch', 2);
+          expect(activeDotIndex()).toBe(0);
+
+          firePointer(region(), 'pointerup', x, 13000);
+          expect(activeDotIndex()).toBe(1);
+        });
 
         it('keeps a released swipe when lostpointercapture follows pointerup', () => {
           renderCarousel(5);
