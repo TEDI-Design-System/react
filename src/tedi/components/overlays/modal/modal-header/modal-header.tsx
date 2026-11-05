@@ -66,7 +66,7 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
   const { onOpenChange, titleId, descriptionTextId, setHasTitle, setHasDescription } = useModalContext();
   const hasTitle = hasContent(title);
   const hasDescription = hasContent(description);
-  const hasChildren = hasContent(children);
+  const hasChildren = Boolean(children);
 
   useLayoutEffect(() => {
     setHasTitle(hasTitle || hasChildren);
