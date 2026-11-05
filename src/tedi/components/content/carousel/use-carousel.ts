@@ -40,8 +40,8 @@ const DEFAULT_CONFIG: CarouselConfig = {
 const WHEEL_DIRECTIONAL_SNAP_THRESHOLD = 0.3;
 // Treat negligible fractional end positions as whole-slide positions.
 const MAX_INDEX_ROUNDING_TOLERANCE = 1e-6;
-// Ignore tiny calculation differences when walking a released drag across positions.
-const EPSILON = 0.001;
+// Ignore floating-point noise when walking a released drag; far below the shortest final step.
+const EPSILON = 1e-9;
 // Drag speed, in slides per ms, that counts as a flick.
 const FLICK_VELOCITY = 0.0015;
 // A flick's speed is measured over this many ms before release.
@@ -89,8 +89,8 @@ export interface CarouselApi {
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => void;
-  onPointerUp: (event?: React.PointerEvent<HTMLDivElement>) => void;
-  onPointerCancel: () => void;
+  onPointerUp: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerCancel: (event: React.PointerEvent<HTMLDivElement>) => void;
 }
 
 /**
@@ -125,6 +125,8 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
   const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const scrollDeltaRef = useRef(0);
   const mountedRef = useRef(true);
+  // The pointer that started the drag; other pointers are ignored until it ends.
+  const pointerIdRef = useRef<number | null>(null);
   // Recent pointer positions, for measuring flick speed at release.
   const samplesRef = useRef<{ x: number; t: number }[]>([]);
   // The current drag's minimum swipe distance (px), set by its pointer type.
@@ -561,9 +563,10 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>): void => {
-      if (!slidesCount) return;
+      if (!slidesCount || draggingRef.current) return;
       viewportRef.current?.setPointerCapture(event.pointerId);
       draggingRef.current = true;
+      pointerIdRef.current = event.pointerId;
       setAnimate(false);
       startXRef.current = event.clientX;
       startIndexRef.current = trackIndexRef.current;
@@ -578,25 +581,24 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const onPointerMove = useCallback(
     (event: React.PointerEvent<HTMLDivElement>): void => {
-      if (!draggingRef.current || !Number.isFinite(event.clientX)) return;
+      if (!draggingRef.current || event.pointerId !== pointerIdRef.current || !Number.isFinite(event.clientX)) return;
       setTrackIndex(trackPointer(event.clientX, event.timeStamp));
     },
     [trackPointer]
   );
 
   const onPointerUp = useCallback(
-    (event?: React.PointerEvent<HTMLDivElement>): void => {
-      if (!draggingRef.current) return;
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      if (!draggingRef.current || event.pointerId !== pointerIdRef.current) return;
       draggingRef.current = false;
 
       // The pointer can move after the last pointermove; the release reports where it ended.
-      const released =
-        event && Number.isFinite(event.clientX)
-          ? trackPointer(event.clientX, event.timeStamp)
-          : dragIndex(lastXRef.current);
+      const released = Number.isFinite(event.clientX)
+        ? trackPointer(event.clientX, event.timeStamp)
+        : dragIndex(lastXRef.current);
 
       setAnimate(true);
-      setTrackIndex(swipeTarget(released, event?.timeStamp ?? lastTimeRef.current));
+      setTrackIndex(swipeTarget(released, event.timeStamp));
     },
     [trackPointer, dragIndex, swipeTarget]
   );
@@ -606,12 +608,15 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
    * a swipe, so return to where it started. After a normal release this is a no-op, as
    * `lostpointercapture` follows `pointerup`.
    */
-  const onPointerCancel = useCallback((): void => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    setAnimate(true);
-    setTrackIndex(snap(startIndexRef.current));
-  }, [snap]);
+  const onPointerCancel = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      if (!draggingRef.current || event.pointerId !== pointerIdRef.current) return;
+      draggingRef.current = false;
+      setAnimate(true);
+      setTrackIndex(snap(startIndexRef.current));
+    },
+    [snap]
+  );
 
   useEffect(() => {
     const viewport = viewportRef.current;

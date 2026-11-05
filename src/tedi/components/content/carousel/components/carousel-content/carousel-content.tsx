@@ -51,7 +51,7 @@ export interface CarouselContentProps {
   centered?: boolean;
   /**
    * How far a drag must go to move on, as a fraction (0–1) of the distance to the next
-   * position; a quick flick always moves one position.
+   * position; a quick flick that falls short of it still moves one position.
    * @default 0.3
    */
   swipeThreshold?: number;
