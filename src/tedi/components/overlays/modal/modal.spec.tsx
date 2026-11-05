@@ -260,4 +260,28 @@ describe('Modal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'External open' }));
     expect(screen.getByText('Controlled body')).toBeInTheDocument();
   });
+
+  it('keeps the trigger child ref attached across re-renders', () => {
+    const calls: (HTMLElement | null)[] = [];
+    const childRef = (node: HTMLElement | null) => {
+      calls.push(node);
+    };
+    const Host = ({ count }: { count: number }) => (
+      <Modal>
+        <Modal.Trigger>
+          <button type="button" ref={childRef}>
+            Open {count}
+          </button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Body>Body</Modal.Body>
+        </Modal.Content>
+      </Modal>
+    );
+    const { rerender } = render(<Host count={0} />);
+    for (let count = 1; count <= 5; count++) rerender(<Host count={count} />);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toBeInstanceOf(HTMLButtonElement);
+  });
 });
