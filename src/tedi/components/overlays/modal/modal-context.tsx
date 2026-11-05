@@ -11,6 +11,8 @@ export interface ModalContextValue {
   context: FloatingContext<ReferenceType>;
   labelId: string;
   descriptionId: string;
+  titleId: string;
+  descriptionTextId: string;
   setHasTitle: (hasTitle: boolean) => void;
   setHasDescription: (hasDescription: boolean) => void;
 }
