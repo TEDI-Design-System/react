@@ -4,7 +4,7 @@ import React, { forwardRef, useEffect, useRef } from 'react';
 import styles from '../../carousel.module.scss';
 import { useCarouselContext } from '../../carousel-context';
 import { BreakpointInput, normalizeBreakpointInput } from '../../carousel-utils';
-import type { CarouselFade } from '../../use-carousel';
+import { CarouselFade, DEFAULT_SWIPE_THRESHOLD } from '../../use-carousel';
 
 export interface CarouselContentProps {
   /**
@@ -50,6 +50,12 @@ export interface CarouselContentProps {
    */
   centered?: boolean;
   /**
+   * How far a drag must go to move on, as a fraction (0–1) of the distance to the next
+   * position; a quick flick always moves one position.
+   * @default 0.3
+   */
+  swipeThreshold?: number;
+  /**
    * Additional class name applied to the viewport.
    */
   className?: string;
@@ -65,6 +71,7 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
       transitionMs = 400,
       loop = true,
       centered = false,
+      swipeThreshold = DEFAULT_SWIPE_THRESHOLD,
       className,
     },
     ref
@@ -73,7 +80,12 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
     const slides = React.Children.toArray(children);
     const slideNodes = useRef<(HTMLDivElement | null)[]>([]);
 
-    const configKey = JSON.stringify({ slidesPerView, gap, fade, transitionMs, loop, centered });
+    const threshold = Number.isFinite(swipeThreshold)
+      ? Math.min(Math.max(swipeThreshold, 0), 1)
+      : DEFAULT_SWIPE_THRESHOLD;
+
+    const configKey = JSON.stringify({ slidesPerView, gap, fade, transitionMs, loop, centered, threshold });
+
     useEffect(() => {
       carousel.setConfig({
         slidesPerView: normalizeBreakpointInput(slidesPerView),
@@ -82,6 +94,7 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
         transitionMs,
         loop,
         centered,
+        swipeThreshold: threshold,
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [configKey]);
@@ -127,8 +140,8 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
         onPointerDown={carousel.onPointerDown}
         onPointerMove={carousel.onPointerMove}
         onPointerUp={carousel.onPointerUp}
-        onPointerCancel={carousel.onPointerUp}
-        onLostPointerCapture={carousel.onPointerUp}
+        onPointerCancel={carousel.onPointerCancel}
+        onLostPointerCapture={carousel.onPointerCancel}
       >
         <div
           ref={carousel.trackRef}

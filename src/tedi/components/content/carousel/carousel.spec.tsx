@@ -427,11 +427,18 @@ describe('Carousel', () => {
       return -translateX / cellWidth;
     };
 
-    const firePointer = (element: HTMLElement, type: string, clientX: number, timeStamp: number): void => {
+    const firePointer = (
+      element: HTMLElement,
+      type: string,
+      clientX: number,
+      timeStamp: number,
+      pointerType = 'touch'
+    ): void => {
       const event = new Event(type, { bubbles: true });
       Object.defineProperties(event, {
         clientX: { value: clientX },
         pointerId: { value: 1 },
+        pointerType: { value: pointerType },
         timeStamp: { value: timeStamp },
       });
       fireEvent(element, event);
@@ -640,6 +647,263 @@ describe('Carousel', () => {
       } finally {
         jest.useRealTimers();
       }
+    });
+
+    describe('swipe release', () => {
+      // With one slide per view and the default 1rem gap, a slide is 1000px plus 16px.
+      const SLIDE = 1016;
+
+      /**
+       * Presses at the first `[clientX, timeStamp]` point, moves through the rest, then ends
+       * with `end` at `endAt` ms; a `pointerup` reports `endX`, which defaults to the last point.
+       */
+      const gesture = (
+        region: HTMLElement,
+        points: [number, number][],
+        {
+          end = 'pointerup',
+          endAt,
+          endX,
+          pointerType = 'touch',
+        }: {
+          end?: 'pointerup' | 'pointercancel' | 'lostpointercapture';
+          endAt?: number;
+          endX?: number;
+          pointerType?: string;
+        } = {}
+      ): void => {
+        // React reads a timeStamp of 0 as missing and substitutes Date.now(), so start later.
+        const at = (t: number): number => 10000 + t;
+        const [[x0, t0], ...moves] = points;
+        const [lastX, lastT] = points[points.length - 1];
+        firePointer(region, 'pointerdown', x0, at(t0), pointerType);
+        moves.forEach(([x, t]) => firePointer(region, 'pointermove', x, at(t), pointerType));
+        firePointer(region, end, endX ?? lastX, at(endAt ?? lastT + 1), pointerType);
+      };
+
+      /** A slow drag by `dx` px, released long after any quick movement. */
+      const slowDrag = (region: HTMLElement, dx: number): void =>
+        gesture(region, [
+          [500, 0],
+          [500 + dx, 2000],
+        ]);
+
+      const region = (): HTMLElement => screen.getByRole('region', { name: 'carousel' });
+
+      it.each([
+        ['forwards past', -0.35, 1],
+        ['forwards short of', -0.25, 0],
+        ['backwards past', 0.35, 4],
+        ['backwards short of', 0.25, 0],
+      ])('moves on a slow drag %s 0.3 of a slide by default', (_, slides, expected) => {
+        renderCarousel(5);
+        slowDrag(region(), slides * SLIDE);
+
+        expect(activeDotIndex()).toBe(expected);
+      });
+
+      it.each([
+        [0.5, -0.45, 0],
+        [0.5, -0.55, 1],
+        [0.1, -0.15, 1],
+        [0.1, -0.05, 0],
+      ])('uses a custom threshold of %s (drag of %s slides → %s)', (swipeThreshold, slides, expected) => {
+        renderCarousel(5, { swipeThreshold });
+        slowDrag(region(), slides * SLIDE);
+
+        expect(activeDotIndex()).toBe(expected);
+      });
+
+      it.each([
+        [2, -0.95, 0],
+        [2, -1, 1],
+        [-1, -0.02, 1],
+        [Number.NaN, -0.25, 0],
+        [Number.NaN, -0.35, 1],
+      ])('keeps the threshold between 0 and 1 and falls back to 0.3 (%s)', (swipeThreshold, slides, expected) => {
+        renderCarousel(5, { swipeThreshold });
+        slowDrag(region(), slides * SLIDE);
+
+        expect(activeDotIndex()).toBe(expected);
+      });
+
+      it('counts each whole slide dragged, plus the remainder past the threshold', () => {
+        renderCarousel(5);
+        slowDrag(region(), -1.2 * SLIDE);
+        expect(activeDotIndex()).toBe(1);
+
+        slowDrag(region(), -1.4 * SLIDE);
+        expect(activeDotIndex()).toBe(3);
+      });
+
+      it('does not add a step for an exact whole-slide drag at threshold 0', () => {
+        renderCarousel(5, { swipeThreshold: 0 });
+        slowDrag(region(), -SLIDE);
+
+        expect(activeDotIndex()).toBe(1);
+      });
+
+      it('counts movement that only the release event reports', () => {
+        renderCarousel(5);
+        gesture(
+          region(),
+          [
+            [500, 0],
+            [400, 1000],
+          ],
+          { endAt: 2000, endX: 500 - 0.35 * SLIDE }
+        );
+
+        expect(activeDotIndex()).toBe(1);
+      });
+
+      describe('on a bounded track with a short final step', () => {
+        // With 2.5 slides per view, a slide is (1000 - 1.5 * 16) / 2.5 + 16 = 406.4px, and the
+        // final step from 2 to the end at 2.5 is half a slide, so 0.3 of it is 0.15 of a slide.
+        const BOUNDED_SLIDE = 406.4;
+
+        it.each([
+          [2, -0.1, 2],
+          [2, -0.2, 2.5],
+          [2.5, 0.1, 2.5],
+          [2.5, 0.2, 2],
+          [0, -0.2, 0],
+          [0, -0.6, 1],
+          [2, -1.5, 2.5],
+        ])('settles a slow drag from %s by %s slides on %s', (from, slides, expected) => {
+          const { container } = render(boundedCarousel(5, 2.5));
+          if (from === 2) fireEvent.click(screen.getAllByRole('button', { name: 'carousel.show-slide' })[2]);
+          if (from === 2.5) fireEvent.keyDown(region(), { key: 'End' });
+
+          slowDrag(region(), slides * BOUNDED_SLIDE);
+
+          expect(trackPosition(container, 2.5)).toBeCloseTo(expected);
+        });
+
+        it('stays at the end on a quick swipe towards it', () => {
+          const { container } = render(boundedCarousel(5, 2.5));
+          fireEvent.keyDown(region(), { key: 'End' });
+
+          gesture(region(), [
+            [500, 0],
+            [460, 20],
+          ]);
+
+          expect(trackPosition(container, 2.5)).toBeCloseTo(2.5);
+        });
+      });
+
+      describe('flicks', () => {
+        // 80px in 40ms is ~2 slides per second.
+        const quickSwipe: [number, number][] = [
+          [500, 0],
+          [460, 20],
+          [420, 40],
+        ];
+
+        it('moves one slide on a quick swipe, however short', () => {
+          renderCarousel(5);
+          gesture(region(), quickSwipe);
+
+          expect(activeDotIndex()).toBe(1);
+        });
+
+        it('does not count a quick move followed by a hold', () => {
+          renderCarousel(5);
+          gesture(region(), quickSwipe, { endAt: 1000 });
+
+          expect(activeDotIndex()).toBe(0);
+        });
+
+        it('detects a quick swipe after holding the pointer down', () => {
+          renderCarousel(5);
+          gesture(region(), [
+            [500, 0],
+            [500, 600],
+            [460, 620],
+            [420, 640],
+          ]);
+
+          expect(activeDotIndex()).toBe(1);
+        });
+
+        it('ignores a quick jitter at the end of a slow drag', () => {
+          renderCarousel(5);
+          gesture(region(), [
+            [500, 0],
+            [400, 1000],
+            [300, 2000],
+            [297, 2005],
+          ]);
+
+          expect(activeDotIndex()).toBe(0);
+        });
+
+        it('does not flick when the quick movement reverses the drag', () => {
+          renderCarousel(5);
+          gesture(region(), [
+            [500, 0],
+            [300, 1500],
+            [340, 1530],
+            [380, 1560],
+          ]);
+
+          expect(activeDotIndex()).toBe(0);
+        });
+
+        it.each(['pointercancel', 'lostpointercapture'] as const)(
+          'returns to the start when the drag ends with %s',
+          (end) => {
+            // The browser took over, e.g. to scroll the page; not a swipe.
+            renderCarousel(5);
+            gesture(region(), quickSwipe, { end });
+
+            expect(activeDotIndex()).toBe(0);
+          }
+        );
+
+        it('keeps a released swipe when lostpointercapture follows pointerup', () => {
+          renderCarousel(5);
+          gesture(region(), quickSwipe);
+          firePointer(region(), 'lostpointercapture', 420, 10042);
+
+          expect(activeDotIndex()).toBe(1);
+        });
+
+        // 6px in 3ms is ~2 slides per second.
+        const shortFlick: [number, number][] = [
+          [500, 0],
+          [494, 2],
+        ];
+
+        it('moves on a short quick flick with a mouse', () => {
+          renderCarousel(5);
+          gesture(region(), shortFlick, { pointerType: 'mouse' });
+
+          expect(activeDotIndex()).toBe(1);
+        });
+
+        it.each(['touch', 'pen'])('ignores a short quick flick with %s, which can slip on press', (pointerType) => {
+          renderCarousel(5);
+          gesture(region(), shortFlick, { pointerType });
+
+          expect(activeDotIndex()).toBe(0);
+        });
+
+        it('ignores mouse jitter under 4px, even when quick', () => {
+          renderCarousel(5);
+          gesture(
+            region(),
+            [
+              [500, 0],
+              [497, 1],
+            ],
+            { pointerType: 'mouse' }
+          );
+
+          expect(activeDotIndex()).toBe(0);
+        });
+      });
     });
   });
 });
