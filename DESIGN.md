@@ -166,8 +166,8 @@ paths) is `component.manifest.json`; all of them import from
   `Toast` component.
 
 The full version of these rules, with the page-shell template and a worked example, is the
-overview the Claude Design System artifact ships (built from `.design-sync/conventions.md` in this
-repository).
+overview the Claude Design System artifact ships (its `conventions.md`, on the `source` branch
+of [TEDI-Design-System/claude-design-system](https://github.com/TEDI-Design-System/claude-design-system/tree/source)).
 <!-- /prose:components -->
 
 ## Do's and Don'ts
@@ -264,7 +264,7 @@ is the organisation default; Claude Code reads it too. If not, publish one from
 ### Publishing it
 
 [TEDI-Design-System/claude-design-system](https://github.com/TEDI-Design-System/claude-design-system)
-holds the artifact's files, built from this repository on every release: `main` has each
+holds the artifact's files, built from each release of this library: `main` has each
 stable release (tagged `react-<version>`), `rc` only the latest release candidate. No build
 is needed:
 
@@ -276,12 +276,14 @@ claude
 
 Then ask Claude Code to "publish this TEDI design system to Claude", or, for a later release,
 to "update our TEDI design system: <artifact link>". It follows the repository's `AGENTS.md`;
-you approve the publishes. Pick the release line your applications are on. Until the first
-stable release after the move, only `rc` exists: clone with `--branch rc`.
+you approve the publishes. Pick the release line your applications are on, and always name it:
+a clone without `--branch` gets the default branch, `source`, which holds the build, not the
+design system. Until the first stable release after the move, only `rc` exists: clone with
+`--branch rc`.
 
 The artifact is **read-only on its page** (`"editing": "code"`): every update replaces its
-files, so changes belong in this repository (the components and stories,
-`.design-sync/conventions.md`, the per-component docs in `.design-sync/docs/`) and reach the
+files, so changes belong in the source: the components and stories in this repository, the
+overview and per-component docs on claude-design-system's `source` branch. They reach the
 artifact with the next release.
 
 ### Organisation themes
@@ -315,12 +317,13 @@ map to code your engineers can ship.
 
 ### How the files are made
 
-`npm run design:artifact` (`.design-sync/artifact/build.mjs`) writes them from `dist/`, the
-stories and core in seconds; `.design-sync/artifact/check.mjs` renders every card the way the
-artifact page does and compares cards with Storybook. The release workflow
-(`.github/workflows/design-artifact.yml`) runs the build and the render check and pushes the
-result to the distribution repository. `.design-sync/NOTES.md` covers the details, including
-grading changed components against Storybook before a release.
+The build lives on claude-design-system's `source` branch, not here. When this repository's
+release workflow tags a release, it sends claude-design-system a `react-release` dispatch with
+the tag; claude-design-system checks this repository out at that tag, builds it, writes the
+artifact's files from `dist/`, the stories and core, renders every card and pushes the result
+to `rc` or (after a reviewer has compared the cards with Storybook) `main`. Its `NOTES.md`
+covers the details. The build reads the story files, `.storybook/preview.tsx`, `public/` and
+`dist/` as they are, so a change to their shape here can break the next release there.
 
 ## Using TEDI in Figma Make
 
