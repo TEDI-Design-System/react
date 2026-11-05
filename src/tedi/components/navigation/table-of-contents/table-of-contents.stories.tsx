@@ -86,7 +86,7 @@ export const Default: Story = {
     headingLevel: 'h3',
     sticky: false,
     numbered: false,
-    bordered: false,
+    divided: false,
     defaultOpen: true,
   },
   render: (args) => <TableOfContents {...args}>{sectionItems()}</TableOfContents>,
@@ -122,14 +122,14 @@ export const ItemStates: Story = {
     const columns: {
       header: string;
       numbered?: boolean;
-      bordered?: boolean;
+      divided?: boolean;
       options?: { icon?: boolean; separator?: boolean };
     }[] = [
       { header: 'Default' },
       { header: 'With number', numbered: true },
       { header: 'With icon', options: { icon: true } },
       { header: 'With separator', options: { separator: true } },
-      { header: 'With border', bordered: true },
+      { header: 'Divided', divided: true },
     ];
 
     return (
@@ -143,10 +143,10 @@ export const ItemStates: Story = {
                 ariaLabel={`${column.header} item states`}
                 sticky={false}
                 numbered={column.numbered}
-                bordered={column.bordered}
+                divided={column.divided}
                 activeId="selected"
               >
-                {stateItems(column.options, column.bordered)}
+                {stateItems(column.options, column.divided)}
               </TableOfContents>
             </VerticalSpacing>
           </div>
@@ -289,12 +289,12 @@ export const WithSeparator: Story = {
 };
 
 /**
- * `bordered` draws a divider between items and a border under the last one, so the
- * list reads as separated rows.
+ * `divided` draws a divider between items, sub-items included, so the list reads as
+ * separated rows.
  */
-export const Bordered: Story = {
+export const Divided: Story = {
   render: () => (
-    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" bordered>
+    <TableOfContents heading="Sisukord" sticky={false} activeId="section-3" divided>
       {sectionItems('description')}
     </TableOfContents>
   ),

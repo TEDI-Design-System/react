@@ -187,18 +187,18 @@ describe('TableOfContents', () => {
     expect(container.querySelector('[class*="tedi-table-of-contents--transparent"]')).toBeInTheDocument();
   });
 
-  it('applies the bordered modifier only when bordered', () => {
+  it('applies the divided modifier only when divided', () => {
     const { container, rerender } = render(<Tree />);
-    expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[class*="tedi-table-of-contents--divided"]')).not.toBeInTheDocument();
 
     rerender(
-      <TableOfContents bordered>
+      <TableOfContents divided>
         <TableOfContents.Item id="x">
           <a href="#x">X</a>
         </TableOfContents.Item>
       </TableOfContents>
     );
-    expect(container.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
+    expect(container.querySelector('[class*="tedi-table-of-contents--divided"]')).toBeInTheDocument();
   });
 
   it('renders a separator below the item that sets `separator`, not the next one', () => {
