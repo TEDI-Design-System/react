@@ -200,6 +200,32 @@ describe('Select component', () => {
     expect(handleChange).toHaveBeenCalledWith(null);
   });
 
+  it('exposes the clear button to assistive technology with a clear label', () => {
+    render(<Select {...defaultProps} value={basicOptions[0]} isClearIndicatorVisible />);
+
+    expect(screen.getByRole('button', { name: 'clear' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['Enter', '{Enter}'],
+    ['Space', ' '],
+  ])('clears the selection when %s is pressed on the focused clear button', async (_key, keys) => {
+    const handleChange = jest.fn();
+    render(<Select {...defaultProps} onChange={handleChange} value={basicOptions[0]} isClearIndicatorVisible />);
+
+    const clearButton = screen.getByRole('button', { name: 'clear' });
+    act(() => clearButton.focus());
+
+    await act(async () => {
+      await userEvent.keyboard(keys);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith(null);
+    await waitFor(() => expect(screen.getByRole('combobox')).toHaveFocus());
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
   it('renders helper text', () => {
     render(<Select {...defaultProps} helper={{ text: 'Please select a fruit' }} />);
     expect(screen.getByText('Please select a fruit')).toBeInTheDocument();
