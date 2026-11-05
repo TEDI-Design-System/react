@@ -2,6 +2,7 @@
 
 .tedi-feedback-text {
   font-size: var(--body-small-regular-size);
+  line-height: var(--body-small-regular-line-height);
   color: var(--general-text-tertiary);
 
   @include mixins.print-grayscale;
