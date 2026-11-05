@@ -93,6 +93,20 @@ describe('Modal', () => {
     expect(screen.getByRole('dialog')).toHaveAttribute('aria-labelledby', heading.id);
   });
 
+  it('keeps the aria-label fallback when Modal.Header children are a bare 0', () => {
+    render(
+      <Modal defaultOpen>
+        <Modal.Content aria-label="Fallback name">
+          <Modal.Header>{0}</Modal.Header>
+        </Modal.Content>
+      </Modal>
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Fallback name' });
+    expect(dialog).not.toHaveAttribute('aria-labelledby');
+    expect(dialog).not.toHaveAttribute('aria-describedby');
+  });
+
   it('closes when the header close button is clicked', () => {
     const onToggle = jest.fn();
     render(
