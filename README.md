@@ -5,7 +5,7 @@ It provides reusable, accessible, and consistent UI components to streamline bui
 
 Usage instructions and detailed documentation for using the components in your application are available in [Storybook](https://storybook.tedi.ee/react/rc/?path=/docs/documentation-get-started--get-started).
 
-[![codecov](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)](https://codecov.io/gh/TEHIK-EE/tedi-design-system/graph/badge.svg?token=NKNNJSG19D)
+[![codecov](https://codecov.io/gh/TEDI-Design-System/react/graph/badge.svg)](https://codecov.io/gh/TEDI-Design-System/react)
 [![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
 ---
@@ -110,7 +110,7 @@ Guides development inside this repo: creating new components, running tests/lint
 
 ### For AI-driven design & UI generation — `DESIGN.md`
 
-[`DESIGN.md`](./DESIGN.md) is the machine-readable representation of the design system — semantic tokens plus tedi-ready component rules — that AI agents read to ground generated UI in real TEDI tokens and components. It also covers where to look things up, and how to use TEDI as a design system in [claude.ai/design](https://claude.ai/design) (each organisation runs its own; design-system projects cannot be shared across organisations).
+[`DESIGN.md`](./DESIGN.md) is the machine-readable representation of the design system — semantic tokens plus tedi-ready component rules — that AI agents read to ground generated UI in real TEDI tokens and components. It also covers where to look things up, and how to use TEDI as a design system in Claude, where it lives as a Design System artifact (each organisation keeps its own copy, built from this library's releases in [claude-design-system](https://github.com/TEDI-Design-System/claude-design-system)).
 
 Its token table is read straight from `@tedi-design-system/core/tokens.json` (core generates it from Figma and publishes it with the stylesheet it describes) and [`component.manifest.json`](./component.manifest.json) is derived from the `src/tedi` barrel; both are produced by `npm run design:build` (see [`design-docs/`](./design-docs)). The surrounding prose is hand-maintained, with the `update-design-docs` skill keeping it current. [`design-system-spec.json`](./design-system-spec.json) is a descriptor pointing at those files, intended for repository-URL import.
 
@@ -118,7 +118,7 @@ Its token table is read straight from `@tedi-design-system/core/tokens.json` (co
 
 ## Visual Testing
 
-<a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
+[![Chromatic](https://img.shields.io/badge/Chromatic-fc521f?logo=chromatic&logoColor=white)](https://www.chromatic.com/)
 
 We use [Chromatic](https://www.chromatic.com/) for visual testing, reviewing UI changes, and preventing visual regressions.
 

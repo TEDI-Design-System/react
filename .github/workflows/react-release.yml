@@ -165,6 +165,20 @@ jobs:
           npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # TEDI-Design-System/claude-design-system builds its Claude Design System artifact from
+      # each release; this tells it which tag to build. semantic-release leaves HEAD on the
+      # tagged release commit, or untagged when nothing was released.
+      - name: Notify claude-design-system
+        env:
+          GH_TOKEN: ${{ secrets.DESIGN_SYSTEM_REPO_TOKEN }}
+        run: |
+          tag=$(git tag --points-at HEAD --list 'react-*' | head -n 1)
+          if [ -z "$tag" ]; then
+            echo "No release tag on HEAD; nothing to send."
+            exit 0
+          fi
+          gh api repos/TEDI-Design-System/claude-design-system/dispatches \
+            -f event_type=react-release -f "client_payload[tag]=$tag"
 
   merge-to-rc:
     needs: build-and-deploy
