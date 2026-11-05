@@ -49,6 +49,50 @@ describe('Modal', () => {
     expect(document.getElementById(describedBy!)).toHaveTextContent('Description text');
   });
 
+  it('gives the title and description stable ids from the first render', () => {
+    // Records every change to an `id` attribute along with its previous value.
+    const observer = new MutationObserver(() => undefined);
+    observer.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['id'],
+      attributeOldValue: true,
+    });
+
+    render(
+      <Modal defaultOpen>
+        <Modal.Content>
+          <Modal.Header title="Title text" description="Description text" />
+        </Modal.Content>
+      </Modal>
+    );
+    const heading = screen.getByRole('heading', { name: 'Title text' });
+    const description = screen.getByText('Description text');
+    const idChanges = observer
+      .takeRecords()
+      .filter((record) => record.target === heading || record.target === description);
+    observer.disconnect();
+
+    // Both are inserted with their final ids - they never start out empty and get patched later.
+    expect(idChanges).toHaveLength(0);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveAttribute('aria-labelledby', heading.id);
+    expect(dialog).toHaveAttribute('aria-describedby', description.id);
+  });
+
+  it('renders a numeric 0 title as the heading and dialog name', () => {
+    render(
+      <Modal defaultOpen>
+        <Modal.Content>
+          <Modal.Header title={0} />
+        </Modal.Content>
+      </Modal>
+    );
+
+    const heading = screen.getByRole('heading', { name: '0' });
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-labelledby', heading.id);
+  });
+
   it('closes when the header close button is clicked', () => {
     const onToggle = jest.fn();
     render(
