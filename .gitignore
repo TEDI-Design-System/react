@@ -61,7 +61,7 @@ migrations.json
 a11y-report/
 junit.xml
 
-# design-sync (claude.ai/design import)
+# design-sync: reference Storybook for check.mjs, plus local leftovers of the retired converter
 .design-sync/sb-reference/
 .design-sync/learnings/
 .design-sync/.cache/

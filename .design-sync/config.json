@@ -1,16 +1,5 @@
 {
-  "pkg": "@tedi-design-system/react",
-  "projectId": "d10e8d07-6086-4ddd-970c-090a49feaa2f",
-  "globalName": "Tedi",
-  "shape": "storybook",
-  "storybookConfigDir": ".storybook",
-  "storybookStatic": ".design-sync/sb-reference",
-  "buildCmd": "npm run build",
-  "entry": "./dist/tedi.es.js",
-  "cssEntry": "./index.css",
-  "tokensPkg": "@tedi-design-system/core",
   "readmeHeader": ".design-sync/conventions.md",
-  "docsDir": "../.design-sync/docs",
   "titleMap": {
     "FormLabel": null,
     "Toast": null
@@ -29,11 +18,6 @@
         }
       }
     }
-  },
-  "storyImports": {
-    "shim": [
-      "src/tedi/providers/"
-    ]
   },
   "overrides": {
     "Accordion": {
@@ -59,8 +43,18 @@
     "CardButton": {
       "cardMode": "column"
     },
+    "CardStepper": {
+      "cardMode": "column"
+    },
+    "Checkbox": {
+      "cardMode": "column"
+    },
     "DateField": {
       "cardMode": "column"
+    },
+    "Dropdown": {
+      "cardMode": "single",
+      "primaryStory": "OpenItemsForVisualTest"
     },
     "Ellipsis": {
       "cardMode": "column"
@@ -72,9 +66,6 @@
       "cardMode": "column"
     },
     "FloatingButton": {
-      "cardMode": "column"
-    },
-    "Link": {
       "cardMode": "column"
     },
     "Footer": {
@@ -97,6 +88,13 @@
     "InfoButton": {
       "cardMode": "column"
     },
+    "Link": {
+      "cardMode": "column"
+    },
+    "Modal": {
+      "cardMode": "single",
+      "primaryStory": "OpenForVisualTest"
+    },
     "OptionContent": {
       "cardMode": "single",
       "primaryStory": "Default"
@@ -104,12 +102,23 @@
     "Pagination": {
       "cardMode": "column"
     },
+    "Popover": {
+      "cardMode": "single",
+      "primaryStory": "OpenForVisualTest"
+    },
     "ProgressBar": {
+      "cardMode": "column"
+    },
+    "Radio": {
       "cardMode": "column"
     },
     "ScrollVisibility": {
       "cardMode": "single",
       "primaryStory": "Default"
+    },
+    "Sheet": {
+      "cardMode": "single",
+      "primaryStory": "OpenForVisualTest"
     },
     "SideNav": {
       "cardMode": "column"
@@ -141,12 +150,15 @@
     },
     "TopNav": {
       "cardMode": "column"
+    },
+    "VerticalStepper": {
+      "cardMode": "column"
     }
   },
-  "libOverrides": {
-    "dts.mjs": "package declares its .d.ts entry only under exports['./tedi'].types (no top-level types) — upstream resolved the nonexistent dist/index.d.ts and found 0 exports. ALSO (2026-08-10): doc cap 120→1200 (upstream truncated 35% of prop descriptions mid-sentence) and preludeFor() fills the prelude with referenced type shapes (118 names referenced, defined nowhere) — see NOTES.md",
-    "previews.mjs": "(1) code reachable from stories reads process.env (label-provider, next/link) — needs the same 'process.env' -> {} substitution Vite makes in the reference storybook; (2) inlines .storybook staticDirs assets as data URIs, which have no other way to reach a preview card",
-    "story-imports.mjs": "kebab-case filenames vs PascalCase exports (button.tsx -> Button) — upstream's case-sensitive filename match shimmed NOTHING, so previews compiled components from src where .module.scss loads empty and all 81 rendered unstyled",
-    "preview-gen-storybook.mjs": "stories declare globals.backgrounds.value and read globals.theme (storybook addon/globalTypes) — unhonoured, inverted cells render white-on-white and the theme readout is blank"
-  }
+  "conventionsIgnore": [
+    "Layout",
+    "Toast",
+    "App",
+    "Name"
+  ]
 }

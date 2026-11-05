@@ -1,69 +1,270 @@
-# design-sync notes — @tedi-design-system/react
+# design-sync notes: @tedi-design-system/react
 
-> **Syncing this repo from another organisation?** You get your own Claude Design project
-> (the targeting rule below handles that automatically — nothing to edit), but you inherit
-> this repo, and that is what this file describes. The mechanical pipeline is ~2 minutes;
-> the cost is the verification campaign over ~400 stories. **Read these four sections
-> before grading anything:**
+> **The design system lives in Claude as a Design System artifact, built by this repo's own
+> script.** `.design-sync/artifact/build.mjs` writes every file of the artifact from `dist/`,
+> the stories and `@tedi-design-system/core`; Claude Code publishes them with its Artifact
+> tool. Standalone claude.ai/design closes on 14 December 2026, and **`/design-sync` is not
+> used any more**: as of Claude Code 2.1.318 it still uploads only to standalone projects.
 >
-> 1. **Accepted permanent deltas** — the big one. Most differences you will see between the
->    storybook and preview panels are already-diagnosed storybook-harness artifacts, not
->    component faults. Grading them as `mismatch` and "fixing" them with an owned preview
->    permanently shadows the real component.
-> 2. **Scope** — `cfg.entry` is tedi-only AND the reference storybook needs
->    `STORYBOOK_EXCLUDE_COMMUNITY=true`; both are required.
-> 3. **Build** — always `npm run build`, never a bare `vite build` (a populated `dist/` is
->    not evidence the build succeeded).
-> 4. **Re-sync risks** — what is only partially verified, and what goes stale silently.
->
-> Everything under `.design-sync/` is committed on purpose: the four lib forks in
-> `overrides/` load automatically, and this file is where their rationale lives. Run
-> receipts are kept to the latest run only — git history has the rest.
+> Until 2026-11-04 the files came from the converter bundled with `/design-sync`. Its run
+> history and notes below are kept for what they learned (the four lib forks that lived in
+> `overrides/` were removed with it; git history has them). **Accepted permanent deltas**
+> still applies when grading: most differences between the Storybook and preview panels are
+> diagnosed harness artifacts, not component faults.
 
-## 🎯 Which project to target — resolve this BEFORE §1 target settlement
+## 🎯 Where this syncs to
 
-`cfg.projectId` pins `d10e8d07-6086-4ddd-970c-090a49feaa2f`, the **TEHIK-owned** project.
-That pin is correct for TEHIK and wrong for everyone else, and TEDI is consumed by many
-government teams across many organisations. Resolve it mechanically — **do not ask the
-user which project to use, and do not ask them to edit config:**
+**The maintained copy:** [TEDI Design System](https://claude.ai/artifact/VknUkEhrGXf7Fg1QkEiHbp),
+a Design System artifact (type `https://claude.ai/artifact/5M7UeXXcx16TP3vzVFNDzd`) shared
+inside the maintainers' organisation; publishing needs edit access to it. The standalone
+project it was moved from (`d10e8d07-…`) is read-only and no longer a target.
 
-1. `get_project(cfg.projectId)`.
-2. **It resolves and `canEdit` is true** → you are in TEHIK. Use it. This is the normal
-   re-sync path; `projectId` + `pkg` were both in place before the run, so §7 applies and
-   untouched components cost nothing.
-3. **Only two results may create a project: a definitive not-found, or a successful
-   response with `canEdit === false`** → you are in a different organisation. Design-system
-   projects are org-scoped (`invited` | `org`, neither crosses an org boundary), so there is
-   no access to grant and nothing to wait for. Silently:
-   - create a design-system project named `TEDI Design System`,
-   - use it for this run,
-   - record its id in `.design-sync/config.json` after the upload verifies (the §6
-     backstop step, just reached by a different route).
+**Any other organisation:** artifacts are org-scoped by default, so each organisation keeps its
+own copy. They don't run this build: they clone
+[claude-design-system](https://github.com/TEDI-Design-System/claude-design-system) and have
+Claude Code publish it (its `AGENTS.md`). The steps below are for maintainers, and for anyone
+publishing a local build; first-sync differences are marked **(first sync)**.
 
-   Treat the run as a **first sync** — no anchor exists, so everything is verified and
-   graded once. That is expected, not a failure.
-4. **Any other failure is NOT evidence of a different organisation — never create a project
-   for it.** Timeouts, 5xx, rate limits, auth errors and unrecognised failures all leave the
-   question unanswered, and the pinned project may be perfectly healthy: creating one here
-   would orphan the real project and re-verify 83 components for nothing. Retry the call;
-   if it keeps failing, **stop and tell the user** — keep `cfg.projectId` exactly as it is
-   and change nothing else.
+## Releases: the claude-design-system repository
 
-**Why the pin is committed rather than removed.** `projectId` + `pkg` present *before* a
-run is the re-sync discriminator, so removing it would push TEHIK maintainers onto the
-full flow on every fresh clone. Keeping it plus this rule costs a downstream org exactly
-one API call and **zero human knowledge**, which is the point: nobody outside TEHIK
-should need to read a setup guide.
+`.github/workflows/design-artifact.yml` runs after every successful `Release TEDI React
+library` run (and on demand, `workflow_dispatch`). When the tip of `rc` or `main` carries a
+`react-*` tag, it runs `npm run build`, `npm run design:artifact -- --release` into a checkout
+of claude-design-system and `check.mjs` (render check), then pushes:
 
-**Downstream teams:** the recorded id is local. If you track upstream, `git pull` will
-conflict on `config.json` — keep your own id; the skill re-records it after every sync
-anyway, so taking upstream's version self-heals on the next run. Never push your id back.
+- **`main`**: one commit per stable release, tagged `react-<version>`.
+- **`rc`**: a single parentless commit, force-pushed over the previous candidate, so release
+  candidates (several a day at times) don't accumulate in a repository every user clones.
 
-**Two other design-system projects exist in the TEHIK org and are deliberately left
-alone:** `TEDI Design System (deprecated)` (owner Silver) and `Design System` (owner
-Märt). The pinned project supersedes the deprecated one — don't sync into either.
+Gates, in order: the build fails if any card's stories pull a library component in from
+source (it would render unstyled, as TextField did once); the render check fails on script
+errors and empty cards; and a stable release also builds the reference Storybook, compares
+every card (`storybook-comparison` workflow artifact) and waits in the
+`claude-design-system-main` environment until a reviewer who has looked at the sheets
+approves. Release candidates publish without the review.
 
-## ✅ RUN COMPLETE + UPLOADED (2026-08-12, third pass — latest) — read this first
+Setup: the `DESIGN_SYSTEM_REPO_TOKEN` secret (a token with `contents: write` on
+claude-design-system) and the `claude-design-system-main` environment with required
+reviewers. `--release` writes the whole tree: `project/`, `publish-plan.json` (every
+file, binaries included; re-publishing unchanged files is a no-op), `release.json`, and
+`README.md` / `AGENTS.md` / `CLAUDE.md` from `artifact/release/`.
+
+**Organisation themes are applied at publish time, not built.** `artifact/release/apply-theme.mjs`
+ships in claude-design-system and takes a TEDI Variables Exporter export (the Figma plugin in
+`../figma-variable-exporter-plugin/`): it appends the export's rules to `tokens.css` under
+`:root:root` selectors (light always on, dark on `[data-theme="dark"]` / `.tedi-theme--dark`),
+writes the colour values into `tokens.json` and `meta.theme`, and adds a note to the README.
+It is plain Node with no imports from this repo, since it runs in the distribution checkout.
+Anything a theme should recolour must use `--tedi-primary-*` / `--tedi-accent-*` or
+`--general-*`, not the raw palette (the cover does); the literal colours left in
+`bundle.css` don't follow a theme.
+
+**Token usage notes live in `artifact/seed/tokens.json`**: the build refreshes values from core
+and prints what changed. When it reports `added ... (usage note TODO)` or a note whose meaning
+moved, copy the built `project/tokens.json` back over the seed, write the notes, and commit
+it; the next release carries them. CI only does the render check, so grade components whose
+sources changed against Storybook (`check.mjs --compare`) before cutting a stable release.
+
+## What the build writes
+
+Under `<out>/project/`, at the artifact's paths (the Design System type's `format.md`):
+
+| Path | From |
+|---|---|
+| `components/bundle.js` | `dist/tedi.es.js` bundled by esbuild as one IIFE assigning `window.Tedi`, reading the page's React; line 1 the `@ds-bundle` header |
+| `components/bundle.css` | `dist/index.css` (component CSS, core utilities, icon font); declarations `tokens.json` owns are stripped, `.tedi-theme--dark` also matches `[data-theme="dark"]`, font URLs point at `../fonts/` |
+| `tokens.json`, `tokens.css` | the artifact's `tokens.json` (or the seed) refreshed against `dist/index.css` (`tokens.mjs`); usage notes kept, new tokens appended with a `TODO` note, removed ones reported in `<out>/tokens-report.json` and left in place |
+| `components/<Name>/<Name>.d.ts`, `components/index.d.ts` | `dist`'s declarations through the TypeScript compiler (`types.mjs`): own props in source spelling with JSDoc, referenced library types one level deep |
+| `components/<Name>/README.md` | generated: usage line, `.design-sync/docs/<Name>.md` when it exists, variants, props, the first six stories' source, related components |
+| `_preview/<Name>.js`, `components/<Name>/preview.html` | the component's stories compiled by esbuild with `compose.tsx`; imports of the library's own modules resolve to `window.Tedi`, so cards render the shipped bundle; Storybook addons are stubbed; `public/` assets referenced by name are inlined |
+| `README.md` | a generated intro line (version, core, component count), `.design-sync/conventions.md`, then generated **Components** (by group, with sub-components), **Deprecated** (from `@deprecated` JSDoc tags, with the tag's text) and **Reference** (package, tokens, links, files, loading) |
+| `components/lib/react.js`, `fonts/` | React 18.3.1 and core's fonts; in the publish plan only with `--seed` or `--with-binaries` |
+
+Components are the barrel exports of `src/tedi` that have a story file; the group is the
+second-to-last segment of the story title. `config.json` holds what the build can't derive:
+`titleMap` (`null` excludes a component), `provider` (the wrapper chain every card mounts in),
+and per-component `overrides` (`cardMode` `grid`|`column`|`single`, `primaryStory`, `skip` by
+story id or export name, `viewport`).
+
+**`conventions.md` is the only hand-written part of the README, and the build checks it.**
+Keep it free of anything a release changes on its own: no version numbers, counts, component
+lists, deprecations or links (the generated sections carry those). What it does name, the
+build validates against the build itself: backticked component names, `Comp.Sub`,
+`Comp.prop`, JSX tags and imports, `--custom-properties`, classes in `className` strings and
+in the class tables, and props in its `Name | Components` tables (against the generated
+`.d.ts` and `dist`'s declarations). A name the build doesn't have is printed as a warning in a
+local build and **fails `--release`**, so a release that renames or removes something cannot
+ship a stale overview: CI stops, someone fixes `conventions.md` (or lists an intentional
+mention in `config.json` `conventionsIgnore`), and the release reruns. The check catches
+names, not meaning: when a release changes how something behaves under the same name, update
+the prose by hand.
+
+## Syncing to the artifact
+
+Run from the repo root in Claude Code.
+
+0. **(first sync)** Create the artifact: in Claude, **+ › Design system › New design system**,
+   or have Claude Code publish with `type_url` = the Design System type, `title` =
+   `TEDI Design System` and no files. New artifacts start private; share it once it is filled.
+1. `nvm use && npm ci`, `npm run build` (never a bare `vite build`), and the reference
+   Storybook for comparisons:
+   `STORYBOOK_EXCLUDE_COMMUNITY=true npx storybook build -c .storybook -o .design-sync/sb-reference`.
+2. `npm run design:artifact -- --out <out>` (**first sync:** add `--seed`). Token values are
+   refreshed from core on top of `artifact/seed/tokens.json`, and `meta` (repo, ref, version,
+   date) is filled in. It prints what changed; for added tokens (`TODO`) or notes whose meaning
+   moved (the radius scale renumbers between core versions), update the seed as **Releases**
+   says and rerun.
+3. `node .design-sync/artifact/check.mjs --out <out>` renders every card the way the artifact
+   page loads it and reports script errors and empty cards. Then grade with
+   `--compare --components A,B,…` (all of them on a first sync, the ones whose sources changed
+   otherwise): `<out>/check/<Name>.png` puts Storybook and the preview side by side.
+4. `read` the artifact (no `path`) and list its files. Publish each batch of
+   `<out>/publish-plan.json` (`{ file_path, files }`): `url` = the artifact, `root` = `<out>`,
+   `file_path` = `<out>/` + the batch's `file_path`, `files` = the batch's `files`. A refusal
+   saying you haven't viewed the latest version means: read again, compare, retry.
+5. Files the artifact holds that the build no longer writes (outside `SKILL.md`,
+   `artifact-type/`, `index.html`, `project/design-system.json` and `project/assets/`) are
+   stale; list them for the user and remove them (`"project/<path>": null`) only once they agree.
+6. Last, on its own, the index with `lastChange` set (`by`, `at`,
+   `via: "GitHub · TEDI-Design-System/react@<sha>"`, `note`) and `"editing": "code"`: `read`
+   `project/design-system.json` again and change only those two keys, or **(first sync)** add
+   `lastChange` to the `<out>/project/design-system.json` that `--seed` wrote (the seed already
+   carries `editing`).
+
+**The page is read-only (`"editing": "code"`).** Each sync regenerates every file except the
+token usage notes, so an edit made on the page would be lost at the next publish. The page
+says so in a line at the top; changes go into this repo (`conventions.md`,
+`.design-sync/docs/<Name>.md`, `config.json`, the components and stories) and out with the next
+sync. To hand the system over to page editing instead, publish the index without `editing`.
+
+## ✅ Last sync (2026-11-05, 21.0.0-rc.1 / core 6.12.0, HEAD `dd999c4c`): first run of `build.mjs`
+
+Artifact versions 58–61. 87 components; `check.mjs` 87/87 cards clean; all 87 compared with
+Storybook (up to 6 stories each) and graded: no mismatches after one fix. That fix: story
+default imports of kebab-named files (`import TextField from './textfield'`) had fallen back
+to compiling the component from source, which drops its CSS-module styles; 20 previews
+changed and were re-graded. The build now warns when a library component is compiled from
+source, and CSS-module imports in stories resolve to the hashed classes in `bundle.css`
+(FileDropzone's forced "Drop over" state). Removed the 7 tokens core 6.12.0 no longer
+defines, and the 359 converter-era files (`components/<group>/<Name>/*`, `_ds_bundle.*`,
+`_vendor/`, `styles.css`, `tokens/index*.css`, `fonts/fonts.css`, `manifest.json`,
+`migration-map.json`, `_ds_manifest.json`); `assets/notes/` (the migration notes) stays.
+Index set to `"editing": "code"`. Known, accepted: Affix "Fixed Example" (the card's
+`transform` makes it the containing block for `position: fixed`), Sheet/Modal/Popover cards
+whose content is `position: fixed`.
+
+## Converter-era history (to 2026-11-04)
+
+Everything below describes the converter pipeline that `/design-sync` bundled. It no longer runs; keep it for the grading lore.
+
+## ✅ Last converter run (2026-11-04, 21.0.0-rc.1 / core 6.12.0)
+
+**First sync straight to the artifact** (HEAD `dd999c4c`), versions 53–56 of the artifact.
+Roster **86 → 87**: `Sheet` added (new TEDI-Ready in 20.0.0). Validator: 87/87 previews render,
+two known warnings (`[TOKENS_MISSING]`, 18 runtime-set vars, triaged below; `[RENDER_THIN]` on
+Sheet, a false positive: the open sheet is `position: fixed`, the screenshot shows it styled).
+**Config changes:** `Checkbox` and `Radio` `cardMode: "column"` (the new card variants overflow
+the grid), `Sheet` `cardMode: "single"` + `primaryStory: "OpenForVisualTest"`; `projectId`
+removed.
+
+**Graded:** `compare.mjs` over the 38 components whose sources changed since `e0738881`;
+23 carried forward, 15 re-graded (90 stories, 0 `mismatch`; every `close` is an accepted
+delta). Dropdown's open menu was checked on its single card, outside the 6-story cap.
+
+**Tokens (core 6.9.0 → 6.12.0):** changed `general-surface-disabled`, `tedi-radius-06..08`
+(the scale renumbered: the pill radius is now `tedi-radius-09`); added
+`general-border-disabled(-selected)`, `general-state-{active,hover,selected,selected-hover}`,
+`general-surface-disabled-{selected,transparent}`, `tedi-radius-09`. **Not in the build any
+more, still in `tokens.json` pending a decision:** `general-separator-primary`,
+`general-status-warning-background-primary`, `general-surface-{active,hover,selected,success}`,
+`general-text-text-inverted-tehik`.
+
+**`conventions.md`:** version table to 21.0.0-rc.1 / 20.0.0 stable, version notes for `Sheet`,
+the 20.0.0 breaking changes and the 21.0.0 `Popover` `offset` change. README is 32,291 chars:
+over the standalone ~32k inline window, but an artifact README may be 200 KB and is read whole.
+
+## ✅ Previous run (2026-10-09, 19.2.0-rc.9 / core 6.9.0, to the standalone project)
+
+**Re-synced from 19.1.0 to 19.2.0-rc.9** (HEAD `e0738881`; the six commits past
+`chore(release): 19.2.0-rc.9` touch no `src/tedi`). `npm ci` was needed (storybook 10.6.0,
+sass 1.105.0 were locked but not installed). Roster unchanged at **86**, 0 added, 0
+removed, 0 deletes. Final driver receipt: `ok: true`, `pendingGrade: []`,
+`learningsUnmerged: []`, render check **86/86 clean** (0 bad / 0 thin / 0 identical).
+**465 content files uploaded**, sentinel re-armed, anchor last, `list_files` verified.
+
+**Re-graded 9 components** whose stories changed (Checkbox, Radio, ChoiceGroup, Label,
+Select, TextField, FileDropzone, TableCard, TableOfContents): 54 stories, 43 `match`, 11
+`close`, 0 `mismatch`. Every `close` is an already-accepted delta (demo-table scaffolding,
+pseudo-state rows, 700px tall-story clip). The new ChoiceGroup card stories (`Radio Card
+Segmented` / `Separated`) were compared full-res and are identical. The `reference_drift`
+spot-check canary (Accordion, Calendar, Textarea, Skeleton, Truncate) confirmed every
+carried grade.
+
+**Converter changed upstream** (`scriptsSha` c0730d65 -> bdeb85aa). The four forks were
+diffed against the fresh libs after normalising dash/ellipsis glyph churn: every remaining
+difference is a documented FORK block, so no merge was needed.
+
+**`conventions.md` edits this run** (it is `readmeHeader`, so not grade-keyed): version
+table now says bundle 19.2.0-rc.9 (npm `rc`), latest stable 19.1.1; new version note that
+`Radio.Group` / `Checkbox.Group` / `variant="card"` are 19.2.0-only and `ChoiceGroup` is
+deprecated; §11 documents the group props (the `.d.ts` types `Group` as `any`); `Radio` and
+`Checkbox` added to the `variant` row. Two stale claims fixed: §5 and §9 said prop
+descriptions are cut at 120 chars and referenced types are not expanded, which the
+`dts.mjs` fork made false long ago (0 truncation markers in this build). **README budget:**
+the additions pushed README to 32,383 chars, which would have cut the component index tail
+(Header, SideNav, TopNav, Heading, Text, Icon, providers). Recovered by dropping §10's
+"Wrong / right" block (it restated the rules table above it) and tightening §0 prose. Header
+is now 26,394 chars, README about 31,700. **Next added component or header line needs
+another trim first.**
+
+## ✅ Previous run (2026-09-24, 19.1.0 / core 6.9.0)
+
+**Version relabel, same day:** 19.1.0 was released to `main` (`react-19.1.0`, `109ab57d`) right
+after the rc.19 upload below. `git diff c0304058 react-19.1.0` touches only `CHANGELOG.md`
+(no `src/`, `.storybook/` or package change), so the uploaded bundle IS 19.1.0 and nothing was
+rebuilt or re-graded. Only `conventions.md`'s version table and new-components note changed
+(19.1.0 is npm `latest`, 19.0.0 the previous stable); driver re-run `ok: true`, full write set
+re-uploaded, anchor last. (For a few minutes after the release the registry still served
+`latest: 19.0.0`; it caught up within the run. Registry lag, not a failed publish.)
+
+**Re-synced from rc.2 to 19.1.0-rc.19** (HEAD `c0304058`, two commits past the release),
+core 6.9.0 (`npm ci` was needed: the lockfile pinned 6.9.0 while 6.8.1 was installed).
+Roster **83 → 86**: `TableCard`, `VerticalStepper`, `CardStepper` added (CategorySearch is
+community, correctly out of scope). Final driver receipt: `ok: true`, `pendingGrade: []`,
+`learningsUnmerged: []`, render check **86/86 clean**, 0 deletes. **465 content files
+uploaded**, sentinel re-armed, anchor last.
+
+**Why this was cheaper than the "expensive kind" predicted above:** the driver kept grades
+for the 46 components whose own sources did not move, even though `styleSha` changed. The
+current converter carries grades across CSS/bundle changes and verifies pipeline churn by
+spot-check, so only the 37 story-edited components plus the 3 new ones were re-graded (262
+stories: 221 `match`, 41 `close`, 0 `mismatch`). The 5-component spot-check canary
+(HashTrigger, ScrollFade, Label, StatusBadge, ClosingButton) confirmed the carried grades.
+The converter itself changed upstream (`scriptsSha` d09681f1 → c0730d65); the four forks
+were diffed against the fresh upstream libs and none needed a merge (every difference is a
+documented FORK block, plus upstream's em-dash-to-ASCII comment churn).
+
+**Config changes this run** (all presentation-only, grades carry): `CardStepper` and
+`VerticalStepper` `cardMode: "column"` (`[GRID_OVERFLOW] wide`); `Dropdown`, `Modal`,
+`Popover` `cardMode: "single"` with the new open `* For Visual Test` story as
+`primaryStory` (`[GRID_OVERFLOW] escape`). See Re-sync risks for what that closed.
+
+**Found a real library bug:** `Dropdown.Item asChild` puts `tedi-dropdown__item` on a
+wrapped Checkbox/Radio indicator (details under Re-sync risks). Graded `close`; reported to
+the DS team. Re-grade Dropdown once it is fixed.
+
+**`conventions.md`** re-validated against the new build; version table updated (bundle
+19.1.0-rc.19, npm `latest` is now 19.0.0) and a note added that the three new components
+are not in 19.0.0. **README budget is now tight:** 31,966 of 32,000 chars. The next added
+component will push the component-index tail past the inline window, so trim the header
+first on the next sync (the Budget guidance says the body tail is what gets lost).
+
+**HashTrigger re-renders every build against the old anchor:** its story compiles community
+`Tabs`, whose source changed, so its renderHash moved (`9e77…` → `ec32…`) with its own
+sources unchanged. That is the `render_churn` canary, grades kept. It stops firing now that
+the new anchor is uploaded.
+
+## ✅ Previous run (2026-08-12, third pass)
 
 **Re-synced at 19.0.0-rc.2 again.** Driver receipt: `ok: true`, all four stages exit 0,
 `pendingGrade: []`, `learningsUnmerged: []`, render check **83/83 previews render cleanly**
@@ -225,18 +426,15 @@ the step-2 sb-reference build, and
 `ts-morph`/`esbuild`). Chromium lives at `~/Library/Caches/ms-playwright` on macOS,
 **not** `~/.cache/ms-playwright`.
 
-**The project exists and is current** (see the top of this section) — the paragraph that
-used to sit here said otherwise and was left over from before the first upload. It was
-last updated 2026-08-10 with the docs work; the anchor on disk matches the remote one.
-Sharing is `scope: "org"` with `link_permission: "edit"`, so anyone in the TEHIK
-organisation can clone the repo and re-sync against the pinned `projectId`. A *different*
-organisation cannot be granted access — see the adoption flow in the repo README.
+Step 4's driver needs the remote anchor, which stayed in the standalone project: on the
+artifact, run the build, validate and scoped `compare.mjs` separately and publish as
+**Syncing to the artifact** (top of this file) describes.
 
 ## Scope
 
 - **`tedi` namespace only.** The repo ships two export namespaces (`/tedi` = TEDI-Ready,
   production-grade; `/community` = community-contributed, relaxed lint rules).
-  `CLAUDE.md` is explicit that community components are *not* a reference for TEDI
+  `AGENTS.md` is explicit that community components are *not* a reference for TEDI
   patterns, so only `tedi` is synced — the design agent must never build on-brand UI
   out of unreviewed community parts.
 - Two levers enforce this and **both are required**:
@@ -247,8 +445,7 @@ organisation cannot be granted access — see the adoption flow in the repo READ
 
 ## Reproducing this sync from scratch
 
-Read this first if you are syncing a fresh clone, or re-syncing after the Claude Design
-project was deleted. **Everything the sync needs is committed under `.design-sync/`** —
+Read this first if you are syncing a fresh clone, or into a new artifact. **Everything the sync needs is committed under `.design-sync/`** —
 `config.json`, `conventions.md` (the README header), `docs/` (per-component gotchas),
 `overrides/` (the four lib forks) and this file. Two inputs are NOT committed and must be
 rebuilt, in this order:
@@ -277,10 +474,8 @@ the README header, the per-component gotcha docs, the uncapped prop descriptions
 referenced-type shapes all come from committed files, not from anything a previous agent
 remembered.
 
-**If the project was deleted**, no manual edit is needed — `get_project(cfg.projectId)`
-will error, which is case 3 of the targeting rule at the top of this file: create a new
-project, use it, record its id after the upload verifies. Same path a different
-organisation takes.
+**If the artifact was deleted**, create a new one from the Design System type and publish
+everything into it, as **Where this syncs to** describes for another organisation.
 
 ## Build
 
@@ -545,6 +740,11 @@ design system never actually applies, which is worse than the honest delta.
     defines a `statesPseudo` block, but the story using it is never captured, so none of
     the six captured rows carry the delta. A `grep` for `pseudo` in the story FILE proves
     nothing about the captured stories.
+  - **The reverse also happens: the delta without `parameters.pseudo` (2026-09-24).**
+    `Select` `States` passes `classNames={{ control: 'pseudo-hover' | 'pseudo-focus' |
+    'pseudo-active' }}` directly, i.e. the class variants the addon generates, which
+    `dist/index.css` does not ship. Same accepted delta, graded `close`. A grep for
+    `pseudo:` misses this form; also grep for `pseudo-hover|pseudo-focus|pseudo-active`.
 - **`tedi-storybook-styles.scss` demo scaffolding — the single most common `close`
   across the roster (~29 tedi story files; confirmed independently by two waves).**
   `grep -rln "example-list\|example-box\|padding-14-16\|border-bottom\|display-flex\|\"bg bg-" src/tedi --include="*.stories.tsx"`
@@ -673,7 +873,10 @@ design system never actually applies, which is worse than the honest delta.
   `Uncontrolled Default Open` shows a correctly styled open tooltip in the preview and
   a ~24px empty sliver in the reference. Grade `match` on the component's own merits.
   Expect this for every open-by-default portal story (Modal, Dropdown, Popover
-  `ControlledOpen`-style). The honest remedy would be capturing
+  `ControlledOpen`-style). Same family, not a portal (2026-09-24): ScrollVisibility
+  `Animation Direction` pins its "Down" bar `position: fixed` to the storybook iframe
+  viewport bottom, below the 624px `#storybook-root` shot, so only the preview shows it.
+  Graded `match`. The honest remedy would be capturing
   `#storybook-root` + the portal root on the reference side — **never** neutralize the
   story's open state to make the two panels agree.
 
@@ -863,6 +1066,16 @@ durable set, so they survive a re-sync.
 
 ## Known render warns (triaged — a warn NOT listed here is new)
 
+- **`[DOCS_UNMAPPED] <Name>` for ~81 components (new 2026-10-09, informational).** The
+  newer converter lists every component without a doc in `cfg.docsDir`
+  (`.design-sync/docs/` holds only Footer, Header, Link, SideNav, Table). It fires only
+  because some docs DID match; it is a nudge, not a failure, and the build is unaffected.
+- **A shrunken compare sheet can hide thin details (2026-10-09).** TableOfContents
+  `Item States` looked like "storybook lacks the Hover underline"; the full-res raw pair
+  showed the underline on both panels (a live probe of `sb-reference` confirmed
+  `text-decoration: underline` from `tedi-btn--is-hovered`). Open the `raw/` PNGs before
+  grading any 1px-scale delta (underlines, borders, focus rings).
+
 - **`[REFERENCE_STALE?]` fires on any docs-only or header-only change — usually benign
   (triaged 2026-08-12).** The check compares "bundle changed" against "`sb-reference`
   unchanged", but the bundle's header embeds the hashes of every `.d.ts`/`.prompt.md`, so
@@ -904,6 +1117,18 @@ durable set, so they survive a re-sync.
   exits 0 with it.
 
 ## Re-sync risks
+
+- **`Radio.Group` / `Checkbox.Group` are typed `React.ComponentType<any>` in the emitted
+  `.d.ts` (2026-10-09).** Their props live only in `conventions.md` §11 (copied from
+  `radio-group.tsx` / `checkbox-group.tsx`). If those prop lists change upstream, update §11
+  by hand; nothing in the build will flag it.
+- **`ChoiceGroup` is deprecated as of 19.2.0** (kept for backwards compatibility). When it
+  is removed upstream, expect `verification.removed: [ChoiceGroup]` and update
+  `conventions.md` §0, §8 (`variant` row) and §9 mentions.
+- **Story cap hides the new card variants on Checkbox/Radio** (17 and 15 stories, only the
+  first 6 captured). ChoiceGroup's card stories ARE captured and match; Checkbox/Radio's own
+  card/group stories are verified only through that sibling. Under the standing story-cap
+  decision this is accepted; raise `--max-stories` once if you want them graded directly.
 
 - **⚠ A story edit with ZERO visual effect still costs a full re-grade of that component
   (2026-08-12).** Adding `parameters.a11y.test: 'todo'` to 9 story files moved every one of
@@ -948,13 +1173,55 @@ durable set, so they survive a re-sync.
   (`Sidenav Item States` row 7), Footer (`With Bottom Section`, a 4px StatusBadge sliver),
   HashTrigger (`Default` 1656px, and the community-Tabs story's tail), Affix
   (`Fixed Example`, and see the `translateZ(0)` entry — a viewport raise is the only lever
-  and even then the containment stands). **Remedy per component:
+  and even then the containment stands), and **TableCard** (new 2026-09-24: `Simple Card`
+  1712px, `With Actions` 2824px, `Has Children Rows` 1242px; the visible 700px windows are
+  identical, so graded `close` under the same standing decision).
+  **Grey band on tall storybook shots (2026-09-24, seen independently by two waves):**
+  past roughly y=684-700 of a tall storybook element shot (DateField / DateTimeField /
+  TimeField / Search `States`, Search `Sizes`, Filter `Customize Content`) the rows sit on
+  a light-grey band. That is the iframe viewport edge showing through the element-shot
+  overflow, exactly the rows the preview panel clips. It is NOT an error-row background or
+  scaffolding; grade it as part of the clipped tail. **Remedy per component:
   `cfg.overrides.<Name>.viewport: "WxH"`** — but `viewport` IS in the grade key, so each
   one re-grades that component and needs a full build. The DS team's standing decision
   (2026-08-07, reaffirmed here) is to accept these, consistent with the story-cap
   decision: the primary story proves the component arrived intact. Close them
   deliberately, in one batch, if ever.
-- **Overlay SURFACES are unverified — only their triggers are (2026-08-12).** Dropdown,
+- **✅ Overlay surfaces: CLOSED for Dropdown, Modal and Popover (2026-09-24).** The DS team
+  added open-by-default `* For Visual Test` stories (tags `test`, `manifest`; not in the
+  sidebar). This run set `cfg.overrides.{Dropdown,Modal,Popover}` to `cardMode: "single"`
+  with those stories as `primaryStory` (so the product card shows the real menu / modal /
+  popover), captured all stories with `compare.mjs --max-stories 20`, and graded every
+  open story. Because the harness storybook element shot never contains portaled content,
+  the grader re-shot the storybook side as a 900x700 VIEWPORT screenshot of
+  `sb-reference/iframe.html?id=<id>` (same reduced motion + frozen clock) for a true
+  side-by-side: Modal 6/6 and Popover 5/5 open stories match, Dropdown 2/3.
+  **If you re-capture these three, pass `--max-stories 20`** or the open stories (past the
+  default cap of 6) drop out of the sheet. Suggest upstream: compare.mjs should take a
+  viewport shot on the storybook side when a component is `portal: true`.
+- **⚠ Real LIBRARY bug found 2026-09-24, not a sync artifact: `Dropdown.Item asChild`
+  styles the wrapped control's INDICATOR.** `dropdown-item.tsx` `cloneElement`s the child
+  with `className: cn(merged.className, childProps.className)`, so `tedi-dropdown__item`
+  (button reset + item padding/radius) lands on whatever element the child forwards
+  `className` to, and `Radio` / `Checkbox` forward it to their indicator div, not their
+  wrapper. Visible in `Dropdown` `Open Control Items For Visual Test`: checkbox rows are
+  broken identically on BOTH panels (unchecked box invisible, indeterminate box missing,
+  checked box stretched); radio rows differ between panels (storybook: bare dot; preview:
+  bordered 26x18 box) only because of stylesheet order (next bullet). Graded `close`: the
+  preview is the faithful shipped render, so no owned preview may "fix" it. The fix belongs
+  in `src/tedi/components/overlays/dropdown/dropdown-item/dropdown-item.tsx` (do not merge
+  the item classes onto an asChild form control). Reported to the user; re-grade Dropdown
+  after the library fix lands.
+- **Storybook per-chunk CSS order differs from `dist/index.css` order (2026-09-24).** The
+  vite storybook build splits CSS per chunk (`assets/radio-*.css`, `assets/dropdown-*.css`)
+  and loads it in story-import order; `dist/index.css` concatenates modules in its own order
+  (checkbox before dropdown-item before radio). Two classes of EQUAL specificity on one
+  element therefore resolve differently in the oracle and the shipped bundle. Latent
+  roster-wide; so far it only shows where a bug already stacks two components' classes on
+  one element (the bullet above). When a delta looks like "the right styles, but the
+  other component's win", check class stacking first.
+- ~~**Overlay SURFACES are unverified — only their triggers are (2026-08-12).**~~ Superseded
+  for Dropdown/Modal/Popover by the first bullet above; InfoTooltip still applies. Dropdown,
   Modal, Popover and InfoTooltip have no open-by-default story inside the 6-story capture,
   so both panels show nothing but the trigger; all 20 of those stories graded `match` on
   triggers alone. The actual menu / modal panel / popover card is therefore

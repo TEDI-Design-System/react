@@ -1,0 +1,146 @@
+name: Publish Claude design system files
+
+# After a release, rebuild the Claude Design System artifact's files and push them to
+# TEDI-Design-System/claude-design-system (see .design-sync/NOTES.md):
+# - a release candidate (rc) replaces the single commit on its rc branch, so candidates
+#   don't accumulate history in a repository every user clones;
+# - a stable release (main) becomes a commit on its main branch, tagged react-<version>,
+#   but only after a reviewer approves the `claude-design-system-main` environment, having
+#   looked at the Storybook comparison sheets the compare job uploads.
+# The build fails on any card whose stories pull a library component in unstyled, and the
+# render check fails on script errors and empty cards; neither replaces looking at the sheets.
+# Needs the DESIGN_SYSTEM_REPO_TOKEN secret: a token with contents: write on that repository.
+
+on:
+  workflow_run:
+    workflows: ['Release TEDI React library']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Release line to publish (main or rc)
+        required: true
+        default: rc
+        type: choice
+        options: [rc, main]
+
+concurrency:
+  group: design-artifact
+  cancel-in-progress: false
+
+env:
+  LINE: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.event.workflow_run.head_branch }}
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
+      commit: ${{ steps.release.outputs.commit }}
+      line: ${{ env.LINE }}
+    steps:
+      - name: Checkout the release line
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LINE }}
+          fetch-depth: 0
+
+      - name: Find the release at the tip
+        id: release
+        run: |
+          tag=$(git tag --points-at HEAD --list 'react-*' | head -n 1)
+          [ -z "$tag" ] && echo "No react-* release tag on the tip of $LINE; nothing to publish."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#react-}" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Use Node.js
+        if: steps.release.outputs.tag != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Build the library and the artifact files
+        if: steps.release.outputs.tag != ''
+        run: |
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+          DESIGN_SYNC_BRANCH="$LINE" npm run design:artifact -- --out release --release
+
+      - name: Render check
+        if: steps.release.outputs.tag != ''
+        run: node .design-sync/artifact/check.mjs --out release
+
+      - name: Upload the release tree
+        if: steps.release.outputs.tag != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-design-system
+          path: release
+          include-hidden-files: false
+          retention-days: 7
+
+  compare:
+    needs: build
+    if: needs.build.outputs.tag != '' && needs.build.outputs.line == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.commit }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - name: Build the library, the reference Storybook and the cards
+        run: |
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+          STORYBOOK_EXCLUDE_COMMUNITY=true npx storybook build -c .storybook -o .design-sync/sb-reference --quiet
+          npm run design:artifact -- --out compare
+      - name: Compare every card with Storybook
+        run: node .design-sync/artifact/check.mjs --out compare --compare
+      - name: Upload the comparison sheets
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-comparison
+          path: compare/check/*.png
+          retention-days: 14
+
+  publish-rc:
+    needs: build
+    if: needs.build.outputs.tag != '' && needs.build.outputs.line == 'rc'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions/publish-claude-design-system
+      - uses: ./.github/actions/publish-claude-design-system
+        with:
+          line: rc
+          tag: ${{ needs.build.outputs.tag }}
+          version: ${{ needs.build.outputs.version }}
+          commit: ${{ needs.build.outputs.commit }}
+          token: ${{ secrets.DESIGN_SYSTEM_REPO_TOKEN }}
+
+  publish-main:
+    needs: [build, compare]
+    if: needs.build.outputs.tag != '' && needs.build.outputs.line == 'main'
+    runs-on: ubuntu-latest
+    # Waits for a reviewer: configure required reviewers on this environment in the
+    # repository settings, and approve once the storybook-comparison sheets look right.
+    environment: claude-design-system-main
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions/publish-claude-design-system
+      - uses: ./.github/actions/publish-claude-design-system
+        with:
+          line: main
+          tag: ${{ needs.build.outputs.tag }}
+          version: ${{ needs.build.outputs.version }}
+          commit: ${{ needs.build.outputs.commit }}
+          token: ${{ secrets.DESIGN_SYSTEM_REPO_TOKEN }}

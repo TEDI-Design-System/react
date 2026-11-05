@@ -197,63 +197,87 @@ Generated summaries are lossy in two specific ways worth knowing: prop descripti
 truncated in some tooling, and types referenced by props are often not expanded. When a
 description ends mid-sentence, assume there is more and go to the source.
 
-## Using TEDI in Claude Design
+## Using TEDI as a design system in Claude
 
-[claude.ai/design](https://claude.ai/design) can host TEDI as a design system, so
-prototypes are built from real TEDI components rather than approximations.
+Claude can host TEDI as a design system, so designs, prototypes and slide decks are built
+from real TEDI components rather than approximations. Design systems live in Claude as
+**Design System artifacts**: Claude Design moved into Claude, and the standalone
+claude.ai/design site closes on 14 December 2026.
 
-> **Creating the design system from this repository's URL does not work.** It produces
-> token-level styling and approximated markup, not working TEDI components — TEDI's class
-> names are hashed CSS Modules, so there is no class contract an importer can target from
-> source. Committing the compiled bundle to the repo was tested (2026-08-11) and did not
-> close the gap either. Use the flow below.
+**Each organisation keeps its own copy.** Design System artifacts are shared inside an
+organisation, and nothing documents a design system shared from another organisation showing
+up in the design-system picker. If your organisation already has a TEDI Design System
+artifact, pick it under **+ › Design system** in a Claude chat, or let Claude use it when it
+is the organisation default; Claude Code reads it too. If not, publish one from
+[TEDI-Design-System/claude-design-system](https://github.com/TEDI-Design-System/claude-design-system).
 
-**You cannot be given access to the TEHIK-owned project.** Design-system projects are
-org-scoped — sharing is `invited` or `org`, and neither crosses an organisation boundary.
-Each organisation runs its own. That is also the better outcome: you own a project you can
-refresh on your own schedule rather than waiting on someone else.
+> **Do not run `/design-sync`.** As of Claude Code 2.1.318 it still uploads only to
+> standalone Claude Design projects and stops once a system has moved to Claude.
+>
+> **Do not import the design system from this repository's URL.** TEDI's class names are
+> hashed CSS Modules, so an importer reading source produces token-level styling and
+> approximated markup. Claude's own "from code" flow works when it is allowed to run the
+> build (it then ships the compiled components), but its previews and docs are generic.
 
-### The flow
+### Publishing it
+
+[TEDI-Design-System/claude-design-system](https://github.com/TEDI-Design-System/claude-design-system)
+holds the artifact's files, built from this repository on every release: `main` has each
+stable release (tagged `react-<version>`), `rc` only the latest release candidate. No build
+is needed:
 
 ```bash
-git clone https://github.com/TEDI-Design-System/react.git
-cd react
-nvm use            # Node >= 24, npm >= 11
-npm ci
+git clone --depth 1 --branch main https://github.com/TEDI-Design-System/claude-design-system.git
+cd claude-design-system
+claude
 ```
 
-Then, in Claude Code inside the repo:
+Then ask Claude Code to "publish this TEDI design system to Claude", or, for a later release,
+to "update our TEDI design system: <artifact link>". It follows the repository's `AGENTS.md`;
+you approve the publishes. Pick the release line your applications are on.
 
-```text
-/design-sync
-```
+The artifact is **read-only on its page** (`"editing": "code"`): every update replaces its
+files, so changes belong in this repository (the components and stories,
+`.design-sync/conventions.md`, the per-component docs in `.design-sync/docs/`) and reach the
+artifact with the next release.
 
-The skill runs the library build, builds the reference Storybook, converts, renders and
-grades every component, and uploads — you do not run those steps yourself.
+### Organisation themes
 
-**There is nothing to configure.** The committed config pins the TEHIK-owned project; the
-sync checks whether it can write there and, when it can't, creates a design system in your
-own organisation instead. You will not be asked to edit a config file or supply an id.
+An organisation that themes TEDI in Figma can publish its artifact in that theme. Export the
+theme with the **TEDI Variables Exporter** plugin (the ZIP of `_*-variables__<theme>*.css`
+files your applications load after TEDI's CSS) and give it to Claude Code when it asks during
+publishing. The distribution repository's `apply-theme.mjs` writes the theme's colours,
+dimensions and type into the files before they are published: the light colours become the
+artifact's defaults, the dark colours its dark mode, and `tokens.json` and the README record
+the theme's name and a hash of the export. Its report lists theme variables TEDI doesn't know,
+references to variables the theme doesn't define, and text colours below 4.5:1 contrast on the
+primary surface, so check it before approving the publish.
+
+- **One artifact carries one theme.** Its title is `TEDI Design System · <brand>`, so
+  organisations with several brands publish one artifact per brand.
+- **Keep the export.** Every update starts from clean files and applies the theme again.
+- **Some component tints stay TEDI's.** A few translucent hover and selected tints are literal
+  colours in the component CSS rather than tokens, so they don't follow a theme.
+- In application code the same theme is `ThemeProvider theme="<theme>"` and
+  `theme="<theme>-dark"`, not `default` and `dark`.
 
 ### What you get
 
-**82 TEDI-Ready components**, each with its real TypeScript prop contract (including the
-shapes of referenced types), a live preview rendering the actual compiled component, and
-per-component usage docs with the silent-failure gotchas. Designs the agent produces are
-made of real TEDI parts and map to code your engineers can ship.
+**87 TEDI-Ready components**, each with its real TypeScript prop contract (including the
+shapes of referenced types), a live preview rendering the actual compiled component in
+light and dark, and per-component usage docs with the silent-failure gotchas. Tokens
+(colours in both themes, type styles, spacing, radius, borders, containers, z-index) come
+from `@tedi-design-system/core`. Designs Claude produces are made of real TEDI parts and
+map to code your engineers can ship.
 
-Everything repo-specific is already committed under `.design-sync/` — converter config,
-provider chain, per-component overrides, adapter forks, the conventions header and
-per-component docs — so you inherit the setup rather than rediscovering it. This is
-verified, not assumed: rebuilding `dist/` and the reference Storybook from source and
-re-running the converter reproduces a byte-identical result.
+### How the files are made
 
-### Timing
-
-The mechanical pipeline is about **two minutes** (library build ~1–1.5 min, Storybook
-~1 min, converter ~35 s). The rest of a first run is the verification pass — every
-component rendered and compared against Storybook — which is the part to budget for.
-Later refreshes only touch what changed.
+`npm run design:artifact` (`.design-sync/artifact/build.mjs`) writes them from `dist/`, the
+stories and core in seconds; `.design-sync/artifact/check.mjs` renders every card the way the
+artifact page does and compares cards with Storybook. The release workflow
+(`.github/workflows/design-artifact.yml`) runs the build and the render check and pushes the
+result to the distribution repository. `.design-sync/NOTES.md` covers the details, including
+grading changed components against Storybook before a release.
 
 ## Using TEDI in Figma Make
 

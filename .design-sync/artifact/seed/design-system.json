@@ -1,0 +1,33 @@
+{
+  "v": 3,
+  "assetGroups": {},
+  "blobs": {},
+  "createdOnFiles": {
+    "v": 1,
+    "at": "<set at first publish>"
+  },
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "groups": [],
+  "layout": "files",
+  "libraries": [
+    {
+      "name": "react",
+      "version": "18.3.1",
+      "global": "React",
+      "file": "components/lib/react.js"
+    },
+    {
+      "name": "react-dom",
+      "version": "18.3.1",
+      "global": "ReactDOM",
+      "file": "components/lib/react-dom.js"
+    }
+  ],
+  "namespace": "Tedi",
+  "sections": {},
+  "title": "TEDI Design System",
+  "editing": "code"
+}
