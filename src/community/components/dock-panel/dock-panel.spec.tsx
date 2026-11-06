@@ -1,6 +1,6 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import {
   DockPanel,
@@ -12,12 +12,17 @@ import {
 
 jest.mock('react-sticky-box', () => ({ __esModule: true, default: () => null }));
 
+const mockUseBreakpoint = jest.fn(() => 'lg');
+
 jest.mock('../../../tedi/helpers', () => ({
   ...jest.requireActual('../../../tedi/helpers'),
+  useBreakpoint: () => mockUseBreakpoint(),
   useBreakpointProps: () => ({
     getCurrentBreakpointProps: <T,>(props: T): T => props,
   }),
 }));
+
+beforeEach(() => mockUseBreakpoint.mockReturnValue('lg'));
 
 const labels: DockPanelLabels = {
   collapse: 'Minimize panel',
@@ -674,6 +679,26 @@ describe('DockPanel', () => {
 
     afterEach(() => jest.restoreAllMocks());
 
+    it('has no resizer on mobile and restores the configured size when docked again', async () => {
+      const panel = () => (
+        <DockPanel title="Details" labels={labels} width="md" resizable>
+          Content
+        </DockPanel>
+      );
+      const { container, rerender } = render(panel());
+      expect(container.querySelector('.tedi-dock-panel__resizer')).toHaveStyle({ width: '500px' });
+
+      mockUseBreakpoint.mockReturnValue('sm');
+      rerender(panel());
+      expect(await screen.findByRole('dialog', { name: 'Details' })).toHaveTextContent('Content');
+      expect(container.querySelector('.tedi-dock-panel__resizer')).not.toBeInTheDocument();
+
+      mockUseBreakpoint.mockReturnValue('lg');
+      rerender(panel());
+      expect(await screen.findByRole('region', { name: 'Details' })).toHaveTextContent('Content');
+      expect(container.querySelector('.tedi-dock-panel__resizer')).toHaveStyle({ width: '500px' });
+    });
+
     it.each([
       ['left', 200, 100, '600px'],
       ['right', 0, 100, '600px'],
@@ -1290,5 +1315,739 @@ describe('DockPanelLayout', () => {
     );
     expect(screen.getByRole('textbox')).toBe(editor);
     expect(editor).toHaveValue('Workspace changes');
+  });
+});
+
+describe('DockPanel mobile presentation', () => {
+  beforeAll(() => {
+    class PointerEventPolyfill extends MouseEvent {
+      pointerId: number;
+      pointerType: string;
+      constructor(type: string, params: PointerEventInit = {}) {
+        super(type, params);
+        this.pointerId = params.pointerId ?? 0;
+        this.pointerType = params.pointerType ?? '';
+      }
+    }
+    window.PointerEvent = PointerEventPolyfill as unknown as typeof PointerEvent;
+    HTMLElement.prototype.setPointerCapture = jest.fn();
+    HTMLElement.prototype.hasPointerCapture = jest.fn(() => true);
+    HTMLElement.prototype.releasePointerCapture = jest.fn();
+  });
+
+  const dragSheet = (distance: number): void => {
+    const handle = document.querySelector('[data-name="sheet-handle"]') as HTMLElement;
+    fireEvent.pointerDown(handle, { clientY: 300, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientY: 300 + distance, pointerId: 1 });
+    fireEvent.pointerUp(handle, { clientY: 300 + distance, pointerId: 1 });
+  };
+
+  // Floating UI focuses in requestAnimationFrame, so a negative focus check has to wait past it.
+  const waitPastFocusFrame = () =>
+    act(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        })
+    );
+
+  const Counter = ({ name }: { name: string }) => {
+    const [count, setCount] = useState(0);
+    return (
+      <button type="button" onClick={() => setCount(count + 1)}>
+        {name}: {count}
+      </button>
+    );
+  };
+  Counter.displayName = 'DockPanelTestCounter';
+
+  describe('presentation', () => {
+    it.each([
+      { mobile: true, breakpoint: 'lg', role: 'dialog' },
+      { mobile: false, breakpoint: 'xs', role: 'region' },
+      { mobile: undefined, breakpoint: 'sm', role: 'dialog' },
+      { mobile: undefined, breakpoint: 'md', role: 'region' },
+    ])('renders a $role at $breakpoint when mobile is $mobile', async ({ mobile, breakpoint, role }) => {
+      mockUseBreakpoint.mockReturnValue(breakpoint);
+      render(
+        <DockPanel title="Details" labels={labels} mobile={mobile}>
+          Content
+        </DockPanel>
+      );
+
+      expect(await screen.findByRole(role, { name: 'Details' })).toHaveTextContent('Content');
+      expect(screen.queryByRole(role === 'dialog' ? 'region' : 'dialog')).not.toBeInTheDocument();
+    });
+
+    it('is a labelled non-modal dialog that leaves the background available', async () => {
+      render(
+        <>
+          <button type="button">Workspace</button>
+          <DockPanel title="Details" labels={labels} mobile>
+            Content
+          </DockPanel>
+        </>
+      );
+
+      expect(await screen.findByRole('dialog', { name: 'Details' })).toHaveAttribute('aria-modal', 'false');
+      await waitPastFocusFrame();
+      const workspace = screen.getByRole('button', { name: 'Workspace' });
+      expect(workspace).not.toHaveAttribute('aria-hidden');
+      expect(workspace).not.toHaveAttribute('inert');
+      expect(workspace.parentElement).not.toHaveAttribute('aria-hidden');
+      expect(workspace.parentElement).not.toHaveAttribute('inert');
+    });
+
+    it('renders description, header actions and footer, and hides them while minimized', async () => {
+      const user = userEvent.setup();
+      render(
+        <DockPanel
+          title="Details"
+          description="More information"
+          labels={labels}
+          headerActions={<button type="button">Header action</button>}
+          footer={<button type="button">Footer action</button>}
+          mobile
+        >
+          Content
+        </DockPanel>
+      );
+
+      const dialog = await screen.findByRole('dialog', { name: 'Details' });
+      const description = within(dialog).getByText('More information');
+      const headerAction = await within(dialog).findByRole('button', { name: 'Header action' });
+      const footerAction = await within(dialog).findByRole('button', { name: 'Footer action' });
+      expect(description).toBeVisible();
+
+      await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
+
+      expect(description).not.toBeVisible();
+      expect(headerAction).not.toBeVisible();
+      expect(footerAction).not.toBeVisible();
+    });
+
+    it.each([
+      { size: 'default', headingElement: undefined, level: 3 },
+      { size: 'small', headingElement: undefined, level: 4 },
+      { size: 'default', headingElement: 'h2', level: 2 },
+    ] as const)('maps size $size and heading $headingElement', async ({ size, headingElement, level }) => {
+      render(
+        <DockPanel title="Details" labels={labels} size={size} headingElement={headingElement} mobile>
+          Content
+        </DockPanel>
+      );
+
+      const dialog = await screen.findByRole('dialog', { name: 'Details' });
+      expect(within(dialog).getByRole('heading', { level, name: 'Details' })).toBeInTheDocument();
+    });
+
+    it('renders numeric zero in the sheet slots', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} headerActions={0} footer={0} mobile>
+          0
+        </DockPanel>
+      );
+
+      expect(await screen.findByRole('dialog', { name: 'Details' })).toHaveTextContent(/^Details0.*0.*0$/);
+    });
+
+    it('passes className and style to the sheet', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} className="custom-panel" style={{ maxWidth: '20rem' }} mobile>
+          Content
+        </DockPanel>
+      );
+
+      const dialog = await screen.findByRole('dialog', { name: 'Details' });
+      expect(dialog).toHaveClass('custom-panel');
+      expect(dialog).toHaveStyle({ maxWidth: '20rem' });
+    });
+
+    it('renders slots in place when mobile is false', () => {
+      const { container } = render(
+        <DockPanel
+          title="Details"
+          labels={labels}
+          mobile={false}
+          headerActions={<button type="button">Action</button>}
+          footer={<button type="button">Footer</button>}
+        >
+          <Editor />
+        </DockPanel>
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Example value' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Footer' })).toBeInTheDocument();
+      expect(container.querySelector('.tedi-dock-panel__slot')).not.toBeInTheDocument();
+    });
+
+    it('leaves no empty slot behind when mobile changes to false', () => {
+      const panel = (mobile?: boolean) => (
+        <DockPanel title="Details" labels={labels} mobile={mobile}>
+          Content
+        </DockPanel>
+      );
+      const { container, rerender } = render(panel());
+      expect(container.querySelector('.tedi-dock-panel__slot')).toBeInTheDocument();
+
+      rerender(panel(false));
+
+      expect(container.querySelector('.tedi-dock-panel__slot')).not.toBeInTheDocument();
+      expect(screen.getByRole('region', { name: 'Details' })).toHaveTextContent('Content');
+    });
+
+    it('connects the content before child effects run when forced to mobile', async () => {
+      const connected: Record<string, boolean | undefined> = {};
+      const Probe = () => {
+        const ref = useRef<HTMLSpanElement>(null);
+        useLayoutEffect(() => {
+          connected.layout = ref.current?.isConnected;
+        }, []);
+        useEffect(() => {
+          connected.passive = ref.current?.isConnected;
+        }, []);
+        return <span ref={ref}>Probe</span>;
+      };
+      Probe.displayName = 'DockPanelTestProbe';
+
+      render(
+        <DockPanel title="Details" labels={labels} mobile>
+          <Probe />
+        </DockPanel>
+      );
+
+      await screen.findByRole('dialog', { name: 'Details' });
+      expect(connected).toEqual({ layout: true, passive: true });
+    });
+  });
+
+  describe('toggle', () => {
+    it('uses the labels and exposes the expanded state of an existing element', async () => {
+      const user = userEvent.setup();
+      render(
+        <DockPanel title="Details" labels={labels} mobile>
+          Content
+        </DockPanel>
+      );
+
+      const toggle = await screen.findByRole('button', { name: 'Minimize panel' });
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(document.getElementById(toggle.getAttribute('aria-controls') as string)).toHaveTextContent('Content');
+
+      await user.click(toggle);
+
+      expect(toggle).toHaveAccessibleName('Restore panel');
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('lets the header wrap only while header actions are shown', async () => {
+      const user = userEvent.setup();
+      render(
+        <DockPanel title="Details" labels={labels} headerActions={<button type="button">Action</button>} mobile>
+          Content
+        </DockPanel>
+      );
+      const header = (await screen.findByRole('heading', { name: 'Details' })).parentElement;
+      expect(header).toHaveClass('tedi-dock-panel__sheet-header');
+
+      await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
+
+      expect(header).not.toHaveClass('tedi-dock-panel__sheet-header');
+    });
+
+    it('minimizes and restores uncontrolled, keeping content mounted but hidden', async () => {
+      const user = userEvent.setup();
+      const onCollapsedChange = jest.fn();
+      render(
+        <DockPanel title="Details" labels={labels} onCollapsedChange={onCollapsedChange} mobile>
+          <Editor />
+        </DockPanel>
+      );
+
+      const input = await screen.findByRole('textbox', { name: 'Example value' });
+      await user.type(input, ' edited');
+      await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
+
+      expect(input).toBeInTheDocument();
+      expect(input).not.toBeVisible();
+      expect(onCollapsedChange).toHaveBeenLastCalledWith(true);
+
+      await user.click(screen.getByRole('button', { name: 'Restore panel' }));
+
+      expect(screen.getByRole('textbox', { name: 'Example value' })).toBe(input);
+      expect(input).toHaveValue('Initial value edited');
+      expect(onCollapsedChange).toHaveBeenLastCalledWith(false);
+    });
+
+    it('only requests changes while controlled', async () => {
+      const user = userEvent.setup();
+      const onCollapsedChange = jest.fn();
+      render(
+        <DockPanel title="Details" labels={labels} collapsed={false} onCollapsedChange={onCollapsedChange} mobile>
+          Content
+        </DockPanel>
+      );
+
+      await user.click(await screen.findByRole('button', { name: 'Minimize panel' }));
+
+      expect(onCollapsedChange).toHaveBeenCalledWith(true);
+      expect(screen.getByRole('button', { name: 'Minimize panel' })).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('starts minimized from defaultCollapsed', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} defaultCollapsed mobile>
+          <Editor />
+        </DockPanel>
+      );
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('stays minimized when resizable', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} defaultCollapsed resizable mobile>
+          Content
+        </DockPanel>
+      );
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('minimizes through minimizeCounter', async () => {
+      const panel = (minimizeCounter: number) => (
+        <DockPanel title="Details" labels={labels} minimizeCounter={minimizeCounter} mobile>
+          Content
+        </DockPanel>
+      );
+      const { rerender } = render(panel(0));
+      await screen.findByRole('button', { name: 'Minimize panel' });
+
+      rerender(panel(1));
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toBeInTheDocument();
+    });
+  });
+
+  describe('close', () => {
+    it('shows no close button without onClose', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} mobile>
+          Content
+        </DockPanel>
+      );
+
+      await screen.findByRole('dialog', { name: 'Details' });
+      expect(screen.queryByRole('button', { name: 'Close panel' })).not.toBeInTheDocument();
+    });
+
+    it('calls onClose once from the labelled close button', async () => {
+      const user = userEvent.setup();
+      const onClose = jest.fn();
+      render(
+        <DockPanel title="Details" labels={labels} onClose={onClose} mobile>
+          Content
+        </DockPanel>
+      );
+
+      await user.click(await screen.findByRole('button', { name: 'Close panel' }));
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays expanded when the workspace is clicked', async () => {
+      const user = userEvent.setup();
+      const onClose = jest.fn();
+      const onCollapsedChange = jest.fn();
+      render(
+        <>
+          <button type="button">Workspace</button>
+          <DockPanel title="Details" labels={labels} onClose={onClose} onCollapsedChange={onCollapsedChange} mobile>
+            Content
+          </DockPanel>
+        </>
+      );
+      const toggle = await screen.findByRole('button', { name: 'Minimize panel' });
+
+      await user.click(screen.getByRole('button', { name: 'Workspace' }));
+
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(onClose).not.toHaveBeenCalled();
+      expect(onCollapsedChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('escape', () => {
+    it('minimizes an expanded sheet without requesting close, even from outside it', async () => {
+      const user = userEvent.setup();
+      const onClose = jest.fn();
+      render(
+        <>
+          <button type="button">Workspace</button>
+          <DockPanel title="Details" labels={labels} onClose={onClose} mobile>
+            Content
+          </DockPanel>
+        </>
+      );
+      await screen.findByRole('button', { name: 'Minimize panel' });
+      await waitPastFocusFrame();
+      const workspace = screen.getByRole('button', { name: 'Workspace' });
+      act(() => workspace.focus());
+
+      await user.keyboard('{Escape}');
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toBeInTheDocument();
+      expect(workspace).toHaveFocus();
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('does nothing while minimized', async () => {
+      const user = userEvent.setup();
+      const onClose = jest.fn();
+      const onCollapsedChange = jest.fn();
+      render(
+        <DockPanel
+          title="Details"
+          labels={labels}
+          onClose={onClose}
+          onCollapsedChange={onCollapsedChange}
+          defaultCollapsed
+          mobile
+        >
+          Content
+        </DockPanel>
+      );
+      await screen.findByRole('button', { name: 'Restore panel' });
+
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByRole('button', { name: 'Restore panel' })).toBeInTheDocument();
+      expect(onClose).not.toHaveBeenCalled();
+      expect(onCollapsedChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('reserved space', () => {
+    it('adds a spacer to the layout only while the sheet is minimized', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <DockPanelLayout
+          panel={
+            <DockPanel title="Details" labels={labels} mobile>
+              Content
+            </DockPanel>
+          }
+        >
+          Workspace
+        </DockPanelLayout>
+      );
+      const spacer = () => container.querySelector('.tedi-dock-panel__sheet-spacer');
+
+      await user.click(await screen.findByRole('button', { name: 'Minimize panel' }));
+      expect(spacer()?.parentElement).toHaveClass('tedi-dock-panel-layout');
+
+      await user.click(screen.getByRole('button', { name: 'Restore panel' }));
+      expect(spacer()).not.toBeInTheDocument();
+    });
+  });
+
+  describe('drag', () => {
+    it.each([
+      ['with', true],
+      ['without', false],
+    ])('minimizes an expanded sheet dragged down %s onClose', async (_, closable) => {
+      const onClose = jest.fn();
+      render(
+        <DockPanel title="Details" labels={labels} onClose={closable ? onClose : undefined} mobile>
+          Content
+        </DockPanel>
+      );
+      await screen.findByRole('button', { name: 'Minimize panel' });
+
+      dragSheet(200);
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toBeInTheDocument();
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('requests close when a minimized sheet is dragged down', async () => {
+      const onClose = jest.fn();
+      render(
+        <DockPanel title="Details" labels={labels} onClose={onClose} defaultCollapsed mobile>
+          Content
+        </DockPanel>
+      );
+      await screen.findByRole('button', { name: 'Restore panel' });
+
+      dragSheet(200);
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('dialog', { name: 'Details' })).toBeInTheDocument();
+    });
+
+    it('stays minimized when dragged down without onClose', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} defaultCollapsed mobile>
+          Content
+        </DockPanel>
+      );
+      await screen.findByRole('button', { name: 'Restore panel' });
+
+      dragSheet(200);
+
+      expect(screen.getByRole('button', { name: 'Restore panel' })).toBeInTheDocument();
+    });
+
+    it('restores a minimized sheet dragged up', async () => {
+      const onCollapsedChange = jest.fn();
+      render(
+        <DockPanel title="Details" labels={labels} onCollapsedChange={onCollapsedChange} defaultCollapsed mobile>
+          Content
+        </DockPanel>
+      );
+      await screen.findByRole('button', { name: 'Restore panel' });
+
+      dragSheet(-100);
+
+      expect(await screen.findByRole('button', { name: 'Minimize panel' })).toBeInTheDocument();
+      expect(onCollapsedChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('swapping presentation', () => {
+    it('keeps content, footer state and collapsed state across breakpoints', async () => {
+      const user = userEvent.setup();
+      const panel = () => (
+        <DockPanel title="Details" labels={labels} footer={<Counter name="Footer" />}>
+          <Editor />
+        </DockPanel>
+      );
+      const { rerender } = render(panel());
+      const input = screen.getByRole('textbox', { name: 'Example value' });
+      await user.type(input, ' edited');
+      await user.click(screen.getByRole('button', { name: 'Footer: 0' }));
+
+      mockUseBreakpoint.mockReturnValue('sm');
+      rerender(panel());
+      const dialog = await screen.findByRole('dialog', { name: 'Details' });
+
+      expect(await within(dialog).findByRole('textbox', { name: 'Example value' })).toBe(input);
+      expect(input).toHaveValue('Initial value edited');
+      expect(within(dialog).getByRole('button', { name: 'Footer: 1' })).toBeInTheDocument();
+
+      await user.click(within(dialog).getByRole('button', { name: 'Minimize panel' }));
+      mockUseBreakpoint.mockReturnValue('lg');
+      rerender(panel());
+
+      const region = await screen.findByRole('region', { name: 'Details' });
+      expect(region).toHaveAttribute('data-collapsed', 'true');
+      expect(region).toContainElement(input);
+      expect(input).toHaveValue('Initial value edited');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('keeps content reachable by keyboard after leaving the sheet', async () => {
+      const user = userEvent.setup();
+      mockUseBreakpoint.mockReturnValue('sm');
+      const ui = () => (
+        <>
+          <button type="button">Workspace</button>
+          <DockPanel title="Details" labels={labels}>
+            <Editor />
+          </DockPanel>
+        </>
+      );
+      const { rerender } = render(ui());
+      const input = await screen.findByRole('textbox', { name: 'Example value' });
+      const workspace = screen.getByRole('button', { name: 'Workspace' });
+      await waitPastFocusFrame();
+
+      act(() => input.focus());
+      act(() => workspace.focus());
+      await waitPastFocusFrame();
+
+      mockUseBreakpoint.mockReturnValue('lg');
+      rerender(ui());
+      await screen.findByRole('region', { name: 'Details' });
+
+      expect(input).not.toHaveAttribute('tabindex');
+      act(() => workspace.focus());
+      await user.tab();
+      await user.tab();
+      expect(input).toHaveFocus();
+    });
+  });
+
+  describe('focus', () => {
+    const workspaceButton = <button type="button">Workspace</button>;
+    const getWorkspace = () => screen.getByRole('button', { name: 'Workspace' });
+
+    const dockedThenSheet = async (defaultCollapsed: boolean) => {
+      const panel = () => (
+        <>
+          {workspaceButton}
+          <DockPanel title="Details" labels={labels} defaultCollapsed={defaultCollapsed}>
+            Content
+          </DockPanel>
+        </>
+      );
+      const { rerender } = render(panel());
+      act(() => getWorkspace().focus());
+
+      mockUseBreakpoint.mockReturnValue('sm');
+      rerender(panel());
+      await screen.findByRole('dialog', { name: 'Details' });
+    };
+
+    it('moves focus into an expanded sheet on mount', async () => {
+      render(
+        <DockPanel title="Details" labels={labels} mobile>
+          Content
+        </DockPanel>
+      );
+
+      const toggle = await screen.findByRole('button', { name: 'Minimize panel' });
+      await waitFor(() => expect(toggle).toHaveFocus());
+    });
+
+    it('leaves focus alone when a minimized sheet mounts', async () => {
+      const { rerender } = render(<>{workspaceButton}</>);
+      act(() => getWorkspace().focus());
+
+      rerender(
+        <>
+          {workspaceButton}
+          <DockPanel title="Details" labels={labels} defaultCollapsed mobile>
+            Content
+          </DockPanel>
+        </>
+      );
+      await screen.findByRole('button', { name: 'Restore panel' });
+      await waitPastFocusFrame();
+
+      expect(getWorkspace()).toHaveFocus();
+    });
+
+    it.each([
+      ['expanded', false],
+      ['minimized', true],
+    ])('leaves focus alone on a programmatic restore starting %s', async (_, startCollapsed) => {
+      const panel = (collapsed: boolean) => (
+        <>
+          {workspaceButton}
+          <DockPanel title="Details" labels={labels} collapsed={collapsed} mobile>
+            Content
+          </DockPanel>
+        </>
+      );
+      const { rerender } = render(panel(startCollapsed));
+      await screen.findByRole('dialog', { name: 'Details' });
+      await waitPastFocusFrame();
+      act(() => getWorkspace().focus());
+
+      rerender(panel(true));
+      await waitPastFocusFrame();
+      rerender(panel(false));
+      await waitPastFocusFrame();
+
+      expect(getWorkspace()).toHaveFocus();
+    });
+
+    it.each([
+      ['an expanded', false],
+      ['a minimized', true],
+    ])('leaves workspace focus alone when %s panel swaps to the sheet', async (_, defaultCollapsed) => {
+      await dockedThenSheet(defaultCollapsed);
+      await waitPastFocusFrame();
+
+      expect(getWorkspace()).toHaveFocus();
+    });
+
+    it.each([
+      ['a drag', () => dragSheet(200)],
+      ['Escape', () => fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' })],
+    ])('moves focus from hidden content to the toggle when %s minimizes the sheet', async (_, minimize) => {
+      render(
+        <DockPanel title="Details" labels={labels} mobile>
+          <Editor />
+        </DockPanel>
+      );
+      const input = await screen.findByRole('textbox', { name: 'Example value' });
+      await waitPastFocusFrame();
+      act(() => input.focus());
+
+      minimize();
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toHaveFocus();
+    });
+
+    it.each([
+      ['header actions', 'Header action'],
+      ['the footer', 'Footer action'],
+    ])('moves focus from %s to the toggle when the sheet minimizes', async (_, name) => {
+      render(
+        <DockPanel
+          title="Details"
+          labels={labels}
+          headerActions={<button type="button">Header action</button>}
+          footer={<button type="button">Footer action</button>}
+          mobile
+        >
+          Content
+        </DockPanel>
+      );
+      const action = await screen.findByRole('button', { name });
+      await waitPastFocusFrame();
+      act(() => action.focus());
+
+      fireEvent.keyDown(action, { key: 'Escape' });
+
+      expect(await screen.findByRole('button', { name: 'Restore panel' })).toHaveFocus();
+    });
+
+    it('keeps focus on panel content across swaps in both directions', async () => {
+      const panel = () => (
+        <DockPanel title="Details" labels={labels}>
+          <Editor />
+        </DockPanel>
+      );
+      const { rerender } = render(panel());
+      const input = screen.getByRole('textbox', { name: 'Example value' });
+      act(() => input.focus());
+
+      mockUseBreakpoint.mockReturnValue('sm');
+      rerender(panel());
+      await screen.findByRole('dialog', { name: 'Details' });
+      await waitFor(() => expect(input).toHaveFocus());
+
+      mockUseBreakpoint.mockReturnValue('lg');
+      rerender(panel());
+      await screen.findByRole('region', { name: 'Details' });
+      await waitFor(() => expect(input).toHaveFocus());
+    });
+
+    it('moves focus from the panel controls to the toggle of the new presentation', async () => {
+      const panel = () => (
+        <DockPanel title="Details" labels={labels}>
+          Content
+        </DockPanel>
+      );
+      const { rerender } = render(panel());
+      act(() => screen.getByRole('button', { name: 'Minimize panel' }).focus());
+
+      mockUseBreakpoint.mockReturnValue('sm');
+      rerender(panel());
+      const dialog = await screen.findByRole('dialog', { name: 'Details' });
+      const sheetToggle = await within(dialog).findByRole('button', { name: 'Minimize panel' });
+      await waitFor(() => expect(sheetToggle).toHaveFocus());
+
+      mockUseBreakpoint.mockReturnValue('lg');
+      rerender(panel());
+      const region = await screen.findByRole('region', { name: 'Details' });
+      const dockedToggle = within(region).getByRole('button', { name: 'Minimize panel' });
+      await waitFor(() => expect(dockedToggle).toHaveFocus());
+    });
   });
 });

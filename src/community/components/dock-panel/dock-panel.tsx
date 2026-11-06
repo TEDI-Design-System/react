@@ -1,10 +1,27 @@
 'use client';
 
+import { enableFocusInside } from '@floating-ui/react/utils';
 import cn from 'classnames';
-import { CSSProperties, JSX, ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  JSX,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
+import { createPortal } from 'react-dom';
 
 import { Heading, HeadingProps } from '../../../tedi/components/base/typography/heading/heading';
 import { Button } from '../../../tedi/components/buttons/button/button';
+import { ClosingButton } from '../../../tedi/components/buttons/closing-button/closing-button';
+import { CollapseButton } from '../../../tedi/components/buttons/collapse-button/collapse-button';
+import { Sheet } from '../../../tedi/components/overlays/sheet/sheet';
+import { isBreakpointBelow, useBreakpoint } from '../../../tedi/helpers';
 import { Resizer } from '../map-components/resizer/resizer';
 import styles from './dock-panel.module.scss';
 
@@ -81,6 +98,12 @@ export interface DockPanelProps {
    */
   resizable?: boolean;
   /**
+   * Use the bottom sheet (true) or docked panel (false).
+   * When omitted, follows TEDI's below-md breakpoint.
+   * Changing presentation preserves content, except when mobile changes to or from false.
+   */
+  mobile?: boolean;
+  /**
    * Controlled minimized state. Apply changes requested by onCollapsedChange.
    * Omit to use internal state initialized from defaultCollapsed.
    */
@@ -97,10 +120,14 @@ export interface DockPanelProps {
    * In controlled mode, the parent applies onCollapsedChange(true).
    */
   minimizeCounter?: number;
-  /** Receives the next minimized state requested by the toggle or minimizeCounter. */
+  /**
+   * Receives the next minimized state requested by the toggle, minimizeCounter,
+   * or a drag or Escape in the bottom sheet.
+   */
   onCollapsedChange?: (collapsed: boolean) => void;
   /**
    * Shows the close button and requests dismissal without changing the minimized state.
+   * Dragging a minimized bottom sheet down also requests it.
    * The application handles removal, unsaved-change confirmation and focus restoration.
    */
   onClose?: () => void;
@@ -135,14 +162,15 @@ export interface DockPanelProps {
   maxHeight?: number;
   /**
    * Title heading tag and expanded text size. Minimized titles always use compact text.
+   * The bottom sheet uses only the tag.
    * @default h3 (h4 when size is small)
    */
   headingElement?: HeadingProps['element'];
-  /** Panel id for external controls. Generated when omitted. */
+  /** Panel id for external controls, on the content element in the bottom sheet. Generated when omitted. */
   id?: string;
   /** Additional panel class names. */
   className?: string;
-  /** Panel styles, including stacking order and CSS custom properties. */
+  /** Panel styles, including docked stacking order and CSS custom properties. */
   style?: CSSProperties;
 }
 
@@ -151,6 +179,40 @@ type DockPanelStyle = CSSProperties & {
   '--dock-panel-max-width'?: string;
   '--dock-panel-height'?: string;
   '--dock-panel-max-height'?: string;
+};
+
+const subscribeToNothing = () => () => undefined;
+
+const useContentSlot = (content: ReactNode, inline: boolean) => {
+  // Portals can't render on the server or during hydration.
+  const isClient = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  if (!inline && isClient && !nodeRef.current) {
+    nodeRef.current = document.createElement('div');
+    nodeRef.current.className = styles['tedi-dock-panel__slot'];
+  }
+  const node = nodeRef.current;
+  const attach = useCallback(
+    (host: HTMLElement | null) => {
+      if (!node) return;
+      if (!host) {
+        // A host switching to inline content would otherwise keep the emptied node.
+        node.remove();
+        return;
+      }
+      // FloatingPortal leaves tabindex="-1" on content that moves out of it while focus is outside.
+      enableFocusInside(node);
+      host.appendChild(node);
+    },
+    [node]
+  );
+  // The Fragment keeps falsy content such as 0: React replaces falsy portal children on update.
+  const portal = node && createPortal(<>{content}</>, node);
+  return inline ? { node: null, host: { children: content }, portal: null } : { node, host: { ref: attach }, portal };
 };
 
 export const DockPanel = (props: DockPanelProps): JSX.Element => {
@@ -162,6 +224,7 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
     placement = 'right',
     size = 'default',
     resizable = false,
+    mobile,
     collapsed,
     defaultCollapsed = false,
     minimizeCounter,
@@ -192,8 +255,54 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
     workspaceHeight: number;
   }>();
 
-  const isMeasuring = resizable && !workspaceDimensions;
+  const breakpoint = useBreakpoint();
+  // Children mount in the docked shell: the Sheet's hosts only exist a commit after it renders.
+  const [hasMounted, setHasMounted] = useState(false);
+  useLayoutEffect(() => setHasMounted(true), []);
+  const isMobile = hasMounted && (mobile ?? isBreakpointBelow(breakpoint, 'md'));
+
+  // Without a Sheet to move into, content can render in place, which also keeps it in server HTML.
+  const isInline = mobile === false;
+  const contentSlot = useContentSlot(children, isInline);
+  const footerSlot = useContentSlot(footer, isInline);
+  const actionsSlot = useContentSlot(headerActions, isInline);
+  const isInSlot = (element: Element | null) =>
+    [contentSlot, footerSlot, actionsSlot].some((slot) => slot.node?.contains(element));
+  const sheetInitialFocus = useRef<number | undefined>(undefined);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
+  const focusToRestore = useRef<HTMLElement | null>(null);
+  const previousIsMobile = useRef(isMobile);
+
+  const attachToggle = useCallback((toggle: HTMLButtonElement | null) => {
+    toggleRef.current = toggle;
+    const target = focusToRestore.current;
+    if (!toggle || !target) return;
+    focusToRestore.current = null;
+    // Deferred because slot hosts later in this commit haven't received their content yet.
+    queueMicrotask(() => (target.isConnected ? target : toggle).focus());
+  }, []);
+
+  // Read during render: the swap's commit removes the focused element's host before any ref or effect runs.
+  if (previousIsMobile.current !== isMobile) {
+    previousIsMobile.current = isMobile;
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && isInSlot(active)) focusToRestore.current = active;
+    else if (toggleRef.current?.parentElement?.contains(active)) focusToRestore.current = toggleRef.current;
+  }
+
+  const isMeasuring = resizable && !isMobile && !workspaceDimensions;
   const isCollapsed = !isMeasuring && (collapsed ?? internalCollapsed);
+
+  // Floating UI re-runs its focus effect if this flips sign, so resolve it once.
+  // A panel that has been docked on screen swaps rather than opens, so the Sheet leaves focus alone.
+  if (hasMounted && !isMobile) sheetInitialFocus.current = -1;
+  else if (isMobile) sheetInitialFocus.current ??= isCollapsed ? -1 : 0;
+
+  // Minimizing hides the slots, and the browser would otherwise drop focus to the body.
+  useLayoutEffect(() => {
+    if (isMobile && isCollapsed && isInSlot(document.activeElement)) toggleRef.current?.focus();
+  }, [isCollapsed]);
+
   const isSidePanel = placement === 'left' || placement === 'right';
   const resizeDimension = isSidePanel ? 'width' : 'height';
 
@@ -211,7 +320,10 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
   };
 
   useLayoutEffect(() => {
-    if (!resizable) return;
+    if (!resizable || isMobile) {
+      setWorkspaceDimensions(undefined);
+      return;
+    }
 
     const workspace = resizeContainerRef.current?.offsetParent;
     if (!workspace) return;
@@ -245,12 +357,19 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
     const observer = new ResizeObserver(updateWorkspaceSize);
     observer.observe(workspace);
     return () => observer.disconnect();
-  }, [resizable]);
+  }, [resizable, isMobile]);
 
-  const handleCollapseToggle = (): void => {
-    const nextCollapsed = !isCollapsed;
-    if (!isControlled) setInternalCollapsed(nextCollapsed);
-    onCollapsedChange?.(nextCollapsed);
+  const requestCollapsed = (next: boolean): void => {
+    if (!isControlled) setInternalCollapsed(next);
+    onCollapsedChange?.(next);
+  };
+  const handleCollapseToggle = (): void => requestCollapsed(!isCollapsed);
+
+  // Drag and Escape reach this; outside press is off, × calls onClose directly, and Escape is off while minimized.
+  const handleSheetDismiss = (open: boolean): void => {
+    if (open) return;
+    if (isCollapsed) onClose?.();
+    else requestCollapsed(true);
   };
 
   useEffect(() => {
@@ -308,13 +427,12 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
           </Heading>
 
           {hasHeaderActions && (
-            <div className={styles['tedi-dock-panel__header-actions']} hidden={isCollapsed}>
-              {headerActions}
-            </div>
+            <div {...actionsSlot.host} className={styles['tedi-dock-panel__header-actions']} hidden={isCollapsed} />
           )}
 
           <div className={styles['tedi-dock-panel__controls']}>
             <Button
+              ref={attachToggle}
               className={styles['tedi-dock-panel__toggle']}
               type="button"
               visualType="neutral"
@@ -350,76 +468,152 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
 
       <div id={bodyId} className={styles['tedi-dock-panel__body']} hidden={isCollapsed}>
         <div className={styles['tedi-dock-panel__scroll-area']}>
-          <div className={styles['tedi-dock-panel__content']}>{children}</div>
+          <div {...contentSlot.host} className={styles['tedi-dock-panel__content']} />
         </div>
-        {hasFooter && <div className={styles['tedi-dock-panel__footer']}>{footer}</div>}
+        {hasFooter && <div {...footerSlot.host} className={styles['tedi-dock-panel__footer']} />}
       </div>
     </div>
   );
 
-  if (!resizable) return panel;
-
-  const resizerElement = panelRef.current?.previousElementSibling;
-  const panelSize =
-    resizerElement instanceof HTMLElement
-      ? Number.parseFloat(resizerElement.style[resizeDimension])
-      : panelRef.current?.getBoundingClientRect()[resizeDimension] ?? 0;
-  const { minimumSize, maximumSize } = getResizeLimits(
-    workspaceDimensions?.workspaceWidth ?? 0,
-    workspaceDimensions?.workspaceHeight ?? 0
+  const sheet = (
+    <Sheet
+      open
+      closeOnBackdropClick={false}
+      closeOnEscape={!isCollapsed}
+      collapsed={isCollapsed}
+      onCollapsedChange={requestCollapsed}
+      onToggle={handleSheetDismiss}
+    >
+      <Sheet.Content
+        showOverlay={false}
+        trapFocus={false}
+        lockScroll={false}
+        returnFocus={false}
+        initialFocus={sheetInitialFocus.current}
+        padding={size}
+        className={className}
+        style={style}
+      >
+        <Sheet.Header
+          title={title}
+          headingLevel={titleElement}
+          variant="default"
+          className={hasHeaderActions && !isCollapsed ? styles['tedi-dock-panel__sheet-header'] : undefined}
+          closeButton={false}
+          endSlot={
+            hasHeaderActions && (
+              <div {...actionsSlot.host} className={styles['tedi-dock-panel__sheet-actions']} hidden={isCollapsed} />
+            )
+          }
+          actions={
+            <>
+              <CollapseButton
+                ref={attachToggle}
+                className={styles['tedi-dock-panel__sheet-toggle']}
+                hideText
+                open={!isCollapsed}
+                onOpenChange={(open) => requestCollapsed(!open)}
+                aria-label={toggleButtonLabel}
+                aria-controls={panelId}
+              />
+              {onClose && <ClosingButton title={labels.close} onClick={onClose} />}
+            </>
+          }
+        />
+        <Sheet.Body className={styles['tedi-dock-panel__sheet-body']}>
+          {description && (
+            <div className={cn(styles['tedi-dock-panel__description'], styles['tedi-dock-panel__sheet-description'])}>
+              {description}
+            </div>
+          )}
+          <div id={panelId} {...contentSlot.host} />
+        </Sheet.Body>
+        {hasFooter && (
+          <Sheet.Footer fullWidth>
+            <div {...footerSlot.host} />
+          </Sheet.Footer>
+        )}
+      </Sheet.Content>
+    </Sheet>
   );
-  const sizeWithinLimits = Math.min(Math.max(panelSize, minimumSize), maximumSize);
 
-  const resizeLayoutStyle: DockPanelStyle = {
-    height: isSidePanel ? panelStyle['--dock-panel-height'] : undefined,
-    maxHeight: panelStyle['--dock-panel-max-height'],
-    zIndex: style?.zIndex,
-    visibility: isMeasuring && (collapsed ?? internalCollapsed) ? 'hidden' : undefined,
-    '--dock-panel-gap': panelStyle['--dock-panel-gap'],
-    '--dock-panel-rail-size': panelStyle['--dock-panel-rail-size'],
-    '--dock-panel-layer': panelStyle['--dock-panel-layer'],
+  const renderResizable = () => {
+    const resizerElement = panelRef.current?.previousElementSibling;
+    const panelSize =
+      resizerElement instanceof HTMLElement
+        ? Number.parseFloat(resizerElement.style[resizeDimension])
+        : panelRef.current?.getBoundingClientRect()[resizeDimension] ?? 0;
+    const { minimumSize, maximumSize } = getResizeLimits(
+      workspaceDimensions?.workspaceWidth ?? 0,
+      workspaceDimensions?.workspaceHeight ?? 0
+    );
+    const sizeWithinLimits = Math.min(Math.max(panelSize, minimumSize), maximumSize);
+
+    const resizeLayoutStyle: DockPanelStyle = {
+      height: isSidePanel ? panelStyle['--dock-panel-height'] : undefined,
+      maxHeight: panelStyle['--dock-panel-max-height'],
+      zIndex: style?.zIndex,
+      visibility: isMeasuring && (collapsed ?? internalCollapsed) ? 'hidden' : undefined,
+      '--dock-panel-gap': panelStyle['--dock-panel-gap'],
+      '--dock-panel-rail-size': panelStyle['--dock-panel-rail-size'],
+      '--dock-panel-layer': panelStyle['--dock-panel-layer'],
+    };
+
+    // Measure against the full workspace; minimized bars also ignore expanded height limits.
+    if (isCollapsed || isMeasuring) {
+      resizeLayoutStyle.height = undefined;
+      resizeLayoutStyle.maxHeight = undefined;
+    }
+
+    return (
+      <div
+        ref={resizeContainerRef}
+        className={cn(
+          styles['tedi-dock-panel__resize-layout'],
+          isMeasuring && styles['tedi-dock-panel__resize-measurement']
+        )}
+        data-placement={placement}
+        data-collapsed={isCollapsed}
+        style={resizeLayoutStyle}
+      >
+        <div className={styles['tedi-dock-panel__resize-frame']}>
+          {workspaceDimensions && (
+            <Resizer
+              key={resizerResetKey}
+              className={styles['tedi-dock-panel__resizer']}
+              handlePosition={resizeHandleByPlacement[placement]}
+              initialWidth={isSidePanel ? sizeWithinLimits : undefined}
+              initialHeight={isSidePanel ? undefined : sizeWithinLimits}
+              minWidth={isSidePanel ? minimumSize : undefined}
+              minHeight={isSidePanel ? undefined : minimumSize}
+              maxWidth={isSidePanel ? maximumSize : undefined}
+              maxHeight={isSidePanel ? undefined : maximumSize}
+              showIndicator={false}
+            >
+              {null}
+            </Resizer>
+          )}
+          {/* Keep content mounted when only Resizer needs a new starting size. */}
+          {panel}
+        </div>
+      </div>
+    );
   };
 
-  // Measure against the full workspace; minimized bars also ignore expanded height limits.
-  if (isCollapsed || isMeasuring) {
-    resizeLayoutStyle.height = undefined;
-    resizeLayoutStyle.maxHeight = undefined;
-  }
+  const shell = isMobile ? sheet : resizable ? renderResizable() : panel;
 
   return (
-    <div
-      ref={resizeContainerRef}
-      className={cn(
-        styles['tedi-dock-panel__resize-layout'],
-        isMeasuring && styles['tedi-dock-panel__resize-measurement']
-      )}
-      data-placement={placement}
-      data-collapsed={isCollapsed}
-      style={resizeLayoutStyle}
-    >
-      <div className={styles['tedi-dock-panel__resize-frame']}>
-        {workspaceDimensions && (
-          <Resizer
-            key={resizerResetKey}
-            className={styles['tedi-dock-panel__resizer']}
-            handlePosition={resizeHandleByPlacement[placement]}
-            initialWidth={isSidePanel ? sizeWithinLimits : undefined}
-            initialHeight={isSidePanel ? undefined : sizeWithinLimits}
-            minWidth={isSidePanel ? minimumSize : undefined}
-            minHeight={isSidePanel ? undefined : minimumSize}
-            maxWidth={isSidePanel ? maximumSize : undefined}
-            maxHeight={isSidePanel ? undefined : maximumSize}
-            showIndicator={false}
-          >
-            {null}
-          </Resizer>
-        )}
-        {/* Keep content mounted when only Resizer needs a new starting size. */}
-        {panel}
-      </div>
-    </div>
+    <>
+      {shell}
+      {isMobile && isCollapsed && <div className={styles['tedi-dock-panel__sheet-spacer']} />}
+      {contentSlot.portal}
+      {footerSlot.portal}
+      {actionsSlot.portal}
+    </>
   );
 };
+
+DockPanel.displayName = 'DockPanel';
 
 /**
  * Expanded panels overlay the workspace; minimized panels reserve a grid track.
@@ -442,5 +636,7 @@ export const DockPanelLayout = ({ children, panel, className, style }: DockPanel
     {panel}
   </div>
 );
+
+DockPanelLayout.displayName = 'DockPanelLayout';
 
 export default DockPanel;
