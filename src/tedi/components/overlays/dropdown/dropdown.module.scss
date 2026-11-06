@@ -1,15 +1,25 @@
 @use '@tedi-design-system/core/mixins';
 
+$max-width: calc(100vw - 2 * var(--layout-page-spacing-x));
+
 .tedi-dropdown {
   z-index: var(--z-index-dropdown);
   display: flex;
   flex-direction: column;
-  width: var(--dropdown-min-width, max-content);
+  width: max-content;
+
+  // Never narrower than the trigger with `width="auto"` (the variable is set only then), and never
+  // wider than the viewport minus the page's side padding, even with a fixed `width` or a wide trigger.
+  min-width: min(var(--_tedi-dropdown-trigger-width), #{$max-width});
+  max-width: $max-width;
+
+  // Clips item backgrounds to the panel's rounded corners.
+  overflow: hidden;
   pointer-events: none;
   background-color: var(--dropdown-item-default-background);
   border: 1px solid var(--card-border-primary);
   border-radius: var(--form-select-area-radius);
-  box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
+  box-shadow: 0 1px 5px 0 var(--general-effect-colors-elevation-dropdown-area-drop-shadow);
   transform: translateY(-4px) scale(0.98);
   transition: opacity 120ms ease, transform 120ms ease;
 
@@ -26,39 +36,53 @@
     min-height: 0;
     overflow-y: auto;
 
+    .tedi-dropdown & > :first-child {
+      border-start-end-radius: 0;
+    }
+
+    .tedi-dropdown & > :last-child,
+    .tedi-dropdown & > .tedi-dropdown__group:last-child > :last-child {
+      border-end-end-radius: 0;
+    }
+
     &:focus-visible {
-      outline: var(--tedi-borders-02) solid var(--tedi-primary-500);
+      outline: var(--tedi-borders-02) solid transparent;
       outline-offset: calc(-1 * var(--tedi-borders-02));
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 var(--tedi-borders-02) var(--general-effect-colors-focus-outset-outer-shadow),
+        inset 0 0 0 var(--tedi-borders-03) var(--general-effect-colors-focus-outset-inner-shadow);
     }
   }
 
-  &--tree {
-    .tedi-dropdown__item {
-      position: relative;
-    }
+  &__menu {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
 
-    .tedi-dropdown__item[data-indent='1']::before {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0.75rem;
-      width: 2px;
-      content: '';
-      background-color: var(--general-border-primary);
-    }
+  &__header {
+    flex-shrink: 0;
+    padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+  }
 
-    .tedi-dropdown__item[data-indent='1']::after {
-      position: absolute;
-      top: 50%;
-      left: 0.75rem;
-      width: 0.75rem;
-      height: 2px;
-      content: '';
-      background-color: var(--general-border-primary);
-    }
+  &__footer {
+    flex-shrink: 0;
+    padding: var(--dropdown-item-padding-y) var(--dropdown-item-padding-x);
+    border-top: 1px solid var(--general-border-primary);
+  }
 
-    .tedi-dropdown__item[data-indent='1'][data-last]::before {
-      bottom: 50%;
-    }
+  &__group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__group-title {
+    padding: var(--dropdown-group-label-padding-y) var(--dropdown-group-label-padding-x) var(--layout-grid-gutters-04);
+    font-size: var(--heading-subtitle-small-size);
+    font-weight: var(--heading-subtitle-small-weight);
+    line-height: var(--heading-subtitle-small-line-height);
+    color: var(--general-text-tertiary);
+    text-transform: uppercase;
   }
 }

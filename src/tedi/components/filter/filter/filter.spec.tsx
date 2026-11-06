@@ -134,9 +134,9 @@ describe('Filter — multi-select dropdown', () => {
     render(<Filter text="Tags" multiselect options={options} onSelectedValuesChange={onChange} />);
     await user.click(screen.getByRole('button'));
     expect(await screen.findByRole('menu')).toBeInTheDocument();
-    await user.click(screen.getByRole('checkbox', { name: 'Option A' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: 'Option A' }));
     expect(onChange).toHaveBeenLastCalledWith(['a']);
-    await user.click(screen.getByRole('checkbox', { name: 'Option B' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: 'Option B' }));
     expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
     // The menu stays open across multi-select clicks.
     expect(screen.getByRole('menu')).toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('Filter — multi-select dropdown', () => {
     render(<Filter text="Tags" multiselect options={options} defaultSelectedValues={['a', 'b']} />);
     expect(screen.getByText('2')).toBeInTheDocument();
     await user.click(screen.getByRole('button'));
-    await user.click(screen.getByRole('checkbox', { name: 'Option A' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: 'Option A' }));
     expect(screen.getByText('1')).toBeInTheDocument();
   });
 
@@ -156,7 +156,7 @@ describe('Filter — multi-select dropdown', () => {
     const onChange = jest.fn();
     render(<Filter text="Tags" multiselect options={options} showSelectAll onSelectedValuesChange={onChange} />);
     await user.click(screen.getByRole('button'));
-    await user.click(screen.getByRole('checkbox', { name: /vali kõik/i }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: /vali kõik/i }));
     expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
   });
 
@@ -174,7 +174,7 @@ describe('Filter — multi-select dropdown', () => {
       />
     );
     await user.click(screen.getByRole('button'));
-    await user.click(screen.getByRole('checkbox', { name: /vali kõik/i }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: /vali kõik/i }));
     expect(onChange).toHaveBeenLastCalledWith([]);
   });
 
@@ -183,8 +183,8 @@ describe('Filter — multi-select dropdown', () => {
     render(<Filter text="Tags" multiselect options={options} searchable />);
     await user.click(screen.getByRole('button'));
     await user.type(screen.getByRole('searchbox'), 'b');
-    expect(screen.queryByRole('checkbox', { name: 'Option A' })).not.toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: 'Option B' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitemcheckbox', { name: 'Option A' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Option B' })).toBeInTheDocument();
   });
 
   it('clear empties the selection', async () => {
@@ -365,7 +365,7 @@ describe('FilterGroup — dropdown filters keep their own selection state', () =
     );
 
     await user.click(screen.getByRole('button', { name: /tags/i }));
-    await user.click(screen.getByRole('checkbox', { name: 'Option A' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: 'Option A' }));
     // The count badge renders only when `isSelected` is true. Pre-fix the chip
     // read `isSelected` from the unset group state, so the badge never appeared.
     expect(screen.getByText('1')).toBeInTheDocument();
@@ -476,7 +476,7 @@ describe('Filter — maxHeight', () => {
     const clear = document.querySelector('[class*="tedi-filter-dropdown__clear"]');
     expect(optionsBody).not.toContainElement(search as HTMLElement);
     expect(optionsBody).not.toContainElement(clear as HTMLElement);
-    expect(optionsBody).toContainElement(screen.getByRole('checkbox', { name: 'Option A' }));
+    expect(optionsBody).toContainElement(screen.getByRole('menuitemcheckbox', { name: 'Option A' }));
   });
 
   it('does not wrap the options when maxHeight is unset', async () => {
