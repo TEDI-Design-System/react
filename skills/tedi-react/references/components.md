@@ -176,6 +176,18 @@ files. This is the part of this document worth maintaining by hand.
   `name` and auto-generate their `id`, so don't hand-wire those. `variant="card"` + `layout`
   (`separated` / `segmented`) switches to the card styling, and `Checkbox.Group`'s `indeterminateCheck`
   adds a select-all whose checkbox shows the indeterminate ("some selected") state.
+- **`Dropdown.Header` / `.Footer` / `.Group` go inside `Dropdown.Content`.** The header (e.g. a
+  search field) and footer (e.g. "Log out") render outside the menu and outside the `maxHeight` scroll
+  area, so they stay in place. They are only recognised as direct children of `Dropdown.Content`, or
+  inside a fragment there; wrapped in another component they are treated as items. With a header,
+  opening focuses its first control instead of an item, and ArrowDown / ArrowUp move between it and
+  the first item. `Dropdown.Group` takes a `label` that is shown as the title and names the group;
+  item `index` values keep counting across groups.
+- **`Dropdown.Item` `indent` is a nesting level, not a length.** Each level adds 32px
+  (`--dropdown-item-indent`); in `variant="tree"` each level is 1rem, because the connector branch
+  takes the rest. A `Checkbox` / `Radio` child becomes the menu item itself (`menuitemcheckbox` /
+  `menuitemradio`) and keeps the dropdown open when toggled, so don't add `asChild` or
+  `closeOnSelect={false}` for it.
 - **`TableOfContents`'s `scrollActiveIntoView` needs a scroll container to do anything.** It keeps
   the active row visible as `activeId` changes, but only ever scrolls the TOC's *own* scroll area —
   never the page. That area is the sticky card (`sticky` is on by default) or, when `sticky={false}`,

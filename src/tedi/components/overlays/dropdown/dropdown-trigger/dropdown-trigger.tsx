@@ -29,3 +29,5 @@ export const DropdownTrigger = ({ children }: DropdownTriggerProps) => {
     })
   );
 };
+
+DropdownTrigger.displayName = 'DropdownTrigger';

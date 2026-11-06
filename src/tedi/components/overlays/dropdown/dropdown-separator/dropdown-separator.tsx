@@ -1,5 +1,14 @@
 import Separator from '../../../misc/separator/separator';
 
-export const DropdownSeparator = () => {
-  return <Separator axis="horizontal" />;
+export type DropdownSeparatorProps = {
+  /**
+   * Additional class name(s) for the separator.
+   */
+  className?: string;
 };
+
+export const DropdownSeparator = ({ className }: DropdownSeparatorProps) => {
+  return <Separator axis="horizontal" className={className} />;
+};
+
+DropdownSeparator.displayName = 'DropdownSeparator';

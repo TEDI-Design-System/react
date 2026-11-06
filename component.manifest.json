@@ -746,7 +746,9 @@
       "name": "Radio",
       "category": "form",
       "sourcePath": "src/tedi/components/form/radio",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Single-select radio input with a label and helper text; supports a selectable card variant and grouping via Radio.Group.",
       "keyProps": [
         "id",
@@ -854,7 +856,9 @@
       "name": "Checkbox",
       "category": "form",
       "sourcePath": "src/tedi/components/form/checkbox",
-      "status": [],
+      "status": [
+        "breakpointSupport"
+      ],
       "description": "Checkbox input with a label and helper text; supports an indeterminate state, a selectable card variant, and grouping via Checkbox.Group.",
       "keyProps": [
         "id",
@@ -994,12 +998,13 @@
       "status": [
         "breakpointSupport"
       ],
-      "description": "Render a floating menu of Dropdown.Item actions anchored to a trigger element.",
+      "description": "Floating menu anchored to a trigger, composed from Dropdown.Trigger, Dropdown.Content, Dropdown.Item, Dropdown.Group, Dropdown.Header, Dropdown.Footer and Dropdown.Separator.",
       "keyProps": [
         "width",
         "placement",
+        "maxHeight",
         "divided",
-        "open"
+        "variant"
       ]
     },
     {

@@ -30,4 +30,9 @@ describe('DropdownSeparator', () => {
     const separator = screen.getByTestId('separator');
     expect(separator.tagName).toBe('HR');
   });
+
+  it('passes className to the separator', () => {
+    render(<DropdownSeparator className="custom-separator" />);
+    expect(screen.getByRole('separator')).toHaveClass('custom-separator');
+  });
 });
