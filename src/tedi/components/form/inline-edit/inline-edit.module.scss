@@ -3,7 +3,7 @@
 .tedi-inline-edit__field {
   display: flex;
   flex-direction: column;
-  gap: var(--tedi-dimensions-02);
+  gap: var(--form-field-outer-spacing);
   width: 100%;
   max-width: 100%;
 
@@ -46,7 +46,7 @@
     min-height: var(--_inline-edit-height);
     padding-top: calc(var(--form-field-padding-y-sm) - var(--tedi-borders-01));
     padding-bottom: calc(var(--form-field-padding-y-sm) - var(--tedi-borders-01));
-    padding-left: calc(var(--tedi-dimensions-03) - var(--tedi-borders-01));
+    padding-left: calc(var(--layout-grid-gutters-04) - var(--tedi-borders-01));
     font-size: var(--_inline-edit-font-size);
     line-height: var(--_inline-edit-line-height);
   }
@@ -58,7 +58,7 @@
   :global(.select__control) {
     min-height: var(--_inline-edit-height);
     padding: calc(var(--form-field-padding-y-sm) - var(--tedi-borders-01))
-      calc(var(--tedi-dimensions-03) - var(--tedi-borders-01));
+      calc(var(--layout-grid-gutters-04) - var(--tedi-borders-01));
     font-size: var(--_inline-edit-font-size);
     line-height: var(--_inline-edit-line-height);
   }
@@ -77,13 +77,13 @@
   @include mixins.button-reset;
 
   display: inline-flex;
-  gap: var(--tedi-dimensions-05);
+  gap: var(--layout-grid-gutters-08);
   align-items: center;
   min-height: var(--_inline-edit-height);
-  padding: var(--form-field-padding-y-sm) var(--tedi-dimensions-03);
+  padding: var(--form-field-padding-y-sm) var(--layout-grid-gutters-04);
   font-size: var(--_inline-edit-font-size);
   line-height: var(--_inline-edit-line-height);
-  color: var(--general-text-primary);
+  color: var(--form-input-text-filled);
   text-align: left;
   cursor: pointer;
   background-color: var(--form-hidden-default);
@@ -159,7 +159,7 @@
 }
 
 .tedi-inline-edit__placeholder {
-  color: var(--general-text-tertiary);
+  color: var(--form-input-text-placeholder);
 }
 
 .tedi-inline-edit__prefix {
@@ -167,6 +167,6 @@
 }
 
 .tedi-inline-edit--readonly {
-  padding: var(--form-field-padding-y-sm) var(--tedi-dimensions-03);
-  color: var(--general-text-primary);
+  padding: var(--form-field-padding-y-sm) var(--layout-grid-gutters-04);
+  color: var(--form-input-text-filled);
 }
