@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
+import { getSubcomponentProps, subcomponentArgTypes } from '../../../../../.storybook/subcomponent-controls';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { FloatingButton } from '../../buttons/floating-button/floating-button';
@@ -380,8 +381,15 @@ const ServiceCard = ({ icon, title, text }: ServiceItem): JSX.Element => (
   </Card>
 );
 
-export const Default: Story = {
-  render: () => (
+export const Default: StoryObj = {
+  argTypes: {
+    ...subcomponentArgTypes(Carousel.Content, {
+      category: 'Carousel.Content',
+      prefix: 'content',
+      include: ['fade', 'transitionMs', 'loop', 'centered', 'swipeThreshold'],
+    }),
+  },
+  render: (args: Record<string, unknown>) => (
     <Carousel>
       <Carousel.Header>
         <div>
@@ -391,7 +399,9 @@ export const Default: Story = {
         </div>
         <Carousel.Navigation />
       </Carousel.Header>
-      <Carousel.Content slidesPerView={RESPONSIVE_SLIDES}>{slides(5)}</Carousel.Content>
+      <Carousel.Content slidesPerView={RESPONSIVE_SLIDES} {...getSubcomponentProps(args, 'content')}>
+        {slides(5)}
+      </Carousel.Content>
       <Carousel.Footer style={{ justifyContent: 'center' }}>
         <Carousel.Indicators />
       </Carousel.Footer>
