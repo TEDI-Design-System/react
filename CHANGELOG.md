@@ -1,3 +1,10 @@
+# [21.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.4...react-21.0.0-rc.5) (2026-11-09)
+
+
+### Features
+
+* **carousel:** add swipeThreshold prop and improve swipe navigation [#941](https://github.com/TEDI-Design-System/react/issues/941) ([#1080](https://github.com/TEDI-Design-System/react/issues/1080)) ([551489c](https://github.com/TEDI-Design-System/react/commit/551489c3626b133c841af9fc87d931b63501be0a))
+
 # [21.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.3...react-21.0.0-rc.4) (2026-11-09)
 
 
