@@ -1,3 +1,12 @@
+# [21.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.3...react-21.0.0-rc.4) (2026-11-09)
+
+
+### Bug Fixes
+
+* **modal:** keep the dialog's accessible name from the first render [#1071](https://github.com/TEDI-Design-System/react/issues/1071) ([#1075](https://github.com/TEDI-Design-System/react/issues/1075)) ([43ae6d2](https://github.com/TEDI-Design-System/react/commit/43ae6d2badae432c956dc588822aba0e62aeeb0b))
+* **modal:** keep the trigger child's ref attached across re-renders [#1072](https://github.com/TEDI-Design-System/react/issues/1072) ([#1077](https://github.com/TEDI-Design-System/react/issues/1077)) ([26a554f](https://github.com/TEDI-Design-System/react/commit/26a554f5d28c4a714425760ba07e162ccbefb102))
+* **select:** clear the value with Enter and Space on the clear button [#1038](https://github.com/TEDI-Design-System/react/issues/1038) ([#1082](https://github.com/TEDI-Design-System/react/issues/1082)) ([737ab07](https://github.com/TEDI-Design-System/react/commit/737ab07ca60a6d42d365ff9978796be5a6882e71))
+
 # [21.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.2...react-21.0.0-rc.3) (2026-11-09)
 
 
