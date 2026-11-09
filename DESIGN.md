@@ -91,8 +91,8 @@ the general-purpose roles (`general-*`, `form-*`) and component-scoped ones (`bu
 your own CSS reach for the `general-*` / `form-*` roles listed in the table above. Everything is in
 `@tedi-design-system/core/tokens.json` under `themes.default.semantic` if you need a value the
 table does not list. The single exception to "never touch base" is the `--tedi-dimensions-*`
-spacing scale, which the semantic spacing roles are themselves built from — see *Typography,
-spacing, radius, dimensions* below for when to reach for it directly.
+spacing scale, from which the semantic spacing roles are built: see *Typography, spacing, radius,
+dimensions* below for when to reach for it directly.
 
 **Colour, by role.** Semantic colours are grouped by intent, so pick the role that matches meaning,
 not appearance:
@@ -149,8 +149,9 @@ paths) is `component.manifest.json`; all of them import from
   `onChange`) and **uncontrolled** (`defaultValue`) modes; use inline feedback via the `helper` prop
   (`{ text, type: 'hint' | 'valid' | 'error' }`) rather than custom error markup. See the forms
   reference for the full control list.
-- **Responsive props, not media queries.** Most components take a partial props object per
-  breakpoint (`sm`, `md`, `lg`, `xl`, `xxl`), e.g. `<Button fullWidth lg={{ fullWidth: false }}>`.
+- **Responsive props, not media queries.** Most components read their direct props as the `xs`
+  (smallest) values and take a partial props object for each larger breakpoint (`sm`, `md`, `lg`,
+  `xl`, `xxl`; there is no `xs` prop), e.g. `<Button fullWidth lg={{ fullWidth: false }}>`.
 - **You own the page shell.** There is no `Layout` component and `SideNav` does not position
   itself: it is `height: 100%`, so its row must be a stretching flex row and `main` must own
   scrolling (`overflow-y: auto`, `min-width: 0`). Breaking this gives a wrong-looking page with no
@@ -198,9 +199,9 @@ of [TEDI-Design-System/claude-design-system](https://github.com/TEDI-Design-Syst
 
 - Don't import from `@tedi-design-system/react/community` when a tedi-ready component exists.
 - Don't hardcode hex/rgb colours or pixel values, and don't reference raw `--tedi-*` primitive
-  tokens; go through the semantic layer. The one exception is the `--tedi-dimensions-*` scale,
-  which semantic spacing roles are themselves built from: use it directly only for spacing that has
-  no semantic role.
+  tokens; go through the semantic layer. The one exception is the `--tedi-dimensions-*` scale, from
+  which the semantic spacing roles are built: use it directly only for spacing that has no semantic
+  role.
 - Don't add `var()` fallbacks: write `var(--token-name)`, not `var(--token-name, #fff)`.
 - Don't hand-roll inputs, dropdowns, modals or date/time pickers that TEDI already provides.
 - Don't skip the providers or the stylesheet import: components render unstyled, show label keys
