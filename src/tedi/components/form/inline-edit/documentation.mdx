@@ -1,0 +1,205 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import * as InlineEditStories from './inline-edit.stories';
+
+<Meta of={InlineEditStories} name="Render props & hook" />
+
+# Render props & hook
+
+How to wire a control into `InlineEdit`, and how to build your own markup with the headless `useInlineEdit` hook.
+
+## Editor render props
+
+The `children` render function receives an editor object:
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>T</code>
+      </td>
+      <td>
+        Current draft value - wire this to the control's <code>value</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>onChange</code>
+      </td>
+      <td>
+        <code>(value: T) =&gt; void</code>
+      </td>
+      <td>
+        Update the draft - wire this to the control's <code>onChange</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>commit</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>
+        Commit the draft (fires <code>onChange</code>) and leave edit mode.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>cancel</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Discard the draft and leave edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>size</code>
+      </td>
+      <td>
+        <code>'default' | 'small'</code>
+      </td>
+      <td>The field's size - forward it so the editor matches the read view.</td>
+    </tr>
+  </tbody>
+</table>
+
+Forward `size` to the control so a small field opens a small editor:
+
+```tsx
+{
+  ({ value, onChange, size }) => (
+    <TextField id="name" label="Nimi" hideLabel value={value} onChange={onChange} size={size} />
+  );
+}
+```
+
+Controls that don't use `value` / `onChange` need a one-line adapter: `DateField` takes `selected` / `onSelect`, and
+`Toggle` takes `checked`.
+
+## Committing on pick
+
+For **single-action** controls — a single-select `Select`, `Radio.Group`, or `Toggle` — commit as soon as the user
+makes a selection rather than waiting for blur. A multi-select `Select` or `Checkbox.Group` should _not_ do this: call
+`onChange` only and let the commit happen on blur, otherwise the field closes after the first pick.
+
+```tsx
+<InlineEdit<ISelectOption | null>
+  label="Riik"
+  value={country}
+  onChange={setCountry}
+  renderValue={(v) => (v ? (v.label as string) : '-')}
+>
+  {({ value, onChange, commit }) => (
+    <Select
+      id="country"
+      label="Riik"
+      hideLabel
+      options={countryOptions}
+      value={value}
+      onChange={(next) => {
+        onChange(next as ISelectOption | null);
+        commit();
+      }}
+    />
+  )}
+</InlineEdit>
+```
+
+## `useInlineEdit` hook
+
+When you need full control of the markup, use the headless `useInlineEdit` hook instead of the `InlineEdit` wrapper. It
+manages the read/committed value and the edit draft, with `edit` / `commit` / `cancel` transitions, and supports both
+controlled and uncontrolled use.
+
+```tsx
+const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<string>({
+  value,
+  onChange: setValue,
+});
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Returns</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>isEditing</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>Whether the field is currently in edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>edit</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Enter edit mode (seeds the draft from the committed value).</td>
+    </tr>
+    <tr>
+      <td>
+        <code>commit</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Commit the draft and leave edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>cancel</code>
+      </td>
+      <td>
+        <code>() =&gt; void</code>
+      </td>
+      <td>Discard the draft and leave edit mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>committedValue</code>
+      </td>
+      <td>
+        <code>T</code>
+      </td>
+      <td>The last committed value (what the read view shows).</td>
+    </tr>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>T</code>
+      </td>
+      <td>The current draft value.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onChange</code>
+      </td>
+      <td>
+        <code>(value: T) =&gt; void</code>
+      </td>
+      <td>Update the draft.</td>
+    </tr>
+  </tbody>
+</table>
