@@ -152,6 +152,8 @@ paths) is `component.manifest.json`; all of them import from
 - **Responsive props, not media queries.** Most components read their direct props as the `xs`
   (smallest) values and take a partial props object for each larger breakpoint (`sm`, `md`, `lg`,
   `xl`, `xxl`; there is no `xs` prop), e.g. `<Button fullWidth lg={{ fullWidth: false }}>`.
+  Not every component does (`Section` doesn't): use breakpoint keys only where the component's
+  props declare them.
 - **You own the page shell.** There is no `Layout` component and `SideNav` does not position
   itself: it is `height: 100%`, so its row must be a stretching flex row and `main` must own
   scrolling (`overflow-y: auto`, `min-width: 0`). Breaking this gives a wrong-looking page with no

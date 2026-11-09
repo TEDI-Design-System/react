@@ -15,7 +15,7 @@ Component documentation, examples and APIs are in [Storybook](https://storybook.
 ### Installation
 
 ```
-npm install @tedi-design-system/react
+npm install @tedi-design-system/react dayjs
 ```
 
 Peer dependencies: `react` and `react-dom` 18.3.1 or 19, and `dayjs`. Design tokens, fonts and icons come from `@tedi-design-system/core`, which is installed with the package.
@@ -28,7 +28,7 @@ Import the stylesheet (fonts, tokens and component styles) once, at your app's e
 import '@tedi-design-system/react/index.css';
 ```
 
-To load only one Material Symbols style, use `index-without-icons.css` together with one of `icons/outlined.css`, `icons/rounded.css`, `icons/sharp.css` or `icons/all.css`.
+To load only one Material Symbols style, use `index-without-icons.css` together with one of `icons/outlined.css`, `icons/rounded.css` or `icons/sharp.css`.
 
 Wrap the app in the providers:
 
