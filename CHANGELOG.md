@@ -1,3 +1,10 @@
+# [21.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.2...react-21.0.0-rc.3) (2026-11-09)
+
+
+### Bug Fixes
+
+* **sheet:** keep mouse drags working after a drag from the handle [#1076](https://github.com/TEDI-Design-System/react/issues/1076) ([#1078](https://github.com/TEDI-Design-System/react/issues/1078)) ([ae8cdfc](https://github.com/TEDI-Design-System/react/commit/ae8cdfc960b149dd11db3851e1770eb1b8fcd99c))
+
 # [21.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.1...react-21.0.0-rc.2) (2026-11-05)
 
 
