@@ -167,8 +167,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # TEDI-Design-System/claude-design-system builds its Claude Design System artifact from
       # each release; this tells it which tag to build. semantic-release leaves HEAD on the
-      # tagged release commit, or untagged when nothing was released.
+      # tagged release commit, or untagged when nothing was released. A failure (an expired
+      # token, say) shows on the step but doesn't block merge-to-rc; rerun claude-design-system's
+      # publish workflow with the tag by hand then.
       - name: Notify claude-design-system
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.DESIGN_SYSTEM_REPO_TOKEN }}
         run: |
