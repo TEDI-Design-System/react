@@ -30,7 +30,8 @@ you own the prose.** Never hand-edit token values or the manifest's derived fiel
    - `components`: high-level guidance + a pointer to `skills/tedi-react/references/components.md`.
      Do NOT re-document every component — the skill and manifest are the catalog.
    - `dosdonts`: concrete rules (import from `@tedi-design-system/react/tedi`; wrap in
-     `ThemeProvider`/`LabelProvider`/`StyleProvider`; no hardcoded hex; tedi-ready over community).
+     `ThemeProvider`/`PrintingProvider`/`LabelProvider`, the last two required; no hardcoded hex;
+     tedi-ready over community).
    Never touch the `<!-- tokens:start/end -->` block. The one hand-maintained passage outside a
    prose marker is the paragraph directly above that block, which explains how to look values up in
    `tokens.json`; keep it accurate if the token pipeline changes, and do not reintroduce a table of
