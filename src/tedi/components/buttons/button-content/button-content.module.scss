@@ -1,7 +1,8 @@
 @use '@tedi-design-system/core/mixins';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-:root {
+:root,
+:host {
   --tedi-btn-text-padding-inline: var(--button-md-inner-spacing);
 }
 

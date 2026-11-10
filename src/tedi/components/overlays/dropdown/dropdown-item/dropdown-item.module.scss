@@ -1,6 +1,7 @@
 @use '@tedi-design-system/core/mixins';
 
-:root {
+:root,
+:host {
   --tree-trunk-width: 2px;
   --tree-branch-width: 12px;
   --tree-bullet-size: 8px;
