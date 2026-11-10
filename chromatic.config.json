@@ -3,5 +3,6 @@
   "buildScriptName": "build:sb",
   "autoAcceptChanges": "main",
   "skip": "dependabot/**",
-  "onlyChanged": true
+  "onlyChanged": true,
+  "untraced": ["CHANGELOG.md", "src/tedi/index.ts", "src/community/index.ts"]
 }
