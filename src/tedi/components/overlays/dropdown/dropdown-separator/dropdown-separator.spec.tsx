@@ -2,6 +2,7 @@
 
 import { render, screen } from '@testing-library/react';
 
+import Separator from '../../../misc/separator/separator';
 import { DropdownSeparator } from './dropdown-separator';
 
 jest.mock('../../../misc/separator/separator', () => ({
@@ -25,10 +26,14 @@ describe('DropdownSeparator', () => {
   });
 
   it('renders a semantic separator (hr)', () => {
+    // The real Separator, not the mock, which always renders an hr.
+    const actual = jest.requireActual('../../../misc/separator/separator');
+    (Separator as unknown as jest.Mock).mockImplementationOnce(actual.default);
     render(<DropdownSeparator />);
 
-    const separator = screen.getByTestId('separator');
+    const separator = screen.getByRole('separator');
     expect(separator.tagName).toBe('HR');
+    expect(separator).not.toHaveAttribute('data-testid');
   });
 
   it('passes className to the separator', () => {

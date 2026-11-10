@@ -36,15 +36,6 @@ $max-width: calc(100vw - 2 * var(--layout-page-spacing-x));
     min-height: 0;
     overflow-y: auto;
 
-    .tedi-dropdown & > :first-child {
-      border-start-end-radius: 0;
-    }
-
-    .tedi-dropdown & > :last-child,
-    .tedi-dropdown & > .tedi-dropdown__group:last-child > :last-child {
-      border-end-end-radius: 0;
-    }
-
     &:focus-visible {
       outline: var(--tedi-borders-02) solid transparent;
       outline-offset: calc(-1 * var(--tedi-borders-02));

@@ -56,8 +56,7 @@ heavily-populated `form-<component>-*` families (`form-checkbox-*`, `form-toggle
 | Role family | Tokens | Example members |
 | --- | --- | --- |
 | `form-calendar-*` | 1 | `form-calendar-date-width` |
-| `form-checkbox-*` | 22 | `form-checkbox-radio-card-checkbox-icon-padding-y`, `form-checkbox-radio-card-checkbox-indicator-padding-y` |
-| `form-choice-*` | 111 | `form-choice-card-primary-selected-background-active`, `form-choice-card-primary-selected-background-default` |
+| `form-checkbox-*` | 72 | `form-checkbox-radio-card-checkbox-icon-padding-y`, `form-checkbox-radio-card-checkbox-indicator-padding-y` |
 | `form-datepicker-*` | 11 | `form-datepicker-date-active`, `form-datepicker-date-available` |
 | `form-field-*` | 18 | `form-field-button-height`, `form-field-button-height-sm` |
 | `form-general-*` | 9 | `form-general-background-action-background`, `form-general-background-default` |
@@ -65,18 +64,17 @@ heavily-populated `form-<component>-*` families (`form-checkbox-*`, `form-toggle
 | `form-input-*` | 10 | `form-input-background-default`, `form-input-background-disabled` |
 | `form-label-*` | 1 | `form-label` |
 | `form-number-*` | 2 | `form-number-input-min-width`, `form-number-min-width` |
-| `form-rating-*` | 18 | `form-rating-selected-background-default`, `form-rating-selected-background-disabled` |
 | `form-select-*` | 2 | `form-select-area-max-height`, `form-select-area-radius` |
 | `form-slider-*` | 23 | `form-slider-active-background-active`, `form-slider-active-background-default` |
 | `form-textarea-*` | 1 | `form-textarea-min-height` |
-| `form-toggle-*` | 34 | `form-toggle-colored-selected-active`, `form-toggle-colored-selected-default` |
-| `general-border-*` | 10 | `general-border-accent`, `general-border-brand` |
+| `form-toggle-*` | 34 | `form-toggle-colored-active-active`, `form-toggle-colored-active-default` |
+| `general-border-*` | 8 | `general-border-accent`, `general-border-brand` |
 | `general-effect-*` | 10 | `general-effect-colors-elevation-dropdown-area-drop-shadow`, `general-effect-colors-elevation-general-primary` |
 | `general-icon-*` | 15 | `general-icon-accent`, `general-icon-background-brand-primary` |
-| `general-state-*` | 4 | `general-state-active`, `general-state-hover` |
-| `general-status-*` | 22 | `general-status-danger-background-primary`, `general-status-danger-background-secondary` |
-| `general-surface-*` | 15 | `general-surface-accent`, `general-surface-brand-primary` |
-| `general-text-*` | 7 | `general-text-brand`, `general-text-dark` |
+| `general-separator-*` | 1 | `general-separator-primary` |
+| `general-status-*` | 23 | `general-status-danger-background-primary`, `general-status-danger-background-secondary` |
+| `general-surface-*` | 17 | `general-surface-accent`, `general-surface-active` |
+| `general-text-*` | 8 | `general-text-brand`, `general-text-dark` |
 <!-- tokens:end -->
 
 ## Colors, Typography, Shapes, Layout

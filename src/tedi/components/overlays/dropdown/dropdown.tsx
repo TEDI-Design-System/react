@@ -33,7 +33,7 @@ import { DropdownTrigger } from './dropdown-trigger/dropdown-trigger';
 
 const DROPDOWN_OFFSET = 4;
 const HEADER_FOCUSABLE =
-  'input:not([disabled]), button:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+  'input:not([disabled]):not([type="hidden"]), button:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 type DropdownBreakpointProps = {
   /**
@@ -228,7 +228,7 @@ export const Dropdown = (props: DropdownProps) => {
       onNavigate: setActiveIndex,
       loop: true,
       selectedIndex: defaultActiveIndex ?? null,
-      focusItemOnOpen: !header.length,
+      focusItemOnOpen: defaultActiveIndex !== undefined || !header.length,
       focusItemOnHover: false,
       enabled: !navigation,
     }),
@@ -314,7 +314,10 @@ export const Dropdown = (props: DropdownProps) => {
       (item) => !!item && !item.disabled && item.getAttribute('aria-disabled') !== 'true'
     );
     const firstItem = listItemsRef.current[firstIndex];
-    const headerControl = headerEl.querySelector<HTMLElement>(HEADER_FOCUSABLE);
+    // Skips controls hidden by styles (e.g. at a breakpoint); checkVisibility is missing in older browsers.
+    const headerControl = Array.from(headerEl.querySelectorAll<HTMLElement>(HEADER_FOCUSABLE)).find(
+      (el) => el.checkVisibility?.() ?? true
+    );
 
     if (event.key === 'ArrowDown' && headerEl.contains(target) && !target.closest(OWN_ARROW_KEYS) && firstItem) {
       event.preventDefault();

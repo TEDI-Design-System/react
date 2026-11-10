@@ -746,9 +746,7 @@
       "name": "Radio",
       "category": "form",
       "sourcePath": "src/tedi/components/form/radio",
-      "status": [
-        "breakpointSupport"
-      ],
+      "status": [],
       "description": "Single-select radio input with a label and helper text; supports a selectable card variant and grouping via Radio.Group.",
       "keyProps": [
         "id",
@@ -856,9 +854,7 @@
       "name": "Checkbox",
       "category": "form",
       "sourcePath": "src/tedi/components/form/checkbox",
-      "status": [
-        "breakpointSupport"
-      ],
+      "status": [],
       "description": "Checkbox input with a label and helper text; supports an indeterminate state, a selectable card variant, and grouping via Checkbox.Group.",
       "keyProps": [
         "id",

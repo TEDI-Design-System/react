@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { UnknownType } from '../../../../types/commonTypes';
 import { Checkbox } from '../../../form/checkbox/checkbox';
@@ -287,6 +288,17 @@ describe('DropdownItem', () => {
       expect(screen.getByRole('menuitemcheckbox', { name: 'Tallinn' })).toHaveAttribute('aria-checked', 'true');
     });
 
+    it('finds a checkbox OptionContent inside a fragment', () => {
+      renderItem(
+        <>
+          <OptionContent type="checkbox" selected>
+            <OptionContent.Label>Tallinn</OptionContent.Label>
+          </OptionContent>
+        </>
+      );
+      expect(screen.getByRole('menuitemcheckbox', { name: 'Tallinn' })).toHaveAttribute('aria-checked', 'true');
+    });
+
     it('announces an unchecked and an indeterminate checkbox', () => {
       const { rerender } = renderItem(<OptionContent type="checkbox">Tartu</OptionContent>);
       expect(screen.getByRole('menuitemcheckbox')).toHaveAttribute('aria-checked', 'false');
@@ -524,15 +536,27 @@ describe('DropdownItem', () => {
       expect(onChange).not.toHaveBeenCalled();
     });
 
-    it('marks a disabled item and an indeterminate checkbox on the input', () => {
+    it('marks a disabled item and an indeterminate checkbox on the input', async () => {
+      const onChange = jest.fn();
       render(
         <DropdownItem index={0} disabled>
-          <Checkbox id="c" label="Kõik" value="" name="" indeterminate onChange={jest.fn()} />
+          <Checkbox id="c" label="Kõik" value="" name="" indeterminate onChange={onChange} />
         </DropdownItem>
       );
 
       const input = screen.getByRole('menuitemcheckbox', { name: 'Kõik' });
       expect(input).toHaveAttribute('aria-disabled', 'true');
+      expect(input).toHaveAttribute('aria-checked', 'mixed');
+
+      // user-event, as fireEvent toggles a disabled input in jsdom, unlike a browser
+      const user = userEvent.setup();
+      await user.click(input);
+      await user.click(screen.getByText('Kõik'));
+      input.focus();
+      await user.keyboard(' ');
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(input).not.toBeChecked();
       expect(input).toHaveAttribute('aria-checked', 'mixed');
     });
 

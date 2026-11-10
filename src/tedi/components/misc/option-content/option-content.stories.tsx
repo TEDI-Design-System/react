@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
-import { Fragment, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 
 import { Icon } from '../../base/icon/icon';
 import { Col, Row as GridRow } from '../../layout/grid';
@@ -246,7 +246,10 @@ const sourceParams = (code: string) => ({
   docs: { source: { language: 'tsx', code } },
 });
 
-const showcaseContext = (variant: 'default' | 'tree'): DropdownContextValue =>
+const showcaseContext = (
+  variant: 'default' | 'tree',
+  nav?: Pick<DropdownContextValue, 'listItemsRef' | 'activeIndex' | 'setActiveIndex'>
+): DropdownContextValue =>
   ({
     open: true,
     setOpen: () => undefined,
@@ -261,8 +264,15 @@ const showcaseContext = (variant: 'default' | 'tree'): DropdownContextValue =>
     setContent: () => undefined,
     divided: false,
     variant,
+    ...nav,
   } as unknown as DropdownContextValue);
 
+const NAV_KEYS = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
+
+/**
+ * Stand-in for an open dropdown. Items with an `index` get a roving tab stop (the first one by default)
+ * and arrow-key navigation, as in a real dropdown.
+ */
 const Menu = ({
   children,
   variant = 'default',
@@ -271,25 +281,56 @@ const Menu = ({
   children: React.ReactNode;
   variant?: 'default' | 'tree';
   width?: number;
-}): JSX.Element => (
-  <DropdownContext.Provider value={showcaseContext(variant)}>
-    <div
-      role="menu"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        maxWidth: width,
-        background: 'var(--general-surface-primary)',
-        border: '1px solid var(--card-border-primary)',
-        borderRadius: 'var(--card-radius-rounded)',
-        boxShadow: '0 1px 5px 0 var(--general-effect-colors-elevation-dropdown-area-drop-shadow)',
-      }}
-    >
-      {children}
-    </div>
-  </DropdownContext.Provider>
-);
+}): JSX.Element => {
+  const listItemsRef = useRef<Array<HTMLButtonElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!NAV_KEYS.includes(e.key)) return;
+    const enabled = listItemsRef.current.flatMap((item, i) =>
+      item && item.getAttribute('aria-disabled') !== 'true' && !item.disabled ? [i] : []
+    );
+    if (!enabled.length) return;
+    e.preventDefault();
+    const pos = enabled.indexOf(activeIndex ?? -1);
+    const next =
+      e.key === 'Home'
+        ? enabled[0]
+        : e.key === 'End'
+        ? enabled[enabled.length - 1]
+        : enabled[(pos + (e.key === 'ArrowDown' ? 1 : enabled.length - 1)) % enabled.length];
+    setActiveIndex(next);
+    listItemsRef.current[next]?.focus();
+  };
+
+  // Clicking an item moves the tab stop to it.
+  const handleFocus = (e: React.FocusEvent) => {
+    const index = listItemsRef.current.indexOf(e.target as HTMLButtonElement);
+    if (index !== -1) setActiveIndex(index);
+  };
+
+  return (
+    <DropdownContext.Provider value={showcaseContext(variant, { listItemsRef, activeIndex, setActiveIndex })}>
+      <div
+        role="menu"
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          maxWidth: width,
+          background: 'var(--general-surface-primary)',
+          border: '1px solid var(--card-border-primary)',
+          borderRadius: 'var(--card-radius-rounded)',
+          boxShadow: '0 1px 5px 0 var(--general-effect-colors-elevation-dropdown-area-drop-shadow)',
+        }}
+      >
+        {children}
+      </div>
+    </DropdownContext.Provider>
+  );
+};
 
 const Row = ({ children, gap = 16 }: { children: React.ReactNode; gap?: number }): JSX.Element => (
   <div style={{ display: 'flex', gap, flexWrap: 'wrap', alignItems: 'flex-start' }}>{children}</div>
@@ -393,6 +434,7 @@ export const WithCheckbox: Story = {
     const item = (
       key: string,
       label: string,
+      index: number,
       {
         indent,
         selected = isChecked(key),
@@ -400,7 +442,7 @@ export const WithCheckbox: Story = {
         onToggle = () => toggle(key),
       }: { indent?: number; selected?: boolean; indeterminate?: boolean; onToggle?: () => void } = {}
     ) => (
-      <DropdownItem key={key} closeOnSelect={false} indent={indent} onClick={onToggle}>
+      <DropdownItem key={key} index={index} closeOnSelect={false} indent={indent} onClick={onToggle}>
         <OptionContent type="checkbox" selected={selected} indeterminate={indeterminate}>
           <OptionContent.Label>{label}</OptionContent.Label>
         </OptionContent>
@@ -410,24 +452,25 @@ export const WithCheckbox: Story = {
     return (
       <Row>
         <Menu>
-          {CHECKBOX_GROUPS.flatMap(({ label, children }) => {
+          {CHECKBOX_GROUPS.flatMap(({ label, children }, g) => {
             const all = children.every(isChecked);
             const some = children.some(isChecked);
+            const start = CHECKBOX_GROUPS.slice(0, g).reduce((n, group) => n + 1 + group.children.length, 0);
             return [
-              item(label, label, {
+              item(label, label, start, {
                 selected: all,
                 indeterminate: some && !all,
                 onToggle: () => setAll(children, !all),
               }),
-              ...children.map((child) => item(child, child, { indent: 1 })),
+              ...children.map((child, i) => item(child, child, start + 1 + i, { indent: 1 })),
             ];
           })}
         </Menu>
 
-        <Menu>{CHECKBOX_GROUPS.map(({ label }) => item(`flat-${label}`, label))}</Menu>
+        <Menu>{CHECKBOX_GROUPS.map(({ label }, i) => item(`flat-${label}`, label, i))}</Menu>
 
         <Menu>
-          {CHECKBOX_LEVELS.map((label, level) => item(`level-${level}`, label, { indent: level || undefined }))}
+          {CHECKBOX_LEVELS.map((label, level) => item(`level-${level}`, label, level, { indent: level || undefined }))}
         </Menu>
       </Row>
     );

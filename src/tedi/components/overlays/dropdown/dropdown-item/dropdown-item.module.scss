@@ -14,27 +14,6 @@
   color: var(--dropdown-item-default-text);
   text-align: left;
 
-  &:first-child {
-    border-top-left-radius: var(--dropdown-item-radius);
-    border-top-right-radius: var(--dropdown-item-radius);
-  }
-
-  &:last-child {
-    border-bottom-right-radius: var(--dropdown-item-radius);
-    border-bottom-left-radius: var(--dropdown-item-radius);
-  }
-
-  [data-dropdown-header] &:first-child {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-
-  [data-dropdown-footer] &:last-child,
-  [class*='tedi-dropdown__group']:not(:last-child) > &:last-child {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
   &--active {
     color: var(--dropdown-item-active-text);
     background-color: var(--dropdown-item-active-background);
@@ -126,6 +105,15 @@
 
     :is(p, label, div > span):not([class*='tedi-checkbox'] *, [class*='tedi-radio'] *) {
       color: var(--dropdown-item-hover-text);
+    }
+  }
+
+  &:active:not(.tedi-dropdown__item--disabled) {
+    color: var(--dropdown-item-active-text);
+    background-color: var(--dropdown-item-active-background);
+
+    :is(p, label, div > span):not([class*='tedi-checkbox'] *, [class*='tedi-radio'] *) {
+      color: var(--dropdown-item-active-text);
     }
   }
 

@@ -1,6 +1,6 @@
 import { useMergeRefs } from '@floating-ui/react';
 import cn from 'classnames';
-import { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
+import { Children, cloneElement, Fragment, isValidElement, ReactNode, useLayoutEffect, useRef } from 'react';
 
 import { Checkbox } from '../../../form/checkbox/checkbox';
 import { Radio } from '../../../form/radio/radio';
@@ -85,6 +85,16 @@ export type DropdownItemProps = {
   role?: React.AriaRole;
 } & React.AriaAttributes;
 
+/** The only child, looking through fragments (e.g. `<><OptionContent /></>`), or `undefined`. */
+const onlyChild = (children: ReactNode): ReactNode => {
+  const nodes = Children.toArray(children);
+  if (nodes.length !== 1) return undefined;
+  const [node] = nodes;
+  return isValidElement<{ children?: ReactNode }>(node) && node.type === Fragment
+    ? onlyChild(node.props.children)
+    : node;
+};
+
 /**
  * Calls a Floating UI item handler as if the event came from the inner control. The handlers find
  * the item by `currentTarget`, and a `Checkbox` / `Radio` item registers its input, not the row.
@@ -115,9 +125,13 @@ export const DropdownItem = ({
 
   const Component = asChild ? 'div' : 'button';
 
-  // The checkbox / radio in OptionContent is hidden from screen readers, so the item exposes its state.
+  // OptionContent's checkbox / radio is aria-hidden (unless indicatorSemantics="control"), so the
+  // item takes the menuitemcheckbox / menuitemradio role and aria-checked from its props.
+  const contentChild = onlyChild(children);
   const optionContent =
-    isValidElement<OptionContentProps>(children) && children.type === OptionContent ? children.props : undefined;
+    isValidElement<OptionContentProps>(contentChild) && contentChild.type === OptionContent
+      ? contentChild.props
+      : undefined;
   const checkType =
     !navigation && optionContent?.indicatorSemantics !== 'control' && optionContent?.type !== 'default'
       ? optionContent?.type
@@ -279,6 +293,9 @@ export const DropdownItem = ({
 
   if (controlOwnsItem) {
     const hookProps = getItemProps({ role: 'none' }) as Record<string, unknown>;
+    // A disabled item disables its control too, so a click or Space on the input can't toggle it.
+    const control = children as React.ReactElement<{ disabled?: boolean }>;
+    const controlChild = disabled ? cloneElement(control, { disabled: control.props.disabled || disabled }) : children;
 
     return (
       <div
@@ -295,7 +312,7 @@ export const DropdownItem = ({
         }}
         onKeyDown={handleKeyDown}
       >
-        {children}
+        {controlChild}
       </div>
     );
   }

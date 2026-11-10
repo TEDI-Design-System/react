@@ -17,7 +17,8 @@ export type DropdownHeaderProps = {
 };
 
 /** Header controls that use the arrow keys themselves, e.g. to open their own list or move the caret. */
-export const OWN_ARROW_KEYS = '[role="combobox"], select, textarea, [aria-expanded="true"]';
+export const OWN_ARROW_KEYS =
+  '[role="combobox"], select, textarea, [aria-expanded="true"], input[type="number"], [role="spinbutton"]';
 
 export const DropdownHeader = ({ children, className }: DropdownHeaderProps) => {
   const { headerRef } = useDropdownContext();

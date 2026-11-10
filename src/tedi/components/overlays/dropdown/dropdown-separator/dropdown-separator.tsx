@@ -8,7 +8,7 @@ export type DropdownSeparatorProps = {
 };
 
 export const DropdownSeparator = ({ className }: DropdownSeparatorProps) => {
-  return <Separator axis="horizontal" className={className} />;
+  return <Separator element="hr" axis="horizontal" className={className} />;
 };
 
 DropdownSeparator.displayName = 'DropdownSeparator';
