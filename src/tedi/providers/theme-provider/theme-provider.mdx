@@ -59,6 +59,8 @@ function ThemeSwitcher() {
   - `.tedi-theme--default`
   - `.tedi-theme--dark`
 - The corresponding CSS variables are applied globally.
+- Inside a Shadow DOM, render the provider inside `StyleProvider` with a `containerElement`. The theme class is then
+  applied to that element instead of `<html>`, and removed from it when the provider unmounts.
 - When the theme changes, styles update in real time without a page reload.
 
 ---

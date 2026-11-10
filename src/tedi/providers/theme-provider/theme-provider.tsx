@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import { StyleContext } from '../style-provider/style-provider';
+
 type TEDITheme = 'default' | 'dark';
 export type Theme = TEDITheme | string;
 
@@ -41,10 +43,13 @@ function getInitialTheme(initialTheme?: Theme): Theme {
 export const ThemeProvider = ({ theme: initialTheme, children }: { theme?: Theme; children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme(initialTheme));
 
+  const { containerElement } = useContext(StyleContext);
+
   useEffect(() => {
     if (typeof document === 'undefined') return;
+    if (containerElement === null) return;
 
-    const root = document.documentElement;
+    const root = containerElement ?? document.documentElement;
 
     for (let i = root.classList.length - 1; i >= 0; i--) {
       const cls = root.classList.item(i);
@@ -57,7 +62,11 @@ export const ThemeProvider = ({ theme: initialTheme, children }: { theme?: Theme
 
     localStorage.setItem(STORAGE_KEY, theme);
     document.cookie = `${STORAGE_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`;
-  }, [theme]);
+
+    return () => {
+      if (containerElement) root.classList.remove(`${THEME_CLASS_PREFIX}${theme}`);
+    };
+  }, [theme, containerElement]);
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

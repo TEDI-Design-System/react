@@ -34,6 +34,7 @@ import {
   useState,
 } from 'react';
 
+import { getBodyOrShadowRoot, getElementByIdInRoot } from '../../../helpers/shadow-dom';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { CollapseButton, CollapseButtonProps } from '../../buttons/collapse-button/collapse-button';
@@ -1313,7 +1314,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           ghostBody.appendChild(ghostRow);
           ghostTable.appendChild(ghostBody);
           ghost.appendChild(ghostTable);
-          document.body.appendChild(ghost);
+          getBodyOrShadowRoot(event.currentTarget).appendChild(ghost);
           event.dataTransfer.setDragImage(ghost, 24, rowRect.height / 2);
           window.setTimeout(() => ghost.remove(), 0);
         }
@@ -1397,7 +1398,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         ghostHead.appendChild(ghostRow);
         ghostTable.appendChild(ghostHead);
         ghost.appendChild(ghostTable);
-        document.body.appendChild(ghost);
+        getBodyOrShadowRoot(event.currentTarget).appendChild(ghost);
         event.dataTransfer.setDragImage(ghost, rect.width / 2, rect.height / 2);
         window.setTimeout(() => ghost.remove(), 0);
 
@@ -1599,7 +1600,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       const row = rows.find((r) => r.original === pending.original);
       handleId = row ? `${resolvedId}-row-reorder-${row.id}` : null;
     }
-    if (handleId) document.getElementById(handleId)?.focus();
+    if (handleId && scrollRef.current) getElementByIdInRoot(scrollRef.current, handleId)?.focus();
   }, [reorderFocusTick, rows, resolvedId]);
 
   return (

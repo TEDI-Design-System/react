@@ -1,4 +1,7 @@
-import { cloneElement, isValidElement, ReactNode, useEffect, useRef } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import { cloneElement, isValidElement, ReactNode, Ref, useEffect, useRef } from 'react';
+
+import { getElementRef } from '../../../helpers/get-element-ref';
 
 export interface HashTriggerProps {
   /**
@@ -8,6 +11,7 @@ export interface HashTriggerProps {
   /**
    * Id, which is passed to first child element/component.<br />
    * Child component has to inject id to DOM itself.<br />
+   * Inside a Shadow DOM the child also has to forward its ref to that DOM element, otherwise the element is not found.<br />
    * It's used to detect element on page where to scroll.
    */
   id: string;
@@ -21,6 +25,8 @@ export interface HashTriggerProps {
    */
   scrollOnMatch?: boolean;
 }
+
+type ChildProps = { id?: string; ref?: Ref<HTMLElement> };
 
 function isInViewport(el: HTMLElement): boolean {
   const rect = el.getBoundingClientRect();
@@ -44,6 +50,9 @@ function getHashArray(): string[] {
 export const HashTrigger = (props: HashTriggerProps) => {
   const { scrollOnMatch = true, onMatch, id, children } = props;
   const isInitial = useRef(true);
+  const elementRef = useRef<HTMLElement | null>(null);
+  const childRef = isValidElement(children) ? getElementRef<HTMLElement>(children) : undefined;
+  const mergedRef = useMergeRefs<HTMLElement>([elementRef, childRef]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -54,7 +63,8 @@ export const HashTrigger = (props: HashTriggerProps) => {
           onMatch(id);
         }
 
-        const element = document.getElementById(id);
+        // Falls back to a document lookup for children whose ref is not a DOM element.
+        const element = elementRef.current instanceof HTMLElement ? elementRef.current : document.getElementById(id);
 
         if (scrollOnMatch && element && !isInViewport(element)) {
           element.scrollIntoView(isInitial.current ? { behavior: 'instant' } : { behavior: 'smooth', block: 'center' });
@@ -74,5 +84,13 @@ export const HashTrigger = (props: HashTriggerProps) => {
     };
   }, [id, onMatch, scrollOnMatch]);
 
-  return isValidElement(children) ? cloneElement(children, { id } as { id?: string }) : <div id={id}>{children}</div>;
+  if (isValidElement<ChildProps>(children)) {
+    return cloneElement(children, { id, ref: mergedRef });
+  }
+
+  return (
+    <div id={id} ref={mergedRef}>
+      {children}
+    </div>
+  );
 };

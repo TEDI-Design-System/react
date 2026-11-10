@@ -211,7 +211,7 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
   useEffect(() => {
     if (openButtonIndex === null) return;
     const onMouseDown = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+      if (navRef.current && !event.composedPath().includes(navRef.current)) {
         setOpenButtonIndex(null);
       }
     };

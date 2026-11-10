@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 
+import { StyleProvider } from '../style-provider/style-provider';
 import { Theme, ThemeProvider, useTheme } from './theme-provider';
 
 import '@testing-library/jest-dom';
@@ -157,5 +158,52 @@ describe('ThemeProvider', () => {
     expect(document.documentElement).toHaveClass('tedi-theme--invalid');
     expect(localStorage.getItem('tedi-theme')).toBe('invalid');
     expect(document.cookie).toContain('tedi-theme=invalid');
+  });
+
+  it('puts the theme class on the StyleProvider container element instead of <html>', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    render(
+      <StyleProvider containerElement={container}>
+        <ThemeProvider theme="dark">
+          <TestComponent />
+        </ThemeProvider>
+      </StyleProvider>
+    );
+
+    expect(container).toHaveClass('tedi-theme--dark');
+    expect(document.documentElement).not.toHaveClass('tedi-theme--dark');
+    container.remove();
+  });
+
+  it('swaps the theme class on the container element when the theme changes', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    render(
+      <StyleProvider containerElement={container}>
+        <ThemeProvider theme="dark">
+          <TestComponent />
+        </ThemeProvider>
+      </StyleProvider>
+    );
+    act(() => screen.getByText('Set Rit').click());
+
+    expect(container).toHaveClass('tedi-theme--rit');
+    expect(container).not.toHaveClass('tedi-theme--dark');
+    container.remove();
+  });
+
+  it('leaves <html> untouched while the StyleProvider container element is pending', () => {
+    render(
+      <StyleProvider containerElement={null}>
+        <ThemeProvider theme="dark">
+          <TestComponent />
+        </ThemeProvider>
+      </StyleProvider>
+    );
+
+    expect(document.documentElement).not.toHaveClass('tedi-theme--dark');
   });
 });
