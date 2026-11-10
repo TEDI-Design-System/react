@@ -37,6 +37,7 @@ jobs:
   guard:
     runs-on: ubuntu-latest
     permissions:
+      contents: read # the shared script is checked out
       pull-requests: write # the skip notice is posted to the PR
     # `pull_request_review` has no `branches:` filter, so the base branch is
     # checked here. Note the dependabot check reads the PR author, not
@@ -53,13 +54,14 @@ jobs:
       build: ${{ steps.check.outputs.build }}
       previous: ${{ steps.check.outputs.previous }}
     steps:
-      # Only the shared script is needed, from the head being approved.
+      # Only the shared script is needed, from the base branch: a PR branched
+      # before the script landed doesn't have it.
       - name: Checkout
         if: github.event_name != 'workflow_dispatch'
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.base.ref }}
           sparse-checkout: .github/scripts
 
       - name: Does this head need a build?
@@ -111,13 +113,18 @@ jobs:
               previewImports.includes(f.filename) ||
               (f.filename === 'package.json' && previewPackages.test(f.patch ?? ''));
             const config = files.filter(forcesFullBuild).map((f) => f.filename);
+            const marker = '<!-- chromatic-skip -->';
+            const existing = comments.find(
+              (c) => c.user?.login === 'github-actions[bot]' && c.body?.includes(marker),
+            );
             if (config.length === 0) {
+              // A later push dropped the change that forced the skip.
+              if (existing) await github.rest.issues.deleteComment({ owner, repo, comment_id: existing.id });
               core.setOutput('build', 'yes');
               return;
             }
             core.info(`Skipping: this PR changes ${config.join(', ')}, which forces a full build.`);
             core.setOutput('build', 'no');
-            const marker = '<!-- chromatic-skip -->';
             const body = [
               marker,
               '## 🎨 Chromatic',
@@ -126,8 +133,11 @@ jobs:
               '',
               'To see the visual diff before merging, run the **Chromatic React** workflow by hand on this branch.',
             ].join('\n');
-            const existing = comments.find((c) => c.body?.includes(marker));
-            if (!existing) await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
 
   chromatic:
     needs: guard
@@ -208,7 +218,9 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner, repo, issue_number, per_page: 100,
             });
-            const existing = comments.find((c) => c.body?.includes(marker));
+            const existing = comments.find(
+              (c) => c.user?.login === 'github-actions[bot]' && c.body?.includes(marker),
+            );
             if (existing) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
             } else {
