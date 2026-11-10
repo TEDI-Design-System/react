@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { useEffect, useId, useRef } from 'react';
 
+import { getActiveElementInRoot } from '../../../../../helpers/shadow-dom';
 import { useLabels } from '../../../../../providers/label-provider';
 import { ColProps, ColSize } from '../../../../layout/grid';
 import ChoiceGroup from '../../../choice-group/choice-group';
@@ -78,7 +79,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
     const items = Array.from(root.querySelectorAll<HTMLElement>('input[type="radio"]:not([disabled])'));
     if (items.length === 0) return;
 
-    const currentIndex = items.findIndex((el) => el === document.activeElement);
+    const currentIndex = items.findIndex((el) => el === getActiveElementInRoot(root));
     let nextIndex: number;
 
     switch (event.key) {
