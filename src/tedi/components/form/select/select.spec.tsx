@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import InputGroup from '../input-group/input-group';
 import { SelectMultiValueRemove } from './components/select-multi-value-remove';
@@ -74,6 +75,23 @@ describe('Select component', () => {
     fireEvent.click(option);
 
     expect(handleChange).toHaveBeenCalledWith(expect.objectContaining({ value: 'banana', label: 'Banana' }));
+  });
+
+  it('renders the menu into the StyleProvider container element', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    render(
+      <StyleProvider containerElement={container}>
+        <Select {...defaultProps} />
+      </StyleProvider>
+    );
+    const selectInput = screen.getByRole('combobox');
+    fireEvent.focus(selectInput);
+    fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+
+    expect(container).toContainElement(screen.getByText('Banana'));
+    container.remove();
   });
 
   it('renders with a placeholder', () => {

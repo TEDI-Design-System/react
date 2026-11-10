@@ -1,6 +1,7 @@
-import { FloatingArrow, FloatingFocusManager, FloatingPortal } from '@floating-ui/react';
+import { FloatingArrow, FloatingFocusManager } from '@floating-ui/react';
 import { CSSProperties, ReactNode, useContext, useEffect } from 'react';
 
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { OverlayContext } from './overlay';
 
 export interface OverlayContentProps {
@@ -126,7 +127,7 @@ export const OverlayContent = (props: OverlayContentProps) => {
   );
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       {role === 'tooltip' ? (
         floatingNode
       ) : (
@@ -134,6 +135,6 @@ export const OverlayContent = (props: OverlayContentProps) => {
           {floatingNode}
         </FloatingFocusManager>
       )}
-    </FloatingPortal>
+    </StylePortal>
   );
 };

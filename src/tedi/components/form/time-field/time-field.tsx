@@ -2,7 +2,6 @@ import {
   autoUpdate,
   flip,
   FloatingFocusManager,
-  FloatingPortal,
   offset,
   shift,
   useClick,
@@ -22,6 +21,7 @@ import {
   useBreakpointProps,
 } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { UnknownType } from '../../../types/commonTypes';
 import { Dropdown } from '../../overlays/dropdown';
 import type { ModalContentProps } from '../../overlays/modal/modal-content/modal-content';
@@ -411,7 +411,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
       )}
 
       {!shouldUseNativePicker && showPicker && !disabled && !useModalPicker && (
-        <FloatingPortal>
+        <StylePortal>
           {open && (
             <FloatingFocusManager context={context} modal={false} initialFocus={-1}>
               <div
@@ -438,7 +438,7 @@ export const TimeField: React.FC<TimeFieldProps> = (props) => {
               </div>
             </FloatingFocusManager>
           )}
-        </FloatingPortal>
+        </StylePortal>
       )}
     </>
   );

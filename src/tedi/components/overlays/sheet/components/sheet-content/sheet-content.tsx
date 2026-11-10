@@ -1,4 +1,4 @@
-import { FloatingFocusManager, FloatingOverlay, FloatingPortal, useTransitionStatus } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingOverlay, useTransitionStatus } from '@floating-ui/react';
 import cn from 'classnames';
 import {
   ComponentProps,
@@ -15,6 +15,7 @@ import {
 
 import { BreakpointSupport, useBreakpointProps } from '../../../../../helpers';
 import { useLabels } from '../../../../../providers/label-provider';
+import { StylePortal } from '../../../../../providers/style-provider/style-portal';
 import styles from '../../sheet.module.scss';
 import { useSheetContext } from '../../sheet-context';
 
@@ -368,7 +369,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   }
 
   return (
-    <FloatingPortal>
+    <StylePortal>
       <FloatingOverlay
         lockScroll={lockScroll && active}
         // `FloatingOverlay` sets `overflow: auto` inline, so overriding it needs an inline style too.
@@ -418,7 +419,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
           </div>
         </FloatingFocusManager>
       </FloatingOverlay>
-    </FloatingPortal>
+    </StylePortal>
   );
 };
 
