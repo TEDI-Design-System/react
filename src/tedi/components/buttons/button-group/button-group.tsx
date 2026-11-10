@@ -28,7 +28,7 @@ export type ButtonGroupProps = {
    * Whether all buttons in the group should have equal width and stretched inside their parent element.
    * If `true`, all buttons will take up equal space.
    * If `false`, the button widths will be determined by their content.
-   * @default true
+   * @default false
    */
   stretch?: boolean;
   /**
