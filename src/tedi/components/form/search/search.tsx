@@ -1,7 +1,6 @@
 import {
   autoUpdate,
   flip,
-  FloatingPortal,
   offset,
   shift,
   size,
@@ -15,6 +14,7 @@ import React, { forwardRef, useMemo, useRef, useState } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { StylePortal } from '../../../providers/style-provider/style-portal';
 import { IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Button, ButtonProps } from '../../buttons/button/button';
@@ -604,7 +604,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
       )}
 
       {panelVisible && (
-        <FloatingPortal>
+        <StylePortal>
           <div
             ref={refs.setFloating}
             style={floatingStyles}
@@ -618,7 +618,7 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
               </div>
             )}
           </div>
-        </FloatingPortal>
+        </StylePortal>
       )}
     </div>
   );
