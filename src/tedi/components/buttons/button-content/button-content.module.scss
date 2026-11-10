@@ -6,7 +6,8 @@ $btn-height-small: 2rem;
 $btn-height-large: 3.5rem;
 $btn-width-large: 3.72rem;
 
-:root {
+:root,
+:host {
   --tedi-btn-text-padding-inline: var(--button-md-inner-spacing);
 }
 

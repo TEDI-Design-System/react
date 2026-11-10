@@ -75,6 +75,24 @@ component documentation under [components](/docs/components-labelprovider--docs)
 
 Provides the global styles the library depends on.
 
+When the application renders inside a Shadow DOM, pass the element inside the shadow root as
+`containerElement`. Components that render in a portal (overlays, dropdowns, tooltips, modals, select
+menus) render into it instead of `document.body`, and the Emotion styles of `Select` are added to it
+instead of `document.head`.
+
+```tsx
+<StyleProvider containerElement={shadowRootElement} cacheKey="my-app">
+  {children}
+</StyleProvider>
+```
+
+- `containerElement` can be `null` while the element is still mounting, for example state set by a
+  callback ref. Portals wait for it instead of rendering into `document.body`.
+- `cacheKey` is the prefix of the Emotion class names (default `tedi`). Use a different key for each
+  application that is on the same page.
+- The library's stylesheet still has to be added to the shadow root yourself, because it is loaded
+  into the document by default.
+
 #### AccessibilityProvider
 
 Provides global accessibility functionality — Skeleton accessibility texts, and initialising the

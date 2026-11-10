@@ -1,7 +1,8 @@
 @use '@tedi-design-system/core/mixins';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-:root {
+:root,
+:host {
   --medium-sidenav-item-height: 2.75rem;
   --small-sidenav-item-height: 2.25rem;
   --tree-trunk-width: 2px;
