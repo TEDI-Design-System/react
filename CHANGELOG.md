@@ -1,3 +1,10 @@
+# [21.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.5...react-21.0.0-rc.6) (2026-11-10)
+
+
+### Bug Fixes
+
+* **button-group:** correct the documented stretch default [#1001](https://github.com/TEDI-Design-System/react/issues/1001) ([#1086](https://github.com/TEDI-Design-System/react/issues/1086)) ([b00bc4a](https://github.com/TEDI-Design-System/react/commit/b00bc4a45653d0f6f67f7705e63b9e2a6f98607f))
+
 # [21.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.4...react-21.0.0-rc.5) (2026-11-09)
 
 
