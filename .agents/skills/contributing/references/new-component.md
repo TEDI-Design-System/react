@@ -14,7 +14,7 @@ and leave the Figma link out of the stories ([stories.md](stories.md)).
 
 1. Use the Figma MCP server to fetch design context, screenshots, and metadata from the Figma link.
 2. Check if TEDI Angular (`../angular/src/tedi/components/`) has an equivalent component; use it as a behavioural reference.
-3. Check TEDI Core (`../core/src/`) for available design tokens and shared styles.
+3. Check the installed TEDI Core (`node_modules/@tedi-design-system/core/`: `variables/`, `tokens.json`, `_mixins.scss`) for available design tokens and shared styles. It matches the version the library builds against. Read `../core/src/` only when core is being changed together with the component.
 
 ## Step 2: Plan
 
