@@ -26,6 +26,29 @@ describe('lockElementScroll', () => {
     expect(element.style.overflow).toBe('');
   });
 
+  it('restores each overflow axis separately', () => {
+    const element = document.createElement('div');
+    element.style.overflowY = 'auto';
+
+    const unlock = lockElementScroll(element);
+    expect(element.style.overflow).toBe('hidden');
+
+    unlock();
+    expect(element.style.overflowY).toBe('auto');
+    expect(element.style.overflowX).toBe('');
+  });
+
+  it('leaves the overflow alone when another lock released it first', () => {
+    const body = document.createElement('div');
+    body.style.overflow = 'hidden';
+
+    const unlock = lockElementScroll(body, 'scroll');
+    body.style.overflow = '';
+
+    unlock();
+    expect(body.style.overflow).toBe('');
+  });
+
   it('keeps the element locked until the last lock is released', () => {
     const element = document.createElement('div');
 
