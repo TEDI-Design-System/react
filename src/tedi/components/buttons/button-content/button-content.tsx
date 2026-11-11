@@ -39,9 +39,9 @@ export type ButtonContentProps<
      */
     color?: ButtonColor;
     /**
-     * Button size
+     * Button size. The 'xs' size is only intended for icon-only buttons (use with the `icon` prop).
      */
-    size?: 'default' | 'small' | 'large';
+    size?: 'default' | 'small' | 'large' | 'xs';
     /**
      * Name of the icon when button only has an icon in it.
      */

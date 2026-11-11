@@ -176,6 +176,15 @@ $btn-width-large: 3.72rem;
   }
 }
 
+.tedi-btn--xs {
+  &.tedi-btn--icon-only {
+    width: var(--button-xs-icon-size);
+    height: var(--button-xs-icon-size);
+    min-height: var(--button-xs-icon-size);
+    padding: 0;
+  }
+}
+
 .tedi-btn--neutral {
   padding: 0;
   padding-top: calc(var(--button-md-neutral-padding-y) - 1px);

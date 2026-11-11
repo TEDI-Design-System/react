@@ -74,6 +74,16 @@ describe('Button component', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
+  it('renders an extra small icon-only button', () => {
+    render(
+      <Button size="xs" icon="close">
+        Close
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Close' });
+    expect(button).toHaveClass('tedi-btn--xs', 'tedi-btn--icon-only');
+  });
+
   it('is hidden when printing', () => {
     render(<Button>Save</Button>);
     expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('no-print');
