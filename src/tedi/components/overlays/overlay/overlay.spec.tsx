@@ -6,6 +6,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
+import { Modal } from '../modal/modal';
 import Overlay, { OverlayContext } from './overlay';
 
 jest.mock('../../../providers/label-provider', () => ({
@@ -302,6 +303,45 @@ describe('Overlay component', () => {
 
       unmount();
       expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    describe.each([
+      ['modal then overlay', ['modal', 'overlay']],
+      ['overlay then modal', ['overlay', 'modal']],
+    ])('with a modal and a scroll-locking overlay closed in the order %s', (_name, closeOrder) => {
+      it('leaves the body scrollable once both are closed', () => {
+        Object.defineProperty(document.documentElement, 'scrollHeight', {
+          value: window.innerHeight + 100,
+          configurable: true,
+        });
+
+        const Harness = ({ modalOpen, overlayOpen }: { modalOpen: boolean; overlayOpen: boolean }) => (
+          <>
+            <Modal open={modalOpen} onToggle={jest.fn()}>
+              <Modal.Content>
+                <Modal.Header title="Title" />
+              </Modal.Content>
+            </Modal>
+            <Overlay open={overlayOpen} onToggle={jest.fn()} scrollLock>
+              <Overlay.Trigger>Trigger</Overlay.Trigger>
+              <Overlay.Content>Content</Overlay.Content>
+            </Overlay>
+          </>
+        );
+
+        const view = render(<Harness modalOpen overlayOpen={false} />);
+        view.rerender(<Harness modalOpen overlayOpen />);
+
+        const state = { modalOpen: true, overlayOpen: true };
+        closeOrder.forEach((name) => {
+          if (name === 'modal') state.modalOpen = false;
+          else state.overlayOpen = false;
+          view.rerender(<Harness {...state} />);
+        });
+
+        expect(document.body.style.overflow).toBe('');
+        expect(document.documentElement.style.overflow).toBe('');
+      });
     });
 
     it('should lock scrolling and not modify body overflow when page has no scrollbar', async () => {
