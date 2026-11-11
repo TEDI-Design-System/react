@@ -513,16 +513,21 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
 
-    // Gives react-select's document `touchend` handler the composed-path target,
-    // so taps inside a shadow root count as inside the select.
+    // Gives react-select's document `touchend` handler the control or menu from the composed path when the tap
+    // was inside one, so taps inside a shadow root (or a shadow root within an option) count as inside the select.
     React.useEffect(() => {
-      const instance = element.current as { onTouchEnd?: (event: TouchEvent) => void } | null;
+      const instance = element.current as {
+        onTouchEnd?: (event: TouchEvent) => void;
+        controlRef?: HTMLElement | null;
+        menuListRef?: HTMLElement | null;
+      } | null;
       const originalTouchEnd = instance?.onTouchEnd;
 
       if (!instance || !originalTouchEnd) return undefined;
 
       const handleTouchEnd = (event: TouchEvent) => {
-        const target = event.composedPath?.()[0] ?? event.target;
+        const path = event.composedPath?.() ?? [event.target];
+        const target = path.find((node) => node === instance.controlRef || node === instance.menuListRef) ?? path[0];
 
         originalTouchEnd.call(instance, { target } as unknown as TouchEvent);
       };

@@ -107,6 +107,28 @@ describe('Select component', () => {
       host.remove();
     });
 
+    it('keeps the select focused when the tap is inside a shadow root within an option', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+
+      const optionHost = document.createElement('span');
+      const inner = document.createElement('span');
+      optionHost.attachShadow({ mode: 'open' }).appendChild(inner);
+      (screen.getByText('Banana').parentElement as HTMLElement).appendChild(optionHost);
+
+      await act(async () => {
+        touchEnd(inner);
+      });
+
+      expect(shadowRoot.activeElement).toBe(input);
+      host.remove();
+    });
+
     it('still closes the menu when the tap is outside the select', async () => {
       const { host, shadowRoot } = renderInShadowRoot();
       const input = shadowRoot.querySelector('input') as HTMLInputElement;
