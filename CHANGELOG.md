@@ -1,3 +1,10 @@
+# [21.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.7...react-21.0.0-rc.8) (2026-11-11)
+
+
+### Features
+
+* **overlay:** add delay prop to popover and tooltip hover [#1037](https://github.com/TEDI-Design-System/react/issues/1037) ([#1088](https://github.com/TEDI-Design-System/react/issues/1088)) ([0f2ec7b](https://github.com/TEDI-Design-System/react/commit/0f2ec7b51a4fde4a31f83f88a1096cc391d495b0))
+
 # [21.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.6...react-21.0.0-rc.7) (2026-11-11)
 
 
