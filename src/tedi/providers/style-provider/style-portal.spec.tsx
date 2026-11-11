@@ -81,4 +81,41 @@ describe('StylePortal', () => {
 
     expect(outerPortalNode).toContainElement(screen.getByText('nested content'));
   });
+
+  it('moves the content to the new container when the container element changes', () => {
+    const otherContainer = document.createElement('div');
+    document.body.appendChild(otherContainer);
+    const content = (target: HTMLElement | null) => (
+      <StyleProvider containerElement={target}>
+        <StylePortal>
+          <span>portal content</span>
+        </StylePortal>
+      </StyleProvider>
+    );
+
+    const { rerender } = render(content(container));
+    expect(container).toContainElement(screen.getByText('portal content'));
+
+    rerender(content(otherContainer));
+    expect(otherContainer).toContainElement(screen.getByText('portal content'));
+    expect(container).not.toContainElement(screen.getByText('portal content'));
+
+    otherContainer.remove();
+  });
+
+  it('removes the content when the container element becomes pending again', () => {
+    const content = (target: HTMLElement | null) => (
+      <StyleProvider containerElement={target}>
+        <StylePortal>
+          <span>portal content</span>
+        </StylePortal>
+      </StyleProvider>
+    );
+
+    const { rerender } = render(content(container));
+    expect(screen.getByText('portal content')).toBeInTheDocument();
+
+    rerender(content(null));
+    expect(screen.queryByText('portal content')).not.toBeInTheDocument();
+  });
 });

@@ -777,7 +777,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           components={customComponents}
           isDisabled={disabled}
           isSearchable={isSearchable}
-          menuIsOpen={menuIsOpen}
+          menuIsOpen={portalRoot === null ? false : menuIsOpen}
           openMenuOnFocus={openMenuOnFocus}
           openMenuOnClick={openMenuOnClick}
           tabSelectsValue={tabSelectsValue}

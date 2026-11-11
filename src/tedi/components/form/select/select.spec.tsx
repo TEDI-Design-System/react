@@ -94,6 +94,19 @@ describe('Select component', () => {
     container.remove();
   });
 
+  it('keeps the menu closed while the StyleProvider container element is pending', () => {
+    render(
+      <StyleProvider containerElement={null}>
+        <Select {...defaultProps} />
+      </StyleProvider>
+    );
+    const selectInput = screen.getByRole('combobox');
+    fireEvent.focus(selectInput);
+    fireEvent.keyDown(selectInput, { key: 'ArrowDown' });
+
+    expect(screen.queryByText('Banana')).not.toBeInTheDocument();
+  });
+
   it('renders with a placeholder', () => {
     render(<Select {...defaultProps} placeholder="Pick something" />);
     expect(screen.getByText('Pick something')).toBeInTheDocument();
