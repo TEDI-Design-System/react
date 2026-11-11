@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useRef, useState } from 'react';
 
 import { useBreakpointProps } from '../../../helpers';
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { Sheet } from './sheet';
 import { useSheet } from './sheet-context';
 
@@ -1336,5 +1337,26 @@ describe('Sheet', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0]).toBeInstanceOf(HTMLButtonElement);
+  });
+
+  it('locks the StyleProvider scroll container instead of the document while open', () => {
+    const scrollContainer = document.createElement('div');
+
+    const { unmount } = render(
+      <StyleProvider scrollContainer={scrollContainer}>
+        <Sheet defaultOpen>
+          <Sheet.Content>
+            <Sheet.Header title="Layers" />
+            <Sheet.Body>Body</Sheet.Body>
+          </Sheet.Content>
+        </Sheet>
+      </StyleProvider>
+    );
+
+    expect(scrollContainer.style.overflow).toBe('hidden');
+    expect(document.body.style.overflow).not.toBe('hidden');
+
+    unmount();
+    expect(scrollContainer.style.overflow).toBe('');
   });
 });

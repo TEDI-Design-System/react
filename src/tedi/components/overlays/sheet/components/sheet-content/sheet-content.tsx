@@ -14,6 +14,7 @@ import {
 } from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../../../helpers';
+import { useScrollContainerLock } from '../../../../../helpers/hooks/use-scroll-container-lock';
 import { useLabels } from '../../../../../providers/label-provider';
 import { StylePortal } from '../../../../../providers/style-provider/style-portal';
 import styles from '../../sheet.module.scss';
@@ -195,6 +196,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   const { open, floating, getFloatingProps, context, labelId, onOpenChange, collapsed, onCollapsedChange } =
     useSheetContext();
   const { isMounted, status } = useTransitionStatus(context, { duration: { open: 350, close: 300 } });
+  const isScrollContainerLocked = useScrollContainerLock(lockScroll && isMounted);
 
   const { snapPoints, defaultSnapPoint, onSnapPointChange } = props;
   const snaps = useMemo(() => (snapPoints ? [...snapPoints].sort((a, b) => a - b) : []), [snapPoints]);
@@ -371,7 +373,7 @@ export const SheetContent = (props: SheetContentProps): JSX.Element | null => {
   return (
     <StylePortal>
       <FloatingOverlay
-        lockScroll={lockScroll && active}
+        lockScroll={lockScroll && active && !isScrollContainerLocked}
         // `FloatingOverlay` sets `overflow: auto` inline, so overriding it needs an inline style too.
         style={{ overflow: 'clip' }}
         data-status={status}

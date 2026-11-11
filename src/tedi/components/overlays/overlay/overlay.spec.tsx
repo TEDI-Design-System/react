@@ -3,6 +3,7 @@ import { useContext } from 'react';
 
 import * as helpers from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
 import Overlay, { OverlayContext } from './overlay';
@@ -213,6 +214,94 @@ describe('Overlay component', () => {
 
       expect(document.documentElement.style.overflow).toBe('');
       expect(document.body.style.overflow).toBe('');
+    });
+
+    it('should lock the StyleProvider scroll container instead of the document', async () => {
+      const scrollContainer = document.createElement('div');
+
+      render(
+        <StyleProvider scrollContainer={scrollContainer}>
+          <Overlay scrollLock>
+            <Overlay.Trigger>Trigger</Overlay.Trigger>
+            <Overlay.Content>Content</Overlay.Content>
+          </Overlay>
+        </StyleProvider>
+      );
+
+      const trigger = screen.getByText('Trigger');
+
+      await act(async () => {
+        fireEvent.mouseEnter(trigger);
+      });
+
+      expect(scrollContainer.style.overflow).toBe('hidden');
+      expect(document.documentElement.style.overflow).toBe('');
+      expect(document.body.style.overflow).toBe('');
+
+      await act(async () => {
+        fireEvent.mouseLeave(trigger);
+      });
+
+      expect(scrollContainer.style.overflow).toBe('');
+    });
+
+    it('should release the document lock when the scroll container is set while the overlay is open', () => {
+      const scrollContainer = document.createElement('div');
+      const overlay = (
+        <Overlay open onToggle={jest.fn()} scrollLock>
+          <Overlay.Trigger>Trigger</Overlay.Trigger>
+          <Overlay.Content>Content</Overlay.Content>
+        </Overlay>
+      );
+
+      const { rerender, unmount } = render(<StyleProvider>{overlay}</StyleProvider>);
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      rerender(<StyleProvider scrollContainer={scrollContainer}>{overlay}</StyleProvider>);
+      expect(document.documentElement.style.overflow).toBe('');
+      expect(scrollContainer.style.overflow).toBe('hidden');
+
+      unmount();
+      expect(scrollContainer.style.overflow).toBe('');
+      expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    it('should keep the document locked until the last overlapping overlay closes', () => {
+      const overlay = (open: boolean) => (
+        <Overlay open={open} onToggle={jest.fn()} scrollLock>
+          <Overlay.Trigger>Trigger</Overlay.Trigger>
+          <Overlay.Content>Content</Overlay.Content>
+        </Overlay>
+      );
+      const Both = ({ a, b }: { a: boolean; b: boolean }) => (
+        <>
+          {overlay(a)}
+          {overlay(b)}
+        </>
+      );
+
+      const { rerender } = render(<Both a b={false} />);
+      rerender(<Both a b />);
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      rerender(<Both a={false} b />);
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      rerender(<Both a={false} b={false} />);
+      expect(document.documentElement.style.overflow).toBe('');
+    });
+
+    it('should release the document lock when the overlay unmounts while open', () => {
+      const { unmount } = render(
+        <Overlay open onToggle={jest.fn()} scrollLock>
+          <Overlay.Trigger>Trigger</Overlay.Trigger>
+          <Overlay.Content>Content</Overlay.Content>
+        </Overlay>
+      );
+      expect(document.documentElement.style.overflow).toBe('hidden');
+
+      unmount();
+      expect(document.documentElement.style.overflow).toBe('');
     });
 
     it('should lock scrolling and not modify body overflow when page has no scrollbar', async () => {

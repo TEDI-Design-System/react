@@ -104,6 +104,21 @@ instead of `document.head`.
 - The library's stylesheet still has to be added to the shadow root yourself, because it is loaded
   into the document by default.
 
+By default, locking the page scroll while an overlay (Overlay, Modal, Sheet) is open, and `useScroll`,
+use the host document. If the application scrolls inside its own element instead of the page, pass
+that element as `scrollContainer`. It is separate from `containerElement`, even when both are the same
+element:
+
+```tsx
+<StyleProvider containerElement={shadowRootElement} scrollContainer={scrollElement}>
+  {children}
+</StyleProvider>
+```
+
+The overlays then lock `scrollContainer` and restore its previous `overflow` when they close, and leave the host
+page scrollable. Like `containerElement`, it can be `null` while the element is still mounting: nothing is locked until
+it is set.
+
 #### AccessibilityProvider
 
 Provides global accessibility functionality — Skeleton accessibility texts, and initialising the
