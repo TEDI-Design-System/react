@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ComponentProps, createRef } from 'react';
 
 import * as helpers from '../../../helpers';
@@ -151,5 +151,21 @@ describe('Tooltip component', () => {
     expect(content).toBeInTheDocument();
     expect(trigger).not.toHaveAttribute('aria-describedby');
     expect(content.closest('[data-testid="overlay-content"]')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  describe('delay prop', () => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    it('shows the tooltip on hover only after the delay has passed', () => {
+      renderTooltip({ children: 'Trigger content' }, { children: 'Tooltip content' }, { delay: 200 });
+
+      fireEvent.mouseEnter(screen.getByText('Trigger content'));
+      act(() => jest.advanceTimersByTime(199));
+      expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
+
+      act(() => jest.advanceTimersByTime(1));
+      expect(screen.getByText('Tooltip content')).toBeInTheDocument();
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
@@ -158,6 +158,49 @@ describe('Popover component', () => {
 
       rerender(renderWithOffset(() => 12));
       await waitFor(() => expect(content.style.top).toBe('29px'));
+    });
+  });
+
+  describe('delay prop', () => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    const renderHover = (delay?: 0 | 100 | 200 | 300) =>
+      render(
+        <Popover openWith="hover" delay={delay}>
+          <Popover.Trigger>Trigger</Popover.Trigger>
+          <Popover.Content>Content</Popover.Content>
+        </Popover>
+      );
+
+    it('opens on hover only after the delay has passed', () => {
+      renderHover(200);
+      fireEvent.mouseEnter(screen.getByText('Trigger'));
+
+      act(() => jest.advanceTimersByTime(199));
+      expect(screen.queryByTestId('overlay-content')).not.toBeInTheDocument();
+
+      act(() => jest.advanceTimersByTime(1));
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+    });
+
+    it('does not open when the pointer leaves before the delay has passed', () => {
+      renderHover(300);
+      const trigger = screen.getByText('Trigger');
+      fireEvent.mouseEnter(trigger);
+      act(() => jest.advanceTimersByTime(100));
+      fireEvent.mouseLeave(trigger);
+      act(() => jest.advanceTimersByTime(500));
+
+      expect(screen.queryByTestId('overlay-content')).not.toBeInTheDocument();
+    });
+
+    it('opens right away without a delay', () => {
+      renderHover();
+      fireEvent.mouseEnter(screen.getByText('Trigger'));
+      act(() => jest.advanceTimersByTime(0));
+
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
     });
   });
 });
