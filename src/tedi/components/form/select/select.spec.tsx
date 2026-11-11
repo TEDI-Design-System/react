@@ -76,6 +76,57 @@ describe('Select component', () => {
     expect(handleChange).toHaveBeenCalledWith(expect.objectContaining({ value: 'banana', label: 'Banana' }));
   });
 
+  describe('touch inside a shadow root', () => {
+    const renderInShadowRoot = (props: Partial<SelectProps> = {}) => {
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      const container = document.createElement('div');
+      host.attachShadow({ mode: 'open' }).appendChild(container);
+      const view = render(<Select {...defaultProps} {...props} />, { container });
+
+      return { ...view, host, shadowRoot: host.shadowRoot as ShadowRoot };
+    };
+
+    const touchEnd = (target: Element) =>
+      target.dispatchEvent(new Event('touchend', { bubbles: true, composed: true, cancelable: true }));
+
+    it('keeps the select focused when its control is tapped', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+      const control = shadowRoot.querySelector('[class*="control"]') as HTMLElement;
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+      await act(async () => {
+        touchEnd(control);
+      });
+
+      expect(shadowRoot.activeElement).toBe(input);
+      host.remove();
+    });
+
+    it('still closes the menu when the tap is outside the select', async () => {
+      const { host, shadowRoot } = renderInShadowRoot();
+      const input = shadowRoot.querySelector('input') as HTMLInputElement;
+      const outside = document.createElement('button');
+      document.body.appendChild(outside);
+
+      await act(async () => {
+        input.focus();
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+      });
+      await act(async () => {
+        touchEnd(outside);
+      });
+
+      expect(shadowRoot.activeElement).not.toBe(input);
+      host.remove();
+      outside.remove();
+    });
+  });
+
   it('renders with a placeholder', () => {
     render(<Select {...defaultProps} placeholder="Pick something" />);
     expect(screen.getByText('Pick something')).toBeInTheDocument();

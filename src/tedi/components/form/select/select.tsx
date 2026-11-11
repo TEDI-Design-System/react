@@ -513,6 +513,26 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
 
+    // Gives react-select's document `touchend` handler the composed-path target,
+    // so taps inside a shadow root count as inside the select.
+    React.useEffect(() => {
+      const instance = element.current as { onTouchEnd?: (event: TouchEvent) => void } | null;
+      const originalTouchEnd = instance?.onTouchEnd;
+
+      if (!instance || !originalTouchEnd) return undefined;
+
+      const handleTouchEnd = (event: TouchEvent) => {
+        const target = event.composedPath?.()[0] ?? event.target;
+
+        originalTouchEnd.call(instance, { target } as unknown as TouchEvent);
+      };
+
+      document.removeEventListener('touchend', originalTouchEnd, false);
+      document.addEventListener('touchend', handleTouchEnd, false);
+
+      return () => document.removeEventListener('touchend', handleTouchEnd, false);
+    }, [async]);
+
     // Touch-only keyboard deferral (see `openKeyboardOnTouch`). Tapping the field
     // to *open* it suppresses the soft keyboard (`inputMode="none"`); tapping the
     // input *itself* clears the flag so typing can raise the keyboard. Mouse and
