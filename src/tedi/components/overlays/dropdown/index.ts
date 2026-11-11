@@ -3,3 +3,7 @@ export * from './dropdown-context';
 export * from './dropdown-content/dropdown-content';
 export * from './dropdown-trigger/dropdown-trigger';
 export * from './dropdown-item/dropdown-item';
+export * from './dropdown-separator/dropdown-separator';
+export * from './dropdown-header/dropdown-header';
+export * from './dropdown-footer/dropdown-footer';
+export * from './dropdown-group/dropdown-group';

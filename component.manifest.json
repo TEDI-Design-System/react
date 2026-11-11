@@ -998,12 +998,13 @@
       "status": [
         "breakpointSupport"
       ],
-      "description": "Render a floating menu of Dropdown.Item actions anchored to a trigger element.",
+      "description": "Floating menu anchored to a trigger, composed from Dropdown.Trigger, Dropdown.Content, Dropdown.Item, Dropdown.Group, Dropdown.Header, Dropdown.Footer and Dropdown.Separator.",
       "keyProps": [
         "width",
         "placement",
+        "maxHeight",
         "divided",
-        "open"
+        "variant"
       ]
     },
     {

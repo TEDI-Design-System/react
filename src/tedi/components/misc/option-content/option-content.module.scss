@@ -112,6 +112,10 @@
   .tedi-option-content--vertical & {
     flex-direction: column;
     align-items: flex-start;
+
+    .tedi-option-content__label {
+      max-width: 100%;
+    }
   }
 }
 
@@ -124,6 +128,11 @@
   line-height: var(--body-regular-line-height);
   color: inherit;
   white-space: nowrap;
+
+  &--no-clip {
+    overflow: visible;
+    white-space: normal;
+  }
 }
 
 .tedi-option-content__meta {
