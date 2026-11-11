@@ -1,5 +1,8 @@
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
+import { useEffect } from 'react';
 
 import { StyleProvider, usePortalRoot } from './style-provider';
 
@@ -77,5 +80,43 @@ describe('StyleProvider', () => {
     expect(container.querySelector('style[data-emotion^="scoped-test"]')).toBeInTheDocument();
     expect(document.head.querySelector('style[data-emotion^="scoped-test"]')).not.toBeInTheDocument();
     container.remove();
+  });
+
+  it('keeps the children mounted when the container element becomes available', () => {
+    const container = document.createElement('div');
+    const onMount = jest.fn();
+    const Child = () => {
+      useEffect(() => onMount(), []);
+
+      return <span>child</span>;
+    };
+
+    const { rerender } = render(
+      <StyleProvider containerElement={null}>
+        <Child />
+      </StyleProvider>
+    );
+    rerender(
+      <StyleProvider containerElement={container}>
+        <Child />
+      </StyleProvider>
+    );
+
+    expect(onMount).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the Emotion cache of a parent provider when there is no container element', () => {
+    const parentCache = createCache({ key: 'parent' });
+    const Box = styled.div({ color: 'red' });
+
+    render(
+      <CacheProvider value={parentCache}>
+        <StyleProvider>
+          <Box>styled</Box>
+        </StyleProvider>
+      </CacheProvider>
+    );
+
+    expect(document.head.querySelector('style[data-emotion^="parent"]')).toBeInTheDocument();
   });
 });
