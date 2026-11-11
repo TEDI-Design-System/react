@@ -1566,8 +1566,10 @@ describe('DockPanel mobile presentation', () => {
       );
 
       const input = await screen.findByRole('textbox', { name: 'Example value' });
+      const minimize = screen.getByRole('button', { name: 'Minimize panel' });
+      await waitFor(() => expect(minimize).toHaveFocus());
       await user.type(input, ' edited');
-      await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
+      await user.click(minimize);
 
       expect(input).toBeInTheDocument();
       expect(input).not.toBeVisible();
