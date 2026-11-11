@@ -1,5 +1,5 @@
 import createCache from '@emotion/cache';
-import { CacheProvider } from '@emotion/react';
+import { __unsafe_useEmotionCache as useEmotionCache, CacheProvider } from '@emotion/react';
 import React from 'react';
 
 import '../../styles/index.scss';
@@ -45,11 +45,15 @@ export const usePortalRoot = (): HTMLElement | null | undefined => {
 export const StyleProvider = (props: StyleProviderProps): JSX.Element => {
   const { children, containerElement, cacheKey = 'tedi' } = props;
   const value = React.useMemo(() => ({ containerElement }), [containerElement]);
-  const emotionCache = React.useMemo(
+  const inheritedEmotionCache = useEmotionCache();
+  const scopedEmotionCache = React.useMemo(
     () => (containerElement ? createCache({ key: cacheKey, container: containerElement }) : null),
     [containerElement, cacheKey]
   );
-  const content = <StyleContext.Provider value={value}>{children}</StyleContext.Provider>;
 
-  return emotionCache ? <CacheProvider value={emotionCache}>{content}</CacheProvider> : content;
+  return (
+    <CacheProvider value={scopedEmotionCache ?? inheritedEmotionCache}>
+      <StyleContext.Provider value={value}>{children}</StyleContext.Provider>
+    </CacheProvider>
+  );
 };
