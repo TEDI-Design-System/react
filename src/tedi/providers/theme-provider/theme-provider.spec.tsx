@@ -206,4 +206,36 @@ describe('ThemeProvider', () => {
 
     expect(document.documentElement).not.toHaveClass('tedi-theme--dark');
   });
+
+  it('persists theme changes while the StyleProvider container element is pending', () => {
+    render(
+      <StyleProvider containerElement={null}>
+        <ThemeProvider>
+          <TestComponent />
+        </ThemeProvider>
+      </StyleProvider>
+    );
+
+    act(() => screen.getByText('Set Dark').click());
+
+    expect(localStorage.getItem('tedi-theme')).toBe('dark');
+  });
+
+  it('removes the theme class from <html> when the theme moves to a container element', () => {
+    const container = document.createElement('div');
+    const tree = (target?: HTMLElement) => (
+      <StyleProvider containerElement={target}>
+        <ThemeProvider theme="dark">
+          <TestComponent />
+        </ThemeProvider>
+      </StyleProvider>
+    );
+
+    const { rerender } = render(tree());
+    expect(document.documentElement).toHaveClass('tedi-theme--dark');
+
+    rerender(tree(container));
+    expect(document.documentElement.className).not.toMatch(/tedi-theme--/);
+    expect(container).toHaveClass('tedi-theme--dark');
+  });
 });

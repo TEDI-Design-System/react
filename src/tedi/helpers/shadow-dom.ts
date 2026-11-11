@@ -37,3 +37,28 @@ export const getBodyOrShadowRoot = (node: Node): HTMLElement | ShadowRoot => {
 
   return (root as Document).body ?? document.body;
 };
+
+/**
+ * Returns the next element after `node` that matches `selector`, in document order.
+ * When there is none in the root of `node`, the search continues after the shadow host in the parent root,
+ * so focus can move out of a shadow root.
+ */
+export const getNextFocusable = (
+  node: Node,
+  selector: string,
+  isExcluded: (element: HTMLElement) => boolean = () => false
+): HTMLElement | undefined => {
+  const root = getRootNode(node);
+  const next = Array.from(root.querySelectorAll<HTMLElement>(selector)).find(
+    (element) =>
+      !isExcluded(element) &&
+      !node.contains(element) &&
+      (node.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
+  );
+
+  if (next) return next;
+
+  return root.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+    ? getNextFocusable((root as ShadowRoot).host, selector, isExcluded)
+    : undefined;
+};

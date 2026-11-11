@@ -79,7 +79,8 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
 
     const block = findFixedContainingBlock(overlayRef.current);
     const root = overlayRef.current ? getRootNode(overlayRef.current) : document;
-    const header = (block ?? root).querySelector('header') ?? root.querySelector('header');
+    const header =
+      (block ?? root).querySelector('header') ?? root.querySelector('header') ?? document.querySelector('header');
 
     if (!header) {
       setOverlayTop('var(--layout-header-height)');

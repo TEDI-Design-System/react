@@ -164,6 +164,32 @@ describe('MobileNav', () => {
     jest.restoreAllMocks();
   });
 
+  test('uses the page header outside a shadow root when there is none inside it', () => {
+    const header = document.createElement('header');
+    jest.spyOn(header, 'getBoundingClientRect').mockReturnValue({ bottom: 64 } as DOMRect);
+    document.body.appendChild(header);
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const shadowContainer = document.createElement('div');
+    host.attachShadow({ mode: 'open' }).appendChild(shadowContainer);
+
+    const originalResizeObserver = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = jest.fn(() => ({
+      observe: jest.fn(),
+      disconnect: jest.fn(),
+      unobserve: jest.fn(),
+    })) as never;
+
+    const { container } = render(<MobileNav {...baseProps} navItems={navItems} />, { container: shadowContainer });
+
+    expect(container.querySelector('.tedi-sidenav__overlay')).toHaveStyle({ top: '64px' });
+
+    globalThis.ResizeObserver = originalResizeObserver;
+    header.remove();
+    host.remove();
+    jest.restoreAllMocks();
+  });
+
   test('falls back to the header-height token when there is no page header', () => {
     const { container } = render(<MobileNav {...baseProps} navItems={navItems} />);
     const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
