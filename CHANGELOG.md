@@ -1,3 +1,15 @@
+# [21.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.6...react-21.0.0-rc.7) (2026-11-11)
+
+
+### Features
+
+* **dock-panel:** Add Responsive Mobile Sheet Presentation [#1083](https://github.com/TEDI-Design-System/react/issues/1083) ([#1084](https://github.com/TEDI-Design-System/react/issues/1084)) ([486da3b](https://github.com/TEDI-Design-System/react/commit/486da3baf1daafbc46ace7bcff8e050278d70cac))
+
+
+### BREAKING CHANGES
+
+* **dock-panel:** DockPanel becomes a Sheet below md unless `mobile` is false.
+
 # [21.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.5...react-21.0.0-rc.6) (2026-11-10)
 
 
