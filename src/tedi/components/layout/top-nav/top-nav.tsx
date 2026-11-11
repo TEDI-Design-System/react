@@ -13,6 +13,7 @@ import React, {
 } from 'react';
 
 import { Breakpoint, BREAKPOINT_WIDTHS, isBreakpointBelow, useBreakpoint, useSafeId } from '../../../helpers';
+import { getRootNode } from '../../../helpers/shadow-dom';
 import { MobileNav } from '../mobile-nav/mobile-nav';
 import { SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
 import { TopNavGroup, TopNavGroupProps } from './components/top-nav-group/top-nav-group';
@@ -210,8 +211,14 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
 
   useEffect(() => {
     if (openButtonIndex === null) return;
+    const nav = navRef.current;
+    const root = nav ? getRootNode(nav) : document;
+    const eventsInsideNav = new WeakSet<Event>();
+    const markInsideNav = (event: Event) => {
+      if (nav?.contains(event.target as Node)) eventsInsideNav.add(event);
+    };
     const onMouseDown = (event: MouseEvent) => {
-      if (navRef.current && !event.composedPath().includes(navRef.current)) {
+      if (navRef.current && !eventsInsideNav.has(event) && !event.composedPath().includes(navRef.current)) {
         setOpenButtonIndex(null);
       }
     };
@@ -224,9 +231,11 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
       trigger?.focus();
       setOpenButtonIndex(null);
     };
+    root.addEventListener('mousedown', markInsideNav);
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('keydown', onKey);
     return () => {
+      root.removeEventListener('mousedown', markInsideNav);
       document.removeEventListener('mousedown', onMouseDown);
       document.removeEventListener('keydown', onKey);
     };

@@ -361,6 +361,36 @@ describe('TopNav', () => {
     expect(screen.queryByRole('link', { name: 'Item' })).not.toBeInTheDocument();
   });
 
+  it.each(['open', 'closed'] as const)('keeps the submenu open on a click inside a %s shadow root', (mode) => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const shadowContainer = document.createElement('div');
+    host.attachShadow({ mode }).appendChild(shadowContainer);
+
+    const { getByRole } = render(
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item
+          isActive
+          submenu={
+            <TopNav.Group title="More">
+              <TopNav.SubItem href="/m">Item</TopNav.SubItem>
+            </TopNav.Group>
+          }
+        >
+          Family
+        </TopNav.Item>
+      </TopNav>,
+      { container: shadowContainer }
+    );
+
+    fireEvent.mouseDown(getByRole('link', { name: 'Item' }));
+    expect(getByRole('link', { name: 'Item' })).toBeInTheDocument();
+
+    fireEvent.mouseDown(document.body);
+    expect(shadowContainer.querySelector('a[href="/m"]')).not.toBeInTheDocument();
+    host.remove();
+  });
+
   it('links the toggle button to its submenu via matching id / aria-controls', () => {
     const { container } = render(
       <TopNav ariaLabel="Primary">

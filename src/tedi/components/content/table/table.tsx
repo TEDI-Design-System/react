@@ -36,6 +36,7 @@ import {
 
 import { getBodyOrShadowRoot, getElementByIdInRoot } from '../../../helpers/shadow-dom';
 import { useLabels } from '../../../providers/label-provider';
+import { usePortalRoot } from '../../../providers/style-provider/style-provider';
 import { Icon } from '../../base/icon/icon';
 import { CollapseButton, CollapseButtonProps } from '../../buttons/collapse-button/collapse-button';
 import { Checkbox, CheckboxProps } from '../../form/checkbox/checkbox';
@@ -1223,6 +1224,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   );
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const portalRoot = usePortalRoot();
 
   const [scrollOverflow, setScrollOverflow] = useState({ left: false, right: false });
   const stickyColumnsEnabled = stickyFirstColumn || stickyLastColumn;
@@ -1407,7 +1409,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
           ghostBody.appendChild(ghostRow);
           ghostTable.appendChild(ghostBody);
           ghost.appendChild(ghostTable);
-          getBodyOrShadowRoot(event.currentTarget).appendChild(ghost);
+          (portalRoot ?? getBodyOrShadowRoot(event.currentTarget)).appendChild(ghost);
           event.dataTransfer.setDragImage(ghost, 24, rowRect.height / 2);
           window.setTimeout(() => ghost.remove(), 0);
         }
@@ -1491,7 +1493,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
         ghostHead.appendChild(ghostRow);
         ghostTable.appendChild(ghostHead);
         ghost.appendChild(ghostTable);
-        getBodyOrShadowRoot(event.currentTarget).appendChild(ghost);
+        (portalRoot ?? getBodyOrShadowRoot(event.currentTarget)).appendChild(ghost);
         event.dataTransfer.setDragImage(ghost, rect.width / 2, rect.height / 2);
         window.setTimeout(() => ghost.remove(), 0);
 
