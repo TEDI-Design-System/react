@@ -63,13 +63,27 @@ describe('SideNav', () => {
     expect(MobileNavToggle).toHaveBeenCalled();
   });
 
-  test('does not render nav when isMenuOpen is false (mobile)', () => {
+  test('keeps the drawer closed when isMenuOpen is false (mobile)', () => {
     (useBreakpoint as jest.Mock).mockReturnValue('sm');
     (isBreakpointBelow as jest.Mock).mockReturnValue(true);
 
     render(<SideNav {...defaultProps} isMobileOpen={false} />);
 
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(SideNavMobile).toHaveBeenCalledWith(expect.objectContaining({ isOpen: false }), expect.anything());
+  });
+
+  test('keeps the drawer closed at or above the breakpoint, even when isMobileOpen is set', () => {
+    render(<SideNav {...defaultProps} isMobileOpen={true} />);
+
+    expect(SideNavMobile).toHaveBeenCalledWith(expect.objectContaining({ isOpen: false }), expect.anything());
+  });
+
+  test('always renders the desktop nav and hides it with a class below the mobile breakpoint', () => {
+    const { rerender } = render(<SideNav {...defaultProps} mobileBreakpoint="tablet" />);
+    expect(screen.getByRole('navigation')).toHaveClass('tedi-sidenav--below-lg');
+
+    rerender(<SideNav {...defaultProps} mobileBreakpoint="mobile" />);
+    expect(screen.getByRole('navigation')).toHaveClass('tedi-sidenav--below-md');
   });
 
   test('applies custom className', () => {
@@ -90,7 +104,7 @@ describe('SideNav', () => {
 
     render(<SideNav {...defaultProps} isMobileOpen={false} />);
 
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(SideNavMobile).toHaveBeenCalledWith(expect.objectContaining({ isOpen: false }), expect.anything());
     expect(defaultProps.onMenuToggle).not.toHaveBeenCalled();
   });
 
@@ -109,6 +123,6 @@ describe('SideNav', () => {
       expect.anything()
     );
 
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('navigation')).toHaveClass('tedi-sidenav--below-md');
   });
 });

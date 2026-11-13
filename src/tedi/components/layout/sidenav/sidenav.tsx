@@ -128,7 +128,7 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
   const isMenuOpen = isControlled ? isMobileOpen : internalOpen;
 
   const [internalCollapsed, setInternalCollapsed] = useState(isCollapsedProp);
-  const isCollapsed = isMobileView ? false : internalCollapsed;
+  const isCollapsed = internalCollapsed;
   const isCollapsible = 'isCollapsed' in props;
 
   useEffect(() => {
@@ -157,49 +157,51 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
     setMenuOpen(!isMenuOpen);
   };
 
-  const BEM = cn(styles['tedi-sidenav'], className, {
-    [styles['tedi-sidenav--has-dividers']]: showDividers,
-    [styles['tedi-sidenav--collapsed']]: isCollapsed,
-  });
+  const BEM = cn(
+    styles['tedi-sidenav'],
+    styles[`tedi-sidenav--below-${mapToBreakpoint(mobileBreakpoint)}`],
+    className,
+    {
+      [styles['tedi-sidenav--has-dividers']]: showDividers,
+      [styles['tedi-sidenav--collapsed']]: isCollapsed,
+    }
+  );
 
-  if (isMobileView) {
-    return (
+  return (
+    <>
       <SideNavMobile
         navItems={navItems}
         ariaLabel={ariaLabel}
         linkAs={linkAs}
-        isOpen={isMenuOpen}
+        isOpen={isMenuOpen && isMobileView}
         onClose={() => setMenuOpen(false)}
         showOverlay={showMobileOverlay}
         className={className}
         {...rest}
       />
-    );
-  }
-
-  return (
-    <Print visibility="hide">
-      <nav id={props.id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
-        {isCollapsible && <MobileNavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
-        {/* Disclosure Navigation (WAI-ARIA APG), not a menubar: SideNav is site
+      <Print visibility="hide">
+        <nav id={props.id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
+          {isCollapsible && <MobileNavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
+          {/* Disclosure Navigation (WAI-ARIA APG), not a menubar: SideNav is site
             navigation (links + `aria-expanded` groups) without menu keyboard
             semantics. A plain list inside the `<nav aria-label>` landmark is the
             correct model — and a `menubar` can't legally contain the expandable
             item's Collapse toggle button. */}
-        <ul className={styles['tedi-sidenav__list']}>
-          {navItems.map((item, key) => (
-            <SideNavItem
-              as={linkAs}
-              {...item}
-              key={key}
-              onItemClick={toggleMenu}
-              isCollapsed={isCollapsed}
-              sideNavItemSize={sideNavItemSize}
-            />
-          ))}
-        </ul>
-      </nav>
-    </Print>
+          <ul className={styles['tedi-sidenav__list']}>
+            {navItems.map((item, key) => (
+              <SideNavItem
+                as={linkAs}
+                {...item}
+                key={key}
+                onItemClick={toggleMenu}
+                isCollapsed={isCollapsed}
+                sideNavItemSize={sideNavItemSize}
+              />
+            ))}
+          </ul>
+        </nav>
+      </Print>
+    </>
   );
 };
 
