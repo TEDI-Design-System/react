@@ -6,6 +6,11 @@
   z-index: var(--z-index-header);
   box-shadow: 0 1px 5px 0 var(--tedi-alpha-20);
 
+  // The open mobile menu starts at the header's bottom edge, so the shadow would fall on it.
+  &:has([data-name='mobile-nav-toggle'][aria-expanded='true']) {
+    box-shadow: none;
+  }
+
   &__main {
     position: relative;
     display: flex;

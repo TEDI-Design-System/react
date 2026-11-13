@@ -150,8 +150,7 @@
 }
 
 .tedi-sidenav__overlay {
-  // Starts at the header's bottom edge; above the header so the drawer covers its shadow.
-  z-index: calc(var(--z-index-header) + 1);
+  z-index: calc(var(--z-index-header) - 1);
   background: var(--tedi-alpha-20);
 
   .tedi-sidenav__item--level-2 {
