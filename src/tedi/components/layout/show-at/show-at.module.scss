@@ -1,0 +1,14 @@
+@use '../../../styles/breakpoint-classes';
+
+.tedi-show-at {
+  display: none;
+}
+
+// `xs` starts at 0, so showing at `xs` and above shows at every width.
+.tedi-show-at-from-xs {
+  display: contents;
+}
+
+@include breakpoint-classes.from-modifiers('.tedi-show-at') {
+  display: contents;
+}
