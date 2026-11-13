@@ -1,19 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
 
-import { useBreakpoint } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import Button from '../button/button';
 import { ButtonGroup } from './button-group';
-
-jest.mock('../../../helpers', () => {
-  const original = jest.requireActual('../../../helpers');
-  return {
-    ...original,
-    useBreakpoint: jest.fn(),
-    isBreakpointBelow: (bp: string, threshold: string) => bp === 'sm' && threshold === 'md',
-  };
-});
 
 jest.mock('../../../providers/label-provider', () => ({
   useLabels: jest.fn(),
@@ -21,7 +11,6 @@ jest.mock('../../../providers/label-provider', () => ({
 
 describe('ButtonGroup Component', () => {
   beforeEach(() => {
-    (useBreakpoint as jest.Mock).mockReturnValue('lg');
     (useLabels as jest.Mock).mockReturnValue({ getLabel: (key: string) => 'sidenav.submenu' });
   });
 
@@ -54,7 +43,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('renders dropdown trigger with dropdownLabel on mobile', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     render(
       <ButtonGroup dropdownLabel="Custom Dropdown" enableMobileDropdown>
         <Button id="button1">Button 1</Button>
@@ -66,7 +54,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('falls back to useLabels value if dropdownLabel is not provided on mobile', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     render(
       <ButtonGroup enableMobileDropdown>
         <Button id="button1">Button 1</Button>
@@ -78,7 +65,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('triggers onSelectionChange when a dropdown item is clicked', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     const onSelectionChange = jest.fn();
 
     render(
@@ -93,14 +79,13 @@ describe('ButtonGroup Component', () => {
     fireEvent.click(triggerButton);
 
     // Query the dropdown item after opening
-    const dropdownItem = screen.getByText('Button 1');
+    const dropdownItem = screen.getByRole('menuitem', { name: /Button 1/ });
     fireEvent.click(dropdownItem);
 
     expect(onSelectionChange).toHaveBeenCalledWith('button1');
   });
 
   it('does not trigger onSelectionChange for a disabled dropdown item', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     const onSelectionChange = jest.fn();
 
     render(
@@ -113,7 +98,7 @@ describe('ButtonGroup Component', () => {
 
     const triggerButton = screen.getByRole('button', { name: /Menu/i });
     fireEvent.click(triggerButton);
-    const dropdownItem = screen.getByText('Button 1');
+    const dropdownItem = screen.getByRole('menuitem', { name: /Button 1/ });
     fireEvent.click(dropdownItem);
     expect(onSelectionChange).not.toHaveBeenCalled();
   });
@@ -144,7 +129,7 @@ describe('ButtonGroup Component', () => {
         <Button id="button2">Button 2</Button>
       </ButtonGroup>
     );
-    const button1 = screen.getByText('Button 1');
+    const button1 = screen.getByRole('button', { name: /Button 1/ });
     fireEvent.click(button1);
     expect(onSelectionChange).toHaveBeenCalledWith('button1');
   });
@@ -159,7 +144,7 @@ describe('ButtonGroup Component', () => {
         <Button id="button2">Button 2</Button>
       </ButtonGroup>
     );
-    const button1 = screen.getByText('Button 1');
+    const button1 = screen.getByRole('button', { name: /Button 1/ });
     fireEvent.click(button1);
     expect(onSelectionChange).not.toHaveBeenCalled();
   });
@@ -237,8 +222,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('uses dropdownLabel when dropdownLabelMode is static even if a button is active', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Static Label" enableMobileDropdown>
         <Button id="button1" isActive>
@@ -252,9 +235,7 @@ describe('ButtonGroup Component', () => {
   });
 
   it('uses active button label when dropdownLabelMode is active', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
-    render(
+    const { container } = render(
       <ButtonGroup dropdownLabel="Static Label" dropdownLabelMode="active" enableMobileDropdown>
         <Button id="button1" isActive>
           Active Button
@@ -262,13 +243,11 @@ describe('ButtonGroup Component', () => {
       </ButtonGroup>
     );
 
-    const triggerButton = screen.getByRole('button', { name: /Active Button/i });
-    expect(triggerButton).toBeInTheDocument();
+    const dropdown = within(container.querySelector('[data-name="button-group-dropdown"]') as HTMLElement);
+    expect(dropdown.getByRole('button', { name: /Active Button/i })).toBeInTheDocument();
   });
 
   it('falls back to dropdownLabel in active mode when no button is active', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Fallback Label" dropdownLabelMode="active" enableMobileDropdown>
         <Button id="button1">Button 1</Button>
@@ -280,8 +259,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('falls back to useLabels value in active mode when no active button and no dropdownLabel', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabelMode="active" enableMobileDropdown>
         <Button id="button1">Button 1</Button>
@@ -293,8 +270,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('renders the default menu icon on the dropdown trigger when the active button has no icon', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" isActive>
@@ -308,8 +283,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('renders the active button iconLeft as string on the dropdown trigger', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" iconLeft="home" isActive>
@@ -323,8 +296,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('renders the active button iconLeft as object on the dropdown trigger', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" iconLeft={{ name: 'star' }} isActive>
@@ -338,8 +309,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('falls back to the active button icon (string) when no iconLeft is set', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" icon="settings" isActive>
@@ -353,8 +322,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('falls back to the active button icon (object) when no iconLeft is set', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" icon={{ name: 'search' }} isActive>
@@ -368,8 +335,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('renders string iconLeft + iconRight inside each dropdown item', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" iconLeft="home" iconRight="arrow_forward">
@@ -385,8 +350,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('renders object iconLeft + iconRight inside each dropdown item', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
-
     render(
       <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
         <Button id="button1" iconLeft={{ name: 'star' }} iconRight={{ name: 'check' }}>
@@ -402,7 +365,6 @@ describe('ButtonGroup Component', () => {
   });
 
   it('uses the index as the dropdown item key when the button has no id', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     const onSelectionChange = jest.fn();
 
     render(
@@ -412,13 +374,12 @@ describe('ButtonGroup Component', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
-    fireEvent.click(screen.getByText('Button without id'));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Button without id/ }));
 
     expect(onSelectionChange).not.toHaveBeenCalled();
   });
 
   it('forwards the button onClick when a dropdown item is clicked', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     const onButtonClick = jest.fn();
 
     render(
@@ -430,13 +391,12 @@ describe('ButtonGroup Component', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: /Menu/i }));
-    fireEvent.click(screen.getByText('Button 1'));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Button 1/ }));
 
     expect(onButtonClick).toHaveBeenCalled();
   });
 
   it('skips the button onClick when the dropdown item is activated via keyboard (Enter)', () => {
-    (useBreakpoint as jest.Mock).mockReturnValue('sm');
     const onButtonClick = jest.fn();
     const onSelectionChange = jest.fn();
 
@@ -482,5 +442,28 @@ describe('ButtonGroup Component', () => {
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(2);
     expect(screen.queryByText('Non-button child')).not.toBeInTheDocument();
+  });
+  it('renders the dropdown and the group, and picks one with CSS classes, when enableMobileDropdown is set', () => {
+    const { container } = render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown mobileBreakpoint="lg">
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    const dropdown = container.querySelector('[data-name="button-group-dropdown"]') as HTMLElement;
+    expect(dropdown.className).toContain('tedi-button-group__mobile-dropdown--below-lg');
+    const group = container.querySelector('[role="group"]') as HTMLElement;
+    expect(group.className).toContain('tedi-button-group--below-lg');
+  });
+
+  it('renders only the group, without a dropdown wrapper, when enableMobileDropdown is not set', () => {
+    const { container } = render(
+      <ButtonGroup>
+        <Button id="button1">Button 1</Button>
+      </ButtonGroup>
+    );
+
+    expect(container.querySelector('[data-name="button-group-dropdown"]')).not.toBeInTheDocument();
+    expect((container.querySelector('[role="group"]') as HTMLElement).className).not.toContain('--below-');
   });
 });
