@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { renderToString } from 'react-dom/server.node';
 
 import { useBreakpoint } from '../../../helpers';
 import { TopNavItem } from './components/top-nav-item/top-nav-item';
@@ -171,21 +172,22 @@ describe('TopNav', () => {
 
   it('omits Separators from the mobile drawer', () => {
     setBreakpoint('sm');
-    render(
+    const { container } = render(
       <TopNav ariaLabel="Primary" isMobileOpen>
         <TopNav.Item href="/">Dashboard</TopNav.Item>
         <TopNav.Separator />
         <TopNav.Item href="/settings">Settings</TopNav.Item>
       </TopNav>
     );
-    expect(screen.queryByRole('separator')).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+    const drawer = within(container.querySelector('[data-name="mobile-sidenav"]') as HTMLElement);
+    expect(drawer.queryByRole('separator')).not.toBeInTheDocument();
+    expect(drawer.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(drawer.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
   });
 
   it('passes submenu groups and sub-items into the mobile drawer', () => {
     setBreakpoint('sm');
-    render(
+    const { container } = render(
       <TopNav ariaLabel="Primary" isMobileOpen>
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item
@@ -206,24 +208,36 @@ describe('TopNav', () => {
       </TopNav>
     );
 
-    const familyButton = screen.getByRole('button', { name: /Family/ });
-    fireEvent.click(familyButton);
-    expect(screen.getByRole('link', { name: 'Get married' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Divorce' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Adoption' })).toBeInTheDocument();
+    const drawer = () => within(container.querySelector('[data-name="mobile-sidenav"]') as HTMLElement);
+    fireEvent.click(drawer().getByRole('button', { name: /Family/ }));
+    expect(drawer().getByRole('link', { name: 'Get married' })).toBeInTheDocument();
+    expect(drawer().getByRole('link', { name: 'Divorce' })).toBeInTheDocument();
+    expect(drawer().getByRole('link', { name: 'Adoption' })).toBeInTheDocument();
   });
 
-  it('falls through to the shared Sidenav mobile drawer below the breakpoint', () => {
+  it('opens the shared Sidenav mobile drawer below the breakpoint', () => {
     setBreakpoint('sm');
-    render(
+    const { container } = render(
       <TopNav ariaLabel="Primary" isMobileOpen>
         <TopNav.Item href="/">Home</TopNav.Item>
         <TopNav.Item href="/docs">Docs</TopNav.Item>
       </TopNav>
     );
-    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Docs' })).toBeInTheDocument();
+    const drawerNav = container.querySelector('[data-name="mobile-sidenav"]') as HTMLElement;
+    expect(drawerNav).toHaveAttribute('aria-label', 'Primary');
+    const drawer = within(drawerNav);
+    expect(drawer.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+    expect(drawer.getByRole('link', { name: 'Docs' })).toBeInTheDocument();
+  });
+
+  it('does not open the drawer at or above the breakpoint, even when isMobileOpen is set', () => {
+    setBreakpoint('lg');
+    const { container } = render(
+      <TopNav ariaLabel="Primary" isMobileOpen>
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
+    );
+    expect(container.querySelector('[data-name="mobile-sidenav"]')).not.toBeInTheDocument();
   });
 
   it('applies maxWidth as inline style on the inner list and submenu inner', () => {
@@ -583,14 +597,31 @@ describe('TopNav', () => {
     expect(screen.getByRole('link', { name: 'A' })).toBeInTheDocument();
   });
 
-  it('does NOT render the desktop bar markup when in mobile mode', () => {
+  it('always renders the desktop bar and hides it with a class below `mobileBreakpoint`', () => {
     setBreakpoint('sm');
-    const { container } = render(
-      <TopNav ariaLabel="Primary" isMobileOpen>
+    const { container, rerender } = render(
+      <TopNav ariaLabel="Primary">
         <TopNav.Item href="/">Home</TopNav.Item>
       </TopNav>
     );
-    expect(container.querySelector('[data-name="top-nav"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-name="top-nav"]')?.className).toContain('tedi-top-nav--below-md');
+
+    rerender(
+      <TopNav ariaLabel="Primary" mobileBreakpoint="lg">
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
+    );
+    expect(container.querySelector('[data-name="top-nav"]')?.className).toContain('tedi-top-nav--below-lg');
+  });
+
+  it('server-renders the bar, whatever the viewport', () => {
+    const html = renderToString(
+      <TopNav ariaLabel="Primary">
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
+    );
+    expect(html).toContain('data-name="top-nav"');
+    expect(html).toContain('Home');
   });
 
   describe('TopNav.Item', () => {

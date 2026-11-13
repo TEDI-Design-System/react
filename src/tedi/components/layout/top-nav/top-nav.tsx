@@ -255,76 +255,73 @@ export const TopNav = (props: TopNavProps): React.ReactElement | null => {
     [items]
   );
 
-  if (isMobileView) {
-    return (
-      <MobileNav
-        navItems={mobileItems}
-        ariaLabel={ariaLabel}
-        isOpen={isOpen}
-        onClose={() => setMenuOpen(false)}
-        showOverlay={showMobileOverlay}
-        className={className}
-      />
-    );
-  }
-
   const renderSubmenuInline = submenuFit === 'content';
   const resolvedMaxWidth = resolveMaxWidth(maxWidth);
 
   let itemCursor = 0;
 
   return (
-    <TopNavContext.Provider value={topNavContextValue}>
-      <nav
-        ref={navRef}
-        id={id}
-        className={cn(styles['tedi-top-nav'], className)}
-        aria-label={ariaLabel}
-        data-name="top-nav"
-      >
-        <div className={styles['tedi-top-nav__bar']}>
-          <ul
-            className={styles['tedi-top-nav__list']}
-            style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
-          >
-            {allChildren.map((child, index) => {
-              if (isNavItem(child)) {
-                const itemIndex = itemCursor++;
-                const hasSubmenu = Children.count(child.props.submenu) > 0;
-                const toggle = isToggleItem(child);
-                const isSubmenuOpen = isItemSubmenuOpen(child, itemIndex);
-                const consumerOnClick = child.props.onClick;
-                const wrappedOnClick = toggle
-                  ? (event: React.MouseEvent | React.KeyboardEvent) => {
-                      consumerOnClick?.(event);
-                      setOpenButtonIndex((current) => (current === itemIndex ? null : itemIndex));
-                    }
-                  : consumerOnClick;
-                return React.cloneElement(child, {
-                  key: index,
-                  hasSubmenu,
-                  renderSubmenuInline,
-                  isSubmenuOpen,
-                  panelId,
-                  onClick: wrappedOnClick,
-                });
-              }
-              return React.cloneElement(child, { key: index });
-            })}
-          </ul>
-        </div>
-        {!renderSubmenuInline && activeItemWithSubmenu && (
-          <div id={panelId} className={styles['tedi-top-nav__submenu']} data-name="top-nav-submenu">
-            <div
-              className={styles['tedi-top-nav__submenu-inner']}
+    <>
+      <TopNavContext.Provider value={topNavContextValue}>
+        <nav
+          ref={navRef}
+          id={id}
+          className={cn(styles['tedi-top-nav'], styles[`tedi-top-nav--below-${mobileBreakpoint}`], className)}
+          aria-label={ariaLabel}
+          data-name="top-nav"
+        >
+          <div className={styles['tedi-top-nav__bar']}>
+            <ul
+              className={styles['tedi-top-nav__list']}
               style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
             >
-              {activeItemWithSubmenu.props.submenu}
-            </div>
+              {allChildren.map((child, index) => {
+                if (isNavItem(child)) {
+                  const itemIndex = itemCursor++;
+                  const hasSubmenu = Children.count(child.props.submenu) > 0;
+                  const toggle = isToggleItem(child);
+                  const isSubmenuOpen = isItemSubmenuOpen(child, itemIndex);
+                  const consumerOnClick = child.props.onClick;
+                  const wrappedOnClick = toggle
+                    ? (event: React.MouseEvent | React.KeyboardEvent) => {
+                        consumerOnClick?.(event);
+                        setOpenButtonIndex((current) => (current === itemIndex ? null : itemIndex));
+                      }
+                    : consumerOnClick;
+                  return React.cloneElement(child, {
+                    key: index,
+                    hasSubmenu,
+                    renderSubmenuInline,
+                    isSubmenuOpen,
+                    panelId,
+                    onClick: wrappedOnClick,
+                  });
+                }
+                return React.cloneElement(child, { key: index });
+              })}
+            </ul>
           </div>
-        )}
-      </nav>
-    </TopNavContext.Provider>
+          {!renderSubmenuInline && activeItemWithSubmenu && (
+            <div id={panelId} className={styles['tedi-top-nav__submenu']} data-name="top-nav-submenu">
+              <div
+                className={styles['tedi-top-nav__submenu-inner']}
+                style={resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined}
+              >
+                {activeItemWithSubmenu.props.submenu}
+              </div>
+            </div>
+          )}
+        </nav>
+      </TopNavContext.Provider>
+      <MobileNav
+        navItems={mobileItems}
+        ariaLabel={ariaLabel}
+        isOpen={isOpen && isMobileView}
+        onClose={() => setMenuOpen(false)}
+        showOverlay={showMobileOverlay}
+        className={className}
+      />
+    </>
   );
 };
 
