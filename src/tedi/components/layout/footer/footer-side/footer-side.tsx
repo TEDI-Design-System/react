@@ -1,9 +1,10 @@
 import cn from 'classnames';
 import { ReactNode, useContext } from 'react';
 
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../helpers';
+import { BreakpointSupport } from '../../../../helpers';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
+import { getResponsiveClassNames, getResponsiveValues } from '../footer-responsive';
 
 export type FooterSidePlacement = 'start' | 'end';
 export type FooterSidePosition = 'start' | 'center' | 'end';
@@ -17,6 +18,9 @@ export interface FooterSideBaseProps {
    * Accepts breakpoint props, so the logo can sit on the side on desktop and drop to the bottom
    * on mobile — e.g. `placement="end" sm={{ placement: 'start' }}` keeps the logo on the left
    * from `sm` up and moves it to the last position once the footer collapses to its stacked layout.
+   *
+   * Breakpoint values change only the visual order; the keyboard and screen-reader order
+   * follows the plain `placement` value.
    * @default start
    */
   placement?: FooterSidePlacement;
@@ -38,26 +42,30 @@ export interface FooterSideBaseProps {
 export type FooterSideProps = BreakpointSupport<FooterSideBaseProps>;
 
 export const FooterSide = (props: FooterSideProps): JSX.Element => {
-  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const breakpoint = useBreakpoint();
   const { mobileBreakpoint } = useContext(FooterContext);
-  const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
+  const { children, className } = props;
 
-  const {
-    placement = 'start',
-    position = 'center',
-    children,
-    className,
-  } = getCurrentBreakpointProps<FooterSideBaseProps>(props, { placement: 'start', position: 'center' });
+  // `placement` and `position` accept breakpoint props, so every value is turned into a class that CSS
+  // applies from its breakpoint up.
+  const placementClasses = getResponsiveClassNames(
+    styles,
+    'tedi-footer-side--placement',
+    getResponsiveValues<FooterSideBaseProps, 'placement'>(props, 'placement', 'start')
+  );
+  const positionClasses = getResponsiveClassNames(
+    styles,
+    'tedi-footer-side--vertical',
+    getResponsiveValues<FooterSideBaseProps, 'position'>(props, 'position', 'center')
+  );
 
   return (
     <div
       data-name="footer-side"
       className={cn(
         styles['tedi-footer-side'],
-        styles[`tedi-footer-side--${placement}`],
-        styles[`tedi-footer-side--vertical-${position}`],
-        { [styles['tedi-footer-side--mobile']]: isMobile },
+        placementClasses,
+        positionClasses,
+        styles[`tedi-footer-side--below-${mobileBreakpoint}`],
         className
       )}
     >

@@ -1,9 +1,10 @@
 import cn from 'classnames';
 import { ReactNode, useContext } from 'react';
 
-import { BreakpointSupport, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../helpers';
+import { Breakpoint, breakpoints, BreakpointSupport } from '../../../../helpers';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
+import { getResponsiveValues } from '../footer-responsive';
 
 type FooterBodyBreakpointProps = {
   /**
@@ -13,7 +14,8 @@ type FooterBodyBreakpointProps = {
    * (e.g. `columns={2} md={{ columns: 3 }} lg={{ columns: 4 }}`). When set, the body uses a CSS grid
    * of `columns` equal tracks; when omitted, columns are content-sized and spread with
    * `space-between` (the default). Ignored below the footer's `mobileBreakpoint`, where the body
-   * always stacks into a single column.
+   * always stacks into a single column. Set the plain `columns` value as the base: if it is only set
+   * from a larger breakpoint, the body uses a single-column grid below that breakpoint.
    */
   columns?: number;
 };
@@ -31,23 +33,32 @@ export interface FooterBodyProps extends BreakpointSupport<FooterBodyBreakpointP
 }
 
 export const FooterBody = (props: FooterBodyProps): JSX.Element => {
-  const { getCurrentBreakpointProps } = useBreakpointProps(props.defaultServerBreakpoint);
-  const { children, className, columns } = getCurrentBreakpointProps<FooterBodyProps>(props);
-
-  const breakpoint = useBreakpoint();
+  const { children, className } = props;
   const { mobileBreakpoint } = useContext(FooterContext);
-  const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
-  const useGrid = !isMobile && typeof columns === 'number' && columns > 0;
+
+  // The column count of every breakpoint is handed to CSS as a custom property (mobile-first, so a
+  // breakpoint without its own value keeps the previous one). The grid itself is switched on and off by CSS.
+  const columnValues = getResponsiveValues<FooterBodyBreakpointProps, 'columns'>(props, 'columns').filter(
+    ([, value]) => typeof value === 'number' && value > 0
+  );
+  const useGrid = columnValues.length > 0;
+  const columnVars: Record<string, number> = {};
+  let current = 1;
+  breakpoints.forEach((bp: Breakpoint) => {
+    current = columnValues.find(([valueBp]) => valueBp === bp)?.[1] ?? current;
+    columnVars[`--tedi-footer-body-columns-${bp}`] = current;
+  });
 
   return (
     <div
       data-name="footer-body"
       className={cn(
         styles['tedi-footer-body'],
-        { [styles['tedi-footer-body--mobile']]: isMobile, [styles['tedi-footer-body--grid']]: useGrid },
+        styles[`tedi-footer-body--below-${mobileBreakpoint}`],
+        { [styles['tedi-footer-body--grid']]: useGrid },
         className
       )}
-      style={useGrid ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}
+      style={useGrid ? columnVars : undefined}
     >
       {children}
     </div>

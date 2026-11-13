@@ -1,17 +1,16 @@
 import cn from 'classnames';
-import { ReactNode, useContext, useId } from 'react';
+import { ReactNode, useContext, useId, useState } from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint } from '../../../../helpers';
+import { Breakpoint } from '../../../../helpers';
 import { Icon } from '../../../base/icon/icon';
 import { Heading } from '../../../base/typography/heading/heading';
-import { Collapse } from '../../../content/collapse/collapse';
 import styles from '../footer.module.scss';
 import { FooterContext } from '../footer-context';
 
 export interface FooterSectionProps {
   /**
-   * Section heading text. Rendered as `<strong>` on desktop or as the trigger label of a
-   * `<Collapse>` on mobile (when `collapsible` is true).
+   * Section heading text. Rendered as `<strong>` on desktop or as the label of the toggle
+   * button on mobile (when `collapsible` is true).
    */
   heading: ReactNode;
   /**
@@ -22,8 +21,7 @@ export interface FooterSectionProps {
   /**
    * When `true`, the section's link list collapses into an accordion below the
    * footer's `mobileBreakpoint` (`sm` by default) — the heading turns into a
-   * toggle button (wired via the shared `<Collapse>` component for keyboard,
-   * focus, and aria-expanded handling). Desktop layout is unaffected.
+   * toggle button. Desktop layout is unaffected.
    * @default false
    */
   collapsible?: boolean;
@@ -59,57 +57,56 @@ export const FooterSection = ({
   children,
   className,
 }: FooterSectionProps): JSX.Element => {
-  const breakpoint = useBreakpoint();
   const { mobileBreakpoint } = useContext(FooterContext);
-  const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
-  const hideIcon = isBreakpointBelow(breakpoint, iconBreakpoint);
-  const applyCollapse = collapsible && isMobile;
-  const collapseId = useId();
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contentId = `tedi-footer-section-${useId()}`;
 
   return (
     <div
       data-name="footer-section"
       className={cn(
         styles['tedi-footer-section'],
-        { [styles['tedi-footer-section--collapsible']]: applyCollapse },
+        styles[`tedi-footer-section--below-${mobileBreakpoint}`],
+        { [styles['tedi-footer-section--collapsible']]: collapsible },
         className
       )}
     >
-      {icon && !hideIcon && (
-        <span className={styles['tedi-footer-section__icon']}>
+      {icon && (
+        <span
+          className={cn(
+            styles['tedi-footer-section__icon'],
+            styles[`tedi-footer-section__icon--below-${iconBreakpoint}`]
+          )}
+        >
           <Icon name={icon} color="white" size={24} />
         </span>
       )}
-      <div
-        className={cn(styles['tedi-footer-section__container'], {
-          [styles['tedi-footer-section__container--mobile']]: isMobile,
-        })}
-      >
-        {applyCollapse ? (
-          <Collapse
-            id={`tedi-footer-section-${collapseId}`}
-            title={
-              <Heading element="h6" color="white">
-                {heading}
-              </Heading>
-            }
-            size="small"
-            inverted
-            hideCollapseText
-            fullRowToggle
-            defaultOpen={defaultOpen}
-            toggleLabel={typeof heading === 'string' ? heading : undefined}
-            className={styles['tedi-footer-section__collapse']}
-            titleRowProps={{ gutter: 0 }}
+      <div className={styles['tedi-footer-section__container']}>
+        <strong className={styles['tedi-footer-section__heading']}>{heading}</strong>
+        {collapsible && (
+          <button
+            type="button"
+            className={styles['tedi-footer-section__toggle']}
+            aria-expanded={isOpen}
+            aria-controls={contentId}
+            onClick={() => setIsOpen((open) => !open)}
           >
-            <div className={styles['tedi-footer-section__content-inner']}>{children}</div>
-          </Collapse>
-        ) : (
-          <>
-            <strong className={styles['tedi-footer-section__heading']}>{heading}</strong>
-            <div className={styles['tedi-footer-section__content']}>{children}</div>
-          </>
+            <Heading element="h6" color="white">
+              {heading}
+            </Heading>
+            <span className={styles['tedi-footer-section__toggle-icon']}>
+              <Icon name="expand_more" color="inherit" filled size={18} />
+            </span>
+          </button>
         )}
+        <div
+          id={contentId}
+          className={cn(styles['tedi-footer-section__content'], {
+            [styles['tedi-footer-section__content--open']]: isOpen,
+          })}
+        >
+          <div className={styles['tedi-footer-section__content-inner']}>{children}</div>
+        </div>
       </div>
     </div>
   );

@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import { Children, isValidElement, ReactNode, useMemo } from 'react';
 
-import { Breakpoint, isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../helpers';
+import { Breakpoint } from '../../../helpers';
 import styles from './footer.module.scss';
 import { FooterBody } from './footer-body/footer-body';
 import { FooterBottom } from './footer-bottom/footer-bottom';
 import { FooterContext, FooterContextValue } from './footer-context';
 import { FooterSection } from './footer-section/footer-section';
-import { FooterSide, FooterSideBaseProps, FooterSideProps } from './footer-side/footer-side';
+import { FooterSide, FooterSideProps } from './footer-side/footer-side';
 
 export interface FooterProps {
   /**
@@ -43,9 +43,6 @@ export interface FooterProps {
 }
 
 export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth }: FooterProps): JSX.Element => {
-  const breakpoint = useBreakpoint();
-  const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
-  const { getCurrentBreakpointProps } = useBreakpointProps();
   const contextValue = useMemo<FooterContextValue>(
     () => ({ mobileBreakpoint, maxWidth }),
     [mobileBreakpoint, maxWidth]
@@ -64,7 +61,8 @@ export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth 
     }
     const type = child.type;
     if (type === FooterSide) {
-      const { placement = 'start' } = getCurrentBreakpointProps<FooterSideBaseProps>(child.props as FooterSideProps);
+      // Source order follows the base placement; responsive placement overrides are applied with CSS `order`.
+      const { placement = 'start' } = child.props as FooterSideProps;
       (placement === 'end' ? end : start).push(child);
       return;
     }
@@ -83,7 +81,7 @@ export const Footer = ({ children, className, mobileBreakpoint = 'sm', maxWidth 
     <FooterContext.Provider value={contextValue}>
       <footer data-name="footer" className={cn(styles['tedi-footer'], className)}>
         <div
-          className={cn(styles['tedi-footer__container'], { [styles['tedi-footer__container--mobile']]: isMobile })}
+          className={cn(styles['tedi-footer__container'], styles[`tedi-footer__container--below-${mobileBreakpoint}`])}
           style={maxWidth !== undefined ? { maxWidth, marginInline: 'auto' } : undefined}
         >
           {start}
