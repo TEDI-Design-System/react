@@ -87,6 +87,10 @@
 }
 
 .tedi-timeline__timings > .tedi-timeline__timings-bottom {
+  @include breakpoints.media-breakpoint-down(lg) {
+    display: none;
+  }
+
   @include breakpoints.media-breakpoint-up(lg) {
     margin-top: auto;
     text-align: right;
@@ -97,6 +101,10 @@
   grid-row: auto;
   grid-column: 2;
   padding-bottom: var(--timeline-padding-y);
+
+  @include breakpoints.media-breakpoint-up(lg) {
+    display: none;
+  }
 }
 
 .tedi-timeline__time {
@@ -157,8 +165,10 @@
   padding-top: calc(var(--timeline-item-top) + var(--timeline-dot-offset-lg));
 }
 
-.tedi-timeline-item.tedi-timeline__item--has-bottom .tedi-timeline__marker {
-  grid-row: span 3;
+@include breakpoints.media-breakpoint-down(lg) {
+  .tedi-timeline-item.tedi-timeline__item--has-bottom .tedi-timeline__marker {
+    grid-row: span 3;
+  }
 }
 
 .tedi-timeline__info {

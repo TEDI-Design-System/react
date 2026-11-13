@@ -1,7 +1,6 @@
 import cn from 'classnames';
 import { Children, isValidElement, type ReactNode } from 'react';
 
-import { isBreakpointBelow, useBreakpoint } from '../../../../../helpers/hooks/use-breakpoint';
 import Separator from '../../../separator/separator';
 import type { TimelineItemState } from '../../timeline';
 import styles from '../../timeline.module.scss';
@@ -43,9 +42,6 @@ export const TimelineItem = ({
   state = 'future',
   isLast = false,
 }: TimelineItemProps): JSX.Element => {
-  const currentBreakpoint = useBreakpoint();
-  const isMobile = isBreakpointBelow(currentBreakpoint, 'lg');
-
   const childArray = Children.toArray(children);
   const isType = (child: ReactNode, type: React.ElementType): boolean => isValidElement(child) && child.type === type;
   const title = childArray.find((child) => isType(child, TimelineTitle));
@@ -56,6 +52,7 @@ export const TimelineItem = ({
   const lineColor = state === 'past' ? 'accent' : 'secondary';
 
   const hasTimingsBottom = timingsBottom !== null && timingsBottom !== undefined && typeof timingsBottom !== 'boolean';
+  // Rendered in two places, and CSS shows one: beside the timings from `lg` up, below the item under `lg`.
   const timingsBottomNode = hasTimingsBottom && (
     <div className={styles['tedi-timeline__timings-bottom']}>{timingsBottom}</div>
   );
@@ -63,7 +60,7 @@ export const TimelineItem = ({
   return (
     <div
       className={cn(styles['tedi-timeline-item'], {
-        [styles['tedi-timeline__item--has-bottom']]: isMobile && hasTimingsBottom,
+        [styles['tedi-timeline__item--has-bottom']]: hasTimingsBottom,
       })}
     >
       <div className={styles['tedi-timeline__timings']}>
@@ -72,7 +69,7 @@ export const TimelineItem = ({
             {timing}
           </span>
         ))}
-        {!isMobile && timingsBottomNode}
+        {timingsBottomNode}
       </div>
 
       <div
@@ -97,7 +94,7 @@ export const TimelineItem = ({
         {content.length > 0 && <div className={styles['tedi-timeline__content']}>{content}</div>}
       </div>
 
-      {isMobile && timingsBottomNode}
+      {timingsBottomNode}
     </div>
   );
 };

@@ -81,19 +81,7 @@ describe('Timeline', () => {
     expect(screen.getByText('Coloured description')).toHaveClass('tedi-text--brand');
   });
 
-  it('renders timingsBottom content', () => {
-    render(
-      <Timeline activeIndex={0}>
-        <Timeline.Item timings={['2020']} timingsBottom={<span>Modified 2021</span>}>
-          <Timeline.Title>Only</Timeline.Title>
-        </Timeline.Item>
-      </Timeline>
-    );
-    expect(screen.getByText('Modified 2021')).toBeInTheDocument();
-  });
-
-  it('renders timingsBottom after the item and flags has-bottom on mobile', () => {
-    mockBreakpoint = 'sm';
+  it('renders timingsBottom beside the timings and below the item, and flags has-bottom', () => {
     const { container } = render(
       <Timeline activeIndex={0}>
         <Timeline.Item timings={['2020']} timingsBottom={<span>Modified 2021</span>}>
@@ -101,8 +89,28 @@ describe('Timeline', () => {
         </Timeline.Item>
       </Timeline>
     );
-    expect(screen.getByText('Modified 2021')).toBeInTheDocument();
+
+    expect(screen.getAllByText('Modified 2021')).toHaveLength(2);
+    expect(
+      container.querySelector('[class*="tedi-timeline__timings"] > [class*="tedi-timeline__timings-bottom"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="tedi-timeline-item"] > [class*="tedi-timeline__timings-bottom"]')
+    ).toBeInTheDocument();
     expect(container.querySelector('[class*="tedi-timeline__item--has-bottom"]')).toBeInTheDocument();
+  });
+
+  it('does not render timingsBottom or flag has-bottom when it is not set', () => {
+    const { container } = render(
+      <Timeline activeIndex={0}>
+        <Timeline.Item timings={['2020']}>
+          <Timeline.Title>Only</Timeline.Title>
+        </Timeline.Item>
+      </Timeline>
+    );
+
+    expect(container.querySelector('[class*="tedi-timeline__timings-bottom"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[class*="tedi-timeline__item--has-bottom"]')).not.toBeInTheDocument();
   });
 
   it('renders every item as future (no current marker) when activeIndex is omitted', () => {
