@@ -2,7 +2,6 @@ import cn from 'classnames';
 import { useMemo, useState } from 'react';
 
 import { Text } from '../../../../../components/base/typography/text/text';
-import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
 import { TediLanguage, useLabels } from '../../../../../providers/label-provider';
 import { Icon } from '../../../../base/icon/icon';
 import Button from '../../../../buttons/button/button';
@@ -66,13 +65,6 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
   const { languages, currentLanguage, selectLabel, labelPosition = 'top' } = props;
   const [languageSelectionOpen, setLanguageSelectionOpen] = useState(false);
   const { getLabel, setLocale, locale } = useLabels();
-  const { getCurrentBreakpointProps } = useBreakpointProps();
-  const breakpoint = useBreakpoint();
-  const isMobileView = isBreakpointBelow(breakpoint, 'md');
-  const { hideLabel } = getCurrentBreakpointProps({
-    hideLabel: true,
-    lg: { hideLabel: false },
-  });
   const displayedLanguage = useMemo(() => {
     if (locale) {
       const found = languages.find((l) => l.locale === locale);
@@ -97,12 +89,8 @@ export const HeaderLanguage = (props: HeaderLanguageProps) => {
   };
 
   return (
-    <div
-      className={cn(styles['tedi-header-language'], styles[`tedi-header-language--label-${labelPosition}`], {
-        [styles['tedi-header-language__mobile']]: isMobileView,
-      })}
-    >
-      <Text modifiers="small" color="secondary" className={cn({ 'visually-hidden': hideLabel })}>
+    <div className={cn(styles['tedi-header-language'], styles[`tedi-header-language--label-${labelPosition}`])}>
+      <Text modifiers="small" color="secondary" className={styles['tedi-header-language__label']}>
         {selectLabel ?? getLabel('header.select-lang')}
       </Text>
 
