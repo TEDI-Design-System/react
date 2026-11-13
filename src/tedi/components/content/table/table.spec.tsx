@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 
+import { StyleProvider } from '../../../providers/style-provider/style-provider';
 import type { TableState } from './table';
 import { groupRowSpan, Table } from './table';
 import { useTableContext } from './table-context';
@@ -1167,6 +1168,42 @@ describe('Table', () => {
       fireEvent.keyDown(handles[0], { key: 'ArrowDown' });
 
       expect(onRowDrop).toHaveBeenCalledWith(expect.objectContaining({ fromIndex: 0, toIndex: 1 }));
+    });
+  });
+
+  describe('drag preview placement', () => {
+    const dragRowAndGetPreviewParent = (tableId: string, container?: HTMLElement) => {
+      let previewParent: Node | null = null;
+      const dataTransfer = {
+        setData: jest.fn(),
+        setDragImage: jest.fn((element: Element) => {
+          previewParent = element.parentNode;
+        }),
+        effectAllowed: '',
+      };
+      const table = <Table<Person> id={tableId} data={data} columns={columns} reorderableRows />;
+
+      const view = render(container ? <StyleProvider containerElement={container}>{table}</StyleProvider> : table);
+      const handle = within(view.container).getAllByRole('button', { name: 'Drag row' })[0];
+      fireEvent.mouseDown(handle);
+      fireEvent.dragStart(handle.closest('tr') as HTMLElement, { dataTransfer });
+      fireEvent.dragEnd(handle.closest('tr') as HTMLElement, { dataTransfer });
+
+      return previewParent;
+    };
+
+    it('appends the drag preview to document.body by default', () => {
+      expect(dragRowAndGetPreviewParent('t-drag-body')).toBe(document.body);
+    });
+
+    it('appends the drag preview inside the StyleProvider container element', () => {
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      const container = document.createElement('div');
+      host.attachShadow({ mode: 'open' }).appendChild(container);
+
+      expect(dragRowAndGetPreviewParent('t-drag-container', container)).toBe(container);
+      host.remove();
     });
   });
 

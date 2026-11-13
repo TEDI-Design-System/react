@@ -65,6 +65,15 @@ Only `default` and `dark` ship with the library's CSS. Any other theme name is a
 yourself. The prop is not validated, so an unknown name fails silently. See
 [Custom theming](/docs/documentation-custom-theming--docs).
 
+Inside a Shadow DOM the class is applied to the `StyleProvider` `containerElement` instead, so
+`ThemeProvider` has to be rendered inside `StyleProvider`:
+
+```tsx
+<StyleProvider containerElement={shadowRootElement}>
+  <ThemeProvider>{children}</ThemeProvider>
+</StyleProvider>
+```
+
 #### LabelProvider
 
 Provides the labels components use, mostly for accessibility. Every application should be wrapped

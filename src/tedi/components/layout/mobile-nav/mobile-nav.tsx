@@ -2,6 +2,7 @@ import { FloatingOverlay } from '@floating-ui/react';
 import classNames from 'classnames';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { getRootNode } from '../../../helpers/shadow-dom';
 import { warnDeprecated } from '../../../helpers/warn-deprecated/warn-deprecated';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
@@ -77,7 +78,9 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
     if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
 
     const block = findFixedContainingBlock(overlayRef.current);
-    const header = (block ?? document).querySelector('header') ?? document.querySelector('header');
+    const root = overlayRef.current ? getRootNode(overlayRef.current) : document;
+    const header =
+      (block ?? root).querySelector('header') ?? root.querySelector('header') ?? document.querySelector('header');
 
     if (!header) {
       setOverlayTop('var(--layout-header-height)');
