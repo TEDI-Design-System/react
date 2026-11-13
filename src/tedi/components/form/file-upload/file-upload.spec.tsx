@@ -188,11 +188,20 @@ describe('FileUpload component', () => {
 
   it('clears all files when clear button is clicked', () => {
     render(<FileUpload {...defaultProps} hasClearButton defaultFiles={[{ name: 'test.jpg', id: '1' }]} />);
-    const clearButton = screen.getByRole('button', { name: /clear/i });
+    const clearButton = screen.getAllByRole('button', { name: /clear/i })[0];
     fireEvent.click(clearButton);
     expect(defaultProps.onChange).toHaveBeenCalledWith([]);
   });
 
+  it('renders a text and an icon clear button and lets CSS show one', () => {
+    const { container } = render(
+      <FileUpload {...defaultProps} hasClearButton defaultFiles={[{ name: 'test.jpg', id: '1' }]} />
+    );
+
+    expect(screen.getAllByRole('button', { name: /clear/i })).toHaveLength(2);
+    expect(container.querySelector('[class*="tedi-file-upload__clear-text"]')).toBeInTheDocument();
+    expect(container.querySelector('[class*="tedi-file-upload__clear-icon"]')).toBeInTheDocument();
+  });
   it('renders the file list correctly', () => {
     const files = [
       { name: 'test1.jpg', id: '1' },
@@ -284,9 +293,7 @@ describe('FileUpload component', () => {
       />
     );
 
-    const clearButton = screen.getByRole('button', {
-      name: /clear/i,
-    });
+    const clearButton = screen.getAllByRole('button', { name: /clear/i })[0];
 
     expect(clearButton).toBeInTheDocument();
 
@@ -327,7 +334,7 @@ describe('FileUpload component', () => {
 
   it('should update innerFiles when files prop is not provided', () => {
     render(<FileUpload {...defaultProps} defaultFiles={[{ name: 'test.jpg', id: '1' }]} />);
-    const removeButton = screen.getByRole('button', { name: /clear/i });
+    const removeButton = screen.getAllByRole('button', { name: /clear/i })[0];
     fireEvent.click(removeButton);
     expect(screen.queryByText('test.jpg')).not.toBeInTheDocument();
   });
@@ -354,7 +361,7 @@ describe('FileUpload component', () => {
   it('should update innerFiles when files prop is not provided', () => {
     render(<FileUpload {...defaultProps} defaultFiles={[{ name: 'test.jpg', id: '1' }]} />);
 
-    const removeButton = screen.getByRole('button', { name: /clear/i });
+    const removeButton = screen.getAllByRole('button', { name: /clear/i })[0];
     fireEvent.click(removeButton);
 
     expect(screen.queryByText('test.jpg')).not.toBeInTheDocument();
@@ -364,7 +371,7 @@ describe('FileUpload component', () => {
     const onChange = jest.fn();
     render(<FileUpload {...defaultProps} onChange={onChange} defaultFiles={[{ name: 'test.jpg', id: '1' }]} />);
 
-    const removeButton = screen.getByRole('button', { name: /clear/i });
+    const removeButton = screen.getAllByRole('button', { name: /clear/i })[0];
     fireEvent.click(removeButton);
 
     expect(onChange).toHaveBeenCalledWith([]);
@@ -380,7 +387,7 @@ describe('FileUpload component', () => {
     const file = { name: 'test.jpg', id: '1', isValid: true, isLoading: false };
     render(<FileUpload {...defaultProps} defaultFiles={[file]} />);
 
-    const closeButton = screen.getByRole('button', { name: /clear/i });
+    const closeButton = screen.getAllByRole('button', { name: /clear/i })[0];
     expect(closeButton).toBeInTheDocument();
   });
 
@@ -457,7 +464,7 @@ describe('FileUpload component', () => {
       expect(screen.getAllByText(/file-upload.extension-rejected/i)[0]).toBeInTheDocument();
     });
 
-    const clearButton = screen.getByRole('button', { name: /clear/i });
+    const clearButton = screen.getAllByRole('button', { name: /clear/i })[0];
     fireEvent.click(clearButton);
     await waitFor(() => {
       expect(screen.queryByText('initial.jpg')).not.toBeInTheDocument();

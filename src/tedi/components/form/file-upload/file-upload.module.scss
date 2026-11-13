@@ -105,3 +105,19 @@ $container-height-small: 2rem;
 .tedi-file-upload__items--truncate {
   display: block;
 }
+
+.tedi-file-upload__clear-text {
+  display: contents;
+
+  @include breakpoints.media-breakpoint-up(md) {
+    display: none;
+  }
+}
+
+.tedi-file-upload__clear-icon {
+  display: none;
+
+  @include breakpoints.media-breakpoint-up(md) {
+    display: contents;
+  }
+}
