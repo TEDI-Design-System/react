@@ -20,8 +20,14 @@ type ConditionalTypes<C extends React.ElementType = 'a'> =
       links: AnchorProps<IntentionalAny>[];
     };
 
+/**
+ * @deprecated Use `SkipLinks` from `@tedi-design-system/react/tedi` instead.
+ */
 export type SkipLinksProps<C extends React.ElementType = 'a'> = ConditionalTypes<C>;
 
+/**
+ * @deprecated Use `SkipLinks` from `@tedi-design-system/react/tedi` instead.
+ */
 export const SkipLinks = <C extends React.ElementType = 'a'>(props: SkipLinksProps<C>): JSX.Element => {
   const { links, linkAs } = props;
   return (

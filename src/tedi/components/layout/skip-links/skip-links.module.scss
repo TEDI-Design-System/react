@@ -1,0 +1,40 @@
+.tedi-skip-links {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: calc(var(--z-index-header) + 1);
+  padding: var(--layout-grid-gutters-16);
+  pointer-events: none;
+  background-color: var(--general-surface-secondary);
+  border-bottom: var(--tedi-borders-01) solid var(--general-border-primary);
+  box-shadow: 0 1px 5px 0 var(--general-effect-colors-elevation-general-primary);
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+
+  &:focus-within {
+    pointer-events: auto;
+    opacity: 1;
+    transform: none;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--layout-grid-gutters-16);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  &__target {
+    outline: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tedi-skip-links {
+    transition: none;
+  }
+}

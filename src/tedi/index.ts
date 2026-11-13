@@ -83,6 +83,7 @@ export * from './components/layout/footer';
 export * from './components/layout/header';
 export * from './components/layout/show-at/show-at';
 export * from './components/layout/hide-at/hide-at';
+export * from './components/layout/skip-links/skip-links';
 
 export * from './helpers';
 

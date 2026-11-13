@@ -24,4 +24,10 @@
     margin: 0 !important;
     box-sizing: border-box !important;
   }
+
+  /* A story shown in its own iframe (docs.story.inline: false) sits on the text baseline,
+     which makes the scrolling docs block a few pixels taller than the iframe. */
+  .docs-story iframe {
+    display: block;
+  }
 </style>

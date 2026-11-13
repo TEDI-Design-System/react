@@ -236,6 +236,7 @@ files. This is the part of this document worth maintaining by hand.
   LabelProvider. Max-length and pattern rules belong on `TextField` directly via the native
   attributes.
 - **Announce "no results" with `emptyStateRole="status"`** when a filter can empty the table.
+- **Give the page an element with `id="main-content"`** when using the default `SkipLinks` link.
 - **Give a stepper's `<nav>` an `aria-label`.** `VerticalStepper` and `CardStepper` both render a
   landmark; unnamed landmarks are noise when a page has more than one.
 - **Don't signal state by colour alone**, and give every sort, pagination, expansion and reorder

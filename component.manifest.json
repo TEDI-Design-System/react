@@ -1250,6 +1250,17 @@
         "lg",
         "xl"
       ]
+    },
+    {
+      "id": "layout/skip-links/skip-links",
+      "name": "SkipLinks",
+      "category": "layout",
+      "sourcePath": "src/tedi/components/layout/skip-links/skip-links",
+      "status": [],
+      "description": "Keyboard skip links to page landmarks, hidden until focused and shown as a strip over the top of the page; render first on the page, before Header.",
+      "keyProps": [
+        "links"
+      ]
     }
   ]
 }

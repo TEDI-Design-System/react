@@ -304,6 +304,13 @@ export const labelsMap = validateDefaultLabels({
     en: (slide: number) => `Show slide ${slide}`,
     ru: (slide: number) => `Показать слайд ${slide}`,
   },
+  'skip-links.main-content': {
+    description: 'Default label for the skip link that moves focus to the main content',
+    components: ['SkipLinks'],
+    et: 'Liigu edasi põhisisu juurde',
+    en: 'Skip to main content',
+    ru: 'Перейти к основному содержанию',
+  },
   'header.toggle': {
     description: 'Label for header toggle on mobile',
     components: ['Header'],
