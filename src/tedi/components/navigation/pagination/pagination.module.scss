@@ -1,4 +1,32 @@
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
+@use '../../../styles/breakpoint-classes';
+
+// `--no-<modifier>` removes a slot for good. `--no-<modifier>-below-<breakpoint>` hides it below that
+// breakpoint, and the layout rules below follow it, so the gap closes at the same widths.
+@mixin hide-slot-below($modifier, $slot) {
+  @each $breakpoint in breakpoint-classes.$breakpoint-names {
+    .tedi-pagination--no-#{$modifier}-below-#{$breakpoint} .tedi-pagination__#{$slot} {
+      @include breakpoints.media-breakpoint-down($breakpoint) {
+        display: none;
+      }
+    }
+  }
+}
+
+// Rules that apply when the pager is gone: `&` is the slot they style.
+@mixin no-pager-slot {
+  .tedi-pagination--no-pager & {
+    @content;
+  }
+
+  @each $breakpoint in breakpoint-classes.$breakpoint-names {
+    .tedi-pagination--no-pager-below-#{$breakpoint} & {
+      @include breakpoints.media-breakpoint-down($breakpoint) {
+        @content;
+      }
+    }
+  }
+}
 
 .tedi-pagination {
   display: grid;
@@ -16,11 +44,28 @@
       'page-size';
     grid-template-columns: 1fr;
     gap: var(--layout-grid-gutters-08);
+  }
+}
 
-    &.tedi-pagination--no-pager {
-      grid-template-areas: 'results page-size';
-      grid-template-columns: 1fr auto;
-      gap: var(--tedi-dimensions-10);
+// Without the pager the mobile layout puts results and page size on one row.
+@mixin no-pager-grid {
+  grid-template-areas: 'results page-size';
+  grid-template-columns: 1fr auto;
+  gap: var(--tedi-dimensions-10);
+}
+
+.tedi-pagination.tedi-pagination--no-pager {
+  @include breakpoints.media-breakpoint-down(md) {
+    @include no-pager-grid;
+  }
+}
+
+@each $breakpoint in breakpoint-classes.$breakpoint-names {
+  .tedi-pagination.tedi-pagination--no-pager-below-#{$breakpoint} {
+    @include breakpoints.media-breakpoint-down(md) {
+      @include breakpoints.media-breakpoint-down($breakpoint) {
+        @include no-pager-grid;
+      }
     }
   }
 }
@@ -52,6 +97,10 @@
   display: none;
 }
 
+@include hide-slot-below(results, slot-start);
+@include hide-slot-below(pager, slot-center);
+@include hide-slot-below(page-size, slot-end);
+
 .tedi-pagination__status {
   position: absolute;
   width: 1px;
@@ -76,7 +125,7 @@
     justify-self: center;
   }
 
-  .tedi-pagination--no-pager & {
+  @include no-pager-slot {
     @include breakpoints.media-breakpoint-down(md) {
       justify-content: flex-start;
       justify-self: start;
@@ -103,7 +152,7 @@
     justify-self: center;
   }
 
-  .tedi-pagination--no-pager & {
+  @include no-pager-slot {
     @include breakpoints.media-breakpoint-down(md) {
       justify-content: flex-end;
       justify-self: end;
@@ -346,4 +395,17 @@
 .tedi-pagination__button-label {
   display: inline-block;
   animation: tedi-pagination-label-in 0s ease;
+}
+
+// Both pickers are rendered, and the viewport decides which one is shown.
+.tedi-pagination .tedi-pagination__wide-only {
+  @include breakpoints.media-breakpoint-down(md) {
+    display: none;
+  }
+}
+
+.tedi-pagination .tedi-pagination__compact-only {
+  @include breakpoints.media-breakpoint-up(md) {
+    display: none;
+  }
 }

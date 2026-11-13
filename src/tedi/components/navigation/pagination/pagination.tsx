@@ -1,13 +1,7 @@
 import cn from 'classnames';
 import { forwardRef, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
-import {
-  type Breakpoint,
-  type BreakpointSupport,
-  isBreakpointBelow,
-  useBreakpoint,
-  useBreakpointProps,
-} from '../../../helpers';
+import { type Breakpoint, type BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -227,14 +221,9 @@ export interface PaginationProps extends BreakpointSupport<PaginationBreakpointP
   className?: string;
 }
 
-const BREAKPOINT_ORDER: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'];
-
-const resolveVisibility = (value: PaginationVisibility | undefined, current: Breakpoint | null): boolean => {
-  if (value === undefined || value === false) return false;
-  if (value === true) return true;
-  if (!current) return false;
-  return BREAKPOINT_ORDER.indexOf(current) < BREAKPOINT_ORDER.indexOf(value);
-};
+// A breakpoint hides the slot below it with CSS. `true` removes the slot instead, so it needs no class.
+const hiddenBelow = (slot: 'results' | 'pager' | 'page-size', value: PaginationVisibility | undefined) =>
+  typeof value === 'string' ? styles[`tedi-pagination--no-${slot}-below-${value}`] : undefined;
 
 export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, ref): JSX.Element => {
   const {
@@ -267,8 +256,6 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   } = getCurrentBreakpointProps<PaginationBreakpointProps>(props);
 
   const { getLabel } = useLabels();
-  const breakpoint = useBreakpoint();
-  const useCompactPicker = isBreakpointBelow(breakpoint, 'md');
 
   const mergedLabels = useMemo<PaginationLabels>(() => {
     const pageAriaLabel = labels?.pageAriaLabel ?? ((pageNumber: number) => getLabel('pagination.page', pageNumber));
@@ -372,13 +359,11 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
     [normalizedPageSizeOptions, mergedLabels]
   );
 
-  const isResultsHidden = resolveVisibility(hideResults, breakpoint);
-  const isPageSizeHidden = resolveVisibility(hidePageSize, breakpoint);
-  const isPagerHidden = resolveVisibility(hidePager, breakpoint);
-
-  const showResults = !isResultsHidden && totalItems !== undefined;
-  const showPageSizeSelect = !isPageSizeHidden && Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
-  const showPager = !isPagerHidden && pageCount > 1;
+  // `true` removes the slot. A breakpoint keeps it rendered and hides it below that breakpoint with CSS,
+  // so the server render is already right at every width.
+  const showResults = hideResults !== true && totalItems !== undefined;
+  const showPageSizeSelect = hidePageSize !== true && Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0;
+  const showPager = hidePager !== true && pageCount > 1;
 
   const rootClassName = cn(
     styles['tedi-pagination'],
@@ -389,6 +374,9 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
       [styles['tedi-pagination--no-results']]: !showResults,
       [styles['tedi-pagination--no-page-size']]: !showPageSizeSelect,
     },
+    hiddenBelow('results', hideResults),
+    hiddenBelow('pager', hidePager),
+    hiddenBelow('page-size', hidePageSize),
     className
   );
 
@@ -499,66 +487,62 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
               ? null
               : renderEdgeButton('previous', previousItem, previousIcon, mergedLabels.previous)}
 
-            {!useCompactPicker && (
-              <ul className={styles['tedi-pagination__list']}>
-                {pageItems.map((item, index) => {
-                  const slotKey = `slot-${index}`;
-                  if (item.type === 'ellipsis') {
-                    return (
-                      <li
-                        key={slotKey}
-                        className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
-                        aria-hidden="true"
-                      >
-                        …
-                      </li>
-                    );
-                  }
-                  const pageNumber = item.page as number;
+            <ul className={cn(styles['tedi-pagination__list'], styles['tedi-pagination__wide-only'])}>
+              {pageItems.map((item, index) => {
+                const slotKey = `slot-${index}`;
+                if (item.type === 'ellipsis') {
                   return (
-                    <li key={slotKey} className={styles['tedi-pagination__item']}>
-                      <Button
-                        type="button"
-                        className={cn(styles['tedi-pagination__button'], {
-                          [styles['tedi-pagination__button--selected']]: item.selected,
-                        })}
-                        aria-label={
-                          item.selected
-                            ? mergedLabels.currentPageAriaLabel(pageNumber)
-                            : mergedLabels.pageAriaLabel(pageNumber)
-                        }
-                        aria-current={item.selected ? 'page' : undefined}
-                        onClick={() => handlePageChange(pageNumber)}
-                        noStyle
-                      >
-                        <span key={pageNumber} className={styles['tedi-pagination__button-label']}>
-                          {pageNumber}
-                        </span>
-                      </Button>
+                    <li
+                      key={slotKey}
+                      className={cn(styles['tedi-pagination__item'], styles['tedi-pagination__item--ellipsis'])}
+                      aria-hidden="true"
+                    >
+                      …
                     </li>
                   );
-                })}
-              </ul>
-            )}
+                }
+                const pageNumber = item.page as number;
+                return (
+                  <li key={slotKey} className={styles['tedi-pagination__item']}>
+                    <Button
+                      type="button"
+                      className={cn(styles['tedi-pagination__button'], {
+                        [styles['tedi-pagination__button--selected']]: item.selected,
+                      })}
+                      aria-label={
+                        item.selected
+                          ? mergedLabels.currentPageAriaLabel(pageNumber)
+                          : mergedLabels.pageAriaLabel(pageNumber)
+                      }
+                      aria-current={item.selected ? 'page' : undefined}
+                      onClick={() => handlePageChange(pageNumber)}
+                      noStyle
+                    >
+                      <span key={pageNumber} className={styles['tedi-pagination__button-label']}>
+                        {pageNumber}
+                      </span>
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
 
-            {useCompactPicker && (
-              <button
-                ref={mobileTriggerRef}
-                type="button"
-                className={styles['tedi-pagination__mobile-trigger']}
-                aria-haspopup="dialog"
-                aria-expanded={isMobileModalOpen}
-                aria-label={mobileTriggerAriaLabel}
-                onClick={() => setIsMobileModalOpen(true)}
-              >
-                <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
-                  <strong>{currentPage}</strong>
-                  <span>/</span>
-                  <span>{pageCount}</span>
-                </span>
-                <Icon name="arrow_drop_down" size={24} color="inherit" />
-              </button>
-            )}
+            <button
+              ref={mobileTriggerRef}
+              type="button"
+              className={cn(styles['tedi-pagination__mobile-trigger'], styles['tedi-pagination__compact-only'])}
+              aria-haspopup="dialog"
+              aria-expanded={isMobileModalOpen}
+              aria-label={mobileTriggerAriaLabel}
+              onClick={() => setIsMobileModalOpen(true)}
+            >
+              <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
+                <strong>{currentPage}</strong>
+                <span>/</span>
+                <span>{pageCount}</span>
+              </span>
+              <Icon name="arrow_drop_down" size={24} color="inherit" />
+            </button>
 
             {!showPrevNextButtons && nextItem?.disabled
               ? null
@@ -578,40 +562,37 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
             >
               {mergedLabels.pageSize}
             </Text>
-            {useCompactPicker ? (
-              <button
-                ref={pageSizeTriggerRef}
-                type="button"
-                className={styles['tedi-pagination__mobile-trigger']}
-                aria-haspopup="dialog"
-                aria-expanded={isPageSizeModalOpen}
-                aria-label={`${mergedLabels.pageSize} ${currentPageSizeLabel}`}
-                onClick={() => setIsPageSizeModalOpen(true)}
-              >
-                <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
-                  {currentPageSizeLabel}
-                </span>
-                <Icon name="arrow_drop_down" size={24} color="inherit" />
-              </button>
-            ) : (
-              <Select
-                id={`tedi-pagination-page-size-${selectId}`}
-                className={styles['tedi-pagination__select']}
-                label={mergedLabels.pageSize}
-                hideLabel
-                size="small"
-                options={pageSizeSelectOptions}
-                value={currentPageSizeOption}
-                onChange={handlePageSizeChange}
-                isSearchable={false}
-                isClearable={false}
-              />
-            )}
+            <button
+              ref={pageSizeTriggerRef}
+              type="button"
+              className={cn(styles['tedi-pagination__mobile-trigger'], styles['tedi-pagination__compact-only'])}
+              aria-haspopup="dialog"
+              aria-expanded={isPageSizeModalOpen}
+              aria-label={`${mergedLabels.pageSize} ${currentPageSizeLabel}`}
+              onClick={() => setIsPageSizeModalOpen(true)}
+            >
+              <span className={styles['tedi-pagination__mobile-trigger-label']} aria-hidden="true">
+                {currentPageSizeLabel}
+              </span>
+              <Icon name="arrow_drop_down" size={24} color="inherit" />
+            </button>
+            <Select
+              id={`tedi-pagination-page-size-${selectId}`}
+              className={cn(styles['tedi-pagination__select'], styles['tedi-pagination__wide-only'])}
+              label={mergedLabels.pageSize}
+              hideLabel
+              size="small"
+              options={pageSizeSelectOptions}
+              value={currentPageSizeOption}
+              onChange={handlePageSizeChange}
+              isSearchable={false}
+              isClearable={false}
+            />
           </div>
         )}
       </div>
 
-      {useCompactPicker && showPager && (
+      {showPager && (
         <PaginationMobileModal
           open={isMobileModalOpen}
           onOpenChange={setIsMobileModalOpen}
@@ -623,7 +604,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
         />
       )}
 
-      {useCompactPicker && showPageSizeSelect && (
+      {showPageSizeSelect && (
         <PaginationMobileModal
           open={isPageSizeModalOpen}
           onOpenChange={setIsPageSizeModalOpen}

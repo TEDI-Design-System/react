@@ -38,14 +38,6 @@ jest.mock('../../../providers/label-provider', () => ({
   }),
 }));
 
-jest.mock('../../../helpers', () => {
-  const actual = jest.requireActual('../../../helpers');
-  return {
-    ...actual,
-    useBreakpoint: jest.fn(() => 'lg'),
-  };
-});
-
 describe('usePagination', () => {
   it('returns an empty list when pageCount is 0', () => {
     expect(usePagination({ page: 1, pageCount: 0 })).toEqual([]);
@@ -332,7 +324,7 @@ describe('Pagination component', () => {
 
     const combobox = screen.getByRole('combobox', { name: /Page size/i });
     expect(combobox).toBeInTheDocument();
-    expect(screen.getByText('25')).toBeInTheDocument();
+    expect(screen.getAllByText('25')).toHaveLength(2);
 
     await act(async () => {
       combobox.focus();
@@ -457,19 +449,17 @@ describe('Pagination component', () => {
   });
 });
 
-describe('Pagination — compact mobile picker (below md)', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const helpers = require('../../../helpers') as { useBreakpoint: jest.Mock };
+describe('Pagination — compact mobile picker', () => {
+  // jsdom ignores media queries, so both pickers are in the DOM and CSS decides which one is shown.
+  it('renders the page list and a compact trigger labelled "current / total", each with its own visibility class', () => {
+    const { container } = render(<Pagination pageCount={10} defaultPage={3} />);
+    expect(screen.getByRole('button', { name: 'Page 5' })).toBeInTheDocument();
+    expect(container.querySelector('ul')?.className).toMatch(/wide-only/);
 
-  beforeEach(() => helpers.useBreakpoint.mockReturnValue('sm'));
-  afterEach(() => helpers.useBreakpoint.mockReturnValue('lg'));
-
-  it('swaps the page list for a compact trigger button labelled "current / total"', () => {
-    render(<Pagination pageCount={10} defaultPage={3} />);
-    expect(screen.queryByRole('button', { name: 'Page 5' })).not.toBeInTheDocument();
     const trigger = screen.getByRole('button', { name: /3 \/ 10/ });
     expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger.className).toMatch(/compact-only/);
   });
 
   it('opens the page-picker modal and selects a page', () => {
@@ -480,6 +470,39 @@ describe('Pagination — compact mobile picker (below md)', () => {
     expect(modal).toBeInTheDocument();
     fireEvent.click(within(modal).getByRole('button', { name: 'Page 4' }));
     expect(onPageChange).toHaveBeenCalledWith(4);
+  });
+
+  it('renders a compact page-size trigger next to the select', () => {
+    render(<Pagination pageCount={5} pageSizeOptions={[10, 20]} pageSize={10} />);
+    const trigger = screen.getByRole('button', { name: 'Page size 10' });
+    expect(trigger.className).toMatch(/compact-only/);
+  });
+});
+
+describe('Pagination — slots hidden below a breakpoint', () => {
+  it.each([
+    ['hideResults', 'no-results-below-lg'],
+    ['hidePager', 'no-pager-below-lg'],
+    ['hidePageSize', 'no-page-size-below-lg'],
+  ] as const)('keeps the slot rendered and adds a class when %s is a breakpoint', (prop, expectedClass) => {
+    const { container } = render(
+      <Pagination
+        pageCount={10}
+        defaultPage={1}
+        totalItems={97}
+        pageSizeOptions={[10, 20]}
+        pageSize={10}
+        {...{ [prop]: 'lg' }}
+      />
+    );
+    expect(container.firstElementChild?.className).toContain(expectedClass);
+    expect(screen.getByRole('navigation')).toBeInTheDocument();
+  });
+
+  it('adds no below-breakpoint class when the slot is hidden for good', () => {
+    const { container } = render(<Pagination pageCount={10} defaultPage={1} totalItems={97} hidePager />);
+    expect(container.firstElementChild?.className).not.toMatch(/below/);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 });
 
