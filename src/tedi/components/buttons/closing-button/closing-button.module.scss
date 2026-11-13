@@ -6,7 +6,8 @@
   cursor: pointer;
   border: 0;
   border-radius: var(--button-radius-default);
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: 150ms ease;
+  transition-property: background-color, border-color, color;
 
   &--default {
     width: var(--button-sm-icon-size);
