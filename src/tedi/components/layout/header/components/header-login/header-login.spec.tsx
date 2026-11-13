@@ -1,98 +1,89 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { isBreakpointBelow, useBreakpoint, useBreakpointProps } from '../../../../../helpers';
-import { useLabels } from '../../../../../providers/label-provider';
 import { HeaderLogin } from './header-login';
 
 import '@testing-library/jest-dom';
 
-jest.mock('../../../../../helpers', () => ({
-  ...jest.requireActual('../../../../../helpers'),
-  useBreakpoint: jest.fn(),
-  isBreakpointBelow: jest.fn(),
-  useBreakpointProps: jest.fn(),
+jest.mock('../../../../../providers/label-provider', () => ({
+  useLabels: () => ({ getLabel: (key: string) => key }),
 }));
 
-jest.mock('../../../../../providers/label-provider', () => ({
-  useLabels: jest.fn(),
-}));
+const getVariants = (container: HTMLElement) => container.querySelectorAll('[data-name="header-variant"]');
 
 describe('HeaderLogin component', () => {
-  const mockGetLabel = jest.fn((key: string) => key);
+  it('renders a small and a default button, one per variant', () => {
+    const { container } = render(<HeaderLogin />);
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (useBreakpoint as jest.Mock).mockReturnValue('lg');
-    (isBreakpointBelow as jest.Mock).mockReturnValue(false);
-    (useBreakpointProps as jest.Mock).mockReturnValue({
-      getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => props),
-    });
-    (useLabels as jest.Mock).mockReturnValue({ getLabel: mockGetLabel });
+    const [small, large] = Array.from(getVariants(container));
+    expect(small).toHaveTextContent('header.login.mobile');
+    expect(large).toHaveTextContent('header.login');
+    expect(large).not.toHaveTextContent('header.login.mobile');
   });
 
-  it('renders default size login button on desktop', () => {
-    render(<HeaderLogin />);
+  it('hides each variant at the breakpoints where the other one shows', () => {
+    const { container } = render(<HeaderLogin />);
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.login');
+    const [small, large] = Array.from(getVariants(container));
+    expect(small.className).toMatch(/hidden-md/);
+    expect(small.className).not.toMatch(/hidden-sm/);
+    expect(large.className).toMatch(/hidden-xs/);
+    expect(large.className).toMatch(/hidden-sm/);
+    expect(large.className).not.toMatch(/hidden-md/);
   });
 
-  it('renders small login button on mobile', () => {
-    (isBreakpointBelow as jest.Mock).mockReturnValue(true);
+  it('renders one button without a wrapper when size is set', () => {
+    const { container } = render(<HeaderLogin size="small" />);
 
-    render(<HeaderLogin />);
+    expect(getVariants(container)).toHaveLength(0);
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(container).toHaveTextContent('header.login.mobile');
+  });
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.login.mobile');
+  it('renders only the default variant when size is default', () => {
+    const { container } = render(<HeaderLogin size="default" />);
+
+    expect(getVariants(container)).toHaveLength(0);
+    expect(container).toHaveTextContent('header.login');
+    expect(container).not.toHaveTextContent('header.login.mobile');
+  });
+
+  it('applies size and label overrides from a breakpoint up', () => {
+    const { container } = render(<HeaderLogin size="small" lg={{ size: 'default', label: 'Sign in' }} />);
+
+    const [small, large] = Array.from(getVariants(container));
+    expect(small).toHaveTextContent('header.login.mobile');
+    expect(small.className).toMatch(/hidden-lg/);
+    expect(large).toHaveTextContent('Sign in');
+    expect(large.className).toMatch(/hidden-md/);
+    expect(large.className).not.toMatch(/hidden-lg/);
   });
 
   it('renders with custom label', () => {
-    (useBreakpointProps as jest.Mock).mockReturnValue({
-      getCurrentBreakpointProps: jest.fn((props: Record<string, unknown>) => ({ ...props, label: 'Sign in' })),
-    });
-
-    const { container } = render(<HeaderLogin />);
+    const { container } = render(<HeaderLogin label="Sign in" />);
 
     expect(container.textContent).toContain('Sign in');
   });
 
-  it('renders with href', () => {
+  it('renders links when href is provided', () => {
     const { container } = render(<HeaderLogin href="/login" />);
 
-    const link = container.querySelector('a[href="/login"]');
-    expect(link).toBeInTheDocument();
+    expect(container.querySelectorAll('a[href="/login"]')).toHaveLength(2);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('handles onClick without href', () => {
-    const onClick = jest.fn();
-    render(<HeaderLogin onClick={onClick} />);
-
-    fireEvent.click(screen.getByText('header.login'));
-
-    expect(onClick).toHaveBeenCalled();
-  });
-
-  it('handles onClick with href', () => {
-    const onClick = jest.fn();
-    render(<HeaderLogin onClick={onClick} href="/login" />);
-
-    fireEvent.click(screen.getByRole('link', { name: /header.login/i }));
-
-    expect(onClick).toHaveBeenCalled();
-  });
-
-  it('renders a button when href is not provided', () => {
+  it('renders buttons when href is not provided', () => {
     render(<HeaderLogin />);
 
-    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(2);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders small variant when size is explicitly small', () => {
-    (useBreakpointProps as jest.Mock).mockReturnValue({
-      getCurrentBreakpointProps: jest.fn(() => ({ size: 'small' })),
-    });
+  it('calls onClick', () => {
+    const onClick = jest.fn();
+    render(<HeaderLogin onClick={onClick} size="default" />);
 
-    render(<HeaderLogin />);
+    fireEvent.click(screen.getByRole('button'));
 
-    expect(mockGetLabel).toHaveBeenCalledWith('header.login.mobile');
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
