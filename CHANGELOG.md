@@ -1,3 +1,10 @@
+# [21.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.8...react-21.0.0-rc.9) (2026-11-13)
+
+
+### Bug Fixes
+
+* **closing-button:** match hover transition to button [#1031](https://github.com/TEDI-Design-System/react/issues/1031) ([#1099](https://github.com/TEDI-Design-System/react/issues/1099)) ([9717e78](https://github.com/TEDI-Design-System/react/commit/9717e7803a5e845c22bcaabb5503e89c119540ee))
+
 # [21.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.7...react-21.0.0-rc.8) (2026-11-11)
 
 
