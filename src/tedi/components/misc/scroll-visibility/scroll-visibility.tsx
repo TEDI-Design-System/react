@@ -46,7 +46,7 @@ export interface ScrollVisibilityProps {
   scrollDirection?: 'up' | 'down';
   /**
    * Detect scroll based on this element
-   * @default document.documentElement
+   * @default the `scrollContainer` of `StyleProvider`, otherwise document.documentElement
    */
   scrollContainer?: HTMLElement;
   /**
