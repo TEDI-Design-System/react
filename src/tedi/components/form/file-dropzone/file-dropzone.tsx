@@ -144,6 +144,12 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
     },
   });
 
+  const orderedFiles = React.useMemo(() => {
+    const rejected = innerFiles.filter((file) => file.isValid === false);
+
+    return rejected.length ? [...rejected, ...innerFiles.filter((file) => file.isValid !== false)] : innerFiles;
+  }, [innerFiles]);
+
   const autoError = keepRejectedFiles ? undefined : errorHelper;
   const errorFeedback = autoError ?? (helper?.type === 'error' ? helper : undefined);
   const hintFeedback = helper && helper.type !== 'error' ? helper : restrictionsHint;
@@ -180,21 +186,17 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           disabled={disabled}
         />
         <div className={styles['tedi-file-dropzone__label-wrapper']}>
+          <Icon
+            color="inherit"
+            size={24}
+            name="attach_file"
+            display="inline"
+            className={styles['tedi-file-dropzone__label-icon']}
+          />
           <FormLabel
             id={resolvedId}
             required={required}
-            label={
-              <>
-                <Icon
-                  color={disabled ? 'inherit' : 'secondary'}
-                  size={24}
-                  name="attach_file"
-                  display="inline"
-                  className={styles['tedi-file-dropzone__label-icon']}
-                />
-                {label}
-              </>
-            }
+            label={label}
             className={styles['tedi-file-dropzone__label']}
           />
         </div>
@@ -211,7 +213,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
           style="none"
           aria-label={getLabel('file-dropzone.selected-files')}
         >
-          {innerFiles.map((file: FileUploadFile) => {
+          {orderedFiles.map((file: FileUploadFile) => {
             const overrides = typeof attachmentProps === 'function' ? attachmentProps(file) : attachmentProps;
             const { actions: overrideActions, ...attachmentOverrides } = overrides ?? {};
             return (
@@ -227,7 +229,11 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
                   actions={
                     <>
                       {overrideActions}
-                      <Button visualType="neutral" icon="delete" onClick={() => onFileRemove(file)}>
+                      <Button
+                        visualType="neutral"
+                        icon={file.isValid === false ? 'close' : 'delete'}
+                        onClick={() => onFileRemove(file)}
+                      >
                         {`${getLabel('remove')} ${file.name ?? ''}`}
                       </Button>
                     </>
