@@ -16,6 +16,7 @@ import AsyncSelect from 'react-select/async';
 import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/form/feedback-text/feedback-text';
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { useLabels } from '../../../../tedi/providers/label-provider';
+import { usePortalRoot } from '../../../providers/style-provider/style-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { TextProps } from '../../base/typography/text/text';
 import { TagEllipsis } from '../../tags/tag/tag';
@@ -506,6 +507,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
 
     const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
+    const portalRoot = usePortalRoot();
     const { getLabel } = useLabels();
 
     React.useImperativeHandle(
@@ -775,7 +777,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           components={customComponents}
           isDisabled={disabled}
           isSearchable={isSearchable}
-          menuIsOpen={menuIsOpen}
+          menuIsOpen={portalRoot === null ? false : menuIsOpen}
           openMenuOnFocus={openMenuOnFocus}
           openMenuOnClick={openMenuOnClick}
           tabSelectsValue={tabSelectsValue}
@@ -792,8 +794,8 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           menuPlacement="auto"
           inputIsHidden={inputIsHidden}
           required={required}
-          menuPortalTarget={document.body}
-          menuPosition="absolute"
+          menuPortalTarget={portalRoot === undefined ? document.body : portalRoot}
+          menuPosition={portalRoot ? 'fixed' : 'absolute'}
           classNames={(() => {
             const merged: Record<string, (state: UnknownType) => string> = {};
             if (classNames) {

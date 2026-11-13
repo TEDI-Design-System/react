@@ -3,7 +3,6 @@ import {
   flip,
   FloatingFocusManager,
   FloatingOverlay,
-  FloatingPortal,
   offset,
   useClick,
   useDismiss,
@@ -14,6 +13,7 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 
 import { useLabels } from '../../../../../providers/label-provider';
+import { StylePortal } from '../../../../../providers/style-provider/style-portal';
 import Link from '../../../../navigation/link/link';
 import { SideNavItemProps } from '../sidenav-item/sidenav-item';
 import styles from './sidenav-dropdown.module.scss';
@@ -136,7 +136,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
       </div>
       {open && (
         <FloatingOverlay>
-          <FloatingPortal>
+          <StylePortal>
             <FloatingFocusManager context={context} modal={false}>
               <div
                 ref={refs.setFloating}
@@ -159,7 +159,7 @@ export const SideNavDropdown = <C extends React.ElementType = 'a'>({
                 ))}
               </div>
             </FloatingFocusManager>
-          </FloatingPortal>
+          </StylePortal>
         </FloatingOverlay>
       )}
     </>
