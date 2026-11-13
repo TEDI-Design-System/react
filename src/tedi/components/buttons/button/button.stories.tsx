@@ -314,6 +314,28 @@ export const DangerNeutral: StoryObj<TemplateMultipleProps> = {
   },
 };
 
+/**
+ * The extra small size is only available for icon-only buttons. It does not grow on mobile.
+ */
+export const ExtraSmallIconOnly: StoryObj<ButtonProps<ElementType>> = {
+  render: () => (
+    <div className="flex align-items-center gap-3">
+      <Button size="xs" icon="close" showTooltip>
+        Close
+      </Button>
+      <Button size="xs" icon="edit" visualType="secondary" showTooltip>
+        Edit
+      </Button>
+      <Button size="xs" icon="more_vert" visualType="neutral" showTooltip>
+        More
+      </Button>
+      <Button size="xs" icon="close" disabled showTooltip>
+        Close
+      </Button>
+    </div>
+  ),
+};
+
 export const NoStyleTemplate: StoryFn<ButtonProps> = (args) => {
   return (
     <Button {...args} noStyle={true}>
