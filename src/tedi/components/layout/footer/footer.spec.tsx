@@ -1,4 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { execFileSync } from 'child_process';
+import path from 'path';
 import { renderToString } from 'react-dom/server.node';
 
 import { Footer } from './footer';
@@ -319,5 +321,48 @@ describe('Footer', () => {
     const dots = bottom.querySelectorAll('.tedi-footer-bottom__dot');
     expect(dots).toHaveLength(2);
     dots.forEach((dot) => expect(dot).toHaveAttribute('aria-hidden', 'true'));
+  });
+});
+
+describe('Footer side responsive rules', () => {
+  // jsdom does not evaluate media queries, so the cascade is checked on the compiled stylesheet: classes of equal
+  // specificity apply by source order. The sass CLI runs in a child process, because the sass library does not
+  // work inside Jest's jsdom environment.
+  let css = '';
+
+  beforeAll(() => {
+    const root = path.resolve(__dirname, '../../../../..');
+    css = execFileSync(
+      path.join(root, 'node_modules/.bin/sass'),
+      [
+        '--quiet',
+        '--no-source-map',
+        `--load-path=${path.join(root, 'node_modules')}`,
+        path.resolve(__dirname, 'footer.module.scss'),
+      ],
+      { encoding: 'utf8' }
+    );
+  });
+
+  const BREAKPOINTS = ['sm', 'md', 'lg', 'xl', 'xxl'];
+  const ruleIndex = (selector: string): number => css.indexOf(`.${selector} {`);
+
+  it.each([
+    ['placement', ['start', 'end']],
+    ['vertical', ['start', 'center', 'end']],
+  ])('puts a larger breakpoint after a smaller one for every %s value', (family, values) => {
+    BREAKPOINTS.forEach((smaller, i) => {
+      BREAKPOINTS.slice(i + 1).forEach((larger) => {
+        values.forEach((smallerValue) => {
+          values.forEach((largerValue) => {
+            const first = ruleIndex(`tedi-footer-side--${family}-${smallerValue}-from-${smaller}`);
+            const second = ruleIndex(`tedi-footer-side--${family}-${largerValue}-from-${larger}`);
+
+            expect(first).toBeGreaterThan(-1);
+            expect(second).toBeGreaterThan(first);
+          });
+        });
+      });
+    });
   });
 });
