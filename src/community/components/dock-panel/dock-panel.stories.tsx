@@ -276,6 +276,16 @@ local demo status (no backend call). Footer state survives minimization. All act
 Use \`id\` to connect external controls, \`className\`/\`style\` for styling, and \`headingElement\` for the heading level.
 The required title names the panel.
 
+### Mobile
+
+Below the md breakpoint, DockPanel opens as a TEDI **Sheet**. Use the \`mobile\` prop to control the presentation:
+\`true\` always displays the Sheet, while \`false\` always displays the **DockPanel**.
+Switching between presentations keeps the content mounted, preserving its state. However, changing \`mobile\` to or
+from \`false\` remounts the content and resets its state.
+In the Sheet presentation, \`placement\`, \`resizable\`, \`width\`, \`height\` and the min/max props are ignored.
+The Sheet adjusts its height to fit its content, up to **90dvh**.
+Dragging an expanded Sheet down minimizes it; dragging a minimized Sheet down requests \`onClose\`.
+
 ### Examples
 
 Like the TEDI-Ready Modal documentation, examples begin with **opening buttons** rather than permanently open panels.
@@ -294,6 +304,7 @@ const publicProps = [
   'placement',
   'size',
   'resizable',
+  'mobile',
   'width',
   'minWidth',
   'maxWidth',
@@ -380,6 +391,12 @@ const meta = {
       description:
         'Enables dragging the workspace-facing edge, within 8–92% of the workspace by default. Pixel min/max props replace the corresponding defaults. Minimize/restore preserves the resized dimensions.',
       table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'false' } },
+    },
+    mobile: {
+      control: 'inline-radio',
+      options: ['Automatic', 'Mobile', 'Desktop'],
+      mapping: { Automatic: undefined, Mobile: true, Desktop: false },
+      table: { category: 'Optional props', subcategory: 'Layout', defaultValue: { summary: 'Automatic (below md)' } },
     },
     width: {
       control: 'text',
@@ -1421,4 +1438,10 @@ export const ResizeHeight: Story = {
       },
     },
   },
+};
+
+export const Mobile: Story = {
+  args: { mobile: true, description: 'Additional information about this item.' },
+  argTypes: { mobile: { control: false } },
+  render: (args) => <PanelExample args={args} />,
 };

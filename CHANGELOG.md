@@ -1,3 +1,107 @@
+# [21.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.8...react-21.0.0-rc.9) (2026-11-13)
+
+
+### Bug Fixes
+
+* **closing-button:** match hover transition to button [#1031](https://github.com/TEDI-Design-System/react/issues/1031) ([#1099](https://github.com/TEDI-Design-System/react/issues/1099)) ([9717e78](https://github.com/TEDI-Design-System/react/commit/9717e7803a5e845c22bcaabb5503e89c119540ee))
+
+# [21.0.0-rc.8](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.7...react-21.0.0-rc.8) (2026-11-11)
+
+
+### Features
+
+* **overlay:** add delay prop to popover and tooltip hover [#1037](https://github.com/TEDI-Design-System/react/issues/1037) ([#1088](https://github.com/TEDI-Design-System/react/issues/1088)) ([0f2ec7b](https://github.com/TEDI-Design-System/react/commit/0f2ec7b51a4fde4a31f83f88a1096cc391d495b0))
+
+# [21.0.0-rc.7](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.6...react-21.0.0-rc.7) (2026-11-11)
+
+
+### Features
+
+* **dock-panel:** Add Responsive Mobile Sheet Presentation [#1083](https://github.com/TEDI-Design-System/react/issues/1083) ([#1084](https://github.com/TEDI-Design-System/react/issues/1084)) ([486da3b](https://github.com/TEDI-Design-System/react/commit/486da3baf1daafbc46ace7bcff8e050278d70cac))
+
+
+### BREAKING CHANGES
+
+* **dock-panel:** DockPanel becomes a Sheet below md unless `mobile` is false.
+
+# [21.0.0-rc.6](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.5...react-21.0.0-rc.6) (2026-11-10)
+
+
+### Bug Fixes
+
+* **button-group:** correct the documented stretch default [#1001](https://github.com/TEDI-Design-System/react/issues/1001) ([#1086](https://github.com/TEDI-Design-System/react/issues/1086)) ([b00bc4a](https://github.com/TEDI-Design-System/react/commit/b00bc4a45653d0f6f67f7705e63b9e2a6f98607f))
+
+# [21.0.0-rc.5](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.4...react-21.0.0-rc.5) (2026-11-09)
+
+
+### Features
+
+* **carousel:** add swipeThreshold prop and improve swipe navigation [#941](https://github.com/TEDI-Design-System/react/issues/941) ([#1080](https://github.com/TEDI-Design-System/react/issues/1080)) ([551489c](https://github.com/TEDI-Design-System/react/commit/551489c3626b133c841af9fc87d931b63501be0a))
+
+# [21.0.0-rc.4](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.3...react-21.0.0-rc.4) (2026-11-09)
+
+
+### Bug Fixes
+
+* **modal:** keep the dialog's accessible name from the first render [#1071](https://github.com/TEDI-Design-System/react/issues/1071) ([#1075](https://github.com/TEDI-Design-System/react/issues/1075)) ([43ae6d2](https://github.com/TEDI-Design-System/react/commit/43ae6d2badae432c956dc588822aba0e62aeeb0b))
+* **modal:** keep the trigger child's ref attached across re-renders [#1072](https://github.com/TEDI-Design-System/react/issues/1072) ([#1077](https://github.com/TEDI-Design-System/react/issues/1077)) ([26a554f](https://github.com/TEDI-Design-System/react/commit/26a554f5d28c4a714425760ba07e162ccbefb102))
+* **select:** clear the value with Enter and Space on the clear button [#1038](https://github.com/TEDI-Design-System/react/issues/1038) ([#1082](https://github.com/TEDI-Design-System/react/issues/1082)) ([737ab07](https://github.com/TEDI-Design-System/react/commit/737ab07ca60a6d42d365ff9978796be5a6882e71))
+
+# [21.0.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.2...react-21.0.0-rc.3) (2026-11-09)
+
+
+### Bug Fixes
+
+* **sheet:** keep mouse drags working after a drag from the handle [#1076](https://github.com/TEDI-Design-System/react/issues/1076) ([#1078](https://github.com/TEDI-Design-System/react/issues/1078)) ([ae8cdfc](https://github.com/TEDI-Design-System/react/commit/ae8cdfc960b149dd11db3851e1770eb1b8fcd99c))
+
+# [21.0.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.1...react-21.0.0-rc.2) (2026-11-05)
+
+
+### Features
+
+* **table-of-contents:** rename bordered prop to divided [#1067](https://github.com/TEDI-Design-System/react/issues/1067) ([#1070](https://github.com/TEDI-Design-System/react/issues/1070)) ([b4ecc5d](https://github.com/TEDI-Design-System/react/commit/b4ecc5d35e0923693c946d2b9670b82932372bee))
+
+
+### BREAKING CHANGES
+
+* **table-of-contents:** `bordered` on TableOfContents and TableOfContents.Collapsible
+is renamed to `divided`, and the `tedi-table-of-contents--bordered` class to
+`tedi-table-of-contents--divided`.
+
+# [21.0.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.3...react-21.0.0-rc.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* **table:** render sub-rows only for rows that can expand [#1064](https://github.com/TEDI-Design-System/react/issues/1064) ([#1065](https://github.com/TEDI-Design-System/react/issues/1065)) ([8d977f5](https://github.com/TEDI-Design-System/react/commit/8d977f548ce3e4d9a4d1e3e4c1ba6ef407541a2d))
+* **table:** scope modifier styles to their own table [#1062](https://github.com/TEDI-Design-System/react/issues/1062) ([#1063](https://github.com/TEDI-Design-System/react/issues/1063)) ([9764a90](https://github.com/TEDI-Design-System/react/commit/9764a90edb6b788d99003fe632272b10cd2800fb))
+
+
+### Features
+
+* **popover:** add withArrow prop and make offset exclude the arrow [#1017](https://github.com/TEDI-Design-System/react/issues/1017) ([#1020](https://github.com/TEDI-Design-System/react/issues/1020)) ([3873d0b](https://github.com/TEDI-Design-System/react/commit/3873d0bdce6014988029bba5d26c4aa7ab7b04aa))
+
+
+### BREAKING CHANGES
+
+* **popover:** Popover `offset` is now the visible gap only; the arrow's
+17px height is added automatically when `withArrow` is true. Subtract 17 from
+any custom offset to keep the same position.
+
+# [20.1.0-rc.3](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.2...react-20.1.0-rc.3) (2026-11-04)
+
+
+### Bug Fixes
+
+* **timeline:** collapse empty title and description [#1059](https://github.com/TEDI-Design-System/react/issues/1059) ([#1060](https://github.com/TEDI-Design-System/react/issues/1060)) ([22734fa](https://github.com/TEDI-Design-System/react/commit/22734faef0e59def2732800b82cf694a8ae987c0))
+
+# [20.1.0-rc.2](https://github.com/TEDI-Design-System/react/compare/react-20.1.0-rc.1...react-20.1.0-rc.2) (2026-11-04)
+
+
+### Bug Fixes
+
+* **sheet:** correct design tokens and refine dragging [#1051](https://github.com/TEDI-Design-System/react/issues/1051) ([#1056](https://github.com/TEDI-Design-System/react/issues/1056)) ([e766649](https://github.com/TEDI-Design-System/react/commit/e766649c12c8d6268bbfba441640294a42aec1e8))
+
 # [20.1.0-rc.1](https://github.com/TEDI-Design-System/react/compare/react-20.0.0...react-20.1.0-rc.1) (2026-11-02)
 
 

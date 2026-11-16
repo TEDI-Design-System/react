@@ -68,8 +68,7 @@ All in the same PR:
    ```
 4. **Manifest**: the component's `status` in `component.manifest.json` (see the `update-design-docs`
    skill).
-5. **Migration guide**: goes into the rc release description on GitHub (use the `tedi-migration-guide`
-   skill).
+5. **Migration guide**: goes into the rc release description on GitHub.
 6. **Release notes** of the main release: a row in the `### Deprecations` table (Deprecated /
    Replacement / Since / Migration guide) with "targeted for removal in {T+6 month}". This is the
    documentation removal month.

@@ -1428,6 +1428,44 @@ export const CollapsibleRowsRowTrigger: Story = {
 };
 
 /**
+ * A `Table` rendered inside `renderSubComponent` follows only its own props. The outer table here is
+ * striped, small and has vertical borders; the nested tables keep the default look.
+ */
+export const NestedTable: Story = {
+  render: () => {
+    const columns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'name', header: 'Isik', accessorKey: 'name' },
+      { id: 'age', header: 'Vanus', accessorKey: 'age' },
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+    ];
+    const nestedColumns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+      { id: 'status', header: 'Tõendi staatus', accessorKey: 'status' },
+    ];
+    return (
+      <Table<CollapsibleRecord>
+        id="tedi-table-nested"
+        data={collapsiblePeople}
+        columns={columns}
+        renderSubComponent={(row) => (
+          <Table<CollapsibleRecord>
+            id={`tedi-table-nested-${row.id}`}
+            data={row.original.subRows ?? []}
+            columns={nestedColumns}
+          />
+        )}
+        getRowCanExpand={(row) => !!row.original.subRows}
+        defaultState={{ expanded: { '0': true, '2': true } }}
+        striped
+        verticalBorders
+        size="small"
+        pagination={SHOWCASE_PAGINATION_4}
+      />
+    );
+  },
+};
+
+/**
  * Columns hidden on narrow viewports — the secondary columns whose `id` is in `RESPONSIVE_SECONDARY_COLUMNS`
  * are toggled off below `md` and re-surfaced inside the expandable detail row.
  */

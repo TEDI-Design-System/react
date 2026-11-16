@@ -127,9 +127,9 @@ describe('ButtonGroup Component', () => {
     expect(container.firstChild).toHaveClass('tedi-button-group--stretch');
   });
 
-  it('does not apply the stretch class when the stretch prop is false', () => {
+  it('does not apply the stretch class by default', () => {
     const { container } = render(
-      <ButtonGroup stretch={false}>
+      <ButtonGroup>
         <Button id="button1">Button 1</Button>
       </ButtonGroup>
     );

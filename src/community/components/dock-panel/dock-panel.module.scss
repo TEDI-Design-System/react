@@ -379,3 +379,58 @@
 .tedi-dock-panel-layout > .tedi-dock-panel__resize-layout[data-collapsed='true'][data-placement='bottom'] {
   grid-area: bottom;
 }
+
+/* Keeps docked flex, gap and layout unchanged around the moving content node. */
+.tedi-dock-panel__slot {
+  display: contents;
+}
+
+/* Without a scroll lock, scrolling past the end would otherwise move the page behind. */
+.tedi-dock-panel__sheet-body {
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+
+.tedi-dock-panel__sheet-description {
+  margin-bottom: var(--tedi-dimensions-05);
+}
+
+/* Sheet's action group never shrinks, so wide header actions would clip the toggle and close button. */
+.tedi-dock-panel__sheet-header {
+  flex-wrap: wrap;
+
+  > :last-child {
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+    margin-inline-start: auto;
+  }
+}
+
+.tedi-dock-panel__sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tedi-dimensions-04);
+  align-items: center;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.tedi-dock-panel__sheet-spacer {
+  display: none;
+}
+
+/* The minimized Sheet is fixed to the viewport, so this keeps the workspace end clear of it. */
+.tedi-dock-panel-layout > .tedi-dock-panel__sheet-spacer {
+  display: block;
+  grid-area: bottom;
+  height: var(--sheet-header-height);
+}
+
+/* Matches Sheet's own toggle, whose chevron rule is private to its CSS module. */
+.tedi-dock-panel__sheet-toggle > * {
+  scale: 1 -1;
+}

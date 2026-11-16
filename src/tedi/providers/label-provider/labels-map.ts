@@ -208,7 +208,7 @@ export const labelsMap = validateDefaultLabels({
   },
   clear: {
     description: 'For clearing a value',
-    components: ['TableFilter', 'TextField'],
+    components: ['Select', 'TableFilter', 'TextField'],
     et: 'Tühjenda',
     en: 'Clear',
     ru: 'Очистить',

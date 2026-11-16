@@ -1,6 +1,6 @@
 # WCAG Accessibility Review
 
-Target component: `$ARGUMENTS`
+Target: the component given in the task.
 
 ## Standard
 

@@ -26,7 +26,7 @@ describe('Overlay component', () => {
 
   it('applies class names correctly for overlay components', () => {
     render(
-      <Overlay>
+      <Overlay arrowDimensions={{ width: 34, height: 17 }}>
         <Overlay.Trigger className="custom-class">Trigger Text</Overlay.Trigger>
         <Overlay.Content classNames={{ content: 'custom-content', arrow: 'custom-arrow' }}>Content</Overlay.Content>
       </Overlay>
@@ -43,6 +43,19 @@ describe('Overlay component', () => {
 
     expect(content).toHaveClass('custom-content');
     expect(arrow).toHaveClass('custom-arrow');
+  });
+
+  it('renders no arrow without arrowDimensions', () => {
+    render(
+      <Overlay>
+        <Overlay.Trigger>Trigger Text</Overlay.Trigger>
+        <Overlay.Content>Content</Overlay.Content>
+      </Overlay>
+    );
+    fireEvent.mouseEnter(screen.getByText('Trigger Text'));
+
+    expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+    expect(screen.queryByTestId('overlay-arrow')).not.toBeInTheDocument();
   });
 
   it('applies correct aria attributes when child is an Icon', () => {
