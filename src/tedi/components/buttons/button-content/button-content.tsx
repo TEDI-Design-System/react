@@ -227,6 +227,15 @@ const InternalButtonContent = forwardRef(
       onClick?.(event);
     };
 
+    // A middle-click opens a link without firing `click`.
+    const onAuxClickHandler = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+      if (isLoading) {
+        event.preventDefault();
+        return;
+      }
+      rest.onAuxClick?.(event);
+    };
+
     const isIconOnly = Boolean(icon);
     const getButtonText = (children: React.ReactNode): string | undefined => {
       if (typeof children === 'string') return children;
@@ -248,6 +257,7 @@ const InternalButtonContent = forwardRef(
         aria-disabled={isLoading || rest['aria-disabled']}
         aria-describedby={cn(rest['aria-describedby'], isLoading && loadingDescriptionId) || undefined}
         onClick={onClickHandler}
+        onAuxClick={onAuxClickHandler}
         ref={mergedRef}
         className={BEM}
       >

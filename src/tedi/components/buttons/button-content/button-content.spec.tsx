@@ -161,6 +161,24 @@ describe('ButtonContent component', () => {
     expect(fireEvent.click(link)).toBe(false);
   });
 
+  it('blocks middle-clicks only while loading', () => {
+    const handleAuxClick = jest.fn();
+    const renderLink = (isLoading: boolean) => (
+      <ButtonContent {...defaultProps} as="a" href="/next" isLoading={isLoading} onAuxClick={handleAuxClick}>
+        Next
+      </ButtonContent>
+    );
+    const { rerender } = render(renderLink(true));
+    const link = screen.getByText('Next').closest('a') as HTMLAnchorElement;
+
+    expect(fireEvent(link, new MouseEvent('auxclick', { bubbles: true, cancelable: true }))).toBe(false);
+    expect(handleAuxClick).not.toHaveBeenCalled();
+
+    rerender(renderLink(false));
+    expect(fireEvent(link, new MouseEvent('auxclick', { bubbles: true, cancelable: true }))).toBe(true);
+    expect(handleAuxClick).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps the button focusable while loading', () => {
     render(<ButtonContent {...defaultProps} isLoading />);
     const button = screen.getByRole('button');
