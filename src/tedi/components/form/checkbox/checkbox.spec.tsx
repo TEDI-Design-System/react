@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { act, useState } from 'react';
 
+import { Icon } from '../../base/icon/icon';
 import Checkbox from './checkbox';
+import CheckboxGroup from './checkbox-group/checkbox-group';
 
 import '@testing-library/jest-dom';
 
@@ -193,19 +195,18 @@ describe('Checkbox component', () => {
     expect(input.indeterminate).toBe(false);
   });
 
-  it('calls labelRef.current.click() when clicked', () => {
-    const { getByTestId } = render(
-      <Checkbox id="check-id" label="Checkbox Label" value="check-value" name="check-group" />
+  it('toggles via the input, with the indicator kept decorative', () => {
+    const onChange = jest.fn();
+    render(
+      <Checkbox id="check-id" label="Checkbox Label" value="check-value" name="check-group" onChange={onChange} />
     );
 
-    const label = getByTestId('checkbox-label');
-    const indicator = getByTestId('checkbox-indicator');
+    // The real input overlays the indicator and is the interactive control; the indicator is
+    // decorative (so a mouse click lands on the input and Chrome keeps the focus ring keyboard-only).
+    expect(screen.getByTestId('checkbox-indicator')).toHaveAttribute('aria-hidden', 'true');
 
-    jest.spyOn(label, 'click').mockImplementation(() => {});
-
-    fireEvent.click(indicator);
-
-    expect(label.click).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(onChange).toHaveBeenCalledWith('check-value', true);
   });
 
   it('renders required indicator when required prop is true', () => {
@@ -255,5 +256,61 @@ describe('Checkbox component', () => {
     render(<Checkbox id="checkbox-id" label="Checkbox Label" value="checkbox-value" name="checkbox-group" />);
 
     expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('card variant: accessible name is the label only; description and helper are the description', () => {
+    render(
+      <Checkbox
+        id="cb-card"
+        variant="card"
+        label="Express delivery"
+        value="express"
+        description="Arrives tomorrow"
+        helper={{ text: 'Costs extra' }}
+      />
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Express delivery' });
+    // Name is not merged with the description/helper text.
+    expect(checkbox).toHaveAccessibleName('Express delivery');
+    expect(checkbox).toHaveAccessibleDescription(/Arrives tomorrow/);
+    expect(checkbox).toHaveAccessibleDescription(/Costs extra/);
+  });
+
+  it('card variant: ignores a group-inherited tooltip and warns (tooltip and card are mutually exclusive)', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    render(
+      <CheckboxGroup label="Delivery" variant="card">
+        <Checkbox label="Express delivery" value="express" tooltip="Extra info" />
+      </CheckboxGroup>
+    );
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('tooltip'));
+
+    warn.mockRestore();
+  });
+  it('uses the larger check and indeterminate icons for size="large"', () => {
+    jest.mocked(Icon).mockClear();
+    render(<Checkbox id="check-large" label="Large" value="large" size="large" />);
+
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'check', size: 18 }), expect.anything());
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'remove', size: 18 }), expect.anything());
+  });
+
+  it('card variant: renders the icon sized to match the checkbox size', () => {
+    jest.mocked(Icon).mockClear();
+    const { rerender } = render(<Checkbox id="check-card-icon" variant="card" label="Kartul" value="a" icon="eco" />);
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'eco', size: 18 }), expect.anything());
+
+    jest.mocked(Icon).mockClear();
+    rerender(<Checkbox id="check-card-icon" variant="card" label="Kartul" value="a" icon="eco" size="large" />);
+    expect(Icon).toHaveBeenCalledWith(expect.objectContaining({ name: 'eco', size: 24 }), expect.anything());
+  });
+
+  it('card variant: does not point aria-labelledby at a missing label', () => {
+    render(<Checkbox id="check-card-unlabelled" variant="card" label="" value="a" />);
+    expect(screen.getByRole('checkbox')).not.toHaveAttribute('aria-labelledby');
   });
 });

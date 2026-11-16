@@ -1,4 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -174,10 +175,53 @@ export const Password: Story = {
   },
 };
 
+/**
+ * A password field with a show/hide toggle. The trailing `icon` becomes a button via `onIconClick`;
+ * clicking it swaps the input `type` between `password` and `text` and updates the icon. Give the
+ * icon button an `aria-label` and `aria-pressed` (through `iconButtonProps`) so screen-reader users
+ * know it toggles password visibility and its current state.
+ */
+export const PasswordWithToggle: Story = {
+  render: function PasswordWithToggle() {
+    const [isVisible, setIsVisible] = useState(false);
+    const [value, setValue] = useState('SuperSecret123');
+
+    return (
+      <TextField
+        id="example-password-toggle"
+        label="Password"
+        value={value}
+        onChange={setValue}
+        input={{ type: isVisible ? 'text' : 'password', autoComplete: 'current-password' }}
+        icon={isVisible ? 'visibility_off' : 'visibility'}
+        onIconClick={() => setIsVisible((prev) => !prev)}
+        iconButtonProps={{
+          'aria-label': 'Show password',
+          'aria-pressed': isVisible,
+        }}
+      />
+    );
+  },
+};
+
 export const Placeholder: Story = {
   args: {
     ...Default.args,
     id: 'example-5',
     placeholder: 'Text value',
+  },
+};
+
+/**
+ * `showClearOnInteraction` reveals the clear (×) button only while the field is hovered or focused
+ * (keyboard focus included), instead of whenever it has a value. Requires `isClearable`.
+ */
+export const ClearButtonOnInteraction: Story = {
+  args: {
+    id: 'example-clear-on-interaction',
+    label: 'Label',
+    defaultValue: 'Text value',
+    isClearable: true,
+    showClearOnInteraction: true,
   },
 };

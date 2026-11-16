@@ -154,7 +154,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps): JSX.Element | null => {
               </li>
             ) : (
               <li className={styles['tedi-breadcrumbs__item']}>
-                <Dropdown>
+                <Dropdown navigation>
                   <Dropdown.Trigger>
                     <Button noStyle className={styles['tedi-breadcrumbs__ellipsis']}>
                       <span aria-hidden="true">…</span>
@@ -168,7 +168,12 @@ export const Breadcrumbs = (props: BreadcrumbsProps): JSX.Element | null => {
                           ? cloneElement(hiddenCrumb, { noStyle: true })
                           : hiddenCrumb;
                       return (
-                        <Dropdown.Item key={hiddenCrumb.key ?? hiddenIndex} index={hiddenIndex} asChild>
+                        <Dropdown.Item
+                          key={hiddenCrumb.key ?? hiddenIndex}
+                          index={hiddenIndex}
+                          asChild
+                          className={styles['tedi-breadcrumbs__dropdown-link']}
+                        >
                           {menuCrumb}
                         </Dropdown.Item>
                       );

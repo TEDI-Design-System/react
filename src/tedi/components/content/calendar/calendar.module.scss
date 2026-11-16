@@ -290,24 +290,24 @@
   min-height: 2.5rem;
   padding: calc(var(--button-md-padding-y) - var(--tedi-borders-01)) var(--button-md-padding-x);
   font-size: var(--button-text-size-default);
-  color: var(--form-checkbox-radio-card-primary-default-text);
+  color: var(--form-choice-card-primary-unselected-text-default);
   text-align: center;
-  border: var(--tedi-borders-01) solid var(--form-checkbox-radio-card-secondary-default-border);
+  border: var(--tedi-borders-01) solid var(--form-choice-card-secondary-unselected-border-default);
   border-radius: var(--form-checkbox-radio-card-radius);
 
   &:hover {
-    color: var(--form-checkbox-radio-card-secondary-hover-text);
+    color: var(--form-choice-card-secondary-unselected-text-hover);
     cursor: pointer;
-    border: var(--tedi-borders-01) solid var(--form-checkbox-radio-card-secondary-hover-border);
+    border: var(--tedi-borders-01) solid var(--form-choice-card-secondary-unselected-border-hover);
   }
 
   &--selected {
-    color: var(--form-checkbox-radio-card-secondary-selected-text);
-    border-color: var(--form-checkbox-radio-card-secondary-selected-border);
-    box-shadow: 0 0 0 var(--tedi-borders-01) var(--form-checkbox-radio-card-secondary-selected-border);
+    color: var(--form-choice-card-secondary-selected-text-default);
+    border-color: var(--form-choice-card-secondary-selected-border-default);
+    box-shadow: 0 0 0 var(--tedi-borders-01) var(--form-choice-card-secondary-selected-border-default);
 
     &:hover {
-      box-shadow: 0 0 0 var(--tedi-borders-01) var(--form-checkbox-radio-card-secondary-selected-border);
+      box-shadow: 0 0 0 var(--tedi-borders-01) var(--form-choice-card-secondary-selected-border-default);
     }
   }
 }

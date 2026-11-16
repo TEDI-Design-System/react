@@ -1,0 +1,12 @@
+.category-search-story {
+  width: 30rem;
+  max-width: 100%;
+  min-height: 24rem;
+
+  &__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tedi-dimensions-02);
+    margin-block-end: var(--tedi-dimensions-04);
+  }
+}

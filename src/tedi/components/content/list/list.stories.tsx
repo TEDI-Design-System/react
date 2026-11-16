@@ -3,7 +3,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import List, { ListProps } from './list';
 
 /**
- * <a href="https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2137-19322&m=dev" target="_BLANK">Figma ↗</a><br/>
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?m=dev&node-id=5797-117059" target="_BLANK">Figma ↗</a><br/>
  * <a href="https://www.tedi.ee/1ee8444b7/p/37b651-list" target="_BLANK">Zeroheight ↗</a>
  */
 

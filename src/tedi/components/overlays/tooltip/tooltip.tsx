@@ -8,7 +8,7 @@ const ARROW_HEIGHT = 7 as const;
 const ARROW_WIDTH = 14 as const;
 
 export interface TooltipProps
-  extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset' | 'dismissible' | 'scrollLock'> {
+  extends Omit<OverlayProps, 'arrowDimensions' | 'openWith' | 'offset' | 'offsetDeps' | 'dismissible' | 'scrollLock'> {
   /**
    * Adds correct event listeners that change the open state.
    * @default hover on pointer devices, click on touch devices

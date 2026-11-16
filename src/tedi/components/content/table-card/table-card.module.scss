@@ -30,34 +30,13 @@
     font: inherit;
   }
 
-  &__toggle {
-    @include mixins.button-reset;
-
+  &__collapse-row {
     display: flex;
+    flex: 1;
     gap: var(--layout-grid-gutters-16);
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    text-align: left;
+    min-width: 0;
     cursor: pointer;
-
-    &:focus-visible {
-      outline: var(--tedi-borders-02) solid var(--general-border-brand);
-      outline-offset: 2px;
-      border-radius: var(--table-radius);
-    }
-
-    &:hover .tedi-table-card__chevron {
-      color: var(--link-primary-hover);
-    }
-
-    &:active .tedi-table-card__chevron {
-      color: var(--link-primary-active);
-    }
-
-    &:focus-visible .tedi-table-card__chevron {
-      color: var(--link-primary-focus);
-    }
   }
 
   &__title-group {
@@ -75,17 +54,6 @@
       font-size: var(--body-regular-size);
       font-weight: var(--body-regular-weight);
       line-height: var(--body-regular-line-height);
-    }
-  }
-
-  &__chevron {
-    display: inline-flex;
-    flex-shrink: 0;
-    color: var(--link-primary-default);
-    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
-
-    &--open {
-      transform: rotate(-180deg);
     }
   }
 

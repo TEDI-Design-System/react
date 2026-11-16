@@ -10,6 +10,11 @@ import HeaderBottomContent from './header-bottom-content';
 const meta: Meta<typeof HeaderBottomContent> = {
   component: HeaderBottomContent,
   title: 'Community/Layout/Header/HeaderBottomContent',
+  parameters: {
+    status: {
+      type: ['deprecated', 'ExistsInTediReady'],
+    },
+  },
 };
 
 export default meta;

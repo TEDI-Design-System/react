@@ -143,6 +143,12 @@
   right: var(--collapsed-menu-toggle-arrow-right);
 }
 
+.tedi-sidenav__overlay .tedi-sidenav--mobile {
+  max-width: 100%;
+  height: auto;
+  min-height: 100%;
+}
+
 .tedi-sidenav__overlay {
   z-index: calc(var(--z-index-header) - 1);
   background: var(--tedi-alpha-20);

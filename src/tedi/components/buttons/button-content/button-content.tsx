@@ -6,8 +6,7 @@ import { useLabels } from '../../../providers/label-provider';
 import { UnknownType } from '../../../types/commonTypes';
 import { Icon, IconWithoutBackgroundProps } from '../../base/icon/icon';
 import { Spinner } from '../../loaders/spinner/spinner';
-import { Print } from '../../misc/print/print';
-import { Tooltip } from '../../overlays/tooltip';
+import { Tooltip } from '../../overlays/tooltip/tooltip';
 import { ButtonColor, ButtonType } from '../button/button';
 import styles from './button-content.module.scss';
 
@@ -220,7 +219,7 @@ const InternalButtonContent = forwardRef(
     );
 
     return (
-      <Print visibility="hide">
+      <>
         {showTooltip && isIconOnly && buttonText ? (
           <Tooltip ariaHidden>
             <Tooltip.Trigger>{buttonElement}</Tooltip.Trigger>
@@ -232,7 +231,7 @@ const InternalButtonContent = forwardRef(
         <span id={loadingStatusId} role="status" aria-live="polite" className={styles['tedi-btn__loading-status']}>
           {isLoading ? getLabel('button.loading') : ''}
         </span>
-      </Print>
+      </>
     );
   }
 );

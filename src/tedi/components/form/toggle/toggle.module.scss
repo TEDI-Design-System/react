@@ -1,28 +1,28 @@
 @mixin toggle-variant($color, $type) {
   @if $type == filled {
-    --toggle-bg-default: var(--form-toggle-#{$color}-inactive-default);
-    --toggle-bg-hover: var(--form-toggle-#{$color}-inactive-hover);
-    --toggle-bg-active: var(--form-toggle-#{$color}-inactive-active);
-    --toggle-bg-checked: var(--form-toggle-#{$color}-active-default);
-    --toggle-bg-checked-hover: var(--form-toggle-#{$color}-active-hover);
-    --toggle-bg-checked-active: var(--form-toggle-#{$color}-active-active);
-    --toggle-indicator-default: var(--form-toggle-#{$color}-inactive-indicator);
-    --toggle-indicator-checked: var(--form-toggle-#{$color}-active-indicator);
-    --toggle-icon-default: var(--form-toggle-#{$color}-inactive-icon);
-    --toggle-icon-checked: var(--form-toggle-#{$color}-active-icon);
+    --toggle-bg-default: var(--form-toggle-#{$color}-unselected-default);
+    --toggle-bg-hover: var(--form-toggle-#{$color}-unselected-hover);
+    --toggle-bg-active: var(--form-toggle-#{$color}-unselected-active);
+    --toggle-bg-checked: var(--form-toggle-#{$color}-selected-default);
+    --toggle-bg-checked-hover: var(--form-toggle-#{$color}-selected-hover);
+    --toggle-bg-checked-active: var(--form-toggle-#{$color}-selected-active);
+    --toggle-indicator-default: var(--form-toggle-#{$color}-unselected-indicator);
+    --toggle-indicator-checked: var(--form-toggle-#{$color}-selected-indicator);
+    --toggle-icon-default: var(--form-toggle-#{$color}-unselected-icon);
+    --toggle-icon-checked: var(--form-toggle-#{$color}-selected-icon);
   }
 
   @if $type == outlined {
-    --toggle-border-default: var(--form-toggle-#{$color}-inactive-default);
-    --toggle-border-hover: var(--form-toggle-#{$color}-inactive-hover);
-    --toggle-border-active: var(--form-toggle-#{$color}-inactive-active);
-    --toggle-border-checked: var(--form-toggle-#{$color}-active-default);
-    --toggle-border-checked-hover: var(--form-toggle-#{$color}-active-hover);
-    --toggle-border-checked-active: var(--form-toggle-#{$color}-active-active);
-    --toggle-indicator-default: var(--form-toggle-#{$color}-inactive-default);
-    --toggle-indicator-checked: var(--form-toggle-#{$color}-active-default);
-    --toggle-icon-default: var(--form-toggle-#{$color}-inactive-icon-outlined);
-    --toggle-icon-checked: var(--form-toggle-#{$color}-active-icon-outlined);
+    --toggle-border-default: var(--form-toggle-#{$color}-unselected-default);
+    --toggle-border-hover: var(--form-toggle-#{$color}-unselected-hover);
+    --toggle-border-active: var(--form-toggle-#{$color}-unselected-active);
+    --toggle-border-checked: var(--form-toggle-#{$color}-selected-default);
+    --toggle-border-checked-hover: var(--form-toggle-#{$color}-selected-hover);
+    --toggle-border-checked-active: var(--form-toggle-#{$color}-selected-active);
+    --toggle-indicator-default: var(--form-toggle-#{$color}-unselected-default);
+    --toggle-indicator-checked: var(--form-toggle-#{$color}-selected-default);
+    --toggle-icon-default: var(--form-toggle-#{$color}-unselected-icon-outlined);
+    --toggle-icon-checked: var(--form-toggle-#{$color}-selected-icon-outlined);
   }
 }
 
@@ -107,7 +107,7 @@
     }
 
     &:focus-visible {
-      outline: calc(2 * var(--tedi-borders-01)) solid var(--form-toggle-primary-active-default);
+      outline: calc(2 * var(--tedi-borders-01)) solid var(--form-toggle-primary-selected-default);
       outline-offset: var(--tedi-borders-01);
     }
 

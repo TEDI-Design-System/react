@@ -5,6 +5,7 @@ import { DropdownItem } from './dropdown-item';
 
 const mockSetOpen = jest.fn();
 const mockOnClick = jest.fn();
+let mockContextOverrides: Record<string, UnknownType> = {};
 
 jest.mock('../dropdown-context', () => ({
   useDropdownContext: () => ({
@@ -14,6 +15,7 @@ jest.mock('../dropdown-context', () => ({
     activeIndex: 0,
     divided: false,
     variant: 'default',
+    ...mockContextOverrides,
   }),
 }));
 
@@ -21,6 +23,7 @@ describe('DropdownItem', () => {
   beforeEach(() => {
     mockSetOpen.mockClear();
     mockOnClick.mockClear();
+    mockContextOverrides = {};
   });
 
   it('calls onClick and closes dropdown on click', () => {
@@ -99,6 +102,30 @@ describe('DropdownItem', () => {
     fireEvent.click(wrapper);
     expect(handleChange).toHaveBeenCalledTimes(1);
     expect(mockSetOpen).not.toHaveBeenCalled();
+  });
+
+  it('toggles an inner checkbox once when the checkbox itself is clicked', () => {
+    render(
+      <DropdownItem asChild index={0} closeOnSelect={false}>
+        <input type="checkbox" id="chk-input" aria-label="Checkbox" />
+      </DropdownItem>
+    );
+    const input = screen.getByRole('checkbox', { name: 'Checkbox' });
+    fireEvent.click(input);
+    expect(input).toBeChecked();
+  });
+
+  it('toggles an inner checkbox once when its label is clicked', () => {
+    render(
+      <DropdownItem asChild index={0} closeOnSelect={false}>
+        <div>
+          <input type="checkbox" id="chk-label" />
+          <label htmlFor="chk-label">Checkbox label</label>
+        </div>
+      </DropdownItem>
+    );
+    fireEvent.click(screen.getByText('Checkbox label'));
+    expect(screen.getByLabelText('Checkbox label')).toBeChecked();
   });
 
   it('applies indentation styles when indent is provided', () => {
@@ -338,6 +365,43 @@ describe('DropdownItem', () => {
       expect(mockOnClick).not.toHaveBeenCalled();
       expect(childClick).not.toHaveBeenCalled();
       expect(mockSetOpen).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('navigation mode', () => {
+    it('does not intercept Space on a navigation link, leaving native link behavior', () => {
+      mockContextOverrides = { navigation: true };
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0} onClick={mockOnClick}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+
+      const link = screen.getByRole('link', { name: 'Go' });
+      const notPrevented = fireEvent.keyDown(link, { key: ' ' });
+
+      expect(childClick).not.toHaveBeenCalled();
+      expect(mockOnClick).not.toHaveBeenCalled();
+      expect(mockSetOpen).not.toHaveBeenCalled();
+      expect(notPrevented).toBe(true);
+    });
+
+    it('still lets the navigation link handle its own click', () => {
+      mockContextOverrides = { navigation: true };
+      const childClick = jest.fn();
+      render(
+        <DropdownItem asChild index={0}>
+          <a href="/x" onClick={childClick}>
+            Go
+          </a>
+        </DropdownItem>
+      );
+
+      fireEvent.click(screen.getByRole('link', { name: 'Go' }));
+      expect(childClick).toHaveBeenCalledTimes(1);
     });
   });
 });

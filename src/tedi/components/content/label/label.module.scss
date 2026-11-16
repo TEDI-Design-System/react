@@ -26,11 +26,12 @@
   }
 
   &__info {
-    margin-left: var(--layout-grid-gutters-08);
+    display: inline-flex;
+    margin-left: var(--content-label-inner-spacing-x);
+    vertical-align: top;
   }
 }
 
 .tedi-label__wrapper {
-  display: inline-flex;
-  align-items: center;
+  display: inline;
 }

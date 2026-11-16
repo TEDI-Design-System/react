@@ -5,19 +5,23 @@ import * as PrintStories from './print.stories';
 
 # Printing in TEDI-Ready
 
-Components and layouts include built-in optimizations for print media (via `@media print` styles). This ensures clean, readable output when users trigger print preview or print to PDF.
+TEDI components include print styles for browser printing and saving as PDF.
+These styles apply automatically. Use the `<Print>` component to customise
+print visibility and page breaks.
 
 ## Global Print Behaviors (Applied Automatically)
 
-- Text colors and many components are converted to grayscale for better ink economy and readability.
-- Most background colors are forced to white (or transparent) to reduce ink usage.
+- Links and selected text colours are greyscaled. Individual components also define their own print styles.
+- The page uses a light neutral background. Core sets `print-color-adjust: exact`
+  to ask browsers to preserve the colours defined by the print styles.
 - Base font size is set to **14px**, with proportional scaling for headings, spacing, and line heights.
 - Interactive or non-essential elements are **hidden by default** in print:
   - Buttons
-  - Links/Anchors (unless overridden)
   - Header, Footer
-  - Breadcrumbs
   - Sidenav / Navigation
+- Links and anchors **remain visible when printing**, preserving linked text in the document.
+- Breadcrumbs **remain visible when printing** — the trail shows where the printed page came from.
+  (The older community `Breadcrumbs` still hides itself.)
 - Expandable components are **expanded by default**:
   - Accordion
   - Collapse
@@ -27,13 +31,16 @@ Components and layouts include built-in optimizations for print media (via `@med
   - Review large or multi-column tables individually — consider hiding columns or switching to a simplified print layout when needed.
 - Some components prevent page breaks internally (e.g. `break-inside: avoid` on table rows, Placeholder content), but most page-break decisions should be made explicitly using the tools below.
 
-**Firefox & Page Breaks Note**  
-Firefox has supported the modern `break-before`, `break-after`, and `break-inside` properties since version **65** (January 2019). Legacy `page-break-*` properties are aliased for compatibility.  
-Many fragmentation issues — especially with flex containers and `avoid` values — were resolved around Firefox 122 (late 2023). Complex flexbox layouts may still encounter minor pagination quirks in edge cases.  
-Always test in Firefox print preview. Relevant historical bugs (mostly fixed):
+**Browser support and page breaks**
 
-- [Meta: Flex fragmentation/print issues](https://bugzilla.mozilla.org/show_bug.cgi?id=939897)
-- Related fixes: [1744363](https://bugzilla.mozilla.org/show_bug.cgi?id=1744363), [1695475](https://bugzilla.mozilla.org/show_bug.cgi?id=1695475), [1807406](https://bugzilla.mozilla.org/show_bug.cgi?id=1807406)
+Modern browsers support CSS page-break controls, but complex layouts can still
+paginate differently. Firefox continues to track
+[flex layout pagination issues](https://bugzilla.mozilla.org/show_bug.cgi?id=939897).
+Check multi-page content in both Firefox and Chrome print preview, especially
+long flex layouts and tables. If content is clipped or breaks in an awkward
+place, consider simplifying the layout for print or applying break controls to
+smaller sections. See [MDN's `break-inside` reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/break-inside)
+for how break rules are resolved.
 
 ## How to Control Print Output
 
@@ -41,19 +48,21 @@ Use these tools — in recommended order:
 
 ### 1. Preferred: `<Print>` Component
 
-Wrap content to apply print-specific visibility or page-break behavior via cloned `className`.
+Wrap elements in `<Print>` to control print visibility and page breaks. It adds
+print classes to its child elements without rendering an additional DOM element.
+Custom child components must pass `className` to their DOM element.
 
 ```tsx
 import { Print } from '@tedi-design-system/react/tedi';
 
 // Hide during print
 <Print visibility="hide">
-  This toolbar / interactive section disappears when printing
+  <div>This toolbar is hidden when printing.</div>
 </Print>
 
-// Show only during print
+// Override no-print on the same element
 <Print visibility="show">
-  This message or simplified content is only visible in print preview / on paper
+  <div className="no-print">This content remains visible when printing.</div>
 </Print>
 
 // Control page breaks
@@ -69,6 +78,12 @@ import { Print } from '@tedi-design-system/react/tedi';
 - `visibility`: `'show'` or `'hide'` → adds `show-print` or `no-print`
 - `breakBefore` / `breakAfter` / `breakInside`: `'auto'`, `'avoid'`, `'avoid-page'`, `'avoid-column'`, `'avoid-region'`
 - Full props & stories → [Print component docs](/docs/tedi-ready-components-helpers-print--docs)
+
+**`show` only overrides `no-print` on the same element.** Content inside a
+hidden parent remains hidden. It does not hide the element on screen or make it
+visible only when printing.
+
+**`<Print>` supports avoiding page breaks, but cannot force a new page.**
 
 ### 2. Conditional Rendering: `usePrint()` Hook + `PrintingProvider`
 
@@ -94,7 +109,8 @@ function ReportPage({ data }) {
 }
 ```
 
-**Setup (already handled globally):**
+**Setup:** Wrap the relevant part of your application in `PrintingProvider` if
+it is not already inside one. `usePrint()` requires this provider.
 
 ```tsx
 // In your App.tsx
@@ -106,5 +122,6 @@ import { PrintingProvider } from '@tedi-design-system/react/tedi';
 ```
 
 - Returns `true` during browser print preview / printing
-- Consistent value across all nested components (no race conditions)
-- Uses `beforeprint` / `afterprint` events (more reliable than `matchMedia('print')` alone)
+- Shares the print state with components inside the provider
+- Reads the initial state from `matchMedia('print')` and updates it using
+  `beforeprint` / `afterprint` events

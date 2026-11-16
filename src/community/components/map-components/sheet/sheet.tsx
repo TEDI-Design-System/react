@@ -3,9 +3,13 @@ import classNames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 
 import { ClosingButton, Heading, Icon } from '../../../../tedi';
+import { warnDeprecated } from '../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { UnknownType } from '../../../../tedi/types/commonTypes';
 import styles from './sheet.module.scss';
 
+/**
+ * @deprecated Use `Sheet` from `@tedi-design-system/react/tedi` instead.
+ */
 export interface SheetProps {
   /**
    * Controls whether the sheet is fully open or closed.
@@ -79,7 +83,11 @@ export interface SheetProps {
   isVisible?: boolean;
 }
 
+/**
+ * @deprecated Use `Sheet` from `@tedi-design-system/react/tedi` instead.
+ */
 export const Sheet = (props: SheetProps): JSX.Element | null => {
+  warnDeprecated('Community Sheet', 'Use `Sheet` from `@tedi-design-system/react/tedi` instead.');
   const {
     open,
     onClose,

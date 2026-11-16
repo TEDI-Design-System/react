@@ -5,6 +5,7 @@ import { FeedbackText, FeedbackTextProps } from '../../../../tedi/components/for
 import { FormLabel, FormLabelProps } from '../../../../tedi/components/form/form-label/form-label';
 import { Col, Row } from '../../../../tedi/components/layout/grid';
 import { Tag } from '../../../../tedi/components/tags/tag/tag';
+import { warnDeprecated } from '../../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { ILabelContext, useLabels } from '../../../../tedi/providers/label-provider';
 import Button from '../../button/button';
 import { Card, CardContent } from '../../card';
@@ -120,6 +121,7 @@ const getUploadErrorHelperText = (rejectedFiles: RejectedFile[], getLabel: ILabe
  * @deprecated Use `FileUpload` from `@tedi-design-system/react/tedi` instead.
  */
 export const FileUpload = (props: FileUploadProps): JSX.Element => {
+  warnDeprecated('Community FileUpload', 'Use `FileUpload` from `@tedi-design-system/react/tedi` instead.');
   const { getLabel } = useLabels();
   const {
     id,

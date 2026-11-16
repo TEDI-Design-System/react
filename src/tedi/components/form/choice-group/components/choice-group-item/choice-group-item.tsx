@@ -89,19 +89,12 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
     const target = e.target as HTMLElement;
     if (target.closest('input, label')) return;
 
-    document.getElementById(id)?.click();
+    if (id) document.getElementById(id)?.click();
   };
 
-  const isRadio = type === 'radio';
   return (
     <Col {...colProps} className={ColumnBEM}>
-      <div
-        className={ChoiceGroupItemBEM}
-        tabIndex={isRadio || disabled ? -1 : 0}
-        onClick={handleClick}
-        role={isRadio ? undefined : type}
-        aria-checked={isRadio ? undefined : isChecked}
-      >
+      <div className={ChoiceGroupItemBEM} onClick={handleClick} aria-disabled={disabled || undefined}>
         {variant === 'default' || showIndicator ? (
           <InputComponent
             id={id}
@@ -136,14 +129,15 @@ export const ChoiceGroupItem = (props: ExtendedChoiceGroupItemProps): React.Reac
                 onChangeHandler(value, e.target.checked);
               }}
               className="visually-hidden"
-              role={type === 'radio' ? 'radio' : undefined}
-              aria-checked={isChecked}
-              tabIndex={-1}
             />
             <label htmlFor={id} className={styles['tedi-choice-group-item__label']}>
               {label}
               {helper && (
-                <FeedbackText {...helper} id={id} className={styles['tedi-choice-group-item__feedback-text']} />
+                <FeedbackText
+                  {...helper}
+                  id={helper.id ?? `${id}-helper`}
+                  className={styles['tedi-choice-group-item__feedback-text']}
+                />
               )}
             </label>
           </>

@@ -1,12 +1,41 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { warnDeprecated } from '../../../helpers/warn-deprecated/warn-deprecated';
 import { useLabels } from '../../../providers/label-provider';
 import { Icon } from '../../base/icon/icon';
 import Button from '../../buttons/button/button';
 import { SideNavItem, SideNavItemProps } from '../sidenav/components/sidenav-item/sidenav-item';
 import styles from '../sidenav/sidenav.module.scss';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+/**
+ * A `position: fixed` element is positioned relative to the viewport unless an ancestor
+ * establishes a containing block (via `transform`, `perspective`, `filter`, `will-change`, or
+ * `contain`). `offsetParent` is always `null` for fixed elements, so walk the ancestors to find
+ * that block. This keeps the overlay aligned under its header both in a normal app (no such
+ * ancestor → viewport) and when several instances share one document inside a transformed wrapper
+ * (e.g. Storybook's Docs page, which stacks stories in a single scroll container).
+ */
+const findFixedContainingBlock = (element: HTMLElement | null): HTMLElement | null => {
+  let node = element?.parentElement ?? null;
+  while (node) {
+    const style = getComputedStyle(node);
+    if (
+      style.transform !== 'none' ||
+      style.perspective !== 'none' ||
+      (style.filter !== '' && style.filter !== 'none') ||
+      /\b(transform|perspective|filter)\b/.test(style.willChange) ||
+      /\b(layout|paint|strict|content)\b/.test(style.contain)
+    ) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+};
 
 type NavigationLevel<C extends React.ElementType> = {
   items: SideNavItemProps<C>[];
@@ -37,10 +66,55 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
 }: MobileNavProps<C>) => {
   const { getLabel } = useLabels();
   const [navigationStack, setNavigationStack] = useState<NavigationLevel<C>[]>([{ items: navItems }]);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [overlayTop, setOverlayTop] = useState<string>('var(--layout-header-height)');
 
   useEffect(() => {
     setNavigationStack([{ items: navItems }]);
   }, [navItems]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
+
+    const block = findFixedContainingBlock(overlayRef.current);
+    const header = (block ?? document).querySelector('header') ?? document.querySelector('header');
+
+    if (!header) {
+      setOverlayTop('var(--layout-header-height)');
+      return undefined;
+    }
+
+    const measure = () => {
+      const blockTop = block ? block.getBoundingClientRect().top : 0;
+      setOverlayTop(`${Math.max(0, Math.round(header.getBoundingClientRect().bottom - blockTop))}px`);
+    };
+    measure();
+
+    window.addEventListener('resize', measure);
+    let observer: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(measure);
+      observer.observe(header);
+      if (block) observer.observe(block);
+    }
+
+    return () => {
+      window.removeEventListener('resize', measure);
+      observer?.disconnect();
+    };
+  }, [isOpen, showOverlay]);
+
+  useEffect(() => {
+    if (!isOpen || !showOverlay || typeof document === 'undefined') return undefined;
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+    body.style.overflow = 'hidden';
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isOpen, showOverlay]);
 
   const currentLevel = navigationStack[navigationStack.length - 1];
   const isRootLevel = navigationStack.length === 1;
@@ -189,7 +263,7 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
           {currentLevel.parent?.children}
         </div>
       )}
-      <ul className={styles['tedi-sidenav__list']} role="menubar">
+      <ul className={styles['tedi-sidenav__list']}>
         {currentLevel.renderParentLink && currentLevel.parent && (
           <li className={styles['tedi-sidenav__list-item']}>
             <div className={classNames(styles['tedi-sidenav__collapse'])}>
@@ -209,12 +283,14 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
 
   return showOverlay ? (
     <FloatingOverlay
-      style={{
-        top: '0',
-        position: 'relative',
-        height: '100%',
-      }}
+      ref={overlayRef}
+      style={{ top: overlayTop }}
       className={styles['tedi-sidenav__overlay']}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
     >
       {content}
     </FloatingOverlay>
@@ -227,6 +303,9 @@ export const MobileNav = <C extends React.ElementType = 'a'>({
  * @deprecated Use `MobileNav` (same component, vendor-neutral name). Kept for
  * backward compatibility with the `SideNav.Mobile` sub-component alias.
  */
-export const SideNavMobile = MobileNav;
+export const SideNavMobile = <C extends React.ElementType = 'a'>(props: MobileNavProps<C>) => {
+  warnDeprecated('SideNavMobile', 'Use `MobileNav` (same component, vendor-neutral name).');
+  return <MobileNav<C> {...props} />;
+};
 /** @deprecated Use `MobileNavProps`. */
 export type SideNavMobileProps<C extends React.ElementType = 'a'> = MobileNavProps<C>;

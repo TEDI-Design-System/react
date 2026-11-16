@@ -86,6 +86,20 @@ describe('Select component', () => {
     expect(screen.getByLabelText('Choose a fruit')).toBeDisabled();
   });
 
+  it('adds the reveal-on-hover modifier only with a visible clear indicator and showClearOnInteraction', () => {
+    const root = () => document.querySelector('[data-name="select"]') as HTMLElement;
+    const { rerender } = render(
+      <Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible showClearOnInteraction />
+    );
+    expect(root().className).toContain('tedi-select--clear-on-interaction');
+
+    rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} showClearOnInteraction />);
+    expect(root().className).not.toContain('tedi-select--clear-on-interaction');
+
+    rerender(<Select {...defaultProps} defaultValue={basicOptions[0]} isClearIndicatorVisible />);
+    expect(root().className).not.toContain('tedi-select--clear-on-interaction');
+  });
+
   it('renders with grouped options', async () => {
     render(<Select {...defaultProps} options={groupedOptions} />);
 
@@ -184,6 +198,32 @@ describe('Select component', () => {
     });
 
     expect(handleChange).toHaveBeenCalledWith(null);
+  });
+
+  it('exposes the clear button to assistive technology with a clear label', () => {
+    render(<Select {...defaultProps} value={basicOptions[0]} isClearIndicatorVisible />);
+
+    expect(screen.getByRole('button', { name: 'clear' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['Enter', '{Enter}'],
+    ['Space', ' '],
+  ])('clears the selection when %s is pressed on the focused clear button', async (_key, keys) => {
+    const handleChange = jest.fn();
+    render(<Select {...defaultProps} onChange={handleChange} value={basicOptions[0]} isClearIndicatorVisible />);
+
+    const clearButton = screen.getByRole('button', { name: 'clear' });
+    act(() => clearButton.focus());
+
+    await act(async () => {
+      await userEvent.keyboard(keys);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith(null);
+    await waitFor(() => expect(screen.getByRole('combobox')).toHaveFocus());
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('renders helper text', () => {

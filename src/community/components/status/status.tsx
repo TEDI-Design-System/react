@@ -1,5 +1,6 @@
 import cn from 'classnames';
 
+import { warnDeprecated } from '../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { Tooltip, TooltipProvider, TooltipTrigger } from '../tooltip';
 import styles from './status.module.scss';
 
@@ -26,6 +27,7 @@ export interface StatusProps {
  * @deprecated Use `StatusIndicator` from `@tedi-design-system/react/tedi` instead.
  */
 export const Status = (props: StatusProps): JSX.Element => {
+  warnDeprecated('Community Status', 'Use `StatusIndicator` from `@tedi-design-system/react/tedi` instead.');
   const { children, type, className, tooltipContent, ...rest } = props;
   const StatusBEM = cn(styles['status'], className, styles[`status--${type}`]);
 

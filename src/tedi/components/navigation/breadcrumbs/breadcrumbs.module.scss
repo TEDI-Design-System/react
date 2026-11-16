@@ -34,3 +34,12 @@
     color: var(--link-primary-hover);
   }
 }
+
+a.tedi-breadcrumbs__dropdown-link {
+  color: var(--link-primary-default);
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--link-primary-hover);
+  }
+}

@@ -640,6 +640,38 @@ describe('Table', () => {
       fireEvent.click(collapse);
       expect(screen.queryByText(/details for Anna/)).not.toBeInTheDocument();
     });
+
+    it('does not turn open sub-component rows into landmarks', () => {
+      render(
+        <Table<Person>
+          id="t-exp-landmarks"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          defaultState={{ expanded: true }}
+        />
+      );
+
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(screen.getByText(/details for Jüri/)).toBeInTheDocument();
+      expect(screen.queryAllByRole('region')).toHaveLength(0);
+    });
+
+    it('renders the sub-component only for rows that can expand when expanded is true', () => {
+      render(
+        <Table<Person>
+          id="t-exp-all"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          getRowCanExpand={(row) => row.original.name === 'Anna'}
+          defaultState={{ expanded: true }}
+        />
+      );
+
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(screen.queryByText(/details for Jüri/)).not.toBeInTheDocument();
+    });
   });
 
   describe('expandTrigger="row"', () => {
@@ -851,6 +883,18 @@ describe('Table', () => {
 
       expect(screen.getByRole('cell', { name: 'Anna' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
+    });
+
+    it('resets the column filter from the clear button', () => {
+      render(<Table<Person> id="t-filter-clear" data={data} columns={columns} enableColumnFilters />);
+
+      fireEvent.change(screen.getByLabelText('Filter Name'), { target: { value: 'Anna' } });
+      expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByTitle(/clear/i));
+
+      expect(screen.getByLabelText('Filter Name')).toHaveValue('');
+      expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
     });
 
     it('forwards meta.filterProps (e.g. maxLength) to the built-in column filter input', () => {

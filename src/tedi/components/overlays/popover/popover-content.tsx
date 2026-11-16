@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { CSSProperties, useContext } from 'react';
+import { CSSProperties, ReactNode, useContext } from 'react';
 import { useId } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
@@ -27,7 +27,11 @@ const resolvePopoverPadding = (padding: CardContentPadding | undefined): CSSProp
   } as CSSProperties;
 };
 
-export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames'> {
+export interface PopoverContentProps extends Omit<OverlayContentProps, 'classNames' | 'children'> {
+  /**
+   * Popover body. Optional, so a popover can show only a `title`.
+   */
+  children?: ReactNode | ReactNode[];
   /**
    * Popover title.
    */

@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React from 'react';
 
+import { warnDeprecated } from '../../../tedi/helpers/warn-deprecated/warn-deprecated';
 import { Card, CardContent, CardHeader, CardProps } from '../card';
 import Step, { StepProps } from './step';
 import styles from './stepper.module.scss';
@@ -73,6 +74,7 @@ export interface StepperProps {
  * @deprecated Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.
  */
 export const Stepper = (props: StepperProps): JSX.Element => {
+  warnDeprecated('Community Stepper', 'Use `HorizontalStepper` from `@tedi-design-system/react/tedi` instead.');
   const {
     activeStep,
     defaultActiveStep,

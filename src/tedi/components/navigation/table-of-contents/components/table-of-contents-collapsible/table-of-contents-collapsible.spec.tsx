@@ -99,6 +99,19 @@ describe('TableOfContents.Collapsible', () => {
     expect(within(dialog).getByRole('navigation', { name: 'Sisukord' })).toBeInTheDocument();
   });
 
+  it('falls back to the localised title for the nav landmark when heading is an empty string', () => {
+    render(
+      <TableOfContents.Collapsible heading="" activeId="x">
+        <TableOfContents.Item id="x">
+          <a href="#x">X</a>
+        </TableOfContents.Item>
+      </TableOfContents.Collapsible>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Open' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByRole('navigation', { name: 'Table of contents' })).toBeInTheDocument();
+  });
+
   it('names the sheet navigation with ariaLabel, taking precedence over the heading', () => {
     render(
       <TableOfContents.Collapsible heading="Sisukord" ariaLabel="Section navigation">
@@ -178,23 +191,23 @@ describe('TableOfContents.Collapsible', () => {
     });
   });
 
-  describe('bordered', () => {
-    it('does not apply the bordered modifier by default', () => {
+  describe('divided', () => {
+    it('does not apply the divided modifier by default', () => {
       render(<Tree />);
       fireEvent.click(screen.getByRole('button', { name: 'Open' }));
-      expect(document.querySelector('[class*="tedi-table-of-contents--bordered"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[class*="tedi-table-of-contents--divided"]')).not.toBeInTheDocument();
     });
 
-    it('applies the bordered modifier to the sheet list when bordered', () => {
+    it('applies the divided modifier to the sheet list when divided', () => {
       render(
-        <TableOfContents.Collapsible heading="Sisukord" bordered>
+        <TableOfContents.Collapsible heading="Sisukord" divided>
           <TableOfContents.Item id="intro">
             <a href="#intro">Sissejuhatus</a>
           </TableOfContents.Item>
         </TableOfContents.Collapsible>
       );
       fireEvent.click(screen.getByRole('button', { name: 'Open' }));
-      expect(document.querySelector('[class*="tedi-table-of-contents--bordered"]')).toBeInTheDocument();
+      expect(document.querySelector('[class*="tedi-table-of-contents--divided"]')).toBeInTheDocument();
     });
   });
 

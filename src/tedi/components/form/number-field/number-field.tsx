@@ -97,6 +97,7 @@ export const NumberField = (props: NumberFieldProps) => {
     id,
     label,
     hideLabel,
+    labelProps,
     required,
     className,
     size,
@@ -341,7 +342,14 @@ export const NumberField = (props: NumberFieldProps) => {
 
   return (
     <div data-name="number-field" className={className}>
-      <FormLabel id={resolvedId} label={label} required={required} hideLabel={hideLabel} size={size} />
+      <FormLabel
+        id={resolvedId}
+        label={label}
+        required={required}
+        hideLabel={hideLabel}
+        size={size}
+        labelProps={labelProps}
+      />
       <div className={NumberFieldBem}>
         {renderButton('decrement')}
         {renderInputElement()}

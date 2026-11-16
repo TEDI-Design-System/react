@@ -22,7 +22,7 @@ $backgrounds: (
   background: var(--general-surface-tertiary);
   border-radius: var(--tedi-radius-02-default);
 
-  .filter-item__input:focus + & {
+  .filter-item__input:focus-visible + & {
     @include mixins.focus-element;
   }
 

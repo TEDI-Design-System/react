@@ -839,6 +839,18 @@ describe('DateField component', () => {
       expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
     });
 
+    it('shows the clear button on a calendar-only range', () => {
+      render(
+        <DateField
+          {...defaultProps}
+          mode="range"
+          defaultValue={{ from: new Date(2025, 0, 15), to: new Date(2025, 0, 20) }}
+        />
+      );
+      expect(screen.getByRole('textbox')).toHaveAttribute('readonly');
+      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    });
+
     it('hides the clear button when clearable is false', () => {
       render(<DateField {...defaultProps} defaultValue={new Date(2025, 0, 15)} clearable={false} />);
       expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();

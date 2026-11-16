@@ -16,6 +16,9 @@ export interface HeaderBottomContentProps {
   cardProps?: CardProps;
 }
 
+/**
+ * @deprecated Use the `bottom` prop of `Header` from `@tedi-design-system/react/tedi` instead.
+ */
 export const HeaderBottomContent = (props: HeaderBottomContentProps) => {
   const { children, cardProps } = props;
   const { headerBottomElement } = React.useContext(LayoutContext);

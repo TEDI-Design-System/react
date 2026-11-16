@@ -1,4 +1,4 @@
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useBreakpoint } from '../../../helpers/hooks/use-breakpoint';
 import { useLabels } from '../../../providers/label-provider';
@@ -20,7 +20,11 @@ export interface CarouselConfig {
   transitionMs: number;
   loop: boolean;
   centered: boolean;
+  swipeThreshold: number;
 }
+
+/** Default share of the distance to the next position that a drag must cover to move on. */
+export const DEFAULT_SWIPE_THRESHOLD = 0.3;
 
 const DEFAULT_CONFIG: CarouselConfig = {
   slidesPerView: { xs: 1 },
@@ -29,9 +33,32 @@ const DEFAULT_CONFIG: CarouselConfig = {
   transitionMs: 400,
   loop: true,
   centered: false,
+  swipeThreshold: DEFAULT_SWIPE_THRESHOLD,
 };
 
+// Wheel movement is measured in slide widths; smaller movements snap to the nearest position.
+const WHEEL_DIRECTIONAL_SNAP_THRESHOLD = 0.3;
+// Treat negligible fractional end positions as whole-slide positions.
+const MAX_INDEX_ROUNDING_TOLERANCE = 1e-6;
+// Ignore floating-point noise when walking a released drag; far below the shortest final step.
+const EPSILON = 1e-9;
+// Drag speed, in slides per ms, that counts as a flick.
+const FLICK_VELOCITY = 0.0015;
+// A flick's speed is measured over this many ms before release.
+const FLICK_WINDOW = 100;
+// Drags shorter than this (px) never move the carousel, so taps and jitter stay put.
+const MIN_SWIPE_DISTANCE = 10;
+// A mouse holds still while clicking, so a shorter drag is already deliberate.
+const MIN_MOUSE_SWIPE_DISTANCE = 4;
+
 const mod = (value: number, length: number): number => ((value % length) + length) % length;
+
+const closestPositionIndex = (positions: number[], index: number): number =>
+  positions.reduce(
+    (closest, position, candidate) =>
+      Math.abs(position - index) < Math.abs(positions[closest] - index) ? candidate : closest,
+    0
+  );
 
 export interface CarouselApi {
   viewportRef: React.RefObject<HTMLDivElement>;
@@ -40,7 +67,8 @@ export interface CarouselApi {
   setConfig: (config: CarouselConfig) => void;
   setSlidesCount: (count: number) => void;
   slidesCount: number;
-  slideIndex: number;
+  positions: number[];
+  activePositionIndex: number;
   canPrev: boolean;
   canNext: boolean;
   renderedIndices: number[];
@@ -61,7 +89,8 @@ export interface CarouselApi {
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => void;
-  onPointerUp: () => void;
+  onPointerUp: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onPointerCancel: (event: React.PointerEvent<HTMLDivElement>) => void;
 }
 
 /**
@@ -91,12 +120,17 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
   const pendingFocusRef = useRef(false);
   const startXRef = useRef(0);
   const startIndexRef = useRef(0);
-  const startTimeRef = useRef(0);
   const lastXRef = useRef(0);
   const lastTimeRef = useRef(0);
   const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const scrollDeltaRef = useRef(0);
   const mountedRef = useRef(true);
+  // The pointer that started the drag; other pointers are ignored until it ends.
+  const pointerIdRef = useRef<number | null>(null);
+  // Recent pointer positions, for measuring flick speed at release.
+  const samplesRef = useRef<{ x: number; t: number }[]>([]);
+  // The current drag's minimum swipe distance (px), set by its pointer type.
+  const minSwipeDistanceRef = useRef(MIN_SWIPE_DISTANCE);
 
   const trackIndexRef = useRef(trackIndex);
   const windowBaseRef = useRef(windowBase);
@@ -117,10 +151,20 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const loop = config.loop;
 
-  const maxIndex = useMemo(
-    () => Math.max(0, slidesCount - Math.ceil(currentSlidesPerView)),
-    [slidesCount, currentSlidesPerView]
-  );
+  const maxIndex = useMemo(() => {
+    const rawMaxIndex = Math.max(0, slidesCount - currentSlidesPerView);
+    const nearestWhole = Math.round(rawMaxIndex);
+    return Math.abs(rawMaxIndex - nearestWhole) < MAX_INDEX_ROUNDING_TOLERANCE ? nearestWhole : rawMaxIndex;
+  }, [slidesCount, currentSlidesPerView]);
+
+  const positions = useMemo(() => {
+    if (!slidesCount) return [];
+    if (loop) return Array.from({ length: slidesCount }, (_, i) => i);
+    const whole = Math.floor(maxIndex);
+    const reachable = Array.from({ length: whole + 1 }, (_, i) => i);
+    if (maxIndex > whole) reachable.push(maxIndex);
+    return reachable;
+  }, [slidesCount, loop, maxIndex]);
 
   const clampIndex = useCallback(
     (value: number): number => (loop ? value : Math.min(Math.max(value, 0), maxIndex)),
@@ -129,16 +173,24 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const buffer = loop ? slidesCount : 0;
 
-  const slideIndex = useMemo(() => {
-    if (slidesCount === 0) return 0;
+  const activePositionIndex = useMemo(() => {
+    if (!positions.length) return 0;
     if (loop) return mod(Math.floor(trackIndex), slidesCount);
-    return Math.min(Math.max(Math.round(trackIndex), 0), slidesCount - 1);
-  }, [trackIndex, slidesCount, loop]);
+    return closestPositionIndex(positions, trackIndex);
+  }, [positions, trackIndex, slidesCount, loop]);
 
-  const renderedActiveIndex = loop ? trackIndex - windowBase + buffer : trackIndex;
+  const renderedActiveIndex = loop ? trackIndex - windowBase + buffer : Math.ceil(trackIndex);
 
-  const canPrev = loop || trackIndex > 0.001;
-  const canNext = loop || trackIndex < maxIndex - 0.001;
+  const canPrev = slidesCount > 0 && (loop || trackIndex > 0);
+  const canNext = slidesCount > 0 && (loop || trackIndex < maxIndex);
+
+  useLayoutEffect(() => {
+    if (loop) return;
+    clearTimeout(wheelTimeoutRef.current);
+    scrollDeltaRef.current = 0;
+    trackIndexRef.current = clampIndex(trackIndexRef.current);
+    setTrackIndex((index) => clampIndex(index));
+  }, [loop, maxIndex, clampIndex]);
 
   const renderedIndices = useMemo(() => {
     if (!slidesCount) return [];
@@ -184,10 +236,11 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const isSlideVisible = useCallback(
     (renderedIndex: number): boolean => {
+      if (!loop) return renderedIndex + 1 > trackIndex && renderedIndex < trackIndex + currentSlidesPerView;
       const slidesPerView = Math.ceil(currentSlidesPerView);
       return renderedIndex >= renderedActiveIndex && renderedIndex < renderedActiveIndex + slidesPerView;
     },
-    [currentSlidesPerView, renderedActiveIndex]
+    [currentSlidesPerView, renderedActiveIndex, loop, trackIndex]
   );
 
   const contentClassName = useCallback(
@@ -211,7 +264,7 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
       if (!mountedRef.current || !slidesCount) return;
       const current = loop
         ? mod(Math.floor(trackIndexRef.current), slidesCount)
-        : Math.min(Math.max(Math.round(trackIndexRef.current), 0), slidesCount - 1);
+        : Math.min(Math.max(Math.ceil(trackIndexRef.current), 0), slidesCount - 1);
       setAnnouncement(getLabel('carousel.slide', current + 1, slidesCount));
     }, 100);
   }, [getLabel, slidesCount, loop]);
@@ -225,28 +278,30 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const focusActiveSlide = useCallback((): void => {
     setTimeout(() => {
-      const activeIndex = trackIndexRef.current - windowBaseRef.current + buffer;
+      const activeIndex = loop
+        ? trackIndexRef.current - windowBaseRef.current + buffer
+        : Math.ceil(trackIndexRef.current);
       slideRefs.current[activeIndex]?.focus({ preventScroll: true });
     });
-  }, [buffer]);
+  }, [buffer, loop]);
 
   const next = useCallback((): void => {
     if (!slidesCount || lockedRef.current) return;
-    if (!loop && trackIndexRef.current >= maxIndex - 0.001) return;
+    if (!loop && trackIndexRef.current >= maxIndex) return;
     setAnimate(true);
-    setTrackIndex((index) => clampIndex(index + 1));
+    setTrackIndex((index) => (loop ? index + 1 : positions.find((position) => position > index) ?? maxIndex));
     lockNavigation();
     announceSlideChange();
-  }, [slidesCount, loop, maxIndex, clampIndex, lockNavigation, announceSlideChange]);
+  }, [slidesCount, loop, maxIndex, positions, lockNavigation, announceSlideChange]);
 
   const prev = useCallback((): void => {
     if (!slidesCount || lockedRef.current) return;
-    if (!loop && trackIndexRef.current <= 0.001) return;
+    if (!loop && trackIndexRef.current <= 0) return;
     setAnimate(true);
-    setTrackIndex((index) => clampIndex(index - 1));
+    setTrackIndex((index) => (loop ? index - 1 : [...positions].reverse().find((position) => position < index) ?? 0));
     lockNavigation();
     announceSlideChange();
-  }, [slidesCount, loop, clampIndex, lockNavigation, announceSlideChange]);
+  }, [slidesCount, loop, positions, lockNavigation, announceSlideChange]);
 
   const goToIndex = useCallback(
     (index: number, options?: { focusSlide?: boolean }): void => {
@@ -326,15 +381,29 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
       wheelTimeoutRef.current = setTimeout(() => {
         setAnimate(true);
         const direction = Math.sign(scrollDeltaRef.current);
+        const snapInScrollDirection = Math.abs(scrollDeltaRef.current) > WHEEL_DIRECTIONAL_SNAP_THRESHOLD;
         const currentIndex = trackIndexRef.current;
-        let snapIndex = Math.round(currentIndex);
-
-        if (Math.abs(scrollDeltaRef.current) > 0.3) {
-          snapIndex = direction > 0 ? Math.ceil(currentIndex) : Math.floor(currentIndex);
-        }
-        if (wasClamped) {
-          if (currentIndex <= min) snapIndex = Math.ceil(min);
-          if (currentIndex >= max) snapIndex = Math.floor(max);
+        let snapIndex: number;
+        if (loop) {
+          snapIndex = Math.round(currentIndex);
+          if (snapInScrollDirection) {
+            snapIndex = direction > 0 ? Math.ceil(currentIndex) : Math.floor(currentIndex);
+          }
+          if (wasClamped) {
+            if (currentIndex <= min) snapIndex = Math.ceil(min);
+            if (currentIndex >= max) snapIndex = Math.floor(max);
+          }
+        } else if (wasClamped && currentIndex >= max) {
+          snapIndex = max;
+        } else if (wasClamped && currentIndex <= min) {
+          snapIndex = min;
+        } else if (snapInScrollDirection) {
+          snapIndex =
+            direction > 0
+              ? positions.find((position) => position >= currentIndex) ?? max
+              : [...positions].reverse().find((position) => position <= currentIndex) ?? min;
+        } else {
+          snapIndex = positions[closestPositionIndex(positions, currentIndex)];
         }
 
         const finalIndex = Math.min(Math.max(snapIndex, min), max);
@@ -342,7 +411,7 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
         scrollDeltaRef.current = 0;
       }, 120);
     },
-    [slidesCount, cellWidth, buffer, windowBase, loop, maxIndex]
+    [slidesCount, cellWidth, buffer, windowBase, loop, maxIndex, positions]
   );
 
   const onKeyDown = useCallback(
@@ -364,26 +433,147 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
           break;
         case 'End':
           event.preventDefault();
-          goToIndex(slidesCount - 1);
+          goToIndex(loop ? slidesCount - 1 : maxIndex);
           break;
         default:
           break;
       }
     },
-    [next, prev, goToIndex, slidesCount]
+    [next, prev, goToIndex, slidesCount, loop, maxIndex]
+  );
+
+  /** Snap to the nearest reachable position, including a fractional end. */
+  const snap = useCallback(
+    (value: number): number => {
+      if (loop) return Math.round(value);
+      return positions.length ? positions[closestPositionIndex(positions, value)] : 0;
+    },
+    [loop, positions]
+  );
+
+  /** The next stop position after `position` in the given direction (itself at a bound). */
+  const adjacentStop = useCallback(
+    (position: number, forward: boolean): number =>
+      forward ? clampIndex(Math.floor(position + EPSILON) + 1) : clampIndex(Math.ceil(position - EPSILON) - 1),
+    [clampIndex]
+  );
+
+  /** Where the track sits while dragged with the pointer at `clientX`. */
+  const dragIndex = useCallback(
+    (clientX: number): number => {
+      const width = cellWidth();
+      if (!width) return trackIndexRef.current;
+
+      const deltaSlides = (clientX - startXRef.current) / width;
+      const maxDelta = buffer * 0.9;
+      const base = Math.floor(startIndexRef.current);
+      const min = loop ? base - maxDelta : 0;
+      const max = loop ? base + maxDelta : maxIndex;
+
+      return Math.min(Math.max(startIndexRef.current - deltaSlides, min), max);
+    },
+    [cellWidth, buffer, loop, maxIndex]
+  );
+
+  /** Records the pointer at `clientX` and returns where that drags the track. */
+  const trackPointer = useCallback(
+    (clientX: number, timeStamp: number): number => {
+      lastXRef.current = clientX;
+      lastTimeRef.current = timeStamp;
+
+      const samples = samplesRef.current;
+      samples.push({ x: clientX, t: timeStamp });
+
+      while (samples[0].t < timeStamp - FLICK_WINDOW) {
+        samples.shift();
+      }
+
+      return dragIndex(clientX);
+    },
+    [dragIndex]
+  );
+
+  /**
+   * Whether the drag ended in a flick: at least the minimum swipe distance of movement in
+   * the drag direction within the last `FLICK_WINDOW` ms before release, fast enough.
+   * Measuring up to the release lets a pause before the swipe pass and a hold after it
+   * slow it down.
+   */
+  const isFlick = useCallback(
+    (releasedAt: number): boolean => {
+      // Unmeasured, the gap alone would give a tiny cell width and make any drag a flick.
+      const width = viewportWidth ? cellWidth() : 0;
+      if (!width) return false;
+
+      const recent = samplesRef.current.find((sample) => sample.t >= releasedAt - FLICK_WINDOW);
+      if (!recent) return false;
+
+      const distance = lastXRef.current - recent.x;
+      const elapsed = releasedAt - recent.t;
+      const sameDirection = Math.sign(distance) === Math.sign(lastXRef.current - startXRef.current);
+
+      if (elapsed <= 0 || !sameDirection || Math.abs(distance) < minSwipeDistanceRef.current) return false;
+
+      return Math.abs(distance) / width / elapsed > FLICK_VELOCITY;
+    },
+    [viewportWidth, cellWidth]
+  );
+
+  /**
+   * Where a drag released with the track at `released` settles. Walks stop position to stop
+   * position in the drag direction: each gap fully dragged moves on, and a partly dragged
+   * gap moves on once it reaches `swipeThreshold` of that gap (a bounded track's final gap
+   * can be short). A flick that did not move on otherwise moves one position.
+   */
+  const swipeTarget = useCallback(
+    (released: number, releasedAt: number): number => {
+      const startIndex = startIndexRef.current;
+      const dx = lastXRef.current - startXRef.current;
+      if (Math.abs(dx) < minSwipeDistanceRef.current) return snap(startIndex);
+
+      // Take the direction from the pointer: at a bound the clamped track does not move.
+      const forward = dx < 0;
+      let remaining = Math.abs(released - startIndex);
+      let position = startIndex;
+      let moved = false;
+
+      let next = adjacentStop(position, forward);
+      let gap = Math.abs(next - position);
+
+      // A gap is zero at a bound, which ends the walk.
+      while (gap >= EPSILON && remaining >= gap - EPSILON) {
+        position = next;
+        remaining -= gap;
+        moved = true;
+        next = adjacentStop(position, forward);
+        gap = Math.abs(next - position);
+      }
+
+      if (gap >= EPSILON && remaining > EPSILON && remaining >= gap * config.swipeThreshold - EPSILON) {
+        position = next;
+        moved = true;
+      }
+
+      if (!moved && isFlick(releasedAt)) return adjacentStop(startIndex, forward);
+
+      return moved ? position : snap(startIndex);
+    },
+    [snap, adjacentStop, isFlick, config.swipeThreshold]
   );
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>): void => {
-      if (!slidesCount) return;
+      if (!slidesCount || draggingRef.current) return;
       viewportRef.current?.setPointerCapture(event.pointerId);
       draggingRef.current = true;
+      pointerIdRef.current = event.pointerId;
       setAnimate(false);
       startXRef.current = event.clientX;
       startIndexRef.current = trackIndexRef.current;
-      startTimeRef.current = event.timeStamp;
       lastXRef.current = event.clientX;
       lastTimeRef.current = event.timeStamp;
+      samplesRef.current = [{ x: event.clientX, t: event.timeStamp }];
+      minSwipeDistanceRef.current = event.pointerType === 'mouse' ? MIN_MOUSE_SWIPE_DISTANCE : MIN_SWIPE_DISTANCE;
       if (loop) setWindowBase(Math.floor(trackIndexRef.current));
     },
     [slidesCount, loop]
@@ -391,57 +581,58 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
 
   const onPointerMove = useCallback(
     (event: React.PointerEvent<HTMLDivElement>): void => {
-      if (!draggingRef.current) return;
-      const width = cellWidth();
-      if (!width) return;
-
-      const dx = event.clientX - startXRef.current;
-      if (Number.isNaN(dx)) return;
-      lastXRef.current = event.clientX;
-      lastTimeRef.current = event.timeStamp;
-      const deltaSlides = dx / width;
-      const targetIndex = startIndexRef.current - deltaSlides;
-
-      const maxDelta = buffer * 0.9;
-      const base = Math.floor(startIndexRef.current);
-      const min = loop ? base - maxDelta : 0;
-      const max = loop ? base + maxDelta : maxIndex;
-      setTrackIndex(Math.min(Math.max(targetIndex, min), max));
+      if (!draggingRef.current || event.pointerId !== pointerIdRef.current || !Number.isFinite(event.clientX)) return;
+      setTrackIndex(trackPointer(event.clientX, event.timeStamp));
     },
-    [cellWidth, buffer, loop, maxIndex]
+    [trackPointer]
   );
 
-  const onPointerUp = useCallback((): void => {
-    if (!draggingRef.current) return;
-    draggingRef.current = false;
-    setAnimate(true);
+  const onPointerUp = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      if (!draggingRef.current || event.pointerId !== pointerIdRef.current) return;
+      draggingRef.current = false;
 
-    const width = cellWidth();
-    const rounded = Math.round(trackIndexRef.current);
-    let target = rounded;
+      // The pointer can move after the last pointermove; the release reports where it ended.
+      const released = Number.isFinite(event.clientX)
+        ? trackPointer(event.clientX, event.timeStamp)
+        : dragIndex(lastXRef.current);
 
-    const elapsed = lastTimeRef.current - startTimeRef.current;
-    const velocity = elapsed > 0 && width ? -(lastXRef.current - startXRef.current) / width / elapsed : 0;
-    const FLICK_VELOCITY = 0.0015;
+      setAnimate(true);
+      setTrackIndex(swipeTarget(released, event.timeStamp));
+    },
+    [trackPointer, dragIndex, swipeTarget]
+  );
 
-    if (Math.abs(velocity) > FLICK_VELOCITY && rounded === Math.round(startIndexRef.current)) {
-      target = Math.round(startIndexRef.current) + (velocity > 0 ? 1 : -1);
-    }
-
-    setTrackIndex(clampIndex(target));
-  }, [cellWidth, clampIndex]);
+  /**
+   * The browser ended the drag, e.g. to scroll the page, or capture was lost mid-drag: not
+   * a swipe, so return to where it started. After a normal release this is a no-op, as
+   * `lostpointercapture` follows `pointerup`.
+   */
+  const onPointerCancel = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>): void => {
+      if (!draggingRef.current || event.pointerId !== pointerIdRef.current) return;
+      draggingRef.current = false;
+      setAnimate(true);
+      setTrackIndex(snap(startIndexRef.current));
+    },
+    [snap]
+  );
 
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
-    const measure = (): void => {
-      setViewportWidth(viewport.clientWidth);
+    const measure = (width: number): void => {
+      setViewportWidth(width);
       setRootFontSize(parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
     };
-    measure();
+    const styles = getComputedStyle(viewport);
+    const horizontalPadding = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+    measure(viewport.clientWidth - horizontalPadding);
 
-    const observer = new ResizeObserver(measure);
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) measure(entry.contentRect.width);
+    });
     observer.observe(viewport);
     return () => observer.disconnect();
   }, []);
@@ -461,7 +652,8 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     setConfig,
     setSlidesCount,
     slidesCount,
-    slideIndex,
+    positions,
+    activePositionIndex,
     canPrev,
     canNext,
     renderedIndices,
@@ -483,5 +675,6 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     onPointerDown,
     onPointerMove,
     onPointerUp,
+    onPointerCancel,
   };
 };

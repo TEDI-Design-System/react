@@ -868,7 +868,7 @@ hasn't met yet (incomplete prerequisites, missing permissions, etc.).
 
         .accordion-steps .step-number--disabled {
           border-color: var(--stepper-step-disabled-border);
-          background: var(--stepper-step-disabled-bg);
+          background: var(--stepper-step-disabled-background);
         }
 
         .accordion-steps .step-body {

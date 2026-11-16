@@ -5,7 +5,7 @@ import { FeedbackTextProps } from '../feedback-text/feedback-text';
 import { TextField, TextFieldForwardRef, TextFieldProps } from '../textfield/textfield';
 import styles from './textarea.module.scss';
 
-export interface TextareaProps extends Omit<TextFieldProps, 'icon' | 'isClearable' | 'onClear'> {
+export interface TextareaProps extends Omit<TextFieldProps, 'icon'> {
   /**
    * Maximum number of characters allowed in the textarea.
    */
@@ -16,13 +16,13 @@ export interface TextareaProps extends Omit<TextFieldProps, 'icon' | 'isClearabl
    */
   autoGrow?: boolean;
   /**
-   * Minimum number of rows (only used when autoGrow = true).
+   * Minimum number of rows (only used when autoGrow = true). Values below 1 are treated as 1.
    * @default 3
    */
   minRows?: number;
   /**
    * Maximum number of rows before scrolling (only used when autoGrow = true).
-   * @default 12
+   * Unset, the textarea grows without a row limit.
    */
   maxRows?: number;
   /**
@@ -51,33 +51,34 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     value: externalValue,
     defaultValue,
     autoGrow = false,
-    minRows = 3,
-    maxRows = 12,
+    minRows: minRowsProp = 3,
+    maxRows,
     height = '7.5rem',
     maxHeight,
     ...rest
   } = props;
 
+  // Below one row the field is shorter than its own line of text and scrolls while empty.
+  const minRows = Math.max(1, minRowsProp);
   const [innerValue, setInnerValue] = React.useState(defaultValue ?? '');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [textareaHeight, setTextareaHeight] = React.useState<string | number>('auto');
 
   const handleInputChange = React.useCallback(
     (inputValue: string) => {
-      if (!externalValue && !(onChange || onChangeEvent)) {
+      if (externalValue === undefined) {
         setInnerValue(inputValue);
       }
       onChange?.(inputValue);
     },
-    [externalValue, onChange, onChangeEvent]
+    [externalValue, onChange]
   );
 
   const value = React.useMemo(() => externalValue ?? innerValue, [externalValue, innerValue]);
 
   const calculateHeight = React.useCallback(() => {
-    if (!autoGrow || !textareaRef.current) return;
-
-    const textarea = textareaRef.current;
+    // Only called with autoGrow on, after the textarea has mounted and set the ref.
+    const textarea = textareaRef.current as HTMLTextAreaElement;
 
     const originalOverflow = textarea.style.overflow;
 
@@ -96,20 +97,29 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     const paddingTop = parseFloat(computedStyle.paddingTop);
     const paddingBottom = parseFloat(computedStyle.paddingBottom);
 
+    // With border-box sizing the border is part of the height; leaving it out makes the box 2px too short
+    const borderHeight =
+      computedStyle.boxSizing === 'border-box'
+        ? (parseFloat(computedStyle.borderTopWidth) || 0) + (parseFloat(computedStyle.borderBottomWidth) || 0)
+        : 0;
+
+    // Reset height so scrollHeight reflects the content, not the current box — otherwise it can never shrink
+    textarea.style.height = 'auto';
     const scrollHeight = textarea.scrollHeight;
     const contentHeight = scrollHeight - paddingTop - paddingBottom;
 
-    let rowCount = Math.ceil(contentHeight / lineHeight);
+    // 1px tolerance: scrollHeight is rounded, so fractional line heights shouldn't add a phantom row
+    const contentRows = Math.ceil((contentHeight - 1) / lineHeight);
+    const rowCount = Math.min(Math.max(contentRows, minRows), maxRows ?? Infinity);
 
-    rowCount = Math.min(Math.max(rowCount, minRows), maxRows);
-
-    const nextHeight = `${rowCount * lineHeight + paddingTop + paddingBottom}px`;
+    const nextHeight = `${rowCount * lineHeight + paddingTop + paddingBottom + borderHeight}px`;
     textarea.style.height = nextHeight;
     setTextareaHeight(nextHeight);
 
     textarea.style.overflow = originalOverflow;
-    textarea.style.overflowY = textarea.scrollHeight > textarea.clientHeight ? 'auto' : 'hidden';
-  }, [autoGrow, minRows, maxRows]);
+    // Only scroll once content overflows (past maxRows, or clipped by maxHeight); 1px tolerance for rounding
+    textarea.style.overflowY = textarea.scrollHeight - textarea.clientHeight > 1 ? 'auto' : 'hidden';
+  }, [minRows, maxRows]);
 
   useEffect(() => {
     if (autoGrow) {
@@ -123,6 +133,25 @@ export const Textarea = forwardRef<TextFieldForwardRef, TextareaProps>((props, r
     if (autoGrow && textareaRef.current) {
       calculateHeight();
     }
+  }, [autoGrow, calculateHeight]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!autoGrow || !textarea || typeof ResizeObserver === 'undefined') return undefined;
+
+    // Recalculate when the width changes (e.g. window resize), since line wrapping depends on it
+    let lastWidth = textarea.clientWidth;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      // Record every width (including 0 while hidden), so showing it again at the same width still recalculates
+      const widthChanged = width !== lastWidth;
+      lastWidth = width;
+      if (width > 0 && widthChanged) {
+        calculateHeight();
+      }
+    });
+    observer.observe(textarea);
+    return () => observer.disconnect();
   }, [autoGrow, calculateHeight]);
 
   const handleRef = React.useCallback(

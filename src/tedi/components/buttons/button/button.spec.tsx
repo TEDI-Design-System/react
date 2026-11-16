@@ -103,4 +103,9 @@ describe('Button component', () => {
     rerender(<Button {...defaultProps} isLoading />);
     expect(screen.getByRole('status')).toHaveTextContent(/\S/);
   });
+
+  it('is hidden when printing', () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('no-print');
+  });
 });

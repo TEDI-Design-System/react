@@ -3,13 +3,16 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { Label, LabelProps } from './label';
 
 /**
- * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=2137-19322&m=dev" target="_BLANK">Figma ↗</a><br />
+ * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.102.102?m=dev&node-id=5797-117046" target="_BLANK">Figma ↗</a><br />
  * <a href="https://www.tedi.ee/1ee8444b7/p/64479c-label" target="_BLANK">Zeroheight ↗</a>
  */
 
 const meta: Meta<typeof Label> = {
   component: Label,
   title: 'TEDI-Ready/Content/Label',
+  argTypes: {
+    tooltip: { control: false },
+  },
   parameters: {
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],

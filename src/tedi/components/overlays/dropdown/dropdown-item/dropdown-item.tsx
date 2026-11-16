@@ -108,7 +108,7 @@ export const DropdownItem = ({
   role,
   ...aria
 }: DropdownItemProps) => {
-  const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant } = useDropdownContext();
+  const { getItemProps, listItemsRef, setOpen, activeIndex, divided, variant, navigation } = useDropdownContext();
 
   const Component = asChild ? 'div' : 'button';
   const isSlot = asChild && closeOnSelect !== false && isValidElement(children);
@@ -142,7 +142,8 @@ export const DropdownItem = ({
       'input[type="checkbox"], input[type="radio"]'
     );
     if (input) {
-      input.click();
+      // Clicks on the control or its label already toggle it natively
+      if (!(e.target as HTMLElement).closest('input, label')) input.click();
       return;
     }
 
@@ -204,14 +205,15 @@ export const DropdownItem = ({
     ...aria,
   };
 
-  const itemProps =
-    asChild && closeOnSelect === false
-      ? { ...baseProps, role }
-      : getItemProps({
-          role: role ?? 'menuitem',
-          disabled: !asChild ? disabled : undefined,
-          ...baseProps,
-        });
+  const itemProps = navigation
+    ? { ...baseProps, onKeyDown: undefined, tabIndex: disabled ? -1 : 0, role }
+    : asChild && closeOnSelect === false
+    ? { ...baseProps, role }
+    : getItemProps({
+        role: role ?? 'menuitem',
+        disabled: !asChild ? disabled : undefined,
+        ...baseProps,
+      });
 
   if (isSlot) {
     const child = children as React.ReactElement;
