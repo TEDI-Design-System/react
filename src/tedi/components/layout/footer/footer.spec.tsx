@@ -225,6 +225,67 @@ describe('Footer', () => {
     expect(classes).toContain('tedi-footer-side--vertical-end-from-lg');
   });
 
+  it('keeps the class for a placement that switches back at a later breakpoint', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Side placement="start" sm={{ placement: 'end' }} lg={{ placement: 'start' }}>
+          <img alt="logo" />
+        </Footer.Side>
+      </Footer>
+    );
+
+    const classes = (container.querySelector('.tedi-footer-side') as HTMLElement).className;
+    expect(classes).toContain('tedi-footer-side--placement-start');
+    expect(classes).toContain('tedi-footer-side--placement-end-from-sm');
+    expect(classes).toContain('tedi-footer-side--placement-start-from-lg');
+  });
+
+  it('renders a section icon that is hidden below `lg` by default', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Contact" icon="mail">
+            <a href="#">Email</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    const icon = container.querySelector('.tedi-footer-section__icon');
+    expect(icon).toBeInTheDocument();
+    expect(icon?.className).toContain('tedi-footer-section__icon--below-lg');
+  });
+
+  it('hides the section icon below `iconBreakpoint`', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Contact" icon="mail" iconBreakpoint="md">
+            <a href="#">Email</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(container.querySelector('.tedi-footer-section__icon')?.className).toContain(
+      'tedi-footer-section__icon--below-md'
+    );
+  });
+
+  it('renders no icon element without an `icon`', () => {
+    const { container } = render(
+      <Footer>
+        <Footer.Body>
+          <Footer.Section heading="Contact">
+            <a href="#">Email</a>
+          </Footer.Section>
+        </Footer.Body>
+      </Footer>
+    );
+
+    expect(container.querySelector('.tedi-footer-section__icon')).not.toBeInTheDocument();
+  });
+
   it('server-renders the same markup for every width: both headings, content once, no layout chosen by JS', () => {
     const html = renderToString(
       <Footer mobileBreakpoint="md">
