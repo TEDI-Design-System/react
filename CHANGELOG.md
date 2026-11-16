@@ -1,3 +1,10 @@
+# [21.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.9...react-21.0.0-rc.10) (2026-11-16)
+
+
+### Features
+
+* **dock-panel:** Add Short Title And Presentation Change Callback [#1108](https://github.com/TEDI-Design-System/react/issues/1108) ([#1109](https://github.com/TEDI-Design-System/react/issues/1109)) ([eb662c1](https://github.com/TEDI-Design-System/react/commit/eb662c1799888c2161a867489c59744b766f0f1b))
+
 # [21.0.0-rc.9](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.8...react-21.0.0-rc.9) (2026-11-13)
 
 
