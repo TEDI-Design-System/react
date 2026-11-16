@@ -1,5 +1,5 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
-import { ElementType } from 'react';
+import { ElementType, useState } from 'react';
 
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
@@ -38,7 +38,7 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-const buttonStateArray = ['Default', 'Hover', 'Active', 'Loading', 'Disabled'];
+const buttonStateArray = ['Default', 'Hover', 'Active', 'Focus', 'Disabled'];
 const Template: StoryFn<ButtonProps<ElementType>> = (args) => <Button {...args} />;
 
 export const Default: Story = {
@@ -65,107 +65,52 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
   const { array, titleColor, ...buttonProps } = args;
 
   return (
-    <>
-      <VerticalSpacing size={0.5}>
-        <Row>
-          <Col md={1}></Col>
-          <Col>
+    <VerticalSpacing size={2}>
+      {(['default', 'small'] as const).map((size) => (
+        // Wrapped: a nested VerticalSpacing redefines the variable its own margin reads.
+        <div key={size}>
+          <VerticalSpacing size={0.5}>
             <Text color={titleColor} modifiers="bold">
-              Default
+              {size === 'default' ? 'Default' : 'Small'}
             </Text>
-          </Col>
-          <Col className="text-bold">
-            <Text color={titleColor} modifiers="bold">
-              Small
-            </Text>
-          </Col>
-        </Row>
-        {array.map((value, key) => (
-          <Row key={key}>
-            <Col md={1} className="flex align-items-center">
-              <Text color={titleColor} modifiers="bold">
-                {value}
-              </Text>
-            </Col>
-            <Col className="flex align-items-center gap-3">
-              <Button id={value} {...buttonProps} disabled={value === 'Disabled'} isLoading={value === 'Loading'}>
-                Create
-              </Button>
-              <Button
-                id={value}
-                {...buttonProps}
-                iconRight="arrow_right_alt"
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-              >
-                Continue
-              </Button>
-              <Button
-                id={value}
-                {...buttonProps}
-                iconLeft="edit"
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-              >
-                Edit
-              </Button>
-              <Button
-                id={value}
-                {...buttonProps}
-                icon="arrow_right_alt"
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-                showTooltip
-              >
-                Icon Only
-              </Button>
-            </Col>
-            <Col className="flex align-items-center gap-3">
-              <Button
-                id={value}
-                size="small"
-                {...buttonProps}
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-              >
-                Create
-              </Button>
-              <Button
-                id={value}
-                size="small"
-                {...buttonProps}
-                iconRight="arrow_right_alt"
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-              >
-                Continue
-              </Button>
-              <Button
-                id={value}
-                size="small"
-                {...buttonProps}
-                iconLeft="edit"
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-              >
-                Edit
-              </Button>
-              <Button
-                id={value}
-                size="small"
-                {...buttonProps}
-                icon="arrow_right_alt"
-                disabled={value === 'Disabled'}
-                isLoading={value === 'Loading'}
-                showTooltip
-              >
-                Icon Only
-              </Button>
-            </Col>
-          </Row>
-        ))}
-      </VerticalSpacing>
-    </>
+            {array.map((value) => (
+              <Row key={value}>
+                <Col md={2} className="flex align-items-center">
+                  <Text color={titleColor}>{value}</Text>
+                </Col>
+                <Col className="flex flex-wrap align-items-center gap-3">
+                  <Button id={value} size={size} {...buttonProps} disabled={value === 'Disabled'}>
+                    Create
+                  </Button>
+                  <Button
+                    id={value}
+                    size={size}
+                    {...buttonProps}
+                    iconRight="arrow_right_alt"
+                    disabled={value === 'Disabled'}
+                  >
+                    Continue
+                  </Button>
+                  <Button id={value} size={size} {...buttonProps} iconLeft="edit" disabled={value === 'Disabled'}>
+                    Edit
+                  </Button>
+                  <Button
+                    id={value}
+                    size={size}
+                    {...buttonProps}
+                    icon="arrow_right_alt"
+                    disabled={value === 'Disabled'}
+                    showTooltip
+                  >
+                    Icon Only
+                  </Button>
+                </Col>
+              </Row>
+            ))}
+          </VerticalSpacing>
+        </div>
+      ))}
+    </VerticalSpacing>
   );
 };
 
@@ -179,7 +124,7 @@ export const Primary: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -196,7 +141,7 @@ export const PrimaryInverted: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
   globals: { backgrounds: { value: 'brand' } },
@@ -212,7 +157,7 @@ export const Secondary: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -229,7 +174,7 @@ export const SecondaryInverted: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
   globals: { backgrounds: { value: 'brand' } },
@@ -245,7 +190,7 @@ export const Neutral: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -262,7 +207,7 @@ export const NeutralInverted: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
   globals: { backgrounds: { value: 'brand' } },
@@ -278,7 +223,7 @@ export const Success: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -293,7 +238,7 @@ export const Danger: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
     },
   },
 };
@@ -309,7 +254,47 @@ export const DangerNeutral: StoryObj<TemplateMultipleProps> = {
     pseudo: {
       hover: '#Hover',
       active: '#Active',
-      focus: '#Focus',
+      focusVisible: '#Focus',
+    },
+  },
+};
+
+const LoadingOnClick = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const save = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 3000);
+  };
+
+  return (
+    <Button isLoading={isLoading} loadingLabel="Salvestamine" onClick={save}>
+      Salvesta
+    </Button>
+  );
+};
+
+export const Loading: StoryObj<TemplateMultipleProps> = {
+  render: (args, context) => (
+    <VerticalSpacing size={4}>
+      <div>{TemplateColumn(args, context)}</div>
+      <Row>
+        <Col md={2} className="flex align-items-center">
+          <Text modifiers="bold">On click</Text>
+        </Col>
+        <Col>
+          <LoadingOnClick />
+        </Col>
+      </Row>
+    </VerticalSpacing>
+  ),
+  args: {
+    array: ['Default', 'Focus'],
+    isLoading: true,
+  },
+  parameters: {
+    pseudo: {
+      focusVisible: '#Focus',
     },
   },
 };

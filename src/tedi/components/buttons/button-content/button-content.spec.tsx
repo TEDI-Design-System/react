@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useIsTouchDevice } from '../../../helpers';
+import { AccessibilityContext } from '../../../providers/accessibility-provider/accessibility-provider';
 import ButtonContent, { ButtonContentProps } from './button-content';
 
 import '@testing-library/jest-dom';
@@ -61,17 +62,60 @@ describe('ButtonContent component', () => {
     expect(button).toHaveClass('tedi-btn--underline');
   });
 
-  it('renders in loading state with a decorative spinner and conveys loading via aria-busy', () => {
-    render(<ButtonContent {...defaultProps} isLoading />);
+  it('renders in loading state with a decorative spinner, an unchanged name and a loading description', () => {
+    const { rerender } = render(<ButtonContent {...defaultProps} aria-describedby="hint" isLoading />);
 
     const button = screen.getByRole('button');
-    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).not.toHaveAttribute('aria-busy');
     const spinner = screen.getByTestId('tedi-spinner');
-    expect(spinner).toBeInTheDocument();
     expect(spinner).toHaveClass('tedi-btn__spinner');
     expect(spinner).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(button).toHaveAccessibleName('Click Me');
+    expect(button.getAttribute('aria-describedby')).toMatch(/^hint \S+$/);
+
+    rerender(<ButtonContent {...defaultProps} aria-describedby="hint" />);
+    expect(button).toHaveAttribute('aria-describedby', 'hint');
+  });
+
+  it('announces a switch into loading assertively, only on the focused button', () => {
+    const addLoader = jest.fn();
+    const removeLoader = jest.fn();
+    const renderButton = (isLoading: boolean) => (
+      <AccessibilityContext.Provider value={{ addLoader, removeLoader }}>
+        <ButtonContent {...defaultProps} isLoading={isLoading} />
+      </AccessibilityContext.Provider>
+    );
+
+    const { rerender } = render(renderButton(true));
+    rerender(renderButton(false));
+    rerender(renderButton(true));
+    expect(addLoader).not.toHaveBeenCalled();
+
+    rerender(renderButton(false));
+    screen.getByRole('button').focus();
+    rerender(renderButton(true));
+    expect(addLoader).toHaveBeenCalledWith(
+      expect.objectContaining({ mountLabel: 'button.loading', politeness: 'assertive' })
+    );
+
+    rerender(renderButton(false));
+    expect(removeLoader).toHaveBeenCalledWith(addLoader.mock.calls[0][0].id);
+  });
+
+  it('uses loadingLabel for the description and the announcement', () => {
+    const addLoader = jest.fn();
+    const renderButton = (isLoading: boolean) => (
+      <AccessibilityContext.Provider value={{ addLoader, removeLoader: jest.fn() }}>
+        <ButtonContent {...defaultProps} loadingLabel="Saving" isLoading={isLoading} />
+      </AccessibilityContext.Provider>
+    );
+
+    const { rerender } = render(renderButton(false));
+    screen.getByRole('button').focus();
+    rerender(renderButton(true));
+
+    expect(screen.getByRole('button')).toHaveAccessibleDescription('Saving');
+    expect(addLoader).toHaveBeenCalledWith(expect.objectContaining({ mountLabel: 'Saving' }));
   });
 
   it('renders with full width when fullWidth is true', () => {
@@ -86,6 +130,62 @@ describe('ButtonContent component', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it('does not submit its form while loading', () => {
+    const handleSubmit = jest.fn((event: React.FormEvent) => event.preventDefault());
+    const { rerender } = render(
+      <form onSubmit={handleSubmit}>
+        <ButtonContent {...defaultProps} type="submit" isLoading />
+      </form>
+    );
+    fireEvent.click(screen.getByRole('button'));
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    rerender(
+      <form onSubmit={handleSubmit}>
+        <ButtonContent {...defaultProps} type="submit" />
+      </form>
+    );
+    fireEvent.click(screen.getByRole('button'));
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('prevents link navigation while loading', () => {
+    render(
+      <ButtonContent {...defaultProps} as="a" href="/next" isLoading>
+        Next
+      </ButtonContent>
+    );
+    const link = screen.getByText('Next').closest('a') as HTMLAnchorElement;
+    expect(fireEvent.click(link)).toBe(false);
+  });
+
+  it('blocks middle-clicks only while loading', () => {
+    const handleAuxClick = jest.fn();
+    const renderLink = (isLoading: boolean) => (
+      <ButtonContent {...defaultProps} as="a" href="/next" isLoading={isLoading} onAuxClick={handleAuxClick}>
+        Next
+      </ButtonContent>
+    );
+    const { rerender } = render(renderLink(true));
+    const link = screen.getByText('Next').closest('a') as HTMLAnchorElement;
+
+    expect(fireEvent(link, new MouseEvent('auxclick', { bubbles: true, cancelable: true }))).toBe(false);
+    expect(handleAuxClick).not.toHaveBeenCalled();
+
+    rerender(renderLink(false));
+    expect(fireEvent(link, new MouseEvent('auxclick', { bubbles: true, cancelable: true }))).toBe(true);
+    expect(handleAuxClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the button focusable while loading', () => {
+    render(<ButtonContent {...defaultProps} isLoading />);
+    const button = screen.getByRole('button');
+    button.focus();
+    expect(button).toHaveFocus();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toBeDisabled();
   });
 
   it('triggers onClick when clicked and not loading', () => {

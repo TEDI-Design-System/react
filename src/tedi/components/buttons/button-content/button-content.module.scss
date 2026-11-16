@@ -44,14 +44,18 @@ $btn-width-large: 3.72rem;
     border-color: $border-hover;
   }
 
-  &:focus-visible:not(:disabled, [aria-disabled='true']) {
+  &:focus-visible:not(:disabled) {
     outline: 2px solid $border-focus;
     outline-offset: 1px;
+  }
+
+  &:focus-visible:not(:disabled, [aria-disabled='true']) {
     background-color: $background-focus;
     border-color: $border;
   }
 
-  &:disabled {
+  &:disabled,
+  &[aria-disabled='true'] {
     color: $color-disabled;
     background-color: $background-disabled;
     border-color: $border-disabled;
@@ -142,9 +146,13 @@ $btn-width-large: 3.72rem;
   @include mixins.print-grayscale;
 }
 
+.tedi-btn__loading-description {
+  @include mixins.visually-hidden;
+}
+
 .tedi-btn:disabled,
 .tedi-btn[aria-disabled='true'] {
-  cursor: auto;
+  cursor: not-allowed;
 }
 
 .tedi-btn--small {
@@ -183,21 +191,21 @@ $btn-width-large: 3.72rem;
   background-clip: padding-box;
 
   &.tedi-btn--default.tedi-btn--icon-only {
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled, [aria-disabled='true']) {
       background-color: var(--button-main-neutral-icon-only-background-hover);
     }
 
-    &:active:not(:disabled) {
+    &:active:not(:disabled, [aria-disabled='true']) {
       background-color: var(--button-main-neutral-icon-only-background-active);
     }
   }
 
   &.tedi-btn--danger.tedi-btn--icon-only {
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled, [aria-disabled='true']) {
       background-color: var(--button-main-danger-neutral-icon-only-background-hover);
     }
 
-    &:active:not(:disabled) {
+    &:active:not(:disabled, [aria-disabled='true']) {
       background-color: var(--button-main-danger-neutral-icon-only-background-active);
     }
   }
@@ -375,7 +383,7 @@ $btn-width-large: 3.72rem;
       var(--button-main-neutral-inverted-background-default)
     );
 
-    &:focus-visible:not(:disabled, [aria-disabled='true']) {
+    &:focus-visible:not(:disabled) {
       outline-color: var(--tedi-neutral-100);
     }
   }
