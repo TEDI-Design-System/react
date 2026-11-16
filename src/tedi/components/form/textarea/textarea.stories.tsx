@@ -191,99 +191,77 @@ export const DefaultValue: Story = {
   },
 };
 
-const TemplateHeights: StoryFn<TextareaProps> = (args) => {
-  return (
-    <VerticalSpacing>
-      <Row>
-        <Col>
-          <Text modifiers="bold">Fixed Height (7.5rem default)</Text>
-        </Col>
-        <Col>
-          <Textarea
-            {...args}
-            id="fixed-height-default"
-            label="Label"
-            placeholder="This textarea has a fixed height of 7.5rem"
-          />
-        </Col>
-      </Row>
-
-      <Row>
-        <Col>
-          <Text modifiers="bold">Custom Fixed Height</Text>
-        </Col>
-        <Col>
-          <Textarea
-            {...args}
-            id="custom-height"
-            label="Label"
-            height="4rem"
-            placeholder="This textarea has a fixed height of 4rem"
-          />
-        </Col>
-      </Row>
-
-      <Row>
-        <Col>
-          <Text modifiers="bold">Auto Grow (minRows: 3, maxRows: 12)</Text>
-        </Col>
-        <Col>
-          <Textarea
-            {...args}
-            id="auto-grow"
-            label="Label"
-            autoGrow={true}
-            minRows={3}
-            maxRows={12}
-            placeholder="Type multiple lines to see it grow automatically"
-          />
-        </Col>
-      </Row>
-
-      <Row>
-        <Col>
-          <Text modifiers="bold">Auto Grow with Custom Rows</Text>
-        </Col>
-        <Col>
-          <Textarea
-            {...args}
-            id="auto-grow-custom"
-            label="Label"
-            autoGrow={true}
-            minRows={5}
-            maxRows={8}
-            placeholder="This will grow from 5 to 8 rows maximum"
-          />
-        </Col>
-      </Row>
-
-      <Row>
-        <Col>
-          <Text modifiers="bold">Auto Grow with Max Height</Text>
-        </Col>
-        <Col>
-          <Textarea
-            {...args}
-            id="auto-grow-max-height"
-            label="Label"
-            autoGrow={true}
-            maxHeight="200px"
-            minRows={3}
-            maxRows={12}
-            placeholder="This will grow but max height is limited to 200px"
-          />
-        </Col>
-      </Row>
-    </VerticalSpacing>
-  );
+/**
+ * `showClearOnInteraction` reveals the clear (×) button only while the field is hovered or focused
+ * (keyboard focus included), instead of whenever it has a value. Requires `isClearable`.
+ */
+export const ClearButtonOnInteraction: Story = {
+  args: {
+    id: 'example-clear-on-interaction',
+    label: 'Label',
+    defaultValue:
+      'Rebane on väikese koera suurune ja pika koheva sabaga. Joostes hoiab ta saba horisontaalselt. Tema selja karvad on oranžid. Eestis eelistab ta elupaigana metsatukkasid. Rebane toitub peamiselt närilistest. Ta on ettevaatlik ja oskab hästi põgeneda. Rebase urul on alati mitu väljapääsu. Urud on põhiliselt kutsikate kasvatamiseks. Ta kaevab urud ise või kohendab mägra urge.',
+    isClearable: true,
+    showClearOnInteraction: true,
+  },
 };
+
+const heightExamples: (TextareaProps & { title: string })[] = [
+  {
+    title: 'Default (7.5rem)',
+    id: 'sizing-default',
+    placeholder: 'Rests at 7.5rem, drag to resize',
+  },
+  {
+    title: 'Exact height (10rem)',
+    id: 'sizing-exact',
+    height: '10rem',
+    placeholder: 'Rests at 10rem',
+  },
+  {
+    title: 'Auto grow (defaults: minRows 3, no row limit)',
+    id: 'sizing-auto-grow',
+    autoGrow: true,
+    placeholder: 'Type multiple lines to see it grow',
+  },
+  {
+    title: 'Auto grow (minRows 3, maxRows 8)',
+    id: 'sizing-auto-grow-bounded',
+    autoGrow: true,
+    maxRows: 8,
+    placeholder: 'Grows up to eight rows, then scrolls',
+  },
+  {
+    title: 'Auto grow, capped at 200px',
+    id: 'sizing-auto-grow-capped',
+    autoGrow: true,
+    maxHeight: '200px',
+    placeholder: 'Grows until 200px, then scrolls',
+  },
+];
+
+const TemplateHeights: StoryFn<TextareaProps> = (args) => (
+  <VerticalSpacing>
+    {heightExamples.map(({ title, ...example }) => (
+      <Row key={example.id}>
+        <Col>
+          <Text modifiers="bold">{title}</Text>
+        </Col>
+        <Col>
+          <Textarea {...args} {...example} label="Label" />
+        </Col>
+      </Row>
+    ))}
+  </VerticalSpacing>
+);
 
 export const HeightExamples: Story = {
   render: TemplateHeights,
   parameters: {
     docs: {
       description: {
-        story: 'Examples showing different height configurations for Textarea',
+        story:
+          'Without `autoGrow` the textarea rests at `height` (7.5rem by default) and can be dragged taller. With `autoGrow` it grows with its content from `minRows`, up to `maxRows` if set; leave `maxRows` unset for no row limit. `maxHeight` caps the height in both modes.',
       },
     },
   },

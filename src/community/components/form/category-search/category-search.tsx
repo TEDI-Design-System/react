@@ -1,4 +1,4 @@
-import { autoUpdate, size as sizePanel, useFloating } from '@floating-ui/react';
+import { autoUpdate, shift, size as sizePanel, useFloating } from '@floating-ui/react';
 import cn from 'classnames';
 import React, { forwardRef, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 
@@ -6,8 +6,9 @@ import { Icon } from '../../../../tedi/components/base/icon/icon';
 import { Button } from '../../../../tedi/components/buttons/button/button';
 import { EmptyState } from '../../../../tedi/components/content/empty-state/empty-state';
 import { InputGroup } from '../../../../tedi/components/form/input-group/input-group';
-import { Search, type SearchSuggestion } from '../../../../tedi/components/form/search/search';
+import { Search } from '../../../../tedi/components/form/search/search';
 import type { TextFieldForwardRef } from '../../../../tedi/components/form/textfield/textfield';
+import { Spinner } from '../../../../tedi/components/loaders/spinner/spinner';
 import { Dropdown } from '../../../../tedi/components/overlays/dropdown/dropdown';
 import { Modal } from '../../../../tedi/components/overlays/modal/modal';
 import { isBreakpointBelow, useBreakpoint } from '../../../../tedi/helpers';
@@ -57,25 +58,32 @@ const defaultLabels: CategorySearchLabels = {
 };
 
 /**
- * Text autocomplete and filter searches with independent drafts and results.
- * Filter panels are non-modal on desktop; mobile searches use a full-screen modal.
- * Closing, switching categories, or changing presentation preserves saved state.
+ * Search categories with independent drafts and results in a desktop panel or full-screen mobile modal.
+ * The desktop panel is non-modal. Closing, switching categories, or changing presentation
+ * preserves drafts and results; clearing or emptying text resets only the active category.
  */
 export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
   (
     {
       categories,
       id,
+      categoryId: controlledCategoryId,
       defaultCategoryId,
+      onCategoryChange,
+      open: controlledOpen,
       defaultOpen = false,
+      onOpenChange,
       minimizeCounter,
       mobile,
+      hideSearchBar = false,
       disabled = false,
       size = 'default',
       searchButtonIconSize,
       validationPosition = 'before',
+      showCountInResultsPanel = true,
       labels: labelOverrides,
       searchBarWidth = '100%',
+      textResultsPanelWidth = '100%',
       fullWidthFilterPanel = false,
       maxPanelHeight = 'min(32rem, 70dvh)',
       className,
@@ -88,10 +96,10 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     const rootId = id ?? `category-search-${generatedId}`;
     const panelId = `${rootId}-panel`;
     const labels = { ...defaultLabels, ...labelOverrides };
-    const [categoryId, setCategoryId] = useState(defaultCategoryId ?? categories[0].id);
-    const [open, setOpen] = useState(defaultOpen);
-    const { states, changeDraft, search, clear, select } = useCategorySearch(categories);
-    // Keep the filter view after the user opens it or validation brings it back.
+    const [categoryId, setCategoryId] = useState(controlledCategoryId ?? defaultCategoryId ?? categories[0].id);
+    const [internalOpen, setInternalOpen] = useState(defaultOpen);
+    const open = controlledOpen ?? internalOpen;
+    const { states, changeDraft, search, clear, select, discardResults } = useCategorySearch(categories);
     const [keepFiltersVisible, setKeepFiltersVisible] = useState(false);
 
     const rootRef = useRef<HTMLDivElement>(null);
@@ -103,7 +111,8 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     useEffect(() => {
       if (previousMinimizeCounter.current !== minimizeCounter) {
         previousMinimizeCounter.current = minimizeCounter;
-        setOpen(false);
+        if (controlledOpen === undefined) setInternalOpen(false);
+        onOpenChange?.(false);
       }
     }, [minimizeCounter]);
 
@@ -114,7 +123,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     const hasError = categoryState.status === 'error';
     const hasSearch = Boolean(completedSearch || loading || hasError);
     const textMode = category.mode === 'search';
-    const suggestions = textMode && completedSearch ? (completedSearch.result as SearchSuggestion[]) : [];
+    const minQueryLength = category.minQueryLength ?? 1;
     const fullWidthPanel = !textMode && fullWidthFilterPanel;
     const hasValidationMessage = !textMode && Boolean(category.validationMessage);
     const canShowResults = hasSearch && !hasValidationMessage;
@@ -129,14 +138,21 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
           };
 
     useEffect(() => {
-      if (open && hasValidationMessage && !keepFiltersVisible) {
-        setKeepFiltersVisible(true);
+      if (controlledCategoryId !== undefined && controlledCategoryId !== categoryId && !loading) {
+        setCategoryId(controlledCategoryId);
+        setKeepFiltersVisible(false);
       }
-    }, [keepFiltersVisible, hasValidationMessage, open]);
+    }, [controlledCategoryId, categoryId, loading]);
+
+    useEffect(() => {
+      if (hasValidationMessage && hasSearch) discardResults(category.id);
+    }, [category.id, discardResults, hasSearch, hasValidationMessage]);
 
     let panelView: 'closed' | 'filters' | 'results' = 'closed';
-    if (open && !textMode) {
-      if (canShowResults && !keepFiltersVisible) {
+    if (open) {
+      if (textMode) {
+        if (categoryState.draft && hasSearch) panelView = 'results';
+      } else if (canShowResults && !keepFiltersVisible) {
         panelView = 'results';
       } else {
         panelView = 'filters';
@@ -154,29 +170,45 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       placement: 'bottom-start',
       whileElementsMounted: autoUpdate,
       middleware: [
+        textMode && shift(),
         sizePanel({
-          apply({ rects, elements }) {
-            elements.floating.style.width = `${rects.reference.width}px`;
+          apply({ rects, availableWidth, elements }) {
+            // Text results may be wider; filter panels match their reference.
+            if (textMode) {
+              elements.floating.style.width = '';
+              elements.floating.style.maxWidth = `${Math.max(0, availableWidth)}px`;
+            } else {
+              elements.floating.style.width = `${rects.reference.width}px`;
+              elements.floating.style.maxWidth = '';
+            }
           },
         }),
       ],
     });
 
     let toggleLabel = labels.filter;
-    let showResultCount = false;
+    let showToggleResultCount = false;
     if (panelView === 'results') {
       toggleLabel = labels.showFilters;
     } else if (canShowResults) {
       toggleLabel = labels.showResults;
-      showResultCount = true;
+      showToggleResultCount = true;
     }
 
     useImperativeHandle(forwardedRef, () => rootRef.current as HTMLDivElement);
 
+    function setOpen(nextOpen: boolean) {
+      if (controlledOpen === undefined) setInternalOpen(nextOpen);
+      onOpenChange?.(nextOpen);
+    }
+
     function selectCategory(next: CategorySearchCategory) {
-      if (disabled) return;
-      if (next.id !== category.id) setKeepFiltersVisible(false);
-      setCategoryId(next.id);
+      if (disabled || loading) return;
+      if (controlledCategoryId === undefined) {
+        if (next.id !== category.id) setKeepFiltersVisible(false);
+        setCategoryId(next.id);
+      }
+      onCategoryChange?.(next.id);
       setOpen(true);
     }
 
@@ -197,12 +229,13 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     function clearSearch() {
       if (disabled) return;
       clear(category);
-      setKeepFiltersVisible(hasValidationMessage);
+      setKeepFiltersVisible(false);
       setOpen(true);
     }
 
     function changeQuery(query: string) {
       if (disabled) return;
+      setOpen(isMobile || query.length > 0);
 
       if (!query) {
         clear(category);
@@ -210,32 +243,46 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       }
 
       changeDraft(category.id, query);
+      if (query.length < minQueryLength) {
+        discardResults(category.id);
+        return;
+      }
       // Use this change's text; categoryState.draft still belongs to the previous render.
       void search(category, query);
     }
 
-    function selectSuggestion(suggestion: SearchSuggestion) {
-      if (disabled) return;
-      select(category.id, typeof suggestion.label === 'string' ? suggestion.label : suggestion.value);
-      if (isMobile) setOpen(false);
-      category.onSuggestionSelect?.(suggestion);
+    function selectResult(text: string) {
+      if (!textMode || disabled) return;
+      select(category.id, text);
+      closePanel();
     }
 
     function submitSearch() {
       if (disabled || (textMode && !categoryState.draft)) return;
-      if (!textMode) {
-        // Recover focus before the submitted filter form disappears.
-        const panel = panelRef.current;
-        if (!hasValidationMessage && panel?.contains(document.activeElement)) panel.focus();
-        setKeepFiltersVisible(false);
-        setOpen(true);
+      if (textMode && (categoryState.draft as string).length < minQueryLength) return;
+      // Recover focus before the submitted form or text retry button disappears.
+      const panel = panelRef.current;
+      if (!hasValidationMessage && panel?.contains(document.activeElement)) {
+        if (textMode) focusSearchControl();
+        else panel.focus();
+      }
+      setKeepFiltersVisible(false);
+      setOpen(true);
+      if (
+        !textMode &&
+        !hasValidationMessage &&
+        categoryState.status === 'idle' &&
+        completedSearch &&
+        categoryState.draft === completedSearch.input
+      ) {
+        return;
       }
       void search(category, categoryState.draft);
     }
 
     function toggleView() {
       if (panelView === 'closed') {
-        setKeepFiltersVisible(hasValidationMessage);
+        setKeepFiltersVisible(false);
         setOpen(true);
       } else if (panelView === 'results') {
         setKeepFiltersVisible(true);
@@ -273,7 +320,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
             fullWidth={isMobile}
             iconLeft={isMobile ? 'menu' : undefined}
             size={size}
-            disabled={disabled}
+            disabled={disabled || loading}
             aria-label={`${labels.category}: ${category.label}`}
           >
             <span className={styles['tedi-category-search__category-label']}>
@@ -291,7 +338,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
               role="menuitemradio"
               aria-checked={category.id === item.id}
               active={category.id === item.id}
-              disabled={disabled}
+              disabled={disabled || loading}
               onClick={() => selectCategory(item)}
             >
               {item.label}
@@ -326,14 +373,12 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                   onClear={focusSearchControl}
                   onSearch={submitSearch}
                   button={searchButton}
-                  suggestions={suggestions}
-                  loading={loading}
-                  loadingText={labels.loading}
-                  noResultsText={hasError ? labels.searchError : undefined}
-                  resultsCountText={labels.resultCount}
-                  onSuggestionSelect={selectSuggestion}
-                  renderSuggestionContent={category.renderSuggestionContent}
-                  footer={hasError && suggestions.length > 0 ? <p role="alert">{labels.searchError}</p> : undefined}
+                  input={{
+                    'aria-controls': panelVisible ? panelId : undefined,
+                    onClick: () => {
+                      if (!disabled && completedSearch) setOpen(true);
+                    },
+                  }}
                 />
               </InputGroup.Input>
             ) : (
@@ -351,7 +396,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                     onClick={toggleView}
                   >
                     {toggleLabel}
-                    {showResultCount && count !== undefined ? ` (${count})` : ''}
+                    {showToggleResultCount && count !== undefined ? ` (${count})` : ''}
                   </Button>
                 )}
                 {hasSearch && (
@@ -424,17 +469,22 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
           </form>
         ) : (
           <>
-            {loading && <p role="status">{labels.loading}</p>}
+            {loading && (
+              <Spinner size={36} label={labels.loading} className={styles['tedi-category-search__loading']} />
+            )}
             {hasError && <p role="alert">{labels.searchError}</p>}
             {!loading && completedSearch && (
               <div aria-label={labels.results}>
-                {categoryState.draft !== completedSearch.input && <p>{labels.filtersChanged}</p>}
-                {count !== undefined && count > 0 && <p>{labels.resultCount(count)}</p>}
+                {!textMode && categoryState.draft !== completedSearch.input && <p>{labels.filtersChanged}</p>}
+                {!textMode && showCountInResultsPanel && count !== undefined && count > 0 && (
+                  <p>{labels.resultCount(count)}</p>
+                )}
                 {showEmptyState && <EmptyState type="inside">{labels.noResults}</EmptyState>}
                 {count !== 0 &&
-                  category.renderResults?.({
+                  category.renderResults({
                     value: completedSearch.input,
                     result: completedSearch.result,
+                    selectResult,
                   })}
               </div>
             )}
@@ -442,13 +492,18 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
               <Button size={size} visualType="link" onClick={closePanel}>
                 {labels.close}
               </Button>
+              {textMode && hasError && (
+                <Button size={size} disabled={disabled} onClick={submitSearch}>
+                  {labels.search}
+                </Button>
+              )}
             </div>
           </>
         )}
       </section>
     );
 
-    const announcement = !textMode && (
+    const announcement = (
       <span className={styles['tedi-category-search__sr-only']} role="status" aria-live="polite" aria-atomic="true">
         {panelVisible && !loading && !hasError && completedSearch
           ? `${category.label}: ${count !== undefined ? labels.resultCount(count) : labels.results}`
@@ -464,6 +519,8 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
         style={
           {
             width: searchBarWidth,
+            '--category-search-text-results-panel-width':
+              typeof textResultsPanelWidth === 'number' ? `${textResultsPanelWidth}px` : textResultsPanelWidth,
             '--category-search-panel-max-height':
               typeof maxPanelHeight === 'number' ? `${maxPanelHeight}px` : maxPanelHeight,
           } as React.CSSProperties
@@ -472,25 +529,27 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
       >
         {isMobile ? (
           <>
-            <Search
-              id={`${rootId}-opener`}
-              label={labels.searchInput}
-              hideLabel
-              ariaLabel={category.label}
-              value={textMode ? (categoryState.draft as string) : ''}
-              placeholder={category.placeholder ?? category.label}
-              size={size}
-              disabled={disabled}
-              isClearable={false}
-              onClick={openMobile}
-              onSearch={openMobile}
-              input={{
-                readOnly: true,
-                'aria-haspopup': 'dialog',
-                'aria-expanded': open,
-              }}
-              button={searchButton}
-            />
+            {!hideSearchBar && (
+              <Search
+                id={`${rootId}-opener`}
+                label={labels.searchInput}
+                hideLabel
+                ariaLabel={category.label}
+                value={textMode ? (categoryState.draft as string) : ''}
+                placeholder={category.placeholder ?? category.label}
+                size={size}
+                disabled={disabled}
+                isClearable={false}
+                onClick={openMobile}
+                onSearch={openMobile}
+                input={{
+                  readOnly: true,
+                  'aria-haspopup': 'dialog',
+                  'aria-expanded': open,
+                }}
+                button={searchButton}
+              />
+            )}
             <Modal open={open} onToggle={setOpen}>
               <Modal.Content fullscreen="edge" returnFocus={previousMinimizeCounter.current === minimizeCounter}>
                 <Modal.Header title={labels.searchInput} closeButtonProps={{ title: labels.close }} />
@@ -515,7 +574,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
           </>
         ) : (
           <>
-            {searchBar}
+            {hideSearchBar ? <div ref={panelRefs.setReference} /> : searchBar}
             {panel}
             {announcement}
           </>

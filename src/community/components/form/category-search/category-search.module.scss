@@ -135,6 +135,7 @@
     position: absolute;
     z-index: var(--z-index-dropdown);
     box-sizing: border-box;
+    width: var(--category-search-text-results-panel-width);
     max-height: var(--category-search-panel-max-height);
     padding: var(--layout-grid-gutters-08);
     margin-block-start: var(--tedi-dimensions-01);
@@ -153,6 +154,10 @@
     padding: 0;
     margin: 0;
     border: 0;
+  }
+
+  &__loading {
+    margin-inline: auto;
   }
 
   &__footer {

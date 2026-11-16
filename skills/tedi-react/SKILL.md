@@ -104,27 +104,27 @@ dayjs: ^1.11.10
 ```tsx
 import {
   ThemeProvider,
+  PrintingProvider,
   LabelProvider,
-  StyleProvider,
   AccessibilityProvider,
 } from '@tedi-design-system/react/tedi';
 
 function App() {
   return (
-    <ThemeProvider>
-      <LabelProvider>
-        <StyleProvider>
+    <ThemeProvider theme="default">
+      <PrintingProvider>
+        <LabelProvider locale="et">
           <AccessibilityProvider>
             <YourApp />
           </AccessibilityProvider>
-        </StyleProvider>
-      </LabelProvider>
+        </LabelProvider>
+      </PrintingProvider>
     </ThemeProvider>
   );
 }
 ```
 
-`AccessibilityProvider` exposes `useDeclareLoader` and other a11y hooks; omit it only if you have no loaders/announcements. `PrintingProvider` is also available — wrap it inside `AccessibilityProvider` when you need the `usePrint` context.
+`PrintingProvider` is required: `Collapse` and `SideNav` call `usePrint`, which throws outside it, so anything rendering a `Collapse` fails without it. `LabelProvider` is required for built-in labels. `AccessibilityProvider` exposes `useDeclareLoader` and other a11y hooks; omit it only if you have no loaders/announcements. `StyleProvider` is exported but currently renders its children unchanged, so it is optional.
 
 ### 2. Import core styles
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLabels } from '../../../../../providers/label-provider';
 import { Text } from '../../../../base/typography/text/text';
 import { CollapseButton } from '../../../../buttons/collapse-button/collapse-button';
-import { Sheet } from '../../../../overlays/sheet/sheet';
+import { SheetModal } from '../../../../overlays/sheet/components/sheet-modal/sheet-modal';
 import {
   buildActiveTrail,
   childrenToNodes,
@@ -17,7 +17,7 @@ import { TableOfContentsList } from '../table-of-contents-list/table-of-contents
 export interface TableOfContentsCollapsibleProps
   extends Pick<
     TableOfContentsProps,
-    'children' | 'heading' | 'ariaLabel' | 'activeId' | 'numbered' | 'bordered' | 'defaultOpen' | 'className'
+    'children' | 'heading' | 'ariaLabel' | 'activeId' | 'numbered' | 'divided' | 'defaultOpen' | 'className'
   > {
   /**
    * Pin the bar to the bottom of the viewport. Set `false` to render it inline.
@@ -45,7 +45,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
     ariaLabel,
     activeId,
     numbered = false,
-    bordered = false,
+    divided = false,
     defaultOpen = true,
     sticky = true,
     hideOnScroll = false,
@@ -125,7 +125,7 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         <CollapseButton open={open} onOpenChange={setOpen} underline={false} aria-haspopup="dialog" />
       </div>
 
-      <Sheet
+      <SheetModal
         open={open}
         onToggle={setOpen}
         ariaLabel={title}
@@ -142,12 +142,12 @@ export const TableOfContentsCollapsible = (props: TableOfContentsCollapsibleProp
         <div
           ref={setListElement}
           className={cn(styles['tedi-table-of-contents'], {
-            [styles['tedi-table-of-contents--bordered']]: bordered,
+            [styles['tedi-table-of-contents--divided']]: divided,
           })}
         >
           <TableOfContentsList nodes={nodes} heading={null} />
         </div>
-      </Sheet>
+      </SheetModal>
     </TableOfContentsContext.Provider>
   );
 };

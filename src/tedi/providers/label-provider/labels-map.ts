@@ -219,7 +219,7 @@ export const labelsMap = validateDefaultLabels({
   },
   clear: {
     description: 'For clearing a value',
-    components: ['TableFilter', 'TextField'],
+    components: ['Select', 'TableFilter', 'TextField'],
     et: 'Tühjenda',
     en: 'Clear',
     ru: 'Очистить',
@@ -563,6 +563,27 @@ export const labelsMap = validateDefaultLabels({
     et: 'Sulge modaal',
     en: 'Close modal',
     ru: 'Закрыть модальное окно',
+  },
+  'sheet.close': {
+    description: 'Label for the Sheet close button',
+    components: ['Sheet'],
+    et: 'Sulge',
+    en: 'Close',
+    ru: 'Закрыть',
+  },
+  'sheet.collapse': {
+    description: 'Label for the Sheet collapse toggle when the sheet is expanded',
+    components: ['Sheet'],
+    et: 'Ahenda',
+    en: 'Collapse',
+    ru: 'Свернуть',
+  },
+  'sheet.expand': {
+    description: 'Label for the Sheet collapse toggle when the sheet is collapsed',
+    components: ['Sheet'],
+    et: 'Laienda',
+    en: 'Expand',
+    ru: 'Развернуть',
   },
   'dateField.disabledDateError': {
     description:

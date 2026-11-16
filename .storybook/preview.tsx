@@ -124,6 +124,12 @@ const preview: Preview = {
           description:
             'This component lacks some TEDI-Ready functionality, e.g it may rely on another component that has not yet been developed',
         },
+        deprecated: {
+          background: '#b00020',
+          color: '#fff',
+          description:
+            'This component is deprecated and will be removed in a future release. Migrate to its replacement.',
+        },
         mobileViewDifference: {
           background: '#99BDDA',
           color: '#000',

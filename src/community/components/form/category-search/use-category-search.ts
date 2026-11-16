@@ -44,6 +44,11 @@ export function useCategorySearch(categories: readonly CategorySearchCategory[])
     requests.current.delete(categoryId);
   }
 
+  function discardResults(categoryId: string) {
+    cancel(categoryId);
+    updateState(categoryId, { completedSearch: undefined, status: 'idle' });
+  }
+
   function clear(category: CategorySearchCategory) {
     cancel(category.id);
     updateState(category.id, {
@@ -79,5 +84,5 @@ export function useCategorySearch(categories: readonly CategorySearchCategory[])
     }
   }
 
-  return { states, changeDraft, search, clear, select };
+  return { states, changeDraft, search, clear, select, discardResults };
 }

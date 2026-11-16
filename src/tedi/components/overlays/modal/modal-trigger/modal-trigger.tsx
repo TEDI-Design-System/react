@@ -1,22 +1,8 @@
-import { cloneElement, JSX, MutableRefObject, Ref } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import { cloneElement, JSX } from 'react';
 
 import { getElementRef } from '../../../../helpers/get-element-ref';
 import { useModalContext } from '../modal-context';
-
-type AnyRef<T> = Ref<T> | undefined | null;
-
-const mergeRefs =
-  <T,>(...refs: AnyRef<T>[]) =>
-  (node: T | null) => {
-    for (const ref of refs) {
-      if (!ref) continue;
-      if (typeof ref === 'function') {
-        ref(node);
-      } else {
-        (ref as MutableRefObject<T | null>).current = node;
-      }
-    }
-  };
 
 export interface ModalTriggerProps {
   /**
@@ -30,7 +16,7 @@ export const ModalTrigger = ({ children }: ModalTriggerProps): JSX.Element => {
   const { getReferenceProps, reference } = useModalContext();
 
   const existingRef = getElementRef(children);
-  const mergedRef = mergeRefs(reference, existingRef as AnyRef<unknown>);
+  const mergedRef = useMergeRefs([reference, existingRef]);
 
   return cloneElement(children, getReferenceProps({ ...children.props, ref: mergedRef }));
 };
