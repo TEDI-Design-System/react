@@ -258,15 +258,18 @@
   }
 }
 
-@each $placement in (start, end) {
-  @include breakpoint-classes.from-modifiers('.tedi-footer-side--placement-#{$placement}') {
-    @include footer-side-placement($placement);
+// One block per breakpoint, smallest first, so a larger breakpoint's rule overrides a smaller one's for every value.
+@include breakpoint-classes.each-from using ($breakpoint) {
+  @each $placement in (start, end) {
+    .tedi-footer-side--placement-#{$placement}-from-#{$breakpoint} {
+      @include footer-side-placement($placement);
+    }
   }
-}
 
-@each $position in (start, center, end) {
-  @include breakpoint-classes.from-modifiers('.tedi-footer-side--vertical-#{$position}') {
-    @include footer-side-vertical($position);
+  @each $position in (start, center, end) {
+    .tedi-footer-side--vertical-#{$position}-from-#{$breakpoint} {
+      @include footer-side-vertical($position);
+    }
   }
 }
 

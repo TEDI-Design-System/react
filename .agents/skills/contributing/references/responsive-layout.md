@@ -31,10 +31,16 @@ picks the class.
 ## Responsive props with a few allowed values
 
 For a prop that takes breakpoint keys and has a closed set of values (e.g. `placement`), generate
-`<name>-<value>` and `<name>-<value>-from-<bp>` with `from-modifiers`, and build the class list in the
-component. `Footer.Side` (`footer-responsive.ts`) is the example; move that helper to `helpers/` when a
-second component needs it. For a number (e.g. `columns`) set one custom property per breakpoint on the
-element and read it in `each-from` (see `Footer.Body`).
+`<name>-<value>` and `<name>-<value>-from-<bp>`, and build the class list in the component. `Footer.Side`
+(`footer-responsive.ts`) is the example; move that helper to `helpers/` when a second component needs it.
+
+- One class per breakpoint with a single value (e.g. `HideAt`): `from-modifiers` generates them.
+- Several values per prop: use `each-from` with the breakpoints as the outer loop, smallest first, and the
+  values inside it. Classes of equal specificity apply by source order, so a larger breakpoint has to come
+  after a smaller one for every value (see the `placement` and `vertical` rules in `footer.module.scss`).
+
+For a number (e.g. `columns`) set one custom property per breakpoint on the element and read it in
+`each-from` (see `Footer.Body`).
 
 ## When the markup differs between layouts
 
