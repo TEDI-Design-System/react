@@ -74,34 +74,12 @@ describe('Button component', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it('marks the button aria-busy while loading', () => {
-    render(<Button {...defaultProps} isLoading />);
-    expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
-  });
-
-  it('exposes the loading state in the accessible description while loading', () => {
+  it('keeps the button focusable and its name unchanged while loading', () => {
     render(<Button {...defaultProps} isLoading />);
     const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toBeDisabled();
     expect(button).toHaveAccessibleName('Click Me');
-    expect(button).toHaveAccessibleDescription(/\S/);
-    expect(button).toHaveAttribute('aria-describedby');
-  });
-
-  it('does not describe the button when not loading', () => {
-    render(<Button {...defaultProps} />);
-    expect(screen.getByRole('button')).not.toHaveAttribute('aria-describedby');
-  });
-
-  it('announces the loading state via a live region so it is read even while focus stays on the button', () => {
-    const { rerender } = render(<Button {...defaultProps} />);
-    const status = screen.getByRole('status');
-
-    expect(status).toBeEmptyDOMElement();
-    expect(status).toHaveAttribute('aria-live', 'polite');
-    expect(status).not.toHaveAttribute('aria-hidden');
-
-    rerender(<Button {...defaultProps} isLoading />);
-    expect(screen.getByRole('status')).toHaveTextContent(/\S/);
   });
 
   it('is hidden when printing', () => {

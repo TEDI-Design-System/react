@@ -6,6 +6,12 @@ export interface LoaderObj {
   id: string;
   mountLabel?: string;
   unmountLabel?: string;
+  /**
+   * `assertive` for a loader the user just started on the focused element: a polite
+   * message can be dropped while the screen reader reads that element's own changes.
+   * @default polite
+   */
+  politeness?: 'polite' | 'assertive';
 }
 
 export interface IAccessibilityContext {
@@ -61,9 +67,18 @@ export const AccessibilityProvider = (props: AccessibilityProviderProps): JSX.El
     <AccessibilityContext.Provider value={{ addLoader, removeLoader }}>
       <div className="sr-only">
         <div role="status" aria-live="polite" aria-atomic={false} aria-relevant="additions">
-          {activeLoaders.map((loader) => (
-            <p key={loader.id}>{loader.mountLabel}</p>
-          ))}
+          {activeLoaders
+            .filter((loader) => loader.politeness !== 'assertive')
+            .map((loader) => (
+              <p key={loader.id}>{loader.mountLabel}</p>
+            ))}
+        </div>
+        <div aria-live="assertive" aria-atomic={false} aria-relevant="additions">
+          {activeLoaders
+            .filter((loader) => loader.politeness === 'assertive')
+            .map((loader) => (
+              <p key={loader.id}>{loader.mountLabel}</p>
+            ))}
         </div>
         <div role="status" aria-live="polite" aria-atomic={false} aria-relevant="additions">
           {completedLoaders.map((loader) => (
