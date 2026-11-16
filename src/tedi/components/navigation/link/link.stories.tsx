@@ -2,6 +2,7 @@ import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import NextLink from 'next/link';
 import { ElementType, forwardRef } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text, TextProps } from '../../base/typography/text/text';
 import { Card } from '../../content/card';
 import { Col, Row } from '../../layout/grid';
@@ -417,7 +418,7 @@ export const VisualTest: Story = {
       )}
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Custom component</Text>
-        {CustomComponent.render?.({} as never, {} as never)}
+        <VisualTestStory story={CustomComponent} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">No style link</Text>

@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, ColProps, Row } from '../../layout/grid';
@@ -416,7 +417,7 @@ export const WithExtraContent: Story = {
 };
 
 export const Responsive: Story = {
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     inputType: 'radio',
     label: 'Choose an option:',
@@ -573,24 +574,20 @@ export const CustomItemHTMLLabels: Story = {
   },
 };
 
-const VisualTestStory = ({ story }: { story: Story }) =>
-  story.render ? (
-    <>{story.render({ ...story.args } as ChoiceGroupProps, {} as never)}</>
-  ) : (
-    <ChoiceGroup {...(story.args as ChoiceGroupProps)} />
-  );
-
 const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
-  { label: 'Radio', content: <VisualTestStory story={Radio as Story} /> },
-  { label: 'Radio row', content: <VisualTestStory story={RadioRow} /> },
-  { label: 'Checkbox', content: <VisualTestStory story={Checkbox} /> },
-  { label: 'Checkbox row', content: <VisualTestStory story={CheckboxRow} /> },
+  { label: 'Radio', content: <VisualTestStory story={Radio as Story} component={ChoiceGroup} /> },
+  { label: 'Radio row', content: <VisualTestStory story={RadioRow} component={ChoiceGroup} /> },
+  { label: 'Checkbox', content: <VisualTestStory story={Checkbox} component={ChoiceGroup} /> },
+  { label: 'Checkbox row', content: <VisualTestStory story={CheckboxRow} component={ChoiceGroup} /> },
   { label: 'Radio card segmented', content: <RadioCardSegmented /> },
   { label: 'Radio card separated', content: <RadioCardSeparated /> },
   { label: 'Checkbox card', content: <CheckboxCard /> },
-  { label: 'Radio card with icon', content: <VisualTestStory story={RadioCardWithIcon} /> },
-  { label: 'Checkbox card with icon', content: <VisualTestStory story={CheckboxCardWithIcon} /> },
-  { label: 'With error', content: <VisualTestStory story={WithError} /> },
+  { label: 'Radio card with icon', content: <VisualTestStory story={RadioCardWithIcon} component={ChoiceGroup} /> },
+  {
+    label: 'Checkbox card with icon',
+    content: <VisualTestStory story={CheckboxCardWithIcon} component={ChoiceGroup} />,
+  },
+  { label: 'With error', content: <VisualTestStory story={WithError} component={ChoiceGroup} /> },
   {
     label: 'With default value',
     content: (
@@ -598,6 +595,7 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
         story={{
           args: { ...WithDefaultValue.args, id: 'example-2-vt-default-value', name: 'check-2-vt-default-value' },
         }}
+        component={ChoiceGroup}
       />
     ),
   },
@@ -608,13 +606,17 @@ const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
         story={{
           args: { ...WithIndeterminate.args, id: 'example-2-vt-indeterminate', name: 'check-2-vt-indeterminate' },
         }}
+        component={ChoiceGroup}
       />
     ),
   },
-  { label: 'With extra content', content: <VisualTestStory story={WithExtraContent} /> },
-  { label: 'Custom label', content: <VisualTestStory story={CustomLabel} /> },
-  { label: 'Custom item labels', content: <VisualTestStory story={CustomItemLabels} /> },
-  { label: 'Custom item HTML labels', content: <VisualTestStory story={CustomItemHTMLLabels} /> },
+  { label: 'With extra content', content: <VisualTestStory story={WithExtraContent} component={ChoiceGroup} /> },
+  { label: 'Custom label', content: <VisualTestStory story={CustomLabel} component={ChoiceGroup} /> },
+  { label: 'Custom item labels', content: <VisualTestStory story={CustomItemLabels} component={ChoiceGroup} /> },
+  {
+    label: 'Custom item HTML labels',
+    content: <VisualTestStory story={CustomItemHTMLLabels} component={ChoiceGroup} />,
+  },
 ];
 
 /** Chromatic snapshot for ChoiceGroup: add every new visual variant here too. */

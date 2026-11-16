@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -387,85 +388,31 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <HorizontalStepper aria-label="Default" background="default" compact="sm">
-          <HorizontalStepper.Item label="Kutse" selected />
-          <HorizontalStepper.Item label="Tahteavaldus" />
-          <HorizontalStepper.Item label="Geenianalüüs" />
-          <HorizontalStepper.Item label="Vastus" />
-        </HorizontalStepper>
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Second step</Text>
-        <HorizontalStepper aria-label="Second step" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" selected />
-          <HorizontalStepper.Item label="Geenianalüüs" />
-          <HorizontalStepper.Item label="Vastus" />
-        </HorizontalStepper>
+        <VisualTestStory story={SecondStep} props={{ 'aria-label': 'Second step' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Third step</Text>
-        <HorizontalStepper aria-label="Third step" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" completed />
-          <HorizontalStepper.Item label="Geenianalüüs" selected />
-          <HorizontalStepper.Item label="Vastus" />
-        </HorizontalStepper>
+        <VisualTestStory story={ThirdStep} props={{ 'aria-label': 'Third step' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With errors</Text>
-        <HorizontalStepper aria-label="Vorm vigadega" compact="lg">
-          <HorizontalStepper.Item label="Kutse" error />
-          <HorizontalStepper.Item label="Tahteavaldus" selected />
-          <HorizontalStepper.Item label="Geenianalüüs" />
-          <HorizontalStepper.Item label="Vastus" />
-        </HorizontalStepper>
-        <HorizontalStepper aria-label="Vorm vea kirjeldusega" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" error description="Sammus esinevad vead" />
-          <HorizontalStepper.Item label="Geenianalüüs" selected />
-          <HorizontalStepper.Item label="Vastus" />
-        </HorizontalStepper>
+        <VisualTestStory story={WithErrors} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With descriptions</Text>
-        <HorizontalStepper aria-label="Descriptions, Kutse selected" compact="lg">
-          <HorizontalStepper.Item label="Kutse" selected />
-          <HorizontalStepper.Item label="Tahteavaldus" />
-          <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
-          <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
-        </HorizontalStepper>
-        <HorizontalStepper aria-label="Descriptions, Tahteavaldus selected" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" selected />
-          <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
-          <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
-        </HorizontalStepper>
-        <HorizontalStepper aria-label="Descriptions, Geenianalüüs selected" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" completed />
-          <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
-          <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
-        </HorizontalStepper>
-        <HorizontalStepper aria-label="Descriptions, Vastus selected" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" completed />
-          <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />
-          <HorizontalStepper.Item label="Vastus" selected description="Ametnik täidab" />
-        </HorizontalStepper>
+        <VisualTestStory story={WithDescriptions} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Transparent background</Text>
-        <HorizontalStepper aria-label="Transparent background" background="transparent" compact="lg">
-          <HorizontalStepper.Item label="Kutse" completed />
-          <HorizontalStepper.Item label="Tahteavaldus" selected />
-          <HorizontalStepper.Item label="Geenianalüüs" />
-          <HorizontalStepper.Item label="Vastus" />
-        </HorizontalStepper>
+        <VisualTestStory story={TransparentBackground} props={{ 'aria-label': 'Transparent background' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Compact</Text>
-        {Compact.render?.({} as never, {} as never)}
+        <VisualTestStory story={Compact} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">States</Text>

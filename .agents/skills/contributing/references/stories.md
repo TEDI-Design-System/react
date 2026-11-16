@@ -211,10 +211,16 @@ hidden `VisualTest` story instead of one per docs story.
 - **`VisualTest`** is the last story. It has `tags: ['!dev', '!autodocs']` (hidden from sidebar and
   docs, still run by Chromatic and the test-runner; never add `!test`) and
   `parameters: { chromatic: { disableSnapshot: false } }`. It renders every visual variant of the docs
-  stories with fixed props, reusing their templates, each block under a bold `Text` label.
+  stories, each block under a bold `Text` label.
+- **Reuse the docs stories, never copy them**, so a later change to a docs story reaches Chromatic.
+  Render a docs story with `<VisualTestStory story={X} />` from `.storybook/visual-test-story`:
+  pass `component={Component}` for an args-only story, and `props={{ 'aria-label': '…' }}` to give
+  a repeated landmark a unique label. It throws when a story has nothing to render. Where ids
+  collide, extract the story's markup into a template with an `idPrefix` prop and render that.
 - **Separate snapshots** stay separate: stories that need a viewport, a `play` function, an open
   overlay, animation, scrolling or sticky/fixed positioning. Give them
-  `chromatic: { disableSnapshot: false }` and keep them out of `VisualTest`.
+  `chromatic: { disableSnapshot: false }` and keep them out of `VisualTest`. A story kept separate
+  for its breakpoints also sets `viewports: [375, 1280]`, otherwise Chromatic only captures desktop.
 - **Behaviour-only stories** (they look the same as another story) get no place in `VisualTest`.
 - **Unique within the story**: every `id`, `htmlFor`, `aria-labelledby` and radio `name`, and an
   `aria-label` on each repeated landmark. Pass an id prefix into shared templates.

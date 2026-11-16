@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../../.storybook/visual-test-story';
 import { Col, Row } from '../../../layout/grid';
 import { VerticalSpacing } from '../../../layout/vertical-spacing';
 import { HeadingModifiers, Text } from '../text/text';
@@ -149,6 +150,10 @@ export const VisualTest: Story = {
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Custom modifier</Text>
         <CustomModifierTemplate />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Semantic headings</Text>
+        <VisualTestStory story={SemanticHeadings} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),

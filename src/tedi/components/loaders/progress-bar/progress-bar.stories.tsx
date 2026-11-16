@@ -240,7 +240,7 @@ export const Responsive: Story = {
     helper: HINT,
     md: { labelPosition: 'horizontal', valuePosition: 'horizontal' },
   },
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
 };
 
 /**

@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import React, { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -566,7 +567,7 @@ export const CardsWithIcons: StoryObj = {
  * regular radios from `md` up — resize the canvas to see it switch.
  */
 export const ResponsiveVariant: StoryObj = {
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   render: () => (
     <Radio.Group
       label="Tooraine"
@@ -731,8 +732,6 @@ export const CardStatesSecondary: StoryObj = {
   parameters: { pseudo: cardStatesPseudo('secondary') },
   render: () => renderCardStates('secondary'),
 };
-
-const VisualTestStory = ({ story }: { story: StoryObj }) => <>{story.render?.({ ...story.args }, {} as never)}</>;
 
 const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
   { label: 'Default', content: <VisualTestStory story={Default as StoryObj} /> },

@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -317,7 +318,7 @@ const RESPONSIVE_STEPS: CardStepperStepProps[] = [
  * toolbar) to see it switch.
  */
 export const Responsive: Story = {
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   render: function ResponsiveExample() {
     const [step, setStep] = useState(2);
 
@@ -381,27 +382,27 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        {Default.render?.({} as never, {} as never)}
+        <VisualTestStory story={Default} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With descriptions</Text>
-        {WithDescriptions.render?.({} as never, {} as never)}
+        <VisualTestStory story={WithDescriptions} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With status badges</Text>
-        {WithStatusBadges.render?.({} as never, {} as never)}
+        <VisualTestStory story={WithStatusBadges} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With button</Text>
-        {WithButton.render?.({} as never, {} as never)}
+        <VisualTestStory story={WithButton} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">With links</Text>
-        {WithLinks.render?.({} as never, {} as never)}
+        <VisualTestStory story={WithLinks} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Compact</Text>
-        {Compact.render?.({} as never, {} as never)}
+        <VisualTestStory story={Compact} />
       </VerticalSpacing>
       <VerticalSpacing size={1}>
         <Text modifiers="bold">States: default</Text>

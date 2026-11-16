@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -86,11 +87,13 @@ export const VisualTest: Story = {
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">All variants</Text>
-        {AllVariants.render?.({} as never, {} as never)}
+        <VisualTestStory story={AllVariants} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Examples</Text>
-        <div>{Examples.render?.({} as never, {} as never)}</div>
+        <div>
+          <VisualTestStory story={Examples} />
+        </div>
       </VerticalSpacing>
     </VerticalSpacing>
   ),

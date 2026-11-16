@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { ReactNode } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import InfoButton from '../../buttons/info-button/info-button';
@@ -379,7 +380,7 @@ export const LongTextValues: Story = {
  * the layout adapt.
  */
 export const Responsive: Story = {
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   render: () => {
     const rows = [
       { label: 'Patsient', value: 'Mari Maasikas' },
@@ -546,14 +547,14 @@ const visualTestBlocks: { label: string; content: ReactNode }[] = [
     { label: 'Text weight', story: TextWeight },
     { label: 'Type', story: Types },
     { label: 'Has slot', story: HasSlot },
-  ].map(({ label, story }) => ({ label, content: story.render?.({} as TextGroupProps, {} as never) })),
+  ].map(({ label, story }) => ({ label, content: <VisualTestStory story={story} /> })),
   {
     label: 'Horizontal label length',
     content: <MultipleTextGroupsTemplate {...(HorizontalLabelLength.args as TextGroupProps)} />,
   },
   { label: 'Long text values', content: <TemplateWithLayouts {...(LongTextValues.args as TextGroupProps)} /> },
-  { label: 'Custom label', content: CustomLabel.render?.({} as TextGroupProps, {} as never) },
-  { label: 'With list', content: WithList.render?.({} as TextGroupProps, {} as never) },
+  { label: 'Custom label', content: <VisualTestStory story={CustomLabel} /> },
+  { label: 'With list', content: <VisualTestStory story={WithList} /> },
 ];
 
 /** Chromatic snapshot for TextGroup: add every new visual variant here too. */

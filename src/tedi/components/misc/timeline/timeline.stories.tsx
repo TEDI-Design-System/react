@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Collapse } from '../../content/collapse/collapse';
@@ -8,7 +9,7 @@ import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { InfoTooltip } from '../../overlays/tooltip';
 import Separator from '../separator/separator';
-import { Timeline, TimelineProps } from './timeline';
+import { Timeline } from './timeline';
 
 /**
  * <a href="https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.60.78?node-id=11335-186480&m=dev" target="_blank">Figma ↗</a><br/>
@@ -454,7 +455,7 @@ export const VisualTest: Story = {
       {visualTestStories.map(({ label, story }) => (
         <VerticalSpacing size={0.5} key={label}>
           <Text modifiers="bold">{label}</Text>
-          {story.render?.({ ...story.args } as TimelineProps, {} as never)}
+          <VisualTestStory story={story} component={Timeline} />
         </VerticalSpacing>
       ))}
     </VerticalSpacing>

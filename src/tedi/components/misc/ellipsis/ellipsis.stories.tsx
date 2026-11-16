@@ -46,7 +46,7 @@ export const Default: Story = {
  * Resize the window to see that the ellipsis and popover appear only when content doesn't fit
  */
 export const ResponsiveExample: Story = {
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     lineClamp: 1,
     children: (
@@ -76,7 +76,7 @@ export const LeadingStart: Story = {
  * Use this when you want to show popover always or with custom content
  */
 export const ResponsiveWithCustomPopover: Story = {
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     lineClamp: 1,
     popover: false,

@@ -364,7 +364,7 @@ export const ResponsiveButton: Story = {
     children: 'Responsive Button',
   },
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: [375, 1280] },
     viewport: {
       defaultViewport: 'responsive',
     },

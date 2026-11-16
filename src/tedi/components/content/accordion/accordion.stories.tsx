@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
@@ -1079,8 +1080,6 @@ but the rendered look matches the surrounding accordion items exactly.
     </section>
   ),
 };
-
-const VisualTestStory = ({ story }: { story: StoryObj }) => <>{story.render?.({ ...story.args }, {} as never)}</>;
 
 const visualTestStories: { label: string; story: StoryObj }[] = [
   { label: 'Default', story: Default },

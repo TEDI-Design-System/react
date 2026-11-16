@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { cloneElement, type CSSProperties, type ReactElement, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
@@ -367,7 +368,7 @@ const layoutIds = layoutFlat.map((node) => node.id);
  */
 export const StickyInLayout: Story = {
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: [375, 1280] },
     fullWidth: true,
   },
   render: function StickyInLayout() {
@@ -504,7 +505,7 @@ export const StickyInLayout: Story = {
  */
 export const Collapsible: Story = {
   parameters: {
-    chromatic: { disableSnapshot: false },
+    chromatic: { disableSnapshot: false, viewports: [375, 1280] },
     layout: 'fullscreen',
     fullWidth: true,
   },
@@ -640,7 +641,7 @@ export const Collapsible: Story = {
  */
 export const CollapsibleHideOnScroll: Story = {
   name: 'Collapsible: hide on scroll',
-  parameters: { chromatic: { disableSnapshot: false }, layout: 'fullscreen', fullWidth: true },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] }, layout: 'fullscreen', fullWidth: true },
   render: () => {
     const items = [
       <TableOfContents.Item key="intro" id="intro">
@@ -766,11 +767,6 @@ export const CollapsibleHideOnScroll: Story = {
   },
 };
 
-const withAriaLabel = (story: Story, ariaLabel: string) =>
-  cloneElement(story.render?.((story.args ?? {}) as never, {} as never) as ReactElement<TableOfContentsProps>, {
-    ariaLabel,
-  });
-
 /** Chromatic snapshot for TableOfContents: add every new visual variant here too. */
 export const VisualTest: Story = {
   tags: ['!dev', '!autodocs'],
@@ -779,55 +775,55 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Item states</Text>
-        {ItemStates.render?.({} as never, {} as never)}
+        <VisualTestStory story={ItemStates} />
       </VerticalSpacing>
       <Row gutterY={3}>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">Default</Text>
-            {withAriaLabel(Default, 'Sisukord: default')}
+            <VisualTestStory story={Default} props={{ ariaLabel: 'Sisukord: default' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">Transparent</Text>
-            {withAriaLabel(Transparent, 'Sisukord: transparent')}
+            <VisualTestStory story={Transparent} props={{ ariaLabel: 'Sisukord: transparent' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">With slot</Text>
-            {withAriaLabel(WithSlot, 'Sisukord: with slot')}
+            <VisualTestStory story={WithSlot} props={{ ariaLabel: 'Sisukord: with slot' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">Numbered</Text>
-            {withAriaLabel(Numbered, 'Sisukord: numbered')}
+            <VisualTestStory story={Numbered} props={{ ariaLabel: 'Sisukord: numbered' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">With icon</Text>
-            {withAriaLabel(WithIcon, 'Sisukord: with icon')}
+            <VisualTestStory story={WithIcon} props={{ ariaLabel: 'Sisukord: with icon' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">Headless</Text>
-            {withAriaLabel(Headless, 'Sisukord: headless')}
+            <VisualTestStory story={Headless} props={{ ariaLabel: 'Sisukord: headless' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
             <Text modifiers="bold">With separator</Text>
-            {withAriaLabel(WithSeparator, 'Sisukord: with separator')}
+            <VisualTestStory story={WithSeparator} props={{ ariaLabel: 'Sisukord: with separator' }} />
           </VerticalSpacing>
         </Col>
         <Col md={4}>
           <VerticalSpacing size={0.5}>
-            <Text modifiers="bold">Bordered</Text>
-            {withAriaLabel(Bordered, 'Sisukord: bordered')}
+            <Text modifiers="bold">Divided</Text>
+            <VisualTestStory story={Divided} props={{ ariaLabel: 'Sisukord: divided' }} />
           </VerticalSpacing>
         </Col>
       </Row>

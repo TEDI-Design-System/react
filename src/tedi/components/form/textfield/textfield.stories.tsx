@@ -160,7 +160,7 @@ export const WithHint: Story = {
     ...Default.args,
     id: 'example-3',
     helper: {
-      id: 'example-3',
+      id: 'example-3-helper',
       text: 'Hint text',
       type: 'hint',
     },
@@ -257,7 +257,7 @@ export const VisualTest: Story = {
         <TextField
           id="textfield-vt-hint"
           label="Label"
-          helper={{ id: 'textfield-vt-hint', text: 'Hint text', type: 'hint' }}
+          helper={{ id: 'textfield-vt-hint-helper', text: 'Hint text', type: 'hint' }}
         />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>

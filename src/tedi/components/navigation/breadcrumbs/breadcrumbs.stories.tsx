@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
@@ -150,7 +151,7 @@ export const Condensed: Story = {
  */
 export const ResponsiveVariant: Story = {
   render: Template,
-  parameters: { chromatic: { disableSnapshot: false } },
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     variant: 'short',
     md: { variant: 'long' },
@@ -204,37 +205,23 @@ export const VisualTest: Story = {
     <VerticalSpacing size={2}>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Default</Text>
-        <Breadcrumbs ariaLabel="Default trail">
-          <Link href="#">Dashboard</Link>
-          <Link href="#">Applications</Link>
-          <span aria-current="page">Application nr 506</span>
-        </Breadcrumbs>
+        <VisualTestStory story={Default} props={{ ariaLabel: 'Default trail' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Long</Text>
-        {Long.render?.({} as never, {} as never)}
+        <VisualTestStory story={Long} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Short</Text>
-        <Breadcrumbs variant="short" ariaLabel="Short trail">
-          <Link href="#">Dashboard</Link>
-          <span aria-current="page">Current page</span>
-        </Breadcrumbs>
+        <VisualTestStory story={Short} props={{ ariaLabel: 'Short trail' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Condensed</Text>
-        <Breadcrumbs maxItems={4} itemsBeforeCollapse={1} itemsAfterCollapse={2} ariaLabel="Condensed trail">
-          <Link href="#">Dashboard</Link>
-          <Link href="#">Patients</Link>
-          <Link href="#">Anna Tamm</Link>
-          <Link href="#">Visits</Link>
-          <Link href="#">2024-05-12</Link>
-          <span aria-current="page">Restrictions</span>
-        </Breadcrumbs>
+        <VisualTestStory story={Condensed} props={{ ariaLabel: 'Condensed trail' }} />
       </VerticalSpacing>
       <VerticalSpacing size={0.5}>
         <Text modifiers="bold">Custom separator</Text>
-        {CustomSeparator.render?.({} as never, {} as never)}
+        <VisualTestStory story={CustomSeparator} />
       </VerticalSpacing>
     </VerticalSpacing>
   ),
