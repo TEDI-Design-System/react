@@ -1,6 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Heading } from '../../base/typography/heading/heading';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -33,6 +34,7 @@ const meta: Meta<typeof Tabs> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.38.59?node-id=3419-38773&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -61,6 +63,11 @@ interface TemplateStateProps extends TabsProps {
 
 const noop = () => null;
 
+interface IdPrefixProps {
+  /** Prefixes every tab id, so the template can repeat in one story. */
+  idPrefix?: string;
+}
+
 const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
   const { array } = args;
 
@@ -87,93 +94,99 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
   );
 };
 
+const DefaultTemplate = ({ idPrefix = '' }: IdPrefixProps) => (
+  <Tabs defaultValue={`${idPrefix}tab-1`}>
+    <Tabs.List aria-label="Tervise sakid">
+      <Tabs.Trigger id={`${idPrefix}tab-1`}>Terviseteekond</Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-2`}>Haiguste kulg</Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-3`}>Ravimite ajalugu</Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content id={`${idPrefix}tab-1`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.healthTimeline}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-2`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.diseaseCourse}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-3`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.medication}</Text>
+      </CardContent>
+    </Tabs.Content>
+  </Tabs>
+);
+
 export const Default: Story = {
-  render: () => (
-    <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tervise sakid">
-        <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
-        <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content id="tab-1">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.healthTimeline}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-2">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.diseaseCourse}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-3">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.medication}</Text>
-        </CardContent>
-      </Tabs.Content>
-    </Tabs>
-  ),
+  render: () => <DefaultTemplate />,
 };
+
+const WithIconsTemplate = ({ idPrefix = '' }: IdPrefixProps) => (
+  <Tabs defaultValue={`${idPrefix}tab-1`}>
+    <Tabs.List aria-label="Ikoonidega sakid">
+      <Tabs.Trigger id={`${idPrefix}tab-1`} icon="table_chart">
+        Tabel
+      </Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-2`} icon="grid_on">
+        Ruudustik
+      </Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content id={`${idPrefix}tab-1`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.table}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-2`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.grid}</Text>
+      </CardContent>
+    </Tabs.Content>
+  </Tabs>
+);
 
 export const WithIcons: Story = {
-  render: () => (
-    <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Ikoonidega sakid">
-        <Tabs.Trigger id="tab-1" icon="table_chart">
-          Tabel
-        </Tabs.Trigger>
-        <Tabs.Trigger id="tab-2" icon="grid_on">
-          Ruudustik
-        </Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content id="tab-1">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.table}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-2">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.grid}</Text>
-        </CardContent>
-      </Tabs.Content>
-    </Tabs>
-  ),
+  render: () => <WithIconsTemplate />,
 };
 
+const WithStatusBadgeTemplate = ({ idPrefix = '' }: IdPrefixProps) => (
+  <Tabs defaultValue={`${idPrefix}tab-1`}>
+    <Tabs.List aria-label="Olekumärgisega sakid">
+      <Tabs.Trigger id={`${idPrefix}tab-1`}>
+        <Ellipsis lineClamp={1} popover={true}>
+          Terviseteekond
+        </Ellipsis>{' '}
+        <StatusBadge color="brand">Esitatud</StatusBadge>
+      </Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-2`}>
+        <span style={{ position: 'relative' }}>
+          Lugemata teated&nbsp;
+          <StatusIndicator type="danger" position="top-right" />
+        </span>
+      </Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-3`}>Ravimite ajalugu</Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content id={`${idPrefix}tab-1`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.healthTimeline}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-2`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.unreadMessages}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-3`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.medication}</Text>
+      </CardContent>
+    </Tabs.Content>
+  </Tabs>
+);
+
 export const WithStatusBadge: Story = {
-  render: () => (
-    <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Olekumärgisega sakid">
-        <Tabs.Trigger id="tab-1">
-          <Ellipsis lineClamp={1} popover={true}>
-            Terviseteekond
-          </Ellipsis>{' '}
-          <StatusBadge color="brand">Esitatud</StatusBadge>
-        </Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">
-          <span style={{ position: 'relative' }}>
-            Lugemata teated&nbsp;
-            <StatusIndicator type="danger" position="top-right" />
-          </span>
-        </Tabs.Trigger>
-        <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content id="tab-1">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.healthTimeline}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-2">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.unreadMessages}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-3">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.medication}</Text>
-        </CardContent>
-      </Tabs.Content>
-    </Tabs>
-  ),
+  render: () => <WithStatusBadgeTemplate />,
 };
 
 export const States: StoryObj<TemplateStateProps> = {
@@ -192,7 +205,6 @@ export const States: StoryObj<TemplateStateProps> = {
 };
 
 export const Controlled: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
   render: () => {
     const [currentTab, setCurrentTab] = useState('tab-1');
 
@@ -222,36 +234,39 @@ export const Controlled: Story = {
   },
 };
 
+const WithDisabledTabTemplate = ({ idPrefix = '' }: IdPrefixProps) => (
+  <Tabs defaultValue={`${idPrefix}tab-1`}>
+    <Tabs.List aria-label="Keelatud sakiga sakid">
+      <Tabs.Trigger id={`${idPrefix}tab-1`}>Terviseteekond</Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-2`}>Haiguste kulg</Tabs.Trigger>
+      <Tabs.Trigger id={`${idPrefix}tab-3`} disabled>
+        Ravimite ajalugu
+      </Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content id={`${idPrefix}tab-1`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.healthTimeline}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-2`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.diseaseCourse}</Text>
+      </CardContent>
+    </Tabs.Content>
+    <Tabs.Content id={`${idPrefix}tab-3`}>
+      <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+        <Text>{content.medication}</Text>
+      </CardContent>
+    </Tabs.Content>
+  </Tabs>
+);
+
 export const WithDisabledTab: Story = {
-  render: () => (
-    <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Keelatud sakiga sakid">
-        <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
-        <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
-        <Tabs.Trigger id="tab-3" disabled>
-          Ravimite ajalugu
-        </Tabs.Trigger>
-      </Tabs.List>
-      <Tabs.Content id="tab-1">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.healthTimeline}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-2">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.diseaseCourse}</Text>
-        </CardContent>
-      </Tabs.Content>
-      <Tabs.Content id="tab-3">
-        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-          <Text>{content.medication}</Text>
-        </CardContent>
-      </Tabs.Content>
-    </Tabs>
-  ),
+  render: () => <WithDisabledTabTemplate />,
 };
 
 export const OverflowBehavior: Story = {
+  parameters: { chromatic: { disableSnapshot: false } },
   render: () => (
     <VerticalSpacing size={2}>
       <Text modifiers="bold">Dropdown (default)</Text>
@@ -320,70 +335,121 @@ export const OverflowBehavior: Story = {
   ),
 };
 
+const WithSubTabsTemplate = ({ idPrefix = '' }: IdPrefixProps) => {
+  const [activeSubTab, setActiveSubTab] = useState('work-accidents');
+
+  const subTabLabels: Record<string, string> = {
+    'work-accidents': 'Tööõnnetused',
+    'occupational-diseases': 'Kutsehaigused',
+    'work-related-illnesses': 'Tööga seotud haigused',
+  };
+
+  const subTabContent: Record<string, string> = {
+    'work-accidents': 'Tööõnnetuste juhtumid ja nende menetluse seis.',
+    'occupational-diseases': 'Kutsehaiguste kirjed ja diagnoosid.',
+    'work-related-illnesses': 'Tööga seotud haiguste teated ja tulemused.',
+  };
+
+  return (
+    <Tabs defaultValue={`${idPrefix}tab-3`}>
+      <Tabs.List aria-label="Töötervishoiu ja -ohutuse sakid">
+        <Tabs.Trigger id={`${idPrefix}tab-1`}>Käimasolevad menetlused</Tabs.Trigger>
+        <Tabs.Trigger id={`${idPrefix}tab-2`}>Planeeritavad menetlused</Tabs.Trigger>
+        <Tabs.Trigger id={`${idPrefix}tab-3`}>Õnnetused ja haigused</Tabs.Trigger>
+        <Tabs.Trigger id={`${idPrefix}tab-4`}>Kalender</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content id={`${idPrefix}tab-1`}>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{content.proceduresInProgress}</Text>
+        </CardContent>
+      </Tabs.Content>
+      <Tabs.Content id={`${idPrefix}tab-2`}>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{content.proceduresInPlanning}</Text>
+        </CardContent>
+      </Tabs.Content>
+      <Tabs.Content id={`${idPrefix}tab-3`}>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <VerticalSpacing size={1.5}>
+            <ButtonGroup
+              type="secondary"
+              ariaLabel="Õnnetuste ja haiguste alamnavigatsioon"
+              enableMobileDropdown
+              onSelectionChange={(id) => setActiveSubTab(id.slice(idPrefix.length))}
+            >
+              <Button id={`${idPrefix}work-accidents`} isActive={activeSubTab === 'work-accidents'}>
+                Tööõnnetused
+              </Button>
+              <Button id={`${idPrefix}occupational-diseases`} isActive={activeSubTab === 'occupational-diseases'}>
+                Kutsehaigused
+              </Button>
+              <Button id={`${idPrefix}work-related-illnesses`} isActive={activeSubTab === 'work-related-illnesses'}>
+                Tööga seotud haigused
+              </Button>
+            </ButtonGroup>
+            <Heading element="h2">{subTabLabels[activeSubTab]}</Heading>
+            <Text>{subTabContent[activeSubTab]}</Text>
+          </VerticalSpacing>
+        </CardContent>
+      </Tabs.Content>
+      <Tabs.Content id={`${idPrefix}tab-4`}>
+        <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
+          <Text>{content.calendar}</Text>
+        </CardContent>
+      </Tabs.Content>
+    </Tabs>
+  );
+};
+
 export const WithSubTabs: Story = {
-  render: () => {
-    const [activeSubTab, setActiveSubTab] = useState('work-accidents');
+  render: () => <WithSubTabsTemplate />,
+};
 
-    const subTabLabels: Record<string, string> = {
-      'work-accidents': 'Tööõnnetused',
-      'occupational-diseases': 'Kutsehaigused',
-      'work-related-illnesses': 'Tööga seotud haigused',
-    };
-
-    const subTabContent: Record<string, string> = {
-      'work-accidents': 'Tööõnnetuste juhtumid ja nende menetluse seis.',
-      'occupational-diseases': 'Kutsehaiguste kirjed ja diagnoosid.',
-      'work-related-illnesses': 'Tööga seotud haiguste teated ja tulemused.',
-    };
-
-    return (
-      <Tabs defaultValue="tab-3">
-        <Tabs.List aria-label="Töötervishoiu ja -ohutuse sakid">
-          <Tabs.Trigger id="tab-1">Käimasolevad menetlused</Tabs.Trigger>
-          <Tabs.Trigger id="tab-2">Planeeritavad menetlused</Tabs.Trigger>
-          <Tabs.Trigger id="tab-3">Õnnetused ja haigused</Tabs.Trigger>
-          <Tabs.Trigger id="tab-4">Kalender</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content id="tab-1">
-          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <Text>{content.proceduresInProgress}</Text>
-          </CardContent>
-        </Tabs.Content>
-        <Tabs.Content id="tab-2">
-          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <Text>{content.proceduresInPlanning}</Text>
-          </CardContent>
-        </Tabs.Content>
-        <Tabs.Content id="tab-3">
-          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <VerticalSpacing size={1.5}>
-              <ButtonGroup
-                type="secondary"
-                ariaLabel="Õnnetuste ja haiguste alamnavigatsioon"
-                enableMobileDropdown
-                onSelectionChange={setActiveSubTab}
-              >
-                <Button id="work-accidents" isActive={activeSubTab === 'work-accidents'}>
-                  Tööõnnetused
-                </Button>
-                <Button id="occupational-diseases" isActive={activeSubTab === 'occupational-diseases'}>
-                  Kutsehaigused
-                </Button>
-                <Button id="work-related-illnesses" isActive={activeSubTab === 'work-related-illnesses'}>
-                  Tööga seotud haigused
-                </Button>
-              </ButtonGroup>
-              <Heading element="h2">{subTabLabels[activeSubTab]}</Heading>
-              <Text>{subTabContent[activeSubTab]}</Text>
-            </VerticalSpacing>
-          </CardContent>
-        </Tabs.Content>
-        <Tabs.Content id="tab-4">
-          <CardContent padding={{ vertical: 1.5, horizontal: 1 }}>
-            <Text>{content.calendar}</Text>
-          </CardContent>
-        </Tabs.Content>
-      </Tabs>
-    );
+/** Chromatic snapshot for Tabs: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    a11y: {
+      config: {
+        rules: [
+          { id: 'aria-required-parent', enabled: false },
+          { id: 'aria-valid-attr-value', enabled: false },
+        ],
+      },
+    },
+    pseudo: {
+      hover: '#Hover-tab',
+      active: '#Active-tab',
+      focusVisible: '#Focus-tab',
+    },
   },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <DefaultTemplate idPrefix="vt-1-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With icons</Text>
+        <WithIconsTemplate idPrefix="vt-2-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With status badge</Text>
+        <WithStatusBadgeTemplate idPrefix="vt-3-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VisualTestStory story={States} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With disabled tab</Text>
+        <WithDisabledTabTemplate idPrefix="vt-4-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With sub tabs</Text>
+        <WithSubTabsTemplate idPrefix="vt-5-" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

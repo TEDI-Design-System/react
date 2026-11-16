@@ -1,7 +1,9 @@
 import { Meta, StoryContext, StoryFn, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
+import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Spinner, SpinnerProps } from './spinner';
 
 const withConditionalCanvasBackground = (Story: StoryFn, context: StoryContext) => {
@@ -48,6 +50,7 @@ const meta: Meta<typeof Spinner> = {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2768-42334&mode=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -130,4 +133,22 @@ export const Size: StoryObj<TemplateMultipleProps> = {
 
 export const Color: StoryObj<TemplateMultipleProps> = {
   render: TemplateColors,
+};
+
+/** Chromatic snapshot for Spinner: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Size</Text>
+        <TemplateColumn property="size" color="primary" array={sizeArray} label="Loading..." />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Color</Text>
+        <TemplateColors property="color" array={[]} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

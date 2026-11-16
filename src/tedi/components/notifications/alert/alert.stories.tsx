@@ -26,6 +26,7 @@ const meta: Meta<typeof Alert> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4263-61880&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -214,4 +215,64 @@ export const WithActionButton: Story = {
       </Button>
     ),
   },
+};
+
+/** Chromatic snapshot for Alert: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Alert {...Default.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateColumn array={sizeArray} type="info" onClose={() => null}>
+          Content description
+        </TemplateColumn>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Headless</Text>
+        <Alert>Content description</Alert>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Global</Text>
+        <WithAndWithoutHeading {...Global.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without side borders</Text>
+        <WithAndWithoutHeading {...WithoutSideBorders.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With icon</Text>
+        <WithAndWithoutHeading {...WithIcon.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With close button</Text>
+        <WithAndWithoutHeading {...WithCloseButton.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Alert types</Text>
+        <TypesTemplate {...AlertTypes.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without title, long text</Text>
+        <Alert {...WithoutTitleLongText.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without title, long text and closing button</Text>
+        <Alert {...WithoutTitleLongTextAndClosingButton.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With title, long text and closing button</Text>
+        <Alert {...WithTitleLongTextAndClosingButton.args} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With action button</Text>
+        <Alert {...WithActionButton.args} />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

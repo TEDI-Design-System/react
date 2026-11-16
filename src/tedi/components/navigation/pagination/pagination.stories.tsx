@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
+import { Text } from '../../base/typography/text/text';
+import { Card } from '../../content/card';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { Pagination, PaginationProps } from './pagination';
 
 /**
@@ -24,6 +28,7 @@ const meta: Meta<typeof Pagination> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.45.70?node-id=8478-72385&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 export default meta;
@@ -104,7 +109,6 @@ export const WithoutDropdown: Story = {
  * Controlled mode — the consumer owns `page` state explicitly.
  */
 export const ControlledPage: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
   render: function ControlledPage() {
     const [page, setPage] = useState(3);
     return <Pagination pageCount={10} page={page} onPageChange={setPage} />;
@@ -357,6 +361,7 @@ export const Borders: Story = {
  * see it appear/disappear.
  */
 export const ResponsiveVisibility: Story = {
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     pageCount: 10,
     defaultPage: 3,
@@ -374,6 +379,7 @@ export const ResponsiveVisibility: Story = {
  * returns focus to the trigger.
  */
 export const MobilePicker: Story = {
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375] } },
   args: {
     pageCount: 24,
     defaultPage: 7,
@@ -441,4 +447,223 @@ export const ShowAllPageSize: Story = {
       />
     );
   },
+};
+
+/** Chromatic snapshot for Pagination: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} component={Pagination} props={{ labels: { ariaLabel: 'Default' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">First</Text>
+        <VisualTestStory story={First} component={Pagination} props={{ labels: { ariaLabel: 'First' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Last</Text>
+        <VisualTestStory story={Last} component={Pagination} props={{ labels: { ariaLabel: 'Last' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">All properties shown</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50, 100]}
+          labels={{ ariaLabel: 'All properties shown' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without results number</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50, 100]}
+          labels={{ ariaLabel: 'Without results number' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Without dropdown</Text>
+        <VisualTestStory
+          story={WithoutDropdown}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Without dropdown' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Few pages</Text>
+        <VisualTestStory story={FewPages} component={Pagination} props={{ labels: { ariaLabel: 'Few pages' } }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Many pages ellipsis</Text>
+        <VisualTestStory
+          story={ManyPagesEllipsis}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Many pages ellipsis' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Huge page count</Text>
+        <VisualTestStory
+          story={HugePageCount}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Huge page count' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Wider siblings</Text>
+        <VisualTestStory
+          story={WiderSiblings}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Wider siblings' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Transparent</Text>
+        <Card borderless>
+          <Card.Content background="secondary">
+            <VisualTestStory
+              story={Transparent}
+              component={Pagination}
+              props={{ labels: { ariaLabel: 'Transparent' } }}
+            />
+          </Card.Content>
+        </Card>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Top bottom split</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50, 100]}
+          hidePager
+          borders="bottom"
+          labels={{ ariaLabel: 'Top bottom split, top' }}
+        />
+        <Text color="tertiary">Table content goes here</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50, 100]}
+          hideResults
+          hidePageSize
+          borders="top"
+          labels={{ ariaLabel: 'Top bottom split, bottom' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Disabled boundary arrows</Text>
+        <Pagination
+          pageCount={5}
+          defaultPage={1}
+          showPrevNextButtons
+          labels={{ ariaLabel: 'Disabled boundary arrows' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Arrows with labels</Text>
+        <VisualTestStory
+          story={ArrowsWithLabels}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Arrows with labels' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom arrow icons</Text>
+        <VisualTestStory
+          story={CustomArrowIcons}
+          component={Pagination}
+          props={{ labels: { ariaLabel: 'Custom arrow icons' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Arrows primary variant</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          arrowVariant="default"
+          showPrevNextButtons
+          md={{ arrowVariant: 'primary' }}
+          labels={{ ariaLabel: 'Arrows primary variant' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Borders: top</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="top"
+          labels={{ ariaLabel: 'Pagination (borders: top)' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Borders: bottom</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="bottom"
+          labels={{ ariaLabel: 'Pagination (borders: bottom)' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Borders: both</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="both"
+          labels={{ ariaLabel: 'Pagination (borders: both)' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Borders: none</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={3}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50]}
+          borders="none"
+          labels={{ ariaLabel: 'Pagination (borders: none)' }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Custom labels</Text>
+        <VisualTestStory
+          story={CustomLabels}
+          component={Pagination}
+          props={{ labels: { ...CustomLabels.args?.labels, ariaLabel: 'Custom labels' } }}
+        />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Show all page size</Text>
+        <Pagination
+          pageCount={10}
+          defaultPage={1}
+          totalItems={97}
+          pageSize={10}
+          pageSizeOptions={[10, 25, 50, { value: 97, label: 'Show all' }]}
+          labels={{ ariaLabel: 'Show all page size' }}
+        />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

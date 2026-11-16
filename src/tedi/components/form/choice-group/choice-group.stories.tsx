@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
 import { Col, ColProps, Row } from '../../layout/grid';
@@ -48,6 +49,7 @@ const meta: Meta<typeof ChoiceGroup> = {
     },
     // ChoiceGroup is deprecated and slated for removal — skip the a11y gate for its stories.
     a11y: { test: 'off' },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -415,6 +417,7 @@ export const WithExtraContent: Story = {
 };
 
 export const Responsive: Story = {
+  parameters: { chromatic: { disableSnapshot: false, viewports: [375, 1280] } },
   args: {
     inputType: 'radio',
     label: 'Choose an option:',
@@ -569,4 +572,65 @@ export const CustomItemHTMLLabels: Story = {
       },
     ],
   },
+};
+
+const visualTestBlocks: { label: string; content: React.ReactNode }[] = [
+  { label: 'Radio', content: <VisualTestStory story={Radio as Story} component={ChoiceGroup} /> },
+  { label: 'Radio row', content: <VisualTestStory story={RadioRow} component={ChoiceGroup} /> },
+  { label: 'Checkbox', content: <VisualTestStory story={Checkbox} component={ChoiceGroup} /> },
+  { label: 'Checkbox row', content: <VisualTestStory story={CheckboxRow} component={ChoiceGroup} /> },
+  { label: 'Radio card segmented', content: <RadioCardSegmented /> },
+  { label: 'Radio card separated', content: <RadioCardSeparated /> },
+  { label: 'Checkbox card', content: <CheckboxCard /> },
+  { label: 'Radio card with icon', content: <VisualTestStory story={RadioCardWithIcon} component={ChoiceGroup} /> },
+  {
+    label: 'Checkbox card with icon',
+    content: <VisualTestStory story={CheckboxCardWithIcon} component={ChoiceGroup} />,
+  },
+  { label: 'With error', content: <VisualTestStory story={WithError} component={ChoiceGroup} /> },
+  {
+    label: 'With default value',
+    content: (
+      <VisualTestStory
+        story={{
+          args: { ...WithDefaultValue.args, id: 'example-2-vt-default-value', name: 'check-2-vt-default-value' },
+        }}
+        component={ChoiceGroup}
+      />
+    ),
+  },
+  {
+    label: 'With indeterminate',
+    content: (
+      <VisualTestStory
+        story={{
+          args: { ...WithIndeterminate.args, id: 'example-2-vt-indeterminate', name: 'check-2-vt-indeterminate' },
+        }}
+        component={ChoiceGroup}
+      />
+    ),
+  },
+  { label: 'With extra content', content: <VisualTestStory story={WithExtraContent} component={ChoiceGroup} /> },
+  { label: 'Custom label', content: <VisualTestStory story={CustomLabel} component={ChoiceGroup} /> },
+  { label: 'Custom item labels', content: <VisualTestStory story={CustomItemLabels} component={ChoiceGroup} /> },
+  {
+    label: 'Custom item HTML labels',
+    content: <VisualTestStory story={CustomItemHTMLLabels} component={ChoiceGroup} />,
+  },
+];
+
+/** Chromatic snapshot for ChoiceGroup: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestBlocks.map(({ label, content }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          {content}
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
+  ),
 };

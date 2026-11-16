@@ -1,5 +1,7 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { Text } from '../../base/typography/text/text';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import List, { ListProps } from './list';
 
 /**
@@ -12,6 +14,7 @@ const meta: Meta<typeof List> = {
   title: 'Tedi-Ready/Content/List',
   subcomponents: { 'List.Item': List.Item } as never,
   parameters: {
+    chromatic: { disableSnapshot: true },
     status: {
       type: [{ name: 'breakpointSupport', url: '?path=/docs/helpers-usebreakpointprops--usebreakpointprops' }],
     },
@@ -142,6 +145,15 @@ export const OrderedList: Story = {
   },
 };
 
+const TemplateOrderedListWithStart: StoryFn<Omit<ListProps, 'children'>> = (args) => (
+  <List {...args} element="ol" start={5}>
+    <List.Item>Starts at five</List.Item>
+    <List.Item>Six</List.Item>
+    <List.Item value={10}>Jumps to ten</List.Item>
+    <List.Item>Eleven</List.Item>
+  </List>
+);
+
 /**
  * `start` begins the numbering at a given value, and a single `List.Item` can
  * override its own number with `value` (following items continue from there).
@@ -151,18 +163,19 @@ export const OrderedList: Story = {
  */
 export const OrderedListWithStart: Story = {
   name: 'Ordered list with start / value',
-  render: (args) => (
-    <List {...args} element="ol" start={5}>
-      <List.Item>Starts at five</List.Item>
-      <List.Item>Six</List.Item>
-      <List.Item value={10}>Jumps to ten</List.Item>
-      <List.Item>Eleven</List.Item>
-    </List>
-  ),
+  render: TemplateOrderedListWithStart,
   args: {
     style: 'styled',
   },
 };
+
+const TemplateReversedOrderedList: StoryFn<Omit<ListProps, 'children'>> = (args) => (
+  <List {...args} element="ol" reversed>
+    <List.Item>Third</List.Item>
+    <List.Item>Second</List.Item>
+    <List.Item>First</List.Item>
+  </List>
+);
 
 /**
  * `reversed` counts the list down. With no `start` it begins at the item count
@@ -171,13 +184,7 @@ export const OrderedListWithStart: Story = {
  */
 export const ReversedOrderedList: Story = {
   name: 'Reversed ordered list',
-  render: (args) => (
-    <List {...args} element="ol" reversed>
-      <List.Item>Third</List.Item>
-      <List.Item>Second</List.Item>
-      <List.Item>First</List.Item>
-    </List>
-  ),
+  render: TemplateReversedOrderedList,
   args: {
     style: 'styled',
   },
@@ -188,4 +195,38 @@ export const NoStyleList: Story = {
   args: {
     style: 'none',
   },
+};
+
+/** Chromatic snapshot for List: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Template style="styled" element="ul" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Unordered list</Text>
+        <TemplateUnorderedList style="styled" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Ordered list</Text>
+        <TemplateOrderedList element="ol" style="styled" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Ordered list with start / value</Text>
+        <TemplateOrderedListWithStart style="styled" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Reversed ordered list</Text>
+        <TemplateReversedOrderedList style="styled" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">No style list</Text>
+        <TemplateNoStyleList style="none" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

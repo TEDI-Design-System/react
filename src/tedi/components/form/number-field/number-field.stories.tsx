@@ -26,6 +26,7 @@ const meta: Meta<typeof NumberField> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=4536-78765&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 export default meta;
@@ -178,7 +179,6 @@ export const FullWidth: Story = {
 };
 
 export const Controlled: Story = {
-  parameters: { chromatic: { disableSnapshot: true } },
   args: {
     step: 1,
     max: 10,
@@ -220,4 +220,95 @@ export const Controlled: Story = {
       </VerticalSpacing>
     );
   },
+};
+
+const visualTestStateArgs: Omit<NumberFieldProps, 'id'> = {
+  step: 1,
+  max: 10,
+  min: -10,
+  label: 'Label',
+  defaultValue: 1,
+};
+
+/** Chromatic snapshot for NumberField: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <NumberField id="numberfield-vt-default" label="Label" defaultValue={1} step={1} max={10} min={0} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateSizes id="numberfield-vt-sizes" label="Label" defaultValue={1} step={1} max={10} min={0} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <VerticalSpacing>
+          <Row>
+            <Col lg={2} md={12} className="flex align-items-center gap-3">
+              <Text modifiers="bold">Default</Text>
+            </Col>
+            <Col>
+              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-default" />
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={2} md={12} className="flex align-items-center gap-3">
+              <Text modifiers="bold">Min value</Text>
+            </Col>
+            <Col>
+              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-min" defaultValue={1} min={1} />
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={2} md={12} className="flex align-items-center gap-3">
+              <Text modifiers="bold">Max value</Text>
+            </Col>
+            <Col>
+              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-max" defaultValue={1} max={1} />
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={2} md={12} className="flex align-items-center gap-3">
+              <Text modifiers="bold">Disabled</Text>
+            </Col>
+            <Col>
+              <NumberField {...visualTestStateArgs} id="numberfield-vt-state-disabled" defaultValue={1} disabled />
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={2} md={12} className="flex align-items-center gap-3">
+              <Text modifiers="bold">Error</Text>
+            </Col>
+            <Col>
+              <NumberField
+                {...visualTestStateArgs}
+                id="numberfield-vt-state-error"
+                helper={{ id: 'numberfield-vt-state-error-helper', text: 'Feedback text', type: 'error' }}
+              />
+            </Col>
+          </Row>
+        </VerticalSpacing>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <NumberField id="numberfield-vt-hint" label="Label" helper={{ text: 'Hint text', type: 'hint' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Decimal</Text>
+        <NumberField id="numberfield-vt-decimal" label="Label" defaultValue={1.5} step={0.25} max={3} min={-3} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With unit</Text>
+        <NumberField id="numberfield-vt-unit" label="Label" defaultValue={2} step={1} max={5} min={-5} suffix="unit" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Full width</Text>
+        <NumberField id="numberfield-vt-full-width" label="Label" defaultValue={2} step={1} suffix="unit" fullWidth />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

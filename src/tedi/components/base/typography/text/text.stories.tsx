@@ -13,6 +13,7 @@ const meta: Meta<typeof Text> = {
   component: Text,
   title: 'Tedi-Ready/Base/Typography/Text',
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?node-id=115-11630&m=dev',
@@ -217,4 +218,34 @@ export const GeneralText: Story = {
 export const StatusText: Story = {
   render: TemplateStatusText,
   name: 'Status text colors',
+};
+
+/** Chromatic snapshot for Text: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Text>Text</Text>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Body</Text>
+        <TemplateBodyText />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Subtitles</Text>
+        <TemplateSubtitles />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">General text colors</Text>
+        <TemplateGeneralText />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Status text colors</Text>
+        <TemplateStatusText />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

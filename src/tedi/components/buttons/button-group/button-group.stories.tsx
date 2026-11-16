@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Text } from '../../base/typography/text/text';
 import { Col, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
-import { Button } from '../button/button';
+import { Button, ButtonProps } from '../button/button';
 import ButtonGroup, { ButtonGroupProps } from './button-group';
 
 /**
@@ -15,6 +15,9 @@ import ButtonGroup, { ButtonGroupProps } from './button-group';
 const meta: Meta<typeof ButtonGroup> = {
   title: 'TEDI-Ready/Components/Buttons/ButtonGroup',
   component: ButtonGroup,
+  parameters: {
+    chromatic: { disableSnapshot: true },
+  },
 };
 
 export default meta;
@@ -23,23 +26,24 @@ type Story = StoryObj<typeof ButtonGroup>;
 const buttonStates = ['Default', 'Hover', 'Active', 'Focus', 'Disabled'];
 const sizeArray: ButtonGroupProps['size'][] = ['default', 'small'];
 
-const Template: StoryFn<ButtonGroupProps> = (args) => (
+const Template: StoryFn<Omit<ButtonGroupProps, 'children'> & { idPrefix?: string }> = ({ idPrefix = '', ...args }) => (
   <ButtonGroup {...args} ariaLabel="Button group example">
-    <Button id="1">Details</Button>
-    <Button id="2" isActive>
+    <Button id={`${idPrefix}1`}>Details</Button>
+    <Button id={`${idPrefix}2`} isActive>
       Updates
     </Button>
-    <Button id="3">Settings</Button>
+    <Button id={`${idPrefix}3`}>Settings</Button>
   </ButtonGroup>
 );
 
-interface TemplateMultipleProps<Type = ButtonGroupProps['size']> extends ButtonGroupProps {
+interface TemplateMultipleProps<Type = ButtonGroupProps['size']> extends Omit<ButtonGroupProps, 'children'> {
   array: Type[];
   property: keyof ButtonGroupProps;
+  idPrefix?: string;
 }
 
 const TemplateSizes: StoryFn<TemplateMultipleProps> = (args) => {
-  const { array, property, ...buttonGroupProps } = args;
+  const { array, property, idPrefix = '', ...buttonGroupProps } = args;
 
   return (
     <div className="example-list">
@@ -51,11 +55,11 @@ const TemplateSizes: StoryFn<TemplateMultipleProps> = (args) => {
             </Col>
             <Col>
               <ButtonGroup type="primary" {...buttonGroupProps} {...{ [property]: value }}>
-                <Button id="01">Tab 1</Button>
-                <Button id="02" isActive>
+                <Button id={`${idPrefix}${value}-01`}>Tab 1</Button>
+                <Button id={`${idPrefix}${value}-02`} isActive>
                   Tab 2
                 </Button>
-                <Button id="03">Tab 3</Button>
+                <Button id={`${idPrefix}${value}-03`}>Tab 3</Button>
               </ButtonGroup>
             </Col>
           </Row>
@@ -65,31 +69,31 @@ const TemplateSizes: StoryFn<TemplateMultipleProps> = (args) => {
   );
 };
 
-const TemplateTypes: StoryFn<typeof Button> = (args) => {
+const TemplateTypes: StoryFn<Partial<ButtonProps> & { idPrefix?: string }> = ({ idPrefix = '', ...args }) => {
   return (
     <Row gutterY={2}>
       <Col md={12}>
         <ButtonGroup type="primary" stretch={false} ariaLabel="Button group example">
-          <Button id="1" {...args}>
+          <Button id={`${idPrefix}1`} {...args}>
             Tab 1
           </Button>
-          <Button id="2" isActive {...args}>
+          <Button id={`${idPrefix}2`} isActive {...args}>
             Tab 2
           </Button>
-          <Button id="3" {...args}>
+          <Button id={`${idPrefix}3`} {...args}>
             Tab 3
           </Button>
         </ButtonGroup>
       </Col>
       <Col md={12}>
         <ButtonGroup type="secondary" stretch={false}>
-          <Button id="1" {...args}>
+          <Button id={`${idPrefix}secondary-1`} {...args}>
             Tab 1
           </Button>
-          <Button id="2" isActive {...args}>
+          <Button id={`${idPrefix}secondary-2`} isActive {...args}>
             Tab 2
           </Button>
-          <Button id="3" {...args}>
+          <Button id={`${idPrefix}secondary-3`} {...args}>
             Tab 3
           </Button>
         </ButtonGroup>
@@ -98,32 +102,38 @@ const TemplateTypes: StoryFn<typeof Button> = (args) => {
   );
 };
 
-const TemplateWithIcons: StoryFn<ButtonGroupProps> = (args) => {
+const TemplateWithIcons: StoryFn<Omit<ButtonGroupProps, 'children'> & { idPrefix?: string }> = ({
+  idPrefix = '',
+  ...args
+}) => {
   return (
     <ButtonGroup {...args} stretch={false}>
-      <Button id="1" iconLeft="table">
+      <Button id={`${idPrefix}1`} iconLeft="table">
         Tab 1
       </Button>
-      <Button id="2" iconLeft="refresh" isActive>
+      <Button id={`${idPrefix}2`} iconLeft="refresh" isActive>
         Tab 2
       </Button>
-      <Button id="3" iconLeft="settings">
+      <Button id={`${idPrefix}3`} iconLeft="settings">
         Tab 3
       </Button>
     </ButtonGroup>
   );
 };
 
-const TemplateIconOnly: StoryFn<ButtonGroupProps> = (args) => {
+const TemplateIconOnly: StoryFn<Omit<ButtonGroupProps, 'children'> & { idPrefix?: string }> = ({
+  idPrefix = '',
+  ...args
+}) => {
   return (
     <ButtonGroup {...args} stretch={false}>
-      <Button id="1" icon="table" showTooltip>
+      <Button id={`${idPrefix}1`} icon="table" showTooltip>
         Tab 1
       </Button>
-      <Button id="2" icon="refresh" isActive showTooltip>
+      <Button id={`${idPrefix}2`} icon="refresh" isActive showTooltip>
         Tab 2
       </Button>
-      <Button id="3" icon="settings" showTooltip>
+      <Button id={`${idPrefix}3`} icon="settings" showTooltip>
         Tab 3
       </Button>
     </ButtonGroup>
@@ -232,34 +242,43 @@ export const Secondary: StoryObj<{ states: string[] }> = {
   },
 };
 
-export const DifferentWidthButtons: Story = {
-  render: (args) => {
-    const [selectedId, setSelectedId] = useState<string | null>(null);
+const DifferentWidthTemplate: StoryFn<Omit<ButtonGroupProps, 'children'> & { idPrefix?: string }> = ({
+  idPrefix = '',
+  ...args
+}) => {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-    return (
-      <Row>
-        <Col md={12}>
-          <ButtonGroup
-            {...args}
-            stretch={false}
-            onSelectionChange={setSelectedId}
-            ariaLabel="Button group example"
-            enableMobileDropdown
+  return (
+    <Row>
+      <Col md={12}>
+        <ButtonGroup
+          {...args}
+          stretch={false}
+          onSelectionChange={setSelectedId}
+          ariaLabel="Button group example"
+          enableMobileDropdown
+        >
+          <Button
+            id={`${idPrefix}1`}
+            isActive={selectedId === `${idPrefix}1`}
+            onClick={() => setSelectedId(`${idPrefix}1`)}
           >
-            <Button id="1" isActive={selectedId === '1'} onClick={() => setSelectedId('1')}>
-              Text
-            </Button>
-            <Button id="2" isActive={selectedId === '2'}>
-              Longer text
-            </Button>
-            <Button id="3" isActive={selectedId === '3'}>
-              Even longer text
-            </Button>
-          </ButtonGroup>
-        </Col>
-      </Row>
-    );
-  },
+            Text
+          </Button>
+          <Button id={`${idPrefix}2`} isActive={selectedId === `${idPrefix}2`}>
+            Longer text
+          </Button>
+          <Button id={`${idPrefix}3`} isActive={selectedId === `${idPrefix}3`}>
+            Even longer text
+          </Button>
+        </ButtonGroup>
+      </Col>
+    </Row>
+  );
+};
+
+export const DifferentWidthButtons: Story = {
+  render: DifferentWidthTemplate,
   args: {
     type: 'primary',
   },
@@ -272,4 +291,57 @@ export const Stretched: Story = {
     dropdownLabel: 'Text',
     enableMobileDropdown: true,
   },
+};
+
+/** Chromatic snapshot for ButtonGroup: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: ['#Hover-primary', '#Hover-secondary'],
+      active: ['#Active-primary', '#Active-secondary'],
+      focusVisible: ['#Focus-primary', '#Focus-secondary'],
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Template type="primary" stretch={false} idPrefix="vt-default-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateSizes property="size" array={sizeArray} idPrefix="vt-sizes-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Types</Text>
+        <TemplateTypes idPrefix="vt-types-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With icon</Text>
+        <TemplateWithIcons type="primary" idPrefix="vt-with-icon-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Icon only</Text>
+        <TemplateIconOnly type="primary" idPrefix="vt-icon-only-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Primary states</Text>
+        <TemplateColumn states={buttonStates} type="primary" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Secondary states</Text>
+        <TemplateColumn states={buttonStates} type="secondary" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Different width buttons</Text>
+        <DifferentWidthTemplate type="primary" idPrefix="vt-different-width-" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Stretched</Text>
+        <Template stretch idPrefix="vt-stretched-" />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

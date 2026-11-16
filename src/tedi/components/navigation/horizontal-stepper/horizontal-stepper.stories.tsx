@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
@@ -30,6 +31,7 @@ const meta: Meta<typeof HorizontalStepper> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-2.51.75?node-id=11201-120696&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -83,7 +85,7 @@ const TYPE_COLS: { key: string; label: string; props: Partial<HorizontalStepperI
   { key: 'selected', label: 'Selected', props: { selected: true }, rows: ['default'] },
 ];
 
-const StatesMatrix = ({ compact }: { compact: boolean }) => {
+const StatesMatrix = ({ compact, labelPrefix = '' }: { compact: boolean; labelPrefix?: string }) => {
   const breakpoint = useBreakpoint();
   const isMobile = isBreakpointBelow(breakpoint, 'md');
 
@@ -107,7 +109,7 @@ const StatesMatrix = ({ compact }: { compact: boolean }) => {
                   </div>
                   <div style={{ width: 'fit-content', maxWidth: '100%' }}>
                     <HorizontalStepper
-                      aria-label={`${col.label} – ${row.label}`}
+                      aria-label={`${labelPrefix}${col.label} – ${row.label}`}
                       background="transparent"
                       compact={compact}
                     >
@@ -146,7 +148,7 @@ const StatesMatrix = ({ compact }: { compact: boolean }) => {
             col.rows.includes(row.key) ? (
               <div key={col.key} data-stepper-state={row.key}>
                 <HorizontalStepper
-                  aria-label={`${col.label} – ${row.label}`}
+                  aria-label={`${labelPrefix}${col.label} – ${row.label}`}
                   background="transparent"
                   compact={compact}
                 >
@@ -376,4 +378,50 @@ export const States: Story = {
 export const CompactStates: Story = {
   parameters: statesPseudo,
   render: () => <StatesMatrix compact />,
+};
+
+/** Chromatic snapshot for HorizontalStepper: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false }, ...statesPseudo },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <VisualTestStory story={Default} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Second step</Text>
+        <VisualTestStory story={SecondStep} props={{ 'aria-label': 'Second step' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Third step</Text>
+        <VisualTestStory story={ThirdStep} props={{ 'aria-label': 'Third step' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With errors</Text>
+        <VisualTestStory story={WithErrors} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With descriptions</Text>
+        <VisualTestStory story={WithDescriptions} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Transparent background</Text>
+        <VisualTestStory story={TransparentBackground} props={{ 'aria-label': 'Transparent background' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact</Text>
+        <VisualTestStory story={Compact} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <StatesMatrix compact={false} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Compact states</Text>
+        <StatesMatrix compact labelPrefix="Compact: " />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

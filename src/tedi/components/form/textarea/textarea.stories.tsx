@@ -25,6 +25,7 @@ const meta: Meta<typeof Textarea> = {
       type: 'figma',
       url: 'https://www.figma.com/design/jWiRIXhHRxwVdMSimKX2FF/TEDI-READY-(work-in-progress)?node-id=3486-37618&m=dev',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -265,4 +266,57 @@ export const HeightExamples: Story = {
       },
     },
   },
+};
+
+/** Chromatic snapshot for Textarea: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    pseudo: {
+      hover: '#Hover',
+      focus: '#Focus',
+      active: '#Active',
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <Textarea id="textarea-vt-default" label="Label" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Sizes</Text>
+        <TemplateSizes id="textarea-vt-sizes" label="Label" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">States</Text>
+        <TemplateColumnWithStates array={stateArray} label="Label" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">With hint</Text>
+        <Textarea id="textarea-vt-hint" label="Label" helper={{ text: 'Hint text' }} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Hint text and character count</Text>
+        <Textarea id="textarea-vt-hint-and-count" label="Label" characterLimit={400} helper={[{ text: 'Hint text' }]} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Only character count</Text>
+        <Textarea id="textarea-vt-only-count" label="Label" characterLimit={400} />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Text value</Text>
+        <Textarea id="textarea-vt-text-value" label="Label" defaultValue="Text value" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Placeholder</Text>
+        <Textarea id="textarea-vt-placeholder" label="Label" placeholder="Text value" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Height examples</Text>
+        <TemplateHeights />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

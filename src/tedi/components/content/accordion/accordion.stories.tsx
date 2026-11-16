@@ -6,6 +6,7 @@ import {
   getSubcomponentProps,
   subcomponentArgTypes,
 } from '../../../../../.storybook/subcomponent-controls';
+import { VisualTestStory } from '../../../../../.storybook/visual-test-story';
 import { useBreakpointProps } from '../../../helpers';
 import { Icon } from '../../base/icon/icon';
 import { Heading } from '../../base/typography/heading/heading';
@@ -13,6 +14,7 @@ import { Text } from '../../base/typography/text/text';
 import { Button } from '../../buttons/button/button';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import TextField from '../../form/textfield/textfield';
+import { VerticalSpacing } from '../../layout/vertical-spacing';
 import Separator from '../../misc/separator/separator';
 import { Link } from '../../navigation/link/link';
 import { StatusBadge } from '../../tags/status-badge/status-badge';
@@ -36,6 +38,7 @@ export default {
     controls: {
       exclude: ['sm', 'md', 'lg', 'xl', 'xxl'],
     },
+    chromatic: { disableSnapshot: true },
   },
   argTypes: {
     children: {
@@ -1075,5 +1078,37 @@ but the rendered look matches the surrounding accordion items exactly.
         </Accordion.Item>
       </Accordion>
     </section>
+  ),
+};
+
+const visualTestStories: { label: string; story: StoryObj }[] = [
+  { label: 'Default', story: Default },
+  { label: 'Variants', story: Variants },
+  { label: 'Action types', story: ActionTypes },
+  { label: 'With icon card', story: WithIconCard },
+  { label: 'Customized', story: Customized },
+  { label: 'Disabled', story: Disabled },
+];
+
+/** Chromatic snapshot for Accordion: add every new visual variant here too. */
+export const VisualTest: StoryObj = {
+  tags: ['!dev', '!autodocs'],
+  parameters: {
+    chromatic: { disableSnapshot: false },
+    a11y: {
+      config: {
+        rules: [{ id: 'landmark-unique', enabled: false }],
+      },
+    },
+  },
+  render: () => (
+    <VerticalSpacing size={2}>
+      {visualTestStories.map(({ label, story }) => (
+        <VerticalSpacing size={0.5} key={label}>
+          <Text modifiers="bold">{label}</Text>
+          <VisualTestStory story={story} />
+        </VerticalSpacing>
+      ))}
+    </VerticalSpacing>
   ),
 };

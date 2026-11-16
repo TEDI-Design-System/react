@@ -16,6 +16,7 @@ const meta: Meta<typeof FormLabel> = {
     status: {
       type: 'internalComponent',
     },
+    chromatic: { disableSnapshot: true },
   },
 };
 
@@ -126,4 +127,30 @@ const WrappingTemplate: StoryFn = () => {
 
 export const LabelWrapping = {
   render: WrappingTemplate,
+};
+
+/** Chromatic snapshot for FormLabel: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <FormLabel id="input-id-vt-1" label="Label of input" />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Size</Text>
+        <SizeTemplate />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Structure</Text>
+        <StructureTemplate />
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Label wrapping</Text>
+        <WrappingTemplate />
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };

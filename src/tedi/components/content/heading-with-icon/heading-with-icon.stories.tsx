@@ -1,5 +1,6 @@
 import { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 
+import { Text } from '../../base/typography/text/text';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import HeadingWithIcon, { HeadingWithIconProps } from './heading-with-icon';
 
@@ -12,6 +13,7 @@ export default {
   title: 'Tedi-Ready/Content/HeadingWithIcon',
   component: HeadingWithIcon,
   parameters: {
+    chromatic: { disableSnapshot: true },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/file/jWiRIXhHRxwVdMSimKX2FF/TEDI-Design-System-(draft)?type=design&node-id=2137-19827&mode=dev',
@@ -48,4 +50,24 @@ export const Colors: Story = {
     children: 'My family physician',
     name: 'assignment_ind',
   },
+};
+
+/** Chromatic snapshot for HeadingWithIcon: add every new visual variant here too. */
+export const VisualTest: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: { chromatic: { disableSnapshot: false } },
+  render: () => (
+    <VerticalSpacing size={2}>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Default</Text>
+        <HeadingWithIcon name="assignment_ind" headingColor="brand" iconColor="brand">
+          My family physician
+        </HeadingWithIcon>
+      </VerticalSpacing>
+      <VerticalSpacing size={0.5}>
+        <Text modifiers="bold">Colors</Text>
+        <TemplateColors name="assignment_ind">My family physician</TemplateColors>
+      </VerticalSpacing>
+    </VerticalSpacing>
+  ),
 };
