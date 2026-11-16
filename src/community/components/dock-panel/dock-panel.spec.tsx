@@ -1541,21 +1541,6 @@ describe('DockPanel mobile presentation', () => {
       expect(toggle).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('lets the header wrap only while header actions are shown', async () => {
-      const user = userEvent.setup();
-      render(
-        <DockPanel title="Details" labels={labels} headerActions={<button type="button">Action</button>} mobile>
-          Content
-        </DockPanel>
-      );
-      const header = (await screen.findByRole('heading', { name: 'Details' })).parentElement;
-      expect(header).toHaveClass('tedi-dock-panel__sheet-header');
-
-      await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
-
-      expect(header).not.toHaveClass('tedi-dock-panel__sheet-header');
-    });
-
     it('minimizes and restores uncontrolled, keeping content mounted but hidden', async () => {
       const user = userEvent.setup();
       const onCollapsedChange = jest.fn();
@@ -2051,5 +2036,270 @@ describe('DockPanel mobile presentation', () => {
       const dockedToggle = within(region).getByRole('button', { name: 'Minimize panel' });
       await waitFor(() => expect(dockedToggle).toHaveFocus());
     });
+  });
+});
+
+describe('DockPanel sheet header', () => {
+  const longTitle = 'A very long panel title that does not fit beside the header actions';
+
+  it('leaves the layout to Sheet, which keeps the header on one line', async () => {
+    render(
+      <DockPanel
+        title={longTitle}
+        labels={labels}
+        headerActions={<button type="button">Header action</button>}
+        mobile
+        onClose={jest.fn()}
+      >
+        Content
+      </DockPanel>
+    );
+    const dialog = await screen.findByRole('dialog', { name: longTitle });
+    const heading = within(dialog).getByRole('heading', { name: longTitle });
+    expect(heading.parentElement?.className).not.toMatch(/tedi-dock-panel/);
+    expect(heading).toHaveTextContent(longTitle);
+    expect(within(dialog).getByRole('button', { name: 'Header action' })).toBeVisible();
+    expect(within(dialog).getByRole('button', { name: 'Minimize panel' })).toBeVisible();
+    expect(within(dialog).getByRole('button', { name: 'Close panel' })).toBeVisible();
+  });
+});
+
+describe('DockPanel shortTitle', () => {
+  const fullTitle = 'Details of the selected item and its related documents';
+  const shortTitle = 'Item details';
+  let dockedSpace: number;
+  let sheetSpace: number;
+  let resizeCallbacks: Array<() => void>;
+
+  const rect = (width: number) =>
+    ({ width, height: 20, top: 0, left: 0, right: width, bottom: 20, x: 0, y: 0, toJSON: () => ({}) } as DOMRect);
+
+  const notifyResize = () => act(() => resizeCallbacks.forEach((callback) => callback()));
+
+  beforeEach(() => {
+    dockedSpace = 1000;
+    sheetSpace = 1000;
+    resizeCallbacks = [];
+    jest.spyOn(globalThis, 'ResizeObserver').mockImplementation((callback) => {
+      const observer: ResizeObserver = { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
+      resizeCallbacks.push(() => callback([], observer));
+      return observer;
+    });
+    const getBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      if (this.classList.contains('tedi-dock-panel__title-measure')) {
+        return rect((this.textContent ?? '').length * 10);
+      }
+      if (this.classList.contains('tedi-dock-panel__fitting-title')) {
+        return rect(this.closest('.tedi-dock-panel') ? dockedSpace : sheetSpace);
+      }
+      return getBoundingClientRect.call(this);
+    });
+  });
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it('renders the title without measuring when shortTitle is omitted', () => {
+    const { container } = render(
+      <DockPanel title={fullTitle} labels={labels} mobile={false}>
+        Content
+      </DockPanel>
+    );
+    expect(screen.getByRole('heading', { name: fullTitle })).toBeInTheDocument();
+    expect(container.querySelector('.tedi-dock-panel__fitting-title')).not.toBeInTheDocument();
+    expect(container.querySelector('.tedi-dock-panel__title-measure')).not.toBeInTheDocument();
+  });
+
+  it('shows the full title when it fits and hides the measuring copy from assistive technology', () => {
+    const { container } = render(
+      <DockPanel title={fullTitle} shortTitle={shortTitle} labels={labels} mobile={false}>
+        Content
+      </DockPanel>
+    );
+    expect(screen.getByRole('region', { name: fullTitle })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: fullTitle })).toBeInTheDocument();
+    expect(container.querySelector('.tedi-dock-panel__title-measure')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('switches between the short and full title as the docked space changes', () => {
+    dockedSpace = 300;
+    render(
+      <DockPanel title={fullTitle} shortTitle={shortTitle} labels={labels} mobile={false}>
+        Content
+      </DockPanel>
+    );
+    expect(screen.getByRole('region', { name: shortTitle })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: shortTitle })).toBeInTheDocument();
+
+    dockedSpace = 1000;
+    notifyResize();
+    expect(screen.getByRole('region', { name: fullTitle })).toBeInTheDocument();
+
+    dockedSpace = 300;
+    notifyResize();
+    expect(screen.getByRole('heading', { name: shortTitle })).toBeInTheDocument();
+  });
+
+  it('names the sheet with the visible short title', async () => {
+    sheetSpace = 300;
+    render(
+      <DockPanel title={fullTitle} shortTitle={shortTitle} labels={labels} mobile>
+        Content
+      </DockPanel>
+    );
+    const dialog = await screen.findByRole('dialog', { name: shortTitle });
+    expect(within(dialog).getByRole('heading', { name: shortTitle })).toBeInTheDocument();
+
+    sheetSpace = 1000;
+    notifyResize();
+    expect(screen.getByRole('dialog', { name: fullTitle })).toBeInTheDocument();
+  });
+
+  it('measures again when the presentation changes', async () => {
+    sheetSpace = 300;
+    const panel = () => (
+      <DockPanel title={fullTitle} shortTitle={shortTitle} labels={labels}>
+        Content
+      </DockPanel>
+    );
+    const { rerender } = render(panel());
+    expect(screen.getByRole('region', { name: fullTitle })).toBeInTheDocument();
+
+    mockUseBreakpoint.mockReturnValue('sm');
+    rerender(panel());
+    expect(await screen.findByRole('dialog', { name: shortTitle })).toBeInTheDocument();
+
+    mockUseBreakpoint.mockReturnValue('lg');
+    rerender(panel());
+    expect(await screen.findByRole('region', { name: fullTitle })).toBeInTheDocument();
+  });
+
+  it('measures again when the title changes', () => {
+    dockedSpace = 300;
+    const { rerender } = render(
+      <DockPanel title={fullTitle} shortTitle={shortTitle} labels={labels} mobile={false}>
+        Content
+      </DockPanel>
+    );
+    expect(screen.getByRole('heading', { name: shortTitle })).toBeInTheDocument();
+
+    rerender(
+      <DockPanel title="Declarations" shortTitle={shortTitle} labels={labels} mobile={false}>
+        Content
+      </DockPanel>
+    );
+    expect(screen.getByRole('heading', { name: 'Declarations' })).toBeInTheDocument();
+  });
+});
+
+describe('DockPanel presentation reporting', () => {
+  const rootMarker = () => document.documentElement.getAttribute('data-tedi-dock-panel-sheet');
+
+  it('reports the docked presentation once after mount', async () => {
+    const onPresentationChange = jest.fn();
+    render(
+      <DockPanel title="Details" labels={labels} onPresentationChange={onPresentationChange}>
+        Content
+      </DockPanel>
+    );
+    await waitFor(() => expect(onPresentationChange).toHaveBeenCalledWith('docked'));
+    expect(onPresentationChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports only the sheet presentation when mounting below md', async () => {
+    mockUseBreakpoint.mockReturnValue('sm');
+    const onPresentationChange = jest.fn();
+    render(
+      <DockPanel title="Details" labels={labels} onPresentationChange={onPresentationChange}>
+        Content
+      </DockPanel>
+    );
+    await waitFor(() => expect(onPresentationChange).toHaveBeenCalledWith('sheet'));
+    expect(onPresentationChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports breakpoint changes but not collapse changes', async () => {
+    const user = userEvent.setup();
+    const onPresentationChange = jest.fn();
+    const panel = () => (
+      <DockPanel title="Details" labels={labels} onPresentationChange={onPresentationChange}>
+        Content
+      </DockPanel>
+    );
+    const { rerender } = render(panel());
+    await waitFor(() => expect(onPresentationChange).toHaveBeenLastCalledWith('docked'));
+
+    mockUseBreakpoint.mockReturnValue('sm');
+    rerender(panel());
+    await waitFor(() => expect(onPresentationChange).toHaveBeenLastCalledWith('sheet'));
+
+    await user.click(await screen.findByRole('button', { name: 'Minimize panel' }));
+    await user.click(screen.getByRole('button', { name: 'Restore panel' }));
+
+    mockUseBreakpoint.mockReturnValue('lg');
+    rerender(panel());
+    await waitFor(() => expect(onPresentationChange).toHaveBeenLastCalledWith('docked'));
+    expect(onPresentationChange.mock.calls).toEqual([['docked'], ['sheet'], ['docked']]);
+  });
+
+  it('marks the document root only while a sheet is minimized', async () => {
+    const user = userEvent.setup();
+    const panel = () => (
+      <DockPanel title="Details" labels={labels}>
+        Content
+      </DockPanel>
+    );
+    const { rerender, unmount } = render(panel());
+    await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
+    expect(rootMarker()).toBeNull();
+
+    mockUseBreakpoint.mockReturnValue('sm');
+    rerender(panel());
+    await screen.findByRole('dialog', { name: 'Details' });
+    expect(rootMarker()).toBe('minimized');
+
+    await user.click(screen.getByRole('button', { name: 'Restore panel' }));
+    expect(rootMarker()).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Minimize panel' }));
+    expect(rootMarker()).toBe('minimized');
+
+    unmount();
+    expect(rootMarker()).toBeNull();
+  });
+
+  it('marks the document root on mount for a sheet that starts minimized', async () => {
+    mockUseBreakpoint.mockReturnValue('sm');
+    const { unmount } = render(
+      <DockPanel title="Details" labels={labels} defaultCollapsed>
+        Content
+      </DockPanel>
+    );
+    await screen.findByRole('dialog', { name: 'Details' });
+    expect(rootMarker()).toBe('minimized');
+    unmount();
+    expect(rootMarker()).toBeNull();
+  });
+
+  it('keeps the root marked while another sheet is still minimized', async () => {
+    const panels = (firstCollapsed: boolean, secondCollapsed: boolean) => (
+      <>
+        <DockPanel title="First" labels={labels} mobile collapsed={firstCollapsed}>
+          First content
+        </DockPanel>
+        <DockPanel title="Second" labels={labels} mobile collapsed={secondCollapsed}>
+          Second content
+        </DockPanel>
+      </>
+    );
+    const { rerender } = render(panels(true, true));
+    await screen.findByRole('dialog', { name: 'Second' });
+    expect(rootMarker()).toBe('minimized');
+
+    rerender(panels(false, true));
+    expect(rootMarker()).toBe('minimized');
+
+    rerender(panels(false, false));
+    expect(rootMarker()).toBeNull();
   });
 });

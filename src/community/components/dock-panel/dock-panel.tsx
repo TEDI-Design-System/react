@@ -26,6 +26,8 @@ import { Resizer } from '../map-components/resizer/resizer';
 import styles from './dock-panel.module.scss';
 
 export type DockPanelPlacement = 'left' | 'right' | 'top' | 'bottom';
+/** docked: the panel in its workspace; sheet: the TEDI Sheet fixed to the viewport. */
+export type DockPanelPresentation = 'docked' | 'sheet';
 export type DockPanelSize = 'default' | 'small';
 /** Percentages of the workspace dimension: xs=25%, sm=35%, md=50%, lg=65%, xl=80%. */
 export type DockPanelDimensionPreset = keyof typeof DIMENSION_PERCENTAGES;
@@ -74,6 +76,12 @@ export interface DockPanelLabels {
 export interface DockPanelProps {
   /** Visible heading and accessible name. */
   title: string;
+  /**
+   * Shown instead of title when the full title does not fit on one line in the current presentation.
+   * It is then the visible heading and accessible name. Truncated if it does not fit either.
+   * Re-measured when the title space or font changes.
+   */
+  shortTitle?: string;
   /** Text below the title, hidden while minimized. Omitted or empty text adds no spacing. */
   description?: string;
   /** Panel content, kept mounted while minimized. */
@@ -133,6 +141,12 @@ export interface DockPanelProps {
   onClose?: () => void;
   /** Content before the controls. Hidden but kept mounted while minimized. */
   headerActions?: ReactNode;
+  /**
+   * Receives the presentation after mount and whenever it changes.
+   * While the bottom sheet is minimized, DockPanel also sets data-tedi-dock-panel-sheet="minimized"
+   * on the html element, so layouts other than DockPanelLayout can reserve var(--sheet-header-height) in CSS.
+   */
+  onPresentationChange?: (presentation: DockPanelPresentation) => void;
   /** Content below the scroll area. Hidden but kept mounted while minimized. */
   footer?: ReactNode;
   /**
@@ -183,6 +197,71 @@ type DockPanelStyle = CSSProperties & {
 
 const subscribeToNothing = () => () => undefined;
 
+const MINIMIZED_SHEET_ATTRIBUTE = 'data-tedi-dock-panel-sheet';
+// Counted so one panel restoring doesn't clear the attribute while another sheet is still minimized.
+let minimizedSheetCount = 0;
+
+const useMinimizedSheetAttribute = (isMinimizedSheet: boolean) => {
+  useLayoutEffect(() => {
+    if (!isMinimizedSheet) return;
+    const root = document.documentElement;
+    minimizedSheetCount += 1;
+    root.setAttribute(MINIMIZED_SHEET_ATTRIBUTE, 'minimized');
+    return () => {
+      minimizedSheetCount -= 1;
+      if (minimizedSheetCount === 0) root.removeAttribute(MINIMIZED_SHEET_ATTRIBUTE);
+    };
+  }, [isMinimizedSheet]);
+};
+
+interface FittingTitleProps {
+  title: string;
+  shortTitle: string;
+  /** Changes when the presentation or minimized state may change the title's font or space. */
+  layoutKey: string;
+}
+
+// Measures the full title off screen, so growing space brings the full title back.
+const FittingTitle = ({ title, shortTitle, layoutKey }: FittingTitleProps): JSX.Element => {
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const [isShort, setIsShort] = useState(false);
+
+  // Layout effect: the full title never paints when it doesn't fit.
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const measure = measureRef.current;
+    if (!container || !measure) return;
+
+    const update = (): void => {
+      // Minimized side rails set the title vertically, so the available space is its height.
+      const isVertical = getComputedStyle(container).writingMode?.startsWith('vertical') ?? false;
+      const dimension = isVertical ? 'height' : 'width';
+      const available = container.getBoundingClientRect()[dimension];
+      const needed = measure.getBoundingClientRect()[dimension];
+      setIsShort(needed > available);
+    };
+
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(update);
+    observer.observe(container);
+    observer.observe(measure);
+    return () => observer.disconnect();
+  }, [title, shortTitle, layoutKey]);
+
+  return (
+    <span ref={containerRef} className={styles['tedi-dock-panel__fitting-title']}>
+      {isShort ? shortTitle : title}
+      <span ref={measureRef} aria-hidden="true" className={styles['tedi-dock-panel__title-measure']}>
+        {title}
+      </span>
+    </span>
+  );
+};
+FittingTitle.displayName = 'DockPanelFittingTitle';
+
 const useContentSlot = (content: ReactNode, inline: boolean) => {
   // Portals can't render on the server or during hydration.
   const isClient = useSyncExternalStore(
@@ -218,6 +297,7 @@ const useContentSlot = (content: ReactNode, inline: boolean) => {
 export const DockPanel = (props: DockPanelProps): JSX.Element => {
   const {
     title,
+    shortTitle,
     description,
     children,
     labels,
@@ -231,6 +311,7 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
     onCollapsedChange,
     onClose,
     headerActions,
+    onPresentationChange,
     footer,
     width,
     height,
@@ -292,6 +373,17 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
 
   const isMeasuring = resizable && !isMobile && !workspaceDimensions;
   const isCollapsed = !isMeasuring && (collapsed ?? internalCollapsed);
+  const presentation: DockPanelPresentation = isMobile ? 'sheet' : 'docked';
+
+  // Before mount the presentation is always docked, so only report it once the real one is known.
+  const reportedPresentation = useRef<DockPanelPresentation | undefined>(undefined);
+  useEffect(() => {
+    if (!hasMounted || reportedPresentation.current === presentation) return;
+    reportedPresentation.current = presentation;
+    onPresentationChange?.(presentation);
+  }, [hasMounted, presentation]);
+
+  useMinimizedSheetAttribute(isMobile && isCollapsed);
 
   // Floating UI re-runs its focus effect if this flips sign, so resolve it once.
   // A panel that has been docked on screen swaps rather than opens, so the Sheet leaves focus alone.
@@ -401,6 +493,11 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
   const toggleButtonIcon = isCollapsed ? 'zoom_out_map' : 'zoom_in_map';
   const hasHeaderActions = headerActions !== null && headerActions !== undefined && typeof headerActions !== 'boolean';
   const hasFooter = footer !== null && footer !== undefined && typeof footer !== 'boolean';
+  const titleContent = shortTitle ? (
+    <FittingTitle title={title} shortTitle={shortTitle} layoutKey={`${presentation}-${isCollapsed}`} />
+  ) : (
+    title
+  );
 
   const panel = (
     <div
@@ -423,7 +520,7 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
             modifiers={isCollapsed ? 'small' : undefined}
             className={styles['tedi-dock-panel__title']}
           >
-            {title}
+            {titleContent}
           </Heading>
 
           {hasHeaderActions && (
@@ -495,10 +592,9 @@ export const DockPanel = (props: DockPanelProps): JSX.Element => {
         style={style}
       >
         <Sheet.Header
-          title={title}
+          title={titleContent}
           headingLevel={titleElement}
           variant="default"
-          className={hasHeaderActions && !isCollapsed ? styles['tedi-dock-panel__sheet-header'] : undefined}
           closeButton={false}
           endSlot={
             hasHeaderActions && (
