@@ -27,7 +27,7 @@ assignees: ''
 - [ ] The component has **unit tests** with at least **80% code coverage** _(enforced by the global Jest `coverageThreshold` over `src/tedi/components`, not per component)_
 - [ ] CodeCov passes its threshold _(80% on the changed code, with 10% tolerance — a separate gate from the Jest one above)_
 - [ ] The component has passed **code review**
-- [ ] **The Angular library is checked**: if the same component exists in Angular and needs the same change, an issue is created there and linked in the PR
+- [ ] **The other TEDI libraries are checked**: if the same component exists in another TEDI library and needs the same change, an issue is created there and linked in the PR
 - [ ] The component has passed **Chromatic visual review**
 - [ ] The component has passed the **automated accessibility tests** _(axe checks on the Storybook stories, run in CI)_
 - [ ] The component has been manually tested against **WCAG 2.2 AA** _(see [Ligipääsetavus](https://www.tedi.ee/1ee8444b7/p/33df89-sissejuhatus/b/05a2e8))_
