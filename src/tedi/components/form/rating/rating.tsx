@@ -140,6 +140,11 @@ export const Rating = (props: RatingProps): JSX.Element => {
 
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const interactive = !disabled && !readOnly;
+
+  // The items' `onMouseLeave` can't fire once readOnly unmounts them, so drop a stale preview here.
+  useEffect(() => {
+    if (!interactive) setHoverValue(null);
+  }, [interactive]);
   const isHovering = interactive && hoverValue !== null;
   const displayValue = isHovering ? (hoverValue as number) : currentValue;
 

@@ -175,6 +175,17 @@ describe('Rating', () => {
       expect(items.map(isSelected)).toEqual([false, false, true, false, false]);
     });
 
+    it('drops the preview when readOnly unmounts the hovered item', () => {
+      const { container, rerender } = render(<Rating label="Feedback" count={5} defaultValue={1} />);
+      fireEvent.mouseEnter(screen.getByRole('radio', { name: '4/5' }).closest('label') as HTMLElement);
+
+      rerender(<Rating label="Feedback" count={5} defaultValue={1} readOnly />);
+      rerender(<Rating label="Feedback" count={5} defaultValue={1} />);
+
+      expect(visuals(container).some(isHovered)).toBe(false);
+      expect(visuals(container).map(isSelected)).toEqual([true, false, false, false, false]);
+    });
+
     it('does not preview while disabled', () => {
       const { container } = render(<Rating label="Feedback" count={5} disabled />);
       fireEvent.mouseEnter(screen.getByRole('radio', { name: '3/5' }).closest('label') as HTMLElement);
