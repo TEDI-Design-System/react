@@ -1,3 +1,10 @@
+# [21.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.10...react-21.0.0-rc.11) (2026-11-16)
+
+
+### Bug Fixes
+
+* **select:** keep select working on touch inside shadow dom [#1081](https://github.com/TEDI-Design-System/react/issues/1081) ([#1098](https://github.com/TEDI-Design-System/react/issues/1098)) ([66a1ada](https://github.com/TEDI-Design-System/react/commit/66a1ada2cd34b86ac9750ca2e14c958cf729a3f2))
+
 # [21.0.0-rc.10](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.9...react-21.0.0-rc.10) (2026-11-16)
 
 
