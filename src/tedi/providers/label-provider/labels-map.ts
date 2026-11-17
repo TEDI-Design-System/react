@@ -1443,29 +1443,25 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Нижний колонтитул',
   },
   'numberField.decrement': {
-    description: 'Label for screen-reader for number field decrease button. Second argument is the field label.',
+    description: 'Label for screen-reader for number field decrease button',
     components: ['NumberField'],
-    et: (count: string | number, field?: string) =>
-      field ? `Vähenda välja "${field}" ${count} võrra` : `Vähenda ${count} võrra`,
-    en: (count: string | number, field?: string) => (field ? `Decrease ${field} by ${count}` : `Decrease by ${count}`),
-    ru: (count: string | number, field?: string) =>
-      field ? `Уменьшить «${field}» на ${count}` : `Уменьшить на ${count}`,
+    et: (_count: string | number, _field?: string) => 'Vähenda',
+    en: (_count: string | number, _field?: string) => 'Decrease',
+    ru: (_count: string | number, _field?: string) => 'Уменьшить',
   },
   'numberField.increment': {
-    description: 'Label for screen-reader for number field increase button. Second argument is the field label.',
+    description: 'Label for screen-reader for number field increase button',
     components: ['NumberField'],
-    et: (count: string | number, field?: string) =>
-      field ? `Suurenda välja "${field}" ${count} võrra` : `Suurenda ${count} võrra`,
-    en: (count: string | number, field?: string) => (field ? `Increase ${field} by ${count}` : `Increase by ${count}`),
-    ru: (count: string | number, field?: string) =>
-      field ? `Увеличить «${field}» на ${count}` : `Увеличить на ${count}`,
+    et: (_count: string | number, _field?: string) => 'Suurenda',
+    en: (_count: string | number, _field?: string) => 'Increase',
+    ru: (_count: string | number, _field?: string) => 'Увеличить',
   },
   'numberField.quantityUpdated': {
     description: 'Label for screen-reader when quantity get updated by button click',
     components: ['NumberField'],
-    et: (count: string | number) => `Uuendatud. Uus väärtus ${count}`,
-    en: (count: string | number) => `Updated. New value ${count}`,
-    ru: (count: string | number) => `Обновлено. Новое значение ${count}`,
+    et: (count: string | number, suffix?: string) => (suffix ? `${count} ${suffix}` : `${count}`),
+    en: (count: string | number, suffix?: string) => (suffix ? `${count} ${suffix}` : `${count}`),
+    ru: (count: string | number, suffix?: string) => (suffix ? `${count} ${suffix}` : `${count}`),
   },
   'sidenav.backToMainMenu': {
     description: 'Side navigation label',

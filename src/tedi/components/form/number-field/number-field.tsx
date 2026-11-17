@@ -197,11 +197,11 @@ export const NumberField = (props: NumberFieldProps) => {
   useEffect(() => {
     if (prevValueRef.current !== currentValue) {
       if (!isFocusedRef.current && currentValue !== undefined) {
-        announce(getLabel('numberField.quantityUpdated', currentValue));
+        announce(getLabel('numberField.quantityUpdated', currentValue, suffix));
       }
       prevValueRef.current = currentValue;
     }
-  }, [currentValue, announce, getLabel]);
+  }, [currentValue, suffix, announce, getLabel]);
 
   const roundValue = (currentValue: number) => {
     return decimalPlaces !== undefined ? parseFloat(currentValue.toFixed(decimalPlaces)) : currentValue;
@@ -272,10 +272,7 @@ export const NumberField = (props: NumberFieldProps) => {
       [styles['tedi-number-field__button--disabled']]: isOnOrOutOfBounds || disabled,
     });
 
-    // Include the field's name so the button is self-describing out of context,
-    // e.g. "Decrease Label by 1" rather than a bare "Decrease by 1".
-    const fieldName = typeof label === 'string' ? label : undefined;
-    const changeValue = getLabel(`numberField.${direction}`, step, fieldName);
+    const changeValue = getLabel(`numberField.${direction}`, step);
 
     return (
       <Button
