@@ -111,7 +111,9 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
 
   const renderValue =
     showValue && valuePosition === 'horizontal' ? (
-      <span className={styles['tedi-progress-bar__value']}>{displayValue}</span>
+      <span className={styles['tedi-progress-bar__value']} aria-hidden="true">
+        {displayValue}
+      </span>
     ) : null;
 
   const bar = (
@@ -149,7 +151,11 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
         {helper ? (
           <FeedbackText {...helper} id={helperId} className={cn(styles['tedi-progress-bar__hint'], helper.className)} />
         ) : null}
-        {hasValueBelow ? <span className={styles['tedi-progress-bar__value']}>{displayValue}</span> : null}
+        {hasValueBelow ? (
+          <span className={styles['tedi-progress-bar__value']} aria-hidden="true">
+            {displayValue}
+          </span>
+        ) : null}
       </div>
     ) : null;
 
