@@ -40,7 +40,7 @@ export interface PaginationPageSizeOption {
 export interface PaginationLabels {
   /**
    * Accessible label for the nav wrapper.
-   * @default 'Pagination'
+   * @default 'Pages'
    */
   ariaLabel: string;
   /**
@@ -54,13 +54,14 @@ export interface PaginationLabels {
    */
   next: string;
   /**
-   * Function that builds the aria-label for a numeric page button.
-   * @default (page) => `Go to page ${page}`
+   * Function that builds the aria-label for a numeric page button. The current page also gets `aria-current="page"`.
+   * @default (page) => `Page ${page}`
    */
   pageAriaLabel: (page: number) => string;
   /**
-   * Function that builds the aria-label for the currently active page.
-   * @default (page) => `Current page, page ${page}`
+   * Function that builds the aria-label for the current page.
+   * @default pageAriaLabel
+   * @deprecated The current page is conveyed by `aria-current="page"`; a different label makes screen readers announce it twice. Use `pageAriaLabel`.
    */
   currentPageAriaLabel: (page: number) => string;
   /**
@@ -269,20 +270,20 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>((props, re
   const breakpoint = useBreakpoint();
   const useCompactPicker = isBreakpointBelow(breakpoint, 'md');
 
-  const mergedLabels = useMemo<PaginationLabels>(
-    () => ({
+  const mergedLabels = useMemo<PaginationLabels>(() => {
+    const pageAriaLabel = labels?.pageAriaLabel ?? ((pageNumber: number) => getLabel('pagination.page', pageNumber));
+    return {
       ariaLabel: getLabel('pagination.title'),
       previous: getLabel('pagination.prev-page'),
       next: getLabel('pagination.next-page'),
-      pageAriaLabel: (pageNumber) => getLabel('pagination.page', pageNumber, false),
-      currentPageAriaLabel: (pageNumber) => getLabel('pagination.page', pageNumber, true),
+      pageAriaLabel,
+      currentPageAriaLabel: pageAriaLabel,
       results: (count) => getLabel('pagination.results', count),
       pageSize: getLabel('pagination.page-size'),
       pageStatus: (current, total) => getLabel('pagination.page-status', current, total),
       ...labels,
-    }),
-    [getLabel, labels]
-  );
+    };
+  }, [getLabel, labels]);
 
   const [uncontrolledPage, setUncontrolledPage] = useState<number>(defaultPage);
   const rawPage = page ?? uncontrolledPage;

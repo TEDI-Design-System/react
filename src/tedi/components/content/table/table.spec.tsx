@@ -29,14 +29,14 @@ jest.mock('../../../providers/label-provider', () => ({
     getLabel: (key: string, ...args: unknown[]) => {
       switch (key) {
         case 'pagination.title':
-          return 'Pagination';
+          return 'Pages';
         case 'pagination.prev-page':
           return 'Previous page';
         case 'pagination.next-page':
           return 'Next page';
         case 'pagination.page': {
-          const [page, isCurrent] = args as [number, boolean];
-          return isCurrent ? `Current page, page ${page}` : `Go to page ${page}`;
+          const [page] = args as [number];
+          return `Page ${page}`;
         }
         case 'pagination.results': {
           const [count] = args as [number];
@@ -318,7 +318,7 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Anna' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
 
       expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
@@ -353,7 +353,7 @@ describe('Table', () => {
     it('keeps the current page across data changes when autoResetPageIndex is false', () => {
       render(<EditableHarness autoResetPageIndex={false} />);
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
 
       // Same save, but the user stays on page 2 with the saved value.
@@ -378,7 +378,7 @@ describe('Table', () => {
       scroll.scrollTop = 120;
       expect(scroll.scrollTop).toBe(120);
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
 
       expect(scroll.scrollTop).toBe(0);
     });
@@ -938,8 +938,8 @@ describe('Table', () => {
     it('renders the pagination bar with the next button and current page marker', () => {
       render(<Table<Person> id="t-page" data={many} columns={columns} pagination={{ pageSize: 3 }} />);
 
-      expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Current page, page 1/i })).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByRole('navigation', { name: 'Pages' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 1' })).toHaveAttribute('aria-current', 'page');
       // The Table does not set `showPrevNextButtons`, so the disabled Previous arrow is
       // dropped on the first page (compact default); only the enabled Next arrow renders.
       expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
@@ -953,12 +953,12 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Person 1' })).toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Next page/i }));
-      expect(screen.getByRole('button', { name: /Current page, page 2/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Person 4' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Person 1' })).not.toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Previous page/i }));
-      expect(screen.getByRole('button', { name: /Current page, page 1/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Person 1' })).toBeInTheDocument();
     });
 
@@ -1003,7 +1003,7 @@ describe('Table', () => {
 
     it('omits the pagination bar when pagination is not enabled', () => {
       render(<Table<Person> id="t-no-page" data={data} columns={columns} />);
-      expect(screen.queryByRole('navigation', { name: /Pagination/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('navigation', { name: 'Pages' })).not.toBeInTheDocument();
     });
   });
 

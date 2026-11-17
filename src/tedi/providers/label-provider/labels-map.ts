@@ -1065,17 +1065,16 @@ export const labelsMap = validateDefaultLabels({
   'pagination.title': {
     description: 'Label of the pagination',
     components: ['Table', 'Pagination'],
-    et: 'Pagineerimine',
-    en: 'Pagination',
+    et: 'Lehed',
+    en: 'Pages',
     ru: 'Страницы',
   },
   'pagination.page': {
-    description: 'Label of individual page numbers',
+    description: 'Label of individual page numbers. The current page is conveyed by `aria-current`, not by the label.',
     components: ['Table', 'Pagination'],
-    et: (page: number, isCurrent?: boolean) => (isCurrent ? `Aktiivne leht, leht ${page}` : `Mine lehele ${page}`),
-    en: (page: number, isCurrent?: boolean) => (isCurrent ? `Current page, page ${page}` : `Go to page ${page}`),
-    ru: (page: number, isCurrent?: boolean) =>
-      isCurrent ? `Текущая страница, страница ${page}` : `Перейти на страницу ${page}`,
+    et: (page: number) => `Leht ${page}`,
+    en: (page: number) => `Page ${page}`,
+    ru: (page: number) => `Страница ${page}`,
   },
   'pagination.prev-page': {
     description: 'Previous page button label',
@@ -1110,7 +1109,7 @@ export const labelsMap = validateDefaultLabels({
     description:
       'Status message announced to screen readers via an aria-live region when the page changes. Receives the current page number and total page count.',
     components: ['Pagination'],
-    et: (page?: number, total?: number) => `Lehekülg ${page ?? 0} / ${total ?? 0}`,
+    et: (page?: number, total?: number) => `Leht ${page ?? 0} / ${total ?? 0}`,
     en: (page?: number, total?: number) => `Page ${page ?? 0} of ${total ?? 0}`,
     ru: (page?: number, total?: number) => `Страница ${page ?? 0} из ${total ?? 0}`,
   },
