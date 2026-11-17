@@ -1062,6 +1062,13 @@ export const labelsMap = validateDefaultLabels({
     en: 'Show tooltip',
     ru: 'Показать подсказку',
   },
+  'toast.region': {
+    description: 'Accessible name of the toast notifications region',
+    components: ['ToastContainer'],
+    et: 'Teavitused',
+    en: 'Notifications',
+    ru: 'Уведомления',
+  },
   'pagination.title': {
     description: 'Label of the pagination',
     components: ['Table', 'Pagination'],

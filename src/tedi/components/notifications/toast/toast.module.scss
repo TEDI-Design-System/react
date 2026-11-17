@@ -3,6 +3,10 @@
   --toastify-color-progress-light: transparent !important;
 }
 
+.tedi-toast-container {
+  display: contents;
+}
+
 .tedi-toast {
   display: block;
   width: 100%;
