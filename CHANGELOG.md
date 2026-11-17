@@ -1,3 +1,10 @@
+# [21.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.15...react-21.0.0-rc.16) (2026-11-17)
+
+
+### Bug Fixes
+
+* **mobile-nav:** trap focus and close on Escape in the open menu [#1102](https://github.com/TEDI-Design-System/react/issues/1102) ([#1153](https://github.com/TEDI-Design-System/react/issues/1153)) ([4011c40](https://github.com/TEDI-Design-System/react/commit/4011c4021796665898e29b3e79c22bb58e6dbe4e))
+
 # [21.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.14...react-21.0.0-rc.15) (2026-11-17)
 
 
