@@ -80,7 +80,8 @@ describe('ClosingButton component', () => {
 
     const button = screen.getByRole('button', { name: /close/i });
     expect(button).toHaveAttribute('title', 'Close');
-    expect(button).toHaveAttribute('aria-label', 'Close');
+    expect(button).not.toHaveAttribute('aria-label');
+    expect(button).toHaveAccessibleName('Close');
   });
 
   it('uses custom title if provided', () => {
@@ -88,7 +89,28 @@ describe('ClosingButton component', () => {
 
     const button = screen.getByRole('button', { name: /Custom Close/i });
     expect(button).toHaveAttribute('title', 'Custom Close');
-    expect(button).toHaveAttribute('aria-label', 'Custom Close');
+    expect(button).not.toHaveAttribute('aria-label');
+    expect(button).toHaveAccessibleName('Custom Close');
+  });
+
+  it('uses a consumer aria-label as the name and drops the title', () => {
+    render(<ClosingButton aria-label="Remove" />);
+
+    const button = screen.getByRole('button', { name: 'Remove' });
+    expect(button).not.toHaveAttribute('title');
+    expect(button).toHaveAccessibleName('Remove');
+    expect(button).not.toHaveAccessibleDescription();
+  });
+
+  it('keeps a consumer aria-describedby as the description', () => {
+    render(
+      <>
+        <span id="alert-title">Saved</span>
+        <ClosingButton aria-describedby="alert-title" />
+      </>
+    );
+
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveAccessibleDescription('Saved');
   });
 
   it('applies the correct color classes', () => {

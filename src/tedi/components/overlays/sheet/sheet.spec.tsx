@@ -757,7 +757,7 @@ describe('Sheet', () => {
     const header = screen.getByRole('heading', { name: 'Layers' }).parentElement as HTMLElement;
     const buttons = within(header)
       .getAllByRole('button')
-      .map((button) => button.getAttribute('aria-label') ?? button.textContent);
+      .map((button) => button.getAttribute('aria-label') ?? button.getAttribute('title') ?? button.textContent);
     expect(buttons).toEqual(['Mocked label: sheet.collapse', 'Fullscreen', 'Close']);
     const end = screen.getByText('End content');
     const collapse = screen.getByRole('button', { name: 'Mocked label: sheet.collapse' });
