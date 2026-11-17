@@ -139,6 +139,12 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   helper?: FeedbackTextProps;
   /**
+   * Space-separated ids of elements rendered outside the select (for example the
+   * application's own error message) that describe the combobox. Listed before the
+   * helper id.
+   */
+  'aria-describedby'?: string;
+  /**
    * Visual size variant.
    * - omit — default (40px tall).
    * - `"small"` — compact (32px tall) for dense layouts.
@@ -453,6 +459,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       className,
       hideLabel = false,
       helper,
+      'aria-describedby': ariaDescribedBy,
       placeholder,
       invalid,
       valid,
@@ -505,6 +512,8 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const containerId = shouldHideLabel ? `${resolvedId}-container` : resolvedId;
 
     const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
+    const describedBy =
+      [...new Set([...(ariaDescribedBy?.split(/\s+/) ?? []), helperId].filter(Boolean))].join(' ') || undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
     const { getLabel } = useLabels();
 
@@ -774,7 +783,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           exitKeyboardMode={exitKeyboardMode}
           onKeyDown={handleSelectKeyDown}
           id={containerId}
-          aria-describedby={helperId}
+          aria-describedby={describedBy}
           autoFocus={autoFocus}
           ref={element}
           instanceId={resolvedId}

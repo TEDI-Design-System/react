@@ -846,6 +846,48 @@ describe('Select component', () => {
       expect(combobox.getAttribute('aria-describedby') ?? '').not.toMatch(/-placeholder/);
     });
 
+    it('lists external aria-describedby ids on the combobox', () => {
+      render(
+        <>
+          <p id="external-error">Pick a fruit</p>
+          <Select {...defaultProps} aria-describedby="external-error" />
+        </>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox.getAttribute('aria-describedby')).toBe('external-error');
+      expect(combobox).toHaveAccessibleDescription('Pick a fruit');
+    });
+
+    it('lists external aria-describedby ids before the helper id', () => {
+      render(
+        <Select
+          {...defaultProps}
+          aria-describedby="external-error other"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')).toBe('external-error other fruit-help');
+    });
+
+    it('does not repeat an external id that is also the helper id', () => {
+      render(
+        <Select
+          {...defaultProps}
+          aria-describedby="fruit-help"
+          helper={{ id: 'fruit-help', text: 'Only ripe fruit', type: 'error' }}
+        />
+      );
+
+      expect(screen.getByRole('combobox').getAttribute('aria-describedby')).toBe('fruit-help');
+    });
+
+    it('has no aria-describedby without external ids or helper', () => {
+      render(<Select {...defaultProps} />);
+      expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-describedby');
+    });
+
     it('gives each tag remove button an accessible name including the option label', () => {
       render(<Select {...defaultProps} multiple value={[{ value: 'apple', label: 'Apple' }]} isTagRemovable />);
       expect(screen.getByRole('button', { name: /remove Apple/i })).toBeInTheDocument();
