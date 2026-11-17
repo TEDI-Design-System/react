@@ -223,25 +223,25 @@ export const WithErrors: Story = {
 export const WithDescriptions: Story = {
   render: () => (
     <VerticalSpacing size={1}>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Kutse aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 1)" compact="lg">
         <HorizontalStepper.Item label="Kutse" selected />
         <HorizontalStepper.Item label="Tahteavaldus" />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Tahteavaldus aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 2)" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" selected />
         <HorizontalStepper.Item label="Geenianalüüs" description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Geenianalüüs aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 3)" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" selected description="Ametnik täidab" />
         <HorizontalStepper.Item label="Vastus" description="Ametnik täidab" />
       </HorizontalStepper>
-      <HorizontalStepper aria-label="Sammud kirjeldustega – Vastus aktiivne" compact="lg">
+      <HorizontalStepper aria-label="Sammud kirjeldustega (samm 4)" compact="lg">
         <HorizontalStepper.Item label="Kutse" completed />
         <HorizontalStepper.Item label="Tahteavaldus" completed />
         <HorizontalStepper.Item label="Geenianalüüs" completed description="Ametnik täidab" />

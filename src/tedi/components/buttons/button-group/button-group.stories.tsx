@@ -24,7 +24,7 @@ const buttonStates = ['Default', 'Hover', 'Active', 'Focus', 'Disabled'];
 const sizeArray: ButtonGroupProps['size'][] = ['default', 'small'];
 
 const Template: StoryFn<ButtonGroupProps> = (args) => (
-  <ButtonGroup {...args} ariaLabel="Button group example">
+  <ButtonGroup {...args} ariaLabel="Sections">
     <Button id="1">Details</Button>
     <Button id="2" isActive>
       Updates
@@ -69,7 +69,7 @@ const TemplateTypes: StoryFn<typeof Button> = (args) => {
   return (
     <Row gutterY={2}>
       <Col md={12}>
-        <ButtonGroup type="primary" stretch={false} ariaLabel="Button group example">
+        <ButtonGroup type="primary" stretch={false} ariaLabel="Sections">
           <Button id="1" {...args}>
             Tab 1
           </Button>
@@ -181,7 +181,7 @@ const TemplateColumn: StoryFn<{ states: string[]; type: 'primary' | 'secondary' 
             <strong>{state}</strong>
           </Col>
           <Col lg={6} md={10} sm={10}>
-            <ButtonGroup type={args.type} onSelectionChange={setSelectedId} ariaLabel="Button group example">
+            <ButtonGroup type={args.type} onSelectionChange={setSelectedId} ariaLabel="Sections">
               <Button
                 id={`${state}-${args.type}`}
                 isActive={state === 'Active' || selectedId === `${state}-1-${args.type}`}
@@ -243,7 +243,7 @@ export const DifferentWidthButtons: Story = {
             {...args}
             stretch={false}
             onSelectionChange={setSelectedId}
-            ariaLabel="Button group example"
+            ariaLabel="Sections"
             enableMobileDropdown
           >
             <Button id="1" isActive={selectedId === '1'} onClick={() => setSelectedId('1')}>

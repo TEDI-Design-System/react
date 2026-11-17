@@ -72,12 +72,12 @@ const MatrixTable = ({ rows }: { rows: MatrixRow[] }): JSX.Element => {
 };
 
 export const Default: Story = {
-  args: { value: 60, ariaLabel: 'Edenemisriba pealkiri' },
+  args: { value: 60, ariaLabel: 'Faili üleslaadimine' },
 };
 
 const sizeRows: MatrixRow[] = [
-  { lines: ['Default'], props: { value: 20, ariaLabel: 'Edenemisriba pealkiri', helper: HINT } },
-  { lines: ['Small'], props: { value: 20, small: true, ariaLabel: 'Edenemisriba pealkiri', helper: HINT } },
+  { lines: ['Default'], props: { value: 20, ariaLabel: 'Faili üleslaadimine', helper: HINT } },
+  { lines: ['Small'], props: { value: 20, small: true, ariaLabel: 'Faili üleslaadimine', helper: HINT } },
 ];
 
 export const Sizes: Story = {
@@ -85,8 +85,8 @@ export const Sizes: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<ProgressBar value={20} ariaLabel="Edenemisriba pealkiri" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} small ariaLabel="Edenemisriba pealkiri" helper={{ text: 'Üleslaadimine', type: 'hint' }} />`,
+        code: `<ProgressBar value={20} ariaLabel="Faili üleslaadimine" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
+<ProgressBar value={20} small ariaLabel="Faili üleslaadimine" helper={{ text: 'Üleslaadimine', type: 'hint' }} />`,
       },
     },
   },
@@ -97,7 +97,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Top title', 'Horizontal value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'horizontal',
@@ -108,7 +108,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Top title', 'Bottom value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'bottom',
@@ -119,7 +119,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Horizontal title', 'Horizontal value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'horizontal',
@@ -131,7 +131,7 @@ const positionRows: MatrixRow[] = [
     lines: ['Horizontal title', 'Bottom value', 'Bottom hint'],
     props: {
       value: 20,
-      label: 'Edenemisriba pealkiri',
+      label: 'Faili üleslaadimine',
       required: true,
       labelPosition: 'top',
       valuePosition: 'bottom',
@@ -146,10 +146,10 @@ export const Position: Story = {
   parameters: {
     docs: {
       source: {
-        code: `<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />
-<ProgressBar value={20} label="Edenemisriba pealkiri" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />`,
+        code: `<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
+<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} />
+<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="horizontal" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />
+<ProgressBar value={20} label="Faili üleslaadimine" required labelPosition="top" valuePosition="bottom" helper={{ text: 'Üleslaadimine', type: 'hint' }} md={{ labelPosition: 'horizontal' }} />`,
       },
     },
   },
@@ -186,17 +186,17 @@ export const WithLabel: Story = {
 export const Regular: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '720px' }}>
-      <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" />
-      <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valueLabel="1 / 5" />
-      <ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valuePosition="bottom" />
+      <ProgressBar value={40} ariaLabel="Faili üleslaadimine" />
+      <ProgressBar value={40} ariaLabel="Faili üleslaadimine" valueLabel="1 / 5" />
+      <ProgressBar value={40} ariaLabel="Faili üleslaadimine" valuePosition="bottom" />
     </div>
   ),
   parameters: {
     docs: {
       source: {
-        code: `<ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" />
-<ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valueLabel="1 / 5" />
-<ProgressBar value={40} ariaLabel="Edenemisriba pealkiri" valuePosition="bottom" />`,
+        code: `<ProgressBar value={40} ariaLabel="Faili üleslaadimine" />
+<ProgressBar value={40} ariaLabel="Faili üleslaadimine" valueLabel="1 / 5" />
+<ProgressBar value={40} ariaLabel="Faili üleslaadimine" valuePosition="bottom" />`,
       },
     },
   },
@@ -205,7 +205,7 @@ export const Regular: Story = {
 export const WithHint: Story = {
   args: {
     value: 40,
-    ariaLabel: 'Edenemisriba pealkiri',
+    ariaLabel: 'Faili üleslaadimine',
     helper: HINT,
   },
 };
@@ -216,7 +216,7 @@ export const WithHint: Story = {
 export const WithError: Story = {
   args: {
     value: 40,
-    ariaLabel: 'Edenemisriba pealkiri',
+    ariaLabel: 'Faili üleslaadimine',
     helper: { text: 'Üleslaadimine ebaõnnestus, fail on liiga suur', type: 'error' },
   },
 };
@@ -224,7 +224,7 @@ export const WithError: Story = {
 export const ValueHidden: Story = {
   args: {
     value: 60,
-    ariaLabel: 'Edenemisriba pealkiri',
+    ariaLabel: 'Faili üleslaadimine',
     showValue: false,
   },
 };
@@ -232,7 +232,7 @@ export const ValueHidden: Story = {
 export const Responsive: Story = {
   args: {
     value: 40,
-    label: 'Edenemisriba pealkiri',
+    label: 'Faili üleslaadimine',
     labelPosition: 'top',
     valuePosition: 'bottom',
     helper: HINT,

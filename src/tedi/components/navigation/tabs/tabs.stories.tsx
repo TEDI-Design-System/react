@@ -90,7 +90,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
 export const Default: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Tervise sakid">
+      <Tabs.List aria-label="Terviseandmed">
         <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
         <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
         <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
@@ -117,7 +117,7 @@ export const Default: Story = {
 export const WithIcons: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Ikoonidega sakid">
+      <Tabs.List aria-label="Vaade">
         <Tabs.Trigger id="tab-1" icon="table_chart">
           Tabel
         </Tabs.Trigger>
@@ -142,7 +142,7 @@ export const WithIcons: Story = {
 export const WithStatusBadge: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Olekumärgisega sakid">
+      <Tabs.List aria-label="Terviseandmed">
         <Tabs.Trigger id="tab-1">
           <Ellipsis lineClamp={1} popover={true}>
             Terviseteekond
@@ -202,7 +202,7 @@ export const Controlled: Story = {
           Current tab: <strong>{currentTab}</strong>
         </p>
         <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tabs.List aria-label="Juhitavad sakid">
+          <Tabs.List aria-label="Terviseandmed">
             <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
             <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
             <Tabs.Trigger id="tab-3">Ravimite ajalugu</Tabs.Trigger>
@@ -225,7 +225,7 @@ export const Controlled: Story = {
 export const WithDisabledTab: Story = {
   render: () => (
     <Tabs defaultValue="tab-1">
-      <Tabs.List aria-label="Keelatud sakiga sakid">
+      <Tabs.List aria-label="Terviseandmed">
         <Tabs.Trigger id="tab-1">Terviseteekond</Tabs.Trigger>
         <Tabs.Trigger id="tab-2">Haiguste kulg</Tabs.Trigger>
         <Tabs.Trigger id="tab-3" disabled>
@@ -257,7 +257,7 @@ export const OverflowBehavior: Story = {
       <Text modifiers="bold">Dropdown (default)</Text>
       <div style={{ maxWidth: 400 }}>
         <Tabs defaultValue="more-1">
-          <Tabs.List aria-label="Ületäituvad sakid rippmenüüga">
+          <Tabs.List aria-label="Terviseandmed">
             <Tabs.Trigger id="more-1">Terviseteekond</Tabs.Trigger>
             <Tabs.Trigger id="more-2">Haiguste kulg</Tabs.Trigger>
             <Tabs.Trigger id="more-3">Ravimite ajalugu</Tabs.Trigger>
@@ -288,7 +288,7 @@ export const OverflowBehavior: Story = {
       <Text modifiers="bold">Horizontal scroll</Text>
       <div style={{ maxWidth: 400 }}>
         <Tabs defaultValue="scroll-1">
-          <Tabs.List aria-label="Ületäituvad sakid kerimisega" overflowMode="scroll">
+          <Tabs.List aria-label="Terviseandmed" overflowMode="scroll">
             <Tabs.Trigger id="scroll-1">Terviseteekond</Tabs.Trigger>
             <Tabs.Trigger id="scroll-2">Haiguste kulg</Tabs.Trigger>
             <Tabs.Trigger id="scroll-3">Ravimite ajalugu</Tabs.Trigger>
@@ -338,7 +338,7 @@ export const WithSubTabs: Story = {
 
     return (
       <Tabs defaultValue="tab-3">
-        <Tabs.List aria-label="Töötervishoiu ja -ohutuse sakid">
+        <Tabs.List aria-label="Töötervishoid ja -ohutus">
           <Tabs.Trigger id="tab-1">Käimasolevad menetlused</Tabs.Trigger>
           <Tabs.Trigger id="tab-2">Planeeritavad menetlused</Tabs.Trigger>
           <Tabs.Trigger id="tab-3">Õnnetused ja haigused</Tabs.Trigger>
@@ -359,7 +359,7 @@ export const WithSubTabs: Story = {
             <VerticalSpacing size={1.5}>
               <ButtonGroup
                 type="secondary"
-                ariaLabel="Õnnetuste ja haiguste alamnavigatsioon"
+                ariaLabel="Õnnetused ja haigused"
                 enableMobileDropdown
                 onSelectionChange={setActiveSubTab}
               >
