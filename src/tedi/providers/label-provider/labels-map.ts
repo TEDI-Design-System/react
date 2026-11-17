@@ -677,20 +677,6 @@ export const labelsMap = validateDefaultLabels({
     en: 'Select row',
     ru: 'Выбрать строку',
   },
-  'table.expand-row': {
-    description: 'Accessible label on the expand toggle in expandable rows.',
-    components: ['Table'],
-    et: 'Laienda rida',
-    en: 'Expand row',
-    ru: 'Развернуть строку',
-  },
-  'table.collapse-row': {
-    description: 'Accessible label on the collapse toggle in expandable rows.',
-    components: ['Table'],
-    et: 'Ahenda rida',
-    en: 'Collapse row',
-    ru: 'Свернуть строку',
-  },
   'table.filter-placeholder': {
     description: 'Placeholder for the per-column filter inputs rendered under the header.',
     components: ['Table'],
@@ -706,7 +692,7 @@ export const labelsMap = validateDefaultLabels({
     ru: (columnLabel?: string) => `Фильтр ${columnLabel ?? ''}`.trim(),
   },
   'table.row-details': {
-    description: 'Accessible label for the sub-component / disclosure panel of an expanded row.',
+    description: 'Accessible label of the expand toggle in expandable rows.',
     components: ['Table'],
     et: 'Rea üksikasjad',
     en: 'Row details',
@@ -750,12 +736,16 @@ export const labelsMap = validateDefaultLabels({
   'table.reorder.pickup': {
     description: 'Live-region message when a column is picked up for keyboard reordering.',
     components: ['Table'],
-    et: (columnLabel: string) =>
-      `Veerg ${columnLabel} on valitud. Kasuta vasak-/paremnoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
-    en: (columnLabel: string) =>
-      `Column ${columnLabel} picked up. Use Left/Right arrow to move, Space or Enter to drop.`,
-    ru: (columnLabel: string) =>
-      `Столбец ${columnLabel} взят. Используйте стрелки влево/вправо для перемещения, Пробел или Enter для подтверждения.`,
+    et: (columnLabel: string) => `${columnLabel} valitud.`,
+    en: (columnLabel: string) => `${columnLabel} picked up.`,
+    ru: (columnLabel: string) => `${columnLabel} взят.`,
+  },
+  'table.reorder.instructions': {
+    description: 'Description of the column reorder drag handle.',
+    components: ['Table'],
+    et: 'Tühik või Enter valib ja paigutab, vasak- ja paremnool liigutavad, Escape tühistab.',
+    en: 'Space or Enter picks up and drops, Left and Right arrows move, Escape cancels.',
+    ru: 'Пробел или Enter берёт и ставит, стрелки влево и вправо перемещают, Escape отменяет.',
   },
   'table.reorder.move': {
     description: 'Live-region message while a picked-up column is moved between positions.',
@@ -781,11 +771,16 @@ export const labelsMap = validateDefaultLabels({
   'table.row-reorder.pickup': {
     description: 'Live-region message when a row is picked up for keyboard reordering.',
     components: ['Table'],
-    et: (position: number) =>
-      `Rida ${position} on valitud. Kasuta üles-/allanoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
-    en: (position: number) => `Row ${position} picked up. Use Up/Down arrow to move, Space or Enter to drop.`,
-    ru: (position: number) =>
-      `Строка ${position} взята. Используйте стрелки вверх/вниз для перемещения, Пробел или Enter для подтверждения.`,
+    et: (position: number) => `Rida ${position} valitud.`,
+    en: (position: number) => `Row ${position} picked up.`,
+    ru: (position: number) => `Строка ${position} взята.`,
+  },
+  'table.row-reorder.instructions': {
+    description: 'Description of the row reorder drag handle.',
+    components: ['Table'],
+    et: 'Tühik või Enter valib ja paigutab, üles- ja allanool liigutavad, Escape tühistab.',
+    en: 'Space or Enter picks up and drops, Up and Down arrows move, Escape cancels.',
+    ru: 'Пробел или Enter берёт и ставит, стрелки вверх и вниз перемещают, Escape отменяет.',
   },
   'table.row-reorder.move': {
     description: 'Live-region message while a picked-up row is moved between positions.',
@@ -1015,16 +1010,16 @@ export const labelsMap = validateDefaultLabels({
   'table.select-all': {
     description: 'Row selection - Label for check in table header',
     components: ['Table'],
-    et: (isSelected: boolean) => (isSelected ? 'Eemalda kõik' : 'Vali kõik'),
-    en: (isSelected: boolean) => (isSelected ? 'Deselect all' : 'Select all'),
-    ru: (isSelected: boolean) => (isSelected ? 'Убрать выделение со всего' : 'Выбрать все'),
+    et: 'Vali kõik read',
+    en: 'Select all rows',
+    ru: 'Выбрать все строки',
   },
   'table.select-row': {
     description: 'Row selection - Label for check in table row',
     components: ['Table'],
-    et: (isSelected: boolean) => (isSelected ? 'Eemalda rida' : 'Vali rida'),
-    en: (isSelected: boolean) => (isSelected ? 'Deselect row' : 'Select row'),
-    ru: (isSelected: boolean) => (isSelected ? 'Отменить выбор строки' : 'Выбрать ряд'),
+    et: 'Vali rida',
+    en: 'Select row',
+    ru: 'Выбрать строку',
   },
   'table.sort': {
     description:
@@ -1450,12 +1445,9 @@ export const labelsMap = validateDefaultLabels({
   'sidenav.toggleSubmenuChildren': {
     description: 'Side navigation label for toggling submenu',
     components: ['Sidenav'],
-    et: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
-      isCollapsedInternal ? `Sulge ${children} alammenüü` : `Ava ${children} alammenüü`,
-    en: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
-      isCollapsedInternal ? `Close ${children} submenu` : `Open ${children} submenu`,
-    ru: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
-      isCollapsedInternal ? `Закрыть подменю ${children}` : `Открыть подменю ${children}`,
+    et: ({ children }: { children: React.ReactNode }) => `${children} alammenüü`,
+    en: ({ children }: { children: React.ReactNode }) => `${children} submenu`,
+    ru: ({ children }: { children: React.ReactNode }) => `Подменю ${children}`,
   },
   'sidenav.submenu': {
     description: 'Side navigation label for submenu',
