@@ -77,11 +77,11 @@ export interface AlertProps extends BreakpointSupport<AlertBreakpointProps> {
    */
   action?: React.ReactNode;
   /**
-   * The ARIA role of the alert, informing screen readers about the alert's purpose.
-   * Options:
-   * - 'alert': For high-priority messages that demand immediate attention.
-   * - 'status': For less urgent messages providing feedback or updates.
-   * - 'none': Used when no ARIA role is needed.
+   * How screen readers announce the icon, title and message (buttons stay outside the announcement).
+   * - 'none': static content already on the page when it loads. Some screen readers read a
+   *   role="alert" present at load immediately.
+   * - 'status': non-urgent message that appears later (saved, info). Announced politely.
+   * - 'alert': urgent message that appears later (error, needs action). Announced assertively.
    * @default alert
    */
   role?: 'alert' | 'status' | 'none';
@@ -132,6 +132,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
   );
 
   const isMounted = useIsMounted();
+  const headingId = React.useId();
 
   const getIcon = (icon: string | IconWithoutBackgroundProps) => {
     const defaultIconProps: Partial<IconWithoutBackgroundProps> = { size: 18 };
@@ -141,45 +142,38 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     return <Icon {...iconProps} className={styles['tedi-alert__icon']} />;
   };
 
-  const ariaLive = role === 'alert' ? 'assertive' : role === 'status' ? 'polite' : 'off';
-  const headingId = React.useId();
-
   return isMounted ? (
-    <div
-      role={role}
-      data-name="alert"
-      aria-label={`${type} alert`}
-      aria-live={ariaLive}
-      aria-labelledby={title ? headingId : undefined}
-      {...rest}
-      className={alertBEM}
-    >
-      <VerticalSpacing size={0.25}>
-        <Row gutterX={2} alignItems={title ? 'center' : 'start'}>
-          <Col grow={1} className={styles['tedi-alert__content']}>
-            {icon && getIcon(icon)}
-            <div className="tedi-alert__content-wrapper">
-              {title ? (
-                <Heading element={titleElement} id={headingId} modifiers={['h5']}>
-                  {title}
-                </Heading>
-              ) : (
-                children
-              )}
-            </div>
-          </Col>
-          {action ? (
-            <Col width="auto">{action}</Col>
-          ) : (
-            onClose && (
-              <Col width="auto">
-                <ClosingButton onClick={onClose} iconSize={18} />
-              </Col>
-            )
-          )}
-        </Row>
-        {title && children && <div className="tedi-alert__content-wrapper">{children}</div>}
-      </VerticalSpacing>
+    <div data-name="alert" {...rest} className={alertBEM}>
+      <Row gutterX={2} alignItems={action || (title && !children) ? 'center' : 'start'}>
+        <Col grow={1} className={cn({ [styles['tedi-alert__main--centered']]: !title })}>
+          <div role={role}>
+            <VerticalSpacing size={0.25}>
+              <div className={styles['tedi-alert__content']}>
+                {icon && getIcon(icon)}
+                <div className="tedi-alert__content-wrapper">
+                  {title ? (
+                    <Heading element={titleElement} id={headingId} modifiers={['h5']}>
+                      {title}
+                    </Heading>
+                  ) : (
+                    children
+                  )}
+                </div>
+              </div>
+              {title && children && <div className="tedi-alert__content-wrapper">{children}</div>}
+            </VerticalSpacing>
+          </div>
+        </Col>
+        {action ? (
+          <Col width="auto">{action}</Col>
+        ) : (
+          onClose && (
+            <Col width="auto">
+              <ClosingButton onClick={onClose} iconSize={18} aria-describedby={title ? headingId : undefined} />
+            </Col>
+          )
+        )}
+      </Row>
     </div>
   ) : null;
 };

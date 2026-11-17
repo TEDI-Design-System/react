@@ -283,6 +283,12 @@ import { Alert, sendNotification, ToastContainer } from '@tedi-design-system/rea
 sendNotification({ type: 'success', title: 'Done', children: 'Task completed' });
 ```
 
+Pick `Alert`'s `role` by when the message appears (`sendNotification` passes it through):
+
+- `'none'`: static content already on the page at load. Some screen readers read a `role="alert"` present at load immediately.
+- `'status'`: non-urgent message that appears later (saved, info). Announced politely.
+- `'alert'` (default): urgent message that appears later (error, needs action). Announced assertively.
+
 ## Common Pitfalls
 
 A handful of mistakes account for most TEDI integration issues. Avoid them up front:
