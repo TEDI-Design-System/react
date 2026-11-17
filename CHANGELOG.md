@@ -1,3 +1,10 @@
+# [21.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.13...react-21.0.0-rc.14) (2026-11-17)
+
+
+### Bug Fixes
+
+* **table:** Keep Control Labels Stable [#1129](https://github.com/TEDI-Design-System/react/issues/1129) [#1130](https://github.com/TEDI-Design-System/react/issues/1130) ([#1142](https://github.com/TEDI-Design-System/react/issues/1142)) ([a01fecb](https://github.com/TEDI-Design-System/react/commit/a01fecbb02e01041afaa27fd0def507310c99271))
+
 # [21.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.12...react-21.0.0-rc.13) (2026-11-17)
 
 
