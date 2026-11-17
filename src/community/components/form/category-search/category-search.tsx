@@ -127,12 +127,13 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
     const fullWidthPanel = !textMode && fullWidthFilterPanel;
     const hasValidationMessage = !textMode && Boolean(category.validationMessage);
     const canShowResults = hasSearch && !hasValidationMessage;
+    const buttonSize = size === 'small' ? 'small' : 'default';
+
     const searchButton =
       category.showSearchButton === false
         ? undefined
         : {
             icon: searchButtonIconSize === undefined ? 'search' : { name: 'search', size: searchButtonIconSize },
-            size,
             disabled,
             'aria-label': labels.search,
           };
@@ -319,7 +320,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
             visualType={isMobile ? 'secondary' : undefined}
             fullWidth={isMobile}
             iconLeft={isMobile ? 'menu' : undefined}
-            size={size}
+            size={buttonSize}
             disabled={disabled || loading}
             aria-label={`${labels.category}: ${category.label}`}
           >
@@ -387,7 +388,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                   <Button
                     id={`${rootId}-input`}
                     ref={triggerRef}
-                    size={size}
+                    size={buttonSize}
                     visualType="link"
                     iconLeft="tune"
                     disabled={disabled}
@@ -401,7 +402,7 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                 )}
                 {hasSearch && (
                   <Button
-                    size={size}
+                    size={buttonSize}
                     visualType="link"
                     iconLeft="close"
                     disabled={disabled}
@@ -455,14 +456,19 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
               })}
               {validationPosition === 'after' && category.validationMessage}
             </fieldset>
-            <div className={styles['tedi-category-search__footer']}>
-              <Button size={size} visualType="link" onClick={closePanel}>
+            <div
+              className={cn(
+                styles['tedi-category-search__footer'],
+                size === 'large' && styles['tedi-category-search__footer--large']
+              )}
+            >
+              <Button size={buttonSize} visualType="link" onClick={closePanel}>
                 {labels.close}
               </Button>
-              <Button size={size} visualType="secondary" disabled={disabled} onClick={clearSearch}>
+              <Button size={buttonSize} visualType="secondary" disabled={disabled} onClick={clearSearch}>
                 {labels.clear}
               </Button>
-              <Button size={size} type="submit" formNoValidate={false} disabled={disabled}>
+              <Button size={buttonSize} type="submit" formNoValidate={false} disabled={disabled}>
                 {labels.search}
               </Button>
             </div>
@@ -488,12 +494,17 @@ export const CategorySearch = forwardRef<HTMLDivElement, CategorySearchProps>(
                   })}
               </div>
             )}
-            <div className={styles['tedi-category-search__footer']}>
-              <Button size={size} visualType="link" onClick={closePanel}>
+            <div
+              className={cn(
+                styles['tedi-category-search__footer'],
+                size === 'large' && styles['tedi-category-search__footer--large']
+              )}
+            >
+              <Button size={buttonSize} visualType="link" onClick={closePanel}>
                 {labels.close}
               </Button>
               {textMode && hasError && (
-                <Button size={size} disabled={disabled} onClick={submitSearch}>
+                <Button size={buttonSize} disabled={disabled} onClick={submitSearch}>
                   {labels.search}
                 </Button>
               )}

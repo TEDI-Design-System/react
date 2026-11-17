@@ -122,6 +122,18 @@ describe('Search component', () => {
   });
 });
 
+describe('Search button size', () => {
+  it('uses the large icon size on the button when the search is large', () => {
+    render(<Search id="search-large" label="Search" size="large" button={{ icon: 'search', 'aria-label': 'Otsi' }} />);
+    expect(screen.getByRole('button', { name: 'Otsi' }).querySelector('.tedi-icon--size-24')).toBeInTheDocument();
+  });
+
+  it('keeps the default icon size on the button when the search is not large', () => {
+    render(<Search id="search-default" label="Search" button={{ icon: 'search', 'aria-label': 'Otsi' }} />);
+    expect(screen.getByRole('button', { name: 'Otsi' }).querySelector('.tedi-icon--size-18')).toBeInTheDocument();
+  });
+});
+
 describe('Search autocomplete (suggestions)', () => {
   const OPTIONS: SearchSuggestion[] = [
     { value: 'mari', label: 'Mari Maasikas' },

@@ -60,6 +60,16 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+const LARGE_BUTTON_ICON_SIZE = 24;
+
+const enlargeIcon = (icon?: string | IconWithoutBackgroundProps): string | IconWithoutBackgroundProps | undefined => {
+  if (!icon) return icon;
+
+  return typeof icon === 'string'
+    ? { name: icon, size: LARGE_BUTTON_ICON_SIZE }
+    : { size: LARGE_BUTTON_ICON_SIZE, ...icon };
+};
+
 export interface SearchProps
   extends Omit<
     TextFieldProps,
@@ -85,7 +95,7 @@ export interface SearchProps
   /**
    * Optional button properties.
    */
-  button?: Partial<ButtonProps>;
+  button?: Partial<Omit<ButtonProps, 'size'>>;
   /**
    * Accessible name for the search landmark. Unnamed by default; set it when the page has more than
    * one search. It does not name the field, which keeps its own `label`.
@@ -538,6 +548,8 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
     );
   };
 
+  const isLargeSearch = rest.size === 'large';
+
   return (
     <div
       ref={refs.setReference}
@@ -554,6 +566,10 @@ const SearchInner = forwardRef<TextFieldForwardRef, SearchProps>((props, ref): J
       {button && (
         <Button
           {...button}
+          size={rest.size === 'small' ? 'small' : 'default'}
+          icon={isLargeSearch ? enlargeIcon(button.icon) : button.icon}
+          iconLeft={isLargeSearch ? enlargeIcon(button.iconLeft) : button.iconLeft}
+          iconRight={isLargeSearch ? enlargeIcon(button.iconRight) : button.iconRight}
           onClick={handleButtonClick}
           className={cn(
             styles['tedi-search__button'],
