@@ -1,3 +1,10 @@
+# [21.0.0-rc.15](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.14...react-21.0.0-rc.15) (2026-11-17)
+
+
+### Bug Fixes
+
+* **button:** use per-state text tokens for every button state [#1089](https://github.com/TEDI-Design-System/react/issues/1089) ([#1106](https://github.com/TEDI-Design-System/react/issues/1106)) ([5fc3f42](https://github.com/TEDI-Design-System/react/commit/5fc3f421bdda28e5e015dea131751dc155d096cb))
+
 # [21.0.0-rc.14](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.13...react-21.0.0-rc.14) (2026-11-17)
 
 
