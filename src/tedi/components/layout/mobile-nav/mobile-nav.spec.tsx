@@ -10,7 +10,7 @@ jest.mock('../../../providers/label-provider', () => ({
 
 describe('MobileNav', () => {
   const baseProps = {
-    ariaLabel: 'Main navigation',
+    ariaLabel: 'Main',
     isOpen: true,
     onClose: jest.fn(),
   };
@@ -42,7 +42,7 @@ describe('MobileNav', () => {
 
   test('renders top-level nav items', () => {
     render(<MobileNav {...baseProps} navItems={navItems} />);
-    expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Main' })).toBeInTheDocument();
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Services')).toBeInTheDocument();
   });
@@ -98,7 +98,7 @@ describe('MobileNav', () => {
     const onClose = jest.fn();
     render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
 
-    fireEvent.mouseDown(screen.getByRole('navigation', { name: 'Main navigation' }));
+    fireEvent.mouseDown(screen.getByRole('navigation', { name: 'Main' }));
 
     expect(onClose).not.toHaveBeenCalled();
   });
@@ -108,7 +108,7 @@ describe('MobileNav', () => {
     const { container } = render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
 
     const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
-    const nav = screen.getByRole('navigation', { name: 'Main navigation' });
+    const nav = screen.getByRole('navigation', { name: 'Main' });
 
     // Selection starts inside the nav (mousedown target is the nav) and the drag ends on the
     // backdrop, where the browser dispatches a click to the overlay. Dismissal keys off mousedown,

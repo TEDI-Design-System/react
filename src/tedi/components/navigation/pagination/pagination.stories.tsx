@@ -307,7 +307,7 @@ export const Borders: Story = {
           totalItems={97}
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
-          labels={{ ariaLabel: 'Pagination (borders: top)' }}
+          labels={{ ariaLabel: 'Lehed' }}
         />
       </div>
       <div>
@@ -319,7 +319,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="bottom"
-          labels={{ ariaLabel: 'Pagination (borders: bottom)' }}
+          labels={{ ariaLabel: 'Lehed' }}
         />
       </div>
       <div>
@@ -331,7 +331,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="both"
-          labels={{ ariaLabel: 'Pagination (borders: both)' }}
+          labels={{ ariaLabel: 'Lehed' }}
         />
       </div>
       <div>
@@ -343,7 +343,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="none"
-          labels={{ ariaLabel: 'Pagination (borders: none)' }}
+          labels={{ ariaLabel: 'Lehed' }}
         />
       </div>
     </div>

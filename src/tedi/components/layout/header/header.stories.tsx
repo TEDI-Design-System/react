@@ -393,7 +393,7 @@ const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
 
   return (
     <SideNav
-      ariaLabel="Main navigation"
+      ariaLabel="Main"
       linkAs="a"
       isMobileOpen={isMobileOpen}
       navItems={[
@@ -530,7 +530,7 @@ export const Default: StoryObj = {
           <HideAt lg>
             <div style={{ flex: 1 }}>
               <SideNav
-                ariaLabel="Main navigation"
+                ariaLabel="Main"
                 linkAs="a"
                 isMobileOpen={isOpen}
                 navItems={[
@@ -594,7 +594,7 @@ export const LoggedOut: Story = {
           <HideAt lg>
             <div style={{ flex: 1 }}>
               <SideNav
-                ariaLabel="Main navigation"
+                ariaLabel="Main"
                 linkAs="a"
                 isMobileOpen={isOpen}
                 navItems={[
@@ -1451,7 +1451,7 @@ export const LoggedInWithSidenav: Story = {
               </Header>
 
               <div style={{ flex: 1 }}>
-                <SideNav ariaLabel="Main navigation" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
+                <SideNav ariaLabel="Main" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
               </div>
             </SidenavLayout>
           )}
