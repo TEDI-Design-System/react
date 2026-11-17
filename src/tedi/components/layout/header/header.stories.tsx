@@ -382,7 +382,13 @@ const NavigationLinks = () => {
   );
 };
 
-const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
+const NavigationSideNav = ({
+  isMobileOpen,
+  onMenuToggle,
+}: {
+  isMobileOpen: boolean;
+  onMenuToggle: (open: boolean) => void;
+}) => {
   const { locale = 'en' } = useLabels();
   const pt = (key: keyof typeof translations) => translations[key][locale] ?? translations[key].et;
 
@@ -391,6 +397,7 @@ const NavigationSideNav = ({ isMobileOpen }: { isMobileOpen: boolean }) => {
       ariaLabel="Main"
       linkAs="a"
       isMobileOpen={isMobileOpen}
+      onMenuToggle={onMenuToggle}
       navItems={[
         { children: pt('home'), href: '#' },
         { children: pt('services'), href: '#' },
@@ -528,6 +535,7 @@ export const Default: StoryObj = {
                 ariaLabel="Main"
                 linkAs="a"
                 isMobileOpen={isOpen}
+                onMenuToggle={setIsOpen}
                 navItems={[
                   {
                     children: 'Link text',
@@ -592,6 +600,7 @@ export const LoggedOut: Story = {
                 ariaLabel="Main"
                 linkAs="a"
                 isMobileOpen={isOpen}
+                onMenuToggle={setIsOpen}
                 navItems={[
                   {
                     children: 'Link text',
@@ -694,7 +703,7 @@ Use \`showLogo\` whenever you need to hide the logo at a custom breakpoint that 
 
           <HideAt lg>
             <div style={{ flex: 1 }}>
-              <NavigationSideNav isMobileOpen={isOpen} />
+              <NavigationSideNav isMobileOpen={isOpen} onMenuToggle={setIsOpen} />
             </div>
           </HideAt>
         </div>
@@ -1446,7 +1455,13 @@ export const LoggedInWithSidenav: Story = {
               </Header>
 
               <div style={{ flex: 1 }}>
-                <SideNav ariaLabel="Main" linkAs="a" isMobileOpen={isOpen} navItems={loggedInNavItems} />
+                <SideNav
+                  ariaLabel="Main"
+                  linkAs="a"
+                  isMobileOpen={isOpen}
+                  onMenuToggle={setIsOpen}
+                  navItems={loggedInNavItems}
+                />
               </div>
             </SidenavLayout>
           )}

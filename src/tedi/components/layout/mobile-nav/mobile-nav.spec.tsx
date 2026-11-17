@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 
 import { MobileNav } from './mobile-nav';
 
@@ -168,5 +169,54 @@ describe('MobileNav', () => {
     const { container } = render(<MobileNav {...baseProps} navItems={navItems} />);
     const overlay = container.querySelector('.tedi-sidenav__overlay') as HTMLElement;
     expect(overlay).toHaveStyle({ top: 'var(--layout-header-height)' });
+  });
+
+  describe('focus management', () => {
+    test('moves focus into the menu when it opens', async () => {
+      render(<MobileNav {...baseProps} navItems={navItems} />);
+      await waitFor(() => {
+        expect(screen.getByRole('navigation', { name: 'Main' }).contains(document.activeElement)).toBe(true);
+      });
+    });
+
+    test('hides content behind the overlay from assistive technology', async () => {
+      render(
+        <>
+          <main data-testid="page">
+            <button>Behind</button>
+          </main>
+          <MobileNav {...baseProps} navItems={navItems} />
+        </>
+      );
+      await waitFor(() => {
+        expect(screen.getByTestId('page').closest('[aria-hidden="true"], [inert]')).not.toBeNull();
+      });
+    });
+
+    test('calls onClose when Escape is pressed', () => {
+      const onClose = jest.fn();
+      render(<MobileNav {...baseProps} onClose={onClose} navItems={navItems} />);
+      fireEvent.keyDown(screen.getByRole('navigation', { name: 'Main' }), { key: 'Escape' });
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    test('returns focus to the previously focused element on close', async () => {
+      const Harness = () => {
+        const [open, setOpen] = React.useState(false);
+        return (
+          <>
+            <button onClick={() => setOpen(true)}>Toggle</button>
+            <MobileNav {...baseProps} isOpen={open} onClose={() => setOpen(false)} navItems={navItems} />
+          </>
+        );
+      };
+      render(<Harness />);
+      const toggle = screen.getByText('Toggle');
+      toggle.focus();
+      fireEvent.click(toggle);
+      await waitFor(() => expect(toggle).not.toHaveFocus());
+      fireEvent.keyDown(screen.getByRole('navigation', { name: 'Main' }), { key: 'Escape' });
+      await waitFor(() => expect(toggle).toHaveFocus());
+    });
   });
 });
