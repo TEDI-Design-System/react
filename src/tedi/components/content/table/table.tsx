@@ -53,7 +53,8 @@ import { useTablePersistence } from './use-table-persistence';
  *
  * - drive the column-filter aria-label when the header is non-textual (`label`),
  * - align the column's `<th>` / `<td>` content horizontally (`align`) or vertically
- *   (`vAlign`) without wrapping every cell render in a styled span.
+ *   (`vAlign`) without wrapping every cell render in a styled span,
+ * - mark the column whose body cells head their row (`rowHeader`).
  *
  * Wrapper spans still work for the "I want this *one* cell to be different" case;
  * `meta` covers the common "every cell in the column lines up the same way".
@@ -82,6 +83,13 @@ export interface TableColumnMeta {
    * table's stylesheet.
    */
   vAlign?: 'top' | 'middle' | 'bottom';
+  /**
+   * Renders the column's body cells as `<th scope="row">`, so screen readers
+   * announce the cell as the row's header when moving through the row. Styled
+   * the same as other body cells. Set it on the one column that names the row.
+   * @default false
+   */
+  rowHeader?: boolean;
   /**
    * Per-cell `rowSpan` resolver. Lets a column collapse consecutive rows that
    * share a value into a single vertically-spanning cell ("grouped rows").
@@ -692,9 +700,12 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
         const isDragOverThisCol = !!dragOverColumnId && cell.column.id === dragOverColumnId;
         const resolvedRowSpan = cellMeta?.rowSpan?.(cell.row as Row<unknown>);
         if (resolvedRowSpan === 0) return null;
+        const isRowHeader = !!cellMeta?.rowHeader;
+        const CellTag = isRowHeader ? 'th' : 'td';
         return (
-          <td
+          <CellTag
             key={cell.id}
+            scope={isRowHeader ? 'row' : undefined}
             rowSpan={resolvedRowSpan && resolvedRowSpan > 1 ? resolvedRowSpan : undefined}
             className={cn(
               styles['tedi-table__cell'],
@@ -719,7 +730,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
             ) : (
               flexRender(cell.column.columnDef.cell, cell.getContext())
             )}
-          </td>
+          </CellTag>
         );
       })}
     </tr>

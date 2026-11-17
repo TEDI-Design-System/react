@@ -801,6 +801,90 @@ describe('Table', () => {
       expect(screen.getByRole('columnheader', { name: 'table.expand-column' })).toBeInTheDocument();
     });
 
+    describe('meta.rowHeader', () => {
+      const rowHeaderColumns: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { rowHeader: true } },
+        { id: 'role', header: 'Role', accessorKey: 'role' },
+      ];
+
+      it('renders the row-header column body cells as th scope=row and the rest as td', () => {
+        const { container } = render(<Table<Person> id="t-row-header" data={data} columns={rowHeaderColumns} />);
+
+        const rows = container.querySelectorAll('tbody > tr');
+        expect(rows).toHaveLength(data.length);
+        rows.forEach((row) => {
+          const [nameCell, roleCell] = Array.from(row.children);
+          expect(nameCell.tagName).toBe('TH');
+          expect(nameCell).toHaveAttribute('scope', 'row');
+          expect(nameCell).toHaveClass('tedi-table__cell');
+          expect(roleCell.tagName).toBe('TD');
+          expect(roleCell).not.toHaveAttribute('scope');
+        });
+        expect(screen.getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['Anna', 'Jüri']);
+      });
+
+      it('keeps the row-header column header cell a column header', () => {
+        render(<Table<Person> id="t-row-header-col" data={data} columns={rowHeaderColumns} />);
+
+        expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('scope', 'col');
+      });
+
+      it('renders every body cell as td without the option', () => {
+        render(<Table<Person> id="t-no-row-header" data={data} columns={columns} />);
+
+        expect(screen.queryAllByRole('rowheader')).toHaveLength(0);
+      });
+
+      it('keeps the select column as td', () => {
+        const { container } = render(
+          <Table<Person> id="t-row-header-sel" data={data} columns={rowHeaderColumns} enableRowSelection />
+        );
+
+        const [selectCell, nameCell] = Array.from(container.querySelector('tbody > tr')?.children ?? []);
+        expect(selectCell.tagName).toBe('TD');
+        expect(nameCell.tagName).toBe('TH');
+      });
+
+      it('gives a sticky row-header th the body-cell classes the sticky styles target', () => {
+        const { container } = render(
+          <Table<Person> id="t-row-header-sticky" data={data} columns={rowHeaderColumns} stickyFirstColumn />
+        );
+
+        expect(container.querySelector('[data-name="tedi-table"]')?.className).toContain('--sticky-first-column');
+        const nameCell = container.querySelector('tbody > tr')?.firstElementChild;
+        expect(nameCell?.tagName).toBe('TH');
+        expect(nameCell).toHaveClass('tedi-table__cell');
+        expect(nameCell).not.toHaveClass('tedi-table__header-cell');
+      });
+
+      it('renders one spanning th for a grouped row-header column', () => {
+        const grouped: Person[] = [
+          { id: 'a', name: 'Anna', role: 'Engineer' },
+          { id: 'b', name: 'Anna', role: 'Designer' },
+          { id: 'c', name: 'Bob', role: 'Designer' },
+        ];
+        const groupedColumns: ColumnDef<Person>[] = [
+          {
+            id: 'name',
+            header: 'Name',
+            accessorKey: 'name',
+            meta: { rowHeader: true, rowSpan: groupRowSpan(grouped, (row) => row.name) },
+          },
+          { id: 'role', header: 'Role', accessorKey: 'role' },
+        ];
+        const { container } = render(<Table<Person> id="t-row-header-span" data={grouped} columns={groupedColumns} />);
+
+        const rows = container.querySelectorAll('tbody > tr');
+        const rowHeaders = Array.from(rows).map((row) => row.querySelectorAll('th'));
+        expect(rowHeaders[0]).toHaveLength(1);
+        expect(rowHeaders[0][0]).toHaveAttribute('scope', 'row');
+        expect(rowHeaders[0][0]).toHaveAttribute('rowspan', '2');
+        expect(rowHeaders[1]).toHaveLength(0);
+        expect(rows[1].children).toHaveLength(1);
+        expect(rowHeaders[2][0]).not.toHaveAttribute('rowspan');
+      });
+    });
+
     it('makes the scroll wrapper keyboard-focusable', () => {
       const { container } = render(<Table<Person> id="t-scroll" data={data} columns={columns} />);
 
