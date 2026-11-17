@@ -49,10 +49,14 @@ export interface VerticalStepperItemProps {
    */
   as?: 'a' | 'button';
   /**
-   * Content rendered at the end of the item, below the title / description — a
-   * `StatusBadge`, `Link`, `Button`, `Text`, etc. (Figma: "related assets".)
+   * Content rendered at the end of the item, below the title / description (Figma: "related assets"). Links and
+   * buttons here need the step title in their accessible name or `aria-describedby` (WCAG 2.4.4).
    */
   endSlot?: React.ReactNode;
+  /**
+   * `id` of the title text, for `aria-describedby` on `endSlot` actions.
+   */
+  titleId?: string;
   /**
    * `VerticalStepper.SubItem` elements. When present the step becomes an
    * expandable section: the title toggles the (collapsible) sub-step list.
@@ -93,6 +97,7 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
     onClick,
     as,
     endSlot,
+    titleId,
     children,
     open,
     defaultOpen,
@@ -142,7 +147,9 @@ export const VerticalStepperItem = forwardRef<HTMLLIElement, VerticalStepperItem
 
   const titleNode = (
     <Text element="span" className={styles['tedi-vertical-stepper__label']}>
-      <span className={styles['tedi-vertical-stepper__label-text']}>{title}</span>
+      <span id={titleId} className={styles['tedi-vertical-stepper__label-text']}>
+        {title}
+      </span>
       {!compact && state === 'completed' && (
         <Icon
           name="check"

@@ -148,7 +148,7 @@ export const WithLinks: Story = {
           href="#l1"
           endSlot={
             <Link href="#read-1" iconRight="arrow_forward">
-              Loe rohkem
+              Loe rohkem<span className="visually-hidden">: Vaimne tervis</span>
             </Link>
           }
         />
@@ -158,7 +158,7 @@ export const WithLinks: Story = {
           href="#l2"
           endSlot={
             <Link href="#read-2" iconRight="arrow_forward">
-              Loe rohkem
+              Loe rohkem<span className="visually-hidden">: Füüsiline tervis</span>
             </Link>
           }
         />
