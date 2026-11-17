@@ -662,24 +662,10 @@ const initialsOf = (name: string) =>
 const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
-    meta: { rowHeader: true },
+    meta: { rowHeader: true, sortable: true },
     accessorKey: 'dateRange',
     size: 240,
-    header: ({ column }) => {
-      const sorted = column.getIsSorted();
-      const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-      return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          Kuupäev
-          <Table.HeaderButton
-            icon={iconName}
-            selected={!!sorted}
-            aria-label="Sort by Kuupäev"
-            onClick={column.getToggleSortingHandler()}
-          />
-        </span>
-      );
-    },
+    header: 'Kuupäev',
     cell: ({ row }) => <EditableDateRangeCell row={row.original} field="dateRange" label="Kuupäev" />,
   },
   {
@@ -836,21 +822,8 @@ export const VerticalBorders: Story = {
       {
         id: 'service',
         accessorKey: 'service',
-        header: ({ column }) => {
-          const sorted = column.getIsSorted();
-          const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-          return (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              Teenus
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label="Sorteeri Teenus järgi"
-                onClick={column.getToggleSortingHandler()}
-              />
-            </span>
-          );
-        },
+        header: 'Teenus',
+        meta: { sortable: true },
       },
       {
         id: 'doctor',
@@ -925,42 +898,53 @@ export const EditableValues: Story = {
 };
 
 /**
- * Client-side sorting via `Table.HeaderButton` in the header renderer. The column label is
- * passed as the button's children, so the whole "text + icon" header is one clickable sort
- * target. Each click cycles `unfold_more → arrow_upward → arrow_downward → unfold_more`.
- * TanStack Table handles the sort state internally; no external state needed for client-side use.
+ * Client-side sorting with the `meta: { sortable: true }` shorthand. For a string header the
+ * whole title becomes the sort button; each click cycles ascending, descending and off, and
+ * `aria-sort` stays on the `<th>`. TanStack Table handles the sort state internally; no external
+ * state needed for client-side use. For a custom header (see the next story), the header renders
+ * unchanged and an icon-only sort button follows it. Without `sortable`, hand-built
+ * `Table.HeaderButton` headers keep working as before.
  */
 export const Sortable: Story = {
   render: function Sortable() {
     const columns = useMemo<ColumnDef<Person>[]>(
-      () =>
-        [
-          { id: 'name', header: 'Name', accessorKey: 'name' },
-          { id: 'role', header: 'Role', accessorKey: 'role' },
-          { id: 'location', header: 'Location', accessorKey: 'location' },
-          { id: 'salary', header: 'Salary', accessorKey: 'salary' },
-        ].map((col) => ({
-          ...col,
-          meta: { label: col.header },
-          header: ({ column }) => {
-            const sorted = column.getIsSorted();
-            const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-            return (
-              <Table.HeaderButton
-                icon={iconName}
-                selected={!!sorted}
-                aria-label={`Sort by ${col.header}`}
-                onClick={column.getToggleSortingHandler()}
-              >
-                {col.header}
-              </Table.HeaderButton>
-            );
-          },
-        })),
+      () => [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { sortable: true } },
+        { id: 'role', header: 'Role', accessorKey: 'role', meta: { sortable: true } },
+        { id: 'location', header: 'Location', accessorKey: 'location', meta: { sortable: true } },
+        { id: 'salary', header: 'Salary', accessorKey: 'salary', meta: { sortable: true } },
+      ],
       []
     );
 
     return <Table<Person> id="tedi-table-sortable" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />;
+  },
+};
+
+/**
+ * `meta: { sortable: true }` with a custom header. The header renders unchanged and an icon-only
+ * sort button follows it, so the info button is never nested inside another button. The button's
+ * accessible name comes from `meta.label` (falling back to the column id).
+ */
+export const SortableCustomHeader: Story = {
+  render: function SortableCustomHeader() {
+    const columns = useMemo<ColumnDef<Person>[]>(
+      () => [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { sortable: true } },
+        {
+          id: 'role',
+          accessorKey: 'role',
+          header: () => <HeaderWithInfo label="Role" info="The person's job title." />,
+          meta: { sortable: true, label: 'Role' },
+        },
+        { id: 'location', header: 'Location', accessorKey: 'location' },
+      ],
+      []
+    );
+
+    return (
+      <Table<Person> id="tedi-table-sortable-custom" data={people} columns={columns} pagination={DEFAULT_PAGINATION} />
+    );
   },
 };
 

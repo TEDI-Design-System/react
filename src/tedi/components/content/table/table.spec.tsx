@@ -50,6 +50,12 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'table.row-details':
           return 'Row details';
+        case 'table.sort': {
+          const [direction, columnLabel] = args as ['asc' | 'desc' | false, string | undefined];
+          return `Sort by ${columnLabel} ${
+            direction === 'asc' ? 'descending' : direction === 'desc' ? 'off' : 'ascending'
+          }`;
+        }
         case 'table.drag-column': {
           const [columnLabel] = args as [string];
           return `Drag column ${columnLabel}`;
@@ -1198,6 +1204,87 @@ describe('Table', () => {
       expect(cells[0]).toHaveTextContent('Charlie');
       expect(cells[1]).toHaveTextContent('Alice');
       expect(cells[2]).toHaveTextContent('Bob');
+    });
+  });
+
+  describe('meta.sortable shorthand', () => {
+    const sortData: Person[] = [
+      { id: '1', name: 'Charlie', role: 'Engineer' },
+      { id: '2', name: 'Alice', role: 'Designer' },
+      { id: '3', name: 'Bob', role: 'Manager' },
+    ];
+    const firstName = () =>
+      screen.getAllByRole('cell').filter((c) => /Charlie|Alice|Bob/.test(c.textContent ?? ''))[0].textContent;
+
+    it('makes a string header the sort button and cycles asc, desc, off', () => {
+      render(
+        <Table<Person>
+          id="t-short"
+          data={sortData}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name', meta: { sortable: true } },
+            { id: 'role', header: 'Role', accessorKey: 'role' },
+          ]}
+        />
+      );
+      const th = screen.getByRole('columnheader', { name: 'Name' });
+      const button = within(th).getByRole('button', { name: 'Name' });
+      expect(th).toHaveAttribute('aria-sort', 'none');
+      expect(screen.queryByRole('button', { name: 'Role' })).not.toBeInTheDocument();
+
+      fireEvent.click(button);
+      expect(th).toHaveAttribute('aria-sort', 'ascending');
+      expect(firstName()).toBe('Alice');
+      fireEvent.click(button);
+      expect(th).toHaveAttribute('aria-sort', 'descending');
+      expect(firstName()).toBe('Charlie');
+      fireEvent.click(button);
+      expect(th).toHaveAttribute('aria-sort', 'none');
+    });
+
+    it('keeps a custom header and adds an icon-only sort button named by table.sort', () => {
+      render(
+        <Table<Person>
+          id="t-short-custom"
+          data={sortData}
+          columns={[
+            {
+              id: 'name',
+              header: () => <span>Name</span>,
+              accessorKey: 'name',
+              meta: { sortable: true, label: 'Name' },
+            },
+          ]}
+        />
+      );
+      const button = screen.getByRole('button', { name: 'Sort by Name ascending' });
+      fireEvent.click(button);
+      expect(firstName()).toBe('Alice');
+      expect(screen.getByRole('button', { name: 'Sort by Name descending' })).toBeInTheDocument();
+    });
+
+    it('falls back to the column id for the icon-only button name', () => {
+      render(
+        <Table<Person>
+          id="t-short-id"
+          data={sortData}
+          columns={[{ id: 'name', header: () => <span>Name</span>, accessorKey: 'name', meta: { sortable: true } }]}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Sort by name ascending' })).toBeInTheDocument();
+    });
+
+    it('renders no sort button when sorting is disabled for the column', () => {
+      render(
+        <Table<Person>
+          id="t-short-off"
+          data={sortData}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name', enableSorting: false, meta: { sortable: true } },
+          ]}
+        />
+      );
+      expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
     });
   });
 

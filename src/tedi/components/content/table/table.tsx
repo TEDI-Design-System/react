@@ -45,6 +45,7 @@ import styles from './table.module.scss';
 import { TableColumnsMenu } from './table-columns-menu/table-columns-menu';
 import { TableContext } from './table-context';
 import { TableHeaderButton } from './table-header-button/table-header-button';
+import { TableHeaderContent } from './table-header-content/table-header-content';
 import { TableToolbar } from './table-toolbar/table-toolbar';
 import { useTablePersistence } from './use-table-persistence';
 
@@ -66,6 +67,19 @@ export interface TableColumnMeta {
    * column id, a developer string such as "actions" (filter and reorder get `''` for `header: ''`).
    */
   label?: string;
+  /**
+   * Renders the built-in sort button for the column, so the header needs no hand-built
+   * `Table.HeaderButton`.
+   * - **String / number header:** the whole title becomes the sort button; its icon follows the
+   *   sort state and each click cycles through ascending, descending and off.
+   * - **Custom header:** the header renders unchanged, followed by an icon-only sort button, so
+   *   interactive content in the header (e.g. an info button) is never nested inside another button.
+   *
+   * The icon-only button is named by the `table.sort` label, using `label` (or the string header,
+   * or the column id) as the column name. Has no effect when sorting is disabled for the column.
+   * @default false
+   */
+  sortable?: boolean;
   /**
    * Props forwarded to the built-in per-column filter input (the `TextField`
    * rendered for this column when `enableColumnFilters` is set). Use it to
@@ -1699,6 +1713,13 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
                     const headerDef = header.column.columnDef.header;
+                    const headerContent = (
+                      <TableHeaderContent
+                        header={header}
+                        label={headerLabel}
+                        sortable={headerMeta?.sortable === true}
+                      />
+                    );
                     const headerIsBlank =
                       !columnHasChildren &&
                       (headerDef === null ||
@@ -1767,12 +1788,12 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             >
                               <Icon name="drag_indicator" size={18} color="inherit" />
                             </button>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {headerContent}
                           </span>
                         ) : headerIsBlank && headerLabel ? (
                           <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
-                          flexRender(header.column.columnDef.header, header.getContext())
+                          headerContent
                         )}
                       </th>
                     );
