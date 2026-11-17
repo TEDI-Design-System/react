@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import { AriaRole } from 'react';
 
 import styles from './feedback-text.module.scss';
 
@@ -35,8 +34,7 @@ export interface FeedbackTextProps {
 export const FeedbackText = (props: FeedbackTextProps): JSX.Element => {
   const { text, id, className, type = 'hint', position = 'left', ...rest } = props;
 
-  const role: AriaRole | undefined = type === 'valid' || type === 'error' ? 'alert' : undefined;
-  const ariaLive = type === 'error' || type === 'valid' ? 'assertive' : 'polite';
+  const ariaLive = type === 'error' || type === 'valid' ? 'polite' : undefined;
 
   return (
     <div
@@ -49,7 +47,6 @@ export const FeedbackText = (props: FeedbackTextProps): JSX.Element => {
         styles[`tedi-feedback-text--${position}`],
         className
       )}
-      role={role}
       aria-live={ariaLive}
     >
       {text}
