@@ -67,25 +67,33 @@ const TemplateColumn: StoryFn<TemplateMultipleProps> = (args) => {
     <div className="example-list">
       {array.map((value, key) => {
         const baseId = `${id}-${property}-${value}`;
+        const caption = value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
 
         return (
           <Row className={`${key === array.length - 1 ? '' : 'border-bottom'} padding-14-16`} key={key}>
             <Col width={12} sm={2}>
-              <Text modifiers="bold">{value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}</Text>
+              <Text modifiers="bold">{caption}</Text>
             </Col>
             <Col width={12} sm={10}>
               <VerticalSpacing>
-                <Search {...textFieldProps} {...{ [property]: value }} id={`${baseId}-plain`} />
+                <Search
+                  {...textFieldProps}
+                  {...{ [property]: value }}
+                  id={`${baseId}-plain`}
+                  ariaLabel={`${caption}, lihtne`}
+                />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-icon`}
+                  ariaLabel={`${caption}, ikooniga`}
                   button={{ icon: 'search', size: value, 'aria-label': 'Otsi' }}
                 />
                 <Search
                   {...textFieldProps}
                   {...{ [property]: value }}
                   id={`${baseId}-button`}
+                  ariaLabel={`${caption}, tekstiga`}
                   button={{ iconLeft: 'search', children: 'Otsi', size: value }}
                 />
               </VerticalSpacing>
@@ -111,7 +119,7 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
               <Text modifiers="bold">{state}</Text>
             </Col>
             <Col>
-              <Search {...textFieldProps} id={stateId} disabled={state === 'Disabled'} />
+              <Search {...textFieldProps} id={stateId} ariaLabel={state} disabled={state === 'Disabled'} />
             </Col>
           </Row>
         );
@@ -122,7 +130,12 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Success</Text>
         </Col>
         <Col>
-          <Search {...textFieldProps} id={`${id}-success`} helper={{ text: 'Tagasiside tekst', type: 'valid' }} />
+          <Search
+            {...textFieldProps}
+            id={`${id}-success`}
+            ariaLabel="Success"
+            helper={{ text: 'Tagasiside tekst', type: 'valid' }}
+          />
         </Col>
       </Row>
 
@@ -131,7 +144,12 @@ const TemplateColumnWithStates: StoryFn<TemplateStateProps> = (args) => {
           <Text modifiers="bold">Error</Text>
         </Col>
         <Col>
-          <Search {...textFieldProps} id={`${id}-error`} helper={{ text: 'Tagasiside tekst', type: 'error' }} />
+          <Search
+            {...textFieldProps}
+            id={`${id}-error`}
+            ariaLabel="Error"
+            helper={{ text: 'Tagasiside tekst', type: 'error' }}
+          />
         </Col>
       </Row>
     </VerticalSpacing>
