@@ -1,9 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useEffect } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import MobileNavToggle from '../mobile-nav/components/mobile-nav-toggle/mobile-nav-toggle';
 import { MobileNav as SideNavMobile } from '../mobile-nav/mobile-nav';
-import { SideNavItemProps } from './components/sidenav-item/sidenav-item';
+import { SideNavItem, SideNavItemProps } from './components/sidenav-item/sidenav-item';
 import { SideNav } from './sidenav';
 
 jest.mock('../mobile-nav/mobile-nav');
@@ -84,6 +85,43 @@ describe('SideNav', () => {
 
     rerender(<SideNav {...defaultProps} mobileBreakpoint="mobile" />);
     expect(screen.getByRole('navigation')).toHaveClass('tedi-sidenav--below-md');
+  });
+
+  test('gives the id to the desktop nav, and to the drawer only while it is open', () => {
+    const { rerender } = render(<SideNav {...defaultProps} id="primary-nav" isMobileOpen={true} />);
+    expect(screen.getByRole('navigation')).toHaveAttribute('id', 'primary-nav');
+    expect(SideNavMobile).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: 'primary-nav', isOpen: false }),
+      expect.anything()
+    );
+
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    (isBreakpointBelow as jest.Mock).mockReturnValue(true);
+    rerender(<SideNav {...defaultProps} id="primary-nav" isMobileOpen={true} />);
+
+    expect(screen.getByRole('navigation')).not.toHaveAttribute('id');
+    expect(SideNavMobile).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: 'primary-nav', isOpen: true }),
+      expect.anything()
+    );
+  });
+
+  test('unmounts the desktop items when the breakpoint switches, so open submenus close', () => {
+    const unmounted = jest.fn();
+    (SideNavItem as jest.Mock).mockImplementation(() => {
+      useEffect(() => unmounted, []);
+      return <li />;
+    });
+
+    const { rerender } = render(<SideNav {...defaultProps} navItems={mockNavItems.slice(0, 2)} />);
+    expect(unmounted).not.toHaveBeenCalled();
+
+    (useBreakpoint as jest.Mock).mockReturnValue('sm');
+    (isBreakpointBelow as jest.Mock).mockReturnValue(true);
+    rerender(<SideNav {...defaultProps} navItems={mockNavItems.slice(0, 2)} />);
+
+    expect(unmounted).toHaveBeenCalledTimes(2);
+    (SideNavItem as jest.Mock).mockReset();
   });
 
   test('applies custom className', () => {

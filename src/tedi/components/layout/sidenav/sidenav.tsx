@@ -111,6 +111,7 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
     onMenuToggle,
     onCollapseToggle,
     sideNavItemSize = 'default',
+    id,
     ...rest
   } = props;
 
@@ -157,6 +158,8 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
     setMenuOpen(!isMenuOpen);
   };
 
+  const isDrawerOpen = isMenuOpen && isMobileView;
+
   const BEM = cn(
     styles['tedi-sidenav'],
     styles[`tedi-sidenav--below-${mapToBreakpoint(mobileBreakpoint)}`],
@@ -173,21 +176,23 @@ const SideNavComponent: <C extends React.ElementType = 'a'>(props: SideNavProps<
         navItems={navItems}
         ariaLabel={ariaLabel}
         linkAs={linkAs}
-        isOpen={isMenuOpen && isMobileView}
+        isOpen={isDrawerOpen}
         onClose={() => setMenuOpen(false)}
         showOverlay={showMobileOverlay}
         className={className}
+        id={id}
         {...rest}
       />
       <Print visibility="hide">
-        <nav id={props.id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
+        <nav id={isDrawerOpen ? undefined : id} data-name="sidenav" {...rest} className={BEM} aria-label={ariaLabel}>
           {isCollapsible && <MobileNavToggle menuOpen={!isCollapsed} toggleMenu={toggleCollapse} variant="collapse" />}
           {/* Disclosure Navigation (WAI-ARIA APG), not a menubar: SideNav is site
             navigation (links + `aria-expanded` groups) without menu keyboard
             semantics. A plain list inside the `<nav aria-label>` landmark is the
             correct model — and a `menubar` can't legally contain the expandable
             item's Collapse toggle button. */}
-          <ul className={styles['tedi-sidenav__list']}>
+          {/* The key remounts the items when the breakpoint switches, so an open submenu closes with its nav. */}
+          <ul key={isMobileView ? 'mobile' : 'desktop'} className={styles['tedi-sidenav__list']}>
             {navItems.map((item, key) => (
               <SideNavItem
                 as={linkAs}
