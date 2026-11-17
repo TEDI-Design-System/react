@@ -248,6 +248,13 @@ describe('FileDropzone', () => {
     expect(screen.getByText('PDF only')).toHaveAttribute('id', 'role-test-helper');
   });
 
+  it('names the dropzone button with its visible label only', () => {
+    render(<FileDropzone id="name-test" name="file" label="Upload File" />);
+    const dropzone = screen.getByRole('button');
+    expect(dropzone).toHaveAccessibleName('Upload File');
+    expect(dropzone).not.toHaveAttribute('aria-label');
+  });
+
   it('exposes an invalid file status to screen readers', () => {
     mockUseFileUpload.mockReturnValue({
       innerFiles: [{ id: '1', name: 'big.pdf', isValid: false }],
