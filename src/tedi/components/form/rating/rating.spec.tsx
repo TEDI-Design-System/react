@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
 
+import { useBreakpointProps } from '../../../helpers';
 import { LabelProvider } from '../../../providers/label-provider';
 import { Rating } from './rating';
 
@@ -8,7 +9,18 @@ import '@testing-library/jest-dom';
 
 const renderWithLabels = (ui: JSX.Element) => render(<LabelProvider>{ui}</LabelProvider>);
 
+jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
+  useBreakpointProps: jest.fn(),
+}));
+
 describe('Rating', () => {
+  beforeEach(() => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn((props) => props),
+    });
+  });
+
   it('renders a labelled radiogroup with the requested number of items', () => {
     render(<Rating label="Feedback" type="star" count={5} />);
     const group = screen.getByRole('radiogroup', { name: 'Feedback' });
@@ -36,6 +48,17 @@ describe('Rating', () => {
 
     rerender(<Rating label="Feedback" type="star" orientation="vertical" />);
     expect(screen.getByRole('radiogroup').className).not.toContain('tedi-rating--vertical');
+  });
+
+  it.each([
+    ['below md', false, true],
+    ['at md', true, false],
+  ])('resolves a breakpoint orientation override %s', (_, atMd, vertical) => {
+    (useBreakpointProps as jest.Mock).mockReturnValue({
+      getCurrentBreakpointProps: jest.fn((props) => (atMd ? { ...props, ...props.md } : props)),
+    });
+    render(<Rating label="Feedback" type="icon" orientation="vertical" md={{ orientation: 'horizontal' }} />);
+    expect(screen.getByRole('radiogroup').classList.contains('tedi-rating--vertical')).toBe(vertical);
   });
 
   it('falls back to the type default when count is not a positive integer', () => {
