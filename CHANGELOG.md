@@ -1,3 +1,10 @@
+# [21.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.16...react-21.0.0-rc.17) (2026-11-17)
+
+
+### Bug Fixes
+
+* **split-pane:** move close button out of the separator [#1155](https://github.com/TEDI-Design-System/react/issues/1155) ([#1156](https://github.com/TEDI-Design-System/react/issues/1156)) ([a1d8e34](https://github.com/TEDI-Design-System/react/commit/a1d8e34bba7cdfffbe9413077e1015f1b0a2ad96))
+
 # [21.0.0-rc.16](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.15...react-21.0.0-rc.16) (2026-11-17)
 
 
