@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen } from '@testing-library/react';
-import { et } from 'react-day-picker/locale';
+import { et, faIR } from 'react-day-picker/locale';
 
 import { useBreakpointProps } from '../../../helpers';
 import { Calendar, CalendarProps } from './calendar';
@@ -437,6 +437,12 @@ describe('Calendar', () => {
       expect(labelFor({ date, displayMonth: november })).toBe('Päev');
     });
 
+    it('names days with Gregorian dates for locales whose default calendar differs', () => {
+      render(<Calendar {...baseProps} locale={faIR} />);
+
+      expect(labelFor({ date, displayMonth: november })).toBe('دوشنبه ۱۶ نوامبر');
+    });
+
     it('passes consumer labels to DayPicker', () => {
       const custom = () => 'custom';
       render(<Calendar {...baseProps} labels={{ labelDayButton: custom }} />);
@@ -503,6 +509,22 @@ describe('Calendar', () => {
 
       expect(container.querySelector('[data-name="status-indicator"]')).not.toBeInTheDocument();
       expect(container.querySelector('button')).toHaveAttribute('aria-label', 'neljapäev, 16. jaanuar');
+    });
+
+    it('keeps the day components stable when an inline dayStatus changes identity', () => {
+      const { rerender } = render(<Calendar {...baseProps} dayStatus={(d) => dayStatus(d)} />);
+      const { Day, DayButton } = mockDayPickerProps.current.components;
+
+      rerender(<Calendar {...baseProps} dayStatus={() => ({ type: 'danger', label: 'Busy' })} />);
+      expect(mockDayPickerProps.current.components.Day).toBe(Day);
+      expect(mockDayPickerProps.current.components.DayButton).toBe(DayButton);
+
+      render(
+        <DayButton day={{ date: new Date(2025, 0, 16), displayMonth: new Date(2025, 0) }} modifiers={{}}>
+          16
+        </DayButton>
+      );
+      expect(screen.getByRole('gridcell', { name: 'neljapäev, 16. jaanuar, Busy' })).toBeInTheDocument();
     });
   });
 

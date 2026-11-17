@@ -276,7 +276,9 @@ export const Calendar = (props: CalendarProps) => {
     const dateLib = new DateLib({ locale, timeZone });
     // Locale labels name the day with format(date, 'PPPP'), so that one format is swapped.
     const [withoutYear, withYear] = [undefined, 'numeric' as const].map((year): DateLib => {
+      // Intl follows the locale's own calendar (Persian for fa-IR), but the grid is Gregorian.
       const fmt = new Intl.DateTimeFormat(formatLocale, {
+        calendar: 'gregory',
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -301,12 +303,16 @@ export const Calendar = (props: CalendarProps) => {
           );
   }, [locale, localeDayLabel, formatLocale, timeZone]);
 
+  // Read through a ref so an inline dayStatus does not recreate the day components and remount every button.
+  const dayStatusRef = React.useRef(dayStatus);
+  dayStatusRef.current = dayStatus;
+
   const dayComponents = React.useMemo<DayPickerProps['components']>(
     () => ({
       Day: ({ day: _day, modifiers, ...tdProps }) =>
         modifiers.hidden ? <td {...tdProps} /> : <td {...tdProps} role="presentation" aria-selected={undefined} />,
       DayButton: (dayButtonProps) => {
-        const status = dayStatus?.(dayButtonProps.day.date);
+        const status = dayStatusRef.current?.(dayButtonProps.day.date);
         const label = hasConsumerDayLabel
           ? dayButtonProps['aria-label']
           : dayLabel(dayButtonProps.day, dayButtonProps.modifiers);
@@ -325,7 +331,7 @@ export const Calendar = (props: CalendarProps) => {
         );
       },
     }),
-    [dayStatus, dayLabel, hasConsumerDayLabel]
+    [dayLabel, hasConsumerDayLabel]
   );
 
   return (
