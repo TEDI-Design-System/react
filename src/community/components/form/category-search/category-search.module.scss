@@ -107,6 +107,10 @@ $btn-height-large: 3.5rem;
     padding: calc(var(--form-field-padding-y-lg) - 2px) var(--form-field-padding-x-lg);
   }
 
+  &--large &__mobile-controls > button {
+    height: $btn-height-large;
+  }
+
   &--large &__actions > button {
     height: $btn-height-large;
   }
