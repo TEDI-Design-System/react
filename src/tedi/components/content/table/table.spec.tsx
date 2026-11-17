@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 
-import type { TableState } from './table';
+import type { TableColumnMeta, TableState } from './table';
 import { groupRowSpan, Table } from './table';
 import { useTableContext } from './table-context';
 
@@ -18,6 +18,7 @@ jest.mock('../../../providers/printing-provider/printing-provider', () => ({
 // 'lg' so the existing assertions on the numbered list keep working;
 // breakpoint-specific behaviour is covered by Pagination's own tests.
 jest.mock('../../../helpers', () => ({
+  ...jest.requireActual('../../../helpers'),
   useBreakpoint: () => 'lg',
   isBreakpointBelow: () => false,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,6 +51,16 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'table.row-details':
           return 'Row details';
+        case 'table.filter': {
+          const [columnLabel] = args as [string | undefined];
+          return `Filter ${columnLabel}`;
+        }
+        case 'table.filter-apply':
+          return 'Apply';
+        case 'table.filter-clear':
+          return 'Clear';
+        case 'table.filter-cancel':
+          return 'Cancel';
         case 'table.sort': {
           const [direction, columnLabel] = args as ['asc' | 'desc' | false, string | undefined];
           return `Sort by ${columnLabel} ${
@@ -1326,6 +1337,163 @@ describe('Table', () => {
         />
       );
       expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('meta.filterable popover', () => {
+    const filterData: Person[] = [
+      { id: '1', name: 'Charlie', role: 'Engineer' },
+      { id: '2', name: 'Alice', role: 'Designer' },
+      { id: '3', name: 'Bob', role: 'Manager' },
+    ];
+    const nameCol = (meta: TableColumnMeta): ColumnDef<Person>[] => [
+      { id: 'name', header: 'Name', accessorKey: 'name', filterFn: 'includesString', meta },
+    ];
+    const names = () =>
+      screen
+        .getAllByRole('cell')
+        .map((c) => c.textContent)
+        .filter((t) => /Charlie|Alice|Bob/.test(t ?? ''));
+    const openPopover = () => fireEvent.click(screen.getByRole('button', { name: 'Filter Name' }));
+    const type = (value: string) => fireEvent.change(screen.getByRole('textbox'), { target: { value } });
+
+    it('opens a popover from an icon-only button and filters on apply', () => {
+      render(<Table<Person> id="t-pop" data={filterData} columns={nameCol({ filterable: true })} />);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+
+      openPopover();
+      type('ali');
+      expect(names()).toHaveLength(3);
+      fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+
+      expect(names()).toEqual(['Alice']);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('clear removes the applied filter and closes', () => {
+      render(<Table<Person> id="t-pop-clear" data={filterData} columns={nameCol({ filterable: true })} />);
+      openPopover();
+      type('ali');
+      fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+      openPopover();
+      fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+
+      expect(names()).toHaveLength(3);
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('cancel keeps the applied filter and discards the draft', () => {
+      render(
+        <Table<Person>
+          id="t-pop-cancel"
+          data={filterData}
+          columns={nameCol({ filterable: true })}
+          filterActions={['cancel', 'apply']}
+        />
+      );
+      openPopover();
+      type('ali');
+      fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+      openPopover();
+      type('bob');
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(names()).toEqual(['Alice']);
+
+      openPopover();
+      expect(screen.getByRole('textbox')).toHaveValue('ali');
+    });
+
+    it('orders footer buttons per column and hides the footer for an empty list', () => {
+      const { unmount } = render(
+        <Table<Person>
+          id="t-pop-actions"
+          data={filterData}
+          columns={nameCol({ filterable: { actions: ['apply', 'cancel', 'apply'] } })}
+        />
+      );
+      openPopover();
+      expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(
+        expect.arrayContaining(['Apply', 'Cancel'])
+      );
+      expect(screen.getAllByRole('button', { name: 'Apply' })).toHaveLength(1);
+      expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+      unmount();
+
+      render(<Table<Person> id="t-pop-none" data={filterData} columns={nameCol({ filterable: { actions: [] } })} />);
+      openPopover();
+      expect(screen.queryByRole('button', { name: /Apply|Clear|Cancel/ })).not.toBeInTheDocument();
+    });
+
+    it('hands apply, clear and cancel to custom filter content', () => {
+      render(
+        <Table<Person>
+          id="t-pop-custom"
+          data={filterData}
+          columns={nameCol({
+            filterable: { actions: [] },
+            filterContent: ({ setValue, apply }) => (
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('bob');
+                  apply();
+                }}
+              >
+                Only Bob
+              </button>
+            ),
+          })}
+        />
+      );
+      openPopover();
+      fireEvent.click(screen.getByRole('button', { name: 'Only Bob' }));
+      expect(names()).toEqual(['Bob']);
+      expect(screen.queryByRole('button', { name: 'Only Bob' })).not.toBeInTheDocument();
+    });
+
+    it('marks the trigger as selected only while a filter is applied', () => {
+      const { container } = render(
+        <Table<Person> id="t-pop-active" data={filterData} columns={nameCol({ filterable: true })} />
+      );
+      const trigger = () => screen.getByRole('button', { name: 'Filter Name' });
+      expect(trigger().className).not.toMatch(/selected/);
+      openPopover();
+      type('ali');
+      fireEvent.click(screen.getByRole('button', { name: 'Apply' }));
+      expect(trigger().className).toMatch(/selected/);
+      expect(container).toBeTruthy();
+    });
+
+    it('sits next to the sort button for the same column', () => {
+      render(
+        <Table<Person> id="t-pop-sort" data={filterData} columns={nameCol({ filterable: true, sortable: true })} />
+      );
+      expect(screen.getByRole('button', { name: 'Name' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Filter Name' })).toBeInTheDocument();
+    });
+
+    it('keeps the filter button on a blank header that has a label', () => {
+      render(
+        <Table<Person>
+          id="t-pop-blank"
+          data={filterData}
+          columns={[{ id: 'name', header: '', accessorKey: 'name', meta: { filterable: true, label: 'Name' } }]}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Filter Name' })).toBeInTheDocument();
+    });
+
+    it('renders no filter button when filtering is disabled for the column', () => {
+      render(
+        <Table<Person>
+          id="t-pop-off"
+          data={filterData}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name', enableColumnFilter: false, meta: { filterable: true } },
+          ]}
+        />
+      );
+      expect(screen.queryByRole('button', { name: 'Filter Name' })).not.toBeInTheDocument();
     });
   });
 

@@ -13,6 +13,7 @@ import InfoButton from '../../buttons/info-button/info-button';
 import { EmptyState } from '../../content/empty-state';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { DateField } from '../../form/date-field/date-field';
+import { Radio } from '../../form/radio/radio';
 import { TextField } from '../../form/textfield/textfield';
 import { TimeField } from '../../form/time-field/time-field';
 import { HideAt } from '../../layout/hide-at/hide-at';
@@ -27,7 +28,7 @@ import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/stat
 import { TableCard } from '../table-card/table-card';
 import { TextGroup } from '../text-group/text-group';
 import { Truncate } from '../truncate/truncate';
-import type { TableProps } from './table';
+import type { TableColumnMeta, TableProps } from './table';
 import { groupRowSpan, Table } from './table';
 
 /**
@@ -987,87 +988,6 @@ const filterablePeople: PersonRecord[] = Array.from({ length: 28 }, (_, index) =
   };
 });
 
-const SortLabel = ({
-  column,
-  children,
-  ariaLabel,
-}: {
-  column: {
-    getIsSorted: () => false | 'asc' | 'desc';
-    getToggleSortingHandler: () => ((e: unknown) => void) | undefined;
-  };
-  children: React.ReactNode;
-  ariaLabel: string;
-}) => {
-  const sorted = column.getIsSorted();
-  const iconName = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more';
-  return (
-    <Table.HeaderButton
-      icon={iconName}
-      selected={!!sorted}
-      aria-label={ariaLabel}
-      onClick={column.getToggleSortingHandler()}
-    >
-      {children}
-    </Table.HeaderButton>
-  );
-};
-
-const TextFilterPopover = ({
-  value,
-  onApply,
-  label,
-}: {
-  value: string;
-  onApply: (next: string | undefined) => void;
-  label: string;
-}) => {
-  const [draft, setDraft] = useState(value);
-  const [open, setOpen] = useState(false);
-  return (
-    <Popover open={open} onToggle={setOpen}>
-      <PopoverTrigger>
-        <Table.HeaderButton icon="filter_alt" selected={!!value} filled={!!value} aria-label={`Filtreeri ${label}`} />
-      </PopoverTrigger>
-      <PopoverContent>
-        <VerticalSpacing size={0.5}>
-          <TextField
-            id={`filter-${label}`}
-            name={`filter-${label}`}
-            label={label}
-            hideLabel
-            value={draft}
-            onChange={setDraft}
-          />
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              visualType="secondary"
-              size="small"
-              onClick={() => {
-                setDraft('');
-                onApply(undefined);
-                setOpen(false);
-              }}
-            >
-              Tühista
-            </Button>
-            <Button
-              visualType="primary"
-              size="small"
-              onClick={() => {
-                onApply(draft || undefined);
-                setOpen(false);
-              }}
-            >
-              Filtreeri
-            </Button>
-          </div>
-        </VerticalSpacing>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
 type DateRangeValue = { from?: string; to?: string };
 
 const dateRangeStringToDate = (value?: string): Date | undefined => {
@@ -1085,129 +1005,6 @@ const dateToDateRangeString = (date?: Date): string | undefined => {
   return `${dd}.${mm}.${date.getFullYear()}`;
 };
 
-const DateRangeFilterPopover = ({
-  value,
-  onApply,
-  label,
-}: {
-  value: DateRangeValue | undefined;
-  onApply: (next: DateRangeValue | undefined) => void;
-  label: string;
-}) => {
-  const [range, setRange] = useState<DateRange | undefined>(() => {
-    const from = dateRangeStringToDate(value?.from);
-    const to = dateRangeStringToDate(value?.to);
-    return from || to ? { from, to } : undefined;
-  });
-  const [open, setOpen] = useState(false);
-  const active = Boolean(value?.from || value?.to);
-  return (
-    <Popover open={open} onToggle={setOpen}>
-      <PopoverTrigger>
-        <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
-      </PopoverTrigger>
-      <PopoverContent width="medium">
-        <VerticalSpacing size={0.5}>
-          <DateField
-            id="filter-date-range"
-            mode="range"
-            label={label}
-            selected={range}
-            placeholder="pp.kk.aaaa - pp.kk.aaaa"
-            onSelect={(next) => setRange(next as DateRange | undefined)}
-          />
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              visualType="secondary"
-              size="small"
-              onClick={() => {
-                setRange(undefined);
-                onApply(undefined);
-                setOpen(false);
-              }}
-            >
-              Tühista
-            </Button>
-            <Button
-              visualType="primary"
-              size="small"
-              onClick={() => {
-                const fromStr = dateToDateRangeString(range?.from);
-                const toStr = dateToDateRangeString(range?.to);
-                onApply(fromStr || toStr ? { from: fromStr, to: toStr } : undefined);
-                setOpen(false);
-              }}
-            >
-              Filtreeri
-            </Button>
-          </div>
-        </VerticalSpacing>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
-const MultiSelectFilterPopover = ({
-  value,
-  onApply,
-  label,
-}: {
-  value: CertStatus[] | undefined;
-  onApply: (next: CertStatus[] | undefined) => void;
-  label: string;
-}) => {
-  const [draft, setDraft] = useState<CertStatus[]>(value ?? []);
-  const [open, setOpen] = useState(false);
-  const active = (value?.length ?? 0) > 0;
-  return (
-    <Popover open={open} onToggle={setOpen}>
-      <PopoverTrigger>
-        <Table.HeaderButton icon="filter_alt" selected={active} filled={active} aria-label={`Filtreeri ${label}`} />
-      </PopoverTrigger>
-      <PopoverContent>
-        <VerticalSpacing size={0.5}>
-          {CERT_STATUSES.map((option) => (
-            <Checkbox
-              key={option}
-              id={`filter-status-${option}`}
-              name="filter-status"
-              value={option}
-              label={option}
-              checked={draft.includes(option)}
-              onChange={(_val, checked) =>
-                setDraft((prev) => (checked ? [...prev, option] : prev.filter((v) => v !== option)))
-              }
-            />
-          ))}
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              visualType="secondary"
-              size="small"
-              onClick={() => {
-                setDraft([]);
-                onApply(undefined);
-                setOpen(false);
-              }}
-            >
-              Tühista
-            </Button>
-            <Button
-              visualType="primary"
-              size="small"
-              onClick={() => {
-                onApply(draft.length ? draft : undefined);
-                setOpen(false);
-              }}
-            >
-              Filtreeri
-            </Button>
-          </div>
-        </VerticalSpacing>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
 const parseDate = (value: string): number | null => {
   const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
   if (!match) return null;
@@ -1216,9 +1013,13 @@ const parseDate = (value: string): number | null => {
 };
 
 /**
- * Column filter popovers via `Table.HeaderButton` + `Popover`. Each column provides a `filterFn`
- * and stores its filter value in TanStack Table's `columnFilters` state. Filter UI varies per column:
- * text input for names, date-range fields for dates, and a checkbox list for enum values.
+ * Column filter popovers with `meta: { filterable }`. The table renders an icon-only filter button
+ * in the header that opens a popover with the filter input and footer actions; the column filter
+ * only changes on apply or clear. Without `filterContent` the popover shows a text field; the date
+ * range and checkbox filters below pass their own input through `filterContent`, which receives the
+ * draft `value` / `setValue` and `apply()` / `clear()` / `cancel()`. Each column provides a
+ * `filterFn` and stores its value in TanStack Table's `columnFilters` state. Footer buttons come
+ * from the table's `filterActions` and can be overridden per column through `filterable: { actions }`.
  */
 export const Filters: Story = {
   render: function Filters() {
@@ -1227,23 +1028,14 @@ export const Filters: Story = {
         {
           id: 'name',
           accessorKey: 'name',
+          header: 'Nimi',
           filterFn: 'includesString',
-          header: ({ column }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <SortLabel column={column} ariaLabel="Sorteeri Nimi">
-                Nimi
-              </SortLabel>
-              <TextFilterPopover
-                value={(column.getFilterValue() as string | undefined) ?? ''}
-                onApply={(next) => column.setFilterValue(next)}
-                label="Nimi"
-              />
-            </span>
-          ),
+          meta: { sortable: true, filterable: true },
         },
         {
           id: 'jobStart',
           accessorKey: 'jobStart',
+          header: 'Töö algus',
           filterFn: (row, id, value: DateRangeValue) => {
             if (!value?.from && !value?.to) return true;
             const cell = parseDate(row.getValue(id) as string);
@@ -1254,56 +1046,66 @@ export const Filters: Story = {
             if (toTs !== null && cell > toTs) return false;
             return true;
           },
-          header: ({ column }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <SortLabel column={column} ariaLabel="Sorteeri Töö algus">
-                Töö algus
-              </SortLabel>
-              <DateRangeFilterPopover
-                value={column.getFilterValue() as DateRangeValue | undefined}
-                onApply={(next) => column.setFilterValue(next)}
-                label="Töö algus"
-              />
-            </span>
-          ),
+          meta: {
+            sortable: true,
+            filterable: { popoverWidth: 'medium' },
+            filterContent: ({ value, setValue, label }) => {
+              const current = value as DateRangeValue | undefined;
+              const from = dateRangeStringToDate(current?.from);
+              const to = dateRangeStringToDate(current?.to);
+              return (
+                <DateField
+                  id="filter-date-range"
+                  mode="range"
+                  label={label}
+                  selected={from || to ? { from, to } : undefined}
+                  placeholder="pp.kk.aaaa - pp.kk.aaaa"
+                  onSelect={(next) => {
+                    const range = next as DateRange | undefined;
+                    const fromStr = dateToDateRangeString(range?.from);
+                    const toStr = dateToDateRangeString(range?.to);
+                    setValue(fromStr || toStr ? { from: fromStr, to: toStr } : undefined);
+                  }}
+                />
+              );
+            },
+          } satisfies TableColumnMeta,
         },
-        {
-          id: 'age',
-          accessorKey: 'age',
-          header: ({ column }) => (
-            <SortLabel column={column} ariaLabel="Sorteeri Vanus">
-              Vanus
-            </SortLabel>
-          ),
-        },
-        {
-          id: 'visits',
-          accessorKey: 'visits',
-          header: ({ column }) => (
-            <SortLabel column={column} ariaLabel="Sorteeri Külastuste arv">
-              Külastuste arv
-            </SortLabel>
-          ),
-        },
+        { id: 'age', accessorKey: 'age', header: 'Vanus', meta: { sortable: true } },
+        { id: 'visits', accessorKey: 'visits', header: 'Külastuste arv', meta: { sortable: true } },
         {
           id: 'status',
           accessorKey: 'status',
+          header: 'Tõendi staatus',
           filterFn: (row, id, value: CertStatus[]) => !value?.length || value.includes(row.getValue(id) as CertStatus),
-          header: ({ column }) => (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <SortLabel column={column} ariaLabel="Sorteeri Tõendi staatus">
-                Tõendi staatus
-              </SortLabel>
-              <MultiSelectFilterPopover
-                value={column.getFilterValue() as CertStatus[] | undefined}
-                onApply={(next) => column.setFilterValue(next)}
-                label="Tõendi staatus"
-              />
-            </span>
-          ),
           cell: ({ row }) => (
             <StatusBadge color={certStatusColor[row.original.status]}>{row.original.status}</StatusBadge>
           ),
+          meta: {
+            sortable: true,
+            filterable: true,
+            filterContent: ({ value, setValue }) => {
+              const selected = (value as CertStatus[] | undefined) ?? [];
+              return (
+                <VerticalSpacing size={0.5}>
+                  {CERT_STATUSES.map((option) => (
+                    <Checkbox
+                      key={option}
+                      id={`filter-status-${option}`}
+                      name="filter-status"
+                      value={option}
+                      label={option}
+                      checked={selected.includes(option)}
+                      onChange={(_val, checked) => {
+                        const next = checked ? [...selected, option] : selected.filter((v) => v !== option);
+                        setValue(next.length ? next : undefined);
+                      }}
+                    />
+                  ))}
+                </VerticalSpacing>
+              );
+            },
+          } satisfies TableColumnMeta,
         },
       ],
       []
@@ -1314,6 +1116,70 @@ export const Filters: Story = {
         id="tedi-table-filters"
         data={filterablePeople}
         columns={columns}
+        pagination={DEFAULT_PAGINATION}
+      />
+    );
+  },
+};
+
+/**
+ * Footer buttons of the filter popover. The table's `filterActions` sets the default (here
+ * `cancel` and `apply`) and a column overrides it with `filterable: { actions }`; an empty array
+ * hides the footer so the filter content closes the popover itself through `apply()`, `clear()`
+ * and `cancel()` (here the checkbox list applies on every change).
+ */
+export const FilterActions: Story = {
+  render: function FilterActions() {
+    const columns = useMemo<ColumnDef<PersonRecord>[]>(
+      () => [
+        { id: 'name', accessorKey: 'name', header: 'Nimi', filterFn: 'includesString', meta: { filterable: true } },
+        {
+          id: 'age',
+          accessorKey: 'age',
+          header: 'Vanus',
+          filterFn: (row, id, value: string) => String(row.getValue(id)).includes(value),
+          meta: { filterable: { actions: ['clear', 'cancel', 'apply'], popoverWidth: 'medium' } },
+        },
+        {
+          id: 'status',
+          accessorKey: 'status',
+          header: 'Tõendi staatus',
+          filterFn: 'equals',
+          meta: {
+            filterable: { actions: [] },
+            filterContent: ({ value, apply, setValue, clear }) => (
+              <VerticalSpacing size={0.5}>
+                {CERT_STATUSES.map((option) => (
+                  <Radio
+                    key={option}
+                    id={`filter-action-status-${option}`}
+                    name="filter-action-status"
+                    value={option}
+                    label={option}
+                    checked={value === option}
+                    onChange={() => {
+                      setValue(option);
+                      apply();
+                    }}
+                  />
+                ))}
+                <Button size="small" visualType="secondary" onClick={clear}>
+                  Tühjenda
+                </Button>
+              </VerticalSpacing>
+            ),
+          } satisfies TableColumnMeta,
+        },
+      ],
+      []
+    );
+
+    return (
+      <Table<PersonRecord>
+        id="tedi-table-filter-actions"
+        data={filterablePeople}
+        columns={columns}
+        filterActions={['cancel', 'apply']}
         pagination={DEFAULT_PAGINATION}
       />
     );
