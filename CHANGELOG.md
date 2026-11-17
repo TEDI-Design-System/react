@@ -1,3 +1,13 @@
+# [21.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.11...react-21.0.0-rc.12) (2026-11-17)
+
+
+### Bug Fixes
+
+* **pagination:** Shorten Page Labels And Drop Current Page Text [#1128](https://github.com/TEDI-Design-System/react/issues/1128) ([#1141](https://github.com/TEDI-Design-System/react/issues/1141)) ([48d6516](https://github.com/TEDI-Design-System/react/commit/48d6516cc90d8d8ac155ac34b3b60ecaa0fa2b0e))
+* **progress-bar:** Hide Visible Value From Screen Readers [#1126](https://github.com/TEDI-Design-System/react/issues/1126) ([#1139](https://github.com/TEDI-Design-System/react/issues/1139)) ([1cdbc3e](https://github.com/TEDI-Design-System/react/commit/1cdbc3e87f335fa3bde028bc09c557ced868c1cd))
+* **search:** Leave Search Landmark Unnamed By Default [#1127](https://github.com/TEDI-Design-System/react/issues/1127) ([#1140](https://github.com/TEDI-Design-System/react/issues/1140)) ([55a59e5](https://github.com/TEDI-Design-System/react/commit/55a59e50f9e781940dae558f10eaccce56608a70))
+* **table:** Stop Naming Blank Headers By Column Id [#1104](https://github.com/TEDI-Design-System/react/issues/1104) ([#1149](https://github.com/TEDI-Design-System/react/issues/1149)) ([4d85c22](https://github.com/TEDI-Design-System/react/commit/4d85c2227b96e9803efcb6ec3f104436aaa42ce9))
+
 # [21.0.0-rc.11](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.10...react-21.0.0-rc.11) (2026-11-16)
 
 
