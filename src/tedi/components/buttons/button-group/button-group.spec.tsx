@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
 
 import { useLabels } from '../../../providers/label-provider';
@@ -465,5 +465,23 @@ describe('ButtonGroup Component', () => {
 
     expect(container.querySelector('[data-name="button-group-dropdown"]')).not.toBeInTheDocument();
     expect((container.querySelector('[role="group"]') as HTMLElement).className).not.toContain('--below-');
+  });
+
+  it('closes the open mobile menu when the viewport widens and the dropdown gets hidden', async () => {
+    const { container } = render(
+      <ButtonGroup dropdownLabel="Menu" enableMobileDropdown>
+        <Button id="button1">Button 1</Button>
+        <Button id="button2">Button 2</Button>
+      </ButtonGroup>
+    );
+    const wrapper = container.querySelector('[data-name="button-group-dropdown"]') as HTMLElement;
+
+    fireEvent.click(within(wrapper).getByRole('button', { name: /Menu/i }));
+    expect(screen.getByRole('menuitem', { name: /Button 1/ })).toBeInTheDocument();
+
+    wrapper.style.display = 'none';
+    await act(async () => void window.dispatchEvent(new Event('resize')));
+
+    expect(screen.queryByRole('menuitem', { name: /Button 1/ })).not.toBeInTheDocument();
   });
 });

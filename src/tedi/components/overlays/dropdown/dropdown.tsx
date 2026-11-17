@@ -19,6 +19,7 @@ import React from 'react';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
 import { useLabels } from '../../../providers/label-provider';
+import { isReferenceHidden } from '../overlay/is-reference-hidden';
 import styles from './dropdown.module.scss';
 import { DropdownContent } from './dropdown-content/dropdown-content';
 import { DropdownContext, DropdownContextValue } from './dropdown-context';
@@ -164,13 +165,27 @@ export const Dropdown = (props: DropdownProps) => {
     [controlledOpen, onOpenChange]
   );
 
+  // The menu renders in a portal, so it closes when its trigger gets hidden (for example by CSS at another breakpoint).
+  const setOpenRef = React.useRef(setOpen);
+  React.useEffect(() => {
+    setOpenRef.current = setOpen;
+  }, [setOpen]);
+
   const floating = useFloating({
     nodeId,
     open,
     placement,
     onOpenChange: setOpen,
     middleware: [offset(DROPDOWN_OFFSET), flip(), shift()],
-    whileElementsMounted: autoUpdate,
+    whileElementsMounted: (reference, floatingElement, update) =>
+      autoUpdate(reference, floatingElement, () => {
+        if (isReferenceHidden(reference)) {
+          setOpenRef.current(false);
+          return;
+        }
+
+        update();
+      }),
   });
 
   const { context, refs, x, y, strategy } = floating;
