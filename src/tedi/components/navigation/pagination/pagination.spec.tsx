@@ -477,6 +477,23 @@ describe('Pagination — compact mobile picker', () => {
     const trigger = screen.getByRole('button', { name: 'Page size 10' });
     expect(trigger.className).toMatch(/compact-only/);
   });
+
+  it('opens the page-size modal from the compact trigger and selects a size', () => {
+    const onPageSizeChange = jest.fn();
+    render(
+      <Pagination pageCount={5} pageSizeOptions={[10, 20, 50]} pageSize={10} onPageSizeChange={onPageSizeChange} />
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Page size 10' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(trigger);
+
+    const modal = screen.getByRole('dialog', { name: 'Page size' });
+    fireEvent.click(within(modal).getByRole('button', { name: 'Page size 20' }));
+
+    expect(onPageSizeChange).toHaveBeenCalledWith(20);
+    expect(screen.queryByRole('dialog', { name: 'Page size' })).not.toBeInTheDocument();
+  });
 });
 
 describe('Pagination — slots hidden below a breakpoint', () => {
