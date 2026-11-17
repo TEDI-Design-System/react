@@ -1290,9 +1290,16 @@ describe('Table', () => {
           ]}
         />
       );
+      const order = () =>
+        screen
+          .getAllByRole('cell')
+          .map((c) => c.textContent)
+          .filter((t) => /^[ABC]$/.test(t ?? ''));
+      expect(order()).toEqual(['A', 'B', 'C']);
+
       fireEvent.click(screen.getByRole('button', { name: 'Age' }));
       expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveAttribute('aria-sort', 'ascending');
-      expect(screen.getAllByRole('cell').filter((c) => /^[ABC]$/.test(c.textContent ?? ''))[0]).toHaveTextContent('A');
+      expect(order()).toEqual(['A', 'C', 'B']);
     });
 
     it('names the sort button of a blank header from the sort label', () => {
