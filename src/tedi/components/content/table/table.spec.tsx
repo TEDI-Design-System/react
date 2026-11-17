@@ -56,6 +56,14 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'table.drag-row':
           return 'Drag row';
+        case 'table.select-all':
+          return 'Select all rows';
+        case 'table.select-row':
+          return 'Select row';
+        case 'table.reorder.instructions':
+          return 'Column reorder instructions';
+        case 'table.row-reorder.instructions':
+          return 'Row reorder instructions';
         default:
           return key;
       }
@@ -549,6 +557,45 @@ describe('Table', () => {
       expect(checkboxes[1]).toBeChecked();
     });
 
+    it('keeps stable selection labels; state comes from checked', () => {
+      render(<Table<Person> id="t-sel-labels" data={data} columns={columns} enableRowSelection />);
+
+      const selectAll = screen.getByRole('checkbox', { name: 'Select all rows' });
+      const rowBoxes = screen.getAllByRole('checkbox', { name: 'Select row' });
+      expect(rowBoxes).toHaveLength(data.length);
+
+      fireEvent.click(selectAll);
+      expect(selectAll).toBeChecked();
+      expect(selectAll).toHaveAccessibleName('Select all rows');
+      rowBoxes.forEach((box) => expect(box).toHaveAccessibleName('Select row'));
+    });
+
+    it('names row selection controls with rowSelectionLabel', () => {
+      const { rerender } = render(
+        <Table<Person>
+          id="t-sel-custom"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          rowSelectionLabel={(row) => `Select ${row.original.name}`}
+        />
+      );
+      expect(screen.getByRole('checkbox', { name: 'Select Anna' })).toBeInTheDocument();
+      expect(screen.getByRole('checkbox', { name: 'Select Jüri' })).toBeInTheDocument();
+
+      rerender(
+        <Table<Person>
+          id="t-sel-custom"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          selectionMode="single"
+          rowSelectionLabel={(row) => `Select ${row.original.name}`}
+        />
+      );
+      expect(screen.getByRole('radio', { name: 'Select Anna' })).toBeInTheDocument();
+    });
+
     it('select-all toggles every row', () => {
       render(<Table<Person> id="t-sel-all" data={data} columns={columns} enableRowSelection />);
 
@@ -629,15 +676,15 @@ describe('Table', () => {
         />
       );
 
-      // Without a `LabelProvider` wrapping the render, `getLabel` returns the
-      // i18n key verbatim, which is what the accessible name resolves to.
-      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      const toggle = screen.getAllByRole('button', { name: 'Row details' })[0];
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
       fireEvent.click(toggle);
 
       expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(toggle).toHaveAccessibleName('Row details');
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
-      const collapse = screen.getByRole('button', { name: /table\.collapse-row/i });
-      fireEvent.click(collapse);
+      fireEvent.click(toggle);
       expect(screen.queryByText(/details for Anna/)).not.toBeInTheDocument();
     });
 
@@ -940,7 +987,7 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Alpha' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Bravo' })).toBeInTheDocument();
 
-      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: 'Row details' })[0]);
 
       // Both children render on the same page and Bravo is NOT pushed to page 2.
       expect(screen.getByRole('cell', { name: 'Alpha-1' })).toBeInTheDocument();
@@ -960,7 +1007,7 @@ describe('Table', () => {
         />
       );
 
-      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: 'Row details' })[0]);
 
       // Children now occupy page slots: only the first child fits, the second
       // child and Bravo are pushed to page 2.
@@ -1220,6 +1267,17 @@ describe('Table', () => {
       expect(container.querySelector('[aria-live="polite"]')).toBeInTheDocument();
     });
 
+    it('describes the drag handles with the reorder instructions', () => {
+      render(<Table<Person> id="t-kb-desc" data={data} columns={columns} reorderableColumns reorderableRows />);
+
+      expect(screen.getByRole('button', { name: 'Drag column Name' })).toHaveAccessibleDescription(
+        'Column reorder instructions'
+      );
+      screen
+        .getAllByRole('button', { name: 'Drag row' })
+        .forEach((handle) => expect(handle).toHaveAccessibleDescription('Row reorder instructions'));
+    });
+
     it('reorders a column with the keyboard (pick up → ArrowRight → drop)', () => {
       const onStateChange = jest.fn();
       render(
@@ -1279,7 +1337,7 @@ describe('Table', () => {
         />
       );
 
-      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      const toggle = screen.getAllByRole('button', { name: 'Row details' })[0];
       fireEvent.keyDown(toggle, { key: 'Enter', bubbles: true });
       fireEvent.keyDown(toggle, { key: ' ', bubbles: true });
       // Pressing a non-Enter/Space key bubbles through the span without

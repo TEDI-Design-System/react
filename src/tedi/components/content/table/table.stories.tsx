@@ -1494,6 +1494,7 @@ export const SelectableRows: Story = {
       data={people}
       columns={personColumns}
       enableRowSelection
+      rowSelectionLabel={(row) => `Vali ${row.original.name}`}
       pagination={DEFAULT_PAGINATION}
     />
   ),

@@ -41,7 +41,7 @@ export function getRowSelectionColumn<TData>(id = 'row-selection', showSelectAll
       showSelectAll ? (
         <LabelContext.Consumer>
           {({ getLabel }) => {
-            const toggleLabel = getLabel('table.select-all', table.getIsAllRowsSelected());
+            const toggleLabel = getLabel('table.select-all');
 
             return (
               <Check
@@ -62,7 +62,7 @@ export function getRowSelectionColumn<TData>(id = 'row-selection', showSelectAll
       return (
         <LabelContext.Consumer>
           {({ getLabel }) => {
-            const toggleLabel = getLabel('table.select-row', row.getIsSelected());
+            const toggleLabel = getLabel('table.select-row');
 
             if (!row.getCanSelect()) {
               return null;
