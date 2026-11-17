@@ -817,7 +817,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           menuPlacement="auto"
           inputIsHidden={inputIsHidden}
           required={required}
-          menuPortalTarget={document.body}
+          menuPortalTarget={typeof document === 'undefined' ? undefined : document.body}
           menuPosition="absolute"
           classNames={(() => {
             const merged: Record<string, (state: UnknownType) => string> = {};
