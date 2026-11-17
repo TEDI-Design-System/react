@@ -57,7 +57,8 @@ export const HeaderResponsiveVariants = ({ variants, children }: HeaderResponsiv
     <>
       {variants.map((variant) => (
         <span
-          key={`${variant.size}-${variant.label ?? ''}`}
+          // Every breakpoint belongs to exactly one variant, so the first one identifies it.
+          key={variant.visibleAt[0]}
           data-name="header-variant"
           className={cn(
             styles['tedi-header-variant'],

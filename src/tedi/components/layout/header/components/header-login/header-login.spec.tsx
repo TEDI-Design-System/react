@@ -58,6 +58,16 @@ describe('HeaderLogin component', () => {
     expect(large.className).not.toMatch(/hidden-lg/);
   });
 
+  it('renders an empty label from a breakpoint as its own variant, without duplicate keys', () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const { container } = render(<HeaderLogin size="small" lg={{ label: '' }} />);
+
+    expect(getVariants(container)).toHaveLength(2);
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
   it('renders with custom label', () => {
     const { container } = render(<HeaderLogin label="Sign in" />);
 

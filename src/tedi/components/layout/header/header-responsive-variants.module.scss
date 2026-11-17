@@ -5,7 +5,7 @@
   display: contents;
 
   @each $breakpoint in (xs, sm, md, lg, xl, xxl) {
-    &--hidden-#{$breakpoint} {
+    &.tedi-header-variant--hidden-#{$breakpoint} {
       @include breakpoints.media-breakpoint-only($breakpoint) {
         display: none;
       }
