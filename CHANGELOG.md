@@ -1,3 +1,19 @@
+# [21.0.0-rc.13](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.12...react-21.0.0-rc.13) (2026-11-17)
+
+
+### Bug Fixes
+
+* **alert:** Keep Close And Action Buttons Outside The Live Region [#1134](https://github.com/TEDI-Design-System/react/issues/1134) ([#1145](https://github.com/TEDI-Design-System/react/issues/1145)) ([1380cae](https://github.com/TEDI-Design-System/react/commit/1380caefb341ccb034fe24a4438e0f407bd6fb36))
+* **carousel:** Announce Role Once And Shorten Indicator Labels [#1125](https://github.com/TEDI-Design-System/react/issues/1125) ([#1138](https://github.com/TEDI-Design-System/react/issues/1138)) ([270a8ca](https://github.com/TEDI-Design-System/react/commit/270a8ca358734f69a6fdb9ec5cffd82523543a55))
+* **closing-button:** Render Label Once [#1136](https://github.com/TEDI-Design-System/react/issues/1136) ([#1147](https://github.com/TEDI-Design-System/react/issues/1147)) ([2595aaa](https://github.com/TEDI-Design-System/react/commit/2595aaa3b3aa31b84008408cc1ea3c1c3d4a731d))
+* **number-field:** Shorten Number Field Announcements [#1132](https://github.com/TEDI-Design-System/react/issues/1132) ([#1144](https://github.com/TEDI-Design-System/react/issues/1144)) ([618a805](https://github.com/TEDI-Design-System/react/commit/618a805e41bfe3b5fbb49bf0dda33cf4d6cbaf03))
+* **vertical-stepper:** Give Step Actions Link Context [#1103](https://github.com/TEDI-Design-System/react/issues/1103) ([#1148](https://github.com/TEDI-Design-System/react/issues/1148)) ([b43ab79](https://github.com/TEDI-Design-System/react/commit/b43ab7924e7aa4a9c3764a10389c4b9e6fc75945))
+
+
+### Features
+
+* **table:** Add Row Header Column Option [#1105](https://github.com/TEDI-Design-System/react/issues/1105) ([#1150](https://github.com/TEDI-Design-System/react/issues/1150)) ([616ebf8](https://github.com/TEDI-Design-System/react/commit/616ebf829b23a548e0f8b39083614c528fae8f6c))
+
 # [21.0.0-rc.12](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.11...react-21.0.0-rc.12) (2026-11-17)
 
 
