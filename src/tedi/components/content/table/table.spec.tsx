@@ -115,7 +115,7 @@ describe('Table', () => {
     expect(nameHeader).toHaveAttribute('aria-label', 'Name');
   });
 
-  it('falls back the leaf header accessible name to the column id when no label is provided', () => {
+  it('names a custom header from its content, not the column id, when no label is provided', () => {
     const customColumns: ColumnDef<Person>[] = [
       {
         id: 'name',
@@ -134,8 +134,8 @@ describe('Table', () => {
 
     render(<Table<Person> id="t-fallback" data={data} columns={customColumns} />);
 
-    const nameHeader = screen.getByRole('columnheader', { name: 'name' });
-    expect(nameHeader).toHaveAttribute('aria-label', 'name');
+    const nameHeader = screen.getByRole('columnheader', { name: /^Name/ });
+    expect(nameHeader).not.toHaveAttribute('aria-label');
   });
 
   it('renders the empty state when data is empty', () => {
@@ -777,14 +777,28 @@ describe('Table', () => {
   });
 
   describe('accessibility', () => {
-    it('gives a blank utility header an accessible name (falls back to the column id)', () => {
+    it('names a blank header from meta.label', () => {
+      const withActions: ColumnDef<Person>[] = [
+        ...columns,
+        { id: 'actions', header: '', meta: { label: 'Tegevused' }, cell: () => <button>Edit</button> },
+      ];
+      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+
+      expect(screen.getByRole('columnheader', { name: 'Tegevused' })).toBeInTheDocument();
+    });
+
+    it('leaves a blank header without meta.label unnamed instead of using the column id', () => {
       const withActions: ColumnDef<Person>[] = [
         ...columns,
         { id: 'actions', header: '', cell: () => <button>Edit</button> },
       ];
-      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+      render(<Table<Person> id="t-blank-header-unnamed" data={data} columns={withActions} />);
 
-      expect(screen.getByRole('columnheader', { name: 'actions' })).toBeInTheDocument();
+      const headers = screen.getAllByRole('columnheader');
+      const actionsHeader = headers[headers.length - 1];
+      expect(actionsHeader).not.toHaveAttribute('aria-label');
+      expect(actionsHeader).toBeEmptyDOMElement();
+      expect(screen.queryByRole('columnheader', { name: 'actions' })).not.toBeInTheDocument();
     });
 
     it('names the built-in expand column header', () => {

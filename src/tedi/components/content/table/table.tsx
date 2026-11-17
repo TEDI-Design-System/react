@@ -59,7 +59,11 @@ import { useTablePersistence } from './use-table-persistence';
  * `meta` covers the common "every cell in the column lines up the same way".
  */
 export interface TableColumnMeta {
-  /** Accessible label used when the column header isn't a plain string. */
+  /**
+   * Names a blank or non-text header (e.g. an actions column) for screen readers and in filter,
+   * column drag and reorder labels; without it a blank header has no name and those labels use the
+   * column id, a developer string such as "actions" (filter and reorder get `''` for `header: ''`).
+   */
   label?: string;
   /**
    * Props forwarded to the built-in per-column filter input (the `TextField`
@@ -1665,7 +1669,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       (headerDef === null ||
                         headerDef === undefined ||
                         (typeof headerDef === 'string' && headerDef.trim() === ''));
-                    const headerFallbackLabel = headerLabel ?? (columnHasChildren ? undefined : header.column.id);
                     const userColumnProps = columnProps?.(header.column.id);
                     const headerSize = header.column.getSize();
                     const isBuiltInColumn =
@@ -1703,7 +1706,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         )}
                         scope="col"
                         aria-sort={ariaSort}
-                        aria-label={headerLabel ?? (columnHasChildren ? undefined : header.column.id)}
+                        aria-label={headerLabel}
                         style={
                           headerSize || userColumnProps?.style
                             ? { ...(headerSize ? { width: headerSize } : null), ...userColumnProps?.style }
@@ -1730,8 +1733,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             </button>
                             {flexRender(header.column.columnDef.header, header.getContext())}
                           </span>
-                        ) : headerIsBlank && headerFallbackLabel ? (
-                          <span className={styles['tedi-table__sr-only']}>{headerFallbackLabel}</span>
+                        ) : headerIsBlank && headerLabel ? (
+                          <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
                           flexRender(header.column.columnDef.header, header.getContext())
                         )}
