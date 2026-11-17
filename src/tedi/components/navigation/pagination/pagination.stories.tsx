@@ -307,7 +307,7 @@ export const Borders: Story = {
           totalItems={97}
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
-          labels={{ ariaLabel: 'Lehed' }}
+          labels={{ ariaLabel: 'Lehed: ülemine eraldusjoon' }}
         />
       </div>
       <div>
@@ -319,7 +319,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="bottom"
-          labels={{ ariaLabel: 'Lehed' }}
+          labels={{ ariaLabel: 'Lehed: alumine eraldusjoon' }}
         />
       </div>
       <div>
@@ -331,7 +331,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="both"
-          labels={{ ariaLabel: 'Lehed' }}
+          labels={{ ariaLabel: 'Lehed: mõlemad eraldusjooned' }}
         />
       </div>
       <div>
@@ -343,7 +343,7 @@ export const Borders: Story = {
           pageSize={10}
           pageSizeOptions={[10, 25, 50]}
           borders="none"
-          labels={{ ariaLabel: 'Lehed' }}
+          labels={{ ariaLabel: 'Lehed: eraldusjooneta' }}
         />
       </div>
     </div>
