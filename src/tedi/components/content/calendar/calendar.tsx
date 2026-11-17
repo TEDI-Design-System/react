@@ -1,6 +1,18 @@
 import classNames from 'classnames';
 import React from 'react';
-import { DateRange, DayButton, DayPicker, DayPickerProps, Locale, Matcher, OnSelectHandler } from 'react-day-picker';
+import {
+  CalendarDay,
+  DateLib,
+  DateRange,
+  DayButton,
+  DayPicker,
+  DayPickerProps,
+  labelDayButton,
+  Labels,
+  Locale,
+  Matcher,
+  OnSelectHandler,
+} from 'react-day-picker';
 import { et } from 'react-day-picker/locale';
 
 import { BreakpointSupport, useBreakpointProps } from '../../../helpers';
@@ -255,6 +267,65 @@ export const Calendar = (props: CalendarProps) => {
     }
   })();
 
+  const formatLocale = locale.code ?? localeCode;
+  const { timeZone, labels: consumerLabels } = dayPickerProps;
+  const hasConsumerDayLabel = !!consumerLabels?.labelDayButton;
+  const [dayFormat, dayYearFormat] = React.useMemo(
+    () =>
+      [undefined, 'numeric' as const].map(
+        (year) =>
+          new Intl.DateTimeFormat(formatLocale, { weekday: 'long', day: 'numeric', month: 'long', year, timeZone })
+      ),
+    [formatLocale, timeZone]
+  );
+  // The grid is already named with the month and year, so the day label drops the year.
+  // Locale labels name the day with format(date, 'PPPP'), so that one format is swapped.
+  const withoutYear = (dateLib: DateLib): DateLib =>
+    Object.assign(Object.create(dateLib), {
+      format: (date: Date, formatStr: string, options?: Parameters<DateLib['format']>[2]) =>
+        formatStr === 'PPPP' ? dayFormat.format(date) : dateLib.format(date, formatStr, options),
+    });
+  const localeDayButton =
+    typeof locale.labels?.labelDayButton === 'string'
+      ? () => locale.labels?.labelDayButton as string
+      : locale.labels?.labelDayButton ?? labelDayButton;
+  const dayLabels: Partial<Labels> = {
+    labelDayButton: (date, modifiers, options, dateLib) =>
+      localeDayButton(date, { ...modifiers, selected: false }, options, withoutYear(dateLib ?? new DateLib(options))),
+    ...consumerLabels,
+  };
+
+  const dayComponents = React.useMemo<DayPickerProps['components']>(() => {
+    // Outside days from another year than their month grid name their year.
+    const withGridYear = (label: string | undefined, { date, displayMonth }: CalendarDay) =>
+      label && !hasConsumerDayLabel && date.getFullYear() !== displayMonth.getFullYear()
+        ? label.replace(dayFormat.format(date), dayYearFormat.format(date))
+        : label;
+
+    return {
+      Day: ({ day: _day, modifiers, ...tdProps }) =>
+        modifiers.hidden ? <td {...tdProps} /> : <td {...tdProps} role="presentation" aria-selected={undefined} />,
+      DayButton: (dayButtonProps) => {
+        const status = dayStatus?.(dayButtonProps.day.date);
+        const ariaLabel =
+          [withGridYear(dayButtonProps['aria-label'], dayButtonProps.day), status?.label].filter(Boolean).join(', ') ||
+          undefined;
+
+        return (
+          <DayButton
+            {...dayButtonProps}
+            role="gridcell"
+            aria-selected={dayButtonProps.modifiers.selected || undefined}
+            aria-label={ariaLabel}
+          >
+            {dayButtonProps.children}
+            {status && <StatusIndicator type={status.type} size="sm" className={styles['tedi-calendar__day-status']} />}
+          </DayButton>
+        );
+      },
+    };
+  }, [dayStatus, dayFormat, dayYearFormat, hasConsumerDayLabel]);
+
   return (
     <div className={styles['tedi-calendar__wrapper']}>
       {view === 'years' && (
@@ -299,6 +370,7 @@ export const Calendar = (props: CalendarProps) => {
           {...dayPickerProps}
           {...selectionProps}
           locale={locale}
+          labels={dayLabels}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
           showOutsideDays={showOutsideDays}
@@ -319,26 +391,7 @@ export const Calendar = (props: CalendarProps) => {
               />
             ),
             Nav: () => <></>,
-            ...(dayStatus
-              ? {
-                  DayButton: (dayButtonProps) => {
-                    const status = dayStatus(dayButtonProps.day.date);
-
-                    if (!status) {
-                      return <DayButton {...dayButtonProps} />;
-                    }
-
-                    const ariaLabel = [dayButtonProps['aria-label'], status.label].filter(Boolean).join(', ');
-
-                    return (
-                      <DayButton {...dayButtonProps} aria-label={ariaLabel}>
-                        {dayButtonProps.children}
-                        <StatusIndicator type={status.type} size="sm" className={styles['tedi-calendar__day-status']} />
-                      </DayButton>
-                    );
-                  },
-                }
-              : {}),
+            ...dayComponents,
             ...(fullWidth
               ? {
                   Weekday: ({ children, ...weekdayProps }) => (

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fireEvent, render, screen } from '@testing-library/react';
+import { DateLib } from 'react-day-picker';
+import { et } from 'react-day-picker/locale';
 
 import { useBreakpointProps } from '../../../helpers';
 import { Calendar, CalendarProps } from './calendar';
@@ -370,13 +372,125 @@ describe('Calendar', () => {
     });
   });
 
+  describe('day labels', () => {
+    const dateLib = new DateLib({ locale: et });
+    const date = new Date(2026, 10, 16);
+
+    it('names a day with weekday, day and month but no year', () => {
+      render(<Calendar {...baseProps} />);
+      const { labelDayButton } = mockDayPickerProps.current.labels;
+
+      expect(labelDayButton(date, {}, dateLib.options, dateLib)).toBe('esmaspäev, 16. november');
+    });
+
+    it('keeps the today wording from the locale and leaves the selected state out of the name', () => {
+      render(<Calendar {...baseProps} />);
+      const { labelDayButton } = mockDayPickerProps.current.labels;
+
+      expect(labelDayButton(date, { today: true, selected: true }, dateLib.options, dateLib)).toBe(
+        'Täna, esmaspäev, 16. november'
+      );
+    });
+
+    it('adds the year only to outside days from another year than their month grid', () => {
+      render(<Calendar {...baseProps} />);
+      const { Day, DayButton } = mockDayPickerProps.current.components;
+      const { labelDayButton } = mockDayPickerProps.current.labels;
+      const january = new Date(2027, 0, 1);
+      const december = new Date(2026, 11, 1);
+      const cell = (date: Date, displayMonth: Date) => {
+        const day = { date, displayMonth };
+        return (
+          <Day day={day} modifiers={{}} role="gridcell">
+            <DayButton day={day} modifiers={{}} aria-label={labelDayButton(date, {}, dateLib.options, dateLib)} />
+          </Day>
+        );
+      };
+      render(
+        <table>
+          <tbody>
+            <tr>
+              {cell(new Date(2026, 11, 30), january)}
+              {cell(new Date(2027, 0, 1), january)}
+              {cell(new Date(2026, 11, 31), december)}
+              {cell(new Date(2027, 0, 1), december)}
+            </tr>
+          </tbody>
+        </table>
+      );
+
+      expect(screen.getAllByRole('gridcell').map((el) => el.getAttribute('aria-label'))).toEqual([
+        'kolmapäev, 30. detsember 2026',
+        'reede, 1. jaanuar',
+        'neljapäev, 31. detsember',
+        'reede, 1. jaanuar 2027',
+      ]);
+    });
+
+    it('leaves consumer day labels unchanged on outside days from another year', () => {
+      const label = 'kolmapäev, 30. detsember 2026';
+      render(<Calendar {...baseProps} labels={{ labelDayButton: () => label }} />);
+      const { DayButton } = mockDayPickerProps.current.components;
+      render(
+        <DayButton
+          day={{ date: new Date(2026, 11, 30), displayMonth: new Date(2027, 0, 1) }}
+          modifiers={{}}
+          aria-label={label}
+        />
+      );
+
+      expect(screen.getByRole('gridcell')).toHaveAttribute('aria-label', label);
+    });
+
+    it('uses string labels from the locale', () => {
+      render(<Calendar {...baseProps} locale={{ ...et, labels: { labelDayButton: 'Päev' } }} />);
+      const { labelDayButton } = mockDayPickerProps.current.labels;
+
+      expect(labelDayButton(date, {}, dateLib.options, dateLib)).toBe('Päev');
+    });
+
+    it('lets consumer labels override the defaults', () => {
+      const custom = () => 'custom';
+      render(<Calendar {...baseProps} labels={{ labelDayButton: custom }} />);
+
+      expect(mockDayPickerProps.current.labels.labelDayButton).toBe(custom);
+    });
+  });
+
   describe('dayStatus', () => {
     const dayStatus = (date: Date) => (date.getDate() === 15 ? { type: 'success' as const, label: 'Available' } : null);
 
-    it('does not register a custom DayButton when dayStatus is omitted', () => {
+    it('puts the gridcell role and selected state on the day button', () => {
       render(<Calendar {...baseProps} />);
 
-      expect(mockDayPickerProps.current.components.DayButton).toBeUndefined();
+      const { Day, DayButton } = mockDayPickerProps.current.components;
+      const date = new Date(2025, 0, 16);
+      const { container } = render(
+        <table>
+          <tbody>
+            <tr>
+              <Day day={{ date }} modifiers={{ selected: true }} role="gridcell" aria-selected>
+                <DayButton
+                  day={{ date, displayMonth: date }}
+                  modifiers={{ selected: true }}
+                  aria-label="16 January 2025"
+                >
+                  16
+                </DayButton>
+              </Day>
+              <Day day={{ date }} modifiers={{ hidden: true }} role="gridcell" />
+            </tr>
+          </tbody>
+        </table>
+      );
+      const [visibleCell, hiddenCell] = Array.from(container.querySelectorAll('td'));
+
+      expect(visibleCell).toHaveAttribute('role', 'presentation');
+      expect(visibleCell).not.toHaveAttribute('aria-selected');
+      expect(hiddenCell).toHaveAttribute('role', 'gridcell');
+      expect(screen.getByRole('gridcell', { name: '16 January 2025', selected: true })).toBe(
+        container.querySelector('button')
+      );
     });
 
     it('overlays a StatusIndicator and appends the status label to aria-label for matching days', () => {
@@ -384,7 +498,11 @@ describe('Calendar', () => {
 
       const DayButton = mockDayPickerProps.current.components.DayButton;
       const { container } = render(
-        <DayButton day={{ date: new Date(2025, 0, 15) }} modifiers={{}} aria-label="15 January 2025">
+        <DayButton
+          day={{ date: new Date(2025, 0, 15), displayMonth: new Date(2025, 0) }}
+          modifiers={{}}
+          aria-label="15 January 2025"
+        >
           15
         </DayButton>
       );
@@ -398,7 +516,11 @@ describe('Calendar', () => {
 
       const DayButton = mockDayPickerProps.current.components.DayButton;
       const { container } = render(
-        <DayButton day={{ date: new Date(2025, 0, 16) }} modifiers={{}} aria-label="16 January 2025">
+        <DayButton
+          day={{ date: new Date(2025, 0, 16), displayMonth: new Date(2025, 0) }}
+          modifiers={{}}
+          aria-label="16 January 2025"
+        >
           16
         </DayButton>
       );
