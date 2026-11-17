@@ -126,6 +126,8 @@ function App() {
 
 `PrintingProvider` is required: `Collapse` and `SideNav` call `usePrint`, which throws outside it, so anything rendering a `Collapse` fails without it. `LabelProvider` is required for built-in labels. `AccessibilityProvider` exposes `useDeclareLoader` and other a11y hooks; omit it only if you have no loaders/announcements. `StyleProvider` is exported but currently renders its children unchanged, so it is optional.
 
+Keep `<html lang>` equal to the `LabelProvider` locale, and update it when the locale changes (`useLabels().locale`). TEDI does not set it. Screen readers choose the voice and pronunciation from `lang`, so Estonian labels under `lang="en"` are read with English pronunciation (WCAG 3.1.1).
+
 ### 2. Import core styles
 
 ```tsx
