@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import React from 'react';
 
 import { LabelProvider } from '../../../providers/label-provider';
 import { Rating } from './rating';
@@ -128,6 +129,26 @@ describe('Rating', () => {
 
     fireEvent.reset(screen.getByRole('form', { name: 'Rating form' }));
     expect(screen.getByRole('radio', { name: '2/5' })).toBeChecked();
+  });
+
+  it('keeps the controlled value selected and submitted after a native form reset', () => {
+    const ControlledForm = () => {
+      const [value, setValue] = React.useState(2);
+      return (
+        <form aria-label="Rating form">
+          <Rating label="Feedback" name="rating" count={5} value={value} onChange={setValue} />
+        </form>
+      );
+    };
+    render(<ControlledForm />);
+    fireEvent.click(screen.getByRole('radio', { name: '4/5' }));
+
+    const form = screen.getByRole('form', { name: 'Rating form' }) as HTMLFormElement;
+    form.reset();
+
+    expect(screen.getByRole('radio', { name: '4/5' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '2/5' })).not.toBeChecked();
+    expect(new FormData(form).get('rating')).toBe('4');
   });
 
   describe('hover preview', () => {

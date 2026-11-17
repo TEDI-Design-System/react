@@ -138,6 +138,15 @@ export const Rating = (props: RatingProps): JSX.Element => {
     return () => form.removeEventListener('reset', handleReset);
   }, [isControlled, defaultValue, readOnly]);
 
+  // React only writes the radios' `checked` attribute on mount, so in controlled mode a native reset would
+  // fall back to the first value. Keep the DOM defaults on the current value so a reset leaves it selected.
+  useEffect(() => {
+    if (!isControlled) return;
+    rootRef.current?.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((input) => {
+      input.defaultChecked = Number(input.value) === value;
+    });
+  }, [isControlled, value, readOnly, total]);
+
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const interactive = !disabled && !readOnly;
 
