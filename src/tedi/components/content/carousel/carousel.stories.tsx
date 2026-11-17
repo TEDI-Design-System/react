@@ -382,7 +382,10 @@ const ServiceCard = ({ icon, title, text }: ServiceItem): JSX.Element => (
 );
 
 export const Default: StoryObj = {
+  args: { ariaLabelledBy: 'carousel-default-title' },
   argTypes: {
+    ariaLabel: { control: 'text' },
+    ariaLabelledBy: { control: 'text' },
     ...subcomponentArgTypes(Carousel.Content, {
       category: 'Carousel.Content',
       prefix: 'content',
@@ -390,10 +393,10 @@ export const Default: StoryObj = {
     }),
   },
   render: (args: Record<string, unknown>) => (
-    <Carousel>
+    <Carousel ariaLabel={args.ariaLabel as string} ariaLabelledBy={args.ariaLabelledBy as string}>
       <Carousel.Header>
         <div>
-          <Text element="h2" modifiers="h1">
+          <Text element="h2" modifiers="h1" id="carousel-default-title">
             Pealkiri
           </Text>
         </div>
@@ -412,7 +415,7 @@ export const Default: StoryObj = {
 export const TopPaginationArrowsOnly: Story = {
   name: 'Top pagination - arrows only',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -427,7 +430,7 @@ export const TopPaginationArrowsOnly: Story = {
 export const SeparatedBottomPaginationHasDots: Story = {
   name: 'Separated bottom pagination - has dots',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -450,7 +453,7 @@ export const SeparatedBottomPaginationHasDots: Story = {
 export const SeparatedBottomPaginationHasNumbers: Story = {
   name: 'Separated bottom pagination - has numbers',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -468,7 +471,7 @@ export const SeparatedBottomPaginationHasNumbers: Story = {
 export const CenteredBottomPaginationHasDots: Story = {
   name: 'Centered bottom pagination - has dots',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -490,7 +493,7 @@ export const CenteredBottomPaginationHasDots: Story = {
 export const CenteredBottomPaginationHasNumbers: Story = {
   name: 'Centered bottom pagination - has numbers',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -507,7 +510,7 @@ export const CenteredBottomPaginationHasNumbers: Story = {
 export const CombinationsTopNavigationBottomDots: Story = {
   name: 'Combinations - top navigation, bottom dots',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -531,7 +534,7 @@ export const CenteredHasDots: Story = {
   name: 'Centered - has dots',
   render: () => (
     <div style={{ maxWidth: 400 }}>
-      <Carousel>
+      <Carousel ariaLabel="Pealkiri">
         <Carousel.Header>
           <Text element="h2" modifiers="h1">
             Pealkiri
@@ -555,7 +558,7 @@ export const CenteredHasNumbers: Story = {
   name: 'Centered - has numbers',
   render: () => (
     <div style={{ maxWidth: 400 }}>
-      <Carousel>
+      <Carousel ariaLabel="Pealkiri">
         <Carousel.Header>
           <Text element="h2" modifiers="h1">
             Pealkiri
@@ -572,7 +575,7 @@ export const CenteredHasNumbers: Story = {
 
 export const Faded: Story = {
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -589,7 +592,7 @@ export const Faded: Story = {
 export const FadedBothSides: Story = {
   name: 'Faded - both sides',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -610,7 +613,7 @@ export const FadedBothSides: Story = {
  */
 export const Peeking: Story = {
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -638,7 +641,7 @@ export const Peeking: Story = {
 export const PeekingBothSides: Story = {
   name: 'Peeking - both sides (centered)',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Pealkiri">
       <Carousel.Header>
         <Text element="h2" modifiers="h1">
           Pealkiri
@@ -670,7 +673,7 @@ export const PeekingBothSides: Story = {
 export const BoundedOverlayNavigation: Story = {
   name: 'Bounded - overlay arrows (no loop)',
   render: () => (
-    <Carousel>
+    <Carousel ariaLabel="Kaardid">
       <Carousel.Content slidesPerView={{ xs: 2, sm: 3, md: 4, lg: 6 }} gap={0.5} loop={false}>
         {MAP_ITEMS.map((item) => (
           <MapCard key={item.id} {...item} />

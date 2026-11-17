@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import React, { forwardRef, useEffect, useRef } from 'react';
 
+import { useLabels } from '../../../../../providers/label-provider';
 import styles from '../../carousel.module.scss';
 import { useCarouselContext } from '../../carousel-context';
 import { BreakpointInput, normalizeBreakpointInput } from '../../carousel-utils';
@@ -76,7 +77,9 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
     },
     ref
   ) => {
+    const { getLabel } = useLabels();
     const carousel = useCarouselContext();
+    const named = !!(carousel.regionLabel || carousel.regionLabelledBy);
     const slides = React.Children.toArray(children);
     const slideNodes = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -122,8 +125,9 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
       <div
         ref={setViewportRef}
         role="region"
-        aria-roledescription="carousel"
-        aria-label={carousel.regionLabel}
+        aria-roledescription={named ? getLabel('carousel') : undefined}
+        aria-label={carousel.regionLabel ?? (carousel.regionLabelledBy ? undefined : getLabel('carousel.label'))}
+        aria-labelledby={carousel.regionLabelledBy}
         aria-live="off"
         tabIndex={0}
         className={cn(
@@ -159,7 +163,7 @@ export const CarouselContent = forwardRef<HTMLDivElement, CarouselContentProps>(
                   carousel.setSlideRef(renderedIndex, node);
                 }}
                 role={visible ? 'group' : 'presentation'}
-                aria-roledescription="slide"
+                aria-roledescription={getLabel('carousel.slide-role-description')}
                 aria-label={carousel.slideLabel(slideIndex + 1)}
                 aria-current={renderedIndex === carousel.renderedActiveIndex ? 'true' : undefined}
                 aria-hidden={visible ? undefined : 'true'}
