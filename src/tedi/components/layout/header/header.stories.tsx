@@ -6,7 +6,7 @@ import { getSubcomponentProps, subcomponentArgTypes } from '../../../../../.stor
 import Toggle from '../../../../tedi/components/form/toggle/toggle';
 import Separator from '../../../../tedi/components/misc/separator/separator';
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
-import { LabelProvider, useLabels } from '../../../providers/label-provider';
+import { useLabels } from '../../../providers/label-provider';
 import { useTheme } from '../../../providers/theme-provider/theme-provider';
 import { Icon } from '../../base/icon/icon';
 import { Text } from '../../base/typography/text/text';
@@ -42,11 +42,6 @@ const meta: Meta<typeof Header> = {
     'Header.Search': Header.Search,
   } as never,
   decorators: [
-    (Story) => (
-      <LabelProvider locale="et">
-        <Story />
-      </LabelProvider>
-    ),
     (Story) => {
       const [globals, updateGlobals] = useGlobals();
       const originalThemeRef = useRef<string | null>(null);
