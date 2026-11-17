@@ -290,4 +290,49 @@ describe('Overlay component', () => {
 
     expect(trigger).not.toHaveAttribute('aria-describedby');
   });
+
+  describe('hidden trigger', () => {
+    const renderOpenOverlay = (onToggle?: () => void) =>
+      render(
+        <div data-testid="wrapper">
+          <Overlay defaultOpen openWith="click" onToggle={onToggle}>
+            <Overlay.Trigger>
+              <button>Open</button>
+            </Overlay.Trigger>
+            <Overlay.Content>Content</Overlay.Content>
+          </Overlay>
+        </div>
+      );
+
+    const resize = () => act(async () => void window.dispatchEvent(new Event('resize')));
+
+    it('closes an open overlay when its trigger gets hidden by a `display: none` ancestor', async () => {
+      const onToggle = jest.fn();
+      renderOpenOverlay(onToggle);
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+
+      screen.getByTestId('wrapper').style.display = 'none';
+      await resize();
+
+      expect(screen.queryByTestId('overlay-content')).not.toBeInTheDocument();
+      expect(onToggle).toHaveBeenCalledWith(false);
+    });
+
+    it('stays open when its trigger is inside a `display: contents` ancestor', async () => {
+      renderOpenOverlay();
+
+      screen.getByTestId('wrapper').style.display = 'contents';
+      await resize();
+
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+    });
+
+    it('stays open on resize when the trigger is not hidden', async () => {
+      renderOpenOverlay();
+
+      await resize();
+
+      expect(screen.getByTestId('overlay-content')).toBeInTheDocument();
+    });
+  });
 });
