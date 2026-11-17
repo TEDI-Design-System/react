@@ -78,7 +78,8 @@ export interface CarouselApi {
   contentClassName: (base: string, fadeModifier: string, fadeXModifier: string) => string;
   isSlideVisible: (renderedIndex: number) => boolean;
   announcement: string;
-  regionLabel: string;
+  regionLabel?: string;
+  regionLabelledBy?: string;
   slideLabel: (slide: number) => string;
   next: () => void;
   prev: () => void;
@@ -98,7 +99,7 @@ export interface CarouselApi {
  * imperative API consumed by `Carousel.Content`, `Carousel.Navigation` and
  * `Carousel.Indicators`. Ported from the Angular `tedi-carousel-content`.
  */
-export const useCarousel = (ariaLabel?: string): CarouselApi => {
+export const useCarousel = (ariaLabel?: string, ariaLabelledBy?: string): CarouselApi => {
   const { getLabel } = useLabels();
   const breakpoint = useBreakpoint();
 
@@ -663,8 +664,9 @@ export const useCarousel = (ariaLabel?: string): CarouselApi => {
     contentClassName,
     isSlideVisible,
     announcement,
-    regionLabel: ariaLabel?.trim() || getLabel('carousel'),
-    slideLabel: (slide: number) => getLabel('carousel.slide', slide, slidesCount),
+    regionLabel: ariaLabel?.trim() || undefined,
+    regionLabelledBy: ariaLabelledBy?.trim() || undefined,
+    slideLabel: (slide: number) => getLabel('carousel.slide-label', slide, slidesCount),
     next,
     prev,
     goToIndex,

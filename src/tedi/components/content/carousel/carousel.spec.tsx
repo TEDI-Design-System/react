@@ -1,7 +1,8 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
 
 import { Breakpoint } from '../../../helpers';
+import { LabelProvider } from '../../../providers/label-provider';
 import { FloatingButton } from '../../buttons/floating-button/floating-button';
 import { Carousel } from './carousel';
 
@@ -66,14 +67,15 @@ const activeDotIndex = (): number =>
     .findIndex((dot) => dot.getAttribute('aria-current') === 'true');
 
 describe('Carousel', () => {
-  it('renders a carousel region with an accessible name', () => {
+  it('is a region with the default name and no role description when unnamed', () => {
     renderCarousel();
-    const region = screen.getByRole('region', { name: 'carousel' });
-    expect(region).toHaveAttribute('aria-roledescription', 'carousel');
+    const region = screen.getByRole('region', { name: 'carousel.label' });
+    expect(region).not.toHaveAttribute('aria-roledescription');
+    expect(region).not.toHaveAttribute('aria-labelledby');
     expect(region).toHaveAttribute('aria-live', 'off');
   });
 
-  it('uses a custom ariaLabel as the region name (distinguishes multiple carousels)', () => {
+  it('is a region named by ariaLabel', () => {
     render(
       <Carousel ariaLabel="Uudised">
         <Carousel.Content>
@@ -81,11 +83,29 @@ describe('Carousel', () => {
         </Carousel.Content>
       </Carousel>
     );
-    expect(screen.getByRole('region', { name: 'Uudised' })).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'carousel' })).not.toBeInTheDocument();
+    const region = screen.getByRole('region', { name: 'Uudised' });
+    expect(region).toHaveAttribute('aria-roledescription', 'carousel');
+    expect(region).toHaveAttribute('aria-live', 'off');
   });
 
-  it('falls back to the localized label when ariaLabel is blank', () => {
+  it('is a region named by ariaLabelledBy', () => {
+    render(
+      <Carousel ariaLabelledBy="carousel-title">
+        <Carousel.Header>
+          <h2 id="carousel-title">Title</h2>
+        </Carousel.Header>
+        <Carousel.Content>
+          <div>Slide 1</div>
+        </Carousel.Content>
+      </Carousel>
+    );
+    const region = screen.getByRole('region', { name: 'Title' });
+    expect(region).toHaveAttribute('aria-labelledby', 'carousel-title');
+    expect(region).toHaveAttribute('aria-roledescription', 'carousel');
+    expect(region).not.toHaveAttribute('aria-label');
+  });
+
+  it('falls back to the default name when ariaLabel is blank', () => {
     render(
       <Carousel ariaLabel="   ">
         <Carousel.Content>
@@ -93,18 +113,58 @@ describe('Carousel', () => {
         </Carousel.Content>
       </Carousel>
     );
-    expect(screen.getByRole('region', { name: 'carousel' })).toBeInTheDocument();
+    const region = screen.getByRole('region', { name: 'carousel.label' });
+    expect(region).not.toHaveAttribute('aria-roledescription');
+  });
+
+  it('announces roles once, in the label language (et)', () => {
+    render(
+      <LabelProvider locale="et">
+        <Carousel ariaLabel="Uudised">
+          <Carousel.Content>
+            <div>Slide 1</div>
+            <div>Slide 2</div>
+            <div>Slide 3</div>
+          </Carousel.Content>
+          <Carousel.Footer>
+            <Carousel.Indicators />
+          </Carousel.Footer>
+        </Carousel>
+      </LabelProvider>
+    );
+
+    expect(screen.getByRole('region', { name: 'Uudised' })).toHaveAttribute('aria-roledescription', 'karussell');
+    expect(screen.getByRole('group', { name: '1 / 3' })).toHaveAttribute('aria-roledescription', 'slaid');
+
+    const indicators = screen.getByRole('group', { name: 'Slaidid' });
+    const dots = within(indicators).getAllByRole('button');
+    expect(dots.map((dot) => dot.getAttribute('aria-label'))).toEqual(['Slaid 1', 'Slaid 2', 'Slaid 3']);
+    expect(dots.map((dot) => dot.getAttribute('aria-current'))).toEqual(['true', null, null]);
+  });
+
+  it('names an unnamed carousel without a role description (et)', () => {
+    render(
+      <LabelProvider locale="et">
+        <Carousel>
+          <Carousel.Content>
+            <div>Slide 1</div>
+          </Carousel.Content>
+        </Carousel>
+      </LabelProvider>
+    );
+
+    expect(screen.getByRole('region', { name: 'Karussell' })).not.toHaveAttribute('aria-roledescription');
   });
 
   it('exposes only the slides in view as groups (default 1 per view)', () => {
     renderCarousel(3);
-    expect(screen.getAllByRole('group')).toHaveLength(1);
+    expect(screen.getAllByRole('group', { name: 'carousel.slide-label' })).toHaveLength(1);
   });
 
   it('shows more groups when slidesPerView is increased via a breakpoint object', () => {
     renderCarousel(5, { slidesPerView: { xs: 3 } });
     // ceil(3) visible slides become groups
-    expect(screen.getAllByRole('group')).toHaveLength(3);
+    expect(screen.getAllByRole('group', { name: 'carousel.slide-label' })).toHaveLength(3);
   });
 
   it('renders one dot indicator per slide', () => {
@@ -163,11 +223,29 @@ describe('Carousel', () => {
     expect(screen.getByText(/\/ 3/)).toBeInTheDocument();
   });
 
+  it('names the indicators as a group only when they hold buttons', () => {
+    const numbers = (withArrows: boolean) => (
+      <Carousel>
+        <Carousel.Content>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+        </Carousel.Content>
+        <Carousel.Footer>
+          <Carousel.Indicators variant="numbers" withArrows={withArrows} />
+        </Carousel.Footer>
+      </Carousel>
+    );
+    const { rerender } = render(numbers(false));
+    expect(screen.queryByRole('group', { name: 'carousel.slides' })).not.toBeInTheDocument();
+    rerender(numbers(true));
+    expect(screen.getByRole('group', { name: 'carousel.slides' })).toBeInTheDocument();
+  });
+
   it('navigates with the keyboard (arrows, Home, End)', () => {
     jest.useFakeTimers();
     try {
       renderCarousel(4);
-      const region = screen.getByRole('region', { name: 'carousel' });
+      const region = screen.getByRole('region');
       const advance = () => act(() => jest.advanceTimersByTime(400));
 
       fireEvent.keyDown(region, { key: 'ArrowRight' });
@@ -188,7 +266,7 @@ describe('Carousel', () => {
 
   it('handles a pointer drag without breaking the carousel', () => {
     renderCarousel(4);
-    const region = screen.getByRole('region', { name: 'carousel' });
+    const region = screen.getByRole('region');
 
     fireEvent.pointerDown(region, { clientX: 300, pointerId: 1 });
     fireEvent.pointerMove(region, { clientX: 284, pointerId: 1 });
@@ -202,7 +280,7 @@ describe('Carousel', () => {
     jest.useFakeTimers();
     try {
       renderCarousel(5);
-      const region = screen.getByRole('region', { name: 'carousel' });
+      const region = screen.getByRole('region');
       fireEvent.wheel(region, { deltaX: 200, deltaY: 0 });
       act(() => {
         jest.advanceTimersByTime(200);
@@ -221,9 +299,37 @@ describe('Carousel', () => {
     expect(activeDotIndex()).toBe(1);
   });
 
+  it('announces arrow navigation, but not an indicator click that moves focus to the slide', () => {
+    jest.useFakeTimers();
+    try {
+      const { container } = renderCarousel(3);
+      const liveRegion = container.querySelector('[aria-live="polite"]') as HTMLElement;
+      const track = container.querySelector('[class*="track"]') as HTMLElement;
+      const settle = () => {
+        act(() => jest.advanceTimersByTime(400));
+        const transitionEnd = new Event('transitionend', { bubbles: true });
+        Object.defineProperty(transitionEnd, 'propertyName', { value: 'transform' });
+        fireEvent(track, transitionEnd);
+        act(() => jest.runOnlyPendingTimers());
+      };
+
+      fireEvent.click(screen.getByRole('button', { name: 'carousel.move-forward' }));
+      settle();
+      expect(liveRegion).toHaveTextContent('carousel.slide');
+
+      act(() => liveRegion.replaceChildren());
+      fireEvent.click(screen.getAllByRole('button', { name: 'carousel.show-slide' })[2]);
+      settle();
+      expect(liveRegion).toHaveTextContent('');
+      expect(screen.getByRole('group', { name: 'carousel.slide-label' })).toHaveFocus();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('resets viewport scroll offset on scroll', () => {
     const { container } = renderCarousel(3);
-    const region = screen.getByRole('region', { name: 'carousel' }) as HTMLElement;
+    const region = screen.getByRole('region') as HTMLElement;
     region.scrollLeft = 50;
     fireEvent.scroll(region);
     expect(region.scrollLeft).toBe(0);
@@ -243,8 +349,8 @@ describe('Carousel', () => {
       </Carousel>
     );
 
-    const slideEls = container.querySelectorAll('[aria-roledescription="slide"]');
-    const inertSlides = container.querySelectorAll('[aria-roledescription="slide"][inert]');
+    const slideEls = container.querySelectorAll('[aria-roledescription="carousel.slide-role-description"]');
+    const inertSlides = container.querySelectorAll('[aria-roledescription="carousel.slide-role-description"][inert]');
     expect(slideEls.length - inertSlides.length).toBe(1);
     expect(container.querySelector('[aria-current="true"]')).not.toHaveAttribute('inert');
   });
@@ -273,7 +379,7 @@ describe('Carousel', () => {
 
     it('renders each slide once (no looping duplicates)', () => {
       const { container } = renderFinite(3);
-      expect(container.querySelectorAll('[aria-roledescription="slide"]')).toHaveLength(3);
+      expect(container.querySelectorAll('[aria-roledescription="carousel.slide-role-description"]')).toHaveLength(3);
     });
 
     it('disables prev at the start and next at the end', () => {
@@ -449,7 +555,7 @@ describe('Carousel', () => {
       jest.useFakeTimers();
       try {
         const { container } = render(boundedCarousel(5, slidesPerView));
-        const region = screen.getByRole('region', { name: 'carousel' });
+        const region = screen.getByRole('region');
         const next = screen.getByRole('button', { name: 'carousel.move-forward' });
         const back = screen.getByRole('button', { name: 'carousel.move-back' });
         const dots = screen.getAllByRole('button', { name: 'carousel.show-slide' });
@@ -463,7 +569,9 @@ describe('Carousel', () => {
         expect(trackPosition(container, slidesPerView)).toBeCloseTo(5 - slidesPerView);
         expect(dots[3]).toHaveAttribute('aria-current', 'true');
         expect(next).toBeDisabled();
-        expect(container.querySelectorAll('[aria-roledescription="slide"][role="group"]')).toHaveLength(3);
+        expect(
+          container.querySelectorAll('[aria-roledescription="carousel.slide-role-description"][role="group"]')
+        ).toHaveLength(3);
 
         fireEvent.click(back);
         advance();
@@ -478,7 +586,7 @@ describe('Carousel', () => {
         Object.defineProperty(transitionEnd, 'propertyName', { value: 'transform' });
         fireEvent(container.querySelector('[class*="track"]') as HTMLElement, transitionEnd);
         act(() => jest.runOnlyPendingTimers());
-        expect(container.querySelectorAll('[aria-roledescription="slide"]')[3]).toHaveFocus();
+        expect(container.querySelectorAll('[aria-roledescription="carousel.slide-role-description"]')[3]).toHaveFocus();
       } finally {
         jest.useRealTimers();
       }
@@ -529,7 +637,7 @@ describe('Carousel', () => {
       const { container, rerender } = render(boundedCarousel(5, 2.5, 'numbers'));
       expect(screen.getByText('1')).toBeInTheDocument();
       expect(screen.getByText(/\/ 4/)).toBeInTheDocument();
-      fireEvent.keyDown(screen.getByRole('region', { name: 'carousel' }), { key: 'End' });
+      fireEvent.keyDown(screen.getByRole('region'), { key: 'End' });
       expect(trackPosition(container, 2.5)).toBeCloseTo(2.5);
       expect(screen.getByText('4')).toBeInTheDocument();
       rerender(boundedCarousel(0, 2.5, 'numbers'));
@@ -541,7 +649,7 @@ describe('Carousel', () => {
 
     it('snaps a bounded drag and flick to the fractional final position', () => {
       const { container } = render(boundedCarousel(5, 2.5));
-      const region = screen.getByRole('region', { name: 'carousel' });
+      const region = screen.getByRole('region');
       const dots = screen.getAllByRole('button', { name: 'carousel.show-slide' });
       fireEvent.click(dots[2]);
       firePointer(region, 'pointerdown', 900, 100);
@@ -559,7 +667,7 @@ describe('Carousel', () => {
 
     it('flicks backward from the fractional end', () => {
       const { container } = render(boundedCarousel(5, 2.5));
-      const region = screen.getByRole('region', { name: 'carousel' });
+      const region = screen.getByRole('region');
       fireEvent.keyDown(region, { key: 'End' });
 
       firePointer(region, 'pointerdown', 900, 100);
@@ -572,7 +680,7 @@ describe('Carousel', () => {
 
     it('still flicks forward in looping mode', () => {
       renderCarousel(4);
-      const region = screen.getByRole('region', { name: 'carousel' });
+      const region = screen.getByRole('region');
 
       firePointer(region, 'pointerdown', 900, 100);
       firePointer(region, 'pointermove', 880, 110);
@@ -585,7 +693,7 @@ describe('Carousel', () => {
       jest.useFakeTimers();
       try {
         const { container } = render(boundedCarousel(5, 2.5));
-        const region = screen.getByRole('region', { name: 'carousel' });
+        const region = screen.getByRole('region');
         const wheel = (deltaX: number): void => {
           fireEvent.wheel(region, { deltaX, deltaY: 0 });
           act(() => jest.advanceTimersByTime(120));
@@ -613,7 +721,7 @@ describe('Carousel', () => {
       try {
         const view = { xs: 3, lg: 1 };
         const { container, rerender } = render(boundedCarousel(5, view));
-        const region = screen.getByRole('region', { name: 'carousel' });
+        const region = screen.getByRole('region');
         fireEvent.keyDown(region, { key: 'End' });
         expect(trackPosition(container, 1)).toBeCloseTo(4);
 
@@ -634,7 +742,7 @@ describe('Carousel', () => {
       jest.useFakeTimers();
       try {
         const { container, rerender } = render(boundedCarousel(5, 2.5));
-        const region = screen.getByRole('region', { name: 'carousel' });
+        const region = screen.getByRole('region');
         fireEvent.keyDown(region, { key: 'End' });
         rerender(boundedCarousel(3, 2.5));
         expect(trackPosition(container, 2.5)).toBeCloseTo(0.5);
@@ -689,7 +797,7 @@ describe('Carousel', () => {
           [500 + dx, 2000],
         ]);
 
-      const region = (): HTMLElement => screen.getByRole('region', { name: 'carousel' });
+      const region = (): HTMLElement => screen.getByRole('region');
 
       it.each([
         ['forwards past', -0.35, 1],
