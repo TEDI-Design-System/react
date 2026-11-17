@@ -68,15 +68,7 @@ export interface TableColumnMeta {
    */
   label?: string;
   /**
-   * Renders the built-in sort button for the column, so the header needs no hand-built
-   * `Table.HeaderButton`.
-   * - **String / number header:** the whole title becomes the sort button; its icon follows the
-   *   sort state and each click cycles through ascending, descending and off.
-   * - **Custom header:** the header renders unchanged, followed by an icon-only sort button, so
-   *   interactive content in the header (e.g. an info button) is never nested inside another button.
-   *
-   * The icon-only button is named by the `table.sort` label, using `label` (or the string header,
-   * or the column id) as the column name. Has no effect when sorting is disabled for the column.
+   * Adds a built-in sort control to a sortable column header.
    * @default false
    */
   sortable?: boolean;
@@ -784,6 +776,18 @@ export interface TableRowDropEvent {
   toIndex: number;
 }
 
+/**
+ * TanStack starts numeric columns in descending order. Columns with `meta.sortable` always cycle
+ * ascending, descending, off unless they set `sortDescFirst` themselves; hand-built sort headers
+ * keep TanStack's behaviour.
+ */
+const startSortingAscending = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
+  const children = (column as { columns?: ColumnDef<TData>[] }).columns;
+  const withChildren = children ? { ...column, columns: children.map(startSortingAscending) } : column;
+  const isSortable = (column.meta as TableColumnMeta | undefined)?.sortable === true;
+  return isSortable && column.sortDescFirst === undefined ? { ...withChildren, sortDescFirst: false } : withChildren;
+};
+
 const passthroughFilter: FilterFn<unknown> = () => true;
 const DEFAULT_FILTER_FNS = {
   text: passthroughFilter,
@@ -1100,7 +1104,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       });
     }
 
-    return [...leading, ...columns];
+    return [...leading, ...columns.map(startSortingAscending)];
   }, [
     columns,
     hasSelection,
@@ -1713,6 +1717,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
                     const headerLabel = rawHeaderLabel?.trim() ? rawHeaderLabel : undefined;
                     const headerDef = header.column.columnDef.header;
+                    const hasBuiltInSort = headerMeta?.sortable === true && header.column.getCanSort();
                     const headerContent = (
                       <TableHeaderContent
                         header={header}
@@ -1790,7 +1795,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             </button>
                             {headerContent}
                           </span>
-                        ) : headerIsBlank && headerLabel ? (
+                        ) : headerIsBlank && headerLabel && !hasBuiltInSort ? (
                           <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
                           headerContent

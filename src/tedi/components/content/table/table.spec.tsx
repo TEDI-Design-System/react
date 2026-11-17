@@ -1274,6 +1274,40 @@ describe('Table', () => {
       expect(screen.getByRole('button', { name: 'Sort by name ascending' })).toBeInTheDocument();
     });
 
+    it('starts a numeric column in ascending order', () => {
+      const numeric = [
+        { id: '1', name: 'A', role: '10' },
+        { id: '2', name: 'B', role: '30' },
+        { id: '3', name: 'C', role: '20' },
+      ].map((row) => ({ ...row, age: Number(row.role) }));
+      render(
+        <Table<(typeof numeric)[number]>
+          id="t-short-num"
+          data={numeric}
+          columns={[
+            { id: 'name', header: 'Name', accessorKey: 'name' },
+            { id: 'age', header: 'Age', accessorKey: 'age', meta: { sortable: true } },
+          ]}
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: 'Age' }));
+      expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveAttribute('aria-sort', 'ascending');
+      expect(screen.getAllByRole('cell').filter((c) => /^[ABC]$/.test(c.textContent ?? ''))[0]).toHaveTextContent('A');
+    });
+
+    it('names the sort button of a blank header from the sort label', () => {
+      render(
+        <Table<Person>
+          id="t-short-blank"
+          data={sortData}
+          columns={[{ id: 'name', header: '', accessorKey: 'name', meta: { sortable: true, label: 'Name' } }]}
+        />
+      );
+      const button = screen.getByRole('button', { name: 'Sort by Name ascending' });
+      fireEvent.click(button);
+      expect(firstName()).toBe('Alice');
+    });
+
     it('renders no sort button when sorting is disabled for the column', () => {
       render(
         <Table<Person>

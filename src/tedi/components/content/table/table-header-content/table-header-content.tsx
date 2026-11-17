@@ -42,8 +42,10 @@ export const TableHeaderContent = <TData,>({ header, label, sortable }: TableHea
   };
 
   const headerDef = column.columnDef.header;
+  // A blank string header has no text to name the button, so it gets the icon-only button instead.
+  const hasTitle = typeof headerDef === 'number' || (typeof headerDef === 'string' && headerDef.trim() !== '');
 
-  if (typeof headerDef === 'string' || typeof headerDef === 'number') {
+  if (hasTitle) {
     return <TableHeaderButton {...buttonProps}>{content}</TableHeaderButton>;
   }
 
