@@ -230,6 +230,21 @@ describe('TopNav', () => {
     expect(drawer.getByRole('link', { name: 'Docs' })).toBeInTheDocument();
   });
 
+  it('closes the mobile drawer when a drawer link is activated', () => {
+    setBreakpoint('sm');
+    const onMenuToggle = jest.fn();
+    const { container } = render(
+      <TopNav ariaLabel="Primary" isMobileOpen onMenuToggle={onMenuToggle}>
+        <TopNav.Item href="/">Home</TopNav.Item>
+      </TopNav>
+    );
+    const drawer = within(container.querySelector('[data-name="mobile-sidenav"]') as HTMLElement);
+
+    fireEvent.click(drawer.getByRole('link', { name: 'Home' }));
+
+    expect(onMenuToggle).toHaveBeenCalledWith(false);
+  });
+
   it('does not open the drawer at or above the breakpoint, even when isMobileOpen is set', () => {
     setBreakpoint('lg');
     const { container } = render(
