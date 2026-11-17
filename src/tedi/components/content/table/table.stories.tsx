@@ -387,6 +387,7 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
@@ -490,6 +491,7 @@ const simpleDoctorColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
@@ -567,6 +569,7 @@ const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
@@ -702,6 +705,7 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
     cell: ({ row }) => <EditActionsCell row={row.original} />,
   },
@@ -1606,6 +1610,7 @@ const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
     cell: () => (
       <span style={rowActionsCellStyle}>
@@ -1755,6 +1760,7 @@ export const Actions: Story = {
         {
           id: 'actions',
           header: '',
+          meta: { label: 'Tegevused' },
           size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
@@ -1812,6 +1818,7 @@ export const Custom: Story = {
         {
           id: 'note',
           header: '',
+          meta: { label: 'Märkus' },
           cell: ({ row }) =>
             row.original.note && row.original.noteColor ? (
               <Alert type={row.original.noteColor} size="small" role="status">
@@ -1823,6 +1830,7 @@ export const Custom: Story = {
         {
           id: 'actions',
           header: '',
+          meta: { label: 'Tegevused' },
           size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
