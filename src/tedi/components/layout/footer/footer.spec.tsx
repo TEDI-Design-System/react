@@ -226,6 +226,39 @@ describe('Footer', () => {
     expect((mobile.querySelector('.tedi-footer-section') as HTMLElement).className).toMatch(/--mobile/);
   });
 
+  it('updates visible separators when new link text moves the row break', () => {
+    let firstRowEndsAfter = 2;
+    const offsetTop = jest
+      .spyOn(HTMLElement.prototype, 'offsetTop', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        const index = Array.from(this.parentElement?.children ?? []).indexOf(this);
+        return index < firstRowEndsAfter ? 0 : 24;
+      });
+
+    const footer = (firstLabel: string) => (
+      <Footer>
+        <Footer.Bottom separator>
+          <a href="#">{firstLabel}</a>
+          <a href="#">B</a>
+          <a href="#">C</a>
+        </Footer.Bottom>
+      </Footer>
+    );
+
+    try {
+      const { container, rerender } = render(footer('A'));
+      const followedItems = () =>
+        Array.from(container.querySelectorAll('.tedi-footer-bottom__item--followed'), (item) => item.textContent);
+      expect(followedItems()).toEqual(['A']);
+
+      firstRowEndsAfter = 1;
+      rerender(footer('A much longer label'));
+      expect(followedItems()).toEqual(['B']);
+    } finally {
+      offsetTop.mockRestore();
+    }
+  });
+
   it('Footer.Bottom with `separator` inserts a decorative dot between items', () => {
     const { container } = render(
       <Footer>
