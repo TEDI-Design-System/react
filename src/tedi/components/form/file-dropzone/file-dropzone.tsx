@@ -232,6 +232,7 @@ export const FileDropzone = (props: FileDropzoneProps): JSX.Element => {
                       <Button
                         visualType="neutral"
                         icon={file.isValid === false ? 'close' : 'delete'}
+                        showTooltip
                         onClick={() => onFileRemove(file)}
                       >
                         {`${getLabel('remove')} ${file.name ?? ''}`}
