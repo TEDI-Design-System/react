@@ -99,10 +99,16 @@ type SectionOverrides = Partial<Pick<FooterSectionProps, 'collapsible' | 'defaul
 const StandardSections = ({
   contactIcon = 'call',
   firstOpen = false,
+  showIcons = true,
   ...sectionProps
-}: SectionOverrides & { contactIcon?: string; firstOpen?: boolean }) => (
+}: SectionOverrides & { contactIcon?: string; firstOpen?: boolean; showIcons?: boolean }) => (
   <>
-    <Footer.Section icon="info" heading="Uuri lähemalt" defaultOpen={firstOpen} {...sectionProps}>
+    <Footer.Section
+      icon={showIcons ? 'info' : undefined}
+      heading="Uuri lähemalt"
+      defaultOpen={firstOpen}
+      {...sectionProps}
+    >
       <Link href="#" color="inverted">
         Privaatsuspoliitika
       </Link>
@@ -116,7 +122,7 @@ const StandardSections = ({
         Karjäärivõimalused
       </Link>
     </Footer.Section>
-    <Footer.Section icon="share" heading="Sotsiaalmeedia ja uuendused" {...sectionProps}>
+    <Footer.Section icon={showIcons ? 'share' : undefined} heading="Sotsiaalmeedia ja uuendused" {...sectionProps}>
       <Link href="#" color="inverted">
         Uudiskirja tellimine
       </Link>
@@ -130,25 +136,17 @@ const StandardSections = ({
         Liitu meie kogukonnaga
       </Link>
     </Footer.Section>
-    <Footer.Section icon={contactIcon} heading="Kontakt" {...sectionProps}>
+    <Footer.Section icon={showIcons ? contactIcon : undefined} heading="Kontakt" {...sectionProps}>
       <ContactLinks />
     </Footer.Section>
   </>
 );
 
-const BottomLinks = () => (
-  <>
-    <Link href="#" color="inverted" underline={false}>
-      Facebook
-    </Link>
-    <Link href="#" color="inverted" underline={false}>
-      Instagram
-    </Link>
-    <Link href="#" color="inverted" underline={false}>
-      LinkedIn
-    </Link>
-  </>
-);
+const bottomLinks = ['Facebook', 'Instagram', 'LinkedIn'].map((label) => (
+  <Link key={label} href="#" color="inverted" underline={false}>
+    {label}
+  </Link>
+));
 
 const DeviceFrame = ({
   storyId,
@@ -390,7 +388,7 @@ const BottomSections = () => (
 
 export const WithBottomSection: Story = {
   parameters: { controls: { disable: true } },
-  render: () => (
+  render: (_args, context) => (
     <section aria-label="Footer bottom section examples">
       <VerticalSpacing size={1}>
         <Footer>
@@ -400,9 +398,7 @@ export const WithBottomSection: Story = {
           <Footer.Side placement="end">
             <LogoPlaceholder />
           </Footer.Side>
-          <Footer.Bottom>
-            <BottomLinks />
-          </Footer.Bottom>
+          <Footer.Bottom>{bottomLinks}</Footer.Bottom>
         </Footer>
         <Footer>
           <Footer.Body>
@@ -411,9 +407,63 @@ export const WithBottomSection: Story = {
           <Footer.Side placement="end">
             <LogoPlaceholder />
           </Footer.Side>
-          <Footer.Bottom separator>
-            <BottomLinks />
-          </Footer.Bottom>
+          <Footer.Bottom separator>{bottomLinks}</Footer.Bottom>
+        </Footer>
+        <DeviceFrame
+          storyId="tedi-ready-layout-footer--device-frame-source-bottom-section"
+          label="Mobile"
+          width={360}
+          theme={(context.globals.theme as string) ?? 'default'}
+        />
+      </VerticalSpacing>
+    </section>
+  ),
+};
+
+export const DeviceFrameSourceBottomSection: Story = {
+  tags: ['!dev', '!autodocs'],
+  parameters: deviceFrameSourceParams,
+  render: () => (
+    <Footer>
+      <Footer.Body>
+        <BottomSections />
+      </Footer.Body>
+      <Footer.Side placement="end">
+        <LogoPlaceholder />
+      </Footer.Side>
+      <Footer.Bottom separator>
+        {[1, 2, 3, 4, 5, 6].map((id) => (
+          <Link key={id} href="#" color="inverted" underline={false}>
+            Link
+          </Link>
+        ))}
+      </Footer.Bottom>
+    </Footer>
+  ),
+};
+
+export const ShowIcons: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <section aria-label="Footer icon examples">
+      <VerticalSpacing size={1}>
+        <Text element="h4">With icons</Text>
+        <Footer>
+          <Footer.Body>
+            <StandardSections />
+          </Footer.Body>
+          <Footer.Side placement="end">
+            <LogoPlaceholder />
+          </Footer.Side>
+        </Footer>
+        <Text element="h4">Without icons</Text>
+        <Footer>
+          <Footer.Body>
+            <StandardSections showIcons={false} />
+          </Footer.Body>
+          <Footer.Side placement="end">
+            <LogoPlaceholder />
+          </Footer.Side>
         </Footer>
       </VerticalSpacing>
     </section>
@@ -488,9 +538,9 @@ export const CustomContent: Story = {
                 Liitu meie uuringuga ja avasta uut enda tervise kohta!
               </Text>
             </Footer.Section>
-            <div className="flex align-items-start">
+            <div className="flex flex-wrap align-items-start" style={{ rowGap: 'var(--layout-grid-gutters-16)' }}>
               <img
-                src="https://picsum.photos/seed/tedi-footer/152"
+                src="custom_accordion_1.png"
                 alt=""
                 style={{ flexShrink: 0, width: '4.75rem', height: '4.75rem', objectFit: 'cover', borderRadius: '50%' }}
               />

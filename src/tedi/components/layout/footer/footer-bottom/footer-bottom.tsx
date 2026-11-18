@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { Children, Fragment, isValidElement, ReactNode, useContext } from 'react';
+import { Children, isValidElement, ReactNode, useContext, useLayoutEffect, useRef } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../../helpers';
 import styles from '../footer.module.scss';
@@ -29,6 +29,36 @@ export const FooterBottom = ({ children, separator = false, className }: FooterB
   const isMobile = isBreakpointBelow(breakpoint, mobileBreakpoint);
 
   const items = separator ? Children.toArray(children).filter((child) => isValidElement(child) || child) : null;
+  const innerRef = useRef<HTMLDivElement>(null);
+  const itemCount = items?.length ?? 0;
+
+  useLayoutEffect(() => {
+    const inner = innerRef.current;
+    if (!inner || itemCount < 2) return undefined;
+
+    const updateSeparators = () => {
+      const items = Array.from(inner.children) as HTMLElement[];
+
+      items.forEach((item, index) => {
+        const next = items[index + 1];
+        item.classList.toggle(
+          styles['tedi-footer-bottom__item--followed'],
+          !!next && item.offsetTop === next.offsetTop
+        );
+      });
+    };
+
+    updateSeparators();
+
+    if (typeof ResizeObserver === 'undefined') return undefined;
+
+    const observer = new ResizeObserver(updateSeparators);
+    observer.observe(inner);
+
+    Array.from(inner.children).forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, [children, isMobile, itemCount, maxWidth]);
 
   return (
     <div
@@ -36,13 +66,25 @@ export const FooterBottom = ({ children, separator = false, className }: FooterB
       className={cn(styles['tedi-footer-bottom'], { [styles['tedi-footer-bottom--mobile']]: isMobile }, className)}
     >
       {/* Inner wrapper keeps the strip background full-bleed while its content caps to `maxWidth`. */}
-      <div className={styles['tedi-footer-bottom__inner']} style={maxWidth !== undefined ? { maxWidth } : undefined}>
-        {items
+      <div
+        ref={innerRef}
+        className={cn(styles['tedi-footer-bottom__inner'], {
+          [styles['tedi-footer-bottom__inner--with-separators']]: itemCount > 1,
+        })}
+        style={maxWidth !== undefined ? { maxWidth } : undefined}
+      >
+        {items && itemCount > 1
           ? items.map((child, index) => (
-              <Fragment key={index}>
+              <div key={isValidElement(child) ? child.key : index} className={styles['tedi-footer-bottom__item']}>
                 {child}
-                {index < items.length - 1 && <span className={styles['tedi-footer-bottom__dot']} aria-hidden="true" />}
-              </Fragment>
+                {index < items.length - 1 && (
+                  <span
+                    data-name="footer-bottom-dot"
+                    className={styles['tedi-footer-bottom__dot']}
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
             ))
           : children}
       </div>

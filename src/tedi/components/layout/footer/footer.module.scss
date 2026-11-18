@@ -150,9 +150,11 @@
 }
 
 .tedi-footer-bottom__inner {
+  --_footer-bottom-gap: var(--layout-grid-gutters-24);
+
   display: flex;
   flex-wrap: wrap;
-  gap: var(--layout-grid-gutters-24);
+  gap: var(--_footer-bottom-gap);
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -160,13 +162,34 @@
 }
 
 .tedi-footer-bottom--mobile .tedi-footer-bottom__inner {
-  gap: var(--layout-grid-gutters-16);
+  --_footer-bottom-gap: var(--layout-grid-gutters-16);
+}
+
+.tedi-footer-bottom__inner--with-separators {
+  // Reserve room for dots only where flexbox places a gap between items.
+  column-gap: calc(2 * var(--_footer-bottom-gap) + var(--separator-dot-size-sm));
+  align-items: stretch;
+}
+
+.tedi-footer-bottom__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
 }
 
 .tedi-footer-bottom__dot {
-  flex-shrink: 0;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(100% + var(--_footer-bottom-gap));
+  visibility: hidden;
   width: var(--separator-dot-size-sm);
   height: var(--separator-dot-size-sm);
   background-color: var(--general-border-secondary);
   border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.tedi-footer-bottom__item--followed > .tedi-footer-bottom__dot {
+  visibility: visible;
 }
