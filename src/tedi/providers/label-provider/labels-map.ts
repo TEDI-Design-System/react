@@ -208,7 +208,7 @@ export const labelsMap = validateDefaultLabels({
   },
   clear: {
     description: 'For clearing a value',
-    components: ['TableFilter', 'TextField'],
+    components: ['Select', 'TableFilter', 'TextField'],
     et: 'Tühjenda',
     en: 'Clear',
     ru: 'Очистить',
@@ -270,18 +270,46 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Открывается в новой вкладке',
   },
   carousel: {
-    description: 'Accessible label for the carousel region',
+    description: 'Role description for the carousel region',
+    components: ['Carousel'],
+    et: 'karussell',
+    en: 'carousel',
+    ru: 'карусель',
+  },
+  'carousel.label': {
+    description: 'Default accessible label for the carousel region',
     components: ['Carousel'],
     et: 'Karussell',
     en: 'Carousel',
     ru: 'Карусель',
   },
   'carousel.slide': {
-    description: 'Accessible label / live announcement for a slide, e.g. "Slide 2 of 5"',
+    description: 'Live announcement when the carousel moves to another slide, e.g. "Slide 2 of 5"',
     components: ['Carousel'],
     et: (current: number, total: number) => `Slaid ${current} / ${total}`,
     en: (current: number, total: number) => `Slide ${current} of ${total}`,
     ru: (current: number, total: number) => `Слайд ${current} из ${total}`,
+  },
+  'carousel.slide-label': {
+    description: 'Accessible label for a slide, e.g. "2 of 5"',
+    components: ['Carousel'],
+    et: (current: number, total: number) => `${current} / ${total}`,
+    en: (current: number, total: number) => `${current} of ${total}`,
+    ru: (current: number, total: number) => `${current} из ${total}`,
+  },
+  'carousel.slide-role-description': {
+    description: 'Role description for a slide',
+    components: ['Carousel'],
+    et: 'slaid',
+    en: 'slide',
+    ru: 'слайд',
+  },
+  'carousel.slides': {
+    description: 'Accessible label for the slide indicators group',
+    components: ['Carousel'],
+    et: 'Slaidid',
+    en: 'Slides',
+    ru: 'Слайды',
   },
   'carousel.move-back': {
     description: 'Accessible label for the previous-slide button',
@@ -298,11 +326,11 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Следующий слайд',
   },
   'carousel.show-slide': {
-    description: 'Accessible label for a slide indicator button, e.g. "Show slide 3"',
+    description: 'Accessible label for a slide indicator button, e.g. "Slide 3"',
     components: ['Carousel'],
-    et: (slide: number) => `Näita slaidi ${slide}`,
-    en: (slide: number) => `Show slide ${slide}`,
-    ru: (slide: number) => `Показать слайд ${slide}`,
+    et: (slide: number) => `Slaid ${slide}`,
+    en: (slide: number) => `Slide ${slide}`,
+    ru: (slide: number) => `Слайд ${slide}`,
   },
   'header.toggle': {
     description: 'Label for header toggle on mobile',
@@ -677,20 +705,6 @@ export const labelsMap = validateDefaultLabels({
     en: 'Select row',
     ru: 'Выбрать строку',
   },
-  'table.expand-row': {
-    description: 'Accessible label on the expand toggle in expandable rows.',
-    components: ['Table'],
-    et: 'Laienda rida',
-    en: 'Expand row',
-    ru: 'Развернуть строку',
-  },
-  'table.collapse-row': {
-    description: 'Accessible label on the collapse toggle in expandable rows.',
-    components: ['Table'],
-    et: 'Ahenda rida',
-    en: 'Collapse row',
-    ru: 'Свернуть строку',
-  },
   'table.filter-placeholder': {
     description: 'Placeholder for the per-column filter inputs rendered under the header.',
     components: ['Table'],
@@ -706,7 +720,7 @@ export const labelsMap = validateDefaultLabels({
     ru: (columnLabel?: string) => `Фильтр ${columnLabel ?? ''}`.trim(),
   },
   'table.row-details': {
-    description: 'Accessible label for the sub-component / disclosure panel of an expanded row.',
+    description: 'Accessible label of the expand toggle in expandable rows.',
     components: ['Table'],
     et: 'Rea üksikasjad',
     en: 'Row details',
@@ -750,12 +764,16 @@ export const labelsMap = validateDefaultLabels({
   'table.reorder.pickup': {
     description: 'Live-region message when a column is picked up for keyboard reordering.',
     components: ['Table'],
-    et: (columnLabel: string) =>
-      `Veerg ${columnLabel} on valitud. Kasuta vasak-/paremnoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
-    en: (columnLabel: string) =>
-      `Column ${columnLabel} picked up. Use Left/Right arrow to move, Space or Enter to drop.`,
-    ru: (columnLabel: string) =>
-      `Столбец ${columnLabel} взят. Используйте стрелки влево/вправо для перемещения, Пробел или Enter для подтверждения.`,
+    et: (columnLabel: string) => `${columnLabel} valitud.`,
+    en: (columnLabel: string) => `${columnLabel} picked up.`,
+    ru: (columnLabel: string) => `${columnLabel} взят.`,
+  },
+  'table.reorder.instructions': {
+    description: 'Description of the column reorder drag handle.',
+    components: ['Table'],
+    et: 'Tühik või Enter valib ja paigutab, vasak- ja paremnool liigutavad, Escape tühistab.',
+    en: 'Space or Enter picks up and drops, Left and Right arrows move, Escape cancels.',
+    ru: 'Пробел или Enter берёт и ставит, стрелки влево и вправо перемещают, Escape отменяет.',
   },
   'table.reorder.move': {
     description: 'Live-region message while a picked-up column is moved between positions.',
@@ -781,11 +799,16 @@ export const labelsMap = validateDefaultLabels({
   'table.row-reorder.pickup': {
     description: 'Live-region message when a row is picked up for keyboard reordering.',
     components: ['Table'],
-    et: (position: number) =>
-      `Rida ${position} on valitud. Kasuta üles-/allanoolt liigutamiseks, tühikut või Enterit kinnitamiseks.`,
-    en: (position: number) => `Row ${position} picked up. Use Up/Down arrow to move, Space or Enter to drop.`,
-    ru: (position: number) =>
-      `Строка ${position} взята. Используйте стрелки вверх/вниз для перемещения, Пробел или Enter для подтверждения.`,
+    et: (position: number) => `Rida ${position} valitud.`,
+    en: (position: number) => `Row ${position} picked up.`,
+    ru: (position: number) => `Строка ${position} взята.`,
+  },
+  'table.row-reorder.instructions': {
+    description: 'Description of the row reorder drag handle.',
+    components: ['Table'],
+    et: 'Tühik või Enter valib ja paigutab, üles- ja allanool liigutavad, Escape tühistab.',
+    en: 'Space or Enter picks up and drops, Up and Down arrows move, Escape cancels.',
+    ru: 'Пробел или Enter берёт и ставит, стрелки вверх и вниз перемещают, Escape отменяет.',
   },
   'table.row-reorder.move': {
     description: 'Live-region message while a picked-up row is moved between positions.',
@@ -1015,16 +1038,16 @@ export const labelsMap = validateDefaultLabels({
   'table.select-all': {
     description: 'Row selection - Label for check in table header',
     components: ['Table'],
-    et: (isSelected: boolean) => (isSelected ? 'Eemalda kõik' : 'Vali kõik'),
-    en: (isSelected: boolean) => (isSelected ? 'Deselect all' : 'Select all'),
-    ru: (isSelected: boolean) => (isSelected ? 'Убрать выделение со всего' : 'Выбрать все'),
+    et: 'Vali kõik read',
+    en: 'Select all rows',
+    ru: 'Выбрать все строки',
   },
   'table.select-row': {
     description: 'Row selection - Label for check in table row',
     components: ['Table'],
-    et: (isSelected: boolean) => (isSelected ? 'Eemalda rida' : 'Vali rida'),
-    en: (isSelected: boolean) => (isSelected ? 'Deselect row' : 'Select row'),
-    ru: (isSelected: boolean) => (isSelected ? 'Отменить выбор строки' : 'Выбрать ряд'),
+    et: 'Vali rida',
+    en: 'Select row',
+    ru: 'Выбрать строку',
   },
   'table.sort': {
     description:
@@ -1062,20 +1085,26 @@ export const labelsMap = validateDefaultLabels({
     en: 'Show tooltip',
     ru: 'Показать подсказку',
   },
+  'toast.region': {
+    description: 'Accessible name of the toast notifications region',
+    components: ['ToastContainer'],
+    et: 'Teavitused',
+    en: 'Notifications',
+    ru: 'Уведомления',
+  },
   'pagination.title': {
     description: 'Label of the pagination',
     components: ['Table', 'Pagination'],
-    et: 'Pagineerimine',
-    en: 'Pagination',
+    et: 'Lehed',
+    en: 'Pages',
     ru: 'Страницы',
   },
   'pagination.page': {
-    description: 'Label of individual page numbers',
+    description: 'Label of individual page numbers. The current page is conveyed by `aria-current`, not by the label.',
     components: ['Table', 'Pagination'],
-    et: (page: number, isCurrent?: boolean) => (isCurrent ? `Aktiivne leht, leht ${page}` : `Mine lehele ${page}`),
-    en: (page: number, isCurrent?: boolean) => (isCurrent ? `Current page, page ${page}` : `Go to page ${page}`),
-    ru: (page: number, isCurrent?: boolean) =>
-      isCurrent ? `Текущая страница, страница ${page}` : `Перейти на страницу ${page}`,
+    et: (page: number) => `Leht ${page}`,
+    en: (page: number) => `Page ${page}`,
+    ru: (page: number) => `Страница ${page}`,
   },
   'pagination.prev-page': {
     description: 'Previous page button label',
@@ -1110,7 +1139,7 @@ export const labelsMap = validateDefaultLabels({
     description:
       'Status message announced to screen readers via an aria-live region when the page changes. Receives the current page number and total page count.',
     components: ['Pagination'],
-    et: (page?: number, total?: number) => `Lehekülg ${page ?? 0} / ${total ?? 0}`,
+    et: (page?: number, total?: number) => `Leht ${page ?? 0} / ${total ?? 0}`,
     en: (page?: number, total?: number) => `Page ${page ?? 0} of ${total ?? 0}`,
     ru: (page?: number, total?: number) => `Страница ${page ?? 0} из ${total ?? 0}`,
   },
@@ -1409,29 +1438,25 @@ export const labelsMap = validateDefaultLabels({
     ru: 'Нижний колонтитул',
   },
   'numberField.decrement': {
-    description: 'Label for screen-reader for number field decrease button. Second argument is the field label.',
+    description: 'Label for screen-reader for number field decrease button',
     components: ['NumberField'],
-    et: (count: string | number, field?: string) =>
-      field ? `Vähenda välja "${field}" ${count} võrra` : `Vähenda ${count} võrra`,
-    en: (count: string | number, field?: string) => (field ? `Decrease ${field} by ${count}` : `Decrease by ${count}`),
-    ru: (count: string | number, field?: string) =>
-      field ? `Уменьшить «${field}» на ${count}` : `Уменьшить на ${count}`,
+    et: (_count: string | number, _field?: string) => 'Vähenda',
+    en: (_count: string | number, _field?: string) => 'Decrease',
+    ru: (_count: string | number, _field?: string) => 'Уменьшить',
   },
   'numberField.increment': {
-    description: 'Label for screen-reader for number field increase button. Second argument is the field label.',
+    description: 'Label for screen-reader for number field increase button',
     components: ['NumberField'],
-    et: (count: string | number, field?: string) =>
-      field ? `Suurenda välja "${field}" ${count} võrra` : `Suurenda ${count} võrra`,
-    en: (count: string | number, field?: string) => (field ? `Increase ${field} by ${count}` : `Increase by ${count}`),
-    ru: (count: string | number, field?: string) =>
-      field ? `Увеличить «${field}» на ${count}` : `Увеличить на ${count}`,
+    et: (_count: string | number, _field?: string) => 'Suurenda',
+    en: (_count: string | number, _field?: string) => 'Increase',
+    ru: (_count: string | number, _field?: string) => 'Увеличить',
   },
   'numberField.quantityUpdated': {
     description: 'Label for screen-reader when quantity get updated by button click',
     components: ['NumberField'],
-    et: (count: string | number) => `Uuendatud. Uus väärtus ${count}`,
-    en: (count: string | number) => `Updated. New value ${count}`,
-    ru: (count: string | number) => `Обновлено. Новое значение ${count}`,
+    et: (count: string | number, suffix?: string) => (suffix ? `${count} ${suffix}` : `${count}`),
+    en: (count: string | number, suffix?: string) => (suffix ? `${count} ${suffix}` : `${count}`),
+    ru: (count: string | number, suffix?: string) => (suffix ? `${count} ${suffix}` : `${count}`),
   },
   'sidenav.backToMainMenu': {
     description: 'Side navigation label',
@@ -1450,12 +1475,9 @@ export const labelsMap = validateDefaultLabels({
   'sidenav.toggleSubmenuChildren': {
     description: 'Side navigation label for toggling submenu',
     components: ['Sidenav'],
-    et: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
-      isCollapsedInternal ? `Sulge ${children} alammenüü` : `Ava ${children} alammenüü`,
-    en: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
-      isCollapsedInternal ? `Close ${children} submenu` : `Open ${children} submenu`,
-    ru: ({ isCollapsedInternal, children }: { isCollapsedInternal: boolean; children: React.ReactNode }) =>
-      isCollapsedInternal ? `Закрыть подменю ${children}` : `Открыть подменю ${children}`,
+    et: ({ children }: { children: React.ReactNode }) => `${children} alammenüü`,
+    en: ({ children }: { children: React.ReactNode }) => `${children} submenu`,
+    ru: ({ children }: { children: React.ReactNode }) => `Подменю ${children}`,
   },
   'sidenav.submenu': {
     description: 'Side navigation label for submenu',

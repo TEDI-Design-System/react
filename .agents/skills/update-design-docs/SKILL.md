@@ -30,7 +30,8 @@ you own the prose.** Never hand-edit token values or the manifest's derived fiel
    - `components`: high-level guidance + a pointer to `skills/tedi-react/references/components.md`.
      Do NOT re-document every component — the skill and manifest are the catalog.
    - `dosdonts`: concrete rules (import from `@tedi-design-system/react/tedi`; wrap in
-     `ThemeProvider`/`LabelProvider`/`StyleProvider`; no hardcoded hex; tedi-ready over community).
+     `ThemeProvider`/`PrintingProvider`/`LabelProvider`, the last two required; no hardcoded hex;
+     tedi-ready over community).
    Never touch the `<!-- tokens:start/end -->` block. The one hand-maintained passage outside a
    prose marker is the paragraph directly above that block, which explains how to look values up in
    `tokens.json`; keep it accurate if the token pipeline changes, and do not reintroduce a table of
@@ -40,7 +41,7 @@ you own the prose.** Never hand-edit token values or the manifest's derived fiel
    changed, read its `.tsx`, prop types, and `.stories.tsx`; set a one-line `description`, the
    canonical `name` (from the export / `displayName`), and 2–5 `keyProps`. Preserve existing
    human-authored descriptions unless the component's behavior changed.
-5. **Validate.** Run `npm run design:build` again then `npm test -- design-docs/ --coverage=false` —
+5. **Validate.** Run `npm run design:build` again then `npx jest design-docs/ --coverage=false` —
    the drift test must pass and the second build must produce no diff (idempotent). Confirm DESIGN.md
    has no duplicate `##` headings.
 6. **Report.** Summarize what changed and flag any component whose intended usage is unclear from

@@ -29,14 +29,14 @@ jest.mock('../../../providers/label-provider', () => ({
     getLabel: (key: string, ...args: unknown[]) => {
       switch (key) {
         case 'pagination.title':
-          return 'Pagination';
+          return 'Pages';
         case 'pagination.prev-page':
           return 'Previous page';
         case 'pagination.next-page':
           return 'Next page';
         case 'pagination.page': {
-          const [page, isCurrent] = args as [number, boolean];
-          return isCurrent ? `Current page, page ${page}` : `Go to page ${page}`;
+          const [page] = args as [number];
+          return `Page ${page}`;
         }
         case 'pagination.results': {
           const [count] = args as [number];
@@ -56,6 +56,14 @@ jest.mock('../../../providers/label-provider', () => ({
         }
         case 'table.drag-row':
           return 'Drag row';
+        case 'table.select-all':
+          return 'Select all rows';
+        case 'table.select-row':
+          return 'Select row';
+        case 'table.reorder.instructions':
+          return 'Column reorder instructions';
+        case 'table.row-reorder.instructions':
+          return 'Row reorder instructions';
         default:
           return key;
       }
@@ -115,7 +123,7 @@ describe('Table', () => {
     expect(nameHeader).toHaveAttribute('aria-label', 'Name');
   });
 
-  it('falls back the leaf header accessible name to the column id when no label is provided', () => {
+  it('names a custom header from its content, not the column id, when no label is provided', () => {
     const customColumns: ColumnDef<Person>[] = [
       {
         id: 'name',
@@ -134,8 +142,8 @@ describe('Table', () => {
 
     render(<Table<Person> id="t-fallback" data={data} columns={customColumns} />);
 
-    const nameHeader = screen.getByRole('columnheader', { name: 'name' });
-    expect(nameHeader).toHaveAttribute('aria-label', 'name');
+    const nameHeader = screen.getByRole('columnheader', { name: /^Name/ });
+    expect(nameHeader).not.toHaveAttribute('aria-label');
   });
 
   it('renders the empty state when data is empty', () => {
@@ -318,7 +326,7 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Anna' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Jüri' })).not.toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
 
       expect(screen.queryByRole('cell', { name: 'Anna' })).not.toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
@@ -353,7 +361,7 @@ describe('Table', () => {
     it('keeps the current page across data changes when autoResetPageIndex is false', () => {
       render(<EditableHarness autoResetPageIndex={false} />);
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
       expect(screen.getByRole('cell', { name: 'Jüri' })).toBeInTheDocument();
 
       // Same save, but the user stays on page 2 with the saved value.
@@ -378,7 +386,7 @@ describe('Table', () => {
       scroll.scrollTop = 120;
       expect(scroll.scrollTop).toBe(120);
 
-      fireEvent.click(screen.getByRole('button', { name: /Go to page 2/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
 
       expect(scroll.scrollTop).toBe(0);
     });
@@ -549,6 +557,45 @@ describe('Table', () => {
       expect(checkboxes[1]).toBeChecked();
     });
 
+    it('keeps stable selection labels; state comes from checked', () => {
+      render(<Table<Person> id="t-sel-labels" data={data} columns={columns} enableRowSelection />);
+
+      const selectAll = screen.getByRole('checkbox', { name: 'Select all rows' });
+      const rowBoxes = screen.getAllByRole('checkbox', { name: 'Select row' });
+      expect(rowBoxes).toHaveLength(data.length);
+
+      fireEvent.click(selectAll);
+      expect(selectAll).toBeChecked();
+      expect(selectAll).toHaveAccessibleName('Select all rows');
+      rowBoxes.forEach((box) => expect(box).toHaveAccessibleName('Select row'));
+    });
+
+    it('names row selection controls with rowSelectionLabel', () => {
+      const { rerender } = render(
+        <Table<Person>
+          id="t-sel-custom"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          rowSelectionLabel={(row) => `Select ${row.original.name}`}
+        />
+      );
+      expect(screen.getByRole('checkbox', { name: 'Select Anna' })).toBeInTheDocument();
+      expect(screen.getByRole('checkbox', { name: 'Select Jüri' })).toBeInTheDocument();
+
+      rerender(
+        <Table<Person>
+          id="t-sel-custom"
+          data={data}
+          columns={columns}
+          enableRowSelection
+          selectionMode="single"
+          rowSelectionLabel={(row) => `Select ${row.original.name}`}
+        />
+      );
+      expect(screen.getByRole('radio', { name: 'Select Anna' })).toBeInTheDocument();
+    });
+
     it('select-all toggles every row', () => {
       render(<Table<Person> id="t-sel-all" data={data} columns={columns} enableRowSelection />);
 
@@ -629,16 +676,48 @@ describe('Table', () => {
         />
       );
 
-      // Without a `LabelProvider` wrapping the render, `getLabel` returns the
-      // i18n key verbatim, which is what the accessible name resolves to.
-      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      const toggle = screen.getAllByRole('button', { name: 'Row details' })[0];
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
       fireEvent.click(toggle);
 
       expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(toggle).toHaveAccessibleName('Row details');
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
-      const collapse = screen.getByRole('button', { name: /table\.collapse-row/i });
-      fireEvent.click(collapse);
+      fireEvent.click(toggle);
       expect(screen.queryByText(/details for Anna/)).not.toBeInTheDocument();
+    });
+
+    it('does not turn open sub-component rows into landmarks', () => {
+      render(
+        <Table<Person>
+          id="t-exp-landmarks"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          defaultState={{ expanded: true }}
+        />
+      );
+
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(screen.getByText(/details for Jüri/)).toBeInTheDocument();
+      expect(screen.queryAllByRole('region')).toHaveLength(0);
+    });
+
+    it('renders the sub-component only for rows that can expand when expanded is true', () => {
+      render(
+        <Table<Person>
+          id="t-exp-all"
+          data={data}
+          columns={columns}
+          renderSubComponent={(row) => <span>details for {row.original.name}</span>}
+          getRowCanExpand={(row) => row.original.name === 'Anna'}
+          defaultState={{ expanded: true }}
+        />
+      );
+
+      expect(screen.getByText(/details for Anna/)).toBeInTheDocument();
+      expect(screen.queryByText(/details for Jüri/)).not.toBeInTheDocument();
     });
   });
 
@@ -745,14 +824,28 @@ describe('Table', () => {
   });
 
   describe('accessibility', () => {
-    it('gives a blank utility header an accessible name (falls back to the column id)', () => {
+    it('names a blank header from meta.label', () => {
+      const withActions: ColumnDef<Person>[] = [
+        ...columns,
+        { id: 'actions', header: '', meta: { label: 'Tegevused' }, cell: () => <button>Edit</button> },
+      ];
+      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+
+      expect(screen.getByRole('columnheader', { name: 'Tegevused' })).toBeInTheDocument();
+    });
+
+    it('leaves a blank header without meta.label unnamed instead of using the column id', () => {
       const withActions: ColumnDef<Person>[] = [
         ...columns,
         { id: 'actions', header: '', cell: () => <button>Edit</button> },
       ];
-      render(<Table<Person> id="t-blank-header" data={data} columns={withActions} />);
+      render(<Table<Person> id="t-blank-header-unnamed" data={data} columns={withActions} />);
 
-      expect(screen.getByRole('columnheader', { name: 'actions' })).toBeInTheDocument();
+      const headers = screen.getAllByRole('columnheader');
+      const actionsHeader = headers[headers.length - 1];
+      expect(actionsHeader).not.toHaveAttribute('aria-label');
+      expect(actionsHeader).toBeEmptyDOMElement();
+      expect(screen.queryByRole('columnheader', { name: 'actions' })).not.toBeInTheDocument();
     });
 
     it('names the built-in expand column header', () => {
@@ -767,6 +860,90 @@ describe('Table', () => {
 
       // `getLabel` returns the i18n key verbatim without a LabelProvider, so the resolved name is the key.
       expect(screen.getByRole('columnheader', { name: 'table.expand-column' })).toBeInTheDocument();
+    });
+
+    describe('meta.rowHeader', () => {
+      const rowHeaderColumns: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessorKey: 'name', meta: { rowHeader: true } },
+        { id: 'role', header: 'Role', accessorKey: 'role' },
+      ];
+
+      it('renders the row-header column body cells as th scope=row and the rest as td', () => {
+        const { container } = render(<Table<Person> id="t-row-header" data={data} columns={rowHeaderColumns} />);
+
+        const rows = container.querySelectorAll('tbody > tr');
+        expect(rows).toHaveLength(data.length);
+        rows.forEach((row) => {
+          const [nameCell, roleCell] = Array.from(row.children);
+          expect(nameCell.tagName).toBe('TH');
+          expect(nameCell).toHaveAttribute('scope', 'row');
+          expect(nameCell).toHaveClass('tedi-table__cell');
+          expect(roleCell.tagName).toBe('TD');
+          expect(roleCell).not.toHaveAttribute('scope');
+        });
+        expect(screen.getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['Anna', 'Jüri']);
+      });
+
+      it('keeps the row-header column header cell a column header', () => {
+        render(<Table<Person> id="t-row-header-col" data={data} columns={rowHeaderColumns} />);
+
+        expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('scope', 'col');
+      });
+
+      it('renders every body cell as td without the option', () => {
+        render(<Table<Person> id="t-no-row-header" data={data} columns={columns} />);
+
+        expect(screen.queryAllByRole('rowheader')).toHaveLength(0);
+      });
+
+      it('keeps the select column as td', () => {
+        const { container } = render(
+          <Table<Person> id="t-row-header-sel" data={data} columns={rowHeaderColumns} enableRowSelection />
+        );
+
+        const [selectCell, nameCell] = Array.from(container.querySelector('tbody > tr')?.children ?? []);
+        expect(selectCell.tagName).toBe('TD');
+        expect(nameCell.tagName).toBe('TH');
+      });
+
+      it('gives a sticky row-header th the body-cell classes the sticky styles target', () => {
+        const { container } = render(
+          <Table<Person> id="t-row-header-sticky" data={data} columns={rowHeaderColumns} stickyFirstColumn />
+        );
+
+        expect(container.querySelector('[data-name="tedi-table"]')?.className).toContain('--sticky-first-column');
+        const nameCell = container.querySelector('tbody > tr')?.firstElementChild;
+        expect(nameCell?.tagName).toBe('TH');
+        expect(nameCell).toHaveClass('tedi-table__cell');
+        expect(nameCell).not.toHaveClass('tedi-table__header-cell');
+      });
+
+      it('renders one spanning th for a grouped row-header column', () => {
+        const grouped: Person[] = [
+          { id: 'a', name: 'Anna', role: 'Engineer' },
+          { id: 'b', name: 'Anna', role: 'Designer' },
+          { id: 'c', name: 'Bob', role: 'Designer' },
+        ];
+        const groupedColumns: ColumnDef<Person>[] = [
+          {
+            id: 'name',
+            header: 'Name',
+            accessorKey: 'name',
+            meta: { rowHeader: true, rowSpan: groupRowSpan(grouped, (row) => row.name) },
+          },
+          { id: 'role', header: 'Role', accessorKey: 'role' },
+        ];
+        const { container } = render(<Table<Person> id="t-row-header-span" data={grouped} columns={groupedColumns} />);
+
+        const rows = container.querySelectorAll('tbody > tr');
+        const rowHeaders = Array.from(rows).map((row) => row.querySelectorAll('th'));
+        expect(rowHeaders[0]).toHaveLength(1);
+        expect(rowHeaders[0][0]).toHaveAttribute('scope', 'row');
+        expect(rowHeaders[0][0]).toHaveAttribute('rowspan', '2');
+        expect(rowHeaders[1]).toHaveLength(0);
+        expect(rows[1].children).toHaveLength(1);
+        expect(rowHeaders[2][0]).not.toHaveAttribute('rowspan');
+      });
     });
 
     it('makes the scroll wrapper keyboard-focusable', () => {
@@ -810,7 +987,7 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Alpha' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Bravo' })).toBeInTheDocument();
 
-      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: 'Row details' })[0]);
 
       // Both children render on the same page and Bravo is NOT pushed to page 2.
       expect(screen.getByRole('cell', { name: 'Alpha-1' })).toBeInTheDocument();
@@ -830,7 +1007,7 @@ describe('Table', () => {
         />
       );
 
-      fireEvent.click(screen.getAllByRole('button', { name: /table\.expand-row/i })[0]);
+      fireEvent.click(screen.getAllByRole('button', { name: 'Row details' })[0]);
 
       // Children now occupy page slots: only the first child fits, the second
       // child and Bravo are pushed to page 2.
@@ -906,8 +1083,8 @@ describe('Table', () => {
     it('renders the pagination bar with the next button and current page marker', () => {
       render(<Table<Person> id="t-page" data={many} columns={columns} pagination={{ pageSize: 3 }} />);
 
-      expect(screen.getByRole('navigation', { name: /Pagination/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Current page, page 1/i })).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByRole('navigation', { name: 'Pages' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 1' })).toHaveAttribute('aria-current', 'page');
       // The Table does not set `showPrevNextButtons`, so the disabled Previous arrow is
       // dropped on the first page (compact default); only the enabled Next arrow renders.
       expect(screen.queryByRole('button', { name: /Previous page/i })).not.toBeInTheDocument();
@@ -921,12 +1098,12 @@ describe('Table', () => {
       expect(screen.getByRole('cell', { name: 'Person 1' })).toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Next page/i }));
-      expect(screen.getByRole('button', { name: /Current page, page 2/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Person 4' })).toBeInTheDocument();
       expect(screen.queryByRole('cell', { name: 'Person 1' })).not.toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Previous page/i }));
-      expect(screen.getByRole('button', { name: /Current page, page 1/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: 'Person 1' })).toBeInTheDocument();
     });
 
@@ -971,7 +1148,7 @@ describe('Table', () => {
 
     it('omits the pagination bar when pagination is not enabled', () => {
       render(<Table<Person> id="t-no-page" data={data} columns={columns} />);
-      expect(screen.queryByRole('navigation', { name: /Pagination/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('navigation', { name: 'Pages' })).not.toBeInTheDocument();
     });
   });
 
@@ -1090,6 +1267,17 @@ describe('Table', () => {
       expect(container.querySelector('[aria-live="polite"]')).toBeInTheDocument();
     });
 
+    it('describes the drag handles with the reorder instructions', () => {
+      render(<Table<Person> id="t-kb-desc" data={data} columns={columns} reorderableColumns reorderableRows />);
+
+      expect(screen.getByRole('button', { name: 'Drag column Name' })).toHaveAccessibleDescription(
+        'Column reorder instructions'
+      );
+      screen
+        .getAllByRole('button', { name: 'Drag row' })
+        .forEach((handle) => expect(handle).toHaveAccessibleDescription('Row reorder instructions'));
+    });
+
     it('reorders a column with the keyboard (pick up → ArrowRight → drop)', () => {
       const onStateChange = jest.fn();
       render(
@@ -1149,7 +1337,7 @@ describe('Table', () => {
         />
       );
 
-      const toggle = screen.getAllByRole('button', { name: /table\.expand-row/i })[0];
+      const toggle = screen.getAllByRole('button', { name: 'Row details' })[0];
       fireEvent.keyDown(toggle, { key: 'Enter', bubbles: true });
       fireEvent.keyDown(toggle, { key: ' ', bubbles: true });
       // Pressing a non-Enter/Space key bubbles through the span without

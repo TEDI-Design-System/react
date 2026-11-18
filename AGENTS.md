@@ -2,6 +2,10 @@
 
 Guidance for AI coding agents working in this repository.
 
+**Before working on components, read `.agents/skills/contributing/SKILL.md`.** It routes to the
+references for new components, tests, a11y, stories, refactoring and PR review. Harnesses with skill
+support load it from `.agents/skills/` (Claude Code through the `.claude/skills/contributing` symlink).
+
 > **Design system for AI/UI generation:** read [`DESIGN.md`](./DESIGN.md) (tokens + tedi-ready component rules) before generating or modifying UI. It complements the `tedi-react` skill.
 
 ## Project Overview
@@ -16,9 +20,9 @@ TEDI Design System React — a React component library (`@tedi-design-system/rea
 npm start                # Storybook dev server on port 4400
 npm run build            # Production build with Vite
 npm test                 # Run all Jest tests
-npm test -- --testPathPattern="button"  # Run tests matching path pattern
+npx jest --testPathPattern="button" --coverage=false  # Run tests matching path pattern (npm test passes on no match)
 npm run lint             # ESLint + Stylelint with auto-fix
-npm run test:coverage    # Tests with 80% coverage threshold
+npm run test:coverage    # Same as npm test; both enforce the 80% coverage threshold
 npm run build:sb         # Build static Storybook
 ```
 
@@ -26,7 +30,7 @@ npm run build:sb         # Build static Storybook
 
 ### Source Structure
 
-Components live in `src/tedi/components/` and `src/community/components/`, organized by category: `base/`, `buttons/`, `cards/`, `content/`, `form/`, `layout/`, `loaders/`, `misc/`, `navigation/`, `notifications/`, `overlays/`, `tags/`.
+Components live in `src/tedi/components/` and `src/community/components/`, organized by category: `base/`, `buttons/`, `content/`, `filter/`, `form/`, `layout/`, `loaders/`, `misc/`, `navigation/`, `notifications/`, `overlays/`, `tags/`.
 
 Each component directory follows this pattern:
 - `component-name.tsx` — Component implementation
@@ -58,7 +62,7 @@ Conventional commits enforced by commitlint (husky pre-commit hook). Rules:
 
 - Single quotes, semicolons required, print width 120
 - JSX uses double quotes
-- Import sorting enforced by `simple-import-sort` (packages → `@ria.*` → relative → absolute → side-effects)
+- Import sorting enforced by `simple-import-sort` (packages → relative → side-effects)
 - Unused imports are errors; unused vars are warnings (prefix with `_` to ignore)
 - SCSS follows BEM naming convention, enforced by Stylelint
 - Pre-commit hook runs lint-staged (ESLint + Stylelint + Prettier on staged files)
@@ -67,7 +71,8 @@ Conventional commits enforced by commitlint (husky pre-commit hook). Rules:
 
 - Framework: Jest + jsdom + React Testing Library
 - Coverage collected only from `src/tedi/components/**/*.{js,ts,tsx}` (excludes stories)
-- Coverage threshold: 80% for branches, functions, lines, and statements
+- Coverage threshold: 80% for branches, functions, lines, and statements. `npm test` always collects
+  coverage and enforces it; pass `--coverage=false` for a narrow run.
 - `jest-setup.js` includes `@testing-library/jest-dom` matchers and `window.matchMedia` mock
 
 ## Related Repositories
@@ -96,7 +101,8 @@ Semantic Release on `main` (stable) and `rc` (prerelease) branches. Tag format: 
 
 ## For Code Review Agents (CodeRabbit, etc.)
 
-Read `.claude/skills/contributing/references/best-practices.md` for the full set of coding patterns and rules to enforce during review.
+Read `.agents/skills/contributing/references/best-practices.md` for the full set of coding patterns and rules to enforce during review, and apply the Prop API and Prose sections of `.agents/skills/contributing/references/pr-review.md`.
 
 Key things to **not** flag:
 - Missing CSS `var()` fallback values — intentionally omitted.
+- `src/community/` code not following TEDI patterns: community components have lighter standards.

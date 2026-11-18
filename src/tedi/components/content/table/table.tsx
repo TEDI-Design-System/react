@@ -53,13 +53,18 @@ import { useTablePersistence } from './use-table-persistence';
  *
  * - drive the column-filter aria-label when the header is non-textual (`label`),
  * - align the column's `<th>` / `<td>` content horizontally (`align`) or vertically
- *   (`vAlign`) without wrapping every cell render in a styled span.
+ *   (`vAlign`) without wrapping every cell render in a styled span,
+ * - mark the column whose body cells head their row (`rowHeader`).
  *
  * Wrapper spans still work for the "I want this *one* cell to be different" case;
  * `meta` covers the common "every cell in the column lines up the same way".
  */
 export interface TableColumnMeta {
-  /** Accessible label used when the column header isn't a plain string. */
+  /**
+   * Names a blank or non-text header (e.g. an actions column) for screen readers and in filter,
+   * column drag and reorder labels; without it a blank header has no name and those labels use the
+   * column id, a developer string such as "actions" (filter and reorder get `''` for `header: ''`).
+   */
   label?: string;
   /**
    * Props forwarded to the built-in per-column filter input (the `TextField`
@@ -82,6 +87,13 @@ export interface TableColumnMeta {
    * table's stylesheet.
    */
   vAlign?: 'top' | 'middle' | 'bottom';
+  /**
+   * Renders the column's body cells as `<th scope="row">`, so screen readers
+   * announce the cell as the row's header when moving through the row. Styled
+   * the same as other body cells. Set it on the one column that names the row.
+   * @default false
+   */
+  rowHeader?: boolean;
   /**
    * Per-cell `rowSpan` resolver. Lets a column collapse consecutive rows that
    * share a value into a single vertically-spanning cell ("grouped rows").
@@ -355,6 +367,11 @@ export interface TableProps<TData> {
    */
   selectionMode?: TableSelectionMode;
   /**
+   * Accessible name of each row's selection checkbox or radio, e.g. `(row) => row.original.name`.
+   * @default 'Vali rida'
+   */
+  rowSelectionLabel?: (row: Row<TData>) => string;
+  /**
    * Paints the `--table-active` background tint on every selected row. Turn
    * off when checkboxes are used purely for "pick some rows for a bulk
    * action" and the row-level highlight would be visually noisy. The
@@ -598,6 +615,7 @@ interface TableDataRowProps<TData> {
   columnProps: ((columnId: string) => { className?: string; style?: CSSProperties } | undefined) | undefined;
   draggable: boolean;
   dragHandleLabel: string;
+  dragHandleDescribedBy?: string;
   dragHandlers?: {
     onDragStart: (event: ReactDragEvent<HTMLTableRowElement>) => void;
     onDragOver: (event: ReactDragEvent<HTMLTableRowElement>) => void;
@@ -616,12 +634,14 @@ const DRAG_HANDLE_ATTR = 'data-tedi-drag-handle';
 
 const DragHandleCell = ({
   label,
+  describedBy,
   onHandlePointerDown,
   id,
   pickedUp,
   onKeyDown,
 }: {
   label: string;
+  describedBy?: string;
   onHandlePointerDown: () => void;
   id?: string;
   pickedUp?: boolean;
@@ -634,6 +654,7 @@ const DragHandleCell = ({
       [styles['tedi-table__drag-handle--picked-up']]: pickedUp,
     })}
     aria-label={label}
+    aria-describedby={describedBy}
     aria-pressed={pickedUp}
     onClick={(event) => event.stopPropagation()}
     onMouseDown={onHandlePointerDown}
@@ -660,6 +681,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
     columnProps,
     draggable,
     dragHandleLabel,
+    dragHandleDescribedBy,
     dragHandlers,
     dragHandleId,
     dragHandlePickedUp,
@@ -692,9 +714,12 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
         const isDragOverThisCol = !!dragOverColumnId && cell.column.id === dragOverColumnId;
         const resolvedRowSpan = cellMeta?.rowSpan?.(cell.row as Row<unknown>);
         if (resolvedRowSpan === 0) return null;
+        const isRowHeader = !!cellMeta?.rowHeader;
+        const CellTag = isRowHeader ? 'th' : 'td';
         return (
-          <td
+          <CellTag
             key={cell.id}
+            scope={isRowHeader ? 'row' : undefined}
             rowSpan={resolvedRowSpan && resolvedRowSpan > 1 ? resolvedRowSpan : undefined}
             className={cn(
               styles['tedi-table__cell'],
@@ -711,6 +736,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
             {isDragCell ? (
               <DragHandleCell
                 label={dragHandleLabel}
+                describedBy={dragHandleDescribedBy}
                 onHandlePointerDown={dragHandlers?.onHandlePointerDown ?? (() => undefined)}
                 onKeyDown={dragHandlers?.onKeyDown}
                 id={dragHandleId}
@@ -719,7 +745,7 @@ const TableDataRowBody = <TData,>(props: TableDataRowProps<TData>) => {
             ) : (
               flexRender(cell.column.columnDef.cell, cell.getContext())
             )}
-          </td>
+          </CellTag>
         );
       })}
     </tr>
@@ -786,6 +812,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
     rowHover,
     enableRowSelection,
     selectionMode = 'multiple',
+    rowSelectionLabel,
     highlightSelectedRows = true,
     enableColumnFilters = false,
     renderSubComponent,
@@ -815,6 +842,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
   const resolvedEmptyState = emptyState ?? getLabel('table.no-data');
   const getLabelRef = useRef(getLabel);
   getLabelRef.current = getLabel;
+  const rowSelectionLabelRef = useRef(rowSelectionLabel);
+  rowSelectionLabelRef.current = rowSelectionLabel;
 
   const generatedId = useId();
   const resolvedId = id ?? generatedId;
@@ -971,7 +1000,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 {...checkboxProps}
                 id={`${resolvedId}-select-all`}
                 name={`${resolvedId}-select-all`}
-                label={getLabelRef.current('table.select-all', table.getIsAllPageRowsSelected())}
+                label={getLabelRef.current('table.select-all')}
                 hideLabel
                 value="all"
                 checked={table.getIsAllPageRowsSelected()}
@@ -985,7 +1014,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               {...radioProps}
               id={`${resolvedId}-select-${row.id}`}
               name={radioGroupName}
-              label={getLabelRef.current('table.select-row', row.getIsSelected())}
+              label={rowSelectionLabelRef.current?.(row) ?? getLabelRef.current('table.select-row')}
               hideLabel
               value={row.id}
               checked={row.getIsSelected()}
@@ -999,7 +1028,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
               {...checkboxProps}
               id={`${resolvedId}-select-${row.id}`}
               name={`${resolvedId}-select-${row.id}`}
-              label={getLabelRef.current('table.select-row', row.getIsSelected())}
+              label={rowSelectionLabelRef.current?.(row) ?? getLabelRef.current('table.select-row')}
               hideLabel
               value={row.id}
               checked={row.getIsSelected()}
@@ -1046,8 +1075,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                 hideText
                 id={`${resolvedId}-expand-${row.id}`}
                 aria-controls={renderSubComponent ? subRowId : undefined}
-                openText={getLabelRef.current('table.expand-row')}
-                closeText={getLabelRef.current('table.collapse-row')}
+                openText={getLabelRef.current('table.row-details')}
+                closeText={getLabelRef.current('table.row-details')}
                 open={row.getIsExpanded()}
                 onOpenChange={() => row.toggleExpanded()}
               />
@@ -1611,6 +1640,16 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
             {reorderAnnouncement}
           </div>
         )}
+        {reorderableColumns && (
+          <span id={`${resolvedId}-reorder-hint`} hidden>
+            {getLabel('table.reorder.instructions')}
+          </span>
+        )}
+        {reorderableRows && (
+          <span id={`${resolvedId}-row-reorder-hint`} hidden>
+            {getLabel('table.row-reorder.instructions')}
+          </span>
+        )}
         <div
           ref={scrollRef}
           className={styles['tedi-table__scroll']}
@@ -1665,7 +1704,6 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                       (headerDef === null ||
                         headerDef === undefined ||
                         (typeof headerDef === 'string' && headerDef.trim() === ''));
-                    const headerFallbackLabel = headerLabel ?? (columnHasChildren ? undefined : header.column.id);
                     const userColumnProps = columnProps?.(header.column.id);
                     const headerSize = header.column.getSize();
                     const isBuiltInColumn =
@@ -1703,7 +1741,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         )}
                         scope="col"
                         aria-sort={ariaSort}
-                        aria-label={headerLabel ?? (columnHasChildren ? undefined : header.column.id)}
+                        aria-label={headerLabel}
                         style={
                           headerSize || userColumnProps?.style
                             ? { ...(headerSize ? { width: headerSize } : null), ...userColumnProps?.style }
@@ -1719,6 +1757,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                                 [styles['tedi-table__drag-handle--picked-up']]: isPickedUpThisCol,
                               })}
                               aria-label={getLabel('table.drag-column', headerLabel ?? header.column.id)}
+                              aria-describedby={`${resolvedId}-reorder-hint`}
                               aria-pressed={isPickedUpThisCol}
                               onClick={(event) => event.stopPropagation()}
                               onMouseDown={colHandlers.onHandlePointerDown}
@@ -1730,8 +1769,8 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                             </button>
                             {flexRender(header.column.columnDef.header, header.getContext())}
                           </span>
-                        ) : headerIsBlank && headerFallbackLabel ? (
-                          <span className={styles['tedi-table__sr-only']}>{headerFallbackLabel}</span>
+                        ) : headerIsBlank && headerLabel ? (
+                          <span className={styles['tedi-table__sr-only']}>{headerLabel}</span>
                         ) : (
                           flexRender(header.column.columnDef.header, header.getContext())
                         )}
@@ -1829,6 +1868,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                     columnProps,
                     draggable: reorderableRows,
                     dragHandleLabel: getLabel('table.drag-row'),
+                    dragHandleDescribedBy: reorderableRows ? `${resolvedId}-row-reorder-hint` : undefined,
                     dragHandlers: reorderableRows
                       ? { ...buildRowDragHandlers(row.id), onKeyDown: (event) => handleRowReorderKeydown(event, row) }
                       : undefined,
@@ -1839,12 +1879,13 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                   return (
                     <Fragment key={row.id}>
                       <TableDataRowBody {...rowProps2} />
-                      {renderSubComponent && row.getIsExpanded() && (
+                      {/* `expanded: true` marks every row expanded in TanStack, so gate on getCanExpand too. */}
+                      {renderSubComponent && row.getCanExpand() && row.getIsExpanded() && (
                         <tr className={cn(styles['tedi-table__row'], styles['tedi-table__row--sub-component'])}>
+                          {/* No `region` role: one landmark per open row would pile up (axe `landmark-unique`).
+                              The toggle's `aria-controls` already points here. */}
                           <td
                             id={subRowId}
-                            role="region"
-                            aria-label={getLabel('table.row-details')}
                             colSpan={Math.max(1, leafColumnCount)}
                             className={cn(styles['tedi-table__cell'], styles['tedi-table__cell--sub-component'])}
                           >

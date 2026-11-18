@@ -16,18 +16,16 @@ describe('Alert component', () => {
   });
 
   it('renders the alert with default props', () => {
-    render(<Alert>Default Alert</Alert>);
+    const { container } = render(<Alert>Default Alert</Alert>);
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toBeInTheDocument();
-    expect(alert).toHaveClass('tedi-alert tedi-alert--info');
+    expect(screen.getByRole('alert')).toHaveTextContent('Default Alert');
+    expect(container.firstChild).toHaveClass('tedi-alert tedi-alert--info');
   });
 
   it('renders a custom class name', () => {
-    render(<Alert className="custom-class">Custom Class Alert</Alert>);
+    const { container } = render(<Alert className="custom-class">Custom Class Alert</Alert>);
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('tedi-alert custom-class');
+    expect(container.firstChild).toHaveClass('tedi-alert custom-class');
   });
 
   it('renders with a title', () => {
@@ -50,17 +48,15 @@ describe('Alert component', () => {
   });
 
   it('applies global styles when isGlobal is true', () => {
-    render(<Alert isGlobal>Global Alert</Alert>);
+    const { container } = render(<Alert isGlobal>Global Alert</Alert>);
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('tedi-alert--global');
+    expect(container.firstChild).toHaveClass('tedi-alert--global');
   });
 
   it('removes side borders when noSideBorders is true', () => {
-    render(<Alert noSideBorders>Alert without Side Borders</Alert>);
+    const { container } = render(<Alert noSideBorders>Alert without Side Borders</Alert>);
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('tedi-alert--no-side-borders');
+    expect(container.firstChild).toHaveClass('tedi-alert--no-side-borders');
   });
 
   it('renders a close button when onClose is provided', () => {
@@ -72,6 +68,16 @@ describe('Alert component', () => {
 
     fireEvent.click(closeButton);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('describes the close button with the title', () => {
+    render(
+      <Alert title="Salvestatud" onClose={jest.fn()}>
+        Content
+      </Alert>
+    );
+
+    expect(screen.getByRole('button', { name: 'close' })).toHaveAccessibleDescription('Salvestatud');
   });
 
   it('does not render close button when onClose is not provided', () => {
@@ -98,18 +104,56 @@ describe('Alert component', () => {
     expect(screen.getByRole('link', { name: 'Read more' })).toBeInTheDocument();
   });
 
-  it('sets aria-live based on role prop', () => {
-    render(<Alert role="status">Status Alert</Alert>);
+  it.each(['alert', 'status'] as const)('sets role %s without a redundant aria-live', (role) => {
+    render(<Alert role={role}>Message</Alert>);
 
-    const alert = screen.getByRole('status');
-    expect(alert).toHaveAttribute('aria-live', 'polite');
+    const region = screen.getByRole(role);
+    expect(region).toHaveTextContent('Message');
+    expect(region).not.toHaveAttribute('aria-live');
+    expect(document.querySelector('[aria-live]')).toBeNull();
+  });
+
+  it('does not set a hardcoded aria-label', () => {
+    const { container } = render(<Alert type="warning">Message</Alert>);
+
+    expect(container.querySelector('[aria-label]')).toBeNull();
+    expect(screen.getByRole('alert')).not.toHaveAccessibleName();
+  });
+
+  it('leaves the live region unnamed and announces title and message', () => {
+    render(<Alert title="Salvestamine ebaõnnestus">Proovi uuesti.</Alert>);
+
+    const region = screen.getByRole('alert');
+    expect(region).not.toHaveAccessibleName();
+    expect(region).toHaveTextContent('Salvestamine ebaõnnestusProovi uuesti.');
+  });
+
+  it('keeps the close button outside the live region', () => {
+    render(
+      <Alert title="Title" icon="info" onClose={jest.fn()}>
+        Message
+      </Alert>
+    );
+
+    const region = screen.getByRole('alert');
+    expect(region).toHaveTextContent('TitleMessage');
+    expect(region.querySelector('button')).toBeNull();
+    expect(screen.getByRole('button', { name: 'close' })).toBeInTheDocument();
+  });
+
+  it('keeps the action outside the live region, after the message', () => {
+    render(<Alert action={<button type="button">Open profile</button>}>Message</Alert>);
+
+    const region = screen.getByRole('alert');
+    const action = screen.getByRole('button', { name: 'Open profile' });
+    expect(region).not.toContainElement(action);
+    expect(region.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('renders with danger type and applies correct class', () => {
-    render(<Alert type="danger">Danger Alert</Alert>);
+    const { container } = render(<Alert type="danger">Danger Alert</Alert>);
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('tedi-alert--danger');
+    expect(container.firstChild).toHaveClass('tedi-alert--danger');
   });
 
   it('renders children without a title', () => {
@@ -137,21 +181,19 @@ describe('Alert component', () => {
   });
 
   it('renders with small size and applies correct size class', () => {
-    render(<Alert size="small">Small Alert</Alert>);
+    const { container } = render(<Alert size="small">Small Alert</Alert>);
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('tedi-alert--size-small');
+    expect(container.firstChild).toHaveClass('tedi-alert--size-small');
   });
 
   it('renders danger alert with small size', () => {
-    render(
+    const { container } = render(
       <Alert type="danger" size="small">
         Danger Small Alert
       </Alert>
     );
 
-    const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('tedi-alert--danger');
-    expect(alert).toHaveClass('tedi-alert--size-small');
+    expect(container.firstChild).toHaveClass('tedi-alert--danger');
+    expect(container.firstChild).toHaveClass('tedi-alert--size-small');
   });
 });

@@ -144,14 +144,14 @@ interface Booking {
   location: string;
 }
 
-const bookingDateRange: DateRange = {
-  from: new Date(2029, 2, 22),
-  to: new Date(2029, 2, 29),
-};
+const bookingDateRange = (index: number): DateRange => ({
+  from: new Date(2029, 2, 22 + index),
+  to: new Date(2029, 2, 29 + index),
+});
 
 const bookings: Booking[] = Array.from({ length: 28 }, (_, index) => ({
   id: String(index + 1),
-  dateRange: bookingDateRange,
+  dateRange: bookingDateRange(index),
   hour: '11:14',
   duration: '6 min',
   location: 'Harjumaa',
@@ -253,14 +253,14 @@ function useEditableRows<T extends { id: string }>(initial: T[]): EditableRows<T
   return { rows, editingId, draft, setDraft, beginEdit, cancelEdit, commitEdit };
 }
 
-function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
+function EditActionsCell<T extends { id: string }>({ row, rowLabel }: { row: T; rowLabel: string }) {
   const editor = useEditor<T>();
   if (row.id === editor.editingId) {
     return (
       <span style={editRowActionsStyle}>
-        <ClosingButton title="Tühista" onClick={editor.cancelEdit} />
+        <ClosingButton title={`Tühista ${rowLabel}`} onClick={editor.cancelEdit} />
         <Button visualType="primary" size="small" icon="check" onClick={editor.commitEdit}>
-          Kinnita
+          Kinnita<span className="sr-only"> {rowLabel}</span>
         </Button>
       </span>
     );
@@ -268,7 +268,7 @@ function EditActionsCell<T extends { id: string }>({ row }: { row: T }) {
   return (
     <span style={editRowActionsStyle}>
       <Button visualType="link" iconLeft="edit" onClick={() => editor.beginEdit(row)}>
-        Muuda
+        Muuda<span className="sr-only"> {rowLabel}</span>
       </Button>
     </span>
   );
@@ -362,6 +362,7 @@ function EditableDateRangeCell<T extends { id: string }>({
 const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
+    meta: { rowHeader: true },
     header: 'Kuupäev',
     accessorKey: 'dateRange',
     cell: ({ row }) => <EditableDateRangeCell row={row.original} field="dateRange" label="Kuupäev" />,
@@ -387,8 +388,9 @@ const bookingShowcaseColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={formatDateRange(row.original.dateRange)} />,
   },
 ];
 
@@ -467,6 +469,7 @@ const simplePeopleColumns: ColumnDef<PersonRecord>[] = [
 const simpleDoctorColumns: ColumnDef<Doctor>[] = [
   {
     id: 'name',
+    meta: { rowHeader: true },
     header: 'Arst',
     cell: ({ row }) => (
       <div>
@@ -490,8 +493,9 @@ const simpleDoctorColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={row.original.name} />,
   },
 ];
 
@@ -550,6 +554,7 @@ const LONG_TEXT_MAX_LENGTH = 70;
 const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'name',
+    meta: { rowHeader: true },
     header: 'Arst',
     cell: ({ row }) => (
       <div>
@@ -567,8 +572,9 @@ const baseDoctorWithDescriptionColumns: ColumnDef<Doctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={row.original.name} />,
   },
 ];
 
@@ -656,6 +662,7 @@ const initialsOf = (name: string) =>
 const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'dateRange',
+    meta: { rowHeader: true },
     accessorKey: 'dateRange',
     size: 240,
     header: ({ column }) => {
@@ -702,8 +709,9 @@ const mergedCellsColumns: ColumnDef<Booking>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: ({ row }) => <EditActionsCell row={row.original} />,
+    cell: ({ row }) => <EditActionsCell row={row.original} rowLabel={formatDateRange(row.original.dateRange)} />,
   },
 ];
 
@@ -1428,6 +1436,44 @@ export const CollapsibleRowsRowTrigger: Story = {
 };
 
 /**
+ * A `Table` rendered inside `renderSubComponent` follows only its own props. The outer table here is
+ * striped, small and has vertical borders; the nested tables keep the default look.
+ */
+export const NestedTable: Story = {
+  render: () => {
+    const columns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'name', header: 'Isik', accessorKey: 'name' },
+      { id: 'age', header: 'Vanus', accessorKey: 'age' },
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+    ];
+    const nestedColumns: ColumnDef<CollapsibleRecord>[] = [
+      { id: 'visits', header: 'Külastuste arv', accessorKey: 'visits' },
+      { id: 'status', header: 'Tõendi staatus', accessorKey: 'status' },
+    ];
+    return (
+      <Table<CollapsibleRecord>
+        id="tedi-table-nested"
+        data={collapsiblePeople}
+        columns={columns}
+        renderSubComponent={(row) => (
+          <Table<CollapsibleRecord>
+            id={`tedi-table-nested-${row.id}`}
+            data={row.original.subRows ?? []}
+            columns={nestedColumns}
+          />
+        )}
+        getRowCanExpand={(row) => !!row.original.subRows}
+        defaultState={{ expanded: { '0': true, '2': true } }}
+        striped
+        verticalBorders
+        size="small"
+        pagination={SHOWCASE_PAGINATION_4}
+      />
+    );
+  },
+};
+
+/**
  * Columns hidden on narrow viewports — the secondary columns whose `id` is in `RESPONSIVE_SECONDARY_COLUMNS`
  * are toggled off below `md` and re-surfaced inside the expandable detail row.
  */
@@ -1448,6 +1494,7 @@ export const SelectableRows: Story = {
       data={people}
       columns={personColumns}
       enableRowSelection
+      rowSelectionLabel={(row) => `Vali ${row.original.name}`}
       pagination={DEFAULT_PAGINATION}
     />
   ),
@@ -1552,6 +1599,7 @@ const stickyDoctors: StickyDoctor[] = Array.from({ length: 28 }, (_, index) => (
 const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
   {
     id: 'name',
+    meta: { rowHeader: true },
     header: 'Arst',
     accessorKey: 'name',
     size: 280,
@@ -1568,11 +1616,12 @@ const stickyDoctorColumns: ColumnDef<StickyDoctor>[] = [
   {
     id: 'actions',
     header: '',
+    meta: { label: 'Tegevused' },
     size: 1,
-    cell: () => (
+    cell: ({ row }) => (
       <span style={rowActionsCellStyle}>
         <Button visualType="link" iconLeft="edit">
-          Muuda
+          Muuda<span className="sr-only"> {row.original.name}</span>
         </Button>
       </span>
     ),
@@ -1717,6 +1766,7 @@ export const Actions: Story = {
         {
           id: 'actions',
           header: '',
+          meta: { label: 'Tegevused' },
           size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>
@@ -1774,6 +1824,7 @@ export const Custom: Story = {
         {
           id: 'note',
           header: '',
+          meta: { label: 'Märkus' },
           cell: ({ row }) =>
             row.original.note && row.original.noteColor ? (
               <Alert type={row.original.noteColor} size="small" role="status">
@@ -1785,6 +1836,7 @@ export const Custom: Story = {
         {
           id: 'actions',
           header: '',
+          meta: { label: 'Tegevused' },
           size: 1,
           cell: ({ row }) => (
             <span style={rowActionsCellStyle}>

@@ -131,6 +131,7 @@ export const Default: Story = {
 };
 
 export const CustomTimerForAutoclose: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: (args) => (
     <VerticalSpacing>
       <Row>
@@ -179,6 +180,7 @@ export const PersistentToast: Story = {
 };
 
 export const HoverBehavior: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: (args) => (
     <Row>
       <Col>
@@ -221,6 +223,7 @@ export const HoverBehavior: Story = {
  */
 
 export const WCAGCompliance: Story = {
+  parameters: { chromatic: { disableSnapshot: true } },
   render: (args) => (
     <Row>
       <Col>

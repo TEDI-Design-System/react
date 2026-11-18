@@ -24,18 +24,12 @@ $btn-width-large: 3.72rem;
   $background-active,
   $background-disabled: var(--button-main-disabled-general-background),
   $border-disabled: var(--button-main-disabled-general-border),
-  $color-disabled: var(--button-main-disabled-general-text)
+  $color-disabled: var(--button-main-disabled-general-text),
+  $color-focus: $color
 ) {
   color: $color;
   background-color: $background;
   border-color: $border;
-
-  &.tedi-btn--is-active:not(:disabled, [aria-disabled='true']),
-  &:active:not(:disabled, [aria-disabled='true']) {
-    color: $color-active;
-    background-color: $background-active;
-    border-color: $border-active;
-  }
 
   &.tedi-btn--is-hovered:not(:disabled, [aria-disabled='true']),
   &:hover:not(:disabled, [aria-disabled='true']) {
@@ -44,7 +38,15 @@ $btn-width-large: 3.72rem;
     border-color: $border-hover;
   }
 
+  &.tedi-btn--is-active:not(:disabled, [aria-disabled='true']),
+  &:active:not(:disabled, [aria-disabled='true']) {
+    color: $color-active;
+    background-color: $background-active;
+    border-color: $border-active;
+  }
+
   &:focus-visible:not(:disabled, [aria-disabled='true']) {
+    color: $color-focus;
     outline: 2px solid $border-focus;
     outline-offset: 1px;
     background-color: $background-focus;
@@ -71,7 +73,8 @@ $btn-width-large: 3.72rem;
   $background-active,
   $background-disabled: var(--button-main-disabled-general-background),
   $border-disabled: var(--button-main-disabled-general-border),
-  $color-disabled: var(--button-main-disabled-general-text)
+  $color-disabled: var(--button-main-disabled-general-text),
+  $color-focus: $color
 ) {
   @include button-variant(
     var(--button-main-secondary-background-default),
@@ -87,7 +90,8 @@ $btn-width-large: 3.72rem;
     $background-active,
     $background-disabled,
     $border-disabled,
-    $color-disabled
+    $color-disabled,
+    $color-focus
   );
 }
 
@@ -228,10 +232,10 @@ $btn-width-large: 3.72rem;
       var(--button-main-primary-text-default),
       var(--button-main-primary-background-hover),
       var(--button-main-primary-border-hover),
-      var(--button-main-primary-text-default),
+      var(--button-main-primary-text-hover),
       var(--button-main-primary-border-focus),
       var(--button-main-primary-background-focus),
-      var(--button-main-primary-text-default),
+      var(--button-main-primary-text-active),
       var(--button-main-primary-border-active),
       var(--button-main-primary-background-active)
     );
@@ -248,7 +252,8 @@ $btn-width-large: 3.72rem;
       var(--button-main-secondary-background-focus),
       var(--button-main-secondary-text-active),
       var(--button-main-secondary-border-active),
-      var(--button-main-secondary-background-active)
+      var(--button-main-secondary-background-active),
+      $color-focus: var(--button-main-secondary-text-focus)
     );
   }
 
@@ -266,7 +271,8 @@ $btn-width-large: 3.72rem;
       var(--button-main-neutral-border-active),
       var(--button-main-neutral-background-active),
       var(--button-main-neutral-background-default),
-      var(--button-main-neutral-background-default)
+      var(--button-main-neutral-background-default),
+      $color-focus: var(--button-main-neutral-text-focus)
     );
   }
 }
@@ -302,7 +308,8 @@ $btn-width-large: 3.72rem;
       var(--button-main-danger-neutral-border-active),
       var(--button-main-danger-neutral-background-active),
       var(--button-main-neutral-background-default),
-      var(--button-main-neutral-background-default)
+      var(--button-main-neutral-background-default),
+      $color-focus: var(--button-main-danger-neutral-text-focus)
     );
   }
 }
@@ -336,7 +343,7 @@ $btn-width-large: 3.72rem;
       var(--button-main-primary-inverted-text-hover),
       var(--button-main-primary-inverted-border-focus),
       var(--button-main-primary-inverted-background-focus),
-      var(--button-main-primary-inverted-text-default),
+      var(--button-main-primary-inverted-text-active),
       var(--button-main-primary-inverted-border-active),
       var(--button-main-primary-inverted-background-active)
     );
@@ -368,11 +375,12 @@ $btn-width-large: 3.72rem;
       var(--button-main-neutral-inverted-text-hover),
       var(--button-main-neutral-inverted-border-focus),
       var(--button-main-neutral-inverted-background-focus),
-      var(--button-main-neutral-inverted-text-default),
+      var(--button-main-neutral-inverted-text-active),
       var(--button-main-neutral-inverted-border-active),
       var(--button-main-neutral-inverted-background-active),
       var(--button-main-neutral-inverted-background-default),
-      var(--button-main-neutral-inverted-background-default)
+      var(--button-main-neutral-inverted-background-default),
+      $color-focus: var(--button-main-neutral-inverted-text-focus)
     );
 
     &:focus-visible:not(:disabled, [aria-disabled='true']) {

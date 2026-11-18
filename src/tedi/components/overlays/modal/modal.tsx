@@ -104,6 +104,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
       context,
       labelId: hasTitle ? labelId : '',
       descriptionId: hasDescription ? descriptionId : '',
+      titleId: labelId,
+      descriptionTextId: descriptionId,
       setHasTitle,
       setHasDescription,
     }),

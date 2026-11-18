@@ -21,23 +21,28 @@ export interface CarouselProps {
    */
   className?: string;
   /**
-   * Accessible name for the carousel region. Set a distinct label per carousel when a page has
-   * several. Defaults to the localized `carousel` label.
+   * Accessible name for the carousel. Without it or `ariaLabelledBy`, the name defaults to the `carousel.label` label.
    */
   ariaLabel?: string;
+  /**
+   * Id of the element that names the carousel, typically its heading.
+   */
+  ariaLabelledBy?: string;
 }
 
-const CarouselInner = forwardRef<HTMLDivElement, CarouselProps>(({ children, className, ariaLabel }, ref) => {
-  const carousel = useCarousel(ariaLabel);
+const CarouselInner = forwardRef<HTMLDivElement, CarouselProps>(
+  ({ children, className, ariaLabel, ariaLabelledBy }, ref) => {
+    const carousel = useCarousel(ariaLabel, ariaLabelledBy);
 
-  return (
-    <CarouselContext.Provider value={carousel}>
-      <div ref={ref} className={cn(styles['tedi-carousel'], className)}>
-        {children}
-      </div>
-    </CarouselContext.Provider>
-  );
-});
+    return (
+      <CarouselContext.Provider value={carousel}>
+        <div ref={ref} className={cn(styles['tedi-carousel'], className)}>
+          {children}
+        </div>
+      </CarouselContext.Provider>
+    );
+  }
+);
 
 CarouselInner.displayName = 'Carousel';
 

@@ -139,6 +139,12 @@ export interface SelectProps extends Omit<FormLabelProps, 'id' | 'label'> {
    */
   helper?: FeedbackTextProps;
   /**
+   * Space-separated ids of elements rendered outside the select (for example the
+   * application's own error message) that describe the combobox. Listed before the
+   * helper id.
+   */
+  'aria-describedby'?: string;
+  /**
    * Visual size variant.
    * - omit — default (40px tall).
    * - `"small"` — compact (32px tall) for dense layouts.
@@ -453,6 +459,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       className,
       hideLabel = false,
       helper,
+      'aria-describedby': ariaDescribedBy,
       placeholder,
       invalid,
       valid,
@@ -505,6 +512,8 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
     const containerId = shouldHideLabel ? `${resolvedId}-container` : resolvedId;
 
     const helperId = helper ? helper?.id ?? `${resolvedId}-helper` : undefined;
+    const describedBy =
+      [...new Set([...(ariaDescribedBy?.split(/\s+/) ?? []), helperId].filter(Boolean))].join(' ') || undefined;
     const element = React.useRef<SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>> | null>(null);
     const { getLabel } = useLabels();
 
@@ -512,6 +521,31 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
       ref,
       () => element.current as SelectInstance<ISelectOption, boolean, IGroupedOptions<ISelectOption>>
     );
+
+    // Gives react-select's document `touchend` handler the control or menu from the composed path when the tap
+    // was inside one, so taps inside a shadow root (or a shadow root within an option) count as inside the select.
+    React.useEffect(() => {
+      const instance = element.current as {
+        onTouchEnd?: (event: TouchEvent) => void;
+        controlRef?: HTMLElement | null;
+        menuListRef?: HTMLElement | null;
+      } | null;
+      const originalTouchEnd = instance?.onTouchEnd;
+
+      if (!instance || !originalTouchEnd) return undefined;
+
+      const handleTouchEnd = (event: TouchEvent) => {
+        const path = event.composedPath?.() ?? [event.target];
+        const target = path.find((node) => node === instance.controlRef || node === instance.menuListRef) ?? path[0];
+
+        originalTouchEnd.call(instance, { target } as unknown as TouchEvent);
+      };
+
+      document.removeEventListener('touchend', originalTouchEnd, false);
+      document.addEventListener('touchend', handleTouchEnd, false);
+
+      return () => document.removeEventListener('touchend', handleTouchEnd, false);
+    }, [async]);
 
     // Touch-only keyboard deferral (see `openKeyboardOnTouch`). Tapping the field
     // to *open* it suppresses the soft keyboard (`inputMode="none"`); tapping the
@@ -749,7 +783,7 @@ export const Select = forwardRef<SelectInstance<ISelectOption, boolean, IGrouped
           exitKeyboardMode={exitKeyboardMode}
           onKeyDown={handleSelectKeyDown}
           id={containerId}
-          aria-describedby={helperId}
+          aria-describedby={describedBy}
           autoFocus={autoFocus}
           ref={element}
           instanceId={resolvedId}

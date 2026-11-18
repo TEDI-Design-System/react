@@ -228,14 +228,20 @@ files. This is the part of this document worth maintaining by hand.
 - **Put the column label inside `Table.HeaderButton`.** It renders `children` before the icon so
   the whole "label + icon" area is one sort target. An icon-only toggle next to inert text is the
   wrong shape.
-- **Non-string headers need `meta.label`.** String headers (`header: 'Teenus'`) are used
-  automatically; anything else has no text to derive a filter/sort name from.
+- **Set `meta.label` on a column whose header is blank or not plain text** (an actions column,
+  say). It names the header for screen readers. Without it a blank header has no name, and the
+  filter, column drag-handle and column-reorder labels and announcements fall back to the column id,
+  a developer string such as `'actions'` (the filter and announcements get `''` when the header is
+  an empty string). Sort names come from your `Table.HeaderButton`, not from `meta.label`.
 - **Table filter validation goes through `TextField`'s `invalid` + `helper`**, never a custom
   red-bordered div, which is the only WCAG 3.3.1-compliant path. The label keys
   `table.filter.validation.min-length` and `table.filter.validation.no-spaces` already exist in the
   LabelProvider. Max-length and pattern rules belong on `TextField` directly via the native
   attributes.
 - **Announce "no results" with `emptyStateRole="status"`** when a filter can empty the table.
+- **Set `meta: { rowHeader: true }` on the column that identifies a row** (a name, say). Its cells
+  render as `<th scope="row">`, so screen readers announce that value as row context. Give row
+  action buttons the same context, e.g. `Muuda<span className="sr-only"> {row.original.name}</span>`.
 - **Give a stepper's `<nav>` an `aria-label`.** `VerticalStepper` and `CardStepper` both render a
   landmark; unnamed landmarks are noise when a page has more than one.
 - **Don't signal state by colour alone**, and give every sort, pagination, expansion and reorder
