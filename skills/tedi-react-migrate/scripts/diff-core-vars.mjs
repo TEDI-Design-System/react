@@ -107,7 +107,7 @@ function scan(text, onDecl, scss) {
 
 async function declarations(version) {
   const files = await packageFiles(core, version, (n) => /\.s?css$/.test(n) && !/^icons\//.test(n));
-  // name -> { kind, values: Set, byContext: Map<context, Set<value>>, files: Set }
+  // name -> { kind, values: Set, byContext: Map<context, value[]>, files: Set }
   const vars = new Map();
   for (const { name, text } of files) {
     scan(
@@ -124,8 +124,8 @@ async function declarations(version) {
           });
         const v = vars.get(n);
         v.values.add(norm(value));
-        if (!v.byContext.has(context)) v.byContext.set(context, new Set());
-        v.byContext.get(context).add(norm(value));
+        if (!v.byContext.has(context)) v.byContext.set(context, []);
+        v.byContext.get(context).push(norm(value)); // in order: the last one wins
         v.files.add(name);
       },
       name.endsWith('.scss')
@@ -142,16 +142,18 @@ const sameSet = (a, b) => a.size === b.size && [...a].every((v) => b.has(v));
 // Compare per context where both versions declare the token in the same context. The contexts only one
 // side has (an added or dropped theme override, or a selector core rewrote, such as `:root` becoming
 // `:root,:host`) are compared by their pooled values, so a rewritten selector alone is not a change.
+// Within one context the last declaration wins (`!default` SCSS assignments never override).
+const effective = (list) => list.findLast((v) => !/!default\s*$/.test(v)) ?? list[0];
 const differs = (a, b) => {
   const shared = [...a.byContext.keys()].filter((c) => b.byContext.has(c));
   if (!shared.length) return !sameSet(a.values, b.values);
-  if (shared.some((c) => !sameSet(a.byContext.get(c), b.byContext.get(c)))) return true;
+  if (shared.some((c) => effective(a.byContext.get(c)) !== effective(b.byContext.get(c)))) return true;
   const rest = (v) =>
     new Set([...v.byContext].filter(([c]) => !shared.includes(c)).flatMap(([, values]) => [...values]));
   return !sameSet(rest(a), rest(b));
 };
 const describe = (v) =>
-  [...v.byContext.values()].some((values) => !sameSet(values, v.values))
+  [...v.byContext.values()].some((values) => !sameSet(new Set(values), v.values))
     ? Object.fromEntries([...v.byContext].map(([c, values]) => [c || '(top)', [...values]]))
     : [...v.values];
 
@@ -207,7 +209,7 @@ const renamed = (value) =>
 const withRenames = (v) => ({
   ...v,
   values: new Set([...v.values].map(renamed)),
-  byContext: new Map([...v.byContext].map(([c, values]) => [c, new Set([...values].map(renamed))])),
+  byContext: new Map([...v.byContext].map(([c, values]) => [c, values.map(renamed)])),
 });
 const changed = [...before.keys()]
   .filter((n) => after.has(n) && differs(withRenames(before.get(n)), after.get(n)))

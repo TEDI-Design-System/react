@@ -17,9 +17,11 @@ Find the commands in `package.json` scripts; ask once if it isn't clear which on
    `main.tsx` (or `index.tsx`) in a client-side app; in a framework app it is the framework's root, such
    as Next.js `app/layout.tsx` or `pages/_app.tsx`: render its providers around a top-level page. Run
    it, record the result, then delete it (unless the developer wants to keep it). Typecheck, build and the project's tests all pass when a component throws only at
-   render time, for example because a provider it needs is missing. If no root can be identified or the
-   project has no unit-test runner, record the check as `not run` with the reason and list it under
-   **Needs you**.
+   render time, for example because a provider it needs is missing. If no root can be identified, the
+   project has no unit-test runner, or the test environment cannot render the root (an async server
+   component such as a Next.js App Router `layout.tsx`), record the check as `not run` with the reason
+   and list a runtime check (start the app and open the top-level routes) under **Needs you**. A
+   framework's own route smoke test may replace it if the developer agrees.
 
 A failure is either a plan item not applied yet, a plan item applied wrongly, or a change the notes
 missed. Fix the first two. Add the third to the plan as a new item (`manual` when you can't tell what the

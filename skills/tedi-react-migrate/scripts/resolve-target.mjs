@@ -52,6 +52,7 @@ if (existsSync(projectFile)) {
   const p = JSON.parse(readFileSync(projectFile, 'utf8'));
   const listed = {
     ...p.dependencies,
+    ...p.optionalDependencies,
     ...p.devDependencies,
     ...p.peerDependencies,
   };

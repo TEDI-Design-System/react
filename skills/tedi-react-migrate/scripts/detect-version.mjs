@@ -32,8 +32,13 @@ if (!pj) {
   process.exit(1);
 }
 const manifest = JSON.parse(pj);
+// npm precedence: an optionalDependencies entry overrides the same key in dependencies.
 const depOf = (name) =>
-  manifest.dependencies?.[name] ?? manifest.devDependencies?.[name] ?? manifest.peerDependencies?.[name] ?? null;
+  manifest.optionalDependencies?.[name] ??
+  manifest.dependencies?.[name] ??
+  manifest.devDependencies?.[name] ??
+  manifest.peerDependencies?.[name] ??
+  null;
 const range = depOf(pkg);
 result.packageJsonRange = range;
 result.coreRange = depOf(config.corePkg);
@@ -48,10 +53,32 @@ const isWorkspaceRoot = (d) => {
     return false;
   }
 };
+// With several lockfiles in one folder (a leftover from switching managers), the `packageManager` field
+// decides; without it the first one is used and a warning names the others.
+const MANAGER_LOCKFILE = {
+  npm: 'package-lock.json',
+  pnpm: 'pnpm-lock.yaml',
+  yarn: 'yarn.lock',
+  bun: 'bun.lock',
+};
+const managerOf = (d) => {
+  try {
+    const field = JSON.parse(readFileSync(join(d, 'package.json'), 'utf8')).packageManager;
+    return MANAGER_LOCKFILE[String(field).split('@')[0]] ?? null;
+  } catch {
+    return null;
+  }
+};
 let lock = null;
 for (let d = dir; ; d = dirname(d)) {
-  const file = LOCKFILES.find((f) => existsSync(join(d, f)));
+  const found = LOCKFILES.filter((f) => existsSync(join(d, f)));
+  const preferred = managerOf(d) ?? managerOf(dir);
+  const file = found.includes(preferred) ? preferred : found[0];
   if (file && (d === dir || isWorkspaceRoot(d))) {
+    if (found.length > 1 && file !== preferred)
+      result.lockfileWarning = `several lockfiles (${found.join(
+        ', '
+      )}) and no packageManager field; read ${file}. Ask which package manager the project uses.`;
     lock = {
       file,
       dir: d,
@@ -80,11 +107,13 @@ const nestedCoreAt = (text) => {
     return null;
   }
 };
+const coreAt = (text) =>
+  text == null ? null : (result.coreRange ? null : nestedCoreAt(text)) ?? lockedAt(text, config.corePkg);
 if (lock) {
   const text = readFileSync(join(lock.dir, lock.file), 'utf8');
   result.lockfile = relative(dir, join(lock.dir, lock.file)) || lock.file;
   result.lockfileVersion = lockedAt(text);
-  result.coreLockfileVersion = (result.coreRange ? null : nestedCoreAt(text)) ?? lockedAt(text, config.corePkg);
+  result.coreLockfileVersion = coreAt(text);
   if (!result.lockfileVersion && range)
     result.warning = `${result.lockfile} lists no version of ${pkg} for this project; check the lockfile or run the install`;
 }
@@ -124,12 +153,18 @@ const HISTORY_LIMIT = 500;
 result.history = null;
 if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
   const lockPath = `./${lock.file}`;
-  const at = (rev) => lockedAt(git(['show', `${rev}:${lockPath}`], lock.dir));
+  // Library and core versions from one lockfile revision, so a historical `from` gets its own core.
+  const at = (rev) => {
+    const text = git(['show', `${rev}:${lockPath}`], lock.dir);
+    return { lib: lockedAt(text), core: coreAt(text) };
+  };
   const committed = at('HEAD');
-  if (committed && result.lockfileVersion && committed !== result.lockfileVersion) {
+  if (committed.lib && result.lockfileVersion && committed.lib !== result.lockfileVersion) {
     result.uncommittedBump = {
-      before: committed,
+      before: committed.lib,
       after: result.lockfileVersion,
+      coreBefore: committed.core,
+      coreAfter: result.coreLockfileVersion,
     };
   }
   const log =
@@ -155,13 +190,15 @@ if (lock && git(['rev-parse', '--is-inside-work-tree'], lock.dir)) {
     const oldest = i + 1 === commits.length;
     if (oldest && shallow && !git(['rev-parse', '--verify', '--quiet', `${commit}^`], lock.dir)) continue;
     const before = oldest ? at(`${commit}^`) : versions[i + 1];
-    if (after && before !== after)
+    if (after.lib && before.lib !== after.lib)
       result.history.push({
         commit,
         date,
         subject: subject.join(' '),
-        before,
-        after,
+        before: before.lib,
+        after: after.lib,
+        coreBefore: before.core,
+        coreAfter: after.core,
       });
   }
 }

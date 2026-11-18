@@ -59,13 +59,17 @@ node <skill>/scripts/detect-version.mjs .
 - `from` is the lockfile version (else `node_modules`, else the `package.json` range minimum, marked as
   an estimate). With an `error` and no `from`, ask the developer for the exact version.
 - A `warning` means the lockfile and `node_modules` disagree, or the lockfile lists no version: ask
-  whether the bump was installed, run the install, then re-run.
+  whether the bump was installed, run the install, then re-run. A `lockfileWarning` means several
+  lockfiles and no `packageManager` field: ask which package manager the project uses before trusting
+  `from`.
 - **Already bumped, not migrated:** `uncommittedBump` is an install that is not committed yet; `history`
   lists each commit that changed the locked version (exact `before` and `after`, also for lockfile-only
-  updates). If one of them is recent and the developer says the code wasn't migrated (or the build fails
-  on TEDI errors), use its `before` as `from`. Confirm with the developer. `from` must be an exact
-  version, never a `package.json` range. In that case pass `--version <after>` to `resolve-target` so
-  the target is the version already installed, and ask whether to go to `latest` instead.
+  updates). If the developer says the code wasn't migrated (or the build fails on TEDI errors), ask which
+  exact version the code was last migrated to: several unmigrated bumps can be stacked, so the latest
+  bump's `before` is not necessarily it. Use that version as `from`; the `history` or `uncommittedBump`
+  entry whose `before` matches it supplies `coreBefore` for step 2. `from` must be an exact version,
+  never a `package.json` range. Pass `--version <installed version>` to `resolve-target` so the target is
+  the version already installed, and ask whether to go to `latest` instead.
 - `history` notes: an entry with `before: null` is the commit that added TEDI; it has no earlier version.
   `historyTruncated` means only the latest 500 lockfile commits were read; `historyShallow` means the
   clone is shallow and older bumps may be missing.
@@ -91,13 +95,22 @@ node <skill>/scripts/resolve-target.mjs --from <from> --project . [--channel sta
 
 ### 2. Release notes
 
-Core endpoints: `<core-from>` is `coreVersion` from `detect-version`, else `core.from.min` from
-`resolve-target`; `<core-to>` is `core.to.min`. Both are version strings, not the `core` objects. When
-`core.to.exact` is false, npm installs the highest match, not the minimum: resolve it before planning
-(`npm view "@tedi-design-system/core@<core.to.range>" version --json`, take the highest) and use that
-as `<core-to>`. Say in the plan header when an endpoint is an estimate; after the install, re-run
-`fetch-releases` (core part) and step 3 with `detect-version`'s `coreVersion` and add any new items. If
-neither endpoint resolves, report that the core interval could not be resolved and skip the core flags.
+Core endpoints, as version strings (not the `core` objects):
+
+- `<core-from>`: the core version that went with `from`. When `from` describes today's dependencies,
+  that is `coreVersion` from `detect-version`. When `from` came from an earlier lockfile state (a
+  `history` or `uncommittedBump` entry), take that entry's `coreBefore`; if it is null, use
+  `core.from.min` from `resolve-target` when `core.from.exact` is true, else ask the developer. Never use
+  today's `coreVersion` for an earlier `from`: it would compare the bumped core with itself.
+- `<core-to>`: `core.to.min`. When `core.to.exact` is false, npm installs the highest match, not the
+  minimum: resolve it before planning (`npm view "@tedi-design-system/core@<core.to.range>" version
+--json`, take the highest).
+
+Say in the plan header when an endpoint is an estimate. If neither endpoint resolves, report that the
+core interval could not be resolved and skip the core flags. After the install (step 5), compare
+`detect-version`'s `coreVersion` with `<core-to>`; if it differs, repeat steps 2 and 3 with the
+installed version, update the plan, and get the developer's approval for new or changed items before
+applying them.
 
 ```bash
 node <skill>/scripts/fetch-releases.mjs --from <from> --to <to> --project . \
@@ -173,7 +186,8 @@ non-interactive run), stop here and put the summary in your final message.
 1. Set `Status: applying`, then install the target version with the project's package manager. Keep
    the project's pinning style: an exact version stays exact (`npm install -E`, `pnpm add -E`,
    `yarn add -E`, `bun add --exact`); a range keeps its operator, so pass it in the spec
-   (`npm install "@tedi-design-system/react@~<to>"`).
+   (`npm install "@tedi-design-system/react@~<to>"`). Then check the installed core version against
+   `<core-to>` (step 2) before applying core items.
 2. Work through the plan **in release order**; later releases can build on earlier renames. Ask the
    `assisted` questions as you reach them (batch similar ones), apply, tick the item.
 3. Crossing several majors: the installed package is the target, so code that is right for an
