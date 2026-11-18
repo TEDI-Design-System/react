@@ -102,9 +102,14 @@ describe('ProgressBar', () => {
     expect(screen.getByText('Almost there')).toBeInTheDocument();
   });
 
-  it('renders an error feedback row with role=alert', () => {
+  // FeedbackText announces politely, so an error already on screen at load is
+  // not read over everything else.
+  it('renders an error feedback row as a polite live region', () => {
     render(<ProgressBar value={50} helper={{ text: 'Upload failed', type: 'error' }} />);
-    expect(screen.getByRole('alert')).toHaveTextContent('Upload failed');
+    const helper = screen.getByText('Upload failed');
+
+    expect(helper).toHaveAttribute('aria-live', 'polite');
+    expect(helper).toHaveClass('tedi-feedback-text--error');
   });
 
   it('applies the small modifier when small=true', () => {
