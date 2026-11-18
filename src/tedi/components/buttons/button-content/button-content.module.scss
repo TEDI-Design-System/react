@@ -1,13 +1,18 @@
 @use '@tedi-design-system/core/mixins';
 @use '@tedi-design-system/core/bootstrap-utility/breakpoints';
 
-$btn-height: 2.5rem;
-$btn-height-small: 2rem;
-$btn-height-large: 3.5rem;
-$btn-width-large: 3.72rem;
-
 :root {
   --tedi-btn-text-padding-inline: var(--button-md-inner-spacing);
+}
+
+@mixin button-size($size) {
+  min-height: var(--button-#{$size}-height);
+}
+
+@mixin button-icon-size($size) {
+  width: var(--button-#{$size}-icon-size);
+  height: var(--button-#{$size}-icon-size);
+  min-height: var(--button-#{$size}-icon-size);
 }
 
 @mixin button-variant(
@@ -128,7 +133,7 @@ $btn-width-large: 3.72rem;
   align-items: center;
   justify-content: center;
   max-width: 100%;
-  min-height: $btn-height;
+  min-height: var(--button-md-height);
   padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x);
   margin: 0;
   font-family: var(--family-default);
@@ -152,32 +157,17 @@ $btn-width-large: 3.72rem;
 }
 
 .tedi-btn--small {
-  min-height: $btn-height-small;
+  @include button-size('sm');
+
   padding: calc(var(--button-sm-padding-y) - 1px) var(--button-sm-padding-x) calc(var(--button-sm-padding-y) - 1px)
     var(--button-sm-padding-x);
   font-size: var(--button-text-size-sm);
-
-  @include breakpoints.media-breakpoint-down(md) {
-    height: $btn-height;
-  }
-
-  &.tedi-btn--icon-only {
-    width: $btn-height-small;
-
-    @include breakpoints.media-breakpoint-down(md) {
-      width: $btn-height;
-    }
-  }
 }
 
 .tedi-btn--large {
-  height: $btn-height-large;
+  height: var(--tedi-dimensions-19);
   padding: calc(var(--button-md-padding-y) - 1px) var(--button-md-padding-x) calc(var(--button-md-padding-y) - 1px)
     var(--button-md-padding-x);
-
-  &.tedi-btn--icon-only {
-    width: $btn-width-large;
-  }
 }
 
 .tedi-btn--neutral {
@@ -208,8 +198,22 @@ $btn-width-large: 3.72rem;
 }
 
 .tedi-btn--icon-only {
-  width: $btn-height;
+  @include button-icon-size('md');
+
   padding: 0;
+
+  &.tedi-btn--small {
+    @include button-icon-size('sm');
+  }
+
+  &.tedi-btn--large {
+    width: var(--tedi-dimensions-19);
+    height: var(--tedi-dimensions-19);
+  }
+
+  &.tedi-btn--extra-small {
+    @include button-icon-size('xs');
+  }
 
   .tedi-btn__text {
     position: absolute !important;
@@ -515,8 +519,8 @@ $btn-width-large: 3.72rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.5rem;
-  min-height: 1.5rem;
+  min-width: var(--tedi-dimensions-13);
+  min-height: var(--tedi-dimensions-13);
 
   .tedi-btn--link.tedi-btn__icon-standalone--link:not(.tedi-btn--is-loading) & {
     display: inline-flex;
