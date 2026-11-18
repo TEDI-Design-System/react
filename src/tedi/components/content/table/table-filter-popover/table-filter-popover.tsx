@@ -1,5 +1,5 @@
 import type { Column } from '@tanstack/react-table';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useLabels } from '../../../../providers/label-provider';
 import { Button } from '../../../buttons/button/button';
@@ -24,14 +24,6 @@ const ACTION_LABEL_KEYS = {
   clear: 'table.filter-clear',
   cancel: 'table.filter-cancel',
 } as const;
-
-const serialize = (value: unknown): string => {
-  try {
-    return JSON.stringify(value) ?? '';
-  } catch {
-    return String(value);
-  }
-};
 
 export interface TableFilterPopoverProps<TData> {
   column: Column<TData, unknown>;
@@ -62,21 +54,22 @@ export const TableFilterPopover = <TData,>({
   const applied = column.getFilterValue();
 
   const [open, setOpen] = useState(false);
-  const [draft, setDraftState] = useState<unknown>(applied);
+  const [draft, setDraftState] = useState<unknown>(() => applied);
 
   // Mirrors the draft so `apply()` right after `setValue()` in one handler commits the new value.
   const draftRef = useRef<unknown>(applied);
   const setDraft = useCallback((next: unknown) => {
     draftRef.current = next;
-    setDraftState(next);
+    setDraftState(() => next);
   }, []);
 
-  // Realign the draft when the applied filter changes from outside (clear all, controlled state).
-  const appliedKey = serialize(applied);
+  // Realign the draft when the applied filter is replaced from outside (clear all, controlled state).
+  const previousApplied = useRef(applied);
   useEffect(() => {
+    if (Object.is(previousApplied.current, applied)) return;
+    previousApplied.current = applied;
     setDraft(applied);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appliedKey, setDraft]);
+  }, [applied, setDraft]);
 
   const handleToggle = useCallback(
     (next: boolean) => {
@@ -91,7 +84,8 @@ export const TableFilterPopover = <TData,>({
       value: draft,
       setValue: setDraft,
       apply: () => {
-        column.setFilterValue(draftRef.current);
+        const next = draftRef.current;
+        column.setFilterValue(() => next);
         setOpen(false);
       },
       clear: () => {
@@ -111,6 +105,8 @@ export const TableFilterPopover = <TData,>({
 
   const actions = [...new Set(options.actions ?? defaultActions)];
   const isActive = applied !== undefined;
+  const triggerLabel = getLabel('table.filter', label);
+  const fieldId = useId();
 
   return (
     <Popover open={open} onToggle={handleToggle} placement="bottom-end">
@@ -119,16 +115,16 @@ export const TableFilterPopover = <TData,>({
           icon="filter_alt"
           selected={isActive}
           filled={isActive}
-          aria-label={getLabel('table.filter', label)}
+          aria-label={isActive ? `${triggerLabel}, ${getLabel('table.filter-applied')}` : triggerLabel}
         />
       </PopoverTrigger>
-      <PopoverContent width={options.popoverWidth ?? defaultWidth}>
+      <PopoverContent width={options.popoverWidth ?? defaultWidth} ariaLabel={triggerLabel}>
         <div className={styles['tedi-table-filter']}>
           {content ? (
             content(context)
           ) : (
             <TextField
-              id={`${column.id}-filter`}
+              id={fieldId}
               name={`${column.id}-filter`}
               label={getLabel('table.filter-input', label)}
               hideLabel

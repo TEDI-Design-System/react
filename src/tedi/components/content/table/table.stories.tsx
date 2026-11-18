@@ -13,7 +13,6 @@ import InfoButton from '../../buttons/info-button/info-button';
 import { EmptyState } from '../../content/empty-state';
 import { Checkbox } from '../../form/checkbox/checkbox';
 import { DateField } from '../../form/date-field/date-field';
-import { Radio } from '../../form/radio/radio';
 import { TextField } from '../../form/textfield/textfield';
 import { TimeField } from '../../form/time-field/time-field';
 import { HideAt } from '../../layout/hide-at/hide-at';
@@ -1013,13 +1012,7 @@ const parseDate = (value: string): number | null => {
 };
 
 /**
- * Column filter popovers with `meta: { filterable }`. The table renders an icon-only filter button
- * in the header that opens a popover with the filter input and footer actions; the column filter
- * only changes on apply or clear. Without `filterContent` the popover shows a text field; the date
- * range and checkbox filters below pass their own input through `filterContent`, which receives the
- * draft `value` / `setValue` and `apply()` / `clear()` / `cancel()`. Each column provides a
- * `filterFn` and stores its value in TanStack Table's `columnFilters` state. Footer buttons come
- * from the table's `filterActions` and can be overridden per column through `filterable: { actions }`.
+ * Edits stay in the popover until you select Apply. Clear removes the applied filter.
  */
 export const Filters: Story = {
   render: function Filters() {
@@ -1069,7 +1062,7 @@ export const Filters: Story = {
                 />
               );
             },
-          } satisfies TableColumnMeta,
+          } satisfies TableColumnMeta<PersonRecord>,
         },
         { id: 'age', accessorKey: 'age', header: 'Vanus', meta: { sortable: true } },
         { id: 'visits', accessorKey: 'visits', header: 'Külastuste arv', meta: { sortable: true } },
@@ -1105,7 +1098,7 @@ export const Filters: Story = {
                 </VerticalSpacing>
               );
             },
-          } satisfies TableColumnMeta,
+          } satisfies TableColumnMeta<PersonRecord>,
         },
       ],
       []
@@ -1123,10 +1116,7 @@ export const Filters: Story = {
 };
 
 /**
- * Footer buttons of the filter popover. The table's `filterActions` sets the default (here
- * `cancel` and `apply`) and a column overrides it with `filterable: { actions }`; an empty array
- * hides the footer so the filter content closes the popover itself through `apply()`, `clear()`
- * and `cancel()` (here the checkbox list applies on every change).
+ * Name inherits the table's actions, and Age overrides their order. Status hides the footer and applies the filter when a status is chosen.
  */
 export const FilterActions: Story = {
   render: function FilterActions() {
@@ -1137,7 +1127,6 @@ export const FilterActions: Story = {
           id: 'age',
           accessorKey: 'age',
           header: 'Vanus',
-          filterFn: (row, id, value: string) => String(row.getValue(id)).includes(value),
           meta: { filterable: { actions: ['clear', 'cancel', 'apply'], popoverWidth: 'medium' } },
         },
         {
@@ -1150,25 +1139,24 @@ export const FilterActions: Story = {
             filterContent: ({ value, apply, setValue, clear }) => (
               <VerticalSpacing size={0.5}>
                 {CERT_STATUSES.map((option) => (
-                  <Radio
+                  <Button
                     key={option}
-                    id={`filter-action-status-${option}`}
-                    name="filter-action-status"
-                    value={option}
-                    label={option}
-                    checked={value === option}
-                    onChange={() => {
+                    size="small"
+                    visualType={value === option ? 'primary' : 'secondary'}
+                    onClick={() => {
                       setValue(option);
                       apply();
                     }}
-                  />
+                  >
+                    {option}
+                  </Button>
                 ))}
                 <Button size="small" visualType="secondary" onClick={clear}>
                   Tühjenda
                 </Button>
               </VerticalSpacing>
             ),
-          } satisfies TableColumnMeta,
+          } satisfies TableColumnMeta<PersonRecord>,
         },
       ],
       []

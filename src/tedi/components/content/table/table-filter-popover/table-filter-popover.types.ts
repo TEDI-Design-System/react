@@ -32,7 +32,7 @@ export interface TableFilterContext<TValue = unknown, TData = unknown> {
   value: TValue;
   /** Writes the draft. Does not filter yet; call `apply()` to commit. */
   setValue: (next: TValue) => void;
-  /** Commits the draft with `column.setFilterValue` and closes the popover. */
+  /** Applies the draft filter and closes the popover. */
   apply: () => void;
   /** Removes the applied filter and closes the popover. */
   clear: () => void;

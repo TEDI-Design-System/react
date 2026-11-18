@@ -66,7 +66,7 @@ import { useTablePersistence } from './use-table-persistence';
  * Wrapper spans still work for the "I want this *one* cell to be different" case;
  * `meta` covers the common "every cell in the column lines up the same way".
  */
-export interface TableColumnMeta {
+export interface TableColumnMeta<TData = unknown> {
   /**
    * Names a blank or non-text header (e.g. an actions column) for screen readers and in filter,
    * column drag and reorder labels; without it a blank header has no name and those labels use the
@@ -86,7 +86,7 @@ export interface TableColumnMeta {
   /**
    * Custom input for the filter popover, receiving the draft value and `apply`, `clear` and `cancel`.
    */
-  filterContent?: TableFilterContent;
+  filterContent?: TableFilterContent<TData>;
   /**
    * @deprecated Use `filterable` and `filterContent` for the filter popover instead; the inline
    * filter row is removed in a future major release.
@@ -808,15 +808,21 @@ export interface TableRowDropEvent {
 }
 
 /**
- * TanStack starts numeric columns in descending order. Columns with `meta.sortable` always cycle
- * ascending, descending, off unless they set `sortDescFirst` themselves; hand-built sort headers
- * keep TanStack's behaviour.
+ * Fills in column defaults that follow from `meta`:
+ * - `meta.sortable` columns cycle ascending, descending, off (TanStack starts numeric columns
+ *   descending), unless the column sets `sortDescFirst` itself.
+ * - `meta.filterable` columns with the default text popover use `includesString` (TanStack infers
+ *   `inNumberRange` for numeric columns), unless the column sets `filterFn` itself.
+ * Hand-built sort headers and custom filter content keep TanStack's behaviour.
  */
-const startSortingAscending = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
+const applyMetaDefaults = <TData,>(column: ColumnDef<TData>): ColumnDef<TData> => {
   const children = (column as { columns?: ColumnDef<TData>[] }).columns;
-  const withChildren = children ? { ...column, columns: children.map(startSortingAscending) } : column;
-  const isSortable = (column.meta as TableColumnMeta | undefined)?.sortable === true;
-  return isSortable && column.sortDescFirst === undefined ? { ...withChildren, sortDescFirst: false } : withChildren;
+  const result = (children ? { ...column, columns: children.map(applyMetaDefaults) } : column) as ColumnDef<TData>;
+  const meta = column.meta as TableColumnMeta<TData> | undefined;
+  const defaults: Partial<ColumnDef<TData>> = {};
+  if (meta?.sortable === true && column.sortDescFirst === undefined) defaults.sortDescFirst = false;
+  if (meta?.filterable && !meta.filterContent && column.filterFn === undefined) defaults.filterFn = 'includesString';
+  return Object.keys(defaults).length ? ({ ...result, ...defaults } as ColumnDef<TData>) : result;
 };
 
 const resolveFilterOptions = (filterable: TableColumnMeta['filterable']): TableFilterOptions | undefined => {
@@ -1142,7 +1148,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
       });
     }
 
-    return [...leading, ...columns.map(startSortingAscending)];
+    return [...leading, ...columns.map(applyMetaDefaults)];
   }, [
     columns,
     hasSelection,
@@ -1751,7 +1757,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         ? 'descending'
                         : 'none'
                       : undefined;
-                    const headerMeta = header.column.columnDef.meta as TableColumnMeta | undefined;
+                    const headerMeta = header.column.columnDef.meta as TableColumnMeta<TData> | undefined;
                     const rawHeaderLabel =
                       headerMeta?.label ??
                       (typeof header.column.columnDef.header === 'string' ? header.column.columnDef.header : undefined);
@@ -1766,7 +1772,7 @@ function TableBase<TData>(props: TableProps<TData>): JSX.Element {
                         label={headerLabel}
                         sortable={headerMeta?.sortable === true}
                         filterOptions={resolveFilterOptions(headerMeta?.filterable)}
-                        filterContent={headerMeta?.filterContent as TableFilterContent<TData> | undefined}
+                        filterContent={headerMeta?.filterContent}
                         filterActions={filterActions}
                         filterPopoverWidth={filterPopoverWidth}
                       />

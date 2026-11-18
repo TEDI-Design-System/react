@@ -719,6 +719,13 @@ export const labelsMap = validateDefaultLabels({
     en: (columnLabel?: string) => `Filter ${columnLabel ?? 'column'}`.trim(),
     ru: (columnLabel?: string) => `Фильтр ${columnLabel ?? ''}`.trim(),
   },
+  'table.filter-applied': {
+    description: 'Appended to the column filter button name while a filter is applied to the column.',
+    components: ['Table'],
+    et: 'rakendatud',
+    en: 'applied',
+    ru: 'применён',
+  },
   'table.filter-apply': {
     description: 'Apply action in the footer of the column filter popover.',
     components: ['Table'],
