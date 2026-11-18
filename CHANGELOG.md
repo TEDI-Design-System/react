@@ -1,3 +1,11 @@
+# [21.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.17...react-21.0.0-rc.18) (2026-11-18)
+
+
+### Bug Fixes
+
+* **feedback-text:** use polite live region for valid and error texts [#1137](https://github.com/TEDI-Design-System/react/issues/1137) ([#1159](https://github.com/TEDI-Design-System/react/issues/1159)) ([7ffe9e9](https://github.com/TEDI-Design-System/react/commit/7ffe9e97ff414c4d5127b088f773e4dfdae49e26))
+* **select:** accept external aria-describedby ids [#1157](https://github.com/TEDI-Design-System/react/issues/1157) ([#1158](https://github.com/TEDI-Design-System/react/issues/1158)) ([90a1631](https://github.com/TEDI-Design-System/react/commit/90a1631d8ceeb52f59cbd785b1136abb9a63c081))
+
 # [21.0.0-rc.17](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.16...react-21.0.0-rc.17) (2026-11-17)
 
 
