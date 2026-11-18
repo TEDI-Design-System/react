@@ -1,5 +1,5 @@
 .tedi-table-header-content {
   display: inline-flex;
-  gap: 0.25rem;
+  gap: var(--layout-grid-gutters-04);
   align-items: center;
 }
