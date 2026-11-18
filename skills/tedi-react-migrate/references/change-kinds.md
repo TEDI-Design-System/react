@@ -17,8 +17,9 @@ The full map with signatures is in
 - **Find:** `rg -n "LabelProvider|getLabel\(" src`, then the key itself, quoted and, for keys that are
   valid identifiers, unquoted: `rg -n "['\"]toast\.region['\"]" src`, `rg -n "\bcarousel\s*:" src`.
   Overrides may live in a separate labels file passed to `labels`.
-- **Removed key:** delete the override entry. If the app _reads_ the key, use the replacement the notes
-  give, or make it `manual`.
+- **Removed key:** when the notes give a replacement key, move the override (and any read of the key) to
+  it, keeping the project's wording. Delete the override only when no replacement applies. If the mapping
+  is unclear, make it `manual`.
 - **Reshaped key** (function ↔ string, arguments added or removed, object argument fields removed):
   rewrite the override to the new signature; keep the project's wording.
   The typecheck does not catch every reshape: an override that still declares a removed optional
@@ -104,8 +105,8 @@ TEDI styles are CSS modules with `tedi-` class names; projects sometimes target 
 Only when core comes in through `@tedi-design-system/react` (`coreRange` is null in `detect-version`).
 
 - **Find:** the project's custom properties that set or read a removed or renamed core variable:
-  `rg -n -- "--old-name\b" src --glob "*.{scss,css,tsx,ts}"` for each name (inline `style` objects use the
-  same names), and `rg -n "\$old-scss-var\b"` when the project `@use`s core SCSS.
+  `rg -n --glob "*.{scss,css,tsx,ts}" -- "--old-name\b" src` for each name (inline `style` objects use the
+  same names), and `rg -n '\$old-scss-var\b' src` when the project `@use`s core SCSS.
 - Documented rename → `auto`. Value-matched rename candidate from `diff-core-vars.mjs` that the notes don't
   confirm → `assisted`. Removed with no replacement → `manual`.
 

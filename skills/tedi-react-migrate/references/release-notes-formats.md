@@ -27,9 +27,11 @@ content inside a guide still varies.
 ## Reading rules
 
 - A guide section runs until the next heading of the same or a higher level.
-- The same change can appear twice: in an rc release and again in the stable notes. Merge items that link
-  the same issue number (`index.json` lists `issues` per release), and items with different issues that
-  change the same thing on the same component (one plan item, both releases linked).
+- The same change can appear twice: in an rc release and again in the stable notes. Merge items that
+  describe the same change on the same component into one plan item with both releases linked, whether
+  they link the same issue or different ones. A shared issue number (`index.json` lists `issues` per
+  release) is a hint to compare, not a reason to merge: one issue can cover a rename and a removal, and
+  those stay separate items with their own statuses.
 - A stable release may only link the guide (`[18.1.0-rc.16](…/releases/tag/react-18.1.0-rc.16)`). The
   fetch script downloads linked releases even when they are older than `from`; they still apply if the
   project uses what they describe (for example a deprecated community component).

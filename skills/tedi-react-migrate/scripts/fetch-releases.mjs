@@ -4,7 +4,7 @@
 // Usage: node fetch-releases.mjs --from <version> --to <version> [--project <dir>] [--stable-only]
 //                                [--core-from <core version> --core-to <core version>]
 // Writes .tedi-migrate/cache/releases/<tag>.md and index.json, prints a summary.
-import { writeFileSync, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import config from './config.mjs';
 import { parseArgs, fail, githubReleases, parseVersion, compareVersions, ensureWorkDir, printJson } from './lib.mjs';
@@ -32,13 +32,20 @@ const NO_ACTION = /no action required|opt-in, non-breaking/i;
 const SKIP = /^(node_modules|dist|build|coverage|\.git|\.angular|\.next|\.tedi-migrate)$/;
 const terms = new Set();
 const pkgRe = config.pkg.replace(/[/.-]/g, (c) => `\\${c}`);
+const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const IMPORT = new RegExp(`import\\s*(?:type\\s*)?\\{([^}]+)\\}\\s*from\\s*["']${pkgRe}[^"']*["']`, 'g');
+const NAMESPACE_IMPORT = new RegExp(
+  `import\\s*\\*\\s*as\\s+([A-Za-z_$][\\w$]*)\\s*from\\s*["']${pkgRe}[^"']*["']`,
+  'g'
+);
+// Symbolic links are not followed: a link back up the tree would loop, a dangling one would throw.
 const walk = (dir) => {
-  for (const entry of readdirSync(dir)) {
+  for (const dirent of readdirSync(dir, { withFileTypes: true })) {
+    const entry = dirent.name;
     if (SKIP.test(entry)) continue;
     const path = join(dir, entry);
-    if (statSync(path).isDirectory()) walk(path);
-    else if (/\.(tsx?|jsx?|html|s?css|less|json)$/.test(entry) && entry !== 'package-lock.json') {
+    if (dirent.isDirectory()) walk(path);
+    else if (dirent.isFile() && /\.(tsx?|jsx?|html|s?css|less|json)$/.test(entry) && entry !== 'package-lock.json') {
       const text = readFileSync(path, 'utf8');
       for (const m of text.matchAll(IMPORT))
         for (const name of m[1].split(','))
@@ -48,6 +55,8 @@ const walk = (dir) => {
               .replace(/^type\s+/, '')
               .split(/\s+as\s+/)[0]
           );
+      for (const [, ns] of text.matchAll(NAMESPACE_IMPORT))
+        for (const m of text.matchAll(new RegExp(`\\b${escape(ns)}\\.([A-Za-z_$][\\w$]*)`, 'g'))) terms.add(m[1]);
       // Element and attribute selectors (<tedi-alert>, <label tedi-label>) and BEM blocks.
       for (const m of text.matchAll(/(?<![\w-])(tedi-[a-z]+(?:-[a-z]+)*)/g))
         if (!/^tedi-(design-system|migrate)$/.test(m[1])) terms.add(m[1]);
@@ -61,7 +70,6 @@ const walk = (dir) => {
 if (args.project) walk(project);
 terms.delete('');
 const termList = [...terms];
-const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const termRes = termList.map((t) => [t, new RegExp(`(^|[^A-Za-z0-9_.-])${escape(t)}(?![A-Za-z0-9_-])`)]);
 // Component names in prose ("Closing button", "**carousel:**"), from imports and selectors. Matched
 // against section leads only, where notes name the component a section is about.
@@ -83,7 +91,7 @@ function relevantSections(body) {
   let current = { heading: '(top)', lines: [] };
   for (const line of body.split('\n')) {
     const lead =
-      line.match(/^#{2,6}\s+(.*)/)?.[1] ??
+      line.match(/^#{1,6}\s+(.*)/)?.[1] ??
       line.match(/^\*\*([^*]{2,80})\*\*/)?.[1] ??
       line.match(/^\*\s+\*\*([^*]{2,80})\*\*/)?.[1];
     if (lead) {
@@ -124,12 +132,17 @@ async function collect(repo, prefix, lo, hi) {
     if (args['stable-only'] && v.pre.length) continue;
     selected.set(r.tag_name, { release: r, linked: false });
   }
-  // Stable notes link migration guides that live on older rc releases (deprecation tables).
+  // Stable notes link migration guides that live on older rc releases (deprecation tables). Older links
+  // are kept even below `lo`; a link past the target is not, nor an rc with --stable-only.
   const linkRe = new RegExp(`releases/tag/(${escape(prefix)}[0-9][^)\\s"'#>]*)`, 'g');
   for (const { release } of [...selected.values()]) {
     for (const m of (release.body ?? '').matchAll(linkRe)) {
       const tag = m[1];
-      if (!selected.has(tag) && byTag.has(tag)) selected.set(tag, { release: byTag.get(tag), linked: true });
+      if (selected.has(tag) || !byTag.has(tag)) continue;
+      const v = parseVersion(versionOf(tag));
+      if (!v || compareVersions(v, hi) > 0) continue;
+      if (args['stable-only'] && v.pre.length) continue;
+      selected.set(tag, { release: byTag.get(tag), linked: true });
     }
   }
   return [...selected.values()]
@@ -191,6 +204,6 @@ printJson({
       }
     : 'pass --core-from/--core-to when core changes',
   notes: [
-    "Each index entry's `relevant` lists the sections (heading or bold lead) that mention something the project uses: its imports from the library, tedi-* selectors and directives, label/translation keys it overrides, and custom properties it sets or reads; or its heading names a component the project uses. Read those sections, and the whole Migration guide of their release, in full; skim the rest of a flagged release by its headings.",
+    "Each index entry's `relevant` lists the sections (heading or bold lead) that mention something the project uses: its imports from the library, tedi-* selectors and directives, label/translation keys it overrides, and custom properties it sets or reads; or its heading names a component the project uses. Read those sections, and the whole Migration guide of their release, in full; skim every other release in the range by its headings, flagged or not.",
   ],
 });

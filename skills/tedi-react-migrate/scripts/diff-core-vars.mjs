@@ -3,7 +3,7 @@
 // and which of the project's own declarations are affected.
 // Usage: node diff-core-vars.mjs --lib-from <library version> --lib-to <library version> [--project <dir>] [--full]
 //    or: node diff-core-vars.mjs --from <core version> --to <core version> [--project <dir>]
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import config from './config.mjs';
 import { parseArgs, fail, npmMetadata, coreVersionOf, packageFiles, printJson } from './lib.mjs';
@@ -19,21 +19,80 @@ if (args['lib-from'] || args['lib-to']) {
 if (!from || !to) fail('--from/--to (core versions) or --lib-from/--lib-to (library versions) are required');
 
 const core = await npmMetadata(config.corePkg);
-const CSS_DECL = /(--[A-Za-z0-9_-]+)\s*:\s*([^;{}]+);/g;
-const SCSS_DECL = /^\s*(\$[A-Za-z0-9_-]+)\s*:\s*([^;{}]+);/gm;
 const norm = (v) => v.trim().replace(/\s+/g, ' ');
+
+/**
+ * Declarations of a stylesheet with their context (enclosing selectors and at-rules), so a token whose
+ * light and dark defaults swap still counts as changed. A declaration ends at `;` or at the `}` that
+ * closes its block (core ships minified CSS). Strings, parentheses and SCSS `#{}` are skipped over.
+ */
+function scan(text, onDecl) {
+  const src = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '$1');
+  const stack = [];
+  let buf = '';
+  let paren = 0;
+  let quote = null;
+  const flush = () => {
+    const m = buf.match(/^\s*((?:--|\$)[A-Za-z0-9_-]+)\s*:\s*([\s\S]+?)\s*$/);
+    if (m) onDecl(m[1], m[2], stack.join(' > '));
+    buf = '';
+  };
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    if (quote) {
+      if (c === '\\') buf += c + (src[++i] ?? '');
+      else {
+        if (c === quote) quote = null;
+        buf += c;
+      }
+      continue;
+    }
+    if (c === '"' || c === "'") quote = c;
+    else if (c === '(') paren++;
+    else if (c === ')') paren = Math.max(0, paren - 1);
+    else if (c === '#' && src[i + 1] === '{') {
+      const end = src.indexOf('}', i);
+      buf += src.slice(i, end < 0 ? undefined : end + 1);
+      i = end < 0 ? src.length : end;
+      continue;
+    } else if (!paren && c === ';') {
+      flush();
+      continue;
+    } else if (!paren && c === '{') {
+      stack.push(norm(buf));
+      buf = '';
+      continue;
+    } else if (!paren && c === '}') {
+      flush();
+      stack.pop();
+      continue;
+    }
+    buf += c;
+  }
+  flush();
+}
 
 async function declarations(version) {
   const files = await packageFiles(core, version, (n) => /\.s?css$/.test(n) && !/^icons\//.test(n));
-  const vars = new Map(); // name -> { kind, values:Set }
+  // name -> { kind, values: Set, byContext: Map<context, Set<value>>, files: Set }
+  const vars = new Map();
   for (const { name, text } of files) {
-    const add = (n, kind, value) => {
-      if (!vars.has(n)) vars.set(n, { kind, values: new Set(), files: new Set() });
-      vars.get(n).values.add(norm(value));
-      vars.get(n).files.add(name);
-    };
-    for (const m of text.matchAll(CSS_DECL)) add(m[1], 'css', m[2]);
-    for (const m of text.matchAll(SCSS_DECL)) add(m[1], 'scss', m[2]);
+    scan(text, (n, value, context) => {
+      const kind = n.startsWith('$') ? 'scss' : 'css';
+      if (kind === 'scss' && context) return; // only top-level SCSS variables are API
+      if (!vars.has(n))
+        vars.set(n, {
+          kind,
+          values: new Set(),
+          byContext: new Map(),
+          files: new Set(),
+        });
+      const v = vars.get(n);
+      v.values.add(norm(value));
+      if (!v.byContext.has(context)) v.byContext.set(context, new Set());
+      v.byContext.get(context).add(norm(value));
+      v.files.add(name);
+    });
   }
   return vars;
 }
@@ -43,12 +102,23 @@ const after = await declarations(to);
 const removed = [...before.keys()].filter((n) => !after.has(n));
 const added = [...after.keys()].filter((n) => !before.has(n));
 const sameSet = (a, b) => a.size === b.size && [...a].every((v) => b.has(v));
+// Compare per context where both versions declare the token in the same context; when core moved the
+// declarations to other selectors, fall back to the set of values.
+const differs = (a, b) => {
+  const shared = [...a.byContext.keys()].filter((c) => b.byContext.has(c));
+  if (!shared.length) return !sameSet(a.values, b.values);
+  return shared.some((c) => !sameSet(a.byContext.get(c), b.byContext.get(c)));
+};
+const describe = (v) =>
+  [...v.byContext.values()].some((values) => !sameSet(values, v.values))
+    ? Object.fromEntries([...v.byContext].map(([c, values]) => [c || '(top)', [...values]]))
+    : [...v.values];
 const changed = [...before.keys()]
-  .filter((n) => after.has(n) && !sameSet(before.get(n).values, after.get(n).values))
+  .filter((n) => after.has(n) && differs(before.get(n), after.get(n)))
   .map((n) => ({
     name: n,
-    before: [...before.get(n).values],
-    after: [...after.get(n).values],
+    before: describe(before.get(n)),
+    after: describe(after.get(n)),
   }));
 
 // Rename candidates for each removed name: by name first (core 6 added the --tedi- prefix to base
@@ -99,12 +169,14 @@ if (args.project) {
   const root = args.project;
   const SKIP = /^(node_modules|dist|build|coverage|\.git|\.angular|\.next|\.tedi-migrate)$/;
   const uses = new Map(); // name -> [{ file, line, kind: "sets"|"reads" }]
+  // Symbolic links are not followed: a link back up the tree would loop, a dangling one would throw.
   const walk = (dir) => {
-    for (const entry of readdirSync(dir)) {
+    for (const dirent of readdirSync(dir, { withFileTypes: true })) {
+      const entry = dirent.name;
       if (SKIP.test(entry)) continue;
       const path = join(dir, entry);
-      if (statSync(path).isDirectory()) walk(path);
-      else if (/\.(s?css|less|html|tsx?|jsx?|vue)$/.test(entry)) {
+      if (dirent.isDirectory()) walk(path);
+      else if (dirent.isFile() && /\.(s?css|less|html|tsx?|jsx?|vue)$/.test(entry)) {
         readFileSync(path, 'utf8')
           .split('\n')
           .forEach((text, i) => {
@@ -166,6 +238,11 @@ printJson({
       }),
   notes: [
     "Candidates are guesses (by name pattern, else by identical value); confirm each against the core release notes (fetch-releases --core-from/--core-to) and the library's TEDI Core Migration Guide sections. Documented renames win.",
-    "project: 'not-in-core' lists custom properties the project sets that core <to> does not declare. Most are the project's own; one that looks like a TEDI token (component or semantic name) is a stale override from an older core and has no effect.",
+    "project: 'not-in-core' lists custom properties the project sets that neither compared core version declares. Most are the project's own. Absence from core does not make one unused: the library's own component styles and the project may read it. Check the target library styles and the project's reads before calling an override stale.",
+    ...(args['lib-from']
+      ? [
+          "core versions came from the library's declared core ranges (their minimum). Unless both are exact pins this is an estimate: pass --from <the project's core version> --to <core after the install> instead.",
+        ]
+      : []),
   ],
 });

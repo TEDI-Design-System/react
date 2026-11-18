@@ -1,17 +1,22 @@
 # Verification
 
-Run after each major version step and at the end. Record each command and result in the plan.
+Run once all plan items up to the installed target are applied, and at the end. Record each command and
+result in the plan.
 
 ## Project checks
 
 Find the commands in `package.json` scripts; ask once if it isn't clear which ones to use.
 
-1. Typecheck (`tsc --noEmit`, or the project's `typecheck` script).
+1. Typecheck (the project's `typecheck` script, or its installed `tsc --noEmit`). A JavaScript project
+   without TypeScript has nothing to typecheck: record it as `n/a` and run the other checks.
 2. Build.
 3. Lint.
 4. Unit tests. End-to-end tests only if the developer asks; they are slow and may need a running backend.
-5. **Render smoke test.** Add a throwaway test that renders the root tree from `main.tsx` (all providers plus the top-level routes or pages) once and fails on any
-   thrown error or `console.error`. Run it, record the result, then delete it (unless the developer wants
+5. **Render smoke test.** Add a throwaway test that renders the app's root tree (all providers plus the
+   top-level routes or pages) once and fails on any thrown error or `console.error`. The root is
+   `main.tsx` (or `index.tsx`) in a client-side app; in a framework app it is the framework's root, such
+   as Next.js `app/layout.tsx` or `pages/_app.tsx`: render its providers around a top-level page. If no
+   root can be identified, record the check as `not run` with the reason and list it under **Needs you**. Run it, record the result, then delete it (unless the developer wants
    to keep it). Typecheck, build and the project's tests all pass when a component throws only at
    render time, for example because a provider it needs is missing.
 
@@ -20,7 +25,8 @@ missed. Fix the first two. Add the third to the plan as a new item (`manual` whe
 right fix is) with the error text.
 
 Never make a check pass by weakening it: no new `any`, `as unknown as`, `// @ts-ignore`, skipped tests or
-lint disables. After the run, `git diff` must not add any of those.
+lint disables. After the run, the migration's diff must not add any of those: check the lines `git diff`
+adds that are not already in `.tedi-migrate/start.diff` (the developer's uncommitted changes from step 0).
 
 ## Doctor checks
 

@@ -1,7 +1,7 @@
 // Shared helpers. Zero dependencies, Node >= 20.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve, sep } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 
 export function parseArgs(argv = process.argv.slice(2)) {
@@ -60,10 +60,82 @@ export function compareVersions(a, b) {
 
 export const isPrerelease = (v) => parseVersion(v)?.pre.length > 0;
 
-/** Lowest version a package.json range allows: "^9.0.0" -> "9.0.0". */
+/**
+ * Lowest version a package.json range allows: "^9.0.0" -> "9.0.0". Only for one exact, ^, ~ or >=
+ * version; null for anything else (`||`, `<`, `>`, hyphen ranges, x/* wildcards, tags, URLs).
+ */
 export function rangeMinimum(range) {
-  const m = String(range).match(/(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)/);
+  const m = String(range)
+    .trim()
+    .match(/^(?:[\^~]|>=|=)?\s*v?(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)$/);
   return m ? m[1] : null;
+}
+
+/** An exact version ("9.4.0", "10.0.0-rc.3"), not a range. */
+export const isExactVersion = (v) => /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(String(v));
+
+// ---------- lockfiles ----------
+
+export const LOCKFILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lock'];
+
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+
+/**
+ * The version of `pkg` that a lockfile resolves for one project. `importer` is the project's path
+ * relative to the lockfile ("." for the lockfile's own folder); npm and pnpm workspaces key by it.
+ */
+export function lockedVersion(file, text, pkg, importer = '.') {
+  const escaped = escapeRe(pkg);
+  const exact = (v) => v?.match(/^\d+\.\d+\.\d+[^(\s'"]*/)?.[0] ?? null;
+  try {
+    if (file === 'package-lock.json') {
+      const lock = JSON.parse(text);
+      const base = importer === '.' ? '' : `${importer}/`;
+      return (
+        lock.packages?.[`${base}node_modules/${pkg}`]?.version ??
+        lock.packages?.[`node_modules/${pkg}`]?.version ??
+        lock.dependencies?.[pkg]?.version ??
+        null
+      );
+    }
+    if (file === 'pnpm-lock.yaml') {
+      // pnpm 6+: importers.<path>.<deps>.<pkg>.version. A lockfile without `importers:` has the same
+      // shape at the top level. Never the `packages:` keys: those list every resolved copy.
+      const lines = text.split('\n');
+      const start = lines.indexOf('importers:');
+      let block = lines;
+      let indent = '';
+      if (start >= 0) {
+        const key = new RegExp(`^  ['"]?${escapeRe(importer)}['"]?:\\s*$`);
+        const at = lines.findIndex((l, i) => i > start && key.test(l));
+        if (at < 0) return null;
+        const end = lines.findIndex((l, i) => i > at && /^ {0,2}\S/.test(l));
+        block = lines.slice(at + 1, end < 0 ? undefined : end);
+        indent = '    ';
+      } else {
+        const end = lines.findIndex((l) => /^packages:/.test(l));
+        if (end >= 0) block = lines.slice(0, end);
+      }
+      const name = new RegExp(`^${indent}  ['"]?${escaped}['"]?:\\s*(.*)$`);
+      for (let i = 0; i < block.length; i++) {
+        const m = block[i].match(name);
+        if (!m) continue;
+        if (m[1]) return exact(m[1].replace(/^['"]/, '')); // pnpm 5: "pkg: 1.2.3"
+        for (let j = i + 1; j < block.length; j++) {
+          if (!block[j].startsWith(`${indent}    `)) break;
+          const v = block[j].match(/^\s+version:\s*['"]?([^'"\s]+)/);
+          if (v) return exact(v[1]);
+        }
+      }
+      return null;
+    }
+    if (file === 'yarn.lock')
+      return text.match(new RegExp(`"?${escaped}@[^\\n]*:\\n\\s+version:?\\s+"?([^"\\n]+)"?`))?.[1] ?? null;
+    if (file === 'bun.lock') return text.match(new RegExp(`${escaped}@(\\d+\\.\\d+\\.\\d+[^"'\\s,\\]]*)`))?.[1] ?? null;
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 // ---------- network ----------
@@ -78,7 +150,8 @@ export function coreVersionOf(meta, version) {
   const m = meta.versions?.[version];
   if (!m) return null;
   const range = m.dependencies?.['@tedi-design-system/core'] ?? m.peerDependencies?.['@tedi-design-system/core'];
-  return range ? { range, min: rangeMinimum(range) } : null;
+  // `min` is only the version the project resolves when the range is an exact pin.
+  return range ? { range, min: rangeMinimum(range), exact: isExactVersion(range) } : null;
 }
 
 function hasGh() {
@@ -149,6 +222,7 @@ export async function packageFiles(meta, version, filter = () => true) {
   if (!res.ok) fail(`download failed for ${tarball}`);
   const tar = gunzipSync(Buffer.from(await res.arrayBuffer()));
   const files = [];
+  let paxPath = null; // a pax "path" record names the next entry only
   for (let off = 0; off + 512 <= tar.length; ) {
     const header = tar.subarray(off, off + 512);
     if (header.every((b) => b === 0)) break;
@@ -158,7 +232,14 @@ export async function packageFiles(meta, version, filter = () => true) {
     const size = parseInt(str(124, 136).trim() || '0', 8);
     const type = String.fromCharCode(header[156] || 48);
     const start = off + 512;
-    const path = name.replace(/^package\//, '');
+    if (type === 'x') {
+      const records = tar.subarray(start, start + size).toString('utf8');
+      paxPath = records.match(/^\d+ path=(.*)$/m)?.[1] ?? null;
+      off = start + Math.ceil(size / 512) * 512;
+      continue;
+    }
+    const path = (paxPath ?? name).replace(/^package\//, '');
+    paxPath = null;
     if ((type === '0' || type === '\0') && filter(path)) {
       files.push({
         name: path,
@@ -171,8 +252,10 @@ export async function packageFiles(meta, version, filter = () => true) {
 }
 
 export function writeFiles(root, files) {
+  const base = resolve(root);
   for (const f of files) {
-    const target = join(root, f.name);
+    const target = resolve(base, f.name);
+    if (!target.startsWith(base + sep)) throw new Error(`archive entry escapes the cache: ${f.name}`);
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, f.text);
   }
