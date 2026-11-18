@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import React, { StrictMode } from 'react';
 
 import { useScrollFade, UseScrollFadeOptions } from './use-scroll-fade';
 
@@ -251,6 +251,37 @@ describe('useScrollFade', () => {
 
       await waitFor(() => expect(screen.getByTestId('end')).toHaveTextContent('false'));
       expect(unobserveSpy).toHaveBeenCalledWith(removed);
+    });
+
+    it('observes children with the border box so padding changes are caught', () => {
+      render(<ItemsComponent items={[1]} />);
+
+      const observer = (global.ResizeObserver as jest.Mock).mock.results[0].value;
+      expect(observer.observe).toHaveBeenCalledWith(screen.getByTestId('item-1'), { box: 'border-box' });
+    });
+
+    it('keeps observing in Strict Mode after effects are replayed', async () => {
+      const { rerender } = render(
+        <StrictMode>
+          <ItemsComponent items={[1]} />
+        </StrictMode>
+      );
+      const el = screen.getByTestId('scrollable');
+      mockElementScroll(el, { scrollTop: 300, scrollHeight: 500, clientHeight: 200 });
+
+      act(() => {
+        resizeCallbacks.get(screen.getByTestId('item-1'))?.();
+      });
+      expect(screen.getByTestId('end')).toHaveTextContent('false');
+
+      mockElementScroll(el, { scrollHeight: 700 });
+      rerender(
+        <StrictMode>
+          <ItemsComponent items={[1, 2]} />
+        </StrictMode>
+      );
+
+      await waitFor(() => expect(screen.getByTestId('end')).toHaveTextContent('true'));
     });
 
     it('disconnects the mutation observer on unmount', () => {

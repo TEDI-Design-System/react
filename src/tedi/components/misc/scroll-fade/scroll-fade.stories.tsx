@@ -55,8 +55,8 @@ const DynamicContentTemplate: StoryFn<typeof ScrollFade> = (args) => {
   const [items, setItems] = useState([1, 2, 3, 4, 5, 6]);
 
   return (
-    <>
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+    <div className="flex flex-column gap-3">
+      <div className="flex gap-3">
         <Button onClick={() => setItems((prev) => [...prev, prev.length + 1])}>Add item</Button>
         <Button visualType="secondary" onClick={() => setItems((prev) => prev.slice(0, -1))}>
           Remove item
@@ -64,14 +64,14 @@ const DynamicContentTemplate: StoryFn<typeof ScrollFade> = (args) => {
       </div>
       <div style={{ maxWidth: '200px', maxHeight: '150px' }}>
         <ScrollFade {...args}>
-          {items.map((item) => (
-            <p key={item} style={{ margin: 0, padding: '8px 0' }}>
-              Item {item}
-            </p>
-          ))}
+          <div className="flex flex-column gap-3">
+            {items.map((item) => (
+              <p key={item}>Item {item}</p>
+            ))}
+          </div>
         </ScrollFade>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -181,6 +181,9 @@ export const NoFadeWithoutScrollbar: Story = {
 
 export const DynamicContent: Story = {
   render: DynamicContentTemplate,
+  argTypes: {
+    children: { table: { disable: true } },
+  },
   args: {
     children: null,
   },

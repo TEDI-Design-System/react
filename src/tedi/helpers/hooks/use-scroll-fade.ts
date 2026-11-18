@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 export interface UseScrollFadeOptions {
   /**
@@ -126,7 +126,7 @@ export const useScrollFade = (options: UseScrollFadeOptions = {}): UseScrollFade
           });
           children.forEach((child) => {
             if (!observedChildren.has(child)) {
-              resizeObserver.observe(child);
+              resizeObserver.observe(child, { box: 'border-box' });
               observedChildren.add(child);
             }
           });
@@ -146,8 +146,6 @@ export const useScrollFade = (options: UseScrollFadeOptions = {}): UseScrollFade
     },
     [checkFade, disconnectObservers]
   );
-
-  useEffect(() => disconnectObservers, [disconnectObservers]);
 
   return { scrollRef, canScrollStart, canScrollEnd, handleScroll };
 };
