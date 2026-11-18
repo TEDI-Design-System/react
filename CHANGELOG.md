@@ -1,3 +1,10 @@
+# [21.0.0-rc.20](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.19...react-21.0.0-rc.20) (2026-11-18)
+
+
+### Features
+
+* **button:** add extra-small size for icon-only buttons [#1004](https://github.com/TEDI-Design-System/react/issues/1004) ([#1100](https://github.com/TEDI-Design-System/react/issues/1100)) ([c8b5ce4](https://github.com/TEDI-Design-System/react/commit/c8b5ce45be2d3b2be08c2e961d3909d19f783012))
+
 # [21.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.18...react-21.0.0-rc.19) (2026-11-18)
 
 
