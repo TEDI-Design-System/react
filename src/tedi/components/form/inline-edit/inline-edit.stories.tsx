@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 
 import { isBreakpointBelow, useBreakpoint } from '../../../helpers';
 import { Text } from '../../base/typography/text/text';
-import { Card, CardContent } from '../../content/card';
 import { Label } from '../../content/label/label';
-import { Col, Row } from '../../layout/grid';
+import { Col, NumberAttr, Row } from '../../layout/grid';
 import { VerticalSpacing } from '../../layout/vertical-spacing';
 import { StatusBadge, type StatusBadgeColor } from '../../tags/status-badge/status-badge';
 import { Tag } from '../../tags/tag/tag';
@@ -55,13 +54,38 @@ const addressOptions: ISelectOption[] = [
   { value: 'tartu', label: 'Riia 12, Tartu' },
 ];
 
-const FieldRow = ({ label, children }: { label: string; children: React.ReactNode }): JSX.Element => (
-  <Row alignItems="start" gutter={2}>
-    <Col width="auto">
-      <Label style={{ display: 'block', width: '6.5rem', paddingTop: 'var(--tedi-dimensions-01)' }}>{label}</Label>
+/** Places a story in a column of the given desktop width; full width on mobile. */
+const Column = ({ width, children }: { width: NumberAttr; children: React.ReactNode }): JSX.Element => (
+  <Row>
+    <Col width={12} md={width}>
+      {children}
     </Col>
-    <Col>{children}</Col>
   </Row>
+);
+
+/** Label and value columns, aligned on their first line of text. */
+const Fields = ({ children }: { children: React.ReactNode }): JSX.Element => (
+  <Row alignItems="baseline" gutterX={3} gutterY={0}>
+    {children}
+  </Row>
+);
+
+const FieldRow = ({ label, children }: { label: string; children: React.ReactNode }): JSX.Element => (
+  <>
+    <Col width={4}>
+      <Label>{label}</Label>
+    </Col>
+    <Col width={8}>{children}</Col>
+  </>
+);
+
+const NamedRow = ({ name, children }: { name: string; children: React.ReactNode }): JSX.Element => (
+  <>
+    <Col width={4}>
+      <Text modifiers="bold">{name}</Text>
+    </Col>
+    <Col width={8}>{children}</Col>
+  </>
 );
 
 const NameInline = (props: {
@@ -101,30 +125,6 @@ const alignFields: { label: string; value: string }[] = [
   { label: 'Kohtade arv', value: '2' },
   { label: 'Aadress', value: 'Tulbi tn 6, Tallinn' },
 ];
-
-const AlignExample = ({ align, idPrefix }: { align: 'inline' | 'end'; idPrefix: string }): JSX.Element => (
-  <Card>
-    <CardContent>
-      <VerticalSpacing size={0.25}>
-        {alignFields.map((field, index) => (
-          <Row key={field.label} alignItems="center" gutter={2}>
-            <Col width="auto">
-              <Label style={{ display: 'block', width: '6.5rem' }}>{field.label}</Label>
-            </Col>
-            <Col>
-              <NameInline
-                id={`${idPrefix}-${index}`}
-                label={field.label}
-                defaultValue={field.value}
-                editIconPosition={align}
-              />
-            </Col>
-          </Row>
-        ))}
-      </VerticalSpacing>
-    </CardContent>
-  </Card>
-);
 
 const CountryInline = (props: {
   id: string;
@@ -283,7 +283,7 @@ export const Default: Story = {
   render: function DefaultField(args) {
     const [value, setValue] = useState('Mari Maasikas');
     return (
-      <div style={{ maxWidth: '218px' }}>
+      <Column width={3}>
         <InlineEdit<string>
           label={args.label}
           placeholder={args.placeholder}
@@ -307,21 +307,10 @@ export const Default: Story = {
             />
           )}
         </InlineEdit>
-      </div>
+      </Column>
     );
   },
 };
-
-const NamedRow = ({ name, children }: { name: string; children: React.ReactNode }): JSX.Element => (
-  <Row alignItems="center" gutter={2}>
-    <Col width="auto">
-      <div style={{ width: '6.5rem' }}>
-        <Text modifiers="bold">{name}</Text>
-      </div>
-    </Col>
-    <Col>{children}</Col>
-  </Row>
-);
 
 /**
  * The editor is any TEDI form control, wired to the render props. Give it its own accessible label — a visible label
@@ -331,34 +320,36 @@ export const Type: Story = {
   render: function Type() {
     const [type, setType] = useState<ISelectOption | null>(typeOptions[0]);
     return (
-      <VerticalSpacing size={0.5} style={{ maxWidth: '338px' }}>
-        <NamedRow name="Text field">
-          <NameInline id="ie-type-text" />
-        </NamedRow>
-        <NamedRow name="Select">
-          <InlineEdit<ISelectOption | null>
-            label="Tüüp"
-            value={type}
-            onChange={setType}
-            renderValue={(v) => (v ? (v.label as string) : '—')}
-          >
-            {({ value, onChange, commit }) => (
-              <Select
-                id="ie-type-select"
-                size="small"
-                label="Tüüp"
-                hideLabel
-                options={typeOptions}
-                value={value}
-                onChange={(next) => {
-                  onChange(next as ISelectOption | null);
-                  commit();
-                }}
-              />
-            )}
-          </InlineEdit>
-        </NamedRow>
-      </VerticalSpacing>
+      <Column width={5}>
+        <Fields>
+          <NamedRow name="Text field">
+            <NameInline id="ie-type-text" />
+          </NamedRow>
+          <NamedRow name="Select">
+            <InlineEdit<ISelectOption | null>
+              label="Tüüp"
+              value={type}
+              onChange={setType}
+              renderValue={(v) => (v ? (v.label as string) : '—')}
+            >
+              {({ value, onChange, commit }) => (
+                <Select
+                  id="ie-type-select"
+                  size="small"
+                  label="Tüüp"
+                  hideLabel
+                  options={typeOptions}
+                  value={value}
+                  onChange={(next) => {
+                    onChange(next as ISelectOption | null);
+                    commit();
+                  }}
+                />
+              )}
+            </InlineEdit>
+          </NamedRow>
+        </Fields>
+      </Column>
     );
   },
 };
@@ -367,13 +358,15 @@ const sizeArray: ('default' | 'small')[] = ['default', 'small'];
 
 export const Sizes: Story = {
   render: () => (
-    <VerticalSpacing size={0.5} style={{ maxWidth: '338px' }}>
-      {sizeArray.map((size) => (
-        <NamedRow key={size} name={size === 'default' ? 'Default' : 'Small'}>
-          <NameInline id={`ie-size-${size}`} label="Kuupäev" defaultValue="22.03.2026" size={size} />
-        </NamedRow>
-      ))}
-    </VerticalSpacing>
+    <Column width={5}>
+      <Fields>
+        {sizeArray.map((size) => (
+          <NamedRow key={size} name={size === 'default' ? 'Default' : 'Small'}>
+            <NameInline id={`ie-size-${size}`} label="Kuupäev" defaultValue="22.03.2026" size={size} />
+          </NamedRow>
+        ))}
+      </Fields>
+    </Column>
   ),
 };
 
@@ -390,8 +383,8 @@ export const ValueType: Story = {
     const [olek, setOlek] = useState<ISelectOption | null>(olekOptions[0]);
 
     return (
-      <div style={{ maxWidth: '28rem' }}>
-        <VerticalSpacing size={0.5}>
+      <Column width={5}>
+        <Fields>
           <FieldRow label="Tüüp">
             <InlineEdit<ISelectOption | null>
               label="Tüüp"
@@ -446,7 +439,7 @@ export const ValueType: Story = {
               onChange={setKeywords}
               renderValue={(v) =>
                 v.length ? (
-                  <span style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--tedi-dimensions-05)' }}>
+                  <span className="flex flex-wrap gap-1">
                     {v.map((option) => (
                       <Tag key={option.value as string} color="primary">
                         {option.label}
@@ -495,8 +488,8 @@ export const ValueType: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-        </VerticalSpacing>
-      </div>
+        </Fields>
+      </Column>
     );
   },
 };
@@ -507,20 +500,31 @@ export const ValueType: Story = {
  */
 export const EditIconPosition: Story = {
   render: () => (
-    <Row gutter={4}>
-      <Col xs={12} md={6}>
-        <VerticalSpacing size={0.5}>
-          <Text modifiers="bold">Inline</Text>
-          <AlignExample align="inline" idPrefix="ie-align-inline" />
-        </VerticalSpacing>
-      </Col>
-      <Col xs={12} md={6}>
-        <VerticalSpacing size={0.5}>
-          <Text modifiers="bold">End</Text>
-          <AlignExample align="end" idPrefix="ie-align-end" />
-        </VerticalSpacing>
-      </Col>
-    </Row>
+    <Column width={6}>
+      <Row alignItems="center" gutterX={3} gutterY={4}>
+        {(['inline', 'end'] as const).map((align) => (
+          <React.Fragment key={align}>
+            <Col width={2}>
+              <Text modifiers="bold">{align === 'inline' ? 'Inline' : 'End'}</Text>
+            </Col>
+            <Col width={10}>
+              <Fields>
+                {alignFields.map((field, index) => (
+                  <FieldRow key={field.label} label={field.label}>
+                    <NameInline
+                      id={`ie-align-${align}-${index}`}
+                      label={field.label}
+                      defaultValue={field.value}
+                      editIconPosition={align}
+                    />
+                  </FieldRow>
+                ))}
+              </Fields>
+            </Col>
+          </React.Fragment>
+        ))}
+      </Row>
+    </Column>
   ),
 };
 
@@ -620,78 +624,74 @@ export const States: Story = {
     ];
 
     return (
-      <VerticalSpacing style={{ maxWidth: '640px' }}>
-        {!isMobile && (
-          <Row>
-            <Col md={2}>&nbsp;</Col>
-            <Col md={5}>
-              <Text modifiers="bold">Text field</Text>
-            </Col>
-            <Col md={5}>
-              <Text modifiers="bold">Select</Text>
-            </Col>
-          </Row>
-        )}
-        {stateRows.map((row) => (
-          <Row key={row.key} gutterY={2} md={{ gutterY: 0 }}>
-            <Col xs={12} md={2}>
-              <Text modifiers="bold">{row.label}</Text>
-            </Col>
-            <Col xs={12} md={5}>
-              <NameInline id={`ie-state-${row.key}-text`} {...row.shared} {...row.textProps} />
-            </Col>
-            <Col xs={12} md={5}>
-              <div id={`ie-state-${row.key}-cell`}>
-                <CountryInline id={`ie-state-${row.key}-select`} {...row.shared} {...row.selectProps} />
-              </div>
-            </Col>
-          </Row>
-        ))}
-      </VerticalSpacing>
+      <Column width={8}>
+        <VerticalSpacing>
+          {!isMobile && (
+            <Row>
+              <Col md={2}>&nbsp;</Col>
+              <Col md={5}>
+                <Text modifiers="bold">Text field</Text>
+              </Col>
+              <Col md={5}>
+                <Text modifiers="bold">Select</Text>
+              </Col>
+            </Row>
+          )}
+          {stateRows.map((row) => (
+            <Row key={row.key} gutterY={2} md={{ gutterY: 0 }}>
+              <Col xs={12} md={2}>
+                <Text modifiers="bold">{row.label}</Text>
+              </Col>
+              <Col xs={12} md={5}>
+                <NameInline id={`ie-state-${row.key}-text`} {...row.shared} {...row.textProps} />
+              </Col>
+              <Col xs={12} md={5}>
+                <div id={`ie-state-${row.key}-cell`}>
+                  <CountryInline id={`ie-state-${row.key}-select`} {...row.shared} {...row.selectProps} />
+                </div>
+              </Col>
+            </Row>
+          ))}
+        </VerticalSpacing>
+      </Column>
     );
   },
 };
 
 /**
- * `readOnly` renders the value as plain text with no edit affordance. It keeps an editable row's inset so it still lines
- * up when mixed in with editable ones, which is what it is for — the odd fixed value among the rest. When a whole block
- * is fixed, reach for <a href="./?path=/docs/tedi-ready-content-textgroup--docs" target="_top"><code>TextGroup</code></a>
- * instead.
- *
  * Differs from `disabled`, which keeps the greyed trigger and icon for transient states such as saving.
  */
 export const ReadOnly: Story = {
   name: 'Read-only',
   render: () => (
-    <div style={{ maxWidth: '22rem' }}>
-      <VerticalSpacing size={0.5}>
+    <Column width={5}>
+      <Fields>
         <FieldRow label="Kuupäev">
-          <NameInline id="ro-date" label="Kuupäev" defaultValue="22.03.2026" />
+          <NameInline id="ro-date" label="Kuupäev" defaultValue="22.03.2026" readOnly />
         </FieldRow>
         <FieldRow label="Kellaaeg">
           <NameInline id="ro-time" label="Kellaaeg" defaultValue="08:00" readOnly />
         </FieldRow>
         <FieldRow label="Kohtade arv">
-          <NameInline id="ro-seats" label="Kohtade arv" defaultValue="2" />
+          <NameInline id="ro-seats" label="Kohtade arv" defaultValue="2" readOnly />
         </FieldRow>
-      </VerticalSpacing>
-    </div>
+      </Fields>
+    </Column>
   ),
 };
 
 /**
  * Editing is non-destructive until it is committed. Click the value, change it, then press `Escape` to discard the draft
- * and restore the last committed value - the read view snaps back untouched. Committing instead happens on `Enter`
- * (single-line controls) or on click-away (focus leaving the editor). The committed value shown below updates only on
- * commit, never on cancel.
+ * and restore the last committed value. Committing instead happens on `Enter` (single-line controls) or on click-away
+ * (focus leaving the editor).
  */
 export const CancelEdit: Story = {
   name: 'Cancel edit',
   render: function CancelEdit() {
     const [name, setName] = useState('Mari Maasikas');
     return (
-      <div style={{ maxWidth: '22rem' }}>
-        <VerticalSpacing size={0.5}>
+      <Column width={5}>
+        <Fields>
           <FieldRow label="Nimi">
             <InlineEdit<string> label="Nimi" value={name} onChange={setName} renderValue={(v) => v || '—'}>
               {({ value, onChange, size }) => (
@@ -699,8 +699,8 @@ export const CancelEdit: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-        </VerticalSpacing>
-      </div>
+        </Fields>
+      </Column>
     );
   },
 };
@@ -712,16 +712,16 @@ export const CancelEdit: Story = {
  */
 export const Disabled: Story = {
   render: () => (
-    <div style={{ maxWidth: '22rem' }}>
-      <VerticalSpacing size={0.5}>
+    <Column width={5}>
+      <Fields>
         <FieldRow label="Kuupäev">
           <NameInline id="dis-date" label="Kuupäev" defaultValue="22.03.2026" disabled />
         </FieldRow>
         <FieldRow label="Kellaaeg">
           <NameInline id="dis-time" label="Kellaaeg" defaultValue="08:00" disabled />
         </FieldRow>
-      </VerticalSpacing>
-    </div>
+      </Fields>
+    </Column>
   ),
 };
 
@@ -731,8 +731,8 @@ export const Disabled: Story = {
  */
 export const Invalid: Story = {
   render: () => (
-    <div style={{ maxWidth: '22rem' }}>
-      <VerticalSpacing size={0.5}>
+    <Column width={5}>
+      <Fields>
         <FieldRow label="E-post">
           <NameInline
             id="inv-email"
@@ -741,8 +741,8 @@ export const Invalid: Story = {
             helper={{ text: 'Sisesta korrektne e-posti aadress', type: 'error' }}
           />
         </FieldRow>
-      </VerticalSpacing>
-    </div>
+      </Fields>
+    </Column>
   ),
 };
 
@@ -754,8 +754,8 @@ export const Placeholder: Story = {
   render: function PlaceholderFields() {
     const [address, setAddress] = useState<ISelectOption | null>(null);
     return (
-      <div style={{ maxWidth: '22rem' }}>
-        <VerticalSpacing size={0.5}>
+      <Column width={5}>
+        <Fields>
           <FieldRow label="Nimi">
             <NameInline id="ph-name" label="Nimi" defaultValue="" placeholder="Sisesta nimi" />
           </FieldRow>
@@ -783,8 +783,8 @@ export const Placeholder: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-        </VerticalSpacing>
-      </div>
+        </Fields>
+      </Column>
     );
   },
 };
@@ -820,8 +820,8 @@ export const SupportedControls: Story = {
     const extrasLabels: Record<string, string> = { breakfast: 'Hommikusöök', parking: 'Parkimine' };
 
     return (
-      <div style={{ maxWidth: '24rem' }}>
-        <VerticalSpacing size={0.5}>
+      <Column width={5}>
+        <Fields>
           <FieldRow label="Kuupäev">
             <InlineEdit<Date | undefined>
               label="Kuupäev"
@@ -893,8 +893,8 @@ export const SupportedControls: Story = {
               )}
             </InlineEdit>
           </FieldRow>
-        </VerticalSpacing>
-      </div>
+        </Fields>
+      </Column>
     );
   },
 };

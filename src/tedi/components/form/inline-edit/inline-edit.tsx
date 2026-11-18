@@ -93,8 +93,8 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
   /** Shown in the read view when the value is empty. No default — supply one if you want an empty-state hint. */
   placeholder?: React.ReactNode;
   /**
-   * Renders the value as plain text with no edit affordance, keeping the row's inset so a fixed value lines up among
-   * editable ones. For a block that is entirely read-only, use `TextGroup` instead.
+   * Renders the value as plain text with no edit affordance, keeping the row's inset so it lines up with editable
+   * rows. For a block that is entirely read-only, use `TextGroup` instead.
    */
   readOnly?: boolean;
   /**
