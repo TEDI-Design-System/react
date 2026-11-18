@@ -1,6 +1,6 @@
 // Shared helpers. Zero dependencies, Node >= 20.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, dirname, resolve, sep } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 
@@ -83,10 +83,14 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 /**
  * The version of `pkg` that a lockfile resolves for one project. `importer` is the project's path
  * relative to the lockfile ("." for the lockfile's own folder); npm and pnpm workspaces key by it.
+ * `range` is the project's package.json specifier; yarn entries are keyed by it. `workspace` is the
+ * project's package name; bun keys a workspace's own copy "<workspace>/<pkg>".
  */
-export function lockedVersion(file, text, pkg, importer = '.') {
+export function lockedVersion(file, rawText, pkg, importer = '.', range = null, workspace = null) {
+  const text = rawText.replace(/\r\n?/g, '\n');
   const escaped = escapeRe(pkg);
-  const exact = (v) => v?.match(/^\d+\.\d+\.\d+[^(\s'"]*/)?.[0] ?? null;
+  // pnpm appends peer suffixes: "9.4.0_@angular+core@20.0.0", "9.4.0(@angular/core@20.0.0)".
+  const exact = (v) => v?.match(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/)?.[0] ?? null;
   try {
     if (file === 'package-lock.json') {
       const lock = JSON.parse(text);
@@ -116,22 +120,58 @@ export function lockedVersion(file, text, pkg, importer = '.') {
         const end = lines.findIndex((l) => /^packages:/.test(l));
         if (end >= 0) block = lines.slice(0, end);
       }
+      // Only entries under a dependency section: `specifiers:` and `overrides:` hold ranges.
+      const section = new RegExp(`^${indent}(dependencies|devDependencies|optionalDependencies):\\s*$`);
+      const otherSection = new RegExp(`^${indent}\\S`);
       const name = new RegExp(`^${indent}  ['"]?${escaped}['"]?:\\s*(.*)$`);
+      let inDeps = false;
       for (let i = 0; i < block.length; i++) {
-        const m = block[i].match(name);
+        if (section.test(block[i])) {
+          inDeps = true;
+          continue;
+        }
+        if (otherSection.test(block[i])) {
+          inDeps = false;
+          continue;
+        }
+        const m = inDeps && block[i].match(name);
         if (!m) continue;
-        if (m[1]) return exact(m[1].replace(/^['"]/, '')); // pnpm 5: "pkg: 1.2.3"
+        if (m[1]) {
+          // lockfile 5.x: "pkg: 1.2.3_peer"
+          const v = exact(m[1].replace(/^['"]/, ''));
+          if (v) return v;
+          continue;
+        }
         for (let j = i + 1; j < block.length; j++) {
           if (!block[j].startsWith(`${indent}    `)) break;
           const v = block[j].match(/^\s+version:\s*['"]?([^'"\s]+)/);
-          if (v) return exact(v[1]);
+          if (v && exact(v[1])) return exact(v[1]);
         }
       }
       return null;
     }
-    if (file === 'yarn.lock')
-      return text.match(new RegExp(`"?${escaped}@[^\\n]*:\\n\\s+version:?\\s+"?([^"\\n]+)"?`))?.[1] ?? null;
-    if (file === 'bun.lock') return text.match(new RegExp(`${escaped}@(\\d+\\.\\d+\\.\\d+[^"'\\s,\\]]*)`))?.[1] ?? null;
+    if (file === 'yarn.lock') {
+      // Classic: `"pkg@^9.0.0", "pkg@^9.1.0":` / berry: `"pkg@npm:^9.0.0":`, then `version`.
+      const entries = [
+        ...text.matchAll(
+          new RegExp(`^"?(${escaped}@[^\\n]*):\\n(?:[ \\t]+[^\\n]*\\n)*?[ \\t]+version:?[ \\t]+"?([^"\\n]+)"?`, 'gm')
+        ),
+      ].map((m) => ({
+        specs: m[1].split(/,\s*/).map((s) => s.replace(/^"|"$/g, '')),
+        version: exact(m[2]),
+      }));
+      const wanted = range && [`${pkg}@${range}`, `${pkg}@npm:${range}`];
+      const match = (wanted && entries.find((e) => e.specs.some((s) => wanted.includes(s)))) ?? entries[0];
+      return match?.version ?? null;
+    }
+    if (file === 'bun.lock') {
+      // JSONC with trailing commas. `packages[pkg]` is the top-level copy; nested copies are keyed
+      // "<dependent>/<pkg>".
+      const lock = JSON.parse(text.replace(/,(\s*[}\]])/g, '$1'));
+      const name = importer === '.' ? null : lock.workspaces?.[importer]?.name ?? workspace;
+      const entry = ((name && lock.packages?.[`${name}/${pkg}`]) ?? lock.packages?.[pkg])?.[0];
+      return entry ? exact(entry.slice(entry.lastIndexOf('@') + 1)) : null;
+    }
   } catch {
     return null;
   }
@@ -166,21 +206,29 @@ function hasGh() {
 /** All releases of a GitHub repo, newest first. Uses gh when logged in, else the public REST API. */
 export async function githubReleases(repo) {
   if (hasGh()) {
-    const out = execFileSync(
-      'gh',
-      [
-        'api',
-        '--paginate',
-        `repos/${repo}/releases?per_page=100`,
-        '--jq',
-        '.[] | {tag_name, name, body, prerelease, published_at, html_url}',
-      ],
-      { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 }
-    );
-    return out
-      .split('\n')
-      .filter(Boolean)
-      .map((l) => JSON.parse(l));
+    try {
+      const out = execFileSync(
+        'gh',
+        [
+          'api',
+          '--paginate',
+          `repos/${repo}/releases?per_page=100`,
+          '--jq',
+          '.[] | {tag_name, name, body, prerelease, published_at, html_url}',
+        ],
+        {
+          encoding: 'utf8',
+          maxBuffer: 256 * 1024 * 1024,
+          stdio: ['ignore', 'pipe', 'ignore'],
+        }
+      );
+      return out
+        .split('\n')
+        .filter(Boolean)
+        .map((l) => JSON.parse(l));
+    } catch {
+      process.stderr.write('warning: gh api failed, falling back to the public GitHub API\n');
+    }
   }
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
   const headers = {
@@ -205,6 +253,49 @@ export async function githubReleases(repo) {
 }
 
 // ---------- files ----------
+
+const SKIP_DIRS =
+  /^(node_modules|dist|build|coverage|out|tmp|\.git|\.angular|\.next|\.nx|\.cache|\.tedi-migrate|storybook-static)$/;
+
+/**
+ * Calls `onFile(path, name)` for every regular file under `root` whose name matches `include`. Build
+ * output and dependencies are skipped. Symbolic links are not followed (a link back up the tree would
+ * loop, a dangling one would throw), and unreadable folders are skipped.
+ */
+export function walkProject(root, include, onFile) {
+  const walk = (dir) => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const dirent of entries) {
+      if (SKIP_DIRS.test(dirent.name)) continue;
+      const path = join(dir, dirent.name);
+      if (dirent.isDirectory()) walk(path);
+      else if (dirent.isFile() && include.test(dirent.name)) {
+        let text;
+        try {
+          text = readFileSync(path, 'utf8');
+        } catch {
+          continue;
+        }
+        onFile(path, dirent.name, text);
+      }
+    }
+  };
+  walk(root);
+}
+
+/** `--project <dir>` as a checked string, or `fallback` when the flag is absent. */
+export function projectArg(args, fallback) {
+  const p = args.project;
+  if (p === undefined) return fallback;
+  if (typeof p !== 'string') fail('--project needs a folder');
+  if (!existsSync(p)) fail(`--project ${p} does not exist`);
+  return p;
+}
 
 export function ensureWorkDir(projectDir) {
   const dir = join(projectDir, '.tedi-migrate');

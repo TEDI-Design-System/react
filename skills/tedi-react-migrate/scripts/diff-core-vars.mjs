@@ -3,14 +3,30 @@
 // and which of the project's own declarations are affected.
 // Usage: node diff-core-vars.mjs --lib-from <library version> --lib-to <library version> [--project <dir>] [--full]
 //    or: node diff-core-vars.mjs --from <core version> --to <core version> [--project <dir>]
-import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { relative } from 'node:path';
 import config from './config.mjs';
-import { parseArgs, fail, npmMetadata, coreVersionOf, packageFiles, printJson } from './lib.mjs';
+import {
+  parseArgs,
+  fail,
+  npmMetadata,
+  coreVersionOf,
+  packageFiles,
+  printJson,
+  isExactVersion,
+  projectArg,
+  walkProject,
+} from './lib.mjs';
 
 const args = parseArgs();
 let { from, to } = args;
-if (args['lib-from'] || args['lib-to']) {
+const projectRoot = projectArg(args, null);
+const libMode = args['lib-from'] !== undefined || args['lib-to'] !== undefined;
+if (libMode && (from !== undefined || to !== undefined))
+  fail('pass either --from/--to (core versions) or --lib-from/--lib-to, not both');
+for (const key of ['from', 'to', 'lib-from', 'lib-to'])
+  if (args[key] !== undefined && !isExactVersion(args[key]))
+    fail(`--${key} must be an exact version such as 6.12.0, got "${args[key]}"`);
+if (libMode) {
   const lib = await npmMetadata(config.pkg);
   from = coreVersionOf(lib, args['lib-from'])?.min;
   to = coreVersionOf(lib, args['lib-to'])?.min;
@@ -25,12 +41,15 @@ const norm = (v) => v.trim().replace(/\s+/g, ' ');
  * Declarations of a stylesheet with their context (enclosing selectors and at-rules), so a token whose
  * light and dark defaults swap still counts as changed. A declaration ends at `;` or at the `}` that
  * closes its block (core ships minified CSS). Strings, parentheses and SCSS `#{}` are skipped over.
+ * Comments are dropped as they are met, so comment markers inside strings stay text; `//` is a
+ * comment only in SCSS, and not inside `url(...)`.
  */
-function scan(text, onDecl) {
-  const src = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '$1');
+function scan(text, onDecl, scss) {
+  const src = text;
   const stack = [];
   let buf = '';
   let paren = 0;
+  let urlParen = 0; // paren depth of an open url(...), 0 when none
   let quote = null;
   const flush = () => {
     const m = buf.match(/^\s*((?:--|\$)[A-Za-z0-9_-]+)\s*:\s*([\s\S]+?)\s*$/);
@@ -47,10 +66,24 @@ function scan(text, onDecl) {
       }
       continue;
     }
+    if (c === '/' && src[i + 1] === '*') {
+      const end = src.indexOf('*/', i + 2);
+      i = end < 0 ? src.length : end + 1;
+      continue;
+    }
+    if (scss && !urlParen && c === '/' && src[i + 1] === '/') {
+      const end = src.indexOf('\n', i);
+      i = end < 0 ? src.length : end - 1;
+      continue;
+    }
     if (c === '"' || c === "'") quote = c;
-    else if (c === '(') paren++;
-    else if (c === ')') paren = Math.max(0, paren - 1);
-    else if (c === '#' && src[i + 1] === '{') {
+    else if (c === '(') {
+      paren++;
+      if (!urlParen && /url\s*$/i.test(buf)) urlParen = paren;
+    } else if (c === ')') {
+      if (urlParen === paren) urlParen = 0;
+      paren = Math.max(0, paren - 1);
+    } else if (c === '#' && src[i + 1] === '{') {
       const end = src.indexOf('}', i);
       buf += src.slice(i, end < 0 ? undefined : end + 1);
       i = end < 0 ? src.length : end;
@@ -77,22 +110,26 @@ async function declarations(version) {
   // name -> { kind, values: Set, byContext: Map<context, Set<value>>, files: Set }
   const vars = new Map();
   for (const { name, text } of files) {
-    scan(text, (n, value, context) => {
-      const kind = n.startsWith('$') ? 'scss' : 'css';
-      if (kind === 'scss' && context) return; // only top-level SCSS variables are API
-      if (!vars.has(n))
-        vars.set(n, {
-          kind,
-          values: new Set(),
-          byContext: new Map(),
-          files: new Set(),
-        });
-      const v = vars.get(n);
-      v.values.add(norm(value));
-      if (!v.byContext.has(context)) v.byContext.set(context, new Set());
-      v.byContext.get(context).add(norm(value));
-      v.files.add(name);
-    });
+    scan(
+      text,
+      (n, value, context) => {
+        const kind = n.startsWith('$') ? 'scss' : 'css';
+        if (kind === 'scss' && context) return; // only top-level SCSS variables are API
+        if (!vars.has(n))
+          vars.set(n, {
+            kind,
+            values: new Set(),
+            byContext: new Map(),
+            files: new Set(),
+          });
+        const v = vars.get(n);
+        v.values.add(norm(value));
+        if (!v.byContext.has(context)) v.byContext.set(context, new Set());
+        v.byContext.get(context).add(norm(value));
+        v.files.add(name);
+      },
+      name.endsWith('.scss')
+    );
   }
   return vars;
 }
@@ -102,24 +139,21 @@ const after = await declarations(to);
 const removed = [...before.keys()].filter((n) => !after.has(n));
 const added = [...after.keys()].filter((n) => !before.has(n));
 const sameSet = (a, b) => a.size === b.size && [...a].every((v) => b.has(v));
-// Compare per context where both versions declare the token in the same context; when core moved the
-// declarations to other selectors, fall back to the set of values.
+// Compare per context where both versions declare the token in the same context. The contexts only one
+// side has (an added or dropped theme override, or a selector core rewrote, such as `:root` becoming
+// `:root,:host`) are compared by their pooled values, so a rewritten selector alone is not a change.
 const differs = (a, b) => {
   const shared = [...a.byContext.keys()].filter((c) => b.byContext.has(c));
   if (!shared.length) return !sameSet(a.values, b.values);
-  return shared.some((c) => !sameSet(a.byContext.get(c), b.byContext.get(c)));
+  if (shared.some((c) => !sameSet(a.byContext.get(c), b.byContext.get(c)))) return true;
+  const rest = (v) =>
+    new Set([...v.byContext].filter(([c]) => !shared.includes(c)).flatMap(([, values]) => [...values]));
+  return !sameSet(rest(a), rest(b));
 };
 const describe = (v) =>
   [...v.byContext.values()].some((values) => !sameSet(values, v.values))
     ? Object.fromEntries([...v.byContext].map(([c, values]) => [c || '(top)', [...values]]))
     : [...v.values];
-const changed = [...before.keys()]
-  .filter((n) => after.has(n) && differs(before.get(n), after.get(n)))
-  .map((n) => ({
-    name: n,
-    before: describe(before.get(n)),
-    after: describe(after.get(n)),
-  }));
 
 // Rename candidates for each removed name: by name first (core 6 added the --tedi- prefix to base
 // tokens; later releases renamed active/inactive to selected/unselected, split tokens into -default /
@@ -163,36 +197,44 @@ for (const n of removed) {
 }
 const candidatesFor = new Map(renamedCandidates.map((r) => [r.from, r.candidates]));
 
+// A default that only follows a renamed reference (`var(--primary-600)` → `var(--tedi-primary-600)`)
+// has not changed: map the old values through the unambiguous renames before comparing.
+const renameTo = new Map(
+  renamedCandidates.filter((r) => r.candidates.length === 1).map((r) => [r.from, r.candidates[0].to])
+);
+const renamed = (value) =>
+  value.replace(/var\(\s*(--[A-Za-z0-9_-]+)/g, (m, n) => (renameTo.has(n) ? `var(${renameTo.get(n)}` : m));
+const withRenames = (v) => ({
+  ...v,
+  values: new Set([...v.values].map(renamed)),
+  byContext: new Map([...v.byContext].map(([c, values]) => [c, new Set([...values].map(renamed))])),
+});
+const changed = [...before.keys()]
+  .filter((n) => after.has(n) && differs(withRenames(before.get(n)), after.get(n)))
+  .map((n) => ({
+    name: n,
+    before: describe(before.get(n)),
+    after: describe(after.get(n)),
+  }));
+
 // The project's own declarations and reads of custom properties.
 let project = null;
-if (args.project) {
-  const root = args.project;
-  const SKIP = /^(node_modules|dist|build|coverage|\.git|\.angular|\.next|\.tedi-migrate)$/;
+if (projectRoot) {
+  const root = projectRoot;
   const uses = new Map(); // name -> [{ file, line, kind: "sets"|"reads" }]
-  // Symbolic links are not followed: a link back up the tree would loop, a dangling one would throw.
-  const walk = (dir) => {
-    for (const dirent of readdirSync(dir, { withFileTypes: true })) {
-      const entry = dirent.name;
-      if (SKIP.test(entry)) continue;
-      const path = join(dir, entry);
-      if (dirent.isDirectory()) walk(path);
-      else if (dirent.isFile() && /\.(s?css|less|html|tsx?|jsx?|vue)$/.test(entry)) {
-        readFileSync(path, 'utf8')
-          .split('\n')
-          .forEach((text, i) => {
-            const record = (name, kind) => {
-              if (!uses.has(name)) uses.set(name, []);
-              uses.get(name).push({ file: `${relative(root, path)}:${i + 1}`, kind });
-            };
-            for (const m of text.matchAll(/(--[A-Za-z0-9_-]+)\s*:/g)) record(m[1], 'sets');
-            for (const m of text.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)/g)) record(m[1], 'reads');
-            for (const m of text.matchAll(/(\$[A-Za-z0-9_-]+)/g))
-              if (before.has(m[1]) || after.has(m[1])) record(m[1], 'reads');
-          });
-      }
-    }
-  };
-  walk(root);
+  walkProject(root, /\.(s?css|less|html|tsx?|jsx?|vue)$/, (path, _, file) =>
+    file.split('\n').forEach((text, i) => {
+      const record = (name, kind) => {
+        if (!uses.has(name)) uses.set(name, []);
+        uses.get(name).push({ file: `${relative(root, path)}:${i + 1}`, kind });
+      };
+      // A declaration, not a BEM modifier before a pseudo-class (`.card--active:hover`).
+      for (const m of text.matchAll(/(?<![\w-])(--[A-Za-z0-9_-]+)\s*:/g)) record(m[1], 'sets');
+      for (const m of text.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)/g)) record(m[1], 'reads');
+      for (const m of text.matchAll(/(\$[A-Za-z0-9_-]+)/g))
+        if (before.has(m[1]) || after.has(m[1])) record(m[1], 'reads');
+    })
+  );
   const status = (n) => {
     if (candidatesFor.has(n)) return 'renamed-candidate';
     if (removed.includes(n)) return 'removed';

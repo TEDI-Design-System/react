@@ -15,23 +15,27 @@ Find the commands in `package.json` scripts; ask once if it isn't clear which on
 5. **Render smoke test.** Add a throwaway test that renders the app's root tree (all providers plus the
    top-level routes or pages) once and fails on any thrown error or `console.error`. The root is
    `main.tsx` (or `index.tsx`) in a client-side app; in a framework app it is the framework's root, such
-   as Next.js `app/layout.tsx` or `pages/_app.tsx`: render its providers around a top-level page. If no
-   root can be identified, record the check as `not run` with the reason and list it under **Needs you**. Run it, record the result, then delete it (unless the developer wants
-   to keep it). Typecheck, build and the project's tests all pass when a component throws only at
-   render time, for example because a provider it needs is missing.
+   as Next.js `app/layout.tsx` or `pages/_app.tsx`: render its providers around a top-level page. Run
+   it, record the result, then delete it (unless the developer wants to keep it). Typecheck, build and the project's tests all pass when a component throws only at
+   render time, for example because a provider it needs is missing. If no root can be identified or the
+   project has no unit-test runner, record the check as `not run` with the reason and list it under
+   **Needs you**.
 
 A failure is either a plan item not applied yet, a plan item applied wrongly, or a change the notes
 missed. Fix the first two. Add the third to the plan as a new item (`manual` when you can't tell what the
 right fix is) with the error text.
 
 Never make a check pass by weakening it: no new `any`, `as unknown as`, `// @ts-ignore`, skipped tests or
-lint disables. After the run, the migration's diff must not add any of those: check the lines `git diff`
-adds that are not already in `.tedi-migrate/start.diff` (the developer's uncommitted changes from step 0).
+lint disables. After the run, the migration's diff must not add any of those: check the lines
+`git diff <Base>` adds (`Base` from the plan header, so commits made per release step count too), plus
+new files from `git status --porcelain`, that are not in `.tedi-migrate/start.diff`. Without a
+start.diff, every added line counts.
 
 ## Doctor checks
 
 - **One copy of TEDI and core:** `npm ls @tedi-design-system/react @tedi-design-system/core` (or the
-  `pnpm why` / `yarn why` equivalent). Two versions of core means two sets of CSS variables.
+  `pnpm why` equivalent; `yarn why` takes one package, so run it once per package). Two versions of core
+  means two sets of CSS variables.
 - **Peers satisfied:** the install printed no peer-dependency warnings for TEDI.
 - **Styles still resolve:** every TEDI stylesheet import (`@tedi-design-system/react/index.css`, core
   SCSS `@use`/`@import`) exists in `node_modules`.

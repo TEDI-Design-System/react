@@ -4,15 +4,31 @@
 // Usage: node fetch-releases.mjs --from <version> --to <version> [--project <dir>] [--stable-only]
 //                                [--core-from <core version> --core-to <core version>]
 // Writes .tedi-migrate/cache/releases/<tag>.md and index.json, prints a summary.
-import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import config from './config.mjs';
-import { parseArgs, fail, githubReleases, parseVersion, compareVersions, ensureWorkDir, printJson } from './lib.mjs';
+import {
+  parseArgs,
+  projectArg,
+  walkProject,
+  fail,
+  githubReleases,
+  parseVersion,
+  compareVersions,
+  isExactVersion,
+  ensureWorkDir,
+  printJson,
+} from './lib.mjs';
 
 const args = parseArgs();
 const { from, to } = args;
 if (!from || !to) fail('--from and --to are required');
-const project = args.project ?? process.cwd();
+for (const key of ['from', 'to', 'core-from', 'core-to'])
+  if (args[key] !== undefined && !isExactVersion(args[key]))
+    fail(`--${key} must be an exact version such as 9.4.0, got "${args[key]}"`);
+if (compareVersions(from, to) > 0) fail(`--from ${from} is newer than --to ${to}`);
+if (Boolean(args['core-from']) !== Boolean(args['core-to'])) fail('--core-from and --core-to go together');
+const project = projectArg(args, process.cwd());
 
 // Patterns from references/release-notes-formats.md. Any heading level, any case.
 const FLAGS = {
@@ -29,45 +45,37 @@ const NO_ACTION = /no action required|opt-in, non-breaking/i;
 
 // ---------- what the project uses ----------
 
-const SKIP = /^(node_modules|dist|build|coverage|\.git|\.angular|\.next|\.tedi-migrate)$/;
 const terms = new Set();
 const pkgRe = config.pkg.replace(/[/.-]/g, (c) => `\\${c}`);
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const IMPORT = new RegExp(`import\\s*(?:type\\s*)?\\{([^}]+)\\}\\s*from\\s*["']${pkgRe}[^"']*["']`, 'g');
+// `import { A, type B as C } from`, `import type { … } from` and `export { … } from`.
+const IMPORT = new RegExp(`(?:import|export)\\s*(?:type\\s*)?\\{([^}]+)\\}\\s*from\\s*["']${pkgRe}[^"']*["']`, 'g');
 const NAMESPACE_IMPORT = new RegExp(
-  `import\\s*\\*\\s*as\\s+([A-Za-z_$][\\w$]*)\\s*from\\s*["']${pkgRe}[^"']*["']`,
+  `import\\s*(?:type\\s*)?\\*\\s*as\\s+([A-Za-z_$][\\w$]*)\\s*from\\s*["']${pkgRe}[^"']*["']`,
   'g'
 );
-// Symbolic links are not followed: a link back up the tree would loop, a dangling one would throw.
-const walk = (dir) => {
-  for (const dirent of readdirSync(dir, { withFileTypes: true })) {
-    const entry = dirent.name;
-    if (SKIP.test(entry)) continue;
-    const path = join(dir, entry);
-    if (dirent.isDirectory()) walk(path);
-    else if (dirent.isFile() && /\.(tsx?|jsx?|html|s?css|less|json)$/.test(entry) && entry !== 'package-lock.json') {
-      const text = readFileSync(path, 'utf8');
-      for (const m of text.matchAll(IMPORT))
-        for (const name of m[1].split(','))
-          terms.add(
-            name
-              .trim()
-              .replace(/^type\s+/, '')
-              .split(/\s+as\s+/)[0]
-          );
-      for (const [, ns] of text.matchAll(NAMESPACE_IMPORT))
-        for (const m of text.matchAll(new RegExp(`\\b${escape(ns)}\\.([A-Za-z_$][\\w$]*)`, 'g'))) terms.add(m[1]);
-      // Element and attribute selectors (<tedi-alert>, <label tedi-label>) and BEM blocks.
-      for (const m of text.matchAll(/(?<![\w-])(tedi-[a-z]+(?:-[a-z]+)*)/g))
-        if (!/^tedi-(design-system|migrate)$/.test(m[1])) terms.add(m[1]);
-      for (const m of text.matchAll(/\b(tedi[A-Z][A-Za-z]+)\b/g)) terms.add(m[1]);
-      for (const m of text.matchAll(/["'`]([a-z][a-z0-9-]*(?:\.[a-z0-9-]+)+)["'`]\s*:/g)) terms.add(m[1]);
-      for (const m of text.matchAll(/(--[A-Za-z0-9_-]+)\s*:/g)) terms.add(m[1]);
-      for (const m of text.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)/g)) terms.add(m[1]);
-    }
-  }
+const scanFile = (_path, entry, text) => {
+  if (entry === 'package-lock.json') return;
+  for (const m of text.matchAll(IMPORT))
+    for (const name of m[1].replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '').split(','))
+      terms.add(
+        name
+          .trim()
+          .replace(/^type\s+/, '')
+          .split(/\s+as\s+/)[0]
+      );
+  for (const [, ns] of text.matchAll(NAMESPACE_IMPORT))
+    for (const m of text.matchAll(new RegExp(`\\b${escape(ns)}\\.([A-Za-z_$][\\w$]*)`, 'g'))) terms.add(m[1]);
+  // Element and attribute selectors (<tedi-alert>, <label tedi-label>) and BEM blocks.
+  for (const m of text.matchAll(/(?<![\w-])(tedi-[a-z]+(?:-[a-z]+)*)/g))
+    if (!/^tedi-(design-system|migrate)$/.test(m[1])) terms.add(m[1]);
+  for (const m of text.matchAll(/\b(tedi[A-Z][A-Za-z]+)\b/g)) terms.add(m[1]);
+  for (const m of text.matchAll(/["'`]([a-z][a-z0-9-]*(?:\.[a-z0-9-]+)+)["'`]\s*:/g)) terms.add(m[1]);
+  // A custom property declaration, not a BEM modifier before a pseudo-class (`.card--active:hover`).
+  for (const m of text.matchAll(/(?<![\w-])(--[A-Za-z0-9_-]+)\s*:/g)) terms.add(m[1]);
+  for (const m of text.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)/g)) terms.add(m[1]);
 };
-if (args.project) walk(project);
+if (args.project) walkProject(project, /\.(tsx?|jsx?|html|s?css|less|json)$/, scanFile);
 terms.delete('');
 const termList = [...terms];
 const termRes = termList.map((t) => [t, new RegExp(`(^|[^A-Za-z0-9_.-])${escape(t)}(?![A-Za-z0-9_-])`)]);
@@ -82,7 +90,11 @@ for (const t of termList) {
     : '';
   if (words.length > 2) names.add(words.toLowerCase());
 }
-const nameRes = [...names].map((n) => [n, new RegExp(`\\b${n.split(' ').map(escape).join('[\\s-]?')}s?\\b`, 'i')]);
+const nameRes = [...names].map((n) => [
+  n,
+  // Whole names only: `table` must not match `table-of-contents`, nor `button` `closing-button`.
+  new RegExp(`(?<![\\w-])${n.split(' ').map(escape).join('[\\s-]?')}s?(?![\\w-])`, 'i'),
+]);
 
 /** Sections of a release body (headings, bold leads, bullet leads) that mention a project term. */
 function relevantSections(body) {

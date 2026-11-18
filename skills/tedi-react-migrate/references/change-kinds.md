@@ -2,7 +2,8 @@
 
 Release notes say _what_ changed. This file says how to find each kind of change in a React project and
 how to apply it. Search with `rg` (or `grep -rn`) over the project's source, styles and tests; exclude
-`node_modules`, `dist`, `build` and `.tedi-migrate`.
+`node_modules`, `dist`, `build` and `.tedi-migrate`. The commands below search `src`: replace it with the
+project's source roots (for example `apps packages` in a monorepo) and drop folders that don't exist.
 
 Import paths: `@tedi-design-system/react/tedi` (TEDI-ready) and `@tedi-design-system/react/community`.
 The installed package ships its types: read `node_modules/@tedi-design-system/react/src/**/*.d.ts` when a
@@ -25,7 +26,8 @@ The full map with signatures is in
   The typecheck does not catch every reshape: an override that still declares a removed optional
   argument stays assignable. Find those by searching, not by compiling.
 - **Meaning changed** (same key, new purpose, e.g. `carousel` became the role description): move the
-  project's value to the new key the notes name.
+  project's value to the new key the notes name, then set the old key only if the project wants to
+  override the new meaning.
 - **Tests:** a changed default string breaks tests that assert it. Take the old default from the unpacked
   `from` package (`.tedi-migrate/cache/packages/react@<from>/src/tedi/providers/label-provider/labels-map.es.js`; the `.d.ts` only has
   the types) and search tests for it.
@@ -105,8 +107,9 @@ TEDI styles are CSS modules with `tedi-` class names; projects sometimes target 
 Only when core comes in through `@tedi-design-system/react` (`coreRange` is null in `detect-version`).
 
 - **Find:** the project's custom properties that set or read a removed or renamed core variable:
-  `rg -n --glob "*.{scss,css,tsx,ts}" -- "--old-name\b" src` for each name (inline `style` objects use the
-  same names), and `rg -n '\$old-scss-var\b' src` when the project `@use`s core SCSS.
+  `rg -n --glob "*.{scss,css,tsx,ts}" -e '--old-name([^A-Za-z0-9_-]|$)' src` for each name (inline
+  `style` objects use the same names), and `rg -n '\$old-scss-var([^A-Za-z0-9_-]|$)' src` when the
+  project `@use`s core SCSS. (`\b` would also match `--old-name-hover`.)
 - Documented rename → `auto`. Value-matched rename candidate from `diff-core-vars.mjs` that the notes don't
   confirm → `assisted`. Removed with no replacement → `manual`.
 

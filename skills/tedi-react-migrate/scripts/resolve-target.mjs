@@ -7,6 +7,7 @@ import config from './config.mjs';
 import {
   parseArgs,
   fail,
+  projectArg,
   npmMetadata,
   compareVersions,
   isPrerelease,
@@ -23,6 +24,7 @@ if (!isExactVersion(from))
     `--from must be an exact version such as 9.4.0, got "${from}"; take it from the lockfile (detect-version history) or ask the developer`
   );
 const channel = args.channel ?? 'auto';
+if (!['auto', 'stable', 'rc'].includes(channel)) fail(`--channel must be stable, rc or auto, got "${channel}"`);
 
 const meta = await npmMetadata(config.pkg);
 const tags = meta['dist-tags'] ?? {};
@@ -44,7 +46,7 @@ const inRange = Object.keys(meta.versions)
 const t = meta.versions[target];
 
 // Required peers of the target that the project's package.json doesn't list.
-const projectFile = join(args.project ?? process.cwd(), 'package.json');
+const projectFile = join(projectArg(args, process.cwd()), 'package.json');
 let missingPeers = null;
 if (existsSync(projectFile)) {
   const p = JSON.parse(readFileSync(projectFile, 'utf8'));

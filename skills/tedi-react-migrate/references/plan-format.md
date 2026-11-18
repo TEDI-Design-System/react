@@ -21,8 +21,10 @@ Mark finished items `[x]`. Add `failed: <reason>` when an attempt didn't verify.
 ```markdown
 # TEDI migration: @tedi-design-system/react <from> → <to>
 
-- Started: <date>. Package manager: <npm|pnpm|yarn>. Verify with: `<typecheck>`, `<build>`, `<lint>`, `<test>`.
-- Core: <core from> → <core to> (through the library | direct dependency, out of scope).
+- Status: <planned | approved | applying | verified>. Base: <commit>.
+- Started: <date>. Package manager: <npm|pnpm|yarn|bun>. Verify with: `<typecheck>`, `<build>`, `<lint>`, `<test>`.
+- Core: <core from> → <core to> (through the library | direct dependency, out of scope)[; estimate from a range, re-check after install].
+- Peers to add: <requiredPeersNotInPackageJson, or none>.
 - Sources: <n> releases read, <n> with migration content. Cache: `.tedi-migrate/cache/releases/`.
 
 ## Items

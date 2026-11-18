@@ -34,18 +34,21 @@ npm and GitHub; `gh` (logged in) avoids GitHub rate limits, else set `GITHUB_TOK
 
 ### 0. Prepare
 
+- If `.tedi-migrate/migration-plan.md` already exists, offer to continue it instead of starting over.
+  On resume, keep `.tedi-migrate/start.diff`, take `from`, `to`, the core versions and `Base` from the
+  plan header and skip step 1. If `Status` is `planned`, show the summary and wait for the go-ahead
+  (step 4). Otherwise check that the installed version is `to` (install it if `Status` is `approved`)
+  and continue at the first unchecked item. Re-run `fetch-package` for `from` and `to` if
+  `.tedi-migrate/cache/` is gone.
 - Check `git status`. With uncommitted changes, ask whether to continue; the migration diff is easier
-  to review on its own. If you continue, save the starting diff (`git diff > .tedi-migrate/start.diff`)
-  so verification can tell the migration's changes from the developer's.
+  to review on its own. Record the starting commit (`git rev-parse HEAD`) as `Base` in the plan header.
+  If you continue with uncommitted changes, save them once:
+  `mkdir -p .tedi-migrate && git diff HEAD > .tedi-migrate/start.diff`.
 - Ask once: create a branch? commit per release step? Default: no branch, no commits, leave the diff.
 - Note the package manager and the project's typecheck, build, lint and test commands. Without a
   typecheck script, run the project's installed compiler (`node_modules/.bin/tsc --noEmit`); without
   one, use the build and record that no standalone typecheck ran. Never `npx tsc`: it can download a
   compiler. A JavaScript project without TypeScript has no typecheck: mark it `n/a`. Write down which.
-- If `.tedi-migrate/migration-plan.md` already exists, offer to continue it from the first unchecked
-  item instead of starting over. On resume, take `from` and `to` from the plan header, skip step 1's
-  detection and its up-to-date stop, check that the installed version is the plan's `to` (install it if
-  step 5 had not run yet), and go on at the first unchecked item.
 
 ### 1. Versions
 
@@ -55,11 +58,17 @@ node <skill>/scripts/detect-version.mjs .
 
 - `from` is the lockfile version (else `node_modules`, else the `package.json` range minimum, marked as
   an estimate). With an `error` and no `from`, ask the developer for the exact version.
+- A `warning` means the lockfile and `node_modules` disagree, or the lockfile lists no version: ask
+  whether the bump was installed, run the install, then re-run.
 - **Already bumped, not migrated:** `uncommittedBump` is an install that is not committed yet; `history`
   lists each commit that changed the locked version (exact `before` and `after`, also for lockfile-only
   updates). If one of them is recent and the developer says the code wasn't migrated (or the build fails
   on TEDI errors), use its `before` as `from`. Confirm with the developer. `from` must be an exact
-  version, never a `package.json` range.
+  version, never a `package.json` range. In that case pass `--version <after>` to `resolve-target` so
+  the target is the version already installed, and ask whether to go to `latest` instead.
+- `history` notes: an entry with `before: null` is the commit that added TEDI; it has no earlier version.
+  `historyTruncated` means only the latest 500 lockfile commits were read; `historyShallow` means the
+  clone is shallow and older bumps may be missing.
 - `coreRange` not null means core is a direct dependency: leave core out (rule above). Otherwise
   `coreVersion` is the core version the project resolves today.
 
@@ -74,15 +83,21 @@ node <skill>/scripts/resolve-target.mjs --from <from> --project . [--channel sta
   the code was last migrated to and use that as `from`.
 - Check `targetPeerDependencies` against the project's `react`, `react-dom` and `dayjs`. A required React major upgrade
   comes first: stop and say so. List `requiredPeersNotInPackageJson` in the plan header.
-- `majorsCrossed` lists the majors above `from` that the upgrade enters; empty means one major.
+- When core is a direct dependency and `coreRange` does not allow `core.to.range`, add a `manual` item:
+  align the project's `@tedi-design-system/core` with the library's core (`core.to.range`), or the app
+  ships two copies.
+- `majorsCrossed` lists the majors above `from` that the upgrade enters; empty means the target is in
+  the same major as `from`.
 
 ### 2. Release notes
 
 Core endpoints: `<core-from>` is `coreVersion` from `detect-version`, else `core.from.min` from
 `resolve-target`; `<core-to>` is `core.to.min`. Both are version strings, not the `core` objects. When
-the one you used came from a range (`exact: false`), say in the plan header that the core interval is an
-estimate and re-run step 3 after the install with the installed core version. If neither endpoint
-resolves, report that the core interval could not be resolved and skip the core flags.
+`core.to.exact` is false, npm installs the highest match, not the minimum: resolve it before planning
+(`npm view "@tedi-design-system/core@<core.to.range>" version --json`, take the highest) and use that
+as `<core-to>`. Say in the plan header when an endpoint is an estimate; after the install, re-run
+`fetch-releases` (core part) and step 3 with `detect-version`'s `coreVersion` and add any new items. If
+neither endpoint resolves, report that the core interval could not be resolved and skip the core flags.
 
 ```bash
 node <skill>/scripts/fetch-releases.mjs --from <from> --to <to> --project . \
@@ -108,8 +123,8 @@ core range (`core` in the output; skip the flags when core is a direct dependenc
 Unpack both versions so you can read them before installing (types, inputs, default strings):
 
 ```bash
-node <skill>/scripts/fetch-package.mjs --version <from>
-node <skill>/scripts/fetch-package.mjs --version <to>
+node <skill>/scripts/fetch-package.mjs --version <from> --project .
+node <skill>/scripts/fetch-package.mjs --version <to> --project .
 ```
 
 They land in `.tedi-migrate/cache/packages/react@<version>/`. Use them wherever a reference says
@@ -148,15 +163,17 @@ strings** (from the unpacked `from` package). When one item's choice affects ano
 didn't cause go in the plan's "Found on the way" section, not in the items.
 [references/change-kinds.md](references/change-kinds.md) says how to find and apply each kind of
 change. Write `.tedi-migrate/migration-plan.md` using
-[references/plan-format.md](references/plan-format.md), show the developer a short summary (counts per
-status, the `assisted` questions, the `manual` items) and wait for the go-ahead. If nobody can answer
-(a non-interactive run), stop here and put the summary in your final message.
+[references/plan-format.md](references/plan-format.md) with `Status: planned`, show the developer a
+short summary (counts per status, the `assisted` questions, the `manual` items, and which `deprecated`
+items to migrate now) and wait for the go-ahead; then set `Status: approved`. If nobody can answer (a
+non-interactive run), stop here and put the summary in your final message.
 
 ### 5. Apply
 
-1. Install the target version with the project's package manager (`npm install @tedi-design-system/react@<to>`). Keep the
-   project's pinning style: an exact version stays exact (`npm install -E`, `pnpm add -E`,
-   `yarn add -E`), a range keeps its operator.
+1. Set `Status: applying`, then install the target version with the project's package manager. Keep
+   the project's pinning style: an exact version stays exact (`npm install -E`, `pnpm add -E`,
+   `yarn add -E`, `bun add --exact`); a range keeps its operator, so pass it in the spec
+   (`npm install "@tedi-design-system/react@~<to>"`).
 2. Work through the plan **in release order**; later releases can build on earlier renames. Ask the
    `assisted` questions as you reach them (batch similar ones), apply, tick the item.
 3. Crossing several majors: the installed package is the target, so code that is right for an
@@ -173,7 +190,8 @@ Run the checks in [references/verification.md](references/verification.md): type
 tests, a render of the app's root tree (all providers plus the top-level routes or pages, from `main.tsx`
 or the framework's root) in the test environment (the project's tests rarely cover every
 component, and a missing provider only fails at runtime), then the doctor checks (single core copy,
-peers, style paths, keys exist, no leftovers of `auto` items). Record the results in the plan.
+peers, style paths, keys exist, no leftovers of `auto` items). Record the results in the plan and set
+`Status: verified` when they pass.
 
 ### 7. Report and hand off
 
