@@ -3,7 +3,8 @@
 $badge-colors: ('neutral', 'brand', 'accent', 'success', 'danger', 'warning', 'transparent');
 $badge-variants: ('filled', 'filled-bordered', 'bordered');
 
-:root {
+:root,
+:host {
   --status-badge-icon-primary: var(--tedi-blue-700);
   --status-badge-icon-secondary: var(--tedi-orange-700);
 }
