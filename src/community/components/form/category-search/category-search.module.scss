@@ -1,5 +1,3 @@
-$btn-height-large: 3.5rem;
-
 .tedi-category-search {
   position: relative;
   width: 100%;
@@ -103,16 +101,16 @@ $btn-height-large: 3.5rem;
   }
 
   &--large &__suffix > button {
-    height: $btn-height-large;
+    height: var(--form-field-height-lg);
     padding: calc(var(--form-field-padding-y-lg) - 2px) var(--form-field-padding-x-lg);
   }
 
   &--large &__mobile-controls > button {
-    height: $btn-height-large;
+    height: var(--form-field-height-lg);
   }
 
   &--large &__actions > button {
-    height: $btn-height-large;
+    height: var(--form-field-height-lg);
   }
 
   &__menu {
@@ -182,7 +180,7 @@ $btn-height-large: 3.5rem;
     border-block-start: 1px solid var(--general-border-primary);
 
     &--large > button {
-      height: $btn-height-large;
+      height: var(--form-field-height-lg);
     }
   }
 
