@@ -43,6 +43,7 @@ export const useScrollFade = (options: UseScrollFadeOptions = {}): UseScrollFade
   const [canScrollEnd, setCanScrollEnd] = useState(false);
   const nodeRef = useRef<HTMLElement | null>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
+  const mutationObserverRef = useRef<MutationObserver | null>(null);
   const onScrollToStartRef = useRef(onScrollToStart);
   const onScrollToEndRef = useRef(onScrollToEnd);
   const wasAtStartRef = useRef(false);
@@ -89,32 +90,64 @@ export const useScrollFade = (options: UseScrollFadeOptions = {}): UseScrollFade
     [checkFade]
   );
 
+  const disconnectObservers = useCallback(() => {
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+    mutationObserverRef.current?.disconnect();
+    mutationObserverRef.current = null;
+  }, []);
+
   const scrollRef = useCallback(
     (node: HTMLElement | null) => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
-      }
+      disconnectObservers();
 
       nodeRef.current = node;
 
       if (node) {
         checkFade(node);
 
-        observerRef.current = new ResizeObserver(() => {
+        const resizeObserver = new ResizeObserver(() => {
           checkFade(node);
         });
-        observerRef.current.observe(node);
+        observerRef.current = resizeObserver;
+        resizeObserver.observe(node);
+
+        // A capped scroll container keeps its own size when its content changes, so the
+        // children are observed too, and kept in sync as they are added or removed.
+        const observedChildren = new Set<Element>();
+        const syncChildren = () => {
+          const children = new Set(Array.from(node.children));
+
+          observedChildren.forEach((child) => {
+            if (!children.has(child)) {
+              resizeObserver.unobserve(child);
+              observedChildren.delete(child);
+            }
+          });
+          children.forEach((child) => {
+            if (!observedChildren.has(child)) {
+              resizeObserver.observe(child);
+              observedChildren.add(child);
+            }
+          });
+        };
+
+        syncChildren();
+
+        if (typeof MutationObserver !== 'undefined') {
+          const mutationObserver = new MutationObserver(() => {
+            syncChildren();
+            checkFade(node);
+          });
+          mutationObserverRef.current = mutationObserver;
+          mutationObserver.observe(node, { childList: true });
+        }
       }
     },
-    [checkFade]
+    [checkFade, disconnectObservers]
   );
 
-  useEffect(() => {
-    return () => {
-      observerRef.current?.disconnect();
-    };
-  }, []);
+  useEffect(() => disconnectObservers, [disconnectObservers]);
 
   return { scrollRef, canScrollStart, canScrollEnd, handleScroll };
 };
