@@ -1,3 +1,10 @@
+# [21.0.0-rc.19](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.18...react-21.0.0-rc.19) (2026-11-18)
+
+
+### Bug Fixes
+
+* **file-dropzone:** apply new state colours and lead the list with rejected files [#1026](https://github.com/TEDI-Design-System/react/issues/1026) ([#1058](https://github.com/TEDI-Design-System/react/issues/1058)) ([a5733f9](https://github.com/TEDI-Design-System/react/commit/a5733f9ab41f56111463b1e702fb2f97c00171e0))
+
 # [21.0.0-rc.18](https://github.com/TEDI-Design-System/react/compare/react-21.0.0-rc.17...react-21.0.0-rc.18) (2026-11-18)
 
 
