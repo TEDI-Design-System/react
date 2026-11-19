@@ -53,7 +53,7 @@ export const Check = withDeprecationWarning(
 export const ChoiceGroup = withDeprecationWarning(
   ChoiceGroupBase,
   'Community ChoiceGroup',
-  'Use `ChoiceGroup` from `@tedi-design-system/react/tedi` instead.'
+  'Use `Radio.Group` or `Checkbox.Group` from `@tedi-design-system/react/tedi` instead.'
 );
 export const DatePicker = withDeprecationWarning(
   DatePickerBase,
