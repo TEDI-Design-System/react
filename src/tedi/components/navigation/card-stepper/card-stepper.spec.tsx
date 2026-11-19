@@ -133,6 +133,44 @@ describe('CardStepper', () => {
     expect(within(dialog).getByRole('button', { name: /Proovi andmine/ })).toBeInTheDocument();
   });
 
+  it('runs a sub-step click handler and closes the sheet', async () => {
+    const onSubStepClick = jest.fn();
+    const steps: CardStepperStepProps[] = [
+      { title: 'Kutse', state: 'completed' },
+      { title: 'Geenianalüüs', subSteps: [{ title: 'Proovi andmine', onClick: onSubStepClick }] },
+    ];
+    render(
+      <PrintingProvider>
+        <CardStepper steps={steps} activeStep={1} aria-label="Wizard" />
+      </PrintingProvider>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
+
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /Proovi andmine/ }));
+
+    expect(onSubStepClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('leaves the sheet open on a sub-step link that has no click handler', () => {
+    const steps: CardStepperStepProps[] = [
+      { title: 'Kutse', state: 'completed' },
+      { title: 'Geenianalüüs', subSteps: [{ title: 'Proovi andmine', href: '#proov' }] },
+    ];
+    render(
+      <PrintingProvider>
+        <CardStepper steps={steps} activeStep={1} aria-label="Wizard" />
+      </PrintingProvider>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'stepper.open-steps' }));
+
+    const link = within(screen.getByRole('dialog')).getByRole('link', { name: /Proovi andmine/ });
+    expect(link).toHaveAttribute('href', '#proov');
+    fireEvent.click(link);
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
   it('exposes a screen-reader step status and dialog semantics on the list button', () => {
     render(<CardStepper steps={STEPS} activeStep={1} aria-label="Wizard" />);
     // "2 / 4" is hidden from AT; an unambiguous phrasing is exposed instead.
