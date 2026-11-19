@@ -35,6 +35,19 @@
 
 .tedi-footer-body--grid {
   display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(
+      min(
+        100%,
+        max(
+          var(--tedi-containers-02),
+          calc((100% - (var(--_columns) - 1) * var(--layout-grid-gutters-24)) / var(--_columns) - 0.5px)
+        )
+      ),
+      1fr
+    )
+  );
   align-items: start;
   justify-content: initial;
 }
