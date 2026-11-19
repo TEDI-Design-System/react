@@ -180,7 +180,7 @@ describe('Footer', () => {
 
     const body = container.querySelector('.tedi-footer-body') as HTMLElement;
     expect(body.className).toMatch(/--grid/);
-    expect(body.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
+    expect(body.style.getPropertyValue('--_columns')).toBe('3');
   });
 
   it('ignores `columns` below the mobile breakpoint — the body stacks into one column', () => {
@@ -201,7 +201,7 @@ describe('Footer', () => {
     const body = container.querySelector('.tedi-footer-body') as HTMLElement;
     expect(body.className).not.toMatch(/--grid/);
     expect(body.className).toMatch(/--mobile/);
-    expect(body.style.gridTemplateColumns).toBe('');
+    expect(body.style.getPropertyValue('--_columns')).toBe('');
   });
 
   it('marks sections as mobile only below the footer mobile breakpoint', () => {

@@ -492,7 +492,7 @@ export const CustomContent: Story = {
         </Footer>
 
         <Footer>
-          <Footer.Body>
+          <Footer.Body columns={4}>
             <Footer.Section heading="Uuri lähemalt">
               <Link href="#" color="inverted">
                 Privaatsuspoliitika
@@ -520,11 +520,9 @@ export const CustomContent: Story = {
                 Uudiskirja tellimine
               </Link>
             </Footer.Section>
-            <div style={{ flex: 'none' }}>
-              <Footer.Section icon="call" heading="Kontakt">
-                <ContactLinks />
-              </Footer.Section>
-            </div>
+            <Footer.Section icon="call" heading="Kontakt">
+              <ContactLinks />
+            </Footer.Section>
           </Footer.Body>
           <Footer.Bottom>
             <LogoPlaceholder compact />
