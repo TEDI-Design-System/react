@@ -118,11 +118,10 @@ export interface InlineEditProps<T> extends UseInlineEditOptions<T> {
    */
   helper?: FeedbackTextProps | FeedbackTextProps[];
   /**
-   * Sizes the row to its value rather than filling its container. The row then
-   * changes width when the editor opens, because the control brings its own
-   * width — use it only for a value edited inside running text. @default false
+   * Sizes the row to its value instead of filling its container, so the row changes width when the editor opens.
+   * @default false
    */
-  contentWidth?: boolean;
+  fitContent?: boolean;
   /**
    * Size of the read trigger and editor.
    * - `default` — regular body text.
@@ -163,7 +162,7 @@ export function InlineEdit<T>({
   disabled = false,
   invalid = false,
   helper,
-  contentWidth = false,
+  fitContent = false,
   size = 'default',
   editIconPosition = 'end',
   id,
@@ -178,7 +177,7 @@ export function InlineEdit<T>({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const restoreFocus = React.useRef(false);
   const { isEditing, edit, commit, cancel, committedValue, value, onChange } = useInlineEdit<T>(options);
-  const contentWidthClass = contentWidth ? styles['tedi-inline-edit--content-width'] : undefined;
+  const fitContentClass = fitContent ? styles['tedi-inline-edit--fit-content'] : undefined;
   const smallClass = size === 'small' ? styles['tedi-inline-edit--small'] : undefined;
 
   const hasHelper = Array.isArray(helper) ? helper.length > 0 : Boolean(helper);
@@ -210,7 +209,7 @@ export function InlineEdit<T>({
   const withFeedback = (control: React.ReactNode): JSX.Element => {
     if (!hasHelper) return <>{control}</>;
     return (
-      <div className={cn(styles['tedi-inline-edit__field'], contentWidthClass)}>
+      <div className={cn(styles['tedi-inline-edit__field'], fitContentClass)}>
         {control}
         {renderFeedback()}
       </div>
@@ -256,7 +255,7 @@ export function InlineEdit<T>({
         className={cn(
           styles['tedi-inline-edit'],
           styles['tedi-inline-edit--editing'],
-          contentWidthClass,
+          fitContentClass,
           smallClass,
           className
         )}
@@ -302,7 +301,7 @@ export function InlineEdit<T>({
         className={cn(
           styles['tedi-inline-edit'],
           styles['tedi-inline-edit--readonly'],
-          contentWidthClass,
+          fitContentClass,
           smallClass,
           className
         )}
@@ -325,7 +324,7 @@ export function InlineEdit<T>({
       className={cn(
         styles['tedi-inline-edit'],
         styles['tedi-inline-edit__trigger'],
-        contentWidthClass,
+        fitContentClass,
         smallClass,
         { [styles['tedi-inline-edit--icon-end']]: editIconPosition === 'end' },
         { [styles['tedi-inline-edit--invalid']]: isInvalid },

@@ -97,7 +97,7 @@ const NameInline = (props: {
   placeholder?: string;
   size?: 'default' | 'small';
   editIconPosition?: 'inline' | 'end';
-  contentWidth?: boolean;
+  fitContent?: boolean;
   defaultEditing?: boolean;
   invalid?: boolean;
   helper?: FeedbackTextProps | FeedbackTextProps[];
@@ -131,7 +131,7 @@ const CountryInline = (props: {
   readOnly?: boolean;
   disabled?: boolean;
   size?: 'default' | 'small';
-  contentWidth?: boolean;
+  fitContent?: boolean;
   editIconPosition?: 'inline' | 'end';
   defaultEditing?: boolean;
   invalid?: boolean;
@@ -220,10 +220,10 @@ const meta: Meta<typeof InlineEdit> = {
         'Disables editing while keeping the trigger and edit icon visible but greyed (for saving/pending or dependent fields). Differs from `readOnly`, which drops the edit affordance entirely.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
-    contentWidth: {
+    fitContent: {
       control: 'boolean',
       description:
-        'Sizes the row to its value rather than filling its container. The row then changes width when the editor opens, so it is reserved for a value edited inside running text.',
+        'Sizes the row to its value instead of filling its container, so the row changes width when the editor opens.',
       table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
     },
     defaultEditing: {
@@ -278,7 +278,7 @@ export const Default: Story = {
     editIconPosition: 'end',
     readOnly: false,
     disabled: false,
-    contentWidth: false,
+    fitContent: false,
   },
   render: function DefaultField(args) {
     const [value, setValue] = useState('Mari Maasikas');
@@ -291,7 +291,7 @@ export const Default: Story = {
           editIconPosition={args.editIconPosition}
           readOnly={args.readOnly}
           disabled={args.disabled}
-          contentWidth={args.contentWidth}
+          fitContent={args.fitContent}
           value={value}
           onChange={setValue}
           renderValue={(v) => v}
@@ -552,7 +552,7 @@ export const Responsiveness: Story = {
         size={args.size}
         editIconPosition={args.editIconPosition}
         readOnly={args.readOnly}
-        contentWidth={args.contentWidth}
+        fitContent={args.fitContent}
         value={name}
         onChange={setName}
         renderValue={(v) => v}
